@@ -6,8 +6,8 @@ Filetto (c) 1990 Novarmatic
 
 TODO:
 - Add a proper FDC device;
-- UM5100 sample clock;
-- buzzer sound;
+- UM5100 sample clock (has a velocity knob on PCB);
+- buzzer sound in-game, from the JAMMA card (has two volume knobs, "voice" and "sound");
 
 ===================================================================================================
 The PCB is a un-modified IBM-PC with a CGA adapter & a prototyping card that controls the
@@ -62,7 +62,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
-DEFINE_DEVICE_TYPE(ISA8_CGA_FILETTO, isa8_cga_filetto_device, "filetto_cga", "ISA8_CGA_FILETTO")
+// the CMDC is a CGA clone with optional kanji support (obviously N/A for this)
+DEFINE_DEVICE_TYPE(ISA8_CGA_FILETTO, isa8_cga_filetto_device, "filetto_cga", "Yamaha V6363 CMDC (on-board CGA ISA8)")
 
 //-------------------------------------------------
 //  isa8_cga_filetto_device - constructor
@@ -123,7 +124,6 @@ private:
 	void fdc_dor_w(uint8_t data);
 	uint8_t port_a_r();
 	uint8_t port_b_r();
-	uint8_t port_c_r();
 	void port_b_w(uint8_t data);
 	void voice_start_w(uint8_t data);
 
@@ -213,11 +213,6 @@ uint8_t filetto_state::port_b_r()
 	return m_port_b_data;
 }
 
-uint8_t filetto_state::port_c_r()
-{
-	return 0x00;// DIPS?
-}
-
 // Filetto uses this for either beep and um5100 sound routing,probably there's a I/O select somewhere ...
 void filetto_state::port_b_w(uint8_t data)
 {
@@ -289,7 +284,9 @@ void filetto_state::filetto_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
 	map(0x0060, 0x0060).r(FUNC(filetto_state::port_a_r));  //not a real 8255
 	map(0x0061, 0x0061).rw(FUNC(filetto_state::port_b_r), FUNC(filetto_state::port_b_w));
-	map(0x0062, 0x0062).r(FUNC(filetto_state::port_c_r));
+	map(0x0062, 0x0062).portr("pcvideo_cga_config");
+	map(0x0063, 0x0063).nopw(); // normally writes 0x80
+	map(0x0073, 0x0073).nopr(); // noisy on bit 7, writes a 0 to $63 if on
 	map(0x0201, 0x0201).portr("COIN"); // game port
 	map(0x0310, 0x0311).rw(FUNC(filetto_state::disk_iobank_r), FUNC(filetto_state::disk_iobank_w)); //Prototyping card
 	map(0x0312, 0x0312).portr("IN0"); // Prototyping card, r/o
@@ -317,16 +314,16 @@ static INPUT_PORTS_START( filetto )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Extra Play" )
+	PORT_DIPNAME( 0x04, 0x04, "Extra Play" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, "Play at 6th match reached" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
@@ -338,8 +335,33 @@ static INPUT_PORTS_START( filetto )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	// DSW2 is on lower board, near the Proton PT8010AF
+	// "must be all ON" according to the dip sheet, reading location is unconfirmed
 	PORT_START( "pcvideo_cga_config" )
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(filetto_state::sample_tick)
@@ -384,13 +406,13 @@ void filetto_state::filetto(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &filetto_state::filetto_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "filetto", true); // FIXME: determine ISA bus clock
 
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
 
 	RAM(config, RAM_TAG).set_default_size("640K");
 

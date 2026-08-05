@@ -46,6 +46,7 @@
 
 #include "osdcore.h" // osd_printf_*
 
+#include <cstring>
 #include <tuple>
 
 

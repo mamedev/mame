@@ -4,7 +4,7 @@
 dofile('modules.lua')
 
 forcedincludes {
-	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
+	MAME_DIR .. "src/osd/sdl3/sdlprefix.h"
 }
 
 if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" then
@@ -126,16 +126,6 @@ if _OPTIONS["targetos"]=="windows" then
 
 	configuration { }
 
-elseif _OPTIONS["targetos"]=="linux" then
-	if _OPTIONS["QT_HOME"]~=nil then
-		buildoptions {
-			"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
-		}
-	else
-		buildoptions {
-			backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
-		}
-	end
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",
@@ -164,4 +154,3 @@ configuration { "netbsd" }
 	}
 
 configuration { }
-

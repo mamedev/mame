@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "inputdev.h"
 
+#include "input.h"
+
 #include "corestr.h"
 #include "emuopts.h"
 
@@ -106,7 +108,7 @@ public:
 //**************************************************************************
 
 // standard joystick mappings
-const char          input_class_joystick::map_8way[] = "7778...4445";
+const char          joystick_map::map_8way[] = "7778...4445";
 // const char          input_class_joystick::map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
 // const char          input_class_joystick::map_4way_sticky[] = "s8.4s8.44s8.4445";
 
@@ -123,7 +125,7 @@ joystick_map::joystick_map()
 	: m_lastmap(JOYSTICK_MAP_NEUTRAL)
 {
 	// parse the standard 8-way map as default
-	parse(input_class_joystick::map_8way);
+	parse(map_8way);
 }
 
 
@@ -275,15 +277,21 @@ u8 joystick_map::update(s32 xaxisval, s32 yaxisval)
 //  input_device - constructor
 //-------------------------------------------------
 
-input_device::input_device(input_manager &manager, std::string_view name, std::string_view id, void *internal)
-	: m_manager(manager)
+input_device::input_device(
+		input_class &devclass,
+		std::string_view name,
+		std::string_view id,
+		void *internal,
+		s32 threshold,
+		bool steadykey)
+	: m_class(devclass)
 	, m_name(name)
 	, m_id(id)
 	, m_devindex(-1)
 	, m_maxitem(input_item_id(0))
 	, m_internal(internal)
-	, m_threshold(std::max<s32>(s32(manager.machine().options().joystick_threshold() * osd::input_device::ABSOLUTE_MAX), 1))
-	, m_steadykey_enabled(manager.machine().options().steadykey())
+	, m_threshold(threshold)
+	, m_steadykey_enabled(steadykey)
 {
 }
 
@@ -308,7 +316,7 @@ input_item_id input_device::add_item(
 		item_get_state_func getstate,
 		void *internal)
 {
-	if (machine().phase() != machine_phase::INIT)
+	if (m_class.manager().machine().phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call input_device::add_item at init time!");
 	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != nullptr);
@@ -325,7 +333,7 @@ input_item_id input_device::add_item(
 	assert(m_item[itemid] == nullptr);
 
 	// determine the class and create the appropriate item class
-	switch (m_manager.device_class(devclass()).standard_item_class(originalid))
+	switch (m_class.standard_item_class(originalid))
 	{
 		case ITEM_CLASS_SWITCH:
 			m_item[itemid] = std::make_unique<input_device_switch_item>(*this, name, tokenhint, internal, itemid, getstate);
@@ -383,9 +391,16 @@ bool input_device::match_device_id(std::string_view deviceid) const
 //  input_device_keyboard - constructor
 //-------------------------------------------------
 
-input_device_keyboard::input_device_keyboard(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
-	: input_device(manager, _name, _id, _internal)
+input_device_keyboard::input_device_keyboard(
+		input_class &devclass,
+		std::string_view _name,
+		std::string_view _id,
+		void *_internal,
+		s32 _threshold,
+		bool _steadykey)
+	: input_device(devclass, _name, _id, _internal, _threshold, _steadykey)
 {
+	assert(device_class() == DEVICE_CLASS_KEYBOARD);
 }
 
 
@@ -424,9 +439,15 @@ void input_device_keyboard::apply_steadykey() const
 //  input_device_mouse - constructor
 //-------------------------------------------------
 
-input_device_mouse::input_device_mouse(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
-	: input_device(manager, _name, _id, _internal)
+input_device_mouse::input_device_mouse(
+		input_class &devclass,
+		std::string_view _name,
+		std::string_view _id,
+		void *_internal,
+		s32 _threshold)
+	: input_device(devclass, _name, _id, _internal, _threshold, false)
 {
+	assert(device_class() == DEVICE_CLASS_MOUSE);
 }
 
 
@@ -434,9 +455,15 @@ input_device_mouse::input_device_mouse(input_manager &manager, std::string_view 
 //  input_device_lightgun - constructor
 //-------------------------------------------------
 
-input_device_lightgun::input_device_lightgun(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
-	: input_device(manager, _name, _id, _internal)
+input_device_lightgun::input_device_lightgun(
+		input_class &devclass,
+		std::string_view _name,
+		std::string_view _id,
+		void *_internal,
+		s32 _threshold)
+	: input_device(devclass, _name, _id, _internal, _threshold, false)
 {
+	assert(device_class() == DEVICE_CLASS_LIGHTGUN);
 }
 
 
@@ -444,25 +471,34 @@ input_device_lightgun::input_device_lightgun(input_manager &manager, std::string
 //  input_device_joystick - constructor
 //-------------------------------------------------
 
-input_device_joystick::input_device_joystick(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
-	: input_device(manager, _name, _id, _internal)
-	, m_deadzone(s32(manager.machine().options().joystick_deadzone() * osd::input_device::ABSOLUTE_MAX))
-	, m_saturation(s32(manager.machine().options().joystick_saturation() * osd::input_device::ABSOLUTE_MAX))
-	, m_range(m_saturation - m_deadzone)
+input_device_joystick::input_device_joystick(
+		input_class &devclass,
+		std::string_view _name,
+		std::string_view _id,
+		void *_internal,
+		s32 _threshold,
+		s32 _deadzone,
+		s32 _saturation,
+		char const *mapstring)
+	: input_device(devclass, _name, _id, _internal, _threshold, false)
+	, m_deadzone(_deadzone)
+	, m_saturation(_saturation)
+	, m_range(_saturation - _deadzone)
 {
-	// get the default joystick map
-	const char *mapstring = machine().options().joystick_map();
-	if (mapstring[0] == 0 || strcmp(mapstring, "auto") == 0)
-		mapstring = input_class_joystick::map_8way;
+	assert(device_class() == DEVICE_CLASS_JOYSTICK);
 
-	// parse it
-	if (!m_joymap.parse(mapstring))
+	if (mapstring[0])
 	{
-		osd_printf_error("Invalid joystick map: %s\n", mapstring);
-		m_joymap.parse(input_class_joystick::map_8way);
+		if (!m_joymap.parse(mapstring))
+		{
+			osd_printf_error("Invalid joystick map: %s\n", mapstring);
+			m_joymap = joystick_map();
+		}
+		else
+		{
+			osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string());
+		}
 	}
-	else if (mapstring != input_class_joystick::map_8way)
-		osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string());
 }
 
 
@@ -499,13 +535,20 @@ s32 input_device_joystick::adjust_absolute_value(s32 result) const
 //  input_class - constructor
 //-------------------------------------------------
 
-input_class::input_class(input_manager &manager, input_device_class devclass, const char *name, bool enabled, bool multi)
-	: m_manager(manager),
-		m_devclass(devclass),
-		m_name(name),
-		m_maxindex(0),
-		m_enabled(enabled),
-		m_multi(multi)
+input_class::input_class(
+		input_manager &manager,
+		input_device_class devclass,
+		const char *name,
+		input_item_class axisclass,
+		bool enabled,
+		bool multi)
+	: m_manager(manager)
+	, m_devclass(devclass)
+	, m_name(name)
+	, m_axis_class(axisclass)
+	, m_maxindex(0)
+	, m_enabled(enabled)
+	, m_multi(multi)
 {
 	assert(m_name != nullptr);
 }
@@ -526,16 +569,13 @@ input_class::~input_class()
 
 input_device &input_class::add_device(std::string_view name, std::string_view id, void *internal)
 {
-	if (machine().phase() != machine_phase::INIT)
-		throw emu_fatalerror("Can only call input_class::add_device at init time!");
-
 	// allocate a new device and add it to the index
 	return add_device(make_device(name, id, internal));
 }
 
 input_device &input_class::add_device(std::unique_ptr<input_device> &&new_device)
 {
-	assert(new_device->devclass() == m_devclass);
+	assert(new_device->device_class() == m_devclass);
 
 	// find the next empty index
 	for (int devindex = 0; devindex < DEVICE_INDEX_MAXIMUM; devindex++)
@@ -563,22 +603,27 @@ input_device &input_class::add_device(std::unique_ptr<input_device> &&new_device
 //  standard item
 //-------------------------------------------------
 
-input_item_class input_class::standard_item_class(input_item_id itemid) const
+input_item_class input_class::standard_item_class(input_item_id itemid) const noexcept
 {
-	if (itemid == ITEM_ID_OTHER_SWITCH || itemid < ITEM_ID_XAXIS || (itemid > ITEM_ID_SLIDER2 && itemid < ITEM_ID_ADD_ABSOLUTE1))
+	if ((itemid >= ITEM_ID_XAXIS) && (itemid <= ITEM_ID_SLIDER2))
 	{
-		// most everything standard is a switch, apart from the axes
-		return ITEM_CLASS_SWITCH;
+		// default for these axes depends on device class
+		return m_axis_class;
 	}
-	else if (m_devclass == DEVICE_CLASS_MOUSE || itemid == ITEM_ID_OTHER_AXIS_RELATIVE || (itemid >= ITEM_ID_ADD_RELATIVE1 && itemid <= ITEM_ID_ADD_RELATIVE16))
+	else if ((itemid == ITEM_ID_OTHER_AXIS_ABSOLUTE) || ((itemid >= ITEM_ID_ADD_ABSOLUTE1) && (itemid <= ITEM_ID_ADD_ABSOLUTE16)))
 	{
-		// standard mouse axes are relative
+		// axes that are always absolute
+		return ITEM_CLASS_ABSOLUTE;
+	}
+	else if ((itemid == ITEM_ID_OTHER_AXIS_RELATIVE) || ((itemid >= ITEM_ID_ADD_RELATIVE1) && (itemid <= ITEM_ID_ADD_RELATIVE16)))
+	{
+		// axes that are always relative
 		return ITEM_CLASS_RELATIVE;
 	}
 	else
 	{
-		// all other standard axes are absolute
-		return ITEM_CLASS_ABSOLUTE;
+		// most everything standard is a switch, apart from the axes
+		return ITEM_CLASS_SWITCH;
 	}
 }
 
@@ -609,66 +654,6 @@ void input_class::remap_device_index(int oldindex, int newindex)
 
 
 //**************************************************************************
-//  SPECIFIC INPUT CLASSES
-//**************************************************************************
-
-//-------------------------------------------------
-//  input_class_keyboard - constructor
-//-------------------------------------------------
-
-input_class_keyboard::input_class_keyboard(input_manager &manager)
-	: input_class(manager, DEVICE_CLASS_KEYBOARD, "keyboard", true, manager.machine().options().multi_keyboard())
-{
-	// request a per-frame callback for the keyboard class
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&input_class_keyboard::frame_callback, this));
-}
-
-
-//-------------------------------------------------
-//  frame_callback - per-frame callback for various
-//  bookkeeping
-//-------------------------------------------------
-
-void input_class_keyboard::frame_callback()
-{
-	// iterate over all devices in our class
-	for (int devnum = 0; devnum <= maxindex(); devnum++)
-		if (device(devnum) != nullptr)
-			downcast<input_device_keyboard &>(*device(devnum)).apply_steadykey();
-}
-
-
-//-------------------------------------------------
-//  input_class_mouse - constructor
-//-------------------------------------------------
-
-input_class_mouse::input_class_mouse(input_manager &manager)
-	: input_class(manager, DEVICE_CLASS_MOUSE, "mouse", manager.machine().options().mouse(), manager.machine().options().multi_mouse())
-{
-}
-
-
-//-------------------------------------------------
-//  input_class_lightgun - constructor
-//-------------------------------------------------
-
-input_class_lightgun::input_class_lightgun(input_manager &manager)
-	: input_class(manager, DEVICE_CLASS_LIGHTGUN, "lightgun", manager.machine().options().lightgun(), true)
-{
-}
-
-
-//-------------------------------------------------
-//  input_class_joystick - constructor
-//-------------------------------------------------
-
-input_class_joystick::input_class_joystick(input_manager &manager)
-	: input_class(manager, DEVICE_CLASS_JOYSTICK, "joystick", manager.machine().options().joystick(), true)
-{
-}
-
-
-//**************************************************************************
 //  INPUT DEVICE ITEM
 //**************************************************************************
 
@@ -692,7 +677,7 @@ input_device_item::input_device_item(
 	, m_getstate(getstate)
 	, m_current(0)
 {
-	const char *standard_token = manager().standard_token(itemid);
+	const char *standard_token = input_manager::standard_token(itemid);
 	if (standard_token)
 	{
 		// use a standard token name for known item IDs
@@ -764,8 +749,7 @@ input_device_switch_item::input_device_switch_item(
 s32 input_device_switch_item::read_as_switch(input_item_modifier modifier)
 {
 	// steadykey for keyboards
-	input_device_class devclass = m_device.devclass();
-	if (devclass == DEVICE_CLASS_KEYBOARD && m_device.steadykey_enabled())
+	if (m_device.steadykey_enabled())
 		return m_steadykey;
 
 	// everything else is just the current value as-is
@@ -947,7 +931,7 @@ s32 input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 	s32 const result = update_value();
 
 	// left/right/up/down: if this is a joystick, fetch the paired X/Y axis values and convert
-	if (m_device.devclass() == DEVICE_CLASS_JOYSTICK && modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN)
+	if (m_device.device_class() == DEVICE_CLASS_JOYSTICK && modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN)
 	{
 		input_device_item *xaxis_item = m_device.item(ITEM_ID_XAXIS);
 		input_device_item *yaxis_item = m_device.item(ITEM_ID_YAXIS);
@@ -1028,7 +1012,7 @@ bool input_device_absolute_item::item_check_axis(input_item_modifier modifier, s
 	// ignore min/max for lightguns
 	// so the selection will not be affected by a gun going out of range
 	const s32 curval = read_as_absolute(modifier);
-	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN &&
+	if (m_device.device_class() == DEVICE_CLASS_LIGHTGUN &&
 		(curval == osd::input_device::ABSOLUTE_MAX || curval == osd::input_device::ABSOLUTE_MIN))
 		return false;
 

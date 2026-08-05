@@ -255,8 +255,6 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_tile_info)
 
 void skylncr_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_nmi_enable));
 
 	m_nmi_enable = 0;
@@ -1707,7 +1705,7 @@ void skylncr_state::skylncr(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50)); // duration guessed
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1717,11 +1715,11 @@ void skylncr_state::skylncr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
 	ramdac.set_color_base(0);
 
-	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette));
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", m_palette));
 	ramdac2.set_addrmap(0, &skylncr_state::ramdac2_map);
 	ramdac2.set_color_base(0x100);
 

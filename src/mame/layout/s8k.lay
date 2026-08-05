@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:A. Lenard
+
+Indicator lights for the Zilog S8000
+-->
+
+<mamelayout version="2">
+
+	<element name="power" defstate="0">
+		<text state="0" string="POWER">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</text>
+		<text state="1" string="POWER">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="user" defstate="0">
+		<text state="0" string="USER">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</text>
+		<text state="1" string="USER">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="dma" defstate="0">
+		<text state="0" string="DMA">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</text>
+		<text state="1" string="DMA">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</text>
+	</element>
+
+	<view name="Frontpanel Indicators">
+		<bounds left="0" top="0" right="1024" bottom="768" />
+
+		<screen index="0">
+			<bounds x="0" y="0" width="1024" height="736" />
+		</screen>
+
+		<element name="power_led" ref="power">
+			<bounds left="20" right="120" top="744" bottom="760" />
+		</element>
+
+		<element name="normal_led" ref="user">
+			<bounds left="150" right="250" top="744" bottom="760" />
+		</element>
+
+		<element name="busack_led" ref="dma">
+			<bounds left="270" right="370" top="744" bottom="760" />
+		</element>
+	</view>
+
+</mamelayout>

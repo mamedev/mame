@@ -36,6 +36,7 @@ function devicesProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
+		MAME_DIR .. "3rdparty/asmjit", -- required by asmjit internal use of #include <...> syntax
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 		ext_includedir("asio"),

@@ -117,7 +117,7 @@ void spectrum_d80_device::device_add_mconfig(machine_config &config)
 
 void spectrum_d80v2_device::device_add_mconfig(machine_config &config)
 {
-	WD37C65C(config, m_fdc, 16_MHz_XTAL); // actually GM82C765B
+	WD37C65B(config, m_fdc, 16_MHz_XTAL); // actually GM82C765B
 	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 

@@ -94,6 +94,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/tmp68301.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
@@ -102,7 +103,9 @@ TODO:
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -141,7 +144,6 @@ public:
 	void x180ii(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -638,16 +640,6 @@ static GFXDECODE_START( gfx_x180ii )
 GFXDECODE_END
 
 
-void joystand_state::machine_start()
-{
-	m_blocker.resolve();
-	m_error_lamp.resolve();
-	m_photo_lamp.resolve();
-	m_ok_button_led.resolve();
-	m_cancel_button_led.resolve();
-}
-
-
 void joystand_state::joystand(machine_config &config)
 {
 	// basic machine hardware
@@ -658,7 +650,7 @@ void joystand_state::joystand(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_cartflash_bankdev).set_map(&joystand_state::cart_map).set_options(ENDIANNESS_BIG, 16, 24, 0x800000); // TODO: address bit per carts?
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(joystand_state::screen_update));
 	screen.set_size(0x200, 0x100);
@@ -699,7 +691,7 @@ void joystand_state::x180ii(machine_config &config)
 	I8255(config, "ppi1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify this
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify this
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(joystand_state::screen_update_x180ii));
 	screen.set_size(0x200, 0x100);

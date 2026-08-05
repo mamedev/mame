@@ -512,7 +512,7 @@ void hapyfish_state::hapyfish(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(1024, 768);
@@ -536,10 +536,10 @@ void hapyfish_state::hapyfish(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
 
-	SAMSUNG_K9LAG08U0M(config, m_nand, 0);
+	SAMSUNG_K9LAG08U0M(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 
-	SAMSUNG_K9LAG08U0M(config, m_nand2, 0);
+	SAMSUNG_K9LAG08U0M(config, m_nand2);
 	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 

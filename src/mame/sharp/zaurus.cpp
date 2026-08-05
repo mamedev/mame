@@ -1448,11 +1448,12 @@ public:
 		, m_codec(*this, "codec")
 	{ }
 
-	void zaurus_sa1110(machine_config &config);
+	void zaurus_sa1110(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual void device_reset_after_children() override;
-
 	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<sa1110_periphs_device> m_sa_periphs;
@@ -1470,10 +1471,10 @@ public:
 		, m_power(*this, "PWR")
 	{ }
 
-	void zaurus_pxa_base(machine_config &config);
-	void zaurus_pxa250(machine_config &config);
-	void zaurus_pxa255(machine_config &config);
-	void zaurus_pxa270(machine_config &config);
+	void zaurus_pxa_base(machine_config &config) ATTR_COLD;
+	void zaurus_pxa250(machine_config &config) ATTR_COLD;
+	void zaurus_pxa255(machine_config &config) ATTR_COLD;
+	void zaurus_pxa270(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER( system_start );
 
@@ -1500,8 +1501,10 @@ void zaurus_pxa_state::main_map(address_map &map)
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
-void zaurus_sa_state::device_reset_after_children()
+void zaurus_sa_state::machine_reset()
 {
+	zaurus_state::machine_reset();
+
 	m_sa_periphs->gpio_in<1>(1);
 	m_sa_periphs->gpio_in<24>(1);
 	//m_scoop->gpio_in<2>(1); // DIAG_BOOT1

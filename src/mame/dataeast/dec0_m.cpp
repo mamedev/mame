@@ -18,56 +18,70 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 
 /******************************************************************************/
 
-void dec0_state::machine_start()
+void drgninjab_state::machine_start()
 {
+	dec0_state::machine_start();
+
 	save_item(NAME(m_i8751_return));
 	save_item(NAME(m_i8751_command));
 	save_item(NAME(m_i8751_ports));
 }
 
-uint16_t dec0_state::dec0_controls_r(offs_t offset)
+u16 dec0_state::dec0_controls_r(offs_t offset)
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
-		case 0: /* Player 1 & 2 joystick & buttons */
-			return ioport("INPUTS")->read();
+		case 0x0: /* Player 1 & 2 joystick & buttons */
+			return m_io_inputs->read();
 
-		case 2: /* Credits, start buttons */
-			return ioport("SYSTEM")->read();
+		case 0x2: /* Credits, start buttons */
+			return m_io_system->read();
 
-		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
-			return ioport("DSW")->read();
+		case 0x4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
+			return m_io_dsw->read();
 
-		case 8: /* Intel 8751 mc, Bad Dudes, Heavy Barrel & Birdie Try only */
-			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", m_maincpu->pc(), 0x30c000+offset, m_i8751_return);
-			return m_i8751_return;
+		case 0x8: /* MCU data, see below */
+			return 0;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", m_maincpu->pc(), 0x30c000+offset);
+	if (!machine().side_effects_disabled())
+		logerror("%s: Unknown dec0_controls_r read at %02x\n", machine().describe_context(), offset);
 	return ~0;
+}
+
+u16 drgninjab_state::dec0_controls_r(offs_t offset)
+{
+	switch (offset << 1)
+	{
+		case 0x8: /* Intel 8751 mc, Bad Dudes, Heavy Barrel & Birdie Try only */
+			//logerror("%s: warning - read i8751 %02x - %04x\n", machine().describe_context(), offset, m_i8751_return);
+			return m_i8751_return;
+		default:
+			return dec0_state::dec0_controls_r(offset);
+	}
 }
 
 
 /******************************************************************************/
 
-uint16_t dec0_state::midres_controls_r(offs_t offset)
+u16 dec0_state::midres_controls_r(offs_t offset)
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0: /* Player 1 Joystick + start, Player 2 Joystick + start */
-			return ioport("INPUTS")->read();
+			return m_io_inputs->read();
 
 		case 2: /* Dipswitches */
-			return ioport("DSW")->read();
+			return m_io_dsw->read();
 
 		case 4: /* Player 1 rotary */
-			return ioport("AN0")->read();
+			return m_io_an[0]->read();
 
 		case 6: /* Player 2 rotary */
-			return ioport("AN1")->read();
+			return m_io_an[1]->read();
 
 		case 8: /* Credits, start buttons */
-			return ioport("SYSTEM")->read();
+			return m_io_system->read();
 
 		case 0xa: // clr.w
 			return 0;
@@ -76,7 +90,8 @@ uint16_t dec0_state::midres_controls_r(offs_t offset)
 			return 0;   /* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", m_maincpu->pc(), 0x180000+(offset<<1));
+	if (!machine().side_effects_disabled())
+		logerror("%s: unknown midres_controls_r read at %06x\n", machine().describe_context(), 0x180000 + (offset << 1));
 	return ~0;
 }
 
@@ -85,31 +100,33 @@ uint16_t dec0_state::midres_controls_r(offs_t offset)
 /******************************************************************************/
 
 
-uint8_t hippodrm_state::prot_r(offs_t offset)
+u8 hippodrm_state::prot_r(offs_t offset)
 {
-//logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
+//logerror("%s - prot_r Read %06x\n", machine().describe_context(), offset + 0x1d0000);
 	if (m_prot_lsb == 0x45) return 0x4e;
 	if (m_prot_lsb == 0x92) return 0x15;
 	return 0;
 }
 
-void hippodrm_state::prot_w(offs_t offset, uint8_t data)
+void hippodrm_state::prot_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
 		case 4: m_prot_msb = data; break;
 		case 5: m_prot_lsb = data; break;
 	}
-//logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
+//logerror("%s - prot_w Wrote %02x to %06x\n", machine().describe_context(), data, offset + 0x1d0000);
 }
 
-uint16_t hippodrm_state::sharedram_r(offs_t offset)
+u16 hippodrm_state::sharedram_r(offs_t offset)
 {
-	if (offset == 0) m_maincpu->yield(); /* A wee helper */
+	/* A wee helper */
+	if ((offset == 0) && !machine().side_effects_disabled())
+		m_maincpu->yield();
 	return m_sharedram[offset] & 0xff;
 }
 
-void hippodrm_state::sharedram_w(offs_t offset, uint16_t data)
+void hippodrm_state::sharedram_w(offs_t offset, u16 data)
 {
 	m_sharedram[offset] = data & 0xff;
 }
@@ -151,9 +168,9 @@ void hippodrm_state::sharedram_w(offs_t offset, uint16_t data)
 */
 
 
-uint8_t dec0_state::dec0_mcu_port0_r()
+u8 dec0_8751_state::dec0_mcu_port0_r()
 {
-	uint8_t result = 0xff;
+	u8 result = 0xff;
 
 	// P0 connected to latches
 	if (!BIT(m_i8751_ports[2], 4))
@@ -164,18 +181,18 @@ uint8_t dec0_state::dec0_mcu_port0_r()
 	return result;
 }
 
-void dec0_state::dec0_mcu_port0_w(uint8_t data)
+void dec0_8751_state::dec0_mcu_port0_w(u8 data)
 {
 	m_i8751_ports[0] = data;
 }
 
-void dec0_state::dec0_mcu_port1_w(uint8_t data)
+void dec0_8751_state::dec0_mcu_port1_w(u8 data)
 {
-	logerror("dec0_mcu_port1_w: %02x\n", data);
+	logerror("%s: dec0_mcu_port1_w: %02x\n", machine().describe_context(), data);
 	m_i8751_ports[1] = data;
 }
 
-void dec0_state::dec0_mcu_port2_w(uint8_t data)
+void dec0_8751_state::dec0_mcu_port2_w(u8 data)
 {
 	if (!BIT(data, 2) && BIT(m_i8751_ports[2], 2))
 		m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
@@ -189,13 +206,13 @@ void dec0_state::dec0_mcu_port2_w(uint8_t data)
 	m_i8751_ports[2] = data;
 }
 
-void dec0_state::dec0_mcu_port3_w(uint8_t data)
+void dec0_8751_state::dec0_mcu_port3_w(u8 data)
 {
-	logerror("dec0_mcu_port3_w: %02x\n", data);
+	logerror("%s: dec0_mcu_port3_w: %02x\n", machine().describe_context(), data);
 	m_i8751_ports[3] = data;
 }
 
-void dec0_state::baddudes_i8751_write(int data)
+void drgninjab_state::dec0_i8751_w(u16 data)
 {
 	m_i8751_return = 0;
 
@@ -219,37 +236,29 @@ void dec0_state::baddudes_i8751_write(int data)
 		case 0x75b: m_i8751_return = 0x70f; break;
 	}
 
-	if (!m_i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine().describe_context(),data);
-	m_maincpu->set_input_line(5, HOLD_LINE);
+	if (!m_i8751_return) logerror("%s: warning - write unknown command %04x to 8751\n", machine().describe_context(), data);
+	m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-void dec0_state::dec0_i8751_write(int data)
+void dec0_8751_state::dec0_i8751_w(u16 data)
 {
 	m_i8751_command = data;
 
 	/* Writes to this address raise an IRQ on the i8751 microcontroller */
-	switch (m_game)
-	{
-	case mcu_type::EMULATED:
-		if (BIT(m_i8751_ports[2], 3))
-			m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-		break;
-	case mcu_type::BADDUDES_SIM:
-		baddudes_i8751_write(data);
-		break;
-	}
+	if (BIT(m_i8751_ports[2], 3))
+		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 
-	//logerror("%s: warning - write %02x to i8751\n",machine().describe_context(),data);
+	//logerror("%s: warning - write %04x to i8751\n", machine().describe_context(), data);
 }
 
-void dec0_state::dec0_i8751_reset()
+void drgninjab_state::dec0_i8751_reset_w(u16 data)
 {
 	m_i8751_return = m_i8751_command = 0;
 }
 
 /******************************************************************************/
 
-void dec0_state::sprite_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void hippodrm_state::sprite_mirror_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_spriteram->live()[offset]);
 }
@@ -258,7 +267,7 @@ void dec0_state::sprite_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 void dec0_state::h6280_decrypt(const char *cputag)
 {
-	uint8_t *RAM = memregion(cputag)->base();
+	u8 *RAM = memregion(cputag)->base();
 
 	/* Read each byte, decrypt it */
 	for (int i = 0x00000; i < 0x10000; i++)
@@ -267,7 +276,7 @@ void dec0_state::h6280_decrypt(const char *cputag)
 
 void hippodrm_state::init_hippodrm()
 {
-	uint8_t *RAM = memregion("sub")->base();
+	u8 *RAM = memregion("sub")->base();
 
 	h6280_decrypt("sub");
 
@@ -287,14 +296,4 @@ void slyspy_state::init_slyspy()
 
 	save_item(NAME(m_prot_state));
 	save_item(NAME(m_sound_prot_state));
-}
-
-void dec0_state::init_drgninja()
-{
-	m_game = mcu_type::BADDUDES_SIM;
-}
-
-void dec0_state::init_hbarrel()
-{
-	m_game = mcu_type::EMULATED;
 }

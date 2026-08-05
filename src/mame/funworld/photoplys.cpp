@@ -11,7 +11,7 @@ PCB: Intel FW82801AA (ICH), IT8888F PCI-to-ISA Bridge, CMI8738 audio
 I/O: Winbond W83977, Winbond W83627HF
 BIOS: Intel N82802AB (FWH)
 Dongle: Parallel port + keyboard DIN (uses both ports) with a SX28AC/DP MCU (Parallax, Ubicom, etc.). On some versions there's also a SEEPROM (93C46LN, etc.).
-Net: Optional Ethernet PCI card with RTL8139C
+Net: Optional Ethernet PCI card with Realtek RTL8139C
 
 */
 
@@ -51,7 +51,7 @@ void photoplays_state::photoplays(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &photoplays_state::photoplays_map);
 	m_maincpu->set_disable();
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

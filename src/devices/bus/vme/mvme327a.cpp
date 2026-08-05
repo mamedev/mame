@@ -29,7 +29,7 @@ vme_mvme327a_device::vme_mvme327a_device(machine_config const &mconfig, char con
 	, m_pit(*this, "pit")
 	, m_bim(*this, "bim")
 	, m_fdc(*this, "fdc")
-	, m_scsi(*this, "scsi:7:wd33c93a")
+	, m_scsi(*this, "wd33c93a")
 	, m_boot(*this, "boot")
 {
 }
@@ -67,7 +67,6 @@ static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("wd33c93a", WD33C93A);
 }
 
 void vme_mvme327a_device::device_add_mconfig(machine_config &config)
@@ -76,12 +75,12 @@ void vme_mvme327a_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &vme_mvme327a_device::cpu_mem);
 	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme327a_device::cpu_int);
 
-	MC68153(config, m_bim, 0);
-	PIT68230(config, m_pit, 0);
+	MC68153(config, m_bim);
+	PIT68230(config, m_pit);
 
-	WD37C65C(config, m_fdc, 0);
+	WD37C65(config, m_fdc, 32_MHz_XTAL / 2); // WD37C65-PL
 
-	NSCSI_BUS(config, "scsi", 0);
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
@@ -89,15 +88,9 @@ void vme_mvme327a_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93a", WD33C93A).machine_config(
-			[] (device_t *device)
-			{
-				wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
-				wd33c93.set_clock(10000000);
-				//wd33c93.irq_cb().set(*this, ...);
-				//wd33c93.drq_cb().set(*this, ...);
-			});
+	WD33C93A(config, m_scsi, 10000000);
+	scsi.set_external_device(7, m_scsi);
 }
 
 void vme_mvme327a_device::cpu_mem(address_map &map)

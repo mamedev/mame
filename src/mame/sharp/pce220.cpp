@@ -105,7 +105,6 @@ protected:
 	uint8_t m_port18;
 	uint8_t m_battery_sel;
 
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -824,11 +823,6 @@ static INPUT_PORTS_START( pcg850v )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_PGUP)         PORT_NAME("ON")         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pce220_state::on_irq), 0)
 INPUT_PORTS_END
 
-void pce220_state::device_resolve_objects()
-{
-	m_lcd_symbols.resolve();
-}
-
 void pce220_state::machine_start()
 {
 	uint8_t *rom = memregion("user1")->base();
@@ -923,7 +917,7 @@ void pce220_state::pce220(machine_config &config)
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(m_lcdc, FUNC(hd61202_device::screen_update));
@@ -947,7 +941,7 @@ void pce220_state::pce220(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	PCE220SERIAL(config, m_serial, 0);
+	PCE220SERIAL(config, m_serial);
 	config.set_default_layout(layout_pce220);
 }
 

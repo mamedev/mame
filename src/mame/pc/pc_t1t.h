@@ -91,7 +91,7 @@ private:
 class pcvideo_t1000_device : public pc_t1t_device, public device_gfx_interface
 {
 public:
-	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t read(address_space &space, offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
@@ -157,7 +157,7 @@ class pcvideo_t1000x_device :  public pcvideo_t1000_device
 public:
 	static auto parent_rom_device_type() { return &PCVIDEO_T1000; }
 
-	pcvideo_t1000x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_t1000x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void write(offs_t offset, uint8_t data) override;
 
@@ -189,7 +189,7 @@ class pcvideo_pcjr_device : public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto vsync_callback() { return m_vsync_cb.bind(); }

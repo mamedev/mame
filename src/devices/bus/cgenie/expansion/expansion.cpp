@@ -37,6 +37,7 @@ cg_exp_slot_device::cg_exp_slot_device(const machine_config &mconfig, const char
 	m_nmi_handler(*this),
 	m_reset_handler(*this)
 {
+	set_options(cg_exp_slot_carts, nullptr, false);
 }
 
 //-------------------------------------------------

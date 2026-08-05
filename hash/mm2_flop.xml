@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <softwarelist name="mm2_flop" description="Nokia MikroMikko 2 floppies">
 
-	<software name="msdos221" supported="no">
+	<software name="msdos221">
 		<description>Nokia MS-DOS 2.00 Versio 2.21 (Fin)</description>
 		<year>1985</year>
 		<publisher>Nokia Data</publisher>

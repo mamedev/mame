@@ -57,7 +57,7 @@ static constexpr u8 R = 1U << device_memory_interface::TR_READ;
 static constexpr u8 W = 1U << device_memory_interface::TR_WRITE;
 static constexpr u8 X = 1U << device_memory_interface::TR_FETCH;
 
-static u8 constexpr access[2][8] =
+static constexpr u8 ACCESS[2][8] =
 {
 	{      0,     0,     0,     X, R  |X, R|W|X,     0,     0 }, // user
 	{      0, R  |X, R|W|X, R|W|X, R|W|X, R|W|X,     0,     0 }, // supervisor
@@ -158,7 +158,7 @@ std::optional<std::pair<unsigned, offs_t>> pm2_mmu_device::translate(offs_t cons
 				return std::nullopt;
 
 			// check protection
-			if (!BIT(access[m_super][BIT(prot, 8, 3)], intention))
+			if (!BIT(ACCESS[m_super][BIT(prot, 8, 3)], intention))
 				return std::nullopt;
 
 			// update reference and modify bits

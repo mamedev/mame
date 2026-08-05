@@ -40,7 +40,7 @@ This is a full list of known WonderSwan and WonderSwan Color games.
 | X | 029 | 7572e478 | SWJ-BPR001 |  1  | Super Robot Taisen Compact / スーパーロボット大戦 コンパクト
 | X | 030 | e7c608e5 | SWJ-BAN00D |  0  | Tekken Card Challenge / 鉄拳カードチャレンジ
 | X | 031 | 27b3cc18 | SWJ-BAN00B |  0  | Chaos Gear - Michibikareshi Mono / カオスギア 導かれし者
-| X | 032 | c283ec5f | SWJ-BTM001 |  1  | Trump Collection - Bottom-Up Teki Trump Seikatsu / トランプコレクション2 ボトムアップ的世界一周の旅
+| X | 032 | c283ec5f | SWJ-BTM001 |  1  | Trump Collection - Bottom-Up Teki Trump Seikatsu / トランプコレクション ボトムアップ的トランプ生活
 | X | 033 | 425eb893 | SWJ-SUM004 |  0  | Anchorz Field / アンカーズ・フィールド
 | X | 034 | 302499b9 | SWJ-SUN003 |  0  | Puzzle Bobble / パズルボブル
 | X | 035 | 8fc9e145 | SWJ-BAN00C |  1  | Vaitz Blade / ヴァイツブレイド
@@ -112,7 +112,7 @@ This is a full list of known WonderSwan and WonderSwan Color games.
 | X | 101 | 35361250 | SWJ-BAN00A |  0  | Pocket Fighter / ポケットファイター
 | X | 102 | 352a570d | SWJ-BAN029 |  0  | Slither Link / スリザーリンク
 | X | 103 | 7da6acb9 | SWJ-BPR005 |  0  | Time Bokan Series - Bokan Densetsu - Butamo Odaterya Doronbou / タイム ボカン シリーズ ボカン伝説 ブタもおだてりゃドロンボー
-| X | 104 | 64aaf392 | SWJ-BTM002 |  1  | Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi / トランプコレクション ボトムアップ的トランプ生活
+| X | 104 | 64aaf392 | SWJ-BTM002 |  1  | Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi / トランプコレクション2 ボトムアップ的世界一周の旅
 | X | 105 | bd6fc68a | SWJ-BAN02A |  1  | Hunter X Hunter - Ishi o Tsugu Mono / ハンター×ハンター 意志を継ぐ者
 |   | 106 |          |            |     |
 | X | 107 | b5e675ae | SWJ-BAN02C |  0  | Digital Partner / デジモンアドベンチャー02 デジタルパートナー
@@ -2854,7 +2854,7 @@ The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
 		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BTM002"/>
 		<info name="release" value="20000928"/>
-		<info name="alt_title" value="トランプコレクション ボトムアップ的トランプ生活"/>
+		<info name="alt_title" value="トランプコレクション2 ボトムアップ的世界一周の旅"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100" />
 			<feature name="u1" value="BANDAI 2001" />
@@ -2874,7 +2874,7 @@ The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
 		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BTM001"/>
 		<info name="release" value="19990701"/>
-		<info name="alt_title" value="トランプコレクション2 ボトムアップ的世界一周の旅"/>
+		<info name="alt_title" value="トランプコレクション ボトムアップ的トランプ生活"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032" />
 			<feature name="u1" value="BANDAI 2001" />

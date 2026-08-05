@@ -56,7 +56,7 @@ public:
 	};
 
 	// construction/destruction
-	z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
 	auto out_int_callback() { return m_out_int_cb.bind(); }

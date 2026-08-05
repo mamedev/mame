@@ -86,9 +86,9 @@ public:
 	int lcd_ready_r() { return m_lcd_ready ? 1 : 0; }
 
 	// machine configs
-	void stratos(machine_config &config);
-	void tking(machine_config &config);
-	void tking2(machine_config &config);
+	void stratos(machine_config &config) ATTR_COLD;
+	void tking(machine_config &config) ATTR_COLD;
+	void tking2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -127,10 +127,6 @@ private:
 
 void stratos_base_state::machine_start()
 {
-	// resolve outputs
-	m_out_digit.resolve();
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_lcd_ready));

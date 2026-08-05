@@ -368,7 +368,7 @@ static INPUT_PORTS_START( bw12 )
 
 	PORT_START("SHIFT")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	
+
 	PORT_START("CTRL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 INPUT_PORTS_END
@@ -520,7 +520,7 @@ void bw12_state::common(machine_config &config)
 	m_latch->q_out_cb<7>().set(m_fdc, FUNC(upd765a_device::tc_line_w)); // FDC TC
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::amber()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::amber()));
 	screen.set_raw(XTAL(16'000'000), 904, 0, 640, 271, 0, 225);
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 
@@ -569,7 +569,7 @@ void bw12_state::common(machine_config &config)
 	m_pit->set_clk<2>(XTAL(1'843'200));
 	m_pit->out_handler<2>().set(m_pia, FUNC(pia6821_device::pa4_w));
 
-	AY3600(config, m_kbc, 0);
+	AY3600(config, m_kbc);
 	m_kbc->x0().set_ioport("X0");
 	m_kbc->x1().set_ioport("X1");
 	m_kbc->x2().set_ioport("X2");

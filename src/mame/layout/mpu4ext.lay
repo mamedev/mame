@@ -57,10 +57,10 @@ license:CC0-1.0
 				<bounds x="~x~" y="300" width="50" height="50" />
 			</element>
 		</repeat>
-		<element name="reel5" ref="Steppers" state="0">
+		<element name="reel5:pos" ref="Steppers" state="0">
 			<bounds x="220" y="300" width="50" height="50" />
 		</element>
-		<element name="reel6" ref="Steppers" state="0">
+		<element name="reel6:pos" ref="Steppers" state="0">
 			<bounds x="280" y="300" width="50" height="50" />
 		</element>
 		<repeat count="28">

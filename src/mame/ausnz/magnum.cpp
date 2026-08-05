@@ -290,14 +290,14 @@ void magnum_state::magnum(machine_config &config)
 
 	CDP1879(config, "rtc", XTAL(32'768)).irq_callback().set(FUNC(magnum_state::rtcirq_w));
 
-	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_LCD));
+	screen_device &screen1(SCREEN(config, "screen1").set_lcd());
 	screen1.set_refresh_hz(50);
 	screen1.set_screen_update("lcdc1", FUNC(hd61830_device::screen_update));
 	screen1.set_size(6*40, 9*16);
 	screen1.set_visarea(0, 6*40-1, 0, 8*16-1);
 	screen1.set_palette("palette");
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_LCD));
+	screen_device &screen2(SCREEN(config, "screen2").set_lcd());
 	screen2.set_refresh_hz(50);
 	screen2.set_screen_update("lcdc2", FUNC(hd61830_device::screen_update));
 	screen2.set_size(6*40, 9*16);

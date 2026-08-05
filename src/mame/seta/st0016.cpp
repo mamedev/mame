@@ -733,28 +733,6 @@ void st0016_cpu_device::draw_screen(screen_device &screen, bitmap_ind16 &bitmap,
 
 u32 st0016_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-	{
-		int h, j;
-		FILE *p = fopen("vram.bin", "wb");
-		fwrite(&m_spriteram[0], 1, 0x1000 * MAX_SPR_BANK, p);
-		fclose(p);
-
-		p = fopen("vram.txt","wt");
-		for (h = 0; h < 0xc0; h++)
-			fprintf(p,"VREG %.4x - %.4x\n",h,m_vregs[h]);
-		for (h = 0; h < 0x1000 * MAX_SPR_BANK; h += 8)
-		{
-			fprintf(p, "%.4x - %.4x - ", h, h >> 3);
-			for (j = 0; j < 8; j++)
-				fprintf(p, "%.2x ", m_spriteram[h + j]);
-			fprintf(p, "\n");
-		}
-		fclose(p);
-	}
-#endif
-
 	bitmap.fill(UNUSED_PEN, cliprect);
 	draw_screen(screen, bitmap, cliprect);
 	return 0;

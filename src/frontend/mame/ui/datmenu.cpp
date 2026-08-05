@@ -34,8 +34,8 @@ namespace ui {
 //  system
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system)
-	: menu_textbox(mui, container)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_target &target, const ui_system_info *system)
+	: menu_textbox(mui, target)
 	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
 	, m_swinfo(nullptr)
 	, m_issoft(false)
@@ -75,8 +75,8 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 //  ctor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info &swinfo)
-	: menu_textbox(mui, container)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_target &target, const ui_software_info &swinfo)
+	: menu_textbox(mui, target)
 	, m_system(nullptr)
 	, m_swinfo(&swinfo)
 	, m_issoft(true)
@@ -323,7 +323,7 @@ void menu_dats_view::custom_render(uint32_t flags, void *selectedref, float top,
 		}
 
 		ui().draw_text_full(
-				container(),
+				target(),
 				elem.label,
 				elem.bounds.first, m_tab_line.first, elem.bounds.second - elem.bounds.first,
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,

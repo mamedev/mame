@@ -5,19 +5,23 @@
     boost priority of timer thread in ptlinux.c implementation
  */
 
+#ifndef PORTMIDI_PORTTIME_H
+#define PORTMIDI_PORTTIME_H
+
 /* Should there be a way to choose the source of time here? */
 
 #ifdef WIN32
 #ifndef INT32_DEFINED
-// rather than having users install a special .h file for windows, 
-// just put the required definitions inline here. portmidi.h uses
-// these too, so the definitions are (unfortunately) duplicated there
+/* rather than having users install a special .h file for windows, 
+   just put the required definitions inline here. portmidi.h uses
+   these too, so the definitions are (unfortunately) duplicated there
+*/
 typedef int int32_t;
 typedef unsigned int uint32_t;
 #define INT32_DEFINED
 #endif
 #else
-#include <stdint.h> // needed for int32_t
+#include <stdint.h> /* needed for int32_t */
 #endif
 
 #ifdef __cplusplus
@@ -37,11 +41,13 @@ extern "C" {
 */
 
 typedef enum {
-    ptNoError = 0,         /* success */
-    ptHostError = -10000,  /* a system-specific error occurred */
-    ptAlreadyStarted,      /* cannot start timer because it is already started */
-    ptAlreadyStopped,      /* cannot stop timer because it is already stopped */
-    ptInsufficientMemory   /* memory could not be allocated */
+    ptNoError = 0,         /**< success */
+    ptHostError = -10000,  /**< a system-specific error occurred */
+    ptAlreadyStarted,      /**< cannot start timer because it is already
+                              started */
+    ptAlreadyStopped,      /**< cannot stop timer because it is already
+                              stopped */
+    ptInsufficientMemory   /**< memory could not be allocated */
 } PtError; /**< @brief @enum  PtError PortTime error code; a common return type.
             * No error is indicated by zero; errors are indicated by < 0.
             */
@@ -96,3 +102,5 @@ PMEXPORT void Pt_Sleep(int32_t duration);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PORTMIDI_PORTTIME_H */

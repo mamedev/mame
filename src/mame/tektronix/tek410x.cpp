@@ -319,7 +319,7 @@ void tek4107a_state::tek4107a(machine_config &config)
 	m_keyboard->rdata_callback().set(FUNC(tek4107a_state::kb_rdata_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	screen.set_screen_update(FUNC(tek4107a_state::screen_update));
 

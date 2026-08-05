@@ -49,6 +49,8 @@
 #include "emu.h"
 #include "dafb.h"
 
+#include "endianness.h"
+
 #define LOG_SWATCH      (1U << 1)
 #define LOG_CLOCKGEN    (1U << 2)
 #define LOG_MONSENSE    (1U << 3)
@@ -186,7 +188,7 @@ void dafb_base::device_reset()
 
 void dafb_base::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	m_screen->set_raw(31334400, 896, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(dafb_base::screen_update));
@@ -869,7 +871,7 @@ void dafb_base::recalc_mode()
 		if ((m_hres != 0) && (m_vres != 0))
 		{
 			rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-			m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+			m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 		}
 	}
 }

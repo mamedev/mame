@@ -130,7 +130,7 @@ void lexibook_jg7425_state::lexibook_jg7425(machine_config &config)
 	SCORE7(config, m_maincpu, XTAL(27'000'000) * 4);   // ? not certain on exact type
 	m_maincpu->set_addrmap(AS_PROGRAM, &lexibook_jg7425_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -205,8 +205,7 @@ ROM_END
 
 ROM_START( ubox30 )
 	ROM_REGION( 0x200000, "extrom", 0 ) // SPI ROM in this case
-	ROM_LOAD("ubox_xm25qe16bzig_204015.bin", 0x000000, 0x200000, CRC(f8135947) SHA1(f2a075ae2b0bae186202f1019b566ffc411742bb) )
-	ROM_IGNORE(0x300)
+	ROM_LOAD("ubox_xm25qe16bzig_204015.bin", 0x000000, 0x200000, CRC(3c6f348b) SHA1(06f22a9b4c6b8f0133d3cf549e7b2acfa01577d2) )
 
 	DISK_REGION( "cfcard" )
 	DISK_IMAGE( "ubox_sd_512", 0, SHA1(99f2f1437d644a5e1fe48ce1445acf48fb8b0359) )

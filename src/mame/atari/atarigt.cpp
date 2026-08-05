@@ -879,7 +879,7 @@ void atarigt_state::atarigt(machine_config &config)
 	m_playfield_tilemap->set_info_callback(FUNC(atarigt_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
@@ -887,10 +887,10 @@ void atarigt_state::atarigt(machine_config &config)
 	m_screen->set_screen_update(FUNC(atarigt_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc);
 
 	/* sound hardware */
-	ATARI_CAGE(config, m_cage, 0);
+	ATARI_CAGE(config, m_cage);
 	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
 }
 

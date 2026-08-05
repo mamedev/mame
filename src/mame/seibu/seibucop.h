@@ -16,7 +16,7 @@
 class raiden2cop_device : public device_t
 {
 public:
-	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Command Table
 	uint16_t cop_func_trigger[0x100/8];       /* function trigger */
@@ -221,6 +221,10 @@ private:
 	void execute_b100(int offset, uint16_t data);
 	void execute_b900(int offset, uint16_t data);
 	void execute_f105(int offset, uint16_t data);
+
+	void execute_ede5(int offset, uint16_t data);
+	void execute_f790(int offset, uint16_t data);
+	void execute_fc84(int offset, uint16_t data);
 
 	// TODO: remove/rename these
 	//void LEGACY_execute_130e(int offset, uint16_t data);

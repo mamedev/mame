@@ -148,7 +148,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 #include "sound/samples.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -160,16 +160,13 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 #include "elbaskb.lh"
 
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
-#include "hh_sm500_test.lh" // "
+//#include "hh_sm500_test.lh" // "
 
 
 // machine start/reset
 
 void hh_sm510_state::machine_start()
 {
-	// resolve outputs
-	m_out_x.resolve();
-
 	// determine number of input lines (set it in the subclass constructor if different)
 	if (m_inp_lines == 0 && m_inp_fixed < 0)
 	{
@@ -420,10 +417,9 @@ void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 heig
 	if (width == 0 || height == 0)
 		return;
 
-	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, tag));
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_sm510_single);
 }
@@ -4898,18 +4894,11 @@ public:
 	void elbaskb(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void update_display() override;
 
 private:
 	output_finder<4> m_digits;
 };
-
-void elbaskb_state::machine_start()
-{
-	hh_sm510_state::machine_start();
-	m_digits.resolve();
-}
 
 // handlers
 
@@ -6640,13 +6629,11 @@ INPUT_PORTS_END
 void gamewatch_state::nsmb3(machine_config &config)
 {
 	sm530_common(config, 1203, 1080);
-	config.set_default_layout(layout_hh_sm500_test);
 }
 
 void gamewatch_state::nsmw(machine_config &config)
 {
 	sm530_common(config, 1190, 1080);
-	config.set_default_layout(layout_hh_sm500_test);
 }
 
 // roms
@@ -7197,20 +7184,11 @@ public:
 
 	void tgaiden(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	// R2 connects to a single LED behind the screen
 	output_finder<> m_led_out;
 	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 };
-
-void tgaiden_state::machine_start()
-{
-	hh_sm510_state::machine_start();
-	m_led_out.resolve();
-}
 
 // inputs
 

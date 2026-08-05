@@ -30,6 +30,9 @@
 #include "emu.h"
 #include "ddp516d.h"
 
+#include <bit>
+
+
 ddp516_disassembler::ddp516_disassembler()
 	: util::disasm_interface()
 {
@@ -221,7 +224,7 @@ offs_t ddp516_disassembler::dasm_skip(std::ostream &stream, u16 inst) const
 	if (cond == 036)
 		util::stream_format(stream, "SS%c", BIT(inst, 9) ? 'S' : 'R');
 	else if ((cond & (cond - 1)) == 0)
-		stream << s_skip_insts[count_leading_zeros_32(cond) - 23][BIT(inst, 9)];
+		stream << s_skip_insts[std::countl_zero(cond) - 7][BIT(inst, 9)];
 	else
 		util::stream_format(stream, "%-6s'%04o", "SKP", inst & 001777);
 	return 1 | (cond != 0 ? STEP_COND : 0) | SUPPORTED;

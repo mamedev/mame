@@ -28,6 +28,7 @@
 
 
 #define REG(x)      (m_core->r[x].r)
+#define UIREG(x)    uint32_t(m_core->r[x].r)
 #define FREG(x)     (m_core->r[x].f)
 
 #define UPDATE_CIRCULAR_BUFFER_PM(x)                        \
@@ -60,6 +61,8 @@
 		}                                                   \
 	}
 
+#define SHARC_COND_LT  ((m_core->astat & AF) ? ((m_core->astat & AN) && !(m_core->astat & AZ)) : (bool(m_core->astat & AN) != ((m_core->astat & AV) && !(m_core->mode1 & MODE1_ALUSAT))))
+#define SHARC_COND_LE  ((m_core->astat & AZ) || ((m_core->astat & AF) ? (m_core->astat & AN) : (bool(m_core->astat & AN) != ((m_core->astat & AV) && !(m_core->mode1 & MODE1_ALUSAT)))))
 
 /*****************************************************************************/
 
@@ -67,7 +70,7 @@ void adsp21062_device::add_systemreg_write_latency_effect(int sysreg, uint32_t d
 {
 	if (m_core->systemreg_latency_cycles > 0)
 	{
-		//fatalerror("SHARC: add_systemreg_write_latency_effect: already scheduled! (reg: %02X, data: %08X, PC: %08X)\n", systemreg_latency_reg, systemreg_latency_data, m_core->pc);
+		//throw emu_fatalerror("%s: add_systemreg_write_latency_effect: already scheduled! (reg: %02X, data: %08X, PC: %08X)", tag(), systemreg_latency_reg, systemreg_latency_data, m_core->pc);
 		systemreg_write_latency_effect();
 	}
 
@@ -79,30 +82,30 @@ void adsp21062_device::add_systemreg_write_latency_effect(int sysreg, uint32_t d
 
 void adsp21062_device::systemreg_write_latency_effect()
 {
-	uint32_t data = m_core->systemreg_latency_data;
-	uint32_t old_data = m_core->systemreg_previous_data;
+	uint32_t const data = m_core->systemreg_latency_data;
+	uint32_t const old_data = m_core->systemreg_previous_data;
 
 	switch (m_core->systemreg_latency_reg)
 	{
 		case 0xb:   /* MODE1 */
 		{
-			uint32_t oldreg = old_data;
+			uint32_t const diff = data ^ old_data;
 			m_core->mode1 = data;
 
-			if ((data & 0x1) != (oldreg & 0x1))
+			if (diff & MODE1_BR8)
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable I8 bit-reversing\n");
+				throw emu_fatalerror("%s: systemreg_latency_op: enable I8 bit-reversing", tag());
 			}
-			if ((data & 0x2) != (oldreg & 0x2))
+			if (diff & MODE1_BR0)
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable I0 bit-reversing\n");
+				throw emu_fatalerror("%s: systemreg_latency_op: enable I0 bit-reversing", tag());
 			}
-			if ((data & 0x4) != (oldreg & 0x4))
+			if (diff & MODE1_SRCU)
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable MR alternate\n");
+				throw emu_fatalerror("%s: systemreg_latency_op: enable MR alternate", tag());
 			}
 
-			if ((data & 0x8) != (oldreg & 0x8))         /* Switch DAG1 7-4 */
+			if (diff & MODE1_SRD1H) // Switch DAG1 7-4
 			{
 				using std::swap;
 				swap(m_core->dag1.i[4], m_core->dag1_alt.i[4]);
@@ -122,7 +125,7 @@ void adsp21062_device::systemreg_write_latency_effect()
 				swap(m_core->dag1.b[6], m_core->dag1_alt.b[6]);
 				swap(m_core->dag1.b[7], m_core->dag1_alt.b[7]);
 			}
-			if ((data & 0x10) != (oldreg & 0x10))       /* Switch DAG1 3-0 */
+			if (diff & MODE1_SRD1L) // Switch DAG1 3-0
 			{
 				using std::swap;
 				swap(m_core->dag1.i[0], m_core->dag1_alt.i[0]);
@@ -142,7 +145,7 @@ void adsp21062_device::systemreg_write_latency_effect()
 				swap(m_core->dag1.b[2], m_core->dag1_alt.b[2]);
 				swap(m_core->dag1.b[3], m_core->dag1_alt.b[3]);
 			}
-			if ((data & 0x20) != (oldreg & 0x20))       /* Switch DAG2 15-12 */
+			if (diff & MODE1_SRD2H) // Switch DAG2 15-12
 			{
 				using std::swap;
 				swap(m_core->dag2.i[4], m_core->dag2_alt.i[4]);
@@ -162,7 +165,7 @@ void adsp21062_device::systemreg_write_latency_effect()
 				swap(m_core->dag2.b[6], m_core->dag2_alt.b[6]);
 				swap(m_core->dag2.b[7], m_core->dag2_alt.b[7]);
 			}
-			if ((data & 0x40) != (oldreg & 0x40))       /* Switch DAG2 11-8 */
+			if (diff & MODE1_SRD2L) // Switch DAG2 11-8
 			{
 				using std::swap;
 				swap(m_core->dag2.i[0], m_core->dag2_alt.i[0]);
@@ -182,21 +185,28 @@ void adsp21062_device::systemreg_write_latency_effect()
 				swap(m_core->dag2.b[2], m_core->dag2_alt.b[2]);
 				swap(m_core->dag2.b[3], m_core->dag2_alt.b[3]);
 			}
-			if ((data & 0x80) != (oldreg & 0x80))
+			if (diff & MODE1_SRRFH)
 			{
 				using std::swap;
-				for (int i=8; i<16; i++)
+				for (int i = 8; i < 16; i++)
 					swap(m_core->r[i].r, m_core->reg_alt[i].r);
 			}
-			if ((data & 0x400) != (oldreg & 0x400))
+			if (diff & MODE1_SRRFL)
 			{
 				using std::swap;
-				for (int i=0; i<8; i++)
+				for (int i = 0; i < 8; i++)
 					swap(m_core->r[i].r, m_core->reg_alt[i].r);
+			}
+			if (diff & MODE1_SSE)   // Short word sign extension
+			{
+				if (data & MODE1_SSE)
+					m_dm_short_view.select(0);
+				else
+					m_dm_short_view.disable();
 			}
 			break;
 		}
-		default:    fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X\n", m_core->systemreg_latency_reg, m_core->pc);
+		default:    throw emu_fatalerror("%s: systemreg_latency_op: unknown register %02X at %08X\n", tag(), m_core->systemreg_latency_reg, m_core->pc);
 	}
 
 	m_core->systemreg_latency_reg = -1;
@@ -267,8 +277,11 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 		{
 			switch(reg)
 			{
-				case 0x4:   return m_core->pcstack[m_core->pcstkp];     /* PCSTK */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0x4:   return m_core->pcstk;                       /* PCSTK */
+				case 0x5:   return m_core->pcstkp;                      /* PCSTKP */
+				case 0x7:   return m_core->curlcntr;                    /* CURLCNTR */
+				case 0x8:   return m_core->lcntr;                       /* LCNTR */
+				default:    throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 		}
@@ -282,19 +295,20 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 				case 0x9:   return m_core->irptl;         /* IRPTL */
 				case 0xa:   return m_core->mode2;         /* MODE2 */
 				case 0xb:   return m_core->mode1;         /* MODE1 */
-				case 0xc:                               /* ASTAT */
+				case 0xc:                                 /* ASTAT */
 				{
 					uint32_t r = m_core->astat;
-					r &= ~0x00780000;
-					r |= (m_core->flag[0] << 19);
-					r |= (m_core->flag[1] << 20);
-					r |= (m_core->flag[2] << 21);
-					r |= (m_core->flag[3] << 22);
+					r &= (BIT(m_core->mode2, 15, 4) << FLG0_SHIFT) | ~(FLG0 | FLG1 | FLG2 | FLG3);
+					for (unsigned i = 0; 4 > i; ++i)
+					{
+						if (!BIT(m_core->mode2, i + 15))
+							r |= m_core->flag[i] << (FLG0_SHIFT + i);
+					}
 					return r;
 				}
 				case 0xd:   return m_core->imask;         /* IMASK */
 				case 0xe:   return m_core->stky;          /* STKY */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				default:    throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 		}
@@ -304,15 +318,15 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 			switch(reg)
 			{
 				/* PX needs to be handled separately if the whole 48 bits are needed */
-				case 0xb:   return (uint32_t)(m_core->px);          /* PX */
-				case 0xc:   return (uint16_t)(m_core->px);          /* PX1 */
-				case 0xd:   return (uint32_t)(m_core->px >> 16);    /* PX2 */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0xb:   return uint32_t(m_core->px);            /* PX */
+				case 0xc:   return uint16_t(m_core->px);            /* PX1 */
+				case 0xd:   return uint32_t(m_core->px >> 16);      /* PX2 */
+				default:    throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 		}
 
-		default:            fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+		default:            throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 	}
 }
 
@@ -375,10 +389,58 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 		case 0x6:
 			switch (reg)
 			{
-				case 0x5:   m_core->pcstkp = data; break;     /* PCSTKP */
-				case 0x7:   m_core->curlcntr = data; break;   /* CURLCNTR (Zero Gunner 2B) */
-				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0x4:                                     /* PCSTK */
+					if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
+						m_core->pcstk = data & 0x00ffffff;
+					break;
+
+				case 0x5:                                     /* PCSTKP */
+					if (m_core->pcstkp < 31)
+					{
+						// TODO: this should take effect with a one-cycle delay
+						uint32_t const prev = std::exchange(m_core->pcstkp, data & 0x1f);
+
+						if (prev > 0)
+							m_core->pcstack[prev - 1] = m_core->pcstk;
+
+						if (prev < m_core->pcstkp)
+						{
+							if (m_core->pcstkp >= 31)
+								throw emu_fatalerror("%s: PC Stack overflow!", tag());
+
+							m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+
+							m_core->stky &= ~PCEM;
+							if (m_core->pcstkp >= 30)
+								m_core->stky |= PCFL;
+						}
+						else if (prev > m_core->pcstkp)
+						{
+							if (m_core->pcstkp > 0)
+							{
+								m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+							}
+							else
+							{
+								m_core->pcstk = 0x00ffffff;
+								m_core->stky |= PCEM;
+							}
+							m_core->stky &= ~PCFL;
+						}
+					}
+					break;
+
+				case 0x7:                                     /* CURLCNTR */
+					if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
+						m_core->curlcntr = data;
+					break;
+
+				case 0x8:                                     /* LCNTR */
+					if (m_core->lstkp < 6)
+						m_core->lcntr = data;
+					break;
+
+				default:    throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 
@@ -389,26 +451,45 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 				case 0x1:   m_core->ustat2 = data; break;     /* USTAT2 */
 
 				case 0x9:   m_core->irptl = data; break;      /* IRPTL */
-				case 0xa:   m_core->mode2 = data; break;      /* MODE2 */
-
-				case 0xb:                                   /* MODE1 */
+				case 0xa:                                     /* MODE2 */
 				{
+					u32 const set = ~m_core->mode2 & data;
+					m_core->mode2 = data;
+					for (unsigned i = 0; i < 4; i++)
+					{
+						if (BIT(set, 15 + i))
+							m_flag_out_cb[i](BIT(m_core->astat, FLG0_SHIFT + i));
+					}
+					break;
+				}
+
+				case 0xb:                                     /* MODE1 */
 					add_systemreg_write_latency_effect(reg, data, m_core->mode1);
 					m_core->mode1 = data;
 					break;
-				}
 
-				case 0xc:   m_core->astat = data; break;      /* ASTAT */
-
-				case 0xd:                                   /* IMASK */
+				case 0xc:                                     /* ASTAT */
 				{
-					check_interrupts();
-					m_core->imask = data;
+					u32 const flags = (m_core->astat ^ data) & (BIT(m_core->mode2, 15, 4) << FLG0_SHIFT);
+					m_core->astat = data;
+					for (unsigned i = 0; i < 4; i++)
+					{
+						if (BIT(flags, FLG0_SHIFT + i))
+							m_flag_out_cb[i](BIT(data, FLG0_SHIFT + i));
+					}
 					break;
 				}
 
-				case 0xe:   m_core->stky = data; break;       /* STKY */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0xd:                                     /* IMASK */
+					check_interrupts();
+					m_core->imask = data;
+					break;
+
+				case 0xe:                                     /* STKY */
+					m_core->stky = (m_core->stky & (LSEM | LSOV | SSEM | SSOV | PCEM | PCFL)) | (data & ~(LSEM | LSOV | SSEM | SSOV | PCEM | PCFL));
+					break;
+
+				default:    throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 
@@ -417,11 +498,11 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 			{
 				case 0xc:   m_core->px &= 0xffffffffffff0000U; m_core->px |= (data & 0xffff); break;        /* PX1 */
 				case 0xd:   m_core->px &= 0x000000000000ffffU; m_core->px |= (uint64_t)data << 16; break;     /* PX2 */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				default:    throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 
-		default:            fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+		default:            throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 	}
 }
 
@@ -445,11 +526,11 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			if (shift < 0)
 			{
-				REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
+				REG(rn) = (shift > -32 ) ? (UIREG(rx) >> -shift) : 0;
 			}
 			else
 			{
-				REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
+				REG(rn) = (shift < 32) ? (UIREG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
@@ -479,7 +560,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x02:      /* ROT Rx BY <data8> */
 		{
-			REG(rn) = rotl_32(REG(rx), shift);
+			REG(rn) = std::rotl(UIREG(rx), shift);
 			SET_FLAG_SZ(REG(rn));
 			break;
 		}
@@ -489,11 +570,11 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			uint32_t r = 0;
 			if (shift < 0)
 			{
-				r = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
+				r = (shift > -32 ) ? (UIREG(rx) >> -shift) : 0;
 			}
 			else
 			{
-				r = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
+				r = (shift < 32) ? (UIREG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
@@ -541,7 +622,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			if (len == 0 || bit >= 32)
 				REG(rn) = 0;
 			else if (bit+len > 32)
-				REG(rn) = (uint32_t)REG(rx) >> bit;
+				REG(rn) = UIREG(rx) >> bit;
 			else
 				REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
@@ -641,7 +722,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			break;
 		}
 
-		default:    fatalerror("SHARC: unimplemented shift operation %02X at %08X\n", shiftop, m_core->pc);
+		default:    throw emu_fatalerror("SHARC: unimplemented shift operation %02X at %08X", tag(), shiftop, m_core->pc);
 	}
 }
 
@@ -674,78 +755,57 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 			case 0x01:      compute_multi_reg_to_mr(op & 0xf, rn); break;
 
 			case 0x04:      /* Rm = Rxm * Rym (SSFR),   Ra = Rxa + Rya */
-			{
 				compute_mul_ssfr_add(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x05:      /* Rm = Rxm * Rym (SSFR),   Ra = Rxa - Rya */
-			{
 				compute_mul_ssfr_sub(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x18:      /* Fm = Fxm * Fym,   Fa = Fxa + Fya */
-			{
 				compute_fmul_fadd(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x19:      /* Fm = Fxm * Fym,   Fa = Fxa - Fya */
-			{
 				compute_fmul_fsub(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			case 0x1a:      /* Fm = Fxm * Fym,   Fa = FLOAT Fxa BY Fya */
-			{
+			case 0x1a:      /* Fm = Fxm * Fym,   Fa = FLOAT Fxa BY Rya */
 				compute_fmul_float_scaled(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			case 0x1b:      /* Fm = Fxm * Fym,   Fa = FIX Fxa BY Fya */
-			{
+			case 0x1b:      /* Fm = Fxm * Fym,   Ra = FIX Fxa BY Rya */
 				compute_fmul_fix_scaled(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x1c:      /* Fm = Fxm * Fym,   Fa = (Fxa + Fya) / 2 */
-			{
-				compute_fmul_avg(fm, fxm, fym, fa, fxa, fya);
+				compute_fmul_favg(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x1d:      /* Fm = Fxm * Fym,   Fa = ABS Fxa */
-			{
-				compute_fmul_abs(fm, fxm, fym, fa, fxa, fya);
+				compute_fmul_fabs(fm, fxm, fym, fa, fxa);
 				break;
-			}
 
 			case 0x1e:      /* Fm = Fxm * Fym,   Fa = MAX(Fxa, Fya) */
-			{
 				compute_fmul_fmax(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x1f:      /* Fm = Fxm * Fym,   Fa = MIN(Fxa, Fya) */
-			{
 				compute_fmul_fmin(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 			{
 				/* Parallel Multiplier & Dual Add/Subtract */
 				/* Floating-point */
-				int fs = (opcode >> 16) & 0xf;
+				int const fs = (opcode >> 16) & 0xf;
 				compute_fmul_dual_fadd_fsub(fm, fxm, fym, fa, fs, fxa, fya);
 				break;
 			}
 
 			default:
-				fatalerror("SHARC: compute: multi-function opcode %02X not implemented ! (%08X, %08X)\n", multiop, m_core->pc, opcode);
-				break;
+				throw emu_fatalerror("%s: compute: multi-function opcode %02X not implemented ! (%08X, %08X)", tag(), multiop, m_core->pc, opcode);
 		}
 	}
 	else                        /* Single-function opcode */
@@ -764,19 +824,24 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0x0a:      compute_comp(rx, ry); break;
 					case 0x21:      compute_pass(rn, rx); break;
 					case 0x22:      compute_neg(rn, rx); break;
+					case 0x25:      compute_add_ci(rn, rx); break;
+					case 0x26:      compute_sub_ci(rn, rx); break;
 					case 0x29:      compute_inc(rn, rx); break;
 					case 0x2a:      compute_dec(rn, rx); break;
+					case 0x30:      compute_abs(rn, rx); break;
 					case 0x40:      compute_and(rn, rx, ry); break;
 					case 0x41:      compute_or(rn, rx, ry); break;
 					case 0x42:      compute_xor(rn, rx, ry); break;
 					case 0x43:      compute_not(rn, rx); break;
 					case 0x61:      compute_min(rn, rx, ry); break;
 					case 0x62:      compute_max(rn, rx, ry); break;
+					case 0x63:      compute_clip(rn, rx, ry); break;
 					case 0x81:      compute_fadd(rn, rx, ry); break;
 					case 0x82:      compute_fsub(rn, rx, ry); break;
 					case 0x89:      compute_favg(rn, rx, ry); break;
 					case 0x8a:      compute_fcomp(rx, ry); break;
-					case 0x91:      compute_fabs_plus(rn, rx, ry); break;
+					case 0x91:      compute_fadd_abs(rn, rx, ry); break;
+					case 0x92:      compute_fsub_abs(rn, rx, ry); break;
 					case 0xa1:      compute_fpass(rn, rx); break;
 					case 0xa2:      compute_fneg(rn, rx); break;
 					case 0xb0:      compute_fabs(rn, rx); break;
@@ -813,7 +878,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						break;
 					}
 
-					default:        fatalerror("SHARC: compute: unimplemented ALU operation %02X (%08X, %08X)\n", op, m_core->pc, opcode);
+					default:        throw emu_fatalerror("%s: compute: unimplemented ALU operation %02X (%08X, %08X)", tag(), op, m_core->pc, opcode);
 				}
 				break;
 			}
@@ -835,8 +900,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0xb2:      REG(rn) = compute_mrb_plus_mul_ssin(rx, ry); break;
 
 					default:
-						fatalerror("SHARC: compute: multiplier operation %02X not implemented ! (%08X, %08X)\n", op, m_core->pc, opcode);
-						break;
+						throw emu_fatalerror("%s: compute: multiplier operation %02X not implemented ! (%08X, %08X)", tag(), op, m_core->pc, opcode);
 				}
 				break;
 			}
@@ -854,11 +918,11 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						int const shift = REG(ry);
 						if (shift < 0)
 						{
-							REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
+							REG(rn) = (shift > -32 ) ? (UIREG(rx) >> -shift) : 0;
 						}
 						else
 						{
-							REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
+							REG(rn) = (shift < 32) ? (UIREG(rx) << shift) : 0;
 							if (shift > 0)
 							{
 								m_core->astat |= SV;
@@ -871,17 +935,10 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0x02:      /* ROT Rx BY Ry */
 					{
 						int const shift = REG(ry);
-						if (shift < 0)
+						REG(rn) = std::rotl(UIREG(rx), shift);
+						if (shift > 0)
 						{
-							REG(rn) = rotr_32(REG(rx), -shift);
-						}
-						else
-						{
-							REG(rn) = rotl_32(REG(rx), shift);
-							if (shift > 0)
-							{
-								m_core->astat |= SV;
-							}
+							m_core->astat |= SV;
 						}
 						SET_FLAG_SZ(REG(rn));
 						break;
@@ -930,7 +987,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						if (len == 0 || bit >= 32)
 							REG(rn) = 0;
 						else if (bit+len > 32)
-							REG(rn) = (uint32_t)REG(rx) >> bit;
+							REG(rn) = UIREG(rx) >> bit;
 						else
 							REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
@@ -1007,131 +1064,145 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					}
 
 					default:
-						fatalerror("SHARC: compute: shift operation %02X not implemented ! (%08X, %08X)\n", op >> 2, m_core->pc, opcode);
+						throw emu_fatalerror("%s: compute: shift operation %02X not implemented ! (%08X, %08X)", tag(), op >> 2, m_core->pc, opcode);
 				}
 				break;
 			}
 
 			default:
-				fatalerror("SHARC: compute: invalid single-function operation %02X\n", cu);
+				throw emu_fatalerror("%s: compute: invalid single-function operation %02X", tag(), cu);
 		}
 	}
 }
 
-void adsp21062_device::PUSH_PC(uint32_t pc)
+inline void adsp21062_device::PUSH_PC()
 {
+	if (m_core->pcstkp >= 30)
+		throw emu_fatalerror("%s: PC Stack overflow!", tag());
+
+	if (m_core->pcstkp > 0)
+		m_core->pcstack[m_core->pcstkp - 1] = m_core->pcstk;
+
 	m_core->pcstkp++;
-	if (m_core->pcstkp >= 32)
-		fatalerror("SHARC: PC Stack overflow!\n");
 
-	if (m_core->pcstkp == 0)
-		m_core->stky |= PCEM;
-	else
-		m_core->stky &= ~PCEM;
-
-	m_core->pcstk = pc;
-	m_core->pcstack[m_core->pcstkp] = pc;
+	m_core->stky &= ~PCEM;
+	if (m_core->pcstkp >= 30)
+		m_core->stky |= PCFL;
 }
 
-uint32_t adsp21062_device::POP_PC()
+inline uint32_t adsp21062_device::POP_PC()
 {
-	m_core->pcstk = m_core->pcstack[m_core->pcstkp];
-
 	if (m_core->pcstkp == 0)
-		fatalerror("SHARC: PC Stack underflow!\n");
+		throw emu_fatalerror("%s: PC Stack underflow!", tag());
+
+	uint32_t const result = m_core->pcstk;
 
 	m_core->pcstkp--;
 
-	if (m_core->pcstkp == 0)
-		m_core->stky |= PCEM;
-	else
-		m_core->stky &= ~PCEM;
+	if (m_core->pcstkp < 30)
+	{
+		m_core->pcstack[m_core->pcstkp] = m_core->pcstk;
+		if (m_core->pcstkp > 0)
+		{
+			m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+		}
+		else
+		{
+			m_core->pcstk = 0x00ffffff;
+			m_core->stky |= PCEM;
+		}
+		m_core->stky &= ~PCFL;
+	}
 
+	return result;
+}
+
+inline uint32_t adsp21062_device::TOP_PC()
+{
 	return m_core->pcstk;
 }
 
-uint32_t adsp21062_device::TOP_PC()
+inline void adsp21062_device::PUSH_LOOP()
 {
-	return m_core->pcstack[m_core->pcstkp];
-}
-
-void adsp21062_device::PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count)
-{
-	m_core->lstkp++;
 	if (m_core->lstkp >= 6)
-		fatalerror("SHARC: Loop Stack overflow!\n");
+		throw emu_fatalerror("%s: Loop Stack overflow!", tag());
 
-	if (m_core->lstkp == 0)
-		m_core->stky |= LSEM;
+	if (m_core->lstkp > 0)
+	{
+		m_core->lcstack[m_core->lstkp - 1] = m_core->curlcntr;
+		m_core->lastack[m_core->lstkp - 1] = m_core->laddr.pack();
+	}
+	m_core->curlcntr = m_core->lcntr;
+	m_core->laddr.unpack(m_core->lastack[m_core->lstkp]);
+
+	m_core->lstkp++;
+
+	if (m_core->lstkp < 6)
+		m_core->lcntr = m_core->lcstack[m_core->lstkp];
 	else
-		m_core->stky &= ~LSEM;
+		m_core->lcntr = 0xffffffff;
 
-	m_core->lcstack[m_core->lstkp] = count;
-	m_core->lastack[m_core->lstkp] = (type << 30) | (code << 24) | addr;
-	m_core->curlcntr = count;
-
-	m_core->laddr.addr = addr;
-	m_core->laddr.code = code;
-	m_core->laddr.loop_type = type;
+	m_core->stky &= ~LSEM;
 }
 
-void adsp21062_device::POP_LOOP()
+inline void adsp21062_device::POP_LOOP()
 {
 	if (m_core->lstkp == 0)
-		fatalerror("SHARC: Loop Stack underflow!\n");
+		throw emu_fatalerror("%s: Loop Stack underflow!", tag());
 
 	m_core->lstkp--;
 
-	if (m_core->lstkp == 0)
-		m_core->stky |= LSEM;
+	m_core->lcntr = m_core->curlcntr;
+	m_core->lastack[m_core->lstkp] = m_core->laddr.pack();
+
+	if (m_core->lstkp > 0)
+	{
+		m_core->curlcntr = m_core->lcstack[m_core->lstkp - 1];
+		m_core->laddr.unpack(m_core->lastack[m_core->lstkp - 1]);
+	}
 	else
-		m_core->stky &= ~LSEM;
+	{
+		m_core->curlcntr = 0xffffffff;
+		m_core->laddr.unpack(0xffffffff);
 
-	m_core->curlcntr = m_core->lcstack[m_core->lstkp];
-
-	m_core->laddr.addr = m_core->lastack[m_core->lstkp] & 0xffffff;
-	m_core->laddr.code = (m_core->lastack[m_core->lstkp] >> 24) & 0x1f;
-	m_core->laddr.loop_type = (m_core->lastack[m_core->lstkp] >> 30) & 0x3;
+		m_core->stky |= LSEM;
+	}
 }
 
-void adsp21062_device::PUSH_STATUS_STACK()
+inline void adsp21062_device::PUSH_STATUS_STACK()
 {
 	m_core->status_stkp++;
 	if (m_core->status_stkp >= 5)
-		fatalerror("SHARC: Status stack overflow!\n");
+		throw emu_fatalerror("%s: Status stack overflow!", tag());
 
-	if (m_core->status_stkp == 0)
-		m_core->stky |= SSEM;
-	else
-		m_core->stky &= ~SSEM;
+	m_core->status_stack[m_core->status_stkp - 1].mode1 = GET_UREG(REG_MODE1);
+	m_core->status_stack[m_core->status_stkp - 1].astat = GET_UREG(REG_ASTAT);
 
-	m_core->status_stack[m_core->status_stkp].mode1 = GET_UREG(REG_MODE1);
-	m_core->status_stack[m_core->status_stkp].astat = GET_UREG(REG_ASTAT);
+	m_core->stky &= ~SSEM;
 }
 
-void adsp21062_device::POP_STATUS_STACK()
+inline void adsp21062_device::POP_STATUS_STACK()
 {
-	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
-	SET_UREG(REG_ASTAT, m_core->status_stack[m_core->status_stkp].astat);
+	if (m_core->status_stkp <= 0)
+		throw emu_fatalerror("%s: Status stack underflow!", tag());
 
 	m_core->status_stkp--;
-	if (m_core->status_stkp < 0)
-		fatalerror("SHARC: Status stack underflow!\n");
+
+	uint32_t const flags_mask = FLG0 | FLG1 | FLG2 | FLG3;
+	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
+	SET_UREG(REG_ASTAT, (m_core->astat & flags_mask) | (m_core->status_stack[m_core->status_stkp].astat & ~flags_mask));
 
 	if (m_core->status_stkp == 0)
 		m_core->stky |= SSEM;
-	else
-		m_core->stky &= ~SSEM;
 }
 
-int adsp21062_device::IF_CONDITION_CODE(int cond)
+inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 {
-	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */
-		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
-		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x01:  return SHARC_COND_LT;             /* LT */
+		case 0x02:  return SHARC_COND_LE;             /* LE */
 		case 0x03:  return (m_core->astat & AC);      /* AC */
 		case 0x04:  return (m_core->astat & AV);      /* AV */
 		case 0x05:  return (m_core->astat & MV);      /* MV */
@@ -1143,11 +1214,11 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_core->curlcntr!=1);     /* NOT LCE */
+		case 0x0e:  return 0;                         /* BM */
+		case 0x0f:  return (m_core->curlcntr != 1);   /* NOT LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
-		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x11:  return !SHARC_COND_LT;            /* GE */
+		case 0x12:  return !SHARC_COND_LE;            /* GT */
 		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
 		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
 		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */
@@ -1159,20 +1230,19 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                       /* NOT BM */
-		case 0x1f:  return 1;                       /* TRUE */
+		case 0x1e:  return 1;                         /* NOT BM */
+		case 0x1f:  return 1;                         /* TRUE */
 	}
 	return 1;
 }
 
-int adsp21062_device::DO_CONDITION_CODE(int cond)
+inline int adsp21062_device::DO_CONDITION_CODE(int cond)
 {
-	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */
-		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
-		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x01:  return SHARC_COND_LT;             /* LT */
+		case 0x02:  return SHARC_COND_LE;             /* LE */
 		case 0x03:  return (m_core->astat & AC);      /* AC */
 		case 0x04:  return (m_core->astat & AV);      /* AV */
 		case 0x05:  return (m_core->astat & MV);      /* MV */
@@ -1184,11 +1254,11 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_core->curlcntr==1);     /* LCE */
+		case 0x0e:  return 0;                         /* BM */
+		case 0x0f:  return (m_core->curlcntr == 1);   /* LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
-		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x11:  return !SHARC_COND_LT;            /* GE */
+		case 0x12:  return !SHARC_COND_LE;            /* GT */
 		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
 		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
 		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */
@@ -1200,8 +1270,8 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                       /* NOT BM */
-		case 0x1f:  return 0;                       /* FALSE (FOREVER) */
+		case 0x1e:  return 1;                         /* NOT BM */
+		case 0x1f:  return 0;                         /* FALSE (FOREVER) */
 	}
 	return 1;
 }
@@ -1644,16 +1714,17 @@ void adsp21062_device::sharcop_direct_call()
 
 	if (IF_CONDITION_CODE(cond))
 	{
+		PUSH_PC();
 		if (j)
 		{
-			//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-			PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+			//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+			m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 			CHANGE_PC_DELAYED(address);
 		}
 		else
 		{
-			//PUSH_PC(m_core->pc+1);
-			PUSH_PC(m_core->daddr);
+			//m_core->pcstk = m_core->pc + 1;
+			m_core->pcstk = m_core->daddr;
 			CHANGE_PC(address);
 		}
 	}
@@ -1668,13 +1739,13 @@ void adsp21062_device::sharcop_direct_jump()
 	int const cond = op_get_cond(m_core->opcode);
 	uint32_t const address = m_core->opcode & 0xffffff;
 
-	if(IF_CONDITION_CODE(cond))
+	if (IF_CONDITION_CODE(cond))
 	{
 		// Clear Interrupt
 		if (ci)
 		{
-			// TODO: anything else?
-			if (m_core->status_stkp > 0)
+			// TODO: timer and VIRPT interrupts also push the status stack
+			if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 				POP_STATUS_STACK();
 
 			m_core->interrupt_active = 0;
@@ -1706,14 +1777,15 @@ void adsp21062_device::sharcop_relative_call()
 
 	if (IF_CONDITION_CODE(cond))
 	{
+		PUSH_PC();
 		if (j)
 		{
-			PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+			m_core->pcstk = m_core->pc + 3;  /* 1 instruction + 2 delayed instructions */
 			CHANGE_PC_DELAYED(m_core->pc + util::sext(address, 24));
 		}
 		else
 		{
-			PUSH_PC(m_core->pc+1);
+			m_core->pcstk = m_core->pc + 1;
 			CHANGE_PC(m_core->pc + util::sext(address, 24));
 		}
 	}
@@ -1733,8 +1805,8 @@ void adsp21062_device::sharcop_relative_jump()
 		// Clear Interrupt
 		if (ci)
 		{
-			// TODO: anything else?
-			if (m_core->status_stkp > 0)
+			// TODO: timer and VIRPT interrupts also push the status stack
+			if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 				POP_STATUS_STACK();
 
 			m_core->interrupt_active = 0;
@@ -1772,8 +1844,8 @@ void adsp21062_device::sharcop_indirect_jump()
 	// Clear Interrupt
 	if (ci)
 	{
-		// TODO: anything else?
-		if (m_core->status_stkp > 0)
+		// TODO: timer and VIRPT interrupts also push the status stack
+		if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 			POP_STATUS_STACK();
 
 		m_core->interrupt_active = 0;
@@ -1836,16 +1908,17 @@ void adsp21062_device::sharcop_indirect_call()
 	{
 		if (IF_CONDITION_CODE(cond))
 		{
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
@@ -1862,16 +1935,17 @@ void adsp21062_device::sharcop_indirect_call()
 			if (compute)
 				COMPUTE(compute);
 
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
@@ -1894,8 +1968,8 @@ void adsp21062_device::sharcop_relative_jump_compute()
 	// Clear Interrupt
 	if (ci)
 	{
-		// TODO: anything else?
-		if (m_core->status_stkp > 0)
+		// TODO: timer and VIRPT interrupts also push the status stack
+		if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 			POP_STATUS_STACK();
 
 		m_core->interrupt_active = 0;
@@ -1956,16 +2030,17 @@ void adsp21062_device::sharcop_relative_call_compute()
 	{
 		if (IF_CONDITION_CODE(cond))
 		{
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
 				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 		}
@@ -1982,16 +2057,17 @@ void adsp21062_device::sharcop_relative_call_compute()
 			if (compute)
 				COMPUTE(compute);
 
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
 				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 		}
@@ -2095,7 +2171,7 @@ void adsp21062_device::sharcop_rts()
 	int const compute = op_get_compute(m_core->opcode);
 
 	//if(lr)
-	//  fatalerror("SHARC: rts: loop reentry not implemented!\n");
+	//  throw emu_fatalerror("%s: rts: loop reentry not implemented!", tag());
 
 	if (e)      /* IF...ELSE */
 	{
@@ -2169,7 +2245,8 @@ void adsp21062_device::sharcop_rti()
 		}
 	}
 
-	if (m_core->status_stkp > 0)
+	// TODO: timer and VIRPT interrupts also push the status stack
+	if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 		POP_STATUS_STACK();
 
 	m_core->interrupt_active = 0;
@@ -2197,11 +2274,12 @@ void adsp21062_device::sharcop_do_until_counter_imm()
 		type = 3;
 
 	m_core->lcntr = data;
-	if (m_core->lcntr > 0)
-	{
-		PUSH_PC(m_core->pc+1);
-		PUSH_LOOP(address, cond, type, m_core->lcntr);
-	}
+	PUSH_PC();
+	PUSH_LOOP();
+	m_core->pcstk = m_core->pc + 1;
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = type;
 }
 
 /*****************************************************************************/
@@ -2225,11 +2303,12 @@ void adsp21062_device::sharcop_do_until_counter_ureg()
 		type = 3;
 
 	m_core->lcntr = GET_UREG(ureg);
-	if (m_core->lcntr > 0)
-	{
-		PUSH_PC(m_core->pc+1);
-		PUSH_LOOP(address, cond, type, m_core->lcntr);
-	}
+	PUSH_PC();
+	PUSH_LOOP();
+	m_core->pcstk = m_core->pc + 1;
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = type;
 }
 
 /*****************************************************************************/
@@ -2242,8 +2321,12 @@ void adsp21062_device::sharcop_do_until()
 	int const offset = util::sext(m_core->opcode & 0xffffff, 24);
 	uint32_t const address = (m_core->pc + offset);
 
-	PUSH_PC(m_core->pc+1);
-	PUSH_LOOP(address, cond, 0, 0);
+	PUSH_PC();
+	PUSH_LOOP();
+	m_core->pcstk = m_core->pc + 1;
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = 0;
 }
 
 /*****************************************************************************/
@@ -2425,8 +2508,7 @@ void adsp21062_device::sharcop_sysreg_bitop()
 			break;
 		}
 		default:
-			fatalerror("SHARC: sysreg_bitop: invalid bitop %d\n", bop);
-			break;
+			throw emu_fatalerror("%s: sysreg_bitop: invalid bitop %d", tag(), bop);
 	}
 
 	SET_UREG(0x70 | sreg, src);
@@ -2460,7 +2542,7 @@ void adsp21062_device::sharcop_modify()
 /* I register bit-reverse */
 void adsp21062_device::sharcop_bit_reverse()
 {
-	fatalerror("SHARC: sharcop_bit_reverse unimplemented\n");
+	throw emu_fatalerror("%s: sharcop_bit_reverse unimplemented", tag());
 }
 
 /*****************************************************************************/
@@ -2471,25 +2553,24 @@ void adsp21062_device::sharcop_push_pop_stacks()
 {
 	if (m_core->opcode & 0x008000000000U)
 	{
-		fatalerror("sharcop_push_pop_stacks: push loop not implemented\n");
+		PUSH_LOOP();
 	}
 	if (m_core->opcode & 0x004000000000U)
 	{
-		fatalerror("sharcop_push_pop_stacks: pop loop not implemented\n");
+		POP_LOOP();
 	}
 	if (m_core->opcode & 0x002000000000U)
 	{
-		//fatalerror("sharcop_push_pop_stacks: push sts not implemented\n");
 		PUSH_STATUS_STACK();
 	}
 	if (m_core->opcode & 0x001000000000U)
 	{
-		//fatalerror("sharcop_push_pop_stacks: pop sts not implemented\n");
 		POP_STATUS_STACK();
 	}
 	if (m_core->opcode & 0x000800000000U)
 	{
-		PUSH_PC(m_core->pcstk);
+		// TODO: what should the top-of-stack value be after this?
+		PUSH_PC();
 	}
 	if (m_core->opcode & 0x000400000000U)
 	{
@@ -2522,5 +2603,6 @@ void adsp21062_device::sharcop_idle()
 
 void adsp21062_device::sharcop_unimplemented()
 {
-	fatalerror("SHARC: Unimplemented opcode %012X at %08X\n", m_core->opcode, m_core->pc);
+	throw emu_fatalerror("%s: Unimplemented opcode %012X at %08X: %s",
+			tag(), m_core->opcode, m_core->pc, disassemble_one(m_core->pc, m_core->opcode));
 }

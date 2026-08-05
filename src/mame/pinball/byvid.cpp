@@ -101,12 +101,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
-	void by133(machine_config &config);
-	void granny(machine_config &config);
+	void by133(machine_config &config) ATTR_COLD;
+	void granny(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	u8 m_mpu_to_vid = 0U;
 	u8 m_vid_to_mpu = 0U;
 	u8 m_u7a = 0U;
@@ -738,7 +740,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )
 void by133_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_mpu_to_vid));
 	save_item(NAME(m_vid_to_mpu));
@@ -829,7 +830,7 @@ void by133_state::by133(machine_config &config)
 	TMS9928A(config, m_crtc, XTAL(10'738'635)).set_screen("screen");
 	m_crtc->set_vram_size(0x4000);
 	m_crtc->int_callback().set_inputline(m_videocpu, M6809_IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	genpin_audio(config);

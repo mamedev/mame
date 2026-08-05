@@ -294,7 +294,7 @@ void servicet_state::servicet(machine_config &config)
 	I2C_24C16(config, m_i2cmem);
 
 	// LCD4002A
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_color(rgb_t(6, 120, 245));
 	screen.set_physical_aspect(7*40, 10*2);
 	screen.set_refresh_hz(72);

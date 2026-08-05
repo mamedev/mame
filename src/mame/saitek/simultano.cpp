@@ -39,7 +39,7 @@ TODO:
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -67,8 +67,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
-	void simultano(machine_config &config);
-	void cc2150(machine_config &config);
+	void simultano(machine_config &config) ATTR_COLD;
+	void cc2150(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -106,8 +106,6 @@ private:
 
 void simultano_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_select));
@@ -334,10 +332,9 @@ void simultano_state::cc2150(machine_config &config)
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
 	m_lcd_pwm->output_x().set(FUNC(simultano_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(873/2, 1080/2);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2+2, 8);
 	config.set_default_layout(layout_saitek_simultano);

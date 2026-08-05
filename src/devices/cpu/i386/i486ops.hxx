@@ -27,6 +27,7 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 			case 1:
 			{
 				REG32(EAX) = m_cpu_version;
+				REG32(EBX) = m_brand_id;
 				REG32(EDX) = m_feature_flags;
 				CYCLES(CYCLES_CPUID_EAX1);
 				break;

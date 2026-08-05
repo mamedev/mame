@@ -5,6 +5,8 @@
 
 #include "raizing.h"
 
+#include "endianness.h"
+
 /*
 
 Name        Board No      Maker         Game name
@@ -285,9 +287,6 @@ void batrider_state::batrider_bank_cb(u8 layer, u32 &code)
 void batrider_state::video_start()
 {
 	raizing_base_state::video_start();
-
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
 
 	m_vdp->disable_sprite_buffer(); // disable buffering on this game
 
@@ -781,11 +780,11 @@ void batrider_state::batrider(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &batrider_state::batrider_sound_z80_mem);
 	m_audiocpu->set_addrmap(AS_IO, &batrider_state::batrider_sound_z80_port);
 
-	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
+	TOAPLAN_COINCOUNTER(config, m_coincounter);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	ADDRESS_MAP_BANK(config, m_dma_space, 0);
+	ADDRESS_MAP_BANK(config, m_dma_space);
 	m_dma_space->set_addrmap(0, &batrider_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
@@ -793,7 +792,7 @@ void batrider_state::batrider(machine_config &config)
 	m_dma_space->set_stride(0x8000);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(batrider_state::screen_update));
@@ -845,13 +844,13 @@ void bbakraid_state::bbakraid(machine_config &config)
 	attotime snd_irq_period = attotime::from_hz(32_MHz_XTAL / 6 / 12000); // from sound CPU clock? (divider unverified)
 	m_audiocpu->set_periodic_int(FUNC(bbakraid_state::bbakraid_snd_interrupt), snd_irq_period);
 
-	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
+	TOAPLAN_COINCOUNTER(config, m_coincounter);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C66_8BIT(config, m_eeprom);
 
-	ADDRESS_MAP_BANK(config, m_dma_space, 0);
+	ADDRESS_MAP_BANK(config, m_dma_space);
 	m_dma_space->set_addrmap(0, &bbakraid_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
@@ -859,7 +858,7 @@ void bbakraid_state::bbakraid(machine_config &config)
 	m_dma_space->set_stride(0x8000);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(bbakraid_state::screen_update));
@@ -897,17 +896,17 @@ void nprobowl_state::nprobowl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nprobowl_state::nprobowl_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(nprobowl_state::reset_audiocpu));
 
-	ADDRESS_MAP_BANK(config, m_dma_space, 0);
+	ADDRESS_MAP_BANK(config, m_dma_space);
 	m_dma_space->set_addrmap(0, &nprobowl_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
 	m_dma_space->set_addr_width(16);
 	m_dma_space->set_stride(0x8000);
 
-	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
+	TOAPLAN_COINCOUNTER(config, m_coincounter);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(nprobowl_state::screen_update));

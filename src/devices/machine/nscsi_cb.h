@@ -8,7 +8,7 @@
 #include "machine/nscsi_bus.h"
 
 
-class nscsi_callback_device : public nscsi_device, public nscsi_slot_card_interface
+class nscsi_callback_device : public device_t, public nscsi_device_interface, public nscsi_slot_card_interface
 {
 public:
 	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,9 +25,9 @@ public:
 
 	virtual void scsi_ctrl_changed() override;
 
-	uint8_t read() { return scsi_bus->data_r(); }
+	uint8_t read() { return m_scsi_bus->data_r(); }
 
-	void write(uint8_t data) { scsi_bus->data_w(scsi_refid, data); }
+	void write(uint8_t data) { m_scsi_bus->data_w(m_scsi_refid, data); }
 
 	int rst_r() { return (m_ctrl & S_RST) ? 1 : 0; }
 	int atn_r() { return (m_ctrl & S_ATN) ? 1 : 0; }
@@ -39,15 +39,15 @@ public:
 	int sel_r() { return (m_ctrl & S_SEL) ? 1 : 0; }
 	int bsy_r() { return (m_ctrl & S_BSY) ? 1 : 0; }
 
-	void rst_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_RST : 0, S_RST); }
-	void atn_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_ATN : 0, S_ATN); }
-	void ack_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_ACK : 0, S_ACK); }
-	void req_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_REQ : 0, S_REQ); }
-	void msg_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_MSG : 0, S_MSG); }
-	void io_w(int state)  { scsi_bus->ctrl_w(scsi_refid, state ? S_INP : 0, S_INP); }
-	void cd_w(int state)  { scsi_bus->ctrl_w(scsi_refid, state ? S_CTL : 0, S_CTL); }
-	void sel_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_SEL : 0, S_SEL); }
-	void bsy_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_BSY : 0, S_BSY); }
+	void rst_w(int state) { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_RST : 0, S_RST); }
+	void atn_w(int state) { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_ATN : 0, S_ATN); }
+	void ack_w(int state) { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_ACK : 0, S_ACK); }
+	void req_w(int state) { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_REQ : 0, S_REQ); }
+	void msg_w(int state) { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_MSG : 0, S_MSG); }
+	void io_w(int state)  { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_INP : 0, S_INP); }
+	void cd_w(int state)  { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_CTL : 0, S_CTL); }
+	void sel_w(int state) { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_SEL : 0, S_SEL); }
+	void bsy_w(int state) { m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_BSY : 0, S_BSY); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

@@ -164,10 +164,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void lependu(machine_config &config);
-	void codemagik(machine_config &config);
+	void lependu(machine_config &config) ATTR_COLD;
+	void codemagik(machine_config &config) ATTR_COLD;
 
-	void init_lependu();
+	void init_lependu() ATTR_COLD;
 
 	void lamps_w(uint8_t data);
 	void lamps_cm_w(uint8_t data);
@@ -645,8 +645,6 @@ DISCRETE_SOUND_END
 
 void lependu_state::machine_start()
 {
-	m_lamps.resolve();
-
 	uint8_t *ROM1 = memregion("data1")->base();
 	uint8_t *ROM2 = memregion("data2")->base();
 	m_bank[0]->configure_entries(0, 4, &ROM1[0], 0x2000);
@@ -684,7 +682,7 @@ void lependu_state::lependu(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(lependu_state::mux_w)); // mux + bankswitch
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(lependu_state::screen_update_lependu));
 

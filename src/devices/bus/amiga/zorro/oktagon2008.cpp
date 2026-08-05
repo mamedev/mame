@@ -63,7 +63,7 @@ private:
 oktagon2008_device::oktagon2008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGA_OKTAGON2008, tag, owner, clock)
 	, device_zorro2_card_interface(mconfig, *this)
-	, m_scsic(*this, "scsi:7:scsic")
+	, m_scsic(*this, "scsic")
 	, m_eeprom(*this, "eeprom")
 	, m_rom(*this, "rom")
 	, m_jumpers(*this, "JUMPERS")
@@ -89,7 +89,7 @@ void oktagon2008_device::int_control_w(u8 data)
 	{
 		LOG("%s: 53C94 interrupt %sabled\n", machine().describe_context(), BIT(data, 7) ? "en" : "dis");
 		m_scsic_int_enable = BIT(data, 7);
-		m_zorro->int2_w(m_scsic_int && m_scsic_int_enable);
+		int2_w(m_scsic_int && m_scsic_int_enable);
 	}
 }
 
@@ -112,7 +112,7 @@ void oktagon2008_device::irq_w(int state)
 {
 	m_scsic_int = state;
 	if (m_scsic_int_enable)
-		m_zorro->int2_w(state);
+		int2_w(state);
 }
 
 void oktagon2008_device::device_start()
@@ -141,7 +141,7 @@ void oktagon2008_device::autoconfig_base_address(offs_t address)
 	{
 		int memory_size = m_jumpers->read() & 0x03;
 		LOG("%u bytes of RAM installed\n", (memory_size + 1) * 0x200000);
-		m_zorro->space().install_ram(address, address + (memory_size + 1) * 0x200000 - 1, m_ram.get());
+		zorro_space().install_ram(address, address + (memory_size + 1) * 0x200000 - 1, m_ram.get());
 
 		m_ram_autoconfig_needed = false;
 		cfgin_w(0);
@@ -149,26 +149,26 @@ void oktagon2008_device::autoconfig_base_address(offs_t address)
 	else
 	{
 		// Diag init read from $Ex0001-$Ex0FFF; device drivers read from $Ex2001-$ExFFFF
-		m_zorro->space().install_read_handler(address + 0x0000, address + 0xffff,
+		zorro_space().install_read_handler(address + 0x0000, address + 0xffff,
 			read8sm_delegate(*this, FUNC(oktagon2008_device::rom_r)), 0x00ff);
 
-		m_zorro->space().install_readwrite_handler(address + 0x1000, address + 0x1fff,
+		zorro_space().install_readwrite_handler(address + 0x1000, address + 0x1fff,
 			read16smo_delegate(*m_scsic, FUNC(ncr53c94_device::dma16_swap_r)),
 			write16smo_delegate(*m_scsic, FUNC(ncr53c94_device::dma16_swap_w)), 0xffff);
-		m_zorro->space().install_device(address + 0x3000, address + 0x301f, *m_scsic, &ncr53c94_device::map, 0xff00);
+		zorro_space().install_device(address + 0x3000, address + 0x301f, *m_scsic, &ncr53c94_device::map, 0xff00);
 
-		m_zorro->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
+		zorro_space().install_readwrite_handler(address + 0x8000, address + 0x8001,
 				read8smo_delegate(*this, FUNC(oktagon2008_device::int_control_r)),
 				write8smo_delegate(*this, FUNC(oktagon2008_device::int_control_w)), 0xff00);
-		m_zorro->space().install_readwrite_handler(address + 0x8010, address + 0x8011,
+		zorro_space().install_readwrite_handler(address + 0x8010, address + 0x8011,
 				read8smo_delegate(*this, FUNC(oktagon2008_device::i2c_sda_r)),
 				write8smo_delegate(*this, FUNC(oktagon2008_device::i2c_scl_w)), 0xff00);
-		m_zorro->space().install_readwrite_handler(address + 0x8018, address + 0x8019,
+		zorro_space().install_readwrite_handler(address + 0x8018, address + 0x8019,
 				read8smo_delegate(*this, FUNC(oktagon2008_device::i2c_sda_r)),
 				write8smo_delegate(*this, FUNC(oktagon2008_device::i2c_sda_w)), 0xff00);
 
-		m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
-		m_zorro->cfgout_w(0);
+		zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
+		cfgout_w(0);
 	}
 }
 
@@ -199,7 +199,7 @@ void oktagon2008_device::cfgin_w(int state)
 			autoconfig_serial(0x00000000);
 			autoconfig_rom_vector(0x0000);
 
-			m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+			zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 		}
@@ -236,7 +236,7 @@ ioport_constructor oktagon2008_device::device_input_ports() const
 
 void oktagon2008_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -244,11 +244,11 @@ void oktagon2008_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", NCR53C94).machine_config([this](device_t *device) {
-		device->set_clock(25_MHz_XTAL);
-		downcast<ncr53c94_device &>(*device).set_busmd(ncr53c94_device::BUSMD_1);
-		downcast<ncr53c94_device &>(*device).irq_handler_cb().set(*this, FUNC(oktagon2008_device::irq_w));
-	});
+
+	NCR53C94(config, m_scsic, 25_MHz_XTAL);
+	scsi.set_external_device(7, m_scsic);
+	m_scsic->set_busmd(ncr53c94_device::BUSMD_1);
+	m_scsic->irq_handler_cb().set(*this, FUNC(oktagon2008_device::irq_w));
 
 	I2C_24C04(config, m_eeprom); // 24C02 on some PCBs; only addresses 0x100-0x10e appear to be used by the firmware
 }

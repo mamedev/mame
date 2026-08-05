@@ -164,16 +164,9 @@ void gba_rom_device::device_reset()
 	m_gpio_dirs = 0;
 }
 
-void gba_rom_drilldoz_device::device_start()
-{
-	gba_rom_device::device_start();
-	m_rumble.resolve();
-}
-
 void gba_rom_wariotws_device::device_start()
 {
 	gba_rom_device::device_start();
-	m_rumble.resolve();
 	save_item(NAME(m_last_val));
 	save_item(NAME(m_counter));
 }

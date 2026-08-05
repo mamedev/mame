@@ -35,8 +35,8 @@ protected:
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
-	required_device<wd90c33_vga_device> m_svga;
-	required_memory_region m_vga_rom;
+	required_device<wd90c33_vga_device> m_vga;
+	required_memory_region m_bios;
 
 	void vram_aperture_map(address_map &map) ATTR_COLD;
 

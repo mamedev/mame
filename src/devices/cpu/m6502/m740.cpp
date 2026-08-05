@@ -18,7 +18,7 @@ m740_device::m740_device(const machine_config &mconfig, device_type type, const 
 
 u32 m740_device::get_state_base() const
 {
-	return inst_state_base;
+	return m_inst_state_base;
 }
 
 std::unique_ptr<util::disasm_interface> m740_device::create_disassembler()
@@ -38,10 +38,10 @@ void m740_device::device_reset()
 {
 	m6502_device::device_reset();
 
-	irq_state = false;
+	m_irq_state = false;
 	m_irq_multiplex = 0;
 	m_irq_vector = 0xfffc;
-	SP = 0x00ff;
+	m_SP = 0x00ff;
 }
 
 void m740_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -50,13 +50,13 @@ void m740_device::state_string_export(const device_state_entry &entry, std::stri
 	case STATE_GENFLAGS:
 	case M6502_P:
 		str = string_format("%c%c%c%c%c%c%c",
-						P & F_N ? 'N' : '.',
-						P & F_V ? 'V' : '.',
-						P & F_T ? 'T' : '.',
-						P & F_D ? 'D' : '.',
-						P & F_I ? 'I' : '.',
-						P & F_Z ? 'Z' : '.',
-						P & F_C ? 'C' : '.');
+						m_P & F_N ? 'N' : '.',
+						m_P & F_V ? 'V' : '.',
+						m_P & F_T ? 'T' : '.',
+						m_P & F_D ? 'D' : '.',
+						m_P & F_I ? 'I' : '.',
+						m_P & F_Z ? 'Z' : '.',
+						m_P & F_C ? 'C' : '.');
 		break;
 	}
 }
@@ -80,44 +80,44 @@ uint8_t m740_device::do_rrf(uint8_t in)
 
 void m740_device::do_sbc_dt(uint8_t val)
 {
-	uint8_t c = P & F_C ? 0 : 1;
-	P &= ~(F_N|F_V|F_Z|F_C);
-	uint16_t diff = TMP - val - c;
-	uint8_t al = (TMP & 15) - (val & 15) - c;
+	uint8_t c = m_P & F_C ? 0 : 1;
+	m_P &= ~(F_N|F_V|F_Z|F_C);
+	uint16_t diff = m_TMP - val - c;
+	uint8_t al = (m_TMP & 15) - (val & 15) - c;
 	if(int8_t(al) < 0)
 		al -= 6;
-	uint8_t ah = (TMP >> 4) - (val >> 4) - (int8_t(al) < 0);
+	uint8_t ah = (m_TMP >> 4) - (val >> 4) - (int8_t(al) < 0);
 	if(!uint8_t(diff))
-		P |= F_Z;
+		m_P |= F_Z;
 	else if(diff & 0x80)
-		P |= F_N;
-	if((TMP^val) & (TMP^diff) & 0x80)
-		P |= F_V;
+		m_P |= F_N;
+	if((m_TMP^val) & (m_TMP^diff) & 0x80)
+		m_P |= F_V;
 	if(!(diff & 0xff00))
-		P |= F_C;
+		m_P |= F_C;
 	if(int8_t(ah) < 0)
 		ah -= 6;
-	TMP = (ah << 4) | (al & 15);
+	m_TMP = (ah << 4) | (al & 15);
 }
 
 void m740_device::do_sbc_ndt(uint8_t val)
 {
-	uint16_t diff = TMP - val - (P & F_C ? 0 : 1);
-	P &= ~(F_N|F_V|F_Z|F_C);
+	uint16_t diff = m_TMP - val - (m_P & F_C ? 0 : 1);
+	m_P &= ~(F_N|F_V|F_Z|F_C);
 	if(!uint8_t(diff))
-		P |= F_Z;
+		m_P |= F_Z;
 	else if(int8_t(diff) < 0)
-		P |= F_N;
-	if((TMP^val) & (TMP^diff) & 0x80)
-		P |= F_V;
+		m_P |= F_N;
+	if((m_TMP^val) & (m_TMP^diff) & 0x80)
+		m_P |= F_V;
 	if(!(diff & 0xff00))
-		P |= F_C;
-	TMP = diff;
+		m_P |= F_C;
+	m_TMP = diff;
 }
 
 void m740_device::do_sbct(uint8_t val)
 {
-	if(P & F_D)
+	if(m_P & F_D)
 		do_sbc_dt(val);
 	else
 		do_sbc_ndt(val);
@@ -125,44 +125,44 @@ void m740_device::do_sbct(uint8_t val)
 
 void m740_device::do_adc_dt(uint8_t val)
 {
-	uint8_t c = P & F_C ? 1 : 0;
-	P &= ~(F_N|F_V|F_Z|F_C);
-	uint8_t al = (TMP & 15) + (val & 15) + c;
+	uint8_t c = m_P & F_C ? 1 : 0;
+	m_P &= ~(F_N|F_V|F_Z|F_C);
+	uint8_t al = (m_TMP & 15) + (val & 15) + c;
 	if(al > 9)
 		al += 6;
-	uint8_t ah = (TMP >> 4) + (val >> 4) + (al > 15);
-	if(!uint8_t(TMP + val + c))
-		P |= F_Z;
+	uint8_t ah = (m_TMP >> 4) + (val >> 4) + (al > 15);
+	if(!uint8_t(m_TMP + val + c))
+		m_P |= F_Z;
 	else if(ah & 8)
-		P |= F_N;
-	if(~(TMP^val) & (TMP^(ah << 4)) & 0x80)
-		P |= F_V;
+		m_P |= F_N;
+	if(~(m_TMP^val) & (m_TMP^(ah << 4)) & 0x80)
+		m_P |= F_V;
 	if(ah > 9)
 		ah += 6;
 	if(ah > 15)
-		P |= F_C;
-	TMP = (ah << 4) | (al & 15);
+		m_P |= F_C;
+	m_TMP = (ah << 4) | (al & 15);
 }
 
 void m740_device::do_adc_ndt(uint8_t val)
 {
 	uint16_t sum;
-	sum = TMP + val + (P & F_C ? 1 : 0);
-	P &= ~(F_N|F_V|F_Z|F_C);
+	sum = m_TMP + val + (m_P & F_C ? 1 : 0);
+	m_P &= ~(F_N|F_V|F_Z|F_C);
 	if(!uint8_t(sum))
-		P |= F_Z;
+		m_P |= F_Z;
 	else if(int8_t(sum) < 0)
-		P |= F_N;
-	if(~(TMP^val) & (TMP^sum) & 0x80)
-		P |= F_V;
+		m_P |= F_N;
+	if(~(m_TMP^val) & (m_TMP^sum) & 0x80)
+		m_P |= F_V;
 	if(sum & 0xff00)
-		P |= F_C;
-	TMP = sum;
+		m_P |= F_C;
+	m_TMP = sum;
 }
 
 void m740_device::do_adct(uint8_t val)
 {
-	if(P & F_D)
+	if(m_P & F_D)
 		do_adc_dt(val);
 	else
 		do_adc_ndt(val);
@@ -191,11 +191,11 @@ void m740_device::execute_set_input(int inputnum, int state)
 			break;
 
 		case V_LINE:
-			if(!v_state && state == ASSERT_LINE)
+			if(!m_v_state && state == ASSERT_LINE)
 			{
-				P |= F_V;
+				m_P |= F_V;
 			}
-			v_state = state == ASSERT_LINE;
+			m_v_state = state == ASSERT_LINE;
 			break;
 	}
 }
@@ -214,9 +214,9 @@ void m740_device::set_irq_line(int line, int state)
 		m_irq_multiplex &= ~(1<<line);
 	}
 
-	irq_state = (m_irq_multiplex != 0);
+	m_irq_state = (m_irq_multiplex != 0);
 
-	if (irq_state)
+	if (m_irq_state)
 	{
 		for (int i = 0; i < M740_MAX_INT_LINE; i++)
 		{

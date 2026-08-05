@@ -41,3 +41,14 @@ ISA debug port $80, `wpiset 0x80,1,w,1,{printf "%02x",wpdata;g}`.
 | 34 | Relocate shadow RAM if configured |
 | 36 | Configure EMS system |
 | 38 | Configure wait states |
+
+## Troubleshooting
+
+- Booting in Award BootBlock: implement shadow RAM;
+- PCI targets with OHCI (and probably EHCI) may crash at startup: implement USB chipset, requires relocatable BAR that will default to RAM $0 if not implemented;
+- "Unknown" CPU: r/w the info thru CMOS (Phoenix BIOSes do something similar);
+- DOS (up to Win98) startup stuck while looping around on clearly incorrect conventional memory opcodes: fix A20, chipset possibly has fast A20 mechanism at I/O $92;
+- Award System Config shows N/A for PCI card IRQs: check PCI config space numbering, use cards with confirmed good line/pin setup.
+- Running awfully slow with moderate CPU clocks: don't use `DERIVED_CLOCK` with PIT;
+- Early PCI hosts make no dword access to PCI config space, ISA video card works but PCI don't: check that
+it r/w at $c000 then implement [Configuration Space Access Mechanism 2](https://wiki.osdev.org/PCI#Configuration_Space_Access_Mechanism_#2) if it does;

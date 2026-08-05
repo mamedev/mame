@@ -509,7 +509,7 @@ void mc10_state::mc10_video(machine_config &config)
 	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K,20K,32K");
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	mc6847_device &vdg(MC6847(config, "mc6847", XTAL(3'579'545)));
 	vdg.set_screen("screen");
@@ -552,14 +552,14 @@ void alice32_state::alice32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &alice32_state::alice32_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 	screen.set_size(336, 270);
 	screen.set_visarea(00, 336-1, 00, 270-1);
 	PALETTE(config, "palette").set_entries(8);
 
-	EF9345(config, m_ef9345, 0);
+	EF9345(config, m_ef9345);
 	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 	TIMER(config, "alice32_sl").configure_scanline(FUNC(alice32_state::alice32_scanline), "screen", 0, 10);

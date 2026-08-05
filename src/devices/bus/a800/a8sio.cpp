@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-  a8sio.h - Atari 8 bit SIO bus interface
+  a8sio.cpp - Atari 8 bit SIO bus interface
 
 
               1 1
@@ -32,6 +32,7 @@
 
 #include "emu.h"
 #include "a8sio.h"
+
 #include "atari810.h"
 #include "atari1050.h"
 #include "atarifdc.h"
@@ -62,6 +63,7 @@ a8sio_device::a8sio_device(const machine_config &mconfig, const char *tag, devic
 	, m_out_interrupt_cb(*this)
 	, m_device(nullptr)
 {
+	set_options(a8sio_cards, nullptr, false);
 }
 
 //-------------------------------------------------

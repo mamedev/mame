@@ -43,7 +43,7 @@ void ati_vga_device::device_start()
 
 void ati_vga_device::device_add_mconfig(machine_config &config)
 {
-	MACH8(config, "8514a", 0).set_vga_owner();
+	MACH8(config, "8514a").set_vga_owner();
 }
 
 // TODO: fails VBETEST (after UNIVBE load)

@@ -24,7 +24,7 @@ namespace ui {
 class menu_input_toggles : public menu
 {
 public:
-	menu_input_toggles(mame_ui_manager &mui, render_container &container);
+	menu_input_toggles(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_input_toggles();
 
 protected:

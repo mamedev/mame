@@ -21,7 +21,7 @@
 
 class atarig42_state : public atarigen_state
 {
-public:
+protected:
 	atarig42_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_jsa(*this, "jsa"),
@@ -33,9 +33,9 @@ public:
 		m_mo_command(*this, "mo_command")
 	{ }
 
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	void a2d_select_w(offs_t offset, uint8_t data);
@@ -46,7 +46,8 @@ protected:
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void atarig42(machine_config &config);
+
+	void atarig42(machine_config &config) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<atari_jsa_iii_device> m_jsa;
@@ -79,9 +80,13 @@ protected:
 class atarig42_0x200_state : public atarig42_state
 {
 public:
-	using atarig42_state::atarig42_state;
-	void init_roadriot();
-	void atarig42_0x200(machine_config &config);
+	atarig42_0x200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atarig42_state(mconfig, type, tag)
+	{ }
+
+	void init_roadriot() ATTR_COLD;
+
+	void atarig42_0x200(machine_config &config) ATTR_COLD;
 
 protected:
 	uint16_t roadriot_sloop_data_r(offs_t offset);
@@ -92,10 +97,14 @@ protected:
 class atarig42_0x400_state : public atarig42_state
 {
 public:
-	using atarig42_state::atarig42_state;
-	void init_dangerex();
-	void init_guardian();
-	void atarig42_0x400(machine_config &config);
+	atarig42_0x400_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atarig42_state(mconfig, type, tag)
+	{ }
+
+	void init_dangerex() ATTR_COLD;
+	void init_guardian() ATTR_COLD;
+
+	void atarig42_0x400(machine_config &config) ATTR_COLD;
 
 protected:
 	uint16_t guardians_sloop_data_r(offs_t offset);

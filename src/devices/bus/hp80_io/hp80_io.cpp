@@ -28,6 +28,7 @@ hp80_io_slot_device::hp80_io_slot_device(const machine_config &mconfig, const ch
 	m_halt_cb_func(*this),
 	m_slot_no(0)
 {
+	set_options(hp80_io_slot_devices, nullptr, false);
 }
 
 hp80_io_slot_device::~hp80_io_slot_device()

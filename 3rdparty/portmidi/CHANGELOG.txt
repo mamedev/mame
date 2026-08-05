@@ -1,5 +1,8 @@
 /* CHANGELOG FOR PORTMIDI
  *
+ * 23May22 Roger Dannenberg
+ * - fix for Apple Arm (M1) cpus
+ *
  * 21Feb22 v2.0.3 Roger Dannenberg
  * - this version allows multiple hardware devices to have the same name.
  * 
@@ -14,6 +17,10 @@
  * - Fix for unicode endpoints on macOS CoreMIDI.
  * - Parsing in macOS of realtime message embedded in short messages
  *   (can this actually happen?)
+ * - Support higher data rates using macOS CoreMIDI. Note that
+ *   CoreMIDI will drop messages to non-hardware (e.g. IAC bus) when
+ *   data rate is too high, so PortMIDI throttles data to a safe rate,
+ *   but data to hardware, e.g. USB, is no longer throttled.
  * - renamed pm_test/test.c to pm_test/testio.c
  * - with this release, pm_java, pm_csharp, pm_cl, pm_python, pm_qt
  *   are marked as "legacy code" and README.txt's refer to other

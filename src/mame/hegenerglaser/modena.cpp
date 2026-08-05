@@ -18,7 +18,7 @@ Hardware notes:
 
 #include "emu.h"
 
-#include "mmdisplay1.h"
+#include "mdisplay1.h"
 
 #include "cpu/m6502/w65c02.h"
 #include "machine/clock.h"

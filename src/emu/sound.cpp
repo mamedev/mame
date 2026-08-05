@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound.h"
 
 #include "audio_effects/aeffect.h"
 #include "resampler.h"
@@ -17,6 +18,7 @@
 #include "emuopts.h"
 #include "main.h"
 #include "speaker.h"
+#include "video.h"
 
 #include "wavwrite.h"
 #include "xmlfile.h"
@@ -47,693 +49,10 @@
 const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAMS_UPDATE_FREQUENCY);
 
 
-//**// Output buffer management
-
-// Output buffers store samples produced every system-wide update.
-// They give access to a window of samples produced before the update,
-// and ensure that enough space is available to fit the update.
-
-
-template<typename S> emu::detail::output_buffer_interleaved<S>::output_buffer_interleaved(u32 buffer_size, u32 channels) :
-	m_buffer(channels*buffer_size, 0),
-	m_sync_sample(0),
-	m_write_position(0),
-	m_sync_position(0),
-	m_history(0),
-	m_channels(channels)
-{
-}
-
-template<typename S> void emu::detail::output_buffer_interleaved<S>::set_buffer_size(u32 buffer_size)
-{
-	m_buffer.resize(m_channels*buffer_size, 0);
-}
-
-template<typename S> void emu::detail::output_buffer_interleaved<S>::prepare_space(u32 samples)
-{
-	if(!m_channels)
-		return;
-
-	//   Check if potential overflow, bring data back up front if needed
-	u32 buffer_size = m_buffer.size() / m_channels;
-	if(m_write_position + samples > buffer_size) {
-		u32 source_start = (m_sync_position - m_history) * m_channels;
-		u32 source_end = m_write_position * m_channels;
-		std::copy(m_buffer.begin() + source_start, m_buffer.begin() + source_end, m_buffer.begin());
-		m_write_position -= m_sync_position - m_history;
-		m_sync_position = m_history;
-	}
-
-	//   Clear the destination range
-	u32 fill_start = m_write_position * m_channels;
-	u32 fill_end = (m_write_position + samples) * m_channels;
-	std::fill(m_buffer.begin() + fill_start, m_buffer.begin() + fill_end, 0.0);
-}
-
-template<typename S> void emu::detail::output_buffer_interleaved<S>::commit(u32 samples)
-{
-	m_write_position += samples;
-}
-
-template<typename S> void emu::detail::output_buffer_interleaved<S>::sync()
-{
-	m_sync_sample += m_write_position - m_sync_position;
-	m_sync_position = m_write_position;
-}
-
-
-template<typename S> void emu::detail::output_buffer_interleaved<S>::set_history(u32 history)
-{
-	m_history = history;
-	if(m_sync_position < m_history) {
-		u32 delta = m_history - m_sync_position;
-		if(m_write_position) {
-			std::copy_backward(m_buffer.begin(), m_buffer.begin() + m_write_position * m_channels, m_buffer.begin() + (m_write_position + delta) * m_channels);
-			for(u32 pos = m_channels; pos != delta * m_channels; pos++)
-				m_buffer[pos] = m_buffer[pos - m_channels];
-		} else
-			std::fill(m_buffer.begin(), m_buffer.begin() + m_history * m_channels, 0.0);
-
-		m_write_position += delta;
-		m_sync_position = m_history;
-	}
-}
-
-template<typename S> emu::detail::output_buffer_flat<S>::output_buffer_flat(u32 buffer_size, u32 channels) :
-	m_buffer(channels),
-	m_sync_sample(0),
-	m_write_position(0),
-	m_sync_position(0),
-	m_history(0),
-	m_channels(channels)
-{
-	for(auto &b : m_buffer)
-		b.resize(buffer_size, 0);
-}
-
-template<typename S> void emu::detail::output_buffer_flat<S>::register_save_state(device_t &device, const char *id1, const char *id2)
-{
-	auto &save = device.machine().save();
-
-	for(unsigned int i=0; i != m_buffer.size(); i++)
-		save.save_item(&device, id1, id2, i, NAME(m_buffer[i]));
-
-	save.save_item(&device, id1, id2, 0, NAME(m_sync_sample));
-	save.save_item(&device, id1, id2, 0, NAME(m_write_position));
-	save.save_item(&device, id1, id2, 0, NAME(m_sync_position));
-	save.save_item(&device, id1, id2, 0, NAME(m_history));
-}
-
-template<typename S> void emu::detail::output_buffer_flat<S>::set_buffer_size(u32 buffer_size)
-{
-	for(auto &b : m_buffer)
-		b.resize(buffer_size, 0);
-}
-
-template<typename S> void emu::detail::output_buffer_flat<S>::prepare_space(u32 samples)
-{
-	if(!m_channels)
-		return;
-
-	//   Check if potential overflow, bring data back up front if needed
-	u32 buffer_size = m_buffer[0].size();
-	if(m_write_position + samples > buffer_size) {
-		u32 source_start = m_sync_position - m_history;
-		u32 source_end = m_write_position;
-		for(u32 channel = 0; channel != m_channels; channel++)
-			std::copy(m_buffer[channel].begin() + source_start, m_buffer[channel].begin() + source_end, m_buffer[channel].begin());
-		m_write_position -= source_start;
-		m_sync_position = m_history;
-	}
-
-	//   Clear the destination range
-	u32 fill_start = m_write_position;
-	u32 fill_end = m_write_position + samples;
-	for(u32 channel = 0; channel != m_channels; channel++)
-		std::fill(m_buffer[channel].begin() + fill_start, m_buffer[channel].begin() + fill_end, 0.0);
-}
-
-template<typename S> void emu::detail::output_buffer_flat<S>::commit(u32 samples)
-{
-	m_write_position += samples;
-}
-
-template<typename S> void emu::detail::output_buffer_flat<S>::sync()
-{
-	m_sync_sample += m_write_position - m_sync_position;
-	m_sync_position = m_write_position;
-}
-
-template<typename S> void emu::detail::output_buffer_flat<S>::set_history(u32 history)
-{
-	m_history = history;
-	if(m_sync_position < m_history) {
-		u32 delta = m_history - m_sync_position;
-		if(m_write_position)
-			for(u32 channel = 0; channel != m_channels; channel++) {
-				std::copy_backward(m_buffer[channel].begin(), m_buffer[channel].begin() + m_write_position, m_buffer[channel].begin() + m_write_position + delta);
-				std::fill(m_buffer[channel].begin() + 1, m_buffer[channel].begin() + delta, m_buffer[channel][0]);
-			}
-		else
-			for(u32 channel = 0; channel != m_channels; channel++)
-				std::fill(m_buffer[channel].begin(), m_buffer[channel].begin() + m_history, 0.0);
-
-		m_write_position += delta;
-		m_sync_position = m_history;
-	}
-}
-
-template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previous_rate, u32 next_rate, attotime sync_time, attotime now)
-{
-	auto si = [](attotime time, u32 rate) -> s64 {
-		return time.m_seconds * rate + muldivu_64(time.m_attoseconds, rate, ATTOSECONDS_PER_SECOND);
-	};
-
-	if(!m_write_position || !previous_rate) {
-		m_sync_position = 0;
-		m_sync_sample = si(sync_time, next_rate);
-		m_write_position = si(now, next_rate) - m_sync_sample;
-		m_history = 0;
-		for(u32 channel = 0; channel != m_channels; channel++)
-			std::fill(m_buffer[channel].begin(), m_buffer[channel].begin() + m_write_position, 0);
-		return;
-	}
-
-	if(!next_rate) {
-		m_write_position = m_sync_position = 0;
-		return;
-	}
-
-	// Compute what will be the new start, sync and write positions (if it fits)
-	s64 nsync = si(sync_time, next_rate);
-	s64 nwrite = si(now, next_rate);
-	s64 pbase = m_sync_sample - m_sync_position; // Beware, pbase can be negative at startup due to history size
-	u64 nbase = (pbase <= 0) ? 0 : muldivupu_64(pbase, next_rate, previous_rate);
-
-	if(nbase > nsync)
-		nbase = nsync;
-
-	u32 space = m_buffer[0].size();
-	if(nwrite - nbase > space) {
-		nbase = nwrite - space;
-		if(nbase > nsync)
-			fatalerror("Stream buffer too small, can't proceed, rate change %d -> %d, space=%d\n", previous_rate, next_rate, space);
-	}
-
-	u64 ppos = muldivu_64(nbase, previous_rate, next_rate);
-	if(ppos > pbase + m_write_position)
-		fatalerror("Something went very wrong, ppos=%d, pbase=%d, pbase+wp=%d\n", ppos, pbase, pbase + m_write_position);
-
-	double step = double(previous_rate) / double(next_rate);
-	double pdec = double(nbase % next_rate) * next_rate / previous_rate;
-	pdec -= floor(pdec);
-	u32 pindex = ppos - pbase;
-	u32 nend = nwrite - nbase;
-
-	// Warning: don't try to be too clever, the m_buffer storage is
-	// registered in the save state system, so it must not move or
-	// change size
-
-	std::vector<S> copy(m_write_position);
-	for(u32 channel = 0; channel != m_channels; channel++) {
-		std::copy(m_buffer[channel].begin(), m_buffer[channel].begin() + m_write_position, copy.begin());
-
-		// Interpolate the buffer contents
-
-		for(u32 nindex = 0; nindex != nend; nindex++) {
-			u32 pi0 = std::clamp(pindex, 0U, m_write_position - 1);
-			u32 pi1 = std::clamp(pindex + 1, 0U, m_write_position - 1);
-			m_buffer[channel][nindex] = copy[pi0] * (1-pdec) + copy[pi1] * pdec;
-
-			pdec += step;
-			if(pdec >= 1) {
-				int s = s32(pdec);
-				pindex += s;
-				pdec -= s;
-			}
-		}
-	}
-
-	m_sync_sample = nsync;
-	m_sync_position = m_sync_sample - nbase;
-	m_write_position = nend;
-
-	// history and the associated resizes are taken into account later
-}
-
-template class emu::detail::output_buffer_flat<sound_stream::sample_t>;
-template class emu::detail::output_buffer_interleaved<s16>;
-
-
 // Not inline because with the unique_ptr it would require audio_effect in emu.h
 
 sound_manager::effect_step::effect_step(u32 buffer_size, u32 channels) : m_buffer(buffer_size, channels)
 {
-}
-
-
-//**// Streams and routes
-
-sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
-	m_device(device),
-	m_output_buffer(0, outputs),
-	m_sample_rate((sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE) ? 0 : sample_rate),
-	m_input_count(inputs),
-	m_output_count(outputs),
-	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE),
-	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE),
-	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
-	m_started(false),
-	m_in_update(false),
-	m_sync_timer(nullptr),
-	m_callback(std::move(callback))
-{
-	if(inputs == 0 && outputs == 0)
-		fatalerror("Device %s requiring to create a stream without inputs or outputs\n", device.tag());
-
-	if(inputs == 0)
-		m_input_adaptive = false;
-	if(outputs == 0)
-		m_output_adaptive = false;
-
-	if(m_sample_rate && m_sample_rate < 1000)
-		fatalerror("Device %s requiring to create a stream with too low samplerate %d\n", device.tag(), m_sample_rate);
-
-	// create a name
-	m_name = m_device.name();
-	m_name += " '";
-	m_name += m_device.tag();
-	m_name += "'";
-
-	// create an update timer for synchronous streams
-	if(synchronous())
-		m_sync_timer = m_device.timer_alloc(FUNC(sound_stream::sync_update), this);
-
-	// create the gain vectors
-	m_input_channel_gain.resize(m_input_count, 1.0);
-	m_output_channel_gain.resize(m_output_count, 1.0);
-	m_user_output_channel_gain.resize(m_output_count, 1.0);
-	m_user_output_gain = 1.0;
-}
-
-sound_stream::~sound_stream()
-{
-}
-
-void sound_stream::add_bw_route(sound_stream *source, int output, int input, float gain)
-{
-	m_bw_routes.emplace_back(source, output, input, gain);
-}
-
-void sound_stream::add_fw_route(sound_stream *target, int input, int output)
-{
-	m_fw_routes.emplace_back(target, input, output);
-}
-
-bool sound_stream::set_route_gain(sound_stream *source, int source_channel, int target_channel, float gain)
-{
-	for(auto &r : m_bw_routes)
-		if(r.m_source == source && r.m_output == source_channel && r.m_input == target_channel) {
-			r.m_gain = gain;
-			return true;
-		}
-	return false;
-}
-
-std::vector<sound_stream *> sound_stream::sources() const
-{
-	std::vector<sound_stream *> streams;
-	for(const route_bw &route : m_bw_routes) {
-		sound_stream *stream = route.m_source;
-		for(const sound_stream *s : streams)
-			if(s == stream)
-				goto already;
-		streams.emplace_back(stream);
-	already:;
-	}
-	return streams;
-}
-
-std::vector<sound_stream *> sound_stream::targets() const
-{
-	std::vector<sound_stream *> streams;
-	for(const route_fw &route : m_fw_routes) {
-		sound_stream *stream = route.m_target;
-		for(const sound_stream *s : streams)
-			if(s == stream)
-				goto already;
-		streams.emplace_back(stream);
-	already:;
-	}
-	return streams;
-}
-
-void sound_stream::register_state()
-{
-	// create a unique tag for saving
-	m_state_tag = string_format("%d", m_device.machine().sound().unique_id());
-	auto &save = m_device.machine().save();
-
-	save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), 0, NAME(m_sync_time));
-	save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), 0, NAME(m_sample_rate));
-	if(m_input_count)
-		save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), 0, NAME(m_input_channel_gain));
-	if(m_output_count)
-		save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), 0, NAME(m_output_channel_gain));
-	// user gains go to .cfg files, not state files
-
-	m_output_buffer.register_save_state(m_device, "stream.sound_stream.output_buffer", m_state_tag.c_str());
-
-	for(unsigned int i=0; i != m_bw_routes.size(); i++)
-		save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), i, m_bw_routes[i].m_gain, "route_gain");
-}
-
-
-void sound_stream::compute_dependants()
-{
-	m_dependant_streams.clear();
-	for(const route_bw &r : m_bw_routes)
-		r.m_source->add_dependants(m_dependant_streams);
-}
-
-void sound_stream::add_dependants(std::vector<sound_stream *> &deps)
-{
-	for(const route_bw &r : m_bw_routes)
-		r.m_source->add_dependants(deps);
-	for(sound_stream *dep : deps)
-		if(dep == this)
-			return;
-	deps.emplace_back(this);
-}
-
-
-//**// Gain management
-
-void sound_stream::set_user_output_gain(float gain)
-{
-	if(gain == m_user_output_gain)
-		return;
-	update();
-	m_user_output_gain = gain;
-}
-
-void sound_stream::set_user_output_gain(s32 output, float gain)
-{
-	if(gain == m_user_output_channel_gain[output])
-		return;
-	update();
-	m_user_output_channel_gain[output] = gain;
-}
-
-void sound_stream::set_input_gain(s32 input, float gain)
-{
-	if(gain == m_input_channel_gain[input])
-		return;
-	update();
-	m_input_channel_gain[input] = gain;
-}
-
-void sound_stream::apply_input_gain(s32 input, float gain)
-{
-	if(gain == 1.0f)
-		return;
-	update();
-	m_input_channel_gain[input] *= gain;
-}
-
-void sound_stream::set_output_gain(s32 output, float gain)
-{
-	if(gain == m_output_channel_gain[output])
-		return;
-	update();
-	m_output_channel_gain[output] = gain;
-}
-
-void sound_stream::apply_output_gain(s32 output, float gain)
-{
-	if(gain == 1.0f)
-		return;
-	update();
-	m_output_channel_gain[output] *= gain;
-}
-
-
-//**// Stream sample rate
-
-void sound_stream::set_sample_rate(u32 new_rate)
-{
-	m_input_adaptive = m_output_adaptive = false;
-	internal_set_sample_rate(new_rate);
-}
-
-void sound_stream::internal_set_sample_rate(u32 new_rate)
-{
-	if(new_rate == m_sample_rate)
-		return;
-
-	if(m_started) {
-		if(m_samples_to_update > 0)
-			fatalerror("Error: set_sample_rate called while in stream_update\n");
-
-		update();
-		m_output_buffer.resample(m_sample_rate, new_rate, m_sync_time, m_device.machine().time());
-		m_sample_rate = new_rate;
-		for(const route_fw &r : m_fw_routes)
-			r.m_target->create_resamplers();
-		create_resamplers();
-		lookup_history_sizes();
-
-	} else
-		m_sample_rate = new_rate;
-}
-
-bool sound_stream::try_solving_frequency()
-{
-	if(frequency_is_solved())
-		return false;
-
-	if(input_adaptive() && !output_adaptive()) {
-		u32 freq = 0;
-		for(const route_bw &r : m_bw_routes) {
-			if(!r.m_source->frequency_is_solved())
-				return false;
-			if(freq < r.m_source->sample_rate())
-				freq = r.m_source->sample_rate();
-		}
-		m_sample_rate = freq;
-		return true;
-
-	} else if(output_adaptive() && !input_adaptive()) {
-		u32 freq = 0;
-		for(const route_fw &r : m_fw_routes) {
-			if(!r.m_target->frequency_is_solved())
-				return false;
-			if(freq < r.m_target->sample_rate())
-				freq = r.m_target->sample_rate();
-		}
-		m_sample_rate = freq;
-		return true;
-
-	} else {
-		u32 freqbw = 0;
-		for(const route_bw &r : m_bw_routes) {
-			if(!r.m_source->frequency_is_solved()) {
-				freqbw = 0;
-				break;
-			}
-			if(freqbw < r.m_source->sample_rate())
-				freqbw = r.m_source->sample_rate();
-		}
-		u32 freqfw = 0;
-		for(const route_fw &r : m_fw_routes) {
-			if(!r.m_target->frequency_is_solved()) {
-				freqfw = 0;
-				break;
-			}
-			if(freqfw < r.m_target->sample_rate())
-				freqfw = r.m_target->sample_rate();
-		}
-		if(!freqbw && !freqfw)
-			return false;
-
-		m_sample_rate = (freqfw > freqbw) ? freqfw : freqbw;
-		return true;
-	}
-}
-
-
-//**// Stream flow and updates
-
-void sound_stream::init()
-{
-	// Ensure the buffer size is non-zero, since a stream can be started at any time
-	u32 bsize = m_sample_rate ? m_sample_rate : 48000;
-	m_input_buffer.resize(m_input_count);
-	for(auto &b : m_input_buffer)
-		b.resize(bsize);
-
-	m_output_buffer.set_buffer_size(bsize);
-
-	m_samples_to_update = 0;
-	m_started = true;
-	if(synchronous())
-		reprime_sync_timer();
-}
-
-u64 sound_stream::get_current_sample_index() const
-{
-	attotime now = m_device.machine().time();
-	return now.m_seconds * m_sample_rate + muldivu_64(now.m_attoseconds, m_sample_rate, ATTOSECONDS_PER_SECOND);
-}
-
-void sound_stream::update()
-{
-	if(!is_active() || m_in_update || m_device.machine().time().is_zero())
-		return;
-
-	// Find out where we are and how much we have to do
-	u64 idx = get_current_sample_index();
-	m_samples_to_update = idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
-
-	if(m_samples_to_update > 0) {
-		m_in_update = true;
-
-		// If there's anything to do, well, do it, starting with the dependencies
-		for(auto &stream : m_dependant_streams)
-			stream->update_nodeps();
-
-		do_update();
-		m_in_update = false;
-	}
-	m_samples_to_update = 0;
-}
-
-void sound_stream::update_nodeps()
-{
-	if(!is_active() || m_in_update || m_device.machine().time().is_zero())
-		return;
-
-	// Find out where we are and how much we have to do
-	u64 idx = get_current_sample_index();
-	m_samples_to_update = idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
-
-	if(m_samples_to_update > 0) {
-		m_in_update = true;
-
-		// If there's anything to do, well, do it
-		do_update();
-		m_in_update = false;
-	}
-	m_samples_to_update = 0;
-}
-
-void sound_stream::create_resamplers()
-{
-	if(!is_active()) {
-		for(auto &r : m_bw_routes)
-			r.m_resampler = nullptr;
-		return;
-	}
-
-	for(auto &r : m_bw_routes)
-		if(r.m_source->is_active() && r.m_source->sample_rate() != m_sample_rate)
-			r.m_resampler = m_device.machine().sound().get_resampler(r.m_source->sample_rate(), m_sample_rate);
-		else
-			r.m_resampler = nullptr;
-}
-
-void sound_stream::lookup_history_sizes()
-{
-	u32 history = 0;
-	for(auto &r : m_fw_routes) {
-		u32 h = r.m_target->get_history_for_bw_route(this, r.m_output);
-		if(h > history)
-			history = h;
-	}
-
-	m_output_buffer.set_history(history);
-}
-
-u32 sound_stream::get_history_for_bw_route(const sound_stream *source, u32 channel) const
-{
-	u32 history = 0;
-	for(auto &r : m_bw_routes)
-		if(r.m_source == source && r.m_output == channel && r.m_resampler) {
-			u32 h = r.m_resampler->history_size();
-			if(h > history)
-				history = h;
-		}
-	return history;
-}
-
-void sound_stream::do_update()
-{
-	// Mix in all the inputs (if any)
-	if(m_input_count) {
-		for(auto &b : m_input_buffer)
-			std::fill(b.begin(), b.begin() + m_samples_to_update, 0.0);
-		for(const auto &r : m_bw_routes) {
-			if(!r.m_source->is_active())
-				continue;
-
-			float gain = r.m_source->m_user_output_gain * r.m_source->m_output_channel_gain[r.m_output] * r.m_source->m_user_output_channel_gain[r.m_output] * r.m_gain * m_input_channel_gain[r.m_input];
-			auto &db = m_input_buffer[r.m_input];
-			if(r.m_resampler)
-				r.m_resampler->apply(r.m_source->m_output_buffer, db, m_output_buffer.write_sample(), r.m_output, gain, m_samples_to_update);
-
-			else {
-				const sample_t *sb = r.m_source->m_output_buffer.ptrs(r.m_output, m_output_buffer.write_sample() - r.m_source->m_output_buffer.sync_sample());
-				for(u32 i = 0; i != m_samples_to_update; i++)
-					db[i] += sb[i] * gain;
-			}
-		}
-	}
-
-	// Prepare the output space (if any)
-	m_output_buffer.prepare_space(m_samples_to_update);
-
-	// Call the callback
-	m_callback(*this);
-
-	// Update the indexes
-	m_output_buffer.commit(m_samples_to_update);
-}
-
-void sound_stream::sync(attotime now)
-{
-	m_sync_time = now;
-	m_output_buffer.sync();
-}
-
-
-
-
-attotime sound_stream::sample_to_time(u64 index) const
-{
-	attotime res = attotime::zero;
-	res.m_seconds = index / m_sample_rate;
-	res.m_attoseconds = muldivupu_64(index % m_sample_rate, ATTOSECONDS_PER_SECOND, m_sample_rate);
-	return res;
-}
-
-
-//**// Synchronous stream updating
-
-void sound_stream::reprime_sync_timer()
-{
-	if(!is_active())
-		return;
-
-	u64 next_sample = m_output_buffer.write_sample();
-	attotime next_time = sample_to_time(next_sample);
-	next_time.m_attoseconds += ATTOSECONDS_PER_NANOSECOND; // Go to the next nanosecond
-	m_sync_timer->adjust(next_time - m_device.machine().time());
-}
-
-void sound_stream::sync_update(s32)
-{
-	update();
-	reprime_sync_timer();
 }
 
 
@@ -864,20 +183,20 @@ void sound_manager::after_devices_init()
 	//  Handle all the ready streams in a lifo matter (better for cache when generating sound)
 	while(!ready_streams.empty()) {
 		sound_stream *stream = ready_streams.back();
-		//   add the stream to the update order
+		// add the stream to the update order
 		m_ordered_streams.emplace_back(stream);
 		ready_streams.resize(ready_streams.size() - 1);
-		//   reduce the depcount for all the streams that depend on the updated stream
+		// reduce the depcount for all the streams that depend on the updated stream
 		for(sound_stream *target : stream->targets())
 			if(!--depcounts[target])
-				//   when the depcount is zero, a stream is ready to be updated
+				// when the depcount is zero, a stream is ready to be updated
 				ready_streams.emplace_back(target);
 	}
 
 	//  If not all streams ended up in the sorted list, we have a loop
 	if(m_ordered_streams.size() != m_stream_list.size()) {
-		//  Apply the same algorithm from the other side to the
-		//  remaining streams to only keep the ones in the loop
+		// Apply the same algorithm from the other side to the
+		// remaining streams to only keep the ones in the loop
 
 		std::map<sound_stream *, int> inverted_depcounts;
 		for(auto &dpc : depcounts)
@@ -960,7 +279,6 @@ void sound_manager::input_get(int id, sound_stream &stream)
 	u64 dest_end_pos = dest_start_pos + dest_samples;
 	u32 skip = stream.output_count();
 
-
 	for(const auto &step : m_microphones[id].m_input_mixing_steps) {
 		if(step.m_mode == mixing_step::CLEAR || step.m_mode == mixing_step::COPY)
 				fatalerror("Impossible step encountered in input\n");
@@ -1034,8 +352,7 @@ void sound_manager::run_effects()
 
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
 #endif
-		// Copy the data to the effects threads, expanding as needed
-		// when -speed is in use
+		// Copy the data to the effects threads, expanding as needed when -speed is in use
 		double sf = machine().video().speed_factor();
 		if(sf == 1000) {
 			for(auto &si : m_speakers) {
@@ -1060,27 +377,27 @@ void sound_manager::run_effects()
 				eb.prepare_space(source_samples / sf + 1);
 				int source_sample_index = 0;
 				int dest_index = 0;
-				double m_phase = si.m_speed_phase;
+				double phase = si.m_speed_phase;
 				for(int channel = 0; channel != channels; channel ++) {
 					const sample_t *src = si.m_buffer.ptrs(channel, 0);
-					m_phase = si.m_speed_phase;
-					if(m_phase >= 1) {
-						source_sample_index = int(m_phase);
-						m_phase -= int(m_phase);
+					phase = si.m_speed_phase;
+					if(phase >= 1) {
+						source_sample_index = int(phase);
+						phase -= int(phase);
 					} else
 						source_sample_index = 0;
 					sample_t *dest = eb.ptrw(channel, 0);
 					dest_index = 0;
 					while(source_sample_index < source_samples) {
 						dest[dest_index++] = m_muted ? 0.0 : src[source_sample_index];
-						m_phase += sf;
-						if(m_phase >= 1) {
-							source_sample_index += int(m_phase);
-							m_phase -= int(m_phase);
+						phase += sf;
+						if(phase >= 1) {
+							source_sample_index += int(phase);
+							phase -= int(phase);
 						}
 					}
 				}
-				si.m_speed_phase = m_phase + (source_sample_index - source_samples);
+				si.m_speed_phase = phase + (source_sample_index - source_samples);
 				eb.commit(dest_index);
 			}
 		}
@@ -1090,7 +407,7 @@ void sound_manager::run_effects()
 
 		// Apply the effects
 		for(auto &si : m_speakers)
-			for(u32 i=0; i != si.m_effects.size(); i++) {
+			for(u32 i = 0; i != si.m_effects.size(); i++) {
 				auto &source = i ? si.m_effects[i-1].m_buffer : si.m_effects_buffer;
 				si.m_effects[i].m_effect->apply(source, si.m_effects[i].m_buffer);
 				source.sync();
@@ -1265,7 +582,7 @@ sound_manager::speaker_info::speaker_info(speaker_device &dev, u32 rate, u32 fir
 {
 	m_channels = dev.inputs();
 	m_stream = dev.stream();
-	for(u32 i=0; i != audio_effect::COUNT; i++)
+	for(u32 i = 0; i != audio_effect::COUNT; i++)
 		m_effects.emplace_back(rate, dev.inputs());
 }
 
@@ -1305,9 +622,10 @@ void sound_manager::resume()
 
 void sound_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	if(cfg_type == config_type::FINAL)
+	if(cfg_type == config_type::FINAL) {
 		// Note that the config is loaded
 		m_osd_info.m_generation = 0xffff0001;
+	}
 
 	// If no config file, ignore
 	if(!parentnode)
@@ -1388,7 +706,6 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			if(intf && channel >= 0 && channel < intf->outputs())
 				intf->set_user_output_gain(channel, lv_node->get_attribute_float("gain", 1.0));
 		}
-
 
 		// Mapping configuration
 		m_configs.clear();
@@ -1791,7 +1108,6 @@ void sound_manager::startup_cleanups()
 			}
 	}
 
-
 	// If there's no default source replace all the default source config
 	// entries into the first source available
 	if(!osd_info.m_default_source) {
@@ -2103,7 +1419,6 @@ void sound_manager::update_osd_streams()
 	m_osd_output_streams.clear();
 
 	// Find the index of a sound_io_device in the speaker_info vector or the microphone_info vector
-
 	auto find_sound_io_index = [this](sound_io_device *dev) -> u32 {
 		for(u32 si = 0; si != m_speakers.size(); si++)
 			if(&m_speakers[si].m_dev == dev)
@@ -2113,7 +1428,6 @@ void sound_manager::update_osd_streams()
 				return si;
 		return 0; // Can't happen
 	};
-
 
 	// Find a pointer to a node_info from the node id
 	auto find_node_info = [this](u32 node) -> const osd::audio_info::node_info * {
@@ -2201,7 +1515,6 @@ void sound_manager::update_osd_streams()
 			// Otherwise use the default method
 			return get_input_stream_for_node_and_device(node, dev, rate, is_system_default, true);
 		};
-
 
 		auto get_output_stream_for_node_and_channel = [this, &get_output_stream_for_node_and_device] (const osd::audio_info::node_info *node, u32 node_channel, sound_io_device *dev, u32 rate, bool is_system_default) -> u32 {
 			// First check if there's an active stream with the correct channel not used yet
@@ -2354,8 +1667,7 @@ void sound_manager::update_osd_streams()
 
 		// Retrieve or create the one osd stream for a given
 		// destination.  First check if we already have it, then
-		// whether it was previously created, then otherwise create
-		// it.
+		// whether it was previously created, then otherwise create it.
 
 		auto get_input_stream_for_node = [this, &current_input_streams, &input_stream_per_node] (const osd::audio_info::node_info *node, u32 rate, bool is_system_default) -> u32 {
 			// Pick up the existing stream if there's one
@@ -2671,12 +1983,11 @@ void sound_manager::mapping_update()
 
 
 
-
 //**// Global sound system update
 
 u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
 {
-	return time.m_seconds * sample_rate + muldivu_64(time.m_attoseconds, sample_rate,  ATTOSECONDS_PER_SECOND);
+	return time.m_seconds * sample_rate + muldivu_64(time.m_attoseconds, sample_rate, ATTOSECONDS_PER_SECOND);
 }
 
 void sound_manager::update(s32)
@@ -2710,7 +2021,6 @@ void sound_manager::streams_update()
 		run_effects();
 #endif
 	}
-
 
 	// Send the hooked samples to lua
 	{

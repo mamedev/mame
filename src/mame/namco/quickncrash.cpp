@@ -21,7 +21,16 @@ Namco H-5 CPU PCB (8830970101 - 8830960101)
 - Epson SED1351F0A
 - 2x TC55257DFL-70L
 
-Cool Gunman is thought to run on similar hardware, it probably belongs here
+Cool Gunman runs on similar hardware:
+Main PCB has both 'Namco TY294V-0 1329960102' and 'Tamura GAME PCB'
+- KL5C80A12CFP
+- Oki M9810
+- 93C46N
+- 6264 (removed?)
+- 20.000 MHz XTAL
+- lots of connectors
+
+It probably needs at least a LED driving PCB, too.
 */
 
 #include "emu.h"
@@ -46,12 +55,14 @@ public:
 	{ }
 
 	void qncrash(machine_config &config) ATTR_COLD;
+	void cgunman(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<kl5c80a12_device> m_maincpu;
 
 	void main_program_map(address_map &map) ATTR_COLD;
 	void main_io_map(address_map &map) ATTR_COLD;
+	void cgunman_main_io_map(address_map &map) ATTR_COLD;
 	void dot_program_map(address_map &map) ATTR_COLD;
 	void dot_io_map(address_map &map) ATTR_COLD;
 };
@@ -69,6 +80,13 @@ void qncrash_state::main_io_map(address_map &map)
 	map(0x40, 0x40).lw8(NAME([this] (u8 data) { logerror("%s: port40 out %02X\n", machine().describe_context(), data); }));
 	//map(0x50, 0x50).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write_command_or_tmp_register));
 	map(0x58, 0x5b).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+void qncrash_state::cgunman_main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).lw8(NAME([this] (u8 data) { logerror("%s: port40 out %02X\n", machine().describe_context(), data); }));
+	//map(0x50, 0x50).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write_command_or_tmp_register));
 }
 
 void qncrash_state::dot_program_map(address_map &map)
@@ -162,10 +180,38 @@ void qncrash_state::qncrash(machine_config &config)
 	SPEAKER(config, "gun_speaker").front_center();
 	SPEAKER(config, "target_speaker").front_center();
 
-	okim9810_device &oki(OKIM9810(config, "oki", 4'096'000)); // no evident XTAL on PCB
+	okim9810_device &oki(OKIM9810(config, "oki", 4'096'000)); // XTAL on PCB not readable from the pic
 	// TODO: May need to be swapped. The announcer should come from gun_speaker
 	oki.add_route(0, "gun_speaker", 1.00);
 	oki.add_route(1, "target_speaker", 1.00);
+}
+
+void qncrash_state::cgunman(machine_config &config)
+{
+	// basic machine hardware
+	KL5C80A12(config, m_maincpu, 20_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &qncrash_state::cgunman_main_io_map);
+	m_maincpu->in_p0_callback().set_ioport("IN0");
+	m_maincpu->out_p0_callback().set([this] (u8 data) { logerror("%s: p0 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->out_p1_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(0);
+	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(1);
+	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(2);
+	m_maincpu->out_p2_callback().set([this] (u8 data) { logerror("%s: p2 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->out_p3_callback().set([this] (u8 data) { logerror("%s: p3 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->out_p4_callback().set([this] (u8 data) { logerror("%s: p4 out %02X\n", machine().describe_context(), data); });
+
+	TMPZ84C015(config, "dotcpu", 24'000'000 / 2).set_disable();
+
+	EEPROM_93C46_16BIT(config, "eeprom");
+
+	// video hardware
+	// TODO:
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	OKIM9810(config, "oki", 4'096'000).add_route(ALL_OUTPUTS, "mono", 1.00); // XTAL on PCB not readable from the pic
 }
 
 
@@ -209,8 +255,23 @@ ROM_START( qncrasha )
 	ROM_LOAD( "j4155.ic5", 0x400, 0x155, NO_DUMP )
 ROM_END
 
+ROM_START( cgunman )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cgm1_mpro.ic3", 0x00000, 0x10000, CRC(0aed68fb) SHA1(d72a39c37c33369dae8a298fec2c8ef9065101d9) )
+
+	ROM_REGION( 0x20000, "dotcpu", 0 )
+	ROM_LOAD( "cgm1_dot0.bin", 0x00000, 0x20000, NO_DUMP ) // not 100% sure it exists
+
+	ROM_REGION( 0x400000, "oki", 0 )
+	ROM_LOAD( "cgm1_vo1.ic18", 0x000000, 0x400000, NO_DUMP ) // size not verified
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46n.ic6", 0x00, 0x80, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
 GAME( 1999, qncrash,  0,       qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (Japan, V2.200)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // version listed at 0xa97a in program ROM
 GAME( 1999, qncrasha, qncrash, qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (US)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1998, cgunman,  0,       cgunman, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Cool Gunman (V1.70)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

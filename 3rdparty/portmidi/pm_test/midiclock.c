@@ -179,7 +179,7 @@ int get_number(const char *prompt)
 * Effect: print help text
 ****************************************************************************/
 
-private void showhelp()
+private void showhelp(void)
 {
     printf("\n");
     printf("t toggles sending MIDI Time Code (MTC)\n");

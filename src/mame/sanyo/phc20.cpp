@@ -209,7 +209,7 @@ void phc20_state::phc20(machine_config &config)
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &phc20_state::mem_map);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	M5C6847P1(config, m_vdg, 3.579545_MHz_XTAL);
 	m_vdg->set_screen("screen");

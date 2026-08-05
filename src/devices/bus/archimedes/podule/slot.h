@@ -35,10 +35,7 @@ public:
 	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, U &&opts, const char *dflt)
 		: archimedes_podule_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_exp.set_tag(std::forward<T>(bus_tag));
 	}
 	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -51,7 +48,7 @@ protected:
 	required_device<archimedes_exp_device> m_exp;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ARCHIMEDES_PODULE_SLOT, archimedes_podule_slot_device)
 
 
@@ -116,7 +113,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ARCHIMEDES_EXPANSION_BUS, archimedes_exp_device)
 
 

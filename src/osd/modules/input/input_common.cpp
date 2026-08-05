@@ -13,6 +13,7 @@
 #include "modules/lib/osdobj_common.h"
 
 #include "emu.h" // so we can get an input manager from the running machine
+#include "input.h"
 
 //============================================================
 //  Keyboard translation table

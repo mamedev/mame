@@ -85,6 +85,8 @@
 #include "mn1880.h"
 #include "mn1880d.h"
 
+#include <bit>
+
 // device type definitions
 DEFINE_DEVICE_TYPE(MN1880, mn1880_device, "mn1880", "Panasonic MN1880")
 DEFINE_DEVICE_TYPE(MN18801A, mn18801a_device, "mn18801a", "Panasonic MN18801A")
@@ -2430,7 +2432,7 @@ void mn1880_device::execute_run()
 			if (m_irq != 0)
 			{
 				// IRQ0 (first of four external edge inputs?) has the highest priority (after RESET)
-				unsigned level = 32 - count_leading_zeros_32((m_irq - 1) & ~m_irq);
+				unsigned level = std::bit_width((m_irq - 1U) & ~m_irq);
 				(void)standard_irq_callback(level, cpu.ip);
 				cpu.ie &= ~(1 << level); // No separate in-service lockout; handler must re-enable specific interrupt
 				m_if &= ~(1 << level);

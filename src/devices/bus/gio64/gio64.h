@@ -28,10 +28,7 @@ public:
 	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gio64_tag, slot_type_t slot_type, U &&opts, const char *dflt)
 		: gio64_slot_device(mconfig, tag, owner, (uint32_t)0, slot_type)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_gio64.set_tag(std::forward<T>(gio64_tag));
 	}
 	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, slot_type_t slot_type = GIO64_SLOT_EXP0);

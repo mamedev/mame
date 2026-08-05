@@ -474,7 +474,7 @@ void vme_sys68k_cpu1_card_device::device_add_mconfig(machine_config &config)
 	 * the ROM monitor is over-run while checking for checksums etc if used with
 	 * UI mount <file> feature.
 	 */
-	ACIA6850(config, m_aciahost, 0);
+	ACIA6850(config, m_aciahost);
 	m_aciahost->txd_handler().set("rs232host", FUNC(rs232_port_device::write_txd));
 	m_aciahost->rts_handler().set("rs232host", FUNC(rs232_port_device::write_rts));
 
@@ -483,7 +483,7 @@ void vme_sys68k_cpu1_card_device::device_add_mconfig(machine_config &config)
 	rs232host.cts_handler().set(m_aciahost, FUNC(acia6850_device::write_cts));
 
 	/* P4/Terminal Port config */
-	ACIA6850(config, m_aciaterm, 0);
+	ACIA6850(config, m_aciaterm);
 	m_aciaterm->txd_handler().set("rs232trm", FUNC(rs232_port_device::write_txd));
 	m_aciaterm->rts_handler().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
@@ -492,7 +492,7 @@ void vme_sys68k_cpu1_card_device::device_add_mconfig(machine_config &config)
 	rs232trm.cts_handler().set(m_aciaterm, FUNC(acia6850_device::write_cts));
 
 	/* P5/Remote Port config */
-	ACIA6850(config, m_aciaremt, 0);
+	ACIA6850(config, m_aciaremt);
 
 	/* Bit Rate Generator */
 	MC14411(config, m_brg, XTAL(1'843'200));

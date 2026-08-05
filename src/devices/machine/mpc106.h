@@ -30,7 +30,16 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_rom_tag(rom_tag);
 	}
-	mpc106_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	template <typename T>
+	mpc106_host_device(const machine_config &mconfig, const char *tag, device_t *owner, map_type map, T &&cpu_tag, const char *rom_tag)
+		: mpc106_host_device(mconfig, tag, owner, 0, map, std::forward<T>(cpu_tag), rom_tag)
+	{
+		set_ids_host(0x10570002, 0x00, 0x00000000);
+		set_map_type(map);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_rom_tag(rom_tag);
+	}
+	mpc106_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_info(u8 *ram_ptr, int ram_size);

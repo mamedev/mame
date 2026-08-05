@@ -33,6 +33,12 @@ public:
 	void address_w(uint8_t data);
 	void data_w(uint8_t data);
 
+	// used for bootstrap HLE where it helps to know the page sizes
+	uint32_t page_data_size() { return m_page_data_size;  }
+	uint32_t page_total_size() { return m_page_total_size; }
+	u8* nand_data() { return &m_feeprom_data[0]; }
+	uint32_t nand_size() { return m_page_total_size * m_num_pages; }
+
 protected:
 	enum sm_mode_t : uint8_t
 	{
@@ -148,11 +154,37 @@ public:
 	samsung_k9f2g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class hynix_hy27uf084g2m_device : public nand_device
+{
+public:
+	hynix_hy27uf084g2m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+
 class toshiba_tc58256aft_device : public nand_device
 {
 public:
 	toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
+
+class generalplus_gpr27p512a : public nand_device
+{
+public:
+	generalplus_gpr27p512a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class sandisk_nand_128mb_512_device : public nand_device
+{
+public:
+	sandisk_nand_128mb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class sandisk_nand_256mb_512_device : public nand_device
+{
+public:
+	sandisk_nand_256mb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(NAND, nand_device)
@@ -164,6 +196,10 @@ DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B, samsung_k9f1g08u0b_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M, samsung_k9f1g08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M, samsung_k9lag08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M, samsung_k9f2g08u0m_device)
+DECLARE_DEVICE_TYPE(HYNIX_HY27UF084G2M, hynix_hy27uf084g2m_device)
 DECLARE_DEVICE_TYPE(TOSHIBA_TC58256AFT, toshiba_tc58256aft_device)
+DECLARE_DEVICE_TYPE(GENERALPLUS_GPR27P512A, generalplus_gpr27p512a)
+DECLARE_DEVICE_TYPE(SANDISK_NAND_128MB_512_DEVICE, sandisk_nand_128mb_512_device)
+DECLARE_DEVICE_TYPE(SANDISK_NAND_256MB_512_DEVICE, sandisk_nand_256mb_512_device)
 
 #endif // MAME_MACHINE_NANDFLASH_H

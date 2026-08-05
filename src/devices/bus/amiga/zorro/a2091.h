@@ -40,8 +40,6 @@ protected:
 	virtual void busrst_w(int state) override;
 
 private:
-	void wd33c93_config(device_t *device);
-
 	uint8_t xt_r(offs_t offset);
 	void xt_w(offs_t offset, uint8_t data);
 

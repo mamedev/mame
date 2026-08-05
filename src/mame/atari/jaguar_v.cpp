@@ -148,6 +148,8 @@
 #include "jaguar.h"
 #include "jagblit.h"
 
+#include "endianness.h"
+
 #define LOG_BLITS           (1U << 1)
 #define LOG_BLITTER_STATS   (1U << 2)
 #define LOG_BLITTER_WRITE   (1U << 3)
@@ -157,7 +159,7 @@
 #define LOG_OBJECT_BRANCH   (1U << 7) // log branch taken (verbose)
 
 #define VERBOSE (LOG_UNHANDLED_BLITS)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -734,7 +736,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
 					{
 						rectangle visarea(hbend / 2, hbstart / 2 - 1, vbend / 2, vbstart / 2 - 1);
-						m_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS(double(m_pixel_clock) * 2 / hperiod / vperiod));
+						m_screen->configure(hperiod / 2, vperiod / 2, visarea, attotime::from_ticks(hperiod * vperiod, m_pixel_clock * 2));
 					}
 				}
 				break;

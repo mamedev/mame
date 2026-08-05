@@ -62,7 +62,6 @@ private:
 	void update_background();
 	void update_foreground();
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 	void main_io_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;

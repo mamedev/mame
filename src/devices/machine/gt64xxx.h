@@ -148,7 +148,7 @@ private:
 	galileo_addr_map dma_addr_map[proc_addr_bank::ADDR_NUM];
 	int dma_fetch_next(address_space &space, int which);
 	TIMER_CALLBACK_MEMBER(perform_dma);
-	address_space* dma_decode_address(uint32_t &addr);
+	address_space* dma_decode_address(offs_t &addr);
 };
 
 // Supports R4600/4650/4700/R5000 CPUs

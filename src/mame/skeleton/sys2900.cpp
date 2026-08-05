@@ -144,7 +144,7 @@ void sys2900_state::sys2900(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sys2900_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -154,10 +154,10 @@ void sys2900_state::sys2900(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	Z80CTC(config, "ctc", 0);
-	Z80PIO(config, "pio", 0);
-	Z80SIO(config, "sio1", 0);
-	Z80SIO(config, "sio2", 0);
+	Z80CTC(config, "ctc");
+	Z80PIO(config, "pio");
+	Z80SIO(config, "sio1");
+	Z80SIO(config, "sio2");
 }
 
 /* ROM definition */

@@ -55,8 +55,19 @@ u8 h8_timer8_channel_device::tcr_r()
 void h8_timer8_channel_device::tcr_w(u8 data)
 {
 	update_counter();
+
+	const u8 prev = m_tcr;
 	m_tcr = data;
 	update_tcr();
+
+	// fire any pending interrupts if they're being enabled now
+	if(!(prev & TCR_CMIEA) && (m_tcr & TCR_CMIEA) && (m_tcsr & TCSR_CMFA))
+		m_intc->internal_interrupt(m_irq_ca);
+	if(!(prev & TCR_CMIEB) && (m_tcr & TCR_CMIEB) && (m_tcsr & TCSR_CMFB))
+		m_intc->internal_interrupt(m_irq_cb);
+	if(!(prev & TCR_OVIE) && (m_tcr & TCR_OVIE) && (m_tcsr & TCSR_OVF))
+		m_intc->internal_interrupt(m_irq_v);
+
 	recalc_event();
 }
 

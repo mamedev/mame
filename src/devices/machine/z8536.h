@@ -362,7 +362,23 @@ protected:
 		DCS_DO_NOT_USE
 	};
 
-	void get_interrupt_vector();
+
+	// interrupt priority
+	static constexpr int PRIORITY[] =
+	{
+		COUNTER_TIMER_3_COMMAND_AND_STATUS,
+		PORT_A_COMMAND_AND_STATUS,
+		COUNTER_TIMER_2_COMMAND_AND_STATUS,
+		PORT_B_COMMAND_AND_STATUS,
+		COUNTER_TIMER_1_COMMAND_AND_STATUS
+	};
+
+
+	u8 get_port_a_vector(bool status);
+	u8 get_port_b_vector(bool status);
+	u8 get_timer_vector(bool status);
+	u8 get_current_vector();
+	u8 acknowledge_interrupt();
 	void check_interrupt();
 
 	u8 read_register(offs_t offset);
@@ -408,6 +424,7 @@ protected:
 	// timers
 	emu_timer *m_timer;
 	u16 m_counter[3];
+	bool m_counter_error[3];
 };
 
 // ======================> z8036_device

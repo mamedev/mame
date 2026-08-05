@@ -58,7 +58,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0)
 		, m_floppy_selected_drive(0)
-		, m_scsi(*this, "scsibus:7:ncr5380")
+		, m_scsi(*this, "ncr5380")
 		, m_scsibus(*this, "scsibus")
 		, m_printer_conn(*this, "prn")
 		, m_printer_out(*this, "prn_out")
@@ -169,11 +169,11 @@ void ms68k_state::ms68k(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR53C80)
-		.machine_config([this](device_t *device) {
-			// SCSI Interrupt = 5
-			downcast<ncr53c80_device &>(*device).irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
-		});
+
+	NCR53C80(config, m_scsi);
+	m_scsibus->set_external_device(7, m_scsi);
+	// SCSI Interrupt = 5
+	m_scsi->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 
 	// Set up FDC.
 

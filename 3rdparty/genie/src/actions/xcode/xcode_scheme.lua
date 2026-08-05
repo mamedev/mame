@@ -16,7 +16,7 @@ local xcode   = premake.xcode
 		_p(indent + 0, '<BuildableReference')
 		_p(indent + 1, 'BuildableIdentifier = "primary"')
 		_p(indent + 1, 'BlueprintIdentifier = "%s"', prj.xcode.projectnode.targetid)
-		_p(indent + 1, 'BuildableName = "%s"', cfg.buildtarget.name)
+		_p(indent + 1, 'BuildableName = "%s.app"', cfg.buildtarget.name)
 		_p(indent + 1, 'BlueprintName = "%s"', prj.name)
 		_p(indent + 1, 'ReferencedContainer = "container:%s.xcodeproj">', prj.name)
 		_p(indent + 0, '</BuildableReference>')
@@ -172,7 +172,7 @@ local xcode   = premake.xcode
 			_p(2, 'useCustomWorkingDirectory = "NO"')
 		end
 		_p(2, 'ignoresPersistentStateOnLaunch = "NO"')
-		_p(2, 'debugDocumentVersioning = "YES"')
+		_p(2, 'debugDocumentVersioning = "NO"')
 		_p(2, 'debugServiceExtension = "internal"')
 		_p(2, 'allowLocationSimulation = "YES">')
 		if debugcfg.debugcmd then
@@ -201,7 +201,7 @@ local xcode   = premake.xcode
 		else
 			_p(2, 'useCustomWorkingDirectory = "NO"')
 		end
-		_p(2, 'debugDocumentVersioning = "YES">')
+		_p(2, 'debugDocumentVersioning = "NO">')
 		_p(2, '<BuildableProductRunnable')
 		_p(3, 'runnableDebuggingMode = "0">')
 		buildableref(3, primary, releasecfg)

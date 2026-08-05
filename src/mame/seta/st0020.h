@@ -11,7 +11,7 @@
 class st0020_device : public device_t, public device_gfx_interface
 {
 public:
-	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_is_jclub2(int is_jclub2) { m_is_jclub2 = is_jclub2; }
@@ -37,7 +37,7 @@ protected:
 		int yoffs = 0;
 	};
 
-	st0020_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	st0020_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -81,7 +81,7 @@ protected:
 class st0032_device : public st0020_device
 {
 public:
-	st0032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st0032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint16_t gfxram_r(offs_t offset, uint16_t mem_mask = ~0) override;
 	virtual void gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;

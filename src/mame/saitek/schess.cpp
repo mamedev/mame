@@ -25,10 +25,10 @@ Hardware notes:
 - buzzer, 64+12 leds, button chessboard
 - expansion slot at top-right (dummy empty cartridge by default)
 
-Expansion modules: (* denotes not dumped)
+Expansion modules:
 - Strong Play Module
 - Classical Style Super Strong
-- *Hyper Modern Super Strong
+- Hyper Modern Super Strong
 
 *******************************************************************************/
 

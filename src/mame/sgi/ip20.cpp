@@ -57,7 +57,7 @@ public:
 		, m_int(*this, "int")
 		, m_nvram(*this, "nvram")
 		, m_rtc(*this, "rtc")
-		, m_scsi(*this, "scsi:0:wd33c93a")
+		, m_scsi(*this, "wd33c93a")
 		, m_eth(*this, "eth")
 		, m_scc(*this, "scc%u", 0U)
 		, m_dsp(*this, "dsp")
@@ -178,7 +178,7 @@ void ip20_state::ip20(machine_config &config)
 	m_mc->eisa_present().set_constant(0);
 	m_mc->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(ip20_mc));
 
-	SGI_HPC1(config, m_hpc, 0);
+	SGI_HPC1(config, m_hpc);
 	m_hpc->set_gio(m_cpu, AS_PROGRAM);
 	m_hpc->set_enet(m_eth);
 	m_hpc->int_w().set(m_int, FUNC(sgi_int2_device::lio0_w<sgi_int2_device::LIO0_ETHERNET>));
@@ -209,16 +209,13 @@ void ip20_state::ip20(machine_config &config)
 
 	DP8572A(config, m_rtc, 32.768_kHz_XTAL).set_use_utc(true);
 
-	NSCSI_BUS(config, "scsi", 0);
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93a", WD33C93A).machine_config(
-		[this](device_t *device)
-		{
-			wd33c93a_device &scsi = downcast<wd33c93a_device &>(*device);
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
-			scsi.set_clock(10_MHz_XTAL);
-			scsi.irq_cb().set(m_int, FUNC(sgi_int2_device::lio0_w<sgi_int2_device::LIO0_SCSI>));
-			scsi.drq_cb().set(m_hpc, FUNC(hpc1_device::write_drq<0>));
-		});
+	WD33C93A(config, m_scsi, 10_MHz_XTAL);
+	scsi.set_external_device(0, m_scsi);
+	m_scsi->irq_cb().set(m_int, FUNC(sgi_int2_device::lio0_w<sgi_int2_device::LIO0_SCSI>));
+	m_scsi->drq_cb().set(m_hpc, FUNC(hpc1_device::write_drq<0>));
+
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
@@ -227,7 +224,7 @@ void ip20_state::ip20(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
 
-	SEEQ8003(config, m_eth, 0);
+	SEEQ8003(config, m_eth);
 	m_eth->out_int_cb().set(m_hpc, FUNC(hpc1_device::write_int));
 	m_eth->out_rxrdy_cb().set(m_hpc, FUNC(hpc1_device::write_drq<1>));
 	m_hpc->dma_r_cb<1>().set(m_eth, FUNC(seeq8003_device::fifo_r));
@@ -243,7 +240,7 @@ void ip20_state::ip20(machine_config &config)
 
 	sgi_kbd_port_device &kbd_port(SGI_KBD_PORT(config, "keyboard_port"));
 	kbd_port.option_set("keyboard", SGI_KBD);
-	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port", 0));
+	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port"));
 	mouse_port.option_set("mouse", SGI_HLE_SERIAL_MOUSE);
 	m_scc[0]->out_txda_callback().set(kbd_port, FUNC(sgi_kbd_port_device::write_txd));
 	kbd_port.rxd_handler().set(m_scc[0], FUNC(scc85c30_device::rxa_w));

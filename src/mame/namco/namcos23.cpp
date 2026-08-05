@@ -115,7 +115,7 @@ c8000000:
         raceon              Locks up after POST.
         aking               Inputs unresponsive.
         500gp               Occasional lockups.
-        crszone(all)        Input issues.
+        crszone(all)        Some visual glitches.
 
 ****************************************************************************
 
@@ -874,7 +874,7 @@ Notes:
             Angler King     AG1      KC028     -
             Crisis Zone     CSZ1     KC039     -
             Downhill Bikers DH1      KC016     3A, 3C, 2M and 2F not populated.
-            Final Furlong 2 FFS1     KC???     -
+            Final Furlong 2 FFS1     KC031     -
             Gunmen Wars     GM1      KC018     3A, 3C, 4A, 4C, 2A, 2F and 2M not populated.
             Motocross Go!   MG1      KC009     3A, 3C, 4A, 4C, 4F and 7F not populated.
             Panic Park      PNP1     KC015     3A, 3C, 4A, 4C, 2M and 2F not populated.
@@ -1246,15 +1246,18 @@ It can also be used with Final Furlong when wired correctly.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
+#include "video.h"
 
 #include "md8412b_s23.h"
 #include "namco_settings.h"
 #include "vpx3220a.h"
 
+#include "corefloat.h"
+#include "endianness.h"
+
 #include <cfloat>
 
-#define LOG_PROJ_MAT        (1ULL << 1)
+#define LOG_CLIP_DATA       (1ULL << 1)
 #define LOG_3D_STATE_ERR    (1ULL << 2)
 #define LOG_3D_STATE_UNK    (1ULL << 3)
 #define LOG_MATRIX_ERR      (1ULL << 4)
@@ -1302,7 +1305,7 @@ It can also be used with Final Furlong when wired correctly.
 #define LOG_C451            (1ULL << 46)
 #define LOG_SH2_VPX         (1ULL << 47)
 #define LOG_DIRECT          (1ULL << 48)
-#define LOG_ALL ( LOG_PROJ_MAT | LOG_3D_STATE_ERR | LOG_3D_STATE_UNK | LOG_VEC_ERR | LOG_VEC_UNK | LOG_RENDER_ERR | LOG_RENDER_INFO | LOG_MODEL_ERR | \
+#define LOG_ALL ( LOG_CLIP_DATA | LOG_3D_STATE_ERR | LOG_3D_STATE_UNK | LOG_VEC_ERR | LOG_VEC_UNK | LOG_RENDER_ERR | LOG_RENDER_INFO | LOG_MODEL_ERR | \
 				LOG_MODEL_INFO | LOG_MODELS | LOG_C435_PIO_UNK | LOG_C435_UNK | LOG_C417_UNK | LOG_C417_ACK | LOG_C412_UNK | LOG_C421_UNK | \
 				LOG_C422_IRQ | LOG_C422_UNK | LOG_C361_UNK | LOG_CTL_UNK | LOG_C417_IRQ | LOG_C361_IRQ | LOG_MATRIX_INFO | LOG_VEC_INFO | \
 				LOG_CTL_REG | LOG_C435_REG | LOG_C361_REG | LOG_C417_REG | LOG_C412_RAM | LOG_C421_RAM | LOG_C404_REGS | LOG_C404_RAM | LOG_GMEN | \
@@ -1446,6 +1449,7 @@ struct namcos23_render_entry
 	u16 model_blend_factor;
 	u16 light_power;
 	u16 light_ambient;
+	bool mirror_x;
 	u8 poly_fade_r;
 	u8 poly_fade_g;
 	u8 poly_fade_b;
@@ -1457,6 +1461,11 @@ struct namcos23_render_entry
 	u8 screen_fade_b;
 	u8 screen_fade_factor;
 	u8 fade_flags;
+	s16 vp_size_x;
+	s16 vp_size_y;
+	s16 vp_offset_x;
+	s16 vp_offset_y;
+	float vp_fov;
 
 	union
 	{
@@ -1503,6 +1512,10 @@ struct namcos23_render_data
 	s32 alpha_inv;
 	u8 poly_alpha_pen;
 	u8 prioverchar;
+	s16 vp_size_x;
+	s16 vp_size_y;
+	s16 vp_offset_x;
+	s16 vp_offset_y;
 
 	s32 fadecolor_r;
 	s32 fadecolor_g;
@@ -1543,6 +1556,7 @@ struct namcos23_poly_entry
 	namcos23_render_data rd;
 	int vertex_count;
 	int zkey;
+	int index;
 	poly_vertex pv[16];
 };
 
@@ -1614,6 +1628,7 @@ struct c404_t
 	u16 spritedata_idx;
 	u64 rowscroll_frame;
 	u16 rowscroll[480];
+	u16 linexscroll[1024];
 	u16 lastrow;
 	u16 xscroll;
 	u16 yscroll;
@@ -1667,7 +1682,6 @@ public:
 		m_charram(*this, "charram"),
 		m_textram(*this, "textram"),
 		m_czattr(*this, "czattr", 0x10, ENDIANNESS_BIG),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_lightx(*this, "LIGHTX"),
 		m_lighty(*this, "LIGHTY"),
 		m_p1(*this, "P1"),
@@ -1681,7 +1695,6 @@ public:
 		m_texram(nullptr),
 		m_tileid_mask(0),
 		m_tile_mask(0),
-		m_bgtilemap(nullptr),
 		m_jvs_sense(jvs_port_device::sense::None),
 		m_main_irqcause(0),
 		m_ctl_vbl_active(false),
@@ -1697,7 +1710,11 @@ public:
 		m_model_blend_factor(0x4000),
 		m_light_power(0),
 		m_light_ambient(0),
-		m_proj_matrix_line(0),
+		m_clip_data_line(0),
+		m_vp_size_x(320),
+		m_vp_size_y(240),
+		m_vp_offset_x(0),
+		m_vp_offset_y(0),
 		m_scaling(0x4000),
 		m_c361_irqnum(0),
 		m_c422_irqnum(0),
@@ -1737,8 +1754,6 @@ protected:
 	virtual void irq_update(u32 cause);
 	void subcpu_irq1_update(int state);
 
-	void textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void textchar_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void paletteram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void sprites_idx_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sprites_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -1841,7 +1856,8 @@ protected:
 	s16 *c435_getm(u16 id);
 
 	void c435_state_set_interrupt(const u16 *param);
-	void c435_state_set_projection_matrix_line(const u16 *param);
+	void c435_state_set_viewport_data(const u16 *param);
+	void c435_state_set_clip_data_line(const u16 *param);
 	void c435_state_set(u16 type, const u16 *param);
 	int c435_get_state_entry_size(u16 type);
 
@@ -1881,28 +1897,26 @@ protected:
 	u8 mcu_p6_r();
 	void mcu_p6_w(u8 data);
 
-	TILE_GET_INFO_MEMBER(text_tilemap_get_info);
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(subcpu_scanline_on_tick);
 	TIMER_CALLBACK_MEMBER(subcpu_scanline_off_tick);
 	virtual void vblank(int state);
 
 	u8 nthbyte(const u32 *pSource, int offs);
-	u16 nthword(const u32 *pSource, int offs);
 	float f24_to_f32(u32 v);
 
 	void render_apply_transform(s32 xi, s32 yi, s32 zi, const namcos23_render_entry *re, float &x, float &y, float &z);
 	void render_apply_matrot(s32 xi, s32 yi, s32 zi, const namcos23_render_entry *re, float &x, float &y, float &z);
-	void render_project(poly_vertex &v);
+	void render_project(poly_vertex &v, const s16 vp_size_x, const s16 vp_size_y, const float vp_fov);
 	void render_model(const namcos23_render_entry *re);
 	void render_direct_poly(const namcos23_render_entry *re);
-	void render_sprite(const namcos23_render_entry *re);
-	void render_sprite_tile(u32 code_offset, const namcos23_render_entry *re, int row, int col);
 	void render_immediate(const namcos23_render_entry *re);
+	virtual void dispatch_render_entry(const namcos23_render_entry *re);
 	virtual void render_run(screen_device &screen, bitmap_rgb32 &bitmap);
 
 	void update_text_rowscroll();
 	void apply_text_scroll();
+	void draw_text_layer(screen_device &screen);
 	void mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival);
 
 	required_device<mips3_device> m_maincpu;
@@ -1916,7 +1930,6 @@ protected:
 	required_shared_ptr<u32> m_charram;
 	required_shared_ptr<u32> m_textram;
 	memory_share_creator<u32> m_czattr;
-	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
 	optional_ioport m_lighty;
 	required_ioport m_p1;
@@ -1940,7 +1953,6 @@ protected:
 	const u16 *m_texram;
 	u32 m_tileid_mask;
 	u32 m_tile_mask;
-	tilemap_t *m_bgtilemap;
 
 	u8 m_jvs_sense;
 
@@ -1964,8 +1976,12 @@ protected:
 	u16 m_model_blend_factor;
 	u16 m_light_power;
 	u16 m_light_ambient;
-	float m_proj_matrix[8*3];
-	u8 m_proj_matrix_line;
+	float m_clip_data[8*3];
+	u8 m_clip_data_line;
+	s16 m_vp_size_x;
+	s16 m_vp_size_y;
+	s16 m_vp_offset_x;
+	s16 m_vp_offset_y;
 
 	// There may only be 128 matrix and vector slots.
 	// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
@@ -1995,7 +2011,8 @@ class gorgon_state : public namcos23_state
 {
 public:
 	gorgon_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcos23_state(mconfig, type, tag)
+		namcos23_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -2017,11 +2034,17 @@ protected:
 
 	void c435_pio_mode_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
+	void render_sprite(const namcos23_render_entry *re);
+	void render_sprite_tile(u32 code_offset, const namcos23_render_entry *re, int row, int col);
+
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void dispatch_render_entry(const namcos23_render_entry *re) override;
 	virtual void render_run(screen_device &screen, bitmap_rgb32 &bitmap) override;
 	virtual void vblank(int state) override;
 
 	void recalc_czram();
+
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	std::unique_ptr<u16[]> m_banked_czram[4];
 	std::unique_ptr<u8[]> m_recalc_czram[4];
@@ -2157,6 +2180,8 @@ private:
 class namcoss23_gmen_state : public namcoss23_state
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+
 	namcoss23_gmen_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcoss23_state(mconfig, type, tag),
 		m_sh2(*this, "sh2"),
@@ -2277,12 +2302,6 @@ u8 namcos23_state::nthbyte(const u32 *pSource, int offs)
 	return (pSource[0]<<((offs&3)*8))>>24;
 }
 
-u16 namcos23_state::nthword(const u32 *pSource, int offs)
-{
-	pSource += offs/2;
-	return (pSource[0]<<((offs&1)*16))>>16;
-}
-
 
 
 /***************************************************************************
@@ -2349,7 +2368,7 @@ float namcos23_state::f24_to_f32(u32 v)
 	}
 
 	r = r | (e << 23) | ((m & 0x7fff) << 8);
-	return *(float *)&r;
+	return u2f(r);
 }
 
 s32 *namcos23_state::c435_getv(u16 id)
@@ -2382,7 +2401,16 @@ void namcos23_state::c435_state_set_interrupt(const u16 *param)
 		irq_update(m_main_irqcause & ~MAIN_C435_IRQ);
 }
 
-void namcos23_state::c435_state_set_projection_matrix_line(const u16 *param)
+void namcos23_state::c435_state_set_viewport_data(const u16 *param)
+{
+	const u32 vp_data_raw = ((u32)param[7] << 16) | param[8];
+	const u16 vp_offset_x_raw = (u16)(vp_data_raw & 0x0fff);
+	const u16 vp_offset_y_raw = (u16)((vp_data_raw >> 12) & 0x0fff);
+	m_vp_offset_x = ((s16)(vp_offset_x_raw << 4)) >> 4;
+	m_vp_offset_y = -(((s16)(vp_offset_y_raw << 4)) >> 4);
+}
+
+void namcos23_state::c435_state_set_clip_data_line(const u16 *param)
 {
 	// timecrs2:
 	//   sx = 640/2, sy = 480/2, t = tan(fov/2) (fov=45 degrees)
@@ -2391,24 +2419,30 @@ void namcos23_state::c435_state_set_projection_matrix_line(const u16 *param)
 	//   line 3: 0 0 -1             c  0  0              0 sx/t
 
 	std::ostringstream buf;
-	buf << "projection matrix line:";
+	buf << "clip data line:";
 	for (int i = 0; i < 8; i++)
 	{
 		util::stream_format(buf, " %f", f24_to_f32((param[2 * i + 1] << 16) | param[2 * i + 2]));
-		m_proj_matrix[m_proj_matrix_line * 8 + i] = f24_to_f32((param[2 * i + 1] << 16) | param[2 * i + 2]);
+		m_clip_data[m_clip_data_line * 8 + i] = f24_to_f32((param[2 * i + 1] << 16) | param[2 * i + 2]);
 	}
-	m_proj_matrix_line = (m_proj_matrix_line + 1) % 3;
+	m_clip_data_line = (m_clip_data_line + 1) % 3;
 	buf << "\n";
-	LOGMASKED(LOG_PROJ_MAT, "%s: %s", machine().describe_context(), std::move(buf).str());
+	LOGMASKED(LOG_CLIP_DATA, "%s: %s", machine().describe_context(), std::move(buf).str());
+
+	if (m_clip_data_line == 0 && m_clip_data[10] != 0.f)
+	{
+		m_vp_size_y = (s16)std::roundf(std::abs(m_clip_data[10]) * std::abs(m_clip_data[23]));
+		m_vp_size_x = (s16)std::roundf((float)m_vp_size_y * std::abs(m_clip_data[2]) / std::abs(m_clip_data[10]));
+	}
 
 	std::ostringstream buf2;
-	buf2 << "projection matrix line:";
+	buf2 << "clip data line:";
 	for (int i = 0; i < 8; i++)
 	{
 		util::stream_format(buf2, " %08x", (param[2 * i + 1] << 16) | param[2 * i + 2]);
 	}
 	buf2 << "\n";
-	LOGMASKED(LOG_PROJ_MAT, "%s: %s", machine().describe_context(), std::move(buf2).str());
+	LOGMASKED(LOG_CLIP_DATA, "%s: %s", machine().describe_context(), std::move(buf2).str());
 }
 
 void namcos23_state::c435_state_reset_w(u16 data)
@@ -2763,6 +2797,11 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->ty = 0;
 		re->light_power = m_light_power;
 		re->light_ambient = m_light_ambient;
+		re->vp_size_x = m_vp_size_x;
+		re->vp_size_y = m_vp_size_y;
+		re->vp_offset_x = m_vp_offset_x;
+		re->vp_offset_y = m_vp_offset_y;
+		re->vp_fov = m_clip_data[23];
 		if (m_c435.buffer[0] == 0x4f38)
 		{
 			re->immediate.type  =  param[ 0];
@@ -2844,6 +2883,11 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->ty = 0;
 		re->light_power = m_light_power;
 		re->light_ambient = m_light_ambient;
+		re->vp_size_x = m_vp_size_x;
+		re->vp_size_y = m_vp_size_y;
+		re->vp_offset_x = m_vp_offset_x;
+		re->vp_offset_y = m_vp_offset_y;
+		re->vp_fov = m_clip_data[23];
 		/*
 		3-e0: 1110 0000, has shade+tex+pos
 		3-a0: 1010 0000, has tex+pos
@@ -2926,6 +2970,11 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->ty = 0;
 		re->light_power = m_light_power;
 		re->light_ambient = m_light_ambient;
+		re->vp_size_x = m_vp_size_x;
+		re->vp_size_y = m_vp_size_y;
+		re->vp_offset_x = m_vp_offset_x;
+		re->vp_offset_y = m_vp_offset_y;
+		re->vp_fov = m_clip_data[23];
 		re->immediate.type  =  param[ 0];
 		re->immediate.h     = (param[ 1] << 16) | param[ 2];
 		re->immediate.pal   = (param[ 3] << 16) | param[ 4];
@@ -2962,12 +3011,10 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 			LOGMASKED(LOG_3D_STATE_UNK, "%s: Word %02x: %04x\n", machine().describe_context(), i, m_c435.buffer[1 + i]);
 		break;
 	case 0x0046:
-		LOGMASKED(LOG_3D_STATE_UNK, "%s: unknown matrix(?) set (type 46) (%04x)\n", machine().describe_context(), m_c435.buffer[0]);
-		for (int i = 0; i < (m_c435.buffer[0] & 0xff); i++)
-			LOGMASKED(LOG_3D_STATE_UNK, "%s: Word %02x: %04x\n", machine().describe_context(), i, m_c435.buffer[1 + i]);
+		c435_state_set_viewport_data(param);
 		break;
 	case 0x00c8:
-		c435_state_set_projection_matrix_line(param);
+		c435_state_set_clip_data_line(param);
 		break;
 	default:
 		LOGMASKED(LOG_3D_STATE_UNK, "%s: unknown state type (%04x, %04x)\n", machine().describe_context(), m_c435.buffer[0], m_c435.buffer[1]);
@@ -3057,7 +3104,14 @@ void namcos23_state::c435_render() // 8
 	if (size != 3)
 		LOGMASKED(LOG_RENDER_ERR, "%04x %04x %04x %04x %04x\n", m_c435.buffer[0], m_c435.buffer[1], m_c435.buffer[2], m_c435.buffer[3], m_c435.buffer[4]);
 
+	if (m_c435.buffer[1] == 0)
+	{
+		irq_update(m_main_irqcause | MAIN_C435_IRQ);
+		return;
+	}
+
 	render_t &render = m_render;
+	const bool mirror_x = BIT(m_c435.buffer[0], 13);
 	const bool scroll = BIT(m_c435.buffer[0], 9);
 	const bool use_scaling = BIT(m_c435.buffer[0], 7);
 	const bool transpose = BIT(m_c435.buffer[0], 6);
@@ -3079,10 +3133,16 @@ void namcos23_state::c435_render() // 8
 	re->model.transpose = transpose;
 	re->absolute_priority = m_absolute_priority;
 	re->model_blend_factor = m_model_blend_factor;
+	re->mirror_x = mirror_x;
 	re->tx = scroll ? m_tx : 0;
 	re->ty = scroll ? m_ty : 0;
 	re->light_power = m_light_power;
 	re->light_ambient = m_light_ambient;
+	re->vp_size_x = m_vp_size_x;
+	re->vp_size_y = m_vp_size_y;
+	re->vp_offset_x = m_vp_offset_x;
+	re->vp_offset_y = m_vp_offset_y;
+	re->vp_fov = m_clip_data[23];
 	re->model.light_vector[0] = m_light_vector[0];
 	re->model.light_vector[1] = m_light_vector[1];
 	re->model.light_vector[2] = m_light_vector[2];
@@ -3519,9 +3579,17 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 	const s32 polycolor_r = rd.polycolor_r;
 	const s32 polycolor_g = rd.polycolor_g;
 	const s32 polycolor_b = rd.polycolor_b;
+	const s32 clip_left = ((320 - rd.vp_size_x) + rd.vp_offset_x);
+	const s32 clip_right = ((320 + rd.vp_size_x) + rd.vp_offset_x);
+	const s32 clip_top = ((240 - rd.vp_size_y) - rd.vp_offset_y);
+	const s32 clip_bottom = ((240 + rd.vp_size_y) - rd.vp_offset_y);
 
-	u32 *dest = &rd.bitmap->pix(scanline);
-	u8 *primap = &rd.primap->pix(scanline);
+	const s32 offset_scanline = scanline + (s32)clip_top;
+	if (offset_scanline < 0 || offset_scanline >= 480 || offset_scanline < clip_top || offset_scanline >= clip_bottom)
+		return;
+
+	u32 *dest = &rd.bitmap->pix(offset_scanline);
+	u8 *primap = &rd.primap->pix(offset_scanline);
 
 	const pen_t *pens = rd.pens;
 	int prioverchar = rd.prioverchar;
@@ -3547,7 +3615,8 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 		u32 tx = u32(u * ooz);
 		u32 ty = u32(v * ooz);
 		u8 pen = 0;
-		if (!Stencil || !stencil_lookup(tx, ty))
+		const u32 view_x = x + clip_left;
+		if ((!Stencil || !stencil_lookup(tx, ty)) && view_x >= clip_left && view_x < clip_right)
 		{
 			ty += rd.tbase;
 			u32 tex_rgb = texture_lookup(pens, penshift, penmask, tx, ty, pen);
@@ -3581,7 +3650,7 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 			s32 dr, dg, db;
 			if (Blend || (PolyAlpha && (alpha_enabled || pen == alpha_pen)))
 			{
-				drgb = dest[x];
+				drgb = dest[view_x];
 				dr = s32((drgb >> 16) & 0xff);
 				dg = s32((drgb >> 8) & 0xff);
 				db = s32(drgb & 0xff);
@@ -3600,8 +3669,8 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 				b = ((b * 0x80) + (db * 0x80)) >> 8;
 			}
 
-			dest[x] = 0xff000000 | (r << 16) | (g << 8) | b;
-			primap[x] = (primap[x] & ~1) | prioverchar;
+			dest[view_x] = 0xff000000 | (r << 16) | (g << 8) | b;
+			primap[view_x] = (primap[view_x] & ~1) | prioverchar;
 		}
 
 		z += dz;
@@ -3629,15 +3698,15 @@ void namcos23_state::render_apply_matrot(s32 xi, s32 yi, s32 zi, const namcos23_
 	z = (re->model.m[6] * xi + re->model.m[7] * yi + re->model.m[8] * zi) / 4194304.f;
 }
 
-void namcos23_state::render_project(poly_vertex &pv)
+void namcos23_state::render_project(poly_vertex &pv, const s16 vp_size_x, const s16 vp_size_y, const float vp_fov)
 {
 	// 768 validated by the title screen size on tc2:
 	// texture is 640x480, x range is 3.125, y range is 2.34375, z is 3.75
 	// 640/(3.125/3.75) = 768
 	// 480/(2.34375/3.75) = 768
 
-	pv.x = 320 + m_proj_matrix[23]*pv.x;
-	pv.y = 240 - m_proj_matrix[23]*pv.y;
+	pv.x = (float)vp_size_x + vp_fov * pv.x;
+	pv.y = (float)vp_size_y - vp_fov * pv.y;
 
 	pv.p[0] = 1.0f / pv.p[0];
 }
@@ -3702,7 +3771,9 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 		zsort = std::clamp(zsort, 0, 0x1fffff);
 		zsort |= (absolute_priority << 21);
 		p->zkey = zsort;
+		p->index = render.poly_count;
 
+		p->rd.type = re->type;
 		p->rd.stencil_enabled = false;
 		p->rd.pens = m_palette->pens() + (re->direct.d[2] & 0x7f00);
 		p->rd.direct = true;
@@ -3716,6 +3787,10 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 		p->rd.cz_value = (re->direct.d[3] >> 2) & 0x1fff;
 		p->rd.cz_type = re->direct.d[3] & 3;
 		p->rd.prioverchar = ((p->rd.cmode & 7) == 1) ? 7 : 0;
+		p->rd.vp_size_x = re->vp_size_x;
+		p->rd.vp_size_y = re->vp_size_y;
+		p->rd.vp_offset_x = re->vp_offset_x;
+		p->rd.vp_offset_y = re->vp_offset_y;
 
 		p->rd.fogfactor = 0;
 		p->rd.fadefactor = 0xff;
@@ -3743,7 +3818,6 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 		p->rd.alpha_inv = 0x100 - p->rd.alpha;
 		p->rd.alpha_enabled = ((re->direct.d[2] >> 8) & 0x7f) != re->poly_alpha_color;
 		p->rd.poly_alpha_pen = re->poly_alpha_pen;
-		p->rd.type = re->type;
 
 		// blend
 		p->rd.blend_enabled = false;
@@ -3752,7 +3826,7 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 	}
 }
 
-void namcos23_state::render_sprite(const namcos23_render_entry *re)
+void gorgon_state::render_sprite(const namcos23_render_entry *re)
 {
 	int offset = 0;
 
@@ -3766,14 +3840,14 @@ void namcos23_state::render_sprite(const namcos23_render_entry *re)
 	}
 }
 
-void namcos23_state::render_sprite_tile(u32 code_offset, const namcos23_render_entry *re, int row, int col)
+void gorgon_state::render_sprite_tile(u32 code_offset, const namcos23_render_entry *re, int row, int col)
 {
 	const namcos23_sprite_data &sprite = re->sprite;
 	render_t &render = m_render;
 
 	u32 code = sprite.code + code_offset;
 
-	gfx_element *gfx = m_gfxdecode->gfx(2);
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	s32 sprite_screen_height = (((sprite.ysize << 16) >> 5) * gfx->height() + 0x8000) >> 16;
 	s32 sprite_screen_width = (((sprite.xsize << 16) >> 5) * gfx->width() + 0x8000) >> 16;
 	if (sprite_screen_width && sprite_screen_height)
@@ -3809,6 +3883,8 @@ void namcos23_state::render_sprite_tile(u32 code_offset, const namcos23_render_e
 
 		p->rd.pens = m_palette->pens() + gfx->granularity() * (sprite.color & 0x7f);
 		p->zkey = sprite.zcoord;
+		p->index = render.poly_count;
+
 		p->rd.sprite = true;
 		p->rd.immediate = false;
 		p->rd.shade_enabled = false;
@@ -3886,7 +3962,7 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 			if (z < minz)
 				minz = z;
 
-			render_project(p->pv[i]);
+			render_project(p->pv[i], re->vp_size_x, re->vp_size_y, re->vp_fov);
 
 			float w = p->pv[i].p[0];
 			p->pv[i].p[1] *= w;
@@ -3908,6 +3984,8 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 		}
 
 		p->zkey = zsort | (absolute_priority << 21);
+		p->index = render.poly_count;
+
 		p->rd.stencil_enabled = stencil_enabled;
 		p->rd.pens = m_palette->pens() + (re->immediate.pal & 0x7f00);
 		p->rd.rgb = 0x00ffffff;
@@ -3917,6 +3995,10 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 		p->rd.shade_enabled = true;
 		p->rd.h = h;
 		p->rd.type = type;
+		p->rd.vp_size_x = re->vp_size_x;
+		p->rd.vp_size_y = re->vp_size_y;
+		p->rd.vp_offset_x = re->vp_offset_x;
+		p->rd.vp_offset_y = re->vp_offset_y;
 		p->rd.tbase = 0;
 
 		// global fade
@@ -3972,7 +4054,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 		u32 type = data[offs++];
 		u32 h    = data[offs++];
 
-		u32 cmode = (type & 0x70000000) >> 29;
+		u32 cmode = (type & 0x70000000) >> 28;
 		u32 tbase = (((type & 0x0f000000) >> 24) << 12) | (BIT(type, 31) << 16);
 		u8 color = (h >> 24) & 0x7f;
 		int lmode = (type >> 19) & 3;
@@ -4119,6 +4201,14 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 					continue;
 				}
 			}
+
+			if (re->mirror_x)
+			{
+				pv[0].x *= -1.0f;
+				pv[1].x *= -1.0f;
+				pv[2].x *= -1.0f;
+				pv[3].x *= -1.0f;
+			}
 		}
 		else
 		{
@@ -4149,7 +4239,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 				if (z < minz)
 					minz = z;
 
-				render_project(p->pv[i]);
+				render_project(p->pv[i], re->vp_size_x, re->vp_size_y, re->vp_fov);
 
 				float w = p->pv[i].p[0];
 				p->pv[i].p[1] *= w;
@@ -4164,7 +4254,19 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 				continue;
 			}
 
-			int zsort = 0.5f * (minz + maxz) + 0.5f;
+			int zsort = 0;
+			switch (h & 0x300)
+			{
+			case 0x000:
+				zsort = minz + 0.5f;
+				break;
+			case 0x100:
+				zsort = maxz + 0.5f;
+				break;
+			default:
+				zsort = 0.5f * (minz + maxz) + 0.5f;
+				break;
+			}
 			if (zsort > 0x1fffff) zsort = 0x1fffff;
 
 			int absolute_priority = re->absolute_priority & 7;
@@ -4179,7 +4281,9 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 			zsort = std::clamp(zsort, 0, 0x1fffff);
 			zsort |= (absolute_priority << 21);
 			p->zkey = zsort;
+			p->index = render.poly_count;
 
+			p->rd.type = re->type;
 			p->rd.stencil_enabled = stencil_enabled;
 			p->rd.pens = m_palette->pens() + (color << 8);
 			p->rd.rgb = (alpha << 24) | 0x00ffffff;
@@ -4194,7 +4298,10 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 			p->rd.cmode = cmode;
 			p->rd.cz_value = 0;
 			p->rd.cz_type = 0;
-			p->rd.type = re->type;
+			p->rd.vp_size_x = re->vp_size_x;
+			p->rd.vp_size_y = re->vp_size_y;
+			p->rd.vp_offset_x = re->vp_offset_x;
+			p->rd.vp_offset_y = re->vp_offset_y;
 
 			p->rd.fogfactor = 0;
 			p->rd.fadefactor = 0xff;
@@ -4236,7 +4343,15 @@ static int render_poly_compare(const void *i1, const void *i2)
 	const namcos23_poly_entry *p1 = *(const namcos23_poly_entry **)i1;
 	const namcos23_poly_entry *p2 = *(const namcos23_poly_entry **)i2;
 
-	return p1->zkey <= p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
+	if (p1->zkey < p2->zkey)
+		return 1;
+	if (p1->zkey > p2->zkey)
+		return -1;
+	if (p1->index < p2->index)
+		return -1;
+	if (p1->index > p2->index)
+		return 1;
+	return 0;
 }
 
 #define RENDER_SCANLINE_ENTRY(stencil, shade, polyfade, colorfade, blend, polyalpha) \
@@ -4387,6 +4502,11 @@ void gorgon_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 			re->screen_fade_b = m_c404.screen_fade_b;
 			re->screen_fade_factor = m_c404.screen_fade_factor;
 			re->fade_flags = m_c404.fade_flags;
+			re->vp_size_x = m_vp_size_x;
+			re->vp_size_y = m_vp_size_y;
+			re->vp_offset_x = m_vp_offset_x;
+			re->vp_offset_y = m_vp_offset_y;
+			re->vp_fov = m_clip_data[23];
 			re->absolute_priority = m_absolute_priority;
 			re->model_blend_factor = 0;
 			re->tx = 0;
@@ -4443,6 +4563,38 @@ void gorgon_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 	namcos23_state::render_run(screen, bitmap);
 }
 
+void gorgon_state::dispatch_render_entry(const namcos23_render_entry *re)
+{
+	switch (re->type)
+	{
+	case SPRITE:
+		render_sprite(re);
+		return;
+	default:
+		namcos23_state::dispatch_render_entry(re);
+		return;
+	}
+}
+
+void namcos23_state::dispatch_render_entry(const namcos23_render_entry *re)
+{
+	switch (re->type)
+	{
+	case MODEL:
+		if (m_c404.layer_flags & 1)
+			render_model(re);
+		return;
+	case DIRECT:
+		if (m_c404.layer_flags & 1)
+			render_direct_poly(re);
+		return;
+	case IMMEDIATE:
+		if (m_c404.layer_flags & 1)
+			render_immediate(re);
+		return;
+	}
+}
+
 void namcos23_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 {
 	render_t &render = m_render;
@@ -4451,24 +4603,7 @@ void namcos23_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 	render.poly_count = 0;
 	for (int i = 0; i < render.count[!render.cur]; i++)
 	{
-		switch (re->type)
-		{
-		case MODEL:
-			if (m_c404.layer_flags & 1)
-				render_model(re);
-			break;
-		case DIRECT:
-			if (m_c404.layer_flags & 1)
-				render_direct_poly(re);
-			break;
-		case IMMEDIATE:
-			if (m_c404.layer_flags & 1)
-				render_immediate(re);
-			break;
-		case SPRITE:
-			render_sprite(re);
-			break;
-		}
+		dispatch_render_entry(re);
 		re++;
 	}
 
@@ -4511,32 +4646,6 @@ void namcos23_state::paletteram_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 
-
-// C361 (text)
-
-TILE_GET_INFO_MEMBER(namcos23_state::text_tilemap_get_info)
-{
-	u16 data = nthword(m_textram, tile_index);
-	/**
-	* xxxx.----.----.---- palette select
-	* ----.xx--.----.---- flip
-	* ----.--xx.xxxx.xxxx code
-	*/
-	tileinfo.set(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
-}
-
-void namcos23_state::textram_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	COMBINE_DATA(&m_textram[offset]);
-	m_bgtilemap->mark_tile_dirty(offset*2);
-	m_bgtilemap->mark_tile_dirty((offset*2)+1);
-}
-
-void namcos23_state::textchar_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	COMBINE_DATA(&m_charram[offset]);
-	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
-}
 
 // C404 (mixing, gamma RAM)
 
@@ -4723,23 +4832,82 @@ void namcos23_state::video_start()
 	m_tileid_mask = (memregion("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
 	m_tile_mask = memregion("textile")->bytes()/256 - 1;
 
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_charram.target()));
 	m_mix_bitmap = std::make_unique<bitmap_ind16>(640, 480);
-	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcos23_state::text_tilemap_get_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_bgtilemap->set_scroll_rows(64 * 16); // fake
-	m_bgtilemap->set_transparent_pen(0xf);
 	m_render.polymgr = std::make_unique<namcos23_renderer>(*this, m_tmlrom, m_tmhrom, m_texrom, m_c412.sram, m_tileid_mask, m_tile_mask);
 
 	m_ptrom_limit = memregion("pointrom")->bytes()/4;
-
-	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
-		m_gfxdecode->gfx(1)->get_data(i);
 }
 
 void gorgon_state::video_start()
 {
 	namcos23_state::video_start();
 	m_sprrom = memregion("sprites")->base();
+}
+
+void namcos23_state::draw_text_layer(screen_device &screen)
+{
+	// tile width: 16
+	// tile height: 16
+	// total elements: 0x3c0
+	// bitplanes: 4
+	// plane offsets: 0, 1, 2, 3
+	// bit offset of each horizontal pixel:
+	//     0,   4,   8,  12,  16,  20,  24,  28,  32,  36,  40,  44,  48,  52,  56,  60
+	// bit offset of each vertical pixel:
+	//     0,  64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960
+	// tile spacing (in bits): 1024
+
+	// xxxx.----.----.---- palette select
+	// ----.xx--.----.---- flip
+	// ----.--xx.xxxx.xxxx code
+
+	for (u32 tmy = 0; tmy < 30; tmy++)
+	{
+		for (u32 ty = 0; ty < 16; ty++)
+		{
+			const u32 y = (tmy << 4) | ty;
+			u16 *dst = &m_mix_bitmap->pix(y);
+			u8 *pri = &screen.priority().pix(y);
+			const u32 scrolled_y = (y + m_c404.yscroll) & 0x03ff;
+			const u32 adjusted_tmy = scrolled_y >> 4;
+			const u32 adjusted_ty = scrolled_y & 0xf;
+			for (u32 tmx = 0; tmx < 40; tmx++)
+			{
+				const u16 scroll_x = m_c404.linexscroll[scrolled_y];
+				u16 tile_scroll = scroll_x >> 4;
+				s16 pix_scroll = scroll_x & 0xf;
+				u16 tile_data = util::big_endian_cast<const u16>(m_textram.target())[(adjusted_tmy << 6) | ((tmx + tile_scroll) & 0x3f)];
+				u32 pal_select = BIT(tile_data, 12, 4) << 4;
+				u32 tile_code = (tile_data & 0x03ff) << 5;
+				u8 flipx_mask = BIT(tile_data, 10) ? 0x00 : 0x3c;
+				u16 flipy_mask = BIT(tile_data, 11) ? 0x1e : 0x00;
+				const u32 char_addr = tile_code | ((adjusted_ty << 1) ^ flipy_mask);
+				u64 char_data = ((u64)m_charram[char_addr] << 32) | m_charram[char_addr | 1];
+				for (u32 tx = 0; tx < 16; tx++)
+				{
+					const u8 val = BIT(char_data, ((tx + pix_scroll) << 2) ^ flipx_mask, 4);
+					if (val != 0xf)
+					{
+						*dst = m_c404.palbase | pal_select | val;
+						*pri = 4;
+					}
+					dst++;
+					pri++;
+					if (pix_scroll && (tx + pix_scroll) == 15)
+					{
+						tile_data = util::big_endian_cast<const u16>(m_textram.target())[(adjusted_tmy << 6) | ((tmx + tile_scroll + 1) & 0x3f)];
+						pal_select = BIT(tile_data, 12, 4) << 4;
+						tile_code = (tile_data & 0x03ff) << 5;
+						flipx_mask = BIT(tile_data, 10) ? 0x00 : 0x3c;
+						flipy_mask = BIT(tile_data, 11) ? 0x1e : 0x00;
+						const u32 char_addr = tile_code | ((adjusted_ty << 1) ^ flipy_mask);
+						char_data = ((u64)m_charram[char_addr] << 32) | m_charram[char_addr | 1];
+						pix_scroll -= 16;
+					}
+				}
+			}
+		}
+	}
 }
 
 void namcos23_state::mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
@@ -4819,7 +4987,6 @@ u32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		return UPDATE_HAS_NOT_CHANGED;
 	}
 
-	m_bgtilemap->set_palette_offset(m_c404.palbase);
 	screen.priority().fill(0, cliprect);
 
 	// background color
@@ -4841,9 +5008,8 @@ u32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	if (m_c404.layer_flags & 4)
 	{
 		apply_text_scroll();
-		m_bgtilemap->set_palette_offset(m_c404.palbase);
 
-		m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 4, 4);
+		draw_text_layer(screen);
 		mix_text_layer(screen, bitmap, cliprect, 4);
 	}
 
@@ -5374,17 +5540,11 @@ void namcos23_state::update_text_rowscroll()
 void namcos23_state::apply_text_scroll()
 {
 	update_text_rowscroll();
-	int scroll_y = m_c404.yscroll & 0x3ff;
-
-	m_bgtilemap->set_scrolly(0, scroll_y);
-
-	for (int i = 0; i < 0x400; i++)
-		m_bgtilemap->set_scrollx(i, m_c404.rowscroll[0]);
 
 	// apply current frame x scroll updates to tilemap
 	for (int i = 0; i < 480; i++)
 	{
-		m_bgtilemap->set_scrollx((i + scroll_y + 4) & 0x3ff, m_c404.rowscroll[i]);
+		m_c404.linexscroll[(i + (m_c404.yscroll & 0x3ff) + 4) & 0x3ff] = m_c404.rowscroll[i];
 	}
 }
 
@@ -5467,6 +5627,11 @@ void namcos23_state::direct_buf_w(offs_t offset, u16 data, u16 mem_mask)
 		re->model_blend_factor = 0;
 		re->tx = 0;
 		re->ty = 0;
+		re->vp_size_x = 320;
+		re->vp_size_y = 240;
+		re->vp_offset_x = 0;
+		re->vp_offset_y = 0;
+		re->vp_fov = 320.f;
 		memcpy(re->direct.d, m_c435.direct_buf, sizeof(m_c435.direct_buf));
 		render.count[render.cur]++;
 
@@ -5752,8 +5917,8 @@ void gorgon_state::mips_map(address_map &map)
 	map(0x06110000, 0x0613ffff).ram().w(FUNC(gorgon_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
 	map(0x06300000, 0x06300001).w(FUNC(gorgon_state::sprites_idx_w));
 	map(0x06300002, 0x06300003).w(FUNC(gorgon_state::sprites_data_w));
-	map(0x06400000, 0x0641dfff).ram().w(FUNC(gorgon_state::textchar_w)).share("charram"); // Text CGRAM (C361)
-	map(0x0641e000, 0x0641ffff).ram().w(FUNC(gorgon_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06400000, 0x0641dfff).ram().share("charram"); // Text CGRAM (C361)
+	map(0x0641e000, 0x0641ffff).ram().share("textram"); // Text VRAM (C361)
 
 	c361_map(map, 0x06420000);
 
@@ -5777,8 +5942,8 @@ void namcos23_state::mips_map(address_map &map)
 	map(0x06200000, 0x06203fff).ram(); // C422 RAM
 	map(0x06400000, 0x0640000f).rw(FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
 	map(0x06400002, 0x06400003).w(FUNC(gorgon_state::c422_irq_w));
-	map(0x06800000, 0x0681dfff).ram().w(FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
-	map(0x0681e000, 0x0681ffff).ram().w(FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06800000, 0x0681dfff).ram().share("charram"); // Text CGRAM (C361)
+	map(0x0681e000, 0x0681ffff).ram().share("textram"); // Text VRAM (C361)
 
 	c361_map(map, 0x06820000);
 	c404_map(map, 0x06a08000);
@@ -5836,8 +6001,8 @@ void crszone_state::mips_map(address_map &map)
 	map(0x16200000, 0x16203fff).ram(); // C422 RAM
 	map(0x16400000, 0x1640000f).rw(FUNC(crszone_state::c422_r), FUNC(crszone_state::c422_w)); // C422 registers
 	map(0x16400002, 0x16400003).w(FUNC(crszone_state::c422_irq_w));
-	map(0x16800000, 0x1681dfff).ram().w(FUNC(crszone_state::textchar_w)).share("charram"); // Text CGRAM (C361)
-	map(0x1681e000, 0x1681ffff).ram().w(FUNC(crszone_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x16800000, 0x1681dfff).ram().share("charram"); // Text CGRAM (C361)
+	map(0x1681e000, 0x1681ffff).ram().share("textram"); // Text VRAM (C361)
 
 	c361_map(map, 0x16820000);
 	c404_map(map, 0x16a08000);
@@ -6318,8 +6483,8 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_c435.spritedata));
 
 	save_item(NAME(m_ptrom_limit));
-	save_item(NAME(m_proj_matrix));
-	save_item(NAME(m_proj_matrix_line));
+	save_item(NAME(m_clip_data));
+	save_item(NAME(m_clip_data_line));
 
 	save_item(NAME(m_absolute_priority));
 	save_item(NAME(m_tx));
@@ -6337,8 +6502,6 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_sub_port8));
 	save_item(NAME(m_sub_porta));
 	save_item(NAME(m_sub_portb));
-
-	m_lamps.resolve();
 
 	m_c361.timer = timer_alloc(FUNC(namcos23_state::c361_timer_cb), this);
 	m_c361.timer->adjust(attotime::never);
@@ -6398,8 +6561,8 @@ void namcos23_state::machine_reset()
 	m_model_blend_factor = 0x4000;
 	m_light_power = 0;
 	m_light_ambient = 0;
-	memset(m_proj_matrix, 0, sizeof(m_proj_matrix));
-	m_proj_matrix_line = 0;
+	memset(m_clip_data, 0, sizeof(m_clip_data));
+	m_clip_data_line = 0;
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -6464,34 +6627,10 @@ void namcoss23_gmen_state::machine_reset()
 	m_vpx_sdao = 0;
 }
 
-
-
-#define XOR(a) WORD2_XOR_BE(a)
-static const gfx_layout namcos23_cg_layout =
-{
-	16,16,
-	0x400, /* 0x3c0 */
-	4,
-	{ 0,1,2,3 },
-	{ XOR(0)*4, XOR(1)*4,  XOR(2)*4,  XOR(3)*4,  XOR(4)*4,  XOR(5)*4,  XOR(6)*4,  XOR(7)*4,
-		XOR(8)*4, XOR(9)*4, XOR(10)*4, XOR(11)*4, XOR(12)*4, XOR(13)*4, XOR(14)*4, XOR(15)*4 },
-	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7,64*8,64*9,64*10,64*11,64*12,64*13,64*14,64*15 },
-	64*16
-}; /* cg_layout */
-
-#undef XOR
-
-static GFXLAYOUT_RAW(namcos23_sprite_layout, 32, 32, 32*8, 32*32*8)
-
-static GFXDECODE_START( gfx_namcos23 )
-	GFXDECODE_RAM(   nullptr,   0, namcos23_cg_layout, 0, 0x800 )
-	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,    0, 0x80 )
-GFXDECODE_END
+static GFXLAYOUT_RAW(gorgon_sprite_layout, 32, 32, 32*8, 32*32*8)
 
 static GFXDECODE_START( gfx_gorgon )
-	GFXDECODE_RAM(   nullptr,   0, namcos23_cg_layout,     0, 0x800 )
-	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,        0, 0x80 )
-	GFXDECODE_ENTRY( "sprites", 0, namcos23_sprite_layout, 0, 0x80 )
+	GFXDECODE_ENTRY( "sprites", 0, gorgon_sprite_layout, 0, 0x80 )
 GFXDECODE_END
 
 void gorgon_state::gorgon(machine_config &config)
@@ -6521,7 +6660,7 @@ void gorgon_state::gorgon(machine_config &config)
 	// Timer at 115200*16 for the jvs serial clock
 	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
-	NAMCO_SETTINGS(config, m_settings, 0);
+	NAMCO_SETTINGS(config, m_settings);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
@@ -6533,7 +6672,7 @@ void gorgon_state::gorgon(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gorgon_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(gorgon_state::vblank));
@@ -6597,7 +6736,7 @@ void namcos23_state::s23(machine_config &config)
 	// Timer at 115200*16 for the jvs serial clock
 	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
-	NAMCO_SETTINGS(config, m_settings, 0);
+	NAMCO_SETTINGS(config, m_settings);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
@@ -6609,15 +6748,13 @@ void namcos23_state::s23(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::vblank));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 
 	PALETTE(config, m_palette).set_entries(0x8000);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -6709,11 +6846,11 @@ void namcoss23_gmen_state::gmen(machine_config &config)
 	SH7604(config, m_sh2, XTAL(20'000'000));
 	m_sh2->set_addrmap(AS_PROGRAM, &namcoss23_gmen_state::sh2_map);
 
-	VPX3220A(config, m_vpx, 0);
+	VPX3220A(config, m_vpx);
 	m_vpx->sda_callback().set(FUNC(namcoss23_gmen_state::vpx_i2c_sdao_w));
 	m_vpx->vref_callback().set_inputline(m_sh2, 4);
 
-	MD8412B_S23(config, m_firewire, 0);
+	MD8412B_S23(config, m_firewire);
 	m_firewire->int_callback().set_inputline(m_sh2, 8);
 }
 
@@ -6733,6 +6870,8 @@ void crszone_state::crszone(machine_config &config)
 {
 	ss23(config);
 
+	m_subcpu->read_port7().set_constant(0x80);
+
 	/* basic machine hardware */
 	m_maincpu->set_clock(BUSCLOCK * 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crszone_state::mips_map);
@@ -6740,13 +6879,14 @@ void crszone_state::crszone(machine_config &config)
 	m_jvs->set_default_option("namco_csz1");
 
 	/* debug hardware */
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(crszone_state::acia_irq_w));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1'843'200));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+	acia_clock.set_unscaled_clock(0); // unused debug UART
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));

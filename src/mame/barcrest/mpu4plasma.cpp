@@ -89,7 +89,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 
 	SCC8530(config, "scc", 4915200).out_int_callback().set_inputline("plasmacpu", 4);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -99,7 +99,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);

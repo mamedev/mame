@@ -52,7 +52,7 @@ Releases according to http://www.rolandmuseum.de/indizees/roland_ch.html:
 		<publisher>Roland</publisher>
 		<part name="cart" interface="roland_tnsc2">
 			<dataarea name="rom" size="0x10000">
-				<rom name="tn-sc2-04.bin" size="0x10000" crc="7fd52461" sha1="38e76a348eca1644999361650e2d99f55578a141"/>
+				<rom name="tn-sc2-04.bin" size="0x10000" crc="3c14c84f" sha1="fe69839dc734a8743c8a30c5775246a00266e6db"/>
 			</dataarea>
 		</part>
 	</software>

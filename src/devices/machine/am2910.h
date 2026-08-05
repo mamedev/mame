@@ -22,7 +22,7 @@ class am2910_device : public device_t
 {
 public:
 	// construction/destruction
-	am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void cc_w(int state);    // !CC
 	void ccen_w(int state);  // !CCEN

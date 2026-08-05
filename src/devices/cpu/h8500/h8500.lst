@@ -1,0 +1,1614 @@
+# license:BSD-3-Clause
+# copyright-holders:R. Belmont
+#
+# H8/500 instructions fall into two classes:
+#   * Standalone form (scope='s') - the first byte IS the operation
+#     selector.  Any operand bytes that follow are described by am1/am2
+#     (e.g. Bcc d:8 uses 'rel8').
+#
+#   * General / EA-prefixed form (scope='e', the default) - the first
+#     byte is an EA prefix.  The generator emits auto-injected dispatch
+#     code that reads the EA's operand bytes into m_ir[1..N] and then
+#     consumes the next byte as the operation selector.  Post-EA opcode
+#     entries therefore specify only the operation byte; the body uses
+#     read_ea_8/w() and write_ea_8/w(val) to access the operand.
+#     Operation size (byte/word) is encoded in bit OP_WIDTH (3) of
+#     the EA byte: BIT(m_ir[0], OP_WIDTH) == 0 -> byte, == 1 -> word.
+#
+#     scope='e:NAME' and scope='e:!NAME' are post-EA variants
+#     restricted by EA class.  Two opcodes can share the same
+#     (val, mask) slot if their EA-class byte-sets are disjoint -
+#     the generator emits a small if/else on m_ir[0] at the case
+#     site.  Used for the H8/500 patterns where the same op byte
+#     means an "ALU-with-control-register" form when the EA is
+#     immediate (ORC/ANDC/XORC, scope='e:imm') and a "bit-op-on-EA"
+#     form otherwise (BSET/BCLR/BNOT, scope='e:!imm').  See
+#     EA_CLASSES in h8500make.py for the full list of class names.
+#
+#     EA prefix bytes (handled by the generator, do not redefine):
+#         0x05 / 0x0d   @aa:8           - 1 operand byte
+#         0x15 / 0x1d   @aa:16          - 2 operand bytes
+#         0xa0..0xaf    Rn              - 0 operand bytes
+#         0xb0..0xbf    @-Rn            - 0
+#         0xc0..0xcf    @Rn+            - 0
+#         0xd0..0xdf    @Rn             - 0
+#         0xe0..0xef    @(d:8, Rn)      - 1
+#         0xf0..0xff    @(d:16, Rn)     - 2
+#
+
+# ----------------------------------------------------------------------
+# Macros
+# ----------------------------------------------------------------------
+
+macro fetch_byte
+	m_pir = read8i(pc24());
+	m_pc = (m_pc + 1) & 0xffff;
+
+macro prefetch_start
+	m_npc = pc24();
+	fetch_byte
+
+macro prefetch
+	prefetch_start
+	prefetch_done();
+
+macro prefetch_noirq
+	prefetch_start
+	prefetch_done_noirq();
+
+macro cycles %value
+	internal(%value);
+
+# target PC in m_tmp1
+macro bxx_any %cond
+	prefetch_start
+	m_tmp3 = read8i((m_tmp1 & 0xffff) | (m_cp << 16));
+	if(%cond) {
+		internal(4);
+		prefetch_switch((m_tmp1 & 0xffff) | (m_cp << 16), m_tmp3);
+	}
+	prefetch_done();
+
+macro bxx_8 %cond
+	m_tmp1 = s8(read_imm8());
+	m_tmp1 = (m_pc + m_tmp1) & 0xffff;
+	bxx_any %cond
+
+macro bxx_16 %cond
+	m_tmp1 = s16(read_imm16());
+	m_tmp1 = (m_pc + m_tmp1) & 0xffff;
+	bxx_any %cond
+
+macro push_16 %value
+	m_tmp4 = (r16_r(7) - 2) & 0xffff;
+	write16(m_tmp4 | (m_tp << 16), %value);
+	r16_w(7, m_tmp4);
+
+macro pop_16 %dest
+	m_tmp4 = r16_r(7);
+	%dest = read16(m_tmp4 | (m_tp << 16));
+	r16_w(7, (m_tmp4 + 2) & 0xffff);
+
+macro bset %bit
+	m_tmp1 |= 1 << ((%bit) & 0xf);
+
+macro bnot %bit
+	m_tmp1 ^= 1 << ((%bit) & 0xf);
+
+macro bclr %bit
+	m_tmp1 &= ~(1 << ((%bit) & 0xf));
+
+macro btst %bit
+	if (m_tmp1 & (1 << ((%bit) & 0xf)))
+		m_sr &= ~SR_Z;
+	else
+		m_sr |= SR_Z;
+
+macro fetch_ea_8 %dest
+	%dest = read_ea_8();
+
+macro fetch_ea_16 %dest
+	%dest = read_ea_16();
+
+macro store_ea_8 %src
+	write_ea_8(%src);
+
+macro store_ea_16 %src
+	write_ea_16(%src);
+
+macro fetch_reg_opbyte_8 %dest
+	%dest = r8_r(op_byte());
+
+macro fetch_reg_opbyte_16 %dest
+	%dest = r16_r(op_byte());
+
+macro fetch_imm4_opbyte %dest
+	%dest = op_byte() & 0xf;
+
+macro set_flags_nzv8 %result
+	m_sr = (m_sr & ~(SR_N | SR_Z | SR_V)) | nz8(%result);
+
+macro set_flags_nzv16 %result
+	m_sr = (m_sr & ~(SR_N | SR_Z | SR_V)) | nz16(%result);
+
+# target PC in m_tmp1
+macro do_jsr
+	push_16 m_pc
+	bxx_any true
+
+# Push an exception return frame
+macro push_exception_frame
+	if (h8_maximum_mode()) {
+		push_16 m_pc
+		push_16 m_cp
+		push_16 m_sr
+	} else {
+		push_16 m_pc
+		push_16 m_sr
+	}
+
+# Set up PC (and CP, in maximum mode) for the exception whose vector is in m_taken_irq_vector
+macro set_exception_pc
+	debugger_exception_hook(m_taken_irq_vector);
+	if (h8_maximum_mode()) {
+		m_cp = read16i(m_taken_irq_vector * 4);
+		m_pc = read16i((m_taken_irq_vector * 4) + 2);
+	} else {
+		m_pc = read16i(m_taken_irq_vector * 2);
+	}
+
+# Take an instruction exception (invalid instruction, zero divide) with the
+# vector given as the parameter
+macro take_exception %vector
+	cycles 2
+	m_taken_irq_vector = %vector;
+	push_exception_frame
+	m_sr &= ~SR_T;
+	set_exception_pc
+	cycles 2
+	prefetch_noirq
+
+# ----------------------------------------------------------------------
+# Special states (entered explicitly, not via opcode dispatch).
+# ----------------------------------------------------------------------
+
+# Reset vector format:
+#   minimum mode - word at 0x0000 = initial PC.
+#   maximum mode - 4-byte entry like the other vectors: don't-care byte
+#   at 0x0000, initial CP at 0x0001, PC word at 0x0002.
+
+10000 reset
+	m_cp = 0;
+	m_dp = 0;
+	m_ep = 0;
+	m_tp = 0;
+	m_br = 0;
+	m_sr = SR_I2 | SR_I1 | SR_I0;
+	if(h8_maximum_mode()) {
+		m_cp = read16i(0);
+		m_pc = read16i(2);
+	} else {
+		m_pc = read16i(0);
+	}
+	update_irq_filter();
+	prefetch_noirq
+
+# Interrupt state
+10001 irq
+	internal(2);
+	m_pc = m_npc & 0xffff;
+	push_exception_frame
+	set_exception_pc
+	internal(2);
+	irq_setup();
+	update_irq_filter();
+	interrupt_taken();
+	prefetch_noirq
+
+# ----------------------------------------------------------------------
+# Standalone opcodes (no EA prefix)
+# ----------------------------------------------------------------------
+
+# NOP
+00    ff    nop           s        -      -
+	internal(2);
+	prefetch
+
+# SCB/F
+01b8  fff8  scb_f         s        -      -
+	internal(3);
+	m_tmp1 = m_ir[1] & 7;
+	m_tmp2 = (r16_r(m_tmp1) - 1) & 0xffff;
+	r16_w(m_tmp1, m_tmp2);
+	bxx_8 (m_tmp2 != 0xffff)
+
+# LDM #imm8
+02    ff    ldm           s        -      -
+	m_tmp1 = read_imm8();
+	for (m_tmp2 = 0; m_tmp2 < 8; m_tmp2++) {
+		if (BIT(m_tmp1, m_tmp2)) {
+			internal(4);
+			pop_16 m_tmp3
+			if (m_tmp2 != 7) {
+				r16_w(m_tmp2, m_tmp3);
+			}
+		}
+	}
+	prefetch
+	internal(6);
+
+# PJSR #imm24
+03    ff    pjsr          s        -      -
+	if (h8_maximum_mode()) {
+		m_tmp1 = read_imm8();
+		m_tmp2 = read_imm16();
+		push_16 m_pc
+		push_16 m_cp
+		m_cp = m_tmp1;
+		m_pc = m_tmp2;
+		prefetch
+		internal(15);
+	} else {
+		take_exception 2
+	}
+
+# SCB/NE
+06b8  fff8  scb_ne        s        -      -
+	internal(3);
+	if (m_sr & SR_Z) {
+		m_tmp1 = m_ir[1] & 7;
+		m_tmp2 = (r16_r(m_tmp1) - 1) & 0xffff;
+		r16_w(m_tmp1, m_tmp2);
+		bxx_8 (m_tmp2 != 0xffff)
+	} else {
+		internal(1);
+		read_imm8();
+		prefetch
+	}
+
+# SCB/EQ
+07b8  fff8  scb_eq        s        -      -
+	internal(3);
+	if (!(m_sr & SR_Z)) {
+		m_tmp1 = m_ir[1] & 7;
+		m_tmp2 = (r16_r(m_tmp1) - 1) & 0xffff;
+		r16_w(m_tmp1, m_tmp2);
+		bxx_8 (m_tmp2 != 0xffff)
+	} else {
+		internal(1);
+		read_imm8();
+		prefetch
+	}
+
+# TRAPA #aa:4
+0810  fff0  trapa         s        -      -
+	cycles 2
+	m_taken_irq_vector = 16 + (m_ir[1] & 0xf);
+	push_exception_frame
+	m_sr &= ~SR_T;
+	set_exception_pc
+	cycles 2
+	prefetch_noirq
+
+# TRAP/VS
+09    ff    trap_vs       s        -      -
+	if (m_sr & SR_V) {
+		cycles 2
+		m_taken_irq_vector = 4;
+		push_exception_frame
+		m_sr &= ~SR_T;
+		set_exception_pc
+		cycles 2
+		prefetch_noirq
+	} else {
+		cycles 2
+		prefetch
+	}
+
+# RTE
+0a    ff    rte           s        -      -
+	pop_16 m_sr
+	m_sr &= SR_MASK;
+	update_irq_filter();
+	cycles 2
+	if (h8_maximum_mode()) {
+		pop_16 m_cp
+		cycles 2
+	}
+	pop_16 m_pc
+	cycles 11
+	prefetch_noirq
+
+# BSR rel8
+0e    ff    bsr           s        -      -
+	m_tmp1 = s8(read_imm8());
+	m_tmp1 = (m_pc + m_tmp1) & 0xffff;
+	do_jsr
+	cycles 5
+
+# UNLK FP
+0f    ff    unlk          s        -      -
+	r16_w(7, r16_r(6));
+	pop_16 m_tmp1
+	r16_w(6, m_tmp1);
+	prefetch
+	cycles 5
+
+# JMP #imm16
+10    ff    jmp           s        -      -
+	m_tmp1 = read_imm16();
+	m_pc = m_tmp1;
+	cycles 7
+	prefetch
+
+# PRTD #xx:8
+1114  ffff  prtd          s        -      -
+	if (h8_maximum_mode()) {
+		m_tmp1 = s8(read_imm8());
+		pop_16 m_cp
+		pop_16 m_pc
+		r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
+		cycles 13
+		prefetch
+	} else {
+		take_exception 2
+	}
+
+# PRTS
+1119  ffff  prts          s        -      -
+	if (h8_maximum_mode()) {
+		pop_16 m_cp
+		pop_16 m_pc
+		cycles 12
+		prefetch
+	} else {
+		take_exception 2
+	}
+
+# PRTD #xxxx:16
+111c  ffff  prtd_16       s        -      -
+	if (h8_maximum_mode()) {
+		m_tmp1 = s16(read_imm16());
+		pop_16 m_cp
+		pop_16 m_pc
+		r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
+		cycles 13
+		prefetch
+	} else {
+		take_exception 2
+	}
+
+# PJMP @Rn
+11c0  fff8  pjmp_rn       s        -      -
+	if (h8_maximum_mode()) {
+		m_cp = r16_r(m_ir[1]) & 0xff;
+		m_pc = r16_r(m_ir[1] + 1);
+		cycles 8
+		prefetch
+	} else {
+		take_exception 2
+	}
+
+# PJSR @Rn
+11c8  fff8  pjsr_rn       s        -      -
+	if (h8_maximum_mode()) {
+		m_tmp1 = r16_r(m_ir[1]) & 0xff;
+		m_tmp2 = r16_r(m_ir[1] + 1);
+		push_16 m_pc
+		push_16 m_cp
+		m_cp = m_tmp1;
+		m_pc = m_tmp2;
+		prefetch
+		internal(13);
+	} else {
+		take_exception 2
+	}
+
+# JSR @Rn
+11d8  fff8  jsr_rn        s        -      -
+	m_tmp1 = r16_r(m_ir[1]);
+	cycles 9
+	do_jsr
+
+# JMP @Rn
+11d0  fff8  jmp_rn        s        -      -
+	m_pc = r16_r(m_ir[1]);
+	cycles 6
+	prefetch
+
+# JMP @(disp8:Rn)
+11e0  fff8  jmp_d8r       s        -      -
+	m_tmp1 = s8(read_imm8());
+	m_pc = (r16_r(m_ir[1]) + m_tmp1) & 0xffff;
+	cycles 7
+	prefetch
+
+# JSR @(disp8:Rn)
+11e8  fff8  jsr_d8r       s        -      -
+	m_tmp2 = s8(read_imm8());
+	m_tmp1 = (r16_r(m_ir[1]) + m_tmp2) & 0xffff;
+	cycles 9
+	do_jsr
+
+# JMP @(disp16:Rn)
+11f0  fff8  jmp_d16r      s        -      -
+	m_tmp1 = read_imm16();
+	m_pc = (r16_r(m_ir[1]) + m_tmp1) & 0xffff;
+	cycles 8
+	prefetch
+
+# JSR @(disp16:Rn)
+11f8  fff8  jsr_d16r      s        -      -
+	m_tmp2 = read_imm16();
+	m_tmp1 = (r16_r(m_ir[1]) + m_tmp2) & 0xffff;
+	cycles 10
+	do_jsr
+
+# STM #imm8
+12    ff    stm           s        -      -
+	cycles 6
+	m_tmp1 = read_imm8();
+	for (m_tmp2 = 7; m_tmp2 != -1; m_tmp2--) {
+		if (BIT(m_tmp1, m_tmp2)) {
+			m_tmp3 = r16_r(m_tmp2);
+			if (m_tmp2 == 7) {
+				// the value of R7 that's stored is the pre-instruction SP minus 2
+				m_tmp3 = (m_tmp3 - 2) & 0xffff;
+			}
+			push_16 m_tmp3
+			cycles 3
+		}
+	}
+	prefetch
+
+# PJMP #imm24
+13    ff    pjmp          s        -      -
+	if (h8_maximum_mode()) {
+		m_tmp1 = read_imm8();
+		m_tmp2 = read_imm16();
+		m_cp = m_tmp1;
+		m_pc = m_tmp2;
+		cycles 9
+		prefetch
+	} else {
+		take_exception 2
+	}
+
+# RTD #xx:8
+14    ff    rtd           s        -      -
+	m_tmp1 = s8(read_imm8());
+	pop_16 m_pc
+	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
+	cycles 9
+	prefetch
+
+# LINK FP, #xx:8
+17    ff    link          s        -      -
+	m_tmp1 = s8(read_imm8());
+	push_16 r16_r(6)
+	r16_w(6, r16_r(7));
+	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
+	cycles 2
+	prefetch
+
+# JSR @aa:16
+18    ff    jsr           s        -      -
+	m_tmp1 = read_imm16();
+	do_jsr
+	cycles 9
+
+# RTS
+19    ff    rts           s        -      -
+	pop_16 m_pc
+	cycles 8
+	prefetch
+
+# SLEEP
+1a    ff    sleep         s        -      -
+	prefetch_start
+	if(m_standby_pending) {
+		m_standby_time = total_cycles();
+		notify_standby(1);
+		suspend(SUSPEND_REASON_CLOCK, true);
+		m_standby_cb(1);
+	} else {
+		while(!m_irq_vector) {
+			eat-all-cycles;
+		}
+		prefetch_done();
+	}
+
+# RTD #xxxx:16
+1c    ff    rtd_16        s        -      -
+	m_tmp1 = s16(read_imm16());
+	pop_16 m_pc
+	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
+	cycles 9
+	prefetch
+
+# BSR rel16
+1e    ff    bsr_rel16     s        -      -
+	m_tmp1 = s16(read_imm16());
+	m_tmp1 = (m_pc + m_tmp1) & 0xffff;
+	push_16 m_pc
+	cycles 9
+	bxx_any true
+
+# LINK FP, #xxxx:16
+1f    ff    link_16       s        -      -
+	m_tmp1 = s16(read_imm16());
+	push_16 r16_r(6)
+	r16_w(6, r16_r(7));
+	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
+	cycles 2
+	prefetch
+
+20    ff    bt            s        -      -
+	bxx_8 true
+
+21    ff    bf            s        -      -
+	bxx_8 false
+
+22    ff    bhi           s        -      -
+	bxx_8 !(m_sr & (SR_C|SR_Z))
+
+23    ff    bls           s        -      -
+	bxx_8 m_sr & (SR_C|SR_Z)
+
+24    ff    bcc           s        -      -
+	bxx_8 !(m_sr & SR_C)
+
+25    ff    bcs           s        -      -
+	bxx_8 m_sr & SR_C
+
+26    ff    bne           s        -      -
+	bxx_8 !(m_sr & SR_Z)
+
+27    ff    beq           s        -      -
+	bxx_8 m_sr & SR_Z
+
+28    ff    bvc           s        -      -
+	bxx_8 !(m_sr & SR_V)
+
+29    ff    bvs           s        -      -
+	bxx_8 m_sr & SR_V
+
+2a    ff    bpl           s        -      -
+	bxx_8 !(m_sr & SR_N)
+
+2b    ff    bmi           s        -      -
+	bxx_8 m_sr & SR_N
+
+2c    ff    bge           s        -      -
+	bxx_8 !((m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V)
+
+2d    ff    blt           s        -      -
+	bxx_8 (m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V
+
+2e    ff    bgt           s        -      -
+	bxx_8 !((m_sr & SR_Z) || (m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V)
+
+2f    ff    ble           s        -      -
+	bxx_8 (m_sr & SR_Z) || (m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V
+
+30    ff    bt_w          s        -      -
+	bxx_16 true
+
+31    ff    bf_w          s        -      -
+	bxx_16 false
+
+32    ff    bhi_w         s        -      -
+	bxx_16 !(m_sr & (SR_C|SR_Z))
+
+33    ff    bls_w         s        -      -
+	bxx_16 m_sr & (SR_C|SR_Z)
+
+34    ff    bcc_w         s        -      -
+	bxx_16 !(m_sr & SR_C)
+
+35    ff    bcs_w         s        -      -
+	bxx_16 m_sr & SR_C
+
+36    ff    bne_w         s        -      -
+	bxx_16 !(m_sr & SR_Z)
+
+37    ff    beq_w         s        -      -
+	bxx_16 m_sr & SR_Z
+
+38    ff    bvc_w         s        -      -
+	bxx_16 !(m_sr & SR_V)
+
+39    ff    bvs_w         s        -      -
+	bxx_16 m_sr & SR_V
+
+3a    ff    bpl_w         s        -      -
+	bxx_16 !(m_sr & SR_N)
+
+3b    ff    bmi_w         s        -      -
+	bxx_16 m_sr & SR_N
+
+3c    ff    bge_w         s        -      -
+	bxx_16 !((m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V)
+
+3d    ff    blt_w         s        -      -
+	bxx_16 (m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V
+
+3e    ff    bgt_w         s        -      -
+	bxx_16 !((m_sr & SR_Z) || (m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V)
+
+3f    ff    ble_w         s        -      -
+	bxx_16 (m_sr & SR_Z) || (m_sr & (SR_N|SR_V)) == SR_N || (m_sr & (SR_N|SR_V)) == SR_V
+
+# CMP.B #imm8
+40    f8    cmp_b         s        -      -
+	m_tmp1 = read_imm8();
+	m_tmp2 = r16_r(m_ir[0] & 0x7);
+	do_sub8(m_tmp2, m_tmp1);
+	cycles 1
+	prefetch
+
+# CMP.W #imm16
+48    f8    cmp_w         s        -      -
+	m_tmp1 = read_imm16();
+	m_tmp2 = r16_r(m_ir[0] & 0x7);
+	do_sub16(m_tmp2, m_tmp1);
+	cycles 2
+	prefetch
+
+# MOV.B #imm, Rn
+50    f8    mov_b_imm     s        -      -
+	m_tmp1 = read_imm8();
+	r8_w(m_ir[0] & 7, m_tmp1);
+	set_flags_nzv8 m_tmp1
+	cycles 1
+	prefetch
+
+# MOV.W #imm, Rn
+58    f8    mov_w_imm     s        -      -
+	m_tmp1 = read_imm16();
+	r16_w(m_ir[0] & 7, m_tmp1);
+	set_flags_nzv16 m_tmp1
+	cycles 2
+	prefetch
+
+# MOV.L @aa:8, Rn
+60    f0    mov_aa8_rn    s        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp2 = read_imm8() | (m_br << 8);
+		m_tmp1 = read16(m_tmp2);
+		r16_w(m_ir[0] & 7, m_tmp1);
+		set_flags_nzv16 m_tmp1
+	} else {
+		m_tmp2 = read_imm8() | (m_br << 8);
+		m_tmp1 = read8(m_tmp2);
+		r8_w(m_ir[0] & 7, m_tmp1);
+		set_flags_nzv8 m_tmp1
+	}
+	cycles 5
+	prefetch
+
+# MOV.L Rn, @aa:8
+70    f0    mov_rn_aa8    s        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp2 = read_imm8() | (m_br << 8);
+		m_tmp1 = r16_r(m_ir[0] & 7);
+		write16(m_tmp2, m_tmp1);
+		set_flags_nzv16 m_tmp1
+	} else {
+		m_tmp2 = read_imm8() | (m_br << 8);
+		m_tmp1 = r8_r(m_ir[0] & 7);
+		write8(m_tmp2, m_tmp1);
+		set_flags_nzv8 m_tmp1
+	}
+	cycles 5
+	prefetch
+
+# MOV:F @(d:8, R6), Rd
+80    f0    movf_load     s        -      -
+	m_tmp1 = (r16_r(6) + s8(read_imm8())) & 0xffff;
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp2 = read16(m_tmp1 | (m_tp << 16));
+		r16_w(m_ir[0] & 7, m_tmp2);
+		set_flags_nzv16 m_tmp2
+	} else {
+		m_tmp2 = read8(m_tmp1 | (m_tp << 16));
+		r8_w(m_ir[0] & 7, m_tmp2);
+		set_flags_nzv8 m_tmp2
+	}
+	cycles 5
+	prefetch
+
+# MOV:F Rs, @(d:8, R6)
+90    f0    movf_store    s        -      -
+	m_tmp1 = (r16_r(6) + s8(read_imm8())) & 0xffff;
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp2 = r16_r(m_ir[0] & 7);
+		write16(m_tmp1 | (m_tp << 16), m_tmp2);
+		set_flags_nzv16 m_tmp2
+	} else {
+		m_tmp2 = r8_r(m_ir[0] & 7);
+		write8(m_tmp1 | (m_tp << 16), m_tmp2);
+		set_flags_nzv8 m_tmp2
+	}
+	cycles 5
+	prefetch
+
+# ----------------------------------------------------------------------
+# Post-EA (general form) opcodes
+# ----------------------------------------------------------------------
+
+# DADD EA, Rd (always encoded with EA = a register)
+00a0  fff8  dadd          e:reg    -      -
+	m_tmp1 = r8_r(m_ir[0] & 7);
+	fetch_reg_opbyte_8 m_tmp2
+	r8_w(op_byte(), do_dadd8(m_tmp2, m_tmp1));
+	cycles 4
+	prefetch
+
+# CMP.{B|W} EA, #imm8
+04    ff    cmp_ea_8      e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = s8(read_imm8()) & 0xffff;
+		m_tmp2 = read_ea_16();
+		do_sub16(m_tmp2, m_tmp1);
+		cycles 2
+	} else {
+		m_tmp1 = read_imm8();
+		m_tmp2 = read_ea_8();
+		do_sub8(m_tmp2, m_tmp1);
+		cycles 1
+	}
+	prefetch
+
+# CMP.W EA, #imm16
+05    ff    cmp_ea_16      e        -      -
+	m_tmp1 = read_imm16();
+	m_tmp2 = read_ea_16();
+	do_sub16(m_tmp2, m_tmp1);
+	cycles 2
+	prefetch
+
+# MOV.B #imm, EA
+06    ff    mov_b_imm_ea  e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = s8(read_imm8()) & 0xffff;
+		write_ea_16(m_tmp1);
+		set_flags_nzv16 m_tmp1
+	} else {
+		m_tmp1 = read_imm8();
+		write_ea_8(m_tmp1);
+		set_flags_nzv8 m_tmp1
+	}
+	cycles 7
+	prefetch
+
+# MOV.W #imm, EA
+07    ff    mov_w_imm_ea  e        -      -
+	m_tmp1 = read_imm16();
+	write_ea_16(m_tmp1);
+	set_flags_nzv16 m_tmp1
+	cycles 8
+	prefetch
+
+# ADD.{B|W} #{1/2/-1/-2}, EA
+08    f8    add_q         e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = read_ea_16();
+		if (!(op_byte() & 0x4)) {
+			m_tmp2 = do_add16(m_tmp1, (op_byte() & 1) + 1);
+		} else {
+			if (op_byte() & 1) {
+				m_tmp2 = do_add16(m_tmp1, -2);
+			} else {
+				m_tmp2 = do_add16(m_tmp1, -1);
+			}
+		}
+		write_ea_16(m_tmp2);
+		cycles 4
+	} else {
+		m_tmp1 = read_ea_8();
+		if (!(op_byte() & 0x4)) {
+			m_tmp2 = do_add8(m_tmp1, (op_byte() & 1) + 1);
+		} else {
+			if (op_byte() & 1) {
+				m_tmp2 = do_add8(m_tmp1, -2);
+			} else {
+				m_tmp2 = do_add8(m_tmp1, -1);
+			}
+		}
+		write_ea_8(m_tmp2);
+		cycles 2
+	}
+	prefetch
+
+# SWAP EA (always encoded with EA = a register)
+10    ff    swap          e        -      -
+	m_tmp1 = r16_r(m_ir[0] & 7);
+	m_tmp2 = ((m_tmp1 & 0xff) << 8) | ((m_tmp1 >> 8) & 0xff);
+	r16_w(m_ir[0] & 7, m_tmp2);
+	set_flags_nzv16 m_tmp2
+	cycles 3
+	prefetch
+
+# EXTS Rd
+11    ff    exts          e        -      -
+	m_tmp1 = s8(r8_r(m_ir[0]));
+	r16_w(m_ir[0], m_tmp1);
+	set_flags_nzv16 m_tmp1
+	m_sr &= ~SR_C;
+	cycles 3
+	prefetch
+
+# EXTU Rd
+12    ff    extu          e        -      -
+	m_tmp1 = u8(r8_r(m_ir[0]));
+	r16_w(m_ir[0], m_tmp1);
+	set_flags_nzv16 m_tmp1
+	m_sr &= ~SR_C;
+	cycles 3
+	prefetch
+
+# CLR.{B,W} EA
+13    ff    clr           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		store_ea_16 0
+	} else {
+		store_ea_8 0
+	}
+	m_sr = (m_sr & ~(SR_N | SR_V | SR_C)) | SR_Z;
+	cycles 2
+	prefetch
+
+# NEG.{B,W} EA
+14    ff    neg           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_sub16(0, m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_sub8(0, m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# NOT.{B,W} EA
+15    ff    not           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 ^= 0xffff;
+		store_ea_16 m_tmp1
+		set_flags_nzv16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 ^= 0xff;
+		store_ea_8 m_tmp1
+		set_flags_nzv8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# TST.{B,W} EA
+16    ff    tst           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		do_sub16(m_tmp1, 0);
+	} else {
+		fetch_ea_8 m_tmp1
+		do_sub8(m_tmp1, 0);
+	}
+	m_sr &= ~(SR_V | SR_C);
+	cycles 2
+	prefetch
+
+# TAS EA
+17    ff    tas           e        -      -
+	fetch_ea_8 m_tmp1
+	do_sub8(m_tmp1, 0);
+	m_sr &= ~(SR_V | SR_C);
+	m_tmp1 |= 0x80;
+	store_ea_8 m_tmp1
+	cycles 3
+	prefetch
+
+# SHAL.{B,W} EA
+18    ff    shal          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_shal16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_shal8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# SHAR.{B,W} EA
+19    ff    shar          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_shar16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_shar8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# SHLL.{B,W} EA
+1a    ff    shll          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_shll16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_shll8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# SHLR.{B,W} EA
+1b    ff    shlr          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_shlr16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_shlr8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# ROTL.{B,W} EA
+1c    ff    rotl          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_rotl16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_rotl8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# ROTR.{B,W} EA
+1d    ff    rotr          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_rotr16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_rotr8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# ROTXL.{B,W} EA
+1e    ff    rotxl         e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_rotxl16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_rotxl8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# ROTXR.{B,W} EA
+1f    ff    rotxr         e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 = do_rotxr16(m_tmp1);
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 = do_rotxr8(m_tmp1);
+		store_ea_8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# ADD.{B,W} EA, Rn
+20    f8    add           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+		r16_w(op_byte(), do_add16(m_tmp2, m_tmp1));
+	} else {
+		fetch_ea_8 m_tmp1
+		fetch_reg_opbyte_8 m_tmp2
+		r8_w(op_byte(), do_add8(m_tmp2, m_tmp1));
+	}
+	cycles 2
+	prefetch
+
+
+# ADDS.{B,W} EA, Rn
+28    f8    adds          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+		r16_w(op_byte(), do_adds16(m_tmp2, m_tmp1));
+	} else {
+		fetch_ea_8 m_tmp1
+		r16_w(op_byte(), do_adds16(r16_r(op_byte()), s8(m_tmp1) & 0xffff));
+	}
+	cycles 2
+	prefetch
+
+# SUB.{B,W} EA, Rn
+30    f8    sub           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+		r16_w(op_byte(), do_sub16(m_tmp2, m_tmp1));
+	} else {
+		fetch_ea_8 m_tmp1
+		fetch_reg_opbyte_8 m_tmp2
+		r8_w(op_byte(), do_sub8(m_tmp2, m_tmp1));
+	}
+	cycles 2
+	prefetch
+
+# SUBS.{B,W} EA, Rn
+38    f8    subs          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+		r16_w(op_byte(), do_subs16(m_tmp2, m_tmp1));
+	} else {
+		// a byte source is sign-extended and Rd is always accessed as a
+		// word (Programming Manual section 2.2.53)
+		fetch_ea_8 m_tmp1
+		r16_w(op_byte(), do_subs16(r16_r(op_byte()), s8(m_tmp1) & 0xffff));
+	}
+	cycles 3
+	prefetch
+
+# OR.{B|W} EA, Rn
+40    f8    or            e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+		m_tmp1 |= m_tmp2;
+		r16_w(op_byte(), m_tmp1);
+		set_flags_nzv16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		fetch_reg_opbyte_8 m_tmp2
+		m_tmp1 |= m_tmp2;
+		r8_w(op_byte(), m_tmp1);
+		set_flags_nzv8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# BSET Rn, EA
+48    f8    bset          e:!imm   -      -
+	fetch_reg_opbyte_16 m_tmp2
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		btst m_tmp2
+		bset m_tmp2
+		store_ea_16 m_tmp1
+		cycles 4
+	} else {
+		fetch_ea_8 m_tmp1
+		btst m_tmp2
+		bset m_tmp2
+		store_ea_8 m_tmp1
+		cycles 2
+	}
+	prefetch
+
+# ORC EA, Cx
+48    f8    orc           e:imm    -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		if (!(op_byte() & 0x7)) {		// only control register 0 (SR) is valid for 16-bit ORC
+			m_sr = (m_sr | read_ea_16()) & SR_MASK;
+			update_irq_filter();
+		}
+	} else {
+		m_tmp1 = read_ea_8();
+		switch (op_byte() & 7) {
+			case 1:	// CCR (low byte of SR; bits 7-4 are reserved)
+				m_sr |= m_tmp1 & 0x0f;
+				break;
+			case 3: // BR
+				m_br |= m_tmp1 & 0xff;
+				set_flags_nzv8 m_br
+				break;
+			case 4: // EP
+				m_ep |= m_tmp1 & 0xff;
+				set_flags_nzv8 m_ep
+				break;
+			case 5: // DP
+				m_dp |= m_tmp1 & 0xff;
+				set_flags_nzv8 m_dp
+				break;
+			case 7: // TP
+				m_tp |= m_tmp1 & 0xff;
+				set_flags_nzv8 m_tp
+				break;
+			default:
+				logerror("H8/500: invalid ORC destination %d\n", op_byte() & 7);
+				break;
+		}
+	}
+	prefetch_noirq
+
+# AND.{B|W} EA, Rn
+50    f8    and           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		m_tmp1 &= r16_r(op_byte());
+		r16_w(op_byte(), m_tmp1);
+		set_flags_nzv16 m_tmp1
+		internal(2);
+	} else {
+		fetch_ea_8 m_tmp1
+		m_tmp1 &= r8_r(op_byte());
+		r8_w(op_byte(), m_tmp1);
+		set_flags_nzv8 m_tmp1
+		internal(1);
+	}
+	prefetch
+
+# BCLR Rn, EA
+58    f8    bclr          e:!imm   -      -
+	fetch_reg_opbyte_16 m_tmp2
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		btst m_tmp2
+		bclr m_tmp2
+		store_ea_16 m_tmp1
+		internal(4);
+	} else {
+		fetch_ea_8 m_tmp1
+		btst m_tmp2
+		bclr m_tmp2
+		store_ea_8 m_tmp1
+		internal(2);
+	}
+	prefetch
+
+# ANDC EA, Cx
+58    f8    andc          e:imm    -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		if (!(op_byte() & 0x7)) {		// only control register 0 (SR) is valid for 16-bit ANDC
+			m_sr &= read_ea_16() & SR_MASK;
+			update_irq_filter();
+			internal(9);
+		}
+	} else {
+		m_tmp1 = read_ea_8();
+		switch (op_byte() & 7) {
+			case 1:	// CCR (low byte of SR; bits 7-4 are reserved)
+				m_sr &= 0xff00 | (m_tmp1 & 0x0f);
+				break;
+			case 3: // BR
+				m_br &= m_tmp1 & 0xff;
+				set_flags_nzv8 m_br
+				break;
+			case 4: // EP
+				m_ep &= m_tmp1 & 0xff;
+				set_flags_nzv8 m_ep
+				break;
+			case 5: // DP
+				m_dp &= m_tmp1 & 0xff;
+				set_flags_nzv8 m_dp
+				break;
+			case 7: // TP
+				m_tp &= m_tmp1 & 0xff;
+				set_flags_nzv8 m_tp
+				break;
+			default:
+				logerror("H8/500: invalid ANDC destination %d\n", op_byte() & 7);
+				break;
+		}
+		internal(5);
+	}
+	prefetch_noirq
+
+# XOR.{B|W} EA, Rn
+60    f8    xor           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+		m_tmp1 ^= m_tmp2;
+		r16_w(op_byte(), m_tmp1);
+		set_flags_nzv16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		fetch_reg_opbyte_8 m_tmp2
+		m_tmp1 ^= m_tmp2;
+		r8_w(op_byte(), m_tmp1);
+		set_flags_nzv8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# BNOT Rn, EA
+68    f8    bnot          e:!imm   -      -
+	fetch_reg_opbyte_16 m_tmp2
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		btst m_tmp2
+		bnot m_tmp2
+		store_ea_16 m_tmp1
+		internal(4);
+	} else {
+		fetch_ea_8 m_tmp1
+		btst m_tmp2
+		bnot m_tmp2
+		store_ea_8 m_tmp1
+		internal(2);
+	}
+	prefetch
+
+# XORC EA, Cx
+68    f8    xorc          e:imm    -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		if (!(op_byte() & 0x7)) {		// only control register 0 (SR) is valid for 16-bit XORC
+			m_sr = (m_sr ^ read_ea_16()) & SR_MASK;
+			update_irq_filter();
+			internal(9);
+		}
+	} else {
+		m_tmp1 = read_ea_8();
+		switch (op_byte() & 7) {
+			case 1:	// CCR (low byte of SR; bits 7-4 are reserved)
+				m_sr ^= m_tmp1 & 0x0f;
+				break;
+			case 3: // BR
+				m_br ^= m_tmp1 & 0xff;
+				set_flags_nzv8 m_br
+				break;
+			case 4: // EP
+				m_ep ^= m_tmp1 & 0xff;
+				set_flags_nzv8 m_ep
+				break;
+			case 5: // DP
+				m_dp ^= m_tmp1 & 0xff;
+				set_flags_nzv8 m_dp
+				break;
+			case 7: // TP
+				m_tp ^= m_tmp1 & 0xff;
+				set_flags_nzv8 m_tp
+				break;
+			default:
+				logerror("H8/500: invalid XORC destination %d\n", op_byte() & 7);
+				break;
+		}
+		internal(5);
+	}
+	prefetch_noirq
+
+# CMP.{B|W} EA, Rn
+70    f8    cmp_ea_rd     e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_reg_opbyte_16 m_tmp1
+		fetch_ea_16 m_tmp2
+		do_sub16(m_tmp1, m_tmp2);
+		cycles 2
+	} else {
+		fetch_reg_opbyte_8 m_tmp1
+		fetch_ea_8 m_tmp2
+		do_sub8(m_tmp1, m_tmp2);
+		cycles 1
+	}
+	prefetch
+
+# BTST Rn, EA
+78    f8    btst_rn       e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+	} else {
+		fetch_ea_8 m_tmp1
+		fetch_reg_opbyte_8 m_tmp2
+	}
+	btst m_tmp2
+	cycles 3
+	prefetch
+
+# MOV.G EA, Dn
+80    f8    movg_r        e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		r16_w(op_byte(), m_tmp1);
+		set_flags_nzv16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		r8_w(op_byte(), m_tmp1);
+		set_flags_nzv8 m_tmp1
+	}
+	cycles 2
+	prefetch
+
+# LDC EA, Cx
+88    f8    ldc           e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		if (!(op_byte() & 0x7)) {		// only control register 0 (SR) is valid for 16-bit LDC
+			m_sr = read_ea_16() & SR_MASK;
+			update_irq_filter();
+			internal(6);
+		}
+	} else if ((op_byte() & 7) == 4 && (m_ir[0] == 0xb7 || m_ir[0] == 0xc7)) {
+		// Byte-size LDC/STC of EP via @-SP/@SP+ is promoted to a word
+		// transfer like all stack accesses, and the other half of the word is the
+		// adjacent page register.
+		// Roland RD-500 depends heavily on this being true.
+		m_ir[0] |= 1 << OP_WIDTH;
+		m_tmp1 = read_ea_16();
+		m_ir[0] &= ~(1 << OP_WIDTH);
+		m_ep = (m_tmp1 >> 8) & 0xff;
+		m_dp = m_tmp1 & 0xff;
+		internal(4);
+	} else {
+		m_tmp1 = read_ea_8();
+		switch (op_byte() & 7) {
+			case 1:	// CCR (low byte of SR; bits 7-4 are reserved)
+				m_sr = (m_sr & 0xff00) | (m_tmp1 & 0x0f);
+				break;
+			case 3: // BR
+				m_br = m_tmp1 & 0xff;
+				break;
+			case 4: // EP
+				m_ep = m_tmp1 & 0xff;
+				break;
+			case 5: // DP
+				m_dp = m_tmp1 & 0xff;
+				break;
+			case 7: // TP
+				m_tp = m_tmp1 & 0xff;
+				break;
+			default:
+				logerror("H8/500: invalid LDC destination %d\n", op_byte() & 7);
+				break;
+		}
+		internal(4);
+	}
+	prefetch_noirq
+
+# MOV.G Dn, EA
+90    f8    movg_w        e:!regw  -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = r16_r(op_byte());
+		write_ea_16(m_tmp1);
+		set_flags_nzv16 m_tmp1
+		cycles 2
+	} else {
+		m_tmp1 = r8_r(op_byte());
+		write_ea_8(m_tmp1);
+		set_flags_nzv8 m_tmp1
+		cycles 1
+	}
+	prefetch
+
+# XCH Rn, Rn
+90    f8    xch           e:regw   -      -
+	m_tmp1 = r16_r(m_ir[0] & 7);
+	m_tmp2 = r16_r(m_ir[1] & 7);
+	r16_w(m_ir[0] & 7, m_tmp2);
+	r16_w(m_ir[1] & 7, m_tmp1);
+	cycles 4
+	prefetch
+
+# STC Cx, EA
+98    f8    stc           e:!imm    -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		if (!(op_byte() & 0x7)) {		// only control register 0 (SR) is valid for 16-bit STC
+			write_ea_16(m_sr);
+			internal(2);
+		}
+	} else if ((op_byte() & 7) == 4 && (m_ir[0] == 0xb7 || m_ir[0] == 0xc7)) {
+		// see LDC: stack-promoted byte STC of EP pushes the EP:DP pair,
+		// EP in the even (first) byte and DP in the odd one
+		m_tmp2 = (u32(m_ep) << 8) | m_dp;
+		m_ir[0] |= 1 << OP_WIDTH;
+		write_ea_16(m_tmp2);
+		m_ir[0] &= ~(1 << OP_WIDTH);
+		internal(1);
+	} else {
+		m_tmp2 = 0;
+		switch (op_byte() & 7) {
+			case 1:	// CCR (low byte of SR)
+				m_tmp2 = m_sr & 0xff;
+				break;
+			case 3: // BR
+				m_tmp2 = m_br;
+				break;
+			case 4: // EP
+				m_tmp2 = m_ep;
+				break;
+			case 5: // DP
+				m_tmp2 = m_dp;
+				break;
+			case 7: // TP
+				m_tmp2 = m_tp;
+				break;
+			default:
+				fatalerror("H8/500: invalid STC source %d\n", op_byte() & 7);
+				break;
+		}
+		write_ea_8(m_tmp2);
+		internal(1);
+	}
+	prefetch
+
+# ADDX.{B,W} EA, Rn
+a0    f8    addx          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		fetch_reg_opbyte_16 m_tmp2
+		r16_w(op_byte(), do_addx16(m_tmp2, m_tmp1));
+		internal(2);
+	} else {
+		fetch_ea_8 m_tmp1
+		fetch_reg_opbyte_8 m_tmp2
+		r8_w(op_byte(), do_addx8(m_tmp2, m_tmp1));
+		internal(1);
+	}
+	prefetch
+
+# MULXU EA, Rn
+a8    f8    mulxu         e         -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = read_ea_16();
+		m_tmp2 = r16_r(op_byte());
+		m_tmp2 *= m_tmp1;
+		r16_w(op_byte(), m_tmp2 >> 16);
+		r16_w(op_byte() + 1, m_tmp2 & 0xffff);
+		m_sr &= ~(SR_C | SR_N | SR_V | SR_Z);
+		m_sr |= nz32(m_tmp2);
+		cycles 23
+	} else {
+		m_tmp1 = read_ea_8();
+		m_tmp2 = r8_r(op_byte());
+		m_tmp2 *= m_tmp1;
+		r16_w(op_byte(), m_tmp2 & 0xffff);
+		m_sr &= ~(SR_C | SR_N | SR_V | SR_Z);
+		m_sr |= nz16(m_tmp2);
+		cycles 16
+	}
+	prefetch
+
+# SUBX.{B,W} EA, Rn
+b0    f8    subx          e        -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = read_ea_16();
+		m_tmp2 = op_byte() & 0x07;
+		r16_w(m_tmp2, do_subx16(r16_r(m_tmp2), m_tmp1));
+	} else {
+		m_tmp1 = read_ea_8();
+		m_tmp2 = op_byte() & 0x07;
+		r8_w(m_tmp2, do_subx8(r8_r(m_tmp2), m_tmp1));
+	}
+	cycles 2
+	prefetch
+
+# DIVXU EA, Rn
+b8    f8    divxu         e         -      -
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = r16_r(op_byte()) << 16;
+		m_tmp1 |= r16_r(op_byte() + 1);
+		fetch_ea_16 m_tmp2
+		if (m_tmp2 == 0) {
+			m_sr = (m_sr & ~(SR_N | SR_V | SR_C)) | SR_Z;
+			cycles 22
+			take_exception 3
+		} else if ((m_tmp1 >> 16) >= m_tmp2) {
+			m_sr = (m_sr & ~(SR_N | SR_Z | SR_C)) | SR_V;
+			cycles 26
+			prefetch
+		} else {
+			m_tmp3 = m_tmp1 / m_tmp2;
+			m_tmp4 = m_tmp1 % m_tmp2;
+			r16_w(op_byte(), m_tmp4);
+			r16_w(op_byte() + 1, m_tmp3);
+			m_sr &= ~(SR_C | SR_N | SR_V | SR_Z);
+			set_flags_nzv16 m_tmp3
+			cycles 26
+			prefetch
+		}
+	} else {
+		fetch_reg_opbyte_16 m_tmp1
+		fetch_ea_8 m_tmp2
+		if (m_tmp2 == 0) {
+			m_sr = (m_sr & ~(SR_N | SR_V | SR_C)) | SR_Z;
+			cycles 16
+			take_exception 3
+		} else if ((m_tmp1 >> 8) >= m_tmp2) {
+			m_sr = (m_sr & ~(SR_N | SR_Z | SR_C)) | SR_V;
+			cycles 20
+			prefetch
+		} else {
+			m_tmp3 = m_tmp1 / m_tmp2;
+			m_tmp4 = m_tmp1 % m_tmp2;
+			r16_w(op_byte(), (m_tmp4 << 8) | (m_tmp3 & 0xff));
+			m_sr &= ~(SR_C | SR_N | SR_V | SR_Z);
+			set_flags_nzv8 m_tmp3
+			cycles 20
+			prefetch
+		}
+	}
+
+# BSET #imm, EA
+c0    f0    bset_imm      e         -      -
+	m_tmp2 = op_byte() & 0xf;
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp1 = read_ea_16();
+		btst m_tmp2
+		bset m_tmp2
+		store_ea_16 m_tmp1
+	} else {
+		m_tmp1 = read_ea_8();
+		btst m_tmp2
+		bset m_tmp2
+		store_ea_8 m_tmp1
+	}
+	cycles 4
+	prefetch
+
+# BCLR #imm8, EA
+d0    f0    bclr_imm      e:imm    -      -
+	fetch_imm4_opbyte m_tmp2
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		btst m_tmp2
+		bclr m_tmp2
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		btst m_tmp2
+		bclr m_tmp2
+		store_ea_8 m_tmp1
+	}
+	cycles 4
+	prefetch
+
+# BNOT #imm, EA
+e0    f0    bnot_imm      e:imm    -      -
+	fetch_imm4_opbyte m_tmp2
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+		btst m_tmp2
+		bnot m_tmp2
+		store_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+		btst m_tmp2
+		bnot m_tmp2
+		store_ea_8 m_tmp1
+	}
+	cycles 4
+	prefetch
+
+# BTST #xx, EA
+f0    f0    btst_imm      e        -      -
+	fetch_imm4_opbyte m_tmp2
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		fetch_ea_16 m_tmp1
+	} else {
+		fetch_ea_8 m_tmp1
+	}
+	btst m_tmp2
+	cycles 3
+	prefetch

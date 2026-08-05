@@ -766,7 +766,7 @@ void md_core_state::md_core_ntsc(machine_config &config)
 	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(MASTER_CLOCK_NTSC / 10 / 262 / 342); // same as SMS?
 //  m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8 / 262 / 427); // or 427 Htotal?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
@@ -790,7 +790,7 @@ void md_core_state::md_core_pal(machine_config &config)
 	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 10 / 313 / 342); // same as SMS?
 //  m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 8 / 313 / 423); // or 423 Htotal?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
@@ -807,13 +807,13 @@ void md_base_state::megadriv_ioports(machine_config &config)
 	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
 	hl.output_handler().set_inputline(m_maincpu, 2);
 
-	MEGADRIVE_IO_PORT(config, m_ioports[0], 0);
+	MEGADRIVE_IO_PORT(config, m_ioports[0]);
 	m_ioports[0]->hl_handler().set("hl", FUNC(input_merger_device::in_w<0>));
 
-	MEGADRIVE_IO_PORT(config, m_ioports[1], 0);
+	MEGADRIVE_IO_PORT(config, m_ioports[1]);
 	m_ioports[1]->hl_handler().set("hl", FUNC(input_merger_device::in_w<1>));
 
-	MEGADRIVE_IO_PORT(config, m_ioports[2], 0);
+	MEGADRIVE_IO_PORT(config, m_ioports[2]);
 	m_ioports[2]->hl_handler().set("hl", FUNC(input_merger_device::in_w<2>));
 }
 

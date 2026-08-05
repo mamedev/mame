@@ -53,15 +53,7 @@ class vtech_memexp_slot_device : public device_t, public device_single_card_slot
 	friend class device_vtech_memexp_interface;
 public:
 	// construction/destruction
-	vtech_memexp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: vtech_memexp_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		vtech_memexp_carts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~vtech_memexp_slot_device();
 
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
@@ -78,7 +70,7 @@ public:
 	void reset_w(int state) { m_reset_handler(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -133,7 +125,7 @@ protected:
 	required_device<address_map_bank_device> m_io;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(VTECH_MEMEXP_SLOT, vtech_memexp_slot_device)
 
 #endif // MAME_BUS_VTECH_MEMEXP_MEMEXP_H

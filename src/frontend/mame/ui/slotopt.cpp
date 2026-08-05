@@ -43,7 +43,7 @@ namespace ui {
 //  menu_slot_devices constructor
 //-------------------------------------------------
 
-menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("Slot Devices"));
 }
@@ -68,7 +68,7 @@ device_slot_interface::slot_option const *menu_slot_devices::get_current_option(
 
 	if (!slot.fixed())
 	{
-		char const *const slot_option_name = slot.slot_name();
+		auto const slot_option_name = slot.slot_name();
 		current = machine().options().slot_option(slot_option_name).value();
 	}
 	else
@@ -78,7 +78,7 @@ device_slot_interface::slot_option const *menu_slot_devices::get_current_option(
 		current.assign(slot.default_option());
 	}
 
-	return slot.option(current.c_str());
+	return slot.option(current);
 }
 
 
@@ -99,7 +99,7 @@ void menu_slot_devices::set_slot_device(device_slot_interface &slot, std::string
 	opt.specify(val);
 
 	// erase this from our recorded options list - this is the slot we're trying to change!
-	m_slot_options.erase(slot.slot_name());
+	m_slot_options.erase(std::string(slot.slot_name())); // TODO: get rid of temporary std::string when we have C++20
 
 	// refresh any options that we might have annotated earlier
 	while (try_refresh_current_options())
@@ -126,7 +126,7 @@ void menu_slot_devices::record_current_options()
 			const slot_option &opt(machine().options().slot_option(slot.slot_name()));
 
 			// and record the value in our local cache
-			m_slot_options[slot.slot_name()] = opt.specified_value();
+			m_slot_options[std::string(slot.slot_name())] = opt.specified_value(); // TODO: get rid of temporary std::string if possible when we have C++20
 		}
 	}
 }
@@ -198,7 +198,7 @@ void menu_slot_devices::populate()
 				? FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW
 				: FLAG_DISABLE;
 
-		item_append(slot.slot_name(), opt_name, item_flags, (void *)&slot);
+		item_append(std::string(slot.slot_name()), std::move(opt_name), item_flags, (void *)&slot);
 	}
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset System"), 0, ITEMREF_RESET);
@@ -262,7 +262,7 @@ bool menu_slot_devices::handle(event const *ev)
 		device_slot_interface *slot = (device_slot_interface *)ev->itemref;
 		device_slot_interface::slot_option const *const option = get_current_option(*slot);
 		if (option)
-			menu::stack_push<menu_device_config>(ui(), container(), slot, option);
+			menu::stack_push<menu_device_config>(ui(), target(), slot, option);
 	}
 
 	return false; // any changes require the menu to be rebuilt
@@ -293,11 +293,11 @@ void menu_slot_devices::rotate_slot_device(device_slot_interface &slot, menu_slo
 		std::sort(m_current_option_list.begin(), m_current_option_list.end());
 
 		// find the current position
-		char const *const target = current ? current->name() : "";
+		std::string_view const target = current ? current->name() : std::string_view();
 		m_current_option_list_iter = std::find_if(
 				m_current_option_list.begin(),
 				m_current_option_list.end(),
-				[target] (const std::string &opt_value)
+				[target] (std::string const &opt_value)
 				{
 					return opt_value == target;
 				});

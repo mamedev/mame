@@ -23,5 +23,10 @@ extern size_t lineno;
 
 void check(int cond, const char *format, ...);
 size_t skipspaces(const unsigned char *buf, size_t i);
-size_t encode(unsigned char *dest, const unsigned char *buf);
+size_t encode(unsigned char *dest, size_t *dest_len, const unsigned char *buf);
 size_t simple_getline(unsigned char buf[8192], FILE *f);
+void print_escaped(FILE* f, const utf8proc_uint8_t *utf8);
+void print_string_and_escaped(FILE* f, const utf8proc_uint8_t *utf8);
+void check_compare(const char *transformation,
+                   const utf8proc_uint8_t *input, const utf8proc_uint8_t *expected,
+                   utf8proc_uint8_t *received, int free_received);

@@ -63,7 +63,7 @@ void rx01_device::device_add_mconfig(machine_config &config)
 	cpu.set_addrmap(AS_DATA, &rx01_device::secbuf_map);
 
 	for (auto &floppy : m_image)
-		LEGACY_FLOPPY(config, floppy, 0, &rx01_floppy_interface);
+		LEGACY_FLOPPY(config, floppy, &rx01_floppy_interface);
 }
 
 //-------------------------------------------------

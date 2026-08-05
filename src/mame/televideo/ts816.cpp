@@ -276,7 +276,7 @@ void ts816_state::ts816(machine_config &config)
 	m_maincpu->busack_cb().set("dma", FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ts816_state::kbd_put));
 
 	//z80sio_device& sio0(Z80SIO(config, "sio0", XTAL(16'000'000) / 4));

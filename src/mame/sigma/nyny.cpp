@@ -609,7 +609,7 @@ void nyny_state::nyny(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	screen.set_raw(11.2_MHz_XTAL / 2, 360, 0, 256, 276, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
@@ -626,7 +626,7 @@ void nyny_state::nyny(machine_config &config)
 
 	// 74LS123: This timer is responsible for delaying the setting of PIA2's CA1 line.
 	// This delay ensures that CA1 is only changed in the VBLANK region, but not in HBLANK.
-	TTL74123(config, m_ic48_1, 0);
+	TTL74123(config, m_ic48_1);
 	m_ic48_1->set_connection_type(TTL74123_GROUNDED); // the hook up type
 	m_ic48_1->set_resistor_value(RES_K(22));          // resistor connected to RCext
 	m_ic48_1->set_capacitor_value(CAP_U(0.01));       // capacitor connected to Cext and RCext

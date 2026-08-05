@@ -92,9 +92,6 @@ private:
 
 void namco_30test_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	save_item(NAME(m_mux_data));
 }
 

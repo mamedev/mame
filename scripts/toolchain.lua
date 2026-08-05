@@ -33,7 +33,6 @@ newoption {
 		{ "openbsd-clang", "OpenBSD (clang compiler)"},
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
-		{ "solaris",       "Solaris"                },
 	},
 }
 
@@ -42,8 +41,7 @@ newoption {
 	value = "toolset",
 	description = "Choose VS toolset",
 	allowed = {
-		{ "intel-15",      "Intel C++ Compiler XE 15.0" },
-		{ "clangcl",       "Visual Studio 2019 using Clang/LLVM" },
+		{ "clangcl",       "Visual Studio using Clang/LLVM" },
 	},
 }
 
@@ -105,13 +103,13 @@ function toolchain(_buildDir, _subDir)
 
 		if "asmjs" == _OPTIONS["gcc"] then
 
-			if not os.getenv("EMSCRIPTEN") then
-				print("Set EMSCRIPTEN enviroment variables.")
+			if not os.getenv("EMSDK") then
+				print("Set EMSDK enviroment variables.")
 			end
 
-			premake.gcc.cc   = "$(EMSCRIPTEN)/emcc"
-			premake.gcc.cxx  = "$(EMSCRIPTEN)/em++"
-			premake.gcc.ar   = "$(EMSCRIPTEN)/emar"
+			premake.gcc.cc   = "$(EMSDK)/upstream/emscripten/emcc"
+			premake.gcc.cxx  = "$(EMSDK)/upstream/emscripten/em++"
+			premake.gcc.ar   = "$(EMSDK)/upstream/emscripten/emar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-asmjs")
 		end
@@ -143,10 +141,6 @@ function toolchain(_buildDir, _subDir)
 		if "linux-gcc" == _OPTIONS["gcc"] then
 			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
-		end
-
-		if "solaris" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-solaris")
 		end
 
 
@@ -212,10 +206,11 @@ function toolchain(_buildDir, _subDir)
 			premake.vstudio.toolset = ("ClangCL")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
 		end
+	elseif _ACTION == "vs2026" then
 
-		if "intel-15" == _OPTIONS["vs"] then
-			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
+		if "clangcl" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("ClangCL")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
 		end
 	end
 
@@ -376,35 +371,6 @@ function toolchain(_buildDir, _subDir)
 	configuration { "linux-clang", "x64", "Debug" }
 		targetdir (_buildDir .. "linux_clang" .. "/bin/x64/Debug")
 
-	configuration { "solaris", "x32" }
-		objdir (_buildDir .. "solaris" .. "/obj")
-		buildoptions {
-			"-m32",
-		}
-
-	configuration { "solaris", "x32", "Release" }
-		targetdir (_buildDir .. "solaris" .. "/bin/x32/Release")
-
-	configuration { "solaris", "x32", "Debug" }
-		targetdir (_buildDir .. "solaris" .. "/bin/x32/Debug")
-
-	configuration { "solaris", "x64" }
-		objdir (_buildDir .. "solaris" .. "/obj")
-		buildoptions {
-			"-m64",
-		}
-
-	configuration { "solaris", "x64", "Release" }
-		targetdir (_buildDir .. "solaris" .. "/bin/x64/Release")
-
-	configuration { "solaris", "x64", "Debug" }
-		targetdir (_buildDir .. "solaris" .. "/bin/x64/Debug")
-
-	configuration { "freebsd", "x32" }
-		objdir (_buildDir .. "freebsd" .. "/obj")
-		buildoptions {
-			"-m32",
-		}
 
 	configuration { "freebsd", "x32", "Release" }
 		targetdir (_buildDir .. "freebsd" .. "/bin/x32/Release")

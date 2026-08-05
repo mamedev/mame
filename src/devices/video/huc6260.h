@@ -36,10 +36,10 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	u8 palette_direct_read(offs_t offset);
-	void palette_direct_write(offs_t offset, u8 data);
-
 protected:
+	// construction/destruction
+	huc6260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -48,7 +48,6 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(update_events);
 
-private:
 	void palette_init();
 
 	/* Callback function to retrieve pixel data */
@@ -81,6 +80,18 @@ private:
 };
 
 
-DECLARE_DEVICE_TYPE(HUC6260, huc6260_device)
+class battlera_vce_device : public huc6260_device
+{
+public:
+	// construction/destruction
+	battlera_vce_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	u8 palette_direct_read(offs_t offset);
+	void palette_direct_write(offs_t offset, u8 data);
+};
+
+
+DECLARE_DEVICE_TYPE(HUC6260,      huc6260_device)
+DECLARE_DEVICE_TYPE(BATTLERA_VCE, battlera_vce_device)
 
 #endif // MAME_VIDEO_HUC6260_H

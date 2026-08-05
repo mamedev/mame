@@ -102,8 +102,6 @@ private:
 
 void miconkit_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_select));
 }
 
@@ -280,7 +278,7 @@ void miconkit_state::micon2(machine_config &config)
 	m_ppi->tri_pc_callback().set_constant(0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 240-1, 24, 256-24-1);
@@ -290,7 +288,7 @@ void miconkit_state::micon2(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void miconkit_state::smiconk(machine_config &config)

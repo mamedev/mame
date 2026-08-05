@@ -19,7 +19,7 @@
     DGND 12 |___________| 13 INITB
 
 
-    TOOD:
+    TODO:
     - INITB, DN aren't implemented
     - Filters aren't implemented
 

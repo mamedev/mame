@@ -117,17 +117,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void wpc_an_dd(machine_config &config);
-	void wpc_an(machine_config &config);
-	void wpc_an_base(machine_config &config);
+	void wpc_an_dd(machine_config &config) ATTR_COLD;
+	void wpc_an(machine_config &config) ATTR_COLD;
+	void wpc_an_base(machine_config &config) ATTR_COLD;
 
-	void init_wpc_an();
+	void init_wpc_an() ATTR_COLD;
 
-private:
+protected:
 	// driver_device overrides
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 
+private:
 	void wpc_an_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_tick);
@@ -387,7 +388,6 @@ void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 
 void wpc_an_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_vblank_count));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_bankmask));
@@ -429,7 +429,7 @@ void wpc_an_state::wpc_an_base(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(8'000'000) / 4); // 68B09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_an_state::wpc_an_map);
 
-	WPCASIC(config, m_wpc, 0);
+	WPCASIC(config, m_wpc);
 	m_wpc->irq_callback().set(FUNC(wpc_an_state::irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_an_state::firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_an_state::rombank_w));

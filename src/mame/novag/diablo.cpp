@@ -285,7 +285,7 @@ void diablo_state::diablo68(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60); // arbitrary
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(6*16+1, 10);

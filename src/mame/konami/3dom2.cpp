@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "3dom2.h"
 
+#include "endianness.h"
+
 #include <algorithm> // std::min
 
 

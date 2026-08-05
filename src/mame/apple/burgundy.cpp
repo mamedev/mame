@@ -36,7 +36,16 @@ burgundy_device::burgundy_device(const machine_config &mconfig, const char *tag,
 	, m_output_cb(*this, 0)
 	, m_input_cb(*this)
 	, m_stream(nullptr)
+	, m_active(0)
+	, m_phase(0)
+	, m_reg_addr(0)
+	, m_cur_byte(0)
+	, m_last_byte(0)
+	, m_codec_status(0)
+	, m_last_codec_control(0)
+	, m_counter(0)
 {
+	std::fill(std::begin(m_registers), std::end(m_registers), 0);
 }
 
 //-------------------------------------------------
@@ -65,6 +74,8 @@ void burgundy_device::device_reset()
 	m_phase = 0;
 	m_codec_status = 0;
 	m_counter = 0;
+	m_active = 0;
+	std::fill(std::begin(m_registers), std::end(m_registers), 0);
 	m_stream->set_sample_rate(clock() / 512);
 }
 
@@ -83,9 +94,12 @@ void burgundy_device::sound_stream_update(sound_stream &stream)
 		m_counter &= 3;
 	}
 
+	// The serial link between the MacIO chip and the codec always runs, so output
+	// DMA is always consumed at the sample rate, even with all outputs disabled.
+	const u32 data = swapendian_int32(m_output_cb(m_phase));
+
 	if (m_active & ACTIVE_OUT)
 	{
-		const u32 data = swapendian_int32(m_output_cb(m_phase));
 		const s16 left = data >> 16;
 		const s16 right = data;
 		stream.put_int(0, 0, left, 32768);
@@ -140,7 +154,9 @@ void burgundy_device::write_macrisc(offs_t offset, uint32_t data)
 
 				if (m_reg_addr == 0x60)
 				{
-					if ((m_registers[0x60] & 6) != 0)
+					// reg 0x60 enables outputs: 0x06 = speaker L/R, 0x18 = line out L/R,
+					// 0x60 = headphone L/R, 0x80 = internal.
+					if ((m_registers[0x60] & 0xfe) != 0)
 					{
 						LOG("%s: Playback enabled\n", tag());
 						m_active |= ACTIVE_OUT;

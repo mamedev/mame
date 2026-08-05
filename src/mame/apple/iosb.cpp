@@ -33,6 +33,7 @@
 #define LOG_IOSBREGS    (1U << 3)
 
 #define VERBOSE (0)
+#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 static constexpr u32 C7M  = 7833600;
@@ -56,7 +57,7 @@ void iosb_base::map(address_map &map)
 	map(0x00002000, 0x00003fff).rw(FUNC(iosb_base::mac_via2_r), FUNC(iosb_base::mac_via2_w)).mirror(0x00f00000);
 	map(0x00010000, 0x000100ff).rw(FUNC(iosb_base::turboscsi_r), FUNC(iosb_base::turboscsi_w)).mirror(0x00fc0000);
 	map(0x00010100, 0x00010103).rw(FUNC(iosb_base::turboscsi_dma_r), FUNC(iosb_base::turboscsi_dma_w)).select(0x00fc0000);
-	map(0x00014000, 0x00015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
+	map(0x00014000, 0x00014fff).rw(m_asc, FUNC(asc_base_device::read), FUNC(asc_base_device::write)).mirror(0x00f00000);
 	map(0x00018000, 0x00019fff).rw(FUNC(iosb_base::iosb_regs_r), FUNC(iosb_base::iosb_regs_w)).mirror(0x00f00000);
 	map(0x0001e000, 0x0001ffff).rw(FUNC(iosb_base::swim_r), FUNC(iosb_base::swim_w)).mirror(0x00f00000);
 
@@ -79,13 +80,13 @@ void iosb_base::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(iosb_base::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(iosb_base::via1_irq));
 
-	R65NC22(config, m_via2, C7M / 10);
+	APPLE_QUADRA_PSEUDOVIA(config, m_via2, C7M / 10);
 	m_via2->readpa_handler().set(FUNC(iosb_base::via2_in_a));
 	m_via2->writepb_handler().set(FUNC(iosb_base::via2_out_b));
-	m_via2->irq_handler().set(FUNC(iosb_base::via2_irq));
+	m_via2->irq_callback().set(FUNC(iosb_base::via2_irq));
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, C15M, asc_device::asc_type::SONORA);
+	ASC_EASC(config, m_asc, C15M);   // TODO: should use unique IOSB variant, but that needs more reverse-engineering
 	m_asc->add_route(0, "speaker", 1.0, 0);
 	m_asc->add_route(1, "speaker", 1.0, 1);
 	m_asc->irqf_callback().set(FUNC(iosb_base::asc_irq));
@@ -192,7 +193,6 @@ void iosb_base::device_start()
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_last_taken_interrupt));
 	save_item(NAME(m_hdsel));
-	save_item(NAME(m_via2_ca1_hack));
 	save_item(NAME(m_nubus_irqs));
 	save_item(NAME(m_iosb_regs));
 }
@@ -206,15 +206,7 @@ void iosb_base::device_reset()
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 
-	m_via2_ca1_hack = 1;
-	m_via2->write_ca1(1);
-	m_via2->write_cb1(1);
-
-	// set defaults that make VIA2 pseudo-ish
-	m_via2->write(11, 0xc0);
-	m_via2->write(12, 0x26);
-	m_via2->write(13, 0x00);
-	m_via2->write(14, 0x80);
+	m_nubus_irqs = 0xff;
 }
 
 TIMER_CALLBACK_MEMBER(iosb_base::mac_6015_tick)
@@ -280,8 +272,11 @@ void iosb_base::via2_out_b(uint8_t data)
 
 void iosb_base::via2_irq(int state)
 {
-	m_via2_interrupt = state;
-	field_interrupts();
+	if (state != m_via2_interrupt)
+	{
+		m_via2_interrupt = state;
+		field_interrupts();
+	}
 }
 
 void iosb_base::field_interrupts()
@@ -323,8 +318,6 @@ void iosb_base::scc_irq_w(int state)
 template <u8 mask>
 void iosb_base::via2_irq_w(int state)
 {
-	m_nubus_irqs = m_via2->read(1);
-
 	if (state)
 	{
 		m_nubus_irqs &= ~mask;
@@ -334,21 +327,13 @@ void iosb_base::via2_irq_w(int state)
 		m_nubus_irqs |= mask;
 	}
 
-	m_nubus_irqs |= 0x86;
-
 	if ((m_nubus_irqs & 0x79) != 0x79)
 	{
-		if (m_via2_ca1_hack == 0)
-		{
-			m_via2->write_ca1(1);
-		}
-		m_via2_ca1_hack = 0;
-		m_via2->write_ca1(0);
+		m_via2->slot_irq_w(CLEAR_LINE);
 	}
 	else
 	{
-		m_via2_ca1_hack = 1;
-		m_via2->write_ca1(1);
+		m_via2->slot_irq_w(ASSERT_LINE);
 	}
 }
 
@@ -366,13 +351,13 @@ u8 iosb_base::via2_in_a()
 
 void iosb_base::scsi_irq_w(int state)
 {
-	m_via2->write_cb2(state ^ 1);
+	m_via2->scsi_irq_w(state);
 	m_scsi_irq = state;
 }
 
 void iosb_base::asc_irq(int state)
 {
-	m_via2->write_cb1(state ^ 1);
+	m_via2->asc_irq_w(state);
 	m_asc_irq = state;
 }
 
@@ -414,60 +399,20 @@ void iosb_base::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via1->write(offset, (data >> 8) & 0xff);
 }
 
-u16 iosb_base::mac_via2_r(offs_t offset)
+u8 iosb_base::mac_via2_r(offs_t offset)
 {
-	int data;
-
-	offset >>= 8;
-	offset &= 0x0f;
-
 	if (!machine().side_effects_disabled())
 		via_sync();
 
-	data = m_via2->read(offset);
-	// a little more pseudo-ness: bit 0 of the IFR shows the live line states of the IRQs and DRQ
-	if (offset == 13)
-	{
-		data &= ~0x19;
-		data |= (m_drq) ? 0x01 : 0;
-		data |= (m_scsi_irq) ? 0x08 : 0;
-		data |= (m_asc_irq) ? 0x10 : 0;
-	}
-	return (data & 0xff) | (data << 8);
+	u8 data = m_via2->read(offset);
+	return data;
 }
 
-void iosb_base::mac_via2_w(offs_t offset, u16 data, u16 mem_mask)
+void iosb_base::mac_via2_w(offs_t offset, u8 data)
 {
-	offset >>= 8;
-	offset &= 0x0f;
-
-	// what makes VIA2 "pseudo" is that regs 4-10 can't be written, and 11 and 12 have canned values
-	switch (offset)
-	{
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-			return;
-
-		case 11:
-			m_via2->write(11, 0xc0);
-			return;
-
-		case 12:
-			m_via2->write(12, 0x26);
-			return;
-	}
-
 	via_sync();
 
-	if (ACCESSING_BITS_0_7)
-		m_via2->write(offset, data & 0xff);
-	if (ACCESSING_BITS_8_15)
-		m_via2->write(offset, (data >> 8) & 0xff);
+	m_via2->write(offset, data);
 }
 
 void iosb_base::via_sync()
@@ -650,7 +595,7 @@ void iosb_base::scsi_drq_w(int state)
 {
 	LOGMASKED(LOG_SCSIDRQ, "SCSI DRQ %d (was %d)\n", state, m_drq);
 	m_drq = state;
-	m_via2->write_ca2(state);
+	m_via2->scsi_drq_w(state);
 }
 
 u16 iosb_base::iosb_regs_r(offs_t offset)

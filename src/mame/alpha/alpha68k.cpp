@@ -1271,7 +1271,7 @@ static constexpr u32 ALPHA68K_HTOTAL = 384;
 
 void alpha68k_state::set_screen_raw_params(machine_config &config)
 {
-//  TODO: Same as snk/snk68.cpp, which in turn is awfully similar to NeoGeo CRTC parameters
+	// Same as snk/snk68.cpp, which in turn is awfully similar to NeoGeo CRTC parameters
 	m_screen->set_raw(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,0,256,264,16,240);
 }
 
@@ -1305,7 +1305,7 @@ void alpha68k_II_state::base_config(machine_config &config)
 void alpha68k_II_state::video_config(machine_config &config, u16 num_pens, const gfx_decode_entry *gfxinfo)
 {
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(alpha68k_II_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1321,7 +1321,7 @@ void alpha68k_II_state::video_config(machine_config &config, u16 num_pens, const
 	m_color_entry_mask = (num_pens / 16) - 1;
 
 	// TODO: change into NeoGeo palette format ...
-	ALPHA68K_PALETTE(config, m_palette, 0);
+	ALPHA68K_PALETTE(config, m_palette);
 	m_palette->set_entries(num_pens);
 }
 

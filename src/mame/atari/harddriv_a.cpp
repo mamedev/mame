@@ -435,7 +435,7 @@ void harddriv_sound_board_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_soundcpu, 16_MHz_XTAL/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_68k_map);
 
-	LS259(config, m_latch, 0); // 80R
+	LS259(config, m_latch); // 80R
 	m_latch->q_out_cb<0>().set(FUNC(harddriv_sound_board_device::speech_write_w)); // SPWR - 5220 write strobe
 	m_latch->q_out_cb<1>().set(FUNC(harddriv_sound_board_device::speech_reset_w)); // SPRES - 5220 hard reset
 	m_latch->q_out_cb<2>().set(FUNC(harddriv_sound_board_device::speech_rate_w)); // SPRATE

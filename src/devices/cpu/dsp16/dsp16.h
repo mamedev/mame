@@ -17,6 +17,7 @@
 #include <memory>
 #include <utility>
 
+
 class dsp16_device_base : public cpu_device, protected dsp16_disassembler::cpu
 {
 public:
@@ -173,6 +174,7 @@ private:
 
 	// recompiler helpers
 	class core_state;
+	class opcode_desc;
 	class frontend;
 	class recompiler;
 	struct core_destructer { void operator()(core_state *obj) const noexcept; };

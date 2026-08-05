@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:R. Belmont, Olivier Galibert
 #ifndef MAME_CPU_M6502_M3745X_H
 #define MAME_CPU_M6502_M3745X_H
 
@@ -38,9 +38,9 @@ public:
 
 	const address_space_config m_program_config;
 
-	template<std::size_t Bit> auto read_p() { return m_read_p[Bit-3].bind(); }
-	template<std::size_t Bit> auto write_p() { return m_write_p[Bit-3].bind(); }
-	template<std::size_t Bit> auto read_ad() { return m_read_ad[Bit].bind(); }
+	template<std::size_t Port> auto read_p() { return m_read_p[Port-3].bind(); }
+	template<std::size_t Port> auto write_p() { return m_write_p[Port-3].bind(); }
+	template<std::size_t Port> auto read_ad() { return m_read_ad[Port].bind(); }
 
 	uint8_t ports_r(offs_t offset);
 	void ports_w(offs_t offset, uint8_t data);
@@ -76,7 +76,7 @@ protected:
 	devcb_write8::array<4> m_write_p;
 	devcb_read8::array<8>  m_read_ad;
 
-	uint8_t m_ports[6], m_ddrs[6];
+	uint8_t m_ports[4], m_ddrs[4];
 	uint8_t m_intreq1, m_intreq2, m_intctrl1, m_intctrl2;
 	uint8_t m_adctrl;
 	uint16_t m_last_all_ints;

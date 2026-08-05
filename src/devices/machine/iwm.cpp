@@ -26,8 +26,6 @@ iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t 
 	m_floppy(nullptr),
 	m_q3_clock(q3_clock)
 {
-	m_q3_fclk_ratio = q3_clock ? double(clock)/double(q3_clock) : 0; // ~0.25
-	m_fclk_q3_ratio = q3_clock ? double(q3_clock)/double(clock) : 0; // ~4
 }
 
 void iwm_device::device_start()
@@ -123,7 +121,17 @@ floppy_image_device *iwm_device::get_floppy() const
 
 uint8_t iwm_device::read(offs_t offset)
 {
-	return control(offset, 0x00);
+	if(!machine().side_effects_disabled())
+		control(offset, 0x00);
+
+	switch(m_control & 0xc0) {
+	case 0x00: return m_active ? m_data : 0xff;
+	case 0x40: return (m_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
+	case 0x80: return m_whd;
+	case 0xc0: return 0xff;
+	}
+
+	abort();
 }
 
 void iwm_device::write(offs_t offset, u8 data)
@@ -162,7 +170,7 @@ void iwm_device::flush_write(u64 when)
 		m_flux_write_count = 0;
 }
 
-u8 iwm_device::control(int offset, u8 data)
+void iwm_device::control(int offset, u8 data)
 {
 	sync();
 
@@ -276,14 +284,13 @@ u8 iwm_device::control(int offset, u8 data)
 	if(m_active && !(m_control & 0x80) && !is_sync() && (m_data & 0x80))
 		m_async_update = m_last_sync + 14;
 
-	switch(m_control & 0xc0) {
-	case 0x00: return m_active ? m_data : 0xff;
-	case 0x40: return (m_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
-	case 0x80: return m_whd;
-	case 0xc0: if(offset & 1) { if(m_active) data_w(data); else mode_w(data); } return 0xff;
+	if((m_control & 0xc0) == 0xc0 && (offset & 1))
+	{
+		if(m_active)
+			data_w(data);
+		else
+			mode_w(data);
 	}
-
-	abort();
 }
 
 void iwm_device::mode_w(u8 data)

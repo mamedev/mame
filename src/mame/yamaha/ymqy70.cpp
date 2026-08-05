@@ -166,12 +166,12 @@ void qy70_state::qy70(machine_config &config)
 	NVRAM(config, "userdata.nv", nvram_device::DEFAULT_NONE);
 	NVRAM(config, "workdata.nv", nvram_device::DEFAULT_NONE);
 
-	T6963C(config, m_lcdc, 0);
+	T6963C(config, m_lcdc);
 	m_lcdc->set_addrmap(0, &qy70_state::lcd_map);
 	m_lcdc->set_fs(2);
 	m_lcdc->set_md(8);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(128, 64);
 	screen.set_visarea_full();

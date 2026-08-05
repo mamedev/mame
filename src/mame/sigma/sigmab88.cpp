@@ -79,7 +79,7 @@ void sigmab88_state::sigmab88(machine_config &config)
 	PTM6840(config, "ptm", XTAL(20'000'000)/2/16);
 	//ptm.irq_callback().set_inputline(m_maincpu, hd641016_device::IRQ1_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(1024, 1024);

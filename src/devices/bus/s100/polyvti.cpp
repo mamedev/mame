@@ -313,7 +313,7 @@ GFXDECODE_END
 
 void poly_vti_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*10, 16*15);
@@ -324,7 +324,7 @@ void poly_vti_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_vti);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(poly_vti_device::kbd_put));
 
 	I8212(config, m_kbdlatch);

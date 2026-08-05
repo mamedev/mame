@@ -116,7 +116,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 
 void wangpc_tig_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_screen_update(FUNC(wangpc_tig_device::screen_update));
 	screen.set_size(80*10, 25*12);
 	screen.set_visarea(0, 80*10-1, 0, 25*12-1);

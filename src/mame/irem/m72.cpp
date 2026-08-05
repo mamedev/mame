@@ -1666,7 +1666,7 @@ void m72_state::m72_audio_chips(machine_config &config)
 	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
 	soundlatch.set_separate_acknowledge(true);
 
-	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
+	RST_NEG_BUFFER(config, "soundirq").int_callback().set_inputline(m_soundcpu, 0);
 
 	m_soundcpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
@@ -1693,7 +1693,7 @@ void m72_state::m72_base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_ram_map);
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_portmap);
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
@@ -1702,7 +1702,7 @@ void m72_state::m72_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1842,7 +1842,7 @@ void m72_state::rtype2(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
 	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
@@ -1851,7 +1851,7 @@ void m72_state::rtype2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1897,7 +1897,7 @@ void m72_state::cosmccop(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1935,7 +1935,7 @@ void m82_state::m82(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &m82_state::rtype2_sound_portmap);
 	m_soundcpu->set_periodic_int(FUNC(m82_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
@@ -1944,7 +1944,7 @@ void m82_state::m82(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_majtitle);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m82_state::screen_update_m82));
 	m_screen->set_palette(m_palette);
@@ -1970,7 +1970,7 @@ void poundfor_state::poundfor(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &poundfor_state::poundfor_sound_portmap);
 	m_soundcpu->set_periodic_int(FUNC(poundfor_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	UPD4701A(config, m_upd4701[0]);
@@ -1987,7 +1987,7 @@ void poundfor_state::poundfor(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(poundfor_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2015,7 +2015,7 @@ void m72_state::lohtb(machine_config &config) // almost all to be verified
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);

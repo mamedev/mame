@@ -115,7 +115,7 @@ protected:
 	void combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask);
 	void sprcpt_init() ATTR_COLD;
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	IRQ_CALLBACK_MEMBER( vector_r );
 	virtual void common_save_state() ATTR_COLD;
 	void common_video_start() ATTR_COLD;
 

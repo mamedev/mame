@@ -1,11 +1,12 @@
 // license:Zlib
-// copyright-holders:SDL2 Developers
+// copyright-holders:SDL3 Developers
 package org.libsdl.app;
 
 import android.hardware.usb.*;
 import android.os.Build;
 import android.util.Log;
 import java.util.Arrays;
+import java.util.Locale;
 
 class HIDDeviceUSB implements HIDDevice {
 
@@ -22,6 +23,7 @@ class HIDDeviceUSB implements HIDDevice {
     protected InputThread mInputThread;
     protected boolean mRunning;
     protected boolean mFrozen;
+    protected boolean mClaimed;
 
     public HIDDeviceUSB(HIDDeviceManager manager, UsbDevice usbDevice, int interface_index) {
         mManager = manager;
@@ -30,10 +32,11 @@ class HIDDeviceUSB implements HIDDevice {
         mInterface = mDevice.getInterface(mInterfaceIndex).getId();
         mDeviceId = manager.getDeviceIDForIdentifier(getIdentifier());
         mRunning = false;
+        mClaimed = false;
     }
 
-    public String getIdentifier() {
-        return String.format("%s/%x/%x/%d", mDevice.getDeviceName(), mDevice.getVendorId(), mDevice.getProductId(), mInterfaceIndex);
+    String getIdentifier() {
+        return String.format(Locale.ENGLISH, "%s/%x/%x/%d", mDevice.getDeviceName(), mDevice.getVendorId(), mDevice.getProductId(), mInterfaceIndex);
     }
 
     @Override
@@ -54,13 +57,11 @@ class HIDDeviceUSB implements HIDDevice {
     @Override
     public String getSerialNumber() {
         String result = null;
-        if (Build.VERSION.SDK_INT >= 21) {
-            try {
-                result = mDevice.getSerialNumber();
-            }
-            catch (SecurityException exception) {
-                //Log.w(TAG, "App permissions mean we cannot get serial number for device " + getDeviceName() + " message: " + exception.getMessage());
-            }
+        try {
+            result = mDevice.getSerialNumber();
+        }
+        catch (Exception exception) {
+            //Log.w(TAG, "App permissions mean we cannot get serial number for device " + getDeviceName() + " message: " + exception.getMessage());
         }
         if (result == null) {
             result = "";
@@ -75,10 +76,8 @@ class HIDDeviceUSB implements HIDDevice {
 
     @Override
     public String getManufacturerName() {
-        String result = null;
-        if (Build.VERSION.SDK_INT >= 21) {
-            result = mDevice.getManufacturerName();
-        }
+        String result;
+        result = mDevice.getManufacturerName();
         if (result == null) {
             result = String.format("%x", getVendorId());
         }
@@ -87,10 +86,8 @@ class HIDDeviceUSB implements HIDDevice {
 
     @Override
     public String getProductName() {
-        String result = null;
-        if (Build.VERSION.SDK_INT >= 21) {
-            result = mDevice.getProductName();
-        }
+        String result;
+        result = mDevice.getProductName();
         if (result == null) {
             result = String.format("%x", getProductId());
         }
@@ -102,7 +99,7 @@ class HIDDeviceUSB implements HIDDevice {
         return mDevice;
     }
 
-    public String getDeviceName() {
+    String getDeviceName() {
         return getManufacturerName() + " " + getProductName() + "(0x" + String.format("%x", getVendorId()) + "/0x" + String.format("%x", getProductId()) + ")";
     }
 
@@ -121,6 +118,7 @@ class HIDDeviceUSB implements HIDDevice {
             close();
             return false;
         }
+        mClaimed = true;
 
         // Find the endpoints
         for (int j = 0; j < iface.getEndpointCount(); j++) {
@@ -139,9 +137,12 @@ class HIDDeviceUSB implements HIDDevice {
             }
         }
 
-        // Make sure the required endpoints were present
-        if (mInputEndpoint == null || mOutputEndpoint == null) {
+        // Make sure the required endpoints were present. The original Steam Controller and the wireless dongle for it do NOT
+        // actually have -- or require -- output endpoints, so we need to accept only an input one for them or else we'll fall
+        // back to the Android system gamepad functionality (and lose our paddles et al).
+        if (mInputEndpoint == null) {
             Log.w(TAG, "Missing required endpoint on USB device " + getDeviceName());
+            mConnection.releaseInterface(iface);
             close();
             return false;
         }
@@ -155,54 +156,79 @@ class HIDDeviceUSB implements HIDDevice {
     }
 
     @Override
-    public int sendFeatureReport(byte[] report) {
-        int res = -1;
-        int offset = 0;
-        int length = report.length;
-        boolean skipped_report_id = false;
-        byte report_number = report[0];
-
-        if (report_number == 0x0) {
-            ++offset;
-            --length;
-            skipped_report_id = true;
-        }
-
-        res = mConnection.controlTransfer(
-            UsbConstants.USB_TYPE_CLASS | 0x01 /*RECIPIENT_INTERFACE*/ | UsbConstants.USB_DIR_OUT,
-            0x09/*HID set_report*/,
-            (3/*HID feature*/ << 8) | report_number,
-            mInterface,
-            report, offset, length,
-            1000/*timeout millis*/);
-
-        if (res < 0) {
-            Log.w(TAG, "sendFeatureReport() returned " + res + " on device " + getDeviceName());
+    public int writeReport(byte[] report, boolean feature) {
+        if (mConnection == null) {
+            Log.w(TAG, "writeReport() called with no device connection");
             return -1;
         }
 
-        if (skipped_report_id) {
-            ++length;
+        if (!mClaimed) {
+            Log.w(TAG, "writeReport() called but some other process currently owns the USB device");
+            return -1;
         }
-        return length;
+
+        if (feature) {
+            int res = -1;
+            int offset = 0;
+            int length = report.length;
+            boolean skipped_report_id = false;
+            byte report_number = report[0];
+
+            if (report_number == 0x0) {
+                ++offset;
+                --length;
+                skipped_report_id = true;
+            }
+
+            res = mConnection.controlTransfer(
+                UsbConstants.USB_TYPE_CLASS | 0x01 /*RECIPIENT_INTERFACE*/ | UsbConstants.USB_DIR_OUT,
+                0x09/*HID set_report*/,
+                (3/*HID feature*/ << 8) | report_number,
+                mInterface,
+                report, offset, length,
+                1000/*timeout millis*/);
+
+            if (res < 0) {
+                Log.w(TAG, "writeFeatureReport() returned " + res + " on device " + getDeviceName());
+                return -1;
+            }
+
+            if (skipped_report_id) {
+                ++length;
+            }
+            return length;
+        } else {
+            if (mOutputEndpoint == null)
+            {
+                Log.e(TAG, "Tried to write an output report to an interface with no output endpoint!");
+                return -1;
+            }
+            int res = mConnection.bulkTransfer(mOutputEndpoint, report, report.length, 1000);
+            if (res != report.length) {
+                Log.w(TAG, "writeOutputReport() returned " + res + " on device " + getDeviceName());
+            }
+            return res;
+        }
     }
 
     @Override
-    public int sendOutputReport(byte[] report) {
-        int r = mConnection.bulkTransfer(mOutputEndpoint, report, report.length, 1000);
-        if (r != report.length) {
-            Log.w(TAG, "sendOutputReport() returned " + r + " on device " + getDeviceName());
-        }
-        return r;
-    }
-
-    @Override
-    public boolean getFeatureReport(byte[] report) {
+    public boolean readReport(byte[] report, boolean feature) {
         int res = -1;
         int offset = 0;
         int length = report.length;
         boolean skipped_report_id = false;
         byte report_number = report[0];
+
+        if (mConnection == null) {
+            Log.w(TAG, "readReport() called with no device connection");
+            return false;
+        }
+        if (!mClaimed) {
+            if (feature) {
+                return false;
+            }
+            return true;            
+        }
 
         if (report_number == 0x0) {
             /* Offset the return buffer by 1, so that the report ID
@@ -215,7 +241,7 @@ class HIDDeviceUSB implements HIDDevice {
         res = mConnection.controlTransfer(
             UsbConstants.USB_TYPE_CLASS | 0x01 /*RECIPIENT_INTERFACE*/ | UsbConstants.USB_DIR_IN,
             0x01/*HID get_report*/,
-            (3/*HID feature*/ << 8) | report_number,
+            ((feature ? 3/*HID feature*/ : 1/*HID Input*/) << 8) | report_number,
             mInterface,
             report, offset, length,
             1000/*timeout millis*/);
@@ -236,7 +262,7 @@ class HIDDeviceUSB implements HIDDevice {
         } else {
             data = Arrays.copyOfRange(report, 0, res);
         }
-        mManager.HIDDeviceFeatureReport(mDeviceId, data);
+        mManager.HIDDeviceReportResponse(mDeviceId, data);
 
         return true;
     }
@@ -256,10 +282,13 @@ class HIDDeviceUSB implements HIDDevice {
             mInputThread = null;
         }
         if (mConnection != null) {
-            UsbInterface iface = mDevice.getInterface(mInterfaceIndex);
-            mConnection.releaseInterface(iface);
+            if (mClaimed) {
+                UsbInterface iface = mDevice.getInterface(mInterfaceIndex);
+                mConnection.releaseInterface(iface);                
+            }
             mConnection.close();
             mConnection = null;
+            mClaimed = false;
         }
     }
 
@@ -272,6 +301,22 @@ class HIDDeviceUSB implements HIDDevice {
     @Override
     public void setFrozen(boolean frozen) {
         mFrozen = frozen;
+
+        /* If we have a valid device connection and the claim state doesn't match what we want, try to correct that. */
+        if (mConnection != null && mClaimed == mFrozen) {
+            UsbInterface iface = mDevice.getInterface(mInterfaceIndex);
+            if (frozen) {
+                mClaimed = !mConnection.releaseInterface(iface);
+                if (mClaimed) {
+                    Log.e(TAG, "Tried to release claim on USB device, but failed!");
+                }
+            } else {
+                mClaimed = mConnection.claimInterface(iface, true);
+                if (!mClaimed) {
+                    Log.e(TAG, "Tried to regain claim on USB device, but failed!");
+                }
+            }
+        }
     }
 
     protected class InputThread extends Thread {

@@ -669,7 +669,7 @@ void coinmvga_state::coinmvga(machine_config &config)
 	MSM6242(config, "rtc", 32768);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MACH_CLOCK / 2, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(FUNC(coinmvga_state::screen_update_coinmvga));
 	//screen.set_palette(m_palette);
@@ -678,11 +678,11 @@ void coinmvga_state::coinmvga(machine_config &config)
 	GFXDECODE(config, m_gfxdecode[1], m_palette[1], gfx_coinmvga_4bpp);
 
 	PALETTE(config, m_palette[0]).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette[0]));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette[0]));
 	ramdac.set_addrmap(0, &coinmvga_state::ramdac_map);
 
 	PALETTE(config, m_palette[1]).set_entries(16);
-	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette[1]));
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", m_palette[1]));
 	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 
 	// sound hardware

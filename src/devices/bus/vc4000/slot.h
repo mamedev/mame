@@ -61,10 +61,7 @@ public:
 	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const *dflt)
 		: vc4000_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vc4000_cart_slot_device();
@@ -113,10 +110,7 @@ public:
 	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const *dflt)
 		: h21_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~h21_cart_slot_device();
@@ -124,7 +118,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "h21_cart"; }
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(VC4000_CART_SLOT, vc4000_cart_slot_device)
 DECLARE_DEVICE_TYPE(H21_CART_SLOT,    h21_cart_slot_device)
 

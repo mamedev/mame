@@ -109,11 +109,11 @@ isa16_f65535_lcd_device::isa16_f65535_lcd_device(const machine_config &mconfig, 
 
 void isa16_f65535_lcd_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(f65535_vga_device::screen_update));
 
-	F65535_VGA(config, m_vga, 0);
+	F65535_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(512*1024);
 }
@@ -175,10 +175,10 @@ private:
 
 void ptpc110_state::main_map(address_map &map)
 {
-//	map(0x0000'0000, 0x0009'ffff).ram();
+//  map(0x0000'0000, 0x0009'ffff).ram();
 //  map(0x000a'0000, 0x000b'ffff).rw(m_vga, FUNC(f65535_vga_device::mem_r), FUNC(f65535_vga_device::mem_w));
 //  map(0x000c'0000, 0x000f'ffff).rom().region("bios", 0);
-//	map(0x0100'0000, 0x0107'ffff).ram();
+//  map(0x0100'0000, 0x0107'ffff).ram();
 	map(0xfffc'0000, 0xffff'ffff).rom().region("bios", 0);
 }
 
@@ -268,7 +268,7 @@ void ptpc110_state::ptpc110(machine_config &config)
 
 	RAM(config, "ram").set_default_size("4M").set_extra_options("8M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(vl82c420_device::iochck_w));
@@ -291,8 +291,9 @@ void ptpc110_state::ptpc110(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(vl82c420_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(vl82c420_device::dreq7_w));
 
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, m_isabus, pc_isa_onboard, "vga",     true);
+	ISA16_SLOT(config, "board2", 0, m_isabus, pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
 
 	// TODO: should not fit BIOS wise
 	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
@@ -302,7 +303,7 @@ void ptpc110_state::ptpc110(machine_config &config)
 	keybc.kbd_irq().set(m_chipset, FUNC(vl82c420_device::irq01_w));
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-	keybc.aux_irq().set(m_chipset, FUNC(vl82c420_device::irq04_w));
+	keybc.aux_irq().set(m_chipset, FUNC(vl82c420_device::irq12_w));
 	keybc.aux_clk().set("aux", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.aux_data().set("aux", FUNC(pc_kbdc_device::data_write_from_mb));
 

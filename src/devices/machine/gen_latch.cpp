@@ -9,8 +9,9 @@
 #include "emu.h"
 #include "gen_latch.h"
 
-#define LOG_WARN (1U << 1)
-#define VERBOSE (LOG_WARN)
+#define LOG_LOSTVALUE (1U << 1)
+
+//#define VERBOSE (LOG_LOSTVALUE)
 
 #include "logmacro.h"
 
@@ -158,7 +159,7 @@ void generic_latch_8_device::sync_callback(s32 param)
 
 	// if the latch has been written and the value is changed, log a warning
 	if (is_latch_written() && m_latched_value != value)
-		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
+		LOGMASKED(LOG_LOSTVALUE, "Latch written before being read, value lost. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;
@@ -229,7 +230,7 @@ void generic_latch_16_device::sync_callback(s32 param)
 
 	// if the latch has been written and the value is changed, log a warning
 	if (is_latch_written() && m_latched_value != value)
-		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
+		LOGMASKED(LOG_LOSTVALUE, "Latch written before being read, value lost. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;

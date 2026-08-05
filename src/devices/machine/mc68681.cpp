@@ -314,28 +314,28 @@ void xr68c681_device::device_reset()
 
 void duart_base_device::device_add_mconfig(machine_config &config)
 {
-	DUART_CHANNEL(config, CHANA_TAG, 0);
-	DUART_CHANNEL(config, CHANB_TAG, 0);
+	DUART_CHANNEL(config, CHANA_TAG);
+	DUART_CHANNEL(config, CHANB_TAG);
 }
 
 void sc28c94_device::device_add_mconfig(machine_config &config)
 {
-	DUART_CHANNEL(config, CHANA_TAG, 0);
-	DUART_CHANNEL(config, CHANB_TAG, 0);
-	DUART_CHANNEL(config, CHANC_TAG, 0);
-	DUART_CHANNEL(config, CHAND_TAG, 0);
+	DUART_CHANNEL(config, CHANA_TAG);
+	DUART_CHANNEL(config, CHANB_TAG);
+	DUART_CHANNEL(config, CHANC_TAG);
+	DUART_CHANNEL(config, CHAND_TAG);
 }
 
 void mc68340_duart_device::device_add_mconfig(machine_config &config)
 {
-	DUART_CHANNEL(config, CHANA_TAG, 0);
-	DUART_CHANNEL(config, CHANB_TAG, 0);
+	DUART_CHANNEL(config, CHANA_TAG);
+	DUART_CHANNEL(config, CHANB_TAG);
 }
 
 void mcf5206e_uart_device::device_add_mconfig(machine_config &config)
 {
-	DUART_CHANNEL(config, CHANA_TAG, 0);
-	DUART_CHANNEL(config, CHANB_TAG, 0);
+	DUART_CHANNEL(config, CHANA_TAG);
+	DUART_CHANNEL(config, CHANB_TAG);
 }
 
 void duart_base_device::update_interrupts()
@@ -1428,14 +1428,25 @@ void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
 
 void duart_channel::tra_complete()
 {
-	if (!(SR & STATUS_TRANSMITTER_READY))
+	// The transmit shift register has just emptied.  If another character is
+	// waiting in the THR, transfer it to the shift register and assert TxRDY:
+	// per the datasheet the THR->shift transfer is where the TxRDY conditions
+	// are re-asserted, providing "one full character time of buffering".  If the
+	// THR is empty the transmitter is now idle, so set TxEMT (TxRDY is already
+	// set from the previous transfer).
+	//
+	// Asserting TxRDY here, at the transfer -- rather than in the idle branch --
+	// both prevents the transmitter from deadlocking when TxRDY would otherwise
+	// fail to re-assert on a CPU-write / final-bit-time race, and preserves the
+	// one-character buffering window that firmware polling or pipelining on TxRDY
+	// relies on.
+	if (m_tx_data_in_buffer)
 	{
-		if (m_tx_data_in_buffer)
-		{
-			transmit_register_setup(m_tx_data);
-			m_bits_transmitted = 0;
-			m_tx_data_in_buffer = false;
-		}
+		transmit_register_setup(m_tx_data);
+		m_bits_transmitted = 0;
+		m_tx_data_in_buffer = false;
+		SR |= STATUS_TRANSMITTER_READY;
+		update_interrupts();
 	}
 	else
 	{

@@ -61,9 +61,6 @@ paula_fdc_device::paula_fdc_device(const machine_config &mconfig, const char *ta
 
 void paula_fdc_device::device_start()
 {
-	m_leds.resolve();
-	m_fdc_led.resolve();
-
 	static char const *const names[] = { "0", "1", "2", "3" };
 	for(int i=0; i != 4; i++) {
 		floppy_connector *con = subdevice<floppy_connector>(names[i]);

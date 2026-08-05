@@ -40,6 +40,7 @@ authors:hap
 	<view name="Internal Layout">
 		<bounds left="3" right="71.8" top="9.7" bottom="71.8" />
 
+		<!-- FIXME: this is a bad design and it dosn't even work.  Just use an input for the overlay code like the Beena does. -->
 		<!-- this "overlay_code" example only works for 1 view, since MAME parses all views and not just current active one -->
 		<!-- you can also put the overlay code in the view name, as $XX where XX is the hex value of the overlay in tispeak.cpp -->
 		<element name="overlay_code" ref="overlay_default"><bounds x="0" y="0" width="1" height="1" /></element>

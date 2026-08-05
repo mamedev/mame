@@ -311,13 +311,13 @@ public:
 		m_recoil(*this, "Player%u_Recoil_Piston", 1U)
 	{ }
 
-	void opwolf(machine_config &config);
-	void opwolfb(machine_config &config);
-	void opwolfp(machine_config &config);
+	void opwolf(machine_config &config) ATTR_COLD;
+	void opwolfb(machine_config &config) ATTR_COLD;
+	void opwolfp(machine_config &config) ATTR_COLD;
 
-	void init_opwolf();
-	void init_opwolfb();
-	void init_opwolfp();
+	void init_opwolf() ATTR_COLD;
+	void init_opwolfb() ATTR_COLD;
+	void init_opwolfp() ATTR_COLD;
 
 	ioport_value gun_x_r();
 	ioport_value gun_y_r();
@@ -708,6 +708,13 @@ template<int N>
 void opwolf_state::adpcm_w(offs_t offset, uint8_t data)
 {
 	m_adpcm_regs[N][offset] = data;
+	if (offset == 0x05)
+	{
+		if (N)
+			m_tc0060dca[0]->volume2_w(data);
+		else
+			m_tc0060dca[0]->volume1_w(data);
+	}
 
 	if (offset == 0x04) // trigger?
 	{
@@ -716,11 +723,6 @@ void opwolf_state::adpcm_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[N] = start << 4;
 		m_adpcm_end[N] = end << 4;
 		m_msm[N]->reset_w(0);
-
-		if (N)
-			m_tc0060dca[0]->volume2_w(m_adpcm_regs[N][5]);
-		else
-			m_tc0060dca[0]->volume1_w(m_adpcm_regs[N][5]);
 
 		//logerror("TRIGGER MSM%d\n", N + 1);
 	}
@@ -778,8 +780,6 @@ void opwolf_state::init_opwolfp()
 
 void opwolf_state::machine_start()
 {
-	m_recoil.resolve();
-
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_adpcm_regs));
@@ -853,12 +853,12 @@ void opwolf_state::opwolf(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600)); /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -868,9 +868,9 @@ void opwolf_state::opwolf(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
 
-	PC080SN(config, m_pc080sn, 0, "palette", gfx_opwolf);
+	PC080SN(config, m_pc080sn, "palette", gfx_opwolf);
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_palette("palette");
 	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::colpri_cb));
 
@@ -1133,10 +1133,10 @@ ROM_END
 // C-Chip includes the string 'By_TAITO_Copration_On_OSAKA_BUNSHITU._01.Sep.1987_Toshiaki.Kato_Tsutomuawa_4
 
 //    year  rom       parent    machine   inp      state          init
-GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, rev 2, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, rev 2, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan, rev 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US, rev 2)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  init_opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  init_opwolfp,  ROT0, "Taito Corporation",                "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (World, rev 2, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (World, rev 2, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (Japan, rev 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America",  "Operation Wolf (US, rev 2)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  init_opwolfb,  ROT0, "bootleg (Bear Corporation)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  init_opwolfp,  ROT0, "Taito",          "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

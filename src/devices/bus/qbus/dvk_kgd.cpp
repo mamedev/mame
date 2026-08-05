@@ -106,7 +106,7 @@ uint32_t dvk_kgd_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void dvk_kgd_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(dvk_kgd_device::screen_update));
 	m_screen->set_raw(XTAL(30'800'000) / 2, 800, 0, 800, 286, 0, 286);

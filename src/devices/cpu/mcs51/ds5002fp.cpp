@@ -51,7 +51,7 @@ ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag,
 	, m_region(*this, "internal")
 {
 	m_has_pd = true;
-	m_data_config.m_addr_width = 18;
+	m_xdata_config.m_addr_width = 18;
 }
 
 void ds5002fp_device::device_start()

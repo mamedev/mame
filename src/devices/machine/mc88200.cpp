@@ -11,9 +11,9 @@
  *  - probe commands
  *  - mbus snooping
  *  - cycle counting
- *  - cache inhibited accesses invalidate matching cache tags (no writeback)
  *  - mc88204 64k variant
  *  - find out where patc valid flag is stored
+ *  - refactor read/write for xmem
  */
 
 #include "emu.h"
@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(MC88200, mc88200_device, "mc88200", "Motorola MC88200 Cache/M
 
 mc88200_device::mc88200_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, u8 id)
 	: device_t(mconfig, MC88200, tag, owner, clock)
-	, m_mbus(*this, finder_base::DUMMY_TAG, -1, 32)
+	, m_mbus_space(*this, finder_base::DUMMY_TAG, -1, 32)
 	, m_id(u32(id) << 24)
 {
 }
@@ -64,9 +64,9 @@ enum ssr_mask : u32
 
 enum sctr_mask : u32
 {
-	SCTR_PR = 0x00010000, // priority arbitration
-	SCTR_SE = 0x00020000, // snoop enable
-	SCTR_PE = 0x00040000, // parity enable
+	SCTR_PR = 0x00002000, // priority arbitration
+	SCTR_SE = 0x00004000, // snoop enable
+	SCTR_PE = 0x00008000, // parity enable
 };
 
 enum pfsr_mask : u32
@@ -201,7 +201,9 @@ void mc88200_device::device_start()
 	// TODO: save state for cache lines
 
 	m_idr = m_id | TYPE_MC88200;
-	m_mbus->install_device(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12), *this, &mc88200_device::map);
+	m_mbus_space->install_device(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12), *this, &mc88200_device::map);
+
+	m_mbus_space->specific(m_mbus);
 }
 
 void mc88200_device::device_reset()
@@ -261,9 +263,9 @@ void mc88200_device::idr_w(u32 data)
 	{
 		LOG("idr_w 0x%08x (%s)\n", data, machine().describe_context());
 
-		m_mbus->unmap_readwrite(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12));
+		m_mbus_space->unmap_readwrite(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12));
 		m_idr = (m_idr & ~IDR_ID) | (data & IDR_ID);
-		m_mbus->install_device(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12), *this, &mc88200_device::map);
+		m_mbus_space->install_device(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12), *this, &mc88200_device::map);
 	}
 }
 
@@ -373,13 +375,14 @@ void mc88200_device::bwp_w(offs_t offset, u32 data)
 
 	if (data & BATC_V)
 	{
+		// invalidate duplicate entries
 		for (unsigned i = 0; i < std::size(m_batc); i++)
 		{
-			if ((i != offset) && (m_batc[i] & BATC_V) && BIT(m_batc[i], 19, 13) == BIT(data, 19, 13))
-			{
-				logerror("duplicate batc entry 0x%08x invalidated (%s)\n", data, machine().describe_context());
-				data &= ~BATC_V;
-			}
+			if (i == offset)
+				continue;
+
+			if (!((m_batc[i] ^ data) & (BATC_LBA | BATC_S | BATC_V)))
+				m_batc[i] &= ~BATC_V;
 		}
 	}
 
@@ -725,7 +728,7 @@ std::optional<unsigned> mc88200_device::cache_replace(cache_set const &cs)
 		{
 			unsigned const l = BIT(usage, i * 2, 2);
 
-			if (cs.enabled(i))
+			if (cs.enabled(l))
 				return l;
 		}
 	}
@@ -757,14 +760,14 @@ void mc88200_device::cache_flush(unsigned const start, unsigned const limit, mat
 	}
 }
 
-template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address, bool supervisor)
+template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock)
 {
 	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, false);
 	if (!result.has_value())
 		return std::nullopt;
 
 	u32 const physical_address = result.value().address;
-	if (!result.value().ci)
+	if (!result.value().ci && !lock)
 	{
 		unsigned const s = BIT(physical_address, 4, 8);
 		cache_set &cs = m_cache[s];
@@ -826,18 +829,30 @@ template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address,
 			}
 		}
 	}
+	else
+	{
+		// cache-inhibited cache hits invalidate the line without copyback
+		unsigned const s = BIT(physical_address, 4, 8);
+		cache_set &cs = m_cache[s];
+
+		for (unsigned l = 0; l < std::size(cs.line); l++)
+		{
+			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
+				cs.set_invalid(l);
+		}
+	}
 
 	return mbus_read<T>(physical_address);
 }
 
-template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bool supervisor)
+template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bool supervisor, bool lock)
 {
 	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, true);
 	if (!result.has_value())
 		return false;
 
 	u32 const physical_address = result.value().address;
-	if (!result.value().ci)
+	if (!result.value().ci && !lock)
 	{
 		unsigned const s = BIT(physical_address, 4, 8);
 		cache_set &cs = m_cache[s];
@@ -924,17 +939,29 @@ template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bo
 
 		return true;
 	}
+	else
+	{
+		// cache-inhibited cache hits invalidate the line without copyback
+		unsigned const s = BIT(physical_address, 4, 8);
+		cache_set &cs = m_cache[s];
+
+		for (unsigned l = 0; l < std::size(cs.line); l++)
+		{
+			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
+				cs.set_invalid(l);
+		}
+	}
 
 	return mbus_write(result.value().address, data);
 }
 
-template std::optional<u8> mc88200_device::read(u32 virtual_address, bool supervisor);
-template std::optional<u16> mc88200_device::read(u32 virtual_address, bool supervisor);
-template std::optional<u32> mc88200_device::read(u32 virtual_address, bool supervisor);
+template std::optional<u8> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock);
+template std::optional<u16> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock);
+template std::optional<u32> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock);
 
-template bool mc88200_device::write(u32 virtual_address, u8 data, bool supervisor);
-template bool mc88200_device::write(u32 virtual_address, u16 data, bool supervisor);
-template bool mc88200_device::write(u32 virtual_address, u32 data, bool supervisor);
+template bool mc88200_device::write(u32 virtual_address, u8 data, bool supervisor, bool lock);
+template bool mc88200_device::write(u32 virtual_address, u16 data, bool supervisor, bool lock);
+template bool mc88200_device::write(u32 virtual_address, u32 data, bool supervisor, bool lock);
 
 template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 {
@@ -944,9 +971,9 @@ template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 
 	switch (sizeof(T))
 	{
-	case 1: data = m_mbus->read_byte(address); break;
-	case 2: data = m_mbus->read_word(address); break;
-	case 4: data = m_mbus->read_dword(address); break;
+	case 1: data = m_mbus.read_byte(address); break;
+	case 2: data = m_mbus.read_word(address); break;
+	case 4: data = m_mbus.read_dword(address); break;
 	}
 
 	if (m_bus_error)
@@ -968,9 +995,9 @@ template <typename T> bool mc88200_device::mbus_write(u32 address, T data, bool 
 
 	switch (sizeof(T))
 	{
-	case 1: m_mbus->write_byte(address, data); break;
-	case 2: m_mbus->write_word(address, data); break;
-	case 4: m_mbus->write_dword(address, data); break;
+	case 1: m_mbus.write_byte(address, data); break;
+	case 2: m_mbus.write_word(address, data); break;
+	case 4: m_mbus.write_dword(address, data); break;
 	}
 
 	if (m_bus_error)

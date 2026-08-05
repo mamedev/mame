@@ -21,12 +21,12 @@
 #include "logmacro.h"
 
 
-template path_iterator::path_iterator(char *&, int);
-template path_iterator::path_iterator(char * const &, int);
-template path_iterator::path_iterator(char const *&, int);
-template path_iterator::path_iterator(char const * const &, int);
-template path_iterator::path_iterator(std::vector<std::string> &, int);
-template path_iterator::path_iterator(const std::vector<std::string> &, int);
+template path_iterator::path_iterator(char *&);
+template path_iterator::path_iterator(char * const &);
+template path_iterator::path_iterator(char const *&);
+template path_iterator::path_iterator(char const * const &);
+template path_iterator::path_iterator(std::vector<std::string> &);
+template path_iterator::path_iterator(const std::vector<std::string> &);
 
 template emu_file::emu_file(std::string &, u32);
 template emu_file::emu_file(const std::string &, u32);

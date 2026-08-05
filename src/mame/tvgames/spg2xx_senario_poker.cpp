@@ -42,13 +42,11 @@ public:
 		m_led(*this, "LED_BZ%u", 0U)
 	{ }
 
-	void sentx6p(machine_config &config);
+	void sentx6p(machine_config &config) ATTR_COLD;
 
-	void init_sentx6p();
-	void init_sentx6puk();
-	void init_sentx6pd();
-
-	void mem_map_2m_texas(address_map &map) ATTR_COLD;
+	void init_sentx6p() ATTR_COLD;
+	void init_sentx6puk() ATTR_COLD;
+	void init_sentx6pd() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(ok_latch)
 	{
@@ -69,8 +67,9 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void mem_map_2m_texas(address_map &map) ATTR_COLD;
 
 private:
 	uint16_t sentx_porta_r();
@@ -313,32 +312,6 @@ static INPUT_PORTS_START( sentx6p )
 
 INPUT_PORTS_END
 
-
-void sentx6p_state::machine_start()
-{
-	spg2xx_game_state::machine_start();
-
-	m_suite1.resolve();
-	m_suite2.resolve();
-	m_number1.resolve();
-	m_number2.resolve();
-
-	m_select_fold.resolve();
-	m_select_check.resolve();
-	m_select_bet.resolve();
-	m_select_call.resolve();
-	m_select_raise.resolve();
-	m_select_allin.resolve();
-
-	m_option_fold.resolve();
-	m_option_check.resolve();
-	m_option_bet.resolve();
-	m_option_call.resolve();
-	m_option_raise.resolve();
-	m_option_allin.resolve();
-
-	m_led.resolve();
-}
 
 void sentx6p_state::machine_reset()
 {

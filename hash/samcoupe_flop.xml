@@ -23,7 +23,7 @@ license:CC0-1.0
   SAMDOS disks include the official MGT ZX Spectrum emulator.
 -->
 
-<softwarelist name="samcoupe_flop" description="SAM Coupé floppy disks">
+<softwarelist name="samcoupe_flop" description="MGT SAM Coupé floppy disks">
 
 	<software name="manic">
 		<description>Manic Miner (2 level demo)</description>
@@ -135,6 +135,50 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dyzonium">
+		<description>Dyzonium</description>
+		<year>1992</year>
+		<publisher>FRED Publishing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="836608">
+				<rom name="dyzonium.dsk" size="836608" crc="fef0ab0c" sha1="5f0b19ed9d1097f0df1e46b957fa84dbb3ee757f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dyzonium_dep" cloneof="dyzonium">
+		<description>Dyzonium (deprotected)</description>
+		<year>1992</year>
+		<publisher>FRED Publishing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Dyzonium (Deprotected).dsk" size="819200" crc="30c2e716" sha1="f729cb91ee0ccb56e01e47b957ca02fcf1657338"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plasmoid" cloneof="dyzonium">
+		<description>Plasmoid (beta / demo)</description>
+		<year>1992</year>
+		<publisher>FRED Publishing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="plasmoid(beta-demo).mgt" size="819200" crc="ab431554" sha1="0d8a08572429b9166d88cd225a783ea64e80829d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robmonst">
+		<description>Escape from the Planet of the Robot Monsters</description>
+		<year>1991</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="escapefromtheplanetoftherobotmonsters.dsk" size="860416" crc="3e748c00" sha1="f38485887bfc8415f42f9baeeaf54dc68816ff03"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="exodus">
 		<description>Exodus</description>
 		<year>1993</year>
@@ -152,7 +196,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="5trislnd">
-		<description>Five on a Treasure Island</description>
+		<description>The Famous Five - Five on a Treasure Island</description>
 		<year>1990</year>
 		<publisher>Enigma Variations</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -184,6 +228,50 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mindgam1">
+		<description>Mind Games I</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="MindGames1.dsk" size="860416" crc="e1ea4da5" sha1="ec16ba3272065ea61300608953752288b712fc0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mindgam2">
+		<description>Mind Games 2</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Mind Games II (199x) (Enigma Variations).dsk" size="819200" crc="09a91a79" sha1="2020786c073e039a0130e0f640f338d6b41a6807"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multipck">
+		<description>Multipack 1</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="858571">
+				<rom name="multipack1.dsk" size="858571" crc="ae6b7ab4" sha1="983c54461b23ebc4e6a66838c89dc2056354089d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipemania">
+		<description>Pipe Mania</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="855040">
+				<rom name="pipemania.dsk" size="855040" crc="4a564275" sha1="7f8ef16970a23377eab06c482c085bf80b38db38"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppersia">
 		<description>Prince of Persia</description>
 		<year>1990</year>
@@ -191,6 +279,17 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="857856">
 				<rom name="prince of persia.dsk" size="857856" crc="29020c84" sha1="e75292191c9c403bc8422cb490ad189b4b9dc5cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersia_hdd" cloneof="ppersia">
+		<description>Prince of Persia HDD (mod)</description>
+		<year>2021</year>
+		<publisher>Revelation</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="PrinceOfPersia_HDD.dsk" size="860416" crc="ae6469ef" sha1="21cf3b79b0f76f29681beaa3f4063b2631351888"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +306,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="samstrikes">
-		<description>Sam Strikes Out!</description>
+		<description>SAM Strikes Out!</description>
 		<year>1990</year>
 		<publisher>Enigma Variations</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -287,6 +386,66 @@ license:CC0-1.0
 
 <!-- Homebrews -->
 
+	<software name="arkanoid2">
+		<description>Arkanoid - Revenge of Doh (demo) (RetCon 2024)</description>
+		<year>2024</year>
+		<publisher>wubsoft</publisher>
+		<info name="developer" value="Rob Evans" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="Arkanoid 2 Demo - RetCon 2024.dsk" size="860416" crc="40242ce1" sha1="69e43514b8ff2b1617fe4cc41aafee8c2302a3b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzone">
+		<description>Battle Zone (v2)</description>
+		<year>2021</year>
+		<publisher>Digital Reality</publisher>
+		<info name="developer" value="Chris Pile" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="BattleZone_v2.dsk" size="860416" crc="ed91dfd6" sha1="c4ba4ba11fee586b005a9275bdab6165bb2a9506"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzone_10" cloneof="bzone">
+		<description>Battle Zone (v1)</description>
+		<year>2021</year>
+		<publisher>Digital Reality</publisher>
+		<info name="developer" value="Chris Pile" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="BattleZone.dsk" size="860416" crc="8debede6" sha1="a443134696c8b56f54f62eab4b0b0529b0d7ab7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubghost">
+		<description>Bubble Ghost</description>
+		<year>2021</year>
+		<publisher>wubsoft</publisher>
+		<info name="developer" value="Rob Evans" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="Bubble Ghost v1.dsk" size="860416" crc="70d1f825" sha1="7b69817e15dc36f13f379f58955a3b3599495442"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flapbird">
+		<description>Flappy Bird</description>
+		<year>2021</year>
+		<publisher>Cooking Circle</publisher>
+		<info name="developer" value="Howard Price" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="auto.dsk" size="819200" crc="9627b63d" sha1="f4536e9cf617947b5a11868062d63da0963fb99a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="infuriat">
 		<description>Dave Infuriators</description>
 		<year>2012</year>
@@ -309,6 +468,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gardenun">
+		<description>The Garden Centre of the Universe</description>
+		<year>2011</year>
+		<publisher>wubsoft</publisher>
+		<info name="developer" value="Rob Evans" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="The Garden Centre of the Universe.mgt" size="819200" crc="908b6635" sha1="f9b60251e0024253b765a0b35691d1ff33a0d254"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lostsam">
 		<description>Lost Disks of Sam</description>
 		<year>2012</year>
@@ -316,6 +487,18 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="lost-disks-of-sam.dsk" size="819200" crc="b8eb59c0" sha1="0c17fff87341e113bab4b412772ef2d5be20f49f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicav02">
+		<description>Magic Caves 2002</description>
+		<year>2002</year>
+		<publisher>Daton</publisher>
+		<info name="developer" value="Dave Tonks" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="MagicCaves2002.mgt" size="819200" crc="630a49c8" sha1="dd42b81e8eb6b027bd674c4463ca402862543816"/>
 			</dataarea>
 		</part>
 	</software>
@@ -343,6 +526,42 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="samtona">
+		<description>Samtona - Mk1 750cc</description>
+		<year>2021</year>
+		<publisher>wubsoft</publisher>
+		<info name="developer" value="Rob Evans" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="Samtona Mk1 750cc.dsk" size="860416" crc="1c8cc574" sha1="4d2700e8183cf8b2ef9576e5a72bdb3c6656ae6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samoids">
+		<description>Samoids (Sploids)</description>
+		<year>2021</year>
+		<publisher>Black Jet</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="samoids.dsk" size="819200" crc="8e7d38c5" sha1="66e0152b4a9ae789724fc52347da93c5ad0e36e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceadv">
+		<description>The Space Adventure Simulator</description>
+		<year>2021</year>
+		<publisher>wubsoft</publisher>
+		<info name="developer" value="Rob Evans" />
+		<info name="version" value="v.1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="The Space Adventure Simulator V1.2.dsk" size="860416" crc="8ca50dd8" sha1="17c5714912a582de580e8acc5367b22cb40de0a2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf">
 		<description>Street Fighter 1</description>
 		<year>2017</year>
@@ -351,6 +570,31 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="DTA_StreetFighter1_v1.mgt" size="819200" crc="33d4efbc" sha1="f7dc378b96d38c44f8936129cbb6f8a74f2fd74d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetriscc">
+		<description>Tetris (Cooking Circle)</description>
+		<year>2018</year>
+		<publisher>Cooking Circle</publisher>
+		<info name="developer" value="Howard Price" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="CC-Tetris.dsk" size="819200" crc="2516560b" sha1="7573dd48b5fa4c499a980c2af716da317ad94cdc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xor">
+		<description>XOR</description>
+		<year>2012</year>
+		<publisher>Cooking Circle</publisher>
+		<info name="developer" value="Howard Price" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="XOR.dsk" size="819200" crc="63466e15" sha1="fa5b7484ba0a8f338a1dae17f4702cf9fa7a87d9"/>
 			</dataarea>
 		</part>
 	</software>

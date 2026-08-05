@@ -21,7 +21,7 @@
 #define LOG_FUNC    (1U << 14) // Function calls
 #define LOG_CRC     (1U << 15) // CRC errors
 
-#define VERBOSE (LOG_DESC)
+//#define VERBOSE (LOG_DESC)
 //#define VERBOSE (LOG_DESC | LOG_COMMAND | LOG_MATCH | LOG_WRITE | LOG_STATE | LOG_LINES | LOG_COMP | LOG_CRC )
 //#define LOG_OUTPUT_STREAM std::cout
 

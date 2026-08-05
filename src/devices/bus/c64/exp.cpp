@@ -313,6 +313,7 @@ void c64_expansion_slot_device::set_passthrough()
 
 // slot devices
 #include "16kb.h"
+#include "action_replay.h"
 #include "buscard.h"
 #include "buscard2.h"
 #include "c128_comal80.h"
@@ -412,6 +413,7 @@ void c64_expansion_cards(device_slot_interface &device)
 
 	// the following need ROMs from the software list
 	device.option_add_internal("standard", C64_STD);
+	device.option_add_internal("ar4x", C64_ACTION_REPLAY);
 	device.option_add_internal("comal80", C64_COMAL80);
 	device.option_add_internal("c128_comal80", C128_COMAL80);
 	device.option_add_internal("cs64", C64_CURRAH_SPEECH);

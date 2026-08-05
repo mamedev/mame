@@ -226,7 +226,7 @@ void spi_ram_device::sio_w(offs_t offset, u8 data, u8 mem_mask)
 
 void spi_ram_device::device_validity_check(validity_checker &valid) const
 {
-	if (!m_size || (m_size & (m_size - 1)) || (m_size > 0x0100'0000))
+	if (!std::has_single_bit(m_size) || (m_size > 0x0100'0000))
 		osd_printf_error("Unsupported size %u (must be a power of 2 not larger than 16M)\n", m_size);
 }
 

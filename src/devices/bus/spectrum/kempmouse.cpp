@@ -7,7 +7,7 @@
     Description:
     https://k1.spdns.de/Vintage/Sinclair/82/Peripherals/Mouse%20Interfaces/Kempston%20Mouse%20Interface/
 
-	Mouse interface with two 8bit reverse counters. Readed in ports:
+    Mouse interface with two 8bit reverse counters. Read in ports:
     0xFADF (button bits: 0 - right, 1 - left)
     0xFBDF - X
     0xFFDF - Y
@@ -54,7 +54,7 @@ void spectrum_kempmouse_device::device_start()
 
 uint8_t spectrum_kempmouse_device::iorq_r(offs_t offset)
 {
-	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
+	uint8_t data = (offset & 1) ? m_slot->fb_r() : 0xff;
 
 	switch (offset & 0xffff)
 	{

@@ -273,7 +273,7 @@ uint32_t v60_device::opADDB() /* TRUSTED (C too!)*/
 
 	F12LOADOP2BYTE();
 
-	ADDB(appb, (uint8_t)m_op1);
+	ADDB(appb, (uint8_t)m_op1, 0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -286,7 +286,7 @@ uint32_t v60_device::opADDH() /* TRUSTED (C too!)*/
 
 	F12LOADOP2HALF();
 
-	ADDW(apph, (uint16_t)m_op1);
+	ADDW(apph, (uint16_t)m_op1, 0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -299,7 +299,7 @@ uint32_t v60_device::opADDW() /* TRUSTED (C too!) */
 
 	F12LOADOP2WORD();
 
-	ADDL(appw, (uint32_t)m_op1);
+	ADDL(appw, (uint32_t)m_op1, 0);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -307,14 +307,12 @@ uint32_t v60_device::opADDW() /* TRUSTED (C too!) */
 
 uint32_t v60_device::opADDCB()
 {
-	uint8_t appb, temp;
-
+	uint8_t appb;
 	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
 	F12LOADOP2BYTE();
 
-	temp = ((uint8_t)m_op1 + (_CY?1:0));
-	ADDB(appb, temp);
+	ADDB(appb, (uint8_t)m_op1, _CY?1:0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -322,14 +320,12 @@ uint32_t v60_device::opADDCB()
 
 uint32_t v60_device::opADDCH()
 {
-	uint16_t apph, temp;
-
+	uint16_t apph;
 	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
 	F12LOADOP2HALF();
 
-	temp = ((uint16_t)m_op1 + (_CY?1:0));
-	ADDW(apph, temp);
+	ADDW(apph, (uint16_t)m_op1, _CY?1:0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -337,14 +333,12 @@ uint32_t v60_device::opADDCH()
 
 uint32_t v60_device::opADDCW()
 {
-	uint32_t appw, temp;
-
+	uint32_t appw;
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
 	F12LOADOP2WORD();
 
-	temp = m_op1 + (_CY?1:0);
-	ADDL(appw, temp);
+	ADDL(appw, (uint32_t)m_op1, _CY?1:0);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -501,7 +495,7 @@ uint32_t v60_device::opCMPB() /* TRUSTED (C too!) */
 	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAM, 0);
 
 	appb = (uint8_t)m_op2;
-	SUBB(appb, (uint8_t)m_op1);
+	SUBB(appb, (uint8_t)m_op1, 0);
 
 	F12END();
 }
@@ -512,7 +506,7 @@ uint32_t v60_device::opCMPH() /* TRUSTED (C too!) */
 	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAM, 1);
 
 	apph = (uint16_t)m_op2;
-	SUBW(apph, (uint16_t)m_op1);
+	SUBW(apph, (uint16_t)m_op1, 0);
 
 	F12END();
 }
@@ -522,7 +516,7 @@ uint32_t v60_device::opCMPW() /* TRUSTED (C too!)*/
 {
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAM, 2);
 
-	SUBL(m_op2, (uint32_t)m_op1);
+	SUBL(m_op2, (uint32_t)m_op1, 0);
 
 	F12END();
 }
@@ -1076,7 +1070,7 @@ uint32_t v60_device::opNEGB() /* TRUSTED  (C too!)*/
 	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
 
 	m_modwritevalb = 0;
-	SUBB(m_modwritevalb, (int8_t)m_op1);
+	SUBB(m_modwritevalb, (int8_t)m_op1, 0);
 	_CY = m_modwritevalb ? 1 : 0;
 
 	F12WriteSecondOperand(0);
@@ -1088,7 +1082,7 @@ uint32_t v60_device::opNEGH() /* TRUSTED  (C too!)*/
 	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
 
 	m_modwritevalh = 0;
-	SUBW(m_modwritevalh, (int16_t)m_op1);
+	SUBW(m_modwritevalh, (int16_t)m_op1, 0);
 	_CY = m_modwritevalh ? 1 : 0;
 
 	F12WriteSecondOperand(1);
@@ -1100,7 +1094,7 @@ uint32_t v60_device::opNEGW() /* TRUSTED  (C too!)*/
 	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
 
 	m_modwritevalw = 0;
-	SUBL(m_modwritevalw, (int32_t)m_op1);
+	SUBL(m_modwritevalw, (int32_t)m_op1, 0);
 	_CY = m_modwritevalw ? 1 : 0;
 
 	F12WriteSecondOperand(2);
@@ -2048,7 +2042,7 @@ uint32_t v60_device::opSHLW() /* TRUSTED */
 		}
 	}
 
-//  osd_printf_debug("SHLW: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appw, _CY, _Z, _OV, _S);
+	//osd_printf_debug("SHLW: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appw, _CY, _Z, _OV, _S);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -2075,7 +2069,7 @@ uint32_t v60_device::opSUBB() /* TRUSTED (C too!) */
 
 	F12LOADOP2BYTE();
 
-	SUBB(appb, (uint8_t)m_op1);
+	SUBB(appb, (uint8_t)m_op1, 0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -2088,7 +2082,7 @@ uint32_t v60_device::opSUBH() /* TRUSTED (C too!) */
 
 	F12LOADOP2HALF();
 
-	SUBW(apph, (uint16_t)m_op1);
+	SUBW(apph, (uint16_t)m_op1, 0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -2101,7 +2095,7 @@ uint32_t v60_device::opSUBW() /* TRUSTED (C too!) */
 
 	F12LOADOP2WORD();
 
-	SUBL(appw, (uint32_t)m_op1);
+	SUBL(appw, (uint32_t)m_op1, 0);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -2111,13 +2105,11 @@ uint32_t v60_device::opSUBW() /* TRUSTED (C too!) */
 uint32_t v60_device::opSUBCB()
 {
 	uint8_t appb;
-	uint8_t src;
 	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
 	F12LOADOP2BYTE();
 
-	src = (uint8_t)m_op1 + (_CY?1:0);
-	SUBB(appb, src);
+	SUBB(appb, (uint8_t)m_op1, _CY?1:0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -2126,14 +2118,11 @@ uint32_t v60_device::opSUBCB()
 uint32_t v60_device::opSUBCH()
 {
 	uint16_t apph;
-	uint16_t src;
-
 	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
 	F12LOADOP2HALF();
 
-	src = (uint16_t)m_op1 + (_CY?1:0);
-	SUBW(apph, src);
+	SUBW(apph, (uint16_t)m_op1, _CY?1:0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -2142,14 +2131,11 @@ uint32_t v60_device::opSUBCH()
 uint32_t v60_device::opSUBCW()
 {
 	uint32_t appw;
-	uint32_t src;
-
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
 	F12LOADOP2WORD();
 
-	src = (uint32_t)m_op1 + (_CY?1:0);
-	SUBL(appw, src);
+	SUBL(appw, (uint32_t)m_op1, _CY?1:0);
 
 	F12STOREOP2WORD();
 	F12END();

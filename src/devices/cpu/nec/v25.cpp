@@ -74,6 +74,8 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
+	// TODO: unconfirmed for V25/V35, for now assume true
+	, m_has_div_quirk(true)
 	, m_v25v35_decryptiontable(nullptr)
 {
 }

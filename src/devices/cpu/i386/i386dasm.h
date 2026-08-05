@@ -105,14 +105,12 @@ private:
 		THREE_BYTE          /* [prefix] 0f op1 op2 and then mod/rm */
 	};
 
-	enum {
-		FLAGS_MASK =         0x0ff,
-		VAR_NAME   =         0x100,
-		VAR_NAME4  =         0x200,
-		ALWAYS64   =         0x400,
-		SPECIAL64  =         0x800,
-		GROUP_MOD  =        0x1000
-	};
+	static constexpr unsigned FLAGS_MASK =   0x0ff;
+	static constexpr unsigned VAR_NAME   =   0x100;
+	static constexpr unsigned VAR_NAME4  =   0x200;
+	static constexpr unsigned ALWAYS64   =   0x400;
+	static constexpr unsigned SPECIAL64  =   0x800;
+	static constexpr unsigned GROUP_MOD  =  0x1000;
 
 	struct I386_OPCODE {
 		const char *mnemonic;

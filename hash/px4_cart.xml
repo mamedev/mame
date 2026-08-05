@@ -72,4 +72,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Air quality station calibration software used by the Dutch government -->
+	<software name="diagterm" supported="no">
+		<description>R.I.V.M. Diagnose Terminal Rel. 1.1</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart1" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="diagterm_11_rom1.bin" size="32768" crc="ff8348a3" sha1="71c967c9c8591d3adf04541430a69c4fb6eaa1d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="diagterm_11_rom2.bin" size="32768" crc="9a2263a2" sha1="bb3d6d88ce5c848b7764e5f1d3399c91c00c4b0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

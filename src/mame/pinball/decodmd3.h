@@ -17,7 +17,7 @@
 class decodmd_type3_device : public device_t
 {
 public:
-	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void data_w(uint8_t data);
 	uint8_t busy_r();

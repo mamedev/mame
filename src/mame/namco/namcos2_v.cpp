@@ -93,6 +93,7 @@ bool metlhawk_state::sprite_mix_callback_ns2(u16 &dest, u8 &destpri, u16 colbase
 			{
 				dest = colbase + src;
 			}
+			destpri = primask;
 			return true;
 		}
 	}
@@ -101,7 +102,7 @@ bool metlhawk_state::sprite_mix_callback_ns2(u16 &dest, u8 &destpri, u16 colbase
 
 bool sgunner_state::sprite_mix_callback_c355(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
 {
-	if (srcpri >= destpri)
+	if (destpri <= srcpri)
 	{
 		if ((src & 0xff) != 0xff)
 		{
@@ -166,7 +167,7 @@ u32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			}
 		}
 	}
-	m_ns2sprite->draw_sprites(screen, bitmap, clip, m_gfx_ctrl);
+	m_ns2sprite->draw(screen, bitmap, clip, m_gfx_ctrl);
 	return 0;
 }
 
@@ -188,7 +189,7 @@ u32 finallap_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &
 		}
 		m_c45_road->draw(screen, bitmap, clip, pri, pri, 0);
 	}
-	m_ns2sprite->draw_sprites(screen, bitmap, clip, m_gfx_ctrl);
+	m_ns2sprite->draw(screen, bitmap, clip, m_gfx_ctrl);
 	return 0;
 }
 
@@ -275,6 +276,6 @@ u32 metlhawk_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &
 		}
 		m_c169roz->draw(screen, bitmap, clip, pri, pri, 0);
 	}
-	m_ns2sprite->draw_sprites(screen, bitmap, clip, 0);
+	m_ns2sprite->draw(screen, bitmap, clip, 0);
 	return 0;
 }

@@ -14,8 +14,8 @@
 #include "bus/ata/ataintf.h"
 #include "cpu/sh/sh7014.h"
 #include "machine/icd2061a.h"
-#include "machine/mb87078.h"
 #include "sound/lc78836m.h"
+#include "sound/mb87077.h"
 
 
 class namcos12_cdxa_device : public device_t
@@ -74,8 +74,8 @@ private:
 	required_shared_ptr<uint32_t> m_sram;
 	required_device<ata_interface_device> m_ata;
 	required_device<lc78836m_device> m_lc78836m;
-	required_device <mb87078_device> m_mb87078;
-	required_device <icd2061a_device> m_icd2061a;
+	required_device<mb87078_device> m_mb87078;
+	required_device<icd2061a_device> m_icd2061a;
 	devcb_write_line m_psx_int10_cb;
 
 	bool m_ide_sh2_enabled, m_ide_ps1_enabled;

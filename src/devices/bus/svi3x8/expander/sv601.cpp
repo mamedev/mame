@@ -22,17 +22,17 @@ DEFINE_DEVICE_TYPE(SV601, sv601_device, "sv601", "SV-601 Super Expander")
 
 void sv601_device::device_add_mconfig(machine_config &config)
 {
-	SVI_SLOT_BUS(config, m_slotbus, 0);
+	SVI_SLOT_BUS(config, m_slotbus);
 	m_slotbus->int_handler().set(FUNC(sv601_device::int_w));
 	m_slotbus->romdis_handler().set(FUNC(sv601_device::romdis_w));
 	m_slotbus->ramdis_handler().set(FUNC(sv601_device::ramdis_w));
-	SVI_SLOT(config, "0", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "1", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "2", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "3", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "4", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "5", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "6", m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "0", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "1", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "2", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "3", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "4", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "5", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "6", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
 }
 
 

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "cgsix.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(SBUS_TURBOGX, sbus_turbogx_device, "turbogx", "Sun TurboGX SBus Video")
 DEFINE_DEVICE_TYPE(SBUS_TURBOGXP, sbus_turbogxp_device, "turbogxp", "Sun TurboGX+ SBus Video")
 
@@ -1317,12 +1319,12 @@ const tiny_rom_entry *sbus_turbogx_device::device_rom_region() const
 
 void sbus_turbogx_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(sbus_turbogx_device::screen_update));
 	m_screen->set_raw(105.561_MHz_XTAL, 1472, 0, 1152, 943, 0, 900);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogx_device::vblank_w));
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 }
 
 sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1357,14 +1359,14 @@ const tiny_rom_entry *sbus_turbogxp_device::device_rom_region() const
 
 void sbus_turbogxp_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(sbus_turbogxp_device::screen_update));
 	m_screen->set_size(1152, 900);
 	m_screen->set_visarea(0, 1152-1, 0, 900-1);
 	m_screen->set_refresh_hz(72);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogxp_device::vblank_w));
 
-	BT467(config, m_ramdac, 0);
+	BT467(config, m_ramdac);
 }
 
 sbus_turbogxp_device::sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

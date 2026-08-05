@@ -97,13 +97,13 @@ void if800_state::if800(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &if800_state::if800_io);
 
 
-//  PIC8259(config, "pic8259", 0);
+//  PIC8259(config, "pic8259");
 	UPD7220(config, m_hgdc, 8000000 / 2);
 	m_hgdc->set_addrmap(0, &if800_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(if800_state::hgdc_display_pixels));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);

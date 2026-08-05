@@ -25,7 +25,7 @@ class pc8801_31_device : public device_t
 {
 public:
 	// construction/destruction
-	pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
@@ -45,9 +45,9 @@ protected:
 	TIMER_CALLBACK_MEMBER(select_off_cb);
 
 private:
-	required_device<nscsi_bus_device> m_sasibus;
+	required_device<nscsi_bus_device> m_scsibus;
 	required_device<nscsi_cdrom_pc8801_30_device> m_cddrive;
-	required_device<nscsi_callback_device> m_sasi;
+	required_device<nscsi_callback_device> m_scsi;
 
 	devcb_write_line m_rom_bank_cb;
 	devcb_write_line m_drq_cb;
@@ -67,11 +67,11 @@ private:
 	bool m_clock_hb;
 	bool m_cddrive_enable;
 	bool m_dma_enable;
-	int m_sasi_sel;
-	int m_sasi_req;
+	int m_scsi_sel;
+	int m_scsi_req;
 
-	void sasi_req_w(int state);
-	void sasi_sel_w(int state);
+	void scsi_req_w(int state);
+	void scsi_sel_w(int state);
 };
 
 

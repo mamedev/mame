@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 
 class um8498f_device : public device_t,
-				       public device_memory_interface
+					   public device_memory_interface
 {
 public:
 	template <typename T, typename U, typename V, typename W, typename X>
@@ -104,7 +104,7 @@ public:
 		// external kbreset is ignored when emulation enabled
 		//if (!BIT(m_registers[SOFT_RESET_AND_GATEA20], 4))
 		//{
-		//	// detect transition
+		//  // detect transition
 		if (m_kbrst == 1 && state == 0)
 		{
 			m_write_cpureset(1);
@@ -169,9 +169,9 @@ private:
 	int m_kbrst;
 	int m_ext_gatea20;
 	int m_fast_gatea20;
-//	int m_emu_gatea20;
-//	bool m_keybc_d1_written;
-//	bool m_keybc_data_blocked;
+//  int m_emu_gatea20;
+//  bool m_keybc_d1_written;
+//  bool m_keybc_data_blocked;
 
 	u8 portb_r();
 	void portb_w(u8 data);
@@ -193,7 +193,7 @@ private:
 	std::vector<u8> m_shadow_ram;
 
 	void update_romram_settings();
-//	void update_dma_clock();
+//  void update_dma_clock();
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);
@@ -236,8 +236,8 @@ private:
 		}
 	}
 
-//	void emulated_kbreset(int state);
-//	void emulated_gatea20(int state);
+//  void emulated_kbreset(int state);
+//  void emulated_gatea20(int state);
 };
 
 DECLARE_DEVICE_TYPE(UM8498F, um8498f_device)

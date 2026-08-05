@@ -484,7 +484,7 @@ void vtech1_base_state::vtech1(machine_config &config)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

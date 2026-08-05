@@ -139,32 +139,30 @@ protected:
 	uint16_t  m_STR0, m_STR1;
 	uint8_t   m_IFR;
 	uint8_t   m_RPTC;
-	PAIR    m_ACC;
-	PAIR    m_Preg;
+	PAIR      m_ACC;
+	PAIR      m_Preg;
 	uint16_t  m_Treg;
 	uint16_t  m_AR[8]; // 5 for TMS32020, 8 for rest
 	uint16_t  m_STACK[8]; // 4 level for TMS32020, 8 level for rest
-	PAIR    m_ALU;
+	PAIR      m_ALU;
 	uint16_t  m_drr, m_dxr, m_tim, m_prd, m_imr, m_greg;
 
-	uint16_t m_fixed_STR1;
+	uint16_t  m_fixed_STR1;
 
 	uint8_t   m_timerover;
 
 	/********************** Status data ****************************/
 	PAIR    m_opcode;
-	int     m_idle;
-	int     m_hold;
+	bool    m_idle;
+	bool    m_hold;
 	int     m_external_mem_access;    /** required for hold mode. Implement it ! */
 	int     m_init_load_addr;         /* 0=No, 1=Yes, 2=Once for repeat mode */
-	int     m_tms320c2x_irq_cycles;
 	int     m_tms320c2x_dec_cycles;
 
-	PAIR    m_oldacc;
+	PAIR      m_oldacc;
 	uint32_t  m_memaccess;
-	int     m_icount;
-	int     m_mHackIgnoreARP;          /* special handling for lst, lst1 instructions */
-	int     m_waiting_for_serial_frame;
+	int       m_icount;
+	bool      m_waiting_for_serial_frame;
 
 	uint16_t drr_r();
 	void drr_w(uint16_t data);
@@ -186,8 +184,8 @@ protected:
 	void MODIFY_DP(int data);
 	void MODIFY_PM(int data);
 	void MODIFY_ARP(int data);
-	uint16_t reverse_carry_add(uint16_t arg0, uint16_t arg1 );
-	void MODIFY_AR_ARP();
+	uint16_t reverse_carry_add(uint16_t arg0, uint16_t arg1);
+	template <bool IgnoreARPHack = false> void MODIFY_AR_ARP();
 	void CALCULATE_ADD_CARRY();
 	void CALCULATE_SUB_CARRY();
 	void CALCULATE_ADD_OVERFLOW(int32_t addval);
@@ -195,9 +193,10 @@ protected:
 	uint16_t POP_STACK();
 	void PUSH_STACK(uint16_t data);
 	void SHIFT_Preg_TO_ALU();
-	void GETDATA(int shift,int signext);
+	template <bool IgnoreARPHack = false> void GETDATA(int shift, int signext);
 	void PUTDATA(uint16_t data);
 	void PUTDATA_SST(uint16_t data);
+
 	void opcodes_CE();
 	void opcodes_Dx();
 	void illegal();
@@ -250,22 +249,8 @@ protected:
 	void lack();
 	void lact();
 	void lalk();
-	void lar_ar0();
-	void lar_ar1();
-	void lar_ar2();
-	void lar_ar3();
-	void lar_ar4();
-	void lar_ar5();
-	void lar_ar6();
-	void lar_ar7();
-	void lark_ar0();
-	void lark_ar1();
-	void lark_ar2();
-	void lark_ar3();
-	void lark_ar4();
-	void lark_ar5();
-	void lark_ar6();
-	void lark_ar7();
+	template <unsigned N> void lar_ar();
+	template <unsigned N> void lark_ar();
 	void ldp();
 	void ldpk();
 	void lph();
@@ -310,14 +295,7 @@ protected:
 	void rxf();
 	void sach();
 	void sacl();
-	void sar_ar0();
-	void sar_ar1();
-	void sar_ar2();
-	void sar_ar3();
-	void sar_ar4();
-	void sar_ar5();
-	void sar_ar6();
-	void sar_ar7();
+	template <unsigned N> void sar_ar();
 	void sblk();
 	void sbrk_ar();
 	void sc();
@@ -353,6 +331,7 @@ protected:
 	void zalh();
 	void zalr();
 	void zals();
+
 	int process_IRQs();
 	void process_timer(int clocks);
 };

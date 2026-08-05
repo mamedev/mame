@@ -156,7 +156,7 @@ void k051316_device::set_bpp(int bpp)
 void k051316_device::device_start()
 {
 	// assumes it can make an address mask with .length() - 1
-	assert(!(m_zoom_rom.length() & (m_zoom_rom.length() - 1)));
+	assert(!m_zoom_rom.found() || std::has_single_bit(m_zoom_rom.length()));
 
 	if (!palette().device().started())
 		throw device_missing_dependencies();

@@ -83938,7 +83938,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Thundercats - The Lost Eye Of Thundera (UK) (1987) [Original].zip... --> <!-- CPC Power -->
 	<software name="thunderc" supported="no">
-		<description>Thundercats - The Lost Eye of Thundera (UK) [Original]</description>
+		<description>ThunderCats: The Lost Eye of Thundera (UK) [Original]</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -83950,7 +83950,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Thundercats - The Lost Eye Of Thundera (UK) (1987).zip... --> <!-- CPC Power -->
 	<software name="thunderc01" cloneof="thunderc" supported="no">
-		<description>Thundercats - The Lost Eye of Thundera (UK)</description>
+		<description>ThunderCats: The Lost Eye of Thundera (UK)</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -87293,7 +87293,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Usagi Yojimbo (UK) (1988) (CPM) [Original].zip... --> <!-- CPC Power -->
 	<software name="usagiyoj" supported="no">
-		<description>Usagi Yojimbo (UK) (CPM) [Original]</description>
+		<description>Samurai Warrior: The Battles of... Usagi Yojimbo (UK) (CPM) [Original]</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -87305,7 +87305,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Usagi Yojimbo (UK) (1988) (v2) (CPM) [Original].zip... --> <!-- CPC Power -->
 	<software name="usagiyoj01" cloneof="usagiyoj" supported="no">
-		<description>Usagi Yojimbo (UK) (v2) (CPM) [Original]</description>
+		<description>Samurai Warrior: The Battles of... Usagi Yojimbo (UK) (v2) (CPM) [Original]</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -87317,7 +87317,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Usagi Yojimbo (UK) (1988).zip... --> <!-- CPC Power -->
 	<software name="usagiyoj02" cloneof="usagiyoj" supported="no">
-		<description>Usagi Yojimbo (UK)</description>
+		<description>Samurai Warrior: The Battles of... Usagi Yojimbo (UK)</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -89794,9 +89794,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (UK) (1991) [Original] (Weak Sectors).zip... --> <!-- CPC Power -->
+	<!-- Identifying WWF WrestleMania (UK) (1991) [Original] (Weak Sectors).zip... --> <!-- CPC Power -->
 	<software name="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (UK) [Original] (Weak Sectors)</description>
+		<description>WWF WrestleMania (UK) [Original] (Weak Sectors)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -89806,9 +89806,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (UK) (1991).zip... --> <!-- CPC Power -->
+	<!-- Identifying WWF WrestleMania (UK) (1991).zip... --> <!-- CPC Power -->
 	<software name="wwfwrest01" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (UK)</description>
+		<description>WWF WrestleMania (UK)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -90453,7 +90453,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Yie Ar Kung Fu II (UK) (1986) [Original] (Weak Sectors).zip... --> <!-- CPC Power -->
 	<software name="yiearkun" supported="no">
-		<description>Yie Ar Kung Fu II (UK) [Original] (Weak Sectors)</description>
+		<description>Yie Ar Kung-Fu II (UK) [Original] (Weak Sectors)</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -90465,7 +90465,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Yie Ar Kung Fu II (UK) (1986).zip... --> <!-- CPC Power -->
 	<software name="yiearkun01" cloneof="yiearkun" supported="no">
-		<description>Yie Ar Kung Fu II (UK)</description>
+		<description>Yie Ar Kung-Fu II (UK)</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -110956,9 +110956,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (E).dsk... --> <!-- CPC Base -->
+	<!-- Identifying WWF WrestleMania (E).dsk... --> <!-- CPC Base -->
 	<software name="wwfwrest02" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Euro)</description>
+		<description>WWF WrestleMania (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -110994,7 +110994,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Yie Ar Kung Fu (E).dsk... --> <!-- CPC Base -->
 	<software name="yiearkun04" cloneof="yiearkun" supported="no">
-		<description>Yie Ar Kung Fu (Euro)</description>
+		<description>Yie Ar Kung-Fu (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -150620,7 +150620,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Thundercats (1987)(Elite Systems)[cr Aragorn][t Aragorn].dsk... --> <!-- Mostly GoodCPC -->
 	<software name="thunderc02" cloneof="thunderc" supported="no">
-		<description>Thundercats (Elite Systems)[cr Aragorn][t Aragorn]</description>
+		<description>ThunderCats (Elite Systems)[cr Aragorn][t Aragorn]</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -155202,9 +155202,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (1991)(Ocean Software).dsk... --> <!-- Mostly GoodCPC -->
+	<!-- Identifying WWF WrestleMania (1991)(Ocean Software).dsk... --> <!-- Mostly GoodCPC -->
 	<software name="wwfwrest03" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Ocean Software)</description>
+		<description>WWF WrestleMania (Ocean Software)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -155214,9 +155214,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (1991)(Ocean Software)[a].dsk... --> <!-- Mostly GoodCPC -->
+	<!-- Identifying WWF WrestleMania (1991)(Ocean Software)[a].dsk... --> <!-- Mostly GoodCPC -->
 	<software name="wwfwrest04" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Ocean Software)[a]</description>
+		<description>WWF WrestleMania (Ocean Software)[a]</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -187731,7 +187731,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Thundercats (UK) (1987) [b1].dsk... --> <!-- GoodCPC -->
 	<!--<software name="thunderc03" cloneof="thunderc" supported="no">
-	    <description>Thundercats (UK) [b1]</description>
+	    <description>ThunderCats (UK) [b1]</description>
 	    <year>1987</year>
 	    <publisher>&lt;unknown&gt;</publisher>
 	    <part name="flop1" interface="floppy_3">
@@ -189196,7 +189196,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Usagi Yojimbo (UK) (19xx).dsk... --> <!-- GoodCPC -->
 	<software name="usagiyoj03" cloneof="usagiyoj" supported="no">
-		<description>Usagi Yojimbo (UK, Alt)</description>
+		<description>Samurai Warrior: The Battles of... Usagi Yojimbo (UK, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -190706,9 +190706,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (UK) (1991) [h1].dsk... --> <!-- GoodCPC -->
+	<!-- Identifying WWF WrestleMania (UK) (1991) [h1].dsk... --> <!-- GoodCPC -->
 	<software name="wwfwrest05" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (UK) [h1]</description>
+		<description>WWF WrestleMania (UK) [h1]</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -190960,7 +190960,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Yie Ar Kung Fu (UK) (1985) [a1].dsk... --> <!-- GoodCPC -->
 	<software name="yiearkun07" cloneof="yiearkun" supported="no">
-		<description>Yie Ar Kung Fu (UK) [a1]</description>
+		<description>Yie Ar Kung-Fu (UK) [a1]</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -190972,7 +190972,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Yie Ar Kung Fu (UK) (1985) [h1].dsk... --> <!-- GoodCPC -->
 	<software name="yiearkun08" cloneof="yiearkun" supported="no">
-		<description>Yie Ar Kung Fu (UK) [h1]</description>
+		<description>Yie Ar Kung-Fu (UK) [h1]</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -190984,7 +190984,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Yie Ar Kung Fu 2 (UK) (1986) [a1].dsk... --> <!-- GoodCPC -->
 	<software name="yiearkun09" cloneof="yiearkun" supported="no">
-		<description>Yie Ar Kung Fu 2 (UK) [a1]</description>
+		<description>Yie Ar Kung-Fu 2 (UK) [a1]</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -216587,7 +216587,7 @@ stick to CPC-Power disks, when available)
 
 	<!-- Identifying Thundercats (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="thunderc04" cloneof="thunderc" supported="no">
-		<description>Thundercats</description>
+		<description>ThunderCats</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218457,9 +218457,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania #1 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania #1 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest06" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania #1</description>
+		<description>WWF WrestleMania #1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218469,9 +218469,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania #2 [a] (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania #2 [a] (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest07" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania #2 [a]</description>
+		<description>WWF WrestleMania #2 [a]</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218481,9 +218481,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania #2 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania #2 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest08" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania #2</description>
+		<description>WWF WrestleMania #2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218493,9 +218493,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (ERBE Software) (1991) (Small Cardboard Box) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania (ERBE Software) (1991) (Small Cardboard Box) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest09" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (ERBE Software) (Small Cardboard Box)</description>
+		<description>WWF WrestleMania (ERBE Software) (Small Cardboard Box)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218505,9 +218505,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (Ocean) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania (Ocean) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest0a" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Ocean)</description>
+		<description>WWF WrestleMania (Ocean)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218517,9 +218517,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest0b" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania</description>
+		<description>WWF WrestleMania</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">

@@ -112,7 +112,7 @@ public:
 		GTAX,
 		GTI,
 		GTIW,
-		HALT,
+		HLT,
 		IN,     /* 7801 */
 		INR,
 		INRW,

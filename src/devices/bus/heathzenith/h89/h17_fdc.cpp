@@ -361,7 +361,7 @@ void heath_h17_fdc_device::floppy_formats(format_registration &fr)
 
 void heath_h17_fdc_device::device_add_mconfig(machine_config &config)
 {
-	S2350(config, m_s2350, 0);
+	S2350(config, m_s2350);
 	m_s2350->sync_character_received_cb().set(FUNC(heath_h17_fdc_device::sync_character_received));
 
 	for (int i = 0; i < MAX_FLOPPY_DRIVES; i++)

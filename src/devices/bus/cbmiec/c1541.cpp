@@ -871,9 +871,12 @@ void c1541_device_base::via1_pb_w(uint8_t data)
 	    PB4
 	    PB5     DS0         density select 0
 	    PB6     DS1         density select 1
-	    PB7     SYNC        SYNC detect line
+	    PB7
 
 	*/
+
+	if (machine().phase() != machine_phase::RUNNING)
+		return;
 
 	// spindle motor
 	m_ga->mtr_w(BIT(data, 2));
@@ -989,7 +992,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	m_ga->atn_callback().set(FUNC(c1541_device_base::atn_w));
 	m_ga->byte_callback().set(FUNC(c1541_device_base::byte_w));
 
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0"));
 	connector.option_add("525ssqd", ALPS_3255190X);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
@@ -1033,7 +1036,7 @@ void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &confi
 	centronics_device &centronics(CENTRONICS(config, CENTRONICS_TAG, centronics_devices, "printer"));
 	centronics.ack_handler().set(MC6821_TAG, FUNC(pia6821_device::ca1_w));
 
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out", 0));
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(cent_data_out);
 }
 
@@ -1269,8 +1272,6 @@ msd_sd2_device::msd_sd2_device(const machine_config &mconfig, const char *tag, d
 
 void c1541_device_base::device_start()
 {
-	m_leds.resolve();
-
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 

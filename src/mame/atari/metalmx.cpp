@@ -748,7 +748,7 @@ void metalmx_state::metalmx(machine_config &config)
 	DSP32C(config, m_dsp32c[1], 40'000'000);      // Unverified
 	m_dsp32c[1]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_2_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 384);
@@ -763,7 +763,7 @@ void metalmx_state::metalmx(machine_config &config)
 	SPEAKER(config, "speaker", 4).front().headrest_left(2).headrest_right(3);
 	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
-	ATARI_CAGE(config, m_cage, 0);
+	ATARI_CAGE(config, m_cage);
 	m_cage->set_speedup(0); // TODO: speedup address
 	m_cage->irq_handler().set(FUNC(metalmx_state::cage_irq_callback));
 	m_cage->add_route(0, "speaker", 1.0, 1); // Foward Right

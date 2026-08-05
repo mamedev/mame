@@ -297,7 +297,7 @@ void roland_d10_state::d10(machine_config &config)
 	mb63h149_device &keyscan(MB63H149(config, "keyscan", 16.384_MHz_XTAL));
 	keyscan.int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(roland_d10_state::screen_update));
 //  screen.set_size(20*6-1, 2*9-1);
@@ -307,7 +307,7 @@ void roland_d10_state::d10(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(roland_d10_state::d10_palette), 2);
 
-	MSM6222B_01(config, m_lcd, 0);
+	MSM6222B_01(config, m_lcd);
 
 	TIMER(config, m_midi_timer).configure_generic(FUNC(roland_d10_state::midi_timer_cb));
 

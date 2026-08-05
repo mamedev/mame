@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "hp_dio.h"
+#include "hp98259.h"
 #include "hp98265a.h"
 #include "hp98543.h"
 #include "hp98544.h"
@@ -348,6 +349,7 @@ void device_dio32_card_interface::interface_pre_start()
 
 void dio16_cards(device_slot_interface & device)
 {
+	device.option_add("98259", HPDIO_98259);
 	device.option_add("98543", HPDIO_98543);
 	device.option_add("98544", HPDIO_98544);
 	device.option_add("98603a", HPDIO_98603A);
@@ -360,6 +362,7 @@ void dio16_cards(device_slot_interface & device)
 
 void dio16_hp98x6_cards(device_slot_interface &device)
 {
+	device.option_add("98259", HPDIO_98259);
 	device.option_add("98628", HPDIO_98628);
 	device.option_add("98629", HPDIO_98629);
 }

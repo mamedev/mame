@@ -54,22 +54,22 @@ license:CC0-1.0
 			<bounds x="0" y="0" width="520" height="168" />
 		</group>
 
-		<element name="reel1" ref="Steppers" state="0">
+		<element name="reel1:pos" ref="Steppers" state="0">
 			<bounds x="10" y="300" width="50" height="50"/>
 		</element>
-		<element name="reel2" ref="Steppers" state="0">
+		<element name="reel2:pos" ref="Steppers" state="0">
 			<bounds x="60" y="300" width="50" height="50"/>
 		</element>
-		<element name="reel3" ref="Steppers" state="0">
+		<element name="reel3:pos" ref="Steppers" state="0">
 			<bounds x="110" y="300" width="50" height="50"/>
 		</element>
-		<element name="reel4" ref="Steppers" state="0">
+		<element name="reel4:pos" ref="Steppers" state="0">
 			<bounds x="160" y="300" width="50" height="50"/>
 		</element>
-		<element name="reel5" ref="Steppers" state="0">
+		<element name="reel5:pos" ref="Steppers" state="0">
 			<bounds x="220" y="300" width="50" height="50"/>
 		</element>
-		<element name="reel6" ref="Steppers" state="0">
+		<element name="reel6:pos" ref="Steppers" state="0">
 			<bounds x="280" y="300" width="50" height="50"/>
 		</element>
 

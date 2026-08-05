@@ -105,7 +105,7 @@ void gt913_device::device_add_mconfig(machine_config &config)
 	m_sound->add_route(0, *this, 1.0, 0);
 	m_sound->add_route(1, *this, 1.0, 1);
 
-	GT913_KBD_HLE(config, m_kbd, 0);
+	GT913_KBD_HLE(config, m_kbd);
 	m_kbd->irq_cb().set([this] (int val) {
 							if(val)
 								m_intc->internal_interrupt(5);

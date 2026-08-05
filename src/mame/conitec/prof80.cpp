@@ -448,7 +448,7 @@ void prof80_state::prof80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &prof80_state::prof80_io);
 
 	// MMU
-	PROF80_MMU(config, m_mmu, 0);
+	PROF80_MMU(config, m_mmu);
 	m_mmu->set_addrmap(AS_PROGRAM, &prof80_state::prof80_mmu);
 
 	// RTC

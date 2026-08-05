@@ -29,7 +29,7 @@ class vga_device : public device_t
 
 public:
 	// construction/destruction
-	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -326,7 +326,7 @@ class svga_device :  public vga_device
 public:
 	virtual void zero() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	uint8_t get_video_depth();
+	virtual uint8_t get_video_depth();
 
 protected:
 	// construction/destruction

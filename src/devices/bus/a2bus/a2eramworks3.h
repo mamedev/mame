@@ -36,7 +36,6 @@ protected:
 	virtual u8 *get_vram_ptr() override;
 	virtual u8 *get_auxbank_ptr() override;
 	virtual u16 get_auxbank_mask() override;
-	virtual bool allow_dhr() override { return true; }
 	virtual void write_c07x(u8 offset, u8 data) override;
 
 	int m_bank;

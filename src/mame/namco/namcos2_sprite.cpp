@@ -39,6 +39,7 @@ namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, cons
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
 	m_spriteram(*this, finder_base::DUMMY_TAG),
 	m_pri_cb(*this),
 	m_mix_cb(*this)
@@ -60,6 +61,9 @@ void namcos2_sprite_device::device_start()
 {
 	m_pri_cb.resolve_safe(0);
 	m_mix_cb.resolve_safe(false);
+
+	screen().register_screen_bitmap(m_renderbitmap);
+	screen().register_screen_bitmap(m_screenbitmap);
 }
 
 /**************************************************************************************/
@@ -67,10 +71,9 @@ void namcos2_sprite_device::device_start()
 /**************************************************************************************/
 
 void namcos2_sprite_device::zdrawgfxzoom(
-		screen_device &screen,
 		bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		int scalex, int scaley, int primask)
+		int scalex, int scaley, u32 prival)
 {
 	if (!scalex || !scaley) return;
 	if (dest_bmp.bpp() == 16)
@@ -144,27 +147,19 @@ void namcos2_sprite_device::zdrawgfxzoom(
 				// skip if inner loop doesn't draw anything
 				if (ex > sx)
 				{
-					bitmap_ind8 &priority_bitmap = screen.priority();
-					if (priority_bitmap.valid())
+					for (int y = sy; y < ey; y++)
 					{
-						for (int y = sy; y < ey; y++)
+						u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
+						u16 *const dest = &dest_bmp.pix(y);
+						int x_index = x_index_base;
+						for (int x = sx; x < ex; x++)
 						{
-							u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
-							u16 *const dest = &dest_bmp.pix(y);
-							u8 *const pri = &priority_bitmap.pix(y);
-							int x_index = x_index_base;
-							for (int x = sx; x < ex; x++)
-							{
-								const u8 c = source[x_index >> 16];
-								if (pri[x] != 0xff)
-								{
-									if (m_mix_cb(dest[x], pri[x], gfx->colorbase(), c + pal, primask))
-										pri[x] = 0xff;
-								}
-								x_index += dx;
-							}
-							y_index += dy;
+							const u8 c = source[x_index >> 16];
+							if (c != 0xff)
+								dest[x] = ((prival & 0xf) << 12) | ((pal + c) & 0xfff);
+							x_index += dx;
 						}
+						y_index += dy;
 					}
 				}
 			}
@@ -172,13 +167,48 @@ void namcos2_sprite_device::zdrawgfxzoom(
 	}
 } /* zdrawgfxzoom */
 
-void namcos2_sprite_device::zdrawgfxzoom(
-		screen_device &screen,
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		int scalex, int scaley, int primask)
+void namcos2_sprite_device::copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip)
 {
-	/* nop */
+	for (int y = clip.min_y; y <= clip.max_y; y++)
+	{
+		u16 *const src = &m_renderbitmap.pix(y);
+		u16 *const dest = &dest_bmp.pix(y);
+		u8 *const destpri = &screen.priority().pix(y);
+		for (int x = clip.min_x; x <= clip.max_x; x++)
+		{
+			if (src[x] != 0xffff)
+			{
+				const u8 srcpri = (src[x] >> 12) & 0xf;
+				const u16 c = src[x] & 0xfff;
+				m_mix_cb(dest[x], destpri[x], gfx(0)->colorbase(), c, srcpri);
+			}
+		}
+	}
+}
+
+void namcos2_sprite_device::copybitmap(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip)
+{
+	device_palette_interface &palette = gfx(0)->palette();
+	const pen_t *pal = palette.pens();
+	for (int y = clip.min_y; y <= clip.max_y; y++)
+	{
+		u16 *const src = &m_renderbitmap.pix(y);
+		u16 *const srcrender = &m_screenbitmap.pix(y);
+		u32 *const dest = &dest_bmp.pix(y);
+		u8 *const destpri = &screen.priority().pix(y);
+		for (int x = clip.min_x; x <= clip.max_x; x++)
+		{
+			if (src[x] != 0xffff)
+			{
+				const u8 srcpri = (src[x] >> 12) & 0xf;
+				const u16 c = src[x] & 0xfff;
+				if (m_mix_cb(srcrender[x], destpri[x], gfx(0)->colorbase(), c, srcpri))
+					dest[x] = pal[srcrender[x]];
+			}
+			else if (srcrender[x] != 0xffff)
+				dest[x] = pal[gfx(0)->colorbase() + srcrender[x]];
+		}
+	}
 }
 
 void namcos2_sprite_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
@@ -197,12 +227,30 @@ void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const
 	is_32 = BIT(word1, 13);
 }
 
-void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int control)
+template <class BitmapClass>
+void namcos2_sprite_device::draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int control)
+{
+	m_renderbitmap.fill(0xffff, cliprect);
+	draw_sprites(cliprect, control);
+	copybitmap(screen, bitmap, cliprect);
+}
+
+void namcos2_sprite_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int control)
+{
+	draw_common(screen, bitmap, cliprect, control);
+}
+
+void namcos2_sprite_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int control)
+{
+	draw_common(screen, bitmap, cliprect, control);
+}
+
+void namcos2_sprite_device::draw_sprites(const rectangle &cliprect, int control)
 {
 	gfx_element *const sgfx = gfx(0);
 
 	const int offset = (control & 0x000f) * (128 * 4);
-	for (int loop = 127; loop >= 0; loop--)
+	for (int loop = 0; loop < 128; loop++)
 	{
 		/****************************************
 		* word#0
@@ -243,7 +291,7 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			const int scaley = (sizey << 16) / (is_32 ? 0x20 : 0x10);
 			if (scalex && scaley)
 			{
-				const u32 primask = m_pri_cb(word3 & 0xf);
+				const u32 prival = m_pri_cb(word3 & 0xf);
 				const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
 				const u32 color  = (word3 >> 4) & 0x000f;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
@@ -257,21 +305,20 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 					sgfx->set_source_clip(0, 32, 0, 32);
 
 				zdrawgfxzoom(
-						screen,
-						bitmap,
+						m_renderbitmap,
 						cliprect,
 						sgfx,
 						sprn, color,
 						flipx, flipy,
 						xpos, ypos,
 						scalex, scaley,
-						primask);
+						prival);
 			}
 		}
 	}
 } /* draw_sprites */
 
-void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int control)
+void namcos2_sprite_metalhawk_device::draw_sprites(const rectangle &cliprect, int control)
 {
 	/**
 	 * word#0
@@ -302,7 +349,7 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 	 *  --------xxxx---- color
 	 *  x--------------- unknown
 	 */
-	for (int loop = 127; loop >= 0; loop--)
+	for (int loop = 0; loop < 128; loop++)
 	{
 		const u16 ypos  = m_spriteram[(loop * 8) + 0];
 		const u16 xpos  = m_spriteram[(loop * 8) + 3];
@@ -313,7 +360,7 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 		{
 			const u16 attrs = m_spriteram[(loop * 8) + 7];
 
-			const u32 primask = m_pri_cb((attrs & 0xf));
+			const u32 prival = m_pri_cb((attrs & 0xf));
 			const u16 tile  = m_spriteram[(loop * 8) + 1];
 			const u16 flags = m_spriteram[(loop * 8) + 6];
 			const u32 sprn  =  (tile >> 2) & 0x0fff;
@@ -348,15 +395,14 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 				sgfx->set_source_clip(BIT(tile, 0) ? 16 : 0, 16, BIT(tile, 1) ? 16 : 0, 16);
 
 			zdrawgfxzoom(
-					screen,
-					bitmap,
+					m_renderbitmap,
 					cliprect,
 					sgfx,
 					sprn, color,
 					flipx, flipy,
 					sx, sy,
 					scalex, scaley,
-					primask);
+					prival);
 		}
 	}
 } /* draw_sprites_metalhawk */

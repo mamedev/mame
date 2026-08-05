@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "memarray.h"
 
+#include "endianness.h"
+
 
 //**************************************************************************
 //  MEMORY ARRAY HELPER

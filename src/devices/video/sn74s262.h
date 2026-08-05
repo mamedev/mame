@@ -36,7 +36,7 @@ class sn74s262_device : public device_t,
 {
 public:
 	// construction/destruction
-	sn74s262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn74s262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 read(u8 character, u8 row);
 
@@ -63,7 +63,7 @@ class sn74s263_device : public sn74s262_device
 {
 public:
 	// construction/destruction
-	sn74s263_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn74s263_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// optional information overrides

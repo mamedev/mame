@@ -24,7 +24,7 @@ class wd1000_device : public device_t
 {
 public:
 	// construction/destruction
-	wd1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto intrq_wr_callback() { return m_intrq_cb.bind(); }
 	auto drq_wr_callback() { return m_drq_cb.bind(); }
@@ -86,6 +86,7 @@ private:
 	attotime get_stepping_rate();
 	void start_command();
 	void end_command();
+	bool validate_id_field();
 	int get_lbasector();
 
 	int head() { return (m_sdh >> 0) & 0x07; }

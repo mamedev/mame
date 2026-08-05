@@ -103,8 +103,9 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="graphic">
-		<description>Graphic Designer</description>
+	<!-- similar to P-Designer cart but simpler-->
+	<software name="peditor">
+		<description>P-Editor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with TAPE"/>
@@ -162,8 +163,8 @@ license:CC0-1.0
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basici"/>
 		<part name="cass1" interface="m5_cass">
-			<dataarea name="cass" size="3423">
-				<rom name="music tone (19xx)(-)[chain].cas" size="3423" crc="296671e0" sha1="a5bd05aa110879317e19566936264de21ec34195"/>
+			<dataarea name="cass" size="3424">
+				<rom name="music tone (19xx)(-)[chain].cas" size="3424" crc="1a4ce03b" sha1="fd10afe79494fbfc15d4517e8b1f75ec6b34fb9b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -266,8 +267,8 @@ license:CC0-1.0
 
 	<software name="ssf" supported="no">
 		<description>Solar System Forces</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
 		<info name="alt_title" value="太陽系艦隊"/>
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
@@ -280,8 +281,8 @@ license:CC0-1.0
 
 	<software name="ssfcm" supported="no">
 		<description>Solar System Forces - Commando Team</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
 		<info name="alt_title" value="太陽系艦隊4 コマンドチーム"/>
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
@@ -294,8 +295,8 @@ license:CC0-1.0
 
 	<software name="ssfom" supported="no">
 		<description>Solar System Forces - Operation Maul</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
 		<info name="alt_title" value="太陽系艦隊3 オペレーションモール"/>
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
@@ -308,8 +309,8 @@ license:CC0-1.0
 
 	<software name="ssfvm" supported="no">
 		<description>Solar System Forces - Victory of Mars</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
 		<info name="alt_title" value="太陽系艦隊2 火星軌道上の勝利"/>
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>

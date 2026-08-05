@@ -42,7 +42,7 @@ TILEMAP_MAPPER_MEMBER(liberate_state::fix_scan)
 
 TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 {
-	const uint8_t *RAM = memregion("user1")->base();
+	const uint8_t *ROM = memregion("user1")->base();
 	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 			tile_index = (tile_index & 0xff) + (m_io_ram[2] << 8); /* Top left */
 	}
 
-	tile = RAM[tile_index];
+	tile = ROM[tile_index];
 	if (tile > 0x7f)
 		bank = 3;
 	else
@@ -263,10 +263,9 @@ void liberate_state::liberate_palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (*color_prom >> 6) & 0x01;
+		bit1 = (*color_prom >> 7) & 0x01;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		color_prom++;
 		palette.set_pen_color(i, rgb_t(r, g, b));

@@ -36,8 +36,8 @@ protected:
 	virtual void vram_aperture_map(address_map &map) ATTR_COLD;
 	virtual void indirect_io_map(address_map &map) ATTR_COLD;
 
-	required_device<nvidia_nv3_vga_device> m_svga;
-	required_memory_region m_vga_rom;
+	required_device<nvidia_nv3_vga_device> m_vga;
+	required_memory_region m_bios;
 
 	bool m_vga_legacy_enable = false;
 private:

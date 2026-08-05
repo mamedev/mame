@@ -162,7 +162,7 @@ static INPUT_PORTS_START( mkit09 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mkit09_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
-// ToDo: work out what the keys marked "??" do.
+// TODO: work out what the keys marked "??" do.
 static INPUT_PORTS_START( mkit09a )
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')

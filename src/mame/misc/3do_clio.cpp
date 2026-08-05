@@ -11,7 +11,7 @@
 #define LOG_DSPP  (1U << 5)
 
 #define VERBOSE (LOG_GENERAL | LOG_XBUS | LOG_DSPP)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

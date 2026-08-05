@@ -315,7 +315,7 @@ void wpc_dot_state::wpc_dot(machine_config &config)
 	M6809(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_dot_state::wpc_dot_map);
 
-	WPCASIC(config, m_wpc, 0);
+	WPCASIC(config, m_wpc);
 	m_wpc->irq_callback().set(FUNC(wpc_dot_state::irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_dot_state::firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_dot_state::rombank_w));
@@ -331,7 +331,7 @@ void wpc_dot_state::wpc_dot(machine_config &config)
 	m_wpcsnd->reply_callback().set(FUNC(wpc_dot_state::snd_reply_w));
 	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_native_aspect();
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 128-1, 0, 32-1);

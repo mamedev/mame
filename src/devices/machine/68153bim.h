@@ -45,7 +45,7 @@ class bim68153_channel : public device_t
 	friend class bim68153_device;
 
 public:
-	bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -102,7 +102,7 @@ class bim68153_device : public device_t
 
 public:
 	// construction/destruction
-	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u16 iack(int irqline);
 	int acknowledge();

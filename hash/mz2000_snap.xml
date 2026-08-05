@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0-1.0
+
 Software list of Sharp MZ-2000 snapshots, created to provide support for software that will run as a snapshot image in MAME but (currently) not in the original media.
 -->
 <softwarelist name="mz2000_snap" description="Sharp MZ-2000 snapshots">

@@ -130,11 +130,11 @@ ioport_constructor c64_buscard2_device::device_input_ports() const
 
 void c64_buscard2_device::device_add_mconfig(machine_config &config)
 {
-	MOS6532(config, m_riot, 0);
+	MOS6532(config, m_riot);
 
 	PIA6821(config, m_pia);
 
-	IEEE488(config, m_bus, 0);
+	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);

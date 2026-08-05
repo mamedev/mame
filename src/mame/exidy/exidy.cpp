@@ -1461,8 +1461,6 @@ uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void exidy_state::machine_start()
 {
-	m_led.resolve();
-
 	for (int i = 0; i < 128; i++)
 		m_collision_timer[i] = timer_alloc(FUNC(exidy_state::latch_collision), this);
 }
@@ -1515,7 +1513,7 @@ void exidy_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
 	PALETTE(config, m_palette).set_entries(8);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART);
 	m_screen->set_screen_update(FUNC(exidy_state::screen_update));
@@ -1616,7 +1614,7 @@ void exidy_state::venture(machine_config &config)
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
 	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
-	venture_sound_device &soundbd(EXIDY_VENTURE(config, "soundbd", 0));
+	venture_sound_device &soundbd(EXIDY_VENTURE(config, "soundbd"));
 	soundbd.pa_callback().set("pia", FUNC(pia6821_device::portb_w));
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
@@ -1655,7 +1653,7 @@ void exidy_state::mtrap(machine_config &config)
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
 	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
-	mtrap_sound_device &soundbd(EXIDY_MTRAP(config, "soundbd", 0));
+	mtrap_sound_device &soundbd(EXIDY_MTRAP(config, "soundbd"));
 	soundbd.pa_callback().set("pia", FUNC(pia6821_device::portb_w));
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));

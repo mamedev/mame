@@ -53,7 +53,6 @@ protected:
 	void funworld_lamp_a_w(uint8_t data);
 	void funworld_lamp_b_w(uint8_t data);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 	void funworld_palette(palette_device &palette) const;
 	uint32_t screen_update_funworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

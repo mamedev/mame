@@ -95,8 +95,6 @@ protected:
 		SK_FORMAT_ERROR         = 0x1a
 	};
 
-	virtual void device_reset() override ATTR_COLD;
-
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;

@@ -58,7 +58,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<cpu_device, 2> m_subcpu;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<namco_device> m_namco_sound;
+	optional_device<polepos_wsg_device> m_namco_sound;
 	required_device<ls259_device> m_latch;
 	required_device<adc0804_device> m_adc;
 	required_shared_ptr<uint16_t> m_sprite16_memory;

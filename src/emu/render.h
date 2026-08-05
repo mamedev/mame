@@ -378,7 +378,7 @@ class render_container
 
 public:
 	// construction/destruction
-	render_container(render_manager &manager, screen_device *screen = nullptr);
+	render_container(render_manager &manager, device_video_output_interface *screen = nullptr);
 	~render_container();
 
 	// user settings describes the collected user-controllable settings
@@ -399,7 +399,7 @@ public:
 	};
 
 	// getters
-	screen_device *screen() const { return m_screen; }
+	device_video_output_interface *screen() const { return m_screen; }
 	render_manager &manager() const { return m_manager; }
 	render_texture *overlay() const { return m_overlaytexture; }
 	int orientation() const { return m_user.m_orientation; }
@@ -475,7 +475,7 @@ private:
 	render_manager &        m_manager;              // reference back to the owning manager
 	simple_list<item>       m_itemlist;             // head of the item list
 	fixed_allocator<item>   m_item_allocator;       // free container items
-	screen_device *         m_screen;               // the screen device
+	device_video_output_interface *         m_screen;               // the screen device
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
@@ -488,7 +488,7 @@ private:
 // ======================> render_target
 
 // a render_target describes a surface that is being rendered to
-class render_target
+class render_target final : public osd::ui_event_handler
 {
 	friend class simple_list<render_target>;
 	friend class render_manager;
@@ -567,6 +567,15 @@ public:
 	// resolve tag lookups
 	void resolve_tags();
 
+	// osd::ui_event_handler implementation
+	virtual void push_window_focus_event() override;
+	virtual void push_window_defocus_event() override;
+	virtual void push_mouse_wheel_event(s32 x, s32 y, short delta, int lines) override;
+	virtual void push_pointer_update(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks) override;
+	virtual void push_pointer_leave(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
+	virtual void push_pointer_abort(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
+	virtual void push_char_event(char32_t ch) override;
+
 private:
 	// constants
 	static inline constexpr int NUM_PRIMLISTS = 3;
@@ -615,6 +624,7 @@ private:
 	// internal state
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
+	ui_event_sink &         m_event_sink;               // handler for incoming UI events
 	render_container *const m_ui_container;             // container for drawing UI elements
 	std::list<layout_file>  m_filelist;                 // list of layout files
 	view_mask_vector        m_views;                    // views we consider
@@ -658,14 +668,14 @@ class render_manager
 
 public:
 	// construction/destruction
-	render_manager(running_machine &machine);
+	render_manager(running_machine &machine, ui_event_sink &event_sink);
 	~render_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
 
 	// global queries
-	bool is_live(screen_device &screen) const;
+	bool is_live(device_video_output_interface &screen) const;
 	float max_update_rate() const;
 
 	// targets
@@ -679,7 +689,8 @@ public:
 	// UI targets
 	render_target &ui_target() const { assert(m_ui_target != nullptr); return *m_ui_target; }
 	void set_ui_target(render_target &target) { m_ui_target = &target; }
-	float ui_aspect(render_container *rc = nullptr);
+	float ui_aspect(render_target &target);     // gets result for target's UI container - target must not be a hidden target with no UI container
+	float ui_aspect(render_container &rc);      // rc must be a screen container or a UI container for a render target; requires an O(n) scan of render targets
 
 	// UI containers
 	render_container &ui_container() const { assert(ui_target().ui_container()); return *ui_target().ui_container(); }
@@ -704,6 +715,7 @@ private:
 
 	// internal state
 	running_machine &               m_machine;                  // reference back to the machine
+	ui_event_sink &                 m_event_sink;
 
 	// array of live targets
 	simple_list<render_target>      m_targetlist;               // list of targets

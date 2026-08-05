@@ -17,8 +17,8 @@
 class trident_vga_device :  public svga_device
 {
 public:
-	// SDD fails on higher resolutions, TGUI9680 black screens in calchase (wants PCI?), BitBlt untested
-	// Needs major incremental split
+	// SDD fails on higher resolutions, TGUI9680 black screens in calchase service mode (wants PCI?),
+	// BitBlt untested, needs major incremental splits
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	uint8_t port_83c6_r(offs_t offset);
@@ -167,13 +167,13 @@ private:
 class tgui9680_device : public trident_vga_device
 {
 public:
-	tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class tvga9000_device : public trident_vga_device
 {
 public:
-	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void recompute_params() override;

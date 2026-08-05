@@ -26,10 +26,13 @@ public:
 	void set_cpu(device_t &device);
 
 protected:
+	virtual void update_dpi() override;
 	virtual void recompute_children() override;
 	virtual void update_menu() override;
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;
+
+	void adjust_minmax();
 
 private:
 	enum

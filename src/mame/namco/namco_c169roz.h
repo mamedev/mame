@@ -13,6 +13,8 @@
 class namco_c169roz_device : public device_t, public device_gfx_interface
 {
 public:
+	using c169_tilemap_delegate = device_delegate<void (uint16_t, int&, int&, int)>;
+
 	// construction/destruction
 	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
@@ -25,8 +27,7 @@ public:
 	uint16_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	typedef delegate<void (uint16_t, int&, int&, int)> c169_tilemap_delegate;
-	void set_tile_callback(c169_tilemap_delegate tilemap_cb) { m_c169_cb = tilemap_cb; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_c169_cb.set(std::forward<T>(args)...); }
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint8_t prival = 0, uint8_t primask = uint8_t(~0));
 	void mark_all_dirty();

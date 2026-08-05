@@ -20,10 +20,7 @@ pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, dev
 	device_single_card_slot_interface<device_pc_joy_interface>(mconfig, *this),
 	m_dev(nullptr)
 {
-	option_reset();
-	pc_joysticks(*this);
-	set_default_option("basic_joy");
-	set_fixed(false);
+	set_options(pc_joysticks, "basic_joy", false);
 }
 
 uint8_t pc_joy_device::joy_port_r()

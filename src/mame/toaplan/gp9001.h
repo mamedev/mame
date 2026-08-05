@@ -25,14 +25,12 @@ public:
 
 	auto vint_out_cb() { return m_vint_out_cb.bind(); }
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const u8* primap);
-	void draw_custom_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, const u8* priremap, const u8* pri_enable);
-	void render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
+	void draw_custom_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, int layer);
+	void render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 	void screen_eof();
 	void create_tilemaps();
 	void init_scroll_regs();
-
-	bitmap_ind8 *custom_priority_bitmap;
 
 	void map(address_map &map) ATTR_COLD;
 

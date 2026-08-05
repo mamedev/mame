@@ -65,9 +65,9 @@ void vme_hcpu30_card_device::hcpu30_mem(address_map &map)
 	map(0xfffff000, 0xfffff0ff).rw(FUNC(vme_hcpu30_card_device::dma_r), FUNC(vme_hcpu30_card_device::dma_w));
 	map(0xfffff100, 0xfffff11f).rw(FUNC(vme_hcpu30_card_device::irq_state_r), FUNC(vme_hcpu30_card_device::irq_mask_w));
 	map(0xfffff120, 0xfffff13f).rw(FUNC(vme_hcpu30_card_device::rtc_r), FUNC(vme_hcpu30_card_device::rtc_w));
-	map(0xfffff200, 0xfffff2ff).rw("scsi:7:wd33c93", FUNC(wd33c93_device::indir_r), FUNC(wd33c93_device::indir_w)).umask32(0xffff0000);
+	map(0xfffff200, 0xfffff2ff).rw(m_scsi, FUNC(wd33c93_device::indir_r), FUNC(wd33c93_device::indir_w)).umask32(0xffff0000);
 	map(0xfffff300, 0xfffff3ff).rw("duscc", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write));
-	map(0xfffff580, 0xfffff583).rw("scsi:7:wd33c93", FUNC(wd33c93_device::dma_r), FUNC(wd33c93_device::dma_w)).umask32(0xff000000);
+	map(0xfffff580, 0xfffff583).rw(m_scsi, FUNC(wd33c93_device::dma_r), FUNC(wd33c93_device::dma_w)).umask32(0xff000000);
 	map(0xfffff600, 0xfffff6ff).unmaprw(); // LAN
 	map(0xfffff700, 0xfffff7ff).m("floppy", FUNC(dp8473_device::map));
 }
@@ -197,19 +197,15 @@ void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 	rs232p2.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
 	rs232p2.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0").option_set("hd", NSCSI_HARDDISK);
 	NSCSI_CONNECTOR(config, "scsi:1").option_set("hd", NSCSI_HARDDISK);
 	NSCSI_CONNECTOR(config, "scsi:2").option_set("hd", NSCSI_HARDDISK);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93A).machine_config(
-		[this](device_t *device)
-		{
-			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
-			wd33c93.set_clock(16670000/4); // default internal divisor is 2
-			wd33c93.irq_cb().set(*this, FUNC(vme_hcpu30_card_device::scsiirq_callback)).invert();
-			wd33c93.drq_cb().set(*this, FUNC(vme_hcpu30_card_device::scsidrq_callback));
-		});
+	WD33C93A(config, m_scsi, 16670000/4); // default internal divisor is 2
+	scsi.set_external_device(7, m_scsi);
+	m_scsi->irq_cb().set(DEVICE_SELF, FUNC(vme_hcpu30_card_device::scsiirq_callback)).invert();
+	m_scsi->drq_cb().set(DEVICE_SELF, FUNC(vme_hcpu30_card_device::scsidrq_callback));
 
 	// schematics connect INT to IPL1, not DRQ; could be outdated
 	DP8473(config, m_fdc, 24_MHz_XTAL);
@@ -527,7 +523,7 @@ vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, de
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
 	, m_dusccterm(*this, "duscc")
-	, m_scsi(*this, "scsi:7:wd33c93")
+	, m_scsi(*this, "wd33c93")
 	, m_fdc(*this, "floppy")
 	, m_floppy0(*this, "floppy:0")
 	, m_floppy1(*this, "floppy:1")

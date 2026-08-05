@@ -10,7 +10,7 @@
 
 #include "wavfile.h"
 
-#include "osdcomm.h" // little_endianize_int16
+#include "multibyte.h"
 
 #include <cassert>
 #include <cstdio>
@@ -23,39 +23,6 @@ static const char data_tag_id[4] = { 'd', 'a', 't', 'a' };
 
 #define WAV_FORMAT_PCM      1
 
-
-
-static uint32_t get_leuint32(const void *ptr)
-{
-	uint32_t value;
-	memcpy(&value, ptr, sizeof(value));
-	return little_endianize_int32(value);
-}
-
-
-
-static uint16_t get_leuint16(const void *ptr)
-{
-	uint16_t value;
-	memcpy(&value, ptr, sizeof(value));
-	return little_endianize_int16(value);
-}
-
-
-
-static void put_leuint32(void *ptr, uint32_t value)
-{
-	value = little_endianize_int32(value);
-	memcpy(ptr, &value, sizeof(value));
-}
-
-
-
-static void put_leuint16(void *ptr, uint16_t value)
-{
-	value = little_endianize_int16(value);
-	memcpy(ptr, &value, sizeof(value));
-}
 
 
 
@@ -88,7 +55,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, cassette_
 		return cassette_image::error::INVALID_IMAGE;
 
 	/* read and sanity check size */
-	stated_size = get_leuint32(&file_header[4]) + 8;
+	stated_size = get_u32le(&file_header[4]) + 8;
 	file_size = cassette->image_size();
 	if (stated_size > file_size)
 		stated_size = (uint32_t) file_size;
@@ -96,7 +63,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, cassette_
 	while(offset < stated_size)
 	{
 		cassette->image_read(tag_header, offset, sizeof(tag_header));
-		tag_size = get_leuint32(&tag_header[4]);
+		tag_size = get_u32le(&tag_header[4]);
 		offset += sizeof(tag_header);
 
 		if (!memcmp(tag_header, format_tag_id, 4))
@@ -108,12 +75,12 @@ static cassette_image::error wavfile_process(cassette_image *cassette, cassette_
 
 			cassette->image_read(format_tag, offset, sizeof(format_tag));
 
-			format_type             = get_leuint16(&format_tag[0]);
-			opts->channels          = get_leuint16(&format_tag[2]);
-			opts->sample_frequency  = get_leuint32(&format_tag[4]);
-			bytes_per_second        = get_leuint32(&format_tag[8]);
-//          block_align             = get_leuint16(&format_tag[12]);
-			opts->bits_per_sample   = get_leuint16(&format_tag[14]);
+			format_type             = get_u16le(&format_tag[0]);
+			opts->channels          = get_u16le(&format_tag[2]);
+			opts->sample_frequency  = get_u32le(&format_tag[4]);
+			bytes_per_second        = get_u32le(&format_tag[8]);
+//          block_align             = get_u16le(&format_tag[12]);
+			opts->bits_per_sample   = get_u16le(&format_tag[14]);
 
 			if (format_type != WAV_FORMAT_PCM)
 				return cassette_image::error::INVALID_IMAGE;
@@ -198,23 +165,23 @@ static cassette_image::error wavfile_save(cassette_image *cassette, const casset
 	block_align = (uint16_t) (bytes_per_sample * info->channels);
 
 	/* set up header */
-	memcpy(&header[0],                  magic1, 4);
-	memcpy(&header[8],                  magic2, 4);
-	put_leuint32(&header[4],            file_size);
+	memcpy(&header[0],               magic1, 4);
+	memcpy(&header[8],               magic2, 4);
+	put_u32le(&header[4],            file_size);
 
 	/* set up format tag */
-	memcpy(&format_tag_header[0],       format_tag_id, 4);
-	put_leuint32(&format_tag_header[4], 16);
-	put_leuint16(&format_tag_data[0],   WAV_FORMAT_PCM);
-	put_leuint16(&format_tag_data[2],   info->channels);
-	put_leuint32(&format_tag_data[4],   info->sample_frequency);
-	put_leuint32(&format_tag_data[8],   bytes_per_second);
-	put_leuint16(&format_tag_data[12],  block_align);
-	put_leuint16(&format_tag_data[14],  bits_per_sample);
+	memcpy(&format_tag_header[0],    format_tag_id, 4);
+	put_u32le(&format_tag_header[4], 16);
+	put_u16le(&format_tag_data[0],   WAV_FORMAT_PCM);
+	put_u16le(&format_tag_data[2],   info->channels);
+	put_u32le(&format_tag_data[4],   info->sample_frequency);
+	put_u32le(&format_tag_data[8],   bytes_per_second);
+	put_u16le(&format_tag_data[12],  block_align);
+	put_u16le(&format_tag_data[14],  bits_per_sample);
 
 	/* set up data tag */
-	memcpy(&data_tag_header[0],         data_tag_id, 4);
-	put_leuint32(&data_tag_header[4],   data_size);
+	memcpy(&data_tag_header[0],      data_tag_id, 4);
+	put_u32le(&data_tag_header[4],   data_size);
 
 	/* write consolidated header */
 	cassette->image_write(consolidated_header, 0, sizeof(consolidated_header));

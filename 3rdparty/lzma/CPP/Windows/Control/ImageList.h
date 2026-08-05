@@ -5,7 +5,7 @@
 
 #include <CommCtrl.h>
 
-#include "../Defs.h"
+#include "../WinDefs.h"
 
 namespace NWindows {
 namespace NControl {

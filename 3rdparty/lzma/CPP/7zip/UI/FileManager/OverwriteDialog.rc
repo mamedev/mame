@@ -1,7 +1,7 @@
 #include "OverwriteDialogRes.h"
 #include "../../GuiCommon.rc"
 
-#define xc 280
+#define xc 340
 #define yc 200
 
 #undef iconSize
@@ -25,11 +25,13 @@ BEGIN
   LTEXT  "Would you like to replace the existing file", IDT_OVERWRITE_QUESTION_BEGIN, m, 28, xc, 8
   
   ICON   "", IDI_OVERWRITE_OLD_FILE,             m,  44, iconSize, iconSize
+  ICON   "", IDI_OVERWRITE_OLD_FILE_2,           m,  44 + iconSize, iconSize, iconSize
   LTEXT  "", IDT_OVERWRITE_OLD_FILE_SIZE_TIME,   x,  44, fx, fy, SS_NOPREFIX
   
   LTEXT  "with this one?", IDT_OVERWRITE_QUESTION_END, m,  98, xc, 8
 
   ICON   "", IDI_OVERWRITE_NEW_FILE,             m, 114, iconSize, iconSize
+  ICON   "", IDI_OVERWRITE_NEW_FILE_2,           m, 114 + iconSize, iconSize, iconSize
   LTEXT  "", IDT_OVERWRITE_NEW_FILE_SIZE_TIME,   x, 114, fx, fy, SS_NOPREFIX
   
   PUSHBUTTON  "&Yes",         IDYES,             bx3, by2, bxs, bys

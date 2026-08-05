@@ -123,7 +123,7 @@ void ct486_state::ct486(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ct486_state::ct486_io);
 	m_maincpu->set_irq_acknowledge_callback("cs4031", FUNC(cs4031_device::int_ack_r));
 
-	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc", RAM_TAG);
+	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "bios", "keybc", RAM_TAG);
 	// cpu connections
 	m_cs4031->hold().set(FUNC(ct486_state::cs4031_hold));
 	m_cs4031->nmi().set_inputline("maincpu", INPUT_LINE_NMI);
@@ -150,7 +150,7 @@ void ct486_state::ct486(machine_config &config)
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->iochck_callback().set(m_cs4031, FUNC(cs4031_device::iochck_w));
@@ -172,15 +172,16 @@ void ct486_state::ct486(machine_config &config)
 	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
 	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdc_smc", true);
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
-	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4kw32i", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, m_isabus, pc_isa16_cards, "fdc_smc", true);
+	ISA16_SLOT(config, "board2", 0, m_isabus, pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, m_isabus, pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", 0, m_isabus, pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "isa1", 0, m_isabus, pc_isa16_cards, "svga_et4kw32i", false);
+	ISA16_SLOT(config, "isa2", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, m_isabus, pc_isa16_cards, nullptr, false);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -203,6 +204,7 @@ void ct486_state::ast6000(machine_config &config)
 	// 1 ISA slot only, with ISA bridge x3
 	// CL-GD5428 on-board
 	// Chips & Technologies F82C721 Super I/O
+
 	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "clgd542x", true);
 	ISA16_SLOT(config.replace(), "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
 }
@@ -221,11 +223,11 @@ void ct486_state::ast611(machine_config &config)
 	// 1 ISA slot only, with ISA bridge x3
 	// CL-GD5428 on-board
 	// SMC/SMSC FDC37C653** Super I/O
-	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "clgd542x", true);
+	ISA16_SLOT(config, "board5", 0, m_isabus, pc_isa16_cards, "clgd542x", true);
 	// TODO: Creative CT2504 / Vibra 16S on-board
-//  ISA16_SLOT(config, "board6", 0, "isabus", pc_isa16_cards, "vibra16s", true);
+//  ISA16_SLOT(config, "board6", 0, m_isabus, pc_isa16_cards, "vibra16s", true);
 
-	ISA16_SLOT(config.replace(), "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config.replace(), "isa1", 0, m_isabus, pc_isa16_cards, nullptr, false);
 }
 
 
@@ -234,19 +236,16 @@ void ct486_state::ast611(machine_config &config)
 //**************************************************************************
 
 ROM_START( ct486 )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("chips_1.ami", 0xf0000, 0x10000, CRC(a14a7511) SHA1(b88d09be66905ed2deddc26a6f8522e7d2d6f9a8))
 ROM_END
 
 ROM_START( ast6000 )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("ast6000.bin", 0xe0000, 0x20000, CRC(8982ac34) SHA1(07c10a8857bb91fc673c4299b17214e9ebad4524))
 ROM_END
 
 ROM_START( ast611 )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("ast_611s.bin", 0xe0000, 0x20000, CRC(5e7a4eef) SHA1(955a346d882298ad623d9a31079b059d28e43b9e))
 ROM_END

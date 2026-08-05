@@ -537,7 +537,7 @@ DEFINE_DEVICE_TYPE(ISA8_EGA, isa8_ega_device, "ega", "IBM Enhanced Graphics Adap
 
 void isa8_ega_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16.257_MHz_XTAL, 912, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(EGA_CRTC_NAME, FUNC(crtc_ega_device::screen_update));
 	m_screen->set_palette(m_palette);

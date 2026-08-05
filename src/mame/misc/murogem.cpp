@@ -257,7 +257,7 @@ void murogem_state::murogem(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(murogem_state::irq0_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size((39+1)*8, (38+1)*8);
@@ -278,7 +278,7 @@ void murogem_state::murogem(machine_config &config)
 }
 
 
-ROM_START( murogem )
+ROM_START( murogem ) // 10-50059 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a11-8.8e", 0xf000, 0x0800, CRC(1135345e) SHA1(ae23786a6e2b1b077ce1a183d547af42318ac4d9)  )
 	ROM_LOAD( "a10-9.9e", 0xf800, 0x0800, CRC(f96791d9) SHA1(12b85e0f8b20ea9331f8cb2b2cf2a4383bdb8003)  )

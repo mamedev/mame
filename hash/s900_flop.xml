@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="s900_flop" description="Akai S900 and S950 floppies">
+
+    <software name="sl505">
+		<description>Akai Professional Sound Library SL 505: Orchestra #1</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5465423">
+				<rom name="akai sl505.mfi" size="5465423" crc="fed3dd70" sha1="dbf2bbad5beda7ab06c6a38dca3a7fb38efe7467"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl506">
+		<description>Akai Professional Sound Library SL 506: Strings #1</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5516489">
+				<rom name="akai sl506.mfi" size="5516489" crc="d4375a35" sha1="b9790d77b82ac7f7272aa35d0d2a8d430a726b08"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl521">
+		<description>Akai Professional Sound Library SL 521: Strings #2</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5458876">
+				<rom name="akai sl521.mfi" size="5458876" crc="0f350a5a" sha1="8f333e4ffb8834c486ff6c3ef799b37d378ac4af"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl532">
+		<description>Akai Professional Sound Library SL 532: Violin #1</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5804014">
+				<rom name="akai sl532.mfi" size="5804014" crc="a96e19e5" sha1="e331c3354e4c62cd75a62e7fff0ab64ded4ed37a"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl542">
+		<description>Akai Professional Sound Library SL 542: Fretless Bass</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5700047">
+				<rom name="akai sl542.mfi" size="5700047" crc="f93196c7" sha1="7e9db4296a1688ac22c8ab17f4ad9a3550f09cc0"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl548">
+		<description>Akai Professional Sound Library SL 548: Rolling Timpani, Gong</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5225594">
+				<rom name="akai sl548.mfi" size="5225594" crc="0024b33d" sha1="7c41d8a2a0665b895077df0cfd9ae1ffd783b56f"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl551">
+		<description>Akai Professional Sound Library SL 551: Effects #2</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5876960">
+				<rom name="akai sl551.mfi" size="5876960" crc="761daf31" sha1="c61ec44991a677fe63b3f932d9cfc2461b528615"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl552">
+		<description>Akai Professional Sound Library SL 552: Harpsichord, Tubular Bells</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5266285">
+				<rom name="akai sl552.mfi" size="5266285" crc="b9cb6a28" sha1="9d0024e6ef42488121af106e75f72b7490bcdb73"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl554">
+		<description>Akai Professional Sound Library SL 554: Latin Percussion, Conga</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5000225">
+				<rom name="akai sl554.mfi" size="5000225" crc="ccdc5372" sha1="69bea80e064ed85b6b7833276a3be9b29e6d5829"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl555">
+		<description>Akai Professional Sound Library SL 555: Effects #3</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="5323510">
+				<rom name="akai sl555.mfi" size="5323510" crc="97d94981" sha1="7a91edd464ef2815b6ac3aafad1f23aefd4d5fa5"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

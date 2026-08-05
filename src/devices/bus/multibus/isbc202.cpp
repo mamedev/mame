@@ -486,7 +486,7 @@ static void isbc202_floppy_formats(format_registration &fr)
 
 void isbc202_device::device_add_mconfig(machine_config &config)
 {
-	I3001(config , m_mcu , 0);
+	I3001(config , m_mcu);
 
 	// Allocation of the bit-slices:
 	// m_cpes[ 0 ]  Bits 0..1
@@ -494,7 +494,7 @@ void isbc202_device::device_add_mconfig(machine_config &config)
 	// m_cpes[ 2 ]  Bits 4..5
 	// m_cpes[ 3 ]  Bits 6..7
 	for (auto& finder : m_cpes) {
-		I3002(config , finder , 0);
+		I3002(config , finder);
 	}
 
 	// Connect CO/CI signals

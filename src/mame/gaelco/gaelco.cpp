@@ -863,7 +863,7 @@ void bigkarnk_state::bigkarnk(machine_config &config)
 	m_outlatch->q_out_cb<3>().set(FUNC(bigkarnk_state::coin_counter_w<1>));
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58.74);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
@@ -893,7 +893,7 @@ void gaelco_state::maniacsq(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
@@ -926,7 +926,7 @@ void xorwflat_state::xorwflat(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", 0);
 
 	// Video hardware - guessed, no PCB available
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
@@ -963,7 +963,7 @@ void squash_state::squash(machine_config &config)
 	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
@@ -1002,7 +1002,7 @@ void thoop_state::thoop(machine_config &config)
 	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
@@ -1168,7 +1168,7 @@ ROM_START( biomtoy ) // PCB - REF.922804/2
 	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
 	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )	
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 

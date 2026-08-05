@@ -18,8 +18,8 @@ DEFINE_DEVICE_TYPE(M6503, m6503_device, "m6503", "MOS Technology 6503")
 m6503_device::m6503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6503, tag, owner, clock)
 {
-	program_config.m_addr_width = 12;
-	program_config.m_logaddr_width = 12;
-	sprogram_config.m_addr_width = 12;
-	sprogram_config.m_logaddr_width = 12;
+	m_program_config.m_addr_width = 12;
+	m_program_config.m_logaddr_width = 12;
+	m_sprogram_config.m_addr_width = 12;
+	m_sprogram_config.m_logaddr_width = 12;
 }

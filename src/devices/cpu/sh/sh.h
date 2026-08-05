@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+
 
 /***************************************************************************
     DEBUGGING
@@ -69,16 +69,6 @@
 #define I_SHIFT 4
 #define Q_SHIFT 8
 #define M_SHIFT 9
-
-#define REGFLAG_R(n)                    (1 << (n))
-
-/* register flags 1 */
-#define REGFLAG_PR                      (1 << 0)
-#define REGFLAG_MACL                    (1 << 1)
-#define REGFLAG_MACH                    (1 << 2)
-#define REGFLAG_GBR                     (1 << 3)
-#define REGFLAG_VBR                     (1 << 4)
-#define REGFLAG_SR                      (1 << 5)
 
 /***************************************************************************
     MACROS
@@ -185,6 +175,9 @@ protected:
 		EXECUTE_UNMAPPED_CODE       = 2,
 		EXECUTE_RESET_CACHE         = 3
 	};
+
+	class frontend;
+	class opcode_desc;
 
 	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
 
@@ -448,8 +441,6 @@ public:
 	void alloc_handle(uml::code_handle *&handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
 	void generate_delay_slot(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc);
@@ -463,32 +454,8 @@ public:
 
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-};
-
-class sh_frontend : public drc_frontend
-{
-public:
-	sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-
-protected:
-	virtual uint16_t read_word(opcode_desc &desc);
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
-
-private:
-	bool describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-
-protected:
-	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
-
-	sh_common_execution *m_sh;
 };
 
 #endif // MAME_CPU_SH_SH_H

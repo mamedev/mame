@@ -55,6 +55,10 @@ authors:hap
 		<led7seg><color red="1.0" green="0.2" blue="0.23" /></led7seg>
 	</element>
 
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
+	</element>
+
 
 <!-- build screen -->
 
@@ -91,6 +95,11 @@ authors:hap
 		<element ref="whited"><bounds x="141" y="75" width="4" height="4" /></element>
 		<element ref="greend"><bounds x="141.625" y="75.625" width="2.75" height="2.75" /></element>
 		<element name="2.4" ref="ledg"><bounds x="142.25" y="76.25" width="1.5" height="1.5" /></element>
+
+		<!-- clickable area for lightgun trigger -->
+		<element ref="nothing" inputtag="IN.2" inputmask="0x08" clickthrough="yes">
+			<bounds x="47" y="34" width="114" height="58" />
+		</element>
 
 		<!-- score panel -->
 		<element ref="gray"><bounds x="86" y="100" width="36" height="0.5" /></element>

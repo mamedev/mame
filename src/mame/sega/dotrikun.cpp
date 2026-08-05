@@ -21,6 +21,35 @@ SOUND : (none)
 * 0000-3FFF:ROM 8000-85FF:VRAM(128x96) 8600-87FF:WORK-RAM
 
 
+PCB layout (Roberto Fresca & Dofus):
+
+ .-----------------------------------------------------------.
+ |                               @SEGA 1990 MADE IN JAPAN    |
+ |  .-IC5------. .-IC4------.     .-IC3------. .-IC8------.  |
+ |  |SN74LS10N | |SN74LS02N |     |PC74HC32P | |SN74LS14N |  |
+ |  '----------' '----------'     '----------' '----------'  |
+ | .-IC2-------------. .-OSC--. .-IC1----------------------. |
+ | |      SEGA       | | 4MHz | |        ZILOG Z80         | |
+ | |    MPR-14479    | | Xtal | |       Z0840004PSC        | |
+ | '-----------------' '------' '--------------------------' |
+ | .-IC9------. .-IC20---------. .-IC22------. .-IC19------. |
+ | |HD74S74AP | |CXK5816SPS-15L| |HD74SL166AP| |SN74LS245N | |
+ | '----------' '--------------' '-----------' '-----------' |
+ |  .-IC7------. .-IC10------. .-IC14-----.    .-IC18------. |
+ |  |HD74LS00P | |HD74LS161AP| |HD74S157P |    |HD74LS244N | |
+ |  '----------' '-----------' '----------'    '-----------' |
+ |  .-IC6------. .-IC11------. .-IC15-----.    .-IC17------. |
+ |  |HD74LS08P | |HD74LS161AP| | HD74S157P|    |HD74LS174P | |
+ |  '----------' '-----------' '----------'    '-----------' |
+ |  .-IC13------. .-IC12------. .-IC16-----.   .-IC21------. |
+ |  |HD74LS161AP| |HD74LS161AP| |HD74LS157P|   |HD74LS157P | |
+ |  '-----------' '-----------' '----------'   '-----------' |
+ |   SEGA 837-7409                                           |
+ '-.           .-.         J A M M A                       .-'
+   | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+   '-'-'-'-'-'-' '-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'
+
+
 TODO:
 - improve video timing more (see http://www.chrismcovell.com/dottorikun.html)
 
@@ -209,7 +238,7 @@ void dotrikun_state::dotrikun(machine_config &config)
 	TIMER(config, m_interrupt_timer).configure_generic(FUNC(dotrikun_state::interrupt));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192);
 	m_screen->set_physical_aspect(1, 1); // large border area
 	m_screen->set_screen_update(FUNC(dotrikun_state::screen_update));

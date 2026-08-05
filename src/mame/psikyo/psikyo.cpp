@@ -1127,7 +1127,7 @@ void psikyo_state::sngkace(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::sngkace_sound_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
@@ -1169,7 +1169,7 @@ void psikyo_state::gunbird(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::gunbird_sound_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
@@ -1205,7 +1205,7 @@ void psikyo_bootleg_state::s1945bl(machine_config &config) /* Bootleg hardware b
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_bootleg_state::irq1_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.3);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -1265,7 +1265,7 @@ void s1945_state::s1945(machine_config &config)
 	PIC16C57(config, "mcu", 4_MHz_XTAL).set_disable();
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(s1945_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(s1945_state::screen_vblank));

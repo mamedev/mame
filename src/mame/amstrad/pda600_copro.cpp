@@ -38,6 +38,8 @@
 #include "emu.h"
 #include "pda600_copro.h"
 
+#include <bit>
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -508,9 +510,9 @@ u8 pda600_copro_device::recognize_char()
 
 	for (int i = 0; i < 4; i++)
 	{
-		u32 value = m_fake_ioport[i]->read();
+		u32 const value = m_fake_ioport[i]->read();
 		if (value != 0)
-			return 0x20 + i * 32 + count_leading_zeros_32(value);
+			return 0x20 + (i * 32) + std::countl_zero(value);
 	}
 
 	return 0;

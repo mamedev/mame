@@ -36,10 +36,7 @@ protected:
 
 private:
 	// Length of anti-aliasing filter kernel, measured in number of intermediate samples
-	enum
-	{
-		FILTER_LENGTH = 64
-	};
+	static constexpr unsigned FILTER_LENGTH = 64;
 
 	// internal state
 

@@ -16,7 +16,7 @@
 class md8412b_s23_device : public device_t
 {
 public:
-	md8412b_s23_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	md8412b_s23_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void map(address_map &map);
 
@@ -120,14 +120,14 @@ protected:
 		PACKET_CTRL_BUSYCTRL_WIDTH      = 3,
 		PACKET_CTRL_WRITE_PEND          = 12,
 
-		DIAG_STATUS_BUSY_STATE			= 2,
-		DIAG_STATUS_AT_ACK				= 8,
-		DIAG_STATUS_AT_ACK_MASK			= 0x00000f00,
-		DIAG_STATUS_ACK_STATUS			= 12,
-		DIAG_STATUS_ACK_STATUS_MASK		= 0x00003000,
-		DIAG_STATUS_RETRY_TIME_MAX		= 15,
-		DIAG_STATUS_AT_BUSY				= 24,
-		DIAG_STATUS_IT_BUSY				= 25,
+		DIAG_STATUS_BUSY_STATE          = 2,
+		DIAG_STATUS_AT_ACK              = 8,
+		DIAG_STATUS_AT_ACK_MASK         = 0x00000f00,
+		DIAG_STATUS_ACK_STATUS          = 12,
+		DIAG_STATUS_ACK_STATUS_MASK     = 0x00003000,
+		DIAG_STATUS_RETRY_TIME_MAX      = 15,
+		DIAG_STATUS_AT_BUSY             = 24,
+		DIAG_STATUS_IT_BUSY             = 25,
 
 		PHY_CTRL_MASK                   = 0x00000fff,
 		PHY_CTRL_REG_DATA               = 0,
@@ -153,7 +153,7 @@ protected:
 		CYCLE_TIMER_COUNT_MASK          = 0x01fff000,
 		CYCLE_TIMER_SECONDS             = 25,
 		CYCLE_TIMER_SECONDS_WIDTH       = 7,
-		CYCLE_TIMER_SECONDS_MASK		= 0xfe000000,
+		CYCLE_TIMER_SECONDS_MASK        = 0xfe000000,
 
 		SYNC_LENGTH_MASK                = 0x0fff0000,
 		SYNC_LENGTH_VAL                 = 16,

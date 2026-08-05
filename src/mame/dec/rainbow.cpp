@@ -902,10 +902,6 @@ void rainbow_base_state::machine_start()
 	switch_off_timer = timer_alloc(FUNC(rainbow_base_state::switch_off_tick), this);
 	switch_off_timer->adjust(attotime::from_msec(10));
 
-	m_digits.resolve();
-	m_leds.resolve();
-	m_driveleds.resolve();
-
 	m_screen_blank = false;
 
 	auto *printer_port = subdevice<rs232_port_device>("printer");
@@ -3166,7 +3162,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	m_z80->set_addrmap(AS_IO, &rainbow_base_state::rainbowz80_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240); // ~NTSC compatible video timing (?)
 	screen.set_screen_update(FUNC(rainbow_base_state::screen_update_rainbow));
 	screen.set_palette("vt100_video:palette");
@@ -3189,7 +3185,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	PALETTE(config, m_palette2).set_entries(32);
 
-	SCREEN(config, m_screen2, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen2);
 	m_screen2->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 
 	// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )
@@ -3234,7 +3230,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	HARDDISK(config, "decharddisk1");
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
 
-	CORVUS_HDC(config, m_corvus_hdc, 0);
+	CORVUS_HDC(config, m_corvus_hdc);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");
@@ -3270,7 +3266,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_base_state::kbd_rxready_w));
 	m_kbd8251->txrdy_handler().set(FUNC(rainbow_base_state::kbd_txready_w));
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_lk201->tx_handler().set(m_kbd8251, FUNC(i8251_device::write_rxd));
 
 	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)

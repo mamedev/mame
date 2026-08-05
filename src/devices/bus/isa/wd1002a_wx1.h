@@ -19,7 +19,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> isa16_ide_device
+// ======================> isa8_wd1002a_wx1_device
 
 class isa8_wd1002a_wx1_device : public device_t,
 								public device_isa8_card_interface

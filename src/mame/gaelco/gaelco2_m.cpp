@@ -13,7 +13,8 @@
 #include "gaelco2.h"
 
 #include "machine/eepromser.h"
-#include "chd.h"
+
+#include "endianness.h"
 
 
 /***************************************************************************
@@ -75,6 +76,25 @@ void gaelco2_state::init_alighunt()
 
 	/* split ROM u49 */
 	ROM16_split_gfx("gfx_temp", "gfx", 0x0c00000, 0x0400000, 0x0a00000, 0x0e00000);
+}
+
+
+void gaelco2_state::init_luckyclrs()
+{
+	// TODO: remove if DS5002FP ever gets dumped
+
+	u16 *const rom = &memregion("maincpu")->as_u16();
+
+	// test fec020 , checks for value of 09
+	rom[0x0081a / 2] = 0x4e71;
+	// test fec00f
+	rom[0x01d92 / 2] = 0x4e71;
+	// test fe32b4
+	rom[0x08106 / 2] = 0x4e71;
+	// test fe443c , bypass RESET SCHEDA
+	rom[0x17654 / 2] = 0x4e71;
+	// test fe4440
+	rom[0x1768e / 2] = 0x4e71;
 }
 
 
@@ -249,7 +269,7 @@ static u16 get_lo(u32 x)
 			((x & 0x40000000) >> 27) |
 			((x & 0x00000005) <<  6) |
 			((x & 0x00000008) <<  8) |
-			rotl_32(x & 0x00800040, 9) |
+			std::rotl<u32>(x & 0x00800040, 9) |
 			((x & 0x04000000) >> 16) |
 			((x & 0x00008000) >> 14) |
 			((x & 0x00002000) >> 11) |

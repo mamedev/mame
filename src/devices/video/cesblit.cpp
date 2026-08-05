@@ -278,20 +278,8 @@ void cesblit_device::do_blit()
 
 uint32_t cesblit_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-		if (mask != 0) layers_ctrl &= mask;
-	}
-#endif
-
-	if (layers_ctrl & 1)    copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)    copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	copybitmap_trans(bitmap, m_bitmap[0][BIT(m_regs[0x02/2], 8)], 0,0,0,0, cliprect, 0xff);
+	copybitmap_trans(bitmap, m_bitmap[1][BIT(m_regs[0x02/2], 9)], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }

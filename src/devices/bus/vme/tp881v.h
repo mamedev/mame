@@ -7,11 +7,11 @@
 #pragma once
 
 #include "cpu/m88000/m88000.h"
+#include "machine/eepromser.h"
 #include "machine/i82586.h"
 #include "machine/hd63450.h"
 #include "machine/mc88200.h"
 #include "machine/ncr53c90.h"
-#include "machine/nmc9306.h"
 #include "machine/timekpr.h"
 #include "machine/z80scc.h"
 #include "machine/z8536.h"
@@ -49,7 +49,7 @@ private:
 
 	required_device<z8036_device> m_vcs; // vme control and status cio
 	required_device_array<z8036_device, 2> m_gcs; // global control and status cio
-	required_device<nmc9306_device> m_eeprom;
+	required_device<eeprom_serial_93c06_16bit_device> m_eeprom;
 
 	required_device_array<rs232_port_device, 4> m_serial;
 };

@@ -73,8 +73,8 @@ T parse_number(U &&s)
 //  ctor
 //-------------------------------------------------
 
-menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container, std::function<void ()> &&handler)
-	: menu(mui, container)
+menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_target &target, std::function<void ()> &&handler)
+	: menu(mui, target)
 	, m_handler(std::move(handler))
 	, m_currlang(0)
 	, m_currsysnames(0)
@@ -119,11 +119,11 @@ bool menu_custom_ui::handle(event const *ev)
 	{
 	case FONT_MENU:
 		if (ev->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_font_ui>(ui(), container(), nullptr);
+			menu::stack_push<menu_font_ui>(ui(), target(), nullptr);
 		break;
 	case COLORS_MENU:
 		if (ev->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_colors_ui>(ui(), container());
+			menu::stack_push<menu_colors_ui>(ui(), target());
 		break;
 	case LANGUAGE_MENU:
 		if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT) || (ev->iptkey == IPT_UI_CLEAR))
@@ -142,7 +142,7 @@ bool menu_custom_ui::handle(event const *ev)
 		{
 			// copying list of language names - expensive
 			menu::stack_push<menu_selector>(
-					ui(), container(), _("UI Language"), std::vector<std::string>(m_languages), m_currlang,
+					ui(), target(), _("UI Language"), std::vector<std::string>(m_languages), m_currlang,
 					[this, item = ev->item] (int selection)
 					{
 						m_currlang = selection;
@@ -168,7 +168,7 @@ bool menu_custom_ui::handle(event const *ev)
 		{
 			// copying list of file names - expensive
 			menu::stack_push<menu_selector>(
-					ui(), container(), _("System Names"), std::vector<std::string>(m_sysnames), m_currsysnames,
+					ui(), target(), _("System Names"), std::vector<std::string>(m_sysnames), m_currsysnames,
 					[this, item = ev->item] (int selection)
 					{
 						m_currsysnames = selection;
@@ -195,7 +195,7 @@ bool menu_custom_ui::handle(event const *ev)
 			std::vector<std::string> s_sel(std::size(HIDE_STATUS));
 			std::transform(std::begin(HIDE_STATUS), std::end(HIDE_STATUS), s_sel.begin(), [](auto &s) { return _(s); });
 			menu::stack_push<menu_selector>(
-					ui(), container(), _("Show Side Panels"), std::move(s_sel), m_currpanels,
+					ui(), target(), _("Show Side Panels"), std::move(s_sel), m_currpanels,
 					[this, item = ev->item] (int selection)
 					{
 						m_currpanels = selection;
@@ -323,8 +323,8 @@ void menu_custom_ui::find_sysnames()
 //  ctor
 //-------------------------------------------------
 
-menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_container &container, std::function<void (bool)> &&handler)
-	: menu(mui, container)
+menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_target &target, std::function<void (bool)> &&handler)
+	: menu(mui, target)
 	, m_handler(std::move(handler))
 	, m_fonts()
 	, m_font_min(parse_number<int>(mui.options().get_entry(OPTION_FONT_ROWS)->minimum()))
@@ -468,7 +468,7 @@ bool menu_font_ui::handle(event const *ev)
 			for (auto const &font : m_fonts)
 				display_names.emplace_back(font.second);
 			menu::stack_push<menu_selector>(
-					ui(), container(), _("UI Font"), std::move(display_names), m_actual,
+					ui(), target(), _("UI Font"), std::move(display_names), m_actual,
 					[this] (int selection)
 					{
 						m_face_changed = true;
@@ -557,7 +557,7 @@ void menu_font_ui::custom_render(uint32_t flags, void *selectedref, float top, f
 				std::begin(bottomtext), std::end(bottomtext),
 				origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER, false,
-				ui().colors().text_color(), UI_GREEN_COLOR, ui().get_line_height(m_info_size));
+				ui().colors().text_color(), UI_GREEN_COLOR, ui().get_line_height(target(), m_info_size));
 	}
 }
 
@@ -566,7 +566,7 @@ void menu_font_ui::custom_render(uint32_t flags, void *selectedref, float top, f
 //-------------------------------------------------
 #define SET_COLOR_UI(var, opt) var[M##opt].color = mui.options().rgb_value(OPTION_##opt); var[M##opt].option = OPTION_##opt
 
-menu_colors_ui::menu_colors_ui(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_colors_ui::menu_colors_ui(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("UI Colors"));
 
@@ -615,7 +615,7 @@ bool menu_colors_ui::handle(event const *ev)
 	{
 		if ((uintptr_t)ev->itemref != MUI_RESTORE)
 		{
-			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(uintptr_t)ev->itemref].color, std::string(selected_item().text()));
+			menu::stack_push<menu_rgb_ui>(ui(), target(), &m_color_table[(uintptr_t)ev->itemref].color, std::string(selected_item().text()));
 		}
 		else
 		{
@@ -738,7 +738,7 @@ void menu_colors_ui::custom_render(uint32_t flags, void *selectedref, float top,
 
 	// draw normal text
 	ui().draw_text_full(
-			container(),
+			target(),
 			sampletxt[0],
 			x1, y1, x2 - x1,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
@@ -749,7 +749,7 @@ void menu_colors_ui::custom_render(uint32_t flags, void *selectedref, float top,
 
 	// draw subitem text
 	ui().draw_text_full(
-			container(),
+			target(),
 			sampletxt[1],
 			x1, y1, x2 - x1,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
@@ -761,7 +761,7 @@ void menu_colors_ui::custom_render(uint32_t flags, void *selectedref, float top,
 	// draw selected text
 	highlight(x1, y1, x2, y1 + line_height(), m_color_table[MUI_SELECTED_BG_COLOR].color);
 	ui().draw_text_full(
-			container(),
+			target(),
 			sampletxt[2],
 			x1, y1, x2 - x1,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
@@ -773,7 +773,7 @@ void menu_colors_ui::custom_render(uint32_t flags, void *selectedref, float top,
 	// draw mouse over text
 	highlight(x1, y1, x2, y1 + line_height(), m_color_table[MUI_MOUSEOVER_BG_COLOR].color);
 	ui().draw_text_full(
-			container(),
+			target(),
 			sampletxt[3],
 			x1, y1, x2 - x1,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
@@ -784,7 +784,7 @@ void menu_colors_ui::custom_render(uint32_t flags, void *selectedref, float top,
 
 	// draw clone text
 	ui().draw_text_full(
-			container(),
+			target(),
 			sampletxt[4],
 			x1, y1, x2 - x1,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
@@ -808,8 +808,8 @@ void menu_colors_ui::restore_colors()
 //  ctor
 //-------------------------------------------------
 
-menu_rgb_ui::menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *color, std::string &&title)
-	: menu(mui, container)
+menu_rgb_ui::menu_rgb_ui(mame_ui_manager &mui, render_target &target, rgb_t *color, std::string &&title)
+	: menu(mui, target)
 	, m_color(color)
 	, m_search()
 	, m_key_active(false)
@@ -882,7 +882,7 @@ bool menu_rgb_ui::handle(event const *ev)
 	case IPT_UI_SELECT:
 		if (uintptr_t(ev->itemref) == PALETTE_CHOOSE)
 		{
-			menu::stack_push<menu_palette_sel>(ui(), container(), *m_color);
+			menu::stack_push<menu_palette_sel>(ui(), target(), *m_color);
 			break;
 		}
 		[[fallthrough]];
@@ -987,7 +987,7 @@ void menu_rgb_ui::custom_render(uint32_t flags, void *selectedref, float top, fl
 
 	// draw the text label - force white to ensure it's legible
 	ui().draw_text_full(
-			container(),
+			target(),
 			sampletxt,
 			x1, y1, width - lr_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
@@ -1081,8 +1081,8 @@ std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {
 //  ctor
 //-------------------------------------------------
 
-menu_palette_sel::menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color)
-	: menu(mui, container), m_original(_color)
+menu_palette_sel::menu_palette_sel(mame_ui_manager &mui, render_target &target, rgb_t &_color)
+	: menu(mui, target), m_original(_color)
 {
 }
 

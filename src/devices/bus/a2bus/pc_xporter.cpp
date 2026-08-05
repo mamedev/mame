@@ -252,7 +252,7 @@ void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_v30, 0);
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace(m_v30, AS_PROGRAM);
 	m_isabus->set_iospace(m_v30, AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));

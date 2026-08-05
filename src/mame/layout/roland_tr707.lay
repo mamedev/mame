@@ -260,8 +260,16 @@ the visibility and style of elements that differ between the two.
 
 	<element name="sliderwell"><rect><color red="0.20" green="0.21" blue="0.25"/></rect></element>
 	<element name="sliderknob">
-		<rect><bounds x="0" y="0" width="24" height="50"/><color red="0.41" green="0.44" blue="0.47"/></rect>
-		<rect><bounds x="0" y="15" width="24" height="20"/><color red="0.34" green="0.37" blue="0.39"/></rect>
+		<rect>
+			<bounds x="0" y="0" width="24" height="50"/>
+			<color state="0" red="0.41" green="0.44" blue="0.47"/>
+			<color state="1" red="0.61" green="0.64" blue="0.67"/>
+		</rect>
+		<rect>
+			<bounds x="0" y="15" width="24" height="20"/>
+			<color state="0" red="0.34" green="0.37" blue="0.39"/>
+			<color state="1" red="0.51" green="0.54" blue="0.57"/>
+		</rect>
 		<rect><bounds x="0" y="23" width="24" height="4"/><color red="0.83" green="0.83" blue="0.81"/></rect>
 	</element>
 	<group name="slider">
@@ -278,8 +286,16 @@ the visibility and style of elements that differ between the two.
 		<element ref="txt_slider_~slider_i~" name="is727"><bounds x="0" y="222" width="38" height="12"/></element>
 	</group>
 	<element name="mastersliderknob">
-		<rect><bounds x="0" y="0" width="24" height="50"/><color red="0.41" green="0.44" blue="0.47"/></rect>
-		<rect><bounds x="0" y="15" width="24" height="20"/><color red="0.34" green="0.37" blue="0.39"/></rect>
+		<rect>
+			<bounds x="0" y="0" width="24" height="50"/>
+			<color state="0" red="0.41" green="0.44" blue="0.47"/>
+			<color state="1" red="0.61" green="0.64" blue="0.67"/>
+		</rect>
+		<rect>
+			<bounds x="0" y="15" width="24" height="20"/>
+			<color state="0" red="0.34" green="0.37" blue="0.39"/>
+			<color state="1" red="0.51" green="0.54" blue="0.57"/>
+		</rect>
 		<rect><bounds x="0" y="23" width="24" height="4"/><color red="0.86" green="0.41" blue="0.20"/></rect>
 	</element>
 	<group name="masterslider">
@@ -384,7 +400,18 @@ the visibility and style of elements that differ between the two.
 		</text>
 	</element>
 
-	<element name="tempo_knob"><disk><color red="0.34" green="0.37" blue="0.39"/></disk></element>
+	<element name="tempo_knob">
+		<disk>
+			<color state="0" red="0.34" green="0.37" blue="0.39"/>
+			<color state="1" red="0.44" green="0.47" blue="0.49"/>
+		</disk>
+	</element>
+	<element name="tempo_dot">
+		<disk>
+			<color state="0" red="0" green="0" blue="0" alpha="0"/>
+			<color state="1" red="0.86" green="0.41" blue="0.20"/>
+		</disk>
+	</element>
 	<element name="tempo_well"><disk><color red="0.73" green="0.73" blue="0.72"/></disk></element>
 	<element name="tempo_value">
 		<simplecounter maxstate="100" digits="1"><color red="0.86" green="0.41" blue="0.20"/></simplecounter>
@@ -762,7 +789,8 @@ the visibility and style of elements that differ between the two.
 		<element ref="txt_fast"><bounds x="1477" y="612" width="42" height="15"/></element>
 		<element ref="tempo_well"><bounds x="1366" y="480" width="130" height="130"/></element>
 		<element ref="tempo_knob" id="tempo_knob"><bounds x="1381" y="495" width="100" height="100"/></element>
-		<element ref="tempo_value" inputtag="TEMPO" inputmask="0xffff" inputraw="yes">
+		<element ref="tempo_dot" id="tempo_dot"><bounds x="1425" y="504" width="12" height="12"/></element>
+		<element ref="tempo_value" id="tempo_value" inputtag="TEMPO" inputmask="0xffff" inputraw="yes">
 			<bounds x="1386" y="533" width="90" height="24"/>
 		</element>
 		<element ref="transparent" clickthrough="no"><bounds x="1381" y="495" width="100" height="100"/></element>
@@ -933,10 +961,16 @@ the visibility and style of elements that differ between the two.
 				local view = file.views["Default Layout"]
 				install_slider_callbacks(view)
 
-				add_simplecounter_knob(view, "tempo_knob", "TEMPO", 1.5)
-				add_vertical_slider(view, "master_volume_area", "master_volume_knob", "VOLUME")
+				add_knob(view, "tempo_knob", "TEMPO", 1.5, VERTICAL, "tempo_dot")
+				get_layout_item(view, "tempo_dot"):set_state(1)
+				get_layout_item(view, "tempo_value"):set_color_callback(
+					function()
+						return emu.render_color(0, 0, 0, 0)
+					end)
+
+				add_slider(view, "master_volume_area", "master_volume_knob", "VOLUME")
 				for i = 1, 11 do
-					add_vertical_slider(view, "slider_area_" .. i, "slider_knob_" .. i, "SLIDER_" .. i)
+					add_slider(view, "slider_area_" .. i, "slider_knob_" .. i, "SLIDER_" .. i)
 				end
 
 				view.items["warning"]:set_state(0)
@@ -945,14 +979,24 @@ the visibility and style of elements that differ between the two.
 		-----------------------------------------------------------------------
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
+		-- version: 11
 		-----------------------------------------------------------------------
+
+		-- Global configuration. Can be overwritten in the resolve_tags callback.
+		KNOB_DOT_ANGLE_SPAN = 150  -- -/+ 150 degrees from top center.
+		UPDATE_CLICK_STATE = true
+
+		-- Constants.
+		VERTICAL = 0
+		HORIZONTAL = 1
+
 		local widgets = {}   -- Stores slider and knob information.
 		local pointers = {}  -- Tracks pointer state.
 
 		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
 		-- The click area's vertical size must exactly span the range of the
 		-- knob's movement.
-		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+		function add_slider(view, clickarea_id, knob_id, port_name)
 			table.insert(widgets, {
 				clickarea   = get_layout_item(view, clickarea_id),
 				slider_knob = get_layout_item(view, knob_id),
@@ -961,13 +1005,21 @@ the visibility and style of elements that differ between the two.
 		end
 
 		-- A sweep between the attached field's min and max values requires
-		-- moving the pointer by `scale * clickarea.height` pixes.
-		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+		-- moving the pointer by `scale * clickarea.height` pixels, when drag
+		-- direction is VERTICAL. Replace `height` with `width` when HORIZONTAL.
+		--
+		-- `dot_id` is optional. If not nil, this script will take control of the
+		-- element's position as the knob rotates. The distance of the dot from
+		-- the center of `clickarea` will be preserved during rotation.
+		-- It is suggested you place the dot at the top-center of the knob.
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
 			table.insert(widgets, {
-				clickarea = get_layout_item(view, clickarea_id),
-				field     = get_port_field(port_name),
-				is_knob   = true,
-				scale     = scale })
+				clickarea     = get_layout_item(view, clickarea_id),
+				field         = get_port_field(port_name),
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL),
+				knob_dot      = dot_id and get_layout_item(view, dot_id) })
 		end
 
 		function get_layout_item(view, item_id)
@@ -989,17 +1041,44 @@ the visibility and style of elements that differ between the two.
 				field = val
 				break
 			end
+			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
 			if field == nil then
-				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
 				return nil
 			end
 			return field
 		end
 
+		local function set_click_state(widget, state)
+			if UPDATE_CLICK_STATE then
+				if widget.is_knob then
+					widget.clickarea:set_state(state)
+				else
+					widget.slider_knob:set_state(state)
+				end
+			end
+		end
+
+		local function release_pointer(pointer_id)
+			if pointers[pointer_id] then
+				local widget = widgets[pointers[pointer_id].selected_widget]
+				set_click_state(widget, 0)
+				local field = widget.field
+				if field.is_analog then
+					field:clear_value()
+				end
+			end
+			pointers[pointer_id] = nil
+		end
+
 		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
 			-- If a button is not pressed, reset the state of the current pointer.
 			if btn & 1 == 0 then
-				pointers[id] = nil
+				release_pointer(id)
 				return
 			end
 
@@ -1015,11 +1094,13 @@ the visibility and style of elements that differ between the two.
 						relative = false
 					end
 					if found then
+						set_click_state(widgets[i], 1)
 						pointers[id] = {
 							selected_widget = i,
 							relative = relative,
+							start_x = x,
 							start_y = y,
-							start_value = widgets[i].field.user_value }
+							start_value = widgets[i].field.port:read() }
 						break
 					end
 				end
@@ -1030,8 +1111,7 @@ the visibility and style of elements that differ between the two.
 				return
 			end
 
-			-- A widget is selected. Update its state based on the pointer's Y
-			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
+			-- A widget is selected. Update its state based on the pointer's position.
 
 			local pointer = pointers[id]
 			local widget = widgets[pointer.selected_widget]
@@ -1042,8 +1122,13 @@ the visibility and style of elements that differ between the two.
 
 			local new_value
 			if widget.is_knob then
-				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
-				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
 			else
 				local knob_half_height = widget.slider_knob.bounds.height / 2
 				local min_y = widget.clickarea.bounds.y0 + knob_half_height
@@ -1063,22 +1148,82 @@ the visibility and style of elements that differ between the two.
 			new_value = math.floor(new_value + 0.5)
 			if new_value < min_value then new_value = min_value end
 			if new_value > max_value then new_value = max_value end
-			widget.field.user_value = new_value
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
+		end
+
+		local function get_knob_dot_bounds(widget)
+			local dot = widget.knob_dot_cache
+			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
+			local angle = dot.angle_min + value * dot.angle_range
+			local rx = -dot.center_y * math.sin(angle) * dot.aspect
+			local ry = dot.center_y * math.cos(angle)
+			local x = rx + dot.dx
+			local y = ry + dot.dy
+			return emu.render_bounds(x, y, x + dot.width, y + dot.height)
+		end
+
+		local function configure_knob_dots()
+			for i = 1, #widgets do
+				local dot = widgets[i].knob_dot
+				if dot then
+					-- Remove bounds callback, since we need to access the
+					-- configured bounds.
+					dot:set_bounds_callback(nil)
+
+					local field = widgets[i].field
+					local knob_bounds = widgets[i].clickarea.bounds
+					local dot_bounds = dot.bounds
+					local max_angle = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+
+					-- Compute the distance of the knob dot from the knob center.
+					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
+					local dot_y = dot_bounds.y0 + dot_bounds.height / 2.0
+					local knob_x = knob_bounds.x0 + knob_bounds.width / 2.0
+					local knob_y = knob_bounds.y0 + knob_bounds.height / 2.0
+					local radius = math.sqrt((dot_y - knob_y) ^ 2 + (dot_x - knob_x) ^ 2)
+
+					widgets[i].knob_dot_cache = {
+						width       = dot_bounds.width,
+						height      = dot_bounds.height,
+						aspect      = dot_bounds.aspect,
+						value_min   = field.minvalue,
+						value_range = field.maxvalue - field.minvalue,
+						angle_min   = -max_angle,
+						angle_range = 2.0 * max_angle,
+						center_y    = -radius,
+						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
+						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
+
+					dot:set_bounds_callback(
+						function()
+							return get_knob_dot_bounds(widgets[i])
+						end)
+				end
+			end
 		end
 
 		local function pointer_left(type, id, dev, x, y, up, cnt)
-			pointers[id] = nil
+			release_pointer(id)
 		end
 
 		local function pointer_aborted(type, id, dev, x, y, up, cnt)
-			pointers[id] = nil
+			release_pointer(id)
 		end
 
 		local function forget_pointers()
+			for id, pointer in pairs(pointers) do
+				release_pointer(id)
+			end
 			pointers = {}
 		end
 
 		function install_slider_callbacks(view)
+			view:set_recomputed_callback(configure_knob_dots)
 			view:set_pointer_updated_callback(pointer_updated)
 			view:set_pointer_left_callback(pointer_left)
 			view:set_pointer_aborted_callback(pointer_aborted)

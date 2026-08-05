@@ -227,8 +227,6 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 
 void tandy2k_keyboard_device::device_start()
 {
-	m_leds.resolve();
-
 	// state saving
 	save_item(NAME(m_keylatch));
 }

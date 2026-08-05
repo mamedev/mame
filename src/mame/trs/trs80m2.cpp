@@ -703,7 +703,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_maincpu->busack_cb().set(m_dmac, FUNC(z80dma_device::bai_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(trs80m2_state::screen_update));
@@ -765,9 +765,9 @@ void trs80m2_state::trs80m2(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	TRS80M2_KEYBOARD(config, m_kb, 0);
+	TRS80M2_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
 	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM
@@ -797,7 +797,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_subcpu->set_disable();
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(trs80m2_state::screen_update));
@@ -850,7 +850,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	AM9519(config, m_uic, 0);
+	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline(m_subcpu, M68K_IRQ_5);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -862,9 +862,9 @@ void trs80m16_state::trs80m16(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	TRS80M2_KEYBOARD(config, m_kb, 0);
+	TRS80M2_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
 	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM

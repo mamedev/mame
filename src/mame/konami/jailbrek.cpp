@@ -268,20 +268,20 @@ uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void jailbrek_state::coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 uint8_t jailbrek_state::speech_r()
 {
-	return (m_vlm->bsy() ? 1 : 0);
+	return m_vlm->bsy_r();
 }
 
 void jailbrek_state::speech_w(uint8_t data)
 {
 	// bit 0 is latch direction like in yiear
-	m_vlm->st((data >> 1) & 1);
-	m_vlm->rst((data >> 2) & 1);
+	m_vlm->st_w(BIT(data, 1));
+	m_vlm->rst_w(BIT(data, 2));
 }
 
 void jailbrek_state::prg_map(address_map &map)
@@ -378,7 +378,7 @@ void jailbrek_state::jailbrek(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	K005849(config, m_k005849, 0);
+	K005849(config, m_k005849);
 	m_k005849->set_irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k005849->set_flipscreen_cb().set(FUNC(jailbrek_state::flip_screen_set));
@@ -386,7 +386,7 @@ void jailbrek_state::jailbrek(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
 	PALETTE(config, m_palette, FUNC(jailbrek_state::palette), 512, 32);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(jailbrek_state::screen_update));
 	screen.set_palette(m_palette);

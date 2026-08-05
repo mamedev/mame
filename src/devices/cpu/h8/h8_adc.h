@@ -6,7 +6,6 @@
 
     H8 Analog to Digital Converter subsystem
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H8_ADC_H
@@ -14,7 +13,7 @@
 
 #pragma once
 
-#include "h8.h"
+#include "h8_cpu_base.h"
 #include "h8_intc.h"
 
 class h8_adc_device : public device_t {
@@ -40,8 +39,8 @@ public:
 protected:
 	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	required_device<h8_device> m_cpu;
-	required_device<h8_intc_device> m_intc;
+	required_device<h8_cpu_base> m_cpu;
+	required_device<h8_intc_base> m_intc;
 	int m_intc_vector;
 
 	enum {

@@ -21,12 +21,14 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 
 -->
 
-<!-- Games -->
+<!-- !Games -->
 
-	<software name="mappysr">
-		<description>Mappy (mkIISR)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="mappysr" supported="yes">
+		<description>Mappy (PC-8001mkIISR)</description>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="マッピー"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
 				<rom name="mappy (mkiisr).d88" size="353200" crc="0152ccd0" sha1="e000b25a2ec4232fd2c62c4bf427270715977e3c"/>
@@ -34,25 +36,43 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 		</part>
 	</software>
 
-	<software name="xanadusr">
+	<software name="mappya" cloneof="mappysr" supported="yes">
+		<description>Mappy (PC-8001mkIISR, alt)</description>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="マッピー"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="mappy_v80.d88" size="353200" crc="a9978924" sha1="0bf806b8f1ef54960d855c62af367dd2e1ff2351"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xanadusr" supported="no">
 		<description>Xanadu (mkIISR)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 0, expected_size=100000, current_size=135872" on Disk A
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="418960">
 				<rom name="xanadu (mkiisr) (disk a).d88" size="418960" crc="00e5127b" sha1="bbc366072a338deb48da8b460912bf9241689e3e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="415840">
 				<rom name="xanadu (mkiisr) (disk b).d88" size="415840" crc="b64f896a" sha1="2138091d56e3d9f6f3ff20df57eebf8552f488d8"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- Operating Systems -->
+<!-- !Operating Systems -->
 
-	<software name="n80srbas">
+	<software name="n80srbas" supported="yes">
 		<description>N80SR BASIC system disk (PC-8037SR)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -63,27 +83,120 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 		</part>
 	</software>
 
-<!-- Compilations -->
-
-	<!-- TODO: verify this, each disk seems standalone (and Disk 2 is mkII not mkIISR) -->
-	<software name="pc8001mk">
-		<description>PC-8001mkIISR Game Pack (Compilation)</description>
+	<software name="pc8037sr" cloneof="n80srbas">
+		<description>N80SR BASIC system disk (PC-8037SR, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="pc-8037sr.d88" size="353200" crc="b7448e78" sha1="00b3942080e6b3729bcf23270ef20face4c872e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !Compilations -->
+
+	<!-- the original pc8001mk has been split in clones of the individual pack1/2/3 sets -->
+	<!-- it is unknown if they really released as 3 disks set (and near impossible to know) -->
+
+	<software name="pack1" supported="partial">
+		<description>Super Version (compilation, ver 1.1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Boots in N-80 BASIC
+Dig Dug:
+Xevious:
+Nintendo Golf:
+Nuts and Milk: unemulated mkII mono [gfx] mode
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="dig dug - xevious - nintendo no golf - nuts&amp;milk.d88" size="353200" crc="1e6c02fe" sha1="039c2e1831f8f4d0ca4ca2d9bc8ad857cf4bade2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- pc8001mk:flop2 -->
+	<software name="pack1a" cloneof="pack1" supported="partial">
+		<description>Super Version (compilation, ver 1.1, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+(same as pack1)
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="[compilation] pc-8001mkiisr game pack (disk 2).d88" size="353200" crc="ac5ccf8b" sha1="85e739e6124704b3e96e6e815ad0d9a25270b258"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pack2" supported="yes">
+		<description>Game DOS (compilation, ver 1.0)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Dragon Slayer
+Burger Time
+Excite Bike
+Dig Dug
+Xevious
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dragon slayer - burger time - excite bike - dig dug - xevious.d88" size="348848" crc="143636e6" sha1="077a419dac5c1562a04e6a8467cf8ecd7a590427"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- pc8001mk:flop1 -->
+	<software name="pack2a" cloneof="pack2" supported="no">
+		<description>Game DOS (compilation, ver 1.0, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+(same as pack2)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="[compilation] pc-8001mkiisr game pack (disk 1).d88" size="348848" crc="4711b6c0" sha1="31c406799d0f5fd13b9ea22010b93254fbf1ad61"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="353200">
-				<rom name="[compilation] pc-8001mkiisr game pack (disk 2).d88" size="353200" crc="ac5ccf8b" sha1="85e739e6124704b3e96e6e815ad0d9a25270b258"/>
+	</software>
+
+
+	<!-- not a clone of pack2 (entirely different games) -->
+	<software name="pack3" supported="yes">
+		<description>Game DOS (compilation, ver 1.1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Video-kun
+F2 Grand Prix
+Eggy
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="video-kun - f2 grand prix - eggy.d88" size="348848" crc="45d3515f" sha1="5d6def548da8f943eebdf7f524bea58ed1dab456"/>
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+	</software>
+
+	<!-- pc8001mk:flop3 -->
+	<software name="pack3a" cloneof="pack3" supported="yes">
+		<description>Game DOS (compilation, ver 1.1, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+(same as pack3)
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="[compilation] pc-8001mkiisr game pack (disk 3).d88" size="348848" crc="cb8fef04" sha1="137cd4a7956e86434c22cf59e52c62262ccf5f55"/>
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

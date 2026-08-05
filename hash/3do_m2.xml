@@ -24,7 +24,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/58242/ -->
+	<!-- https://redump.info/disc/58242/ -->
 	<software name="olds" supported="no">
 		<description>Oldsmobile (USA)</description>
 		<year>199?</year>

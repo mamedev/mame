@@ -38,7 +38,7 @@ geforce256_device::geforce256_device(const machine_config &mconfig, const char *
 
 
 ROM_START( geforce256 )
-	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "elsa", "ELSA Synergy Force (Ver 7.03.00 01/11/00)" )
 	ROMX_LOAD( "nv10.bin", 0x0000, 0xac00, BAD_DUMP CRC(3525816d) SHA1(6fef6773dd1b18148890f8c3d45f988e5e06b50d), ROM_BIOS(0) )
 ROM_END
@@ -55,7 +55,7 @@ void geforce256_device::device_start()
 	add_map( 16*1024*1024, M_MEM, FUNC(geforce256_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(geforce256_device::vram_aperture_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 0x10000);
+	add_rom((u8 *)m_bios->base(), 0x10000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -74,7 +74,7 @@ geforce256_ddr_device::geforce256_ddr_device(const machine_config &mconfig, cons
 }
 
 ROM_START( geforce256_ddr )
-	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "creative", "Creative GeForce CT6971 AGP (Ver 2.10.4.02.04)" )
 	ROMX_LOAD( "creative.rom", 0x000000, 0x009800, CRC(fd956e0b) SHA1(aaac61e99193221280c5913cf3ca503e5b5ea408), ROM_BIOS(0) )
 ROM_END
@@ -99,7 +99,7 @@ quadro_device::quadro_device(const machine_config &mconfig, const char *tag, dev
 }
 
 ROM_START( quadro )
-	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	// NB: difference between these two is type of RAM used (SDR vs. DDR) and
 	//     interface type (AGP x4 vs. Pro)
 	ROM_SYSTEM_BIOS( 0, "elsa",    "Elsa GLoria II (Ver 7.02.02)" )

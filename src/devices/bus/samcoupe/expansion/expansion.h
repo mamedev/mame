@@ -63,10 +63,7 @@ public:
 	samcoupe_expansion_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts)
 		: samcoupe_expansion_device(mconfig, tag, owner, uint32_t(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), nullptr, false);
 	}
 
 	samcoupe_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

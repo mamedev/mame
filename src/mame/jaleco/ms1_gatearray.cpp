@@ -18,7 +18,10 @@ megasys1_gatearray_device::megasys1_gatearray_device(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_gatearray_hs(false)
+	, m_gatearray_hs_ram{0}
+	, m_gatearray_seq(nullptr)
+	, m_cpuspace(*this, finder_base::DUMMY_TAG, -1, 16)
 	, m_cpuregion(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -34,56 +37,55 @@ void megasys1_gatearray_device::device_start()
 
 void megasys1_gatearray_device::device_reset()
 {
-	m_gatearray_hs = 0;
+	m_gatearray_hs = false;
 }
 
 
 void megasys1_gatearray_d65006_device::rom_decode()
 {
-	u16 *RAM = (u16 *)m_cpuregion->base();
+	u16 *const RAM = (u16 *)m_cpuregion->base();
 	int size = m_cpuregion->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (int i = 0 ; i < size/2 ; i++)
 	{
-		const u16 x = RAM[i];
+		u16 const x = RAM[i];
 
 		auto const BITSWAP_0 = [x] () { return bitswap<16>(x,0xd,0xe,0xf,0x0,0x1,0x8,0x9,0xa,0xb,0xc,0x5,0x6,0x7,0x2,0x3,0x4); };
 		auto const BITSWAP_1 = [x] () { return bitswap<16>(x,0xf,0xd,0xb,0x9,0x7,0x5,0x3,0x1,0xe,0xc,0xa,0x8,0x6,0x4,0x2,0x0); };
 		auto const BITSWAP_2 = [x] () { return bitswap<16>(x,0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc); };
 
 		u16 y;
-		if      (i < 0x08000/2) { y = ( (i | (0x248/2)) != i ) ? BITSWAP_0() : BITSWAP_1(); }
-		else if (i < 0x10000/2) { y = BITSWAP_2(); }
-		else if (i < 0x18000/2) { y = ( (i | (0x248/2)) != i ) ? BITSWAP_0() : BITSWAP_1(); }
-		else if (i < 0x20000/2) { y = BITSWAP_1(); }
-		else                    { y = BITSWAP_2(); }
+		if      (i < 0x08000 / 2) { y = ((i | (0x248 / 2)) != i) ? BITSWAP_0() : BITSWAP_1(); }
+		else if (i < 0x10000 / 2) { y = BITSWAP_2(); }
+		else if (i < 0x18000 / 2) { y = ((i | (0x248 / 2)) != i) ? BITSWAP_0() : BITSWAP_1(); }
+		else if (i < 0x20000 / 2) { y = BITSWAP_1(); }
+		else                      { y = BITSWAP_2(); }
 
 		RAM[i] = y;
 	}
-
 }
 
 void megasys1_gatearray_gs88000_device::rom_decode()
 {
-	u16 *RAM = (u16 *)m_cpuregion->base();
+	u16 *const RAM = (u16 *)m_cpuregion->base();
 	int size = m_cpuregion->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (int i = 0 ; i < size/2 ; i++)
 	{
-		const u16 x = RAM[i];
+		u16 const x = RAM[i];
 
 		auto const BITSWAP_0 = [x] () { return bitswap<16>(x,0xd,0xe,0xf,0x0,0xa,0x9,0x8,0x1,0x6,0x5,0xc,0xb,0x7,0x2,0x3,0x4); };
 		auto const BITSWAP_1 = [x] () { return bitswap<16>(x,0xf,0xd,0xb,0x9,0x7,0x5,0x3,0x1,0x8,0xa,0xc,0xe,0x0,0x2,0x4,0x6); };
 		auto const BITSWAP_2 = [x] () { return bitswap<16>(x,0x4,0x5,0x6,0x7,0x0,0x1,0x2,0x3,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc); };
 
 		u16 y;
-		if      (i < 0x08000/2) { y = ( (i | (0x248/2)) != i ) ? BITSWAP_0() : BITSWAP_1(); }
-		else if (i < 0x10000/2) { y = BITSWAP_2(); }
-		else if (i < 0x18000/2) { y = ( (i | (0x248/2)) != i ) ? BITSWAP_0() : BITSWAP_1(); }
-		else if (i < 0x20000/2) { y = BITSWAP_1(); }
-		else                    { y = BITSWAP_2(); }
+		if      (i < 0x08000 / 2) { y = ((i | (0x248 / 2)) != i) ? BITSWAP_0() : BITSWAP_1(); }
+		else if (i < 0x10000 / 2) { y = BITSWAP_2(); }
+		else if (i < 0x18000 / 2) { y = ((i | (0x248 / 2)) != i) ? BITSWAP_0() : BITSWAP_1(); }
+		else if (i < 0x20000 / 2) { y = BITSWAP_1(); }
+		else                      { y = BITSWAP_2(); }
 
 		RAM[i] = y;
 	}
@@ -91,13 +93,13 @@ void megasys1_gatearray_gs88000_device::rom_decode()
 
 void megasys1_gatearray_unkarray_device::rom_decode()
 {
-	u16 *RAM = (u16 *)m_cpuregion->base();
+	u16 *const RAM = (u16 *)m_cpuregion->base();
 	int size = m_cpuregion->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (int i = 0 ; i < size/2 ; i++)
 	{
-		const u16 x = RAM[i];
+		u16 const x = RAM[i];
 
 		auto const BITSWAP_0 = [x] () { return bitswap<16>(x,0xd,0x0,0xa,0x9,0x6,0xe,0xb,0xf,0x5,0xc,0x7,0x2,0x3,0x8,0x1,0x4); };
 		auto const BITSWAP_1 = [x] () { return bitswap<16>(x,0x4,0x5,0x6,0x7,0x0,0x1,0x2,0x3,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc); };
@@ -105,11 +107,11 @@ void megasys1_gatearray_unkarray_device::rom_decode()
 		auto const BITSWAP_3 = [x] () { return bitswap<16>(x,0x4,0x5,0x1,0x2,0xe,0xd,0x3,0xb,0xa,0x9,0x6,0x7,0x0,0x8,0xf,0xc); };
 
 		u16 y;
-		if      (i < 0x08000/2) { y = ( (i | (0x248/2)) != i ) ? BITSWAP_0() : BITSWAP_1(); }
-		else if (i < 0x10000/2) { y = ( (i | (0x248/2)) != i ) ? BITSWAP_2() : BITSWAP_3(); }
-		else if (i < 0x18000/2) { y = ( (i | (0x248/2)) != i ) ? BITSWAP_0() : BITSWAP_1(); }
-		else if (i < 0x20000/2) { y = BITSWAP_1(); }
-		else                    { y = BITSWAP_3(); }
+		if      (i < 0x08000 / 2) { y = ((i | (0x248 / 2)) != i) ? BITSWAP_0() : BITSWAP_1(); }
+		else if (i < 0x10000 / 2) { y = ((i | (0x248 / 2)) != i) ? BITSWAP_2() : BITSWAP_3(); }
+		else if (i < 0x18000 / 2) { y = ((i | (0x248 / 2)) != i) ? BITSWAP_0() : BITSWAP_1(); }
+		else if (i < 0x20000 / 2) { y = BITSWAP_1(); }
+		else                      { y = BITSWAP_3(); }
 
 		RAM[i] = y;
 	}
@@ -125,30 +127,28 @@ void megasys1_gatearray_unkarray_device::rom_decode()
 */
 
 
-
 inline bool megasys1_gatearray_device::hs_seq() const
 {
-
-	return
-			m_gatearray_hs_ram[0/2] == m_gatearray_seq[0] &&
-			m_gatearray_hs_ram[2/2] == m_gatearray_seq[1] &&
-			m_gatearray_hs_ram[4/2] == m_gatearray_seq[2] &&
-			m_gatearray_hs_ram[6/2] == m_gatearray_seq[3];
+	return m_gatearray_hs_ram[0 / 2] == m_gatearray_seq[0] &&
+			m_gatearray_hs_ram[2 / 2] == m_gatearray_seq[1] &&
+			m_gatearray_hs_ram[4 / 2] == m_gatearray_seq[2] &&
+			m_gatearray_hs_ram[6 / 2] == m_gatearray_seq[3];
 }
 
 
 u16 megasys1_gatearray_device::gatearray_r(offs_t offset, u16 mem_mask)
 {
-	u16 *rom_maincpu = (u16 *)m_cpuregion->base();
-	if(m_gatearray_hs && ((m_gatearray_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	if (m_gatearray_hs && ((m_gatearray_hs_ram[8 / 2] << 6) & 0x3ffc0) == ((offset * 2) & 0x3ffc0))
 	{
-		LOG("GATEARRAY HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+		if (!machine().side_effects_disabled())
+			LOG("%s: GATEARRAY HS R (%04x) <- [%08x]\n", machine().describe_context(), mem_mask, offset * 2);
 
 		if (m_gatearray_seq)
 			return m_gatearray_seq[4];
 		else
 			return 0;
 	}
+	u16 const *const rom_maincpu = (u16 const *)m_cpuregion->base();
 	return rom_maincpu[offset];
 }
 
@@ -162,7 +162,7 @@ void megasys1_gatearray_device::gatearray_w(offs_t offset, u16 data, u16 mem_mas
 
 	if (!m_gatearray_seq)
 	{
-		logerror("Write to ROM area with no gatearray sequence");
+		logerror("%s: Write to ROM area with no gatearray sequence", machine().describe_context());
 		return;
 	}
 
@@ -170,19 +170,19 @@ void megasys1_gatearray_device::gatearray_w(offs_t offset, u16 data, u16 mem_mas
 
 	COMBINE_DATA(&m_gatearray_hs_ram[offset]);
 
-	if (hs_seq() && offset == 0x8/2)
-		m_gatearray_hs = 1;
+	if (hs_seq() && offset == (0x8 / 2))
+		m_gatearray_hs = true;
 	else
-		m_gatearray_hs = 0;
+		m_gatearray_hs = false;
 
-	LOG("GATEARRAY HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+	LOG("%s: GATEARRAY HS W %04x (%04x) -> [%02x]\n", machine().describe_context(), data, mem_mask, offset * 2);
 }
 
 void megasys1_gatearray_device::install_overlay()
 {
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_r)));
-	m_cpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x2ffff, write16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_w)));
-	m_gatearray_hs = 0;
+	m_cpuspace->install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_r)));
+	m_cpuspace->install_write_handler(0x20000, 0x2ffff, write16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_w)));
+	m_gatearray_hs = false;
 	memset(m_gatearray_hs_ram, 0, sizeof(m_gatearray_hs_ram));
 }
 

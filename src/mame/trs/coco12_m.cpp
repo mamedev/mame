@@ -12,12 +12,12 @@
 #include "coco12.h"
 
 //-------------------------------------------------
-//  device_start
+//  machine_start
 //-------------------------------------------------
 
-void coco12_state::device_start()
+void coco12_state::machine_start()
 {
-	coco_state::device_start();
+	coco_state::machine_start();
 	configure_sam();
 }
 
@@ -93,10 +93,10 @@ void coco12_state::pia1_pb_changed(uint8_t data)
 
 
 //-------------------------------------------------
-//  deluxecoco_state::device_start
+//  deluxecoco_state::machine_start
 //-------------------------------------------------
 
-void deluxecoco_state::device_start()
+void deluxecoco_state::machine_start()
 {
 	coco12_state::device_start();
 	configure_sam();

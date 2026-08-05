@@ -247,7 +247,7 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 void cit101_state::screen_reconfigure(const XTAL &xtal, int visible_width, int total_width, int visible_height, int total_height)
 {
 	const rectangle visarea(0, visible_width - 1, 0, visible_height - 1);
-	const attoseconds_t frame_period = attotime::from_ticks(total_width * total_height, xtal).as_attoseconds();
+	const attotime frame_period = attotime::from_ticks(total_width * total_height, xtal);
 
 	m_screen->set_unscaled_clock(xtal);
 	m_screen->configure(total_width, total_height, visarea, frame_period);
@@ -403,7 +403,7 @@ void cit101_state::cit101(machine_config &config)
 	m_maincpu->in_sid_func().set_constant(0); // used to time NVR reads
 	m_maincpu->out_sod_func().set(FUNC(cit101_state::blink_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	//m_screen->set_raw(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240);
 	m_screen->set_raw(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240);
 	m_screen->set_screen_update(FUNC(cit101_state::screen_update));
@@ -439,7 +439,7 @@ void cit101_state::cit101(machine_config &config)
 
 	CIT101_KEYBOARD(config, "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
 
-	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit8253_device &pit0(PIT8253(config, "pit0"));
 	pit0.set_clk<0>(6.144_MHz_XTAL / 4);
 	pit0.set_clk<1>(6.144_MHz_XTAL / 4);
 	//pit0.set_clk<2>(6.144_MHz_XTAL / 4);
@@ -448,7 +448,7 @@ void cit101_state::cit101(machine_config &config)
 	// OUT2 might be used for an internal expansion similar to the VT100 STP.
 	// The output appears to be fixed to a 307.2 kHz rate; turning this off boosts driver performance.
 
-	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit8253_device &pit1(PIT8253(config, "pit1"));
 	pit1.set_clk<0>(6.144_MHz_XTAL / 4);
 	pit1.set_clk<1>(6.144_MHz_XTAL / 4);
 	pit1.set_clk<2>(6.144_MHz_XTAL / 4);

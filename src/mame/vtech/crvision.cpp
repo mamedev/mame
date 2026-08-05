@@ -821,7 +821,7 @@ void crvision_state::creativision(machine_config &config)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
 
-	INPUT_BUFFER(config, "cent_status_in", 0);
+	INPUT_BUFFER(config, "cent_status_in");
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
@@ -852,7 +852,7 @@ void crvision_state::ntsc(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*-------------------------------------------------
@@ -867,7 +867,7 @@ void crvision_pal_state::pal(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*-------------------------------------------------
@@ -911,7 +911,7 @@ void laser2001_state::lasr2001(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// cartridge
 	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);

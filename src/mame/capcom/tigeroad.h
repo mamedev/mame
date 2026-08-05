@@ -7,10 +7,10 @@
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/i8051.h"
-
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
-
 #include "video/bufsprite.h"
 
 #include "emupal.h"
@@ -24,8 +24,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
 		, m_palette(*this, "palette")
-		, m_has_coinlock(true)
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
 		, m_bgmap(*this, "bgmap")
@@ -43,18 +43,21 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<palette_device> m_palette;
+	required_device<buffered_spriteram16_device> m_spriteram;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void soundcmd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void videoctrl_w(u8 data);
+	virtual void videoctrl_w(u8 data);
 	void scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void main_map(address_map &map) ATTR_COLD;
-	bool m_has_coinlock;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 
 private:
-	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<u16> m_videoram;
 	required_region_ptr<u16> m_bgmap;
 	optional_device<msm5205_device> m_msm;
@@ -69,8 +72,6 @@ private:
 	void comad_sound_map(address_map &map) ATTR_COLD;
 	void sample_map(address_map &map) ATTR_COLD;
 	void sample_port_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void sound_port_map(address_map &map) ATTR_COLD;
 
 	void msm5205_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -80,6 +81,37 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
+class f1dream_state : public tigeroad_state
+{
+public:
+	f1dream_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tigeroad_state(mconfig, type, tag)
+		, m_mcu(*this, "mcu")
+		, m_mcu_p3(0xff)
+		, m_soundlatch_data(0xff)
+	{
+	}
+
+	void f1dream(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void f1dream_map(address_map &map) ATTR_COLD;
+	void f1dream_mcu_data(address_map &map) ATTR_COLD;
+
+	void mcu_out3_w(u8 data);
+
+	u8 mcu_shared_r(offs_t offset);
+	void mcu_shared_w(offs_t offset, u8 data);
+
+	void to_mcu_w(u16 data);
+
+	required_device<i8751_device> m_mcu;
+	u8 m_mcu_p3;
+	u8 m_soundlatch_data;
+};
 
 class pushman_state : public tigeroad_state
 {
@@ -93,15 +125,16 @@ public:
 		, m_mcu_latch(0xffff)
 		, m_mcu_output(0xffff)
 		, m_mcu_latch_ctl(0xff)
-	{
-		m_has_coinlock = false;
-	}
+	{ }
 
 	void pushman(machine_config &config);
 	void bballs(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	// mask out coin lockouts
+	virtual void videoctrl_w(u8 data) override { tigeroad_state::videoctrl_w(data | 0x30); }
 
 private:
 	u16 mcu_comm_r(offs_t offset, u16 mem_mask = ~0);
@@ -121,36 +154,4 @@ private:
 	u16     m_host_latch, m_mcu_latch;
 	u16     m_mcu_output;
 	u8      m_mcu_latch_ctl;
-};
-
-class f1dream_state : public tigeroad_state
-{
-public:
-	f1dream_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tigeroad_state(mconfig, type, tag)
-		, m_mcu(*this, "mcu")
-		, m_ram16(*this, "ram16")
-		, m_old_p3(0xff)
-	{
-	}
-
-	void f1dream(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
-private:
-	void f1dream_map(address_map &map) ATTR_COLD;
-	void f1dream_mcu_data(address_map &map) ATTR_COLD;
-
-	void out3_w(u8 data);
-
-	u8 mcu_shared_r(offs_t offset);
-	void mcu_shared_w(offs_t offset, u8 data);
-
-	void to_mcu_w(u16 data);
-
-	required_device<i8751_device> m_mcu;
-	required_shared_ptr<u16> m_ram16;
-	u8 m_old_p3;
 };

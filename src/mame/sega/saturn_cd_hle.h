@@ -18,7 +18,7 @@ class saturn_cd_hle_device : public device_t,
 	static constexpr uint32_t MAX_DIR_SIZE = 256*1024;
 
 public:
-	saturn_cd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_cd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void amap(address_map &map);
 

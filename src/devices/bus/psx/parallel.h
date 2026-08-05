@@ -22,10 +22,7 @@ public:
 	psx_parallel_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: psx_parallel_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	psx_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~psx_parallel_slot_device();
@@ -36,7 +33,7 @@ public:
 	bool hascard() const { return bool(m_card); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -61,7 +58,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(PSX_PARALLEL_SLOT, psx_parallel_slot_device)
 
 void psx_parallel_devices(device_slot_interface &device);

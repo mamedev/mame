@@ -283,7 +283,7 @@ void multifont_device::rom_map(address_map &map)
 
 void multifont_device::map(address_map &map)
 {
-	map(0x00, 0x01).rw(FUNC(multifont_device::read), FUNC(multifont_device::write));
+	map(0x00, 0x01).mirror(0xff00).rw(FUNC(multifont_device::read), FUNC(multifont_device::write));
 }
 
 } // namespace bus::epson_qx

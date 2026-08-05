@@ -1464,10 +1464,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mercury">
-		<description>Mercury (version 1.0) (cleanly cracked)</description>
+		<description>Mercury (A-249 version 1.0) (trex crack)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A249" />
+		<info name="partno" value="A-249" />
 		<info name="programmer" value="John J. Krenz" />
 		<info name="programmer" value="Brian Nesse" />
 		<info name="programmer" value="Michael Palmquist" />
@@ -1478,18 +1478,16 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
-		<!-- "Mercury" is a 1989 desktop publishing program developed by John J. Krenz, Brian Nesse, Michael Palmquist, Steve Splinter, Michael Stein, and Paul Wenker, and distributed by MECC. -->
+		<!-- desktop publishing program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - System disk"/>
+			<feature name="part_id" value="Disk 1 - System"/>
 			<dataarea name="flop" size="819264">
 				<rom name="mercury v1.0 iigs - disk 1 - system (trex crack).2mg" size="819264" crc="d28c1950" sha1="aeef36625bfdd12e5a7df000222725a2126cfc5d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<feature name="part_id" value="Disk 2 - Program"/>
 			<dataarea name="flop" size="819264">
 				<rom name="mercury v1.0 iigs - disk 2 - program (trex crack).2mg" size="819264" crc="2682521b" sha1="5fd3948bac00b1ca4e08c79ccb437483798f25a9"/>
 			</dataarea>
@@ -2132,10 +2130,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="strybkwv">
-		<description>Storybook Weaver (version 1.0) (cleanly cracked)</description>
+		<description>Storybook Weaver (A-275 version 1.0) (trex crack)</description>
 		<year>1990</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A275" />
+		<info name="partno" value="A-275" />
 		<info name="programmer" value="Charolyn Kapplinger" />
 		<info name="programmer" value="Patricia Korn" />
 		<info name="programmer" value="John J. Krenz" />
@@ -2146,18 +2144,16 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
-		<!-- "Storybook Weaver" is a 1990 educational program developed by Charolyn Kapplinger, Patricia Korn, John J. Krenz, Brian S. Nesse, Jean Sharp, and Steve Zehm, and distributed by MECC. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - System disk"/>
+			<feature name="part_id" value="Disk 1 - System"/>
 			<dataarea name="flop" size="819264">
 				<rom name="storybook weaver v1.0 iigs - disk 1 - system (trex crack).2mg" size="819264" crc="c6acd3b2" sha1="814f84b31bab49e29f80797dced8bc8692055e4e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<feature name="part_id" value="Disk 2 - Program"/>
 			<dataarea name="flop" size="819264">
 				<rom name="storybook weaver v1.0 iigs - disk 2 - program (trex crack).2mg" size="819264" crc="5bafb45c" sha1="ddb7117bb3e096be90f638e538c0551409131bec"/>
 			</dataarea>
@@ -2165,10 +2161,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="strywvwa">
-		<description>Storybook Weaver - World of Adventure (version 1.0) (cleanly cracked)</description>
+		<description>Storybook Weaver: World of Adventure (A-276 version 1.0) (trex crack)</description>
 		<year>1991</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A276" />
+		<info name="partno" value="A-276" />
 		<info name="programmer" value="Patricia Korn" />
 		<info name="programmer" value="Brian S. Nesse" />
 		<info name="programmer" value="Dee Dee Roedel " />
@@ -2177,18 +2173,16 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
-		<!-- "Storybook Weaver: World of Adventure" is a 1991 educational program developed by Patricia Korn, Brian S. Nesse, Dee Dee Roedel & Jean Sharp, and distributed by MECC. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - System disk"/>
+			<feature name="part_id" value="Disk 1 - System"/>
 			<dataarea name="flop" size="819264">
 				<rom name="storybook weaver - world of adventure v1.0 iigs - disk 1 - system (trex crack).2mg" size="819264" crc="589e942d" sha1="25ee4d9872302c2f235e3d775a0536a426e610d5"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<feature name="part_id" value="Disk 2 - Program"/>
 			<dataarea name="flop" size="819264">
 				<rom name="storybook weaver - world of adventure v1.0 iigs - disk 2 - program (trex crack).2mg" size="819264" crc="03e3ce87" sha1="86aca233933b10f3f25cdae7692375e60c3f6650"/>
 			</dataarea>
@@ -2196,10 +2190,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="strywvmb">
-		<description>Storybook Weaver - World of Make-Believe (version 1.0) (cleanly cracked)</description>
+		<description>Storybook Weaver: World of Make-Believe (A-298 version 1.0) (trex crack)</description>
 		<year>1991</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A298" />
+		<info name="partno" value="A-298" />
 		<info name="programmer" value="Charolyn Kapplinger" />
 		<info name="programmer" value="Patricia Korn" />
 		<info name="programmer" value="Jean Sharp" />
@@ -2207,18 +2201,16 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
-		<!-- "Storybook Weaver: World of Make-Believe" is a 1991 educational program developed by Charolyn Kapplinger, Patricia Korn, and Jean Sharp, and distributed by MECC. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - System disk"/>
+			<feature name="part_id" value="Disk 1 - System"/>
 			<dataarea name="flop" size="819264">
 				<rom name="storybook weaver - world of make-believe v1.0 iigs - disk 1 - system (trex crack).2mg" size="819264" crc="54e1fb99" sha1="3fc4031f0bda54e2c73ffc3f2ac8a17c1f73fc71"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<feature name="part_id" value="Disk 2 - Program"/>
 			<dataarea name="flop" size="819264">
 				<rom name="storybook weaver - world of make-believe v1.0 iigs - disk 2 - program (trex crack).2mg" size="819264" crc="0c778c48" sha1="91b4b8d9264985b63eda4b34d3140d4414a800fa"/>
 			</dataarea>
@@ -3003,9 +2995,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="usageogr">
-		<description>USA GeoGraph (Version 1.0) (cleanly cracked)</description>
+		<description>USA GeoGraph (A-300 version 1.0) (trex crack)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
+		<info name="partno" value="A-300" />
 		<info name="programmer" value="Nelson Whyatt" />
 		<info name="programmer" value="Paul R. Wenker" />
 		<info name="programmer" value="Wayne Studer" />
@@ -3016,18 +3009,16 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2023-04-13 -->
-		<!-- It requires a 768K Apple IIgs. -->
-		<!-- "USA GeoGraph" is a 1989 educational program developed by Nelson Whyatt, Paul R. Wenker, Wayne Studer, Steven D. Splinter, John L. Krenz, and Charolyn Kapplinger, and distributed by MECC Software. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<feature name="part_id" value="Disk 1 - Program"/>
 			<dataarea name="flop" size="819264">
 				<rom name="usa geograph v1.0 iigs - disk 1 - program (trex crack).2mg" size="819264" crc="f968d252" sha1="ebda6798c67d277a15314b97d116f40e6b072ccd" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Information disk"/>
+			<feature name="part_id" value="Disk 2 - Information"/>
 			<dataarea name="flop" size="819264">
 				<rom name="usa geograph v1.0 iigs - disk 2 - Information (trex crack).2mg" size="819264" crc="c5bc2c2c" sha1="6ef5b7be7d2a813387cfb4fa381c76d40d94c6ca" />
 			</dataarea>
@@ -3237,9 +3228,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="wldgeogr">
-		<description>World GeoGraph (Version 1.3) (cleanly cracked)</description>
+		<description>World GeoGraph (USG-100 version 1.3) (trex crack)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
+		<info name="partno" value="USG-100" />
 		<info name="programmer" value="Charolyn Kapplinger" />
 		<info name="programmer" value="John L. Krenz" />
 		<info name="programmer" value="Diane Portner" />
@@ -3251,18 +3243,16 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2023-04-13 -->
-		<!-- It requires a 768K Apple IIgs. -->
-		<!-- "USA GeoGraph" is a 1989 educational program developed by Charolyn Kapplinger, John L. Krenz, Diane Portner, Steven D. Splinter, Wayne Studer, Paul R. Wenker, and Nelson Whyatt, and distributed by MECC Software. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<feature name="part_id" value="Disk 1 - Program"/>
 			<dataarea name="flop" size="819264">
 				<rom name="world geograph v1.3 iigs - disk 1 - program (trex crack).2mg" size="819264" crc="a296d62a" sha1="15aa6627a08b3c4f3d1c9e7651218311f07e481e" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Information disk"/>
+			<feature name="part_id" value="Disk 2 - Information"/>
 			<dataarea name="flop" size="819264">
 				<rom name="world geograph v1.3 iigs - disk 2 - Information (trex crack).2mg" size="819264" crc="1ec2c293" sha1="6131f8ea4938f9f180e8a5f0a67d5f8f38d90e22" />
 			</dataarea>

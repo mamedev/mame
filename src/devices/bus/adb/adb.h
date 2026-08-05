@@ -22,10 +22,7 @@ public:
 	adb_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
 		: adb_connector(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 
 	adb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);

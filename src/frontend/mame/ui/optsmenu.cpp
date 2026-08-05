@@ -36,9 +36,9 @@ namespace ui {
 
 menu_simple_game_options::menu_simple_game_options(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		std::function<void ()> &&handler)
-	: menu(mui, container)
+	: menu(mui, target)
 	, m_handler(std::move(handler))
 {
 	set_process_flags(PROCESS_LR_REPEAT);
@@ -96,32 +96,32 @@ bool menu_simple_game_options::handle_item_event(event const &menu_event)
 		switch ((uintptr_t)menu_event.itemref)
 		{
 		case MISC_MENU:
-			menu::stack_push<submenu>(ui(), container(), submenu::misc_options());
+			menu::stack_push<submenu>(ui(), target(), submenu::misc_options());
 			ui_globals::reset = true;
 			break;
 		case SOUND_MENU:
-			menu::stack_push<menu_sound_options>(ui(), container());
+			menu::stack_push<menu_sound_options>(ui(), target());
 			ui_globals::reset = true;
 			break;
 		case DISPLAY_MENU:
-			menu::stack_push<submenu>(ui(), container(), submenu::video_options());
+			menu::stack_push<submenu>(ui(), target(), submenu::video_options());
 			ui_globals::reset = true;
 			break;
 		case CONTROLLER_MENU:
-			menu::stack_push<submenu>(ui(), container(), submenu::control_options());
+			menu::stack_push<submenu>(ui(), target(), submenu::control_options());
 			break;
 		case INPUTASSIGN_MENU:
-			menu::stack_push<menu_input_groups>(ui(), container());
+			menu::stack_push<menu_input_groups>(ui(), target());
 			break;
 		case ADVANCED_MENU:
-			menu::stack_push<submenu>(ui(), container(), submenu::advanced_options());
+			menu::stack_push<submenu>(ui(), target(), submenu::advanced_options());
 			ui_globals::reset = true;
 			break;
 		case PLUGINS_MENU:
-			menu::stack_push<menu_plugins_configure>(ui(), container());
+			menu::stack_push<menu_plugins_configure>(ui(), target());
 			break;
 		case INPUTDEV_MENU:
-			menu::stack_push<menu_input_devices>(ui(), container());
+			menu::stack_push<menu_input_devices>(ui(), target());
 			break;
 		case SAVE_CONFIG:
 			ui().save_main_option();
@@ -138,10 +138,10 @@ bool menu_simple_game_options::handle_item_event(event const &menu_event)
 
 menu_game_options::menu_game_options(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		machine_filter_data &filter_data,
 		std::function<void ()> &&handler)
-	: menu_simple_game_options(mui, container, std::move(handler))
+	: menu_simple_game_options(mui, target, std::move(handler))
 	, m_filter_data(filter_data)
 	, m_main_filter(filter_data.get_current_filter_type())
 {
@@ -219,7 +219,7 @@ bool menu_game_options::handle_item_event(event const &menu_event)
 				s_sel[index] = machine_filter::display_name(machine_filter::type(index));
 
 			menu::stack_push<menu_selector>(
-					ui(), container(), _("System Filter"), std::move(s_sel), m_main_filter,
+					ui(), target(), _("System Filter"), std::move(s_sel), m_main_filter,
 					[this] (int selection)
 					{
 						m_main_filter = machine_filter::type(selection);
@@ -240,7 +240,7 @@ bool menu_game_options::handle_item_event(event const &menu_event)
 		{
 			m_filter_data.get_filter(m_main_filter).show_ui(
 					ui(),
-					container(),
+					target(),
 					[this] (machine_filter &filter)
 					{
 						if (machine_filter::CUSTOM == filter.get_type())
@@ -258,11 +258,11 @@ bool menu_game_options::handle_item_event(event const &menu_event)
 		break;
 	case CONF_DIR:
 		if (menu_event.iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_directory>(ui(), container());
+			menu::stack_push<menu_directory>(ui(), target());
 		break;
 	case CUSTOM_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_custom_ui>(ui(), container(), [this] () { reset(reset_options::REMEMBER_REF); });
+			menu::stack_push<menu_custom_ui>(ui(), target(), [this] () { reset(reset_options::REMEMBER_REF); });
 		break;
 	default:
 		return menu_simple_game_options::handle_item_event(menu_event);

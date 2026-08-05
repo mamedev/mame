@@ -683,8 +683,6 @@ void tiki100_state::busrq_w(int state)
 
 void tiki100_state::machine_start()
 {
-	m_leds.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -717,12 +715,12 @@ void tiki100_state::tiki100(machine_config &config)
 
 	/* video hardware */
 	TIMER(config, "scantimer").configure_scanline(FUNC(tiki100_state::scanline_start), "screen", 0, 1);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(tiki100_state::screen_update));
 	PALETTE(config, m_palette).set_entries(16);
 
-	TIKI100_BUS(config, m_exp, 0);
+	TIKI100_BUS(config, m_exp);
 	m_exp->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));

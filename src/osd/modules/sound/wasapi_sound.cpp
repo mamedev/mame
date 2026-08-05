@@ -266,7 +266,7 @@ sound_wasapi::stream_info::stream_info(
 		uint32_t rate) :
 	m_host(host),
 	m_event(std::move(event)),
-	m_buffer(channels),
+	m_buffer(channels, rate),
 	m_underflow_fill(channels, 0U),
 	m_client(std::move(client)),
 	m_buffer_frames(buffer_frames),
@@ -275,6 +275,7 @@ sound_wasapi::stream_info::stream_info(
 	m_exiting(false)
 {
 	info.m_node = node.m_id;
+	m_buffer.set_latency(host.m_audio_latency / 20e-3F);
 	InitializeCriticalSection(&m_critical_section);
 }
 

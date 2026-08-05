@@ -301,7 +301,7 @@ public:
 #endif
 	virtual render_primitive_list *get_primitives() override
 	{
-		osd_dim nd = window().get_size();
+		osd_dim nd = window().get_size_pixels();
 		if (nd != m_blit_dim)
 		{
 			m_blit_dim = nd;
@@ -1163,7 +1163,7 @@ int renderer_ogl::draw(const int update)
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = window().get_size_pixels();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{

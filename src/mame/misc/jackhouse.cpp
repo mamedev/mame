@@ -53,14 +53,12 @@ public:
 
 	{ }
 
-	void jackhouse(machine_config &config);
+	void jackhouse(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); };
 	virtual void video_start() override ATTR_COLD;
 
 private:
-
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -524,7 +522,7 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_M)              // unknown
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                            // attendant pay key
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                            // hopper payout button
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )         PORT_NAME("Confirm / Test Mode")  // confirm / test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )               PORT_NAME("Confirm / Test Mode")  // confirm / test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )            PORT_NAME("Record Mode")          // books-record / color test
 
 	PORT_START("IN3")
@@ -691,7 +689,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("DSW5");
 	ppi1.in_pc_callback().set_ioport("DSW3");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(512, 256);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
@@ -700,7 +698,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x300);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &jackhouse_state::ramdac_map);
 	ramdac.set_color_base(0);
 

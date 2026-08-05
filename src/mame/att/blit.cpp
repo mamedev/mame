@@ -235,7 +235,7 @@ void blit_state::blit(machine_config &config)
 	M68000(config, m_maincpu, XTAL(33'000'000) / 4); // maybe XTAL(32'760'000)
 	m_maincpu->set_addrmap(AS_PROGRAM, &blit_state::blit_mem);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	SCREEN(config, m_screen).set_lcd().set_color(rgb_t::white());
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(800, 1024);
 	m_screen->set_visarea(0, 800-1, 0, 1024-1);
@@ -247,7 +247,7 @@ void blit_state::blit(machine_config &config)
 
 	CLOCK(config, "system_clock", 19200 * 16).signal_handler().set(FUNC(blit_state::system_clock_write));
 
-	ACIA6850(config, m_acia0, 0);
+	ACIA6850(config, m_acia0);
 	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia0->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_5);
@@ -258,7 +258,7 @@ void blit_state::blit(machine_config &config)
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 	rs232h.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(host_rs232_defaults));
 
-	ACIA6850(config, m_acia1, 0);
+	ACIA6850(config, m_acia1);
 	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia1->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_2);

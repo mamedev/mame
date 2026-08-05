@@ -42,6 +42,7 @@
 #include <set>
 #include <tuple>
 #include <cctype>
+#include <cstdio>
 #include <iostream>
 
 
@@ -251,7 +252,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 		return;
 	}
 
-	// read INI's, if appropriate
+	// read INIs, if appropriate
 	if (m_options.read_config())
 	{
 		mame_options::parse_standard_inis(m_options, option_errors);
@@ -662,7 +663,7 @@ void cli_frontend::listbios(const std::vector<std::string> &args)
 		if (firstsystem)
 			firstsystem = false;
 		else
-			printf("\n");
+			osd_printf_info("\n");
 
 		// print system BIOS options if there are any
 		bool firstbios = true;
@@ -670,13 +671,13 @@ void cli_frontend::listbios(const std::vector<std::string> &args)
 		{
 			if (firstbios)
 			{
-				printf("BIOS options for system %s (%s):\n", root.name(), root.shortname());
+				osd_printf_info("BIOS options for system %s (%s -bios X):\n", root.name(), root.shortname());
 				firstbios = false;
 			}
-			printf("    %-16s %s\n", bios.get_name(), bios.get_description());
+			osd_printf_info("    %-16s %s\n", bios.get_name(), bios.get_description());
 		}
 		if (firstbios)
-			printf("No BIOS options for system %s (%s)\n", root.name(), root.shortname());
+			osd_printf_info("No BIOS options for system %s (%s)\n", root.name(), root.shortname());
 
 		// iterate over slots
 		for (const device_slot_interface &slot : slot_interface_enumerator(root))
@@ -692,10 +693,10 @@ void cli_frontend::listbios(const std::vector<std::string> &args)
 			{
 				if (firstcard)
 				{
-					printf("\n  BIOS options for device %s (-%s %s):\n", card->name(), slot.device().tag() + 1, card->basetag());
+					osd_printf_info("\n  BIOS options for device %s (-%s %s,bios=X):\n", card->name(), slot.device().tag() + 1, card->basetag());
 					firstcard = false;
 				}
-				printf("      %-16s %s\n", bios.get_name(), bios.get_description());
+				osd_printf_info("      %-16s %s\n", bios.get_name(), bios.get_description());
 			}
 		}
 	}
@@ -762,9 +763,9 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 	{
 		// print a header
 		if (!first)
-			printf("\n");
+			osd_printf_info("\n");
 		first = false;
-		printf("Driver %s (%s):\n", drivlist.driver().name, drivlist.driver().type.fullname());
+		osd_printf_info("Driver %s (%s):\n", drivlist.driver().name, drivlist.driver().type.fullname());
 
 		// build a list of devices
 		std::vector<device_t *> device_list;
@@ -808,20 +809,20 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 						depth++;
 					}
 			}
-			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
+			osd_printf_info("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
 
 			// add more information
 			uint32_t clock = device->clock();
 			if (clock >= 1000000000)
-				printf(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
+				osd_printf_info(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
 			else if (clock >= 1000000)
-				printf(" @ %d.%02d MHz\n", clock / 1000000, (clock / 10000) % 100);
+				osd_printf_info(" @ %d.%02d MHz\n", clock / 1000000, (clock / 10000) % 100);
 			else if (clock >= 1000)
-				printf(" @ %d.%02d kHz\n", clock / 1000, (clock / 10) % 100);
+				osd_printf_info(" @ %d.%02d kHz\n", clock / 1000, (clock / 10) % 100);
 			else if (clock > 0)
-				printf(" @ %d Hz\n", clock);
+				osd_printf_info(" @ %d Hz\n", clock);
 			else
-				printf("\n");
+				osd_printf_info("\n");
 		}
 	}
 }
@@ -842,8 +843,8 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// print header
-	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "SLOT NAME", "SLOT OPTIONS", "SLOT DEVICE NAME");
-	printf("%s %s %s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(28,'-').c_str());
+	osd_printf_info("%-16s %-16s %-16s %s\n", "SYSTEM", "SLOT NAME", "SLOT OPTIONS", "SLOT DEVICE NAME");
+	osd_printf_info("%s %s %s %s\n", std::string(16,'-'), std::string(16,'-'), std::string(16,'-'), std::string(28,'-'));
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -867,12 +868,12 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 					option_list.end(),
 					[] (device_slot_interface::slot_option const *opt1, device_slot_interface::slot_option const *opt2)
 					{
-						return strcmp(opt1->name(), opt2->name()) < 0;
+						return opt1->name() < opt2->name();
 					});
 
 
 			// output the line, up to the list of extensions
-			printf("%-16s %-16s ", first ? drivlist.driver().name : "", slot.device().tag()+1);
+			osd_printf_info("%-16s %-16s ", first ? drivlist.driver().name : "", slot.device().tag()+1);
 
 			bool first_option = true;
 
@@ -880,22 +881,22 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			for (device_slot_interface::slot_option const *opt : option_list)
 			{
 				if (first_option)
-					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
+					osd_printf_info("%-16s %s\n", opt->name(), opt->devtype().fullname());
 				else
-					printf("%-34s%-16s %s\n", "", opt->name(), opt->devtype().fullname());
+					osd_printf_info("%-34s%-16s %s\n", "", opt->name(), opt->devtype().fullname());
 
 				first_option = false;
 			}
 			if (first_option)
-				printf("%-16s %s\n", "[none]","No options available");
+				osd_printf_info("%-16s %s\n", "[none]","No options available");
 			// end the line
-			printf("\n");
+			osd_printf_info("\n");
 			first = false;
 		}
 
 		// if we didn't get any at all, just print a none line
 		if (first)
-			printf("%-16s (none)\n", drivlist.driver().name);
+			osd_printf_info("%-16s (none)\n", drivlist.driver().name);
 	}
 }
 
@@ -915,8 +916,8 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// print header
-	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
-	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(31,'-').c_str());
+	osd_printf_info("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
+	osd_printf_info("%s %s-%s %s\n", std::string(16,'-'), std::string(16,'-'), std::string(10,'-'), std::string(31,'-'));
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -932,26 +933,26 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 			std::string paren_shortname = string_format("(%s)", imagedev.brief_instance_name());
 
 			// output the line, up to the list of extensions
-			printf("%-16s %-16s %-10s ", drivlist.driver().name, imagedev.instance_name().c_str(), paren_shortname.c_str());
+			osd_printf_info("%-16s %-16s %-10s ", drivlist.driver().name, imagedev.instance_name(), paren_shortname);
 
 			// get the extensions and print them
 			std::string extensions(imagedev.file_extensions());
 			for (int start = 0, end = extensions.find_first_of(',');; start = end + 1, end = extensions.find_first_of(',', start))
 			{
 				std::string curext(extensions, start, (end == -1) ? extensions.length() - start : end - start);
-				printf(".%-5s", curext.c_str());
+				osd_printf_info(".%-5s", curext);
 				if (end == -1)
 					break;
 			}
 
 			// end the line
-			printf("\n");
+			osd_printf_info("\n");
 			first = false;
 		}
 
 		// if we didn't get any at all, just print a none line
 		if (first)
-			printf("%-16s (none)\n", drivlist.driver().name);
+			osd_printf_info("%-16s (none)\n", drivlist.driver().name);
 	}
 }
 
@@ -1754,10 +1755,13 @@ void cli_frontend::execute_commands(std::string_view exename)
 	}
 
 	// other commands need the INIs parsed
-	std::ostringstream option_errors;
-	mame_options::parse_standard_inis(m_options,option_errors);
-	if (option_errors.tellp() > 0)
-		osd_printf_error("%s\n", option_errors.str());
+	if (m_options.read_config())
+	{
+		std::ostringstream option_errors;
+		mame_options::parse_standard_inis(m_options, option_errors);
+		if (option_errors.tellp() > 0)
+			osd_printf_error("%s\n", option_errors.str());
+	}
 
 	// createconfig?
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)

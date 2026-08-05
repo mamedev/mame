@@ -83,7 +83,13 @@ function maintargetosdoptions(_target,_subtarget)
 
 		links {
 			"dinput8",
+			"gdi32",
+			"imm32",
+			"ole32",
 			"psapi",
+			"setupapi",
+			"uuid",
+			"version",
 		}
 	elseif _OPTIONS["targetos"]=="haiku" then
 		links {
@@ -103,14 +109,30 @@ end
 
 
 function sdlconfigcmd()
-	if _OPTIONS["targetos"]=="asmjs" then
-		return "sdl3-config"
-	elseif _OPTIONS["SDL_PKGCONFIG_PATH"] then
+	if _OPTIONS["SDL_PKGCONFIG_PATH"] then
 		return path.join(_OPTIONS["SDL_PKGCONFIG_PATH"],"pkg-config") .. " sdl3"
 	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
 		return pkgconfigcmd() .. " sdl3"
 	else
-		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin","sdl3") .. "-config"
+		return "PKG_CONFIG_LIBDIR=" .. path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","pkgconfig") .. " " .. pkgconfigcmd() .. " sdl3"
+	end
+end
+
+local function sdlpkgconfigcmd()
+	if _OPTIONS["SDL_PKGCONFIG_PATH"] then
+		return path.join(_OPTIONS["SDL_PKGCONFIG_PATH"],"pkg-config")
+	else
+		return pkgconfigcmd()
+	end
+end
+
+local function macosx_uses_libsdl_by_default()
+	if _OPTIONS["targetos"]~="macosx" then
+		return false
+	elseif _OPTIONS["SDL_INSTALL_ROOT"] then
+		return true
+	else
+		return os.execute(sdlpkgconfigcmd() .. " --exists sdl3")
 	end
 end
 
@@ -179,13 +201,15 @@ newoption {
 
 newoption {
 	trigger = "SDL_PKGCONFIG_PATH",
-	description = "Location of pkg-config command that knows about SDL.  Useful for non-root Homebrew installs on Linux.",
+	description = "Location of pkg-config command that knows about SDL.  Useful for non-default Homebrew installs.",
 }
 
 newoption {
 	trigger = "SDL_FRAMEWORK_PATH",
 	description = "Location of SDL framework for custom OS X installations",
 }
+
+local framework_path_default = (_OPTIONS["SDL_FRAMEWORK_PATH"] == nil)
 
 -- SDL 3's framework now contains all Apple platforms in a single framework, so we need to
 -- specifically ask for the macOS version.
@@ -202,8 +226,16 @@ newoption {
 	},
 }
 
+local use_libsdl_default = (_OPTIONS["USE_LIBSDL"] == nil)
+
 if not _OPTIONS["USE_LIBSDL"] then
 	_OPTIONS["USE_LIBSDL"] = "0"
+end
+
+-- Prefer pkg-config/library installs on macOS when available, as that is the
+-- common Homebrew layout.  Preserve explicit framework and USE_LIBSDL choices.
+if use_libsdl_default and framework_path_default and macosx_uses_libsdl_by_default() then
+	_OPTIONS["USE_LIBSDL"] = "1"
 end
 
 
@@ -227,7 +259,6 @@ if BASE_TARGETOS=="unix" then
 			"-framework QuartzCore",
 			"-framework OpenGL",
 			"-framework IOKit",
-			"-rpath " .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 		}
 
 
@@ -238,6 +269,7 @@ if BASE_TARGETOS=="unix" then
 		end
 		if _OPTIONS["USE_LIBSDL"]~="1" then
 			linkoptions {
+				"-rpath " .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 			}
 			links {
@@ -304,7 +336,6 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 	qtdebuggerbuild()
 
 project ("osd_" .. _OPTIONS["osd"])
-	targetsubdir(_OPTIONS["target"] .."_" .._OPTIONS["subtarget"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
@@ -322,6 +353,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "src/osd/sdl3",
 	}
+	addincludesfromstring(backtick(sdlconfigcmd() .. " --cflags"))
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
@@ -384,7 +416,6 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 project ("ocore_" .. _OPTIONS["osd"])
-	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
@@ -401,6 +432,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/osd/sdl3",
 	}
+	addincludesfromstring(backtick(sdlconfigcmd() .. " --cflags"))
 
 	files {
 		MAME_DIR .. "src/osd/osdcore.cpp",
@@ -442,5 +474,3 @@ project ("ocore_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/file/stdfile.cpp",
 		}
 	end
-
-

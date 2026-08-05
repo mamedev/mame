@@ -70,13 +70,13 @@ device_memory_interface::space_config_vector vt3xx_spu_device::memory_space_conf
 {
 	if(has_configured_map(AS_OPCODES))
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
-			std::make_pair(AS_OPCODES, &sprogram_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_sprogram_config),
 			std::make_pair(5, &m_extdata_config),
 		};
 	else
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(5, &m_extdata_config),
 		};
 }

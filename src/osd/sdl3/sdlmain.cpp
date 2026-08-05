@@ -25,6 +25,7 @@
 #include "strconv.h"
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
 // only for oslog callback
 #include <functional>
@@ -80,8 +81,13 @@ int main(int argc, char** argv)
 	diagnostics_module::get_instance()->init_crash_diagnostics();
 
 #if defined(SDLMAME_ANDROID)
-	/* Enable standard application logging */
+	// Enable standard application logging
 	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
+#endif
+
+#if defined(SDLMAME_MACOSX) && SDL_VERSION_ATLEAST(3, 4, 0)
+	// disable the popup accents menu on macOS
+	SDL_SetHint(SDL_HINT_MAC_PRESS_AND_HOLD, "false");
 #endif
 
 	// FIXME: this should be done differently

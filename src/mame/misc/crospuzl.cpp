@@ -377,7 +377,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 
 //  ROM strings have references to a K9FXX08 device
 //  TODO: use this device, in machine/nandflash.h (has issues with is_busy() emulation)
-//  SAMSUNG_K9F1G08U0B(config, m_nand, 0); // TODO: exact flavor
+//  SAMSUNG_K9F1G08U0B(config, m_nand); // TODO: exact flavor
 
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
 

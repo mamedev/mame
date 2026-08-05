@@ -32,7 +32,7 @@ void msc_device::map(address_map &map)
 	map(0x00000000, 0x000fffff).r(FUNC(msc_device::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x10f00000, 0x10f01fff).rw(FUNC(msc_device::via_r), FUNC(msc_device::via_w));
-	map(0x10f14000, 0x10f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x10f14000, 0x10f15fff).rw(m_asc, FUNC(asc_msc_device::read), FUNC(asc_msc_device::write));
 	map(0x10f26000, 0x10f27fff).rw(FUNC(msc_device::via2_r), FUNC(msc_device::via2_w));
 	map(0x10fa0000, 0x10fa0003).w(FUNC(msc_device::power_cycle_w));
 }
@@ -51,7 +51,7 @@ void msc_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(msc_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(msc_device::via1_irq));
 
-	APPLE_PSEUDOVIA(config, m_pseudovia, C15M);
+	APPLE_MSC_PSEUDOVIA(config, m_pseudovia, C15M);
 	m_pseudovia->irq_callback().set(FUNC(msc_device::via2_irq));
 	m_pseudovia->readpa_handler().set(FUNC(msc_device::via2_in_a));
 	m_pseudovia->readpb_handler().set(FUNC(msc_device::via2_in_b));
@@ -62,10 +62,10 @@ void msc_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->readvideo_handler().set(FUNC(msc_device::msc_config_r));
 	m_pseudovia->writevideo_handler().set(FUNC(msc_device::msc_config_w));
 
-	ASC(config, m_asc, C15M, asc_device::asc_type::EASC);
+	ASC_MSC(config, m_asc, C15M);
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
-	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
+	m_asc->irqf_callback().set(m_pseudovia, FUNC(msc_pseudovia_device::asc_irq_w));
 }
 
 mscvia_device::mscvia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

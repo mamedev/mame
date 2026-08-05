@@ -209,43 +209,43 @@ static bool validate_file_type(std::string str)
 std::vector<meta_description> prodos_image::volume_meta_description() const
 {
 	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "Volume name, up to 15 characters"));
-	res.emplace_back(meta_description(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version"));
-	res.emplace_back(meta_description(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version"));
+	res.emplace_back(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "Volume name, up to 15 characters");
+	res.emplace_back(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version");
+	res.emplace_back(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version");
 
 	auto now = util::arbitrary_datetime::now();
-	res.emplace_back(meta_description(meta_name::creation_date, now, false, nullptr, "Creation time"));
-	res.emplace_back(meta_description(meta_name::modification_date, now, false, nullptr, "Modification time"));
+	res.emplace_back(meta_name::creation_date, now, false, nullptr, "Creation time");
+	res.emplace_back(meta_name::modification_date, now, false, nullptr, "Modification time");
 	return res;
 }
 
 std::vector<meta_description> prodos_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, "Empty file", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "File name, up to 15 characters"));
-	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
-	res.emplace_back(meta_description(meta_name::rsrc_length, 0, true, nullptr, "Size of the resource fork in bytes"));
-	res.emplace_back(meta_description(meta_name::file_type, "UNK", false, [](const meta_value &m) { return validate_file_type(m.as_string()); }, "File type, 3 letters or hex code preceded by 0x"));
-	res.emplace_back(meta_description(meta_name::loading_address, 0x803, false, nullptr, "Loading address or auxiliary file type"));
-	res.emplace_back(meta_description(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version"));
-	res.emplace_back(meta_description(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version"));
+	res.emplace_back(meta_name::name, "Empty file", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "File name, up to 15 characters");
+	res.emplace_back(meta_name::length, 0, true, nullptr, "Size of the file in bytes");
+	res.emplace_back(meta_name::rsrc_length, 0, true, nullptr, "Size of the resource fork in bytes");
+	res.emplace_back(meta_name::file_type, "UNK", false, [](const meta_value &m) { return validate_file_type(m.as_string()); }, "File type, 3 letters or hex code preceded by 0x");
+	res.emplace_back(meta_name::loading_address, 0x803, false, nullptr, "Loading address or auxiliary file type");
+	res.emplace_back(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version");
+	res.emplace_back(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version");
 
 	auto now = util::arbitrary_datetime::now();
-	res.emplace_back(meta_description(meta_name::creation_date, now, false, nullptr, "Creation time"));
-	res.emplace_back(meta_description(meta_name::modification_date, now, false, nullptr, "Modification time"));
+	res.emplace_back(meta_name::creation_date, now, false, nullptr, "Creation time");
+	res.emplace_back(meta_name::modification_date, now, false, nullptr, "Modification time");
 	return res;
 }
 
 std::vector<meta_description> prodos_image::directory_meta_description() const
 {
 	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, "Empty directory", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "Directory name, up to 15 characters"));
-	res.emplace_back(meta_description(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version"));
-	res.emplace_back(meta_description(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version"));
+	res.emplace_back(meta_name::name, "Empty directory", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "Directory name, up to 15 characters");
+	res.emplace_back(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version");
+	res.emplace_back(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version");
 
 	auto now = util::arbitrary_datetime::now();
-	res.emplace_back(meta_description(meta_name::creation_date, now, false, nullptr, "Creation time"));
-	res.emplace_back(meta_description(meta_name::modification_date, now, false, nullptr, "Modification time"));
+	res.emplace_back(meta_name::creation_date, now, false, nullptr, "Creation time");
+	res.emplace_back(meta_name::modification_date, now, false, nullptr, "Modification time");
 	return res;
 }
 
@@ -388,7 +388,7 @@ std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_c
 				meta.set(meta_name::creation_date, prodos_to_dt(blk->r32l(off + 0x18)));
 				meta.set(meta_name::modification_date, prodos_to_dt(blk->r32l(off + 0x21)));
 
-				res.emplace_back(dir_entry(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta));
+				res.emplace_back(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta);
 			}
 		}
 		block = blk->r16l(2);

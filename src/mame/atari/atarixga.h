@@ -27,16 +27,13 @@ protected:
 	{
 	}
 
-	virtual void device_start() override = 0;
-	virtual void device_reset() override = 0;
-
 	std::unique_ptr<uint16_t[]> m_ram; // CY7C185-45PC, only 16-Kbit used
 };
 
 class atari_136094_0072_device : public atari_xga_device
 {
 public:
-	atari_136094_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_136094_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) override;
@@ -68,7 +65,7 @@ private:
 class atari_136095_0072_device : public atari_xga_device
 {
 public:
-	atari_136095_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_136095_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void polylsb_write(offs_t offset, uint32_t data);
 	uint32_t polylsb_read(offs_t offset, uint32_t mem_mask = ~0);

@@ -33,7 +33,7 @@ TODO:
 
 #include "cpu/ht1130/ht1130.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -67,10 +67,9 @@ INPUT_CHANGED_MEMBER(hh_ht11xx_state::input_wakeup)
 
 void hh_ht11xx_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
 {
-	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, tag));
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_ht11xx_lcd);
 }
@@ -94,8 +93,6 @@ public:
 	void piko55(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	void segment_w(offs_t offset, u64 data);
 
 private:
@@ -104,11 +101,6 @@ private:
 	required_ioport m_in_pp;
 	required_ioport m_in_ps;
 };
-
-void hh_ht1130_state::machine_start()
-{
-	m_out_x.resolve();
-}
 
 void hh_ht1130_state::segment_w(offs_t offset, u64 data)
 {
@@ -147,8 +139,6 @@ public:
 	void brke23p2(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	void segment_w(offs_t offset, u64 data);
 
 private:
@@ -156,11 +146,6 @@ private:
 	required_ioport m_in_pp;
 	required_ioport m_in_ps;
 };
-
-void hh_ht1190_state::machine_start()
-{
-	m_out_x.resolve();
-}
 
 void hh_ht1190_state::segment_w(offs_t offset, u64 data)
 {

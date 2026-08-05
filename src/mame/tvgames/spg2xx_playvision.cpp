@@ -22,7 +22,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void pvmil(machine_config &config);
+	void pvmil(machine_config &config) ATTR_COLD;
 
 	int pvmil_p4buttons_r();
 
@@ -47,7 +47,6 @@ void pvmil_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
 
-	m_leds.resolve();
 	save_item(NAME(m_portcdata));
 	save_item(NAME(m_latchcount));
 	save_item(NAME(m_latchbit));

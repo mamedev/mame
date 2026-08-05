@@ -20,7 +20,7 @@ class bq4847_device : public device_t,
 					  public device_rtc_interface
 {
 public:
-	bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto wdo_handler() { return m_wdo_handler.bind(); }
 	auto int_handler() { return m_int_handler.bind(); }

@@ -48,10 +48,14 @@ public:
 		, m_io_keyboard(*this, "X%d", 0)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
-		{ }
+	{ }
 
-	void inderp(machine_config &config);
-	void init_1player();
+	void inderp(machine_config &config) ATTR_COLD;
+	void init_1player() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void clock_tick(int state);
@@ -67,8 +71,6 @@ private:
 	void display_w(offs_t, u8);
 	u16 seg8to14(u16 data);
 	void mem_map(address_map &map) ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<m6504_device> m_maincpu;
 	required_ioport_array<11> m_io_keyboard;
 	output_finder<48> m_digits;
@@ -309,9 +311,6 @@ void inderp_state::clock_tick(int state)
 void inderp_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_key_row));
 	save_item(NAME(m_t_c));

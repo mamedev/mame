@@ -268,6 +268,8 @@ void es1373_device::sound_stream_update(sound_stream &stream)
 //-------------------------------------------------
 void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, sound_stream &stream)
 {
+	// TODO: use the actual pci_device bus master interface
+
 	// Only transfer PCI data if bus mastering is enabled
 	// Fill initial half buffer
 	if (1 && (command & 0x4) && (!chan.initialized)) {
@@ -336,8 +338,8 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, sound_st
 				chan.buf_rptr -= 0x10;
 			}
 		}
-		stream.put_int(0, i, lsamp, 32768);
-		stream.put_int(1, i, rsamp, 32768);
+		stream.put_int_clamp(0, i, lsamp, 32768);
+		stream.put_int_clamp(1, i, rsamp, 32768);
 	}
 }
 
@@ -473,10 +475,10 @@ void es1373_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 		case ES_CODEC:
 			if (data&(1<<23)) {
-				// Read from AC97 codec registers
+				// Read from AC'97 codec registers
 				m_es_regs[offset] = (data&0xFFFF0000) | m_ac97_regs[(data>>16)&0x7f] | 0x80000000;
 			} else {
-				// Write to AC97 codec registers
+				// Write to AC'97 codec registers
 				m_ac97_regs[(data>>16)&0x7f] = data&0xFFFF;
 			}
 			break;

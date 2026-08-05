@@ -144,9 +144,9 @@ private:
 
 void pangofun_state::main_map(address_map &map)
 {
-//	map(0x00000000, 0x0009ffff).ram();
-//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-//	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+//  map(0x00000000, 0x0009ffff).ram();
+//  map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//  map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	// boot ROM has four 0xaa55 headers
 	// $00000 has CON/AUX/LPT/COM refs
 	// $08000 contains COMMAND.COM
@@ -155,19 +155,19 @@ void pangofun_state::main_map(address_map &map)
 	// moves in conventional memory and jumps to PC=700
 	map(0x000d0000, 0x000d7fff).rom().region("romdisk", 0x10000);
 	map(0x000d8000, 0x000dffff).rom().region("romdisk", 0x18000);
-//	map(0x000e0000, 0x000e7fff).rom().region("romdisk", 0x00000);
-//	map(0x000e8000, 0x000effff).rom().region("romdisk", 0x08000);
-//	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
-//	map(0x00100000, 0x01ffffff).ram();
+//  map(0x000e0000, 0x000e7fff).rom().region("romdisk", 0x00000);
+//  map(0x000e8000, 0x000effff).rom().region("romdisk", 0x08000);
+//  map(0x000f0000, 0x000fffff).rom().region("bios", 0);
+//  map(0x00100000, 0x01ffffff).ram();
 	map(0x00100000, 0x03ffffff).noprw();
-//	map(0x02000000, 0xfffeffff).noprw();
+//  map(0x02000000, 0xfffeffff).noprw();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
 
 void pangofun_state::main_io(address_map &map)
 {
 	map(0x00e0, 0x00e3).nopw(); // timestamp stuff?
-//	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
+//  map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
 
@@ -211,7 +211,7 @@ void pangofun_state::pangofun(machine_config &config)
 	// unknown, not provided. Chipset can go up to 32M, but will go "memory fail" with that (?)
 	RAM(config, "ram").set_default_size("64M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
@@ -234,13 +234,14 @@ void pangofun_state::pangofun(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(um8498f_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(um8498f_device::dreq7_w));
 
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "avga1", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa8_cards,  nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, m_isabus, pc_isa16_cards, "avga1", false);
+	ISA16_SLOT(config, "isa2", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, m_isabus, pc_isa8_cards,  nullptr, false);
 	// TODO: this space will be reserved to the romdisk
-	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, m_isabus, pc_isa16_cards, nullptr, false);
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(um8498f_device::kbrst_w));

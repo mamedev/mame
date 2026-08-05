@@ -210,7 +210,7 @@ void agvision_state::agvision(machine_config &config)
 	m_pia_0->cb2_handler().set(FUNC(agvision_state::pia0_cb2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);

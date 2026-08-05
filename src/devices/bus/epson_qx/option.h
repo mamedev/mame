@@ -129,10 +129,7 @@ public:
 	option_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, int slot, U &&opts, const char *dflt)
 		: option_slot_device(mconfig, tag, owner, bus_tag->clock())
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_bus.set_tag(std::forward<T>(bus_tag));
 		m_slot = slot;
 	}
@@ -159,7 +156,7 @@ public:
 	auto in_eopf_callback() { return m_eopf_cb.bind(); }
 	auto in_eops_callback() { return m_eops_cb.bind(); }
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// configuration
@@ -223,7 +220,7 @@ public:
 	option_slot_device* operator[](int index) const {assert(index < m_slot_list.size()); return m_slot_list[index]; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -273,7 +270,7 @@ void option_bus_devices(device_slot_interface &device);
 } // namespace bus::epson_qx
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_BUS_SLOT, bus::epson_qx, option_slot_device)
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_BUS, bus::epson_qx, option_bus_device)
 

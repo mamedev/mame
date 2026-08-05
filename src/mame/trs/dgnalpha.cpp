@@ -341,7 +341,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// floppy
@@ -373,13 +373,13 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 }
 
 ROM_START(dgnalpha)
-	ROM_REGION(0x10000,"maincpu",0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("boot10")
 	ROM_SYSTEM_BIOS(0, "boot10", "Boot v1.0")
 	ROMX_LOAD("alpha_bt_10.rom", 0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "boot04", "Boot v0.4")
 	ROMX_LOAD("alpha_bt_04.rom", 0x2000,  0x2000, CRC(d6172b56) SHA1(69ea376dbc7418f69e9e809b448d22a4de012344), ROM_BIOS(1))
-	ROM_LOAD("alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
+	ROM_LOAD("alpha_ba.rom",    0x4000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 ROM_END
 
 } // anonymous namespace

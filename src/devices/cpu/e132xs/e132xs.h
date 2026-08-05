@@ -5,11 +5,9 @@
 
 #pragma once
 
-#include "32xsdasm.h"
+#include "e1dasm.h"
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 
 #include <utility>
 
@@ -43,9 +41,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class e132xs_frontend;
-
 
 enum
 {
@@ -107,8 +102,6 @@ enum
 // Used by core CPU interface
 class hyperstone_device : public cpu_device, public hyperstone_disassembler::config
 {
-	friend class e132xs_frontend;
-
 public:
 	// input line numbers
 	static inline constexpr int INPUT_INT1 = 0;
@@ -125,6 +118,9 @@ public:
 	virtual ~hyperstone_device() override;
 
 protected:
+	class frontend;
+	class opcode_desc;
+
 	using b_r_delegate  = delegate<uint8_t  (offs_t)>;
 	using hw_r_delegate = delegate<uint16_t (offs_t)>;
 	using w_r_delegate  = delegate<uint32_t (offs_t)>;
@@ -443,9 +439,10 @@ private:
 	FILE *m_trace_log;
 #endif
 
+	hyperstone_disassembler m_disassembler;
 	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
-	std::unique_ptr<e132xs_frontend> m_drcfe;
+	std::unique_ptr<frontend> m_drcfe;
 	uint32_t m_drcoptions;
 	bool m_single_instruction_mode;
 	uint8_t m_cache_dirty;
@@ -481,6 +478,7 @@ private:
 	void flush_drc_cache();
 	void generate_invariant();
 	void code_compile_block(uint8_t mode, offs_t pc);
+	void log_descriptions(const opcode_desc *desc_list, unsigned indent);
 	//void load_fast_iregs(drcuml_block &block);
 	//void save_fast_iregs(drcuml_block &block);
 	void static_generate_helpers(drcuml_block &block, uml::code_label &label);
@@ -497,9 +495,6 @@ private:
 	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
 	void generate_get_trap_addr(drcuml_block &block, uml::code_label &label, uml::parameter trapno);
-	uint32_t generate_get_const(const opcode_desc *desc);
-	uint32_t generate_get_immediate_s(const opcode_desc *desc);
-	uint32_t generate_get_pcrel(const opcode_desc *desc);
 	std::pair<uint16_t, uint32_t> generate_get_d_code_dis(const opcode_desc *opcode);
 
 	void generate_get_global_register_high(drcuml_block &block, compiler_state &compiler, uint32_t code, uml::parameter dst);
@@ -514,12 +509,12 @@ private:
 	void generate_add_dis(drcuml_block &block, compiler_state &compiler, uml::parameter dst, uml::parameter base, uint32_t dis, unsigned alignment);
 	void generate_set_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, reg_bank global, uint32_t code, uml::parameter src, uml::parameter localidx, bool calcidx);
 	void generate_set_dst(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, reg_bank global, uint32_t code, uml::parameter src, uml::parameter localidx, bool calcidx);
-	void generate_update_flags_addsub(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
-	void generate_update_flags_addsubc(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
-	void generate_update_flags_addsubs(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
-	void generate_update_flags_cmp(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
-	void generate_update_nz(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
-	void generate_update_nz_d(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
+	void generate_update_flags_addsub(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
+	void generate_update_flags_addsubc(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
+	void generate_update_flags_addsubs(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
+	void generate_update_flags_cmp(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
+	void generate_update_nz(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
+	void generate_update_nz_d(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
 
 	template <trap_exception_or_int TYPE> void generate_trap_exception_or_int(drcuml_block &block, uml::code_label &label, uml::parameter trapno);
 	void generate_software(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);

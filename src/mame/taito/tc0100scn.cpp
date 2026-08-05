@@ -144,6 +144,8 @@ the wide tilemap mode)
 #include "tc0100scn.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */

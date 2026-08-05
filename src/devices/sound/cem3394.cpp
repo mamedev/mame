@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles,m1macrophage
 /***************************************************************************
 
     Curtis Electromusic Specialties CEM3394 µP-Controllable Synthesizer Voice
@@ -10,20 +10,14 @@
 
 #include "emu.h"
 #include "cem3394.h"
+#include "sound/flt_rc.h"
 
-#include <algorithm>
-
-
-#define ENABLE_FILTER       1
-#define ENABLE_AC_COUPLING  1
+#include <limits>
 
 
 // logging
 #define LOG_CONTROL_CHANGES (1U << 1)
-#define LOG_NANS            (1U << 2)
-#define LOG_VALUES          (1U << 3)
-#define LOG_CONFIG          (1U << 4)
-#define VERBOSE (LOG_NANS)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 
@@ -38,13 +32,6 @@ static constexpr double TRIANGLE_VOLUME = SAWTOOTH_VOLUME * 1.27f;
 
 // external input is unknown but let's make it the same as the pulse
 static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
-
-
-// waveform generation parameters
-#define ENABLE_PULSE        1
-#define ENABLE_TRIANGLE     1
-#define ENABLE_SAWTOOTH     1
-#define ENABLE_EXTERNAL     1
 
 
 /********************************************************************************
@@ -101,12 +88,6 @@ static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
 ********************************************************************************/
 
 
-// various waveforms
-#define WAVE_TRIANGLE       1
-#define WAVE_SAWTOOTH       2
-#define WAVE_PULSE          4
-
-
 // device type definition
 DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394 Synthesizer Voice")
 
@@ -114,217 +95,385 @@ DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394 Synthesizer Voic
 //  LIVE DEVICE
 //**************************************************************************
 
-//-------------------------------------------------
-//  cem3394_device - constructor and configuration
-//-------------------------------------------------
 
 cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, CEM3394, tag, owner, clock),
-	device_sound_interface(mconfig, *this),
-	m_vcf(*this, "vcf"),
-	m_stream(nullptr),
-	m_inv_sample_rate(1.0 / 48000.0),
-	m_vco_zero_freq(500.0),
-	m_filter_zero_freq(1300.0),
-	m_hpf_k(0),
-	m_values{-1}, // will be initialized in device_start()
-	m_wave_select(0),
-	m_volume(0),
-	m_mixer_internal(0),
-	m_mixer_external(0),
-	m_vco_position(0),
-	m_vco_step(0),
-	m_filter_frequency(1300),
-	m_filter_modulation(0),
-	m_filter_resonance(0),
-	m_pulse_width(0),
-	m_hpf_mem(0)
+	cem3394_device(mconfig, tag, owner, components(), stream_inputs())
 {
-	// configuring with the example values in the datasheet
-	configure(270E3, 2E-9, 33E-9, 4.7E-6);
 }
 
-cem3394_device &cem3394_device::configure(double r_vco, double c_vco, double c_vcf, double c_ac)
-{
+cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const stream_inputs &inputs) :
+	device_t(mconfig, CEM3394, tag, owner, 0),
+	device_sound_interface(mconfig, *this),
+	m_stream_inputs(inputs),
+	m_components(comps),
 	// datasheet equation for Fout at CV = 0
-	m_vco_zero_freq = 1.3 / (5.0 * r_vco * c_vco);
-
-	// VCO can range up to pow(2, 4.0/.75) = ~40.3 * zero-voltage-freq
-	const double sample_rate = m_vco_zero_freq * pow(2, 4.0 / 0.75) * 5;
-	m_inv_sample_rate = 1.0 / sample_rate;
-
+	m_vco_zero_freq(1.3 / (5.0 * comps.r_vco * comps.c_vco)),
 	// datasheet equation for Pzcv
 	// Note that "4.3 x 10E-5" in the equation should be 4.3E-5. The surrounding
 	// text and the example walkthrough use the correct value.
-	m_filter_zero_freq = 4.3E-5 / c_vcf;
-
-	// See hpf() for more info
-	constexpr double R_AC = 11E3;  // internal AC coupling resistor
-	m_hpf_k = 1.0 - exp((-1 / (R_AC * c_ac)) * m_inv_sample_rate);
-
-	LOGMASKED(LOG_CONFIG, "CEM3394 config - vco zero freq: %f, filter zero freq: %f, sample rate: %d\n",
-			  m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
-	return *this;
-}
-
-
-//-------------------------------------------------
-//  hpf - apply AC coupling to the output of the
-//  filter, before the signal gets routed to the VCA.
-//-------------------------------------------------
-
-double cem3394_device::hpf(double input)
+	m_filter_zero_freq(4.3E-5 / comps.c_vcf),
+	m_initialized(false),
+	m_stream(nullptr),
+	m_vco(*this, "vco"),
+	m_filt_freq(*this, "filt_freq"),
+	m_filt_fm(*this, "filt_fm"),
+	m_vcf(*this, "vcf"),
+	m_vca(*this, "vca"),
+	m_vco_freq_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_mod_amount_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_wave_select_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_pulse_width_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_mixer_balance_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_filt_res_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_filt_freq_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_final_gain_cv(std::numeric_limits<double>::quiet_NaN()),
+	m_tri(false),
+	m_saw(false),
+	m_vco_frequency(500.0),
+	m_pulse_width(0),
+	m_volume(0),
+	m_mixer_internal(0),
+	m_mixer_external(0),
+	m_filter_frequency(1300),
+	m_filter_modulation(0),
+	m_filter_resonance(0)
 {
-	// The filter's output is AC-coupled to the VCA input.
-
-	// Based on the block diagram in the datasheet, the AC coupling (high-pass
-	// filtering) is implemented by subtracting a low-pass-filtered signal
-	// from the original signal.
-
-	// The capacitor of the LPF RC is attached to pin 17, whereas the resistor
-	// (11 KOhm) is internal to the chip.
-
-	// The LPF code was obtained from sound/flt_rc.cpp.
-
-	m_hpf_mem += (input - m_hpf_mem) * m_hpf_k; // low-pass filtered signal
-	return input - m_hpf_mem; // HPFed signal = signal - LPFed signal
 }
-
-
-//-------------------------------------------------
-//  sound_stream_update - generate sound to the mix
-//  buffer in mono
-//-------------------------------------------------
 
 void cem3394_device::sound_stream_update(sound_stream &stream)
 {
-	if (m_wave_select == 0 && m_mixer_external == 0)
-		LOGMASKED(LOG_VALUES, "%f V didn't cut it\n", m_values[WAVE_SELECT]);
-
-	const u64 input_mask = get_sound_requested_inputs_mask();
-	const bool streaming_cv = input_mask & 0x1fe;
-
-	// loop over samples
-	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
-	{
-		// take into account any streaming voltage inputs
-		if (streaming_cv)
-		{
-			for (int i = 1; i < INPUT_COUNT; i++)
-			{
-				if (BIT(input_mask, i))
-					set_voltage_internal(i, stream.get(i, sampindex));
-			}
-		}
-
-		// get the current VCO position and step it forward
-		double vco_position = m_vco_position;
-		m_vco_position += m_vco_step;
-
-		// clamp VCO position to a fraction
-		if (m_vco_position >= 1.0)
-			m_vco_position -= floor(m_vco_position);
-
-		// handle the pulse component
-		double result = 0;
-		if (ENABLE_PULSE && (m_wave_select & WAVE_PULSE))
-		{
-			// The datasheet mentions a "unique circuit [...] that keeps the
-			// average DC level [...] constant regardless of duty cycle". The
-			// block diagram shows the pulse signal being subtracted from the
-			// pulse width. Here, the pulse width is subtracted from the signal
-			// instead, to ensure a phase consistent with the rest of the signal.
-			if (vco_position < m_pulse_width)
-				result += (1 - m_pulse_width) * PULSE_VOLUME * m_mixer_internal;
-			else
-				result += (0 - m_pulse_width) * PULSE_VOLUME * m_mixer_internal;
-		}
-
-		// handle the sawtooth component
-		if (ENABLE_SAWTOOTH && (m_wave_select & WAVE_SAWTOOTH))
-			result += SAWTOOTH_VOLUME * m_mixer_internal * (vco_position - 0.5);
-
-		// always compute the triangle waveform which is also used for filter modulation
-		double triangle = 2.0 * vco_position;
-		if (triangle > 1.0)
-			triangle = 2.0 - triangle;
-		triangle -= 0.5;
-
-		// handle the triangle component
-		if (ENABLE_TRIANGLE && (m_wave_select & WAVE_TRIANGLE))
-			result += TRIANGLE_VOLUME * m_mixer_internal * triangle;
-
-		// convert from [-0.5, 0.5] to [-1, 1]
-		result *= 2;
-
-		// compute extension input (for Bally/Sente this is the noise)
-		if (ENABLE_EXTERNAL && BIT(input_mask, AUDIO_INPUT))
-			result += EXTERNAL_VOLUME * m_mixer_external * stream.get(AUDIO_INPUT, sampindex);
-
-		// compute the modulated filter frequency and apply the filter
-		// modulation tracks the VCO triangle
-		if (ENABLE_FILTER)
-		{
-			m_vcf->set_fixed_freq_cv(m_filter_frequency * (1 + m_filter_modulation * triangle));
-			m_vcf->set_fixed_res_cv(m_filter_resonance);
-			result = m_vcf->process_sample(result);
-		}
-
-		// apply AC coupling
-		if (ENABLE_AC_COUPLING)
-			result = hpf(result);
-
-		// write the sample
-		stream.put(0, sampindex, result * m_volume);
-	}
+	stream.copy(0, 0);
 }
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void cem3394_device::device_add_mconfig(machine_config &config)
 {
-	VA_LPF4(config, m_vcf).configure_drive(1.0);
+	// Set up the VCO.
+	// Route gains will be adjusted when relevant CVs are updated.
+	VA_VCO(config, m_vco)
+		.configure_pulse_from_tri(true)
+		.configure_pulse_dc_comp(true)
+		.add_route(va_vco_device::OUTPUT_RAMP, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO)
+		.add_route(va_vco_device::OUTPUT_PULSE, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO)
+		.add_route(va_vco_device::OUTPUT_TRIANGLE, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO)
+		.add_route(va_vco_device::OUTPUT_TRIANGLE, m_filt_fm, 0.0, va_vca_device::INPUT_AUDIO);
 
-	// According to the datasheet, the filter maintains the apparent loudness
-	// constant as resonance increases. The value below was selected by trial
-	// and error, to qualitatively match the preceding statement.
-	m_vcf->configure_bass_gain_comp(0.2);
+	// Set up the external input.
+	if (m_stream_inputs.ext_input != nullptr)
+	{
+		// Route gain will be adjusted in set_mixer_balance_cv().
+		m_stream_inputs.ext_input->add_route(0, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO);
+	}
+
+	// Set up filter frequency control.
+	device_sound_interface *filt_freq = nullptr;
+	if (m_stream_inputs.filt_freq_cv != nullptr)
+	{
+		m_stream_inputs.filt_freq_cv->add_route(0, "cv2filtfreq", 1.0);
+		filt_freq = &VA_LAMBDA(config, "cv2filtfreq", [this] (float cv) { return stream_op_filter_freq(cv); });
+	}
+	else
+	{
+		filt_freq = &VA_CONST(config, m_filt_freq);
+	}
+
+	// When the filter's cutoff frequency is modulated, its frequency is:
+	//   filt_freq * (1 + filt_mod_amount * triangle) -- triangle's range: [-0.5, 0.5]
+	//   = filt_freq + filt_freq * filt_mod_amount * 0.5 * triangle  -- triangle's range: [-1, 1].
+	// The two terms in the equation above are summed in m_vcf's INPUT_FREQ node.
+
+	// First term:
+	filt_freq->add_route(0, m_vcf, 1.0, va_lpf4_device::INPUT_FREQ);
+
+	// Second term, computed by the m_filt_fm VCA:
+	// - The triangle wave (range: [-1, 1]) is applied to m_filt_fm's INPUT_AUDIO
+	//   (see VCO configuration above).
+	// - The route gain of the above is set to filt_mod_amount * 0.5
+	//   (see set_mod_amount_cv()).
+	// - filt_freq is applied to INPUT_GAIN (see right below).
+	// The above make m_filt_fm's output: filt_freq * filt_mod_amount * 0.5 * triangle
+	filt_freq->add_route(0, m_filt_fm, 1.0, va_vca_device::INPUT_GAIN);
+	VA_VCA(config, m_filt_fm).add_route(0, m_vcf, 1.0, va_lpf4_device::INPUT_FREQ);
+
+	// Set up the VCF.
+	VA_LPF4(config, m_vcf)
+		.configure_drive(1.0)
+		// According to the datasheet, the filter maintains the apparent loudness
+		// constant as resonance increases. The value below was selected by trial
+		// and error, to qualitatively match the preceding statement.
+		.configure_bass_gain_comp(0.2)
+		.add_route(0, "ac_couple", 1.0);
+
+	// Set up AC coupling.
+	constexpr double R_AC = 11E3;  // internal AC coupling resistor
+	FILTER_RC(config, "ac_couple")
+		.set_rc(filter_rc_device::HIGHPASS, R_AC, 0, 0, m_components.c_ac)
+		.add_route(0, m_vca, 1.0, va_vca_device::INPUT_AUDIO);
+
+	// Set up the VCA.
+	if (m_stream_inputs.final_gain_cv != nullptr)
+	{
+		m_stream_inputs.final_gain_cv->add_route(0, "cv2ampgain", 1.0);
+		VA_LAMBDA(config, "cv2ampgain", [this] (float cv) { return stream_op_amp_gain(cv); })
+			.add_route(0, m_vca, 1.0, va_vca_device::INPUT_GAIN);
+	}
+	VA_VCA(config, m_vca).add_route(0, *this, 1.0);
 }
 
 void cem3394_device::device_start()
 {
-	// compute a sample rate
-	const int sample_rate = int(round(1.0 / m_inv_sample_rate));
-	m_vcf->configure_streamless(sample_rate);
-
 	// allocate stream channels
-	m_stream = stream_alloc(get_sound_requested_inputs(), 1, sample_rate);
+	m_stream = stream_alloc(1, 1, machine().sample_rate());
 
-	save_item(NAME(m_values));
-	save_item(NAME(m_wave_select));
+	save_item(NAME(m_vco_freq_cv));
+	save_item(NAME(m_mod_amount_cv));
+	save_item(NAME(m_wave_select_cv));
+	save_item(NAME(m_pulse_width_cv));
+	save_item(NAME(m_mixer_balance_cv));
+	save_item(NAME(m_filt_res_cv));
+	save_item(NAME(m_filt_freq_cv));
+	save_item(NAME(m_final_gain_cv));
 
+	save_item(NAME(m_tri));
+	save_item(NAME(m_saw));
+	save_item(NAME(m_vco_frequency));
+	save_item(NAME(m_pulse_width));
 	save_item(NAME(m_volume));
 	save_item(NAME(m_mixer_internal));
 	save_item(NAME(m_mixer_external));
-
-	save_item(NAME(m_vco_position));
-	save_item(NAME(m_vco_step));
-
 	save_item(NAME(m_filter_frequency));
 	save_item(NAME(m_filter_modulation));
 	save_item(NAME(m_filter_resonance));
+}
 
-	save_item(NAME(m_pulse_width));
+void cem3394_device::device_reset()
+{
+	if (!m_initialized)
+	{
+		// This initialization is only required on startup, not on reset. But it
+		// can't be done in device_start() because it requires the owned devices
+		// to be running. Using m_initialized to ensure this is only done once.
 
-	save_item(NAME(m_hpf_mem));
+		set_vco_freq_cv(0.0);
+		set_mod_amount_cv(0.0);
+		set_wave_select_cv(0.0);
+		set_pulse_width_cv(0.0);
+		set_mixer_balance_cv(0.0);
+		set_filt_res_cv(0.0);
 
-	// Ensures that m_values, and member variables derived from m_values, are
-	// properly initialized. Index 0 is unused.
-	for (int i = 1; i < INPUT_COUNT; i++)
-		set_voltage_internal(i, 0);
+		if (m_stream_inputs.filt_freq_cv != nullptr)
+			set_filt_freq_cv_internal(0.0);
+		else
+			set_filt_freq_cv(0.0);
+
+		if (m_stream_inputs.final_gain_cv != nullptr)
+			set_final_gain_cv_internal(0.0);
+		else
+			set_final_gain_cv(0.0);
+
+		m_initialized = true;
+	}
+}
+
+
+void cem3394_device::set_vco_freq_cv(double cv)
+{
+	if (cv == m_vco_freq_cv)
+		return;
+
+	m_vco_freq_cv = cv;
+
+	// frequency varies from -4.0 to +4.0, at 0.75V/octave
+	m_vco_frequency = m_vco_zero_freq * pow(2.0, -cv * (1.0 / 0.75));
+	LOGMASKED(LOG_CONTROL_CHANGES, "VCO_FREQ=%6.3fV -> freq=%f\n", cv, m_vco_frequency);
+
+	m_vco->set_freq_ctrl(m_vco_frequency);
+}
+
+void cem3394_device::set_mod_amount_cv(double cv)
+{
+	if (cv == m_mod_amount_cv)
+		return;
+
+	m_mod_amount_cv = cv;
+
+	// At max depth, the frequency is modulated from 0.01x to 2.0x. This
+	// implementation modulates from 0.01x to 1.99x, for simpler math. 0%
+	// modulation is achieved when the CV is below -0.3 - +0.1 V. Using a
+	// threshold of 0.01 here, to ensure the min CV set by the sixtrak results
+	// in 0% modulation. 100% modulation is achieved when the CV is above 3 - 4 V.
+	// Using the midpoint (3.5) as the threshold here.
+	if (cv < 0.01)
+		m_filter_modulation = 0;
+	else if (cv > 3.5)
+		m_filter_modulation = 1.98;
+	else
+		m_filter_modulation = 1.98 * (cv - 0.01) / (3.5 - 0.01);
+	LOGMASKED(LOG_CONTROL_CHANGES, "FLT_MODU=%6.3fV -> mod=%f\n", cv, m_filter_modulation);
+
+	// See m_filt_fm setup in device_add_mconfig().
+	const double mod_gain = 0.5 * m_filter_modulation;
+	m_vco->set_route_gain(va_vco_device::OUTPUT_TRIANGLE, m_filt_fm, va_vca_device::INPUT_AUDIO, mod_gain);
+}
+
+void cem3394_device::set_wave_select_cv(double cv)
+{
+	if (cv == m_wave_select_cv)
+		return;
+
+	m_wave_select_cv = cv;
+
+	// Wave select chooses between triangle, sawtooth, both, or neither.
+	// The waveform selection voltages, as specified in the datasheet, are:
+	// - none:                 less than -0.5
+	// - triangle:            -0.5  - -0.2
+	// - triangle + sawtooth:  0.9  -  1.5
+	// - sawtooth:             2.3  -  3.9
+	// However, some systems (such as the Six-Trak) use voltages outside those
+	// ranges. The logic below uses the midpoint of two boundaries as the
+	// transition point.
+	m_tri = (cv >= -0.5 && cv < 1.9);
+	m_saw = (cv >= 0.35);
+	LOGMASKED(LOG_CONTROL_CHANGES, "WAVE_SEL=%6.3fV -> tri=%d saw=%d\n", cv, m_tri, m_saw);
+
+	update_osc_mix();
+}
+
+void cem3394_device::set_pulse_width_cv(double cv)
+{
+	if (cv == m_pulse_width_cv)
+		return;
+
+	m_pulse_width_cv = cv;
+
+	// pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100%
+	// A pulse width of 0 or 1 will result in the waveform being 0 for its
+	// entire cycle, which means it is essentially disabled.
+	m_pulse_width = std::clamp(0.5 * cv, 0.0, 1.0);
+	LOGMASKED(LOG_CONTROL_CHANGES, "PULSE_WI=%6.3fV -> adj=%f\n", cv, m_pulse_width);
+
+	m_vco->set_pw_ctrl(m_pulse_width);
+}
+
+void cem3394_device::set_mixer_balance_cv(double cv)
+{
+	if (cv == m_mixer_balance_cv)
+		return;
+
+	m_mixer_balance_cv = cv;
+
+	// mixer balance is a pan between the external input and the internal input
+	// 0.0 is equal parts of both; positive values favor external, negative favor internal
+	if (cv >= 0.0)
+	{
+		m_mixer_internal = compute_db_volume(3.55 - cv);
+		m_mixer_external = compute_db_volume(3.55 + 0.45 * (cv * 0.25));
+	}
+	else
+	{
+		m_mixer_internal = compute_db_volume(3.55 - 0.45 * (cv * 0.25));
+		m_mixer_external = compute_db_volume(3.55 + cv);
+	}
+	LOGMASKED(LOG_CONTROL_CHANGES, " BALANCE=%6.3fV -> int=%f ext=%f\n", cv, m_mixer_internal, m_mixer_external);
+
+	const double pulse_gain = PULSE_VOLUME * m_mixer_internal;
+	m_vco->set_route_gain(va_vco_device::OUTPUT_PULSE, m_vcf, va_lpf4_device::INPUT_AUDIO, pulse_gain);
+	update_osc_mix();
+
+	if (m_stream_inputs.ext_input != nullptr)
+	{
+		const double ext_gain = EXTERNAL_VOLUME * m_mixer_external;
+		m_stream_inputs.ext_input->set_route_gain(0, m_vcf, va_lpf4_device::INPUT_AUDIO, ext_gain);
+	}
+}
+
+void cem3394_device::set_filt_res_cv(double cv)
+{
+	if (cv == m_filt_res_cv)
+		return;
+
+	m_filt_res_cv = cv;
+
+	// According to the datasheet, the "no resonance" CV threshold is between
+	// 0V and 0.3V, and oscillation starts between 2.0 and 3.0 V, with a typical
+	// threshold of 2.5V. So 2.5V will map to a resonance gain of 4.
+	if (cv < 0.0)
+		m_filter_resonance = 0.0;
+	else
+		m_filter_resonance = 4.0 * cv / 2.5;
+	LOGMASKED(LOG_CONTROL_CHANGES, "FLT_RESO=%6.3fV -> mod=%f\n", cv, m_filter_resonance);
+
+	m_vcf->set_fixed_res_cv(m_filter_resonance);
+}
+
+void cem3394_device::set_filt_freq_cv_internal(double cv)
+{
+	if (cv == m_filt_freq_cv)
+		return;
+
+	m_filt_freq_cv = cv;
+
+	// filter frequency varies from -3.0 to +4.0, at 0.375V/octave
+	m_filter_frequency = m_filter_zero_freq * pow(2.0, -cv * (1.0 / 0.375));
+	LOGMASKED(LOG_CONTROL_CHANGES, "FLT_FREQ=%6.3fV -> freq=%f\n", cv, m_filter_frequency);
+}
+
+void cem3394_device::set_filt_freq_cv(double cv)
+{
+	if (m_stream_inputs.filt_freq_cv != nullptr)
+		fatalerror("%s - Cannot call set_fill_freq_cv() when filt_freq is a streaming input.\n", tag());
+	if (cv == m_filt_freq_cv)
+		return;
+
+	set_filt_freq_cv_internal(cv);
+	m_filt_freq->set_value(m_filter_frequency);
+}
+
+void cem3394_device::set_final_gain_cv_internal(double cv)
+{
+	if (cv == m_final_gain_cv)
+		return;
+
+	m_final_gain_cv = cv;
+
+	// final gain is pretty self-explanatory; 0.0 means ~90dB, 4.0 means 0dB
+	m_volume = compute_db_volume(cv);
+	LOGMASKED(LOG_CONTROL_CHANGES, "TOT_GAIN=%6.3fV -> vol=%f\n", cv, m_volume);
+}
+
+void cem3394_device::set_final_gain_cv(double cv)
+{
+	if (m_stream_inputs.final_gain_cv != nullptr)
+		fatalerror("%s - Cannot call set_final_gain_cv() when final_gain is a streaming input.\n", tag());
+	if (cv == m_final_gain_cv)
+		return;
+
+	set_final_gain_cv_internal(cv);
+	m_vca->set_fixed_gain_cv(m_volume);
+}
+
+
+double cem3394_device::vco_freq()
+{
+	return m_vco_frequency;
+}
+
+double cem3394_device::filt_res()
+{
+	return m_filter_resonance;
+}
+
+double cem3394_device::filt_freq()
+{
+	if (m_stream_inputs.filt_freq_cv != nullptr)
+		m_stream->update();
+	return m_filter_frequency;
+}
+
+double cem3394_device::final_gain()
+{
+	if (m_stream_inputs.final_gain_cv != nullptr)
+		m_stream->update();
+	return m_volume;
 }
 
 
@@ -354,206 +503,30 @@ double cem3394_device::compute_db(double voltage)
 	}
 }
 
-
 sound_stream::sample_t cem3394_device::compute_db_volume(double voltage)
 {
 	// convert from dB to volume and return
 	return powf(0.891251f, compute_db(voltage));
 }
 
-
-void cem3394_device::set_voltage_internal(int input, double voltage)
+void cem3394_device::update_osc_mix()
 {
-	double temp;
+	const double tri_gain = m_tri ? (TRIANGLE_VOLUME * m_mixer_internal) : 0;
+	m_vco->set_route_gain(va_vco_device::OUTPUT_TRIANGLE, m_vcf, va_lpf4_device::INPUT_AUDIO, tri_gain);
 
-	// don't do anything if no change
-	if (voltage == m_values[input])
-		return;
-	m_values[input] = voltage;
-
-	// switch off the input
-	switch (input)
-	{
-		// frequency varies from -4.0 to +4.0, at 0.75V/octave
-		case VCO_FREQUENCY:
-			temp = m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
-			m_vco_step = temp * m_inv_sample_rate;
-			LOGMASKED(LOG_CONTROL_CHANGES, "VCO_FREQ=%6.3fV -> freq=%f\n", voltage, temp);
-			break;
-
-		// Wave select chooses between triangle, sawtooth, both, or neither.
-		// The waveform selection voltages, as specified in the datasheet, are:
-		// - none:                 less than -0.5
-		// - triangle:            -0.5  - -0.2
-		// - triangle + sawtooth:  0.9  -  1.5
-		// - sawtooth:             2.3  -  3.9
-		// However, some systems (such as the Six-Trak) use voltages outside
-		// those ranges. The logic below uses the midpoint of two boundaries as
-		// the transition point.
-		case WAVE_SELECT:
-			m_wave_select &= ~(WAVE_TRIANGLE | WAVE_SAWTOOTH);
-			if (voltage >= -0.5 && voltage < 0.35)
-				m_wave_select |= WAVE_TRIANGLE;
-			else if (voltage >= 0.35 && voltage < 1.9)
-				m_wave_select |= WAVE_TRIANGLE | WAVE_SAWTOOTH;
-			else if (voltage >= 1.9)
-				m_wave_select |= WAVE_SAWTOOTH;
-			LOGMASKED(LOG_CONTROL_CHANGES, "WAVE_SEL=%6.3fV -> tri=%d saw=%d\n", voltage, (m_wave_select & WAVE_TRIANGLE) ? 1 : 0, (m_wave_select & WAVE_SAWTOOTH) ? 1 : 0);
-			break;
-
-		// pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100%
-		case PULSE_WIDTH:
-			if (voltage < 0.0)
-			{
-				m_pulse_width = 0;
-				m_wave_select &= ~WAVE_PULSE;
-			}
-			else if (voltage > 2.0)
-			{
-				m_pulse_width = 1;
-				m_wave_select &= ~WAVE_PULSE;
-			}
-			else
-			{
-				m_pulse_width = voltage * 0.5;
-				m_wave_select |= WAVE_PULSE;
-			}
-			LOGMASKED(LOG_CONTROL_CHANGES, "PULSE_WI=%6.3fV -> raw=%f adj=%f\n", voltage, voltage * 0.5, m_pulse_width);
-			break;
-
-		// final gain is pretty self-explanatory; 0.0 means ~90dB, 4.0 means 0dB
-		case FINAL_GAIN:
-			m_volume = compute_db_volume(voltage);
-			LOGMASKED(LOG_CONTROL_CHANGES, "TOT_GAIN=%6.3fV -> vol=%f\n", voltage, m_volume);
-			break;
-
-		// mixer balance is a pan between the external input and the internal input
-		// 0.0 is equal parts of both; positive values favor external, negative favor internal
-		case MIXER_BALANCE:
-			if (voltage >= 0.0)
-			{
-				m_mixer_internal = compute_db_volume(3.55 - voltage);
-				m_mixer_external = compute_db_volume(3.55 + 0.45 * (voltage * 0.25));
-			}
-			else
-			{
-				m_mixer_internal = compute_db_volume(3.55 - 0.45 * (voltage * 0.25));
-				m_mixer_external = compute_db_volume(3.55 + voltage);
-			}
-			LOGMASKED(LOG_CONTROL_CHANGES, " BALANCE=%6.3fV -> int=%f ext=%f\n", voltage, m_mixer_internal, m_mixer_external);
-			break;
-
-		// filter frequency varies from -3.0 to +4.0, at 0.375V/octave
-		case FILTER_FREQUENCY:
-			m_filter_frequency = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
-			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_FREQ=%6.3fV -> freq=%f\n", voltage, m_filter_frequency);
-			break;
-
-		// At max depth, the frequency is modulated from 0.01x to 2.0x. This
-		// implementation modulates from 0.01x to 1.99x, for simpler math.
-		// 0% modulation is achieved when the CV is below -0.3 - +0.1 V. Using
-		// a threshold of 0.01 here, to ensure the min CV set by the sixtrak
-		// results in 0% modulation.
-		// 100% modulation is achieved when the CV is above 3 - 4 V. Using the
-		// midpoint (3.5) as the threshold here.
-		case MODULATION_AMOUNT:
-			if (voltage < 0.01)
-				m_filter_modulation = 0;
-			else if (voltage > 3.5)
-				m_filter_modulation = 1.98;
-			else
-				m_filter_modulation = 1.98 * (voltage - 0.01) / (3.5 - 0.01);
-			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_MODU=%6.3fV -> mod=%f\n", voltage, m_filter_modulation);
-			break;
-
-		// According to the datasheet, the "no resonance" CV threshold is between
-		// 0V and 0.3V, and oscillation starts between 2.0 and 3.0 V, with a
-		// typical threshold of 2.5V. So 2.5V will map to a resonance gain of 4.
-		case FILTER_RESONANCE:
-			if (voltage < 0.0)
-				m_filter_resonance = 0.0;
-			else
-				m_filter_resonance = 4.0 * voltage / 2.5;
-			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_RESO=%6.3fV -> mod=%f\n", voltage, m_filter_resonance);
-			break;
-
-		default:
-			fatalerror("%s - unrecognized input: %d\n", tag(), input);
-			break;
-	}
+	const double saw_gain = m_saw ? (SAWTOOTH_VOLUME * m_mixer_internal) : 0;
+	m_vco->set_route_gain(va_vco_device::OUTPUT_RAMP, m_vcf, va_lpf4_device::INPUT_AUDIO, saw_gain);
 }
 
-
-void cem3394_device::set_voltage(int input, double voltage)
+float cem3394_device::stream_op_filter_freq(float voltage)
 {
-	if (input < 1 || input >= INPUT_COUNT)
-		fatalerror("%s - Invalid input to set_voltage(): %d\n", tag(), input);
-
-	if (BIT(get_sound_requested_inputs_mask(), input))
-		fatalerror("%s - Cannot call set_voltage(%d, ...). %d is a streaming input.\n", tag(), input, input);
-
-	if (voltage == m_values[input])
-		return;
-
-	m_stream->update();
-	set_voltage_internal(input, voltage);
+	set_filt_freq_cv_internal(voltage);
+	return m_filter_frequency;
 }
 
-double cem3394_device::get_voltage(int input)
+float cem3394_device::stream_op_amp_gain(float voltage)
 {
-	if (input < 1 || input >= INPUT_COUNT)
-		fatalerror("%s - Invalid input to get_voltage(): %d\n", tag(), input);
-
-	if (BIT(get_sound_requested_inputs_mask(), input))
-		m_stream->update();
-
-	return m_values[input];
+	set_final_gain_cv_internal(voltage);
+	return m_volume;
 }
 
-double cem3394_device::get_parameter(int input)
-{
-	const double voltage = get_voltage(input);
-
-	switch (input)
-	{
-		case VCO_FREQUENCY:
-			return m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
-
-		case WAVE_SELECT:
-			return voltage;
-
-		case PULSE_WIDTH:
-			if (voltage <= 0.0)
-				return 0.0;
-			else if (voltage >= 2.0)
-				return 1.0;
-			else
-				return voltage * 0.5;
-
-		case FINAL_GAIN:
-			return compute_db(voltage);
-
-		case MIXER_BALANCE:
-			return voltage * 0.25;
-
-		case MODULATION_AMOUNT:
-			if (voltage < 0.0)
-				return 0.01;
-			else if (voltage > 3.5)
-				return 1.99;
-			else
-				return (voltage * (1.0 / 3.5)) * 1.98 + 0.01;
-
-		case FILTER_RESONANCE:
-			if (voltage < 0.0)
-				return 0.0;
-			else if (voltage > 2.5)
-				return 1.0;
-			else
-				return voltage * (1.0 / 2.5);
-
-		case FILTER_FREQUENCY:
-			return m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
-	}
-	return 0.0;
-}

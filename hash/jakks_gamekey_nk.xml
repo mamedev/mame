@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="jakks_gamekey_nk" description="JAKKS Pacific 'NK' Game Keys">
+<softwarelist name="jakks_gamekey_nk" description="JAKKS Pacific 'NK' Game Keys (Nickelodeon)">
 
 	<!-- This list is for the 'NK' coded Game Keys, for Nicktoons and related systems -->
 
@@ -22,7 +22,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="volbird">
-		<description>Nicktoons Vollyball &amp; Birdie Putt</description>
+		<description>Nicktoons Volleyball &amp; Birdie Putt</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific / Handheld Games</publisher>
 		<part name="cart" interface="jakks_gamekey">

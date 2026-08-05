@@ -66,7 +66,7 @@ public:
 	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -106,7 +106,7 @@ public:
 protected:
 	using parent::update_streams;
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// memory space configuration

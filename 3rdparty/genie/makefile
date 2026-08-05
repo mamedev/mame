@@ -54,7 +54,7 @@ release-windows release-darwin: $(GENIE)
 
 release-linux: $(GENIE)
 	$(SILENT) $(GENIE) release
-	$(SILENT) $(MAKE) -C build/$(PROJECT_TYPE).darwin  clean all CC=x86_64-apple-darwin20.2-clang
+	$(SILENT) $(MAKE) -C build/$(PROJECT_TYPE).darwin  clean all CC=arm64-apple-darwin24.1-clang CFLAGS="-arch arm64" LDFLAGS="-arch arm64"
 	$(SILENT) $(MAKE) -C build/$(PROJECT_TYPE).linux   clean all
 	$(SILENT) $(MAKE) -C build/$(PROJECT_TYPE).windows clean all CC=x86_64-w64-mingw32-gcc
 	$(SILENT) git checkout src/host/version.h

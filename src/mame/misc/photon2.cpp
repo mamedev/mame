@@ -370,13 +370,13 @@ void photon2_state::photon2(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
 
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("JOY");
 	m_ppi->in_pc_callback().set_ioport("COIN");
 	m_ppi->out_pc_callback().set(FUNC(photon2_state::misc_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50.08);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT);

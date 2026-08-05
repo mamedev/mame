@@ -91,8 +91,8 @@ public:
 		, m_leds(*this, "led_%u", 0U)
 	{ }
 
-	void votrhv(machine_config &config);
-	void hc110(machine_config &config);
+	void votrhv(machine_config &config) ATTR_COLD;
+	void hc110(machine_config &config) ATTR_COLD;
 
 	void reset_counter(int state);
 	void key_pressed(int state);
@@ -406,8 +406,6 @@ TIMER_CALLBACK_MEMBER(hc120_state::scan_keys)
 void votrhv_state::machine_start()
 {
 	m_resume_timer = timer_alloc(FUNC(votrhv_state::resume_tick), this);
-
-	m_leds.resolve();
 
 	save_item(NAME(m_latchx));
 	save_item(NAME(m_latchy));

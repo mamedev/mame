@@ -85,7 +85,7 @@ void ncd_ppc_state::explorapro(machine_config &config)
 	PPC403GA(config, m_maincpu, 50000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_ppc_state::explorapro_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(77.4144_MHz_XTAL, 1376, 0, 1024, 803, 0, 768);
 	m_screen->set_screen_update(FUNC(ncd_ppc_state::screen_update));
 }

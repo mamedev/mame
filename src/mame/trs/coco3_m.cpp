@@ -47,6 +47,21 @@
 #include "coco3.h"
 
 //-------------------------------------------------
+//  machine_start
+//-------------------------------------------------
+
+void coco3_state::machine_start()
+{
+	coco_state::machine_start();
+
+	// save state support
+	save_item(NAME(m_prev_keyboard_pressed));
+	save_item(NAME(m_pia1b_control_register));
+}
+
+
+
+//-------------------------------------------------
 //  ff20_write
 //-------------------------------------------------
 
@@ -87,16 +102,29 @@ void coco3_state::ff40_write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  update_keyboard_input
+//  keyboard_changed
 //-------------------------------------------------
 
-void coco3_state::update_keyboard_input(uint8_t value)
+INPUT_CHANGED_MEMBER(coco3_state::keyboard_changed)
 {
-	coco_state::update_keyboard_input(value);
-	m_gime->set_il1(value == 0xFF);
+	coco_state::keyboard_changed(field, param, oldval, newval);
+
+	/* Support for CoCo 3 keyboard GIME interrupt */
+	uint8_t any_pressed = 0;
+	for (unsigned i = 0; i < m_keyboard.size(); i++)
+	{
+		any_pressed |= (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xff;
+	}
+
+	bool pressed = any_pressed != 0;
+	if (pressed != m_prev_keyboard_pressed)
+	{
+		m_gime->set_il1(true);
+		m_gime->set_il1(false);
+	}
+
+	m_prev_keyboard_pressed = pressed;
 }
-
-
 
 //-------------------------------------------------
 //  cart_w

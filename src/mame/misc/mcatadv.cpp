@@ -149,6 +149,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "video/tmap038.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 
@@ -390,23 +391,23 @@ u32 mcatadv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 
 	LOGROWSCROLL("%02x %02x %02x %02x",
-		m_tilemap[0]->rowscroll_en(),
-		m_tilemap[0]->rowselect_en(),
-		m_tilemap[1]->rowscroll_en(),
-		m_tilemap[1]->rowselect_en());
+			m_tilemap[0]->rowscroll_en(),
+			m_tilemap[0]->rowselect_en(),
+			m_tilemap[1]->rowscroll_en(),
+			m_tilemap[1]->rowselect_en());
 
 
 	for (int i = 0; i <= 3; i++)
 	{
 	#ifdef MAME_DEBUG
-			if (!machine().input().code_pressed(KEYCODE_Q))
+		if (!machine().input().code_pressed(KEYCODE_Q))
 	#endif
-				draw_tilemap_part(screen, 0, i | 0x8, bitmap, cliprect);
+			draw_tilemap_part(screen, 0, i | 0x8, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
-			if (!machine().input().code_pressed(KEYCODE_W))
+		if (!machine().input().code_pressed(KEYCODE_W))
 	#endif
-				draw_tilemap_part(screen, 1, i | 0x8, bitmap, cliprect);
+			draw_tilemap_part(screen, 1, i | 0x8, bitmap, cliprect);
 	}
 
 	auto profile = g_profiler.start(PROFILER_USER1);
@@ -708,7 +709,7 @@ void mcatadv_state::mcatadv(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::mcatadv_sound_io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 256);

@@ -28,8 +28,10 @@ HD44820B63 MCU is used in:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
+
+#include <bit>
 
 // internal artwork
 #include "cxg_pchess.lh"
@@ -88,7 +90,7 @@ void pchess_state::machine_start()
 void pchess_state::update_lcd()
 {
 	// LCD common is analog (voltage level)
-	const u8 com = population_count_32(m_lcd_com & 3);
+	const u8 com = std::popcount(m_lcd_com & 3U);
 	const u64 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 	m_display->write_row(0, data);
 }
@@ -184,10 +186,9 @@ void pchess_state::pchess(machine_config &config)
 	m_display->set_bri_levels(0.05);
 	config.set_default_layout(layout_cxg_pchess);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/4, 914/4);
-	screen.set_visarea_full();
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

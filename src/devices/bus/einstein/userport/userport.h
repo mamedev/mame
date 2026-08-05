@@ -36,16 +36,7 @@ class einstein_userport_device : public device_t, public device_single_card_slot
 {
 public:
 	// construction/destruction
-	einstein_userport_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: einstein_userport_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		einstein_userport_cards(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-
-	einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~einstein_userport_device();
 
 	// callbacks
@@ -59,7 +50,7 @@ public:
 	void brdy_w(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_einstein_userport_interface *m_card;
@@ -85,7 +76,7 @@ protected:
 	einstein_userport_device *m_slot;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(EINSTEIN_USERPORT, einstein_userport_device)
 
 #endif // MAME_BUS_EINSTEIN_USERPORT_USERPORT_H

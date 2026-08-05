@@ -460,7 +460,6 @@ void systeme_state::coin_counters_write(uint8_t data)
 
 void systeme_state::machine_start()
 {
-	m_lamp.resolve();
 	membank("vdp1_bank")->configure_entries(0, 2, m_vram[0], 0x4000);
 	membank("vdp2_bank")->configure_entries(0, 2, m_vram[1], 0x4000);
 	m_bank1->configure_entries(0, 16, m_maincpu_region->base() + 0x10000, 0x4000);
@@ -901,7 +900,7 @@ void systeme_state::systeme(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(systeme_state::coin_counters_write));
 	m_ppi->tri_pb_callback().set_constant(0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(10'738'635)/2,
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192);

@@ -2359,7 +2359,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="to9pappsc" cloneof="to9papps">
-		<description>TO9+ Applications (640K Disk)</description>
+		<description>TO9+ Applications (640K disk)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 

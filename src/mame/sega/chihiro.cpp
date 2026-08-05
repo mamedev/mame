@@ -463,7 +463,7 @@ class jvs_master : public jvs_host
 {
 public:
 	// construction/destruction
-	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	int get_sense_line();
 	void send_packet(int destination, int length, uint8_t *data);
 	int received_packet(uint8_t *buffer);
@@ -1876,7 +1876,7 @@ void chihiro_state::machine_start()
 class sega_network_board : public device_t
 {
 public:
-	sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -1947,8 +1947,8 @@ void chihiro_state::chihiro_base(machine_config &config)
 	OHCI_USB_CONNECTOR(config, "pci:02.0:port3", usb_baseboard, nullptr, false);
 	OHCI_USB_CONNECTOR(config, "pci:02.0:port4", usb_baseboard, nullptr, false);
 
-	JVS_MASTER(config, "jvs_master", 0);
-	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
+	JVS_MASTER(config, "jvs_master");
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", "jvs_master"));
 	sega837.set_port_tag<0>("TILT");
 	sega837.set_port_tag<1>("P1");
 	sega837.set_port_tag<2>("P2");
@@ -1968,7 +1968,7 @@ void chihiro_state::chihirogd(machine_config &config)
 	chihiro_base(config);
 	NAOMI_GDROM_BOARD(config, m_dimmboard, 0, ":gdrom", "pic");
 	m_dimmboard->irq_callback().set_nop();
-	SEGA_NETWORK_BOARD(config, "network", 0);
+	SEGA_NETWORK_BOARD(config, "network");
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

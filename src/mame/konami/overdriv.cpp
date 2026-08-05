@@ -417,7 +417,6 @@ INPUT_PORTS_END
 
 void overdriv_state::machine_start()
 {
-	m_led.resolve();
 	m_objdma_end_timer = timer_alloc(FUNC(overdriv_state::objdma_end_cb), this);
 
 	save_item(NAME(m_cpuB_ctrl));
@@ -469,7 +468,7 @@ void overdriv_state::overdriv(machine_config &config)
 	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set_ioport("PADDLE");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 305, 264, 0, 224);
 	screen.set_screen_update(FUNC(overdriv_state::screen_update));
 	screen.set_palette("palette");
@@ -492,10 +491,10 @@ void overdriv_state::overdriv(machine_config &config)
 	m_k051316[1]->set_offsets(111, 1);
 	m_k051316[1]->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
-	K053250(config, "k053250_1", 0, "palette", m_screen, 0, 0);
-	K053250(config, "k053250_2", 0, "palette", m_screen, 0, 0);
+	K053250(config, "k053250_1", "palette", m_screen, 0, 0);
+	K053250(config, "k053250_2", "palette", m_screen, 0, 0);
 
 	K053252(config, m_k053252, 24_MHz_XTAL / 4);
 	m_k053252->set_offsets(13*8, 2*8);

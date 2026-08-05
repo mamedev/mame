@@ -57,9 +57,10 @@
 
 *****************************************************************************/
 
-
 #include "emu.h"
 #include "mos6560.h"
+
+#include <numbers>
 
 
 /*****************************************************************************
@@ -661,7 +662,7 @@ void mos6560_device::sound_start()
 
 		for (int i = 0; i < m_tonesize; i++)
 		{
-			m_tone[i] = int16_t(sin (2 * M_PI * i / m_tonesize) * 127 + 0.5);
+			m_tone[i] = int16_t(sin (2 * std::numbers::pi * i / m_tonesize) * 127 + 0.5);
 		}
 	}
 }

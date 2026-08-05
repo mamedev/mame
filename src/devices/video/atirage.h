@@ -82,7 +82,7 @@ protected:
 class atirageiidvd_device : public atirage_device
 {
 public:
-	atirageiidvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atirageiidvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

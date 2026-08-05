@@ -22,12 +22,12 @@ DEFINE_DEVICE_TYPE(NANORESEAU_MO, nanoreseau_mo_device, "nanoreseau_mo", "Nanore
 }
 
 nanoreseau_to_device::nanoreseau_to_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool no_id) :
-	nanoreseau_device(mconfig, NANORESEAU_TO, tag, owner, clock)
+	nanoreseau_device(mconfig, NANORESEAU_TO, tag, owner, clock, no_id)
 {
 }
 
 nanoreseau_mo_device::nanoreseau_mo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool no_id) :
-	nanoreseau_device(mconfig, NANORESEAU_MO, tag, owner, clock)
+	nanoreseau_device(mconfig, NANORESEAU_MO, tag, owner, clock, no_id)
 {
 }
 

@@ -60,6 +60,7 @@ epson_sio_device::epson_sio_device(const machine_config &mconfig, const char *ta
 	m_write_rx(*this),
 	m_write_pin(*this)
 {
+	set_options(epson_sio_devices, nullptr, false);
 }
 
 

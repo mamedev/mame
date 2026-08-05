@@ -43,7 +43,6 @@ public:
 	void tetrisp2(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	void setup_main_sysctrl(machine_config &config, const XTAL clock) ATTR_COLD;

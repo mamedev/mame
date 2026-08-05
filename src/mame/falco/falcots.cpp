@@ -591,7 +591,7 @@ void falcots_state::ts1(machine_config &config)
 	pci.txrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst1_w));
 	pci.rxrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst2_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15.2064_MHz_XTAL, 792, 0, 640, 320, 0, 300);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
@@ -654,7 +654,7 @@ void falcots_state::ts2624(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_bell).add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.7456_MHz_XTAL, 768, 0, 640, 320, 0, 286);
 	//screen.set_raw(23.9616_MHz_XTAL, 1248, 0, 1056, 320, 0, 286);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

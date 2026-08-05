@@ -75,7 +75,7 @@ class pc98_cbus_root_device : public device_t,
 							  public device_memory_interface
 {
 public:
-	pc98_cbus_root_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc98_cbus_root_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u16 mem_r(offs_t offset, u16 mem_mask = ~0);
 	void mem_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -157,10 +157,7 @@ public:
 	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cbus_tag, U &&opts, const char *dflt, bool fixed = false)
 		: pc98_cbus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 		m_bus.set_tag(std::forward<T>(cbus_tag));
 	}
 	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

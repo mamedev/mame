@@ -14,6 +14,11 @@
 #pragma once
 
 #include "options.h"
+#include "coretmpl.h"
+
+#include <string>
+#include <string_view>
+
 
 #define OPTION_PRIORITY_CMDLINE     OPTION_PRIORITY_HIGH + 1
 // core options
@@ -171,6 +176,7 @@
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
 #define OPTION_NVRAM_SAVE           "nvram_save"
+#define OPTION_RTC_TIME             "rtc"
 
 // core comm options
 #define OPTION_COMM_LOCAL_HOST      "comm_localhost"
@@ -228,7 +234,7 @@ public:
 	void set_default_card_software(std::string &&s);
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
-	core_options::entry::shared_ptr setup_option_entry(const char *name);
+	core_options::entry::shared_ptr setup_option_entry(std::string &&name);
 
 private:
 	void possibly_changed(const std::string &old_value);
@@ -454,6 +460,7 @@ public:
 	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 	bool nvram_save() const { return bool_value(OPTION_NVRAM_SAVE); }
+	const char *rtc_time() const { return value(OPTION_RTC_TIME); }
 
 	// core comm options
 	const char *comm_localhost() const { return value(OPTION_COMM_LOCAL_HOST); }
@@ -483,16 +490,15 @@ public:
 	short http_port() const { return int_value(OPTION_HTTP_PORT); }
 	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
-	// slots and devices - the values for these are stored outside of the core_options
-	// structure
-	const ::slot_option &slot_option(const std::string &device_name) const;
-	::slot_option &slot_option(const std::string &device_name);
-	const ::slot_option *find_slot_option(const std::string &device_name) const;
-	::slot_option *find_slot_option(const std::string &device_name);
-	bool has_slot_option(const std::string &device_name) const { return find_slot_option(device_name) ? true : false; }
-	const ::image_option &image_option(const std::string &device_name) const;
-	::image_option &image_option(const std::string &device_name);
-	bool has_image_option(const std::string &device_name) const { return m_image_options.find(device_name) != m_image_options.end(); }
+	// slots and devices - the values for these are stored outside of the core_options structure
+	const ::slot_option &slot_option(std::string_view device_name) const;
+	::slot_option &slot_option(std::string_view device_name);
+	const ::slot_option *find_slot_option(std::string_view device_name) const;
+	::slot_option *find_slot_option(std::string_view device_name);
+	bool has_slot_option(std::string_view device_name) const { return bool(find_slot_option(device_name)); }
+	const ::image_option &image_option(std::string_view device_name) const;
+	::image_option &image_option(std::string_view device_name);
+	bool has_image_option(std::string_view device_name) const { return m_image_options.find(device_name) != m_image_options.end(); }
 
 protected:
 	virtual void command_argument_processed() override;
@@ -500,9 +506,9 @@ protected:
 private:
 	struct software_options
 	{
-		std::unordered_map<std::string, std::string>    slot;
-		std::unordered_map<std::string, std::string>    slot_defaults;
-		std::unordered_map<std::string, std::string>    image;
+		util::transparent_string_unordered_map<std::string, std::string>    slot;
+		util::transparent_string_unordered_map<std::string, std::string>    slot_defaults;
+		util::transparent_string_unordered_map<std::string, std::string>    image;
 	};
 
 	// slot/image/softlist calculus
@@ -521,9 +527,9 @@ private:
 	const game_driver *                                 m_system;
 
 	// slots and devices
-	std::unordered_map<std::string, ::slot_option>      m_slot_options;
-	std::unordered_map<std::string, ::image_option>     m_image_options_canonical;
-	std::unordered_map<std::string, ::image_option *>   m_image_options;
+	util::transparent_string_unordered_map<std::string, ::slot_option>      m_slot_options;
+	util::transparent_string_unordered_map<std::string, ::image_option>     m_image_options_canonical;
+	util::transparent_string_unordered_map<std::string, ::image_option *>   m_image_options;
 
 	// cached options, for scenarios where parsing core_options is too slow
 	int                                                 m_coin_impulse;

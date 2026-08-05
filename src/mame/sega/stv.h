@@ -7,6 +7,7 @@
 
 #include "saturn.h"
 
+#include "315_5649.h"
 #include "segabill.h"
 
 #include "rax.h"
@@ -30,6 +31,7 @@ public:
 		m_5838crypt(*this, "315_5838"),
 		m_hopper(*this, "hopper"),
 		m_billboard(*this, "billboard"),
+		m_ioga(*this, "ioga"),
 		m_ioga_ports(*this, "PORT%c", 'A'),
 		m_ioga_counters(*this, "PORTG.%u", 0),
 		m_ioga_mahjong{ { *this, "P1_KEY%u", 0 }, { *this, "P2_KEY%u", 0 } },
@@ -106,12 +108,10 @@ private:
 	void ioga_w(offs_t offset, uint8_t data);
 	uint8_t critcrsh_ioga_r(offs_t offset);
 	void critcrsh_ioga_w(offs_t offset, uint8_t data);
-	uint8_t magzun_ioga_r(offs_t offset);
-	void magzun_ioga_w(offs_t offset, uint8_t data);
 	uint8_t stvmp_ioga_r(offs_t offset);
 	void stvmp_ioga_w(offs_t offset, uint8_t data);
-	uint32_t magzun_hef_hack_r();
-	uint32_t magzun_rx_hack_r();
+	[[maybe_unused]] uint32_t magzun_hef_hack_r();
+	[[maybe_unused]] uint32_t magzun_rx_hack_r();
 	void hop_ioga_w(offs_t offset, uint8_t data);
 
 	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot);
@@ -134,7 +134,7 @@ private:
 	uint8_t     m_ioga_mode = 0;
 	uint8_t     m_ioga_portg = 0;
 	uint16_t    m_ioga_count[4]{};
-	uint16_t    m_serial_tx = 0;
+	void pd_output_w(uint8_t data);
 
 	// protection specific variables and functions
 	uint32_t m_abus_protenable = 0;
@@ -160,6 +160,7 @@ private:
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	optional_device<ticket_dispenser_device> m_hopper;
 	required_device<sega_billboard_device> m_billboard;
+	optional_device<sega_315_5649_device> m_ioga;
 	optional_ioport_array<7> m_ioga_ports;
 	required_ioport_array<4> m_ioga_counters;
 	optional_ioport_array<5> m_ioga_mahjong[2];
@@ -178,7 +179,6 @@ private:
 	void scsp_mem(address_map &map) ATTR_COLD;
 	void stv_mem(address_map &map) ATTR_COLD;
 	void critcrsh_mem(address_map &map) ATTR_COLD;
-	void magzun_mem(address_map &map) ATTR_COLD;
 	void stvmp_mem(address_map &map) ATTR_COLD;
 	void hopper_mem(address_map &map) ATTR_COLD;
 	void stvcd_mem(address_map &map) ATTR_COLD;

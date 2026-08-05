@@ -131,10 +131,7 @@ public:
 	heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false) :
 		heath_intr_socket(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 
 	heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);

@@ -6,6 +6,8 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
+#include <cstring>
+
 static constexpr unsigned HEADER_LENGTH = 66;
 static constexpr uint8_t MAGIC_XOR = 0xb3;
 
@@ -26,7 +28,7 @@ const char *sap_dsk_format::name() const noexcept
 
 const char *sap_dsk_format::description() const noexcept
 {
-	return "Thomson SAP disk image (Systeme d'Archivage Pukall)";
+	return "SAP disk image (Systeme d'Archivage Pukall)";
 }
 
 const char *sap_dsk_format::extensions() const noexcept

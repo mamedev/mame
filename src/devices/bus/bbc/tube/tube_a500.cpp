@@ -192,7 +192,7 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 
 	ARCHIMEDES_KEYBOARD(config, "keyboard").kout().set(m_ioc, FUNC(acorn_ioc_device::kin_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_VIDC1(config, m_vidc, 24_MHz_XTAL);
@@ -200,7 +200,7 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
 
-	//SOFTWARE_LIST(config, "flop_ls_arm").set_original("bbc_flop_arm").set_filter("A500");
+	SOFTWARE_LIST(config, "flop_list").set_original("bbc_flop_arm").set_filter("A500");
 }
 
 void bbc_tube_a500d_device::device_add_mconfig(machine_config &config)

@@ -335,7 +335,7 @@ void mw8080bw_state::mw8080bw_root(machine_config &config)
 	maincpu.out_inte_func().set(FUNC(mw8080bw_state::int_enable_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
 	m_screen->set_screen_update(FUNC(mw8080bw_state::screen_update_mw8080bw));
 }
@@ -347,17 +347,6 @@ void mw8080bw_state::mw8080bw_root(machine_config &config)
  *  Sea Wolf (PCB #596)
  *
  *************************************/
-
-void seawolf_state::machine_start()
-{
-	mw8080bw_state::machine_start();
-
-	m_exp_lamps.resolve();
-	m_torp_lamps.resolve();
-	m_ready_lamp.resolve();
-	m_reload_lamp.resolve();
-}
-
 
 void seawolf_state::explosion_lamp_w(u8 data)
 {
@@ -2405,26 +2394,6 @@ void mw8080bw_state::phantom2(machine_config &config)
  *  Bowling Alley (PCB #730)
  *
  *************************************/
-
-void bowler_state::machine_start()
-{
-	mw8080bw_state::machine_start();
-
-	m_200_left_light.resolve();
-	m_200_right_light.resolve();
-	m_400_left_light.resolve();
-	m_400_right_light.resolve();
-	m_500_left_light.resolve();
-	m_500_right_light.resolve();
-	m_700_light.resolve();
-	m_x_left_light.resolve();
-	m_x_right_light.resolve();
-	m_regulation_game_light.resolve();
-	m_flash_game_light.resolve();
-	m_straight_ball_light.resolve();
-	m_hook_ball_light.resolve();
-	m_select_game_light.resolve();
-}
 
 uint8_t bowler_state::shift_result_r()
 {

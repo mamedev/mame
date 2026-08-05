@@ -12,7 +12,7 @@ class vt369_adpcm_decoder_device : public device_t
 {
 public:
 	// construction/destruction
-	vt369_adpcm_decoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt369_adpcm_decoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	s32 decode_packet(u8* packet);
 

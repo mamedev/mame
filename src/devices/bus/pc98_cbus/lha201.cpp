@@ -48,17 +48,11 @@ void lha201_device::device_add_mconfig(machine_config &config)
 	pc9801_55_device::device_add_mconfig(config);
 	// two xtals, 28 MHz (MX2) and 20 MHz (MX1)
 
-	NSCSI_CONNECTOR(config.replace(), "scsi:7").option_set("wdc", WD33C93B).machine_config(
-		[this](device_t *device)
-		{
-			wd33c9x_base_device &adapter = downcast<wd33c9x_base_device &>(*device);
-
-			// FIXME: check frequency select in wd core
-			adapter.set_clock(20'000'000 / 4);
-			adapter.irq_cb().set(*this, FUNC(lha201_device::scsi_irq_w));
-			adapter.drq_cb().set(*this, FUNC(lha201_device::scsi_drq_w));
-		}
-	);
+	// FIXME: check frequency select in wd core
+	WD33C93B(config.replace(), m_wdc, 20'000'000 / 4);
+	m_scsi_bus->set_external_device(7, m_wdc);
+	m_wdc->irq_cb().set(DEVICE_SELF, FUNC(lha201_device::scsi_irq_w));
+	m_wdc->drq_cb().set(DEVICE_SELF, FUNC(lha201_device::scsi_drq_w));
 
 	// 2x DS21S07A active terminators
 	// uPD65641 gate array at IC1, chip labeled BMX-2 "REV 930701 9510WD005"
@@ -75,7 +69,8 @@ static INPUT_PORTS_START( lha201 )
 	PORT_DIPSETTING(    0x05, "5" )
 	PORT_DIPSETTING(    0x06, "6" )
 	PORT_DIPSETTING(    0x07, "7" )
-	PORT_DIPNAME( 0x38, 0x18, "LHA-201: Interrupt level") PORT_DIPLOCATION("SCSI_SW1:!4,!5,!6")
+	// INT3 actual default, put it in a place that doesn't clash with IDE hardmounted in driver for now
+	PORT_DIPNAME( 0x38, 0x00, "LHA-201: Interrupt level") PORT_DIPLOCATION("SCSI_SW1:!4,!5,!6")
 	PORT_DIPSETTING(    0x00, "INT0" )
 	PORT_DIPSETTING(    0x08, "INT1" )
 	PORT_DIPSETTING(    0x10, "INT2" )
@@ -91,7 +86,8 @@ static INPUT_PORTS_START( lha201 )
 	PORT_DIPSETTING(    0xc0, "3" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x06, "LHA-201: ROM address") PORT_DIPLOCATION("SCSI_SW2:!1,!2,!3")
+	// $dc000 actual default, same as above
+	PORT_DIPNAME( 0x07, 0x00, "LHA-201: ROM address") PORT_DIPLOCATION("SCSI_SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x00, "0xd0000-0xd0fff" )
 	PORT_DIPSETTING(    0x01, "0xd2000-0xd2fff" )
 	PORT_DIPSETTING(    0x02, "0xd4000-0xd4fff" )

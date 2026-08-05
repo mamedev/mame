@@ -1316,8 +1316,6 @@ GFXDECODE_END
 
 void cvs_state::machine_start()
 {
-	m_lamps.resolve();
-
 	// register state save
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_character_banking_mode));
@@ -1370,7 +1368,7 @@ void cvs_state::cvs(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(cvs_state::palette), (256 + 4) * 8 + 8 + 1, 16);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 30*8-1, 1*8, 32*8-1);
@@ -1381,13 +1379,13 @@ void cvs_state::cvs(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 	m_screen->screen_vblank().append(FUNC(cvs_state::scroll_stars));
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(-5, -26);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(-5, -26);
 
-	S2636(config, m_s2636[2], 0);
+	S2636(config, m_s2636[2]);
 	m_s2636[2]->set_offsets(-5, -26);
 
 	// audio hardware
@@ -1398,7 +1396,7 @@ void cvs_state::cvs(machine_config &config)
 
 	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
 	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
-	BEEP(config, m_beep[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.075); // "
+	BEEP(config, m_beep[2]).add_route(ALL_OUTPUTS, "speaker", 0.075); // "
 
 	TMS5100(config, m_tms5100, 620'000); // R/C osc, approximation
 	m_tms5100->data().set(FUNC(cvs_state::speech_rom_read_bit));

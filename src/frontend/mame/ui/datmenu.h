@@ -36,8 +36,8 @@ namespace ui {
 class menu_dats_view : public menu_textbox
 {
 public:
-	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info &swinfo);
-	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_target &target, const ui_software_info &swinfo);
+	menu_dats_view(mame_ui_manager &mui, render_target &target, const ui_system_info *system = nullptr);
 	virtual ~menu_dats_view() override;
 
 	static void add_info_text(text_layout &layout, std::string_view text, rgb_t color, float size = 1.0f);

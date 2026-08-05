@@ -15,7 +15,8 @@ public:
 	u32 get_local_seconds(system_time &systime);
 	u32 get_seconds(int year, int month, int day, int day_of_week, int hour, int minute, int second);
 
-	private : int m_is_dst;
+private:
+	int m_is_dst;
 	time_t m_gmt_offset;
 };
 

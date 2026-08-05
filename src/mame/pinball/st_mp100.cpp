@@ -52,7 +52,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void st_mp100(machine_config &config);
+	void st_mp100(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -719,10 +719,6 @@ void st_mp100_state::u11_b_w(u8 data)
 
 void st_mp100_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_leds.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));
 	save_item(NAME(m_u11a));

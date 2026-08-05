@@ -9,7 +9,7 @@
 class iox_hle_device : public device_t
 {
 public:
-	iox_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iox_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <unsigned Which> auto p1_key_input_cb() { return m_p1_key[Which].bind(); }
 	template <unsigned Which> auto p2_key_input_cb() { return m_p2_key[Which].bind(); }

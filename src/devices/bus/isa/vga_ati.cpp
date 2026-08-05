@@ -79,13 +79,13 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_MACH64,      isa16_vga_mach64_device,      "mach64
 
 void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(ati_vga_device::screen_update));
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ATI_VGA(config, m_vga, 0);
+	ATI_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
@@ -96,13 +96,13 @@ void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
 
 void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach32_device::screen_update));
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	ATIMACH32(config, m_vga, 0);
+	ATIMACH32(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
@@ -113,13 +113,13 @@ void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
 
 void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach64_device::screen_update));
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	ATIMACH64(config, m_vga, 0);
+	ATIMACH64(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));

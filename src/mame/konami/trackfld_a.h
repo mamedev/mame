@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "sound/vlm5030.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/vlm5030.h"
 
 class trackfld_audio_device : public device_t
 {
@@ -18,8 +18,15 @@ public:
 		m_audiocpu.set_tag(std::forward<T>(cpu_tag));
 		m_vlm.set_tag(std::forward<U>(vlm_tag));
 	}
+	template <typename T, typename U>
+	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&vlm_tag)
+		: trackfld_audio_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag), std::forward<U>(vlm_tag))
+	{
+		m_audiocpu.set_tag(std::forward<T>(cpu_tag));
+		m_vlm.set_tag(std::forward<U>(vlm_tag));
+	}
 
-	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void sh_irqtrigger_w(int state);
 	uint8_t trackfld_sh_timer_r();
@@ -29,7 +36,7 @@ public:
 	void hyperspt_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -38,8 +45,7 @@ private:
 	optional_device<vlm5030_device> m_vlm;
 
 	// internal state
-	int      m_last_addr;
-	int      m_last_irq;
+	uint8_t m_last_irq;
 };
 
 DECLARE_DEVICE_TYPE(TRACKFLD_AUDIO, trackfld_audio_device)

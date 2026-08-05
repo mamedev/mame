@@ -149,7 +149,7 @@ public:
 protected:
 	class mi_xavix : public memory_interface {
 	public:
-		xavix_device *base;
+		xavix_device *m_base;
 
 		mi_xavix(xavix_device *base);
 		virtual ~mi_xavix() {}
@@ -162,7 +162,7 @@ protected:
 
 	uint8_t m_databank;
 	uint8_t m_codebank;
-	uint32_t XPC;
+	uint32_t m_XPC;
 
 	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -178,11 +178,10 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_special_data_config;
-	address_space *m_special_data_space;
 	address_space_config m_lowbus_config;
 	address_space_config m_extbus_config;
-	address_space *m_lowbus_space;
-	address_space *m_extbus_space;
+	memory_access<15, 0, 0, ENDIANNESS_LITTLE>::specific m_lowbus;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_extbus;
 
 protected:
 	xavix_interrupt_vector_delegate m_vector_callback;

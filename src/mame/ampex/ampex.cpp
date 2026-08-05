@@ -366,7 +366,7 @@ void ampex_state::ampex(machine_config &config)
 	Z80(config, m_maincpu, 23.814_MHz_XTAL / 9); // clocked by 8224?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampex_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(23.814_MHz_XTAL / 2, 105 * AMPEX_CH_WIDTH, 0, 80 * AMPEX_CH_WIDTH, 270, 0, 250);
 	screen.set_screen_update(FUNC(ampex_state::screen_update));
 
@@ -375,7 +375,7 @@ void ampex_state::ampex(machine_config &config)
 	m_vtac->vsyn_callback().set(FUNC(ampex_state::vsyn_w));
 	m_vtac->set_screen("screen");
 
-	AY31015(config, m_uart, 0); // COM8017, actually
+	AY31015(config, m_uart); // COM8017, actually
 	m_uart->write_so_callback().set(FUNC(ampex_state::so_w));
 	m_uart->write_dav_callback().set(FUNC(ampex_state::dav_w));
 	m_uart->set_auto_rdav(true);

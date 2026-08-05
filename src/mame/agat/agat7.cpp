@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(AGAT7VIDEO, agat7video_device, "agat7video", "Agat-7 Video")
 
 void agat7video_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &a7screen(SCREEN(config, "a7screen", SCREEN_TYPE_RASTER));
+	screen_device &a7screen(SCREEN(config, "a7screen"));
 	a7screen.set_raw(XTAL(10'500'000), 672, 0, 512, 312, 0, 256);
 	a7screen.set_screen_update(FUNC(agat7video_device::screen_update));
 	a7screen.set_palette(DEVICE_SELF);

@@ -8,5 +8,6 @@
 #include "nubus.h"
 
 DECLARE_DEVICE_TYPE(NUBUS_LASERVIEW, device_nubus_card_interface)
+DECLARE_DEVICE_TYPE(PDS030_LVIEW, device_nubus_card_interface)
 
 #endif // MAME_BUS_NUBUS_LASERVIEW_H

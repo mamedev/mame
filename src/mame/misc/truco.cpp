@@ -497,7 +497,7 @@ void truco_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( truco )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )  PORT_NAME("Keyout enable Key")         // Connected to JAMMA S17 (P2 START)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )        PORT_NAME("Keyout enable Key")         // Connected to JAMMA S17 (P2 START)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                            // Connected to JAMMA S14 (SERVICE SW)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )         PORT_NAME("P1-4")PORT_CODE(KEYCODE_D)  // still not clear... Connected to JAMMA C26 (P2 SELECT)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)                                            // Connected to JAMMA S16 (COIN2)
@@ -588,7 +588,7 @@ void truco_state::truco(machine_config &config)
 	pia.irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(256, 192);

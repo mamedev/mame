@@ -157,39 +157,19 @@ u8 k051733_device::read(offs_t offset)
 				return 0xff;
 
 			// octant angle
-			if (y1 >= y2)
+			if (dy <= 0)
 			{
-				if (x1 >= x2)
-				{
-					if (dy >= dx)
-						return 0x00;
-					else
-						return 0x06;
-				}
+				if (dx <= 0)
+					return (dy >= dx) ? 0x00 : 0x06;
 				else
-				{
-					if (dy >= -dx)
-						return 0x04;
-					else
-						return 0x07;
-				}
+					return (dy >= -dx) ? 0x04 : 0x07;
 			}
 			else
 			{
-				if (x1 >= x2)
-				{
-					if (dy > -dx)
-						return 0x02;
-					else
-						return 0x01;
-				}
+				if (dx <= 0)
+					return (dy > -dx) ? 0x02 : 0x01;
 				else
-				{
-					if (dy > dx)
-						return 0x03;
-					else
-						return 0x05;
-				}
+					return (dy > dx) ? 0x03 : 0x05;
 			}
 		}
 	}

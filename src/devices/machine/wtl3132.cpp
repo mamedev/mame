@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "wtl3132.h"
 
+#include "corefloat.h"
+
 #define LOG_REGS    (1U << 1)
 #define LOG_IO      (1U << 2)
 #define LOG_BYPASS  (1U << 3)

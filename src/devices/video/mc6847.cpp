@@ -651,7 +651,7 @@ void mc6847_base_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (!screen().configured())
 	{
 		// It is preferred to initialize the screen device using set_raw.
 		// Setting screen device's raw parameters requires values in terms of pixels.

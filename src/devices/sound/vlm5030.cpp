@@ -264,7 +264,16 @@ void vlm5030_device::device_reset()
 
 void vlm5030_device::device_post_load()
 {
-	restore_state();
+	int interp_effect = FR_SIZE - (m_interp_count%FR_SIZE);
+	/* restore parameter data */
+	setup_parameter(m_parameter);
+
+	/* restore current energy,pitch & filter */
+	m_current_energy = m_old_energy + (m_target_energy - m_old_energy) * interp_effect / FR_SIZE;
+	if (m_old_pitch > 1)
+		m_current_pitch = m_old_pitch + (m_target_pitch - m_old_pitch) * interp_effect / FR_SIZE;
+	for (int i = 0; i <= 9; i++)
+		m_current_k[i] = m_old_k[i] + (m_target_k[i] - m_old_k[i]) * interp_effect / FR_SIZE;
 }
 
 void vlm5030_device::rom_bank_pre_change()
@@ -272,14 +281,13 @@ void vlm5030_device::rom_bank_pre_change()
 	m_channel->update();
 }
 
-int vlm5030_device::get_bits(int sbit,int bits)
+int vlm5030_device::get_bits(int sbit, int bits)
 {
-	int offset = m_address + (sbit>>3);
-	int data;
+	const int offset = m_address + (sbit >> 3);
 
-	data = read_byte(offset) | (read_byte(offset+1)<<8);
-	data >>= (sbit&7);
-	data &= (0xff>>(8-bits));
+	int data = read_byte(offset) | (read_byte(offset + 1) << 8);
+	data >>= (sbit & 7);
+	data &= (0xff >> (8 - bits));
 
 	return data;
 }
@@ -326,27 +334,21 @@ int vlm5030_device::parse_frame()
 	m_new_energy = m_coeff->energytable[get_bits(6,m_coeff->energy_bits)];
 
 	/* 10 K's */
-	m_new_k[9] = m_coeff->ktable[9][get_bits(11,m_coeff->kbits[9])];
-	m_new_k[8] = m_coeff->ktable[8][get_bits(14,m_coeff->kbits[8])];
-	m_new_k[7] = m_coeff->ktable[7][get_bits(17,m_coeff->kbits[7])];
-	m_new_k[6] = m_coeff->ktable[6][get_bits(20,m_coeff->kbits[6])];
-	m_new_k[5] = m_coeff->ktable[5][get_bits(23,m_coeff->kbits[5])];
-	m_new_k[4] = m_coeff->ktable[4][get_bits(26,m_coeff->kbits[4])];
-	m_new_k[3] = m_coeff->ktable[3][get_bits(29,m_coeff->kbits[3])];
-	m_new_k[2] = m_coeff->ktable[2][get_bits(33,m_coeff->kbits[2])];
-	m_new_k[1] = m_coeff->ktable[1][get_bits(37,m_coeff->kbits[1])];
-	m_new_k[0] = m_coeff->ktable[0][get_bits(42,m_coeff->kbits[0])];
+	m_new_k[9] = m_coeff->ktable[9][get_bits(11, m_coeff->kbits[9])];
+	m_new_k[8] = m_coeff->ktable[8][get_bits(14, m_coeff->kbits[8])];
+	m_new_k[7] = m_coeff->ktable[7][get_bits(17, m_coeff->kbits[7])];
+	m_new_k[6] = m_coeff->ktable[6][get_bits(20, m_coeff->kbits[6])];
+	m_new_k[5] = m_coeff->ktable[5][get_bits(23, m_coeff->kbits[5])];
+	m_new_k[4] = m_coeff->ktable[4][get_bits(26, m_coeff->kbits[4])];
+	m_new_k[3] = m_coeff->ktable[3][get_bits(29, m_coeff->kbits[3])];
+	m_new_k[2] = m_coeff->ktable[2][get_bits(33, m_coeff->kbits[2])];
+	m_new_k[1] = m_coeff->ktable[1][get_bits(37, m_coeff->kbits[1])];
+	m_new_k[0] = m_coeff->ktable[0][get_bits(42, m_coeff->kbits[0])];
 
 	m_address += 6;
 	logerror("VLM5030 %04X voice \n", m_address);
 	//fprintf(stderr,"*** target Energy, Pitch, and Ks = %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_new_energy, m_new_pitch, m_new_k[0], m_new_k[1], m_new_k[2], m_new_k[3], m_new_k[4], m_new_k[5], m_new_k[6], m_new_k[7], m_new_k[8], m_new_k[9]);
 	return FR_SIZE;
-}
-
-/* realtime update */
-void vlm5030_device::update()
-{
-	m_channel->update();
 }
 
 /* setup parameteroption when RST=H */
@@ -364,7 +366,7 @@ void vlm5030_device::setup_parameter(uint8_t param)
 		m_interp_step = 1; /* 2400bps : 4 interpolator */
 
 	/* bit 3,4,5 : speed (frame size) */
-	m_frame_size = vlm5030_speed_table[(param>>3) & 7];
+	m_frame_size = vlm5030_speed_table[(param >> 3) & 7];
 
 	/* bit 6,7 : low / high pitch */
 	if (param & 0x80)  /* bit7=1 , high pitch */
@@ -376,24 +378,10 @@ void vlm5030_device::setup_parameter(uint8_t param)
 }
 
 
-void vlm5030_device::restore_state()
-{
-	int interp_effect = FR_SIZE - (m_interp_count%FR_SIZE);
-	/* restore parameter data */
-	setup_parameter(m_parameter);
-
-	/* restore current energy,pitch & filter */
-	m_current_energy = m_old_energy + (m_target_energy - m_old_energy) * interp_effect / FR_SIZE;
-	if (m_old_pitch > 1)
-		m_current_pitch = m_old_pitch + (m_target_pitch - m_old_pitch) * interp_effect / FR_SIZE;
-	for (int i = 0; i <= 9 ; i++)
-		m_current_k[i] = m_old_k[i] + (m_target_k[i] - m_old_k[i]) * interp_effect / FR_SIZE;
-}
-
 /* get BSY pin level */
-int vlm5030_device::bsy()
+int vlm5030_device::bsy_r()
 {
-	update();
+	m_channel->update();
 	return m_pin_BSY;
 }
 
@@ -404,23 +392,24 @@ void vlm5030_device::data_w(uint8_t data)
 }
 
 /* set RST pin level : reset / set table address A8-A15 */
-void vlm5030_device::rst(int state)
+void vlm5030_device::rst_w(int state)
 {
+	state = state ? 1 : 0;
+
 	if (m_pin_RST != state)
 	{
 		/* pin level is changed */
-		update();
+		m_channel->update();
+		m_pin_RST = state;
 
 		if (!state)
 		{
 			/* H -> L : latch parameters */
-			m_pin_RST = 0;
 			setup_parameter(m_latch_data);
 		}
 		else
 		{
 			/* L -> H : reset chip */
-			m_pin_RST = 1;
 			if (m_pin_BSY)
 			{
 				device_reset();
@@ -430,29 +419,30 @@ void vlm5030_device::rst(int state)
 }
 
 /* set VCU pin level : ?? unknown */
-void vlm5030_device::vcu(int state)
+void vlm5030_device::vcu_w(int state)
 {
 	/* direct mode / indirect mode */
-	m_pin_VCU = state;
+	m_pin_VCU = state ? 1 : 0;
 }
 
 /* set ST pin level : set table address A0-A7 / start speech */
-void vlm5030_device::st(int state)
+void vlm5030_device::st_w(int state)
 {
+	state = state ? 1 : 0;
+
 	if (m_pin_ST != state)
 	{
 		/* pin level is changed */
-		update();
+		m_channel->update();
+		m_pin_ST = state;
 
 		if (!state)
 		{
 			/* H -> L */
-			m_pin_ST = 0;
-
 			if (m_pin_VCU)
 			{
 				/* direct access mode & address High */
-				m_vcu_addr_h = ((int)m_latch_data<<8) + 0x01;
+				m_vcu_addr_h = ((int)m_latch_data << 8) + 0x01;
 			}
 			else
 			{
@@ -461,14 +451,14 @@ void vlm5030_device::st(int state)
 				if (m_vcu_addr_h)
 				{
 					/* direct access mode */
-					m_address = (m_vcu_addr_h&0xff00) + m_latch_data;
+					m_address = (m_vcu_addr_h & 0xff00) + m_latch_data;
 					m_vcu_addr_h = 0;
 				}
 				else
 				{
 					/* indirect access mode */
-					int table = (m_latch_data&0xfe) + (((int)m_latch_data&1)<<8);
-					m_address = (read_byte(table)<<8) | read_byte(table+1);
+					int table = (m_latch_data & 0xfe) + (((int)m_latch_data & 1) << 8);
+					m_address = (read_byte(table) << 8) | read_byte(table + 1);
 					/* show unsupported parameter message */
 					/* if (m_interp_step != 1) popmessage("No %d %dBPS parameter",table/2,m_interp_step*2400); */
 				}
@@ -484,7 +474,6 @@ void vlm5030_device::st(int state)
 		else
 		{
 			/* L -> H */
-			m_pin_ST = 1;
 			/* setup speech , BSY on after 30ms? */
 			m_phase = PH_SETUP;
 			m_sample_count = 1; /* wait time for busy on */
@@ -500,16 +489,13 @@ void vlm5030_device::st(int state)
 
 void vlm5030_device::sound_stream_update(sound_stream &stream)
 {
-	int interp_effect;
-	int i;
-	int u[11];
-
 	/* running */
-	int sampindex = 0;
 	if (m_phase == PH_RUN || m_phase == PH_STOP)
 	{
+		int u[11];
+
 		/* playing speech */
-		for ( ; sampindex < stream.samples(); sampindex++)
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
 			int current_val;
 
@@ -540,7 +526,7 @@ void vlm5030_device::sound_stream_update(sound_stream &stream)
 					/* Set old target as new start of frame */
 					m_current_energy = m_old_energy;
 					m_current_pitch = m_old_pitch;
-					for (i = 0; i <= 9; i++)
+					for (int i = 0; i <= 9; i++)
 						m_current_k[i] = m_old_k[i];
 
 					/* is this a zero energy frame? */
@@ -549,7 +535,7 @@ void vlm5030_device::sound_stream_update(sound_stream &stream)
 						/*osd_printf_debug("processing frame: zero energy\n");*/
 						m_target_energy = 0;
 						m_target_pitch = m_current_pitch;
-						for (i = 0; i <= 9; i++)
+						for (int i = 0; i <= 9; i++)
 							m_target_k[i] = m_current_k[i];
 					}
 					else
@@ -559,7 +545,7 @@ void vlm5030_device::sound_stream_update(sound_stream &stream)
 						/*osd_printf_debug("proc: %d %d\n",last_fbuf_head,fbuf_head);*/
 						m_target_energy = m_new_energy;
 						m_target_pitch = m_new_pitch;
-						for (i = 0; i <= 9; i++)
+						for (int i = 0; i <= 9; i++)
 							m_target_k[i] = m_new_k[i];
 					}
 				}
@@ -568,11 +554,11 @@ void vlm5030_device::sound_stream_update(sound_stream &stream)
 				/* Update values based on step values 25% , 50% , 75% , 100% */
 				m_interp_count -= m_interp_step;
 				/* 3,2,1,0 -> 1,2,3,4 */
-				interp_effect = FR_SIZE - (m_interp_count%FR_SIZE);
+				int interp_effect = FR_SIZE - (m_interp_count % FR_SIZE);
 				m_current_energy = m_old_energy + (m_target_energy - m_old_energy) * interp_effect / FR_SIZE;
 				if (m_old_pitch > 1)
 					m_current_pitch = m_old_pitch + (m_target_pitch - m_old_pitch) * interp_effect / FR_SIZE;
-				for (i = 0; i <= 9 ; i++)
+				for (int i = 0; i <= 9; i++)
 					m_current_k[i] = m_old_k[i] + (m_target_k[i] - m_old_k[i]) * interp_effect / FR_SIZE;
 			}
 
@@ -595,9 +581,9 @@ void vlm5030_device::sound_stream_update(sound_stream &stream)
 
 			/* Lattice filter here */
 			u[10] = current_val;
-			for (i = 9; i >= 0; i--)
+			for (int i = 9; i >= 0; i--)
 				u[i] = u[i+1] - ((-m_current_k[i] * m_x[i]) / 512);
-			for (i = 9; i >= 1; i--)
+			for (int i = 9; i >= 1; i--)
 				m_x[i] = m_x[i-1] + ((-m_current_k[i-1] * u[i-1]) / 512);
 			m_x[0] = u[0];
 

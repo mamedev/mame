@@ -40,15 +40,15 @@ xavix_device::xavix_device(const machine_config &mconfig, const char *tag, devic
 
 xavix_device::xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
-	XPC(0),
+	m_XPC(0),
 	m_lowbus_config("lowbus", ENDIANNESS_LITTLE, 8, 15),
 	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24),
 	m_vector_callback(*this)
 {
-	program_config.m_addr_width = 24;
-	program_config.m_logaddr_width = 24;
-	sprogram_config.m_addr_width = 24;
-	sprogram_config.m_logaddr_width = 24;
+	m_program_config.m_addr_width = 24;
+	m_program_config.m_logaddr_width = 24;
+	m_sprogram_config.m_addr_width = 24;
+	m_sprogram_config.m_logaddr_width = 24;
 	// XaviX specific spaces
 	m_lowbus_config.m_addr_width = 15;
 	m_lowbus_config.m_logaddr_width = 15;
@@ -71,15 +71,15 @@ offs_t xavix_device::pc_to_external(u16 pc)
 
 void xavix_device::device_start()
 {
-	mintf = std::make_unique<mi_xavix>(this);
+	m_mintf = std::make_unique<mi_xavix>(this);
 
 	// bind delegates
 	m_vector_callback.resolve();
 
 	init();
 
-	m_lowbus_space = &space(5);
-	m_extbus_space = &space(6);
+	space(5).specific(m_lowbus);
+	space(6).specific(m_extbus);
 
 	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");
 	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).callimport().formatstr("%2s");
@@ -103,7 +103,7 @@ void xavix_device::device_reset()
 
 xavix_device::mi_xavix::mi_xavix(xavix_device *_base)
 {
-	base = _base;
+	m_base = _base;
 }
 
 void xavix_device::write_special_stack(uint32_t addr, uint8_t data)
@@ -176,36 +176,36 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 				return m_databank;
 			}
 
-			return m_lowbus_space->read_byte(adr);
+			return m_lowbus.read_interruptible(adr);
 		}
 		else
 		{
-			return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
+			return m_extbus.read_interruptible(((databank << 16) | adr) & 0x7fffff);
 		}
 	}
 	else
 	{
-		return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
+		return m_extbus.read_interruptible(((databank << 16) | adr) & 0x7fffff);
 	}
 }
 
 // data reads
 inline uint8_t xavix_device::mi_xavix::read(uint16_t adr)
 {
-	uint8_t databank = base->get_databank();
-	return base->read_full_data(databank, adr);
+	uint8_t databank = m_base->get_databank();
+	return m_base->read_full_data(databank, adr);
 }
 
 // opcode reads
 uint8_t xavix_device::mi_xavix::read_sync(uint16_t adr)
 {
-	return csprogram.read_byte(base->adr_with_codebank(adr));
+	return m_csprogram.read_interruptible(m_base->adr_with_codebank(adr));
 }
 
 // oprand reads
 uint8_t xavix_device::mi_xavix::read_arg(uint16_t adr)
 {
-	return cprogram.read_byte(base->adr_with_codebank(adr));
+	return m_cprogram.read_interruptible(m_base->adr_with_codebank(adr));
 }
 
 // data writes
@@ -217,13 +217,13 @@ void xavix_device::write_full_data(uint32_t addr, uint8_t val)
 uint8_t xavix_device::read_stack(uint32_t addr)
 {
 	// address is always 0x100-0x1ff
-	return m_lowbus_space->read_byte((addr & 0xff)+0x100);
+	return m_lowbus.read_interruptible((addr & 0xff) + 0x100);
 }
 
 void xavix_device::write_stack(uint32_t addr, uint8_t val)
 {
 	// address is always 0x100-0x1ff
-	m_lowbus_space->write_byte((addr & 0xff)+0x100, val);
+	m_lowbus.write_interruptible((addr & 0xff) + 0x100, val);
 }
 
 uint8_t xavix_device::read_zeropage(uint32_t addr)
@@ -240,7 +240,7 @@ uint8_t xavix_device::read_zeropage(uint32_t addr)
 		return m_databank;
 	}
 
-	return m_lowbus_space->read_byte(addr);
+	return m_lowbus.read_interruptible(addr);
 }
 
 void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
@@ -259,7 +259,7 @@ void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
 		return;
 	}
 
-	m_lowbus_space->write_byte(addr, val);
+	m_lowbus.write_interruptible(addr, val);
 }
 
 
@@ -281,23 +281,23 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 				return;
 			}
 
-			m_lowbus_space->write_byte(adr, val);
+			m_lowbus.write_interruptible(adr, val);
 		}
 		else
 		{
-			m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
+			m_extbus.write_interruptible(((databank << 16) | adr) & 0x7fffff, val);
 		}
 	}
 	else
 	{
-		m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
+		m_extbus.write_interruptible(((databank << 16) | adr) & 0x7fffff, val);
 	}
 }
 
 void xavix_device::mi_xavix::write(uint16_t adr, uint8_t val)
 {
-	uint8_t databank = base->get_databank();
-	base->write_full_data(databank, adr, val);
+	uint8_t databank = m_base->get_databank();
+	m_base->write_full_data(databank, adr, val);
 }
 
 void xavix_device::set_codebank(uint8_t bank)
@@ -328,14 +328,14 @@ device_memory_interface::space_config_vector xavix_device::memory_space_config()
 {
 	if(has_configured_map(AS_OPCODES))
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
-			std::make_pair(AS_OPCODES, &sprogram_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_sprogram_config),
 			std::make_pair(5, &m_lowbus_config),
 			std::make_pair(6, &m_extbus_config)
 		};
 	else
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(5, &m_lowbus_config),
 			std::make_pair(6, &m_extbus_config)
 		};

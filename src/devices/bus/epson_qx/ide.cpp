@@ -104,7 +104,7 @@ void ide_device::write(offs_t offset, uint8_t data)
 
 void ide_device::map(address_map &map)
 {
-	map(0x00, 0x0f).rw(FUNC(ide_device::read), FUNC(ide_device::write));
+	map(0x00, 0x0f).mirror(0xff00).rw(FUNC(ide_device::read), FUNC(ide_device::write));
 }
 
 } // namespace bus::epson_qx

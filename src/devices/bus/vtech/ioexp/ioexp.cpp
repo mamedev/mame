@@ -32,6 +32,7 @@ vtech_ioexp_slot_device::vtech_ioexp_slot_device(const machine_config &mconfig, 
 	device_single_card_slot_interface<device_vtech_ioexp_interface>(mconfig, *this),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1)
 {
+	set_options(vtech_ioexp_slot_carts, nullptr, false);
 }
 
 //-------------------------------------------------

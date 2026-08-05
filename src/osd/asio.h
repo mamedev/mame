@@ -27,11 +27,6 @@
 #define ASIO_STANDALONE
 #define ASIO_SEPARATE_COMPILATION
 
-#if defined(__sun) || defined(__sun__)
-#define ASIO_DISABLE_DEV_POLL
-#define ASIO_HAS_EPOLL
-#endif
-
 #include <asio.hpp>
 #undef interface
 

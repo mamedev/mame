@@ -324,7 +324,7 @@ void chessking_state::chesskng(machine_config &config)
 	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 160);
 	m_screen->set_visarea_full();
@@ -333,7 +333,7 @@ void chessking_state::chesskng(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, m_beeper, 0);
+	BEEP(config, m_beeper);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// Cartridge

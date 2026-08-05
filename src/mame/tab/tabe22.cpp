@@ -254,7 +254,7 @@ void tabe22_state::tabe22(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tabe22_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &tabe22_state::io_map);
 
-	ADDRESS_MAP_BANK(config, m_vram_bank, 0);
+	ADDRESS_MAP_BANK(config, m_vram_bank);
 	m_vram_bank->set_map(&tabe22_state::vram_map);
 	m_vram_bank->set_addr_width(13);
 	m_vram_bank->set_data_width(8);
@@ -262,7 +262,7 @@ void tabe22_state::tabe22(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_raw(21.7566_MHz_XTAL, 918, 0, 720, 395, 0, 378); // 80 column mode
 //  m_screen->set_raw(35.8344_MHz_XTAL, 1494, 0, 1188, 395, 0, 378); // 132 column mode

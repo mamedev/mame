@@ -210,7 +210,6 @@ void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			sy = 240 - sy;
 		}
 
-
 		m_gfxdecode->gfx(1)->transpen(bitmap, clip, code, color, flipx, flipy, sx, sy, 0);
 	}
 }

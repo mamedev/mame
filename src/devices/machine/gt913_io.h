@@ -11,6 +11,8 @@
 
 #include "cpu/h8/h8_intc.h"
 
+class h8_cpu_base;
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -51,8 +53,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
-	required_device<h8_device> m_cpu;
-	required_device<h8_intc_device> m_intc;
+	required_device<h8_cpu_base> m_cpu;
+	required_device<h8_intc_base> m_intc;
 
 	/* timers */
 	uint8_t m_timer_control[2];

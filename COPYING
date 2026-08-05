@@ -182,7 +182,7 @@ lua_zlib - Lua 5.1 interface to zlib
 Copyright (c) 2009 Brian Maher
 
 OpenGL Mathematics (GLM)
-Copyright (c) 2005 -2016 G-Truc Creation
+Copyright (c) 2005 - G-Truc Creation
 
 PortAudio Portable Real-Time Audio Library
 Copyright (c) 1999-2006 Ross Bencina and Phil Burk
@@ -259,7 +259,7 @@ Copyright (c) 2006 and later Cockos Incorporated
 Copyright (c) 1999 D. J. Bernstein
 
 zlib data compression library
-Copyright (C) 1995-2023 Jean-loup Gailly and Mark Adler
+Copyright (C) 1995-2026 Jean-loup Gailly and Mark Adler
 
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages

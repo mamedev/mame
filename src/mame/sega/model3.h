@@ -217,7 +217,7 @@ private:
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<dsb2_device> m_dsb2;        // 68k-based MPEG Digital Sound Board
-	optional_device<i8251_device> m_uart;
+	required_device<i8251_device> m_uart;
 	required_shared_ptr<uint16_t> m_soundram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -360,7 +360,6 @@ private:
 	uint64_t model3_rtc_r(offs_t offset, uint64_t mem_mask = ~0);
 	void model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t real3d_status_r(offs_t offset);
-	uint8_t model3_sound_r(offs_t offset);
 	void model3_sound_w(offs_t offset, uint8_t data);
 
 	void daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);

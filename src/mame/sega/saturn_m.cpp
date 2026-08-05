@@ -65,69 +65,6 @@ uint16_t saturn_state::soundram_r(offs_t offset)
 	return m_sound_ram[offset];
 }
 
-/* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
-void saturn_state::minit_w(uint32_t data)
-{
-	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
-	machine().scheduler().trigger(1000);
-	machine().scheduler().synchronize(); // force resync
-	m_slave->pulse_frt_input();
-}
-
-void saturn_state::sinit_w(uint32_t data)
-{
-	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
-	machine().scheduler().synchronize(); // force resync
-	m_maincpu->pulse_frt_input();
-}
-
-/*
-TODO:
-Some games seems to not like either MAME's interleave system and/or SH-2 DRC, causing an hard crash.
-Reported games are:
-Blast Wind (before FMV)
-Choro Q Park (car selection)
-060311E4: MOV.L R14,@-SP ;R14 = 0x60ffba0 / R15 = 0x60ffba0
-060311E6: MOV SP,R14 ;R14 = 0x60ffba0 / R15 = 0x60ffb9c / [0x60ffb9c] <- 0x60ffba0
-060311E8: MOV.L @SP+,R14 ;R14 = 0x60ffb9c / R15 = 0x60ffb9c / [0x60ffb9c] -> R14
-060311EA: RTS ;R14 = 0x60ffba0 / R15 = 0x60ffba0
-060311EC: NOP
-06031734: MULS.W R9, R8 ;R14 = 0x60ffba0 / R15 = 0x60ffba0 / EA = 0x60311E4
-on DRC this becomes:
-R14 0x6031b78 (cause of the crash later on), R15 = 0x60ffba4 and EA = 0
-
-Shinrei Jusatsushi Taromaru (options menu)
-
-*/
-
-void saturn_state::saturn_minit_w(uint32_t data)
-{
-	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
-	if(m_fake_comms->read() & 1)
-		machine().scheduler().synchronize(); // force resync
-	else
-	{
-		machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
-		machine().scheduler().trigger(1000);
-	}
-
-	m_slave->pulse_frt_input();
-}
-
-void saturn_state::saturn_sinit_w(uint32_t data)
-{
-	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
-	if(m_fake_comms->read() & 1)
-		machine().scheduler().synchronize(); // force resync
-	else
-		machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
-
-	m_maincpu->pulse_frt_input();
-}
-
-
 uint8_t saturn_state::backupram_r(offs_t offset)
 {
 	if(!(offset & 1))
@@ -193,40 +130,63 @@ TODO:
 - VDP1 timing and CEF emulation isn't accurate at all.
 */
 
+void saturn_state::vint_callback(int state)
+{
+	if (m_prev_vint != state)
+	{
+		if (state)
+		{
+			m_scu->vblank_in_w(1);
+			m_slave->set_input_line(0x6, ASSERT_LINE);
+		}
+		else
+		{
+			m_scu->vblank_out_w(1);
+			m_slave->set_input_line(0x4, ASSERT_LINE);
+		}
+	}
 
+	m_prev_vint = state;
+}
+
+void saturn_state::hint_callback(int state)
+{
+	if (!m_prev_hint && state)
+	{
+		m_scu->hblank_in_w(1);
+		m_slave->set_input_line(0x2, ASSERT_LINE);
+	}
+	else if (m_prev_hint && !state)
+	{
+		// Essentially clears?
+		m_slave->set_input_line(0x0, ASSERT_LINE);
+	}
+
+	m_prev_hint = state;
+}
+
+// TODO: stuff that should really be in VDP1
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 {
 	int scanline = param;
 	int y_step, vblank_line;
 
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
+	vblank_line = m_vdp2->get_vblank_start_position();
+	y_step = m_vdp2->get_ystep_count();
 
 	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
-	if(scanline == 0*y_step)
+	if(scanline == vblank_line*y_step)
 	{
-		m_scu->vblank_out_w(1);
-	}
-	else if(scanline == vblank_line*y_step)
-	{
-		m_scu->vblank_in_w(1);
-
-		// flip odd bit here
-		m_vdp2.odd ^= 1;
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
 		vdp1_video_update();
 	}
-	else if((scanline % y_step) == 0 && scanline < vblank_line * y_step)
-	{
-		m_scu->hblank_in_w(1);
-	}
 
-	if(scanline == (vblank_line+1) * y_step)
+	if(scanline == (vblank_line + 1) * y_step)
 	{
 		/* docs mentions that VBE happens one line after vblank-in. */
 		if(VDP1_VBE())
-			m_vdp1.framebuffer_clear_on_next_frame = 1;
+			m_vdp1_legacy.framebuffer_clear_on_next_frame = 1;
 	}
 
 	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
@@ -236,21 +196,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		m_scu->vdp1_end_w(1);
 	}
 
-	m_scu->check_scanline_timers(scanline, y_step);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
-{
-	int scanline = param;
-	int y_step, vblank_line;
-
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
-
-	if(scanline == vblank_line*y_step)
-		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43); // SH2
-	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41); // SH2
 }
 
 static const gfx_layout tiles8x8x4_layout =
@@ -371,11 +316,20 @@ void saturn_state::dot_select_w(int state)
 {
 	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
-	m_maincpu->set_unscaled_clock(xtal/2);
-	m_slave->set_unscaled_clock(xtal/2);
+	m_maincpu->set_unscaled_clock(xtal / 2);
+	m_slave->set_unscaled_clock(xtal / 2);
+	m_dcc->set_unscaled_clock(xtal / 2);
 
-	m_vdp2.dotsel = state ^ 1;
-	vdp2_dynamic_res_change();
+	m_scu->set_unscaled_clock(xtal);
+
+//	m_vdp1->set_unscaled_clock(xtal);
+	m_vdp2->set_unscaled_clock(xtal);
+	m_vdp2->set_dotsel(!state);
+
+	m_scsp->reset();
+	m_scu->reset();
+//  m_vdp1->reset();
+	m_vdp2->reset();
 }
 
 

@@ -556,8 +556,6 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 
 void missile_state::machine_start()
 {
-	m_leds.resolve();
-
 	// create a timer to speed/slow the CPU
 	m_cpu_timer = timer_alloc(FUNC(missile_state::adjust_cpu_speed), this);
 	m_cpu_timer->adjust(m_screen->time_until_pos(v_to_scanline(0), 0));
@@ -978,7 +976,7 @@ void missile_state::missile(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_entries(8);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(missile_state::screen_update_missile));
 	m_screen->set_palette(m_palette);

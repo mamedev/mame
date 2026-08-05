@@ -64,7 +64,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void spectra(machine_config &config);
+	void spectra(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -246,8 +246,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 void spectra_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
@@ -258,6 +256,7 @@ void spectra_state::machine_start()
 void spectra_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

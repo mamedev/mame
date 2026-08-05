@@ -51,25 +51,15 @@ public:
 	void set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_clock_changed() override;
-	virtual void device_reset() override ATTR_COLD;
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
-	TIMER_CALLBACK_MEMBER(update_state);
-
-	void stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp);
-
-	enum {
+	enum
+	{
 		IDLE,
 		RUNNING,
 		RUNNING_SYNCPOINT
 	};
 
-	struct live_info {
+	struct live_info
+	{
 		attotime tm;
 		int state, next_state;
 		int sync;
@@ -95,6 +85,32 @@ protected:
 		attotime write_buffer[32];
 		int write_position;
 	};
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_clock_changed() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(update_state);
+
+	void stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp);
+
+	floppy_image_device* get_floppy();
+
+	void live_start();
+	void checkpoint();
+	void rollback();
+	bool write_next_bit(bool bit, const attotime &limit);
+	void start_writing(const attotime &tm);
+	void commit(const attotime &tm);
+	void stop_writing(const attotime &tm);
+	void live_delay(int state);
+	void live_sync();
+	void live_abort();
+	void live_run(const attotime &limit = attotime::never);
+	void get_next_edge(const attotime &when);
+	int get_next_bit(attotime &tm, const attotime &limit);
 
 	devcb_write_line m_write_sync;
 	devcb_write_line m_write_ready;
@@ -122,26 +138,10 @@ protected:
 
 	live_info cur_live, checkpoint_live;
 	emu_timer *t_gen;
-
-	floppy_image_device* get_floppy();
-
-	void live_start();
-	void checkpoint();
-	void rollback();
-	bool write_next_bit(bool bit, const attotime &limit);
-	void start_writing(const attotime &tm);
-	void commit(const attotime &tm);
-	void stop_writing(const attotime &tm);
-	void live_delay(int state);
-	void live_sync();
-	void live_abort();
-	void live_run(const attotime &limit = attotime::never);
-	void get_next_edge(const attotime &when);
-	int get_next_bit(attotime &tm, const attotime &limit);
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(C2040_FDC, c2040_fdc_device)
 
 #endif // MAME_BUS_IEEE488_C2040FDC_H

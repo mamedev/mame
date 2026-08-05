@@ -16,7 +16,6 @@
 #include "a2bus.h"
 #include "bus/nscsi/devices.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cb.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,6 +23,7 @@
 
 class a2bus_sider_device:
 	public device_t,
+	public nscsi_device_interface,
 	public device_a2bus_card_interface
 {
 protected:
@@ -43,7 +43,6 @@ protected:
 	virtual bool take_c800() const override { return true; }
 
 	required_device<nscsi_bus_device> m_sasibus;
-	required_device<nscsi_callback_device> m_sasi;
 	required_region_ptr<u8> m_rom;
 
 private:

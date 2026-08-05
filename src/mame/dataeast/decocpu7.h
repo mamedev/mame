@@ -15,7 +15,7 @@ public:
 protected:
 	class mi_decrypt : public mi_default {
 	public:
-		bool had_written;
+		bool m_had_written;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
@@ -24,7 +24,7 @@ protected:
 
 	class disassembler : public m6502_disassembler {
 	public:
-		mi_decrypt *mintf;
+		mi_decrypt *m_mintf;
 
 		disassembler(mi_decrypt *m);
 		virtual ~disassembler() = default;

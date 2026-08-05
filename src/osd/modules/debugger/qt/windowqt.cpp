@@ -141,7 +141,7 @@ WindowQt::~WindowQt()
 void WindowQt::debugActOpenMemory()
 {
 	MemoryWindow *foo = new MemoryWindow(m_debugger, this);
-	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
+	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new taskbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
 	foo->show();

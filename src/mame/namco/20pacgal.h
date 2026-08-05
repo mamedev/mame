@@ -100,6 +100,7 @@ protected:
 
 	void _20pacgal_io_map(address_map &map) ATTR_COLD;
 	void _20pacgal_map(address_map &map) ATTR_COLD;
+	void waveram_map(address_map &map) ATTR_COLD;
 };
 
 

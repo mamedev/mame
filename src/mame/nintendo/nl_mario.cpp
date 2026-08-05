@@ -23,7 +23,6 @@
 /* ---------------------------------------------------------------------- */
 static NETLIST_START(nl_mario_snd0)
 {
-
 	RES(R17, RES_K(27))               /* 20 according to parts list           */
 										/* 27 verified, 30K in schematics       */
 	CAP(C14, CAP_U(4.7))              /* verified                             */
@@ -74,7 +73,6 @@ static NETLIST_START(nl_mario_snd0)
 /* ---------------------------------------------------------------------- */
 static NETLIST_START(nl_mario_snd1)
 {
-
 	RES(R18, RES_K(30))               /* 20 according to parts list           */
 										/* 27 verified, 30K in schematics       */
 	CAP(C15, CAP_U(4.7))              /* verified                             */
@@ -123,7 +121,6 @@ static NETLIST_START(nl_mario_snd1)
 // FIXME: Diodes are 1S953
 static NETLIST_START(nl_mario_snd7)
 {
-
 	RES(R61, RES_K(47))
 	CAP(C41, CAP_U(4.7))              /* verified                             */
 
@@ -169,7 +166,6 @@ static NETLIST_START(nl_mario_snd7)
 
 	TTL_7486_XOR(1K_C, 3H.Q4, 4K_A.Y)
 	TTL_7408_AND(2K_C, 4L_A.Q, 1K_C)
-
 }
 
 /* ---------------------------------------------------------------------- */
@@ -222,7 +218,6 @@ static NETLIST_START(nl_mario_dac)
 
 NETLIST_START(mario)
 {
-
 	LOCAL_SOURCE(nl_mario_snd0)
 	LOCAL_SOURCE(nl_mario_snd1)
 	LOCAL_SOURCE(nl_mario_snd7)
@@ -234,7 +229,7 @@ NETLIST_START(mario)
 	PARAM(Solver.GS_LOOPS, 1)
 	/* Dynamic timestepping avoids excessive newton loops on startup */
 	PARAM(Solver.DYNAMIC_LTE, 5e-2)
-	PARAM(Solver.DYNAMIC_TS,  0)
+	PARAM(Solver.DYNAMIC_TS,  1)
 
 	ANALOG_INPUT(V5, 5)
 	ALIAS(VCC, V5) // no-ttl-dip devices need VCC!

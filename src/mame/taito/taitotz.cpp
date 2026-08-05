@@ -89,7 +89,7 @@ E74-06.IC2 is the TMP95C063 program code.
 
 
 
-Rizing Ping Pong
+Raizin Ping Pong
 Taito 2002
 
 This game runs on Taito Type Zero hardware.
@@ -181,6 +181,8 @@ Notes:
 #include "video/poly.h"
 
 #include "screen.h"
+
+#include "corefloat.h"
 
 #include <algorithm>
 
@@ -2640,7 +2642,7 @@ void taitotz_state::taitotz(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 384);

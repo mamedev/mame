@@ -441,7 +441,7 @@ void nightmare_state::nightmare(machine_config &config)
 	m_vdc[1]->set_vram_size(0x4000);
 	m_vdc[1]->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));
 
 	EFO_SOUND3(config, m_sound3);

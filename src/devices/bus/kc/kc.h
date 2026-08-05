@@ -51,10 +51,7 @@ public:
 	kcexp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: kcexp_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kcexp_slot_device();
@@ -83,8 +80,8 @@ public:
 protected:
 	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
+	// device_t implementation
+	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	device_kcexp_interface*     m_cart;
@@ -102,10 +99,7 @@ public:
 	kccart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: kccart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kccart_slot_device();

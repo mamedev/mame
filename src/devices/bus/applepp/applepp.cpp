@@ -5,6 +5,9 @@
 #include "applepp.h"
 #include "storagehle.h"
 
+#include <bit>
+
+
 DEFINE_DEVICE_TYPE(APPLEPP_CONNECTOR, applepp_connector, "applepp_connector", "Apple parallel connector")
 
 applepp_connector::applepp_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -73,7 +76,7 @@ void applepp_connector::pres_w(int level)
 void applepp_connector::pd_set(u8 data)
 {
 	m_write_pd(data);
-	m_write_pparity((population_count_32(data) + 1) & 1);
+	m_write_pparity((std::popcount(data) + 1) & 1);
 }
 
 void applepp_connector::pbsy_set(int state)

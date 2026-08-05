@@ -205,7 +205,7 @@ void tv965_state::tv965(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5864BP-10L + battery
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	//  m_screen->set_raw(26.9892_MHz_XTAL, 1020, 0, 800, 441, 0, 416);
 	m_screen->set_raw(44.4528_MHz_XTAL, 1680, 0, 1320, 441, 0, 416);
 	m_screen->set_screen_update("crtc", FUNC(scn2672_device::screen_update));
@@ -216,10 +216,10 @@ void tv965_state::tv965(machine_config &config)
 	m_crtc->intr_callback().set_inputline(m_maincpu, G65816_LINE_NMI);
 	m_crtc->set_screen(m_screen);
 
-	mos6551_device &acia1(MOS6551(config, "acia1", 0));
+	mos6551_device &acia1(MOS6551(config, "acia1"));
 	acia1.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
 
-	mos6551_device &acia2(MOS6551(config, "acia2", 0));
+	mos6551_device &acia2(MOS6551(config, "acia2"));
 	acia2.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
 }
 

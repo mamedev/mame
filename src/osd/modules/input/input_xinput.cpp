@@ -194,6 +194,7 @@ LSX 15  C
 #include "eminline.h"
 
 #include <algorithm>
+#include <bit>
 #include <cstdint>
 #include <iterator>
 #include <string>
@@ -459,12 +460,12 @@ xinput_device_base::xinput_device_base(
 	}
 
 	// detect invalid axis resolutions
-	bool const ltcap_bad = m_capabilities.Gamepad.bLeftTrigger && count_leading_zeros_32(m_capabilities.Gamepad.bLeftTrigger << 24);
-	bool const rtcap_bad = m_capabilities.Gamepad.bRightTrigger && count_leading_zeros_32(m_capabilities.Gamepad.bRightTrigger << 24);
-	bool const lsxcap_bad = m_capabilities.Gamepad.sThumbLX && count_leading_zeros_32(m_capabilities.Gamepad.sThumbLX << 16);
-	bool const lsycap_bad = m_capabilities.Gamepad.sThumbLY && count_leading_zeros_32(m_capabilities.Gamepad.sThumbLY << 16);
-	bool const rsxcap_bad = m_capabilities.Gamepad.sThumbRX && count_leading_zeros_32(m_capabilities.Gamepad.sThumbRX << 16);
-	bool const rsycap_bad = m_capabilities.Gamepad.sThumbRY && count_leading_zeros_32(m_capabilities.Gamepad.sThumbRY << 16);
+	bool const ltcap_bad = m_capabilities.Gamepad.bLeftTrigger && std::countl_zero(m_capabilities.Gamepad.bLeftTrigger);
+	bool const rtcap_bad = m_capabilities.Gamepad.bRightTrigger && std::countl_zero(m_capabilities.Gamepad.bRightTrigger);
+	bool const lsxcap_bad = m_capabilities.Gamepad.sThumbLX && std::countl_zero(u16(m_capabilities.Gamepad.sThumbLX));
+	bool const lsycap_bad = m_capabilities.Gamepad.sThumbLY && std::countl_zero(u16(m_capabilities.Gamepad.sThumbLY));
+	bool const rsxcap_bad = m_capabilities.Gamepad.sThumbRX && std::countl_zero(u16(m_capabilities.Gamepad.sThumbRX));
+	bool const rsycap_bad = m_capabilities.Gamepad.sThumbRY && std::countl_zero(u16(m_capabilities.Gamepad.sThumbRY));
 
 	// log some diagnostic information
 	osd_printf_verbose(
@@ -493,22 +494,22 @@ xinput_device_base::xinput_device_base(
 	osd_printf_verbose(
 			"XInput: Axis capabilities LT=0x%02X (%d-bit%s) RT=0x%02X (%d-bit%s) LSX=0x%04X (%d-bit%s) LSY=0x%04X (%d-bit%s) RSX=0x%04X (%d-bit%s) RSY=0x%04X (%d-bit%s).\n",
 			m_capabilities.Gamepad.bLeftTrigger,
-			count_leading_ones_32(u32(m_capabilities.Gamepad.bLeftTrigger) << 24),
+			std::countl_one(m_capabilities.Gamepad.bLeftTrigger),
 			ltcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.bRightTrigger,
-			count_leading_ones_32(u32(m_capabilities.Gamepad.bRightTrigger) << 24),
+			std::countl_one(m_capabilities.Gamepad.bRightTrigger),
 			rtcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbLX,
-			count_leading_ones_32(u32(u16(m_capabilities.Gamepad.sThumbLX)) << 16),
+			std::countl_one(u16(m_capabilities.Gamepad.sThumbLX)),
 			lsxcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbLY,
-			count_leading_ones_32(u32(u16(m_capabilities.Gamepad.sThumbLY)) << 16),
+			std::countl_one(u16(m_capabilities.Gamepad.sThumbLY)),
 			lsycap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbRX,
-			count_leading_ones_32(u32(u16(m_capabilities.Gamepad.sThumbRX)) << 16),
+			std::countl_one(u16(m_capabilities.Gamepad.sThumbRX)),
 			rsxcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbRY,
-			count_leading_ones_32(u32(u16(m_capabilities.Gamepad.sThumbRY)) << 16),
+			std::countl_one(u16(m_capabilities.Gamepad.sThumbRY)),
 			rsycap_bad ? ", invalid" : "");
 
 	// ignore capabilities if invalid

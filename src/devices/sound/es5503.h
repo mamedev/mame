@@ -15,7 +15,7 @@ class es5503_device : public device_t,
 {
 public:
 	// construction/destruction
-	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// channels must be a power of two
 	void set_channels(int channels) { m_output_channels = channels; }
@@ -87,7 +87,7 @@ private:
 
 	std::vector<int32_t> m_mix_buffer;
 
-	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift);
+	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift, uint8_t newCtrl);
 };
 
 

@@ -304,7 +304,7 @@ void hotchili_state::hc_map(address_map &map)
 static INPUT_PORTS_START( hotchili )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Clear / Configuration")  // pressed on startup
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("All Clear / Configuration")  // pressed on startup
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unknown
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  // active: enables RNG and read inputs on secondary buffer (inputs with special timing)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meter Reading Key") PORT_TOGGLE
@@ -538,7 +538,6 @@ uint8_t hotchili_state::extram_r(offs_t offset)
 
 void hotchili_state::machine_start()
 {
-	m_lamp.resolve();
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
@@ -556,7 +555,7 @@ void hotchili_state::hotchili(machine_config &config)
 	RAM(config, m_ram).set_default_size("2K").set_default_value(0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw( MAIN_CLOCK / 2, 260, 0, 256, 256, 16, 239);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(hotchili_state::screen_update));

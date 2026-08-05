@@ -621,6 +621,42 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="anpaddrd" supported="no">
+		<description>Soreike! Anpanman Doki Doki! Rescue Drive: Car Navi-tsuki</description>
+		<year>2008</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="それいけ！アンパンマンどきどき！レスキュードライブ～カーナビつき～"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100037-1000 - Soreike Anpanman Doki Doki Rescue Drive Car Navi-tsuki (Japan).bin" size="0x800000" crc="ee4b60b7" sha1="6ee30ff9860bc1ebfaa12c153719f85bf1ae84df"/>
+			</dataarea>
+			<dataarea name="page1" size="0x155e133"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x155e133" crc="9548bf8c" sha1="61f3a18fc0086b009116d1770c3a18fbea9d2b52"/>
+			</dataarea>
+			<dataarea name="page2" size="0x157eaa8"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x157eaa8" crc="57e2cf21" sha1="8c9fd4c3f8cc7130da538bb1c746e276fbd898ab"/>
+			</dataarea>
+			<dataarea name="page3" size="0x161b092"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x161b092" crc="a06d3444" sha1="2f5bdffbe9b833aaef700fd7bce2523dc38ed8a8"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1792932"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1792932" crc="692d690a" sha1="71f67e271a4aebea95a45f4d3e9d1ddea97f68bc"/>
+			</dataarea>
+			<dataarea name="page5" size="0x161ad84"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x161ad84" crc="965dc79e" sha1="1ae072810fa03275fc38da1ad3941e5ec300268f"/>
+			</dataarea>
+			<dataarea name="page6" size="0x14c44bc"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x14c44bc" crc="070cad3b" sha1="3ced0c00023994710566c14f0974fd91cb57395b"/>
+			</dataarea>
+			<dataarea name="page7" size="0x17a3d70"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x17a3d70" crc="c1eaad40" sha1="0a9a58f9405715c9fb83f4edf375d353d65c4ee0"/>
+			</dataarea>
+			<dataarea name="page8" size="0x187b4a3"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x187b4a3" crc="72e6bac9" sha1="7d751e105af1aad8511e8fbf8a37900c2c275283"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="anpaeigo" supported="yes">
 		<description>Soreike! Anpanman Waku Waku Eigo Game!</description>
 		<year>2011</year>
@@ -1534,6 +1570,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dorats_1" supported="yes">
+		<description>Doraemon Tanoshii En Seikatsu Youchien Hoikuen (Rev. T-120002-1100)</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ドラえもんたのしいえんせいかつようちえん・ほいくえん"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-120002-1100 - Doraemon Tanoshii En Seikatsu Youchien Hoikuen (Japan).bin" size="0x400000" crc="89890ad5" sha1="6a61675e840c05920878e30ef7dfeeef568d2ea3"/>
+			</dataarea>
+			<dataarea name="page1" size="0x17f1788"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x17f1788" crc="4118d615" sha1="54a8ed13dcdc3cec8d9f26a9c916f91382a87d29"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1893189"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1893189" crc="fe68025b" sha1="96728e8d842e7e34d8dd79f761edbd9e72db4ad8"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1aa1752"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1aa1752" crc="22796b6e" sha1="cfa1ba2091e86dccbf4df2561e3d1df53afd6914"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1aaa176"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1aaa176" crc="0fbb4fab" sha1="9e48c0e0e73f3207982a79b9cf23e05aff2b64dd"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1aa5f4c"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1aa5f4c" crc="125a28c6" sha1="59c1d1ce13e4b308a21b26fe50efd1af7b2c8445"/>
+			</dataarea>
+			<dataarea name="page6" size="0x184a55e"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x184a55e" crc="7eabcefd" sha1="9d3356f02c3bf1f67d35785924d0028f943eb14e"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1bee1d3"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1bee1d3" crc="fab972fb" sha1="61c934ec61bbf8d540cf75c2bf94a007d0a49503"/>
+			</dataarea>
+			<dataarea name="page8" size="0x186bc6d"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x186bc6d" crc="69302387" sha1="f53d24252dbb6f72c92c46b6ef6abaf3a5eff3cc"/>
+			</dataarea>
+			<dataarea name="page9" size="0x192a8be"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x192a8be" crc="aebe7e70" sha1="9fb7c57af56d046dfb076a0f23e97e3dd0c1eb3c"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1656551"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1656551" crc="cce5f5fb" sha1="b084d0bdb9eef481059cbe5be9c623c68e30e314"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1822970"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1822970" crc="91598ef6" sha1="8ed57ef8a297f1eabc034ea5972806cdb81833a5"/>
+			</dataarea>
+			<dataarea name="page12" size="0x193bdbb"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x193bdbb" crc="6498b6c0" sha1="7d8a63048c19b88f47f0cf6632fddf7d42ed817e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dorawwgl" supported="yes">
 		<description>Doraemon Chinou Daikaihatsu! Waku Waku Game Land</description>
 		<year>2006</year>
@@ -1578,6 +1662,55 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="page12" size="0x1f712bc"> <!-- book pages -->
 				<rom name="0 - 0012.png" size="0x1f712bc" crc="5a8330b1" sha1="4ecbf9a74714f2eb35922cfc40824a47246c6b0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorawwsi" supported="partial">
+		<description>Doraemon Waku Waku Sekai Isshuu Game: Asonde Oboeru Chizu Kokki</description>
+		<year>2010</year>
+		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="ドラえもんわくわく世界一周ゲーム～あそんでおぼえる地図・国旗～"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-120004-1000 - Doraemon Waku Waku Sekai Isshuu Game - Asonde Oboeru Chizu Kokki (Japan).bin" size="0x800000" crc="21de1ecb" sha1="2300c279f55a7eb491cad17d723333756598abeb"/>
+			</dataarea>
+			<dataarea name="page1" size="0x154dfba"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x154dfba" crc="2e51a769" sha1="1d405f9828176f1e3e80d53e570261de1c122ded"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1759349"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1759349" crc="111dc3ba" sha1="98b3770f020e22de6cdb80417893f92e2504a22c"/>
+			</dataarea>
+			<dataarea name="page3" size="0x15c376d"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x15c376d" crc="47b404a9" sha1="d2a98d5157732824ef573cd9ba4d63de54fe4ce8"/>
+			</dataarea>
+			<dataarea name="page4" size="0x16296ce"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x16296ce" crc="d8eb8869" sha1="ec5ab96650d030549fcf2bc892330f44fc23e929"/>
+			</dataarea>
+			<dataarea name="page5" size="0x156aa33"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x156aa33" crc="2974b31d" sha1="895e2383be46c91e33ae8d78be51e2569a7176e4"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1592b5d"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1592b5d" crc="d87b4ee6" sha1="8ba7c942e2f294f3dfd745c3789d9f5862f7c4fd"/>
+			</dataarea>
+			<dataarea name="page7" size="0x14e1cd1"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x14e1cd1" crc="56af52b0" sha1="08e0387ef88f5e9f801ffe575348c4b1de51f240"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1492ef2"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1492ef2" crc="f6012863" sha1="6a6d0aa96b77a4955bb0b0fb7148527015ac16ee"/>
+			</dataarea>
+			<dataarea name="page9" size="0x14aa214"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x14aa214" crc="69e3dba4" sha1="313b2a64eea241387a0e3c302ab8e5c3d6952994"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1584eda"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1584eda" crc="27cccd5b" sha1="7ada810a3a973dab471675bf455559719791879f"/>
+			</dataarea>
+			<dataarea name="page11" size="0x15502d5"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x15502d5" crc="503d6b9d" sha1="046dd6ab0cd559d9b1ea320a32d97c62e7595be8"/>
+			</dataarea>
+			<dataarea name="page12" size="0x15ac053"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x15ac053" crc="c135b7b5" sha1="0aa2fd8516a5d38b64407db1f730bbea10013e27"/>
 			</dataarea>
 		</part>
 	</software>

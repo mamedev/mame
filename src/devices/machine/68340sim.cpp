@@ -20,7 +20,7 @@
 #define LOG_CS      (1U << 9)
 
 #define VERBOSE  (LOG_PIT)
-#define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -498,8 +498,6 @@ void m68340_cpu_device::start_68340_sim()
 
 void m68340_sim::reset()
 {
-	LOG("%s\n", FUNCNAME);
-
 	// Ports - only setup those that are affected by reset
 	m_ddra   = 0x00;
 	m_ppara1 = 0xff;

@@ -217,7 +217,6 @@ void drw80pkr_state::machine_start()
 	subdevice<nvram_device>("nvram")->set_base(m_pkr_io_ram, sizeof(m_pkr_io_ram));
 
 	m_active_bank = 0;
-	m_lamps.resolve();
 	m_t1 = 1;  // battery level sensor (1 = battery ok)
 }
 
@@ -624,7 +623,7 @@ void drw80pkr_state::drw80pkr(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(8_MHz_XTAL / 2, 256, 0, 192, 257, 0, 216);  // 4 MHz?
 	screen.set_screen_update(FUNC(drw80pkr_state::screen_update));
 	screen.set_palette("palette");

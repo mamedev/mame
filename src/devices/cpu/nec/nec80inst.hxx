@@ -133,14 +133,14 @@ OP80( 0x84, i_addh  ) { uint32_t src = Breg(BH), dst = Breg(AL); ADDB; Breg(AL) 
 OP80( 0x85, i_addl  ) { uint32_t src = Breg(BL), dst = Breg(AL); ADDB; Breg(AL) = dst; CLK(1); }
 OP80( 0x86, i_addm  ) { uint32_t src = GetMemB(DS0, Wreg(BW)), dst = Breg(AL); ADDB; Breg(AL) = dst; CLK(1); }
 OP80( 0x87, i_adda  ) { uint32_t src = Breg(AL), dst = Breg(AL); ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x88, i_adcb  ) { uint32_t src = Breg(CH), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x89, i_adcc  ) { uint32_t src = Breg(CL), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x8a, i_adcd  ) { uint32_t src = Breg(DH), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x8b, i_adce  ) { uint32_t src = Breg(DL), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x8c, i_adch  ) { uint32_t src = Breg(BH), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x8d, i_adcl  ) { uint32_t src = Breg(BL), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x8e, i_adcm  ) { uint32_t src = GetMemB(DS0, Wreg(BW)), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
-OP80( 0x8f, i_adca  ) { uint32_t src = Breg(AL), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
+OP80( 0x88, i_adcb  ) { uint32_t src = Breg(CH), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x89, i_adcc  ) { uint32_t src = Breg(CL), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x8a, i_adcd  ) { uint32_t src = Breg(DH), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x8b, i_adce  ) { uint32_t src = Breg(DL), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x8c, i_adch  ) { uint32_t src = Breg(BH), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x8d, i_adcl  ) { uint32_t src = Breg(BL), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x8e, i_adcm  ) { uint32_t src = GetMemB(DS0, Wreg(BW)), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x8f, i_adca  ) { uint32_t src = Breg(AL), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
 OP80( 0x90, i_subb  ) { uint32_t src = Breg(CH), dst = Breg(AL); SUBB; Breg(AL) = dst; CLK(1); }
 OP80( 0x91, i_subc  ) { uint32_t src = Breg(CL), dst = Breg(AL); SUBB; Breg(AL) = dst; CLK(1); }
 OP80( 0x92, i_subd  ) { uint32_t src = Breg(DH), dst = Breg(AL); SUBB; Breg(AL) = dst; CLK(1); }
@@ -149,14 +149,14 @@ OP80( 0x94, i_subh  ) { uint32_t src = Breg(BH), dst = Breg(AL); SUBB; Breg(AL) 
 OP80( 0x95, i_subl  ) { uint32_t src = Breg(BL), dst = Breg(AL); SUBB; Breg(AL) = dst; CLK(1); }
 OP80( 0x96, i_subm  ) { uint32_t src = GetMemB(DS0, Wreg(BW)), dst = Breg(AL); SUBB; Breg(AL) = dst; CLK(1); }
 OP80( 0x97, i_suba  ) { uint32_t src = Breg(AL), dst = Breg(AL); SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x98, i_sbbb  ) { uint32_t src = Breg(CH), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x99, i_sbbc  ) { uint32_t src = Breg(CL), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x9a, i_sbbd  ) { uint32_t src = Breg(DH), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x9b, i_sbbe  ) { uint32_t src = Breg(DL), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x9c, i_sbbh  ) { uint32_t src = Breg(BH), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x9d, i_sbbl  ) { uint32_t src = Breg(BL), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x9e, i_sbbm  ) { uint32_t src = GetMemB(DS0, Wreg(BW)), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
-OP80( 0x9f, i_sbba  ) { uint32_t src = Breg(AL), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
+OP80( 0x98, i_sbbb  ) { uint32_t src = Breg(CH), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x99, i_sbbc  ) { uint32_t src = Breg(CL), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x9a, i_sbbd  ) { uint32_t src = Breg(DH), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x9b, i_sbbe  ) { uint32_t src = Breg(DL), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x9c, i_sbbh  ) { uint32_t src = Breg(BH), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x9d, i_sbbl  ) { uint32_t src = Breg(BL), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x9e, i_sbbm  ) { uint32_t src = GetMemB(DS0, Wreg(BW)), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
+OP80( 0x9f, i_sbba  ) { uint32_t src = Breg(AL), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
 OP80( 0xa0, i_anab  ) { uint32_t src = Breg(CH), dst = Breg(AL); ANDB; Breg(AL) = dst; CLK(1); }
 OP80( 0xa1, i_anac  ) { uint32_t src = Breg(CL), dst = Breg(AL); ANDB; Breg(AL) = dst; CLK(1); }
 OP80( 0xa2, i_anad  ) { uint32_t src = Breg(DH), dst = Breg(AL); ANDB; Breg(AL) = dst; CLK(1); }
@@ -202,7 +202,7 @@ OP80( 0xc9, i_ret   ) { POP80(m_ip); CHANGE_PC; CLK(1); } //0xd9
 OP80( 0xca, i_jz    ) { uint32_t addr = fetchword(); if (ZF) { m_ip = addr; CHANGE_PC; } CLK(1); }
 OP80( 0xcc, i_cz    ) { uint32_t addr = fetchword(); if (ZF) { PUSH80(m_ip); m_ip = addr; CHANGE_PC; } CLK(1); }
 OP80( 0xcd, i_call  ) { uint32_t addr = fetchword(); PUSH80(m_ip); m_ip = addr; CHANGE_PC; CLK(1); } // 0xdd, 0xfd
-OP80( 0xce, i_aci   ) { uint32_t src = fetch(), dst = Breg(AL); src+=CF; ADDB; Breg(AL) = dst; CLK(1); }
+OP80( 0xce, i_aci   ) { uint32_t src = fetch(), dst = Breg(AL); ADDCB; Breg(AL) = dst; CLK(1); }
 OP80( 0xcf, i_rst1  ) { PUSH80(m_ip); m_ip = 8; CHANGE_PC; CLK(1); }
 OP80( 0xd0, i_rnc   ) { if (!CF) { POP80(m_ip); CHANGE_PC; } CLK(1); }
 OP80( 0xd1, i_popd  ) { POP80(Wreg(DW)); }
@@ -216,7 +216,7 @@ OP80( 0xd8, i_rc    ) { if (CF) { POP80(m_ip); CHANGE_PC; } CLK(1); }
 OP80( 0xda, i_jc    ) { uint32_t addr = fetchword(); if (CF) { m_ip = addr; CHANGE_PC; } CLK(1); }
 OP80( 0xdb, i_in    ) { uint8_t port = fetch(); Breg(AL) = read_port_byte(port); CLK(1); }
 OP80( 0xdc, i_cc    ) { uint32_t addr = fetchword(); if (CF) { PUSH80(m_ip); m_ip = addr; CHANGE_PC; } CLK(1); }
-OP80( 0xde, i_sbi   ) { uint32_t src = fetch(), dst = Breg(AL); src+=CF; SUBB; Breg(AL) = dst; CLK(1); }
+OP80( 0xde, i_sbi   ) { uint32_t src = fetch(), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
 OP80( 0xdf, i_rst3  ) { PUSH80(m_ip); m_ip = 0x18; CHANGE_PC; CLK(1); }
 OP80( 0xe0, i_rpo   ) { if (!PF) { POP80(m_ip); CHANGE_PC; } CLK(1); }
 OP80( 0xe1, i_poph  ) { POP80(Wreg(BW)); }

@@ -939,20 +939,103 @@ void segas1x_bootleg_state::tetrisbl_map(address_map &map)
 }
 
 
-uint16_t segas1x_bootleg_state::beautyb_unkx_r()
+/*
+    Beauty Block / IQ Pipe protection
+
+    The 68000, its two program ROMs and a PAL16L8 (u4, undumped) are on a small
+    daughterboard.  The PAL unscrambles data bits 13 and 10 of the ROMs (the
+    'xor 0x2400 + conditional swap on A4' already handled by init_beautyb) but it
+    also implements a small state machine which is only visible on *data*
+    accesses to two 32 byte windows inside the program ROM:
+
+      $xx80-$xx8F   a read clocks an 8 bit up/down counter, the direction being
+                    given by A2 (0 = up, 1 = down); the value read is discarded
+      $xx90-$xx9F   a read returns the ROM word with bits 13 and 10 replaced by
+                    two sums of products of the counter
+
+    with xx = $68 or $90.  Opcode fetches are not affected - $9090-$909F is
+    ordinary executable code - hence the separate AS_OPCODES map.
+
+    The game holds five identical copies of the check ($860C, $9874, $A80A,
+    $C1A2, $D150).  When one of them fails the code silences the sound, blanks
+    the screen and tries to wipe the program ROM ($EF3C): that was the black
+    screen.  The 68000 code computes the expected value itself, so the equations
+    below are taken verbatim from it ($8698-$8724 and its four clones).
+*/
+template <unsigned Base>
+uint16_t segas1x_bootleg_state::beautyb_prot_r(offs_t offset)
 {
-	m_beautyb_unkx++;
-	m_beautyb_unkx &= 0x7f;
-	return m_beautyb_unkx;
+	uint16_t const data = m_maincpu_rom[Base + offset];
+
+	if (!BIT(offset, 3)) // $xx80-$xx8F - only clocks the counter
+	{
+		if (!machine().side_effects_disabled())
+		{
+			if (BIT(offset, 1))
+				m_beautyb_prot_ctr--;
+			else
+				m_beautyb_prot_ctr++;
+		}
+
+		return data;
+	}
+
+	// $xx90-$xx9F - the PAL drives D13 and D10 instead of the ROM
+	uint8_t const v = (m_beautyb_prot_ctr >> 3) & 0x1f;
+	bool const b0 = BIT(v, 0), b1 = BIT(v, 1), b2 = BIT(v, 2), b3 = BIT(v, 3), b4 = BIT(v, 4);
+
+	uint16_t res = data & ~0x2400;
+	if ((b0 && b3) || (b4 && !b2)) res |= 0x2000;
+	if ((b1 && !b3) || (b2 && !b0)) res |= 0x0400;
+
+	return res;
+}
+
+/*
+    IQ Pipe uses the same scheme but a different PAL: the counter direction is
+    inverted (A2 = 1 counts up) and the two equations are different.  Both
+    windows are executable code here, so AS_OPCODES is mandatory.
+*/
+template <unsigned Base>
+uint16_t segas1x_bootleg_state::iqpipe_prot_r(offs_t offset)
+{
+	uint16_t const data = m_maincpu_rom[Base + offset];
+
+	if (!BIT(offset, 3)) // $xx80-$xx8F - only clocks the counter
+	{
+		if (!machine().side_effects_disabled())
+		{
+			if (BIT(offset, 1))
+				m_beautyb_prot_ctr++;
+			else
+				m_beautyb_prot_ctr--;
+		}
+
+		return data;
+	}
+
+	// $xx90-$xx9F - the PAL drives D13 and D10 instead of the ROM
+	uint8_t const v = (m_beautyb_prot_ctr >> 3) & 0x1f;
+	bool const b0 = BIT(v, 0), b1 = BIT(v, 1), b2 = BIT(v, 2), b3 = BIT(v, 3), b4 = BIT(v, 4);
+
+	uint16_t res = data & ~0x2400;
+	if ((b0 && !b3) || (b2 && !b4)) res |= 0x2000;
+	if ((b1 && b3) || (b0 && b2)) res |= 0x0400;
+
+	return res;
+}
+
+void segas1x_bootleg_state::beautyb_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("maincpu", 0);
 }
 
 void segas1x_bootleg_state::beautyb_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().nopw();
+	map(0x006880, 0x00689f).r(FUNC(segas1x_bootleg_state::beautyb_prot_r<0x6880 / 2>));
+	map(0x009080, 0x00909f).r(FUNC(segas1x_bootleg_state::beautyb_prot_r<0x9080 / 2>));
 	map(0x010000, 0x03ffff).nopw();
-
-	map(0x0280D6, 0x0280D7).r(FUNC(segas1x_bootleg_state::beautyb_unkx_r));
-	map(0x0280D8, 0x0280D9).r(FUNC(segas1x_bootleg_state::beautyb_unkx_r));
 
 	map(0x3f0000, 0x3fffff).w(FUNC(segas1x_bootleg_state::sys16_tilebank_w));
 
@@ -970,13 +1053,27 @@ void segas1x_bootleg_state::beautyb_map(address_map &map)
 
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
-	map(0xc41004, 0xc41005).portr("P2");
+	map(0xc41006, 0xc41007).portr("P2");   // the 68000 reads $c41007, not $c41005
+	map(0xc42000, 0xc42001).portr("DSW2"); // both read through the I/O pointer table at $813A
+	map(0xc42002, 0xc42003).portr("DSW1");
 	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc43034, 0xc43035).nopw();
 
 	map(0xc40000, 0xc40001).nopw();
 	map(0xc80000, 0xc80001).noprw(); // vblank irq ack
 
 	map(0xffc000, 0xffffff).ram(); // work ram
+}
+
+/***************************************************************************/
+
+void segas1x_bootleg_state::iqpipe_map(address_map &map)
+{
+	beautyb_map(map);
+
+	// same protection scheme, different PAL equations
+	map(0x006880, 0x00689f).r(FUNC(segas1x_bootleg_state::iqpipe_prot_r<0x6880 / 2>));
+	map(0x009080, 0x00909f).r(FUNC(segas1x_bootleg_state::iqpipe_prot_r<0x9080 / 2>));
 }
 
 /***************************************************************************/
@@ -2149,7 +2246,7 @@ void segas1x_bootleg_state::datsu_2x_ym2203_msm5205(machine_config &config)
 	ym2.add_route(2, "mono", 0.50);
 	ym2.add_route(3, "mono", 0.80);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("5205", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, 384000);
@@ -2173,7 +2270,7 @@ void segas1x_bootleg_state::system16_base(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 36*8);
@@ -2272,7 +2369,7 @@ void segas1x_bootleg_state::goldnaxeb_base(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2283,7 +2380,7 @@ void segas1x_bootleg_state::goldnaxeb_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
 	PALETTE(config, m_palette, palette_device::BLACK, 2048*SHADOW_COLORS_MULTIPLIER);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-121);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
@@ -2306,7 +2403,7 @@ void segas1x_bootleg_state::goldnaxeb2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::goldnaxeb2_map);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	m_palette->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
@@ -2328,7 +2425,7 @@ void segas1x_bootleg_state::bayrouteb2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::bayrouteb2_map);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	datsu_ym2151_msm5205(config);
 
@@ -2344,7 +2441,7 @@ void segas1x_bootleg_state::tturfbl(machine_config &config)
 
 	datsu_ym2151_msm5205(config);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-107);
 }
 
@@ -2355,7 +2452,7 @@ void segas1x_bootleg_state::dduxbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::dduxbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
@@ -2368,7 +2465,7 @@ void segas1x_bootleg_state::eswatbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::eswatbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-124);
 
 	z80_ym2151_upd7759(config);
@@ -2381,7 +2478,7 @@ void segas1x_bootleg_state::eswatbl2(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::eswatbl2_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-121);
 
 	datsu_2x_ym2203_msm5205(config);
@@ -2394,7 +2491,7 @@ void segas1x_bootleg_state::tetrisbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tetrisbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
@@ -2407,23 +2504,44 @@ void segas1x_bootleg_state::altbeastbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tetrisbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-112);
 
 	datsu_2x_ym2203_msm5205(config);
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 }
 
+/*
+    The 68000 /RESET line clears the protection counter on the daughterboard,
+    while the game clears its own software copy of it ($FFE2C4 in Beauty Block,
+    $FFE484 in IQ Pipe) every time it boots.  Without this the two get out of
+    step after a soft reset and the protection check fails.
+*/
+MACHINE_RESET_MEMBER(segas1x_bootleg_state,beautyb)
+{
+	m_beautyb_prot_ctr = 0;
+}
+
 void segas1x_bootleg_state::beautyb(machine_config &config)
 {
 	system16_base(config);
 
+	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,beautyb)
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::beautyb_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas1x_bootleg_state::beautyb_opcodes_map);
 
 	// no sprites
 
 	z80_ym2151(config);
+}
+
+void segas1x_bootleg_state::iqpipe(machine_config &config)
+{
+	beautyb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::iqpipe_map);
 }
 
 /* System 18 Bootlegs */
@@ -2438,7 +2556,7 @@ void segas1x_bootleg_state::system18(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_18_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2451,7 +2569,7 @@ void segas1x_bootleg_state::system18(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 
 	/* sound hardware */
@@ -2484,7 +2602,7 @@ void segas1x_bootleg_state::mwalkbl(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sys18bl_sound_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.271); /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2497,7 +2615,7 @@ void segas1x_bootleg_state::mwalkbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -2570,7 +2688,7 @@ void segas1x_bootleg_state::ddcrewbl(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2583,7 +2701,7 @@ void segas1x_bootleg_state::ddcrewbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-124);
 
 	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
@@ -2606,7 +2724,7 @@ void segas1x_bootleg_state::bloxeedbl(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sys18bl_sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.271); // V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2619,7 +2737,7 @@ void segas1x_bootleg_state::bloxeedbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, system16)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -3896,8 +4014,6 @@ void segas1x_bootleg_state::init_common()
 
 	m_soundbank_ptr = nullptr;
 
-	m_beautyb_unkx = 0;
-
 	if (m_soundbank.found())
 	{
 		m_soundbank->configure_entries(0, 8, m_soundcpu_region->base(), 0x4000);
@@ -4145,6 +4261,8 @@ void segas1x_bootleg_state::init_beautyb()
 									7,6,5,4,   3,2,1,0 );
 	}
 
+	save_item(NAME(m_beautyb_prot_ctr));
+
 	init_common();
 }
 
@@ -4208,8 +4326,8 @@ GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_sta
 GAME( 1987, timescanbl,  timescan,  tetrisbl,      tetris,   segas1x_bootleg_state,  empty_init,      ROT0,   "bootleg", "Time Scanner (bootleg)", MACHINE_NOT_WORKING ) // encrypted
 
 /* Tetris-based hardware */
-GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, iqpipe,      0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, iqpipe,      0,         iqpipe,        tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 /* System 18 bootlegs */
 GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  init_sys18bl_oki,ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -25,6 +25,8 @@ public:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
+	void zero_default_pram() { m_zero_default_pram = true; }
+
 	// VIA interface routines
 	u8 get_treq() { return m_treq; }
 	void set_tip(u8 val) { m_tip = val; }
@@ -78,6 +80,7 @@ private:
 	s32 m_adb_dtime;
 	u8 m_disk_pram[0x100]{};
 	bool m_pram_loaded;
+	bool m_zero_default_pram;
 };
 
 class cuda_2xx_device : public cuda_device

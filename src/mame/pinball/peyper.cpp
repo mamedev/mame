@@ -638,10 +638,6 @@ void peyper_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_leds.resolve();
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_row));
 	save_item(NAME(m_game));
 	save_item(NAME(m_outhole_solenoid));

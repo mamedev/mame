@@ -241,9 +241,6 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 void compis_keyboard_device::device_start()
 {
 	m_out_tx_handler(1);
-
-	// resolve output finder
-	m_led_caps.resolve();
 }
 
 

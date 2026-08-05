@@ -59,8 +59,8 @@ public:
 		, m_config(*this, "CONFIG")
 	{ }
 
-	void triton1(machine_config &config);
-	void triton2(machine_config &config);
+	void triton1(machine_config &config) ATTR_COLD;
+	void triton2(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(pushbutton_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(charset_changed);
@@ -390,8 +390,6 @@ void triton_state::machine_start()
 
 	m_exp_ram = make_unique_clear<uint8_t[]>(0xe000);
 
-	m_led.resolve();
-
 	save_pointer(NAME(m_exp_ram), 0xe000);
 }
 
@@ -448,7 +446,7 @@ void triton_state::triton1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &triton_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(triton_state::inta_cb));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("ef9364", FUNC(ef9364_device::screen_update));
 	screen.set_size(64 * 8, 16 * 12);

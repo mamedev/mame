@@ -5,23 +5,11 @@
 
 #include "sharc.h"
 
-
-// DRC instruction description flags
-constexpr uint32_t  OP_USERFLAG_LOOP                     = 0x00000001;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AZ      = 0x00001000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AN      = 0x00002000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AC      = 0x00004000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AV      = 0x00008000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_MV      = 0x00010000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_MN      = 0x00020000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_SV      = 0x00040000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_SZ      = 0x00080000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_BTF     = 0x00100000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY         = 0x001ff000;
-constexpr uint32_t  OP_USERFLAG_CALL                     = 0x10000000;
+#include <algorithm>
 
 
 // constants for IEEE754 single-precision float format
+constexpr uint32_t  FLOAT_CANONICAL_NAN     = 0xffffffff;
 constexpr uint32_t  FLOAT_INFINITY          = 0x7f800000;
 constexpr uint32_t  FLOAT_SIGN_MASK         = 0x80000000;
 constexpr uint32_t  FLOAT_EXPONENT_MASK     = 0x7f800000;
@@ -47,6 +35,18 @@ struct alignas(16) adsp21062_device::sharc_internal_state
 		uint32_t addr;
 		uint32_t code;
 		uint32_t loop_type;
+
+		uint32_t pack() const
+		{
+			return (loop_type << 30) | (code << 24) | addr;
+		}
+
+		void unpack(uint32_t in)
+		{
+			addr = BIT(in, 0, 24);
+			code = BIT(in, 24, 5);
+			loop_type = BIT(in, 30, 2);
+		}
 	};
 
 	struct ASTAT_DRC
@@ -74,6 +74,11 @@ struct alignas(16) adsp21062_device::sharc_internal_state
 			};
 			uint64_t flags64[8];
 		};
+
+		void clear()
+		{
+			std::fill(std::begin(flags64), std::end(flags64), 0);
+		}
 
 		uint32_t pack() const
 		{
@@ -125,7 +130,7 @@ struct alignas(16) adsp21062_device::sharc_internal_state
 	uint64_t mrf;
 	uint64_t mrb;
 
-	uint32_t pcstack[32];
+	uint32_t pcstack[30];
 	uint32_t lcstack[6];
 	uint32_t lastack[6];
 	uint32_t lstkp;

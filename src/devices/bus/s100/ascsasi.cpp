@@ -119,29 +119,29 @@ void asc_sasi_device::req_w(int state)
 {
 	// Clear ACK when REQ is negated
 	if (!state)
-		m_sasi->ctrl_w(7, 0, nscsi_device::S_ACK);
+		m_sasi->ctrl_w(7, 0, nscsi_device_interface::S_ACK);
 }
 
 void asc_sasi_device::sasi_sel_pulse()
 {
-	m_sasi->ctrl_w(7, nscsi_device::S_SEL, nscsi_device::S_SEL);
+	m_sasi->ctrl_w(7, nscsi_device_interface::S_SEL, nscsi_device_interface::S_SEL);
 	m_sel_off_timer->adjust(s_pulse_width);
 }
 
 void asc_sasi_device::sasi_rst_pulse()
 {
-	m_sasi->ctrl_w(7, nscsi_device::S_RST, nscsi_device::S_RST);
+	m_sasi->ctrl_w(7, nscsi_device_interface::S_RST, nscsi_device_interface::S_RST);
 	m_rst_off_timer->adjust(s_pulse_width);
 }
 
 TIMER_CALLBACK_MEMBER(asc_sasi_device::sel_off)
 {
-	m_sasi->ctrl_w(7, 0, nscsi_device::S_SEL);
+	m_sasi->ctrl_w(7, 0, nscsi_device_interface::S_SEL);
 }
 
 TIMER_CALLBACK_MEMBER(asc_sasi_device::rst_off)
 {
-	m_sasi->ctrl_w(7, 0, nscsi_device::S_RST);
+	m_sasi->ctrl_w(7, 0, nscsi_device_interface::S_RST);
 }
 
 u8 asc_sasi_device::s100_smemr_r(offs_t offset)
@@ -162,16 +162,16 @@ u8 asc_sasi_device::s100_sinp_r(offs_t offset)
 		{
 			// 74LS240 buffer (IC7)
 			u32 ctrl = m_sasi->ctrl_r();
-			return (ctrl & nscsi_device::S_INP ? 0x01 : 0x00)
-				| (ctrl & nscsi_device::S_BSY ? 0x04 : 0x00)
-				| (ctrl & nscsi_device::S_REQ ? 0x10 : 0x00)
-				| (ctrl & nscsi_device::S_CTL ? 0x80 : 0x00);
+			return (ctrl & nscsi_device_interface::S_INP ? 0x01 : 0x00)
+				| (ctrl & nscsi_device_interface::S_BSY ? 0x04 : 0x00)
+				| (ctrl & nscsi_device_interface::S_REQ ? 0x10 : 0x00)
+				| (ctrl & nscsi_device_interface::S_CTL ? 0x80 : 0x00);
 		}
 		else
 		{
 			// INDAT: 74LS240 buffer (IC13)
-			if (!machine().side_effects_disabled() && (m_sasi->ctrl_r() & nscsi_device::S_REQ))
-				m_sasi->ctrl_w(7, nscsi_device::S_ACK, nscsi_device::S_ACK);
+			if (!machine().side_effects_disabled() && (m_sasi->ctrl_r() & nscsi_device_interface::S_REQ))
+				m_sasi->ctrl_w(7, nscsi_device_interface::S_ACK, nscsi_device_interface::S_ACK);
 			return m_sasi->data_r();
 		}
 	}
@@ -187,10 +187,10 @@ void asc_sasi_device::s100_sout_w(offs_t offset, u8 data)
 		{
 		case 0:
 			// LATENA: 74LS373 latch (IC8) outputs to 74LS240 buffer (IC9)
-			if (!machine().side_effects_disabled() && (m_sasi->ctrl_r() & nscsi_device::S_REQ))
-				m_sasi->ctrl_w(7, nscsi_device::S_ACK, nscsi_device::S_ACK);
+			if (!machine().side_effects_disabled() && (m_sasi->ctrl_r() & nscsi_device_interface::S_REQ))
+				m_sasi->ctrl_w(7, nscsi_device_interface::S_ACK, nscsi_device_interface::S_ACK);
 			m_data_latch = data;
-			if (!(m_sasi->ctrl_r() & nscsi_device::S_INP))
+			if (!(m_sasi->ctrl_r() & nscsi_device_interface::S_INP))
 				m_sasi->data_w(7, data);
 			break;
 

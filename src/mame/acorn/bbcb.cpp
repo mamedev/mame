@@ -440,7 +440,7 @@ void bbcb_state::bbca(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
@@ -568,7 +568,7 @@ void bbcb_state::bbcb(machine_config &config)
 	m_adlc->out_irq_cb().set(FUNC(bbcb_state::adlc_irq_w));
 	//m_adlc->out_rts_cb().
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));

@@ -19,10 +19,7 @@ public:
 	segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
 		: segaai_exp_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~segaai_exp_slot_device();

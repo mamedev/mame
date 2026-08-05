@@ -53,10 +53,7 @@ public:
 	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
 		: nes_kstudio_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), nullptr, false);
 	}
 
 	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

@@ -11,7 +11,7 @@ license:CC0-1.0
 	<view name="Landscape">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
-			<orientation rotate="90" />
+			<orientation rotate="270" />
 		</screen>
 	</view>
 </mamelayout>

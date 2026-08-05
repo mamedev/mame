@@ -160,7 +160,7 @@ void rc2014_ym2149_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2149(config, m_psg, 0);
+	YM2149(config, m_psg);
 	m_psg->add_route(0, "speaker", 0.25, 1);
 	m_psg->add_route(2, "speaker", 0.25, 1);
 	m_psg->add_route(1, "speaker", 0.25, 0);
@@ -191,7 +191,7 @@ void rc2014_ay8190_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker", 2).front();
 
-	AY8910(config, m_psg, 0);
+	AY8910(config, m_psg);
 	m_psg->add_route(0, "speaker", 0.25, 1);
 	m_psg->add_route(2, "speaker", 0.25, 1);
 	m_psg->add_route(1, "speaker", 0.25, 0);

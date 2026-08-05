@@ -76,6 +76,7 @@ public:
 	bool keepaspect() const;
 
 	virtual osd_dim get_size() = 0;
+	virtual osd_dim get_size_pixels() { return get_size(); }
 
 	osd_monitor_info *monitor() const { return m_monitor.get(); }
 	std::shared_ptr<osd_monitor_info> monitor_from_rect(const osd_rect *proposed) const;

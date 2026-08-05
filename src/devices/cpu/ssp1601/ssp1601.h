@@ -51,7 +51,7 @@ private:
 	PAIR m_gr[8];     /* general regs, some are 16bit, some 32bit */
 	union
 	{
-		unsigned char m_r[8];             /* pointer registers, 4 for earch bank */
+		unsigned char m_r[8];             /* pointer registers, 4 for each bank */
 		struct {
 			unsigned char m_r0[4];
 			unsigned char m_r1[4];

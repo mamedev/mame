@@ -47,8 +47,9 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ariel_device> m_ariel;
-	required_device<asc_device> m_asc;
+	required_device<asc_base_device> m_asc;
 	required_device<pseudovia_device> m_pseudovia;
+	optional_ioport m_config_port;
 
 	std::unique_ptr<u32 []> m_vram;
 

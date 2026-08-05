@@ -7,8 +7,7 @@
 
 #include "cpu/mcs48/mcs48.h"
 
-class mg1_kbd_device
-	: public device_t
+class mg1_kbd_device : public device_t
 {
 public:
 	auto out_data() { return m_data_cb.bind(); }

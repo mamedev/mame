@@ -32,6 +32,7 @@ protected:
 
 	virtual void fdc_io(address_map &map) ATTR_COLD;
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	TIMER_CALLBACK_MEMBER(tc_zero_tick);
 
 	required_device<upd765a_device> m_fdc;

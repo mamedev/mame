@@ -478,7 +478,7 @@ void cocoloco_state::cocoloco(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cocoloco_state::cocoloco_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256);  // TODO: not accurate, ~50 Hz
 	screen.set_screen_update(FUNC(cocoloco_state::screen_update));
 	screen.set_palette(m_palette);

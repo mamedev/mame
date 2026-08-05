@@ -13,6 +13,7 @@
 
 #include "mips3com.h"
 #include "mips3dsm.h"
+#include "mips3fe.h"
 #include "ps2vu.h"
 
 #include "emuopts.h"
@@ -217,6 +218,10 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 		set_vtlb_fixed_entries(2 * m_tlbentries + 3);
 	else
 		set_vtlb_fixed_entries(2 * m_tlbentries + 2);
+}
+
+mips3_device::~mips3_device()
+{
 }
 
 device_memory_interface::space_config_vector mips3_device::memory_space_config() const
@@ -439,7 +444,7 @@ void mips3_device::device_start()
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_drc_cache, flags, 8, 32, 2);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_drc_cache, flags, 8, 32, 2, COMPILE_FORWARDS_BYTES);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -486,7 +491,7 @@ void mips3_device::device_start()
 	m_drcuml->symbol_add(&m_fpmode, sizeof(m_fpmode), "fpmode");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<mips3_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));

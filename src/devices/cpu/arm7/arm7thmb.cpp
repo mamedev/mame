@@ -660,7 +660,7 @@ void arm7_cpu_device::tg04_00_07(uint32_t pc, uint32_t op) /* ROR Rd, Rs */
 	const uint32_t imm = GetRegister(rs) & 0xff;
 	if (imm > 0)
 	{
-		SetRegister(rd, rotr_32(rrd, imm));
+		SetRegister(rd, std::rotr(rrd, imm));
 		if (rrd & (1 << ((imm - 1) & 0x1f)))
 		{
 			set_cpsr(GET_CPSR | C_MASK);

@@ -23,38 +23,60 @@
 #pragma once
 
 
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> pcd3311_device
 
-class pcd3311_device :  public device_t,
-				   public device_sound_interface
+class pcd3311_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
 	pcd3311_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write(uint8_t data) { m_data = data; }
-	void strobe_w(int state) { m_strobe = state; }
+	void strobe_w(int state);
 	void mode_w(int state) { m_mode = state; }
-	void a0_w(int state) { m_a0 = state; }
+	void a0_w(int state);
+
+	void scl_w(int state);
+	void sda_w(int state);
+	int sda_r();
+
+	// use in memory maps to avoid strobe logic.
+	void write_direct(uint8_t data) { load_data(data); }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 
-	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	int m_a0;
+	static constexpr uint8_t PCD3311_SLAVE_ADDRESS = 0x48;
+
+	enum { STATE_IDLE, STATE_DEVSEL, STATE_DATAIN };
+
+	void load_data(uint8_t data);
+
 	int m_mode;
 	int m_strobe;
 	uint8_t m_data;
+
+	int m_slave_address;
+	int m_scl;
+	int m_sdaw;
+	int m_sdar;
+	int m_state;
+	int m_bits;
+	int m_shift;
+	int m_devsel;
+
+	sound_stream *m_stream;               // stream number
+	uint32_t m_freq[2];                   // current frequencies
+	int32_t m_incr[2];                    // initial wave state
+	sound_stream::sample_t m_signal[2];   // current signals
 };
 
 

@@ -254,7 +254,7 @@ void shine_state::shine(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	MC6847(config, m_vdg, 3.579545_MHz_XTAL);
 	m_vdg->set_screen("screen");

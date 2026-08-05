@@ -564,7 +564,7 @@ void cle68k_state::cle68k(machine_config &config)
 
 	// AT90S4414 (needs core and dumps)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -575,11 +575,11 @@ void cle68k_state::cle68k(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x200); // TODO
 
-	RAMDAC(config, m_ramdac[0], 0, "palette");
+	RAMDAC(config, m_ramdac[0], "palette");
 	m_ramdac[0]->set_addrmap(0, &cle68k_state::ramdac_map<0>);
 	m_ramdac[0]->set_color_base(0);
 
-	RAMDAC(config, m_ramdac[1], 0, "palette");
+	RAMDAC(config, m_ramdac[1], "palette");
 	m_ramdac[1]->set_addrmap(0, &cle68k_state::ramdac_map<1>);
 	m_ramdac[1]->set_color_base(0x100);
 

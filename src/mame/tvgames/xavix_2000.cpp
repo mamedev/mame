@@ -254,7 +254,7 @@ void xavix_2000_nv_sdb_state::xavix2000_nv_sdb(machine_config &config)
 void xavix_i2c_state::xavix2000_i2c_24c08(machine_config &config)
 {
 	xavix2000(config);
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c08_4mb(machine_config &config)
@@ -268,7 +268,7 @@ void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c04_2mb(machine_config &config)
@@ -288,7 +288,7 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 void xavix_duelmast_state::xavix_extbus_map(address_map &map)
@@ -301,9 +301,9 @@ void xavix_duelmast_state::duelmast(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 
-	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
+	EKARA_CART_SLOT(config, m_cartslot, ekara_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list_duelmast").set_original("duelmast_cart");
 }
 

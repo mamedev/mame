@@ -53,10 +53,7 @@ public:
 	compis_graphics_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
 		: compis_graphics_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	compis_graphics_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -78,7 +75,7 @@ public:
 	void dma_request_w(int state) { m_write_dma_request(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line   m_write_dma_request;
@@ -87,7 +84,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(COMPIS_GRAPHICS_SLOT, compis_graphics_slot_device)
 
 

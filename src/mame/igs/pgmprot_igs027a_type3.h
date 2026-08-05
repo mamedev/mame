@@ -1,15 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Xing Xing
+#ifndef MAME_IGS_PGMPROT_IGS027A_TYPE3_H
+#define MAME_IGS_PGMPROT_IGS027A_TYPE3_H
+
+#pragma once
 
 class pgm_arm_type3_state : public pgm_state
 {
 public:
 	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag),
-			m_arm_ram(*this, "arm_ram"),
-			m_arm_ram2(*this, "arm_ram2"),
-			m_prot(*this, "prot") {
+		: pgm_state(mconfig, type, tag)
+		, m_arm_ram(*this, "arm_ram")
+		, m_arm_ram2(*this, "arm_ram2")
+		, m_prot(*this, "prot")
+	{
 	}
+
 	void init_theglad();
 	void init_theglada();
 	void init_svg();
@@ -29,7 +35,7 @@ protected:
 
 private:
 	// svg
-	int m_svg_ram_sel = 0;
+	u8 m_svg_ram_sel = 0;
 	std::unique_ptr<u32[]> m_svg_shareram[2];    //for 5585G MACHINE
 
 	u32 m_svg_latchdata_68k_w = 0;
@@ -77,3 +83,5 @@ INPUT_PORTS_EXTERN(svg);
 INPUT_PORTS_EXTERN(svghk);
 INPUT_PORTS_EXTERN(svgtw);
 INPUT_PORTS_EXTERN(svgpcb);
+
+#endif // MAME_IGS_PGMPROT_IGS027A_TYPE3_H

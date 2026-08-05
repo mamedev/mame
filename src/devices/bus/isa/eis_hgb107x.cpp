@@ -145,7 +145,7 @@ DEFINE_DEVICE_TYPE(ISA8_EPC_MDA, isa8_epc_mda_device, "isa_epc_mda", "Ericsson P
 /* This matches the difference between the crystals so we assume this for now     */
 void isa8_epc_mda_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, EPC_MDA_SCREEN, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, EPC_MDA_SCREEN));
 	screen.set_raw(XTAL(19'170'000) / 4, 720, 0, 720, 400, 0, 400);
 	screen.set_screen_update(MC6845_NAME, FUNC(mc6845_device::screen_update));
 
@@ -294,7 +294,7 @@ void isa8_epc_mda_device::io_write(offs_t offset, uint8_t data)
 			m_update_row_type = ((data & 0x20) == 0 ? MDA_LOWRES_TEXT_INTEN : MDA_LOWRES_TEXT_BLINK);
 			{
 				rectangle rect(0, get_xres() - 1, 0, get_yres() -1);
-				m_screen->configure(get_xres(), get_yres(), rect, HZ_TO_ATTOSECONDS(50));
+				m_screen->configure(get_xres(), get_yres(), rect, attotime::from_hz(50));
 			}
 			LOGMODE("Video Mode:%02x\n\n", m_vmode);
 			break;
@@ -309,7 +309,7 @@ void isa8_epc_mda_device::io_write(offs_t offset, uint8_t data)
 			m_vmode |= ((m_mode_control2 & 0x80) ? VM_VER400 : 0);
 			{
 				rectangle rect(0, get_xres() - 1, 0, get_yres() -1);
-				m_screen->configure(get_xres(), get_yres(), rect, HZ_TO_ATTOSECONDS(50));
+				m_screen->configure(get_xres(), get_yres(), rect, attotime::from_hz(50));
 			}
 			LOGMODE("Video Mode:%02x\n\n", m_vmode);
 			break;

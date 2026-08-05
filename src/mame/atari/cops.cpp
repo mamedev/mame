@@ -655,8 +655,7 @@ INPUT_PORTS_END
 
 void cops_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
+	// TODO: savestates
 }
 
 void cops_state::machine_reset()
@@ -680,7 +679,7 @@ void cops_state::base(machine_config &config)
 {
 	M6502(config, m_maincpu, MAIN_CLOCK/2/2); // fed through two dividers
 
-	SONY_LDP1450HLE(config, m_ld, 0);
+	SONY_LDP1450HLE(config, m_ld);
 	m_ld->set_screen("screen");
 	m_ld->set_overlay(256, 256, FUNC(cops_state::screen_update));
 	m_ld->add_route(0, "speaker", 0.50, 0);
@@ -703,7 +702,7 @@ void cops_state::base(machine_config &config)
 
 void cops_state::acia_comms(machine_config &config)
 {
-	MOS6551(config, m_acia, 0).set_xtal(ACIA_CLOCK);
+	MOS6551(config, m_acia).set_xtal(ACIA_CLOCK);
 	m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
 	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
 	m_acia->irq_handler().set(FUNC(cops_state::vqacia_irq));
@@ -756,9 +755,9 @@ void cops_state::revlatns(machine_config &config)
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
 
-	METERS(config, m_meters, 0).set_number(2);
+	METERS(config, m_meters).set_number(2);
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
 	m_dacia->txd2_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 
@@ -780,7 +779,7 @@ void cops_state::visnqust(machine_config &config)
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
 
-	METERS(config, m_meters, 0).set_number(2);
+	METERS(config, m_meters).set_number(2);
 
 }
 
@@ -852,7 +851,7 @@ ROM_END
 } // Anonymous namespace
 
 
-GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                                 "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",        "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                       "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns )
+GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                                 "Cops (USA)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",        "Cops (UK)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                       "Revelations",  MACHINE_SUPPORTS_SAVE, layout_revlatns )
 GAMEL( 1992, visnqust, 0,    visnqust, visnqust, cops_state, init_cops, ROT0, "Kramer Manufacturing / Nova Productions Ltd.","Vision Quest", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_visnqust )

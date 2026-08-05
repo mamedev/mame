@@ -54,6 +54,7 @@ public:
 	void footbpow(machine_config &config);
 	void gaelco3d2(machine_config &config);
 	void gaelco3d(machine_config &config);
+	void speedup(machine_config &config);
 
 	template <int N> int analog_bit_r();
 	template <int N> int fp_analog_bit_r();

@@ -10,12 +10,15 @@
 #include "lgy98.h"
 #include "lha201.h"
 #include "pc9801_02.h"
+#include "pc9801_03.h"
 #include "pc9801_14.h"
 #include "pc9801_26.h"
 #include "pc9801_27.h"
 #include "pc9801_55.h"
 #include "pc9801_86.h"
+#include "pc9801_96.h"
 #include "pc9801_118.h"
+#include "pcfxga.h"
 #include "mif201.h"
 #include "mpu_pc98.h"
 #include "sb16_ct2720.h"
@@ -28,6 +31,7 @@ void pc98_cbus_devices(device_slot_interface &device)
 {
 	// sound cards
 	// NEC
+	device.option_add("pc9801_03",  PC9801_03);
 	device.option_add("pc9801_14",  PC9801_14);
 	device.option_add("pc9801_26",  PC9801_26);
 	device.option_add("pc9801_86",  PC9801_86);
@@ -73,6 +77,12 @@ void pc98_cbus_devices(device_slot_interface &device)
 
 	// Ethernet
 	device.option_add("lgy98", LGY98);
+
+	// Systems on card
+	device.option_add("pcfxga", PCFXGA_CBUS);
+
+	// Window Accelerator Board
+	device.option_add("pc9801_96", PC9801_96);
 
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);

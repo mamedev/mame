@@ -56,6 +56,10 @@
 
 #include "debugger.h"
 
+#include "endianness.h"
+
+#include <bit>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -146,7 +150,7 @@ private:
 	u8 m_irq_active[4];
 	u8 m_irq_mask[4];
 
-	util::endian_cast<u32, u16, util::endianness::big> m_nram;
+	util::endian_cast<u32, u16, std::endian::big> m_nram;
 };
 
 class luna88k_state : public luna_88k_state_base
@@ -155,7 +159,7 @@ public:
 	luna88k_state(machine_config const &mconfig, device_type type, char const *tag)
 		: luna_88k_state_base(mconfig, type, tag)
 		, m_rtc(*this, "rtc")
-		, m_spc(*this, "scsi:7:spc")
+		, m_spc(*this, "spc")
 		, m_net(*this, "net")
 		, m_eprom(*this, "eprom")
 	{
@@ -179,7 +183,7 @@ public:
 	luna88k2_state(machine_config const &mconfig, device_type type, char const *tag)
 		: luna_88k_state_base(mconfig, type, tag)
 		, m_rtc(*this, "rtc")
-		, m_spc(*this, "scsi%u:7:spc", 0U)
+		, m_spc(*this, "spc%u", 0U)
 		, m_net(*this, "net%u", 0U)
 		, m_cbus_root(*this, "cbus")
 		, m_cbus_irq(*this, "cbus_irq")
@@ -532,7 +536,7 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 
 
 	// TODO: crt timing control by HD6445CP4
-	screen_device &crt(SCREEN(config, "crt", SCREEN_TYPE_RASTER));
+	screen_device &crt(SCREEN(config, "crt"));
 	crt.set_raw(108'992'000, 2048, 0, 1280, 1024, 0, 1024);
 	crt.set_screen_update(FUNC(luna_88k_state_base::screen_update));
 
@@ -545,7 +549,7 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 
 	palette_device &palette(PALETTE(config, "palette", palette_device::MONOCHROME));
 
-	screen_device &lcd(SCREEN(config, "lcd", SCREEN_TYPE_LCD));
+	screen_device &lcd(SCREEN(config, "lcd").set_lcd());
 	lcd.set_raw(192'000, 40 * 6, 0, 16 * 6, 2 * 8, 0, 2 * 8);
 	lcd.set_screen_update(m_lcdc, FUNC(ks0066_device::screen_update));
 	lcd.set_palette(palette);
@@ -557,7 +561,7 @@ void luna88k_state::luna88k(machine_config &config)
 
 	M48T02(config, m_rtc);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -565,14 +569,10 @@ void luna88k_state::luna88k(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
-		[this](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-			spc.set_clock(8_MHz_XTAL);
-			spc.out_irq_callback().set(*this, &luna88k_state::irq<0, 3>, "irq0,3");
-		});
+	MB89352(config, m_spc, 8_MHz_XTAL);
+	scsi.set_external_device(7, m_spc);
+	m_spc->out_irq_callback().set(DEVICE_SELF, &luna88k_state::irq<0, 3>, "irq0,3");
 
 	AM7990(config, m_net, 40_MHz_XTAL / 4);
 	m_net->intr_out().set(&luna88k_state::irq<0, 4>, "irq0,4").invert();
@@ -590,7 +590,7 @@ void luna88k2_state::luna88k2(machine_config &config)
 	input_merger_any_high_device &spc_irq(INPUT_MERGER_ANY_HIGH(config, "spc_irq"));
 	spc_irq.output_handler().set(&luna88k2_state::irq<0, 3>, "irq0,3");
 
-	NSCSI_BUS(config, "scsi0");
+	auto &scsi0(NSCSI_BUS(config, "scsi0"));
 	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:2", scsi_devices, nullptr);
@@ -598,16 +598,11 @@ void luna88k2_state::luna88k2(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi0:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:6", scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spc", MB89352).machine_config(
-		[&spc_irq](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
+	MB89352(config, m_spc[0], 8_MHz_XTAL);
+	scsi0.set_external_device(7, m_spc[0]);
+	m_spc[0]->out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<0>));
 
-			spc.set_clock(8_MHz_XTAL);
-			spc.out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<0>));
-		});
-
-	NSCSI_BUS(config, "scsi1");
+	auto &scsi1(NSCSI_BUS(config, "scsi1"));
 	NSCSI_CONNECTOR(config, "scsi1:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:2", scsi_devices, nullptr);
@@ -615,14 +610,9 @@ void luna88k2_state::luna88k2(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("spc", MB89352).machine_config(
-		[&spc_irq](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
-
-			spc.set_clock(8_MHz_XTAL);
-			spc.out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<1>));
-		});
+	MB89352(config, m_spc[1], 8_MHz_XTAL);
+	scsi1.set_external_device(7, m_spc[1]);
+	m_spc[1]->out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
 	input_merger_any_low_device &net_irq(INPUT_MERGER_ANY_LOW(config, "net_irq"));
 	net_irq.output_handler().set(&luna88k2_state::irq<0, 4>, "irq0,4");
@@ -640,7 +630,7 @@ void luna88k2_state::luna88k2(machine_config &config)
 	INPUT_MERGER_ANY_LOW(config, m_cbus_irq);
 	m_cbus_irq->output_handler().set(net_irq, FUNC(input_merger_any_low_device::in_w<2>));
 
-	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	PC98_CBUS_ROOT(config, m_cbus_root);
 	m_cbus_root->int_cb<0>().set(FUNC(luna88k2_state::cbus_irq_w<0>));
 	m_cbus_root->int_cb<1>().set(FUNC(luna88k2_state::cbus_irq_w<1>));
 	m_cbus_root->int_cb<2>().set(FUNC(luna88k2_state::cbus_irq_w<2>));
@@ -777,7 +767,7 @@ u32 luna_88k_state_base::irq_ctl_r(offs_t offset)
 	u8 const active = m_irq_active[offset] & (0x80 | m_irq_mask[offset] << 1);
 	if (active)
 	{
-		unsigned const level = 31 - count_leading_zeros_32(active);
+		unsigned const level = std::bit_width(active) - 1;
 
 		data |= (level << 29);
 	}

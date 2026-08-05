@@ -23,7 +23,7 @@ elan_eu3a05_soc_device::elan_eu3a05_soc_device(const machine_config &mconfig, de
 {
 	m_extbus_config.m_addr_width = 24;
 	m_extbus_config.m_logaddr_width = 24;
-	program_config.m_internal_map = address_map_constructor(FUNC(elan_eu3a05_soc_device::int_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(elan_eu3a05_soc_device::int_map), this);
 
 	m_fixed_bank_address = 0x3f8000;
 }
@@ -107,7 +107,7 @@ void elan_eu3a05_soc_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(256);
 
-	ELAN_EU3A05_GPIO(config, m_gpio, 0);
+	ELAN_EU3A05_GPIO(config, m_gpio);
 	m_gpio->read_callback<0>().set(FUNC(elan_eu3a05_soc_device::port_r<0>));
 	m_gpio->write_callback<0>().set(FUNC(elan_eu3a05_soc_device::port_w<0>));
 	m_gpio->read_callback<1>().set(FUNC(elan_eu3a05_soc_device::port_r<1>));
@@ -115,11 +115,11 @@ void elan_eu3a05_soc_device::device_add_mconfig(machine_config &config)
 	m_gpio->read_callback<2>().set(FUNC(elan_eu3a05_soc_device::port_r<2>));
 	m_gpio->write_callback<2>().set(FUNC(elan_eu3a05_soc_device::port_w<2>));
 
-	ELAN_EU3A05_SYS(config, m_sys, 0);
+	ELAN_EU3A05_SYS(config, m_sys);
 	m_sys->set_cpu(DEVICE_SELF);
 	m_sys->bank_change_callback().set(FUNC(elan_eu3a05_soc_device::bank_change));
 
-	ELAN_EU3A05_VID(config, m_vid, 0);
+	ELAN_EU3A05_VID(config, m_vid);
 	m_vid->set_cpu(DEVICE_SELF);
 	m_vid->set_palette(m_palette);
 	m_vid->set_entries(256);
@@ -160,13 +160,13 @@ device_memory_interface::space_config_vector elan_eu3a05_soc_device::memory_spac
 {
 	if(has_configured_map(AS_OPCODES))
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
-			std::make_pair(AS_OPCODES, &sprogram_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_sprogram_config),
 			std::make_pair(AS_EXTERNAL, &m_extbus_config),
 		};
 	else
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_EXTERNAL, &m_extbus_config),
 		};
 }

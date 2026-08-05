@@ -65,10 +65,7 @@ public:
 	coleco_expansion_device(machine_config const &mconfig, char const *tag, device_t *owner, const char *dflt) :
 		coleco_expansion_device(mconfig, tag, owner, uint32_t(0))
 	{
-		option_reset();
-		coleco_expansion_cards(*this);
 		set_default_option(dflt);
-		set_fixed(false);
 	}
 
 	coleco_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

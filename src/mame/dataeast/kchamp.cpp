@@ -425,7 +425,7 @@ void kchamp_state::kchampvs(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // 59.10 Hz refresh measured on PCB
 	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchampvs));
 	screen.set_palette(m_palette);
@@ -478,7 +478,7 @@ void kchamp_state::kchamp(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchamp));
 	screen.set_palette(m_palette);

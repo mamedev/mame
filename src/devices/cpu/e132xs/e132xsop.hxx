@@ -1459,7 +1459,7 @@ void hyperstone_device::hyperstone_testlz()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t sreg = m_core->local_regs[(SRC_CODE + fp) & 0x3f];
-	const uint32_t zeros = count_leading_zeros_32(sreg);
+	const uint32_t zeros = std::countl_zero(sreg);
 
 	m_core->local_regs[(DST_CODE + fp) & 0x3f] = zeros;
 
@@ -1480,7 +1480,7 @@ void hyperstone_device::hyperstone_rol()
 
 	uint32_t val = m_core->local_regs[dst_code];
 
-	val = rotl_32(val, n);
+	val = std::rotl(val, n);
 
 	SR &= ~(V_MASK | Z_MASK | C_MASK | N_MASK);
 	if (!(val & 0x80000000) ? (val & mask) : ((val & mask) ^ mask))

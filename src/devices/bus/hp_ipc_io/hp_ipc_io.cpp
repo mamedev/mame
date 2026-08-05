@@ -27,6 +27,7 @@ hp_ipc_io_slot_device::hp_ipc_io_slot_device(const machine_config &mconfig, cons
 	m_irq_cb_func(*this),
 	m_slot_idx(0)
 {
+	set_options(hp_ipc_io_slot_devices, nullptr, false);
 }
 
 hp_ipc_io_slot_device::~hp_ipc_io_slot_device()

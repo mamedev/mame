@@ -35,7 +35,7 @@ protected:
 
 	class disassembler : public m6502_disassembler {
 	public:
-		mi_decrypt *mintf;
+		mi_decrypt *m_mintf;
 
 		disassembler(mi_decrypt *m);
 		virtual ~disassembler() = default;
@@ -72,7 +72,7 @@ protected:
 
 	class disassembler : public rp2a03_disassembler {
 	public:
-		mi_decrypt *mintf;
+		mi_decrypt *m_mintf;
 
 		disassembler(mi_decrypt *m);
 		virtual ~disassembler() = default;

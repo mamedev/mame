@@ -30,6 +30,8 @@
 
 #include "screen.h"
 
+#include "corefloat.h"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -297,6 +299,16 @@ u8 ppu2c0x_device::readbyte(offs_t address)
 	return space().read_byte(address);
 }
 
+u8 ppu2c0x_device::ppu_vram_direct_read(offs_t address)
+{
+	return readbyte(address);
+}
+
+void ppu2c0x_device::ppu_vram_direct_write(offs_t address, u8 data)
+{
+	writebyte(address, data);
+}
+
 
 //-------------------------------------------------
 //  writebyte - write a byte at the given address
@@ -393,7 +405,7 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int colo
 
 	default:
 		sat = tint;
-		rad = M_PI * ((color_num * 30 + hue) / 180.0);
+		rad = DEGREE_TO_RADIAN<double>(color_num * 30 + hue);
 		y = brightness[1][color_intensity];
 		break;
 	}
@@ -1220,7 +1232,7 @@ void ppu2c0x_device::write(offs_t offset, u8 data)
 		offset &= PPU_MAX_REG - 1;
 	}
 
-#ifdef MAME_DEBUG
+#if 0
 	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
 		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, screen().vpos(), screen().hpos());
@@ -1379,6 +1391,11 @@ u16 ppu2c0x_device::get_vram_dest()
 void ppu2c0x_device::set_vram_dest(u16 dest)
 {
 	m_videomem_addr = dest;
+}
+
+void ppu2c0x_device::reload_refresh_data()
+{
+	m_refresh_data = m_refresh_latch;
 }
 
 /*************************************

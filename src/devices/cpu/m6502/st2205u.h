@@ -221,9 +221,9 @@ private:
 		u8 breadc(u16 adr);
 		void bwrite(u16 adr, u8 val);
 
-		u16 brr;
+		u16 m_brr;
 
-		std::unique_ptr<u8[]> ram;
+		std::unique_ptr<u8[]> m_ram;
 	};
 
 	u8 brrl_r();

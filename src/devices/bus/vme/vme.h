@@ -129,10 +129,7 @@ public:
 	vme_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, char const *default_option, bool const fixed = false)
 		: vme_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<T>(slot_options), default_option, fixed);
 	}
 
 protected:

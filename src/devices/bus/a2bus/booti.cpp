@@ -20,7 +20,7 @@
 #include "emu.h"
 #include "booti.h"
 
-#include "machine/at28c64b.h"
+#include "machine/at28.h"
 #include "machine/ch376.h"
 
 
@@ -65,7 +65,7 @@ protected:
 	virtual bool take_c800() const override { return true; }
 
 private:
-	required_device<at28c64b_device> m_flash;
+	required_device<at28c64b_nvram_device> m_flash;
 	required_device<ch376_device> m_ch376;
 
 	int m_rombank;
@@ -81,7 +81,7 @@ private:
 
 void a2bus_booti_device::device_add_mconfig(machine_config &config)
 {
-	AT28C64B(config, "flash", 0);
+	AT28C64B_NVRAM(config, "flash", 0);
 
 	CH376(config, "ch376");
 }

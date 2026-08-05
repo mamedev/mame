@@ -300,7 +300,7 @@ int mame_machine_manager::execute()
 			if (machine.exit_pending())
 			{
 				m_options.set_system_name("");
-				m_options.set_value(OPTION_BIOS, "", OPTION_PRIORITY_CMDLINE);
+				m_options.get_entry(OPTION_BIOS)->revert(OPTION_PRIORITY_CMDLINE, OPTION_PRIORITY_CMDLINE);
 			}
 		}
 
@@ -440,11 +440,11 @@ void emulator_info::display_ui_chooser(running_machine& machine)
 {
 	// force the UI to show the game select screen
 	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-	render_container &container = machine.render().ui_container();
+	render_target &target = machine.render().ui_target();
 	if (machine.options().ui() == emu_options::UI_SIMPLE)
-		ui::simple_menu_select_game::force_game_select(mui, container);
+		ui::simple_menu_select_game::force_game_select(mui, target);
 	else
-		ui::menu_select_game::force_game_select(mui, container);
+		ui::menu_select_game::force_game_select(mui, target);
 }
 
 int emulator_info::start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args)
@@ -461,7 +461,7 @@ int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int 
 
 bool emulator_info::draw_user_interface(running_machine& machine)
 {
-	return mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
+	return mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_target());
 }
 
 void emulator_info::periodic_check()

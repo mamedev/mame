@@ -73,7 +73,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void serial_io_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->txd_handler().append(FUNC(serial_io_device::tx_w));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -137,7 +137,7 @@ void dual_serial_base::device_reset()
 
 void dual_serial_base::device_add_mconfig(machine_config &config)
 {
-	Z80SIO(config, m_sio, 0);
+	Z80SIO(config, m_sio);
 	m_sio->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_sio->out_txda_callback().append(FUNC(dual_serial_base::tx_w));
 	m_sio->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));

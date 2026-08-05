@@ -12,7 +12,8 @@
 #include "machine/upd765.h"
 
 class tek_msu_fdc_device
-	: public nscsi_device
+	: public device_t
+	, public nscsi_device_interface
 	, public nscsi_slot_card_interface
 {
 public:

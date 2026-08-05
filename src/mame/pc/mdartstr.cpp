@@ -125,12 +125,14 @@ void isa16_medalist_rom_disk::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	IDT7202(config, m_fifo);
+#if 0
 	// TODO: one byte off (speaker pops), may disconnect timer on FIFO empty?
-	//m_fifo->ef_handler().set([this] (int state) {
-	//	printf("%d\n", state);
-	//	if (state)
-	//		m_dac_timer->adjust(attotime::from_hz(11'025));
-	//});
+	m_fifo->ef_handler().set([this] (int state) {
+		printf("%d\n", state);
+		if (state)
+			m_dac_timer->adjust(attotime::from_hz(11'025));
+	});
+#endif
 
 	AD7224(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -210,7 +212,7 @@ TIMER_CALLBACK_MEMBER(isa16_medalist_rom_disk::dac_cb)
 
 	const u8 data = m_fifo->data_byte_r();
 
-//	printf("%02x %d\n", data, m_fifo->ef_r());
+//  printf("%02x %d\n", data, m_fifo->ef_r());
 
 	m_dac->data_w(data);
 }
@@ -513,11 +515,11 @@ isa16_f65535_device::isa16_f65535_device(const machine_config &mconfig, const ch
 
 void isa16_f65535_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(f65535_vga_device::screen_update));
 
-	F65535_VGA(config, m_vga, 0);
+	F65535_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(512*1024);
 }
@@ -645,7 +647,7 @@ void mdartstr_state::mdartstr(machine_config &config)
 	// 640 + 384 KB
 	RAM(config, "ram").set_default_size("1024K");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(f82c836a_device::iochck_w));
@@ -669,6 +671,7 @@ void mdartstr_state::mdartstr(machine_config &config)
 	m_isabus->drq7_callback().set(m_chipset, FUNC(f82c836a_device::dreq7_w));
 
 	// all on one backplane
+	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "boot",    true).set_option_machine_config("boot", romdisk_config);;
 
@@ -676,7 +679,7 @@ void mdartstr_state::mdartstr(machine_config &config)
 	keybc.hot_res().set(m_chipset, FUNC(f82c836a_device::kbrst_w));
 	// looks unconnected, the BIOS will just use fast A20 exclusively for driving the line
 	keybc.gate_a20().set_nop();
-//	keybc.gate_a20().set(m_chipset, FUNC(f82c836a_device::gatea20_w));
+//  keybc.gate_a20().set(m_chipset, FUNC(f82c836a_device::gatea20_w));
 	keybc.kbd_irq().set(m_chipset, FUNC(f82c836a_device::irq01_w));
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));

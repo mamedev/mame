@@ -49,8 +49,6 @@ Notes:
 
 void suna8_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_rombank = 0;
 
 	save_item(NAME(m_rombank));
@@ -1928,7 +1926,7 @@ void suna8_state::hardhead(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60));     // No NMI
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed; 59.10 Hz refresh verified on pcb
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1979,7 +1977,7 @@ void suna8_state::rranger(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2041,7 +2039,7 @@ void suna8_state::brickzn11(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state, brickzn )
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2141,7 +2139,7 @@ void suna8_state::starfigh(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); // No NMI
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2189,7 +2187,7 @@ void suna8_state::sparkman(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); // No NMI
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);

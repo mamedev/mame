@@ -575,6 +575,18 @@ private:
 
 
 //-------------------------------------------------
+//  make_tag_object_ptr_map - make a wrapper for a
+//  tag to object pointer map
+//-------------------------------------------------
+
+template <typename T>
+auto lua_engine::make_tag_object_ptr_map(T &map)
+{
+	return tag_object_ptr_map<std::remove_cv_t<T> >(map);
+}
+
+
+//-------------------------------------------------
 //  make_notifier_adder - make a function for
 //  subscribing to a notifier
 //-------------------------------------------------

@@ -14,7 +14,7 @@ exorterm155_terminal_device::exorterm155_terminal_device(const machine_config &m
 
 void exorterm155_terminal_device::device_add_mconfig(machine_config &config)
 {
-	EXORTERM155(config, m_exorterm155, 0);
+	EXORTERM155(config, m_exorterm155);
 	m_exorterm155->rs232_conn_txd_handler().set(FUNC(exorterm155_terminal_device::output_rxd));
 	m_exorterm155->rs232_conn_rts_handler().set(FUNC(exorterm155_terminal_device::route_term_rts));
 	m_exorterm155->rs232_conn_dtr_handler().set(FUNC(exorterm155_terminal_device::route_term_dtr));

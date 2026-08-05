@@ -50,6 +50,8 @@ public:
 	void ir6_w(int state) { set_irq_line(6, state); }
 	void ir7_w(int state) { set_irq_line(7, state); }
 
+	void set_irq_line(int irq, int state);
+
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
@@ -64,8 +66,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
-	void set_irq_line(int irq, int state);
-
 	enum class state_t : u8
 	{
 		ICW1,

@@ -824,19 +824,6 @@ void xpander_state::machine_start()
 {
 	firq_timer_elapsed(*m_firq_timer, m_firq_timer_preset);  // Reset the timer.
 
-	m_cassmute.resolve();
-	m_vfd_outputs.resolve();
-	m_fm_mdac.resolve();
-	m_filter_mode.resolve();
-	m_noise.resolve();
-	m_pan.resolve();
-	m_saw1.resolve();
-	m_saw2.resolve();
-	m_tri1.resolve();
-	m_tri2.resolve();
-	m_vcofm.resolve();
-	m_sync.resolve();
-
 	save_item(NAME(m_firq_timer_preset));
 	save_item(NAME(m_selected_cv_in));
 	save_item(NAME(m_inhibit_cv_in));
@@ -865,7 +852,7 @@ void xpander_state::xpander(machine_config &config)
 	NVRAM(config, NVRAM_A_TAG, nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, NVRAM_B_TAG, nvram_device::DEFAULT_ALL_0);
 
-	ACIA6850(config, m_midiacia, 0);
+	ACIA6850(config, m_midiacia);
 	m_midiacia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_midiacia->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 

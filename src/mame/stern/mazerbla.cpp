@@ -142,11 +142,11 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void greatgun(machine_config &config);
-	void mazerbla(machine_config &config);
+	void greatgun(machine_config &config) ATTR_COLD;
+	void mazerbla(machine_config &config) ATTR_COLD;
 
-	void init_mazerbla();
-	void init_greatgun();
+	void init_mazerbla() ATTR_COLD;
+	void init_greatgun() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -893,9 +893,6 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
-	m_leds.resolve();
-	m_lamps.resolve();
-
 	m_gfx_bank->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_port02_status));
@@ -970,7 +967,7 @@ void mazerbla_state::mazerbla(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(40*8, 32*8);
@@ -1017,7 +1014,7 @@ void mazerbla_state::greatgun(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(40*8, 32*8);

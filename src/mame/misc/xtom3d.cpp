@@ -127,7 +127,6 @@ HS3PIN  Unpopulated header near A40MX04
 
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/pci-smbus.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
@@ -154,7 +153,7 @@ HS3PIN  Unpopulated header near A40MX04
 #define LOG_FLASH     (1U << 1)
 
 #define VERBOSE (LOG_GENERAL | LOG_FLASH)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -526,8 +525,7 @@ void isa16_xtom3d_io_sound::remap(int space_id, offs_t start, offs_t end)
  * ISA16 Oksan Virtual LPC
  *
  * Doesn't really accesses a Super I/O, which implies that the Holtek keyboard
- * is a motherboard ISA resource.
- *
+ * and the RTC chips are motherboard ISA resources.
  */
 
 class isa16_oksan_lpc : public device_t, public device_isa16_card_interface
@@ -536,14 +534,15 @@ public:
 	// construction/destruction
 	isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<kbdc8042_device> m_kbdc;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	required_device<mc146818_device> m_rtc;
+	required_device<kbdc8042_device> m_kbdc;
+
 	void remap(int space_id, offs_t start, offs_t end) override;
 
 	void device_map(address_map &map) ATTR_COLD;
@@ -554,16 +553,21 @@ DEFINE_DEVICE_TYPE(ISA16_OKSAN_LPC, isa16_oksan_lpc, "isa16_oksan_lpc", "ISA16 O
 isa16_oksan_lpc::isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA16_OKSAN_LPC, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
+	, m_rtc(*this, "rtc")
 	, m_kbdc(*this, "kbdc")
 {
 }
 
 void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 {
-	KBDC8042(config, m_kbdc, 0);
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
+	m_rtc->set_century_index(0x32);
+
+	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
-	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_kbdc->gate_a20_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 #if !ENABLE_VOODOO
 	m_kbdc->set_keyboard_tag("at_keyboard");
@@ -587,14 +591,14 @@ void isa16_oksan_lpc::device_reset()
 void isa16_oksan_lpc::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
-		m_isa->install_device(0x60, 0x6f, *this, &isa16_oksan_lpc::device_map);
+		m_isa->install_device(0x60, 0x7f, *this, &isa16_oksan_lpc::device_map);
 }
 
 void isa16_oksan_lpc::device_map(address_map &map)
 {
 	map(0x00, 0x0f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-//	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
-//	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
+	map(0x10, 0x17).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x10, 0x17).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 }
 
 
@@ -672,17 +676,18 @@ void xtom3d_state::xtom3d(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// PCB has ZX marking but BIOS returns BX, shouldn't matter
-	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+	I82443BX_HOST(config, "pci:00.0", "maincpu", 64*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
-	I82371EB_IDE(config, m_pci_ide, 0, m_maincpu);
+	I82371EB_IDE(config, m_pci_ide, m_maincpu);
 	m_pci_ide->irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
 	m_pci_ide->irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
@@ -691,19 +696,20 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
-	I82371EB_USB (config, "pci:07.2", 0);
-	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	I82371EB_USB (config, "pci:07.2");
+	I82371EB_ACPI(config, "pci:07.3");
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
+	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
 	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "xtom3d_io_sound", true);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", xtom3d_isa_cards, "xtom3d_io_sound", true);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// Expansion slots, mapping SVGA for debugging
 #if ENABLE_VOODOO
-	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo->set_fbmem(8);
 	// NOTE: pumpit1 touches this a lot
 	m_voodoo->set_status_cycles(1000);
@@ -711,7 +717,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 //  subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq5_w));
 
 	// TODO: fix legacy raw setup here
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);

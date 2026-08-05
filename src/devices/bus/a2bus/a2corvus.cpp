@@ -73,7 +73,7 @@ ROM_END
 
 void a2bus_corvus_device::device_add_mconfig(machine_config &config)
 {
-	CORVUS_HDC(config, m_corvushd, 0);
+	CORVUS_HDC(config, m_corvushd);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");

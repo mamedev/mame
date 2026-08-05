@@ -240,14 +240,14 @@ void mikrosha_state::mikrosha(machine_config &config)
 	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels));
 	i8275.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(0);
 	pit.set_clk<1>(0);
 	pit.set_clk<2>(2000000);
 	pit.out_handler<2>().set(FUNC(mikrosha_state::mikrosha_pit_out2));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_size(78*6, 30*10);

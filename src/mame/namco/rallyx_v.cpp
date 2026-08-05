@@ -41,7 +41,7 @@ needs more color combination to render its graphics.
 
   Convert the color PROMs.
 
-  Rally X has one 32x8 palette PROM and one 256x4 color lookup table PROM.
+  Rally-X has one 32x8 palette PROM and one 256x4 color lookup table PROM.
   The palette PROM is connected to the RGB output this way:
 
   bit 7 -- 220 ohm resistor  -- BLUE
@@ -323,7 +323,7 @@ VIDEO_START_MEMBER(rallyx_state,rallyx)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
-	// the scrolling tilemap is slightly misplaced in Rally X
+	// the scrolling tilemap is slightly misplaced in Rally-X
 	m_bg_tilemap->set_scrolldx(3, 3);
 
 	m_spriteram_base = 0x14;

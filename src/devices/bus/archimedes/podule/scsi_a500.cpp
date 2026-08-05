@@ -78,7 +78,7 @@ const tiny_rom_entry *arc_scsi_a500_device::device_rom_region() const
 
 void arc_scsi_a500_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false); // Philips VP415
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -86,12 +86,10 @@ void arc_scsi_a500_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93).clock(DERIVED_CLOCK(1, 1))
-		.machine_config([this](device_t *device)
-		{
-			wd33c93_device &wd33c93(downcast<wd33c93_device &>(*device));
-			wd33c93.irq_cb().set([this](int state) { set_pirq(state); });
-		});
+
+	WD33C93(config, m_wd33c93, DERIVED_CLOCK(1, 1));
+	scsi.set_external_device(7, m_wd33c93);
+	m_wd33c93->irq_cb().set([this](int state) { set_pirq(state); });
 }
 
 
@@ -106,7 +104,7 @@ void arc_scsi_a500_device::device_add_mconfig(machine_config &config)
 arc_scsi_a500_device::arc_scsi_a500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ARC_SCSI_A500, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
-	, m_wd33c93(*this, "scsi:7:wd33c93")
+	, m_wd33c93(*this, "wd33c93")
 	, m_podule_rom(*this, "podule_rom")
 {
 }

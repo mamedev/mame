@@ -120,10 +120,9 @@ public:
 
 	{ }
 
-	void paracaidista(machine_config &config);
+	void paracaidista(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void paraca_map(address_map &map) ATTR_COLD;
@@ -425,7 +424,7 @@ void paracaidista_state::paracaidista(machine_config &config)
 	m_dma8257->out_memw_cb().set(FUNC(paracaidista_state::dmac_mem_w));  // under test
 
 	// video hardware
-	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(paracaidista_state::screen_update));
 	screen.set_size(256, 256);

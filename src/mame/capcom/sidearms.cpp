@@ -695,7 +695,7 @@ void sidearms_state::sidearms(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(sidearms_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -736,7 +736,7 @@ void sidearms_state::turtship(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8); // 61.0338 Hz measured
 	m_screen->set_screen_update(FUNC(sidearms_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -780,7 +780,7 @@ void sidearms_state::whizz(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(sidearms_state::screen_update));
 	m_screen->set_palette(m_palette);

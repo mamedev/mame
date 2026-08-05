@@ -14,7 +14,7 @@ class s3vision864_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	s3vision864_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3vision864_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -50,6 +50,7 @@ protected:
 		uint8_t cr3a;
 		uint8_t cr42;
 		uint8_t cr43;
+		uint8_t cr50;
 		uint8_t cr51;
 		uint8_t cr53;
 		uint8_t id_high;
@@ -98,7 +99,7 @@ private:
 class s3vision964_vga_device : public s3vision864_vga_device
 {
 public:
-	s3vision964_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3vision964_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	s3vision964_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -108,7 +109,7 @@ protected:
 class s3vision968_vga_device : public s3vision964_vga_device
 {
 public:
-	s3vision968_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3vision968_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	s3vision968_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -118,7 +119,7 @@ protected:
 class s3trio64_vga_device : public s3vision968_vga_device
 {
 public:
-	s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

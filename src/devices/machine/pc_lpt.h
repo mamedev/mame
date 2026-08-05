@@ -29,6 +29,9 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	// alias of above for ISA PnP targets (where $279 writes are really routed there)
+	void isa_map(address_map &map);
+
 	uint8_t data_r();
 	void data_w(uint8_t data);
 	uint8_t status_r();
@@ -53,7 +56,9 @@ private:
 		CONTROL_INIT = 4,
 		CONTROL_SELECT = 8,
 		CONTROL_IRQ_ENABLED = 16,
-		CONTROL_OUTPUT_ENABLED = 32
+		// SPP in PS/2 bidirectional mode and ECP adds these two extra control bits
+		CONTROL_OUTPUT_ENABLED = 32,
+		CONTROL_AUTO_STROBE = 128
 	};
 
 	enum

@@ -117,7 +117,7 @@ bool menu_cheat::handle(event const *ev)
     menu_cheat_populate - populate the cheat menu
 -------------------------------------------------*/
 
-menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_cheat::menu_cheat(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("Cheat Options"));
 	set_process_flags(PROCESS_LR_REPEAT);

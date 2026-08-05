@@ -31,10 +31,7 @@ public:
 	ss50_interface_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: ss50_interface_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -55,7 +52,7 @@ public:
 	void f600_1200_w(int state);
 
 protected:
-	// device-specific overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
@@ -100,7 +97,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(SS50_INTERFACE, ss50_interface_port_device)
 
 void ss50_default_2rs_devices(device_slot_interface &device);

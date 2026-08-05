@@ -143,8 +143,6 @@ private:
 
 void ggm_state::machine_start()
 {
-	m_fdigit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_digit_data));

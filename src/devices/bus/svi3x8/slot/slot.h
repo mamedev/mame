@@ -56,7 +56,7 @@ class svi_slot_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~svi_slot_bus_device();
 
 	// callbacks
@@ -95,7 +95,7 @@ private:
 	devcb_write_line m_ramdis_handler;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(SVI_SLOT_BUS, svi_slot_bus_device)
 
 // ======================> svi_slot_device
@@ -105,13 +105,10 @@ class svi_slot_device : public device_t, public device_single_card_slot_interfac
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	svi_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt)
-		: svi_slot_device(mconfig, tag, owner, 0)
+	svi_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&bus, U &&opts, char const *dflt)
+		: svi_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_bus(std::forward<T>(bus));
 	}
 
@@ -127,7 +124,7 @@ protected:
 	required_device<svi_slot_bus_device> m_bus;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(SVI_SLOT, svi_slot_device)
 
 // ======================> svi_slot_device

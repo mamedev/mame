@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 
-http://redump.org/discs/system/acd
+https://redump.info/discs/system/acd
 -->
 <softwarelist name="amiga_cd" description="Commodore AmigaCD images">
 
@@ -45,7 +45,7 @@ Not extensively tested
 	</software>
 
 	<software name="finlodys" supported="no">
-		<!-- http://redump.org/disc/18527/ -->
+		<!-- https://redump.info/disc/18527/ -->
 		<!-- "Peter Spinaze's Final Odyssey" on introduction screen -->
 		<description>Final Odyssey: Theseus Verses the Minotaur (Europe)</description>
 		<year>1997</year>
@@ -61,7 +61,7 @@ Requires an ECS or AGA machine with enough installed Fast RAM on it
 	</software>
 
 	<software name="gunbee" supported="no">
-		<!-- http://redump.org/disc/41238/ -->
+		<!-- https://redump.info/disc/41238/ -->
 		<description>Gunbee F-99: The Kidnapping of Lady Akiko (Europe)</description>
 		<year>1998</year>
 		<!-- APC &amp; TCP? -->
@@ -102,7 +102,7 @@ cd32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will othe
 	</software>
 
 	<software name="pballdmg" supported="no">
-		<!-- http://redump.org/disc/16919/ -->
+		<!-- https://redump.info/disc/16919/ -->
 		<description>Pinball Brain Damage (Europe)</description>
 		<year>1997</year>
 		<!-- Packaging Design: Epic Marketing -->
@@ -125,7 +125,7 @@ Editor and HD Install untested
 
 	<software name="wendetta" supported="no">
 		<!-- "A1200/A4000 CD32" on cover art -->
-		<!-- http://redump.org/disc/106519/ -->
+		<!-- https://redump.info/disc/106519/ -->
 		<description>Wendetta 2175 (Europe)</description>
 		<year>1996</year>
 		<publisher>Skills</publisher>
@@ -144,7 +144,7 @@ Editor and HD Install untested
 <!-- !Collections -->
 
 	<software name="17bitph4" supported="no">
-		<!-- http://redump.org/disc/20852/ -->
+		<!-- https://redump.info/disc/20852/ -->
 		<description>17 Bit - Phase Four (Europe)</description>
 		<year>1994</year>
 		<publisher>Almathera</publisher>
@@ -160,7 +160,7 @@ Requires stable [FDC] write
 	</software>
 
 	<software name="17bit5th" supported="no">
-		<!-- http://redump.org/disc/20853/ -->
+		<!-- https://redump.info/disc/20853/ -->
 		<description>17 Bit - The Fifth Dimension (Europe)</description>
 		<year>1995</year>
 		<!-- No publisher on CD covers, assume Almathera went bankrupt at this point -->
@@ -177,7 +177,7 @@ Requires stable [FDC] write
 	</software>
 
 	<software name="17bitlv6" supported="no">
-		<!-- http://redump.org/disc/20854/ -->
+		<!-- https://redump.info/disc/20854/ -->
 		<description>17 Bit - Level 6 (Europe)</description>
 		<!-- Year and publisher from info file -->
 		<year>1997</year>
@@ -209,7 +209,7 @@ Not extensively tested, some games known to use ECS or AGA features. (cfr. Bruta
 	</software>
 
 	<software name="emuplus" supported="no">
-		<!-- http://redump.org/disc/43683/ -->
+		<!-- https://redump.info/disc/43683/ -->
 		<description>Emulators Unlimited Plus (Germany)</description>
 		<!-- Unknown release date, file datestamps all have unlikely '92 or '78 -->
 		<!-- Has a tool for Psion Series 3/a (page 6 of Information complete list) so mid-to-late 90s possible -->
@@ -235,7 +235,7 @@ cd32: disc 10 black screen
 		<info name="usage" value="CD32: In order to load any other disc in this collection, insert disc 1 then hold right mouse button at startup for being prompted to disc swap with any other CD in this collection, then soft reset machine"/>
 		<part name="cdrom1" interface="cdrom">
 			<!-- <category>Applications</category> -->
-			<!-- http://redump.org/disc/18550/ -->
+			<!-- https://redump.info/disc/18550/ -->
 			<!-- <rom name="Almathera Comms &amp; Networking CD (Europe).cue" size="106" crc="803a023b" md5="3dd92c3d34ed3cda877dfa31ce492fa6" sha1="fea81c0d76b0f7c84798b9de72d9acc678226530"/> -->
 			<!-- <rom name="Almathera Comms &amp; Networking CD (Europe).bin" size="248571120" crc="f9991efe" md5="cca00b0125a0f164b6bc73fb6339ee11" sha1="b4520eb166407bd00e54b9cbaf31212b3f54bc7a"/> -->
 			<feature name="part_id" value="Almathera Comms &amp; Networking CD"/>
@@ -246,7 +246,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom2" interface="cdrom">
 			<!-- <category>Applications</category> -->
-			<!-- http://redump.org/disc/18548/ -->
+			<!-- https://redump.info/disc/18548/ -->
 			<!-- <rom name="CDPD 1 (Europe).cue" size="81" crc="7e261a25" md5="961b2e9c6f18b5167fe713c0545ca9a2" sha1="f0e60c1c6f0b3a86494a7f46c676a36b363f9bcc"/> -->
 			<!-- <rom name="CDPD 1 (Europe).bin" size="746776464" crc="30c57806" md5="43b45e0afd4a960359d0ed1ba9120ae7" sha1="4a743f0feba8e20040e3b1ff77c051e57f9222ff"/> -->
 			<feature name="part_id" value="CDPD 1"/>
@@ -257,7 +257,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom3" interface="cdrom">
 			<!-- <category>Applications</category> -->
-			<!-- http://redump.org/disc/18548/ -->
+			<!-- https://redump.info/disc/18548/ -->
 			<!-- <rom name="CDPD 2 (Europe).cue" size="81" crc="958c5298" md5="1f456742c84b59639360e5105b0a2205" sha1="9f8e7a02a6369833885d6bfdc75c9714378e1551"/> -->
 			<!-- <rom name="CDPD 2 (Europe).bin" size="658442400" crc="a94c14cc" md5="73e3a9b78888aee9e9754793d797bfd1" sha1="57b63e986dd15ba49362e1ff02eabe4a754b412f"/> -->
 			<feature name="part_id" value="CDPD 2"/>
@@ -268,7 +268,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom4" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/18551/ -->
+			<!-- https://redump.info/disc/18551/ -->
 			<!-- <rom name="Demo 1 (Europe).cue" size="81" crc="0f256c23" md5="23d4594e745f3174e8b9b8ecfcac1f34" sha1="73317088554a3c8aa8b3ca5feaeb3ff63b062585"/> -->
 			<!-- <rom name="Demo 1 (Europe).bin" size="708610560" crc="9ee5043f" md5="30d0e664799138e2c8d641b48d4192c0" sha1="42966b2d2f0ffd5540ec795861eb8b15f7076899"/> -->
 			<feature name="part_id" value="Demo 1"/>
@@ -279,7 +279,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom5" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/18523/ -->
+			<!-- https://redump.info/disc/18523/ -->
 			<!-- <rom name="World Vista (Europe).cue" size="86" crc="74387a47" md5="2194ac62bf9b48f0608aac799428e47e" sha1="705c4eb8cdfadc98b66a924c0aadc15046b77875"/> -->
 			<!-- <rom name="World Vista (Europe).bin" size="502789392" crc="b2113b15" md5="8ec646ed17c575139d644efcf1566fbd" sha1="5b71c5976c388dd7a6e870ca36840c7accd50701"/> -->
 			<feature name="part_id" value="World Vista"/>
@@ -290,7 +290,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom6" interface="cdrom">
 			<!-- <category>Educational</category> -->
-			<!-- http://redump.org/disc/18522/ -->
+			<!-- https://redump.info/disc/18522/ -->
 			<!-- <rom name="Illustrated Works of Shakespeare (Europe).cue" size="107" crc="abb7e3a0" md5="0f3e783ca41909d10a74c9d45191f3d3" sha1="b2438bd35b8e60b2ebd2d3ef501e6b1d28eab6ef"/> -->
 			<!-- <rom name="Illustrated Works of Shakespeare (Europe).bin" size="53214000" crc="29c9634c" md5="a6984256d64d0daad5423575a805b41e" sha1="bab8b78ce7c95da36b650394cfbc285af7726da0"/> -->
 			<feature name="part_id" value="Illustrated Works of Shakespeare"/>
@@ -301,7 +301,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom7" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/18521/ -->
+			<!-- https://redump.info/disc/18521/ -->
 			<!-- <rom name="Pandora's CD (Europe) (Alt).cue" size="93" crc="6685c80c" md5="8147396f05b2b7b17b55821d9678c982" sha1="620f0c1437e2ea13adf14baf3895fc55b5c988e5"/> -->
 			<!-- <rom name="Pandora's CD (Europe) (Alt).bin" size="458738784" crc="ddb7e392" md5="e7740666bced9f7a96da85ad9b4d113f" sha1="adac7c881f641bfc4667fcf8e7469886906548ea"/> -->
 			<feature name="part_id" value="Pandora's CD"/>
@@ -312,7 +312,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom8" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/18520/ -->
+			<!-- https://redump.info/disc/18520/ -->
 			<!-- <rom name="Team Yankee (Europe) (Ten on Ten).cue" size="99" crc="606f0162" md5="8c173ad5d43a8447e924ce5075a7471c" sha1="62e5d539082c8d4796a8057577e6e59906193298"/> -->
 			<!-- <rom name="Team Yankee (Europe) (Ten on Ten).bin" size="7079520" crc="de95d6f2" md5="efc8a6b9face11df7a53ba32c74bbb2a" sha1="713bd1aaefe59e15af61771abffde3c89b5b9d2c"/> -->
 			<feature name="part_id" value="Team Yankee"/>
@@ -323,7 +323,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom9" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/18519/ -->
+			<!-- https://redump.info/disc/18519/ -->
 			<!-- <rom name="Almathera Photo Library CD, The (Europe).cue" size="106" crc="68b31c99" md5="ea8423140d0209f04755a2505bef109f" sha1="1941996df3ce012770172fbc7f6552bd34b9503e"/> -->
 			<!-- <rom name="Almathera Photo Library CD, The (Europe).bin" size="636801648" crc="75ecfbe4" md5="c1957cc3701c16379261420285f11677" sha1="dc1f8e27a0831476d694548fe1021c73974523c6"/> -->
 			<feature name="part_id" value="The Almathera Photo Library CD"/>
@@ -334,7 +334,7 @@ cd32: disc 10 black screen
 
 		<part name="cdrom10" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/18518/ -->
+			<!-- https://redump.info/disc/18518/ -->
 			<!-- <rom name="Almathera Clipart &amp; Fonts CD, The (Europe).cue" size="108" crc="78acde0b" md5="0440ed5c13780246105b0ea4b76ed7ca" sha1="d644a15e06b84a308dfee8e543d214d2ebadc0ea"/> -->
 			<!-- <rom name="Almathera Clipart &amp; Fonts CD, The (Europe).bin" size="230662992" crc="89ab1b59" md5="efcc9acae92fe1cf7975c41c38ad30a1" sha1="039ab9c11793fd66ac74e34fbc44d138babfb666"/> -->
 			<feature name="part_id" value="The Almathera Clipart &amp; Fonts CD"/>

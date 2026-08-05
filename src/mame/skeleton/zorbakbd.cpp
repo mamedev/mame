@@ -301,9 +301,6 @@ void zorba_keyboard_device::mcu_pc_w(u8 data)
 
 void zorba_keyboard_device::device_start()
 {
-	m_led_key_caps_lock.resolve();
-	m_led_key_shift_lock.resolve();
-
 	save_item(NAME(m_txd_high));
 	save_item(NAME(m_row_select));
 

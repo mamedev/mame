@@ -490,9 +490,6 @@ void gticlub_base_state::soundtimer_ack_w(uint16_t data)
 
 void gticlub_base_state::machine_start()
 {
-	m_pcb_digit.resolve();
-	m_wheel_motor.resolve();
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -847,7 +844,6 @@ uint32_t gticlub_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 #endif
 
-	//m_dsp[0]->set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 	m_dsp[0]->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
@@ -893,7 +889,7 @@ void gticlub_state::gticlub(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
-	ADC1038(config, m_adc1038, 0);
+	ADC1038(config, m_adc1038);
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 	m_adc1038->set_gti_club_hack(true);
 
@@ -901,7 +897,7 @@ void gticlub_state::gticlub(machine_config &config)
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 1024);
 	screen.set_visarea(40, 511+40, 28, 383+28); // needs CRTC emulation
@@ -909,17 +905,17 @@ void gticlub_state::gticlub(machine_config &config)
 
 	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
-	K001604(config, m_k001604[0], 0);
+	K001604(config, m_k001604[0]);
 	m_k001604[0]->set_palette(m_palette[0]);
 
-	K001005(config, m_k001005, 0, m_k001006[0]);
+	K001005(config, m_k001005, m_k001006[0]);
 
-	K001006(config, m_k001006[0], 0);
+	K001006(config, m_k001006[0]);
 	m_k001006[0]->set_gfx_region("textures");
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	K001006(config, m_k001006[1], 0);
+	K001006(config, m_k001006[1]);
 	m_k001006[1]->set_gfx_region("textures");
 
 	K056800(config, m_k056800, 33.8688_MHz_XTAL / 2);
@@ -931,7 +927,7 @@ void gticlub_state::gticlub(machine_config &config)
 	rfsnd.add_route(0, "speaker", 1.0, 0);
 	rfsnd.add_route(1, "speaker", 1.0, 1);
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
@@ -978,7 +974,7 @@ void hangplt_state::hangplt(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
-	ADC1038(config, m_adc1038, 0);
+	ADC1038(config, m_adc1038);
 	m_adc1038->set_input_callback(FUNC(hangplt_state::adc1038_input_callback));
 
 	K056230(config, m_k056230);
@@ -1002,29 +998,29 @@ void hangplt_state::hangplt(machine_config &config)
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
-	K033906(config, "k033906_1", 0, m_voodoo[0]);
-	K033906(config, "k033906_2", 0, m_voodoo[1]);
+	K033906(config, "k033906_1", m_voodoo[0]);
+	K033906(config, "k033906_2", m_voodoo[1]);
 
 	// video hardware
 	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 	PALETTE(config, m_palette[1]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_size(600, 420);
 	lscreen.set_visarea(44, 555, 27, 410);
 	lscreen.set_screen_update(FUNC(hangplt_state::screen_update<0>));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_size(600, 420);
 	rscreen.set_visarea(44, 555, 27, 410);
 	rscreen.set_screen_update(FUNC(hangplt_state::screen_update<1>));
 
-	K001604(config, m_k001604[0], 0);
+	K001604(config, m_k001604[0]);
 	m_k001604[0]->set_palette(m_palette[0]);
 
-	K001604(config, m_k001604[1], 0);
+	K001604(config, m_k001604[1]);
 	m_k001604[1]->set_palette(m_palette[1]);
 
 	K056800(config, m_k056800, 33.8688_MHz_XTAL / 2);
@@ -1036,7 +1032,7 @@ void hangplt_state::hangplt(machine_config &config)
 	rfsnd.add_route(0, "speaker", 1.0, 0);
 	rfsnd.add_route(1, "speaker", 1.0, 1);
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_dsp_tag(1, m_dsp[1]);
 	m_konppc->set_k033906_tag(0, "k033906_1");

@@ -69,7 +69,7 @@ namespace {
 class pickytlk_base_state : public driver_device
 {
 public:
-	DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
+	float pen_y_mapper(float linear_value);
 	ioport_value pen_y_rescale_r();
 	ioport_value pen_target_r();
 
@@ -171,11 +171,11 @@ void pickytlk_base_state::machine_reset()
 	m_pen_target = PEN_TARGET_LCD;
 }
 
-CROSSHAIR_MAPPER_MEMBER(pickytlk_base_state::pen_y_mapper)
+float pickytlk_base_state::pen_y_mapper(float linear_value)
 {
 	// Parameter `linear_value` is ignored, since we will read the input port directly
 	// for adjustments, just need to return that value in the expected range [0.0f..1.0f].
-	return (float) pen_y_rescale_r() / 0xff;
+	return float(pen_y_rescale_r()) / 0xff;
 }
 
 ioport_value pickytlk_base_state::pen_y_rescale_r()
@@ -380,7 +380,7 @@ void pickytlk_base_state::pickytlk(machine_config &config)
 	m_maincpu->in0_cb().set(FUNC(pickytlk_base_state::in0_r));
 	m_maincpu->input_flag_cb().set(FUNC(pickytlk_base_state::input_flag_read));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(127, 64);
 	m_screen->set_visarea(0, 127 - 1, 0, 64 - 1);

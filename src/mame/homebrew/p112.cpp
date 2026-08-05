@@ -78,17 +78,17 @@ void p112_state::io_map(address_map &map)
 {
 	map.unmap_value_low();
 	map.global_mask(0xff);
-//	map(0x40, 0x7f) expansion bus
-//	map(0x8c, 0x8f) LPT
-//	map(0x90, 0x91) Super I/O
-//	map(0x90, 0x97) FDC
-//	map(0x98, 0x9f) COM
+//  map(0x40, 0x7f) expansion bus
+//  map(0x8c, 0x8f) LPT
+//  map(0x90, 0x91) Super I/O
+//  map(0x90, 0x97) FDC
+//  map(0x98, 0x9f) COM
 	map(0x9d, 0x9d).lr8(NAME([] () { return 0x40; }));
-//	map(0xa0, 0xbf) floppy DMA
-//	map(0xc0, 0xd7) expansion bus
+//  map(0xa0, 0xbf) floppy DMA
+//  map(0xc0, 0xd7) expansion bus
 	map(0xe0, 0xe0).lr8(NAME([] () { return 0x04; })); // ready bit for video
 	// logic analyzer ping, actually using Z180 serial i/f for video?
-//	map(0xe0, 0xe1).lw8(NAME([] (u8 data) { printf("%c", data); }));
+//  map(0xe0, 0xe1).lw8(NAME([] (u8 data) { printf("%c", data); }));
 }
 
 /* Input ports */
@@ -117,7 +117,7 @@ void p112_state::p112(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &p112_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(240, 320);

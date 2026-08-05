@@ -1142,7 +1142,7 @@ void atom_state::atom_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
 	config.set_perfect_quantum(m_maincpu); // required for Tube interface
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	MC6847(config, m_vdg, 3.579545_MHz_XTAL);
 	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));

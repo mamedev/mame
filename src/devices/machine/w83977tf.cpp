@@ -185,7 +185,7 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 		// can't map below 0x100
 		if (m_activate[1] & 1 && m_lpt_address & 0xf00)
 		{
-			m_isa->install_device(m_lpt_address, m_lpt_address + 3, read8sm_delegate(*m_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_lpt, FUNC(pc_lpt_device::write)));
+			m_isa->install_device(m_lpt_address, m_lpt_address + 3, *m_lpt, &pc_lpt_device::isa_map);
 		}
 
 		if (m_activate[5] & 1)
@@ -278,13 +278,16 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[0](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<0>), FUNC(w83977tf_device::activate_w<0>));
 	m_logical_view[0](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_fdc_address >> (offset * 8)) & 0xff;
+			if (offset)
+				return m_fdc_address & 0xf8;
+
+			return (m_fdc_address >> 8) & 0xf;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const u8 shift = offset * 8;
 			m_fdc_address &= 0xff << shift;
 			m_fdc_address |= data << (shift ^ 8);
-			m_fdc_address &= ~0xf007;
+			m_fdc_address &= 0xff8;
 			LOGFDC("LD0 (FDC): remap %04x ([%d] %02x)\n", m_fdc_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
@@ -364,13 +367,16 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[1](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<1>), FUNC(w83977tf_device::activate_w<1>));
 	m_logical_view[1](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_lpt_address >> (offset * 8)) & 0xff;
+			if (offset)
+				return m_lpt_address & 0xfc;
+
+			return (m_lpt_address >> 8) & 0xf;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const u8 shift = offset * 8;
 			m_lpt_address &= 0xff << shift;
 			m_lpt_address |= data << (shift ^ 8);
-			m_lpt_address &= ~0xf003;
+			m_lpt_address &= 0xffc;
 			LOG("LD1 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);

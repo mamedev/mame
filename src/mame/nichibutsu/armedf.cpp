@@ -1076,7 +1076,7 @@ void armedf_state::machine_reset()
 
 void armedf_state::video_config(machine_config &config, int hchar_start, int vstart, int vend)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// assume all games on this HW running at ~59.1358Hz (trusted for Big Fighter)
 	// TODO: recheck if visible area isn't just 320x240 for everything (overscan may be masked by the text layer).
 	// TODO: bootlegs may not run at this speed
@@ -1173,7 +1173,7 @@ void armedf_state::terraf(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terraf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
-	NB1414M4(config, m_nb1414m4, 0);
+	NB1414M4(config, m_nb1414m4);
 
 	video_config(config, 12, 8, 248);
 
@@ -1214,7 +1214,7 @@ void armedf_state::kozure(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::kozure_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
-	NB1414M4(config, m_nb1414m4, 0);
+	NB1414M4(config, m_nb1414m4);
 
 	/* video hardware */
 	video_config(config, 12, 8, 248);
@@ -1244,7 +1244,7 @@ void armedf_state::cclimbr2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
 
-	NB1414M4(config, m_nb1414m4, 0);
+	NB1414M4(config, m_nb1414m4);
 
 	video_config(config, 14, 16, 240);
 
@@ -1270,7 +1270,7 @@ void armedf_state::legion(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::legion_map);
 
-	NB1414M4(config, m_nb1414m4, 0);
+	NB1414M4(config, m_nb1414m4);
 
 	/* sound hardware */
 	sound_config_legion(config);

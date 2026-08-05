@@ -70,10 +70,7 @@ public:
 	pce_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, const char *interface)
 		: pce_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 		set_intf(interface);
 	}
 
@@ -111,7 +108,7 @@ protected:
 
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device)
 
 #endif // MAME_BUS_PCE_PCE_SLOT_H

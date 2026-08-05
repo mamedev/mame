@@ -843,7 +843,7 @@ void vic20_state::write_user_cassette_switch(int state)
 
 void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(VIC_TAG, FUNC(mos6560_device::screen_update));
 
@@ -863,7 +863,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
 	m_iec->srq_callback().set(m_via2, FUNC(via6522_device::write_cb1));
 
-	VCS_CONTROL_PORT(config, m_joy, 0);
+	VCS_CONTROL_PORT(config, m_joy);
 	vcs_control_port_devices(*m_joy);
 	m_joy->set_default_option("joy");
 	m_joy->trigger_wr_callback().set(FUNC(vic20_state::write_light_pen));

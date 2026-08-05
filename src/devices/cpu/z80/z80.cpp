@@ -795,8 +795,8 @@ void z80_device::execute_set_input(int inputnum, int state)
 		break;
 
 	case INPUT_LINE_NMI:
-		// mark an NMI pending on the rising edge
-		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
+		// mark an NMI pending on the rising edge (not at the same time RESET is cleared)
+		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE && total_cycles())
 			set_service_attention<SA_NMI_PENDING, 1>();
 		m_nmi_state = state;
 		break;

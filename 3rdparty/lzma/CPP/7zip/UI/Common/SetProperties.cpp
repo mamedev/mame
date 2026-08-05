@@ -83,6 +83,6 @@ HRESULT SetProperties(IUnknown *unknown, const CObjectVector<CProperty> &propert
     for (i = 0; i < realNames.Size(); i++)
       names.Add((const wchar_t *)realNames[i]);
     
-    return setProperties->SetProperties(&names.Front(), values.values, names.Size());
+    return setProperties->SetProperties(names.ConstData(), values.values, names.Size());
   }
 }

@@ -10,14 +10,16 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh7604.h"
+#include "machine/timer.h"
+#include "sound/scsp.h"
 
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
+#include "saturn_dcc.h"
 #include "saturn_scu.h"
+//#include "saturn_vdp1.h"
+#include "saturn_vdp2.h"
 #include "smpc.h"
-
-#include "machine/timer.h"
-#include "sound/scsp.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -31,13 +33,15 @@ public:
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
-			m_fake_comms(*this, "fake"),
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_dcc(*this, "dcc"),
 			m_scsp(*this, "scsp"),
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
+			//m_vdp1(*this, "vdp1"),
+			m_vdp2(*this, "vdp2"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette")
@@ -62,7 +66,6 @@ protected:
 	required_shared_ptr<uint32_t> m_workram_l;
 	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint16_t> m_sound_ram;
-	optional_ioport m_fake_comms;
 
 	memory_region *m_cart_reg[4];
 	std::unique_ptr<uint8_t[]>     m_backupram;
@@ -73,11 +76,6 @@ protected:
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
 	uint8_t     m_en_68k = 0;
-
-	int       m_minit_boost = 0;
-	int       m_sinit_boost = 0;
-	attotime  m_minit_boost_timeslice;
-	attotime  m_sinit_boost_timeslice;
 
 	struct {
 		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
@@ -102,28 +100,23 @@ protected:
 		int         local_y = 0;
 
 		emu_timer * draw_end_timer = nullptr;
-	}m_vdp1;
+	} m_vdp1_legacy;
 
 	struct {
 		std::unique_ptr<uint8_t[]>      gfx_decode;
 		bitmap_rgb32 roz_bitmap[2];
-		uint8_t     dotsel = 0;
-		uint8_t     pal = 0;
-		uint8_t     odd = 0;
-		uint16_t    h_count = 0;
-		uint16_t    v_count = 0;
-		uint8_t     exltfg = 0;
-		uint8_t     exsyfg = 0;
 		int       old_crmd = 0;
-		int       old_tvmd = 0;
-	}m_vdp2;
+	} m_vdp2_legacy;
 
 	required_device<sh7604_device> m_maincpu;
 	required_device<sh7604_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<saturn_dcc_device> m_dcc;
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<saturn_scu_device> m_scu;
+//  required_device<saturn_vdp1_device> m_vdp1;
+	required_device<saturn_vdp2_device> m_vdp2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -143,16 +136,13 @@ protected:
 	DECLARE_VIDEO_START(vdp2_video_start);
 	uint32_t screen_update_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
-
+	void vint_callback(int state);
+	void hint_callback(int state);
+	int m_prev_hint, m_prev_vint;
 
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
 	void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t soundram_r(offs_t offset);
-	void minit_w(uint32_t data);
-	void sinit_w(uint32_t data);
-	void saturn_minit_w(uint32_t data);
-	void saturn_sinit_w(uint32_t data);
 	uint8_t backupram_r(offs_t offset);
 	void backupram_w(offs_t offset, uint8_t data);
 
@@ -271,18 +261,6 @@ protected:
 
 	/* VDP2 */
 
-	uint8_t get_vblank();
-	uint8_t get_hblank();
-	int get_hcounter();
-	int get_vcounter();
-	int get_vblank_duration();
-	int get_hblank_duration();
-	int get_pixel_clock();
-	uint8_t get_odd_bit();
-	void vdp2_dynamic_res_change();
-	int get_vblank_start_position();
-	int get_ystep_count();
-
 	void refresh_palette_data();
 	inline int vdp2_window_process(int x,int y);
 	void vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
@@ -334,7 +312,6 @@ protected:
 	void vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t pri);
-	int true_vcount[263][4];
 
 	void vdp2_state_save_postload();
 	void vdp2_exit();

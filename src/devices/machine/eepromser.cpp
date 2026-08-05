@@ -1093,6 +1093,12 @@ eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_#
 	size(_cells, _bits); \
 	set_address_bits(_addrbits); \
 } \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) : \
+	eeprom_serial_##_baseclass##_device(mconfig, type, tag, owner, eeprom_serial_streaming::DISABLE) \
+{ \
+	size(_cells, _bits); \
+	set_address_bits(_addrbits); \
+} \
 DEFINE_DEVICE_TYPE(EEPROM_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device, #_lowercase "_" #_bits, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
 
 // standard 93CX6 class of 16-bit EEPROMs

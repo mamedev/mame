@@ -90,7 +90,7 @@ protected:
 
 	u16 m_disp_enable = 0U;
 
-	int m_VIEW2_2_pri = 0;
+	int m_view2_2_pri = 0;
 
 	virtual void common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize) ATTR_COLD;
 	void coin_lockout_w(u8 data);

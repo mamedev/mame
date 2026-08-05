@@ -218,7 +218,7 @@ void m5074x_device::recalc_irqs()
 				m740_device::execute_set_input(M740_INT0_LINE + i, ASSERT_LINE);
 			}
 		}
-		else    // bit is clear now
+		else // bit is clear now
 		{
 			// ...and wasn't clear last time
 			if (m_last_all_ints & (1 << i))

@@ -10,7 +10,7 @@ luna_68k_ioc_device::luna_68k_ioc_device(machine_config const &mconfig, char con
 	, device_memory_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_dma(*this, "dma%u", 0U)
-	, m_spc(*this, "scsi%u:7:spc", 0U)
+	, m_spc(*this, "spc%u", 0U)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:0")
 	, m_scc(*this, "scc")
@@ -172,7 +172,7 @@ void luna_68k_ioc_device::scsi_drq0_w(int state)
 		} else {
 			if(m_packed_index == 0)
 				m_dma[0]->drq2_w(1);
-			
+
 			else {
 				while(m_scsi_drq0 && m_packed_index != 5) {
 					m_scsi0_dma_write(m_packed_data >> (24 - 8*(m_packed_index-1)));
@@ -304,7 +304,7 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 	m_dma[1]->irq_callback().set([this](int state) { m_interrupt_dma1_cb(state); });
 
 	// internal SCSI
-	NSCSI_BUS(config, "scsi0");
+	auto &scsi0(NSCSI_BUS(config, "scsi0"));
 	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:2", scsi_devices, nullptr);
@@ -312,21 +312,15 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi0:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:6", scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spc", MB89352)
-		.machine_config(
-						[this, dma=m_dma[0].target()](device_t *device)
-						{
-							mb89352_device &spc = downcast<mb89352_device &>(*device);
-							
-							spc.set_clock(10'000'000);
-							spc.out_irq_callback().set([this](int state) { m_interrupt_scsii_cb(state); });
-							spc.out_dreq_callback().set(*this, FUNC(luna_68k_ioc_device::scsi_drq0_w));
-							m_scsi0_dma_read.bind().set(spc, FUNC(mb89352_device::dma_r));
-							m_scsi0_dma_write.bind().set(spc, FUNC(mb89352_device::dma_w));
-						});
+	MB89352(config, m_spc[0], 10'000'000);
+	scsi0.set_external_device(7, m_spc[0]);
+	m_spc[0]->out_irq_callback().set([this](int state) { m_interrupt_scsii_cb(state); });
+	m_spc[0]->out_dreq_callback().set(DEVICE_SELF, FUNC(luna_68k_ioc_device::scsi_drq0_w));
+	m_scsi0_dma_read.bind().set(m_spc[0], FUNC(mb89352_device::dma_r));
+	m_scsi0_dma_write.bind().set(m_spc[0], FUNC(mb89352_device::dma_w));
 
 	// external SCSI
-	NSCSI_BUS(config, "scsi1");
+	auto &scsi1(NSCSI_BUS(config, "scsi1"));
 	NSCSI_CONNECTOR(config, "scsi1:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:2", scsi_devices, nullptr);
@@ -334,15 +328,9 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("spc", MB89352)
-		.machine_config(
-						[this](device_t *device)
-						{
-							mb89352_device &spc = downcast<mb89352_device &>(*device);
-							
-							spc.set_clock(10'000'000);
-							spc.out_irq_callback().set([this](int state) { m_interrupt_scsie_cb(state); });
-						});
+	MB89352(config, m_spc[1], 10'000'000);
+	scsi1.set_external_device(7, m_spc[1]);
+	m_spc[1]->out_irq_callback().set([this](int state) { m_interrupt_scsii_cb(state); });
 
 	MB8877(config, m_fdc, 32_MHz_XTAL / 4);
 	FLOPPY_CONNECTOR(config, m_floppy, floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);

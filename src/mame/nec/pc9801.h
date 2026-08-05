@@ -11,6 +11,11 @@
 
 #pragma once
 
+#include "bus/ata/atadev.h"
+#include "bus/ata/ataintf.h"
+#include "bus/pc98_cbus/slot.h"
+#include "bus/rs232/rs232.h"
+
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
@@ -32,10 +37,6 @@
 #include "machine/upd4991a.h"
 #include "machine/upd765.h"
 
-#include "bus/rs232/rs232.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
-
 #include "sound/beep.h"
 //#include "sound/dac.h"
 #include "sound/spkrdev.h"
@@ -43,15 +44,10 @@
 
 #include "video/upd7220.h"
 
-#include "bus/pc98_cbus/slot.h"
-
 #include "pc98_cd.h"
 #include "pc98_kbd.h"
 #include "pc98_memsw.h"
 #include "pc98_sdip.h"
-
-#include "bus/ata/atadev.h"
-#include "bus/ata/ataintf.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -190,10 +186,14 @@ protected:
 	void pit_clock_config(machine_config &config, const XTAL clock);
 
 	void pc9801_common_io(address_map &map) ATTR_COLD;
+	void cbus_overlay_io(address_map &map) ATTR_COLD;
 	void ipl_bank(address_map &map) ATTR_COLD;
 
 	uint8_t pc9801_a0_r(offs_t offset);
 	void pc9801_a0_w(offs_t offset, uint8_t data);
+
+	virtual u8 kanji_r(offs_t offset);
+	virtual void kanji_w(offs_t offset, uint8_t data);
 
 	uint8_t m_nmi_ff = 0;
 

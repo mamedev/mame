@@ -6,9 +6,10 @@
 
 #pragma once
 
+#include "rtpc_kbdc.h"
+
 #include "cpu/mcs48/mcs48.h"
 
-#include "rtpc_kbdc.h"
 
 class rtpc_kbd_device
 	: public device_t

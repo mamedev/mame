@@ -204,13 +204,11 @@ public:
 	h89bus_left_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *sltag, U &&opts, const char *dflt)
 		: h89bus_left_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_h89bus_slot(std::forward<T>(sltag), tag);
 	}
 
-	h89bus_left_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h89bus_left_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T>
@@ -232,7 +230,7 @@ protected:
 	const char *m_h89bus_slottag;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_LEFT_SLOT, h89bus_left_slot_device)
 
 class h89bus_right_slot_device : public device_t, public device_single_card_slot_interface<device_h89bus_right_card_interface>
@@ -243,13 +241,11 @@ public:
 	h89bus_right_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *sltag, U &&opts, const char *dflt)
 		: h89bus_right_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_h89bus_slot(std::forward<T>(sltag), tag);
 	}
 
-	h89bus_right_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h89bus_right_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T>
@@ -277,7 +273,7 @@ protected:
 	bool m_p506_signals;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_RIGHT_SLOT, h89bus_right_slot_device)
 
 
@@ -298,7 +294,7 @@ class heath_io_decoder_444_43 : public device_t,
 								public device_heath_io_decoder_interface
 {
 public:
-	heath_io_decoder_444_43(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_io_decoder_444_43(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
@@ -312,7 +308,7 @@ class heath_io_decoder_444_61 : public device_t,
 								public device_heath_io_decoder_interface
 {
 public:
-	heath_io_decoder_444_61(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_io_decoder_444_61(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
@@ -326,7 +322,7 @@ class heath_io_decoder_mms_61c : public device_t,
 								public device_heath_io_decoder_interface
 {
 public:
-	heath_io_decoder_mms_61c(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_io_decoder_mms_61c(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
@@ -339,7 +335,7 @@ class heath_io_decoder_cdr86: public device_t,
 							public device_heath_io_decoder_interface
 {
 public:
-	heath_io_decoder_cdr86(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_io_decoder_cdr86(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
@@ -349,6 +345,7 @@ protected:
 	required_region_ptr<uint8_t> m_decode_prom;
 };
 
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_444_43,  heath_io_decoder_444_43)
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_444_61,  heath_io_decoder_444_61)
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_MMS_61C, heath_io_decoder_mms_61c)
@@ -363,13 +360,10 @@ public:
 	heath_io_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false) :
 		heath_io_decoder_socket(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 
-	heath_io_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_io_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false);
 
@@ -379,6 +373,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_SOCKET,  heath_io_decoder_socket)
 
 
@@ -392,7 +387,7 @@ class h89bus_device : public device_t
 
 public:
 	// construction/destruction
-	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~h89bus_device();
 
 	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler) ATTR_COLD;
@@ -494,7 +489,7 @@ inline void device_h89bus_right_card_interface::set_slot_wait(int state)
 	h89bus().set_wait_line(state);
 }
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS, h89bus_device)
 
 #endif  // MAME_BUS_HEATHZENITH_H89_H89BUS_H

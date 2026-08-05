@@ -10,11 +10,12 @@ CPU main PCB is a standard EPIA
 ROMs    epia BIOS + solid state HD
 
 1x VIA EPIA5000EAG (main PCB) with:
+VT6801A North Bridge PLE133
 VT8231 South Bridge
 VIA Eden Processor
 VIA EPIA Companion Chip VT1612A (Audio CODEC)
 VIA EPIA Companion Chip VT6103 (Networking)
-processor speed is 533MHz <- likely to be a Celeron / Pentium III Socket 370 -AS
+processor speed is 533MHz, EBGA368 socket (VIA C3 or later, Pentium 3 equivalent + 3DNow as bare minimum)
 
  it's a 2002 era PC at least based on the BIOS,
   almost certainly newer than the standard 'PENTIUM' CPU

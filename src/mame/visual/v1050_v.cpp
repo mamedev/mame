@@ -113,7 +113,7 @@ void v1050_state::v1050_video(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(v1050_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(v1050_state::crtc_vs_w));
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_screen_update(H46505_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));

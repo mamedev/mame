@@ -143,7 +143,7 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 	m_i80186->tmrout0_handler().set_inputline(m_i80186, INPUT_LINE_HALT).invert();
 	m_i80186->tmrout1_handler().set_inputline(m_i80186, INPUT_LINE_NMI).invert();
 
-	TUBE(config, m_ula, 0);
+	TUBE(config, m_ula);
 	m_ula->pirq_handler().set(m_i80186, FUNC(i80186_cpu_device::int0_w));
 	m_ula->drq_handler().set(m_i80186, FUNC(i80186_cpu_device::drq0_w));
 	m_ula->prst_handler().set(FUNC(bbc_tube_80186_device::prst_w));

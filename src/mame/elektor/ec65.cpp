@@ -213,7 +213,7 @@ void ec65_state::ec65(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ec65_state::ec65_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 200);
@@ -230,17 +230,17 @@ void ec65_state::ec65(machine_config &config)
 	crtc.set_update_row_callback(FUNC(ec65_state::crtc_update_row));
 
 	/* devices */
-	ACIA6850(config, "fdc", 0); // used as a FDC on separate card
+	ACIA6850(config, "fdc"); // used as a FDC on separate card
 	PIA6821(config, "pia"); // assists 6850
 
 	MOS6522(config, m_via0, XTAL(4'000'000) / 4);
 
 	MOS6522(config, m_via1, XTAL(4'000'000) / 4);
 
-	mos6551_device &uart(MOS6551(config, "uart", 0));
+	mos6551_device &uart(MOS6551(config, "uart"));
 	uart.set_xtal(XTAL(1'843'200));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(ec65_state::kbd_put));
 }
 
@@ -251,7 +251,7 @@ void ec65k_state::ec65k(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &ec65k_state::ec65k_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 200);
@@ -268,7 +268,7 @@ void ec65k_state::ec65k(machine_config &config)
 	crtc.set_update_row_callback(FUNC(ec65k_state::crtc_update_row));
 
 	/* devices */
-	ACIA6850(config, "fdc", 0); // used as a FDC on separate card
+	ACIA6850(config, "fdc"); // used as a FDC on separate card
 	PIA6821(config, "pia"); // assists 6850
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
@@ -277,10 +277,10 @@ void ec65k_state::ec65k(machine_config &config)
 	PIA6821(config, m_pia0);
 	PIA6821(config, m_pia1);
 
-	mos6551_device &uart(MOS6551(config, "uart", 0));
+	mos6551_device &uart(MOS6551(config, "uart"));
 	uart.set_xtal(XTAL(1'843'200));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(ec65k_state::kbd_put));
 }
 

@@ -105,7 +105,7 @@ NOTES:
       Keycus numbers with unknown games may not exist.
       There might be more games, possibly only released in Japan.
       Pacman's Arcade Party Arcade Version includes the following games....
-        Pacman, Galaga, Galaxian, Xevious, Bosconian, Dragon Spirit, Rolling Thunder, Dig Dug, Pacmania, Mappy, Rally X, Galaga 88.
+        Pacman, Galaga, Galaxian, Xevious, Bosconian, Dragon Spirit, Rolling Thunder, Dig Dug, Pacmania, Mappy, Rally-X, Galaga 88.
       Pacman's Arcade Party Home Version included all the above games with the addition of Ms. Pacman.
       Pac-Man Battle Royale CHOMPionship is confirmed to be PC-based (i.e. not S147/148).
       The Sea Story board configuration is unknown. The cabinet is square with two players on each side so it might consist of 8 System 147/148 boards and they are definitely networked together.
@@ -532,7 +532,7 @@ void namcos14x_state::system14x(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos14x_state::program_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(namcos14x_state::screen_update));
 	screen.set_size(640, 480);

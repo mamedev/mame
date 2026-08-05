@@ -65,7 +65,7 @@ void luna_68k_bm_device::device_add_mconfig(machine_config &config)
 
 	BT458(config, m_dac, 108_MHz_XTAL);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(108_MHz_XTAL, 1728, 0, 1280, 1056, 0, 1024);
 	m_screen->set_screen_update(FUNC(luna_68k_bm_device::screen_update));
 	m_screen->set_palette(m_dac);

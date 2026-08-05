@@ -40,8 +40,11 @@ void pk8020_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	if (!BIT(offset, 7))
 	{
+		if ((m_bank_select ^ data) & 0xfc)
+		{
+			logerror("%s: Bank select = %02X (raw %02X)\n", machine().describe_context(), (data >> 2) & 0x1f, data & 0xfc);
+		}
 		m_bank_select = data & 0xfc;
-		logerror("%s: Bank select = %02X\n", machine().describe_context(), (data >> 2) & 0x1f);
 	}
 
 	if (!BIT(offset, 6))
@@ -93,19 +96,14 @@ void pk8020_state::memory_w(offs_t offset, uint8_t data)
 		text_w(offset & 0x3ff, data);
 }
 
-uint8_t pk8020_state::ppi_porta_r()
+uint8_t pk8020_state::iop1_porta_r()
 {
-	return 0xf0 | (m_takt <<1) | (m_text_attr<<3) | ((m_cass->input() > +0.04) ? 1 : 0);
+	return 0xf0 | (m_screen->vblank() << 1) | (m_printer_busy << 2) | (m_text_attr << 3) | ((m_cass->input() > +0.04) ? 1 : 0);
 }
 
 void pk8020_state::floppy_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
-
-	// Turn all motors off
-	for (int n = 0; n < 4; n++)
-		if (m_floppy[n]->get_device())
-			m_floppy[n]->get_device()->mon_w(1);
 
 	for (int n = 0; n < 4; n++)
 		if (BIT(data, n))
@@ -115,20 +113,24 @@ void pk8020_state::floppy_control_w(uint8_t data)
 
 	if (floppy)
 	{
-		floppy->mon_w(0);
+		if (BIT(data, 5))
+		{
+			floppy->mon_w(0);
+			m_inr->ir7_w(CLEAR_LINE);
+			m_timer->adjust(attotime::from_msec(3000));
+		}
 		floppy->ss_w(BIT(data, 4));
 	}
 
-	// todo: at least bit 5 and bit 7 is connected to something too...
 }
 
 
-void pk8020_state::ppi_2_portc_w(uint8_t data)
+void pk8020_state::iop2_portc_w(uint8_t data)
 {
 	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_cass->output(levels[data & 3]);
 
-	m_sound_gate = BIT(data,3);
+	m_sound_gate = BIT(data, 3);
 	m_speaker->level_w(m_sound_gate ? m_sound_level : 0);
 
 	m_printer->write_select(!BIT(data, 4));
@@ -183,12 +185,25 @@ void pk8020_state::log_bank_select(uint8_t bank, offs_t start, offs_t end, uint8
 		logerror("Bank select %02X, %04X-%04Xh: read %s (%02X), write %s (%02X)\n", bank, start, end, plm_select_name(rdecplm), rdecplm, plm_select_name(wdecplm), wdecplm);
 }
 
+TIMER_CALLBACK_MEMBER(pk8020_state::timer_tick)
+{
+	m_inr->ir7_w(ASSERT_LINE);
+
+	// Turn all motors off
+	for (int n = 0; n < 4; n++)
+		if (m_floppy[n]->get_device())
+			m_floppy[n]->get_device()->mon_w(1);
+}
+
 void pk8020_state::machine_start()
 {
 	m_ios[0]->write_cts(0);
 	m_ios[1]->write_cts(0);
 	m_ios[1]->write_dsr(0);
 	m_takt = 0;
+
+	m_timer = timer_alloc(FUNC(pk8020_state::timer_tick), this);
+	m_timer->adjust(attotime::never, 0, attotime::never);
 
 	save_item(NAME(m_bank_select));
 	save_item(NAME(m_takt));

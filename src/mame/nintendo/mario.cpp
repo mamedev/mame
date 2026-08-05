@@ -26,11 +26,12 @@ darker, for some reason they removed the blue text shadowing, and Mario's
 overall was changed from blue to black. The 1st half of the color PROM is
 unchanged (in other words, it looks the same with the default monitor).
 
-Japan revision C is from around the same time as US revision E. marioja is
-a very early version.
+Japan revision C is from around the same time as US revision E. The marioja
+set is a very early version, eg. it has a different demonstration screen, and
+Mario continues running when letting go of the joystick.
 
 The sound MCU can be easily replaced with a ROMless one such as I8039
-(or just force EA high), by doing a 1-byte patch to the external ROM:
+(or just force EA high), by doing a 1-byte patch to the external ROM 6K:
 offset $01: change $00 to $01 (call $100 -> call $101)
 
 TODO:
@@ -39,6 +40,9 @@ TODO:
 - draw_sprites should adopt the scanline logic from dkong, the schematics have
   the same logic for sprite buffering
 - a lot of soundlatch warnings in error.log, it's probably harmless
+- Dump M58715 internal ROM. The EA pin dumping method does not work, is the
+  MCU read protected? It's probably a small initialization routine, followed
+  by a jump to external ROM. MAME has a fake bootstrap for now.
 
 BTANB:
 - erratic line at top when scrolling down "Mario Bros" title is confirmed
@@ -72,7 +76,7 @@ read:
  *
 *
  * IN1 (bits NOT inverted)
- * bit 7 : ?
+ * bit 7 : ? SL 2
  * bit 6 : COIN 2
  * bit 5 : COIN 1
  * bit 4 : JUMP player 2
@@ -145,9 +149,7 @@ public:
 		m_palette(*this, "palette"),
 		m_z80dma(*this, "z80dma"),
 		m_soundlatch(*this, "soundlatch%u", 0),
-		m_audio_snd0(*this, "snd_nl:snd0"),
-		m_audio_snd1(*this, "snd_nl:snd1"),
-		m_audio_snd7(*this, "snd_nl:snd7"),
+		m_audio_snd(*this, { { "snd_nl:snd0", "snd_nl:snd1", "snd_nl:snd7" } }),
 		m_audio_dac(*this, "snd_nl:dac"),
 		m_soundrom(*this, "soundrom"),
 		m_spriteram(*this, "spriteram"),
@@ -155,7 +157,6 @@ public:
 	{ }
 
 	void mario_base(machine_config &config);
-	void masao(machine_config &config);
 	void mario(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(adjust_palette) { set_palette(newval); }
@@ -167,41 +168,12 @@ protected:
 	virtual void sound_start() override ATTR_COLD;
 	virtual void sound_reset() override ATTR_COLD;
 
-private:
-	// devices
-	required_device<z80_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<z80dma_device> m_z80dma;
-	optional_device_array<generic_latch_8_device, 4> m_soundlatch;
-	optional_device<netlist_mame_logic_input_device> m_audio_snd0;
-	optional_device<netlist_mame_logic_input_device> m_audio_snd1;
-	optional_device<netlist_mame_logic_input_device> m_audio_snd7;
-	optional_device<netlist_mame_int_input_device> m_audio_dac;
-
-	// memory pointers
-	optional_region_ptr<uint8_t> m_soundrom;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_videoram;
-
-	// video state
-	uint8_t m_gfx_bank = 0;
-	uint8_t m_palette_bank = 0;
-	tilemap_t *m_bg_tilemap = nullptr;
-
-	// misc
-	uint8_t m_irq_clock = 0;
-	bool m_nmi_mask = false;
-	bool m_z80_sync = false;
-
 	// handlers
-	uint8_t mario_sh_tune_r(offs_t offset);
-	void mario_sh_sound_w(uint8_t data);
-	void masao_sh_irqtrigger_w(uint8_t data);
-	void mario_sh1_w(uint8_t data) { m_audio_snd0->write(data); }
-	void mario_sh2_w(uint8_t data) { m_audio_snd1->write(data); }
-	void mario_sh3_w(offs_t offset, uint8_t data);
+	uint8_t tune_r(offs_t offset);
+	void dac_w(uint8_t data) { m_audio_dac->write(data); }
+	TIMER_CALLBACK_MEMBER(walk_off) { m_audio_snd[param & 1]->write(1); }
+	template<int N> void walk_w(uint8_t data);
+	void samples_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void set_palette(int monitor);
@@ -220,14 +192,61 @@ private:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
+	// address maps
 	void base_map(address_map &map) ATTR_COLD;
 	void mario_map(address_map &map) ATTR_COLD;
-	void masao_map(address_map &map) ATTR_COLD;
 	void mario_io_map(address_map &map) ATTR_COLD;
 
 	void mario_sound_map(address_map &map) ATTR_COLD;
 	void mario_sound_io_map(address_map &map) ATTR_COLD;
+
+	// devices
+	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<z80dma_device> m_z80dma;
+	optional_device_array<generic_latch_8_device, 4> m_soundlatch;
+	optional_device_array<netlist_mame_logic_input_device, 3> m_audio_snd;
+	optional_device<netlist_mame_int_input_device> m_audio_dac;
+
+	// memory pointers
+	optional_region_ptr<uint8_t> m_soundrom;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+
+	// video state
+	uint8_t m_gfx_bank = 0;
+	uint8_t m_palette_bank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	// misc
+	bool m_nmi_mask = false;
+	bool m_z80_sync = false;
+	emu_timer *m_walk_timer[2] = { };
+};
+
+// different sound hardware
+class masao_state : public mario_state
+{
+public:
+	masao_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mario_state(mconfig, type, tag)
+	{ }
+
+	void masao(machine_config &config);
+
+protected:
+	virtual void sound_start() override ATTR_COLD;
+	virtual void sound_reset() override ATTR_COLD;
+
+private:
+	void soundirq_w(uint8_t data);
+
+	void masao_map(address_map &map) ATTR_COLD;
 	void masao_sound_map(address_map &map) ATTR_COLD;
+
+	bool m_soundirq = false;
 };
 
 
@@ -258,26 +277,40 @@ void mario_state::machine_reset()
 
 void mario_state::sound_start()
 {
-	if (m_audiocpu->type() != Z80)
-	{
-		uint8_t *SND = memregion("audiocpu")->base();
+	for (int i = 0; i < 2; i++)
+		m_walk_timer[i] = timer_alloc(FUNC(mario_state::walk_off), this);
 
-		// Hack to bootstrap MCU program into external MB1
-		SND[0x0000] = 0xf5;
-		SND[0x0001] = 0x04;
-		SND[0x0002] = 0x00;
-	}
+	// Hack to bootstrap MCU program into external MB1
+	uint8_t *SND = memregion("audiocpu")->base();
 
-	save_item(NAME(m_irq_clock));
+	SND[0x0000] = 0xf5; // sel mb1
+	SND[0x0001] = 0x04; // jmp 0
+	SND[0x0002] = 0x00;
 }
 
 void mario_state::sound_reset()
 {
 	m_soundlatch[0]->clear_w();
-	if (m_soundlatch[1]) m_soundlatch[1]->clear_w();
-	if (m_soundlatch[3]) m_soundlatch[3]->clear_w();
+	m_soundlatch[1]->clear_w();
+	m_soundlatch[3]->clear_w();
 
-	m_irq_clock = 0;
+	m_audio_snd[0]->write(1);
+	m_audio_snd[1]->write(1);
+}
+
+void masao_state::sound_start()
+{
+	//mario_state::sound_start(); // don't
+
+	save_item(NAME(m_soundirq));
+}
+
+void masao_state::sound_reset()
+{
+	//mario_state::sound_reset(); // don't
+
+	m_soundlatch[0]->clear_w();
+	m_soundirq = false;
 }
 
 
@@ -287,7 +320,7 @@ void mario_state::sound_reset()
  *
  *************************************/
 
-uint8_t mario_state::mario_sh_tune_r(offs_t offset)
+uint8_t mario_state::tune_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -306,24 +339,16 @@ uint8_t mario_state::mario_sh_tune_r(offs_t offset)
 		return m_soundrom[(p2 & 0x0f) << 8 | offset];
 }
 
-void mario_state::mario_sh_sound_w(uint8_t data)
+template<int N>
+void mario_state::walk_w(uint8_t data)
 {
-	m_audio_dac->write(data);
+	m_audio_snd[N]->write(0);
+
+	// WR is asserted for 3 cycles
+	m_walk_timer[N]->adjust(attotime::from_ticks(3, m_maincpu->clock()), N);
 }
 
-void mario_state::masao_sh_irqtrigger_w(uint8_t data)
-{
-	data &= 1;
-
-	// setting bit 0 high then low triggers IRQ on the sound CPU
-	if (m_irq_clock && !data)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-
-	m_irq_clock = data;
-}
-
-
-void mario_state::mario_sh3_w(offs_t offset, uint8_t data)
+void mario_state::samples_w(offs_t offset, uint8_t data)
 {
 	data &= 1;
 
@@ -352,9 +377,20 @@ void mario_state::mario_sh3_w(offs_t offset, uint8_t data)
 
 		// skid
 		case 7:
-			m_audio_snd7->write(data ^ 1);
+			m_audio_snd[2]->write(data ^ 1);
 			break;
 	}
+}
+
+void masao_state::soundirq_w(uint8_t data)
+{
+	data &= 1;
+
+	// setting bit 0 high then low triggers IRQ on the sound CPU
+	if (m_soundirq && !data)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+
+	m_soundirq = bool(data);
 }
 
 
@@ -495,21 +531,21 @@ void mario_state::scroll_w(uint8_t data)
 
 void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const bool flip = flip_screen();
+	const uint8_t flip = flip_screen() ? 0xff : 0;
 	int offs = 0;
 
 	while (offs != m_spriteram.bytes())
 	{
 		if (m_spriteram[offs])
 		{
-			// from schematics ....
+			// from schematics...
 			int y = (m_spriteram[offs + 0] + (flip ? 0xf7 : 0xf9) + 1) & 0xff;
 			int x = m_spriteram[offs + 3];
 			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
 			y = 240 - y; // logical screen position
 
-			y = y ^ (flip ? 0xff : 0x00); // physical screen location
-			x = x ^ (flip ? 0xff : 0x00); // physical screen location
+			y ^= flip; // physical screen location
+			x ^= flip; // physical screen location
 
 			int code = m_spriteram[offs + 2];
 			int color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank;
@@ -520,6 +556,8 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				y -= 14;
 				x -= 7;
+				flipx = !flipx;
+				flipy = !flipy;
 			}
 			else
 			{
@@ -527,22 +565,11 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				x -= 8;
 			}
 
-			if (flip)
-			{
-				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-					code,
-					color,
-					!flipx, !flipy,
-					x, y, 0);
-			}
-			else
-			{
-				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 					code,
 					color,
 					flipx, flipy,
 					x, y, 0);
-			}
 		}
 
 		offs += 4;
@@ -625,15 +652,15 @@ void mario_state::base_map(address_map &map)
 void mario_state::mario_map(address_map &map)
 {
 	base_map(map);
-	map(0x7c00, 0x7c00).w(FUNC(mario_state::mario_sh1_w)); // Mario run sample
-	map(0x7c80, 0x7c80).w(FUNC(mario_state::mario_sh2_w)); // Luigi run sample
-	map(0x7f00, 0x7f07).w(FUNC(mario_state::mario_sh3_w)); // misc samples
+	map(0x7c00, 0x7c00).w(FUNC(mario_state::walk_w<0>)); // Mario walk sample
+	map(0x7c80, 0x7c80).w(FUNC(mario_state::walk_w<1>)); // Luigi walk sample
+	map(0x7f00, 0x7f07).w(FUNC(mario_state::samples_w)); // misc samples
 }
 
-void mario_state::masao_map(address_map &map)
+void masao_state::masao_map(address_map &map)
 {
 	base_map(map);
-	map(0x7f00, 0x7f00).w(FUNC(mario_state::masao_sh_irqtrigger_w));
+	map(0x7f00, 0x7f00).w(FUNC(masao_state::soundirq_w));
 }
 
 void mario_state::mario_io_map(address_map &map)
@@ -651,10 +678,10 @@ void mario_state::mario_sound_map(address_map &map)
 
 void mario_state::mario_sound_io_map(address_map &map)
 {
-	map(0x00, 0xff).r(FUNC(mario_state::mario_sh_tune_r)).w(FUNC(mario_state::mario_sh_sound_w));
+	map(0x00, 0xff).r(FUNC(mario_state::tune_r)).w(FUNC(mario_state::dac_w));
 }
 
-void mario_state::masao_sound_map(address_map &map)
+void masao_state::masao_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x23ff).ram();
@@ -688,7 +715,7 @@ static INPUT_PORTS_START( mario )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
@@ -828,7 +855,7 @@ void mario_state::mario_base(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(mario_state::screen_update));
 	screen.set_palette(m_palette);
@@ -858,28 +885,26 @@ void mario_state::mario(machine_config &config)
 	for (int i = 0; i < 4; i++)
 		GENERIC_LATCH_8(config, m_soundlatch[i]);
 
-	NETLIST_SOUND(config, "snd_nl", 48000)
-		.set_source(netlist_mario)
-		.add_route(ALL_OUTPUTS, "mono", 0.5);
+	NETLIST_SOUND(config, "snd_nl", 48000).set_source(netlist_mario).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	NETLIST_LOGIC_INPUT(config, m_audio_snd0, "SOUND0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_audio_snd1, "SOUND1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_audio_snd7, "SOUND7.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_snd[0], "SOUND0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_snd[1], "SOUND1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_snd[2], "SOUND7.IN", 0);
 	NETLIST_INT_INPUT(config, m_audio_dac, "DAC.VAL", 0, 255);
 
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(150000.0 / 32768.0, 0.0);
 }
 
-void mario_state::masao(machine_config &config)
+void masao_state::masao(machine_config &config)
 {
 	mario_base(config);
 
 	m_maincpu->set_clock(4'000'000); // 4MHz?
-	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::masao_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &masao_state::masao_map);
 
 	// sound hardware
 	Z80(config, m_audiocpu, 14'318'181 / 8); // 1.79MHz?
-	m_audiocpu->set_addrmap(AS_PROGRAM, &mario_state::masao_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &masao_state::masao_sound_map);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1097,4 +1122,4 @@ GAME( 1983, mariog,  mario, mario, mario,  mario_state, empty_init, ROT0, "Ninte
 GAME( 1983, mariof,  mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, revision F)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioj,  mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, revision C)", MACHINE_SUPPORTS_SAVE ) // probably newer than US revision E
 GAME( 1983, marioja, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, older)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,   mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,   mario, masao, mario,  masao_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )

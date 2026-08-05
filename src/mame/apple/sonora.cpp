@@ -51,9 +51,9 @@ void sonora_device::map(address_map &map)
 	map(0x00000000, 0x000fffff).r(FUNC(sonora_device::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x10000000, 0x10001fff).rw(FUNC(sonora_device::mac_via_r), FUNC(sonora_device::mac_via_w)).mirror(0x00fc0000);
-	map(0x10014000, 0x10015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
+	map(0x10014000, 0x10015fff).rw(m_asc, FUNC(asc_sonora_device::read), FUNC(asc_sonora_device::write)).mirror(0x00f00000);
 	map(0x10016000, 0x10017fff).rw(FUNC(sonora_device::swim_r), FUNC(sonora_device::swim_w)).mirror(0x00f00000);
-	map(0x10026000, 0x10027fff).rw(m_pseudovia, FUNC(pseudovia_device::read), FUNC(pseudovia_device::write)).mirror(0x00f00000);
+	map(0x10026000, 0x10027fff).rw(m_pseudovia, FUNC(sonora_pseudovia_device::read), FUNC(sonora_pseudovia_device::write)).mirror(0x00f00000);
 	map(0x10f24000, 0x10f24003).rw(m_video, FUNC(mac_video_sonora_device::dac_r), FUNC(mac_video_sonora_device::dac_w));
 	map(0x10f28000, 0x10f28007).rw(m_video, FUNC(mac_video_sonora_device::vctrl_r), FUNC(mac_video_sonora_device::vctrl_w));
 
@@ -67,7 +67,7 @@ void sonora_device::map(address_map &map)
 void sonora_device::device_add_mconfig(machine_config &config)
 {
 	MAC_VIDEO_SONORA(config, m_video);
-	m_video->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));
+	m_video->screen_vblank().set(m_pseudovia, FUNC(sonora_pseudovia_device::slot_irq_w<0x40>));
 
 	R65NC22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(sonora_device::via_in_a));
@@ -77,13 +77,13 @@ void sonora_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(sonora_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(sonora_device::via1_irq));
 
-	APPLE_PSEUDOVIA(config, m_pseudovia, C15M);
+	APPLE_SONORA_PSEUDOVIA(config, m_pseudovia, C15M);
 	m_pseudovia->irq_callback().set(FUNC(sonora_device::via2_irq));
 
-	ASC(config, m_asc, C15M, asc_device::asc_type::SONORA);
+	ASC_SONORA(config, m_asc, C15M);
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
-	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
+	m_asc->irqf_callback().set(m_pseudovia, FUNC(sonora_pseudovia_device::asc_irq_w));
 
 	SWIM2(config, m_fdc, C15M);
 	m_fdc->devsel_cb().set(FUNC(sonora_device::devsel_w));

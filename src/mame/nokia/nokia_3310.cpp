@@ -688,7 +688,7 @@ void noki3310_state::noki3310(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &noki3310_state::noki3310_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD, rgb_t::white()));
+	screen_device &screen(SCREEN(config, "screen").set_lcd().set_color(rgb_t::white()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(84, 48);
@@ -698,7 +698,7 @@ void noki3310_state::noki3310(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	PCD8544(config, m_pcd8544, 0);
+	PCD8544(config, m_pcd8544);
 	m_pcd8544->set_screen_update_cb(FUNC(noki3310_state::pcd8544_screen_update));
 
 	INTEL_TE28F160(config, "flash");

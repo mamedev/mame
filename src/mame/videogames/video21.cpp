@@ -47,7 +47,8 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void video21(machine_config &config);
+	void video21(machine_config &config) ATTR_COLD;
+
 	int hopper_coinout_r() { return m_hopper_coin; }
 
 protected:
@@ -84,8 +85,6 @@ private:
 void video21_state::machine_start()
 {
 	m_hopper_timer = timer_alloc(FUNC(video21_state::hopper_coinout), this);
-
-	m_lamps.resolve();
 
 	// register for savestates
 	save_item(NAME(m_hopper_motor));
@@ -275,7 +274,7 @@ void video21_state::video21(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(20.79_MHz_XTAL / 4, 330, 0, 32*8, 315, 0, 28*8); // parameters guessed
 	screen.set_screen_update(FUNC(video21_state::screen_update));
 	screen.set_palette("palette");
@@ -285,7 +284,7 @@ void video21_state::video21(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

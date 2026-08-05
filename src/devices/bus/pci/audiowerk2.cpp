@@ -67,7 +67,9 @@ void audiowerk2_device::device_start()
 
 	// INTA#
 	intr_pin = 1;
-	// TODO: PCI regs 0x3e/0x3f max_lat = 0x26, min_gnt = 0x0f
+	// min_gnt = 3.75 usec, max_lat = 9.5 usec
+	minimum_grant = 0x0f;
+	maximum_latency = 0x26;
 }
 
 void audiowerk2_device::device_reset()

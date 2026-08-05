@@ -386,11 +386,11 @@ void tsispch_state::prose2k(machine_config &config)
 	m_dsp->p1().set(FUNC(tsispch_state::dsp_to_8086_p1_w));
 
 	/* PIC 8259 */
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* uarts */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

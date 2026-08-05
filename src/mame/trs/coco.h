@@ -77,7 +77,7 @@ public:
 	coco_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	// driver update handlers
-	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 
 	// IO
@@ -120,9 +120,8 @@ public:
 	void coco_floating_map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
@@ -138,7 +137,7 @@ protected:
 	ram_device &ram() { return *m_ram; }
 
 	// miscellaneous
-	virtual void update_keyboard_input(uint8_t value);
+	void update_keyboard_input(uint8_t value);
 	virtual void cart_w(bool state);
 	virtual void update_cart_base(uint8_t *cart_base) { }
 

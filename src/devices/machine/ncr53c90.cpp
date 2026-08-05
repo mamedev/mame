@@ -151,8 +151,8 @@ void ncr53cf94_device::write(offs_t offset, uint8_t data)
 }
 
 ncr53c90_device::ncr53c90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nscsi_device(mconfig, type, tag, owner, clock)
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
+	: device_t(mconfig, type, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
 	, select_timeout(0), seq(0), tcount(0), tcounter(0), tcounter_mask(0xffff), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), dma_dir(0), irq(false), drq(false), test_mode(false), stepping(0)
 	, m_irq_handler(*this)
@@ -213,8 +213,6 @@ ncr53cf96_device::ncr53cf96_device(const machine_config &mconfig, const char *ta
 
 void ncr53c90_device::device_start()
 {
-	nscsi_device::device_start();
-
 	save_item(NAME(command));
 	save_item(NAME(config));
 	save_item(NAME(status));
@@ -261,12 +259,12 @@ void ncr53c90_device::device_reset()
 	m_irq_handler(irq);
 
 	state = IDLE;
-	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	drq = false;
 	test_mode = false;
 	m_drq_handler(drq);
 
-	scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_RST);
 	tcount = 0;
 	tcounter = 0;
 	tcounter_mask = 0xffff;
@@ -276,7 +274,7 @@ void ncr53c90_device::device_reset()
 
 void ncr53c90_device::reset_disconnect()
 {
-	scsi_bus->ctrl_w(scsi_refid, 0, ~S_RST);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, ~S_RST);
 
 	command_pos = 0;
 	memset(command, 0, sizeof(command));
@@ -285,7 +283,7 @@ void ncr53c90_device::reset_disconnect()
 
 void ncr53c90_device::scsi_ctrl_changed()
 {
-	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t ctrl = m_scsi_bus->ctrl_r();
 	if(ctrl & S_RST) {
 		LOG("scsi bus reset\n");
 		return;
@@ -303,8 +301,8 @@ TIMER_CALLBACK_MEMBER(ncr53c90_device::update_tick)
 
 void ncr53c90_device::step(bool timeout)
 {
-	uint32_t ctrl = scsi_bus->ctrl_r();
-	uint32_t data = scsi_bus->data_r();
+	uint32_t ctrl = m_scsi_bus->ctrl_r();
+	uint32_t data = m_scsi_bus->data_r();
 	uint8_t c     = command[0] & 0x7f;
 
 	LOGMASKED(LOG_STATE, "state=%d.%d %s @ %s\n",
@@ -325,7 +323,7 @@ void ncr53c90_device::step(bool timeout)
 
 	case BUSRESET_WAIT_INT:
 		state = IDLE;
-		scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_RST);
 		reset_disconnect();
 
 		if (!(config & 0x40)) {
@@ -341,13 +339,13 @@ void ncr53c90_device::step(bool timeout)
 
 		int win;
 		for(win=7; win>=0 && !(data & (1<<win)); win--) {};
-		if(win != scsi_id) {
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+		if(win != m_scsi_id) {
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 			fatalerror("ncr53c90_device::step need to wait for bus free\n");
 		}
 		state = (state & STATE_MASK) | (ARB_ASSERT_SEL << SUB_SHIFT);
-		scsi_bus->ctrl_w(scsi_refid, S_SEL, S_SEL);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_SEL, S_SEL);
 		delay(6);
 		break;
 	}
@@ -356,7 +354,7 @@ void ncr53c90_device::step(bool timeout)
 		if(!timeout)
 			break;
 
-		scsi_bus->data_w(scsi_refid, (1<<scsi_id) | (1<<bus_id));
+		m_scsi_bus->data_w(m_scsi_refid, (1<<m_scsi_id) | (1<<bus_id));
 		state = (state & STATE_MASK) | (ARB_SET_DEST << SUB_SHIFT);
 		delay_cycles(4);
 		break;
@@ -366,7 +364,7 @@ void ncr53c90_device::step(bool timeout)
 			break;
 
 		state = (state & STATE_MASK) | (ARB_RELEASE_BUSY << SUB_SHIFT);
-		scsi_bus->ctrl_w(scsi_refid, c == CD_SELECT_ATN || c == CD_SELECT_ATN_STOP ? S_ATN : 0, S_ATN|S_BSY);
+		m_scsi_bus->ctrl_w(m_scsi_refid, c == CD_SELECT_ATN || c == CD_SELECT_ATN_STOP ? S_ATN : 0, S_ATN|S_BSY);
 		delay(2);
 		break;
 
@@ -377,7 +375,7 @@ void ncr53c90_device::step(bool timeout)
 		if(ctrl & S_BSY) {
 			state = (state & STATE_MASK) | (ARB_DESKEW_WAIT << SUB_SHIFT);
 			if(c == CD_RESELECT)
-				scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 			delay_cycles(2);
 		} else {
 			state = (state & STATE_MASK) | (ARB_TIMEOUT_BUSY << SUB_SHIFT);
@@ -393,8 +391,8 @@ void ncr53c90_device::step(bool timeout)
 		if(!timeout)
 			break;
 
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_SEL);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
 
 		if(c == CD_RESELECT) {
 			LOG("mode switch to Target\n");
@@ -409,14 +407,14 @@ void ncr53c90_device::step(bool timeout)
 
 	case ARB_TIMEOUT_BUSY << SUB_SHIFT:
 		if(timeout) {
-			scsi_bus->data_w(scsi_refid, 0);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
 			LOG("select timeout\n");
 			state = (state & STATE_MASK) | (ARB_TIMEOUT_ABORT << SUB_SHIFT);
 			delay(1000);
 		} else if(ctrl & S_BSY) {
 			state = (state & STATE_MASK) | (ARB_DESKEW_WAIT << SUB_SHIFT);
 			if(c == CD_RESELECT)
-				scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 			delay_cycles(2);
 		}
 		break;
@@ -428,10 +426,10 @@ void ncr53c90_device::step(bool timeout)
 		if(ctrl & S_BSY) {
 			state = (state & STATE_MASK) | (ARB_DESKEW_WAIT << SUB_SHIFT);
 			if(c == CD_RESELECT)
-				scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 			delay_cycles(2);
 		} else {
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 			state = IDLE;
 			istatus |= I_DISCONNECT;
 			reset_disconnect();
@@ -451,8 +449,8 @@ void ncr53c90_device::step(bool timeout)
 		if(ctrl & S_REQ)
 			break;
 		state = state & STATE_MASK;
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		step(false);
 		break;
 
@@ -470,7 +468,7 @@ void ncr53c90_device::step(bool timeout)
 
 		if((state & STATE_MASK) != INIT_XFR_RECV_PAD)
 		{
-			fifo_push(scsi_bus->data_r());
+			fifo_push(m_scsi_bus->data_r());
 			// in async mode data in phase in initiator mode, tcount is decremented on ACKO, not DACK
 			if ((mode == MODE_I) && (sync_offset == 0) && ((ctrl & S_PHASE_MASK) == S_PHASE_DATA_IN))
 			{
@@ -479,7 +477,7 @@ void ncr53c90_device::step(bool timeout)
 				check_drq();
 			}
 		}
-		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		state = (state & STATE_MASK) | (RECV_WAIT_REQ_0 << SUB_SHIFT);
 		step(false);
 		break;
@@ -516,7 +514,7 @@ void ncr53c90_device::step(bool timeout)
 		} else
 			state = DISC_SEL_ATN_WAIT_REQ;
 
-		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+		m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 		step(false);
 		break;
 
@@ -528,7 +526,7 @@ void ncr53c90_device::step(bool timeout)
 			break;
 		}
 		if(c == CD_SELECT_ATN)
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN);
 		state = DISC_SEL_ATN_SEND_BYTE;
 		send_byte();
 		break;
@@ -551,7 +549,7 @@ void ncr53c90_device::step(bool timeout)
 				seq = 4;
 			else
 				seq = 2;
-			scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
+			m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_REQ);
 			function_bus_complete();
 			break;
 		}
@@ -573,7 +571,7 @@ void ncr53c90_device::step(bool timeout)
 
 	case INIT_CPT_RECV_BYTE_ACK:
 		state = INIT_CPT_RECV_WAIT_REQ;
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		step(false);
 		break;
 
@@ -616,7 +614,7 @@ void ncr53c90_device::step(bool timeout)
 
 			// if it's the last message byte, deassert ATN before sending
 			if (xfr_phase == S_PHASE_MSG_OUT && remaining_bytes == 1)
-				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN);
 
 			send_byte();
 			break;
@@ -636,7 +634,7 @@ void ncr53c90_device::step(bool timeout)
 			break;
 
 		default:
-			LOG("xfer on phase %d\n", scsi_bus->ctrl_r() & S_PHASE_MASK);
+			LOG("xfer on phase %d\n", m_scsi_bus->ctrl_r() & S_PHASE_MASK);
 			function_complete();
 			break;
 		}
@@ -669,7 +667,7 @@ void ncr53c90_device::step(bool timeout)
 
 	case INIT_XFR_RECV_BYTE_ACK:
 		state = INIT_XFR_WAIT_REQ;
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		step(false);
 		break;
 
@@ -732,7 +730,7 @@ void ncr53c90_device::step(bool timeout)
 		decrement_tcounter();
 		if(!(status & S_TC0)) {
 			state = INIT_XFR_RECV_PAD_WAIT_REQ;
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			step(false);
 		} else
 			function_complete();
@@ -754,19 +752,19 @@ void ncr53c90_device::send_byte()
 	if((state & STATE_MASK) != INIT_XFR_SEND_PAD) {
 		if(!fifo_pos)
 			fatalerror("ncr53c90_device::send_byte - !fifo_pos\n");
-		scsi_bus->data_w(scsi_refid, fifo_pop());
+		m_scsi_bus->data_w(m_scsi_refid, fifo_pop());
 	}
 	else
-		scsi_bus->data_w(scsi_refid, 0);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
 
-	scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
-	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 	delay_cycles(sync_period);
 }
 
 void ncr53c90_device::recv_byte()
 {
-	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 	state = (state & STATE_MASK) | (RECV_WAIT_REQ_1 << SUB_SHIFT);
 	step(false);
 }
@@ -967,7 +965,7 @@ void ncr53c90_device::start_command()
 	case CM_RESET_BUS:
 		LOGMASKED(LOG_COMMAND, "Reset SCSI bus\n");
 		state = BUSRESET_WAIT_INT;
-		scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 		delay(130);
 		break;
 
@@ -1004,7 +1002,7 @@ void ncr53c90_device::start_command()
 	case CI_XFER:
 		LOGMASKED(LOG_COMMAND, "Transfer information\n");
 		state = INIT_XFR;
-		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+		xfr_phase = m_scsi_bus->ctrl_r() & S_PHASE_MASK;
 		dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
 		check_drq();
 		step(false);
@@ -1026,30 +1024,30 @@ void ncr53c90_device::start_command()
 		// after ACK is asserted the device disconnects and the INIT_MSG_WAIT_REQ state is never
 		// entered, meaning we end up with I_DISCONNECT instead of I_BUS interrupt status.
 		seq = 2;
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		step(false);
 		break;
 
 	case CI_PAD:
 		LOGMASKED(LOG_COMMAND, "Transfer pad\n");
-		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+		xfr_phase = m_scsi_bus->ctrl_r() & S_PHASE_MASK;
 		if(xfr_phase & S_INP)
 			state = INIT_XFR_RECV_PAD_WAIT_REQ;
 		else
 			state = INIT_XFR_SEND_PAD_WAIT_REQ;
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		step(false);
 		break;
 
 	case CI_SET_ATN:
 		LOGMASKED(LOG_COMMAND, "Set ATN\n");
-		scsi_bus->ctrl_w(scsi_refid, S_ATN, S_ATN);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ATN, S_ATN);
 		command_pop_and_chain();
 		break;
 
 	case CI_RESET_ATN:
 		LOGMASKED(LOG_COMMAND, "Reset ATN\n");
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN);
 		command_pop_and_chain();
 		break;
 
@@ -1073,8 +1071,8 @@ bool ncr53c90_device::check_valid_command(uint8_t cmd)
 void ncr53c90_device::arbitrate()
 {
 	state = (state & STATE_MASK) | (ARB_COMPLETE << SUB_SHIFT);
-	scsi_bus->data_w(scsi_refid, 1 << scsi_id);
-	scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+	m_scsi_bus->data_w(m_scsi_refid, 1 << m_scsi_id);
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 	delay(11);
 }
 
@@ -1089,7 +1087,7 @@ void ncr53c90_device::check_irq()
 
 uint8_t ncr53c90_device::status_r()
 {
-	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t ctrl = m_scsi_bus->ctrl_r();
 	uint8_t res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
 	//LOG("status_r %02x (%s)\n", res, machine().describe_context());
 
@@ -1158,7 +1156,7 @@ uint8_t ncr53c90_device::conf_r()
 void ncr53c90_device::conf_w(uint8_t data)
 {
 	config = data;
-	scsi_id = data & 7;
+	m_scsi_id = data & 7;
 
 	// test mode can only be cleared by hard/soft reset
 	if (data & 0x8)
@@ -1197,7 +1195,7 @@ uint8_t ncr53c90_device::dma_r()
 
 	uint8_t r = fifo_pop();
 
-	if ((sync_offset != 0) || ((scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+	if ((sync_offset != 0) || ((m_scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
 	{
 		decrement_tcounter();
 	}
@@ -1289,7 +1287,7 @@ void ncr53c90a_device::device_reset()
 
 uint8_t ncr53c90a_device::status_r()
 {
-	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t ctrl = m_scsi_bus->ctrl_r();
 	uint8_t res = (irq ? S_INTERRUPT : 0) | status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
 	//LOG("status_r %02x (%s)\n", res, machine().describe_context());
 	if (irq && !machine().side_effects_disabled())
@@ -1339,7 +1337,7 @@ u16 ncr53c94_device::dma16_r()
 		memmove(fifo, fifo + 2, fifo_pos);
 
 		// update drq
-		if ((sync_offset != 0) || ((scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+		if ((sync_offset != 0) || ((m_scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
 		{
 			decrement_tcounter(2);
 		}

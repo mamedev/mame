@@ -757,79 +757,79 @@ license:CC0-1.0
 	<element ref="dark_round_button" inputtag="CPL_SEG7" inputmask="0x08"><!-- screen button: exit --><bounds x="889" y="362" width="29" height="29"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x01"><bounds x="227" y="477" width="37" height="21"/></element>
-	<element name="CPL_1" ref="green_led"><!-- COMPOSER: MEMORY --><bounds x="242" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_1" ref="green_led"><!-- COMPOSER: MEMORY --><bounds x="242" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x02"><bounds x="262" y="477" width="37" height="21"/></element>
-	<element name="CPL_2" ref="green_led"><!-- COMPOSER: MENU --><bounds x="277" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_2" ref="green_led"><!-- COMPOSER: MENU --><bounds x="277" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x04"><bounds x="297" y="477" width="37" height="21"/></element>
-	<element name="CPL_3" ref="green_led"><!-- SOUND ARRANGER: SET --><bounds x="312" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_3" ref="green_led"><!-- SOUND ARRANGER: SET --><bounds x="312" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x08"><bounds x="332" y="477" width="37" height="21"/></element>
-	<element name="CPL_4" ref="green_led"><!-- SOUND ARRANGER: ON/OFF --><bounds x="348" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_4" ref="green_led"><!-- SOUND ARRANGER: ON/OFF --><bounds x="348" y="469" width="5" height="5"/></element>
 
 	<element id="tempo_program_encoder" ref="tempo_encoder"><bounds x="591" y="460" width="91" height="91"/></element>
 	<element id="tempo_program_encoder_finger" ref="tempo_encoder_finger"><bounds x="641" y="512" width="27" height="27"/></element>
 
 	<element ref="light_ellipse_button" inputtag="CPL_SEG1" inputmask="0x10"><bounds x="444" y="455" width="81" height="23"/></element>
-	<element name="CPL_5" ref="green_led"><!-- MUSIC STYLIST: ONE TOUCH PLAY --><bounds x="483" y="448" width="5" height="5"/></element>
+	<element name="cpl_led_5" ref="green_led"><!-- MUSIC STYLIST: ONE TOUCH PLAY --><bounds x="483" y="448" width="5" height="5"/></element>
 
 	<element ref="dark_half_left_ellipse_button" inputtag="CPL_SEG1" inputmask="0x20"><!-- fade in --><bounds x="444" y="500" width="41" height="23"/></element>
-	<element name="CPL_6" ref="green_led"><!-- FADE IN --><bounds x="452" y="497" width="5" height="5"/></element>
+	<element name="cpl_led_6" ref="green_led"><!-- FADE IN --><bounds x="452" y="497" width="5" height="5"/></element>
 
 	<element ref="dark_half_right_ellipse_button" inputtag="CPL_SEG1" inputmask="0x40"><!-- fade out --><bounds x="484" y="500" width="41" height="23"/></element>
-	<element name="CPL_7" ref="green_led"><!-- FADE OUT --><bounds x="513" y="497" width="5" height="5"/></element>
+	<element name="cpl_led_7" ref="green_led"><!-- FADE OUT --><bounds x="513" y="497" width="5" height="5"/></element>
 
-	<element name="CPL_8" ref="red_led"><!-- DISPLAY HOLD --><bounds x="863" y="354" width="5" height="5"/></element>
+	<element name="cpl_led_8" ref="red_led"><!-- DISPLAY HOLD --><bounds x="863" y="354" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x01"><bounds x="95" y="529" width="37" height="21"/></element>
-	<element name="CPL_9" ref="red_led"><!-- U.S. TRAD --><bounds x="111" y="521" width="5" height="5"/></element>
+	<element name="cpl_led_9" ref="red_led"><!-- U.S. TRAD --><bounds x="111" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x02"><bounds x="130" y="529" width="37" height="21"/></element>
-	<element name="CPL_10" ref="red_led"><!-- COUNTRY --><bounds x="146" y="521" width="5" height="5"/></element>
+	<element name="cpl_led_10" ref="red_led"><!-- COUNTRY --><bounds x="146" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x04"><bounds x="165" y="529" width="37" height="21"/></element>
-	<element name="CPL_11" ref="red_led"><!-- LATIN --><bounds x="181" y="521" width="5" height="5"/></element>
+	<element name="cpl_led_11" ref="red_led"><!-- LATIN --><bounds x="181" y="521" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x08"><bounds x="25" y="582" width="37" height="21"/></element>
-	<element name="CPL_12" ref="red_led"><!-- MARCH & WALTZ --><bounds x="41" y="573" width="5" height="5"/></element>
+	<element name="cpl_led_12" ref="red_led"><!-- MARCH & WALTZ --><bounds x="41" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x10"><bounds x="60" y="582" width="37" height="21"/></element>
-	<element name="CPL_13" ref="red_led"><!-- PARTY TIME --><bounds x="76" y="573" width="5" height="5"/></element>
+	<element name="cpl_led_13" ref="red_led"><!-- PARTY TIME --><bounds x="76" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x20"><bounds x="95" y="582" width="37" height="21"/></element>
-	<element name="CPL_14" ref="red_led"><!-- SHOWTIME & TRAD DANCE --><bounds x="111" y="573" width="5" height="5"/></element>
+	<element name="cpl_led_14" ref="red_led"><!-- SHOWTIME & TRAD DANCE --><bounds x="111" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x40"><bounds x="130" y="582" width="37" height="21"/></element>
-	<element name="CPL_15" ref="red_led"><!-- WORLD --><bounds x="146" y="573" width="5" height="5"/></element>
+	<element name="cpl_led_15" ref="red_led"><!-- WORLD --><bounds x="146" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x80"><bounds x="165" y="582" width="37" height="21"/></element>
-	<element name="CPL_16" ref="green_led"><!-- CUSTOM --><bounds x="181" y="573" width="5" height="5"/></element>
+	<element name="cpl_led_16" ref="green_led"><!-- CUSTOM --><bounds x="181" y="573" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x01"><bounds x="25" y="477" width="37" height="21"/></element>
-	<element name="CPL_17" ref="red_led"><!-- STANDARD ROCK --><bounds x="41" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_17" ref="red_led"><!-- STANDARD ROCK --><bounds x="41" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x02"><bounds x="60" y="477" width="37" height="21"/></element>
-	<element name="CPL_18" ref="red_led"><!-- R & ROLL & BLUES --><bounds x="76" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_18" ref="red_led"><!-- R & ROLL & BLUES --><bounds x="76" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x04"><bounds x="95" y="477" width="37" height="21"/></element>
-	<element name="CPL_19" ref="red_led"><!-- POP & BALLAD --><bounds x="111" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_19" ref="red_led"><!-- POP & BALLAD --><bounds x="111" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x08"><bounds x="130" y="477" width="37" height="21"/></element>
-	<element name="CPL_20" ref="red_led"><!-- FUNK & FUSION --><bounds x="146" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_20" ref="red_led"><!-- FUNK & FUSION --><bounds x="146" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x10"><bounds x="165" y="477" width="37" height="21"/></element>
-	<element name="CPL_21" ref="red_led"><!-- SOUL & MODERN DANCE --><bounds x="181" y="469" width="5" height="5"/></element>
+	<element name="cpl_led_21" ref="red_led"><!-- SOUL & MODERN DANCE --><bounds x="181" y="469" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x20"><bounds x="25" y="529" width="37" height="21"/></element>
-	<element name="CPL_22" ref="red_led"><!-- BIG BAND & SWING --><bounds x="41" y="521" width="5" height="5"/></element>
+	<element name="cpl_led_22" ref="red_led"><!-- BIG BAND & SWING --><bounds x="41" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x40"><bounds x="60" y="529" width="37" height="21"/></element>
-	<element name="CPL_23" ref="red_led"><!-- JAZZ COMBO --><bounds x="76" y="521" width="5" height="5"/></element>
+	<element name="cpl_led_23" ref="red_led"><!-- JAZZ COMBO --><bounds x="76" y="521" width="5" height="5"/></element>
 
 	<element ref="music_note"><bounds x="58" y="225" width="6" height="11"/></element>
 	<element ref="light_pill_button" inputtag="CPL_SEG3" inputmask="0x01"><!-- DEMO --><bounds x="25" y="247" width="37" height="21"/></element>
@@ -837,7 +837,7 @@ license:CC0-1.0
 	<element ref="dark_pill_button" inputtag="CPL_SEG3" inputmask="0x02"><!-- MSP: BANK --><bounds x="111" y="247" width="37" height="21"/></element>
 	<element ref="dark_pill_button" inputtag="CPL_SEG3" inputmask="0x04"><!-- MSP: MENU --><bounds x="184" y="247" width="37" height="21"/></element>
 	<element ref="dark_pill_button" inputtag="CPL_SEG3" inputmask="0x08"><!-- MSP: STOP/RECORD --><bounds x="260" y="247" width="37" height="21"/></element>
-	<element name="CPL_24" ref="green_led"><!-- MSP: MENU --><bounds x="200" y="236" width="5" height="5"/></element>
+	<element name="cpl_led_24" ref="green_led"><!-- MSP: MENU --><bounds x="200" y="236" width="5" height="5"/></element>
 
 	<element ref="msp_corner_button" inputtag="CPL_SEG5" inputmask="0x01"><!-- MSP 1 --><orientation flipx="no" flipy="no"/><bounds x="111" y="293" width="63" height="39"/></element>
 	<element ref="msp_middle_button" inputtag="CPL_SEG5" inputmask="0x02"><!-- MSP 2 --><orientation flipx="no" flipy="no"/><bounds x="173" y="292" width="61" height="40"/></element>
@@ -851,206 +851,206 @@ license:CC0-1.0
 	<element ref="line"><bounds x="221" y="589" width="6" height="1"/></element>
 
 	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x01"><bounds x="228" y="572" width="31" height="31"/></element>
-	<element name="CPL_25" ref="red_led"><!-- VARIATION & MSA 1 --><bounds x="241" y="563" width="5" height="5"/></element>
+	<element name="cpl_led_25" ref="red_led"><!-- VARIATION & MSA 1 --><bounds x="241" y="563" width="5" height="5"/></element>
 
 	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x02"><bounds x="264" y="572" width="31" height="31"/></element>
-	<element name="CPL_26" ref="red_led"><!-- VARIATION & MSA 2 --><bounds x="277" y="563" width="5" height="5"/></element>
+	<element name="cpl_led_26" ref="red_led"><!-- VARIATION & MSA 2 --><bounds x="277" y="563" width="5" height="5"/></element>
 
 	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x04"><bounds x="300" y="572" width="31" height="31"/></element>
-	<element name="CPL_27" ref="red_led"><!-- VARIATION & MSA 3 --><bounds x="312" y="563" width="5" height="5"/></element>
+	<element name="cpl_led_27" ref="red_led"><!-- VARIATION & MSA 3 --><bounds x="312" y="563" width="5" height="5"/></element>
 
 	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x08"><bounds x="336" y="572" width="31" height="31"/></element>
-	<element name="CPL_28" ref="red_led"><!-- VARIATION & MSA 4 --><bounds x="348" y="563" width="5" height="5"/></element>
+	<element name="cpl_led_28" ref="red_led"><!-- VARIATION & MSA 4 --><bounds x="348" y="563" width="5" height="5"/></element>
 
 	<element ref="light_21x21_button" inputtag="CPL_SEG4" inputmask="0x10"><bounds x="233" y="529" width="21" height="21"/></element>
-	<element name="CPL_29" ref="red_led"><!-- MUSIC STYLE ARRANGER --><bounds x="241" y="521" width="5" height="5"/></element>
+	<element name="cpl_led_29" ref="red_led"><!-- MUSIC STYLE ARRANGER --><bounds x="241" y="521" width="5" height="5"/></element>
 
 	<element ref="light_37x21_button" inputtag="CPL_SEG4" inputmask="0x20"><!-- SPLIT POINT --><bounds x="297" y="529" width="37" height="21"/></element>
 
 	<element ref="light_37x21_button" inputtag="CPL_SEG4" inputmask="0x40"><bounds x="332" y="529" width="37" height="21"/></element>
-	<element name="CPL_30" ref="green_led"><!-- AUTO PLAY CHORD --><bounds x="348" y="521" width="5" height="5"/></element>
+	<element name="cpl_led_30" ref="green_led"><!-- AUTO PLAY CHORD --><bounds x="348" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x01"><bounds x="444" y="571" width="30" height="34"/></element>
-	<element name="CPL_33" ref="red_led"><!-- FILL IN 1 --><bounds x="455" y="558" width="5" height="5"/></element>
+	<element name="cpl_led_33" ref="red_led"><!-- FILL IN 1 --><bounds x="455" y="558" width="5" height="5"/></element>
 
 	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x02"><bounds x="479" y="571" width="30" height="34"/></element>
-	<element name="CPL_34" ref="red_led"><!-- FILL IN 2 --><bounds x="490" y="558" width="5" height="5"/></element>
+	<element name="cpl_led_34" ref="red_led"><!-- FILL IN 2 --><bounds x="490" y="558" width="5" height="5"/></element>
 
 	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x04"><bounds x="520" y="571" width="30" height="34"/></element>
-	<element name="CPL_35" ref="red_led"><!-- INTRO & ENDING 1 --><bounds x="533" y="558" width="5" height="5"/></element>
+	<element name="cpl_led_35" ref="red_led"><!-- INTRO & ENDING 1 --><bounds x="533" y="558" width="5" height="5"/></element>
 
 	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x08"><bounds x="555" y="571" width="30" height="34"/></element>
-	<element name="CPL_36" ref="red_led"><!-- INTRO & ENDING 2 --><bounds x="569" y="558" width="5" height="5"/></element>
+	<element name="cpl_led_36" ref="red_led"><!-- INTRO & ENDING 2 --><bounds x="569" y="558" width="5" height="5"/></element>
 
 	<element ref="split_point_indicator"><bounds x="266" y="619" width="5" height="8"/></element>
-	<element name="CPL_37" ref="red_led"><!-- SPLIT POINT INDICATOR (LEFT) --><bounds x="266" y="612" width="5" height="5"/></element>
+	<element name="cpl_led_37" ref="red_led"><!-- SPLIT POINT INDICATOR (LEFT) --><bounds x="266" y="612" width="5" height="5"/></element>
 
 	<element ref="split_point_indicator"><bounds x="434" y="619" width="5" height="8"/></element>
-	<element name="CPL_38" ref="red_led"><!-- SPLIT POINT INDICATOR (CENTER) --><bounds x="434" y="612" width="5" height="5"/></element>
+	<element name="cpl_led_38" ref="red_led"><!-- SPLIT POINT INDICATOR (CENTER) --><bounds x="434" y="612" width="5" height="5"/></element>
 
 	<element ref="split_point_indicator"><bounds x="640" y="619" width="5" height="8"/></element>
-	<element name="CPL_39" ref="red_led"><!-- SPLIT POINT INDICATOR (RIGHT) --><bounds x="640" y="612" width="5" height="5"/></element>
+	<element name="cpl_led_39" ref="red_led"><!-- SPLIT POINT INDICATOR (RIGHT) --><bounds x="640" y="612" width="5" height="5"/></element>
 
-	<element name="CPL_40" ref="green_led"><!-- TEMPO/PROGRAM --><bounds x="636" y="448" width="5" height="5"/></element>
+	<element name="cpl_led_40" ref="green_led"><!-- TEMPO/PROGRAM --><bounds x="636" y="448" width="5" height="5"/></element>
 
-	<element name="CPL_49" ref="red_led"><!-- OTHER PARTS/TR --><bounds x="430" y="354" width="5" height="5"/></element>
+	<element name="cpl_led_49" ref="red_led"><!-- OTHER PARTS/TR --><bounds x="430" y="354" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x01"><bounds x="855" y="476" width="37" height="21"/></element>
-	<element name="CPR_1" ref="red_led"><!-- EFFECT: SUSTAIN --><bounds x="872" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_1" ref="red_led"><!-- EFFECT: SUSTAIN --><bounds x="872" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x02"><bounds x="890" y="476" width="37" height="21"/></element>
-	<element name="CPR_2" ref="red_led"><!-- EFFECT: DIGITAL EFFECT --><bounds x="907" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_2" ref="red_led"><!-- EFFECT: DIGITAL EFFECT --><bounds x="907" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x04"><bounds x="925" y="476" width="37" height="21"/></element>
-	<element name="CPR_3" ref="red_led"><!-- EFFECT: DSP EFFECT --><bounds x="942" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_3" ref="red_led"><!-- EFFECT: DSP EFFECT --><bounds x="942" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x08"><bounds x="960" y="476" width="37" height="21"/></element>
-	<element name="CPR_4" ref="red_led"><!-- EFFECT: DIGITAL REVERB --><bounds x="977" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_4" ref="red_led"><!-- EFFECT: DIGITAL REVERB --><bounds x="977" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x10"><bounds x="995" y="476" width="37" height="21"/></element>
-	<element name="CPR_5" ref="red_led"><!-- EFFECT: ACOUSTIC ILLUSION --><bounds x="1013" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_5" ref="red_led"><!-- EFFECT: ACOUSTIC ILLUSION --><bounds x="1013" y="469" width="5" height="5"/></element>
 
 
 	<element ref="light_37x21_button" inputtag="CPR_SEG5" inputmask="0x08"><bounds x="979" y="235" width="37" height="21"/></element>
-	<element name="CPR_6" ref="green_led"><!-- SEQUENCER: PLAY --><bounds x="996" y="226" width="5" height="5"/></element>
+	<element name="cpr_led_6" ref="green_led"><!-- SEQUENCER: PLAY --><bounds x="996" y="226" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG5" inputmask="0x10"><bounds x="1030" y="235" width="37" height="21"/></element>
 	<element ref="red_line"><bounds x="1040" y="244" width="19" height="4"/></element>
-	<element name="CPR_7" ref="green_led"><!-- SEQUENCER: EASY REC --><bounds x="1047" y="226" width="5" height="5"/></element>
+	<element name="cpr_led_7" ref="green_led"><!-- SEQUENCER: EASY REC --><bounds x="1047" y="226" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG5" inputmask="0x20"><bounds x="1065" y="235" width="37" height="21"/></element>
-	<element name="CPR_8" ref="green_led"><!-- SEQUENCER: MENU --><bounds x="1082" y="226" width="5" height="5"/></element>
+	<element name="cpr_led_8" ref="green_led"><!-- SEQUENCER: MENU --><bounds x="1082" y="226" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x01"><bounds x="1052" y="476" width="37" height="21"/></element>
-	<element name="CPR_9" ref="red_led"><!-- PIANO --><bounds x="1067" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_9" ref="red_led"><!-- PIANO --><bounds x="1067" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x02"><bounds x="1087" y="476" width="37" height="21"/></element>
-	<element name="CPR_10" ref="red_led"><!-- GUITAR --><bounds x="1103" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_10" ref="red_led"><!-- GUITAR --><bounds x="1103" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x04"><bounds x="1122" y="476" width="37" height="21"/></element>
-	<element name="CPR_11" ref="red_led"><!-- STRINGS & VOCAL --><bounds x="1138" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_11" ref="red_led"><!-- STRINGS & VOCAL --><bounds x="1138" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x08"><bounds x="1157" y="476" width="37" height="21"/></element>
-	<element name="CPR_12" ref="red_led"><!-- BRASS --><bounds x="1173" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_12" ref="red_led"><!-- BRASS --><bounds x="1173" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x10"><bounds x="1192" y="476" width="37" height="21"/></element>
-	<element name="CPR_13" ref="red_led"><!-- FLUTE --><bounds x="1208" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_13" ref="red_led"><!-- FLUTE --><bounds x="1208" y="469" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x20"><bounds x="1227" y="476" width="37" height="21"/></element>
-	<element name="CPR_14" ref="red_led"><!-- SAX & REED --><bounds x="1243" y="469" width="5" height="5"/></element>
+	<element name="cpr_led_14" ref="red_led"><!-- SAX & REED --><bounds x="1243" y="469" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x40"><bounds x="1052" y="528" width="37" height="21"/></element>
-	<element name="CPR_15" ref="red_led"><!-- MALLET & ORCH PERC --><bounds x="1067" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_15" ref="red_led"><!-- MALLET & ORCH PERC --><bounds x="1067" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x80"><bounds x="1087" y="528" width="37" height="21"/></element>
-	<element name="CPR_16" ref="red_led"><!-- WORLD PERC --><bounds x="1103" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_16" ref="red_led"><!-- WORLD PERC --><bounds x="1103" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x01"><bounds x="1122" y="528" width="37" height="21"/></element>
-	<element name="CPR_17" ref="red_led"><!-- ORGAN & ACCORDION --><bounds x="1138" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_17" ref="red_led"><!-- ORGAN & ACCORDION --><bounds x="1138" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x02"><bounds x="1157" y="528" width="37" height="21"/></element>
-	<element name="CPR_18" ref="red_led"><!-- ORCHESTRAL PAD --><bounds x="1173" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_18" ref="red_led"><!-- ORCHESTRAL PAD --><bounds x="1173" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x04"><bounds x="1192" y="528" width="37" height="21"/></element>
-	<element name="CPR_19" ref="red_led"><!-- SYNTH --><bounds x="1208" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_19" ref="red_led"><!-- SYNTH --><bounds x="1208" y="521" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x08"><bounds x="1227" y="528" width="37" height="21"/></element>
-	<element name="CPR_20" ref="red_led"><!-- BASS --><bounds x="1243" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_20" ref="red_led"><!-- BASS --><bounds x="1243" y="521" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x10"><bounds x="1052" y="581" width="37" height="21"/></element>
 	<element ref="line"><bounds x="1061" y="589" width="19" height="4"/></element>
-	<element name="CPR_21" ref="red_led"><!-- DIGITAL DRAWBAR --><bounds x="1067" y="573" width="5" height="5"/></element>
+	<element name="cpr_led_21" ref="red_led"><!-- DIGITAL DRAWBAR --><bounds x="1067" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x20"><bounds x="1087" y="581" width="37" height="21"/></element>
 	<element ref="line"><bounds x="1096" y="589" width="19" height="4"/></element>
-	<element name="CPR_22" ref="red_led"><!-- ACCORDION REGISTER --><bounds x="1103" y="573" width="5" height="5"/></element>
+	<element name="cpr_led_22" ref="red_led"><!-- ACCORDION REGISTER --><bounds x="1103" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x40"><bounds x="1122" y="581" width="37" height="21"/></element>
-	<element name="CPR_23" ref="red_led"><!-- GM SPECIAL --><bounds x="1138" y="573" width="5" height="5"/></element>
+	<element name="cpr_led_23" ref="red_led"><!-- GM SPECIAL --><bounds x="1138" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x80"><bounds x="1157" y="581" width="37" height="21"/></element>
-	<element name="CPR_24" ref="red_led"><!-- DRUM KITS --><bounds x="1173" y="573" width="5" height="5"/></element>
+	<element name="cpr_led_24" ref="red_led"><!-- DRUM KITS --><bounds x="1173" y="573" width="5" height="5"/></element>
 
 	<element ref="line"><bounds x="973" y="296" width="7" height="1"/></element>
 	<element ref="line"><bounds x="973" y="296" width="1" height="52"/></element>
 	<element ref="line"><bounds x="973" y="348" width="7" height="1"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x01"><bounds x="980" y="335" width="25" height="25"/></element>
-	<element name="CPR_25" ref="green_led"><!-- PANEL MEMORY 1 --><bounds x="988" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_25" ref="green_led"><!-- PANEL MEMORY 1 --><bounds x="988" y="327" width="5" height="5"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x02"><bounds x="1017" y="335" width="25" height="25"/></element>
-	<element name="CPR_26" ref="green_led"><!-- PANEL MEMORY 2 --><bounds x="1024" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_26" ref="green_led"><!-- PANEL MEMORY 2 --><bounds x="1024" y="327" width="5" height="5"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x04"><bounds x="1054" y="335" width="25" height="25"/></element>
-	<element name="CPR_27" ref="green_led"><!-- PANEL MEMORY 3 --><bounds x="1061" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_27" ref="green_led"><!-- PANEL MEMORY 3 --><bounds x="1061" y="327" width="5" height="5"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x08"><bounds x="1090" y="335" width="25" height="25"/></element>
-	<element name="CPR_28" ref="green_led"><!-- PANEL MEMORY 4 --><bounds x="1098" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_28" ref="green_led"><!-- PANEL MEMORY 4 --><bounds x="1098" y="327" width="5" height="5"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x10"><bounds x="1127" y="335" width="25" height="25"/></element>
-	<element name="CPR_29" ref="green_led"><!-- PANEL MEMORY 5 --><bounds x="1135" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_29" ref="green_led"><!-- PANEL MEMORY 5 --><bounds x="1135" y="327" width="5" height="5"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x20"><bounds x="1164" y="335" width="25" height="25"/></element>
-	<element name="CPR_30" ref="green_led"><!-- PANEL MEMORY 6 --><bounds x="1172" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_30" ref="green_led"><!-- PANEL MEMORY 6 --><bounds x="1172" y="327" width="5" height="5"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x40"><bounds x="1201" y="335" width="25" height="25"/></element>
-	<element name="CPR_31" ref="green_led"><!-- PANEL MEMORY 7 --><bounds x="1209" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_31" ref="green_led"><!-- PANEL MEMORY 7 --><bounds x="1209" y="327" width="5" height="5"/></element>
 
 	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x80"><bounds x="1238" y="335" width="25" height="25"/></element>
-	<element name="CPR_32" ref="green_led"><!-- PANEL MEMORY 8 --><bounds x="1245" y="327" width="5" height="5"/></element>
+	<element name="cpr_led_32" ref="green_led"><!-- PANEL MEMORY 8 --><bounds x="1245" y="327" width="5" height="5"/></element>
 
 
 	<element ref="light_21x21_button" inputtag="CPR_SEG4" inputmask="0x01"><bounds x="864" y="529" width="21" height="21"/></element>
-	<element name="CPR_33" ref="red_led"><!-- PART SELECT: LEFT --><bounds x="872" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_33" ref="red_led"><!-- PART SELECT: LEFT --><bounds x="872" y="521" width="5" height="5"/></element>
 
 	<element ref="light_21x21_button" inputtag="CPR_SEG4" inputmask="0x02"><bounds x="899" y="529" width="21" height="21"/></element>
-	<element name="CPR_34" ref="red_led"><!-- PART SELECT: RIGHT 2 --><bounds x="907" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_34" ref="red_led"><!-- PART SELECT: RIGHT 2 --><bounds x="907" y="521" width="5" height="5"/></element>
 
 	<element ref="light_21x21_button" inputtag="CPR_SEG4" inputmask="0x04"><bounds x="933" y="529" width="21" height="21"/></element>
-	<element name="CPR_35" ref="red_led"><!-- PART SELECT: RIGHT 1 --><bounds x="941" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_35" ref="red_led"><!-- PART SELECT: RIGHT 1 --><bounds x="941" y="521" width="5" height="5"/></element>
 
 
 	<element ref="dark_pill_button" inputtag="CPR_SEG4" inputmask="0x08"><bounds x="994" y="528" width="37" height="21"/></element>
-	<element name="CPR_36" ref="green_led"><!-- ENTERTAINER --><bounds x="1010" y="521" width="5" height="5"/></element>
+	<element name="cpr_led_36" ref="green_led"><!-- ENTERTAINER --><bounds x="1010" y="521" width="5" height="5"/></element>
 
 
 	<element ref="light_31x31_button" inputtag="CPR_SEG4" inputmask="0x10"><bounds x="859" y="574" width="31" height="31"/></element>
-	<element name="CPR_37" ref="red_led"><!-- CONDUCTOR: LEFT --><bounds x="872" y="564" width="5" height="5"/></element>
+	<element name="cpr_led_37" ref="red_led"><!-- CONDUCTOR: LEFT --><bounds x="872" y="564" width="5" height="5"/></element>
 
 	<element ref="light_31x31_button" inputtag="CPR_SEG4" inputmask="0x20"><bounds x="893" y="574" width="31" height="31"/></element>
-	<element name="CPR_38" ref="red_led"><!-- CONDUCTOR: RIGHT 2 --><bounds x="907" y="564" width="5" height="5"/></element>
+	<element name="cpr_led_38" ref="red_led"><!-- CONDUCTOR: RIGHT 2 --><bounds x="907" y="564" width="5" height="5"/></element>
 
 	<element ref="light_31x31_button" inputtag="CPR_SEG4" inputmask="0x40"><bounds x="927" y="574" width="31" height="31"/></element>
-	<element name="CPR_39" ref="red_led"><!-- CONDUCTOR: RIGHT 1 --><bounds x="941" y="564" width="5" height="5"/></element>
+	<element name="cpr_led_39" ref="red_led"><!-- CONDUCTOR: RIGHT 1 --><bounds x="941" y="564" width="5" height="5"/></element>
 
 
 	<element ref="dark_pill_button" inputtag="CPR_SEG4" inputmask="0x80"><bounds x="994" y="580" width="37" height="21"/></element>
-	<element name="CPR_40" ref="red_led"><!-- TECHNI CHORD --><bounds x="1010" y="573" width="5" height="5"/></element>
+	<element name="cpr_led_40" ref="red_led"><!-- TECHNI CHORD --><bounds x="1010" y="573" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x04"><bounds x="1121" y="235" width="37" height="21"/></element>
-	<element name="CPR_49" ref="green_led"><!-- MENU: SOUND --><bounds x="1138" y="226" width="5" height="5"/></element>
+	<element name="cpr_led_49" ref="green_led"><!-- MENU: SOUND --><bounds x="1138" y="226" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x08"><bounds x="1156" y="235" width="37" height="21"/></element>
-	<element name="CPR_50" ref="green_led"><!-- MENU: CONTROL --><bounds x="1173" y="226" width="5" height="5"/></element>
+	<element name="cpr_led_50" ref="green_led"><!-- MENU: CONTROL --><bounds x="1173" y="226" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x10"><bounds x="1191" y="235" width="37" height="21"/></element>
-	<element name="CPR_51" ref="green_led"><!-- MENU: MIDI --><bounds x="1208" y="226" width="5" height="5"/></element>
+	<element name="cpr_led_51" ref="green_led"><!-- MENU: MIDI --><bounds x="1208" y="226" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x20"><bounds x="1226" y="235" width="37" height="21"/></element>
-	<element name="CPR_52" ref="green_led"><!-- MENU: DISK --><bounds x="1244" y="226" width="5" height="5"/></element>
+	<element name="cpr_led_52" ref="green_led"><!-- MENU: DISK --><bounds x="1244" y="226" width="5" height="5"/></element>
 
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG9" inputmask="0x40"><bounds x="1192" y="581" width="37" height="21"/></element>
-	<element name="CPR_57" ref="green_led"><!-- MEMORY A --><bounds x="1208" y="573" width="5" height="5"/></element>
+	<element name="cpr_led_57" ref="green_led"><!-- MEMORY A --><bounds x="1208" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_37x21_button" inputtag="CPR_SEG9" inputmask="0x80"><bounds x="1227" y="581" width="37" height="21"/></element>
-	<element name="CPR_58" ref="green_led"><!-- MEMORY B --><bounds x="1243" y="573" width="5" height="5"/></element>
+	<element name="cpr_led_58" ref="green_led"><!-- MEMORY B --><bounds x="1243" y="573" width="5" height="5"/></element>
 
 	<element ref="dark_curved_18x34_button" inputtag="CPR_SEG8" inputmask="0x40"><bounds x="774" y="571" width="18" height="34"/></element>
-	<element name="CPR_61" ref="red_led"><!-- SYNCHRO & BREAK --><bounds x="780" y="558" width="5" height="5"/></element>
+	<element name="cpr_led_61" ref="red_led"><!-- SYNCHRO & BREAK --><bounds x="780" y="558" width="5" height="5"/></element>
 
 	<element ref="dark_curved_27x34_button" inputtag="CPR_SEG8" inputmask="0x80"><!-- TAP TEMPO --><bounds x="805" y="571" width="27" height="34"/></element>
 
@@ -1058,21 +1058,21 @@ license:CC0-1.0
 	<element ref="dark_half_right_ellipse_button" inputtag="CPR_SEG0" inputmask="0x40"><!-- TRANSPOSE + --><bounds x="788" y="455" width="41" height="23"/></element>
 
 	<element ref="dark_half_left_ellipse_button" inputtag="CPR_SEG8" inputmask="0x08"><!-- MINUS --><bounds x="748" y="503" width="41" height="23"/></element>
-	<element name="CPR_62" ref="red_led"><!-- R1/R2 OCTAVE MINUS --><bounds x="756" y="497" width="5" height="5"/></element>
+	<element name="cpr_led_62" ref="red_led"><!-- R1/R2 OCTAVE MINUS --><bounds x="756" y="497" width="5" height="5"/></element>
 	<element ref="dark_half_right_ellipse_button" inputtag="CPR_SEG8" inputmask="0x10"><!-- PLUS --><bounds x="788" y="503" width="41" height="23"/></element>
-	<element name="CPR_63" ref="red_led"><!-- R1/R2 OCTAVE PLUS --><bounds x="817" y="497" width="5" height="5"/></element>
+	<element name="cpr_led_63" ref="red_led"><!-- R1/R2 OCTAVE PLUS --><bounds x="817" y="497" width="5" height="5"/></element>
 
 	<element ref="dark_pill_button" inputtag="CPR_SEG7" inputmask="0x01"><!-- SEQUENCER: SET --><bounds x="979" y="286" width="37" height="21"/></element>
 	<element ref="red_line"><bounds x="988" y="295" width="19" height="4"/></element>
 	<element ref="dark_pill_button" inputtag="CPR_SEG7" inputmask="0x02"><!-- SEQUENCER: NEXT BANK --><bounds x="1031" y="286" width="37" height="21"/></element>
 	<element ref="dark_pill_button" inputtag="CPR_SEG7" inputmask="0x04"><!-- SEQUENCER: BANK VIEW --><bounds x="1082" y="286" width="37" height="21"/></element>
-	<element name="CPR_64" ref="green_led"><!-- BANK VIEW --><bounds x="1098" y="277" width="5" height="5"/></element>
+	<element name="cpr_led_64" ref="green_led"><!-- BANK VIEW --><bounds x="1098" y="277" width="5" height="5"/></element>
 
 	<element ref="light_curved_53x34_button" inputtag="CPR_SEG8" inputmask="0x20"><!-- START/STOP --><bounds x="687" y="571" width="53" height="34"/></element>
-	<element name="CPR_65" ref="red_led"><!-- BEAT #1 --><bounds x="685" y="558" width="5" height="5"/></element>
-	<element name="CPR_66" ref="green_led"><!-- BEAT #2 --><bounds x="700" y="558" width="5" height="5"/></element>
-	<element name="CPR_67" ref="green_led"><!-- BEAT #3 --><bounds x="716" y="558" width="5" height="5"/></element>
-	<element name="CPR_68" ref="green_led"><!-- BEAT #4 --><bounds x="732" y="558" width="5" height="5"/></element>
+	<element name="cpr_led_65" ref="red_led"><!-- BEAT #1 --><bounds x="685" y="558" width="5" height="5"/></element>
+	<element name="cpr_led_66" ref="green_led"><!-- BEAT #2 --><bounds x="700" y="558" width="5" height="5"/></element>
+	<element name="cpr_led_67" ref="green_led"><!-- BEAT #3 --><bounds x="716" y="558" width="5" height="5"/></element>
+	<element name="cpr_led_68" ref="green_led"><!-- BEAT #4 --><bounds x="732" y="558" width="5" height="5"/></element>
 
 	<element ref="black_transparent_rect"><bounds x="1232" y="5" width="46" height="26" /></element>
 	<element ref="maincpu_text"><bounds x="1235" y="8" width="30" height="8"/></element>

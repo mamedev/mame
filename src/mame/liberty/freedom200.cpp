@@ -28,9 +28,8 @@
     - Expansion slot
 
     TODO:
-    - Light/dark background
     - Soft scroll
-    - Pixel clock, characters should be 9 pixels?
+    - Verify clocks
     - I/O write to 0xc0
 
     Notes:
@@ -222,16 +221,21 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom200_state::draw_character )
 	const int table = bitswap<4>(m_video_ctrl, 0, 4, 3, 2);
 	charcode = m_translate[(table << 8) | charcode];
 
-	uint8_t data = m_chargen[charcode << 4 | linecount];
+	uint16_t data = m_chargen[charcode << 4 | linecount];
+	data <<= 1;
+
+	// maybe? extend data for line-drawing characters
+	if (charcode >= 0xc0)
+		data |= BIT(data, 1);
 
 	if (ul && (BIT(attrcode, 3)))
-		data = 0xff;
+		data = 0x1ff;
 
 	if (blink && (BIT(attrcode, 1)))
-		data = 0x00;
+		data = 0x000;
 
 	if (BIT(attrcode, 0))
-		data = 0x00;
+		data = 0x000;
 
 	if (BIT(attrcode, 2))
 		data = ~data;
@@ -250,13 +254,13 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom200_state::draw_character )
 		swap(fg, bg);
 	}
 
-	// draw 8 pixels of the character
+	// draw 9 pixels of the character
 	if (dw)
 	{
 		// first or second half of char
-		int b = m_dw_active ? 3 : 7;
+		int b = m_dw_active ? 4 : 8;
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			bitmap.pix(y, x + i * 2 + 0) = BIT(data, b - i) ? fg : bg;
 			bitmap.pix(y, x + i * 2 + 1) = BIT(data, b - i) ? fg : bg;
@@ -266,8 +270,8 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom200_state::draw_character )
 	}
 	else
 	{
-		for (int i = 0; i < 8; i++)
-			bitmap.pix(y, x + i) = BIT(data, 7 - i) ? fg : bg;
+		for (int i = 0; i < 9; i++)
+			bitmap.pix(y, x + i) = BIT(data, 8 - i) ? fg : bg;
 	}
 }
 
@@ -324,24 +328,24 @@ void freedom200_state::freedom200(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
-	m_screen->set_raw(16000000, 768, 0, 640, 321, 0, 300); // clock unverified
+	m_screen->set_raw(16000000, 768, 0, 720, 321, 0, 300); // clock unverified
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
-	SCN2674(config, m_avdc, 16000000 / 8); // clock unverified
+	SCN2674(config, m_avdc, 16000000 / 9); // clock unverified
 	m_avdc->intr_callback().set(FUNC(freedom200_state::avdc_intr_w));
 	m_avdc->set_screen(m_screen);
-	m_avdc->set_character_width(8); // unverified
+	m_avdc->set_character_width(9); // unverified
 	m_avdc->set_addrmap(0, &freedom200_state::char_map);
 	m_avdc->set_addrmap(1, &freedom200_state::attr_map);
 	m_avdc->set_display_callback(FUNC(freedom200_state::draw_character));
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(18.432_MHz_XTAL / 10);
 	pit.set_clk<1>(18.432_MHz_XTAL / 10);
 	pit.set_clk<2>(18.432_MHz_XTAL / 10);
@@ -352,19 +356,19 @@ void freedom200_state::freedom200(machine_config &config)
 	pit.out_handler<2>().set(m_usart[0], FUNC(i8251_device::write_txc));
 	pit.out_handler<2>().append(m_usart[0], FUNC(i8251_device::write_rxc));
 
-	I8251(config, m_usart[0], 0); // unknown clock
+	I8251(config, m_usart[0]); // unknown clock
 	m_usart[0]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<0>));
 	m_usart[0]->txrdy_handler().set("irq", FUNC(input_merger_device::in_w<1>));
 	m_usart[0]->txd_handler().set("mainport", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->rts_handler().set("mainport", FUNC(rs232_port_device::write_rts));
 
-	I8251(config, m_usart[1], 0); // unknown clock
+	I8251(config, m_usart[1]); // unknown clock
 	m_usart[1]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<2>));
 	m_usart[1]->txrdy_handler().set("irq", FUNC(input_merger_device::in_w<3>));
 	m_usart[1]->txd_handler().set("auxport", FUNC(rs232_port_device::write_txd));
 	m_usart[1]->rts_handler().set("auxport", FUNC(rs232_port_device::write_rts));
 
-	I8251(config, m_usart[2], 0); // unknown clock
+	I8251(config, m_usart[2]); // unknown clock
 	m_usart[2]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<4>));
 	m_usart[2]->txd_handler().set("kbd", FUNC(freedom220_kbd_device::rxd_w));
 

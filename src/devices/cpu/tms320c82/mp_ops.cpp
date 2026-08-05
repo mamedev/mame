@@ -5,6 +5,8 @@
 #include "emu.h"
 #include "tms320c82.h"
 
+#include "corefloat.h"
+
 
 #define OP_LINK() ((m_ir >> 27) & 0x1f)
 #define OP_RD() ((m_ir >> 27) & 0x1f)
@@ -243,11 +245,11 @@ void tms320c82_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -272,14 +274,14 @@ void tms320c82_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 				// sign extend
 				if (res & (1 << (end - 1)))
 					res |= 0xffffffff << end;
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 				// sign extend makes no sense to left..
 			}
 
@@ -306,11 +308,11 @@ void tms320c82_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -336,11 +338,11 @@ void tms320c82_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = (rotr_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (std::rotr(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 			else        // left
 			{
-				res = (rotl_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (std::rotl(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 
 			if (rd)
@@ -366,14 +368,14 @@ void tms320c82_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 				// sign extend
 				if (res & (1 << (31 - rot)))
 					res |= 0xffffffff << (31 - rot);
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 				// sign extend makes no sense to left..
 			}
 
@@ -400,11 +402,11 @@ void tms320c82_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -430,11 +432,11 @@ void tms320c82_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = (rotr_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (std::rotr(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 			else        // left
 			{
-				res = (rotl_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (std::rotl(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 
 			if (rd)
@@ -887,11 +889,11 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -917,14 +919,14 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 				// sign extend
 				if (res & (1 << (31 - rot)))
 					res |= 0xffffffff << (31 - rot);
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -950,11 +952,11 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = rotr_32(source, rot) & compmask;
+				res = std::rotr(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = rotl_32(source, rot) & compmask;
+				res = std::rotl(source, rot) & compmask;
 			}
 
 			if (rd)

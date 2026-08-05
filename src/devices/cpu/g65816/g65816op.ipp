@@ -1437,7 +1437,7 @@
 #undef OP_XBA
 #if FLAG_SET_M
 #define OP_XBA()                                                            \
-			CLK(CLK_OP + CLK_IMPLIED);                                      \
+			CLK(CLK_OP + CLK_IMPLIED + 1);                                  \
 			FLAG_Z = REGISTER_B>>8;                                             \
 			REGISTER_B = REGISTER_A<<8;                                             \
 			REGISTER_A = FLAG_Z;                                                    \

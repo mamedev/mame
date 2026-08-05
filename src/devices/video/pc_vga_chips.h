@@ -17,7 +17,7 @@ public:
 	// stub-ish, clearly unemulated_features but mdartstr client don't deserve that
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
-	f65535_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	f65535_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

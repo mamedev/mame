@@ -25,7 +25,7 @@ namespace ui {
 class menu_control_device_preset : public menu
 {
 public:
-	menu_control_device_preset(mame_ui_manager &mui, render_container &container, device_image_interface &image);
+	menu_control_device_preset(mame_ui_manager &mui, render_target &target, device_image_interface &image);
 	virtual ~menu_control_device_preset() override;
 
 protected:

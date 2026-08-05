@@ -218,8 +218,8 @@ public:
 		m_mram(*this, "mainram")
 	{ }
 
-	void z80ne(machine_config &config);
-	void init_z80ne();
+	void z80ne(machine_config &config) ATTR_COLD;
+	void init_z80ne() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
 
@@ -228,9 +228,9 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void base_reset();
-	void save_state_vars();
+	void save_state_vars() ATTR_COLD;
 
-	static void floppy_formats(format_registration &fr);
+	static void floppy_formats(format_registration &fr) ATTR_COLD;
 
 	uint8_t m_lx383_scan_counter = 0;
 	uint8_t m_lx383_key[LX383_KEYS]{};
@@ -292,8 +292,8 @@ public:
 	{
 	}
 
-	void lx387(machine_config &config);
-	void z80net(machine_config &config);
+	void lx387(machine_config &config) ATTR_COLD;
+	void z80net(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(z80net_nmi);
 
@@ -328,7 +328,7 @@ public:
 	{
 	}
 
-	void z80netb(machine_config &config);
+	void z80netb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -349,12 +349,11 @@ public:
 	{
 	}
 
-	void z80netf(machine_config &config);
+	void z80netf(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void driver_start() override;
+	virtual void driver_start() override ATTR_COLD;
 
 	struct wd17xx_state_t
 	{
@@ -702,18 +701,10 @@ void z80ne_state::machine_start()
 {
 	m_timer_nmi = timer_alloc(FUNC(z80ne_state::pulse_nmi), this);
 
-	m_lx383_digits.resolve();
-
 	m_lx385_ctrl = 0x1f;
 	m_cassette_timer = timer_alloc(FUNC(z80ne_state::cassette_tc), this);
 	m_kbd_timer = timer_alloc(FUNC(z80ne_state::kbd_scan), this);
 	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
-}
-
-void z80netf_state::machine_start()
-{
-	z80ne_state::machine_start();
-	m_drv_led.resolve();
 }
 
 
@@ -1415,7 +1406,7 @@ void z80net_state::z80net(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
+	SCREEN(config, "lx388");
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
@@ -1456,7 +1447,7 @@ void z80netb_state::z80netb(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
+	SCREEN(config, "lx388");
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
@@ -1498,7 +1489,7 @@ void z80netf_state::z80netf(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
+	SCREEN(config, "lx388");
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");

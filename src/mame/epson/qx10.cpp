@@ -180,7 +180,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<bus::epson_qx::option_bus_device> m_bus;
 	required_device<speaker_sound_device>   m_speaker;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	memory_view m_lower_view;
 	memory_view m_upper_view;
@@ -744,27 +744,27 @@ void qx10_state::qx10_mem(address_map &map)
 
 void qx10_state::qx10_io(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x03).rw(m_pit_1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x04, 0x07).rw(m_pit_2, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x08, 0x09).rw(m_pic_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0c, 0x0d).rw(m_pic_s, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x10, 0x13).rw(m_scc, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
-	map(0x14, 0x17).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x18, 0x1b).portr("DSW").w(FUNC(qx10_state::qx10_18_w));
-	map(0x1c, 0x1f).w(FUNC(qx10_state::prom_sel_w));
-	map(0x20, 0x23).w(FUNC(qx10_state::cmos_sel_w));
-	map(0x2c, 0x2c).portr("CONFIG");
-	map(0x2d, 0x2d).rw(FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
-	map(0x30, 0x33).rw(FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
-	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0x3a, 0x3a).w(FUNC(qx10_state::zoom_w));
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0xff00).rw(m_pit_1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x04, 0x07).mirror(0xff00).rw(m_pit_2, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x08, 0x09).mirror(0xff00).rw(m_pic_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0c, 0x0d).mirror(0xff00).rw(m_pic_s, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x10, 0x13).mirror(0xff00).rw(m_scc, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
+	map(0x14, 0x17).mirror(0xff00).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x18, 0x1b).mirror(0xff00).portr("DSW").w(FUNC(qx10_state::qx10_18_w));
+	map(0x1c, 0x1f).mirror(0xff00).w(FUNC(qx10_state::prom_sel_w));
+	map(0x20, 0x23).mirror(0xff00).w(FUNC(qx10_state::cmos_sel_w));
+	map(0x2c, 0x2c).mirror(0xff00).portr("CONFIG");
+	map(0x2d, 0x2d).mirror(0xff00).rw(FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
+	map(0x30, 0x33).mirror(0xff00).rw(FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
+	map(0x34, 0x35).mirror(0xff00).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x38, 0x39).mirror(0xff00).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+	map(0x3a, 0x3a).mirror(0xff00).w(FUNC(qx10_state::zoom_w));
 //  map(0x3b, 0x3b) GDC light pen req
-	map(0x3c, 0x3c).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
-	map(0x3d, 0x3d).w(m_rtc, FUNC(mc146818_device::address_w));
-	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x3c, 0x3c).mirror(0xff00).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
+	map(0x3d, 0x3d).mirror(0xff00).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x40, 0x4f).mirror(0xff00).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x50, 0x5f).mirror(0xff00).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
 
 /* Input ports */
@@ -924,12 +924,13 @@ void qx10_state::qx10(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CLK / 4);
+	m_maincpu->z80_set_m1_cycles(4+1);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qx10_state::qx10_mem);
 	m_maincpu->set_addrmap(AS_IO, &qx10_state::qx10_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(qx10_state::inta_call));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_raw(16.67_MHz_XTAL, 872, 152, 792, 421, 4, 404);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
@@ -944,7 +945,7 @@ void qx10_state::qx10(machine_config &config)
     1       Keyboard clock (1200bps)    +5V                     8259A (10E) IR5 Software timer
     2       Clock 1,9668MHz             Memory register D7      8259 (12E) IR1  Software timer
 */
-	PIT8253(config, m_pit_1, 0);
+	PIT8253(config, m_pit_1);
 	m_pit_1->set_clk<0>(1200);
 	m_pit_1->out_handler<0>().set(FUNC(qx10_state::speaker_duration));
 	m_pit_1->set_clk<1>(1200);
@@ -959,7 +960,7 @@ void qx10_state::qx10(machine_config &config)
     1       Clock 1,9668MHz     +5V         Keyboard clock      1200bps (Clock / 1664)
     2       Clock 1,9668MHz     +5V         RS-232C baud rate   9600bps (Clock / 208)
 */
-	PIT8253(config, m_pit_2, 0);
+	PIT8253(config, m_pit_2);
 	m_pit_2->set_clk<0>(MAIN_CLK / 8);
 	m_pit_2->out_handler<0>().set(FUNC(qx10_state::speaker_freq));
 	m_pit_2->set_clk<1>(MAIN_CLK / 8);
@@ -967,12 +968,12 @@ void qx10_state::qx10(machine_config &config)
 	m_pit_2->set_clk<2>(MAIN_CLK / 8);
 	m_pit_2->out_handler<2>().set(m_scc, FUNC(upd7201_device::rxtxcb_w));
 
-	PIC8259(config, m_pic_m, 0);
+	PIC8259(config, m_pic_m);
 	m_pic_m->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic_m->in_sp_callback().set_constant(1);
 	m_pic_m->read_slave_ack_callback().set(FUNC(qx10_state::get_slave_ack));
 
-	PIC8259(config, m_pic_s, 0);
+	PIC8259(config, m_pic_s);
 	m_pic_s->out_int_callback().set(m_pic_m, FUNC(pic8259_device::ir7_w));
 	m_pic_s->in_sp_callback().set_constant(0);
 
@@ -999,7 +1000,7 @@ void qx10_state::qx10(machine_config &config)
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
 	m_dma_2->dreq_active_low();
 
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set("prndata", FUNC(output_latch_device::write));
 	m_ppi->in_pb_callback().set(FUNC(qx10_state::portb_r));
 	m_ppi->out_pc_callback().set(FUNC(qx10_state::portc_w));

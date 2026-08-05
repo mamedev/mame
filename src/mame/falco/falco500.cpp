@@ -302,7 +302,7 @@ void falco500_state::asic_mode_w(uint8_t data)
 
 	// timing wrong
 	rectangle visarea(0, (BIT(data, 0) ? 1320 : 1120) - 1, 0, 400 - 1);
-	m_screen->configure(1500, 422, visarea, HZ_TO_ATTOSECONDS(60));
+	m_screen->configure(1500, 422, visarea, attotime::from_hz(60));
 }
 
 void falco500_state::kbd_int_w(int state)
@@ -577,7 +577,7 @@ void falco500_state::falco500(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5864AP-10L + battery
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_raw(37.98_MHz_XTAL, 1500, 0, 800, 422, 0, 400); // 25.32 kHz/60 Hz confirmed
 	m_screen->set_screen_update(FUNC(falco500_state::screen_update));

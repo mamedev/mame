@@ -916,11 +916,6 @@ void x68k_state::machine_reset()
 
 void x68k_state::machine_start()
 {
-	// resolve outputs
-	m_eject_drv_out.resolve();
-	m_ctrl_drv_out.resolve();
-	m_access_drv_out.resolve();
-
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
@@ -1063,7 +1058,7 @@ void x68k_state::x68000_base(machine_config &config)
 	m_rtc->set_year_offset(20);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(69.55199_MHz_XTAL / 2, 1096, 0, 768, 568, 0, 512);  // initial setting
 	m_screen->set_screen_update(FUNC(x68k_state::screen_update));
 
@@ -1145,7 +1140,7 @@ void x68k_state::x68000(machine_config &config)
 	m_crtc->gvram_read_cb().set(FUNC(x68k_state::gvram_read));
 	m_crtc->gvram_write_cb().set(FUNC(x68k_state::gvram_write));
 
-	X68KHDC(config, "x68k_hdc", 0);
+	X68KHDC(config, "x68k_hdc");
 }
 
 static void scsi_devices(device_slot_interface &device)
@@ -1158,7 +1153,7 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 {
 	x68000_base(config);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -1166,15 +1161,10 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
-		[this](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
-
-			spc.set_clock(40_MHz_XTAL / 8);
-			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
-			// TODO: duplicate DMA glue from CZ-6BS1
-		});
+	MB89352(config, m_scsictrl, 40_MHz_XTAL / 8);
+	scsi.set_external_device(7, m_scsictrl);
+	m_scsictrl->out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
+	// TODO: duplicate DMA glue from CZ-6BS1
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);

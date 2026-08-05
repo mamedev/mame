@@ -9,9 +9,9 @@
 
 #pragma once
 
+#include "toaplan_dsp.h"
 #include "toaplan_scu.h"
 
-#include "cpu/tms320c1x/tms320c1x.h"
 #include "machine/74259.h"
 #include "video/bufsprite.h"
 #include "video/mc6845.h"
@@ -39,11 +39,13 @@ public:
 		m_spriteram16(*this, "spriteram16")
 	{ }
 
-	void twincobr(machine_config &config);
-	void twincobrw(machine_config &config);
-	void fsharkbt(machine_config &config);
-	void fshark(machine_config &config);
-	void fnshark(machine_config &config);
+	void init_fsharkbt() ATTR_COLD;
+
+	void twincobr(machine_config &config) ATTR_COLD;
+	void twincobrw(machine_config &config) ATTR_COLD;
+	void fsharkbt(machine_config &config) ATTR_COLD;
+	void fshark(machine_config &config) ATTR_COLD;
+	void fnshark(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -51,7 +53,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<tms320c10_device> m_dsp;
+	required_device<toaplan_dsp_device> m_dsp;
 	required_device<toaplan_scu_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -86,24 +88,15 @@ protected:
 	tilemap_t *m_tx_tilemap = nullptr;
 
 	bool m_intenable = false;
-	s32 m_dsp_bio = 0;
 	s32 m_fsharkbt_8741 = 0;
-	bool m_dsp_execute = false;
-	u32 m_dsp_addr_w = 0;
-	u32 m_main_ram_seg = 0;
 
-	void twincobr_dsp_addrsel_w(u16 data);
-	u16 twincobr_dsp_r();
-	void twincobr_dsp_w(u16 data);
-	void wardner_dsp_addrsel_w(u16 data);
-	u16 wardner_dsp_r();
-	void wardner_dsp_w(u16 data);
-	void twincobr_dsp_bio_w(u16 data);
+	virtual void dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr);
+	virtual u16 dsp_host_read_cb(u32 seg, u32 addr);
+	virtual bool dsp_host_write_cb(u32 seg, u32 addr, u16 data);
+
 	u16 fsharkbt_dsp_r();
 	void fsharkbt_dsp_w(u16 data);
-	int twincobr_bio_r();
 	void int_enable_w(int state);
-	void dsp_int_w(int state);
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);
 	void coin_lockout_1_w(int state);
@@ -147,8 +140,6 @@ protected:
 	void fg_rom_bank_w(int state);
 	void log_vram();
 
-	void dsp_io_map(address_map &map) ATTR_COLD;
-	void dsp_program_map(address_map &map) ATTR_COLD;
 	void fnshark_sound_io_map(address_map &map) ATTR_COLD;
 	void fsharkbt_i8741_io_map(address_map &map) ATTR_COLD;
 	void main_program_map(address_map &map) ATTR_COLD;

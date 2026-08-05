@@ -35,12 +35,16 @@ public:
 		dio16_slot_device(mconfig, tag, owner, clock)
 	{
 		set_dio(std::forward<T>(dio_tag));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 	}
-	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio16_slot_device(mconfig, tag, owner)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		set_options(std::forward<U>(opts), dflt, fixed);
+	}
+	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_dio(T &&dio_tag) { m_dio.set_tag(std::forward<T>(dio_tag)); }
@@ -48,7 +52,7 @@ public:
 protected:
 	dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
@@ -62,7 +66,7 @@ class dio16_device : public device_t
 {
 public:
 	// construction/destruction
-	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	// inline configuration
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_prgspace.set_tag(std::forward<T>(tag), spacenum); }
 
@@ -131,7 +135,7 @@ protected:
 	dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	void install_space(int spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -233,15 +237,19 @@ public:
 		dio32_slot_device(mconfig, tag, owner, clock)
 	{
 		set_dio(std::forward<T>(dio_tag));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 	}
-	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio32_slot_device(mconfig, tag, owner)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		set_options(std::forward<U>(opts), dflt, fixed);
+	}
+	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 };
 
@@ -250,12 +258,12 @@ class dio32_device : public dio16_device
 {
 public:
 	// construction/destruction
-	dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 };
 
@@ -279,7 +287,7 @@ protected:
 
 } // namespace bus::hp_dio
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device)
 DECLARE_DEVICE_TYPE_NS(DIO32, bus::hp_dio, dio32_device)
 DECLARE_DEVICE_TYPE_NS(DIO32_SLOT, bus::hp_dio, dio32_slot_device)

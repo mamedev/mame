@@ -8,16 +8,17 @@
 
 #pragma once
 
+
 class wpc_lamp_device : public device_t
 {
 public:
-	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~wpc_lamp_device();
+
+	void set_names(char const *const (&names)[8][8]);
 
 	void row_w(uint8_t data);
 	void col_w(uint8_t data);
-
-	void set_names(const char *const *lamp_names);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -27,11 +28,11 @@ protected:
 
 	void update();
 
-	uint8_t state[64]{};
-	uint8_t col = 0;
-	uint8_t row = 0;
-	emu_timer *timer = nullptr;
-	const char *const *names;
+	output_finder<8, 8> outputs;
+	emu_timer *timer;
+	uint8_t state[64];
+	uint8_t col;
+	uint8_t row;
 };
 
 DECLARE_DEVICE_TYPE(WPC_LAMP, wpc_lamp_device)

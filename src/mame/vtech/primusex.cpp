@@ -21,9 +21,13 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "video/hd61202.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+
+#include <bit>
+
 
 namespace {
 
@@ -185,7 +189,7 @@ ioport_value primusex_state::encoder_r()
 	if (cursor_keys == 0)
 		return 0xf;
 	else
-		return 31 - count_leading_zeros_32(cursor_keys);
+		return std::bit_width(cursor_keys) - 1;
 }
 
 INPUT_PORTS_START(primusex)
@@ -324,7 +328,7 @@ void primusex_state::primusex(machine_config &config)
 	ppi2.in_pb_callback().set(FUNC(primusex_state::ppi2_pb_r));
 	ppi2.out_pc_callback().set(FUNC(primusex_state::ppi2_pc_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_size(80, 48);
 	screen.set_visarea_full();

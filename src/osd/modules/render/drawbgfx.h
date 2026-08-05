@@ -57,8 +57,8 @@ public:
 	virtual void record() override;
 	virtual void toggle_fsfx() override { }
 
-	uint32_t get_window_width(uint32_t index) const;
-	uint32_t get_window_height(uint32_t index) const;
+	uint32_t get_window_width() const { return m_new_dimensions.width(); }
+	uint32_t get_window_height() const { return m_new_dimensions.height(); }
 
 	virtual render_primitive_list *get_primitives() override;
 
@@ -120,8 +120,8 @@ private:
 	bgfx_target *m_framebuffer;
 	bgfx_texture *m_texture_cache;
 
-	// Original display_mode
-	osd_dim m_dimensions;
+	osd_dim m_dimensions; // Original display_mode
+	osd_dim m_new_dimensions;
 
 	std::unique_ptr<texture_manager> m_textures;
 	std::unique_ptr<target_manager> m_targets;
@@ -141,12 +141,12 @@ private:
 	std::unique_ptr<bgfx_view> m_ortho_view;
 	uint32_t m_max_view;
 
-	bgfx_view *m_avi_view;
-	avi_write *m_avi_writer;
+	std::unique_ptr<bgfx_view> m_avi_view;
+	std::unique_ptr<avi_write> m_avi_writer;
 	bgfx_target *m_avi_target;
 	bgfx::TextureHandle m_avi_texture;
 	bitmap_rgb32 m_avi_bitmap;
-	uint8_t *m_avi_data;
+	std::unique_ptr<uint8_t []> m_avi_data;
 
 	std::unique_ptr<util::xml::file> m_config;
 	const util::notifier_subscription m_load_sub;
@@ -157,8 +157,6 @@ private:
 	static const uint32_t WHITE_HASH;
 
 	static uint32_t s_current_view;
-	static uint32_t s_width[16];
-	static uint32_t s_height[16];
 };
 
 #endif // MAME_RENDER_DRAWBGFX_H

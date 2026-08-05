@@ -1265,8 +1265,6 @@ INTERRUPT_GEN_MEMBER(segas16b_state::i8751_main_cpu_vblank)
 
 void segas16b_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_i8751_sync_timer = timer_alloc(FUNC(segas16b_state::i8751_sync), this);
 }
 
@@ -2419,23 +2417,24 @@ INPUT_PORTS_START( dddoor ) // port names are taken from test mode
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("D. HAND") // this is Doraemon's hand on the control panel
 
+	// control panel has 12 pictographic buttons: 4 each line, 3 each row
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("L.P.SRV") // no idea what this is.. Large Prize Service?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("SWT. 01") // this and the following are 12 buttons on the control panel (4 each line, 3 each row)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SWT. 03")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("SWT. 05")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("SWT. 07")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("SWT. 01 (Makai)") // まかい
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SWT. 03 (Chitei)") // ちてい
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("SWT. 05 (Uchuusen)") // うちゅうせん
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("SWT. 07 (Kumo no Sekai)") // くものせかい
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("SWT. 09")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("SWT. 11")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("SWT. 09 (Kyouryuu)") // きょうりゅう
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("SWT. 11 (Jungle)") // ジャングル
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("SWT. 10")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("SWT. 12")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("SWT. 10 (Yuuenchi)") // ゆうえんち
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("SWT. 12 (Edo)") // えど
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2444,10 +2443,10 @@ INPUT_PORTS_START( dddoor ) // port names are taken from test mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("SWT. 02")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("SWT. 04")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("SWT. 06")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("SWT. 08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("SWT. 02 (Kaitei)") // かいてい
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("SWT. 04 (Omocha no Kuni)") // おもちゃのくに
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("SWT. 06 (Mirai)") // みらい
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("SWT. 08 (Okashi no Kuni)") // おかしのくに
 
 	PORT_MODIFY("DSW2") // rest unused according to test mode
 	PORT_DIPNAME( 0x03, 0x03, "Advertising Interval" ) PORT_DIPLOCATION("SW2:1,2")
@@ -4105,13 +4104,13 @@ void segas16b_state::system16b(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
 	PALETTE(config, m_palette).set_entries(2048*2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4201,7 +4200,7 @@ void segas16b_state::aceattacb_fd1094(machine_config &config)
 void segas16b_state::hwchamp(machine_config &config)
 {
 	system16b(config);
-	MSM6253(config, m_adc, 0);
+	MSM6253(config, m_adc);
 	m_adc->set_input_tag<0>("MONITOR");
 	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 	m_adc->set_input_tag<1>("RIGHT");
@@ -4211,7 +4210,7 @@ void segas16b_state::hwchamp(machine_config &config)
 void segas16b_state::hwchamp_fd1094(machine_config &config)
 {
 	system16b_fd1094(config);
-	MSM6253(config, m_adc, 0);
+	MSM6253(config, m_adc);
 	m_adc->set_input_tag<0>("MONITOR");
 	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 	m_adc->set_input_tag<1>("RIGHT");
@@ -4237,9 +4236,9 @@ void segas16b_state::system16b_i8751(machine_config &config)
 
 void segas16b_state::rom_5797_fragment(machine_config &config)
 {
-	SEGA_315_5248_MULTIPLIER(config, m_multiplier, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
+	SEGA_315_5248_MULTIPLIER(config, m_multiplier);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2);
 }
 
 void segas16b_state::system16b_5797(machine_config &config)
@@ -4316,7 +4315,7 @@ void segas16b_state::fpointbl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(75); // these align the pieces with the playfield
 	m_sprites->set_local_originy(-2); // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
@@ -4351,13 +4350,13 @@ void segas16b_state::lockonph(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockonph);
 	PALETTE(config, m_palette).set_entries(4096*2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -6234,7 +6233,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Doraemon no Dokodemo Door, Sega System 16B
+//  Doraemon no Dokodemo Door (ドラえもんのどこでもドア), Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5797
 //  Sega game ID: 834-11170-91 DOKODEMO DOOR
@@ -8895,7 +8894,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Sukeban Jansi Ryuko (JPN Ver.)
+//  Sukeban Jansi Ryuko (JPN Ver.) (スケバン雀士竜子)
 //  CPU: FD1089B 317-5021 (16A/16B) (version uses i8751(317-5019) known to be exist)
 //  ROM Board type: 171-???
 //
@@ -9181,7 +9180,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Toryumon, Sega System 16B
+//  Toryumon (登龍門), Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5797
 //
@@ -9246,7 +9245,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Waku Waku Ultraman Racing, Sega System 16B
+//  Waku Waku Ultraman Racing (わくわくウルトラマンレーシング), Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5797
 //

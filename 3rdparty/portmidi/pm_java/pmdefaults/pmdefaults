@@ -1,8 +1,0 @@
-#!/bin/sh
-# Run PmDefaults, the GUI to select default MIDI input and output for PortMidi
-# Due to the locations of the .jar file and libpmjni, this script only runs
-# from <portmidi-repo-path>/pm_java/pmdefaults. PmDefaults is minimally
-# supported -- if you would like it to appear as an app on your desktop,
-# contact the developer(s) and let us know it's actually being used.
-# library path here includes directory locations for macOS and Linux. 
-java -Djava.library.path=../../Release:../../Debug:../.. -jar pmdefaults.jar > /dev/null

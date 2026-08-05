@@ -317,7 +317,7 @@ void mbs1_state::mbs1(machine_config &config)
 	bml3mk5_state::bml3mk5(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbs1_state::s1_map);
 
-	MBS1_MMU(config, m_mmu, 0);
+	MBS1_MMU(config, m_mmu);
 	m_mmu->set_map(&mbs1_state::s1_mmu_map);
 }
 
