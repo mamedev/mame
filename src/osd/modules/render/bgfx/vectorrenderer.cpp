@@ -468,18 +468,26 @@ void bgfx_vector_renderer::prepare(uint32_t &view, render_primitive *first, uint
 	// Scale the output-pixel bloom radius relative to a 1080-line reference.
 	float const bloom_scale = std::clamp(float(m_height) / 1080.0f, 0.25f, 2.0f);
 	float const bloom_radius = m_bloom_radius * bloom_scale;
+	float const sigma_x = bloom_radius * float(m_bloom_width) / float(m_width);
+	float const sigma_y = bloom_radius * float(m_bloom_height) / float(m_height);
+
+	// Gaussian variances add over repeated passes.  Divide sigma so the
+	// combined blur retains the radius requested by the slider.
+	float const pass_scale = 1.0f / std::sqrt(float(BLOOM_PASSES));
+	float const pass_sigma_x = sigma_x * pass_scale;
+	float const pass_sigma_y = sigma_y * pass_scale;
 
 	for (unsigned pass = 0; pass < BLOOM_PASSES; ++pass)
 	{
 		setup_view(uint16_t(view), m_bloom[1].framebuffer, m_bloom_width, m_bloom_height, false);
 		bgfx::setTexture(0, m_blur_effect->uniform("s_tex")->handle(), m_bloom[0].texture, SAMPLE_FLAGS);
-		set_uniform(m_blur_effect, "u_blur", bloom_radius / float(m_width), 0.0f);
+		set_uniform(m_blur_effect, "u_blur", 1.0f / float(m_bloom_width), 0.0f, pass_sigma_x);
 		draw_post(m_blur_effect, uint16_t(view));
 		++view;
 
 		setup_view(uint16_t(view), m_bloom[0].framebuffer, m_bloom_width, m_bloom_height, false);
 		bgfx::setTexture(0, m_blur_effect->uniform("s_tex")->handle(), m_bloom[1].texture, SAMPLE_FLAGS);
-		set_uniform(m_blur_effect, "u_blur", 0.0f, bloom_radius / float(m_height));
+		set_uniform(m_blur_effect, "u_blur", 0.0f, 1.0f / float(m_bloom_height), pass_sigma_y);
 		draw_post(m_blur_effect, uint16_t(view));
 		++view;
 	}
@@ -515,7 +523,7 @@ void bgfx_vector_renderer::create_sliders()
 		{ "Vector beam intensity",        10, 400, 500, 1 },   // 4.00
 		{ "Vector beam halo",              0,   4, 100, 1 },   // 0.04
 		{ "Vector bloom strength",         0,  20, 300, 1 },   // 0.20
-		{ "Vector bloom radius",          20, 150, 400, 1 },   // 1.50
+		{ "Vector bloom radius",          50, 212, 260, 1 },   // 2.12
 		{ "Vector exposure",              10,  78, 400, 1 },   // 0.78
 	};
 

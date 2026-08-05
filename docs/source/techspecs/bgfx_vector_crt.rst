@@ -12,8 +12,8 @@ replaces direct, frame-oriented line drawing with a persistent HDR phosphor
 buffer, instanced Gaussian beam deposition, approximate scan-order timing,
 bloom, and tone-mapped composition.
 
-Set the ``bgfx_vectorcrt`` option to ``1`` to enable it.  The option is disabled
-by default.  The renderer is used only with the BGFX video backend and when the
+The ``bgfx_vectorcrt`` option is enabled by default; set it to ``0`` to disable
+it.  The renderer is used only with the BGFX video backend and when the
 primitive list contains a vector-buffer marker.  If its effects, geometry, or
 RGBA16F render targets cannot be created, BGFX falls back to normal vector line
 rendering.
@@ -54,7 +54,7 @@ Pipeline overview
                 +----> persistent full-resolution phosphor
                 |
                 v
-    One-third-resolution box downsample
+    Half-resolution box downsample
                 |
                 v
     Two horizontal/vertical Gaussian blur iterations
@@ -63,13 +63,13 @@ Pipeline overview
     Phosphor + bloom -> exposure -> tone map -> gamma -> output
 
 The persistent accumulation is ping-ponged between two full-resolution
-RGBA16F targets.  Bloom uses two RGBA16F targets rounded up to one third of the
-output dimensions:
+RGBA16F targets.  Bloom uses two RGBA16F targets rounded up to half the output
+dimensions:
 
 .. code-block:: cpp
 
-    bloom_width  = max(1, (width  + 2) / 3);
-    bloom_height = max(1, (height + 2) / 3);
+    bloom_width  = max(1, (width  + 1) / 2);
+    bloom_height = max(1, (height + 1) / 2);
 
 RGBA16F is required because additive beam contributions must retain HDR energy
 across frames before tone mapping.
@@ -296,8 +296,11 @@ Bloom
 -----
 
 The full-resolution phosphor image is reduced with a four-sample box filter.
-Bloom uses a separable five-tap Gaussian approximation.  Two complete
-horizontal/vertical iterations produce four blur draws per frame.
+Bloom uses a separable nine-tap Gaussian kernel.  Each axis samples the centre
+texel and integer offsets from one through four texels in both directions.
+The fragment shader calculates weights from the uniform sigma and normalises
+them for unit DC gain.  Two complete horizontal/vertical iterations produce
+four blur draws per frame.
 
 Bloom radius is referenced to 1080 lines:
 
@@ -307,8 +310,29 @@ Bloom radius is referenced to 1080 lines:
     bloom_radius = m_bloom_radius * bloom_scale;
 
 This keeps bloom approximately constant as a fraction of screen height through
-2160p.  The clamp prevents extreme kernels outside that range.  Blur offsets
-are normalised by the one-third-resolution target dimensions.
+2160p.  The clamp prevents extreme kernels outside that range.  The radius is
+converted from output pixels to bloom-texture texels independently for each
+axis:
+
+.. code-block:: cpp
+
+    sigma_x = bloom_radius * bloom_width  / output_width;
+    sigma_y = bloom_radius * bloom_height / output_height;
+
+    pass_scale   = 1 / sqrt(bloom_passes);
+    pass_sigma_x = sigma_x * pass_scale;
+    pass_sigma_y = sigma_y * pass_scale;
+
+    horizontal_u_blur = (1 / bloom_width,  0,                pass_sigma_x, 0);
+    vertical_u_blur   = (0,                1 / bloom_height, pass_sigma_y, 0);
+
+``u_blur.xy`` is therefore exactly one bloom texel along the active axis, and
+``u_blur.z`` is Gaussian sigma in bloom texels.  The fragment shader samples
+at integer multiples of that texel step.  Minification and magnification remain
+linearly filtered, but the kernel no longer relies on fractional bilinear tap
+positions.  Gaussian variances add across the repeated iterations, so dividing
+each pass's sigma by the square root of the pass count makes the combined blur
+match the radius requested by the slider.
 
 There is no brightness threshold.  All positive phosphor energy contributes,
 and ``Vector bloom strength`` controls bloom during composition.
@@ -372,11 +396,11 @@ cannot reach rendering.
      - Strength of the wide Gaussian component
    * - Vector bloom strength
      - 0.00-3.00x
-     - 0.12x
+     - 0.20x
      - Bloom contribution during composition
    * - Vector bloom radius
-     - 0.20-4.00 px at 1080p
-     - 0.65
+     - 0.50-2.60 px at 1080p
+     - 2.12
      - Blur radius before resolution scaling
    * - Vector exposure
      - 0.10-4.00x
@@ -393,10 +417,10 @@ Performance characteristics
 CPU work is linear in segment count: collect primitives, measure lengths, and
 fill transient instance buffers.  There is no CPU per-pixel rasterisation.
 
-GPU beam cost is proportional to padded quad area.  Bloom has one one-third-
-resolution downsample and four one-third-resolution blur passes.  Decay and
+GPU beam cost is proportional to padded quad area.  Bloom has one half-
+resolution downsample and four half-resolution blur passes.  Decay and
 composition are full-resolution.  Memory is dominated by two full-resolution
-and two one-third-resolution RGBA16F targets.
+and two half-resolution RGBA16F targets.
 
 Transient instance-buffer exhaustion is handled in batches.  Failure to
 allocate any instances logs a warning and stops beam submission for that frame.
