@@ -787,7 +787,6 @@ void upd765_family_device::fifo_push(uint8_t data, bool internal)
 		disable_transfer();
 }
 
-
 uint8_t upd765_family_device::fifo_pop(bool internal)
 {
 	if(!fifo_pos) {
@@ -1506,6 +1505,12 @@ void upd765_family_device::start_command(int cmd)
 	result_pos = 0;
 	main_phase = PHASE_EXEC;
 	tc_done = false;
+	fifo_pos = 0;
+	if(internal_drq)
+	{
+		internal_drq = false;
+		check_irq();
+	}
 
 	execute_command(cmd);
 }
