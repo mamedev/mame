@@ -4971,7 +4971,8 @@ void z8002_device::Z7D_ssss_1ccc()
 		case 2:
 			{
 				uint16_t fcw;
-				fcw = RW(src) & 0xd8fc;
+				/* the part stores what is written, reserved bits included */
+				fcw = RW(src);
 				CHANGE_FCW(fcw); /* check for user/system mode change */
 			}
 			break;
