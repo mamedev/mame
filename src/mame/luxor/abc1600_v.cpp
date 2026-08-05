@@ -165,6 +165,9 @@ inline uint16_t abc1600_mover_device::get_crtca(uint16_t ma, uint8_t ra, uint8_t
 
 MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 {
+	if ((vbp + y) > cliprect.max_y)
+		return;
+
 	int x = 0;
 	const pen_t *pen = m_palette->pens();
 
@@ -181,8 +184,10 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 			{
 				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
 
-				bitmap.pix(vbp + y, hbp + x++) = pen[color];
+				if ((hbp + x) <= cliprect.max_x)
+					bitmap.pix(vbp + y, hbp + x) = pen[color];
 
+				x++;
 				data <<= 1;
 			}
 		}
