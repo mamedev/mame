@@ -162,6 +162,7 @@ void saturn_cd_hle_device::device_start()
 	save_item(NAME(cdda_maxrepeat));
 	save_item(NAME(cdda_repeat_count));
 	save_item(NAME(tray_is_closed));
+	save_item(NAME(m_status_change_in_progress));
 	save_item(NAME(numfiles));
 	save_item(NAME(firstfile));
 }
@@ -185,6 +186,7 @@ void saturn_cd_hle_device::device_reset()
 	calcsize = 0;
 	playtype = 0;
 	buffull_temp_pause = false;
+	m_status_change_in_progress = false;
 
 	curdir.clear();
 
@@ -659,6 +661,9 @@ void saturn_cd_hle_device::cd_change_status(u16 new_status)
 	// - houkago will chain 0x21 commands due of PERI hook (leading to a crash)
 	cd_stat = CD_STAT_BUSY;
 	cd_next_stat = new_status;
+	m_status_change_in_progress = true;
+	// we are changing the status, definitely don't want PERI to interfere
+	cd_stat &= ~CD_STAT_PERI;
 }
 
 /*
@@ -884,6 +889,8 @@ void saturn_cd_hle_device::cmd_play_disc()
 	uint8_t play_mode;
 
 	LOGCMD("%s: Play Disc\n",   machine().describe_context());
+	// TODO: don't do this here, always respect seek phase first
+	// (this causes a double call for anything that will go in track mode below)
 	cd_change_status(CD_STAT_PLAY);
 
 	play_mode = (cr3 >> 8) & 0x7f;
@@ -1021,8 +1028,18 @@ void saturn_cd_hle_device::cmd_seek_disc()
 		// TODO: jungrhyt sets a seek track mode then this back-to-back when restarting a stage
 		if (temp == 0xffffff)
 		{
-			cd_change_status(CD_STAT_PAUSE);
-			m_cdda->pause_audio(1);
+			// TODO: amagishi loves to do this a ton
+			// it shouldn't be instant but gracefully seek back (also cfr. capgen5)
+			if (cd_stat == CD_STAT_PAUSE)
+			{
+				cd_change_status(CD_STAT_STANDBY);
+				cd_curfad = 150;
+			}
+			else
+			{
+				cd_change_status(CD_STAT_PAUSE);
+				m_cdda->pause_audio(1);
+			}
 		}
 		else
 		{
@@ -2144,6 +2161,15 @@ void saturn_cd_hle_device::cd_exec_command()
 
 TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::sh1_command_cb )
 {
+	// yield current command until we managed to handle the new status change
+	// - cnc* definitely wants this at FMV playbacks
+	// TODO: seeking probably needs to yield as well
+	if (m_status_change_in_progress)
+	{
+		m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
+		return;
+	}
+
 	if((cmd_pending == 0xf) && (!(hirqreg & CMOK)))
 		cd_exec_command();
 }
@@ -2779,7 +2805,9 @@ void saturn_cd_hle_device::cd_playdata()
 		{
 			// accept the previously chained command
 			// amagishi wants this at startup
+			LOGSTATUS("Change to new status %04x -> %04x\n", cd_stat, cd_next_stat);
 			cd_stat = cd_next_stat;
+			m_status_change_in_progress = false;
 			break;
 		}
 		case CD_STAT_SEEK:

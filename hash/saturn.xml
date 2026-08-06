@@ -2001,11 +2001,13 @@ FMV logo and in-game speeches are off-sync [CD-Block]
 		</part>
 	</software>
 
-	<!-- Black screen (and SIGSEGV with [DRC]) on FMVs, [CD-Block] transfers 1 sector at a time but actual transfers are way ahead. -->
 	<software name="cncj" cloneof="cnc" supported="no">
 		<description>Command &amp; Conquer (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen (and SIGSEGV with [DRC]) on FMVs, [CD-Block] transfers 1 sector at a time but actual transfers are way ahead.
+]]></notes>
 		<info name="serial" value="GS-9131"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="コマンド &amp; コンカー"/>
@@ -13890,6 +13892,7 @@ Black screen, enables [SCU] Timer 1
 		<publisher>Clip House</publisher>
 		<notes><![CDATA[
 Sound clips overdrives a bit
+[CD-Block] randomly doesn't boot
 Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-1513G"/>
@@ -22007,7 +22010,7 @@ One jigsaw reference randomly crapped out during playtesting, was fine on restar
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Black screen after Sega Sports logo, requires [SMPC] same SSHON issued to pseudo instantly return
-PC=6004FC0
+PC=6004FC0 (fixed)
 Randomly doesn't boot
 ]]></notes>
 		<info name="serial" value="GS-9139"/>

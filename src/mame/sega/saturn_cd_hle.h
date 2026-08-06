@@ -178,6 +178,7 @@ private:
 	uint8_t cdda_maxrepeat;
 	uint8_t cdda_repeat_count;
 	uint8_t tray_is_closed;
+	bool m_status_change_in_progress;
 	int get_timing_command( void );
 
 	direntryT curroot;       // root entry of current filesystem
