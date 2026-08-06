@@ -6750,7 +6750,7 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 		/* lengris3 bit 3 normal, bit 1 during battle field */
 		/* mslug bit 0 during gameplay */
 		/* bugu Sega Away Logo onward 0x470 */
-		/* cncu 0x0004 0xc000 */
+		/* cncu 0x0004 0xc000, azelpanztai 0x0004 0x0000 (FMV) */
 		if(VDP2_SFSEL & ~0x47f)
 			popmessage("Special Function Code Select enable %04x %04x",VDP2_SFSEL,VDP2_SFCODE);
 

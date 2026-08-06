@@ -878,6 +878,7 @@ void scsp_device::UpdateReg(int reg)
 
 				// behavior from real hardware: if you SCIRE a timer that's expired,
 				// it'll immediately pop up again in SCIPD.  cfr. saturn:sakurat
+				// TODO: crocj disagrees with this (keeps going spurious irqs)
 				if (m_TimCnt[0] == 0xffff)
 				{
 					m_udata.data[0x20/2] |= 0x40;

@@ -168,8 +168,10 @@ void saturn_cd_hle_device::device_reset()
 {
 	int32_t i, j;
 
-	hirqmask = 0;
-	hirqreg = 0;
+	hirqmask = 0x0000;
+	// FIXME: should be zero but CD auto load and azelpanztai breaks otherwise
+	// (what's the origin of this CMOK?)
+	hirqreg = 0x0001;
 	cr1 = 'C';
 	cr2 = ('D'<<8) | 'B';
 	cr3 = ('L'<<8) | 'O';

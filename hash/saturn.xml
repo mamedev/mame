@@ -1810,13 +1810,15 @@ Options menu is too large [VDP1], sports [VDP1] zooming error for the background
 		</part>
 	</software>
 
-	<!-- DaiMakaiMura BGM playbacks misses one instrument starting from stage 2 (only in-game, works fine in sound test), [SCSP] key on/off issue? -->
-	<!-- Wrong [VDP2] tilemap [VDP1] sprite priorities, particularly noticeable in ChohMakaiMura -->
-	<!-- Missing [VDP2] mosaic for ChohMakaiMura on map transitions -->
 	<software name="capgen2" supported="no">
 		<description>Capcom Generation - Dai-2-Shuu - Makai to Kishi (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+DaiMakaiMura BGM playbacks misses one instrument starting from stage 2 (only in-game, works fine in sound test), [SCSP] key on/off issue?
+Wrong [VDP2] tilemap [VDP1] sprite priorities, particularly noticeable in ChohMakaiMura
+Missing [VDP2] mosaic for ChohMakaiMura on map transitions
+]]></notes>
 		<info name="serial" value="T-1233G"/>
 		<info name="release" value="19980923"/>
 		<info name="alt_title" value="カプコン ジェネレーション ～第2集 魔界と騎士～"/>
@@ -8797,6 +8799,9 @@ Black screen at boot, [CD-Block] never completes first FMV transfer after FAD=55
 		<description>Azel - Panzer Dragoon RPG Taikenban (Japan)</description>
 		<year>1997?</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Performance is dire in gameplay [VDP2]
+]]></notes>
 		<info name="serial" value="610-6749"/>
 		<info name="alt_title" value="アゼル ―パンツァードラグーンＲＰＧ― 体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -37556,7 +37561,7 @@ Doesn't accept any input on System Memory requirement screen
 		</part>
 	</software>
 
-	<!-- Misc Protos -->
+<!-- !Misc Protos -->
 
 	<!-- Released by Josh Fairhurst / Screaming Villains in Bin+Cue format, built from the original source files. -->
 	<software name="prizefhe" supported="no">
