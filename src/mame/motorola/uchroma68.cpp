@@ -451,6 +451,9 @@ void uchroma68_state::uchroma68(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SCREEN(config, m_screen);
+	// NTSC
+	m_screen->set_raw(XTAL_UCHROMA68 * 2, 456, 0, 372, 262, 0, 243);
+	m_screen->set_screen_update(m_mc6847, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_mc6847, XTAL_UCHROMA68);
 	m_mc6847->set_screen(m_screen);

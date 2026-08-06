@@ -211,6 +211,8 @@ void agvision_state::agvision(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen);
+	m_screen->set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	m_screen->set_screen_update("vdg", FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);
