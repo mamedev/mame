@@ -14,7 +14,8 @@ following setup can be figured out:
 - Linux 2.6.20.1
 Some games on this hardware are known to use a touch screen.
 
-There is an external PCB (USB) with a MCU for managing the security encryption.
+There is an external PCB (USB) for managing the security encryption with Atmel Atmega 64/128 for the
+encryption keys and a FT232BM/245BM for the USB.
 
 Known games on this hardware:
   2014 - Slot Club Gold
@@ -107,6 +108,8 @@ void octavian_g650_state::octavian_g650(machine_config &config)
 /* The first HDD has three partitions, the second one is encrypted and is mounted as a RAM disc. The third one seems encrypted too.
    The second HDD have references to both "Admiral Parrot" and "Sweet Street" games (both from Octavian and both from 2007), but 
    seems to be "Sweet Street", and that the "Admiral Parrot" stuff is just a leftover.
+   The encryption is a pre-block Blowfish CBC, with the IV depending on the offset. Linux uses cryptoloop + Blowfish with the values
+   readed from the Atmel on the USB external board. It skips all-zero blocks.
    At boot, it shows a splash screen from "Dream Games - Gaming System". */
 ROM_START(sweetstr)
 	// ROM_REGION32_LE(0x80000, "bios", 0)
