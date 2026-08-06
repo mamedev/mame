@@ -1320,6 +1320,12 @@ macsefd
 unitron
 utrn1024
 
+@source:apple/maccatalyst.cpp
+pmac7200
+pmac7200_90
+pmac7200_100
+pmac7200_120
+
 @source:apple/macii.cpp
 mac2fdhd
 macii

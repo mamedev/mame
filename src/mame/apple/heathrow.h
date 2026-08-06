@@ -7,7 +7,9 @@
 #pragma once
 
 #include "dbdma.h"
+#include "mesh.h"
 
+#include "bus/ata/ataintf.h"
 #include "machine/pci.h"
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
@@ -30,10 +32,6 @@ public:
 
 	auto codec_r_callback() { return read_codec.bind(); }
 	auto codec_w_callback() { return write_codec.bind(); }
-	auto scsi0_r_callback() { return read_scsi0.bind(); }
-	auto scsi0_w_callback() { return write_scsi0.bind(); }
-	auto scsi0_dma_r_callback() { return read_scsi0_dma.bind(); }
-	auto scsi0_dma_w_callback() { return write_scsi0_dma.bind(); }
 
 	auto iobus_a_r_callback() { return read_iobus_a.bind(); }
 	auto iobus_a_w_callback() { return write_iobus_a.bind(); }
@@ -87,12 +85,6 @@ protected:
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
 
-	u8 scsi0_r(offs_t offset);
-	void scsi0_w(offs_t offset, u8 data);
-
-	u32 scsi0_dma_r(offs_t offset);
-	void scsi0_dma_w(offs_t offset, u32 data);
-
 	template <devcb_read32 macio_device::*R> u32 iobus_r(offs_t offset, u32 mem_mask);
 	template <devcb_write32 macio_device::*W> void iobus_w(offs_t offset, u32 data, u32 mem_mask);
 
@@ -101,11 +93,6 @@ protected:
 
 	devcb_read32 read_codec;
 	devcb_write32 write_codec;
-
-	devcb_read8 read_scsi0;
-	devcb_write8 write_scsi0;
-	devcb_read16 read_scsi0_dma;
-	devcb_write16 write_scsi0_dma;
 
 	devcb_read8 read_fdc_dma;
 	devcb_write8 write_fdc_dma;
@@ -152,6 +139,12 @@ public:
 
 	virtual void map(address_map &map) ATTR_COLD;
 
+	// Grand Central has no SCSI controller of its own: it interfaces to two external ones.
+	auto scsi0_r_callback() { return read_scsi0.bind(); }
+	auto scsi0_w_callback() { return write_scsi0.bind(); }
+	auto scsi0_dma_r_callback() { return read_scsi0_dma.bind(); }
+	auto scsi0_dma_w_callback() { return write_scsi0_dma.bind(); }
+
 	auto scsi1_r_callback() { return read_scsi1.bind(); }
 	auto scsi1_w_callback() { return write_scsi1.bind(); }
 
@@ -173,6 +166,11 @@ protected:
 	virtual uint8_t cache_line_size_r() override { return 0x08; }
 
 private:
+	u8 scsi0_r(offs_t offset);
+	void scsi0_w(offs_t offset, u8 data);
+	u32 scsi0_dma_r(offs_t offset);
+	void scsi0_dma_w(offs_t offset, u32 data);
+
 	u8 scsi1_r(offs_t offset);
 	void scsi1_w(offs_t offset, u8 data);
 	u32 scsi1_dma_r(offs_t offset);
@@ -182,6 +180,11 @@ private:
 	template <devcb_write32 grandcentral_device::*W> void iobus_w(offs_t offset, u32 data, u32 mem_mask);
 
 	required_device<dbdma_device> m_dma_scsi1;
+
+	devcb_read8 read_scsi0;
+	devcb_write8 write_scsi0;
+	devcb_read16 read_scsi0_dma;
+	devcb_write16 write_scsi0_dma;
 
 	devcb_read8 read_scsi1;
 	devcb_write8 write_scsi1;
@@ -212,11 +215,23 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 	required_device<dbdma_device> m_dma_ata0, m_dma_ata1;
+	required_device<mesh_device> m_mesh;
+	required_device_array<ata_interface_device, 2> m_ata;
+
+	void ohare_start();
+
+	u8 mesh_r(offs_t offset);
+	void mesh_w(offs_t offset, u8 data);
+
+	template <int Ch> u32 ata_r(offs_t offset, u32 mem_mask);
+	template <int Ch> void ata_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Ch> void ata_dmarq(int state);
 
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
 
 	u8 m_nvram[0x8000];
+	u32 m_ata_config[2];
 };
 
 class heathrow_device : public ohare_device

@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "heathrow.h"
 
+#include "bus/ata/atapicdr.h"
 #include "bus/rs232/rs232.h"
 #include "formats/ap_dsk35.h"
 
@@ -107,7 +108,9 @@ void ohare_device::map(address_map &map)
 	base_map(map);
 	map(0x08b00, 0x08b1f).m(m_dma_ata0, FUNC(dbdma_device::map));
 	map(0x08c00, 0x08c1f).m(m_dma_ata1, FUNC(dbdma_device::map));
-	map(0x10000, 0x100ff).rw(FUNC(ohare_device::scsi0_r), FUNC(ohare_device::scsi0_w));
+	map(0x10000, 0x100ff).rw(FUNC(ohare_device::mesh_r), FUNC(ohare_device::mesh_w));
+	map(0x20000, 0x20fff).rw(FUNC(ohare_device::ata_r<0>), FUNC(ohare_device::ata_w<0>));
+	map(0x21000, 0x21fff).rw(FUNC(ohare_device::ata_r<1>), FUNC(ohare_device::ata_w<1>));
 
 	map(0x60000, 0x7ffff).rw(FUNC(ohare_device::nvram_r), FUNC(ohare_device::nvram_w)).umask32(0x000000ff);
 }
@@ -133,8 +136,6 @@ void macio_device::device_add_mconfig(machine_config &config)
 	DBDMA_CHANNEL(config, m_dma_scsi0, 0);
 	m_dma_scsi0->set_width(1);
 	m_dma_scsi0->irq_callback().set(FUNC(macio_device::set_irq_line<0>));
-	m_dma_scsi0->dma_r().set(FUNC(macio_device::scsi0_dma_r));
-	m_dma_scsi0->dma_w().set(FUNC(macio_device::scsi0_dma_w));
 
 	DBDMA_CHANNEL(config, m_dma_floppy, 0);
 	m_dma_floppy->set_width(1);
@@ -193,6 +194,8 @@ void grandcentral_device::device_add_mconfig(machine_config &config)
 	macio_device::device_add_mconfig(config);
 
 	m_dma_scsi0->set_width(2);
+	m_dma_scsi0->dma_r().set(FUNC(grandcentral_device::scsi0_dma_r));
+	m_dma_scsi0->dma_w().set(FUNC(grandcentral_device::scsi0_dma_w));
 
 	DBDMA_CHANNEL(config, m_dma_scsi1, 0);
 	m_dma_scsi1->set_width(2);
@@ -212,6 +215,30 @@ void ohare_device::device_add_mconfig(machine_config &config)
 	DBDMA_CHANNEL(config, m_dma_ata1, 0);
 	m_dma_ata1->set_width(2);
 	m_dma_ata1->irq_callback().set(FUNC(macio_device::set_irq_line<3>));
+
+	// O'Hare and later have MESH on-chip.  We leave it to the driver to decide
+	// what the SCSI devices are, if any.
+	nscsi_bus_device &scsibus(NSCSI_BUS(config, "scsi"));
+	APPLE_MESH_SCSI(config, m_mesh, 50_MHz_XTAL);
+	scsibus.set_external_device(7, m_mesh);
+	m_mesh->irq_handler_cb().set(FUNC(macio_device::scsi0_irq));
+	m_mesh->drq_handler_cb().set(FUNC(macio_device::scsi0_drq));
+	m_dma_scsi0->dma_r().set(m_mesh, FUNC(mesh_device::dma8_r));
+	m_dma_scsi0->dma_w().set(m_mesh, FUNC(mesh_device::dma8_w));
+
+	ATA_INTERFACE(config, m_ata[0]).options(ata_devices, nullptr, nullptr, false);
+	m_ata[0]->irq_handler().set(FUNC(macio_device::set_irq_line<13>));
+	m_ata[0]->dmarq_handler().set(FUNC(ohare_device::ata_dmarq<0>));
+	m_dma_ata0->dma_r().set(m_ata[0], FUNC(ata_interface_device::read_dma));
+	m_dma_ata0->dma_w().set(m_ata[0], FUNC(ata_interface_device::write_dma));
+
+	ATA_INTERFACE(config, m_ata[1]).options(ata_devices, nullptr, nullptr, false);
+	m_ata[1]->slot(0).set_option_machine_config("cdrom", [](device_t *device)
+			{ downcast<atapi_cdrom_device &>(*device).set_is_ready(true); });
+	m_ata[1]->irq_handler().set(FUNC(macio_device::set_irq_line<14>));
+	m_ata[1]->dmarq_handler().set(FUNC(ohare_device::ata_dmarq<1>));
+	m_dma_ata1->dma_r().set(m_ata[1], FUNC(ata_interface_device::read_dma));
+	m_dma_ata1->dma_w().set(m_ata[1], FUNC(ata_interface_device::write_dma));
 }
 
 void macio_device::config_map(address_map &map)
@@ -232,10 +259,6 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	read_pb3(*this, 0),
 	read_codec(*this, 0),
 	write_codec(*this),
-	read_scsi0(*this, 0),
-	write_scsi0(*this),
-	read_scsi0_dma(*this, 0),
-	write_scsi0_dma(*this),
 	read_fdc_dma(*this, 0),
 	write_fdc_dma(*this),
 	read_iobus_a(*this, 0),
@@ -268,6 +291,10 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 grandcentral_device::grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	macio_device(mconfig, GRAND_CENTRAL, tag, owner, clock),
 	m_dma_scsi1(*this, "dma_scsi1"),
+	read_scsi0(*this, 0),
+	write_scsi0(*this),
+	read_scsi0_dma(*this, 0),
+	write_scsi0_dma(*this),
 	read_scsi1(*this, 0),
 	write_scsi1(*this),
 	read_scsi1_dma(*this, 0),
@@ -283,7 +310,9 @@ ohare_device::ohare_device(const machine_config &mconfig, device_type type, cons
 	macio_device(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_dma_ata0(*this, "dma_ata0"),
-	m_dma_ata1(*this, "dma_ata1")
+	m_dma_ata1(*this, "dma_ata1"),
+	m_mesh(*this, "mesh"),
+	m_ata(*this, "ata%u", 0U)
 {
 }
 
@@ -351,15 +380,23 @@ void grandcentral_device::device_start()
 	m_dma_scsi1->set_address_space(get_pci_busmaster_space());
 }
 
+void ohare_device::ohare_start()
+{
+	save_item(NAME(m_nvram));
+
+	m_ata_config[0] = m_ata_config[1] = 0;
+	save_item(NAME(m_ata_config));
+
+	m_dma_ata0->set_address_space(get_pci_busmaster_space());
+	m_dma_ata1->set_address_space(get_pci_busmaster_space());
+}
+
 void ohare_device::device_start()
 {
 	common_init();
 	add_map(0x80000, M_MEM, FUNC(grandcentral_device::map));
 	set_ids(0x106b0007, 0x01, 0xff0000, 0x000000);
-	save_item(NAME(m_nvram));
-
-	m_dma_ata0->set_address_space(get_pci_busmaster_space());
-	m_dma_ata1->set_address_space(get_pci_busmaster_space());
+	ohare_start();
 }
 
 void heathrow_device::device_start()
@@ -367,7 +404,7 @@ void heathrow_device::device_start()
 	common_init();
 	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	set_ids(0x106b0010, 0x01, 0xff0000, 0x000000);
-	save_item(NAME(m_nvram));
+	ohare_start();
 }
 
 void paddington_device::device_start()
@@ -375,7 +412,7 @@ void paddington_device::device_start()
 	common_init();
 	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	set_ids(0x106b0017, 0x01, 0xff0000, 0x000000);
-	save_item(NAME(m_nvram));
+	ohare_start();
 }
 
 //-------------------------------------------------
@@ -776,6 +813,92 @@ void macio_device::scc_macrisc_w(offs_t offset, u8 data)
 	}
 }
 
+// O'Hare and later have a MESH SCSI controller on-chip
+u8 ohare_device::mesh_r(offs_t offset)
+{
+	return m_mesh->read(offset >> 4);
+}
+
+void ohare_device::mesh_w(offs_t offset, u8 data)
+{
+	m_mesh->write(offset >> 4, data);
+}
+
+template <int Ch> u32 ohare_device::ata_r(offs_t offset, u32 mem_mask)
+{
+	ata_interface_device &ata = *m_ata[Ch];
+
+	switch ((offset >> 2) & 0xff)
+	{
+		case 0x00:  // data register (16- or 32-bit PIO)
+			if (ACCESSING_BITS_16_31)
+			{
+				const u16 w0 = ata.cs0_r(0);
+				const u16 w1 = ata.cs0_r(0);
+				return w0 | (u32(w1) << 16);
+			}
+			return ata.cs0_r(0, mem_mask & 0xffff);
+
+		case 0x01: case 0x02: case 0x03: case 0x04:
+		case 0x05: case 0x06: case 0x07:    // command block, byte-wide
+			return ata.cs0_r((offset >> 2) & 7, 0xff);
+
+		case 0x16:  // control block: alternate status
+			return ata.cs1_r(6, 0xff);
+
+		case 0x20:  // Apple timing configuration register
+			return m_ata_config[Ch];
+	}
+
+	return 0;
+}
+
+template <int Ch> void ohare_device::ata_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	ata_interface_device &ata = *m_ata[Ch];
+
+	switch ((offset >> 2) & 0xff)
+	{
+		case 0x00:  // data register (16- or 32-bit PIO)
+			if (ACCESSING_BITS_16_31)
+			{
+				ata.cs0_w(0, data & 0xffff);
+				ata.cs0_w(0, (data >> 16) & 0xffff);
+			}
+			else
+			{
+				ata.cs0_w(0, data & 0xffff, mem_mask & 0xffff);
+			}
+			break;
+
+		case 0x01: case 0x02: case 0x03: case 0x04:
+		case 0x05: case 0x06: case 0x07:    // command block, byte-wide
+			ata.cs0_w((offset >> 2) & 7, data & 0xff, 0xff);
+			break;
+
+		case 0x16:  // control block: device control
+			ata.cs1_w(6, data & 0xff, 0xff);
+			break;
+
+		case 0x20:  // Apple timing configuration register
+			m_ata_config[Ch] = data;
+			break;
+	}
+}
+
+template <int Ch> void ohare_device::ata_dmarq(int state)
+{
+	dbdma_device &dma = *(Ch ? m_dma_ata1 : m_dma_ata0);
+
+	if (state)
+		m_ata[Ch]->write_dmack(ASSERT_LINE);
+
+	dma.drq_w(state);
+
+	if (!state)
+		m_ata[Ch]->write_dmack(CLEAR_LINE);
+}
+
 // O'Hare and later OF NVRAM support
 u8 ohare_device::nvram_r(offs_t offset)
 {
@@ -833,29 +956,9 @@ void macio_device::codec_dma_write(offs_t offset, u32 data)
 	m_dma_audio_in->dma_write(offset, data);
 }
 
-u8 macio_device::scsi0_r(offs_t offset)
-{
-	return read_scsi0(offset >> 4);
-}
-
-void macio_device::scsi0_w(offs_t offset, u8 data)
-{
-	write_scsi0(offset >> 4, data);
-}
-
 void macio_device::scsi0_drq(int state)
 {
 	m_dma_scsi0->drq_w(state);
-}
-
-u32 macio_device::scsi0_dma_r(offs_t offset)
-{
-	return read_scsi0_dma(offset);
-}
-
-void macio_device::scsi0_dma_w(offs_t offset, u32 data)
-{
-	write_scsi0_dma(offset, data);
 }
 
 template <devcb_read32 macio_device::*R> u32 macio_device::iobus_r(offs_t offset, u32 mem_mask)
@@ -876,6 +979,26 @@ template <devcb_read32 grandcentral_device::*R> u32 grandcentral_device::iobus_r
 template <devcb_write32 grandcentral_device::*W> void grandcentral_device::iobus_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	(this->*W)(offset, data, mem_mask);
+}
+
+u8 grandcentral_device::scsi0_r(offs_t offset)
+{
+	return read_scsi0(offset >> 4);
+}
+
+void grandcentral_device::scsi0_w(offs_t offset, u8 data)
+{
+	write_scsi0(offset >> 4, data);
+}
+
+u32 grandcentral_device::scsi0_dma_r(offs_t offset)
+{
+	return read_scsi0_dma(offset);
+}
+
+void grandcentral_device::scsi0_dma_w(offs_t offset, u32 data)
+{
+	write_scsi0_dma(offset, data);
 }
 
 u8 grandcentral_device::scsi1_r(offs_t offset)
