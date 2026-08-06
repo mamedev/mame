@@ -30,16 +30,6 @@
 
 */
 
-/*
-
-    TODO:
-
-    - [:2a:chb] - TX FIFO is full, discarding data
-        [:] SCC write 000003
-        [:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
-
-*/
-
 #include "emu.h"
 #include "abc1600_v.h"
 #include "abc1600_mmu.h"
