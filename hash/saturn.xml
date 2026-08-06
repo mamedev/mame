@@ -2007,6 +2007,7 @@ FMV logo and in-game speeches are off-sync [CD-Block]
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Black screen (and SIGSEGV with [DRC]) on FMVs, [CD-Block] transfers 1 sector at a time but actual transfers are way ahead.
+Runs slow in gameplay
 ]]></notes>
 		<info name="serial" value="GS-9131"/>
 		<info name="release" value="19970425"/>
