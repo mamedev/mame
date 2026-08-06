@@ -4572,13 +4572,13 @@ ROM_END
 
 ROM_START( cybrcomm )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // main program
-	ROM_LOAD32_BYTE( "cy1prgll.4d", 0x00003, 0x80000, CRC(b3eab156) SHA1(2a5c4e0360c3b9500687a4d70f7110a0c30da2a5) )
-	ROM_LOAD32_BYTE( "cy1prglm.2d", 0x00002, 0x80000, CRC(884a5b0e) SHA1(0e27ae366b8a2695fe112b4740c8c9013bb97e26) )
-	ROM_LOAD32_BYTE( "cy1prgum.8d", 0x00001, 0x80000, CRC(c9c4a921) SHA1(76a52461165a8bd8d984a34063fbeb4cb73624af) )
-	ROM_LOAD32_BYTE( "cy1prguu.6d", 0x00000, 0x80000, CRC(5f22975b) SHA1(a1a5cb66358d64a3c564b912f2eeafa182786b1e) )
+	ROM_LOAD32_BYTE( "cyc1prgll.4d", 0x00003, 0x80000, CRC(b3eab156) SHA1(2a5c4e0360c3b9500687a4d70f7110a0c30da2a5) )
+	ROM_LOAD32_BYTE( "cyc1prglm.2d", 0x00002, 0x80000, CRC(884a5b0e) SHA1(0e27ae366b8a2695fe112b4740c8c9013bb97e26) )
+	ROM_LOAD32_BYTE( "cyc1prgum.8d", 0x00001, 0x80000, CRC(c9c4a921) SHA1(76a52461165a8bd8d984a34063fbeb4cb73624af) )
+	ROM_LOAD32_BYTE( "cyc1prguu.6d", 0x00000, 0x80000, CRC(5f22975b) SHA1(a1a5cb66358d64a3c564b912f2eeafa182786b1e) )
 
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) // sound data
-	ROM_LOAD( "cy1data.6r", 0x00000, 0x20000, CRC(10d0005b) SHA1(10508eeaf74d24a611b44cd3bb12417ceb78904f) )
+	ROM_LOAD( "cyc1data.6r", 0x00000, 0x20000, CRC(10d0005b) SHA1(10508eeaf74d24a611b44cd3bb12417ceb78904f) )
 	ROM_RELOAD(             0x20000, 0x20000)
 	ROM_RELOAD(             0x40000, 0x20000)
 	ROM_RELOAD(             0x60000, 0x20000)
@@ -4611,10 +4611,10 @@ ROM_START( cybrcomm )
 	ROM_LOAD( "cyc1ptu2.3d", 0x400000, 0x080000, CRC(a0e73674) SHA1(1e22142a564e664031c12b250664fc82e3b3d43b) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // samples
-	ROM_LOAD( "cy1wav0.10r", 0x000000, 0x100000, CRC(c6f366a2) SHA1(795dbee09df159d3501c748fb3de16cca81742d6) )
-	ROM_LOAD( "cy1wav1.10p", 0x200000, 0x100000, CRC(f30b5e37) SHA1(9f5a94d82741ef9688c6e415ebb9009c906737c9) )
-	ROM_LOAD( "cy1wav2.10n", 0x100000, 0x100000, CRC(b98c1ca6) SHA1(4b66aa05f82be5ef3315acc30031872698ff4391) )
-	ROM_LOAD( "cy1wav3.10l", 0x300000, 0x100000, CRC(43dbac19) SHA1(83fd4ae4e7ec264fc217ed18caf59bf438af0c3d) )
+	ROM_LOAD( "cyc1wav0.10r", 0x000000, 0x100000, CRC(c6f366a2) SHA1(795dbee09df159d3501c748fb3de16cca81742d6) )
+	ROM_LOAD( "cyc1wav1.10p", 0x200000, 0x100000, CRC(f30b5e37) SHA1(9f5a94d82741ef9688c6e415ebb9009c906737c9) )
+	ROM_LOAD( "cyc1wav2.10n", 0x100000, 0x100000, CRC(b98c1ca6) SHA1(4b66aa05f82be5ef3315acc30031872698ff4391) )
+	ROM_LOAD( "cyc1wav3.10l", 0x300000, 0x100000, CRC(43dbac19) SHA1(83fd4ae4e7ec264fc217ed18caf59bf438af0c3d) )
 
 	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d", 0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4622,7 +4622,7 @@ ROM_START( cybrcomm )
 	ROM_LOAD( "rr1gam.4d", 0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 
 	ROM_REGION( 0x2000, "eeprom", 0 ) // default eeprom
-	ROM_LOAD( "cy1eeprm.9e", 0x0000, 0x2000, CRC(8432c066) SHA1(99d4bfda3f8aec288dbeaf291bce85fe9009a1de) )
+	ROM_LOAD( "cyc1eeprm.9e", 0x0000, 0x2000, CRC(8432c066) SHA1(99d4bfda3f8aec288dbeaf291bce85fe9009a1de) )
 ROM_END
 
 
@@ -6406,7 +6406,7 @@ GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,   namcos22_state,  init_r
 GAME( 1994, ridgera2j,  ridgera2, namcos22,  ridgera2,   namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
 GAME( 1994, ridgera2ja, ridgera2, namcos22,  ridgera2,   namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
 GAME( 1994, ridgera28,  ridgera2, namcos22,  ridgera2,   namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (World, RRS8)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-XX-XX - Test Location / proto??
-GAME( 1994, cybrcomm,   0,        cybrcomm,  cybrcomm,   namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Japan, CY1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
+GAME( 1994, cybrcomm,   0,        cybrcomm,  cybrcomm,   namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Japan, CYC1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
 GAME( 1995, raverace,   0,        namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (World, RV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
 GAME( 1995, raveracej,  raverace, namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
 GAME( 1995, raveraceja, raverace, namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
