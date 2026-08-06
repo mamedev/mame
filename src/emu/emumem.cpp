@@ -313,6 +313,14 @@ void memory_manager::initialize()
 	for (auto const memory : memories)
 		memory->populate_from_maps();
 
+	// validate that shares referenced from maps are fully covered
+	for (auto const &[name, share] : m_sharelist)
+	{
+		std::string const result = share->validate_mapping();
+		if (!result.empty())
+			fatalerror("%s\n", result);
+	}
+
 	// disable logging of unmapped access when no one receives it
 	if (!machine().options().log() && !machine().options().oslog() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
 		for (auto const memory : memories)
@@ -1145,5 +1153,32 @@ std::string memory_share::compare(u8 width, size_t bytes, endianness_t endiannes
 		return util::string_format("share %s found with unexpected endianness (expected %s, found %s)", m_name,
 								   endianness == ENDIANNESS_LITTLE ? "little" : "big",
 								   m_endianness == ENDIANNESS_LITTLE ? "little" : "big");
+	return "";
+}
+
+void memory_share::record_mapping(size_t offset, size_t bytes)
+{
+	if (!m_mapped)
+	{
+		m_mapped_min = offset;
+		m_mapped_max = offset + bytes - 1;
+		m_mapped = true;
+	}
+	else
+	{
+		if (offset < m_mapped_min)
+			m_mapped_min = offset;
+		if (offset + bytes - 1 > m_mapped_max)
+			m_mapped_max = offset + bytes - 1;
+	}
+}
+
+std::string memory_share::validate_mapping() const
+{
+	if (!m_mapped)
+		return "";
+	if (m_mapped_min != 0 || m_mapped_max + 1 != m_bytes)
+		return util::string_format("share %s mapped range %x-%x does not cover declared size %x",
+								   m_name, m_mapped_min, m_mapped_max, m_bytes);
 	return "";
 }
