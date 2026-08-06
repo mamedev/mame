@@ -1,30 +1,4 @@
-pugixml 1.16 - an XML processing library
-
-Copyright (C) 2006-2026, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
-Report bugs and download new versions at https://pugixml.org/
-
-This is the distribution of pugixml, which is a C++ XML processing library,
-which consists of a DOM-like interface with rich traversal/modification
-capabilities, an extremely fast XML parser which constructs the DOM tree from
-an XML file/buffer, and an XPath 1.0 implementation for complex data-driven
-tree queries. Full Unicode support is also available, with Unicode interface
-variants and conversions between different Unicode encodings (which happen
-automatically during parsing/saving).
-
-The distribution contains the following folders:
-
-	docs/ - documentation
-		docs/samples - pugixml usage examples
-		docs/quickstart.html - quick start guide
-		docs/manual.html - complete manual
-
-	scripts/ - project files for IDE/build systems
-
-	src/ - header and source files
-
-	readme.txt - this file.
-
-This library is distributed under the MIT License:
+MIT License
 
 Copyright (c) 2006-2026 Arseny Kapoulkine
 
