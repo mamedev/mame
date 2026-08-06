@@ -82,6 +82,7 @@ void sh7709s_device::device_reset()
 	m_wb_active_cycles = 0;
 	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
+	m_burst_continuation_remaining_cycles = 0;
 	m_last_op_cycle_count = 0;
 }
 
@@ -96,6 +97,7 @@ void sh7709s_device::device_start()
 	m_wb_active_cycles = 0;
 	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
+	m_burst_continuation_remaining_cycles = 0;
 	m_last_op_cycle_count = 0;
 
 	for (int i = 0; i < SH7709S_CACHE_BLOCKS; i++)
@@ -324,6 +326,12 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 	return SH7709S_CACHE_LINE_SIZE >> bcr2_val;
 }
 
+
+static unsigned int get_burst_word(uint32_t address)
+{
+	return (address % 16) / 4;
+}
+
 #define CACHE_MISS_STALL (1) // Miss detection in 1 cpu cycle, the rest of the ops (wb buffer movement, etc..) happen in the background
 
 static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
@@ -367,11 +375,13 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// Non-SDRAM areas : T1(address) + T2(data) + WCR2 wait states
 	// 2 + WCR2
 
-	// Critical word first handling, only stall until the critical word
-	// Right now we just stall until the first word lands which isn't quite right but is probably fine
+	// Critical word first: the CPU stalls only until the critical word lands.
+	// The remaining burst words keep transferring on the bus after that and
+	// must block any subsequent bus access; that's tracked separately below
+	// via m_burst_continuation_remaining_cycles.
 
 	if (is_sdram_region(address))
-		bus_penalty = 1 + mcr_rcd() + get_wcr2_timing(address);
+		bus_penalty = 1 + mcr_rcd() + get_wcr2_timing(address) + (is_cacheable(address) ? burst_word : 0);
 	else
 	{
 		if (is_cacheable(address))
@@ -388,10 +398,20 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// only need to handle non-cacheable + write for this check
 	m_last_area_accessed_was_write = (!is_cacheable(address) && write);
 
-	// CPU is in auto precharge mode, check how many cycles to stall if not enough time has elapsed on a bank conflict
-	if (is_sdram_region(address) && bank_read == m_last_sdram_bank && m_precharge_remaining_cycles > 0)
-		cpu_penalty += remaining_cycles(elapsed_cycles, m_precharge_remaining_cycles);
+	// The remaining burst words of a prior cache fill still occupy the bus, so
+	// any subsequent access must wait for them to drain regardless of bank.
+	uint64_t burst_cycles_left = remaining_cycles(elapsed_cycles, m_burst_continuation_remaining_cycles);
+	cpu_penalty += burst_cycles_left;
 
+	// The burst bank precharge only starts after the burst drains, so measure its
+	// remaining cycles from burst completion instead of from the access start.
+	if (is_sdram_region(address) && bank_read == m_last_sdram_bank && m_precharge_remaining_cycles > 0)
+	{
+		uint64_t precharge_cycles_left = (burst_cycles_left == 0) ? elapsed_cycles - m_burst_continuation_remaining_cycles : elapsed_cycles;
+		cpu_penalty += remaining_cycles(precharge_cycles_left, m_precharge_remaining_cycles);
+	}
+
+	m_burst_continuation_remaining_cycles = 0;
 	m_precharge_remaining_cycles = 0;
 
 	// We hit another bus operation before a writeback eviction finished, calculate remaining stall time
@@ -420,9 +440,13 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 			if (bank_read == bank_write)
 			{
 				if (is_cacheable(address))
-					m_wb_active_cycles += (3 + mcr_tpc()) * 2;
+					m_wb_active_cycles += (3 - burst_word + mcr_tpc()) * 2;
 				else
 					m_wb_active_cycles += mcr_tpc() * 2;
+			}
+			else
+			{
+				m_wb_active_cycles += (3 - burst_word) * 2; // no tpc wait if there's no bank conflict, wait on burst completion
 			}
 			m_wb_active_cycles += (1 + mcr_rcd() + 3 + mcr_trwl() + mcr_tpc() + get_wcr1_timing(m_wb_address)) * 2;
 			m_last_sdram_bank = bank_write;
@@ -434,11 +458,17 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 		}
 
 		m_wb_address = 0;
+		m_last_area_accessed_was_write = true;
 	}
-	else if (is_sdram_region(address)) // Account for the read close after burst read if we hit the same bank, writebacks include the cost in the background cycles if there is a conflict
+	else if (is_sdram_region(address)) // Account for the burst continuation and read close after the critical word lands, writebacks include the cost in the background cycles if there is a conflict
 	{
 		if (is_cacheable(address))
-			m_precharge_remaining_cycles = (3 + mcr_tpc()) * 2;
+		{
+			// Remaining burst words occupy the bus, blocking subsequent accesses regardless of bank
+			m_burst_continuation_remaining_cycles = (3 - burst_word) * 2;
+			// Auto precharge of this bank after the burst, only blocks accesses to the same bank
+			m_precharge_remaining_cycles = mcr_tpc() * 2;
+		}
 		else
 			m_precharge_remaining_cycles = mcr_tpc() * 2;
 	}
