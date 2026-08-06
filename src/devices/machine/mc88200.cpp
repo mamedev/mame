@@ -9,11 +9,9 @@
  *
  * TODO:
  *  - probe commands
- *  - mbus snooping
  *  - cycle counting
  *  - mc88204 64k variant
  *  - find out where patc valid flag is stored
- *  - refactor read/write for xmem
  */
 
 #include "emu.h"
@@ -28,6 +26,7 @@ DEFINE_DEVICE_TYPE(MC88200, mc88200_device, "mc88200", "Motorola MC88200 Cache/M
 mc88200_device::mc88200_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, u8 id)
 	: device_t(mconfig, MC88200, tag, owner, clock)
 	, m_mbus_space(*this, finder_base::DUMMY_TAG, -1, 32)
+	, m_global(*this)
 	, m_id(u32(id) << 24)
 {
 }
@@ -288,19 +287,19 @@ void mc88200_device::scr_w(u32 data)
 	case 0x18: // copy back line
 	case 0x1c: // copy back and invalidate line
 		LOG("data cache %s line 0x%08x\n", action[BIT(data, 2, 2)], m_sar);
-		cache_flush(BIT(m_sar, 4, 8), BIT(m_sar, 4, 8) + 1, &mc88200_device::cache_set::cache_line::match_page, BIT(data, 3), BIT(data, 2));
+		cache_flush(BIT(m_sar, 4, 8), BIT(m_sar, 4, 8) + 1, &cache_set::cache_line::match_page, BIT(data, 3), BIT(data, 2));
 		break;
 	case 0x15: // invalidate page
 	case 0x19: // copy back page
 	case 0x1d: // copy back and invalidate page
 		LOG("data cache %s page 0x%08x\n", action[BIT(data, 2, 2)], m_sar & ~LA_OFS);
-		cache_flush(0, CACHE_SETS, &mc88200_device::cache_set::cache_line::match_page, BIT(data, 3), BIT(data, 2));
+		cache_flush(0, CACHE_SETS, &cache_set::cache_line::match_page, BIT(data, 3), BIT(data, 2));
 		break;
 	case 0x16: // invalidate segment
 	case 0x1a: // copy back segment
 	case 0x1e: // copy back and invalidate segment
 		LOG("data cache %s segment 0x%08x\n", action[BIT(data, 2, 2)], m_sar & LA_SEG);
-		cache_flush(0, CACHE_SETS, &mc88200_device::cache_set::cache_line::match_segment, BIT(data, 3), BIT(data, 2));
+		cache_flush(0, CACHE_SETS, &cache_set::cache_line::match_segment, BIT(data, 3), BIT(data, 2));
 		break;
 	case 0x17: // invalidate all
 	case 0x1b: // copy back all
@@ -413,7 +412,7 @@ void mc88200_device::cssp_w(u32 data)
 }
 
 // abbreviated, side-effect free address translation for debugger
-bool mc88200_device::translate(int intention, u32 &address, bool supervisor)
+bool mc88200_device::translate(int intention, offs_t &address, bool supervisor)
 {
 	// select area descriptor
 	u32 const apr = supervisor ? m_sapr : m_uapr;
@@ -463,7 +462,7 @@ bool mc88200_device::translate(int intention, u32 &address, bool supervisor)
 	return true;
 }
 
-std::optional<mc88200_device::translate_result> mc88200_device::translate(u32 virtual_address, bool supervisor, bool write)
+std::optional<mc88200_device::translate_result> mc88200_device::translate(offs_t virtual_address, bool supervisor, bool write)
 {
 	// select area descriptor
 	u32 const apr = supervisor ? m_sapr : m_uapr;
@@ -593,9 +592,13 @@ std::optional<mc88200_device::translate_result> mc88200_device::translate(u32 vi
 		 * when translation is disabled without regard to the active mode,
 		 * ensuring cache inhibit is activated.
 		 */
-		for (unsigned i = 8; i < 10; i++)
-			if (BIT(virtual_address, 19, 13) == BIT(m_batc[i], 19, 13))
-				return translate_result(((m_batc[i] & BATC_PBA) << 13) | (virtual_address & ~BATC_LBA), m_batc[i] & BATC_CI, m_batc[i] & BATC_G, m_batc[i] & BATC_WT);
+		 if (BIT(virtual_address, 19, 13) == BIT(m_batc[8], 19, 13))
+			 return translate_result(((m_batc[8] & BATC_PBA) << 13) | (virtual_address & ~BATC_LBA),
+				 m_batc[8] & BATC_CI, m_batc[8] & BATC_G, m_batc[8] & BATC_WT);
+
+		 if (BIT(virtual_address, 19, 13) == BIT(m_batc[9], 19, 13))
+			 return translate_result(((m_batc[9] & BATC_PBA) << 13) | (virtual_address & ~BATC_LBA),
+				 m_batc[9] & BATC_CI, m_batc[9] & BATC_G, m_batc[9] & BATC_WT);
 
 		return translate_result(virtual_address, apr & APR_CI, apr & APR_G, apr & APR_WT);
 	}
@@ -619,38 +622,45 @@ void mc88200_device::cache_set::set_mru(unsigned const line)
 	status = (status & ~flags[line].clr) | flags[line].set;
 }
 
+// set cache line state exclusive unmodified
 void mc88200_device::cache_set::set_unmodified(unsigned const line)
 {
 	status &= ~(INV << (12 + line * 2));
 }
 
+// set cache line state exclusive modified
 void mc88200_device::cache_set::set_modified(unsigned const line)
 {
 	status &= ~(INV << (12 + line * 2));
 	status |= EXM << (12 + line * 2);
 }
 
+// set cache line state shared unmodified
 void mc88200_device::cache_set::set_shared(unsigned const line)
 {
 	status &= ~(INV << (12 + line * 2));
 	status |= SHU << (12 + line * 2);
 }
 
+// set cache line state invalid
 void mc88200_device::cache_set::set_invalid(unsigned const line)
 {
 	status |= INV << (12 + line * 2);
 }
 
+// cache line state is exclusive modified
 bool mc88200_device::cache_set::modified(unsigned const line) const
 {
 	return BIT(status, 12 + line * 2, 2) == EXM;
 }
 
+// cache line state is shared unmodified
 bool mc88200_device::cache_set::shared(unsigned const line) const
 {
 	return BIT(status, 12 + line * 2, 2) == SHU;
 }
 
+// cache line state is invalid
 bool mc88200_device::cache_set::invalid(unsigned const line) const
 {
 	return BIT(status, 12 + line * 2, 2) == INV;
@@ -720,8 +730,7 @@ std::optional<unsigned> mc88200_device::cache_replace(cache_set const &cs)
 		0xc6, 0xd2, 0x00, 0xd8, 0xc9, 0x00, 0xe1, 0xe4, // 38-3f
 	};
 
-	u8 const usage = usage_table[BIT(cs.status, 24, 6)];
-	if (usage)
+	if (u8 const usage = usage_table[BIT(cs.status, 24, 6)])
 	{
 		// find least-recently used enabled line
 		for (unsigned i = 0; i < 4; i++)
@@ -739,9 +748,9 @@ std::optional<unsigned> mc88200_device::cache_replace(cache_set const &cs)
 
 void mc88200_device::cache_flush(unsigned const start, unsigned const limit, match_function match, bool const copyback, bool const invalidate)
 {
-	for (unsigned s = start; s < limit; s++)
+	for (unsigned set = start; set < limit; set++)
 	{
-		cache_set &cs = m_cache[s];
+		cache_set &cs = m_cache[set];
 
 		for (unsigned l = 0; l < std::size(cs.line); l++)
 		{
@@ -749,8 +758,13 @@ void mc88200_device::cache_flush(unsigned const start, unsigned const limit, mat
 			{
 				// copy back
 				if (copyback && cs.modified(l))
-					if (!cs.line[l].copy_back(*this, cs.line[l].tag | (s << 4), true))
+				{
+					if (!cs.line[l].copy_back(*this, cs.line[l].tag | (set << 4), true))
 						return;
+
+					// TODO: confirm flushed line state is updated
+					cs.set_unmodified(l);
+				}
 
 				// invalidate
 				if (invalidate)
@@ -760,21 +774,22 @@ void mc88200_device::cache_flush(unsigned const start, unsigned const limit, mat
 	}
 }
 
-template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock)
+template <typename T> std::optional<T> mc88200_device::read(offs_t virtual_address, bool supervisor, bool lock)
 {
-	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, false);
-	if (!result.has_value())
+	std::optional<translate_result> tr = translate(virtual_address, supervisor, false);
+	if (!tr.has_value())
 		return std::nullopt;
 
-	u32 const physical_address = result.value().address;
-	if (!result.value().ci && !lock)
-	{
-		unsigned const s = BIT(physical_address, 4, 8);
-		cache_set &cs = m_cache[s];
+	translate_result const t = tr.value();
+	u32 const physical_address = t.address;
+	unsigned const set = BIT(physical_address, 4, 8);
+	cache_set &cs = m_cache[set];
 
+	if (!t.ci && !lock)
+	{
 		for (unsigned l = 0; l < std::size(cs.line); l++)
 		{
-			// cache line hit: tag match, enabled, not invalid
+			// cache hit: tag match, enabled, not invalid
 			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
 			{
 				// set most recently used
@@ -792,34 +807,39 @@ template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address,
 			}
 		}
 
-		// select cache line for replacement
-		std::optional<unsigned> const l = cache_replace(cs);
-
-		if (l.has_value())
+		// cache miss: select line for replacement
+		if (std::optional<unsigned> const r = cache_replace(cs))
 		{
+			unsigned const l = r.value();
+			cache_set::cache_line &line = cs.line[l];
+
 			// copy back modified line
-			if (cs.modified(l.value()))
-				if (!cs.line[l.value()].copy_back(*this, cs.line[l.value()].tag | (s << 4)))
+			if (cs.modified(l))
+				if (!line.copy_back(*this, line.tag | (set << 4)))
 					return std::nullopt;
 
 			// mark line invalid
-			cs.set_invalid(l.value());
+			cs.set_invalid(l);
 
 			// update tag
-			cs.line[l.value()].tag = physical_address & ~LA_OFS;
+			line.tag = physical_address & ~LA_OFS;
+
+			// notify snoopers
+			if (t.g)
+				m_global(physical_address, 0);
 
 			// load line from memory
-			if (!cs.line[l.value()].load_line(*this, physical_address & 0xfffffff0U))
+			if (!line.load_line(*this, line.tag | (set << 4)))
 				return std::nullopt;
 
-			// mark line shared unmodified
-			cs.set_shared(l.value());
+			// set line state
+			cs.set_shared(l);
 
 			// set most recently used
-			cs.set_mru(l.value());
+			cs.set_mru(l);
 
 			// return data
-			u32 const data = cs.line[l.value()].data[BIT(physical_address, 2, 2)];
+			u32 const data = line.data[BIT(physical_address, 2, 2)];
 
 			switch (sizeof(T))
 			{
@@ -831,35 +851,47 @@ template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address,
 	}
 	else
 	{
-		// cache-inhibited cache hits invalidate the line without copyback
-		unsigned const s = BIT(physical_address, 4, 8);
-		cache_set &cs = m_cache[s];
-
+		// cache-inhibited cache hits invalidate the line
 		for (unsigned l = 0; l < std::size(cs.line); l++)
 		{
 			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
+			{
+				// copy back modified line (locked transactions only)
+				if (lock && cs.modified(l))
+					if (!cs.line[l].copy_back(*this, cs.line[l].tag | (set << 4)))
+						return std::nullopt;
+
 				cs.set_invalid(l);
+
+				break;
+			}
 		}
 	}
 
+	// notify snoopers
+	if (t.g)
+		m_global(physical_address, lock);
+
+	// cache inhibited, cache unavailable, or locked read
 	return mbus_read<T>(physical_address);
 }
 
-template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bool supervisor, bool lock)
+template <typename T> bool mc88200_device::write(offs_t virtual_address, T data, bool supervisor, bool lock)
 {
-	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, true);
-	if (!result.has_value())
+	std::optional<translate_result> tr = translate(virtual_address, supervisor, true);
+	if (!tr.has_value())
 		return false;
 
-	u32 const physical_address = result.value().address;
-	if (!result.value().ci && !lock)
-	{
-		unsigned const s = BIT(physical_address, 4, 8);
-		cache_set &cs = m_cache[s];
+	translate_result const t = tr.value();
+	u32 const physical_address = t.address;
+	unsigned const set = BIT(physical_address, 4, 8);
+	cache_set &cs = m_cache[set];
 
+	if (!t.ci && !lock)
+	{
 		for (unsigned l = 0; l < std::size(cs.line); l++)
 		{
-			// cache line hit: tag match, enabled, not invalid
+			// cache hit: tag match, enabled, not invalid
 			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
 			{
 				// write data to cache
@@ -874,18 +906,28 @@ template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bo
 				// set most recently used
 				cs.set_mru(l);
 
-				// write data to memory
-				if (result.value().wt || result.value().g)
+				if (t.wt)
+				{
+					// notify snoopers
+					if (t.g)
+						m_global(physical_address, 1);
+
+					// write through
 					if (!mbus_write(physical_address, data))
 						return false;
 
-				// update line status
-				if (cs.shared(l))
+					cs.set_shared(l);
+				}
+				else if (t.g && cs.shared(l))
 				{
-					if (result.value().g)
-						cs.set_unmodified(l);
-					else if (!result.value().wt)
-						cs.set_modified(l);
+					// notify snoopers
+					m_global(physical_address, 1);
+
+					// write once
+					if (!mbus_write(physical_address, data))
+						return false;
+
+					cs.set_unmodified(l);
 				}
 				else
 					cs.set_modified(l);
@@ -894,35 +936,37 @@ template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bo
 			}
 		}
 
-		// select cache line for replacement
-		std::optional<unsigned> const l = cache_replace(cs);
-
-		if (l.has_value())
+		// cache miss: select line for replacement
+		if (std::optional<unsigned> const r = cache_replace(cs))
 		{
+			unsigned const l = r.value();
+			cache_set::cache_line &line = cs.line[l];
+
 			// copy back modified line
-			if (cs.modified(l.value()))
-				if (!cs.line[l.value()].copy_back(*this, cs.line[l.value()].tag | (s << 4)))
+			if (cs.modified(l))
+				if (!line.copy_back(*this, line.tag | (set << 4)))
 					return false;
 
 			// mark line invalid
-			cs.set_invalid(l.value());
+			cs.set_invalid(l);
+
+			// update tag
+			line.tag = physical_address & ~LA_OFS;
+
+			// notify snoopers
+			if (t.g)
+				m_global(physical_address, 1);
 
 			// load line from memory
-			if (!cs.line[l.value()].load_line(*this, physical_address & 0xfffffff0U))
+			if (!line.load_line(*this, line.tag | (set << 4)))
 				return false;
-		}
 
-		// write data to memory
-		if (!mbus_write(physical_address, data))
-			return false;
-
-		if (l.has_value())
-		{
-			// update tag
-			cs.line[l.value()].tag = physical_address & ~LA_OFS;
+			// write data to memory
+			if (!mbus_write(physical_address, data))
+				return false;
 
 			// write data into cache
-			u32 &cache_data = cs.line[l.value()].data[BIT(physical_address, 2, 2)];
+			u32 &cache_data = line.data[BIT(physical_address, 2, 2)];
 			switch (sizeof(T))
 			{
 			case 1: cache_data = (cache_data & ~(0x000000ffU << (24 - (physical_address & 3) * 8))) | (u32(data) << (24 - (physical_address & 3) * 8)); break;
@@ -930,38 +974,48 @@ template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bo
 			case 4: cache_data = data; break;
 			}
 
-			// mark line exclusive unmodified
-			cs.set_unmodified(l.value());
+			// set line state
+			if (t.wt)
+				// TODO: confirm writethrough line state
+				cs.set_shared(l);
+			else
+				cs.set_unmodified(l);
 
 			// set most recently used
-			cs.set_mru(l.value());
-		}
+			cs.set_mru(l);
 
-		return true;
+			return true;
+		}
 	}
-	else
+	else if (!lock)
 	{
 		// cache-inhibited cache hits invalidate the line without copyback
-		unsigned const s = BIT(physical_address, 4, 8);
-		cache_set &cs = m_cache[s];
-
 		for (unsigned l = 0; l < std::size(cs.line); l++)
 		{
 			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
+			{
 				cs.set_invalid(l);
+
+				break;
+			}
 		}
 	}
 
-	return mbus_write(result.value().address, data);
+	// notify snoopers
+	if (t.g)
+		m_global(physical_address, 1);
+
+	// cache inhibited, cache unavailable, or locked write
+	return mbus_write(physical_address, data);
 }
 
-template std::optional<u8> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock);
-template std::optional<u16> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock);
-template std::optional<u32> mc88200_device::read(u32 virtual_address, bool supervisor, bool lock);
+template std::optional<u8> mc88200_device::read(offs_t virtual_address, bool supervisor, bool lock);
+template std::optional<u16> mc88200_device::read(offs_t virtual_address, bool supervisor, bool lock);
+template std::optional<u32> mc88200_device::read(offs_t virtual_address, bool supervisor, bool lock);
 
-template bool mc88200_device::write(u32 virtual_address, u8 data, bool supervisor, bool lock);
-template bool mc88200_device::write(u32 virtual_address, u16 data, bool supervisor, bool lock);
-template bool mc88200_device::write(u32 virtual_address, u32 data, bool supervisor, bool lock);
+template bool mc88200_device::write(offs_t virtual_address, u8 data, bool supervisor, bool lock);
+template bool mc88200_device::write(offs_t virtual_address, u16 data, bool supervisor, bool lock);
+template bool mc88200_device::write(offs_t virtual_address, u32 data, bool supervisor, bool lock);
 
 template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 {
@@ -1017,4 +1071,42 @@ template <typename T> bool mc88200_device::mbus_write(u32 address, T data, bool 
 	}
 	else
 		return true;
+}
+
+// respond to an incoming global transaction
+void mc88200_device::snoop_w(offs_t offset, u8 data)
+{
+	if (!(m_sctr & SCTR_SE))
+		return;
+
+	unsigned const set = BIT(offset, 4, 8);
+	cache_set &cs = m_cache[set];
+
+	for (unsigned l = 0; l < std::size(cs.line); l++)
+	{
+		if (cs.line[l].match_page(offset) && cs.enabled(l) && !cs.invalid(l))
+		{
+			if (cs.modified(l))
+			{
+				if (!cs.line[l].copy_back(*this, cs.line[l].tag | (set << 4)))
+				{
+					m_ssr |= SSR_CE;
+					return;
+				}
+			}
+
+			if (data)
+				cs.set_invalid(l);
+			else
+				cs.set_shared(l);
+
+			return;
+		}
+	}
+}
+
+void mc88200_device::bus_error_w(int state)
+{
+	if (!machine().side_effects_disabled())
+		m_bus_error = true;
 }
