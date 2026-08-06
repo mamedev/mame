@@ -99,6 +99,7 @@ void octavian_g650_state::octavian_g650(machine_config &config)
 	PENTIUM4(config, m_maincpu, 100'000'000); // Unknown VIA 32 bits CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &octavian_g650_state::octavian_g650_map);
 	m_maincpu->set_addrmap(AS_IO, &octavian_g650_state::octavian_g650_io);
+	m_maincpu->set_disable();
 
 	PCI_ROOT(config, "pci");
 	// ...
