@@ -1602,6 +1602,8 @@ void saturn_cd_hle_device::cmd_get_sector_data()
 		return;
 	}
 
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+
 	if (partitions[bufnum].numblks < sectnum)
 	{
 		LOGWARN("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
@@ -1609,8 +1611,6 @@ void saturn_cd_hle_device::cmd_get_sector_data()
 		hirqreg |= (CMOK|EHST);
 		return;
 	}
-
-	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
 
 	xfertype32 = XFERTYPE32_GETSECTOR;
 	xferoffs = 0;
@@ -1704,6 +1704,10 @@ void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
 		return;
 	}
 
+	// we need to calculate this before REJECT condition
+	// - shadtusk at startup
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+
 	/* yoshimj uses the REJECT status to verify when the data is ready. */
 	// TODO: verify again if it's really REJECT or something else
 	if (partitions[bufnum].numblks < sectnum)
@@ -1713,8 +1717,6 @@ void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
 		hirqreg |= (CMOK|EHST);
 		return;
 	}
-
-	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
 
 	xfertype32 = XFERTYPE32_GETDELETESECTOR;
 	xferoffs = 0;

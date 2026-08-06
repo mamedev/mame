@@ -28506,7 +28506,8 @@ Not extensively tested
 		<year>1998</year>
 		<publisher>Hudson</publisher>
 		<notes><![CDATA[
-Black screen, [CD-Block] no xferdnum error before hanging
+[DRC] crashes after title screen
+Currently untested in gameplay
 ]]></notes>
 		<info name="serial" value="T-14319G"/>
 		<info name="release" value="19980521"/>
