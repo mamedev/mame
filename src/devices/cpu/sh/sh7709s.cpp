@@ -43,6 +43,17 @@
 *   bank active mode. The cv1k board uses a 16 bit rom in area 0 which means the SDRAM is now stuck
 *   using auto precharge mode that forces a row close after every access which leads to some extra
 *   delays when cache misses collide on the same bank back to back.
+*
+* - Slowdown oddities:
+*	- In titles where rank decides bullet speed more than bullet count this leads to situations where
+*     the lower your rank the more slowdown there is as a result of bullets remaining on screen longer
+*     rather than being a deliberate result of some code
+*   - The games only check for collisions every other frame to save some time, the other optimization
+*     they do is that rather than check every bullet they have a candidate list of bullets that comprises
+*     of bullets within a certain distance of the player ship that then gets retested once they move closer.
+*     There are a handful of sections where you can manipulate slowdown by being closer (more slowdown) or
+*     farther (less slowdown) especially on patterns where bullets fly at angles around the screen rather
+*     than directly at the ship
 */
 
 #include "emu.h"
@@ -342,7 +353,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// 1 + RCD + CAS + 3
 	//
 	// CPU does critical word first so it should only actually stall until:
-	// 1 + RCD + CAS
+	// 1 + RCD + CAS + critical word cycle
 	//
 	// Single read (uncached): Tr + Tc1(READA) + Td1
 	// 1 + RCD + CAS
@@ -369,10 +380,13 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 			bus_penalty = 2 + get_wcr2_timing(address);
 	}
 
-	if (area != m_last_area_accessed)
+	if (area != m_last_area_accessed || (!m_last_area_accessed_was_write && !is_cacheable(address) && write))
 		bus_penalty += get_wcr1_timing(address);
 
 	m_last_area_accessed = area;
+	// cacheable access miss will be a read, write flag set in writeback
+	// only need to handle non-cacheable + write for this check
+	m_last_area_accessed_was_write = (!is_cacheable(address) && write);
 
 	// CPU is in auto precharge mode, check how many cycles to stall if not enough time has elapsed on a bank conflict
 	if (is_sdram_region(address) && bank_read == m_last_sdram_bank && m_precharge_remaining_cycles > 0)
@@ -434,6 +448,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 
 void sh7709s_device::update_access_cycles(uint32_t address, bool write)
 {
+#if SH7709S_ICACHE_TRACKING_HEAVY == 0
 	// For now only handle cacheable instruction fetch sampling when we do
 	// data accesses. The majority of uncached instruction fetches is
 	// handled in the cache flush timing
@@ -441,6 +456,7 @@ void sh7709s_device::update_access_cycles(uint32_t address, bool write)
 		m_sh2_state->icount -= access_penalty(m_sh2_state->pc, false);
 		m_last_op_cycle_count = total_cycles();
 	}
+#endif
 	m_sh2_state->icount -= access_penalty(address, write);
 	m_last_op_cycle_count = total_cycles();
 }
@@ -466,6 +482,28 @@ static void cfunc_drc_memory_access_write(void* param)
 {
 	((sh7709s_device*)param)->drc_memory_access_write();
 }
+
+#if SH7709S_ICACHE_TRACKING_HEAVY == 1
+
+void sh7709s_device::drc_update_icache()
+{
+	// instruction fetches done 2 at a time
+	if ((m_sh2_state->pc & 0x3) == 0)
+		update_access_cycles(m_sh2_state->pc, false);
+}
+
+static void cfunc_drc_update_icache(void* param)
+{
+	((sh7709s_device*)param)->drc_update_icache();
+}
+
+bool sh7709s_device::generate_opcode(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint32_t ovrpc)
+{
+	UML_CALLC(block, cfunc_drc_update_icache, this);
+	return sh3_base_device::generate_opcode(block, compiler, desc, ovrpc);
+}
+
+#endif
 
 // Same as static_generate_memory_accessor from sh4.cpp but with added read/write penalty tracking
 // Address of access stored in arg0, size in arg1 (unused for now)
@@ -626,6 +664,7 @@ void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// enforced and not handled by the hardware
 		memset(m_cache, 0, sizeof(m_cache));
 		LOG("SH7709S cache invalidate\n");
+#if SH7709S_ICACHE_TRACKING_HEAVY == 0
 		// We want to account for some of the uncached instruction
 		// fetches that happen here but instrumenting every instruction
 		// is too cpu intensive. Since this causes a decent amount of
@@ -639,6 +678,7 @@ void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// ADD #$10, R1
 		m_sh2_state->icount -= (2 /*fetches*/ * 2 /*bus cycle convert*/ * 1024 /*loop iterations*/) *
 			(1 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
+#endif
 	}
 	COMBINE_DATA(&m_ccr);
 	logerror("'%s' (%08x): CCN unmapped internal write %08x & %08x (CCR)\n", tag(), m_sh2_state->pc, data, mem_mask);

@@ -6,6 +6,10 @@
 
 #include "sh4.h"
 
+// When enabled switches from icache sampling + heuristic to full icache tracking
+// Heavy on CPU usage but useful for debugging icache penalties if your cpu can handle it
+#define SH7709S_ICACHE_TRACKING_HEAVY (0)
+
 // U bit tracked in the dirty field, V bit currently untracked
 struct sh7709s_cache_entry
 {
@@ -24,6 +28,11 @@ public:
 	void drc_memory_access_write();
 
 	void update_access_cycles(uint32_t address, bool write);
+
+#if SH7709S_ICACHE_TRACKING_HEAVY == 1
+	void drc_update_icache();
+	bool generate_opcode(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint32_t ovrpc) override;
+#endif
 
 protected:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
