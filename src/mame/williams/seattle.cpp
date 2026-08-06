@@ -261,6 +261,10 @@ namespace {
 // Widget interrupts
 #define WINT_ETHERNET_SHIFT (2)
 
+// Simulated wheel motor speed, in ADC counts per second. The real motor
+// sweeps the wheel lock to lock (256 counts) in well under a second.
+#define WHEEL_MOTOR_SPEED   (512)
+
 /*************************************
 *  Structures
 *************************************/
@@ -396,6 +400,7 @@ private:
 	int8_t m_wheel_force = 0;
 	int m_wheel_offset = 0;
 	bool m_wheel_calibrated = false;
+	attotime m_wheel_last_update;
 
 	uint32_t interrupt_state_r();
 	uint32_t interrupt_state2_r();
@@ -426,6 +431,7 @@ private:
 	void widget_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void i40_w(uint32_t data);
 	void wheel_board_w(offs_t offset, uint32_t data);
+	void wheel_update();
 
 	void ide_interrupt(int state);
 	void vblank_assert(int state);
@@ -483,7 +489,10 @@ void seattle_state::machine_start()
 	save_item(NAME(m_output_mode));
 	save_item(NAME(m_i40_data));
 	save_item(NAME(m_gear));
+	save_item(NAME(m_wheel_force));
+	save_item(NAME(m_wheel_offset));
 	save_item(NAME(m_wheel_calibrated));
+	save_item(NAME(m_wheel_last_update));
 }
 
 
@@ -497,6 +506,7 @@ void seattle_state::machine_reset()
 	m_wheel_force = 0;
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
+	m_wheel_last_update = attotime::zero;
 	m_ethernet_irq_num = 0;
 
 	// reset either the DCS2 board or the CAGE board
@@ -691,17 +701,40 @@ uint32_t seattle_state::analog_port_r()
 }
 
 
+// Simulate the movement of the motorized steering wheel. The wheel moves
+// at a fixed rate for as long as the game applies motor force, so the
+// sweep is independent of how often the game samples the ADC. Called on
+// every ADC access and whenever the commanded force changes.
+void seattle_state::wheel_update()
+{
+	attotime const now = machine().time();
+	if (!m_wheel_calibrated && ((m_wheel_force > 20) || (m_wheel_force < -20)))
+	{
+		// consume whole steps only, carrying the remainder forward
+		int64_t const steps = (now - m_wheel_last_update).as_ticks(WHEEL_MOTOR_SPEED);
+		if (steps > 0)
+		{
+			m_wheel_last_update += attotime::from_ticks(steps, WHEEL_MOTOR_SPEED);
+			if (m_wheel_force > 0)
+				m_wheel_offset = std::min<int64_t>(m_wheel_offset + steps, 128);
+			else
+				m_wheel_offset = std::max<int64_t>(m_wheel_offset - steps, -128);
+		}
+	}
+	else
+	{
+		m_wheel_last_update = now;
+	}
+}
+
 void seattle_state::analog_port_w(uint32_t data)
 {
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", m_maincpu->pc(), data);
 	int index = data & 7;
 	uint8_t currValue = m_io_analog[index].read_safe(0);
+	wheel_update();
 	if (!m_wheel_calibrated && ((m_wheel_force > 20) || (m_wheel_force < -20))) {
-		if (m_wheel_force > 0 && m_wheel_offset < 128)
-			m_wheel_offset++;
-		else if (m_wheel_offset > -128)
-			m_wheel_offset--;
 		int tmpVal = int(currValue) + m_wheel_offset;
 		if (tmpVal < m_io_analog[index]->field(0xff)->minval())
 			m_pending_analog_read = m_io_analog[index]->field(0xff)->minval();
@@ -745,6 +778,7 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 		else
 		{
 			m_wheel_driver = arg; // target wheel angle. signed byte.
+			wheel_update(); // integrate elapsed time at the previous force
 			m_wheel_force = int8_t(arg);
 		}
 	}
@@ -981,6 +1015,7 @@ void seattle_state::output_w(uint32_t data)
 
 			case 0x04:
 				m_wheel_motor = arg; // wheel motor delta. signed byte.
+				wheel_update(); // integrate elapsed time at the previous force
 				m_wheel_force = int8_t(~arg);
 				//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 				break;
