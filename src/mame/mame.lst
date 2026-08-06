@@ -37214,6 +37214,9 @@ megapcpl
 @source:pc/nforcepc.cpp
 nforcepc
 
+@source:pc/octavian_g650.cpp
+sweetstr
+
 @source:pc/pangofun.cpp
 pangofun
 
