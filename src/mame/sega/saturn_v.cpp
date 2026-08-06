@@ -2123,6 +2123,8 @@ void saturn_state::vdp1_process_list()
 					break;
 
 				default:
+					// asenna 0x0c or 0x0d (transition from title screen)
+					// albodysj 0x0f (always)
 					popmessage ("VDP1: Sprite List Illegal %02x (%d)",current_sprite.CMDCTRL & 0xf,spritecount);
 					m_vdp1_legacy.lopr = (position * 0x20) >> 3;
 					//m_vdp1_legacy.copr = (position * 0x20) >> 3;

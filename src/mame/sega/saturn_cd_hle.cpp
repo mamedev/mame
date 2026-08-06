@@ -50,8 +50,9 @@ DASM notes:
 #define LOG_CMD            (1U << 2)
 #define LOG_SEEK           (1U << 3)
 #define LOG_XFER           (1U << 4)
+#define LOG_STATUS         (1U << 5) // log CD status changes
 
-#define VERBOSE (LOG_CMD | LOG_WARN)
+#define VERBOSE (LOG_CMD | LOG_WARN | LOG_STATUS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -60,6 +61,7 @@ DASM notes:
 #define LOGCMD(...)          LOGMASKED(LOG_CMD, __VA_ARGS__)
 #define LOGSEEK(...)         LOGMASKED(LOG_SEEK, __VA_ARGS__)
 #define LOGXFER(...)         LOGMASKED(LOG_XFER, __VA_ARGS__)
+#define LOGSTATUS(...)       LOGMASKED(LOG_STATUS, __VA_ARGS__)
 
 #define LIVE_CD_VIEW    0
 
@@ -643,6 +645,16 @@ void saturn_cd_hle_device::mpeg_standard_return(uint16_t cur_status)
 
 void saturn_cd_hle_device::cd_change_status(u16 new_status)
 {
+	// BUSY over BUSY is an unexpected condition hence the !
+	// The "???" are just to avoid making a division in this hot path
+	const std::string status_names[16] = {
+		"BUSY (!)",  "PAUSE", "STANDBY", "PLAY", "SEEK", "SCAN", "OPEN", "NODISC",
+		"RETRY",     "ERROR", "FATAL",   "???",  "???",  "???",  "???",  "???"
+	};
+	LOGSTATUS("Status change: %s (%04x) -> BUSY -> %s (%04x)\n"
+		, status_names[(cd_stat >> 8) & 0xf], cd_stat
+		, status_names[(new_status >> 8) & 0xf], new_status
+	);
 	// it would make more sense with mask & 0xf0ff
 	// - houkago will chain 0x21 commands due of PERI hook (leading to a crash)
 	cd_stat = CD_STAT_BUSY;
@@ -988,6 +1000,12 @@ void saturn_cd_hle_device::cmd_play_disc()
 void saturn_cd_hle_device::cmd_seek_disc()
 {
 	uint32_t temp;
+
+	// clear any pending transfer
+	// - asenna when playing back a video and going back in main menu
+	fadstoplay = 0;
+	cdda_repeat_count = 0;
+	playtype = 0;
 
 	LOGCMD("%s: Disc seek\n",   machine().describe_context());
 	LOGCMD("\t%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);

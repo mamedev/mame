@@ -1795,10 +1795,15 @@ Options menu is too large [VDP1], sports [VDP1] zooming error for the background
 		</part>
 	</software>
 
-	<software name="capgen1" supported="yes">
+	<software name="capgen1" supported="partial">
 		<description>Capcom Generation - Dai-1-Shuu - Gekitsui Ou no Jidai (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+1942, 1943, 1943 Kai
+[SCSP] No sound in main menu (including Collection)
+[SCSP] No SFXs in gameplay
+]]></notes>
 		<info name="serial" value="T-1232G"/>
 		<info name="release" value="19980827"/>
 		<info name="alt_title" value="カプコン ジェネレーション ～第1集 撃墜王の時代～"/>
@@ -1815,9 +1820,10 @@ Options menu is too large [VDP1], sports [VDP1] zooming error for the background
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-DaiMakaiMura BGM playbacks misses one instrument starting from stage 2 (only in-game, works fine in sound test), [SCSP] key on/off issue?
-Wrong [VDP2] tilemap [VDP1] sprite priorities, particularly noticeable in ChohMakaiMura
-Missing [VDP2] mosaic for ChohMakaiMura on map transitions
+MakaiMura, DaiMakaiMura, ChohMakaiMura
+Dai BGM playbacks misses one instrument starting from stage 2 (only in-game, works fine in sound test), [SCSP] key on/off issue?
+Wrong [VDP2] tilemap [VDP1] sprite priorities, particularly noticeable in Choh
+Missing [VDP2] mosaic for Choh on map transitions
 ]]></notes>
 		<info name="serial" value="T-1233G"/>
 		<info name="release" value="19980923"/>
@@ -1830,11 +1836,14 @@ Missing [VDP2] mosaic for ChohMakaiMura on map transitions
 		</part>
 	</software>
 
-	<!-- Identifying Capcom Generation - Dai 3 Shuu Kokoni Rekishi Hajimaru (Japan)... -->
-	<software name="capgen3" supported="no">
+	<software name="capgen3" supported="partial">
 		<description>Capcom Generation - Dai-3-Shuu - Kokoni Rekishi Hajimaru (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Vulgus, Son Son, Pirate Ship Higemaru, Exed Exes
+Exed Exes: randomly doesn't boot
+]]></notes>
 		<info name="serial" value="T-1234G"/>
 		<info name="release" value="19981015"/>
 		<info name="alt_title" value="カプコン ジェネレーション ～第3集 ここに歴史はじまる～"/>
@@ -1846,13 +1855,16 @@ Missing [VDP2] mosaic for ChohMakaiMura on map transitions
 		</part>
 	</software>
 
-	<!-- Plays wrong sound/BGMs in all games, [CD-Block]? -->
-	<!-- Capcon Generation "Title Select" screen draws transparent instead of opaque [VDP2] -->
-	<!-- All games uses unemulated [VDP1] framebuffer rotation in Yoko screen mode, sprites are slightly glitchy in Tate mode. -->
 	<software name="capgen4" supported="no">
 		<description>Capcom Generation - Dai-4-Shuu - Kokou no Eiyuu (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Senjou no Ookami 1 and 2, Gun.Smoke
+Plays wrong sound/BGMs in all games, [CD-Block]?
+Capcon Generation "Title Select" screen draws transparent instead of opaque [VDP2]
+All games uses unemulated [VDP1] framebuffer rotation in Yoko screen mode, glitchy sprites in Tate mode [VDP2]
+]]></notes>
 		<info name="serial" value="T-1235G"/>
 		<info name="release" value="19981112"/>
 		<info name="alt_title" value="カプコン ジェネレーション ～第4集 孤高の英雄～"/>
@@ -1864,10 +1876,15 @@ Missing [VDP2] mosaic for ChohMakaiMura on map transitions
 		</part>
 	</software>
 
-	<software name="capgen5" supported="yes">
+	<software name="capgen5" supported="partial">
 		<description>Capcom Generation - Dai-5-Shuu - Kakutou ke Tachi (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+SF2, SF2', SF2 Turbo
+SF2': completable with no glitches
+Black screen when accessing collection menu
+]]></notes>
 		<info name="serial" value="T-1236G"/>
 		<info name="release" value="19981203"/>
 		<info name="alt_title" value="カプコン ジェネレーション ～第5集 格闘家たち～"/>
@@ -1879,14 +1896,14 @@ Missing [VDP2] mosaic for ChohMakaiMura on map transitions
 		</part>
 	</software>
 
-	<!-- Works including mouse support -->
-	<software name="catrip">
+	<software name="catrip" supported="partial">
 		<description>Cat the Ripper - 13-ninme no Tanteishi (Japan)</description>
 		<year>1997</year>
 		<publisher>Tonkin House</publisher>
 		<info name="serial" value="T-35701G"/>
 		<info name="release" value="19970718"/>
 		<info name="alt_title" value="キャット・ザ・リパー 13人目の探偵士"/>
+		<info name="usage" value="Optionally supports mouse"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2375,7 +2392,7 @@ Some kanji drawings are dubious (verify)
 		</part>
 	</software>
 
-	<software name="delisoba" supported="yes">
+	<software name="delisoba" supported="partial">
 		<!-- Dates refers to build date, actual release unknown -->
 		<description>Delisoba Deluxe (Japan)</description>
 		<year>1997?</year>
@@ -2499,8 +2516,7 @@ Crashes with [DRC] if FMV is left playing for a bit, skipped then starting a new
 		</part>
 	</software>
 
-	<!-- Works including loading from Save Game Manager CDs -->
-	<software name="dezaemn2">
+	<software name="dezaemn2" supported="partial">
 		<description>Dezaemon 2 (Japan)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
@@ -8794,7 +8810,6 @@ Black screen at boot, [CD-Block] never completes first FMV transfer after FAD=55
 		</part>
 	</software>
 
-	<!-- Identifying Azel Panzer Dragoon RPG Taikenban (JAP) (DW0866)... -->
 	<software name="azelpanztai" cloneof="panzsaga" supported="no">
 		<description>Azel - Panzer Dragoon RPG Taikenban (Japan)</description>
 		<year>1997?</year>
@@ -8827,7 +8842,7 @@ Performance is dire in gameplay [VDP2]
 		</part>
 	</software>
 
-	<software name="bigichig" supported="yes">
+	<software name="bigichig" supported="partial">
 		<description>Big Ichigeki! Pachi-slot Daikouryaku (Japan, v1.000)</description>
 		<year>1996</year>
 		<publisher>ASK Kodansha</publisher>
@@ -11913,7 +11928,7 @@ Missing elements during gameplay [VDP2] priorities?
 		</part>
 	</software>
 
-	<software name="guyferd" supported="yes">
+	<software name="guyferd" supported="partial">
 		<description>Shichisei Toushin Guyferd - Crown Kaimetsu Sakusen (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
@@ -14055,11 +14070,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Ayrton Senna Personal Talk - Message for the Future (GS-9020)... -->
-	<software name="asenna" supported="no">
+	<software name="asenna" supported="partial">
 		<description>Ayrton Senna Personal Talk - Message for the Future (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Throws harmless [VDP1] illegal 0xc/0xd when pressing start on main menu
+]]></notes>
 		<info name="serial" value="GS-9020"/>
 		<info name="release" value="19950428"/>
 		<info name="alt_title" value="アイルトン・セナ パーソナルトーク"/>
@@ -18763,6 +18780,10 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		<description>Samurai Spirits - Zankourou Musouken (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
+		<notes><![CDATA[
+Horribly stretched [VDP2] backgrounds when jumping
+https://mametesters.org/view.php?id=7508 (temporary)
+]]></notes>
 		<!-- Doukonban version has the same disc (T-3104G) -->
 		<info name="serial" value="T-3104G (Doukonban), T-3106G"/>
 		<info name="release" value="19961108"/>
@@ -20665,7 +20686,7 @@ Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 
 		</part>
 	</software>
 
-	<software name="vfportj" cloneof="vfport" supported="yes">
+	<software name="vfportj" cloneof="vfport" supported="partial">
 		<description>Virtua Fighter CG Portrait Collection (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -21625,24 +21646,26 @@ Triggers [VDP2] window enabled for RGB888 tiles on FMVs
 		</part>
 	</software>
 
-	<!-- Identifying Dejig Aqua World (T-30303G)... -->
-	<software name="dejigaqw" supported="no">
+	<software name="dejigaqw" supported="partial">
 		<description>Dejig Aqua World (Japan)</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
+		<notes><![CDATA[
+One jigsaw reference randomly crapped out during playtesting, was fine on restarted session (dump?)
+]]></notes>
 		<info name="serial" value="T-30303G"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="デジグ アクアワールド"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<!-- baddump: cfr. notes -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="dejig aqua world (t-30303g)" sha1="66ba3e4b5c8dfcbd6686db0ee68d278c4334d0c0" />
+				<disk name="dejig aqua world (t-30303g)" sha1="66ba3e4b5c8dfcbd6686db0ee68d278c4334d0c0" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Identifying Dejig McKnight - Art Collection (T-30305G)... -->
-	<software name="dejigmck" supported="no">
+	<software name="dejigmck" supported="partial">
 		<description>Dejig McKnight - Art Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
@@ -22469,9 +22492,8 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Isto E Zico - Zico no Kangaeru Soccer (T-18802G)... -->
-	<software name="zico" supported="no">
-		<description>Isto é Zico - Zico no Kangaeru Soccer (Japan)</description>
+	<software name="zico" supported="partial">
+		<description>Isto é Zico: Zico no Kangaeru Soccer (Japan)</description>
 		<year>1996</year>
 		<publisher>Mizuki</publisher>
 		<info name="serial" value="T-18802G"/>
@@ -27519,11 +27541,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying DejigTinToy... -->
-	<software name="dejigtin" supported="no">
+	<software name="dejigtin" supported="partial">
 		<description>Dejig Tin Toy</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
+		<notes><![CDATA[
+[DRC] hangs at end of movie playback
+]]></notes>
 		<info name="serial" value="T-30302G"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="デジグ ティントーイ"/>
