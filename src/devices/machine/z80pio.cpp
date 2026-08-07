@@ -237,16 +237,23 @@ uint8_t z80pio_device::control_read()
 void z80pio_device::check_interrupts()
 {
 	int state = CLEAR_LINE;
-	bool ius = (m_port[PORT_A].m_ius || m_port[PORT_B].m_ius);
+	// IUS from port N blocks ports N+1, N+2 ... but NOT port N itself.
+	// Track "any higher-priority port in service" as we scan A->B so that
+	// each port is gated only by ports above it, not its own IUS.
+	bool ius_above = false;
 
 	for (int index = PORT_A; index < PORT_COUNT; index++)
 	{
 		if (LOG) logerror("Z80PIO Port %c IE %s IP %s IUS %s\n", 'A' + index, m_port[index].m_ie ? "1":"0", m_port[index].m_ip ? "1":"0", m_port[index].m_ius ? "1":"0");
 
-		if (!ius && m_port[index].m_ie && m_port[index].m_ip)
+		if (!ius_above && m_port[index].m_ie && m_port[index].m_ip)
 		{
 			state = ASSERT_LINE;
 		}
+
+		// A port in service blocks all lower-priority ports.
+		if (m_port[index].m_ius)
+			ius_above = true;
 	}
 
 	if (LOG) logerror("Z80PIO INT %u\n", state);
