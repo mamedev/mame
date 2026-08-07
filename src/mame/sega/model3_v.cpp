@@ -550,7 +550,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	/* decode it */
 	for (y = 0; y < pixheight; y++)
 	{
-		const uint16_t *texsrc = &m_texture_ram[page][(texy * 32 + y) * 2048 + texx * 32];
+		const uint16_t *texsrc = &m_texture_ram[page][((texy * 32 + y) & 1023) * 2048];
 		rgb_t *dest = &tex->data[2 * pixwidth * y];
 
 		switch (format)
@@ -558,7 +558,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 0:     /* 1-5-5-5 ARGB */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint16_t pixdata = texsrc[x];
+					uint16_t pixdata = texsrc[(texx * 32 + x) & 2047];
 					alpha &= dest[x] = rgb_t(pal1bit(~pixdata >> 15), pal5bit(pixdata >> 10), pal5bit(pixdata >> 5), pal5bit(pixdata >> 0));
 				}
 				break;
@@ -566,8 +566,8 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 1:     /* A4L4 interleaved */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint8_t grayvalue = pal4bit(texsrc[x] & 0xf);
-					uint8_t a = pal4bit((texsrc[x] >> 4) & 0xf);
+					uint8_t grayvalue = pal4bit(texsrc[(texx * 32 + x) & 2047] & 0xf);
+					uint8_t a = pal4bit((texsrc[(texx * 32 + x) & 2047] >> 4) & 0xf);
 					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -575,8 +575,8 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 2:     /* A4L4? */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint8_t grayvalue = pal4bit((texsrc[x] >> 0) & 0xf);
-					uint8_t a = pal4bit((texsrc[x] >> 4) & 0xf);
+					uint8_t grayvalue = pal4bit((texsrc[(texx * 32 + x) & 2047] >> 0) & 0xf);
+					uint8_t a = pal4bit((texsrc[(texx * 32 + x) & 2047] >> 4) & 0xf);
 					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -584,8 +584,8 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 3:     /* A4L4 interleaved */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint8_t grayvalue = pal4bit((texsrc[x] >> 8) & 0xf);
-					uint8_t a = pal4bit((texsrc[x] >> 12) & 0xf);
+					uint8_t grayvalue = pal4bit((texsrc[(texx * 32 + x) & 2047] >> 8) & 0xf);
+					uint8_t a = pal4bit((texsrc[(texx * 32 + x) & 2047] >> 12) & 0xf);
 					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -593,7 +593,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 4:     /* 8-bit A4L4 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint8_t pixdata = texsrc[x] >> 8;
+					uint8_t pixdata = texsrc[(texx * 32 + x) & 2047] >> 8;
 					alpha &= dest[x] = rgb_t(pal4bit(pixdata), pal4bit(pixdata >> 4), pal4bit(pixdata >> 4), pal4bit(pixdata >> 4));
 				}
 				break;
@@ -601,7 +601,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 5:     /* L8 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint8_t grayvalue = texsrc[x];
+					uint8_t grayvalue = texsrc[(texx * 32 + x) & 2047];
 					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -609,7 +609,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 6:     /* L8 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint8_t grayvalue = texsrc[x] >> 8;
+					uint8_t grayvalue = texsrc[(texx * 32 + x) & 2047] >> 8;
 					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -617,7 +617,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 7:     /* 4-4-4-4 ARGB */
 				for (x = 0; x < pixwidth; x++)
 				{
-					uint16_t pixdata = texsrc[x];
+					uint16_t pixdata = texsrc[(texx * 32 + x) & 2047];
 					alpha &= dest[x] = rgb_t(pal4bit(pixdata >> 0), pal4bit(pixdata >> 12), pal4bit(pixdata >> 8), pal4bit(pixdata >> 4));
 				}
 				break;
