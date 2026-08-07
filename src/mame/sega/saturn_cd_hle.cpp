@@ -728,6 +728,7 @@ void saturn_cd_hle_device::cmd_get_session_info()
 	switch (cr1 & 0xff)
 	{
 		case 0: // get total session info / disc end
+			// TODO: shouldn't require a status change
 			cd_change_status(CD_STAT_PAUSE);
 			cr1 = cd_stat;
 			cr2 = 0;
@@ -736,6 +737,7 @@ void saturn_cd_hle_device::cmd_get_session_info()
 			break;
 
 		case 1: // get total session info / disc start
+			// TODO: as above
 			cd_change_status(CD_STAT_PAUSE);
 			cr1 = cd_stat;
 			cr2 = 0;
@@ -772,8 +774,9 @@ void saturn_cd_hle_device::cmd_init_cdsystem()
 	{
 		if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 		{
-			cd_change_status(CD_STAT_PAUSE);
-			cd_curfad = 150;
+			cd_fad_seek = 150;
+			cd_change_status(CD_STAT_SEEK);
+			cd_seek_stat = CD_STAT_PAUSE;
 			//cur_track = 1;
 			fadstoplay = 0;
 		}
@@ -804,6 +807,7 @@ void saturn_cd_hle_device::cmd_init_cdsystem()
 		//cddevice = (filterT *)nullptr;
 	}
 
+	// TODO: ESEL happens at the end of the actual reset phase
 	hirqreg |= (CMOK | ESEL | EFLS | ECPY | EHST);
 	cr_standard_return(cd_stat);
 	status_type = 0;
@@ -1345,11 +1349,12 @@ void saturn_cd_hle_device::cmd_set_filter_connection()
 
 void saturn_cd_hle_device::cmd_reset_selector()
 {
-	int i,j;
+	int i, j;
 	// Reset Selector
 
 	LOGCMD("%s: Reset Selector %02x\n", machine().describe_context(), cr1);
 
+	// reset defined buffer partition data, in cr3
 	if((cr1 & 0xff) == 0x00)
 	{
 		uint8_t bufnum = cr3 >> 8;
@@ -1378,42 +1383,13 @@ void saturn_cd_hle_device::cmd_reset_selector()
 		return;
 	}
 
-	/* reset false filter output conditions */
-	/// TODO: verify default value for these two
-	if(cr1 & 0x80)
-	{
-		for(i=0;i<MAX_FILTERS;i++)
-			filters[i].condfalse = 0;
-	}
+	// TODO: what follows should delay a bit
+	// cfr. indepdayu
 
-	/* reset true filter output conditions */
-	if(cr1 & 0x40)
+	// reset all buffer partitions
+	if(BIT(cr1, 2))
 	{
-		for(i=0;i<MAX_FILTERS;i++)
-			filters[i].condtrue = 0;
-	}
-
-	/* reset filter conditions*/
-	if(cr1 & 0x10)
-	{
-		for(i=0;i<MAX_FILTERS;i++)
-		{
-			filters[i].fad = 0;
-			filters[i].range = 0xffffffff;
-			filters[i].mode = 0;
-			filters[i].chan = 0;
-			filters[i].smmask = 0;
-			filters[i].cimask = 0;
-			filters[i].fid = 0;
-			filters[i].smval = 0;
-			filters[i].cival = 0;
-		}
-	}
-
-	/* reset partition buffer data */
-	if(cr1 & 0x4)
-	{
-		for(i=0;i<MAX_FILTERS;i++)
+		for(i = 0; i < MAX_FILTERS; i++)
 		{
 			for (j = 0; j < MAX_BLOCKS; j++)
 			{
@@ -1428,6 +1404,52 @@ void saturn_cd_hle_device::cmd_reset_selector()
 
 		buffull = sectorstore = 0;
 		buffull_temp_pause = false;
+	}
+
+	// TODO: bit 3, initialize all partition output connectors
+
+	// reset all filter conditions
+	if(BIT(cr1, 4))
+	{
+		for(i = 0; i < MAX_FILTERS; i++)
+		{
+			filters[i].fad = 0;
+			filters[i].range = 0xffffffff;
+			filters[i].mode = 0;
+			filters[i].chan = 0;
+			filters[i].smmask = 0;
+			filters[i].cimask = 0;
+			filters[i].fid = 0;
+			filters[i].smval = 0;
+			filters[i].cival = 0;
+		}
+	}
+
+	// reset all filter input connectors
+	if(BIT(cr1, 5))
+	{
+		for(i = 0; i < MAX_FILTERS; i++)
+		{
+			if (i == cddevicenum)
+				cddevice = (filterT *)nullptr;
+
+			if (filters[i].condfalse < MAX_FILTERS)
+				filters[i].condfalse = 0xff;
+		}
+	}
+
+	// reset all true filter output connectors
+	if(BIT(cr1, 6))
+	{
+		for(i = 0; i < MAX_FILTERS; i++)
+			filters[i].condtrue = i;
+	}
+
+	// reset all false filter output connectors
+	if(BIT(cr1, 7))
+	{
+		for(i = 0; i < MAX_FILTERS; i++)
+			filters[i].condfalse = 0xff;
 	}
 
 	hirqreg |= (CMOK|ESEL);
