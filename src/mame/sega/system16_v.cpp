@@ -448,6 +448,17 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
 	m_system18 = 1;
 }
 
+VIDEO_START_MEMBER(segas1x_bootleg_state,iqpipe)
+{
+	VIDEO_START_CALL_MEMBER(system16);
+	m_text_layer->set_scrolldx(-3, 0);
+}
+
+VIDEO_START_MEMBER(segas1x_bootleg_state,beautyb)
+{
+	VIDEO_START_CALL_MEMBER(iqpipe);
+	m_text_layer->set_scrolldy( 1, 0); // correct for beautyb (compared to hw shots) but iqpipe wraps a line of text to the top
+}
 
 /*****************************************************************************************
  System 16A bootleg video
