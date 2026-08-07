@@ -3117,7 +3117,7 @@ ROM_END
 
 ROM_START( smartcyc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	/* no system ROM, all game data is on cartridges */
+	// no system ROM, all game data is on cartridges
 ROM_END
 
 ROM_START( spidm2 )
@@ -3374,7 +3374,7 @@ CONS( 2007, lpetshop,   0,        0, lpetshop,   lpetshop,   spg2xx_game_lpetsho
 
 CONS( 2005, barbpet,    0,        0, spg2xx,     barbpet,    spg2xx_game_state,               empty_init,    "Mattel", "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc,   spg2xx_game_smartcycle_state,    empty_init,    "Fisher-Price", "Smart Cycle", MACHINE_NOT_WORKING )
+CONS( 2007, smartcyc,   0,        0, smartcycle, smartcyc,   spg2xx_game_smartcycle_state,    empty_init,    "Fisher-Price", "Smart Cycle", MACHINE_NOT_WORKING )
 
 CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,     spg2xx_game_state,               empty_init,    "N-Vision", "Spider-Man 2 Web Action", MACHINE_IMPERFECT_SOUND )
 
