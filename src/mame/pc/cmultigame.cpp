@@ -112,6 +112,7 @@ ROM_START(cmultigame)
 	ROMX_LOAD( "8simlh.f7.u14",    0x00000, 0x40000, CRC(13502db1) SHA1(664ba7be6fceb2e73b398988542d8fdbe6960312), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7, "f1", "F1" )
 	ROMX_LOAD( "8simlh.f1.u14",    0x00000, 0x40000, CRC(77f74ddf) SHA1(f45178ce40bc3c4f620c066c05d3b387d663be23), ROM_BIOS(7) )
+	ROM_DEFAULT_BIOS("f1") // The older one, but was the one found om the actual machine
 
 	// ATI Rage Mobility-P BIOS
 	ROM_REGION( 0x10000, "vga", 0 )
