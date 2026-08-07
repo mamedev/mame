@@ -8,6 +8,9 @@ license:CC0-1.0
 
 <!--
 
+TODO:
+- Make SW list to follow a stricter alphabetical order (couldn't care less)
+
 ## Undumped/missing list (Japan, retail):
 
 - Angelique Special 2 (Japan) [T-7627G]
@@ -34,8 +37,8 @@ license:CC0-1.0
 - Sega Saturn Photo CD Operator (Japan) [HSS-0121]
 - Sega Saturn You Word Processor Keyboard Set (Japan) (EGWORD v1.02) [T-7626G-1]
 - Sega Saturn You Word Processor Set (Japan) (EGWORD) [T-7626G]
-- Sega Saturn You Word Processor Set (Digital Camera Taiouban) (Japan) (EGWORD v2.00)
-- Sega Saturn You Word Processor Upgrade Kit (Digital Camera Taiouban) (Japan)
+- Sega Saturn You Word Processor Set (Digital Camera Taiouban) (Japan) (EGWORD v2.00) [T-7641G]
+- Sega Saturn You Word Processor Upgrade Kit (Digital Camera Taiouban) (Japan) (EGWORD v2.00) [T-7642G]
 - Soviet Strike (Japan) [T-10621G]
 - Special Disc with Sega Saturn Internet 2 (Japan) [T-31303G]
 - Special Gift Pack (Japan) [T-21509G]
@@ -1228,6 +1231,9 @@ Olympic Soccer (Fra) T-7904H-09
 		<description>AI Shougi (Japan)</description>
 		<year>1995</year>
 		<publisher>Soft Bank</publisher>
+		<notes><![CDATA[
+Randomly crashes between startup and gameplay [CD-Block]
+]]></notes>
 		<info name="serial" value="T-18602G"/>
 		<info name="release" value="19950825"/>
 		<info name="alt_title" value="AI将棋"/>
@@ -1350,8 +1356,7 @@ Black screen, enables [SCU] Timer 1
 		</part>
 	</software>
 
-	<!-- Identifying America Oudan Ultra Quiz (Japan)... -->
-	<software name="amoudan" supported="no">
+	<software name="amoudan" supported="partial">
 		<description>America Oudan Ultra Quiz (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
@@ -3267,11 +3272,13 @@ Doesn't recognize start button on title screen, [CD-Block] related
 		</part>
 	</software>
 
-	<!-- Black screen, [CD-Block] uses fnum reject filter -->
 	<software name="gakkokai" supported="no">
 		<description>Gakkou no Kaidan (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, [CD-Block] uses fnum reject filter
+]]></notes>
 		<info name="serial" value="GS-9026"/>
 		<info name="release" value="19950714"/>
 		<info name="alt_title" value="学校の怪談"/>
@@ -5604,8 +5611,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		</part>
 	</software>
 
-	<!-- Identifying Pukunpa - Joshikousei no Houkago... (Japan)... -->
-	<software name="pukunpa" supported="no">
+	<software name="pukunpa" supported="partial">
 		<description>Pukunpa - Joshikousei no Houkago... (Japan)</description>
 		<year>1996</year>
 		<publisher>Athena</publisher>
@@ -6528,7 +6534,7 @@ Missing elements during gameplay [VDP2] priorities?
 		<year>1998</year>
 		<publisher>ESP</publisher>
 		<notes><![CDATA[
-Black screen after loading of a new game
+Black screen after loading of a new game, requires raster effect support in [VDP2] (updates color offsets on the fly)
 [VDP2] Gradation enabled a003
 ]]></notes>
 		<info name="serial" value="T-30902G"/>
@@ -21650,12 +21656,12 @@ Triggers [VDP2] window enabled for RGB888 tiles on FMVs
 		</part>
 	</software>
 
-	<software name="dejigaqw" supported="partial">
+	<software name="dejigaqw" supported="no">
 		<description>Dejig Aqua World (Japan)</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
 		<notes><![CDATA[
-One jigsaw reference randomly crapped out during playtesting, was fine on restarted session (dump?)
+Bad reference graphics after completing a puzzle, [CD-Block]?
 ]]></notes>
 		<info name="serial" value="T-30303G"/>
 		<info name="release" value="19970425"/>
@@ -33774,12 +33780,17 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		</part>
 	</software>
 
-	<!-- Identifying dw-sat-0682-Midway_presents_Arcade_s_Greatest_Hits-usa... -->
 	<software name="arcadegh" supported="no">
 		<description>Arcade's Greatest Hits (USA)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+No sound in gameplay, enables [SCSP] SCIPD bit 5 (master to sound irq)
+Has [VDP2] visible layer of garbage on credits menu and Digital Eclipse logo
+Joust: going up causes [VDP1] player to disappear, enemies flicker
+]]></notes>
 		<info name="serial" value="T-9703H"/>
+		<info name="developer" value="Digital Eclipse"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
