@@ -737,7 +737,9 @@ void i8291a_device::handle_command()
 		if ((m_address_mode & 3) != 1 && m_rl_state == remote_local_state::LWLS)
 			update_state(m_rl_state, remote_local_state::RWLS);
 
-		if ((m_address_mode & 3) == 3) {
+		// APT: (TPAS + LPAS)*SCG*ACDS*MODE 3 (Table 4)
+		if ((m_address_mode & 3) == 3 &&
+				(m_tp_state == talker_primary_state::TPAS || m_lp_state == listener_primary_state::LPAS)) {
 			/* In address mode 3, MSA is passed to host for verification */
 			m_ints1 |= REG_INTS1_APT;
 			m_cpt = m_din;
