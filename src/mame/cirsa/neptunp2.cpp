@@ -13,6 +13,7 @@ The "960606-5" PCB is used at least on the following games:
   Unidesa/Cirsa Blue Swamp Land
   Unidesa/Cirsa Corsarios
   Unidesa/Cirsa Dinópolis
+  Unidesa/Cirsa El Tesoro del Faraón
   Unidesa/Cirsa Euro Bingo 7 (1000)
   Unidesa/Cirsa Euro Bingo 7
   Unidesa/Cirsa Euro Lucky
@@ -117,7 +118,7 @@ It's just a small PCB with a SEEPROM:
  |:                    ·|
  |______________________|
 
-According with the Spanish laws (at that time) for slot machines, it was mandatory to destroy
+According to the Spanish laws (at that time) for slot machines, it was mandatory to destroy
 the program ROMs and the security counters module for retiring the machines from service. That's
 the reason why most games on this driver are missing these ROMs.
 
@@ -430,8 +431,8 @@ ROM_START( perlacrb )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "cirsa_cs-4_st24c16.bin", 0x000, 0x800, CRC(16fb7d4f) SHA1(e795731d041bbfd21270d774f3c1d7d4e91c4a15) ) // Probably contains operator data
 
-	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat063-1_gal16v8d.u6", 0x000, 0x104, NO_DUMP ) // "PAT-063/1", protected
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT-063/1", protected, dump from "eurbingo7"
 ROM_END
 
 
@@ -492,8 +493,27 @@ ROM_START( charles )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT 063/1", protected, dump from "eurbingo7"
+ROM_END
+
+// '960606-3A*' PCB and 'CB1 (CS4)' security counters module.
+ROM_START( eltesorof )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "c._el_tesoro_del_f._b-hm0007_v1.1cat.u16", 0x000000, 0x080000, CRC(f1cf40d8) SHA1(11f6732de05c3191807ac9766032b31735ca8f8c) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c._el_tesoro_del_f._b-hm0007_s104_1.0.u15", 0x000000, 0x080000, CRC(b1164183) SHA1(2b3fb69bb8bea77727be2cc97818baa43d286a99) )
+	ROM_LOAD( "c._el_tesoro_del_f._b-hm0007_s105_1.0.u14", 0x080000, 0x080000, CRC(62673bbe) SHA1(08890ac4247c97fea7794fd56e2f27b377ce4e27) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24c16.u10", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cs4.bin", 0x000, 0x800, NO_DUMP)
+
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
+	ROM_LOAD( "pat_058.u6", 0x000, 0x104, NO_DUMP ) // "PAT 058", protected
 ROM_END
 
 /* '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors).
@@ -534,8 +554,8 @@ ROM_START( gladiador )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "225c_b-h240891_cs4_24c16w.bin", 0x000, 0x800, CRC(fd418bd7) SHA1(c257b11288aa70ae986fcf8cbdfcbc4bc83dbd45) ) // Dump for machine with serial 09-01000 (the SEEPROM is probably tied to the serial number)
 
-	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT-063/1", protected, dump from "eurbingo7"
 
 	// Two reels PCBs 615092000401-3
 	ROM_REGION( 0x2000, "reels", 0)
@@ -733,10 +753,11 @@ ROM_END
 GAME( 2003,  neptunp2,   0,         video,    neptunp2, neptunp2_video_state, empty_init, ROT0, "Unidesa/Cirsa",         "Neptune's Pearls 2",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Year from legal registry date
 GAME( 2008,  perlacrb,   0,         video,    neptunp2, neptunp2_video_state, empty_init, ROT0, "Unidesa/Cirsa",         "La Perla del Caribe (V1.0, Catalonia)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-// Screenless games on Cirsa "960606-5" CPU PCB
+// Screenless games on Cirsa "960606" CPU PCB
 GAME( 1999,  ccorsario,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
 GAME( 1999,  ccorsarioa, ccorsario, no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V5.10D, Catalonia)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
 GAME( 2002?, charles,    0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( 1998,  eltesorof,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         u8"El Tesoro del Faraón (V1.1, Catalonia)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
 GAME( 2010,  eurbingo7,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Euro Bingo 7 (V8.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from parts' manual and sticker on PCB
 GAME( 2008,  gladiador,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
 GAME( 2006,  mltpoints,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
