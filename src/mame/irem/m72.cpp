@@ -4636,7 +4636,7 @@ GAME( 1988, nspiritj,    nspirit,  m72_8751,     nspirit,      m72_mcu_state,  e
 
 GAME( 1988, imgfight,    0,        m72_8751,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightj,   imgfight, m72_8751,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
+GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_mcu_state,  empty_init,      ROT270, "bootleg", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
 
 GAME( 1989, loht,        0,        m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

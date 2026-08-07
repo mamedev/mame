@@ -42,11 +42,13 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -432,5 +434,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, empty_init, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwo,  0,      onetwo, onetwo, onetwo_state, empty_init, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, empty_init, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )

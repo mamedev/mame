@@ -760,6 +760,6 @@ void jchan_state::init_jchan()
 
 
 /* game drivers */
-GAME( 1995, jchan,      0, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 4?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,  0,     jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 4?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, jchana, jchan, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 3?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2,     0, jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2, 0,     jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -448,7 +448,7 @@ ROM_START( ultraman )
 	ROM_LOAD( "910-a06.c06", 0x000000, 0x040000, CRC(28fa99c9) SHA1(54663d79ee105ac18d6ba01333a52e3732f2e5fe) )
 ROM_END
 
-}
+} // anonymous namespace
 
 
 GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, empty_init, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -379,7 +379,6 @@ ROM_START( warpsped )
 
 	ROM_REGION(0x0200, "gfx2", 0)
 	ROM_LOAD( "k1.k1",  0x0000, 0x0200, CRC(76b10d47) SHA1(e644a50df06535fe1fbfb8754cfc7b4a49fcb05e) )
-
 ROM_END
 
 } // anonymous namespace
