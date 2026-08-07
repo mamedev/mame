@@ -54,7 +54,7 @@ static const struct
 	int x, y;
 } cdi220_lcd_indicators[] =
 {
-	{ 0x0001, "MUTE",					2, LCD_SIDE_Y0 }, // TODO: Unconfirmed
+	{ 0x2000, "MUTE",					2, LCD_SIDE_Y0 },
 	{ 0x0004, "PAUSE",					2, LCD_SIDE_Y1 },
 	{ 0x1000, "PLAY",					2, LCD_SIDE_Y2 },
 	{ 0x0400, "FTS",          LCD_DIGIT_X,           6 },
@@ -63,13 +63,13 @@ static const struct
 	{ 0x0800, "GRAPHICS",     LCD_RIGHT_X, LCD_SIDE_Y2 },
 
 	// TODO: Unused indicator lights. If these are drawn, there is an unknown behavior.
+	{ 0x0001, "ONE",      0, 0 },
 	{ 0x0002, "TWO",      0, 0 },
 	{ 0x0008, "FOUR",	  0, 0 },
 	{ 0x0010, "FIVE",     0, 0 },
 	{ 0x0020, "SIX",      0, 0 },
 	{ 0x0040, "SEVEN",    0, 0 },
 	{ 0x0080, "EIGHT",    0, 0 },
-	{ 0x2000, "FOURTEEN", 0, 0 },
 	{ 0x4000, "FIFTEEN",  0, 0 },
 	{ 0x8000, "SIXTEEN",  0, 0 }
 };
