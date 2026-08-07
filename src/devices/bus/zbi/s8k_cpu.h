@@ -81,6 +81,11 @@ protected:
 	uint8_t reg_trpl_r();
 	uint8_t reg_if1l_r();
 
+	// Bus-side address latches (U66 sheet 2, U48-U50 sheet 3): track the
+	// segment number and low address byte of every memory cycle and of the
+	// last IFETCH1 cycle, and feed the IFETCH1 address to all three MMUs.
+	void observe_bus_cycle(offs_t offset, bool if1);
+
 	//helpers
 	void out_ns_cb(int state);
 	void out_busack_cb(int state);
@@ -95,10 +100,17 @@ protected:
 	devcb_write_line m_ns_cb;
 	devcb_write_line m_busack_cb;
 
-	// Board registers
+	// Board registers: snapshots of the running latches below, captured by
+	// the segment trap flip-flop (U20 sheet 8) when SEGT- is raised.
 	uint8_t m_reg_snvr  = 0; // Segment Violation Register
 	uint8_t m_reg_trpl  = 0; // Segment trap memory address low-byte
 	uint8_t m_reg_if1l  = 0; // Segment trap instruction low-byte
+
+	// Running bus-side latches and the SEGT- line state
+	uint8_t m_lad_seg   = 0; // segment number of the current memory cycle
+	uint8_t m_lad_low   = 0; // low address byte of the current memory cycle
+	uint8_t m_if1_low   = 0; // low address byte of the last IFETCH1 cycle
+	bool m_segt_state   = false;
 
 	bool m_is_seg_os = false;
 	bool m_is_seg_user = false;

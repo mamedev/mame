@@ -342,6 +342,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 {
 	bool nsup = true;
 	bool exec;
+	bool const side_effects = !machine().side_effects_disabled();
 
 	st &= BCS_CPU_MASK;
 	exec = (st == z8002_device::ST_IFETCH_N) || (st == z8002_device::ST_IFETCH_1);
@@ -353,7 +354,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 	// diagnostic purpose.  So BCS tracks the bus live only while no violation is
 	// pending; the violating cycle's own status is the last one stored.  (UC3003
 	// TST01 validates BCS == 0x08 = ST_REQ_DATA after a provoked write violation.)
-	if (!m_vtype)
+	if (side_effects && !m_vtype)
 		m_bcs = ((!sys) * BCS_N_S) | ((!write) * BCS_R_W) | (st);
 
 	if (!(m_mode & MODE_MSEN) ||                                        // Master enable?
@@ -394,14 +395,14 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			viol |= VTYPE_SLV;
 		}
 
-		if (viol ||
-			(dma && (s.attr & SDR_ATTR_DMAI))) // DMA-inhibit violaiton?
+		if (side_effects && (viol ||
+			(dma && (s.attr & SDR_ATTR_DMAI)))) // DMA-inhibit violation?
 		{
 			nsup = false;
 		}
 
 		// Check write warnings
-		if (write && is_stack && (so == s.limit))
+		if (side_effects && write && is_stack && (so == s.limit))
 		{
 			if (m_vtype == 0)   // Primary write warning?
 				viol |= VTYPE_PWW;
@@ -414,7 +415,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			}
 		}
 
-		if (viol)
+		if (side_effects && viol)
 		{
 			if (m_vtype && !(viol & VTYPE_SWW)) // Fatal?
 			{
@@ -443,7 +444,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			m_vtype |= viol;
 		}
 
-		if (!m_vtype || ((m_vtype >= VTYPE_PWW) && !(m_vtype & VTYPE_FATL)))
+		if (side_effects && (!m_vtype || ((m_vtype >= VTYPE_PWW) && !(m_vtype & VTYPE_FATL))))
 		{
 			if (write)
 			{

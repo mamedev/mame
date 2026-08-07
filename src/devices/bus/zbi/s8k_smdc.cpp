@@ -742,11 +742,13 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		pkt->DS = SMD_DS_FT;
 	}
 
-	if (drv_good)
-		pkt->DS |= SMD_DS_OC;
-
 	pkt->DS &= 0x003f;
-	pkt->DS |= SMD_DS_RY | ((1<<drv) << 8) | ((1<<drv) << 12);
+	pkt->DS |= ((1<<drv) << 8) | ((1<<drv) << 12);
+	// Only report the drive ready / on-cylinder when a disk is actually present.
+	// Reporting RY for an empty unit makes ZEUS's disk-config probe treat the 3
+	// unpopulated SMD units as real (size 0) drives and spin on them.
+	if (drv_good)
+		pkt->DS |= SMD_DS_RY | SMD_DS_OC;
 }
 
 //**************************************************************************
