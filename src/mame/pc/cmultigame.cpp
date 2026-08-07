@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2002, cmultigame, 0, cmultigame, cmultigame, cmultigame_state, empty_init, ROT0, "Covielsa", "Multigame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2002, cmultigame, 0, cmultigame, cmultigame, cmultigame_state, empty_init, ROT0, "Covielsa", "Multigame (Covielsa)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
