@@ -10,6 +10,7 @@
 #include "pio_port.h"
 
 // supported card devices
+#include "cpnet_bridge.h"
 #include "keyboard.h"
 
 
@@ -86,4 +87,5 @@ device_rc702_pio_port_interface::~device_rc702_pio_port_interface()
 void rc702_pio_port_cards(device_slot_interface &device)
 {
 	device.option_add("keyboard", RC702_PIO_KEYBOARD);
+	device.option_add("cpnet_bridge", RC702_PIO_CPNET_BRIDGE);
 }
