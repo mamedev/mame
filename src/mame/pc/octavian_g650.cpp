@@ -109,8 +109,32 @@ void octavian_g650_state::octavian_g650(machine_config &config)
 /* The first HDD has three partitions, the second one is encrypted and is mounted as a RAM disc. The third one seems encrypted too.
    The second HDD have references to both "Admiral Parrot" and "Sweet Street" games (both from Octavian and both from 2007), but 
    seems to be "Sweet Street", and that the "Admiral Parrot" stuff is just a leftover.
-   The encryption is a pre-block Blowfish CBC, with the IV depending on the offset. Linux uses cryptoloop + Blowfish with the values
-   readed from the Atmel on the USB external board. It skips all-zero blocks.
+
+   The encryption is a pre-block Blowfish CBC and 128 bits keys, with the IV depending on the offset.
+   Linux uses cryptoloop + Blowfish with the values readed from the Atmel on the USB external board. It skips all-zero blocks.
+
+   First partition initrd is decrypted performing a MD5 of /boot/vmlinuz
+     key = RIPEMD160( ascii_hex( MD5(/boot/vmlinuz) ) )
+   Then, the second partition is descrypted using the key at /sbin/init
+     #!/bin/sh
+     /bin/mount -n -o remount,rw /dev/loop0 /  > /dev/null 2>&1
+     /bin/mount -n /proc /proc -t proc  > /dev/null 2>&1
+     /sbin/losetup  -e blowfish /dev/loop1 /dev/hda2 -m 6c228c3c296d > /dev/null 2>&1
+     /sbin/e2fsck -a /dev/loop1 <dev/tty2 >dev/tty2 2>&1
+     /bin/mount   -n -o ro -t ext2 /dev/loop1 /mnt  > /dev/null 2>&1
+     [ -d /mnt/dgt/ram ] || exit 0
+     /bin/umount -n /proc  > /dev/null 2>&1
+     cd /mnt  > /dev/null 2>&1
+     /sbin/pivot_root . initrd  > /dev/null 2>&1
+     cd /
+     exec /usr/sbin/chroot . bin/sh -c \
+      '/bin/mount -n /proc /proc -t proc;umount -n -lf /initrd; /bin/umount -n /proc; exec /sbin/init' \
+      <dev/tty2 >dev/tty2 2>&1
+   Finally, /etc/init.d/mountall.sh does the final step. and /etc/init.d/mountdg.sh mount the third partition (the game itself)
+   at /dgt/distr
+   /usr/sbin/key_find is used to look up for the USB external board, sending "test", and receiving
+   "3dd0de425ec68a50d498f30cc66b78c79880d0c2" from the MCU.
+
    At boot, it shows a splash screen from "Dream Games - Gaming System". */
 ROM_START(sweetstr)
 	// ROM_REGION32_LE(0x80000, "bios", 0)
