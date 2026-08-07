@@ -38,8 +38,10 @@ interactive layout, and is intended as an educational tool.
 #include "nl_source.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/7474.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
+#include "machine/quadmouse.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "sound/va_eg.h"
@@ -74,6 +76,10 @@ public:
 	source_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
+		, m_encoder(*this, "encoder")
+		, m_enc_ff_top(*this, "encoder_flipflop_top")
+		, m_enc_ff_bottom(*this, "encoder_flipflop_bottom")
+		, m_enc_ff_irq(*this, "encoder_flipflop_irq")
 		, m_contour(*this, "contour_%d", 0)
 		, m_contour_comp(*this, "contour_comp_%d", 0)
 		, m_contour_rate(*this, "source_nl:cntr_rate_%d", 0)
@@ -85,7 +91,6 @@ public:
 		, m_button_a_io(*this, "button_group_a_%d", 0U)
 		, m_button_b_io(*this, "button_group_b_%d", 0U)
 		, m_keyboard_io(*this, "keyboard_oct_%d", 1U)
-		, m_encoder(*this, "incremental_controller")
 		, m_trigger_io(*this, "trigger_in")
 		, m_octave_led(*this, "octave_led_%d", 0U)
 		, m_lfo_rate_led(*this, "mod_rate_led")
@@ -106,7 +111,6 @@ public:
 	void source(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(octave_button_pressed);
-	DECLARE_INPUT_CHANGED_MEMBER(encoder_moved);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -114,6 +118,9 @@ protected:
 
 private:
 	void update_octave_leds();
+
+	void enc_ph2_changed(int state);
+	void enc_ph1_changed(int state);
 
 	void edit_latch_w(u8 data);
 	void output_latch_a_w(u8 data);
@@ -142,6 +149,11 @@ private:
 
 	required_device<z80_device> m_maincpu;
 
+	required_device<quadencoder_device> m_encoder;  // Board 6
+	required_device<ttl7474_device> m_enc_ff_top;  // Board 3 U20A (CD4013B)
+	required_device<ttl7474_device> m_enc_ff_bottom;  // Board 3 U20B (CD4013B)
+	required_device<ttl7474_device> m_enc_ff_irq;  // Board 3 U15A (74LS74)
+
 	required_device_array<va_ota_eg_device, 2> m_contour;
 	required_device_array<va_comparator_device, 2> m_contour_comp;
 	required_device_array<netlist_mame_analog_input_device, 2> m_contour_rate;
@@ -155,7 +167,6 @@ private:
 	required_ioport_array<6> m_button_a_io;
 	required_ioport_array<6> m_button_b_io;
 	required_ioport_array<4> m_keyboard_io;
-	required_ioport m_encoder;
 	required_ioport m_trigger_io;
 
 	output_finder<2> m_octave_led;
@@ -173,7 +184,6 @@ private:
 
 	bool m_octave_hi = true;  // `true` due to internal pullups of 74LS367 and 7404.
 	u8 m_button_row_latch = 0xff;
-	bool m_encoder_incr = false;
 	bool m_lfo_state = false;  // Square output of the LFO. -14V (false) to 14V (true).
 
 	float m_lfo_cc = 0;  // Control current into the LFO OTA.
@@ -239,6 +249,30 @@ void source_state::update_octave_leds()
 {
 	m_octave_led[0] = m_octave_hi ? 0 : 1;
 	m_octave_led[1] = m_octave_hi ? 1 : 0;
+}
+
+void source_state::enc_ph2_changed(int state)
+{
+	// U19: CD40106B Schmitt-trigger inverter.
+	// U21: 74LS386 XOR.
+
+	const bool ph2_inv = !state;  // Inverted by U19B.
+	const bool ph2 = !ph2_inv;  // Inverted again by U19F.
+	const bool ph1_inv = !m_encoder->pl_r();  // Inverted by U19C.
+
+	m_enc_ff_top->clock_w(ph2_inv);
+	m_enc_ff_bottom->clock_w(ph2);
+	m_enc_ff_irq->clock_w(ph1_inv != ph2_inv);  // U21A XOR, ph2 inverted again by U19E.
+}
+
+void source_state::enc_ph1_changed(int state)
+{
+	const bool ph1_inv = !state;  // Inverted by U19C.
+	const bool ph2_inv = !!!m_encoder->mn_r();  // Inverted by U19B, U19F, U19E.
+
+	m_enc_ff_top->d_w(ph1_inv);
+	m_enc_ff_bottom->d_w(ph1_inv);
+	m_enc_ff_irq->clock_w(ph1_inv != ph2_inv);  // U21A XOR
 }
 
 void source_state::edit_latch_w(u8 data)
@@ -576,13 +610,23 @@ u8 source_state::buttons_b_r()
 
 u8 source_state::encoder_r()
 {
-	// D0 contains whether the encoder was last incremented or decremented.
-	LOGMASKED(LOG_ENCODER,
-			  "Encoder read: %d - %d\n", m_encoder->read(), m_encoder_incr);
 	// Reading the encoder's state also clears /INT (via U21B, U7A and U15A).
 	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	return m_encoder_incr ? 1 : 0;
+	{
+		// Strobed on port read.
+		m_enc_ff_irq->clear_w(0);
+		m_enc_ff_irq->clear_w(1);
+	}
+
+	bool incr = false;
+	if (!m_encoder->mn_r())  // Inverted by U19B.
+		incr = m_enc_ff_top->output_comp_r();
+	else
+		incr = m_enc_ff_bottom->output_r();
+	LOGMASKED(LOG_ENCODER, "Encoder read - increment: %d\n", incr);
+
+	// D0: encoder incremented.
+	return incr ? 1 : 0;
 }
 
 template<int Which> NETDEV_ANALOG_CALLBACK_MEMBER(source_state::contour_cv_changed)
@@ -757,7 +801,6 @@ void source_state::machine_start()
 {
 	save_item(NAME(m_octave_hi));
 	save_item(NAME(m_button_row_latch));
-	save_item(NAME(m_encoder_incr));
 	save_item(NAME(m_lfo_state));
 	save_item(NAME(m_lfo_cc));
 	save_item(NAME(m_contour_cc));
@@ -788,6 +831,17 @@ void source_state::source(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &source_state::io_map);
 
 	NVRAM(config, NVRAM_TAG, nvram_device::DEFAULT_ALL_0);  // 2x6514: U27, U28.
+
+	// The encoder assembly is a custom design. There is a radial transparent
+	// film with black stripes attached to the wheel. 2 MCT8 optocouplers and
+	// supporting components generate the quadrature pulses. Logic gates and
+	// flipflops process those to produce the IRQ signal and a direction bit.
+	QUADENCODER(config, m_encoder);
+	m_encoder->write_mn().set(FUNC(source_state::enc_ph2_changed));
+	m_encoder->write_pl().set(FUNC(source_state::enc_ph1_changed));
+	TTL7474(config, m_enc_ff_top);
+	TTL7474(config, m_enc_ff_bottom);
+	TTL7474(config, m_enc_ff_irq).comp_output_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0).invert();
 
 	config.set_default_layout(layout_moog_source);
 
@@ -864,18 +918,6 @@ DECLARE_INPUT_CHANGED_MEMBER(source_state::octave_button_pressed)
 		// No buttons pressed. No change in selected octave.
 	}
 	update_octave_leds();
-}
-
-DECLARE_INPUT_CHANGED_MEMBER(source_state::encoder_moved)
-{
-	constexpr int WRAP_BUFFER = 10;
-	const bool overflowed = newval <= WRAP_BUFFER &&
-							oldval >= 240 - WRAP_BUFFER;
-	const bool underflowed = newval >= 240 - WRAP_BUFFER &&
-							 oldval <= WRAP_BUFFER;
-	m_encoder_incr = ((newval > oldval) || overflowed) && !underflowed;
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	LOGMASKED(LOG_ENCODER, "Encoder changed: %d %d\n", newval, m_encoder_incr);
 }
 
 INPUT_PORTS_START(source)
@@ -981,11 +1023,13 @@ INPUT_PORTS_START(source)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Octave +1")  // SW2 (Board 5).
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(source_state::octave_button_pressed), 0x02)
 
+	// Custom assembly on Board 6. A radial film around the knob has
+	// approximately 100 black stripes.
 	PORT_START("incremental_controller")
-	PORT_BIT(0xff, 0x00, IPT_POSITIONAL_V) PORT_POSITIONS(240) PORT_WRAPS
-		PORT_SENSITIVITY(25) PORT_KEYDELTA(3)
-		PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP) PORT_FULL_TURN_COUNT(240)
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(source_state::encoder_moved), 1)
+	PORT_BIT(0xff, 0x00, IPT_POSITIONAL_V) PORT_POSITIONS(99) PORT_WRAPS
+		PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
+		PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP) PORT_FULL_TURN_COUNT(100)
+		PORT_CHANGED_MEMBER("encoder", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("keyboard_oct_1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C2
