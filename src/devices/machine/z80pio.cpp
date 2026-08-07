@@ -392,6 +392,15 @@ void z80pio_device::pio_port::set_mode(int mode)
 	case MODE_OUTPUT:
 		if (LOG) m_device->logerror("Z80PIO Port %c Mode: Output\n", 'A' + m_index);
 
+		// set mode register BEFORE firing the output callback.  Otherwise
+		// downstream devices (e.g. the rc702 cpnet_bridge) can call back
+		// into the chip via strobe_w from inside their write() handler
+		// while m_mode still holds its prior value -- if that prior value
+		// was MODE_INPUT, the chip fires m_in_pb_cb and pollutes m_input
+		// with whatever the peripheral returns at that moment.  Setting
+		// m_mode first makes the strobe-back see MODE_OUTPUT (no callback).
+		m_mode = mode;
+
 		// enable data output
 		if (m_index == PORT_A)
 			m_device->m_out_pa_cb((offs_t)0, m_output);
@@ -401,8 +410,6 @@ void z80pio_device::pio_port::set_mode(int mode)
 		// assert ready line
 		set_rdy(true);
 
-		// set mode register
-		m_mode = mode;
 		break;
 
 	case MODE_INPUT:
