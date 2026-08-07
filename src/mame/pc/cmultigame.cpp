@@ -5,6 +5,11 @@
 Skeleton driver for Covielsa "Multigame".
 PC hardware:
 - Gigabyte GA-8SIMLH Rev 2.0 motherboard.
+   * Realtek RTL8100BL Ethernet controller.
+   * Winbond W83697HF Super I/O.
+   * Realtek ALC650 AC'97 audio.
+   * SiS 962L southbridge.
+   * SiS 651 northbridge.
 - ATI Rage Mobiity-P AGP video.
 - Intel Celeron 1.7 GHz (100x17).
 - 128 MB RAM DDR 256.
@@ -83,7 +88,7 @@ INPUT_PORTS_END
 
 void cmultigame_state::cmultigame(machine_config &config)
 {
-	PENTIUM4(config, m_maincpu, 100'000'000); // Unknown VIA 32 bits CPU
+	PENTIUM4(config, m_maincpu, 100'000'000); // Intel Celeron 1.7 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmultigame_state::cmultigame_map);
 	m_maincpu->set_addrmap(AS_IO, &cmultigame_state::cmultigame_io);
 
