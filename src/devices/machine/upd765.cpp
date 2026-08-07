@@ -420,6 +420,7 @@ void upd765_family_device::tc_w(bool _tc)
 	if(tc != _tc && _tc) {
 		live_sync();
 		tc_done = true;
+		disable_transfer();
 		tc = _tc;
 		if(cur_live.fi)
 			general_continue(*cur_live.fi);
@@ -812,7 +813,7 @@ void upd765_family_device::fifo_expect(int size, bool write)
 {
 	fifo_expected = size;
 	fifo_write = write;
-	if(fifo_write)
+	if(fifo_write && !tc_done)
 		enable_transfer();
 }
 
