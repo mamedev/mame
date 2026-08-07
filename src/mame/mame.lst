@@ -33667,6 +33667,9 @@ ampscarp
 @source:motorola/assist05.cpp
 assist05
 
+@source:motorola/execphone2.cpp
+execphone2
+
 @source:motorola/exorciser.cpp
 exorciser
 
