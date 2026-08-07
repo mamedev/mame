@@ -140,6 +140,14 @@ void i8291a_device::device_reset()
 	update_state(m_sh_state, source_handshake_state::SIDS);
 	update_state(m_ah_state, acceptor_handshake_state::AIDS);
 	update_state(m_lp_state, listener_primary_state::LPIS);
+
+	// none of the power-up states drives the bus; release outputs the bypassed FSM paths left held
+	set_nrfd(false);
+	set_ndac(false);
+	set_dav(false);
+	set_eoi(false);
+	set_srq(false);
+	m_dio_write_func(0xff);
 }
 
 void i8291a_device::device_start()
