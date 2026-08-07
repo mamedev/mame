@@ -3392,7 +3392,7 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 	// bneg     bpos
 	// bvs      bvc
 
-	switch(COND)
+	switch (COND)
 	{
 		case 0:     return false;
 		case 1:     return ICC_Z_SET;

@@ -601,4 +601,4 @@ void rugby_state::driver_init()
 /*    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS          INIT         ROT   COMPANY      FULLNAME                         FLAGS  */
 GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, driver_init, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, driver_init, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, rugby,   0,      rugby,   4roses, rugby_state,   driver_init, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, rugby,   0,      rugby,   4roses, rugby_state,   driver_init, ROT0, "C.M.C.",    "Rugby? (Four Roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

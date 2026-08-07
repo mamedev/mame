@@ -4229,7 +4229,7 @@ GAME( 1995, dragoonj,    dragoona, dragoonj,      dragoonj, konamigx_state, init
 
 GAME( 1996, sexyparo,    konamigx, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1996, sexyparoa,   sexyparo, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, sexyparoebl, sexyparo, sexyparoebl,   gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver EAA, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, sexyparoebl, sexyparo, sexyparoebl,   gokuparo, konamigx_state, init_konamigx, ROT0, "bootleg", "Sexy Parodius (ver EAA, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 1996, daiskiss,    konamigx, konamigx,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
