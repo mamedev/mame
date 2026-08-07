@@ -2124,6 +2124,7 @@ void saturn_state::vdp1_process_list()
 
 				default:
 					// asenna 0x0c or 0x0d (transition from title screen)
+					// raymanj 0x0d (at startup)
 					// albodysj 0x0f (always)
 					popmessage ("VDP1: Sprite List Illegal %02x (%d)",current_sprite.CMDCTRL & 0xf,spritecount);
 					m_vdp1_legacy.lopr = (position * 0x20) >> 3;
@@ -5413,6 +5414,7 @@ void saturn_state::vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle 
 	}
 }
 
+// - arcadegh uses incy zoom for most games but Joust
 void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int xsize, ysize, xsize_mask, ysize_mask;
@@ -5424,6 +5426,7 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	int scrolly = current_tilemap.scrolly;
 	uint16_t dot_data;
 	uint16_t pal_bank;
+	int xf, yf;
 
 	xsize = (current_tilemap.bitmap_size & 2) ? 1024 : 512;
 	ysize = (current_tilemap.bitmap_size & 1) ? 512 : 256;
@@ -5445,8 +5448,13 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 			if(!vdp2_window_process(xdst,ydst))
 				continue;
 
-			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize_mask-1);
+			xf = current_tilemap.incx * xdst;
+			xf>>=16;
+			yf = current_tilemap.incy * ydst;
+			yf>>=16;
+
+			xsrc = (xf + scrollx) & (xsize_mask-1);
+			ysrc = (yf + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs/= 2;
 			src_offs += map_offset;
@@ -5729,9 +5737,9 @@ void saturn_state::vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectangle 
 	{
 		switch(current_tilemap.colour_depth)
 		{
-		//  case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
+			case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
 			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
-		//  case 2: draw_11bpp_bitmap(bitmap, cliprect); return;
+		//  case 2: draw_11bpp_bitmap(bitmap,cliprect); return;
 			case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
 			case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
