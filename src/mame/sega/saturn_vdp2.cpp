@@ -130,7 +130,7 @@ void saturn_vdp2_device::regs_map(address_map &map)
 			m_lsmd = (m_tvmd >> 6) & 3;
 			m_vreso = (m_tvmd >> 4) & 3;
 			m_hreso = (m_tvmd >> 0) & 7;
-			if (ACCESSING_BITS_0_7 && m_tvmd != m_old_tvmd)
+			if (ACCESSING_BITS_0_7 && (m_tvmd & 0xff) != (m_old_tvmd & 0xff))
 				reconfigure_crtc();
 			m_old_tvmd = m_tvmd;
 		})

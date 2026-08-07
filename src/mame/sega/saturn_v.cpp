@@ -8631,6 +8631,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 //  vdp2_apply_window_on_layer(mycliprect);
 
+	// TODO: reminder that this is an unfollowable snippet ...
 	if (interlace_framebuffer == 0 && double_x == 0 )
 	{
 		if ( alpha_enabled == 0 )
@@ -8650,6 +8651,10 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						continue;
 
 					pix = framebuffer_line[x];
+					// pukunpa, no alpha no framebuffer bumps
+					if(VDP2_SPWINEN && pix == 0x8000)
+						continue;
+
 					if ( (pix & 0x8000) && sprite_color_mode)
 					{
 						if ( sprite_priorities[0] != pri )
@@ -8658,9 +8663,6 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 							vdp1_sprite_priorities_in_fb_line[y][sprite_priorities[0]] = 1;
 							continue;
 						};
-
-						if(VDP2_SPWINEN && pix == 0x8000) /* Pukunpa */
-							continue;
 
 						b = pal5bit((pix & 0x7c00) >> 10);
 						g = pal5bit((pix & 0x03e0) >> 5);
@@ -8685,7 +8687,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						// Pretty Fighter X, Game Tengoku shadows
 						// TODO: Pretty Fighter X doesn't read what's behind on title screen, VDP1 bug?
 						// TODO: seldomly Game Tengoku shadows aren't drawn properly
-						if(pix & 0x8000 && VDP2_SDCTL & 0x100)
+						if(pix & 0x8000 && VDP2_SDCTL & 0x100 && !VDP2_SPWINEN)
 						{
 							rgb_t p = bitmap_line[x];
 							bitmap_line[x] = rgb_t(p.r() >> 1, p.g() >> 1, p.b() >> 1);
@@ -8743,6 +8745,10 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						continue;
 
 					pix = framebuffer_line[x];
+					// raymanj on FMV, alpha enabled (no noticeable difference?)
+					if(VDP2_SPWINEN && pix == 0x8000)
+						continue;
+
 					if ( (pix & 0x8000) && sprite_color_mode)
 					{
 						if ( sprite_priorities[0] != pri )
@@ -8751,6 +8757,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 							vdp1_sprite_priorities_in_fb_line[y][sprite_priorities[0]] = 1;
 							continue;
 						};
+
 
 						b = pal5bit((pix & 0x7c00) >> 10);
 						g = pal5bit((pix & 0x03e0) >> 5);
@@ -8860,6 +8867,10 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					continue;
 
 				pix = framebuffer_line[x];
+				// amoudan, interlaced case
+				if(VDP2_SPWINEN && pix == 0x8000)
+					continue;
+
 				if ( (pix & 0x8000) && sprite_color_mode)
 				{
 					if ( sprite_priorities[0] != pri )

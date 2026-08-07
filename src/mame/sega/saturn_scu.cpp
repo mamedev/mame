@@ -368,7 +368,7 @@ void saturn_scu_device::device_reset_after_children()
 
 inline void saturn_scu_device::update_dma_status(int level, dma_state_t new_state)
 {
-	const std::string status_names[] = { "IDLE", "WAIT", "MOVE", "????" };
+	const std::string status_names[] = { "IDLE", "MOVE", "WAIT", "????" };
 	const int log_shifts[] = { 4, 8, 12 };
 	assert(level >= 0);
 
