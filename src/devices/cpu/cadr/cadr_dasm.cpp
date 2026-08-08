@@ -4,12 +4,7 @@
 
     MIT CADR microcode disassembler
 
-The official assembler language is unknown.
-An attempt has been made to keep the generated assembler code short and
-understandable.
-
-TODO:
-- bit 45 ilong
+Disassembler reverse engineered from cadrlp source.
 
 ***************************************************************************/
 
@@ -19,475 +14,219 @@ TODO:
 
 namespace {
 
-static constexpr u64 NOP_MASK = u64(0x7fffffffeffff);
-
-static const char *const mult_div_op[0x20] =
+static const char *const jump_rp[0x04] =
 {
-	"mult-step", "div-step",      "unk", "unk", "unk", "rem-corr", "unk", "unk",
-	"unk",       "init-div-step", "unk", "unk", "unk", "unk",      "unk", "unk",
-	"mult-step", "div-step",      "unk", "unk", "unk", "rem-corr", "unk", "unk",
-	"unk",       "init-div-step", "unk", "unk", "unk", "unk",      "unk", "unk"
+	"JUMP", "CALL", "POPJ", "CALL-POPJ-??"
 };
 
-static const char *const output_bus_control[0x04] =
+static const char *const jump_cond[0x08] =
 {
-	"ill ", "", ">> ", "<< "
+	"T",              "-LESS-THAN",                  "-LESS-OR-EQUAL",     "-EQUAL",
+	"-IF-PAGE-FAULT", "-IF-PAGE-FAULT-OR-INTERRUPT", "-IF-SEQUENCE-BREAK", "NIL"
 };
 
-static const char *const q_control[0x04] =
+static const char *const jump_cond_invert[0x08] =
 {
-	"", "<<Q,", ">>Q,", "Q,"
+	"T",                 "-GREATER-OR-EQUAL",              "-GREATER-THAN",         "-NOT-EQUAL",
+	"-IF-NO-PAGE-FAULT", "-IF-NO-PAGE-FAULT-OR-INTERRUPT", "-IF-NO-SEQUENCE-BREAK", "-NEVER"
 };
 
-static const char *const rp[0x04] =
+static const char *const alu_op[0x40] =
 {
-	"branch", "call", "return", "imem-write"
+	"SETZ",            "AND",             "ANDCA",           "SETM",
+	"ANDCM",           "",                "XOR",             "IOR",
+	"ANDCB",           "EQV",             "SETCA",           "ORCA",
+	"SETCM",           "ORCM",            "ORCB",            "SETO",
+
+	"ALU-FUNCTION-20", "ALU-FUNCTION-21", "ALU-FUNCTION-22", "ALU-FUNCTION-23",
+	"ALU-FUNCTION-24", "ALU-FUNCTION-25", "SUB",             "ALU-FUNCTION-27",
+	"ALU-FUNCTION-30", "ADD",             "ALU-FUNCTION-32", "ALU-FUNCTION-33",
+	"INCM",            "ALU-FUNCTION-35", "ALU-FUNCTION-36", "LSHM",
+
+	"MUL",             "DIV",             "ALU-FUNCTION-42", "ALU-FUNCTION-43",
+	"ALU-FUNCTION-44", "DIVRC",           "ALU-FUNCTION-46", "ALU-FUNCTION-47",
+	"ALU-FUNCTION-50", "DIVFS",           "ALU-FUNCTION-52", "ALU-FUNCTION-53",
+	"ALU-FUNCTION-54", "ALU-FUNCTION-55", "ALU-FUNCTION-56", "ALU-FUNCTION-57",
+
+	"ALU-FUNCTION-60", "ALU-FUNCTION-61", "ALU-FUNCTION-62", "ALU-FUNCTION-63",
+	"ALU-FUNCTION-64", "ALU-FUNCTION-65", "ALU-FUNCTION-66", "ALU-FUNCTION-67",
+	"ALU-FUNCTION-70", "ALU-FUNCTION-71", "ALU-FUNCTION-72", "ALU-FUNCTION-73",
+	"ALU-FUNCTION-74", "ALU-FUNCTION-75", "ALU-FUNCTION-76", "ALU-FUNCTION-77",
+};
+
+static const char *const output_selector[0x04] =
+{
+	"OUTPUT-SELECTOR-0", "", "OUTPUT-SELECTOR-RIGHTSHIFT-1", "OUTPUT-SELECTOR-LEFTSHIFT-1"
+};
+
+static const char *const q_shift[0x04] =
+{
+	"", "SHIFT-Q-LEFT", "SHIFT-Q-RIGHT", ""
+};
+
+static const char *const byte_operation[0x04] =
+{
+	"BYTE-OPERATION-0", "LDB", "SELECTIVE-DEPOSIT", "DPB"
+};
+
+static const char *const map_dispatch[0x04] =
+{
+	"", " MAP-14", " MAP-15", " MAP-BOTH-14-AND-15"
 };
 
 
-void a_source(std::ostream &stream, u64 op)
+void output(std::ostream &stream, bool &need_sp, const char * const string)
 {
-	util::stream_format(stream, "a[%o]", ((op >> 32) & 0x3ff));
+	if (need_sp) stream << " ";
+	stream << string;
+	need_sp = true;
 }
 
 
-void m_source(std::ostream &stream, u64 op)
+template <typename Stream, typename Format, typename... Params>
+typename Stream::off_type output(Stream &stream, bool &need_sp, Format const &fmt, Params &&... args)
+{
+	if (need_sp) stream << " ";
+	need_sp = true;
+	return util::stream_format(stream, fmt, std::forward<Params>(args)...);
+}
+
+
+void m_source(std::ostream &stream, bool &need_sp, u64 op)
 {
 	if (BIT(op, 31))
 	{
 		switch ((op >> 26) & 0x1f)
 		{
-		case 0x00: stream << "dispatch-constant"; break;
-		case 0x01: stream << "SPC-ptr, SPC-data"; break;
-		case 0x02: util::stream_format(stream, "PDL-ptr %o", op & 0x3ff); break;
-		case 0x03: util::stream_format(stream, "PDL-idx %o", op & 0x3ff); break;
-		case 0x04: stream << "PDL-buff--"; break;
-		case 0x05: stream << "PDL-buff"; break;
-		case 0x06: util::stream_format(stream, "OPC-reg %05o", op & 0x1fff); break;
-		case 0x07: stream << "Q"; break;
-		case 0x08: stream << "VMA"; break;
-		case 0x09: stream << "MAP[MD]"; break;
-		case 0x0a: stream << "MD"; break;
-		case 0x0b: stream << "LC"; break;
-		case 0x0c: stream << "SPC-ptr and data,pop"; break;
-		case 0x0d: stream << "reserved"; break;
-		case 0x0e: stream << "reserved"; break;
-		case 0x0f: stream << "reserved"; break;
-		case 0x14: stream << "PDL[Ptr],pop"; break;
-		case 0x15: stream << "PDL[Ptr]"; break;
-		default:   stream << "illegal"; break;
+		case 0x00: output(stream, need_sp, "READ-I-ARG"); break;
+		case 0x01: output(stream, need_sp, "MICRO-STACK-PNTR-AND-DATA"); break;
+		case 0x02: output(stream, need_sp, "PDL-BUFFER-POINTER-%o", op & 0x3ff); break;
+		case 0x03: output(stream, need_sp, "PDL-BUFFER-INDEX-%o", op & 0x3ff); break;
+//		case 0x04: output(stream, need_sp, "C-PDL-BUFFER-INDEX--"); break; // not official
+		case 0x05: output(stream, need_sp, "C-PDL-BUFFER-INDEX"); break;
+		case 0x06: output(stream, need_sp, "C-OPC-BUFFER-%05o", op & 0x1fff); break;
+		case 0x07: output(stream, need_sp, "Q-R"); break;
+		case 0x08: output(stream, need_sp, "VMA"); break;
+		case 0x09: output(stream, need_sp, "MEMORY-MAP-DATA"); break;
+		case 0x0a: output(stream, need_sp, "MD"); break;
+		case 0x0b: output(stream, need_sp, "LOCATION-COUNTER"); break;
+		case 0x0c: output(stream, need_sp, "MICRO-STACK-PNTR-AND-DATA-POP"); break;
+//		case 0x0d: output(stream, need_sp, "reserved-0d"); break;
+//		case 0x0e: output(stream, need_sp, "reserved-0e"); break;
+//		case 0x0f: output(stream, need_sp, "reserved-0f"); break;
+		case 0x14: output(stream, need_sp, "C-PDL-BUFFER-POINTER-POP"); break;
+		case 0x15: output(stream, need_sp, "C-PDL-BUFFER-POINTER"); break;
+		default:   output(stream, need_sp, "FSOURCE-%o", (op >> 26) & 0x1f); break;
 		}
 	}
 	else
 	{
-		util::stream_format(stream, "m[%o]", (op >> 26) & 0x1f);
+		if ((op >> 26) & 0x1f)
+		{
+			output(stream, need_sp, "M-%o", (op >> 26) & 0x1f);
+		}
 	}
 }
 
 
-void disassemble_alu_op(std::ostream &stream, u64 op)
+void disassemble_alu_op(std::ostream &stream, bool &need_sp, u64 op)
 {
-	if (BIT(op, 8))
+	if (((op >> 3) & 0x3f) != 0x05)
+		output(stream, need_sp, "%s", alu_op[(op >> 3) & 0x3f]);
+	if (((op >> 3) & 0x3f) == 22)
 	{
-		util::stream_format(stream, "%s ", mult_div_op[(op >> 3) & 0x1f]);
-		a_source(stream, op);
-		stream << " ";
-		m_source(stream, op);
-		util::stream_format(stream, " C=%d ", BIT(op, 2));
+		if (!BIT(op, 2))
+			output(stream, need_sp, "ALU-CARRY-IN-ZERO");
 	}
 	else
 	{
-		if (BIT(op, 7))
+		if (BIT(op, 2))
+			output(stream, need_sp, "ALU-CARRY-IN-ONE");
+	}
+}
+
+
+void disassemble_destination(std::ostream &stream, bool &need_sp, u64 op)
+{
+	if (!((op >> 14) & 0x7ff))
+	{
+		if (((op >> 43) & 0x03) == 0x00 && (op & 0x03) == 0x03)
+			output(stream, need_sp, "(Q-R)");
+		return;
+	}
+
+	output(stream, need_sp, "(");
+	need_sp = false; // We do not want a separator after an opening (
+	if (BIT(op, 25))
+	{
+		output(stream, need_sp, "A-%o", (op >> 14) & 0x3ff);
+	}
+	else
+	{
+		if ((op >> 14) & 0x1f)
+			output(stream, need_sp, "M-%o", (op >> 14) & 0x1f);
+
+		switch ((op >> 19) & 0x1f)
 		{
-			if (BIT(op, 2))
-			{
-				// Arithmetic operations with carry-in
-				switch ((op >> 3) & 0x0f)
-				{
-				case 0x00: // 0
-					stream << "0";
-					break;
-				case 0x01: // M&A
-					m_source(stream, op);
-					stream << "&";
-					a_source(stream, op);
-					break;
-				case 0x02: // M&~A
-					m_source(stream, op);
-					stream << "&~";
-					a_source(stream, op);
-					break;
-				case 0x03: // M
-					m_source(stream, op);
-					break;
-				case 0x04: // (M|~A)+1
-					stream << "(";
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					stream << ")+1";
-					break;
-				case 0x05: // (M|~A)+(M&A)+1
-					stream << "(";
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					stream << ")+(";
-					m_source(stream, op);
-					stream << "&";
-					a_source(stream, op);
-					stream << ")+1";
-					break;
-				case 0x06: // M-A
-					m_source(stream, op);
-					stream << "-";
-					a_source(stream, op);
-					break;
-				case 0x07: // (M|~A)+M+1
-					stream << "(";
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					stream << ")+";
-					m_source(stream, op);
-					stream << "+1";
-					break;
-				case 0x08: // (M|A)+1
-					stream << "(";
-					m_source(stream, op);
-					stream << "|";
-					a_source(stream, op);
-					stream << ")+1";
-					break;
-				case 0x09: // M+A+1
-					m_source(stream, op);
-					stream << "+";
-					a_source(stream, op);
-					stream << "+1";
-					break;
-				case 0x0a: // (M|A)+(M&~A)+1
-					stream << "(";
-					m_source(stream, op);
-					stream << "|";
-					a_source(stream, op);
-					stream << ")+(";
-					m_source(stream, op);
-					stream << "&~";
-					a_source(stream, op);
-					stream << ")+1";
-					break;
-				case 0x0b: // (M|A)+M+1
-					stream << "(";
-					m_source(stream, op);
-					stream << "|";
-					a_source(stream, op);
-					stream << ")+";
-					m_source(stream, op);
-					stream << "+1";
-					break;
-				case 0x0c: // M+1
-					m_source(stream, op);
-					stream << "+1";
-					break;
-				case 0x0d: // M+(M&A)+1
-					m_source(stream, op);
-					stream << "+(";
-					m_source(stream, op);
-					stream << "&";
-					a_source(stream, op);
-					stream << ")+1";
-					break;
-				case 0x0e: // M+(M|~A)+1
-					m_source(stream, op);
-					stream << "+(";
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					stream << ")+1";
-					break;
-				case 0x0f: // M+M+1
-					m_source(stream, op);
-					stream << "+";
-					m_source(stream, op);
-					stream << "+1";
-					break;
-				}
-			}
-			else
-			{
-				// Arithmetic operations without carry-in
-				switch ((op >> 3) & 0x0f)
-				{
-				case 0x00: // -1
-					stream << "-1";
-					break;
-				case 0x01: // (M&A)-1
-					stream << "(";
-					m_source(stream, op);
-					stream << "&";
-					a_source(stream, op);
-					stream << ")-1";
-					break;
-				case 0x02: // (M&~A)-1
-					stream << "(";
-					m_source(stream, op);
-					stream << "&~";
-					a_source(stream, op);
-					stream << ")-1";
-					break;
-				case 0x03: // M-1
-					m_source(stream, op);
-					stream << "-1";
-					break;
-				case 0x04: // M|~A
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					break;
-				case 0x05: // (M|~A)+(M&A)
-					stream << "(";
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					stream << ")+(";
-					m_source(stream, op);
-					stream << "&";
-					a_source(stream, op);
-					stream << ")";
-					break;
-				case 0x06: // M-A-1
-					m_source(stream, op);
-					stream << "-";
-					a_source(stream, op);
-					stream << "-1";
-					break;
-				case 0x07: // (M|~A)+M
-					stream << "(";
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					stream << ")+";
-					m_source(stream, op);
-					break;
-				case 0x08: // M|A
-					m_source(stream, op);
-					stream << "|";
-					a_source(stream, op);
-					break;
-				case 0x09: // M+A
-					m_source(stream, op);
-					stream << "+";
-					a_source(stream, op);
-					break;
-				case 0x0a: // (M|A)+(M&~A)
-					stream << "(";
-					m_source(stream, op);
-					stream << "|";
-					a_source(stream, op);
-					stream << ")+(";
-					m_source(stream, op);
-					stream << "&~";
-					a_source(stream, op);
-					stream << ")";
-					break;
-				case 0x0b: // (M|A)+M
-					stream << "(";
-					m_source(stream, op);
-					stream << "|";
-					a_source(stream, op);
-					stream << ")+";
-					m_source(stream, op);
-					break;
-				case 0x0c: // M
-					m_source(stream, op);
-					break;
-				case 0x0d: // M+(M&A)
-					m_source(stream, op);
-					stream << "+(";
-					m_source(stream, op);
-					stream << "&";
-					a_source(stream, op);
-					stream << ")";
-					break;
-				case 0x0e: // M+(M|~A)
-					m_source(stream, op);
-					stream << "+(";
-					m_source(stream, op);
-					stream << "|~";
-					a_source(stream, op);
-					stream << ")";
-					break;
-				case 0x0f: // M+M
-					m_source(stream, op);
-					stream << "+";
-					m_source(stream, op);
-					break;
-				}
-			}
+		case 0x00: break;
+		case 0x01: output(stream, need_sp, "LOCATION-COUNTER"); break;
+		case 0x02: output(stream, need_sp, "INTERRUPT-CONTROL"); break;
+		case 0x08: output(stream, need_sp, "C-PDL-BUFFER-POINTER"); break;
+		case 0x09: output(stream, need_sp, "C-PDL-BUFFER-POINTER-PUSH"); break;
+		case 0x0a: output(stream, need_sp, "C-PDL-BUFFER-INDEX"); break;
+		case 0x0b: output(stream, need_sp, "PDL-BUFFER-INDEX"); break;
+		case 0x0c: output(stream, need_sp, "PDL-BUFFER-POINTER"); break;
+		case 0x0d: output(stream, need_sp, "MICRO-STACK-DATA-PUSH"); break;
+		case 0x0e: output(stream, need_sp, "OA-REG-LOW"); break;
+		case 0x0f: output(stream, need_sp, "OA-REG-HI"); break;
+		case 0x10: output(stream, need_sp, "VMA"); break;
+		case 0x11: output(stream, need_sp, "VMA-START-READ"); break;
+		case 0x12: output(stream, need_sp, "VMA-START-WRITE"); break;
+		case 0x13: output(stream, need_sp, "VMA-WRITE-MAP"); break;
+		case 0x18: output(stream, need_sp, "MD"); break;
+		case 0x19: output(stream, need_sp, "MD-START-READ"); break;
+		case 0x1a: output(stream, need_sp, "MD-START-WRITE"); break;
+		case 0x1b: output(stream, need_sp, "MD-WRITE-MAP"); break;
+		default:   output(stream, need_sp, "FDEST-%o", (op >> 19) & 0x1f); break;
+		}
+	}
+	if (((op >> 43) & 0x03) == 0x00 && (op & 0x03) == 0x03)
+	{
+		output(stream, need_sp, "Q-R");
+	}
+	stream << ")";
+	need_sp = true;
+}
+
+
+void disassemble_jump_condition(std::ostream &stream, bool &need_sp, u64 op)
+{
+	output(stream, need_sp, jump_rp[(op >>8) & 0x03]);
+	if (!BIT(op, 5))
+	{
+		stream << (BIT(op, 6) ? "-IF-BIT-SET" : "-IF-BIT-CLEAR");
+		if (BIT(op, 7))
+			stream << "-XCT-NEXT";
+		output(stream, need_sp, "(BYTE-FIELD 1 %o)", 32 - (op & 0x1f));
+	}
+	else
+	{
+		if (op & 0x07)
+		{
+			if (BIT(op, 6) || (op & 0x07) != 0x07)
+				stream << (BIT(op, 6) ? jump_cond_invert[op & 0x07] : jump_cond[op & 0x07]);
+			if (!BIT(op, 7))
+				stream << "-XCT-NEXT";
 		}
 		else
 		{
-			// Boolean operations
-			switch ((op >> 3) & 0x0f)
-			{
-			case 0x00: // SETZ
-				stream << "0";
-				break;
-			case 0x01: // AND
-				m_source(stream, op);
-				stream << "&";
-				a_source(stream, op);
-				break;
-			case 0x02: // ANDCA
-				m_source(stream, op);
-				stream << "&~";
-				a_source(stream, op);
-				break;
-			case 0x03: // SETM
-				m_source(stream, op);
-				break;
-			case 0x04: // ANDCM
-				stream << "~";
-				m_source(stream, op);
-				stream << "&";
-				a_source(stream, op);
-				break;
-			case 0x05: // SETA
-				a_source(stream, op);
-				break;
-			case 0x06: // XOR
-				m_source(stream, op);
-				stream << "^";
-				a_source(stream, op);
-				break;
-			case 0x07: // IOR
-				m_source(stream, op);
-				stream << "|";
-				a_source(stream, op);
-				break;
-			case 0x08: // ANDCB
-				stream << "~";
-				m_source(stream, op);
-				stream << "&~";
-				a_source(stream, op);
-				break;
-			case 0x09: // EQV
-				m_source(stream, op);
-				stream << "=";
-				a_source(stream, op);
-				break;
-			case 0x0a: // SETCA
-				stream << "~";
-				a_source(stream, op);
-				break;
-			case 0x0b: // ORCA
-				m_source(stream, op);
-				stream << "|~";
-				a_source(stream, op);
-				break;
-			case 0x0c: // SETCM
-				stream << "~";
-				m_source(stream, op);
-				break;
-			case 0x0d: // ORCM
-				stream << "~";
-				m_source(stream, op);
-				stream << "|";
-				a_source(stream, op);
-				break;
-			case 0x0e: // ORCB
-				stream << "~";
-				m_source(stream, op);
-				stream << "|~";
-				a_source(stream, op);
-				break;
-			case 0x0f: // SETO
-				stream << "-1";
-				break;
-			}
+			if (!BIT(op, 7))
+				stream << "-XCT-NEXT";
+			stream << " JUMP-CONDITION 0";
+			if (!BIT(op, 6))
+				stream << " (INVERTED)";
 		}
 	}
-}
-
-
-void disassemble_destination(std::ostream &stream, u64 op)
-{
-	if (BIT(op, 25))
-	{
-		util::stream_format(stream, "a[%o] ", (op >> 14) & 0x3ff);
-	}
-	else
-	{
-		switch ((op >> 19) & 0x1f)
-		{
-		case 0x00: stream << ""; break;
-		case 0x01: stream << "LC,"; break;
-		case 0x02: stream << "IC,"; break;
-		case 0x08: stream << "PDL[ptr],"; break;
-		case 0x09: stream << "PDL[ptr],push,"; break;
-		case 0x0a: stream << "PDL[index],"; break;
-		case 0x0b: stream << "PDL-idx,"; break;
-		case 0x0c: stream << "PDL-ptr,"; break;
-		case 0x0d: stream << "SPC-dat,push,"; break;
-		case 0x0e: stream << "OA-reg-lo,"; break;
-		case 0x0f: stream << "OA-reg-hi,"; break;
-		case 0x10: stream << "VMA,"; break;
-		case 0x11: stream << "VMA,start-read,"; break;
-		case 0x12: stream << "VMA,start-write,"; break;
-		case 0x13: stream << "VMA->write-map,"; break;
-		case 0x18: stream << "MD,"; break;
-		case 0x19: stream << "MD,start-read,"; break;
-		case 0x1a: stream << "MD,start-write,"; break;
-		case 0x1b: stream << "MD,write-map,"; break;
-		default:   stream << "illegal,"; break;
-		}
-		util::stream_format(stream, "m[%o] ", (op >> 14) & 0x1f);
-	}
-}
-
-
-void disassemble_condition(std::ostream &stream, u64 op)
-{
-	if (BIT(op, 5))
-	{
-		switch (op & 0x07)
-		{
-		case 0x00: stream << "illegal "; break;
-		case 0x01: // M < A
-			m_source(stream, op);
-			stream << "<";
-			a_source(stream, op);
-			break;
-		case 0x02: // M <= A
-			m_source(stream, op);
-			stream << "<=";
-			a_source(stream, op);
-			break;
-		case 0x03: // M = A
-			m_source(stream, op);
-			stream << "=";
-			a_source(stream, op);
-			break;
-		case 0x04:
-			stream << "pf";
-			break;
-		case 0x05:
-			stream << "pf/int";
-			break;
-		case 0x06:
-			stream << "pf/int/seq";
-			break;
-		case 0x07:
-			stream << "always";
-			break;
-		}
-	}
-	else
-	{
-		m_source(stream, op);
-		util::stream_format(stream, "<<%02o", op & 0x1f);
-	}
-	stream << " ";
 }
 
 
@@ -505,90 +244,60 @@ offs_t cadr_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	offs_t cpc = pc;
 	offs_t flags = 0;
 	u64 op = opcodes.r64(cpc++);
+	bool need_sp = false;
 
 	if (BIT(op, 42))
-	{
-		stream << "popj, ";
-	}
+		output(stream, need_sp, "(POPJ-AFTER-NEXT");
+	else
+		stream << "(";
 
-	switch (op & (u64(3) << 43))
+	switch ((op >> 43) & 0x03)
 	{
-	case u64(0) << 43: // ALU
-		stream << "alu ";
-		if ((op & NOP_MASK) == 0)
-		{
-			stream << "no-op";
-		}
-		else
-		{
-			disassemble_alu_op(stream, op);
-			stream << output_bus_control[(op >> 12) & 0x03];
-			stream << " -> ";
-			stream << q_control[op & 0x03];
-			disassemble_destination(stream, op);
-		}
+	case 0x00: // ALU
+		disassemble_destination(stream, need_sp, op);
+		disassemble_alu_op(stream, need_sp, op);
+		if (((op >> 12) & 0x03) != 0x01)
+			output(stream, need_sp, "%s", output_selector[(op >> 12) & 0x03]);
+		if (((op & 0x03) == 0x01) || ((op & 0x03) == 0x02))
+			output(stream, need_sp, "%s", q_shift[op & 0x03]);
+		m_source(stream, need_sp, op);
+		if ((op >> 32) & 0x3ff)
+			output(stream, need_sp, "A-%o", (op >> 32) & 0x3ff);
 		break;
-	case u64(1) << 43: // JUMP
-		if (((op >> 8) & 0x03) != 0x02)
-		{
-			util::stream_format(stream, "%s %05o ", rp[(op >> 8) & 0x03], (op >> 12) & 0x3fff);
-		}
-		else
-		{
-			util::stream_format(stream, "%s ", rp[(op >> 8) & 0x03]);
-		}
-		if (BIT(op, 7))
-		{
-			stream << "!next ";
-		}
-		if (BIT(op, 6))
-		{
-			stream << "not ";
-		}
-		disassemble_condition(stream, op);
+	case 0x01: // JUMP
+		disassemble_jump_condition(stream, need_sp, op);
+		m_source(stream, need_sp, op);
+		if ((op >> 32) & 0x3ff)
+			output(stream, need_sp, "A-%o", (op >> 32) & 0x3ff);
+		output(stream, need_sp, "%o", (op >> 12) & 0x3fff);
 		break;
-	case u64(2) << 43: // DISPATCH
-		stream << "dispatch ";
+	case 0x02: // DISPATCH
+		output(stream, need_sp, "DISPATCH");
+		if ((op >> 32) & 0x3ff)
+			output(stream, need_sp, "(%o)", (op >> 12) & 0x3ff);
+		output(stream, need_sp, "(BYTE-FIELD %o %o)", ((op >> 5) & 0x07), 32 - (op & 0x1f));
+		m_source(stream, need_sp, op);
+		output(stream, need_sp, "%o", (op >> 12) & 0x7ff);
 		if (BIT(op, 25))
-		{
-			stream << "!N+1 ";
-		}
+			output(stream, need_sp, "PUSH-OWN-ADDRESS");
 		if (BIT(op, 24))
-		{
-			stream << "ISH ";
-		}
-		m_source(stream, op);
-		util::stream_format(stream, " disp-const %o, disp-addr %o, map %o, len %o, rot %o", (op >> 32) & 0x2ff,
-			(op >> 12) & 0x7ff, (op >> 8) & 0x03, (op >> 5) & 0x07, op & 0x1f
-		);
+			output(stream, need_sp, "IFETCH");
+		stream << map_dispatch[(op >> 8) & 0x03];
 		break;
-	case u64(3) << 43: // BYTE
-		stream << "byte ";
-		a_source(stream, op);
-		stream << " ";
-		m_source(stream, op);
-		stream << " ";
-		if (BIT(op, 13))
-		{
-			if (BIT(op, 12))
-			{
-				util::stream_format(stream, "dpb pos=%02o, width=%03o ", op & 0x1f, ((op >> 5) & 0x1f) + 1);
-			}
-			else
-			{
-				util::stream_format(stream, "sdp pos=%02o, width=%03o ", op & 0x1f, ((op >> 5) & 0x1f) + 1);
-			}
-		}
-		else
-		{
-			if (BIT(op, 12))
-			{
-				util::stream_format(stream, "ldb pos=%02o, width=%03o ", op & 0x1f, ((op >> 5) & 0x1f) + 1);
-			}
-		}
-		disassemble_destination(stream, op);
+	case 0x03: // BYTE
+		disassemble_destination(stream, need_sp, op);
+		output(stream, need_sp, byte_operation[(op >> 12) & 0x03]);
+		output(stream, need_sp, "(BYTE-FIELD %o %o)", ((op >> 5) & 0x07) + 1, ((op >> 10) & 0x03) == 1 ? 32 - (op & 0x1f) : (op & 0x1f));
+		m_source(stream, need_sp, op);
+		if ((op >> 32) & 0x3ff)
+			output(stream, need_sp, "A-%o", (op >> 32) & 0x3ff);
 		break;
 	}
+	if ((op >> 10) & 0x03)
+		output(stream, need_sp, "MF-%o", (op >> 10) & 0x03);
+	if (BIT(op, 45))
+		output(stream, need_sp, "ILONG");
+	stream << ")";
 
 	return (cpc - pc) | flags | SUPPORTED;
 }
