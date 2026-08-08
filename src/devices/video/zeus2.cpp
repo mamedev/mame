@@ -35,32 +35,40 @@ DEFINE_DEVICE_TYPE(ZEUS2, zeus2_device, "zeus2", "Midway Zeus2")
 zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ZEUS2, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_vblank(*this), m_irq(*this), m_atlantis(0)
+	, m_vsync(*this), m_irq(*this), m_atlantis(0)
 {
 }
 
 /*************************************
-*  Display interrupt generation
+*  Vertical sync generation
 *************************************/
 
-TIMER_CALLBACK_MEMBER(zeus2_device::display_irq_off)
+// VSync Start is reg 0x35's high half and VSync End reg 0x36's low half, in unscaled lines.
+// The fallback covers the frames before the game programs the CRTC, when both read zero.
+attotime zeus2_device::time_until_line(uint32_t line, const attotime &fallback) const
 {
-	m_vblank(CLEAR_LINE);
-
-	//attotime vblank_period = screen().time_until_pos(m_zeusbase[0x37] & 0xffff);
-
-	///* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
-	//if (vblank_period == attotime::zero)
-	//  vblank_period = screen().frame_period();
-	//vblank_timer->adjust(vblank_period);
-	vblank_timer->adjust(screen().time_until_vblank_start());
+	line <<= m_yScale;
+	if (line > screen().visible_area().max_y && line < screen().height())
+		return screen().time_until_pos(line);
+	return fallback;
 }
 
-TIMER_CALLBACK_MEMBER(zeus2_device::display_irq)
+void zeus2_device::rearm_vsync()
 {
-	m_vblank(ASSERT_LINE);
-	/* set a timer for the next off state */
-	vblank_off_timer->adjust(screen().time_until_vblank_end());
+	m_vsync(CLEAR_LINE);
+	vsync_stop_timer->adjust(attotime::never);
+	vsync_start_timer->adjust(time_until_line(m_zeusbase[0x35] >> 16, screen().time_until_vblank_start()));
+}
+
+TIMER_CALLBACK_MEMBER(zeus2_device::vsync_stop)
+{
+	rearm_vsync();
+}
+
+TIMER_CALLBACK_MEMBER(zeus2_device::vsync_start)
+{
+	m_vsync(ASSERT_LINE);
+	vsync_stop_timer->adjust(time_until_line(m_zeusbase[0x36] & 0xffff, screen().time_until_vblank_end()));
 }
 
 TIMER_CALLBACK_MEMBER(zeus2_device::int_timer_callback)
@@ -88,8 +96,8 @@ void zeus2_device::device_start()
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
 
 	int_timer = timer_alloc(FUNC(zeus2_device::int_timer_callback), this);
-	vblank_timer = timer_alloc(FUNC(zeus2_device::display_irq), this);
-	vblank_off_timer = timer_alloc(FUNC(zeus2_device::display_irq_off), this);
+	vsync_start_timer = timer_alloc(FUNC(zeus2_device::vsync_start), this);
+	vsync_stop_timer = timer_alloc(FUNC(zeus2_device::vsync_stop), this);
 
 
 	/* save states */
@@ -118,7 +126,7 @@ void zeus2_device::device_start()
 	save_item(NAME(m_curPalTableSrc));
 	save_item(NAME(m_texmodeReg));
 	// int_timer
-	// vblank_timer
+	// vsync_start_timer
 	// yoffs
 	// texel_width
 	// zbase
@@ -316,7 +324,8 @@ uint32_t zeus2_device::zeus2_r(offs_t offset)
 			// 0x00080000 EXPY_ACTIVE1
 			/* bit  $000C0070 are tested in a loop until 0 */
 			/* bits $00080000 is tested in a loop until 0 */
-			/* bit  $00000004 is tested for toggling; probably VBLANK */
+			// bit $00000004 is the wide blanking interval, not the vsync window: only mwskins reads it,
+			// and driving it from vsync is byte-for-byte identical to tying it low
 			result = 0x00;
 			if (screen().vblank())
 				result |= 0x04;
@@ -458,8 +467,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			zeus_cliprect = visarea;
 			zeus_cliprect.max_x -= zeus_cliprect.min_x;
 			zeus_cliprect.min_x = 0;
-			// Startup vblank timer
-			vblank_timer->adjust(attotime::from_usec(1));
+			// re-time vertical sync against the mode just programmed
+			rearm_vsync();
 		}
 		break;
 

@@ -98,13 +98,13 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t zeus2_r(offs_t offset);
 	void zeus2_w(offs_t offset, uint32_t data);
-	TIMER_CALLBACK_MEMBER(display_irq_off);
-	TIMER_CALLBACK_MEMBER(display_irq);
+	TIMER_CALLBACK_MEMBER(vsync_stop);
+	TIMER_CALLBACK_MEMBER(vsync_start);
 
-	auto vblank_callback() { return m_vblank.bind(); }
+	auto vsync_callback() { return m_vsync.bind(); }
 	auto irq_callback() { return m_irq.bind(); }
 
-	devcb_write_line   m_vblank;
+	devcb_write_line   m_vsync;
 	devcb_write_line   m_irq;
 
 	void set_float_mode(int mode) { m_atlantis = mode; }
@@ -136,8 +136,8 @@ public:
 	uint32_t m_texmodeReg;
 
 	emu_timer *int_timer;
-	emu_timer *vblank_timer;
-	emu_timer *vblank_off_timer;
+	emu_timer *vsync_start_timer;
+	emu_timer *vsync_stop_timer;
 	int yoffs;
 	int texel_width;
 	float zbase;
@@ -192,6 +192,8 @@ private:
 	void WAVERAM_WRITE32(uint32_t *base, offs_t dwordnum, uint32_t data) { *WAVERAM_WRAP<uint32_t>(base, dwordnum) = data; }
 
 	TIMER_CALLBACK_MEMBER(int_timer_callback);
+	attotime time_until_line(uint32_t line, const attotime &fallback) const;
+	void rearm_vsync();
 	void zeus2_register32_w(offs_t offset, uint32_t data, int logit);
 	void zeus2_register_update(offs_t offset, uint32_t oldval, int logit);
 	bool zeus2_fifo_process(const uint32_t *data, int numwords);
