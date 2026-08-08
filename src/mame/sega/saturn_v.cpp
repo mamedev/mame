@@ -6727,10 +6727,6 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 //      if(VDP2_SCXDN0 || VDP2_SCXDN1 || VDP2_SCYDN0 || VDP2_SCYDN1)
 //          popmessage("Fractional part scrolling write");
 
-		/* pukunpa */
-		//if(VDP2_SPWINEN)
-		//  popmessage("Sprite Window enabled");
-
 		/* capgen2 - Choh Makaimura (obviously) */
 		if(VDP2_MZCTL & 0x1f && POPMESSAGE_DEBUG)
 			popmessage("Mosaic control enabled = %04x\n",VDP2_MZCTL);
@@ -8637,7 +8633,20 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	current_tilemap.window_control.area[1] = VDP2_SPW1A;
 //  current_tilemap.window_control.? = VDP2_SPSWA;
 
+	// several games attempt to use sprite window with an illegal type 1
+	// even if document explicitly states they won't work.
+	// (reportedly seen with a SPCTL of 0x30f1, and bits 7 & 6 are <undefined> there).
+	// - raymanj (corrupted tiles when showing stage intro)
+	// - sandor (player feet during attract intro)
+	// - samsho4 (character select & gameplay)
+	// TODO: document also states that color mode must be zero
+	// - but pukunpa (already) uses mode 1 and wants this enabled, mistake?
+	const bool sprite_window = VDP2_SPWINEN && sprite_type >= 2 && sprite_type <= 7;
+
 //  vdp2_apply_window_on_layer(mycliprect);
+
+	//if (VDP2_SPWINEN)
+	//	popmessage("(%d %d) enable mask %d type %d | color %d alpha %d shadow %d", interlace_framebuffer, double_x,	sprite_window, sprite_type, sprite_color_mode, alpha_enabled, sprite_shadow);
 
 	// TODO: reminder that this is an unfollowable snippet ...
 	if (interlace_framebuffer == 0 && double_x == 0 )
@@ -8660,7 +8669,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 					pix = framebuffer_line[x];
 					// pukunpa, no alpha no framebuffer bumps
-					if(VDP2_SPWINEN && pix == 0x8000)
+					if(sprite_window && pix == 0x8000)
 						continue;
 
 					if ( (pix & 0x8000) && sprite_color_mode)
@@ -8695,6 +8704,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						// Pretty Fighter X, Game Tengoku shadows
 						// TODO: Pretty Fighter X doesn't read what's behind on title screen, VDP1 bug?
 						// TODO: seldomly Game Tengoku shadows aren't drawn properly
+						// TODO: allegedly can't enable this with sprite window (verify)
 						if(pix & 0x8000 && VDP2_SDCTL & 0x100 && !VDP2_SPWINEN)
 						{
 							rgb_t p = bitmap_line[x];
@@ -8754,7 +8764,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 					pix = framebuffer_line[x];
 					// raymanj on FMV, alpha enabled (no noticeable difference?)
-					if(VDP2_SPWINEN && pix == 0x8000)
+					if(sprite_window && pix == 0x8000)
 						continue;
 
 					if ( (pix & 0x8000) && sprite_color_mode)
@@ -8876,7 +8886,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 				pix = framebuffer_line[x];
 				// amoudan, interlaced case
-				if(VDP2_SPWINEN && pix == 0x8000)
+				if(sprite_window && pix == 0x8000)
 					continue;
 
 				if ( (pix & 0x8000) && sprite_color_mode)
