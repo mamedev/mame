@@ -1541,7 +1541,7 @@ void royalmah_tmp_state::cafepara_map(address_map &map)
 	map(0x7ff0, 0x7ff0).w(FUNC(royalmah_tmp_state::janptr96_coin_counter_w));
 	map(0x7ff1, 0x7ff1).portr("SYSTEM").nopw();
 	map(0x7ff3, 0x7ff3).w(FUNC(royalmah_tmp_state::input_port_select_w));
-	map(0x7ff4, 0x7ff4).lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); if (data >= 0x10) logerror("mainbank_w: %02x\n", data); }));
+	map(0x7ff4, 0x7ff4).lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); }));
 	map(0x7ff5, 0x7ff5).w(FUNC(royalmah_tmp_state::janptr96_rambank_w));
 	map(0x7ff6, 0x7ff6).w(FUNC(royalmah_tmp_state::mjderngr_palbank_w));
 	map(0x7ff7, 0x7ff7).w(FUNC(royalmah_tmp_state::cafetime_7fe3_w));
