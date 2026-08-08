@@ -90,6 +90,10 @@ public:
 		m_fdc_drq(0),
 		m_fdc_dd0(0),
 		m_fdc_dd1(0),
+		m_fdc_index(0),
+		m_sysctrl(0),
+		m_index_prev{ 0, 0 },
+		m_index_timer(nullptr),
 		m_fdc_tc(0),
 		m_ds1(false),
 		m_ds2(false)
@@ -160,6 +164,11 @@ private:
 	uint8_t led_off_r();
 	void parity_nmi_clr_w(uint8_t data);
 	uint8_t option_id_r();
+	void option_id_w(uint8_t data);
+	uint8_t sysctrl_r();
+	void sysctrl_w(uint8_t data);
+	uint8_t index_clr_r();
+	uint8_t ibm_kb_r(offs_t offset);
 
 	void hrq_w(int state);
 	void eop_w(int state);
@@ -193,6 +202,7 @@ private:
 	void on_disk0_unload(floppy_image_device *image);
 	void on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
+	TIMER_CALLBACK_MEMBER(sample_index);
 
 	void wangpc_io(address_map &map) ATTR_COLD;
 	void wangpc_mem(address_map &map) ATTR_COLD;
@@ -217,6 +227,11 @@ private:
 	int m_fdc_drq;
 	int m_fdc_dd0;
 	int m_fdc_dd1;
+	int m_fdc_index;
+	uint8_t m_sysctrl;
+	uint8_t m_kb_latch = 0;
+	int m_index_prev[2];
+	emu_timer *m_index_timer;
 	int m_fdc_tc;
 	int m_ds1;
 	int m_ds2;
@@ -550,9 +565,58 @@ uint8_t wangpc_state::uart_r()
 	uint8_t data = m_uart->read();
 
 	if (!machine().side_effects_disabled())
+	{
 		LOG("%s: UART read %02x\n", machine().describe_context(), data);
 
+		// the last keyboard byte stays readable at port 0x60, IBM PC
+		// style: the port scan run on real hardware finds the break code
+		// of the key that launched it there
+		m_kb_latch = data;
+	}
+
 	return data;
+}
+
+
+//-------------------------------------------------
+//  ibm_kb_r - IBM PC style view of the keyboard:
+//  port 0x60 returns the last scan code translated
+//  to the XT set, 0x61 a control latch the guest
+//  toggles to acknowledge
+//-------------------------------------------------
+
+//  Wang to XT scan code translation, from the IBMSCAN.KBD table that ships
+//  with the IBM PC emulation option (first byte of the file is the entry
+//  count, 0x7f).  The translation is consistent with the port scan run on
+//  real hardware: Return maps to the same code in both sets, and 0x9c -
+//  the break of the Return that launched the scan - is what port 0x60
+//  holds there.
+static const uint8_t WANG_TO_XT[0x80] =
+{
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0x51, 0x45, 0x46, 0x4a, 0x2b, 0x48, 0x49, 0x4d, 0x29, 0x37, 0xff, 0x2a, 0x1c, 0x00, 0x3a, 0x01,
+	0x00, 0x00, 0x00, 0x00, 0x1d, 0x38, 0x47, 0xff, 0x50, 0x48, 0x34, 0x0e, 0x39, 0x4b, 0x4d, 0x0c,
+	0x50, 0x4f, 0x53, 0xff, 0x52, 0x36, 0xff, 0x35, 0x33, 0x32, 0x31, 0x30, 0x2f, 0x2e, 0x2d, 0x2c,
+	0x4c, 0x4b, 0xff, 0xff, 0x1c, 0x28, 0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20, 0x1f, 0x1e,
+	0x47, 0x51, 0x53, 0x1c, 0x1b, 0x1a, 0x19, 0x18, 0x17, 0x16, 0x15, 0x14, 0x13, 0x12, 0x11, 0x10,
+	0x4e, 0x49, 0x52, 0xff, 0x0d, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x0f,
+	0xff, 0xff, 0x00, 0xff, 0xff, 0x44, 0x43, 0x42, 0x41, 0x40, 0x3f, 0x3e, 0x3d, 0x3c, 0x3b, 0xff
+};
+
+uint8_t wangpc_state::ibm_kb_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+	{
+		// the port scan run on real hardware reads 0x4c at port 0x61.
+		// Bit 4 is the refresh detect bit of the IBM PC, toggling every
+		// 15.085us: software of the day counts its flips as a CPU speed
+		// independent time base - Flight Simulator paces its frames on it
+		uint8_t data = 0x4c & ~0x10;
+		data |= (machine().time().as_ticks(66287) & 1) << 4;
+		return data;
+	}
+
+	return WANG_TO_XT[m_kb_latch & 0x7f] | (m_kb_latch & 0x80);
 }
 
 
@@ -705,9 +769,62 @@ uint8_t wangpc_state::option_id_r()
 	uint8_t data = 0;
 
 	// FDC interrupt
-	data |= (m_fdc_dd0 || m_fdc_dd1 || (int) m_fdc->get_irq()) << 7;
+	data |= (m_fdc_dd0 || m_fdc_dd1 || m_fdc_index || (int) m_fdc->get_irq()) << 7;
+
+	// the index latch is cleared by the read, so that software polling this
+	// port sees one pulse per disk revolution rather than a level
+	if (!machine().side_effects_disabled())
+		m_fdc_index = 0;
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  sysctrl_r / sysctrl_w -
+//-------------------------------------------------
+
+uint8_t wangpc_state::sysctrl_r()
+{
+	// Undocumented: the shape comes from the software that uses the pair.
+	// The Wang LapTop translator writes 0x00 then 0x80 to 0x1098 and checks
+	// bit 1 here after each, which reads as a presence test, so the status
+	// follows what was last written.
+	return 0xfd | (BIT(m_sysctrl, 7) << 1);
+}
+
+void wangpc_state::sysctrl_w(uint8_t data)
+{
+	m_sysctrl = data;
+}
+
+
+//-------------------------------------------------
+//  index_clr_r -
+//-------------------------------------------------
+
+uint8_t wangpc_state::index_clr_r()
+{
+	// Also undocumented.  The IBM PC emulation firmware reads this and
+	// throws the value away, right after it has counted a disk index
+	// pulse, which is how the Wang board clears its latches everywhere
+	// else - so reading here drops the index latch.
+	if (!machine().side_effects_disabled())
+		m_fdc_index = 0;
+
+	return 0xff;
+}
+
+
+//-------------------------------------------------
+//  option_id_w -
+//-------------------------------------------------
+
+void wangpc_state::option_id_w(uint8_t data)
+{
+	// the IBM PC emulation firmware writes here once it is done timing the
+	// drives, which reads as an acknowledge of the index latch
+	m_fdc_index = 0;
 }
 
 
@@ -737,6 +854,11 @@ void wangpc_state::wangpc_mem(address_map &map)
 void wangpc_state::wangpc_io(address_map &map)
 {
 	map.unmap_value_high();
+
+	// the keyboard answers IBM PC style down here, as the port scan run on
+	// real hardware shows
+	map(0x0060, 0x0061).r(FUNC(wangpc_state::ibm_kb_r));
+
 	map(0x1000, 0x1000).w(FUNC(wangpc_state::fdc_ctrl_w));
 	map(0x1004, 0x1004).rw(FUNC(wangpc_state::deselect_drive1_r), FUNC(wangpc_state::deselect_drive1_w));
 	map(0x1006, 0x1006).rw(FUNC(wangpc_state::select_drive1_r), FUNC(wangpc_state::select_drive1_w));
@@ -753,6 +875,9 @@ void wangpc_state::wangpc_io(address_map &map)
 	map(0x1060, 0x1063).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x1080, 0x1087).r(m_epci, FUNC(scn_pci_device::read)).umask16(0x00ff);
 	map(0x1088, 0x108f).w(m_epci, FUNC(scn_pci_device::write)).umask16(0x00ff);
+	map(0x1090, 0x1090).r(FUNC(wangpc_state::sysctrl_r));
+	map(0x1094, 0x1094).r(FUNC(wangpc_state::index_clr_r));
+	map(0x1098, 0x1098).w(FUNC(wangpc_state::sysctrl_w));
 	map(0x10a0, 0x10bf).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
 	map(0x10c2, 0x10c7).w(FUNC(wangpc_state::dma_page_w)).umask16(0x00ff);
 	map(0x10e0, 0x10e0).rw(FUNC(wangpc_state::status_r), FUNC(wangpc_state::timer0_irq_clr_w));
@@ -763,7 +888,7 @@ void wangpc_state::wangpc_io(address_map &map)
 	map(0x10ea, 0x10ea).rw(FUNC(wangpc_state::centronics_r), FUNC(wangpc_state::centronics_w));
 	map(0x10ec, 0x10ec).rw(FUNC(wangpc_state::busy_clr_r), FUNC(wangpc_state::acknlg_clr_w));
 	map(0x10ee, 0x10ee).rw(FUNC(wangpc_state::led_off_r), FUNC(wangpc_state::parity_nmi_clr_w));
-	map(0x10fe, 0x10fe).r(FUNC(wangpc_state::option_id_r));
+	map(0x10fe, 0x10fe).rw(FUNC(wangpc_state::option_id_r), FUNC(wangpc_state::option_id_w));
 	map(0x1100, 0x1fff).rw(m_bus, FUNC(wangpcbus_device::sad_r), FUNC(wangpcbus_device::sad_w));
 }
 
@@ -1184,6 +1309,10 @@ void wangpc_state::machine_start()
 	m_floppy[0]->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
 	m_floppy[1]->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
 	m_floppy[1]->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
+	// the index line is sampled rather than hooked: floppy_image_device keeps
+	// room for a single index callback and the FDC claims it
+	m_index_timer = timer_alloc(FUNC(wangpc_state::sample_index), this);
+	m_index_timer->adjust(attotime::from_usec(500), 0, attotime::from_usec(500));
 
 	// state saving
 	save_item(NAME(m_dma_page));
@@ -1202,6 +1331,10 @@ void wangpc_state::machine_start()
 	save_item(NAME(m_enable_eop));
 	save_item(NAME(m_disable_dreq2));
 	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_fdc_index));
+	save_item(NAME(m_sysctrl));
+	save_item(NAME(m_kb_latch));
+	save_item(NAME(m_index_prev));
 	save_item(NAME(m_ds1));
 	save_item(NAME(m_ds2));
 }
@@ -1221,6 +1354,24 @@ void wangpc_state::machine_reset()
 //-------------------------------------------------
 //  on_disk0_change -
 //-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(wangpc_state::sample_index)
+{
+	// One pulse per revolution, and only while a drive is spinning with a
+	// disk in it: the IBM PC emulation firmware times the interval between
+	// these to tell a 300 rpm drive from a 360 rpm one.  The pulse lasts
+	// about 2ms, so it is latched for software to find.
+	for (int i = 0; i < 2; i++)
+	{
+		int const state = m_floppy[i]->idx_r();
+
+		if (state && !m_index_prev[i])
+			m_fdc_index = 1;
+
+		m_index_prev[i] = state;
+	}
+}
+
 
 void wangpc_state::on_disk0_load(floppy_image_device *image)
 {
