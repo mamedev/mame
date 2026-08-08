@@ -15,6 +15,7 @@
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -31,6 +32,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki%u", 1)
 		, m_int_timer(*this, "int_timer")
+		, m_irqs(*this, "irqs")
 		, m_eeprom(*this, "eeprom")
 		, m_hopper(*this, "hopper")
 		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
@@ -78,6 +80,13 @@ public:
 	void uopoko(machine_config &config) ATTR_COLD;
 
 protected:
+	enum
+	{
+		VBLANK_IRQ,
+		SOUND_IRQ,
+		UNKNOWN_IRQ
+	};
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -86,6 +95,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device_array<okim6295_device, 2> m_oki;
 	required_device<timer_device> m_int_timer;
+	required_device<input_merger_device> m_irqs;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device_array<gfxdecode_device, 4> m_gfxdecode;
@@ -117,10 +127,6 @@ protected:
 
 	// misc
 	int       m_time_vblank_irq = 0;
-	u8        m_irq_level = 0U;
-	u8        m_vblank_irq = 0U;
-	u8        m_sound_irq = 0U;
-	u8        m_unknown_irq = 0U;
 	u8        m_agallet_vblank_irq = 0U;
 
 	u16       m_leds[2]{};
@@ -147,9 +153,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_left);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_right);
-
-	void sound_irq_gen(int state);
-	void update_irq_state();
 
 	bool colpri_cb(u8 &dstpri, u32 &colpri);
 

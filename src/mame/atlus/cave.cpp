@@ -124,29 +124,18 @@ NOTE: Easter egg in Fereron SOS / Dangun Feveron:
 ***************************************************************************/
 
 
-/* Update the IRQ state based on all possible causes */
-void cave_state::update_irq_state()
-{
-	if (m_vblank_irq || m_sound_irq || m_unknown_irq)
-		m_maincpu->set_input_line(m_irq_level, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(m_irq_level, CLEAR_LINE);
-}
-
 TIMER_CALLBACK_MEMBER(cave_state::vblank_end)
 {
 	if (m_kludge == 3) // mazinger metmqstr
 	{
-		m_unknown_irq = 1;
-		update_irq_state();
+		m_irqs->in_set<UNKNOWN_IRQ>();
 	}
 	m_agallet_vblank_irq = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cave_state::vblank_start)
 {
-	m_vblank_irq = 1;
-	update_irq_state();
+	m_irqs->in_set<VBLANK_IRQ>();
 	m_spritegen[0]->get_sprite_info(m_screen[0]->visible_area());
 	m_agallet_vblank_irq = 1;
 	m_vblank_end_timer->adjust(attotime::from_usec(2000)); // 2000us : vblank time
@@ -173,14 +162,6 @@ INTERRUPT_GEN_MEMBER(ppsatan_state::interrupt_ppsatan)
 	m_int_timer_right->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
 
-/* Called by the YMZ280B to set the IRQ state */
-void cave_state::sound_irq_gen(int state)
-{
-	m_sound_irq = (state != 0);
-	update_irq_state();
-}
-
-
 /*  Level 1 irq routines:
 
     Game        |first read | bit==0->routine + |
@@ -201,19 +182,17 @@ u16 cave_state::irq_cause_r(offs_t offset)
 {
 	u16 result = 0x0003;
 
-	if (m_vblank_irq)
+	if (m_irqs->in_r<VBLANK_IRQ>())
 		result ^= 0x01;
-	if (m_unknown_irq)
+	if (m_irqs->in_r<UNKNOWN_IRQ>())
 		result ^= 0x02;
 
 	if (!machine().side_effects_disabled())
 	{
 		if (offset == 4/2)
-			m_vblank_irq = 0;
+			m_irqs->in_clear<VBLANK_IRQ>();
 		if (offset == 6/2)
-			m_unknown_irq = 0;
-
-		update_irq_state();
+			m_irqs->in_clear<UNKNOWN_IRQ>();
 	}
 
 /*
@@ -2129,9 +2108,6 @@ void cave_state::machine_start()
 {
 	m_vblank_end_timer = timer_alloc(FUNC(cave_state::vblank_end), this);
 
-	save_item(NAME(m_vblank_irq));
-	save_item(NAME(m_sound_irq));
-	save_item(NAME(m_unknown_irq));
 	save_item(NAME(m_agallet_vblank_irq));
 }
 
@@ -2155,9 +2131,9 @@ void ppsatan_state::machine_start()
 
 void cave_state::machine_reset()
 {
-	m_vblank_irq = 0;
-	m_sound_irq = 0;
-	m_unknown_irq = 0;
+	m_irqs->in_clear<VBLANK_IRQ>();
+	m_irqs->in_clear<SOUND_IRQ>();
+	m_irqs->in_clear<UNKNOWN_IRQ>();
 	m_agallet_vblank_irq = 0;
 }
 
@@ -2175,6 +2151,8 @@ void cave_state::add_base_config(machine_config &config, int layer)
 {
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_vblank_int("screen.0", FUNC(cave_state::interrupt));
+
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, 1);
 
 	TIMER(config, m_int_timer).configure_generic(FUNC(cave_state::vblank_start));
 
@@ -2211,7 +2189,7 @@ void cave_state::add_ymz(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
-	ymz.irq_handler().set(FUNC(cave_state::sound_irq_gen));
+	ymz.irq_handler().set(m_irqs, FUNC(input_merger_any_high_device::in_w<SOUND_IRQ>));
 	ymz.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -2418,6 +2396,8 @@ void cave_state::korokoro(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::korokoro_map);
+
+	m_irqs->output_handler().set_inputline(m_maincpu, 2);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -5415,8 +5395,6 @@ void cave_state::init_cave()
 {
 	m_kludge = 0;
 	m_time_vblank_irq = 100;
-
-	m_irq_level = 1;
 }
 
 void cave_z80_state::init_z80_bank()
@@ -5574,8 +5552,6 @@ void cave_state::init_uopoko()
 void cave_state::init_korokoro()
 {
 	init_guwange();
-
-	m_irq_level = 2;
 
 	m_leds[0] = 0;
 	m_leds[1] = 0;

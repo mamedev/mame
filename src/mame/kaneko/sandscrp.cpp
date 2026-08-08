@@ -81,6 +81,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
@@ -101,24 +102,33 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_pandora(*this, "pandora")
 		, m_view2(*this, "view2")
+		, m_irqs(*this, "irqs")
 		, m_soundlatch(*this, "soundlatch%u", 1)
 		, m_audiobank(*this, "audiobank")
 	{ }
 
 	void sandscrp(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
+	enum
+	{
+		SPRITE_IRQ,
+		UNKNOWN_IRQ,
+		VBLANK_IRQ
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<kaneko_view2_tilemap_device> m_view2;
+	required_device<input_merger_device> m_irqs;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	required_memory_bank m_audiobank;
 
-	u8 m_sprite_irq = 0;
-	u8 m_unknown_irq = 0;
-	u8 m_vblank_irq = 0;
 	bool m_latch_full[2]{};
 
 	u8 irq_cause_r();
@@ -131,13 +141,10 @@ private:
 	void bankswitch_w(u8 data);
 	u8 latchstatus_r();
 
-	virtual void machine_start() override ATTR_COLD;
-
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	void update_irq_state();
 	void sandscrp_mem(address_map &map) ATTR_COLD;
 	void sandscrp_soundmem(address_map &map) ATTR_COLD;
 	void sandscrp_soundport(address_map &map) ATTR_COLD;
@@ -173,28 +180,14 @@ void sandscrp_state::machine_start()
 {
 	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
-	save_item(NAME(m_sprite_irq));
-	save_item(NAME(m_unknown_irq));
-	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_latch_full));
-}
-
-
-/* Update the IRQ state based on all possible causes */
-void sandscrp_state::update_irq_state()
-{
-	if (m_vblank_irq || m_sprite_irq || m_unknown_irq)
-		m_maincpu->set_input_line(1, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 
 /* Called once/frame to generate the VBLANK interrupt */
 INTERRUPT_GEN_MEMBER(sandscrp_state::interrupt)
 {
-	m_vblank_irq = 1;
-	update_irq_state();
+	m_irqs->in_set<VBLANK_IRQ>();
 }
 
 
@@ -203,8 +196,7 @@ void sandscrp_state::screen_vblank(int state)
 	// rising edge
 	if (state)
 	{
-		m_sprite_irq = 1;
-		update_irq_state();
+		m_irqs->in_set<SPRITE_IRQ>();
 		m_pandora->eof();
 	}
 }
@@ -212,9 +204,9 @@ void sandscrp_state::screen_vblank(int state)
 /* Reads the cause of the interrupt */
 u8 sandscrp_state::irq_cause_r()
 {
-	return  (m_sprite_irq  ?  0x08  : 0) |
-			(m_unknown_irq ?  0x10  : 0) |
-			(m_vblank_irq  ?  0x20  : 0);
+	return  (m_irqs->in_r<SPRITE_IRQ>()  ? 0x08 : 0) |
+			(m_irqs->in_r<UNKNOWN_IRQ>() ? 0x10 : 0) |
+			(m_irqs->in_r<VBLANK_IRQ>()  ? 0x20 : 0);
 }
 
 
@@ -225,13 +217,11 @@ void sandscrp_state::irq_cause_w(u8 data)
 //  m_sprite_flipy = BIT(data, 0);
 
 	if (BIT(data, 3))
-		m_sprite_irq  = 0;
+		m_irqs->in_clear<SPRITE_IRQ>();
 	if (BIT(data, 4))
-		m_unknown_irq = 0;
+		m_irqs->in_clear<UNKNOWN_IRQ>();
 	if (BIT(data, 5))
-		m_vblank_irq  = 0;
-
-	update_irq_state();
+		m_irqs->in_clear<VBLANK_IRQ>();
 }
 
 
@@ -444,6 +434,8 @@ void sandscrp_state::sandscrp(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);   /* Z8400AB1, Reads the DSWs: it can't be disabled */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_soundmem);
 	m_audiocpu->set_addrmap(AS_IO, &sandscrp_state::sandscrp_soundport);
+
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, 1);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
