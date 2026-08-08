@@ -63,6 +63,7 @@ References:
 #include "emu.h"
 
 #include "pio_port/pio_port.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -144,11 +145,11 @@ public:
 		, m_promcfg(*this, "PROMCFG")
 	{ }
 
-	void rc700_base(machine_config &config);
-	void rc702(machine_config &config);
-	void rc702mini(machine_config &config);
-	void rc703(machine_config &config);
-	void rc702sem702(machine_config &config);
+	void rc700_base(machine_config &config) ATTR_COLD;
+	void rc702(machine_config &config) ATTR_COLD;
+	void rc702mini(machine_config &config) ATTR_COLD;
+	void rc703(machine_config &config) ATTR_COLD;
+	void rc702sem702(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -176,11 +177,11 @@ private:
 	void rc702_palette(palette_device &palette) const;
 	void kbd_put(u8 data);
 	uint8_t kbd_r();
-	uint8_t m_kbd_data = 0U;
 
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 
+	uint8_t m_kbd_data = 0U;
 	bool m_q_state = false;
 	bool m_qbar_state = false;
 	bool m_drq_state = false;
@@ -196,6 +197,7 @@ private:
 	uint8_t m_sem702_char_latch = 0U;
 	uint8_t m_sem702_dot_latch = 0U;
 	bool m_has_sem702 = false;
+
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -273,6 +275,7 @@ INPUT_PORTS_END
 /* Input ports - PROM reads port 0x14 bit 7: set=mini, clear=maxi. */
 static INPUT_PORTS_START( rc702_maxi )
 	PORT_INCLUDE( rc702_promcfg )
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "S01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
@@ -303,6 +306,7 @@ INPUT_PORTS_END
 /* Same as rc702_maxi but S08 (Minifloppy) defaults On. */
 static INPUT_PORTS_START( rc702_mini )
 	PORT_INCLUDE( rc702_maxi )
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x80, 0x80, "S08 Minifloppy")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
@@ -334,7 +338,7 @@ void rc702_state::machine_reset()
 
 	// Set FDC data rate: 8" maxi drives use 500 kbps, 5.25" mini use 250 kbps.
 	// DIP switch S08 bit 7: clear = maxi (8"), set = mini (5.25").
-	m_fdc->set_rate(BIT(m_dsw->read(), 7) ? 250000 : 500000);
+	m_fdc->set_rate(BIT(m_dsw->read(), 7) ? 250'000 : 500'000);
 
 	m_maincpu->reset();
 }
@@ -741,8 +745,10 @@ void rc702_state::add_fdc_dma(machine_config &config)
 void rc702_state::rc702(machine_config &config)
 {
 	rc700_base(config);
+
 	UPD765A(config, m_fdc, MAIN_XTAL, true, true);        // 8 MHz for 8" drives, SSSD not tested.
 	add_fdc_dma(config);
+
 	FLOPPY_CONNECTOR(config, "fdc:0", rc702_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc702_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 }
@@ -750,8 +756,10 @@ void rc702_state::rc702(machine_config &config)
 void rc702_state::rc702mini(machine_config &config)
 {
 	rc700_base(config);
+
 	UPD765A(config, m_fdc, MAIN_XTAL / 2, true, true);    // 4 MHz for 5.25" drives
 	add_fdc_dma(config);
+
 	FLOPPY_CONNECTOR(config, "fdc:0", rc702mini_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc702mini_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 }
@@ -759,8 +767,10 @@ void rc702_state::rc702mini(machine_config &config)
 void rc702_state::rc703(machine_config &config)
 {
 	rc700_base(config);
+
 	UPD765A(config, m_fdc, MAIN_XTAL / 2, true, true);    // 4 MHz for 5.25" QD drives
 	add_fdc_dma(config);
+
 	FLOPPY_CONNECTOR(config, "fdc:0", rc703_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc703_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	// TODO: Hard disk ports 0x60-0x67, CTC2 ports (on hard disk board) 0x44-0x47
@@ -802,6 +812,11 @@ ROM_START( rc702 )
 	ROM_LOAD( "roa327.rom", 0x0800, 0x0800, CRC(bed7ddb0) SHA1(201ae9e4ac3812577244b9c9044fadd04fb2b82f) ) // semi_gfx
 ROM_END
 
+// rc702mini and rc702sem702 are RC702 machines -> roa375
+#define rom_rc702mini    rom_rc702
+#define rom_rc702sem702  rom_rc702
+
+
 // RC703: defaults to its own rob357 PROM; rob358 (RC700/RC703) selectable.
 ROM_START( rc703 )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -822,11 +837,6 @@ ROM_END
 
 
 /* Driver */
-
-// rc702mini and rc702sem702 are RC702 machines -> roa375.  rc703 has its own
-// ROM_START above.
-#define rom_rc702mini    rom_rc702
-#define rom_rc702sem702  rom_rc702
 
 //    YEAR  NAME         PARENT  COMPAT  MACHINE      INPUT        CLASS        INIT        COMPANY           FULLNAME                          FLAGS
 COMP( 1979, rc702,       0,      0,      rc702,       rc702_maxi,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (8\")",            MACHINE_SUPPORTS_SAVE )

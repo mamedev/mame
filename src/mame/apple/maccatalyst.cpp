@@ -33,9 +33,10 @@
 #include "machine/ram.h"
 #include "sound/cdda.h"
 
-#include "endianness.h"
 #include "softlist.h"
 #include "speaker.h"
+
+#include "endianness.h"
 
 #define LOG_NVRAM   (1U << 1)
 
@@ -44,15 +45,22 @@
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
+
+namespace {
+
 class catalyst_state : public driver_device
 {
 public:
-	void pm7200(machine_config &config);
-	void pm7200_90(machine_config &config);
-	void pm7200_100(machine_config &config);
-	void pm7200_120(machine_config &config);
+	void pm7200(machine_config &config) ATTR_COLD;
+	void pm7200_90(machine_config &config) ATTR_COLD;
+	void pm7200_100(machine_config &config) ATTR_COLD;
+	void pm7200_120(machine_config &config) ATTR_COLD;
 
 	catalyst_state(const machine_config &mconfig, device_type type, const char *tag);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void pm7200_map(address_map &map) ATTR_COLD;
@@ -67,9 +75,6 @@ private:
 	u32 machine_id_r(offs_t offset, u32 mem_mask);
 
 	void slot_irq_handler(int line, int state);
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<ppc_device> m_maincpu;
 	required_device<pci_root_device> m_pci_root;
@@ -238,10 +243,12 @@ void catalyst_state::pm7200(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
-																							{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1); });
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+			[] (device_t *device)
+			{
+				device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+				device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
+			});
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
@@ -319,8 +326,11 @@ ROM_END
 #define rom_pmac7200_100 rom_pmac7200
 #define rom_pmac7200_120 rom_pmac7200
 
-/*    YEAR  NAME          PARENT    COMPAT  MACHINE  INPUT   CLASS           INIT        COMPANY           FULLNAME        FLAGS */
-COMP( 1995, pmac7200,     0,        0,       pm7200,  pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/75", MACHINE_SUPPORTS_SAVE)
-COMP( 1995, pmac7200_90,  pmac7200, 0,    pm7200_90,  pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/90", MACHINE_SUPPORTS_SAVE)
-COMP( 1996, pmac7200_100, pmac7200, 0,   pm7200_100,  pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/100", MACHINE_SUPPORTS_SAVE)
-COMP( 1996, pmac7200_120, pmac7200, 0,   pm7200_120,  pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/120", MACHINE_SUPPORTS_SAVE)
+} // anonymous namespace
+
+
+//    YEAR  NAME          PARENT    COMPAT  MACHINE      INPUT   CLASS           INIT        COMPANY           FULLNAME                    FLAGS
+COMP( 1995, pmac7200,     0,        0,      pm7200,      pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/75",  MACHINE_SUPPORTS_SAVE)
+COMP( 1995, pmac7200_90,  pmac7200, 0,      pm7200_90,   pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/90",  MACHINE_SUPPORTS_SAVE)
+COMP( 1996, pmac7200_100, pmac7200, 0,      pm7200_100,  pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/100", MACHINE_SUPPORTS_SAVE)
+COMP( 1996, pmac7200_120, pmac7200, 0,      pm7200_120,  pm7200, catalyst_state, empty_init, "Apple Computer", "Power Macintosh 7200/120", MACHINE_SUPPORTS_SAVE)

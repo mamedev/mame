@@ -1506,8 +1506,7 @@ void upd765_family_device::start_command(int cmd)
 	main_phase = PHASE_EXEC;
 	tc_done = false;
 	fifo_pos = 0;
-	if(internal_drq)
-	{
+	if(internal_drq) {
 		internal_drq = false;
 		check_irq();
 	}

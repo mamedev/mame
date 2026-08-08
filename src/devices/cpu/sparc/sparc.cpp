@@ -12,7 +12,7 @@
 //        is currently no use made of it, and it is unlikely to
 //        ever be.
 //
-//  To-Do:
+//  TODO:
 //      - Test: SPARCv8 ops are untested
 //      - Extended-precision FPU support
 //      - Coprocessor support
@@ -3397,7 +3397,7 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 		case 0:     return false;
 		case 1:     return ICC_Z_SET;
 		case 2:     return ICC_Z_SET || (ICC_N != ICC_V);
-		case 3:     return (ICC_N != ICC_V);
+		case 3:     return ICC_N != ICC_V;
 		case 4:     return ICC_C_SET || ICC_Z_SET;
 		case 5:     return ICC_C_SET;
 		case 6:     return ICC_N_SET;
@@ -3406,7 +3406,7 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 		case 8:     return true;
 		case 9:     return ICC_Z_CLEAR;
 		case 10:    return ICC_Z_CLEAR && (ICC_N == ICC_V);
-		case 11:    return (ICC_N == ICC_V);
+		case 11:    return ICC_N == ICC_V;
 		case 12:    return ICC_C_CLEAR && ICC_Z_CLEAR;
 		case 13:    return ICC_C_CLEAR;
 		case 14:    return ICC_N_CLEAR;

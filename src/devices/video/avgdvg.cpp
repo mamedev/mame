@@ -664,7 +664,7 @@ int avg_device::handler_7() // avg_strobe3
 				x,
 				y,
 				vector_device::color111(m_color),
-				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe));
+				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 	}
 
 	return cycles;
@@ -715,7 +715,7 @@ int avg_tempest_device::handler_7() // tempest_strobe3
 				y - m_ycenter + m_xcenter,
 				x - m_xcenter + m_ycenter,
 				rgb_t(r, g, b),
-				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe));
+				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 	}
 
 	return cycles;
@@ -832,7 +832,7 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 						x,
 						y,
 						rgb_t(r, g, b),
-						pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe));
+						pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 				m_spkl_shift = (BIT(m_spkl_shift, 6) ^ BIT(m_spkl_shift, 5) ^ 1) | (m_spkl_shift << 1);
 
 				if ((m_spkl_shift & 0x7f) == 0x7f)
@@ -861,7 +861,7 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 					x,
 					y,
 					rgb_t(r, g, b),
-					pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe));
+					pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 		}
 	}
 
@@ -927,20 +927,18 @@ int avg_starwars_device::handler_7() // starwars_strobe3
 		// 12k / 24k / 47k resistive current summing network.
 		// https://www.amazingarcading.com.au/Star-Wars-Schematic-Page-14B.jpg
 		constexpr float DAC_REFERENCE_RESISTOR = 12000.0f;
+		constexpr float DAC_FULL_SCALE =
+				(DAC_REFERENCE_RESISTOR / 12000.0f) +
+				(DAC_REFERENCE_RESISTOR / 24000.0f) +
+				(DAC_REFERENCE_RESISTOR / 47000.0f);
 
 		const float dac =
-			((m_int_latch >> 3) & 1) * (DAC_REFERENCE_RESISTOR / 12000.0f) +
-			((m_int_latch >> 2) & 1) * (DAC_REFERENCE_RESISTOR / 24000.0f) +
-			((m_int_latch >> 1) & 1) * (DAC_REFERENCE_RESISTOR / 47000.0f);
-
-		const float dac_full_scale =
-			(DAC_REFERENCE_RESISTOR / 12000.0f) +
-			(DAC_REFERENCE_RESISTOR / 24000.0f) +
-			(DAC_REFERENCE_RESISTOR / 47000.0f);
+				BIT(m_int_latch, 3) * (DAC_REFERENCE_RESISTOR / 12000.0f) +
+				BIT(m_int_latch, 2) * (DAC_REFERENCE_RESISTOR / 24000.0f) +
+				BIT(m_int_latch, 1) * (DAC_REFERENCE_RESISTOR / 47000.0f);
 
 		// Normalize DAC output to the vector intensity range 0-255.
-		const int intensity =
-			int((dac / dac_full_scale) * m_intensity + 0.5f);
+		const int intensity = int((dac / DAC_FULL_SCALE) * m_intensity + 0.5f);
 
 		vg_add_point_buf(
 				m_xpos,
@@ -1180,7 +1178,7 @@ int avg_bzone_device::handler_7() // bzone_strobe3
 				m_xpos,
 				m_ypos,
 				vector_device::color111(7),
-				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe));
+				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 	}
 
 	return cycles;

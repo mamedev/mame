@@ -2,4 +2,6 @@
 // copyright-holders:Miodrag Milanovic
 #include "asio.h"
 
-//#include <asio/impl/src.hpp>
+#if defined(ASIO_SEPARATE_COMPILATION)
+#include <asio/impl/src.hpp>
+#endif

@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <condition_variable>
 #include <cstring>
+#include <iterator>
 #include <locale>
 #include <mutex>
 #include <sstream>
@@ -177,6 +178,13 @@ public:
 };
 
 
+struct output_range
+{
+	output_manager::output_iterator begin;
+	output_manager::output_iterator end;
+};
+
+
 struct device_state_entries
 {
 	device_state_entries(device_state_interface const &s) : state(s) { }
@@ -242,9 +250,110 @@ void resume_tasks(lua_State *L, T &&tasks, bool status)
 
 namespace sol {
 
+template <> struct is_container<output_range> : std::true_type { };
 template <> struct is_container<device_state_entries> : std::true_type { };
 template <> struct is_container<image_interface_formats> : std::true_type { };
 template <> struct is_container<plugin_options_plugins> : std::true_type { };
+
+
+template <>
+struct usertype_container<output_range> : lua_engine::immutable_collection_helper<output_range, output_range const, output_manager::output_iterator>
+{
+private:
+	template <bool Indexed>
+	static int next_pairs(lua_State *L)
+	{
+		typename usertype_container::indexed_iterator &i(stack::unqualified_get<user<typename usertype_container::indexed_iterator> >(L, 1));
+		if (i.src.end == i.it)
+			return stack::push(L, lua_nil);
+		output_manager::output_proxy output(*i.it);
+		int result;
+		if constexpr (Indexed)
+			result = stack::push(L, i.ix + 1);
+		else
+			result = stack::push(L, output.name());
+		result += stack::push(L, std::move(output));
+		++i;
+		return result;
+	}
+
+	template <bool Indexed>
+	static int start_pairs(lua_State *L)
+	{
+		output_range const &self(usertype_container::get_self(L));
+		stack::push(L, next_pairs<Indexed>);
+		stack::push<user<typename usertype_container::indexed_iterator> >(L, self, self.begin);
+		stack::push(L, lua_nil);
+		return 3;
+	}
+
+public:
+	static int at(lua_State *L)
+	{
+		output_range const &self(usertype_container::get_self(L));
+		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
+		if ((index > 0) && (index <= std::distance(self.begin, self.end)))
+			return stack::push(L, self.begin[index - 1]);
+		else
+			return stack::push(L, lua_nil);
+	}
+
+	static int get(lua_State *L)
+	{
+		output_range const &self(usertype_container::get_self(L));
+		char const *const name(stack::unqualified_get<char const *>(L));
+		auto const found(
+				std::lower_bound(
+					self.begin,
+					self.end,
+					name,
+					[] (output_manager::output_proxy const &o, char const *const n) { return o.name() < n; }));
+		if (found != self.end)
+		{
+			auto result(*found);
+			if (result.name() == name)
+				return stack::push(L, std::move(result));
+		}
+		return stack::push(L, lua_nil);
+	}
+
+	static int index_get(lua_State *L)
+	{
+		return get(L);
+	}
+
+	static int index_of(lua_State *L)
+	{
+		output_range const &self(usertype_container::get_self(L));
+		auto &output(stack::unqualified_get<output_manager::output_proxy>(L, 2));
+		auto const found(
+				std::lower_bound(
+					self.begin,
+					self.end,
+					output,
+					[] (output_manager::output_proxy const &l, output_manager::output_proxy const &r) { return l.name() < r.name(); }));
+		if ((found != self.end) && ((*found).name() == output.name()))
+			return stack::push(L, std::distance(self.begin, found) + 1);
+		else
+			return stack::push(L, lua_nil);
+	}
+
+	static int size(lua_State *L)
+	{
+		output_range const &self(usertype_container::get_self(L));
+		return stack::push(L, std::distance(self.begin, self.end));
+	}
+
+	static int empty(lua_State *L)
+	{
+		output_range const &self(usertype_container::get_self(L));
+		return stack::push(L, self.begin == self.end);
+	}
+
+	static int next(lua_State *L) { return stack::push(L, next_pairs<false>); }
+	static int pairs(lua_State *L) { return start_pairs<false>(L); }
+	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
+};
 
 
 template <typename T>
@@ -1400,6 +1509,14 @@ void lua_engine::initialize()
 			"output_proxy",
 			sol::call_constructor, sol::constructors<output_proxy(device_t &, std::string_view)>());
 	output_proxy_type.set_function("exists", &output_proxy::exists);
+	output_proxy_type.set_function("name",
+			[] (output_proxy &o, sol::this_state s) -> sol::object
+			{
+				if (o.exists())
+					return sol::make_object(s, o.name());
+				else
+					return sol::lua_nil;
+			});
 	output_proxy_type.set_function("get", &output_proxy::get);
 	output_proxy_type.set_function("set", &output_proxy::set);
 
@@ -1566,6 +1683,12 @@ void lua_engine::initialize()
 	device_type["owner"] = sol::property(&device_t::owner);
 	device_type["configured"] = sol::property(&device_t::configured);
 	device_type["started"] = sol::property(&device_t::started);
+	device_type["outputs"] = sol::property(
+			[] (device_t &dev, sol::this_state s)
+			{
+				auto [begin, end] = dev.machine().output().device_outputs(dev);
+				return output_range{ begin, end };
+			});
 	device_type["debug"] = sol::property(
 			[] (device_t &dev, sol::this_state s) -> sol::object
 			{
@@ -1883,6 +2006,7 @@ void lua_engine::initialize()
 	screen_dev_type["width"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().width(); });
 	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });
 	screen_dev_type["refresh"] = sol::property([] (screen_device &sdev) { return sdev.frame_period().as_hz(); });
+	screen_dev_type["refresh_interval"] = sol::property([] (screen_device &sdev) { return sdev.frame_period(); });
 	screen_dev_type["xoffset"] = sol::property(&screen_device::xoffset);
 	screen_dev_type["yoffset"] = sol::property(&screen_device::yoffset);
 	screen_dev_type["xscale"] = sol::property(&screen_device::xscale);
