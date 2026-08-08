@@ -209,7 +209,9 @@ void phc20_state::phc20(machine_config &config)
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &phc20_state::mem_map);
 
-	SCREEN(config, "screen");
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update(m_vdg, FUNC(m5c6847p1_device::screen_update));
 
 	M5C6847P1(config, m_vdg, 3.579545_MHz_XTAL);
 	m_vdg->set_screen("screen");

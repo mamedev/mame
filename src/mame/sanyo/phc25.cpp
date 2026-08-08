@@ -631,7 +631,9 @@ void phc25_state::phc25(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
 
 	/* video hardware */
-	SCREEN(config, "screen");
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_vdg, FUNC(m5c6847p1_device::screen_update));
 
 	M5C6847P1(config, m_vdg, XTAL(4'433'619), true);
 	m_vdg->set_screen("screen");
@@ -668,6 +670,10 @@ void phc25_state::phc25(machine_config &config)
 void phc25_state::phc25j(machine_config &config)
 {
 	phc25(config);
+
+	screen_device &screen(SCREEN(config.replace(), "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update(m_vdg, FUNC(m5c6847p1_device::screen_update));
 
 	M5C6847P1(config.replace(), m_vdg, XTAL(3'579'545));
 	m_vdg->set_screen("screen");

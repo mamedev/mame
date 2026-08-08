@@ -1406,7 +1406,9 @@ void z80net_state::z80net(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388");
+	screen_device &screen(SCREEN(config, "lx388"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
@@ -1447,7 +1449,9 @@ void z80netb_state::z80netb(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388");
+	screen_device &screen(SCREEN(config, "lx388"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
@@ -1489,7 +1493,9 @@ void z80netf_state::z80netf(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388");
+	screen_device &screen(SCREEN(config, "lx388"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
