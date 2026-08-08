@@ -2389,6 +2389,23 @@ if opt_tool(CPUS, "V850") then
 end
 
 --------------------------------------------------
+-- NEC uPD7720
+--@src/devices/cpu/upd7725/upd7720.h,CPUS["UPD7720"] = true
+--------------------------------------------------
+
+if CPUS["UPD7720"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/upd7725/upd7720.cpp",
+		MAME_DIR .. "src/devices/cpu/upd7725/upd7720.h",
+	}
+end
+
+if opt_tool(CPUS, "UPD7720") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd7725/dasm7720.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd7725/dasm7720.h")
+end
+
+--------------------------------------------------
 -- NEC uPD7725
 --@src/devices/cpu/upd7725/upd7725.h,CPUS["UPD7725"] = true
 --------------------------------------------------
