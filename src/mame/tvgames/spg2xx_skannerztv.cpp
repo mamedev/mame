@@ -435,4 +435,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2007, rad_sktv,  0,        0, rad_sktv, rad_sktv,   skannerztv_state, init_crc, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2007, rad_sktv, 0, 0, rad_sktv, rad_sktv, skannerztv_state, init_crc, "Radica", "Skannerz TV", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

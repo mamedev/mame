@@ -822,36 +822,37 @@ ROM_END
 
 } // anonymous namespace
 
-// Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本
-CONS( 2006, ban_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Naruto Ninja Taikan - Dattebayo! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ!～ / バンダイ / 日本
+CONS( 2006, ban_naru,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Naruto Ninja Taikan: Dattebayo! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 影発動体感! ブルードラゴン -極めろ!ファイヤークライシス!-
-CONS( 2006, ban_bldj, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Kage Hatsudou Taikan! Blue Dragon - Kiwamero! Fire Crisis! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_bldj,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Kage Hatsudou Taikan! Blue Dragon: Kiwamero! Fire Crisis! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, ban_dbz,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Dragon Ball Z Battle Experience Kamehameha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波
+CONS( 2005, ban_dbz,   0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Dragon Ball Z: Battle Taikan Kamehameha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～
-CONS( 2006, ban_db2j, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_db2j,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Dragon Ball Z: Battle Taikan Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
-CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// ドラえもん テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
+CONS( 2006, epo_dabj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Doraemon: TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん 太鼓あいうえお図鑑
-CONS( 200?, epo_dab2j, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Taiko AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2010, epo_dab2j, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Doraemon Taiko AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん 体感タケコプター! 空とぶ大冒険
-CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Taikan Take-copter! Sora Tobu Daibouken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_dtcj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Doraemon Taikan Take-copter! Sora Tobu Daibouken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦
-CONS( 2006, epo_sskj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_sskj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // 究極! 筋肉(マッスル)スタジアム! サスケ完全制覇
-CONS( 2008, epo_ssk2, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Kyuukyoku! Muscle Stadium! Sasuke Kanzen Seiha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, epo_ssk2,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Kyuukyoku! Muscle Stadium! Sasuke Kanzen Seiha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, epo_pabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Pooh-san to Issho: ABC AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, epo_pabj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "TV de Asobou! Manabou! Pooh-san to Issho: ABC AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
+// These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix_2002.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
 // Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times.
-CONS( 2008, domfitad, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, dombikec, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitad,  0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, dombikec,  0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company Ltd.", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

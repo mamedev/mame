@@ -56,7 +56,7 @@
                  Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
 
 
-    JAKKS Pacific Test modes:
+    JAKKS Pacific test modes:
 
     jak_hmhsm : uses the standard JAKKS code (on first screen - Hold Up, Hold A, Release Up, Down)
                 the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
