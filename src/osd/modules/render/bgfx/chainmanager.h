@@ -66,6 +66,12 @@ public:
 	uint32_t update_screen_textures(uint32_t view, render_primitive *starting_prim, osd_window& window);
 	uint32_t process_screen_chains(uint32_t view, osd_window& window);
 
+	// inject a GPU-rendered FBO as "screen0" for vector game chain processing.
+	// Must be called before process_screen_chains() each frame.
+	// vec_fb_w/h are the supersample FBO dimensions (typically 2x window).
+	void inject_vector_screen(bgfx::TextureHandle color_tex, uint16_t width, uint16_t height,
+		uint16_t vec_fb_w, uint16_t vec_fb_h);
+
 	// Getters
 	running_machine& machine() const { return m_machine; }
 	const osd_options& options() const { return m_options; }
@@ -96,19 +102,26 @@ private:
 		chain_desc &operator=(const chain_desc &) = default;
 		chain_desc &operator=(chain_desc &&) = default;
 
-		chain_desc(std::string &&name, std::string &&path)
+		chain_desc(std::string &&name, std::string &&path, bool is_vector = false)
 			: m_name(std::move(name))
 			, m_path(std::move(path))
+			, m_is_vector(is_vector)
 		{
 		}
 
 		std::string m_name;
 		std::string m_path;
+		bool        m_is_vector = false;  // from the chain JSON "screen_type": "vector" tag
 	};
 
 	void load_chains();
 	void destroy_chains();
 	void reload_chains();
+
+	// Rebuild m_compat_chain_indices according to m_is_vector_game.
+	void rebuild_compat_chain_indices();
+	// Detect the game type from the machine (called once in the constructor)
+	void detect_vector_game();
 
 	void init_texture_converters();
 
@@ -154,6 +167,12 @@ private:
 	std::vector<uint8_t>        m_palette_temp;
 
 	static inline constexpr uint32_t CHAIN_NONE = 0;
+
+	// Game type (initialized in the constructor)
+	bool m_is_vector_game = false;
+	// Absolute indices into m_available_chains that are compatible with the current game type,
+	// used to filter the UI selection slider's choices by screen_type. CHAIN_NONE (0) is always included.
+	std::vector<size_t> m_compat_chain_indices;
 };
 
 #endif // MAME_RENDER_BGFX_CHAINMANAGER_H

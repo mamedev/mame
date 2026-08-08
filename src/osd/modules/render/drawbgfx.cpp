@@ -8,6 +8,8 @@
 
 #include "drawbgfx.h"
 
+#include <chrono>
+
 // render/bgfx
 #include "bgfx/effect.h"
 #include "bgfx/effectmanager.h"
@@ -31,6 +33,9 @@
 #include "config.h"
 #include "render.h"
 #include "rendutil.h"
+
+// complete slider_state type (for core->description access)
+#include "../frontend/mame/ui/slider.h"
 
 // util
 #include "util/xmlfile.h"
@@ -669,6 +674,13 @@ renderer_bgfx::~renderer_bgfx()
 	else if (m_chains)
 		m_chains->save_config(m_module().persistent_settings());
 
+	// release the vector-drawing FBO
+	if (bgfx::isValid(m_vec_fb))
+	{
+		bgfx::destroy(m_vec_fb);
+		m_vec_fb = BGFX_INVALID_HANDLE;
+	}
+
 	bgfx::reset(0, 0, BGFX_RESET_NONE);
 
 	if (m_avi_writer && m_avi_writer->recording())
@@ -755,6 +767,37 @@ int renderer_bgfx::create()
 
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
+
+	// Create the vector-drawing FBO (window 0 only).
+	// Managed purely through the BGFX API, not via chain_manager / target_manager.
+	// Use two attachments, color + depth (BGFX sometimes assumes a depth attachment exists when
+	// drawing). Follows how bgfx_target.cpp creates them.
+	if (window().index() == 0)
+	{
+		m_vec_fb_w = uint16_t(wdim.width() * VEC_SUPERSAMPLE);
+		m_vec_fb_h = uint16_t(wdim.height() * VEC_SUPERSAMPLE);
+		// draw() recreates this when the size no longer matches (only the initial creation is here;
+		// draw()'s recreation logic uses equivalent code).
+		// POINT filter flags omitted -> default bilinear.
+		// MSAA can't be sampled by a standard sampler, so it's avoided; supersample + fs_vector_line instead.
+		const uint64_t color_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP |
+			BGFX_TEXTURE_RT;
+		const uint64_t depth_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP |
+			BGFX_TEXTURE_RT;
+		bgfx::TextureHandle tex_color = bgfx::createTexture2D(
+			m_vec_fb_w, m_vec_fb_h, false, 1, bgfx::TextureFormat::BGRA8, color_flags);
+		bgfx::TextureHandle tex_depth = bgfx::createTexture2D(
+			m_vec_fb_w, m_vec_fb_h, false, 1, bgfx::TextureFormat::D32F, depth_flags);
+		bgfx::TextureHandle attachments[2] = { tex_color, tex_depth };
+		m_vec_fb = bgfx::createFrameBuffer(2, attachments, true);  // true=textures owned by FBO
+
+	}
+
+	// load the analytic-AA vector line effect
+	if (window().index() == 0)
+	{
+		m_line_effect = m_effects->get_or_load_effect(m_module().options(), "vector_line");
+	}
 
 	return 0;
 }
@@ -1225,6 +1268,165 @@ uint32_t renderer_bgfx::u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a 
 	return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
+// Analytic-AA vector line drawing.
+// Draw a line as a single quad from 6 vertices. The vertex UV spans 0..1 across the line width,
+// and fs_vector_line.sc computes the parabolic fade `1 - (2|v-0.5|)^2`.
+// -> Because GPU interpolation is linear, the same width profile results regardless of angle.
+// Rounded line caps - add a fan of N triangles at each end (half-circle approximation).
+// 6 (line body) + 2 * N * 3 = 6 + 6N vertices/line. N=8 gives 54 vertices.
+static constexpr int   LINE_CAP_SEGMENTS      = 8;
+static constexpr int   LINE_VERTICES_PER_LINE = 6 + 2 * LINE_CAP_SEGMENTS * 3;
+static constexpr float LINE_CAP_SIZE_PX       = 4.0f;  // cap radius (px at a 1920px-wide window)
+static constexpr float LINE_POINT_THRESHOLD   = 2.0f;  // segments shorter than this are drawn as points
+
+void renderer_bgfx::put_solid_line(render_primitive *prim, ScreenVertex* vertex)
+{
+	float width = prim->width < 0.5f ? 0.5f : prim->width;
+	float x0 = prim->bounds.x0;
+	float y0 = prim->bounds.y0;
+	float x1 = prim->bounds.x1;
+	float y1 = prim->bounds.y1;
+
+	// Pack the line color as-is.
+	const uint32_t rgba = u32Color(
+		uint32_t(prim->color.r * 255.0f + 0.5f),
+		uint32_t(prim->color.g * 255.0f + 0.5f),
+		uint32_t(prim->color.b * 255.0f + 0.5f),
+		uint32_t(prim->color.a * 255.0f + 0.5f));
+
+	float dx = x1 - x0;
+	float dy = y1 - y0;
+	const float seg_len = sqrtf(dx * dx + dy * dy);
+	// Point-treatment test (seg_len <= threshold -> skip the body and draw a single circle).
+	// MAME's add_point yields x0=x1, y0=y1, so seg_len=0.
+	// Drawn in normal mode, the two half-circle caps overlap at the same center -> double intensity + shape distortion.
+	const bool as_point = (seg_len <= LINE_POINT_THRESHOLD);
+	if (seg_len > 0.0001f)
+	{
+		const float inv = 1.0f / seg_len;
+		dx *= inv;
+		dy *= inv;
+	}
+	else
+	{
+		dx = dy = 0.70710678f;
+	}
+
+	// normal perpendicular to the line direction (normalized)
+	float nx = dy;
+	float ny = -dx;
+
+	// widen the quad by 1 pixel to accommodate the AA fade
+	float r = width * 0.5f + 0.5f;
+	if (r < 1.0f) r = 1.0f;
+
+	// The line body is an (x0..x1) quad with no end extension; the rounded fans handle the ends,
+	// so the cap/body boundary is continuous.
+
+	// line-body quad, 4 vertices (indices: 0=start+n, 1=end+n, 2=end-n, 3=start-n)
+	const float qx[4] = { x0 + nx * r, x1 + nx * r, x1 - nx * r, x0 - nx * r };
+	const float qy[4] = { y0 + ny * r, y1 + ny * r, y1 - ny * r, y0 - ny * r };
+	const float qv[4] = { 0.0f,        0.0f,        1.0f,        1.0f        };
+
+	// The cap center vertex uses the same color as the line body.
+	const uint32_t cap_center_rgba = rgba;
+
+	auto setv = [&](int i, float x, float y, float v_value, uint32_t vrgba = 0) {
+		vertex[i].m_x = x;
+		vertex[i].m_y = y;
+		vertex[i].m_z = 0.0f;
+		vertex[i].m_rgba = (vrgba == 0) ? rgba : vrgba;
+		vertex[i].m_u = 0.0f;     // reserved (sharp analytic-AA fade)
+		vertex[i].m_v = v_value;  // across the line width [0..1], 0.5 = center
+	};
+
+	// Cap radius in pixels, scaled to resolution against a 1920px-wide base so the on-screen cap
+	// size stays constant across window resolutions. The cap only expands the line when it exceeds
+	// the line-body radius r; thicker lines (r >= cap radius) get a plain rounded end.
+	const float cap_res_scale    = float(s_width[window().index()]) / 1920.0f;
+	const float fixed_cap_radius = std::max(0.0f, LINE_CAP_SIZE_PX * cap_res_scale);
+	const float cap_extent       = std::max(0.0f, fixed_cap_radius - r);
+
+	int vi = 6;
+
+	if (as_point)
+	{
+		// point-treatment branch
+		// Skip the body (fill the 6 body vertices as degenerate triangles at the center) and spend
+		// the two end caps' vertex budget (48) on a single 360-degree fan. The caps no longer
+		// overlap, drawing one clean circle for the point.
+		const float cx = (x0 + x1) * 0.5f;
+		const float cy = (y0 + y1) * 0.5f;
+
+		// line-body slots 0-5: degenerate at the center point (zero-area, culled by the GPU)
+		for (int i = 0; i < 6; ++i)
+			setv(i, cx, cy, 0.5f, cap_center_rgba);
+
+		// full-circle fan: LINE_CAP_SEGMENTS * 2 = 16 segments, 48 vertices
+		const int full_segs = LINE_CAP_SEGMENTS * 2;
+		const float dtheta_full = 2.0f * 3.14159265f / float(full_segs);
+		const float pr = std::max(r, fixed_cap_radius);  // ensure the point is at least the fixed radius
+		for (int i = 0; i < full_segs; ++i)
+		{
+			const float t0 = float(i) * dtheta_full;
+			const float t1 = float(i + 1) * dtheta_full;
+			const float p0x = cx + pr * cosf(t0);
+			const float p0y = cy + pr * sinf(t0);
+			const float p1x = cx + pr * cosf(t1);
+			const float p1y = cy + pr * sinf(t1);
+
+			setv(vi++, cx,  cy,  0.5f, cap_center_rgba);  // center: boosted color, fade=1
+			setv(vi++, p0x, p0y, 0.0f);                   // rim, fade=0
+			setv(vi++, p1x, p1y, 0.0f);
+		}
+	}
+	else
+	{
+		// line body: triangle 1 (0,1,2), triangle 2 (0,2,3)
+		setv(0, qx[0], qy[0], qv[0]);
+		setv(1, qx[1], qy[1], qv[1]);
+		setv(2, qx[2], qy[2], qv[2]);
+		setv(3, qx[0], qy[0], qv[0]);
+		setv(4, qx[2], qy[2], qv[2]);
+		setv(5, qx[3], qy[3], qv[3]);
+
+		// rounded end-cap fan
+		// radius r(theta) = r + cap_extent * sin theta:
+		//   theta=0    -> r              (continuous with the line-body corner)
+		//   theta=pi/2 -> r + cap_extent (= fixed_cap_radius if cap > r, else r for a plain rounded line)
+		//   theta=pi   -> r              (continuous with the opposite corner)
+		// On thin lines, cap_extent > 0 swells the circle into a "dot".
+		// On thick lines (r >= fixed_cap_radius), cap_extent=0 gives a plain half-circle = rounded line.
+		const float dtheta = 3.14159265f / float(LINE_CAP_SEGMENTS);
+
+		auto add_cap = [&](float cx, float cy, float ax, float ay) {
+			for (int i = 0; i < LINE_CAP_SEGMENTS; ++i)
+			{
+				const float t0 = float(i) * dtheta;
+				const float t1 = float(i + 1) * dtheta;
+				const float c0 = cosf(t0), s0 = sinf(t0);
+				const float c1 = cosf(t1), s1 = sinf(t1);
+				// radii r0/r1 = r + cap_extent * sin theta; cap_extent is added only along the axis (theta=pi/2).
+				const float r0 = r + cap_extent * s0;
+				const float r1 = r + cap_extent * s1;
+
+				const float p0x = cx + r0 * (c0 * nx + s0 * ax);
+				const float p0y = cy + r0 * (c0 * ny + s0 * ay);
+				const float p1x = cx + r1 * (c1 * nx + s1 * ax);
+				const float p1y = cy + r1 * (c1 * ny + s1 * ay);
+
+				// triangle: center (boosted color) -> p0 (normal color) -> p1
+				setv(vi++, cx,  cy,  0.5f, cap_center_rgba);  // fade=1, boost
+				setv(vi++, p0x, p0y, 0.0f);                   // fade=0, normal
+				setv(vi++, p1x, p1y, 0.0f);                   // fade=0, normal
+			}
+		};
+
+		add_cap(x0, y0, -dx, -dy);  // start cap (half-circle opposite the line direction)
+		add_cap(x1, y1,  dx,  dy);  // end cap (half-circle along the line direction)
+	}
+}
+
 int renderer_bgfx::draw(int update)
 {
 	int window_index = window().index();
@@ -1250,6 +1452,8 @@ int renderer_bgfx::draw(int update)
 	{
 		return 0;
 	}
+
+	// All sliders come from the chain JSON and are restored via chain_manager's standard load_config.
 
 	if (num_screens)
 	{
@@ -1285,13 +1489,186 @@ int renderer_bgfx::draw(int update)
 	// Mark our texture atlas as dirty if we need to do so
 	bool atlas_valid = update_atlas();
 
+	// Layer the UI on top of the vector blit. Difference from stock: using view 0 for both the UI
+	// and the clear would ADD-composite the vector blit over the UI, hiding/ghosting it. So view 0
+	// is used for a manual clear only, and the UI's m_ortho_view is allocated at a late index in
+	// buffer_primitives and drawn last.
+	if (window_index == 0)
+	{
+		const uint16_t clear_view = uint16_t(s_current_view++);
+		const uint16_t cw = uint16_t(s_width[window_index]);
+		const uint16_t ch = uint16_t(s_height[window_index]);
+		bgfx::setViewFrameBuffer(clear_view, BGFX_INVALID_HANDLE);
+		bgfx::setViewRect(clear_view, 0, 0, cw, ch);
+		bgfx::setViewClear(clear_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+		bgfx::setViewMode(clear_view, bgfx::ViewMode::Sequential);
+		bgfx::touch(clear_view);
+
+	}
+
+	// Recreate the vector FBO if its size no longer matches the current window.
+	// Avoids clipping vertices outside the FBO when the size at create() differs from the size at
+	// draw() (mid window-init, user resize, etc.).
+	if (window_index == 0)
+	{
+		const uint16_t cur_w = uint16_t(s_width[window_index]);
+		const uint16_t cur_h = uint16_t(s_height[window_index]);
+		const uint16_t target_fb_w = uint16_t(cur_w * VEC_SUPERSAMPLE);
+		const uint16_t target_fb_h = uint16_t(cur_h * VEC_SUPERSAMPLE);
+		if (cur_w > 0 && cur_h > 0 && (target_fb_w != m_vec_fb_w || target_fb_h != m_vec_fb_h))
+		{
+			if (bgfx::isValid(m_vec_fb))
+				bgfx::destroy(m_vec_fb);
+			m_vec_fb_w = target_fb_w;
+			m_vec_fb_h = target_fb_h;
+			// bilinear (no MSAA, for sampler compatibility)
+			const uint64_t cf = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP |
+				BGFX_TEXTURE_RT;
+			bgfx::TextureHandle tc = bgfx::createTexture2D(m_vec_fb_w, m_vec_fb_h, false, 1, bgfx::TextureFormat::BGRA8, cf);
+			bgfx::TextureHandle td = bgfx::createTexture2D(m_vec_fb_w, m_vec_fb_h, false, 1, bgfx::TextureFormat::D32F, cf);
+			bgfx::TextureHandle at[2] = { tc, td };
+			m_vec_fb = bgfx::createFrameBuffer(2, at, true);
+
+		}
+	}
+
+	// ===== draw vector LINEs into the FBO =====
+	// Draw directly into the FBO purely through the BGFX API, not via chain_manager / bgfx_ortho_view.
+	// On success, set m_vectors_in_fbo=true; buffer_primitives skips those LINEs, and right after we
+	// additively blit the FBO contents to the backbuffer.
+	m_vectors_in_fbo = false;
+	if (window_index == 0 && bgfx::isValid(m_vec_fb) && atlas_valid)
+	{
+		// Only LINEs with PRIMFLAG_VECTOR go to the FBO, to keep UI lines out of the phosphor path
+		// (which would ghost them). UI / MAME-menu LINEs stay on the normal buffer_primitives path
+		// (View 0, cleared each frame).
+		int vector_count = 0;
+		render_primitive *scan = window().m_primlist->first();
+		while (scan != nullptr)
+		{
+			if (scan->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(scan->flags))
+				vector_count++;
+			scan = scan->next();
+		}
+
+		if (vector_count > 0)
+		{
+			// 1 line = body 6 + both rounded end fans 2*N*3 = LINE_VERTICES_PER_LINE vertices
+			const uint32_t needed = uint32_t(vector_count) * uint32_t(LINE_VERTICES_PER_LINE);
+			if (needed == bgfx::getAvailTransientVertexBuffer(needed, ScreenVertex::ms_decl))
+			{
+				bgfx::TransientVertexBuffer tvb;
+				bgfx::allocTransientVertexBuffer(&tvb, needed, ScreenVertex::ms_decl);
+				if (tvb.data)
+				{
+					// fill vertex data (put_solid_line builds the AA-free quad + rounded fans)
+					int vertices = 0;
+					ScreenVertex* vptr = reinterpret_cast<ScreenVertex*>(tvb.data);
+
+					render_primitive *vprim = window().m_primlist->first();
+					while (vprim != nullptr)
+					{
+						// Write only LINEs with PRIMFLAG_VECTOR to the FBO.
+						// UI lines are drawn normally by buffer_primitives (to avoid phosphor ghosting).
+						if (vprim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(vprim->flags))
+						{
+							put_solid_line(vprim, vptr + vertices);
+							vertices += LINE_VERTICES_PER_LINE;
+						}
+						vprim = vprim->next();
+					}
+
+					if (vertices > 0)
+					{
+						// allocate a view for FBO drawing
+						const uint16_t fbo_view = uint16_t(s_current_view);
+						s_current_view++;
+						bgfx::setViewFrameBuffer(fbo_view, m_vec_fb);
+						// viewport: the whole FBO (post-supersample resolution)
+						bgfx::setViewRect(fbo_view, 0, 0, m_vec_fb_w, m_vec_fb_h);
+						bgfx::setViewClear(fbo_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+						bgfx::setViewMode(fbo_view, bgfx::ViewMode::Sequential);
+
+						// Target bounds are back to 1x, so primitive coords are 1x too.
+						// Projection covers the 1x window range; the viewport is m_vec_fb (= 2x window).
+						// Rasterizing 1x coords into a 2x viewport improves sub-pixel precision on the GPU
+						// (the set_bounds primitive-rounding resolution boost is gone, but the 2x rasterizer
+						// resolution + fs_vector_line's analytic AA + 25-tap halo absorb it).
+						float proj[16];
+						const bgfx::Caps* caps = bgfx::getCaps();
+						bx::mtxOrtho(proj, 0.0f,
+							float(s_width[window_index]),
+							float(s_height[window_index]),
+							0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
+						bgfx::setViewTransform(fbo_view, nullptr, proj);
+
+						bgfx::setVertexBuffer(0, &tvb);
+						// no texture needed; fs_vector_line computes the fade in-shader
+						bgfx_effect* line_eff = (m_line_effect != nullptr) ? m_line_effect : m_gui_effect[BLENDMODE_ADD];
+						bgfx_uniform* inv = line_eff->uniform("u_inv_view_dims");
+						if (inv)
+						{
+							float values[2] = { -1.0f / float(s_width[window_index]), 1.0f / float(s_height[window_index]) };
+							inv->set(values, sizeof(float) * 2);
+							inv->upload();
+						}
+						line_eff->submit(fbo_view);
+						m_vectors_in_fbo = true;
+					}
+				}
+			}
+		}
+	}
+
+	// chain: inject the FBO into the chain system and render it.
+	// Pass m_vec_fb's color attachment (attachment 0) to the chain as "screen0".
+	// The chain does a passthrough blit and writes directly to the backbuffer.
+	if (m_vectors_in_fbo && window_index == 0)
+	{
+		bgfx::TextureHandle vec_color = bgfx::getTexture(m_vec_fb, 0);
+		if (bgfx::isValid(vec_color))
+		{
+			m_chains->inject_vector_screen(vec_color,
+				uint16_t(s_width[window_index]),
+				uint16_t(s_height[window_index]),
+				m_vec_fb_w, m_vec_fb_h);
+			// Restore slider values from config once, the first time, after the chain is loaded.
+			// For vector games num_screens=0, so the later `if (num_screens) { load_config }` block
+			// never fires; it must be called explicitly here.
+			if (m_config && m_chains->has_applicable_chain(0))
+			{
+				osd_printf_verbose("BGFX: Applying configuration (vector mode) for window %d\n", window().index());
+				m_chains->load_config(*m_config->get_first_child());
+				m_config.reset();
+			}
+			// Guard against null chain (e.g. chain change from menu, or failed load).
+			if (m_chains->has_applicable_chain(0))
+			{
+				uint32_t chain_views = m_chains->process_screen_chains(s_current_view, window());
+				s_current_view += chain_views;
+			}
+		}
+	}
+
+
+	// Force-allocate m_ortho_view (the UI view) at a late index.
+	// Without this, when every primitive in the frame is skipped as VECTOR/VECTORBUF, the lazy
+	// allocation inside buffer_primitives never runs, m_ortho_view stays null, and the later
+	// `m_gui_effect[blend]->submit(m_ortho_view->get_index())` null-derefs.
+	if (window_index == 0)
+		setup_ortho_view();
+
 	render_primitive *prim = window().m_primlist->first();
 	std::vector<void*> sources;
 	while (prim != nullptr)
 	{
 		uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 
-		bgfx::TransientVertexBuffer buffer;
+		// allocate_buffer does not initialize the buffer when vertices==0. This happens on frames
+		// where every prim is skipped (VECTOR LINE + VECTORBUF QUAD), and the later
+		// bgfx::setVertexBuffer would null-deref via a garbage handle.
+		// Zero-initialize explicitly so "not allocated" can be detected as data==nullptr.
+		bgfx::TransientVertexBuffer buffer = {};
 		allocate_buffer(prim, blend, &buffer);
 
 		int32_t screen = -1;
@@ -1312,8 +1689,15 @@ int renderer_bgfx::draw(int update)
 
 		buffer_status status = buffer_primitives(atlas_valid, &prim, &buffer, screen, window_index);
 
-		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN)
+		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN
+			&& m_ortho_view && m_ortho_view->get_index() != UINT_MAX
+			&& buffer.data != nullptr)
 		{
+			// Guard on m_ortho_view + buffer allocation. setup_ortho_view was just force-called, but
+			// this prevents a null deref in abnormal states (e.g. shutdown).
+			// buffer.data == nullptr means allocate_buffer returned without doing anything at
+			// vertices==0 (all prims skipped); passing it to setVertexBuffer would crash inside BGFX
+			// with a garbage handle.
 			bgfx::setVertexBuffer(0, &buffer);
 			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
 
@@ -1336,6 +1720,9 @@ int renderer_bgfx::draw(int update)
 
 	window().m_primlist->release_lock();
 
+	// The blit block was moved before buffer_primitives (see above); nothing to do here.
+	// The UI was already submitted to m_ortho_view (the late view) inside buffer_primitives.
+
 	// This dummy draw call is here to make sure that view 0 is cleared
 	// if no other draw calls are submitted to view 0.
 	//bgfx::touch(s_current_view > 0 ? s_current_view - 1 : 0);
@@ -1356,6 +1743,7 @@ int renderer_bgfx::draw(int update)
 	{
 		bgfx::frame();
 	}
+
 
 	return 0;
 }
@@ -1427,6 +1815,9 @@ void renderer_bgfx::setup_ortho_view()
 	if (!m_ortho_view)
 	{
 		m_ortho_view = std::make_unique<bgfx_ortho_view>(this, 0, m_framebuffer, m_seen_views);
+		// Since the UI view is placed at a late index after the blit, m_ortho_view itself does not
+		// clear the backbuffer (the manual clear view already did).
+		m_ortho_view->disable_color_clear();
 	}
 	if (m_ortho_view->get_index() == UINT_MAX)
 	{
@@ -1451,7 +1842,15 @@ render_primitive_list *renderer_bgfx::get_primitives()
 
 	osd_dim wdim = window().get_size_pixels();
 	if (wdim.width() > 0 && wdim.height() > 0)
-		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
+	{
+		// Keep target bounds at the 1x window (2x supersample bounds cause atlas bleeding in MAME UI
+		// glyph rendering = the neighboring cell's "|" appears between characters). Vector-line
+		// supersampling is provided solely by the vec_fb (= 2x window) rasterizer resolution.
+		window().target()->set_bounds(
+			wdim.width(),
+			wdim.height(),
+			window().pixel_aspect());
+	}
 
 	window().target()->set_transform_container(!chain_transform);
 	return &window().target()->get_primitives();
@@ -1467,12 +1866,21 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 		switch ((*prim)->type)
 		{
 			case render_primitive::LINE:
+				// Only LINEs with PRIMFLAG_VECTOR were drawn via the FBO; the rest (UI / MAME menu)
+				// are drawn normally, directly to the View 0 backbuffer. Symmetric with the FBO-side
+				// selection, so phosphor ghosting does not affect the UI.
+				if (m_vectors_in_fbo && PRIMFLAG_GET_VECTOR((*prim)->flags))
+					break;
 				setup_ortho_view();
 				put_packed_line(*prim, (ScreenVertex*)buffer->data + vertices);
 				vertices += 30;
 				break;
 
 			case render_primitive::QUAD:
+				// Skip the VECTORBUF background quad (the black background drawn by vector.cpp):
+				// it would overwrite the vec blit, which has already filled the backbuffer.
+				if (m_vectors_in_fbo && PRIMFLAG_GET_VECTORBUF((*prim)->flags))
+					break;
 				if ((*prim)->texture.base == nullptr)
 				{
 					setup_ortho_view();
@@ -1666,10 +2074,17 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, uint32_t blend, bgfx
 		switch (prim->type)
 		{
 			case render_primitive::LINE:
+				// Symmetric with buffer_primitives: skip only PRIMFLAG_VECTOR LINEs (drawn via the
+				// FBO); reserve vertices for UI lines.
+				if (m_vectors_in_fbo && PRIMFLAG_GET_VECTOR(prim->flags))
+					break;
 				vertices += 30;
 				break;
 
 			case render_primitive::QUAD:
+				// Symmetric with the skip in buffer_primitives
+				if (m_vectors_in_fbo && PRIMFLAG_GET_VECTORBUF(prim->flags))
+					break;
 				if (!prim->packable(PACKABLE_SIZE))
 				{
 					if (prim->texture.base == nullptr)
@@ -1712,6 +2127,7 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, uint32_t blend, bgfx
 std::vector<ui::menu_item> renderer_bgfx::get_slider_list()
 {
 	m_sliders_dirty = false;
+	// All sliders now come from the chain, so nothing to append.
 	return m_chains->get_slider_list();
 }
 
@@ -1750,4 +2166,5 @@ void renderer_bgfx::save_config(util::xml::data_node &parentnode)
 		m_config->get_first_child()->copy_into(parentnode);
 	else
 		m_chains->save_config(parentnode);
+	// All sliders are saved by chain_manager's standard <screen> persistence.
 }

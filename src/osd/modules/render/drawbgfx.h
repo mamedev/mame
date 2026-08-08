@@ -8,6 +8,7 @@
 #include "binpacker.h"
 #include "bgfx/chain.h"
 #include "bgfx/chainmanager.h"
+#include "bgfx/slider.h"
 #include "bgfx/vertex.h"
 #include "sliderdirtynotifier.h"
 
@@ -37,6 +38,10 @@ class avi_write;
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
+	// Supersample factor for vector drawing (used for both the render_target bounds
+	// and the FBO resolution). Public because view.cpp and others reference it.
+	static constexpr uint16_t VEC_SUPERSAMPLE = 2;
+
 	class parent_module;
 
 	renderer_bgfx(osd_window &window, parent_module &parent_module);
@@ -103,6 +108,11 @@ private:
 	void put_polygon(const float* coords, uint32_t num_coords, float r, uint32_t rgba, ScreenVertex* vertex);
 	void put_line(float x0, float y0, float x1, float y1, float r, uint32_t rgba, ScreenVertex* vertex, float fth = 1.0f);
 
+	// Solid line without AA (for FBO-based vector drawing).
+	// Draws a line as a single solid quad from 6 vertices. Unlike put_packed_line it has no
+	// transparent edge, so it keeps uniform intensity regardless of line width and angle.
+	void put_solid_line(render_primitive *prim, ScreenVertex* vertex);
+
 	void set_bgfx_state(uint32_t blend);
 
 	static uint32_t u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
@@ -132,6 +142,17 @@ private:
 	bgfx_effect *m_gui_effect[4];
 	bgfx_effect *m_screen_effect[4];
 	std::vector<uint32_t> m_seen_views;
+
+	// FBO for vector drawing in the BGFX-sample style (not routed through chain_manager).
+	// (VEC_SUPERSAMPLE lives in the public section.)
+	bgfx::FrameBufferHandle m_vec_fb = BGFX_INVALID_HANDLE;
+	uint16_t m_vec_fb_w = 0;
+	uint16_t m_vec_fb_h = 0;
+	bool m_vectors_in_fbo = false;  // whether vector LINEs were drawn into the FBO this frame
+
+	// Analytic-AA vector line effect (fs_vector_line). Draws vector LINEs into m_vec_fb.
+	// The subsequent post-processing is handled by the chain (JSON).
+	bgfx_effect* m_line_effect = nullptr;
 
 	std::map<uint32_t, rectangle_packer::packed_rectangle> m_hash_to_entry;
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
