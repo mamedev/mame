@@ -326,7 +326,6 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 	return SH7709S_CACHE_LINE_SIZE >> bcr2_val;
 }
 
-
 static unsigned int get_burst_word(uint32_t address)
 {
 	return (address % 16) / 4;
@@ -352,6 +351,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	uint32_t cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
 	uint32_t bank_read = sdram_bank(address);
 	uint32_t bus_penalty = 0;
+	unsigned int burst_word = get_burst_word(address);
 
 	// SDRAM timing based on SH7709S documentation
 	// These are copied from the timing charts. These are all in bus cycles
@@ -402,13 +402,16 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// any subsequent access must wait for them to drain regardless of bank.
 	uint64_t burst_cycles_left = remaining_cycles(elapsed_cycles, m_burst_continuation_remaining_cycles);
 	cpu_penalty += burst_cycles_left;
+	elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, m_burst_continuation_remaining_cycles);
 
 	// The burst bank precharge only starts after the burst drains, so measure its
 	// remaining cycles from burst completion instead of from the access start.
 	if (is_sdram_region(address) && bank_read == m_last_sdram_bank && m_precharge_remaining_cycles > 0)
 	{
 		uint64_t precharge_cycles_left = (burst_cycles_left == 0) ? elapsed_cycles - m_burst_continuation_remaining_cycles : elapsed_cycles;
-		cpu_penalty += remaining_cycles(precharge_cycles_left, m_precharge_remaining_cycles);
+		uint64_t precharge_penalty = remaining_cycles(precharge_cycles_left, m_precharge_remaining_cycles);
+		cpu_penalty += precharge_penalty;
+		elapsed_cycles -= std::min<uint64_t>(precharge_cycles_left, m_precharge_remaining_cycles);
 	}
 
 	m_burst_continuation_remaining_cycles = 0;
@@ -419,11 +422,14 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	{
 		uint64_t wb_cycles_left = remaining_cycles(elapsed_cycles, m_wb_active_cycles);
 		cpu_penalty += wb_cycles_left;
+		elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, m_wb_active_cycles);
 		// If there was a bank conflict also calculate remaining cycles for the precharge
 		if (m_last_sdram_bank == bank_read)
 		{
 			uint64_t tpc_cycles_left = (wb_cycles_left == 0) ? elapsed_cycles - m_wb_active_cycles : 0;
-			cpu_penalty += remaining_cycles(tpc_cycles_left, mcr_tpc() * 2);
+			uint64_t tpc_penalty = remaining_cycles(tpc_cycles_left, mcr_tpc() * 2);
+			cpu_penalty += tpc_penalty;
+			elapsed_cycles -= std::min<uint64_t>(tpc_cycles_left, mcr_tpc() * 2);
 		}
 		m_wb_active_cycles = 0;
 	}
@@ -463,14 +469,8 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	else if (is_sdram_region(address)) // Account for the burst continuation and read close after the critical word lands, writebacks include the cost in the background cycles if there is a conflict
 	{
 		if (is_cacheable(address))
-		{
-			// Remaining burst words occupy the bus, blocking subsequent accesses regardless of bank
 			m_burst_continuation_remaining_cycles = (3 - burst_word) * 2;
-			// Auto precharge of this bank after the burst, only blocks accesses to the same bank
-			m_precharge_remaining_cycles = mcr_tpc() * 2;
-		}
-		else
-			m_precharge_remaining_cycles = mcr_tpc() * 2;
+		m_precharge_remaining_cycles = mcr_tpc() * 2;
 	}
 
 	return cpu_penalty + (bus_penalty * 2);
