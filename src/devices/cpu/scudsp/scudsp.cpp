@@ -669,6 +669,11 @@ void scudsp_cpu_device::op_dma( uint32_t opcode )
 		m_dma.dst = (m_wa0 << 2) & 0x27ffffff;
 	}
 
+	// TODO: inherit rules from base SCU
+	// - mshvssf definitely wants the C-Bus rule for palette (on reads tho?)
+	if ((m_dma.src & 0x0700'0000) == 0x0600'0000 || (m_dma.dst & 0x0700'0000) == 0x0600'0000)
+		m_dma.add = 4;
+
 	m_dma.update = ( hold == 0 );
 	m_dma.ex = 1;
 	m_dma.count = 0;

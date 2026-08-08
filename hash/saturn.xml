@@ -1193,11 +1193,14 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying 6 Inch My Darling (Japan)... -->
 	<software name="6inchmyd" supported="no">
 		<description>6 Inch My Darling (Japan)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
+		<notes><![CDATA[
+Has bad [VDP2] color calculation on character appearance/disappereance [VDP2] (verify)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-19721G"/>
 		<info name="release" value="19981223"/>
 		<info name="alt_title" value="6インチ まいだ～りん"/>
@@ -1209,11 +1212,15 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Game crashes in the intro of Chapter 2 of Story Mode, has some transparency and color issues in some places. -->
 	<software name="avg" supported="no">
 		<description>Advanced V.G. (Japan)</description>
 		<year>1997</year>
 		<publisher>TGL</publisher>
+		<notes><![CDATA[
+Hangs during gameplay [SCSP]?
+Game crashes in the intro of Chapter 2 of Story Mode.
+Has some transparency and color issues in places
+]]></notes>
 		<!-- The Genteiban box contains the same disc. -->
 		<info name="serial" value="T-32501G, T-32506G (Genteiban)"/>
 		<info name="release" value="19970314"/>
@@ -1282,11 +1289,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Akumajou Dracula X - Gekka no Yasoukyoku (Japan) (2M)... -->
 	<software name="draculax" supported="no">
 		<description>Akumajou Dracula X - Gekka no Yasoukyoku (Japan, 2M)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Offset cursor in name select [VDP1]
+[VDP1] currently too fast in places
+[VDP2] doesn't cut off top of GFXs in magic device screen (3rd option in pause menu, scroll up/down)
+]]></notes>
 		<info name="serial" value="T-9527G (VS010-J1)"/>
 		<info name="release" value="19980625"/>
 		<info name="alt_title" value="悪魔城ドラキュラX ～月下の夜想曲～"/>
@@ -1321,11 +1332,14 @@ Reportedly should slowdown [VDP1] command execution on battles (unverified, assu
 		</part>
 	</software>
 
-	<!-- Identifying Alien Trilogy (Japan)... -->
 	<software name="alientrij" cloneof="alientri" supported="no">
 		<description>Alien Trilogy (Japan)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<notes><![CDATA[
+Color masks energy/ammo bars badly, [VDP2] line window?
+Not extensively tested
+]]></notes>
 		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113G"/>
 		<info name="release" value="19960830"/>
@@ -1437,11 +1451,14 @@ Hardlocks at boot, [SCU] DMA-ing in VDP2 RAM with max sizes
 		</part>
 	</software>
 
-	<!-- Black screen in Roosters after game over, other games untested -->
 	<software name="wonder3" supported="no">
 		<description>Arcade Gears Vol. 3 - Wonder 3 (Japan)</description>
 		<year>1998</year>
 		<publisher>Xing</publisher>
+		<notes><![CDATA[
+Rooster: unstable, randomly hangs particularly with game overs, [DRC]?
+Chariot and Don't Pull untested
+]]></notes>
 		<info name="serial" value="T-26107G"/>
 		<info name="release" value="19980305"/>
 		<info name="alt_title" value="ワンダー3 アーケードギアーズ"/>
@@ -1472,11 +1489,13 @@ Crashes often after Xing logo with [DRC]
 		</part>
 	</software>
 
-	<!-- Identifying Assault Suit Leynos 2 (Japan)... -->
 	<software name="leynos2" supported="no">
 		<description>Assault Suit Leynos 2 (Japan)</description>
 		<year>1997</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Throws a not ready [CD-Block] transfer fatalerror when reaching gameplay
+]]></notes>
 		<info name="serial" value="T-2501G"/>
 		<info name="release" value="19970221"/>
 		<info name="alt_title" value="重装機兵レイノス2 ~ Juusou Kihei Leynos 2"/>
@@ -1488,11 +1507,14 @@ Crashes often after Xing logo with [DRC]
 		</part>
 	</software>
 
-	<!-- Identifying Astra Superstars (Japan)... -->
 	<software name="astrass" supported="no">
 		<description>Astra Superstars (Japan)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+[SCSP] SFXs are silent (including in sound test)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1521G"/>
 		<info name="release" value="19980806"/>
 		<info name="alt_title" value="アストラスーパースターズ"/>
@@ -4872,11 +4894,13 @@ Crashes after FMV in [DRC], either by skipping it or not
 		</part>
 	</software>
 
-	<!-- Identifying Marvel Super Heroes vs. Street Fighter (Japan)... -->
 	<software name="mshvssf" supported="no">
 		<description>Marvel Super Heroes vs. Street Fighter (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1239G"/>
 		<info name="release" value="19981022"/>
 		<info name="alt_title" value="マーヴル・スーパーヒーローズVS.ストリートファイター"/>
@@ -7343,11 +7367,14 @@ Runs too slow, enables [SCU] hblank-in irq
 		</part>
 	</software>
 
-	<!-- Identifying Street Fighter Zero 3 (Japan)... -->
 	<software name="sfz3" supported="no">
 		<description>Street Fighter Zero 3 (Japan)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Intro is incredibly slow (redbook playback completes way earlier than GFXs)
+Crashes when reaching gameplay (or left in attract mode after title), [CD-Block]?
+]]></notes>
 		<info name="serial" value="T-1247G"/>
 		<info name="release" value="19990805"/>
 		<info name="alt_title" value="ストリートファイターZERO3"/>
@@ -8521,11 +8548,13 @@ Black screen at boot, [CD-Block] never completes first FMV transfer after FAD=55
 		</part>
 	</software>
 
-	<!-- Identifying X-Men vs. Street Fighter (Japan) (1M)... -->
 	<software name="xmvssf" supported="no">
 		<description>X-Men vs. Street Fighter (Japan, 1M)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Black screen after Capcom logo, [CD-Block]?
+]]></notes>
 		<info name="serial" value="T-1227G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="エックスメンVS.ストリートファイター"/>
@@ -20151,18 +20180,23 @@ Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 
 		</part>
 	</software>
 
-	<!-- Identifying Thunder Force Gold Pack 1 (T-1807G)... -->
 	<software name="tfgold1" supported="no">
 		<description>Thunder Force Gold Pack 1 (Japan)</description>
 		<year>1996</year>
 		<publisher>Technosoft</publisher>
+		<notes><![CDATA[
+TF2: crashes with [DRC]
+TF2: shows [VDP1] sprite wobbling, particularly noticeable with overhead stage bases
+Both games: bad [CD-Block] redbook on BGM repeats (cross borders with the successive track)
+]]></notes>
 		<info name="serial" value="T-1807G"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="サンダーフォースゴールドパック1"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<!-- baddump: check redbook repeats -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="thunder force gold pack 1 (t-1807g)" sha1="6190073e2e8e2d8987195a62a69cb75c7f120000" />
+				<disk name="thunder force gold pack 1 (t-1807g)" sha1="6190073e2e8e2d8987195a62a69cb75c7f120000" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -21674,10 +21708,14 @@ Bad reference graphics after completing a puzzle, [CD-Block]?
 		</part>
 	</software>
 
-	<software name="dejigmck" supported="partial">
+	<software name="dejigmck" supported="no">
 		<description>Dejig McKnight - Art Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
+		<notes><![CDATA[
+Shows black [VDP2] on stage intros
+Bad reference graphics after completing a puzzle, [CD-Block]?
+]]></notes>
 		<info name="serial" value="T-30305G"/>
 		<info name="release" value="19971204"/>
 		<info name="alt_title" value="デジグ マックナイト ～アートコレクション～"/>
@@ -27550,12 +27588,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="dejigtin" supported="partial">
+	<software name="dejigtin" supported="no">
 		<description>Dejig Tin Toy</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
 		<notes><![CDATA[
 [DRC] hangs at end of movie playback
+Bad reference graphics after completing a puzzle, [CD-Block]? (untested, assume same as other DeJig)
 ]]></notes>
 		<info name="serial" value="T-30302G"/>
 		<info name="release" value="19970425"/>
@@ -36332,7 +36371,7 @@ Black screen, loops on [SCSP] MCIPD timer B and MIDI masks
 	</software>
 
 	<software name="scud" supported="no">
-		<description>Scud - The Disposable Assassin (USA)</description>
+		<description>Scud: The Disposable Assassin (USA)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
