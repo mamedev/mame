@@ -1888,7 +1888,7 @@ void z8002_device::Z18_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	RQ(dst) = MULTL(RQ(dst), RL(src)); //@@@
+	RQ(dst) = MULTL(RQ(dst), RDIR_L(src));
 }
 
 /******************************************
