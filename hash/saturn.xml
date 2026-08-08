@@ -6192,7 +6192,6 @@ Runs too slow, enables [SCU] hblank-in irq
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<notes><![CDATA[
-[VDP1] has transparent pen issues (cfr. Haomaru black pens)
 [VDP1] line glitches
 Not extensively tested
 ]]></notes>
@@ -33787,7 +33786,10 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		<notes><![CDATA[
 No sound in gameplay, enables [SCSP] SCIPD bit 5 (master to sound irq)
 Has [VDP2] visible layer of garbage on credits menu and Digital Eclipse logo
+Crashes on attract mode
 Joust: going up causes [VDP1] player to disappear, enemies flicker
+Defender II: crashes after a short while with trailing [VDP1] sprites, actually [DRC]
+Sinistar: hangs with bezel drawn only
 ]]></notes>
 		<info name="serial" value="T-9703H"/>
 		<info name="developer" value="Digital Eclipse"/>
