@@ -67,11 +67,12 @@
  * - overworked disassembler
  *
  *  TODO:
- * - remove fake HALT line for DMAs (depends on better timings downstream);
+ * - find a way to DTACK CPUs when DMA-ing rather than stalling this;
  * - Fix disassembler;
  * - Fix timings (no info available so far);
  * - Add control flags;
  * - Scheduler corrupts a lot in debugger, particularly with DRC enabled;
+ * - convert CTx to array;
  * - vkyoute2: heavy glitches with VDP1 vertices going haywire;
  *
  *
@@ -266,23 +267,32 @@ uint32_t scudsp_cpu_device::compute_condition( uint32_t condition )
 	return result;
 }
 
-void scudsp_cpu_device::set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter )
+// DMA CTx r/ws follows MC increment rules
+void scudsp_cpu_device::set_dest_dma_mem( uint32_t memcode, uint32_t value )
 {
 	if ( memcode < 4 )
 	{
 		switch(memcode)
 		{
 			case 0x0:   /* MC0 */
-				scudsp_writemem(((m_ct0 + counter) & 0x3f),0,value);
+				scudsp_writemem(m_ct0, 0, value);
+				m_ct0 ++;
+				m_ct0 &= 0x3f;
 				break;
 			case 0x1:   /* MC1 */
-				scudsp_writemem(((m_ct1 + counter) & 0x3f),1,value);
+				scudsp_writemem(m_ct1, 1, value);
+				m_ct1 ++;
+				m_ct1 &= 0x3f;
 				break;
 			case 0x2:   /* MC2 */
-				scudsp_writemem(((m_ct2 + counter) & 0x3f),2,value);
+				scudsp_writemem(m_ct2, 2, value);
+				m_ct2 ++;
+				m_ct2 &= 0x3f;
 				break;
 			case 0x3:   /* MC3 */
-				scudsp_writemem(((m_ct3 + counter) & 0x3f),3,value);
+				scudsp_writemem(m_ct3, 3, value);
+				m_ct3 ++;
+				m_ct3 &= 0x3f;
 				break;
 		}
 	}
@@ -294,20 +304,33 @@ void scudsp_cpu_device::set_dest_dma_mem( uint32_t memcode, uint32_t value, uint
 	}
 }
 
-uint32_t scudsp_cpu_device::get_mem_source_dma( uint32_t memcode, uint32_t counter )
+uint32_t scudsp_cpu_device::get_mem_source_dma( uint32_t memcode )
 {
+	uint32_t value = 0;
 	switch( memcode & 0x3 )
 	{
 		case 0x0:
-			return scudsp_readmem(((m_ct0 + counter) & 0x3f),0);
+			value = scudsp_readmem(m_ct0, 0);
+			m_ct0 ++;
+			m_ct0 &= 0x3f;
+			break;
 		case 0x1:
-			return scudsp_readmem(((m_ct1 + counter) & 0x3f),1);
+			value = scudsp_readmem(m_ct1, 1);
+			m_ct1 ++;
+			m_ct1 &= 0x3f;
+			break;
 		case 0x2:
-			return scudsp_readmem(((m_ct2 + counter) & 0x3f),2);
+			value = scudsp_readmem(m_ct2, 2);
+			m_ct2 ++;
+			m_ct2 &= 0x3f;
+			break;
 		case 0x3:
-			return scudsp_readmem(((m_ct3 + counter) & 0x3f),3);
+			value = scudsp_readmem(m_ct3, 3);
+			m_ct3 ++;
+			m_ct3 &= 0x3f;
+			break;
 	}
-	return 0;
+	return value;
 }
 
 
@@ -658,21 +681,41 @@ void scudsp_cpu_device::op_dma( uint32_t opcode )
 	}
 
 	m_dma.dir = dir_from_D0;
+	// printf("SRC %08x DST %08x SIZE %08x UPDATE %08x DIR %08x ADD %08x\n",m_dma.src,m_dma.dst,m_dma.size,m_dma.update,m_dma.dir, add);
+
 	if ( m_dma.dir == 0 )
 	{
 		m_dma.src = (m_ra0 << 2) & 0x27ffffff;
 		m_dma.dst = dsp_mem;
+
+		// TODO: inherit bus reading from base SCU
+		// C-Bus reads can either be 0 or 4 only
+		// - mshvssf definitely wants this behaviour for palette at title & gameplay
+		if ((m_dma.src & 0x0700'0000) == 0x0600'0000)
+		{
+			m_dma.add = (1 << (add & 2)) & ~1;
+		}
+
+		// B-Bus reads are reportedly always +4
+		if ((m_dma.src & 0x0700'0000) == 0x0500'0000 || (m_dma.src & 0x00e0'0000) >= 0x00a0'0000)
+		{
+			m_dma.add = 4;
+		}
 	}
 	else
 	{
 		m_dma.src = dsp_mem;
 		m_dma.dst = (m_wa0 << 2) & 0x27ffffff;
-	}
 
-	// TODO: inherit rules from base SCU
-	// - mshvssf definitely wants the C-Bus rule for palette (on reads tho?)
-	if ((m_dma.src & 0x0700'0000) == 0x0600'0000 || (m_dma.dst & 0x0700'0000) == 0x0600'0000)
-		m_dma.add = 4;
+		// TODO: implement this rule for B-Bus
+		// (updates destination on every 16-bit write)
+		//if ((m_dma.dst & 0x0700'0000) == 0x0500'0000 || (m_dma.dst & 0x00e0'0000) >= 0x00a0'0000)
+		//{
+		//	m_dma.add = (1 << add) & ~1;
+		//}
+
+		// TODO: C-Bus uses the same add rule as B, except it's buggy for add mode = 1 and crossing 1KiB boundaries
+	}
 
 	m_dma.update = ( hold == 0 );
 	m_dma.ex = 1;
@@ -685,7 +728,6 @@ void scudsp_cpu_device::op_dma( uint32_t opcode )
 	m_out_ddmv_cb(0);
 	m_dma_timer->adjust(attotime::from_ticks(4, this->clock()));
 
-	// printf("SRC %08x DST %08x SIZE %08x UPDATE %08x DIR %08x ADD %08x\n",m_dma.src,m_dma.dst,m_dma.size,m_dma.update,m_dma.dir,m_dma.add);
 
 	// HACK: should be burst not cycle steal
 	// this is duct tape to make stv:vfremix not overrun atomic execution in the SH-2s,
@@ -796,7 +838,7 @@ void scudsp_cpu_device::exec_dma()
 	if ( m_dma.dir == 0 )
 	{
 		data = (m_in_dma_cb(m_dma.src)<<16) | m_in_dma_cb(m_dma.src+2);
-		set_dest_dma_mem( m_dma.dst, data, m_dma.count );
+		set_dest_dma_mem( m_dma.dst, data );
 
 		m_dma.src += m_dma.add;
 
@@ -807,10 +849,10 @@ void scudsp_cpu_device::exec_dma()
 	}
 	else
 	{
-		data = get_mem_source_dma( m_dma.src, m_dma.count );
+		data = get_mem_source_dma( m_dma.src );
 
 		m_out_dma_cb(m_dma.dst, data >> 16 );
-		m_out_dma_cb(m_dma.dst+2, data & 0xffff );
+		m_out_dma_cb(m_dma.dst + 2, data & 0xffff );
 
 		m_dma.dst += m_dma.add;
 
