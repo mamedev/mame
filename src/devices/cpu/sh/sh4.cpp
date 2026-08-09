@@ -41,8 +41,50 @@
 #include <cfenv>
 #include <numbers>
 
+#if defined(__clang_major__) && (__clang_major__ < 12)
+// can't guarantee floating point environment control works
+#else
+#pragma STDC FENV_ACCESS ON
+#endif
+
 // From FPSCR.RM: 00 = round to nearest, 01 = round to zero; 10/11 are reserved
 static const uint8_t fpmode_source[4] = { uml::ROUND_ROUND, uml::ROUND_TRUNC, uml::ROUND_ROUND, uml::ROUND_ROUND };
+static const int feround_source[4] = { FE_TONEAREST, FE_TOWARDZERO, FE_TONEAREST, FE_TONEAREST };
+
+namespace {
+
+// For convenience, we run in the host's rounding mode most of the time and only switch during actual FPU ops.
+// That shields read/write handlers and the debugger hook from seeing unexpected rounding mode changes.
+class host_rounding_scope
+{
+public:
+	host_rounding_scope(uint32_t fpscr, int hostmode) :
+		m_hostmode(hostmode),
+		m_changed(feround_source[fpscr & 3] != hostmode)
+	{
+		if (m_changed)
+		{
+			std::fesetround(feround_source[fpscr & 3]);
+		}
+	}
+
+	~host_rounding_scope()
+	{
+		if (m_changed)
+		{
+			std::fesetround(m_hostmode);
+		}
+	}
+
+	host_rounding_scope(const host_rounding_scope &) = delete;
+	host_rounding_scope &operator=(const host_rounding_scope &) = delete;
+
+private:
+	const int   m_hostmode;
+	const bool  m_changed;
+};
+
+} // anonymous namespace
 
 
 DEFINE_DEVICE_TYPE(SH3, sh3_device,   "sh3", "Hitachi SH-3 (Unidentified)")
@@ -1503,10 +1545,6 @@ inline void sh34_base_device::LDSMFPSCR(const uint16_t opcode)
 #endif
 	m_sh2_state->m_fpu_sz = (m_sh2_state->m_fpscr & SZ) ? 1 : 0;
 	m_sh2_state->m_fpu_pr = (m_sh2_state->m_fpscr & PR) ? 1 : 0;
-	if (!m_isdrc)
-	{
-		sh4_set_host_rounding();
-	}
 }
 
 /*  LDC.L   @Rm+,DBR */
@@ -1563,8 +1601,6 @@ inline void sh34_base_device::LDSFPSCR(const uint16_t opcode)
 #endif
 	m_sh2_state->m_fpu_sz = (m_sh2_state->m_fpscr & SZ) ? 1 : 0;
 	m_sh2_state->m_fpu_pr = (m_sh2_state->m_fpscr & PR) ? 1 : 0;
-	if (!m_isdrc)
-		sh4_set_host_rounding();
 }
 
 /*  LDC     Rm,DBR */
@@ -2147,11 +2183,14 @@ inline void sh34_base_device::FLOAT(const uint16_t opcode)
 		if (n & 1)
 			fatalerror("SH-4: FLOAT opcode used with n %d", n);
 
+		// int32 -> double is an exact conversion so the rounding mode doesn't matter
 		n = n & 14;
 		FP_RFD(n) = (double)*((int32_t *)&m_sh2_state->m_fpul);
 	}
 	else                /* PR = 0 */
 	{
+		const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 		FP_RFS(n) = (float)*((int32_t *)&m_sh2_state->m_fpul);
 	}
 }
@@ -2251,6 +2290,8 @@ inline void sh34_base_device::FCNVDS(const uint16_t opcode)
 
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
+		const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 		n = n & 14;
 		if (m_sh2_state->m_fpscr & RM)
 			m_sh2_state->m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)] &= 0xe0000000; /* round toward zero*/
@@ -2277,6 +2318,8 @@ inline void sh34_base_device::FADD(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		n = n & 14;
@@ -2295,6 +2338,8 @@ inline void sh34_base_device::FSUB(const uint16_t opcode)
 {
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
+
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
 
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
@@ -2316,6 +2361,8 @@ inline void sh34_base_device::FMUL(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		n = n & 14;
@@ -2335,6 +2382,8 @@ inline void sh34_base_device::FDIV(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		n = n & 14;
@@ -2353,6 +2402,8 @@ inline void sh34_base_device::FMAC(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr == 0) /* PR = 0 */
 	{
 		const float p = FP_RFS(0) * FP_RFS(m);
@@ -2365,6 +2416,8 @@ inline void sh34_base_device::FMAC(const uint16_t opcode)
 inline void sh34_base_device::FSQRT(const uint16_t opcode)
 {
 	uint32_t n = REG_N;
+
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
 
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
@@ -2382,10 +2435,13 @@ inline void sh34_base_device::FSRRA(const uint16_t opcode)
 {
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	FP_RFS(n) = 1.0f / sqrtf(FP_RFS(n));
 }
 
 /*  FSSCA FPUL,FRn PR=0 1111nnn011111101 */
+// sinf/cosf are libm calls so we *don't* override the rounding mode here.
 void sh34_base_device::FSSCA(const uint16_t opcode)
 {
 	uint32_t n = REG_N;
@@ -2402,6 +2458,8 @@ inline void sh34_base_device::FIPR(const uint16_t opcode)
 	uint32_t m = (n & 3) << 2;
 	n = n & 12;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	float ml[4];
 	for (int a = 0; a < 4; a++)
 		ml[a] = FP_RFS(n + a) * FP_RFS(m + a);
@@ -2413,6 +2471,8 @@ void sh34_base_device::FTRV(const uint16_t opcode)
 {
 	uint32_t n = REG_N;
 	n = n & 12;
+
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
 
 	float sum[4];
 	for (int i = 0; i < 4; i++)
@@ -3022,9 +3082,8 @@ void sh34_base_device::execute_run()
 		return;
 	}
 
-	// Save and restore the host's rounding mode since we're going to override it for the FPU
-	const int hostround = std::fegetround();
-	sh4_set_host_rounding();
+	// save the host's rounding mode so the RAII helper can restore it when necessary
+	m_host_round = std::fegetround();
 
 	do
 	{
@@ -3053,8 +3112,6 @@ void sh34_base_device::execute_run()
 
 		m_sh2_state->icount--;
 	} while (m_sh2_state->icount > 0);
-
-	std::fesetround(hostround);
 }
 
 void sh3_base_device::device_start()
@@ -3932,7 +3989,8 @@ void sh34_base_device::device_start()
 	//state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->m_ppc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->pc).callimport().noshow();
 
-	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));
+	memcpy(m_sh2_state->m_fpmode, fpmode_source, sizeof(fpmode_source));
+	m_host_round = FE_TONEAREST;
 
 	m_sh2_state->m_fzero = 0.0f;
 	m_sh2_state->m_fone = 1.0f;
@@ -3953,7 +4011,7 @@ void sh34_base_device::device_start()
 
 	drc_start();
 
-	m_drcuml->symbol_add(&m_fpmode, sizeof(m_fpmode), "fpmode");
+	m_drcuml->symbol_add(&m_sh2_state->m_fpmode, sizeof(m_sh2_state->m_fpmode), "fpmode");
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)
@@ -4352,20 +4410,9 @@ void sh34_base_device::generate_update_cycles(drcuml_block &block, compiler_stat
 
 void sh34_base_device::generate_set_fmod(drcuml_block &block)
 {
-	UML_AND(block, I0, mem(&m_sh2_state->m_fpscr), 3);              // and     i0,fpscr,3
-	UML_LOAD(block, I0, &m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);     // load    i0,fpmode,i0,byte
-	UML_SETFMOD(block, I0);                                         // setfmod i0
-}
-
-/*-------------------------------------------------
-    sh4_set_host_rounding - point the host FPU at
-    the mode FPSCR selects, for the interpreter
--------------------------------------------------*/
-
-void sh34_base_device::sh4_set_host_rounding()
-{
-	static const int feround[4] = { FE_TONEAREST, FE_TOWARDZERO, FE_TONEAREST, FE_TONEAREST };
-	std::fesetround(feround[m_sh2_state->m_fpscr & 3]);
+	UML_AND(block, I0, mem(&m_sh2_state->m_fpscr), 3);                          // and     i0,fpscr,3
+	UML_LOAD(block, I0, &m_sh2_state->m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);    // load    i0,fpmode,i0,byte
+	UML_SETFMOD(block, I0);                                                     // setfmod i0
 }
 
 /*-------------------------------------------------
@@ -5918,11 +5965,8 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_bl
 	return true;
 }
 
-// The backend restores the host default rounding mode around a C call, so FPSCR.RM has to
-// be re-applied here
 void sh34_base_device::func_FSSCA()
 {
-	sh4_set_host_rounding();
 	FSSCA(m_sh2_state->arg0);
 }
 static void cfunc_FSSCA(void *param) { ((sh34_base_device *)param)->func_FSSCA(); };

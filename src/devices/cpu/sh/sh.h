@@ -144,6 +144,7 @@ public:
 		float   m_ftrc_smax;
 		float   m_fzero;             // FTRV accumulator initialiser
 		float   m_fone;              // FSRRA reciprocal numerator
+		uint8_t m_fpmode[4];         // FPSCR.RM -> UML rounding mode
 
 		int     m_frt_input;
 		int     m_fpu_sz;

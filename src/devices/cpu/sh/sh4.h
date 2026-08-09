@@ -187,7 +187,6 @@ public:
 	void generate_pop(drcuml_block &block, uint32_t reg, const uml::parameter &dst);
 	void generate_fmov_single(drcuml_block &block, uint32_t reg, bool load);
 	void generate_fmov_pair(drcuml_block &block, uint32_t reg, bool load);
-	void sh4_set_host_rounding();
 	void func_FSSCA();
 	void func_LDTLB();
 
@@ -223,7 +222,7 @@ protected:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	uint8_t m_fpmode[4];   // FPSCR.RM -> host rounding mode table
+	int m_host_round;      // host rounding mode the interpreter has to leave in place
 	uml::parameter m_fs_regmap[16];
 	uml::parameter m_fd_regmap[16];
 
