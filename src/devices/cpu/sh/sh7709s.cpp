@@ -326,11 +326,6 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 	return SH7709S_CACHE_LINE_SIZE >> bcr2_val;
 }
 
-static unsigned int get_burst_word(uint32_t address)
-{
-	return (address % 16) / 4;
-}
-
 #define CACHE_MISS_STALL (1) // Miss detection in 1 cpu cycle, the rest of the ops (wb buffer movement, etc..) happen in the background
 
 static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
@@ -351,7 +346,6 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	uint32_t cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
 	uint32_t bank_read = sdram_bank(address);
 	uint32_t bus_penalty = 0;
-	unsigned int burst_word = get_burst_word(address);
 
 	// SDRAM timing based on SH7709S documentation
 	// These are copied from the timing charts. These are all in bus cycles
@@ -366,8 +360,8 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// Burst read  (cache fill, 4 longwords): Tr(ACTV) + Trw(RCD-1) + Tc1-Tc4 + CAS + Td2-Td4
 	// 1 + RCD + CAS + 3
 	//
-	// CPU does critical word first so it should only actually stall until:
-	// 1 + RCD + CAS + critical word cycle
+	// CPU does critical word first (with wraparound) so it should only actually stall until:
+	// 1 + RCD + CAS
 	//
 	// Single read (uncached): Tr + Tc1(READA) + Td1
 	// 1 + RCD + CAS
@@ -387,7 +381,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// via m_burst_continuation_remaining_cycles.
 
 	if (is_sdram_region(address))
-		bus_penalty = 1 + mcr_rcd() + get_wcr2_timing(address) + (is_cacheable(address) ? burst_word : 0);
+		bus_penalty = 1 + mcr_rcd() + get_wcr2_timing(address);
 	else
 	{
 		if (is_cacheable(address))
@@ -448,7 +442,9 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 			if (bank_read == bank_write)
 				m_wb_active_cycles += mcr_tpc() * 2;
 			// wait on burst completion of the read
-			m_wb_active_cycles += (3 - burst_word) * 2;
+			m_wb_active_cycles += 3 * 2;
+			// Write back folded the cost in for the burst wait
+			m_burst_continuation_remaining_cycles = 0;
 			// since this is a dirty cache line eviction we always add wcr1 as it's handled after the miss fetch read
 			// and we're switching from read->write
 			m_wb_active_cycles += (1 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(m_wb_address)) * 2;
@@ -465,7 +461,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	}
 	// Account for the burst continuation and read close after the critical word lands, writebacks include the cost in the background cycles if there is a conflict
 	else if (is_sdram_region(address) && is_cacheable(address))
-		m_burst_continuation_remaining_cycles = (3 - burst_word) * 2;
+		m_burst_continuation_remaining_cycles = 3 * 2;
 
 	return cpu_penalty + (bus_penalty * 2);
 }
