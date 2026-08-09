@@ -292,8 +292,11 @@ u64 cv1k_state::flash_port_e_r()
 	return ((!m_nand->is_busy() ? 0x20 : 0x00)) | 0xdf;
 }
 
+// The cv1k_map is in physical addresses, the titles access registers from
+// uncached region 5 0xB...
 u8 cv1k_state::flash_io_r(offs_t offset)
 {
+	m_maincpu->update_access_cycles(0xB0000000 + offset, false);
 	switch (offset)
 	{
 		default:
@@ -309,14 +312,13 @@ u8 cv1k_state::flash_io_r(offs_t offset)
 			return 0xff;
 
 		case 0x00:
-			m_maincpu->update_access_cycles(0x10000000 + offset, false);
 			return m_nand->data_r();
 	}
 }
 
 void cv1k_state::flash_io_w(offs_t offset, u8 data)
 {
-	m_maincpu->update_access_cycles(0x10000000 + offset, true);
+	m_maincpu->update_access_cycles(0xB0000000 + offset, true);
 	switch (offset)
 	{
 		default:
@@ -343,7 +345,7 @@ void cv1k_state::flash_io_w(offs_t offset, u8 data)
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 {
-	m_maincpu->update_access_cycles(0x10c00000 + offset, false);
+	m_maincpu->update_access_cycles(0xB0c00000 + offset, false);
 	switch (offset)
 	{
 		case 0x01:
@@ -356,7 +358,7 @@ u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 
 void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 {
-	m_maincpu->update_access_cycles(0x10c00000 + offset, true);
+	m_maincpu->update_access_cycles(0xB0c00000 + offset, true);
 	switch (offset)
 	{
 		case 0x01:
@@ -376,7 +378,7 @@ void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 // Sound writes are also done to an uncached area so they should take a penalty hit
 void cv1k_state::sound_w(offs_t offset, u8 data)
 {
-	m_maincpu->update_access_cycles(0x10400000 + offset, true);
+	m_maincpu->update_access_cycles(0xB0400000 + offset, true);
 	m_ymz770->write(offset, data);
 }
 
