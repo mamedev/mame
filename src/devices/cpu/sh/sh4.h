@@ -175,77 +175,21 @@ public:
 	void sh4_dma_ddt(struct sh4_ddt_dma *s);
 
 	// DRC C-substitute ops
-	void func_STCRBANK();
 	void func_TRAPA();
 	void func_LDCSR();
 	void func_LDCMSR();
 	void func_RTE();
-	void func_SHAD();
-	void func_SHLD();
 	void func_CHECKIRQ();
-	void func_LDCRBANK();
-	void func_STCMSPC();
-	void func_LDCMSPC();
-	void func_STCMSSR();
-	void func_LDCMSSR();
-	void func_STCMRBANK();
-	void func_LDCMRBANK();
 	void func_PREFM();
-	void func_FADD();
-	void func_FADD_spre();
-	void func_FADD_spost();
-	void func_FSUB();
-	void func_FMUL();
-	void func_FDIV();
-	void func_FCMP_EQ();
-	void func_FCMP_GT();
-	void func_LDSFPSCR();
-	void func_LDCDBR();
-	void func_FMOVMRIFR();
-	void func_FRCHG();
-	void func_FSCHG();
-	void func_LDSMFPUL();
-	void func_LDSMFPSCR();
-	void func_FMOVFRMDR();
-	void func_LDCSSR();
-	void func_STSFPSCR();
-	void func_FLDI0();
-	void func_FLDI1();
-	void func_FMOVFR();
-	void func_FMOVFRS0();
-	void func_FTRC();
-	void func_FMOVMRFR();
-	void func_FMOVS0FR();
-	void func_STSFPUL();
-	void func_FMOVFRMR();
-	void func_LDSFPUL();
-	void func_FLOAT();
-	void func_STSMFPSCR();
-	void func_STSMFPUL();
-	void func_FNEG();
-	void func_FMAC();
-	void func_FABS();
-	void func_FLDS();
-	void func_FTRV();
-	void func_FSTS();
+	void generate_set_fmod(drcuml_block &block);
+	void generate_set_fpscr(drcuml_block &block, compiler_state &compiler);
+	void generate_push(drcuml_block &block, uint32_t reg, const uml::parameter &src);
+	void generate_pop(drcuml_block &block, uint32_t reg, const uml::parameter &dst);
+	void generate_fmov_single(drcuml_block &block, uint32_t reg, bool load);
+	void generate_fmov_pair(drcuml_block &block, uint32_t reg, bool load);
+	void sh4_set_host_rounding();
 	void func_FSSCA();
-	void func_FCNVSD();
-	void func_FIPR();
-	void func_FSRRA();
-	void func_FSQRT();
-	void func_FCNVDS();
-	void func_LDCMDBR();
-	void func_STCMDBR();
-	void func_LDCSPC();
-	void func_STCMSGR();
-	void func_STCDBR();
-	void func_STCSGR();
-	void func_SETS();
-	void func_CLRS();
 	void func_LDTLB();
-	void func_MOVCAL();
-	void func_STCSSR();
-	void func_STCSPC();
 
 protected:
 	class sh4_frontend;
@@ -279,6 +223,7 @@ protected:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
+	uint8_t m_fpmode[4];   // FPSCR.RM -> host rounding mode table
 	uml::parameter m_fs_regmap[16];
 	uml::parameter m_fd_regmap[16];
 
