@@ -343,6 +343,7 @@ void cv1k_state::flash_io_w(offs_t offset, u8 data)
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 {
+	m_maincpu->update_access_cycles(0x10c00000 + offset, false);
 	switch (offset)
 	{
 		case 0x01:
@@ -355,6 +356,7 @@ u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 
 void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 {
+	m_maincpu->update_access_cycles(0x10c00000 + offset, true);
 	switch (offset)
 	{
 		case 0x01:
