@@ -10,8 +10,9 @@
    Copyright (c) 2000      Clark Cooper <coopercc@users.sourceforge.net>
    Copyright (c) 2001-2002 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
    Copyright (c) 2006      Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2017 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -41,6 +42,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h> // NULL
 #include <unistd.h>
 
 #ifndef MAP_FILE
@@ -93,15 +95,14 @@ filemap(const tchar *name,
     close(fd);
     return 1;
   }
-  p = (void *)mmap((void *)0, (size_t)nbytes, PROT_READ, MAP_FILE | MAP_PRIVATE,
-                   fd, (off_t)0);
-  if (p == (void *)-1) {
+  p = mmap(NULL, nbytes, PROT_READ, MAP_FILE | MAP_PRIVATE, fd, (off_t)0);
+  if (p == MAP_FAILED) {
     tperror(name);
     close(fd);
     return 0;
   }
   processor(p, nbytes, name, arg);
-  munmap((void *)p, nbytes);
+  munmap(p, nbytes);
   close(fd);
   return 1;
 }

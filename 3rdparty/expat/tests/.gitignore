@@ -1,0 +1,11 @@
+/*.log
+/*.trs
+/out
+/lib*.dll
+/xmlconf
+/xmltest.log
+Makefile
+runtests
+xmlts.zip
+XML-Test-Suite
+.libs

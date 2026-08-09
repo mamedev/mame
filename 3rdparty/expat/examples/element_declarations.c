@@ -16,6 +16,7 @@
    Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2019      Zhongyuan Zhou <zhouzhongyuan@huawei.com>
    Copyright (c) 2024      Hanno Böck <hanno@gentoo.org>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -82,7 +83,7 @@ stackPopFree(Stack *stackTop) {
   return newStackTop;
 }
 
-static char *
+static const char *
 contentTypeName(enum XML_Content_Type contentType) {
   switch (contentType) {
   case XML_CTYPE_EMPTY:
@@ -102,7 +103,7 @@ contentTypeName(enum XML_Content_Type contentType) {
   }
 }
 
-static char *
+static const char *
 contentQuantName(enum XML_Content_Quant contentQuant) {
   switch (contentQuant) {
   case XML_CQUANT_NONE:

@@ -9,7 +9,7 @@
    Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
    Copyright (c) 2000      Clark Cooper <coopercc@users.sourceforge.net>
    Copyright (c) 2002      Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
-   Copyright (c) 2016-2022 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2017 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2022      Martin Ettl <ettl.martin78@googlemail.com>
    Licensed under the MIT license:
 

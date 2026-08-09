@@ -9,6 +9,7 @@
    Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017-2023 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2022      Sean McBride <sean@rogue-research.com>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -55,8 +56,7 @@ static AllocationEntry *find_allocation(const void *ptr);
 /* Allocate some memory and keep track of it. */
 void *
 tracking_malloc(size_t size) {
-  AllocationEntry *const entry
-      = (AllocationEntry *)malloc(sizeof(AllocationEntry));
+  AllocationEntry *const entry = malloc(sizeof(AllocationEntry));
 
   if (entry == NULL) {
     printf("Allocator failure\n");
@@ -142,7 +142,7 @@ tracking_realloc(void *ptr, size_t size) {
   entry = find_allocation(ptr);
   if (entry == NULL) {
     printf("Attempting to realloc unallocated memory at %p\n", ptr);
-    entry = (AllocationEntry *)malloc(sizeof(AllocationEntry));
+    entry = malloc(sizeof(AllocationEntry));
     if (entry == NULL) {
       printf("Reallocator failure\n");
       return NULL;

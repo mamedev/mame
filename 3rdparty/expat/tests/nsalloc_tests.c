@@ -10,7 +10,7 @@
    Copyright (c) 2003      Greg Stein <gstein@users.sourceforge.net>
    Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
    Copyright (c) 2005-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2026 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Joe Orton <jorton@redhat.com>
    Copyright (c) 2017      José Gutiérrez de la Concha <jose@zeroc.com>
@@ -18,6 +18,7 @@
    Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
    Copyright (c) 2020      Tim Gates <tim.gates@iress.com>
    Copyright (c) 2021      Donghee Na <donghee.na@python.org>
+   Copyright (c) 2026      Christian Ng <christianrng@berkeley.edu>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -83,7 +84,7 @@ START_TEST(test_nsalloc_xmlns) {
   const unsigned int max_alloc_count = 30;
 
   for (i = 0; i < max_alloc_count; i++) {
-    g_allocation_count = i;
+    g_allocation_count = (int)i;
     /* Exercise more code paths with a default handler */
     XML_SetDefaultHandler(g_parser, dummy_default_handler);
     if (_XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE)
@@ -454,10 +455,15 @@ START_TEST(test_nsalloc_realloc_attributes) {
     nsalloc_teardown();
     nsalloc_setup();
   }
+#if XML_GE == 1
+  assert_true(
+      i == 0); // because expat_realloc relies on expat_malloc to some extent
+#else
   if (i == 0)
     fail("Parsing worked despite failing reallocations");
   else if (i == max_realloc_count)
     fail("Parsing failed at max reallocation count");
+#endif
 }
 END_TEST
 
@@ -523,7 +529,7 @@ START_TEST(test_nsalloc_realloc_binding_uri) {
   /* Now repeat with a longer URI and a duff reallocator */
   for (i = 0; i < max_realloc_count; i++) {
     XML_ParserReset(g_parser, NULL);
-    g_reallocation_count = i;
+    g_reallocation_count = (int)i;
     if (_XML_Parse_SINGLE_BYTES(g_parser, second, (int)strlen(second), XML_TRUE)
         != XML_STATUS_ERROR)
       break;
@@ -1500,6 +1506,34 @@ START_TEST(test_nsalloc_prefixed_element) {
 }
 END_TEST
 
+/* Verify that retry after OOM in setContext() does not crash.
+ */
+START_TEST(test_nsalloc_set_context_zombie) {
+  const char *text = "<doc>Hello</doc>";
+  unsigned int i;
+  const unsigned int max_alloc_count = 30;
+
+  for (i = 0; i < max_alloc_count; i++) {
+    g_allocation_count = (int)i;
+    if (XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE)
+        != XML_STATUS_ERROR)
+      break;
+    /* Retry on the same parser — must not crash */
+    g_allocation_count = ALLOC_ALWAYS_SUCCEED;
+    const enum XML_Status status
+        = XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE);
+    (void)status;
+
+    nsalloc_teardown();
+    nsalloc_setup();
+  }
+  if (i == 0)
+    fail("Parsing worked despite failing allocations");
+  else if (i == max_alloc_count)
+    fail("Parsing failed even at maximum allocation count");
+}
+END_TEST
+
 void
 make_nsalloc_test_case(Suite *s) {
   TCase *tc_nsalloc = tcase_create("namespace allocation tests");
@@ -1534,4 +1568,5 @@ make_nsalloc_test_case(Suite *s) {
   tcase_add_test__if_xml_ge(tc_nsalloc, test_nsalloc_long_default_in_ext);
   tcase_add_test(tc_nsalloc, test_nsalloc_long_systemid_in_ext);
   tcase_add_test(tc_nsalloc, test_nsalloc_prefixed_element);
+  tcase_add_test(tc_nsalloc, test_nsalloc_set_context_zombie);
 }

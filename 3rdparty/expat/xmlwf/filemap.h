@@ -10,6 +10,7 @@
    Copyright (c) 2000      Clark Cooper <coopercc@users.sourceforge.net>
    Copyright (c) 2002      Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
    Copyright (c) 2016-2017 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -36,7 +37,7 @@
 #include <stddef.h>
 
 /* The following limit (for XML_Parse's int len) derives from
- * this loop in xmparse.c:
+ * this loop in xmlparse.c:
  *
  *    do {
  *      bufferSize = (int) (2U * (unsigned) bufferSize);

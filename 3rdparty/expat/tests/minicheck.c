@@ -16,6 +16,7 @@
    Copyright (c) 2018      Marco Maggi <marco.maggi-ipsu@poste.it>
    Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
    Copyright (c) 2023-2024 Sony Corporation / Snild Dolkow <snild@sony.com>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -54,7 +55,7 @@
 
 Suite *
 suite_create(const char *name) {
-  Suite *suite = (Suite *)calloc(1, sizeof(Suite));
+  Suite *suite = calloc(1, sizeof(Suite));
   if (suite != NULL) {
     suite->name = name;
   }
@@ -63,7 +64,7 @@ suite_create(const char *name) {
 
 TCase *
 tcase_create(const char *name) {
-  TCase *tc = (TCase *)calloc(1, sizeof(TCase));
+  TCase *tc = calloc(1, sizeof(TCase));
   if (tc != NULL) {
     tc->name = name;
   }
@@ -94,8 +95,7 @@ tcase_add_test(TCase *tc, tcase_test_function test) {
   if (tc->allocated == tc->ntests) {
     int nalloc = tc->allocated + 100;
     size_t new_size = sizeof(tcase_test_function) * nalloc;
-    tcase_test_function *const new_tests
-        = (tcase_test_function *)realloc(tc->tests, new_size);
+    tcase_test_function *const new_tests = realloc(tc->tests, new_size);
     assert(new_tests != NULL);
     tc->tests = new_tests;
     tc->allocated = nalloc;
@@ -130,7 +130,7 @@ suite_free(Suite *suite) {
 
 SRunner *
 srunner_create(Suite *suite) {
-  SRunner *const runner = (SRunner *)calloc(1, sizeof(SRunner));
+  SRunner *const runner = calloc(1, sizeof(SRunner));
   if (runner != NULL) {
     runner->suite = suite;
   }

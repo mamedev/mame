@@ -31,12 +31,12 @@ project "expat"
 		"PACKAGE=\"expat\"",
 		"PACKAGE_BUGREPORT=\"https://github.com/libexpat/libexpat/issues\"",
 		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat-2.7.1\"",
+		"PACKAGE_STRING=\"expat-2.8.2\"",
 		"PACKAGE_TARNAME=\"expat\"",
 		"PACKAGE_URL=\"\"",
-		"PACKAGE_VERSION=\"2.7.1\"",
+		"PACKAGE_VERSION=\"2.8.2\"",
 		"STDC_HEADERS",
-		"VERSION=\"2.7.1\"",
+		"VERSION=\"2.8.2\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
 		"XML_GE=1",
@@ -103,12 +103,14 @@ if _OPTIONS["targetos"]=="windows" then
 		buildoptions_c {
 			"-Wno-error=format", -- GCC with UCRT produces warnings for the non-standard I64 size modifier
 			"-Wno-error=format-extra-args",
+			"-Wno-error=implicit-function-declaration",
 		}
 end
 
 	configuration { }
 
 	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random_buf.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmlparse.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",

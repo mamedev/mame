@@ -10,32 +10,466 @@
 !!                 ~~~~~~~~~~~~                                              !!
 !! The following topics need *additional skilled C developers* to progress   !!
 !! in a timely manner or at all (loosely ordered by descending priority):    !!
+!!                            _______________________                        !!
+!! - teaming up on fixing the UNFIXED SECURITY ISSUES listed at:             !!
+!!                            """""""""""""""""""""""                        !!
+!!   https://github.com/libexpat/libexpat/issues/1160                        !!
 !!                                                                           !!
 !! - teaming up on researching and fixing future security reports and        !!
 !!   ClusterFuzz findings with few-days-max response times in communication  !!
 !!   in order to (1) have a sound fix ready before the end of a 90 days      !!
 !!   grace period and (2) in a sustainable manner,                           !!
-!! - helping CPython Expat bindings with supporting Expat's billion laughs   !!
-!!   attack protection API (https://github.com/python/cpython/issues/90949): !!
-!!   - XML_SetBillionLaughsAttackProtectionActivationThreshold               !!
-!!   - XML_SetBillionLaughsAttackProtectionMaximumAmplification              !!
-!! - helping Perl's XML::Parser Expat bindings with supporting Expat's       !!
-!!   security API (https://github.com/cpan-authors/XML-Parser/issues/102):   !!
-!!   - XML_SetBillionLaughsAttackProtectionActivationThreshold               !!
-!!   - XML_SetBillionLaughsAttackProtectionMaximumAmplification              !!
-!!   - XML_SetReparseDeferralEnabled                                         !!
+!!                                                                           !!
 !! - implementing and auto-testing XML 1.0r5 support                         !!
 !!   (needs discussion before pull requests),                                !!
-!! - smart ideas on fixing the Autotools CMake files generation issue        !!
-!!   without breaking CI (needs discussion before pull requests),            !!
-!! - pushing migration from `int` to `size_t` further                        !!
-!!   including edge-cases test coverage (needs discussion before anything).  !!
 !!                                                                           !!
 !! For details, please reach out via e-mail to sebastian@pipping.org so we   !!
 !! can schedule a voice call on the topic, in English or German.             !!
 !!                                                                           !!
-!! THANK YOU!                        Sebastian Pipping -- Berlin, 2024-03-09 !!
+!! THANK YOU!                        Sebastian Pipping -- Berlin, 2026-03-17 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Release 2.8.2 Thu June 25 2026
+        Security fixes:
+           #1246  CVE-2026-50219 -- Disallow calls to functions
+                    `XML_GetBuffer`, `XML_Parse`, `XML_ParseBuffer`,
+                    `XML_ParserFree`, `XML_ParserReset` to guard e.g.
+                    Expat bindings from memory corruption;
+                    this CPython issue is related:
+                    https://github.com/python/cpython/issues/146169
+           #1267  CVE-2026-56131 -- Protect XML_ResumeParser from being called
+                                    from a handler, plugging a hole in the fix
+                                    to CVE-2026-50219
+           #1272  CVE-2026-56132 -- Fix out-of-bound scaffolding index store
+                                    in `doProlog`
+     #1229 #1232  CVE-2026-56403 -- Integer overflow in `storeAtts`
+           #1249  CVE-2026-56404 -- Integer overflow in `addBinding`
+           #1251  CVE-2026-56405 -- Integer overflow in `getAttributeId`
+           #1255  CVE-2026-56406 -- Integer overflow in `XML_ParseBuffer`
+           #1262  CVE-2026-56407 -- Integer overflow in `textLen` handling
+            #565  CVE-2026-56408 -- Integer overflow in `copyString`
+                    (commit 16e2efd867ea8567ffa012210b52ef5918e20817)
+           #1259  CVE-2026-56409 -- xmlwf: Integer overflow in output path join
+           #1252  CVE-2026-56410 -- xmlwf: Integer overflow in
+                    `resolveSystemId`
+           #1263  CVE-2026-56411 -- xmlwf: Integer overflow in notation list
+                    allocation
+           #1278  CVE-2026-56412 -- Guard XML_TOK_DATA_CHARS handler calls in
+                    `doCdataSection`, plugging a hole in the fix to
+                    CVE-2026-50219
+
+        Bug fixes:
+           #1260  xmlwf: Escape names and base URI in meta output
+           #1266  xmlwf: Pick a safe quote for notation system and public IDs
+
+        Other changes:
+           #1257  CMake|Autotools: Stop using /dev/urandom by default
+     #1244 #1254  CMake: Fix guard for Unix sources of entropy
+     #1183 #1270  CMake|Windows: Add missing export for symbol
+                                 `XML_SetHashSalt16Bytes`
+           #1236  CMake: Mark option EXPAT_OSSFUZZ_BUILD as advanced
+           #1283  Limit output indentation for EXPAT_ENTITY_DEBUG=1 and
+                    allow unlimited indentation via EXPAT_ENTITY_DEBUG=2
+            #565  Replace some loops by use of `memcpy`, `strlen`, `wcslen`
+           #1220  lib: Use a size_t for group sizes
+           #1221  lib: Fix too-conservative integer overflow check when
+                       appending raw name
+           #1222  lib: Simplify attribute allocation/management logic
+           #1224  Update fallthrough annotations to satisfy Clang and GCC
+           #1226  lib: Remove unnecessary void * casts in random code
+           #1228  lib: Reduce scope of locals in storeAtts
+           #1230  lib: Count attributes with size_t variables
+           #1238  Minor get-buffer improvements
+     #1239 #1240  lib|tests: Include header expat_config.h first
+           #1241  lib: Shrink size of XML_GetBuffer
+           #1242  lib: Remove a legacy comment
+           #1243  lib: XML_ParserReset: Extract repeated linked-list move logic
+           #1243  lib: Unify entity free lists
+           #1247  lib: Fix use of '0' as boolean literal
+           #1248  lib: Make XML_Index overflow check more intuitive
+           #1256  lib: Use size_t for counting string/URI lengths
+           #1258  lib: XML_GetInputContext: Remove use of 0 for NULL
+           #1261  Comment typo fixes
+           #1275  Teach Memory Sanitizer semantics of randomization functions
+     #1276 #1281  Version info bumped from 13:1:12 (libexpat*.so.1.12.1)
+                    to 13:2:12 (libexpat*.so.1.12.2); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+           #1231  perl-integration.yml: Bump to XML::Parser 2.59
+           #1237  emscripten.yml: Bump from Ubuntu 22.04 to 24.04
+     #1183 #1271  windows-build.yml: Cover completeness of file
+                                     libexpat.def.cmake
+           #1274  linux.yml: Make llvm-symbolizer available in CI
+
+        Special thanks to:
+            Alessandro Gario
+            Asher Darden
+            Christoph Reiter
+            Haris Hussain
+            Matthew Fernandez
+            Kartik Kenchi
+            Nick Begg
+            Sajin S
+            Yousef Shanableh
+                 and
+            Anthropic
+            Astra Security
+            Trail of Bits
+
+Release 2.8.1 Sun May 10 2026
+        Security fixes:
+           #1216  CVE-2026-45186 -- Fix quadratic runtime from attribute name
+                    collision checks that allowed denial of service attacks
+                    through moderately sized crafted XML input (CWE-407).
+                    Please note that a layer of compression around XML can
+                    significantly reduce the minimum attack payload size.
+
+        Other changes:
+     #1209 #1213  Drop more casts related to `void *` that C99 does not need
+           #1213  xmlwf: Streamline use of `mmap`
+     #1214 #1217  Version info bumped from 13:0:12 (libexpat*.so.1.12.0)
+                    to 13:1:12 (libexpat*.so.1.12.1); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+           #1210  CI: Cover compilation with Visual Studio 18 2026 on Windows
+           #1215  CI: Cover compilation for ARM64 on Windows
+           #1212  CI: Bump WASI SDK from 32 to 33
+
+        Special thanks to:
+            Berkay Eren Ürün
+            Matthew Fernandez
+            Nick Wellnhofer
+            Tania Somanna
+
+Release 2.8.0 Fri April 24 2026
+        Security fixes:
+       #47 #1183  CVE-2026-41080 -- The existing hash flooding protection
+                    (based on SipHash) only used 4 to 8 bytes of entropy for
+                    a salt, when 16 bytes of salt are supported by the
+                    implementation of SipHash used by Expat. Now full 16 bytes
+                    of entropy are used to improve protection against hash
+                    flooding attacks.
+                      Existing API function XML_SetHashSalt is now deprecated
+                    because of its limitations, and its use should be
+                    considered a vulnerability. Please either use the new API
+                    function XML_SetHashSalt16Bytes (with known-high-quality
+                    entropy input only!) instead, or leave the derivation of
+                    a 16-bytes hash salt from high quality entropy to Expat's
+                    internal machinery (by *not* calling either of the two
+                    XML_SetHashSalt* functions).
+
+        Bug fixes:
+           #1188  Avoid propagating /dev/urandom file descriptor to child
+                    processes
+           #1193  Fix interpretation of `errno` after randomization calls
+           #1195  Avoid assuming uint8_t is a character type
+
+        Other changes:
+     #1180 #1199  Add support for `getentropy(3)` as a source of entropy;
+                    this helps with protecting against hash flooding attacks,
+                    in particular with WASI SDK (where none of the other
+                    entropy sources supported by libexpat are available).
+           #1200  Autotools: Add `--without-arc4random` and
+                    `--without-arc4random-buf`
+           #1200  Autotools: Make `./configure` output report on available
+                    high quality entropy sources
+           #1173  Autotools|macOS: Sync CMake templates with CMake 4.3.0
+           #1201  Autotools|CMake: Improve checks for `arc4random` and
+                    `arc4random_buf` e.g. with modern glibc
+           #1201  CMake: Report on availability of functions `arc4random` and
+                    `arc4random_buf`
+           #1201  CMake: Mark entropy related build switches as advanced
+        #1189 ..
+     #1203 #1204  Extract new files from entropy extraction code
+           #1194  Stop duplicating C tests 1:1 as C++ ("runtests_cxx")
+           #1202  Fix a comment typo in expat_external.h
+           #1187  Fix grammar in compile error message
+           #1192  examples: Build warning-free with -Wwrite-strings
+           #1171  tests: Address harmless warning from Coverity
+     #1170 #1176  Sync file headers
+     #1190 #1206  Version info bumped from 12:3:11 (libexpat*.so.1.11.3)
+                    to 13:0:12 (libexpat*.so.1.12.0); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+  #1166 #1167 ..
+  #1172 #1175 ..
+  #1178 #1179 ..
+     #1185 #1205  CI: Make Perl XML::Parser integration tests run against
+                    both version 2.47 and the latest release 2.58
+           #1169  CI: Adapt to breaking changes regarding Inno Setup
+           #1173  CI: Adapt to breaking changes regarding CMake
+           #1174  CI: Include public corpus of fuzzer `xml_lpm_fuzzer` with
+                    regression testing
+     #1181 #1182  CI: Bump WASI SDK from 30 to 32
+
+        Special thanks to:
+            Jérôme Duval
+            Matthew Fernandez
+
+Release 2.7.5 Tue March 17 2026
+        Security fixes:
+           #1158  CVE-2026-32776 -- Fix NULL function pointer dereference for
+                    empty external parameter entities; it takes use of both
+                    functions XML_ExternalEntityParserCreate and
+                    XML_SetParamEntityParsing for an application to be
+                    vulnerable.
+     #1161 #1162  CVE-2026-32777 -- Protect from XML_TOK_INSTANCE_START
+                    infinite loop in function entityValueProcessor; it takes
+                    use of both functions XML_ExternalEntityParserCreate and
+                    XML_SetParamEntityParsing for an application to be
+                    vulnerable.
+           #1163  CVE-2026-32778 -- Fix NULL dereference in function setContext
+                    on retry after an earlier ouf-of-memory condition; it takes
+                    use of function XML_ParserCreateNS or XML_ParserCreate_MM
+                    for an application to be vulnerable.
+           #1160  Three more unfixed vulnerabilities left
+
+        Other changes:
+     #1146 #1147  Autotools: Fix condition for symbol versioning check, in
+                    particular when compiling with slibtool (not libtool)
+           #1156  Address Cppcheck >=2.20.0 warnings
+           #1153  tests: Make test_buffer_can_grow_to_max work for MinGW on
+                    Ubuntu 24.04
+     #1157 #1159  Version info bumped from 12:2:11 (libexpat*.so.1.11.2)
+                    to 12:3:11 (libexpat*.so.1.11.3); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+           #1148  CI: Fix FreeBSD and Solaris CI
+           #1149  CI: Bump to WASI SDK 30
+           #1153  CI: Adapt to breaking changes with Ubuntu 22.04
+           #1156  CI: Adapt to breaking changes in Cppcheck
+
+        Special thanks to:
+            Berkay Eren Ürün
+            Christian Ng
+            Fabio Scaccabarozzi
+            Francesco Bertolaccini
+            Mark Brand
+            Rhodri James
+                 and
+            AddressSanitizer
+            Buttercup
+            OSS-Fuzz / ClusterFuzz
+            Trail of Bits
+
+Release 2.7.4 Sat January 31 2026
+        Security fixes:
+           #1131  CVE-2026-24515 -- Function XML_ExternalEntityParserCreate
+                    failed to copy the encoding handler data passed to
+                    XML_SetUnknownEncodingHandler from the parent to the new
+                    subparser. This can cause a NULL dereference (CWE-476) from
+                    external entities that declare use of an unknown encoding.
+                    The expected impact is denial of service. It takes use of
+                    both functions XML_ExternalEntityParserCreate and
+                    XML_SetUnknownEncodingHandler for an application to be
+                    vulnerable.
+           #1075  CVE-2026-25210 -- Add missing check for integer overflow
+                    related to buffer size determination in function doContent
+
+        Bug fixes:
+           #1073  lib: Fix missing undoing of group size expansion in doProlog
+                    failure cases
+           #1107  xmlwf: Fix a memory leak
+           #1104  WASI: Fix format specifiers for 32bit WASI SDK
+
+        Other changes:
+           #1105  lib: Fix strict aliasing
+           #1106  lib: Leverage feature "flexible array member" of C99
+           #1051  lib: Swap (size_t)(-1) for C99 equivalent SIZE_MAX
+           #1109  lib|xmlwf: Return NULL instead of 0 for pointers
+           #1068  lib|Windows: Clean up use of macro _MSC_EXTENSIONS with MSVC
+           #1112  lib: Remove unused import
+           #1110  xmlwf: Warn about XXE in --help output (and man page)
+     #1102 #1103  WASI: Stop using getpid
+     #1113 #1130  Autotools: Drop file expat.m4 that provided obsolete Autoconf
+                    macro AM_WITH_EXPAT
+           #1123  Autotools: Limit -Wno-pedantic-ms-format to MinGW
+  #1129 #1134 ..
+           #1087  Autotools|macOS: Sync CMake templates with CMake 4.0
+     #1139 #1140  Autotools|CMake: Introduce off-by-default symbol versioning
+                    The related build system flags are:
+                    - For Autotools, configure with --enable-symbol-versioning
+                    - For CMake, configure with -DEXPAT_SYMBOL_VERSIONING=ON
+                    Please double-check for consequences before activating
+                    this inside distro packaging. Bug reports welcome!
+           #1117  Autotools|CMake: Remove libbsd support
+           #1105  Autotools|CMake: Stop using -fno-strict-aliasing, and use
+                    -Wstrict-aliasing=3 instead
+           #1124  Autotools|CMake: Prefer command gsed (GNU sed) over sed
+                    (e.g. for Solaris) inside fix-xmltest-log.sh
+           #1067  CMake: Detect and warn about unusable check_c_compiler_flag
+           #1137  CMake: Drop support for CMake <3.17
+           #1138  CMake|Windows: Fix libexpat.def.cmake version comments
+
+     #1086 #1110  docs: Add warning about external reference handlers and XXE
+           #1066  docs: Be explicit that parent parsers need to outlive
+                    subparsers
+        #1089 ..
+  #1090 #1091 ..
+  #1092 #1093 ..
+  #1094 #1098 ..
+     #1115 #1116  docs: Misc non-content improvements to doc/reference.html
+     #1132 #1133  Version info bumped from 12:1:11 (libexpat*.so.1.11.1)
+                    to 12:2:11 (libexpat*.so.1.11.2); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+     #1119 #1121  Document guidelines for contributing to Expat
+           #1120  Introduce a pull request template
+           #1074  CI: Stop using about-to-be-removed image "macos-13"
+     #1083 #1088  CI: Mitigate random Wine crashes
+           #1104  CI: Cover compilation with WASI SDK
+           #1116  CI: Enforce clean doc XML formatting
+        #1124 ..
+     #1135 #1136  CI: Cover Solaris 11.4
+           #1125  CI: Extend CI coverage of FreeBSD
+     #1139 #1140  CI: Cover symbol versioning
+           #1114  xmlwf: Reformat helpgen code (using Black 25.12.0)
+           #1071  .gitignore: Add files CPackConfig.cmake and
+                    CPackSourceConfig.cmake
+
+        Special thanks to:
+            Alfonso Gregory
+            Bénédikt Tran
+            Gordon Messmer
+            Hanno Böck
+            Jakub Kulík
+            Matthew Fernandez
+            Neil Pang
+            Rosen Penev
+                 and
+            Artiphishell Inc.
+
+Release 2.7.3 Wed September 24 2025
+        Security fixes:
+     #1046 #1048  Fix alignment of internal allocations for some non-amd64
+                    architectures (e.g. sparc32); fixes up on the fix to
+                    CVE-2025-59375 from #1034 (of Expat 2.7.2 and related
+                    backports)
+           #1059  Fix a class of false positives where input should have been
+                    rejected with error XML_ERROR_ASYNC_ENTITY; regression from
+                    CVE-2024-8176 fix pull request #973 (of Expat 2.7.0 and
+                    related backports). Please check the added unit tests for
+                    example documents.
+
+        Other changes:
+           #1043  Prove and regression-proof absence of integer overflow
+                    from function expat_realloc
+           #1062  Remove "harmless" cast that truncated a size_t to unsigned
+           #1049  Autotools: Remove "ln -s" discovery
+           #1054  docs: Be consistent with use of floating point around
+                    XML_SetAllocTrackerMaximumAmplification
+           #1056  docs: Make it explicit that XML_GetCurrentColumnNumber
+                    starts at 0
+           #1057  docs: Better integrate the effect of the activation
+                    thresholds
+           #1058  docs: Fix an in-comment typo in expat.h
+           #1045  docs: Fix a typo in README.md
+           #1041  docs: Improve change log of release 2.7.2
+           #1053  xmlwf: Resolve use of functions XML_GetErrorLineNumber
+                    and XML_GetErrorColumnNumber
+           #1032  Windows: Normalize .bat files to CRLF line endings
+     #1060 #1061  Version info bumped from 12:0:11 (libexpat*.so.1.11.0)
+                    to 12:1:11 (libexpat*.so.1.11.1); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+     #1047 #1050  CI: Cleanup UndefinedBehaviorSanitizer fatality
+           #1044  CI|Linux: Stop aborting at first job failure
+           #1052  CI|FreeBSD: Upgrade to FreeBSD 15.0
+           #1039  CI|FreeBSD: Do not install CMake meta-package
+
+        Special thanks to:
+            Bénédikt Tran
+            Berkay Eren Ürün
+            Daniel Engberg
+            Hanno Böck
+            Matthew Fernandez
+            Rolf Eike Beer
+            Sam James
+            Tim Bray
+                 and
+            Clang/GCC UndefinedBehaviorSanitizer
+            OSS-Fuzz / ClusterFuzz
+            Z3 Theorem Prover
+
+Release 2.7.2 Tue September 16 2025
+        Security fixes:
+     #1018 #1034  CVE-2025-59375 -- Disallow use of disproportional amounts of
+                    dynamic memory from within an Expat parser (e.g. previously
+                    a ~250 KiB sized document was able to cause allocation of
+                    ~800 MiB from the heap, i.e. an "amplification" of factor
+                    ~3,300); once a threshold (that defaults to 64 MiB) is
+                    reached, a maximum amplification factor (that defaults to
+                    100.0) is enforced, and violating documents are rejected
+                    with an out-of-memory error.
+                    There are two new API functions to fine-tune this new
+                    behavior:
+                      - XML_SetAllocTrackerActivationThreshold
+                      - XML_SetAllocTrackerMaximumAmplification .
+                    If you ever need to increase these defaults for non-attack
+                    XML payload, please file a bug report with libexpat.
+                      There is also a new environment variable
+                    EXPAT_MALLOC_DEBUG=(0|1|2) to control the verbosity
+                    of allocations debugging at runtime, disabled by default.
+                      Known impact is (reliable and easy) denial of service:
+                    CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:H/RL:O/RC:C
+                    (Base Score: 7.5, Temporal Score: 7.2)
+                    Please note that a layer of compression around XML can
+                    significantly reduce the minimum attack payload size.
+                      Distributors intending to backport (or cherry-pick) the
+                    fix need to copy 99% of the related pull request, not just
+                    the "lib: Implement tracking of dynamic memory allocations"
+                    commit, to not end up with a state that literally does both
+                    too much and too little at the same time. Appending ".diff"
+                    to the pull request URL could be of help.
+
+        Other changes:
+     #1008 #1017  Autotools|macOS: Sync CMake templates with CMake 3.31
+           #1007  CMake: Drop support for CMake <3.15
+           #1004  CMake: Fix off_t detection for -Werror
+           #1007  CMake|Windows: Fix -DEXPAT_MSVC_STATIC_CRT=ON
+           #1013  Windows: Drop support for Visual Studio <=16.0/2019
+           #1026  xmlwf: Mention supported environment variables in
+                    --help output
+           #1024  xmlwf: Fix (internal) help generator
+           #1034  docs: Promote the contract to call function
+                    XML_FreeContentModel when registering a custom
+                    element declaration handler (via a call to function
+                    XML_SetElementDeclHandler)
+           #1027  docs: Add missing <p>..</p> wrap
+            #994  docs: Drop AppVeyor badge
+           #1000  tests: Fix portable_strndup
+           #1036  Drop casts around malloc/free/realloc that C99 does not need
+           #1010  Replace empty for loops with while loops
+           #1011  Add const with internal XmlInitUnknownEncodingNS
+       #14 #1037  Drop an OpenVMS support leftover
+      #999 #1001  Address more clang-tidy warnings
+     #1030 #1038  Version info bumped from 11:2:10 (libexpat*.so.1.10.2)
+                    to 12:0:11 (libexpat*.so.1.11.0); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+           #1003  CI: Cover compilation on FreeBSD
+     #1009 #1035  CI: Upgrade Clang from 19 to 21
+           #1031  CI: Make calling Cppcheck without --suppress=objectIndex
+                    and --suppress=unknownMacro possible
+           #1013  CI|Windows: Get off of deprecated image "windows-2019"
+  #1008 #1017 ..
+     #1023 #1025  CI: Adapt to breaking changes in GitHub Actions
+
+        Special thanks to:
+            Alexander Bluhm
+            Neil Pang
+            Theo Buehler
+                 and
+            GNU Time
+            OSS-Fuzz / ClusterFuzz
+            Perl XML::Parser
 
 Release 2.7.1 Thu March 27 2025
         Bug fixes:
@@ -54,7 +488,7 @@ Release 2.7.1 Thu March 27 2025
        #983 #984  Fix printf format specifiers for 32bit Emscripten
             #992  docs: Promote OpenSSF Best Practices self-certification
             #978  tests/benchmark: Resolve mistaken double close
-            #986  Address compiler warnings
+            #986  Address Frama-C warnings
        #990 #993  Version info bumped from 11:1:10 (libexpat*.so.1.10.1)
                     to 11:2:10 (libexpat*.so.1.10.2); see https://verbump.de/
                     for what these numbers do
@@ -1474,7 +1908,7 @@ Release 2.1.0 Sat March 24 2012
         - Bug Fixes:
           #1742315: Harmful XML_ParserCreateNS suggestion.
           #1785430: Expat build fails on linux-amd64 with gcc version>=4.1 -O3.
-          #1983953, 2517952, 2517962, 2649838: 
+          #1983953, 2517952, 2517962, 2649838:
                 Build modifications using autoreconf instead of buildconf.sh.
           #2815947, #2884086: OBJEXT and EXEEXT support while building.
           #2517938: xmlwf should return non-zero exit status if not well-formed.
@@ -1500,7 +1934,7 @@ Release 2.1.0 Sat March 24 2012
                 See bug #2990652 and patch #3312568.
           Added run-benchmark target to Makefile.in - relies on testdata module
                 present in the same relative location as in the repository.
-          
+
 Release 2.0.1 Tue June 5 2007
         - Fixed bugs #1515266, #1515600: The character data handler's calling
           of XML_StopParser() was not handled properly; if the parser was

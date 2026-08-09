@@ -10,7 +10,7 @@
    Copyright (c) 2003      Greg Stein <gstein@users.sourceforge.net>
    Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
    Copyright (c) 2005-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2024 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2026 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Joe Orton <jorton@redhat.com>
    Copyright (c) 2017      José Gutiérrez de la Concha <jose@zeroc.com>
@@ -19,6 +19,8 @@
    Copyright (c) 2020      Tim Gates <tim.gates@iress.com>
    Copyright (c) 2021      Donghee Na <donghee.na@python.org>
    Copyright (c) 2023      Sony Corporation / Snild Dolkow <snild@sony.com>
+   Copyright (c) 2026      Berkay Eren Ürün <berkay.ueruen@siemens.com>
+   Copyright (c) 2026      Kartik Kenchi <netliomax25@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -88,6 +90,7 @@ typedef struct attrInfo {
 typedef struct elementInfo {
   const XML_Char *name;
   int attr_count;
+  int default_attr_count;
   const XML_Char *id_name;
   AttrInfo *attributes;
 } ElementInfo;
@@ -158,6 +161,9 @@ extern int XMLCALL MiscEncodingHandler(void *data, const XML_Char *encoding,
 extern int XMLCALL long_encoding_handler(void *userData,
                                          const XML_Char *encoding,
                                          XML_Encoding *info);
+
+extern int XMLCALL user_data_checking_unknown_encoding_handler(
+    void *userData, const XML_Char *encoding, XML_Encoding *info);
 
 /* External Entity Handlers */
 
@@ -607,6 +613,19 @@ typedef struct {
 
 extern void XMLCALL
 accumulate_and_suspend_comment_handler(void *userData, const XML_Char *data);
+
+extern void XMLCALL forbidden_calls_character_handler(void *userData,
+                                                      const XML_Char *s,
+                                                      int len);
+
+typedef struct {
+  XML_Parser parser;
+  int callCount;
+} ResumeFromHandlerData;
+
+extern void XMLCALL suspend_then_resume_character_handler(void *userData,
+                                                          const XML_Char *s,
+                                                          int len);
 
 #endif /* XML_HANDLERS_H */
 

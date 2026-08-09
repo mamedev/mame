@@ -1,5 +1,4 @@
 [![Run Linux CI tasks](https://github.com/libexpat/libexpat/actions/workflows/linux.yml/badge.svg)](https://github.com/libexpat/libexpat/actions/workflows/linux.yml)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/libexpat/libexpat?svg=true)](https://ci.appveyor.com/project/libexpat/libexpat)
 [![Packaging status](https://repology.org/badge/tiny-repos/expat.svg)](https://repology.org/metapackage/expat/versions)
 [![Downloads SourceForge](https://img.shields.io/sourceforge/dt/expat?label=Downloads%20SourceForge)](https://sourceforge.net/projects/expat/files/)
 [![Downloads GitHub](https://img.shields.io/github/downloads/libexpat/libexpat/total?label=Downloads%20GitHub)](https://github.com/libexpat/libexpat/releases)
@@ -12,7 +11,7 @@
 > at the top of the `Changes` file.
 
 
-# Expat, Release 2.7.1
+# Expat, Release 2.8.2
 
 This is Expat, a C99 library for parsing
 [XML 1.0 Fourth Edition](https://www.w3.org/TR/2006/REC-xml-20060816/), started by
@@ -27,7 +26,8 @@ Expat supports the following C99 compilers:
 
 - GNU GCC >=4.5 (for use from C) or GNU GCC >=4.8.1 (for use from C++)
 - LLVM Clang >=3.5
-- Microsoft Visual Studio >=16.0/2019 (rolling `${today} minus 5 years`)
+- Microsoft Visual Studio >=17.0/2022
+  (the oldest version supported by the [official GitHub Actions Windows images](https://github.com/actions/runner-images))
 
 Windows users can use the
 [`expat-win32bin-*.*.*.{exe,zip}` download](https://github.com/libexpat/libexpat/releases),
@@ -120,7 +120,7 @@ project(hello VERSION 1.0.0)
 FetchContent_Declare(
     expat
     GIT_REPOSITORY https://github.com/libexpat/libexpat/
-    GIT_TAG        000000000_GIT_COMMIT_SHA1_HERE_000000000  # i.e. Git tag R_0_Y_Z
+    GIT_TAG        000000000_GIT_COMMIT_SHA1_HERE_000000000  # i.e. Git tag R_X_Y_Z
     SOURCE_SUBDIR  expat/
 )
 
@@ -234,11 +234,6 @@ overrides the in-makefile set `DESTDIR`, because variable-setting priority is
 Note: This only applies to the Expat library itself, building UTF-16 versions
 of xmlwf and the tests is currently not supported.
 
-When using Expat with a project using autoconf for configuration, you
-can use the probing macro in `conftools/expat.m4` to determine how to
-include Expat.  See the comments at the top of that file for more
-information.
-
 A reference manual is available in the file `doc/reference.html` in this
 distribution.
 
@@ -291,21 +286,12 @@ EXPAT_ENABLE_INSTALL:BOOL=ON
 // Use /MT flag (static CRT) when compiling in MSVC
 EXPAT_MSVC_STATIC_CRT:BOOL=OFF
 
-// Build fuzzers via OSS-Fuzz for the expat library
-EXPAT_OSSFUZZ_BUILD:BOOL=OFF
-
 // Build a shared expat library
 EXPAT_SHARED_LIBS:BOOL=ON
 
+// Define to provide symbol versioning for dependency generation
+EXPAT_SYMBOL_VERSIONING:BOOL=OFF
+
 // Treat all compiler warnings as errors
 EXPAT_WARNINGS_AS_ERRORS:BOOL=OFF
-
-// Make use of getrandom function (ON|OFF|AUTO) [default=AUTO]
-EXPAT_WITH_GETRANDOM:STRING=AUTO
-
-// Utilize libbsd (for arc4random_buf)
-EXPAT_WITH_LIBBSD:BOOL=OFF
-
-// Make use of syscall SYS_getrandom (ON|OFF|AUTO) [default=AUTO]
-EXPAT_WITH_SYS_GETRANDOM:STRING=AUTO
 ```

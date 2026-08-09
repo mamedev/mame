@@ -7,7 +7,7 @@
 #
 # Copyright (c) 2010      Patrick Spendrin <ps_ml@gmx.de>
 # Copyright (c) 2012      Karl Waclawek <karl@waclawek.net>
-# Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2016-2026 Sebastian Pipping <sebastian@pipping.org>
 # Copyright (c) 2016      Sergei Nikulov <sergey.nikulov@gmail.com>
 # Copyright (c) 2016      Björn Lindahl <bjorn.lindahl@foi.se>
 # Copyright (c) 2016      Tobias Taschner <github@tc84.de>
@@ -32,14 +32,18 @@
 # Copyright (c) 2022      Johnny Jazeix <jazeix@gmail.com>
 # Copyright (c) 2022      Mark Brand <markbrand@google.com>
 # Copyright (c) 2022      David Faure <david.faure@kdab.com>
+# Copyright (c) 2025      Alfonso Gregory <gfunni234@gmail.com>
+# Copyright (c) 2026      Rosen Penev <rosenp@gmail.com>
+# Copyright (c) 2026      Gordon Messmer <gordon.messmer@gmail.com>
+# Copyright (c) 2026      Nick Begg <nick@stunttruck.net>
 # Unlike most of Expat,
 # this file is copyrighted under the BSD-license for buildsystem files of KDE.
 
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.17.0)
 
 project(expat
     VERSION
-        2.7.1
+        2.8.2
     LANGUAGES
         C
 )
@@ -118,9 +122,8 @@ macro(expat_shy_set var default cache type desc)
 
     if(DEFINED ${var})
         # NOTE: The idea is to (ideally) only add to the cache if
-        #       there is no cache entry, yet.  "if(DEFINED CACHE{var})"
-        #       requires CMake >=3.14.
-        if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.14" AND NOT DEFINED "CACHE{${var}}")
+        #       there is no cache entry, yet.
+        if(NOT DEFINED "CACHE{${var}}")
             set("${var}" "${${var}}" CACHE "${type}" "${desc}")
         endif()
     else()
@@ -136,12 +139,11 @@ expat_shy_set(EXPAT_BUILD_DOCS ${_EXPAT_BUILD_DOCS_DEFAULT} CACHE BOOL "Build ma
 expat_shy_set(EXPAT_BUILD_FUZZERS OFF CACHE BOOL "Build fuzzers for the expat library")
 expat_shy_set(EXPAT_BUILD_PKGCONFIG ${_EXPAT_BUILD_PKGCONFIG_DEFAULT} CACHE BOOL "Build pkg-config file")
 expat_shy_set(EXPAT_OSSFUZZ_BUILD OFF CACHE BOOL "Build fuzzers via OSS-Fuzz for the expat library")
-if(UNIX OR _EXPAT_HELP)
-    expat_shy_set(EXPAT_WITH_LIBBSD OFF CACHE BOOL "Utilize libbsd (for arc4random_buf)")
-endif()
+mark_as_advanced(EXPAT_OSSFUZZ_BUILD)
 expat_shy_set(EXPAT_ENABLE_INSTALL ON CACHE BOOL "Install expat files in cmake install target")
 expat_shy_set(EXPAT_CONTEXT_BYTES 1024 CACHE STRING "Define to specify how much context to retain around the current parse point, 0 to disable")
 mark_as_advanced(EXPAT_CONTEXT_BYTES)
+expat_shy_set(EXPAT_SYMBOL_VERSIONING OFF CACHE BOOL "Define to provide symbol versioning for dependency generation")
 expat_shy_set(EXPAT_DTD ON CACHE BOOL "Define to make parameter entity parsing functionality available")
 mark_as_advanced(EXPAT_DTD)
 expat_shy_set(EXPAT_GE ON CACHE BOOL "Define to make general entity parsing functionality available")
@@ -150,10 +152,22 @@ expat_shy_set(EXPAT_NS ON CACHE BOOL "Define to make XML Namespaces functionalit
 mark_as_advanced(EXPAT_NS)
 expat_shy_set(EXPAT_WARNINGS_AS_ERRORS OFF CACHE BOOL "Treat all compiler warnings as errors")
 if(UNIX OR _EXPAT_HELP)
-    expat_shy_set(EXPAT_DEV_URANDOM ON CACHE BOOL "Define to include code reading entropy from `/dev/urandom'.")
-    expat_shy_set(EXPAT_WITH_GETRANDOM "AUTO" CACHE STRING "Make use of getrandom function (ON|OFF|AUTO) [default=AUTO]")
-    expat_shy_set(EXPAT_WITH_SYS_GETRANDOM "AUTO" CACHE STRING "Make use of syscall SYS_getrandom (ON|OFF|AUTO) [default=AUTO]")
+    expat_shy_set(EXPAT_DEV_URANDOM OFF CACHE BOOL "Define to include code reading entropy from `/dev/urandom'.")
     mark_as_advanced(EXPAT_DEV_URANDOM)
+endif()
+if(UNIX OR WASI OR _EXPAT_HELP)
+    expat_shy_set(EXPAT_WITH_ARC4RANDOM "AUTO" CACHE STRING "Make use of arc4random function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_ARC4RANDOM)
+    expat_shy_set(EXPAT_WITH_ARC4RANDOM_BUF "AUTO" CACHE STRING "Make use of arc4random_buf function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_ARC4RANDOM_BUF)
+    expat_shy_set(EXPAT_WITH_GETENTROPY "AUTO" CACHE STRING "Make use of getentropy function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_GETENTROPY)
+endif()
+if(UNIX OR _EXPAT_HELP)
+    expat_shy_set(EXPAT_WITH_GETRANDOM "AUTO" CACHE STRING "Make use of getrandom function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_GETRANDOM)
+    expat_shy_set(EXPAT_WITH_SYS_GETRANDOM "AUTO" CACHE STRING "Make use of syscall SYS_getrandom (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_SYS_GETRANDOM)
 endif()
 expat_shy_set(EXPAT_CHAR_TYPE "char" CACHE STRING "Character type to use (char|ushort|wchar_t) [default=char]")
 expat_shy_set(EXPAT_ATTR_INFO OFF CACHE BOOL "Define to allow retrieving the byte offsets for attribute names and values")
@@ -170,15 +184,11 @@ if(NOT _EXPAT_HELP)
     mark_as_advanced(_EXPAT_M32)
 endif()
 
-if(EXPAT_BUILD_TESTS OR EXPAT_BUILD_FUZZERS)
+if(EXPAT_BUILD_FUZZERS)
     # We have to call enable_language() before modifying any CMAKE_CXX_* variables
     enable_language(CXX)
 
-    if (EXPAT_BUILD_FUZZERS)
-        set(CMAKE_CXX_STANDARD 17)  # for std::string_view for Abseil for libprotobuf-mutator
-    else()
-        set(CMAKE_CXX_STANDARD 11)
-    endif()
+    set(CMAKE_CXX_STANDARD 17)  # for std::string_view for Abseil for libprotobuf-mutator
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)  # i.e. -std=c++11 rather than default -std=gnu++11
 endif()
@@ -191,23 +201,14 @@ if(EXPAT_DTD AND NOT EXPAT_GE)
     message(SEND_ERROR "Please either enable option EXPAT_GE (recommended) or disable EXPAT_DTD also.")
 endif()
 
-if(EXPAT_WITH_LIBBSD)
-    find_library(LIB_BSD NAMES bsd)
-    if(NOT LIB_BSD)
-        message(SEND_ERROR "EXPAT_WITH_LIBBSD option is enabled, but libbsd was not found")
-    else()
-        set(HAVE_LIBBSD TRUE)
-    endif()
-endif()
-
 if(MSVC)
     # For the three types of MSVC version values, please see:
     # - https://cmake.org/cmake/help/latest/variable/MSVC_VERSION.html
     # - https://sourceforge.net/p/predef/wiki/Compilers/
     # - https://en.wikipedia.org/wiki/Microsoft_Visual_Studio#History
     set(_EXPAT_MSVC_REQUIRED_INT 1800)  # i.e. 12.0/2013/1800; see PR #426
-    set(_EXPAT_MSVC_SUPPORTED_INT 1920)
-    set(_EXPAT_MSVC_SUPPORTED_DISPLAY "Visual Studio 16.0/2019/${_EXPAT_MSVC_SUPPORTED_INT}")
+    set(_EXPAT_MSVC_SUPPORTED_INT 1930)
+    set(_EXPAT_MSVC_SUPPORTED_DISPLAY "Visual Studio 17.0/2022/${_EXPAT_MSVC_SUPPORTED_INT}")
 
     if(MSVC_VERSION VERSION_LESS ${_EXPAT_MSVC_SUPPORTED_INT})
         if(MSVC_VERSION VERSION_LESS ${_EXPAT_MSVC_REQUIRED_INT})
@@ -287,6 +288,9 @@ macro(evaluate_detection_results use_ref have_ref thing_lower thing_title)
 endmacro()
 
 if(NOT WIN32)
+    evaluate_detection_results(EXPAT_WITH_ARC4RANDOM HAVE_ARC4RANDOM "function arc4random" "Function arc4random")
+    evaluate_detection_results(EXPAT_WITH_ARC4RANDOM_BUF HAVE_ARC4RANDOM_BUF "function arc4random_buf" "Function arc4random_buf")
+    evaluate_detection_results(EXPAT_WITH_GETENTROPY HAVE_GETENTROPY "function getentropy" "Function getentropy")
     evaluate_detection_results(EXPAT_WITH_GETRANDOM HAVE_GETRANDOM "function getrandom" "Function getrandom")
     evaluate_detection_results(EXPAT_WITH_SYS_GETRANDOM HAVE_SYSCALL_GETRANDOM "syscall SYS_getrandom" "Syscall SYS_getrandom")
 endif()
@@ -316,8 +320,11 @@ expat_install(FILES "${CMAKE_CURRENT_BINARY_DIR}/expat_config.h" DESTINATION ${C
 
 
 set(EXTRA_COMPILE_FLAGS)
-if(FLAG_NO_STRICT_ALIASING)
-    set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -fno-strict-aliasing")
+if(FLAG_WSTRICT_ALIASING)
+    set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Wstrict-aliasing=3")
+endif()
+if(FLAG_WIMPLICIT_FALLTHROUGH)
+    set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Wimplicit-fallthrough")
 endif()
 if(FLAG_VISIBILITY)
   if(EXPAT_SHARED_LIBS)
@@ -344,22 +351,16 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}")
 
 if (MSVC)
+    cmake_policy(GET CMP0091 _policy_cmp0091_behavior)
+    if (NOT _policy_cmp0091_behavior STREQUAL NEW)
+        message(SEND_ERROR "Policy CMP0091 behavior is '${_policy_cmp0091_behavior}' rather than 'NEW', mis-compilation detected.")
+    endif()
+
+    message(STATUS "-- Using static CRT ${EXPAT_MSVC_STATIC_CRT}")
     if (EXPAT_MSVC_STATIC_CRT)
-        message("-- Using static CRT ${EXPAT_MSVC_STATIC_CRT}")
-        foreach(flag_var
-                CMAKE_CXX_FLAGS_${_EXPAT_BUILD_TYPE_UPPER}
-                CMAKE_CXX_FLAGS_DEBUG
-                CMAKE_CXX_FLAGS_RELEASE
-                CMAKE_CXX_FLAGS_MINSIZEREL
-                CMAKE_CXX_FLAGS_RELWITHDEBINFO
-                CMAKE_C_FLAGS_${_EXPAT_BUILD_TYPE_UPPER}
-                CMAKE_C_FLAGS_DEBUG
-                CMAKE_C_FLAGS_RELEASE
-                CMAKE_C_FLAGS_MINSIZEREL
-                CMAKE_C_FLAGS_RELWITHDEBINFO
-                )
-            string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-        endforeach()
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")  # .. without suffix "DLL": static
+    else()
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")  # i.e. CMake default behavior: shared
     endif()
 endif()
 
@@ -393,12 +394,67 @@ set(_EXPAT_C_SOURCES
     lib/xmlrole.c
     lib/xmltok.c
 # NOTE: ISO C forbids an empty translation unit
+#   lib/xcsinc.c
 #   lib/xmltok_impl.c
 #   lib/xmltok_ns.c
 )
 
+if(HAVE_ARC4RANDOM)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_arc4random.c
+        lib/random_arc4random.h
+    )
+endif()
+
+if(HAVE_ARC4RANDOM_BUF)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_arc4random_buf.c
+        lib/random_arc4random_buf.h
+    )
+endif()
+
+if(EXPAT_DEV_URANDOM)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_dev_urandom.c
+        lib/random_dev_urandom.h
+    )
+endif()
+
+if(HAVE_GETENTROPY)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_getentropy.c
+        lib/random_getentropy.h
+    )
+endif()
+
+if(HAVE_GETRANDOM OR HAVE_SYSCALL_GETRANDOM)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_getrandom.c
+        lib/random_getrandom.h
+    )
+endif()
+
+if(WIN32)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_rand_s.c
+        lib/random_rand_s.h
+    )
+endif()
+
 if(EXPAT_SHARED_LIBS)
     set(_SHARED SHARED)
+    if(EXPAT_DTD OR EXPAT_GE)
+        set(_EXPAT_DTD_OR_GE TRUE)
+    else()
+        set(_EXPAT_DTD_OR_GE FALSE)
+    endif()
+
     if(WIN32)
         macro(_expat_def_file_toggle source_var target_var)
             if(${source_var})
@@ -407,12 +463,6 @@ if(EXPAT_SHARED_LIBS)
                 set(${target_var} ";")  # i.e. commented out
             endif()
         endmacro()
-
-        if(EXPAT_DTD OR EXPAT_GE)
-            set(_EXPAT_DTD_OR_GE TRUE)
-        else()
-            set(_EXPAT_DTD_OR_GE FALSE)
-        endif()
 
         _expat_def_file_toggle(_EXPAT_DTD_OR_GE _EXPAT_COMMENT_DTD_OR_GE)
         _expat_def_file_toggle(EXPAT_ATTR_INFO _EXPAT_COMMENT_ATTR_INFO)
@@ -424,6 +474,20 @@ if(EXPAT_SHARED_LIBS)
         string(REPLACE "." "," _EXPAT_DLL_VERSION ${PROJECT_VERSION}.0)
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/win32/version.rc.cmake" "${CMAKE_CURRENT_BINARY_DIR}/win32/version.rc")
         set(_EXPAT_EXTRA_SOURCES ${_EXPAT_EXTRA_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/win32/version.rc")
+    else()
+        macro(_expat_map_file_toggle source_var target_var)
+            if(${source_var})
+                set(${target_var} " ")  # i.e. not commented out, a single space
+            else()
+                set(${target_var} "#")  # i.e. commented out
+            endif()
+        endmacro()
+
+        _expat_map_file_toggle(_EXPAT_DTD_OR_GE _EXPAT_COMMENT_DTD_OR_GE)
+        _expat_map_file_toggle(EXPAT_ATTR_INFO _EXPAT_COMMENT_ATTR_INFO)
+
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/lib/libexpat.map.in" "${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.map")
+        set(_EXPAT_EXTRA_SOURCES ${_EXPAT_EXTRA_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.map")
     endif()
 else()
     set(_SHARED STATIC)
@@ -433,9 +497,6 @@ add_library(expat ${_SHARED} ${_EXPAT_C_SOURCES} ${_EXPAT_EXTRA_SOURCES})
 add_library(expat::expat ALIAS expat)
 if(_EXPAT_LIBM_FOUND)
     target_link_libraries(expat m)
-endif()
-if(EXPAT_WITH_LIBBSD)
-    target_link_libraries(expat ${LIB_BSD})
 endif()
 
 #
@@ -471,21 +532,20 @@ foreach(build_type_upper
     set_property(TARGET expat PROPERTY ${build_type_upper}_POSTFIX ${EXPAT_${build_type_upper}_POSTFIX})
 endforeach()
 
-set(LIBCURRENT 11)  # sync
+set(LIBCURRENT 13)  # sync
 set(LIBREVISION 2)  # with
-set(LIBAGE 10)      # configure.ac!
+set(LIBAGE 12)      # configure.ac!
 math(EXPR LIBCURRENT_MINUS_AGE "${LIBCURRENT} - ${LIBAGE}")
 
 if(NOT WIN32)
     set_property(TARGET expat PROPERTY VERSION ${LIBCURRENT_MINUS_AGE}.${LIBAGE}.${LIBREVISION})
     set_property(TARGET expat PROPERTY SOVERSION ${LIBCURRENT_MINUS_AGE})
     set_property(TARGET expat PROPERTY NO_SONAME ${NO_SONAME})
+    if(EXPAT_SYMBOL_VERSIONING)
+        set_property(TARGET expat PROPERTY LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.map")
+    endif()
 
     if(APPLE)
-        if(NOT CMAKE_VERSION VERSION_GREATER_EQUAL 3.17)
-            message(FATAL_ERROR "Expat requires CMake >=3.17 on platform \"APPLE\".")
-        endif()
-
         # NOTE: This intends to talk CMake into compatibility with GNU Libtool
         math(EXPR _EXPAT_MACHO_COMPATIBILITY_VERSION "${LIBCURRENT} + 1")
         set(_EXPAT_MACHO_CURRENT_VERSION "${_EXPAT_MACHO_COMPATIBILITY_VERSION}.${LIBREVISION}")
@@ -643,8 +703,6 @@ if(EXPAT_BUILD_TESTS)
         endif()
     endfunction()
 
-    set(_EXPAT_TEST_TARGETS runtests runtests_cxx)
-
     add_executable(runtests
         tests/acc_tests.c
         tests/alloc_tests.c
@@ -663,38 +721,12 @@ if(EXPAT_BUILD_TESTS)
         ${_EXPAT_C_SOURCES}
     )
 
-    add_executable(runtests_cxx
-        tests/acc_tests_cxx.cpp
-        tests/alloc_tests_cxx.cpp
-        tests/basic_tests_cxx.cpp
-        tests/chardata_cxx.cpp
-        tests/common_cxx.cpp
-        tests/dummy_cxx.cpp
-        tests/handlers_cxx.cpp
-        tests/memcheck_cxx.cpp
-        tests/minicheck_cxx.cpp
-        tests/misc_tests_cxx.cpp
-        tests/ns_tests_cxx.cpp
-        tests/nsalloc_tests_cxx.cpp
-        tests/runtests_cxx.cpp
-        tests/structdata_cxx.cpp
-        ${_EXPAT_C_SOURCES}
-    )
-
-    foreach(_target ${_EXPAT_TEST_TARGETS})
-        target_compile_definitions(${_target} PRIVATE -DXML_TESTING)
-
-        set_property(TARGET ${_target} PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
-        expat_add_test(${_target} $<TARGET_FILE:${_target}>)
-
-        if(_EXPAT_LIBM_FOUND)
-            target_link_libraries(${_target} m)
-        endif()
-
-        if(EXPAT_WITH_LIBBSD)
-            target_link_libraries(${_target} ${LIB_BSD})
-        endif()
-    endforeach()
+    target_compile_definitions(runtests PRIVATE -DXML_TESTING)
+    set_property(TARGET runtests PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
+    expat_add_test(runtests $<TARGET_FILE:runtests>)
+    if(_EXPAT_LIBM_FOUND)
+        target_link_libraries(runtests m)
+    endif()
 
     add_executable(benchmark tests/benchmark/benchmark.c)
     set_property(TARGET benchmark PROPERTY RUNTIME_OUTPUT_DIRECTORY tests/benchmark)
@@ -829,7 +861,11 @@ endif()
 # C/C++ config affecting multiple targets
 #
 if(WIN32)
-    set(_EXPAT_STATIC_TARGETS ${_EXPAT_TEST_TARGETS})
+    set(_EXPAT_STATIC_TARGETS "")  # intended as "empty list"
+
+    if(EXPAT_BUILD_TESTS)
+        list(APPEND _EXPAT_STATIC_TARGETS runtests)
+    endif()
     if(NOT EXPAT_SHARED_LIBS)
         list(APPEND _EXPAT_STATIC_TARGETS expat)
     endif()
@@ -976,6 +1012,8 @@ get_property(_EXPAT_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI
 
 message(STATUS "===========================================================================")
 message(STATUS "")
+message(STATUS "CMake version in use ......... ${CMAKE_VERSION}")
+message(STATUS "")
 message(STATUS "Configuration")
 message(STATUS "  Generator .................. ${CMAKE_GENERATOR}")
 if(_EXPAT_GENERATOR_IS_MULTI_CONFIG)
@@ -1015,10 +1053,12 @@ message(STATUS "  Entropy sources")
 if(WIN32)
     message(STATUS "    rand_s ................... ON")
 else()
+    message(STATUS "    arc4random ............... ${HAVE_ARC4RANDOM}")
+    message(STATUS "    arc4random_buf ........... ${HAVE_ARC4RANDOM_BUF}")
+    message(STATUS "    getentropy ............... ${HAVE_GETENTROPY}")
     message(STATUS "    getrandom ................ ${HAVE_GETRANDOM}")
     message(STATUS "    syscall SYS_getrandom .... ${HAVE_SYSCALL_GETRANDOM}")
-    message(STATUS "    libbsd ................... ${EXPAT_WITH_LIBBSD}")
-    message(STATUS "    /dev/random .............. ${EXPAT_DEV_URANDOM}")
+    message(STATUS "    /dev/urandom ............. ${EXPAT_DEV_URANDOM}")
 endif()
 message(STATUS "")
 if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")

@@ -1,0 +1,7 @@
+/lib*.dll
+Debug
+Release
+xmlwf.plg
+Makefile
+xmlwf
+.libs

@@ -1,0 +1,11 @@
+compile
+config.guess
+config.sub
+depcomp
+install-sh
+libtool.m4
+ltconfig
+ltmain.sh
+missing
+test-driver
+ar-lib

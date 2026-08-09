@@ -11,7 +11,7 @@ dnl   Copyright (c) 2000      Clark Cooper <coopercc@users.sourceforge.net>
 dnl   Copyright (c) 2000-2005 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
 dnl   Copyright (c) 2001-2003 Greg Stein <gstein@users.sourceforge.net>
 dnl   Copyright (c) 2006-2012 Karl Waclawek <karl@waclawek.net>
-dnl   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
+dnl   Copyright (c) 2016-2026 Sebastian Pipping <sebastian@pipping.org>
 dnl   Copyright (c) 2017      S. P. Zeidler <spz@netbsd.org>
 dnl   Copyright (c) 2017      Stephen Groat <stephen@groat.us>
 dnl   Copyright (c) 2017-2020 Joe Orton <jorton@redhat.com>
@@ -24,6 +24,11 @@ dnl   Copyright (c) 2019      Kishore Kunche <kishore.kunche@intel.com>
 dnl   Copyright (c) 2020      Jeffrey Walton <noloader@gmail.com>
 dnl   Copyright (c) 2024      Ferenc Géczi <ferenc.gm@gmail.com>
 dnl   Copyright (c) 2024      Dag-Erling Smørgrav <des@des.dev>
+dnl   Copyright (c) 2025      Matthew Fernandez <matthew.fernandez@gmail.com>
+dnl   Copyright (c) 2025      Alfonso Gregory <gfunni234@gmail.com>
+dnl   Copyright (c) 2026      Rosen Penev <rosenp@gmail.com>
+dnl   Copyright (c) 2026      Gordon Messmer <gordon.messmer@gmail.com>
+dnl   Copyright (c) 2026      Fabio Scaccabarozzi <fsvm88@gmail.com>
 dnl   Licensed under the MIT license:
 dnl
 dnl   Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -84,9 +89,9 @@ dnl
 dnl If the API changes incompatibly set LIBAGE back to 0
 dnl
 
-LIBCURRENT=11  # sync
+LIBCURRENT=13  # sync
 LIBREVISION=2  # with
-LIBAGE=10      # CMakeLists.txt!
+LIBAGE=12      # CMakeLists.txt!
 
 AC_CONFIG_HEADERS([expat_config.h])
 AH_TOP([#ifndef EXPAT_CONFIG_H
@@ -95,7 +100,6 @@ AH_BOTTOM([#endif // ndef EXPAT_CONFIG_H])
 
 AM_PROG_AR
 AC_PROG_INSTALL
-AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 LT_PREREQ([2.4])
@@ -117,10 +121,12 @@ AS_IF([test "$GCC" = yes],
    dnl GCC don't support it and it causes extra warnings that are only
    dnl distracting; avoid.
    AX_APPEND_COMPILE_FLAGS([-fexceptions], [AM_CFLAGS])
-   AX_APPEND_COMPILE_FLAGS([-fno-strict-aliasing -Wmissing-prototypes -Wstrict-prototypes], [AM_CFLAGS])
+   AX_APPEND_COMPILE_FLAGS([-Wstrict-aliasing=3 -Wmissing-prototypes -Wstrict-prototypes], [AM_CFLAGS])
    AX_APPEND_COMPILE_FLAGS([-pedantic -Wduplicated-cond -Wduplicated-branches -Wlogical-op], [AM_CFLAGS])
    AX_APPEND_COMPILE_FLAGS([-Wrestrict -Wnull-dereference -Wjump-misses-init -Wdouble-promotion], [AM_CFLAGS])
-   AX_APPEND_COMPILE_FLAGS([-Wshadow -Wformat=2 -Wno-pedantic-ms-format -Wmisleading-indentation], [AM_CFLAGS])])
+   AX_APPEND_COMPILE_FLAGS([-Wshadow -Wformat=2 -Wmisleading-indentation], [AM_CFLAGS])
+   AS_CASE(["${host_os}"], [mingw*], [AX_APPEND_COMPILE_FLAGS([-Wno-pedantic-ms-format], [AM_CFLAGS])])
+  ])
 
 AC_LANG_PUSH([C++])
 AC_PROG_CXX
@@ -131,11 +137,23 @@ AS_IF([test "$GCC" = yes],
    dnl GCC don't support it and it causes extra warnings that are only
    dnl distracting; avoid.
    AX_APPEND_COMPILE_FLAGS([-fexceptions], [AM_CXXFLAGS])
-   AX_APPEND_COMPILE_FLAGS([-fno-strict-aliasing], [AM_CXXFLAGS])])
+   AX_APPEND_COMPILE_FLAGS([-Wstrict-aliasing=3], [AM_CXXFLAGS])])
 AC_LANG_POP([C++])
 
 AS_IF([test "$GCC" = yes],
-  [AX_APPEND_LINK_FLAGS([-fno-strict-aliasing],[AM_LDFLAGS])])
+  [AX_APPEND_LINK_FLAGS([-Wstrict-aliasing=3],[AM_LDFLAGS])])
+
+AC_ARG_ENABLE([symbol-versioning],
+  [AS_HELP_STRING([--enable-symbol-versioning],
+    [provide symbol versioning for dependency generation @<:@default=no@:>@])],
+  [enable_symbol_versioning=$enableval],
+  [enable_symbol_versioning=no])
+AS_IF([test "x$enable_symbol_versioning" != xno],
+  [VSCRIPT_LDFLAGS="-Wl,--version-script"
+   AC_SUBST([VSCRIPT_LDFLAGS])
+  ])
+AM_CONDITIONAL([HAVE_VSCRIPT],
+  [test "x$enable_symbol_versioning" != xno])
 
 dnl patching ${archive_cmds} to affect generation of file "libtool" to fix linking with clang (issue #312)
 AS_CASE(["$LD"],[*clang*],
@@ -199,48 +217,110 @@ AM_CONDITIONAL([_INTERNAL_LARGE_SIZE], [echo -- "${CPPFLAGS}${CFLAGS}" | ${FGREP
 
 LT_LIB_M
 
-AC_ARG_WITH([libbsd],
-  [AS_HELP_STRING([--with-libbsd], [utilize libbsd (for arc4random_buf)])],
+AC_ARG_WITH([arc4random],
+  [AS_HELP_STRING([--with-arc4random],
+                  [enforce the use of arc4random function in the system @<:@default=check@:>@])
+AS_HELP_STRING([--without-arc4random],
+               [skip auto detect of arc4random @<:@default=check@:>@])],
   [],
-  [with_libbsd=no])
-AS_IF([test "x${with_libbsd}" != xno],
-  [AC_CHECK_LIB([bsd],
-     [arc4random_buf],
-     [],
-     [AS_IF([test "x${with_libbsd}" = xyes],
-        [AC_MSG_ERROR([Enforced use of libbsd cannot be satisfied.])])])])
-AC_MSG_CHECKING([for arc4random_buf (BSD, libbsd or glibc 2.36+)])
-AC_LINK_IFELSE([AC_LANG_SOURCE([
-    #if defined(HAVE_LIBBSD)
-    # include <bsd/stdlib.h>
-    #else
-    # include <stdlib.h>  /* for arc4random_buf on BSD */
-    #endif
-    int main(void) {
-      char dummy[[123]];  // double brackets for m4
-      arc4random_buf(dummy, 0U);
-      return 0;
-    }
-  ])],
-  [AC_DEFINE([HAVE_ARC4RANDOM_BUF], [1], [Define to 1 if you have the `arc4random_buf' function.])
-   AC_MSG_RESULT([yes])],
-  [AC_MSG_RESULT([no])
+  [with_arc4random=check])
 
-   AC_MSG_CHECKING([for arc4random (BSD, macOS, libbsd or glibc 2.36+)])
+AC_ARG_WITH([arc4random-buf],
+  [AS_HELP_STRING([--with-arc4random-buf],
+                  [enforce the use of arc4random_buf function in the system @<:@default=check@:>@])
+AS_HELP_STRING([--without-arc4random-buf],
+               [skip auto detect of arc4random_buf @<:@default=check@:>@])],
+  [],
+  [with_arc4random_buf=check])
+
+have_arc4random=false
+have_arc4random_buf=false
+
+AS_IF([test "x${with_arc4random_buf}" != xno],
+  [AC_MSG_CHECKING([for arc4random_buf (BSD or glibc 2.36+)])
    AC_LINK_IFELSE([AC_LANG_SOURCE([
-       #if defined(HAVE_LIBBSD)
-       # include <bsd/stdlib.h>
-       #else
-       # include <stdlib.h>
+       #if ! defined(_DEFAULT_SOURCE)
+       # define _DEFAULT_SOURCE 1 /* for glibc */
        #endif
+       #include <stdlib.h>
+       int main(void) {
+         char dummy[[123]];  // double brackets for m4
+         arc4random_buf(dummy, 0U);
+         return 0;
+       }
+     ])],
+     [AC_DEFINE([HAVE_ARC4RANDOM_BUF], [1], [Define to 1 if you have the `arc4random_buf' function.])
+      have_arc4random_buf=true
+      AC_MSG_RESULT([yes])],
+     [AC_MSG_RESULT([no])
+      AS_IF([test "x${with_arc4random_buf}" = xyes],
+        [AC_MSG_ERROR([enforced the use of arc4random_buf --with-arc4random-buf, but not detected])])])])
+
+AS_IF([test "x${with_arc4random}" != xno],
+  [AC_MSG_CHECKING([for arc4random (BSD, macOS, or glibc 2.36+)])
+   AC_LINK_IFELSE([AC_LANG_SOURCE([
+       #if ! defined(_DEFAULT_SOURCE)
+       # define _DEFAULT_SOURCE 1 /* for glibc */
+       #endif
+       #include <stdlib.h>
        int main(void) {
           arc4random();
           return 0;
        }
      ])],
      [AC_DEFINE([HAVE_ARC4RANDOM], [1], [Define to 1 if you have the `arc4random' function.])
+      have_arc4random=true
       AC_MSG_RESULT([yes])],
-     [AC_MSG_RESULT([no])])])
+     [AC_MSG_RESULT([no])
+      AS_IF([test "x${with_arc4random}" = xyes],
+        [AC_MSG_ERROR([enforced the use of arc4random --with-arc4random, but not detected])])])])
+
+AM_CONDITIONAL([WITH_ARC4RANDOM], [test x${have_arc4random} = xtrue])
+AM_CONDITIONAL([WITH_ARC4RANDOM_BUF], [test x${have_arc4random_buf} = xtrue])
+
+have_getentropy=false
+
+AC_ARG_WITH([getentropy],
+  [AS_HELP_STRING([--with-getentropy],
+                  [enforce the use of getentropy function in the system @<:@default=check@:>@])
+AS_HELP_STRING([--without-getentropy],
+               [skip auto detect of getentropy @<:@default=check@:>@])],
+  [],
+  [with_getentropy=check])
+
+AS_IF([test "x$with_getentropy" != xno],
+  [AC_MSG_CHECKING([for getentropy (BSD, macOS 10.12+, glibc 2.25+)])
+   AC_LINK_IFELSE([AC_LANG_SOURCE([
+       // NOTE: Please keep this block in sync with its two siblings in files
+       //       'ConfigureChecks.cmake' and 'lib/random_getentropy.c'!
+       #if defined(__APPLE__)
+       #  include <sys/random.h>
+       #else
+       #  if defined(__GLIBC__) && ! defined(_DEFAULT_SOURCE)
+       #    define _DEFAULT_SOURCE 1
+       #  endif
+       #  if ! defined(_GNU_SOURCE)
+       #    define _GNU_SOURCE 1 /* for musl */
+       #  endif
+       #  include <unistd.h>
+       #endif // ! defined(__APPLE__)
+
+       int main(void) {
+         return getentropy(NULL, 0U);
+       }
+     ])],
+     [AC_DEFINE([HAVE_GETENTROPY], [1], [Define to 1 if you have the `getentropy' function.])
+      have_getentropy=true
+      AC_MSG_RESULT([yes])],
+     [AC_MSG_RESULT([no])
+      AS_IF([test "x$with_getentropy" = xyes],
+        [AC_MSG_ERROR([enforced the use of getentropy --with-getentropy, but not detected])])])])
+
+AM_CONDITIONAL([WITH_GETENTROPY], [test x${have_getentropy} = xtrue])
+
+have_either_getrandom=false
+have_getrandom_function=false
+have_getrandom_syscall=false
 
 AC_ARG_WITH([getrandom],
   [AS_HELP_STRING([--with-getrandom],
@@ -260,6 +340,8 @@ AS_IF([test "x$with_getrandom" != xno],
        }
      ])],
      [AC_DEFINE([HAVE_GETRANDOM], [1], [Define to 1 if you have the `getrandom' function.])
+      have_either_getrandom=true
+      have_getrandom_function=true
       AC_MSG_RESULT([yes])],
      [AC_MSG_RESULT([no])
       AS_IF([test "x$with_getrandom" = xyes],
@@ -286,10 +368,14 @@ AS_IF([test "x$with_sys_getrandom" != xno],
      }
    ])],
      [AC_DEFINE([HAVE_SYSCALL_GETRANDOM], [1], [Define to 1 if you have `syscall' and `SYS_getrandom'.])
+      have_either_getrandom=true
+      have_getrandom_syscall=true
       AC_MSG_RESULT([yes])],
      [AC_MSG_RESULT([no])
       AS_IF([test "x$with_sys_getrandom" = xyes],
         [AC_MSG_ERROR([enforced the use of syscall SYS_getrandom --with-sys-getrandom, but not detected])])])])
+
+AM_CONDITIONAL([WITH_EITHER_GETRANDOM], [test x${have_either_getrandom} = xtrue])
 
 dnl Only needed for xmlwf:
 AC_CHECK_HEADERS(fcntl.h unistd.h)
@@ -309,8 +395,23 @@ AC_DEFINE([XML_GE], 1,
           [Define as 1/0 to enable/disable support for general entities.])
 AC_DEFINE([XML_DTD], 1,
           [Define to make parameter entity parsing functionality available.])
-AC_DEFINE([XML_DEV_URANDOM], 1,
-          [Define to include code reading entropy from `/dev/urandom'.])
+
+
+have_dev_urandom=false
+
+AC_ARG_WITH([dev-urandom],
+  [AS_HELP_STRING([--with-dev-urandom],
+                  [enforce the use of /dev/urandom in the system @<:@default=no@:>@])
+AS_HELP_STRING([--without-dev-urandom],
+               [enforce not using /dev/urandom in the system @<:@default=no@:>@])],
+  [with_dev_urandom=${withval}],
+  [])
+
+AS_IF([test "x${with_dev_urandom}" = "xyes"],
+  [have_dev_urandom=true
+   AC_DEFINE([XML_DEV_URANDOM], 1,
+             [Define to include code reading entropy from `/dev/urandom'.])])
+
 
 AC_ARG_ENABLE([xml-attr-info],
   [AS_HELP_STRING([--enable-xml-attr-info],
@@ -381,9 +482,14 @@ dnl NOTE: The *_TRUE variables read here are Automake conditionals
 dnl       that are either set to "" when enabled or to "#" when disabled
 dnl       (because they are used to dynamically comment out certain things)
 AS_IF([test "x${enable_xml_attr_info}" = xyes],
-  [EXPAT_ATTR_INFO=ON],
-  [EXPAT_ATTR_INFO=OFF])
+  [EXPAT_ATTR_INFO=ON
+   _EXPAT_COMMENT_ATTR_INFO=" "],
+  [EXPAT_ATTR_INFO=OFF
+   _EXPAT_COMMENT_ATTR_INFO="#"])
+AC_SUBST([_EXPAT_COMMENT_ATTR_INFO])
 EXPAT_DTD=ON
+_EXPAT_COMMENT_DTD_OR_GE=" "
+AC_SUBST([_EXPAT_COMMENT_DTD_OR_GE])
 AS_IF([test "x${_INTERNAL_LARGE_SIZE_TRUE}" = x],
   [EXPAT_LARGE_SIZE=ON],
   [EXPAT_LARGE_SIZE=OFF])
@@ -440,17 +546,28 @@ AC_MSG_RESULT([${CMAKE_SHARED_LIBRARY_PREFIX}])
 AC_SUBST([CMAKE_SHARED_LIBRARY_PREFIX])
 
 AS_CASE("${host_os}",
-  [darwin*], [CMAKE_NOCONFIG_SOURCE=cmake/autotools/expat-noconfig__macos.cmake.in],
-  [mingw*|cygwin*], [CMAKE_NOCONFIG_SOURCE=cmake/autotools/expat-noconfig__windows.cmake.in],
-  [CMAKE_NOCONFIG_SOURCE=cmake/autotools/expat-noconfig__linux.cmake.in])
+  [darwin*], [
+    CMAKE_SOURCE=cmake/autotools/expat__macos.cmake.in
+    CMAKE_NOCONFIG_SOURCE=cmake/autotools/expat-noconfig__macos.cmake.in
+  ],
+  [mingw*|cygwin*], [
+    CMAKE_SOURCE=cmake/autotools/expat__windows.cmake.in
+    CMAKE_NOCONFIG_SOURCE=cmake/autotools/expat-noconfig__windows.cmake.in
+  ],
+  [
+    CMAKE_SOURCE=cmake/autotools/expat__linux.cmake.in
+    CMAKE_NOCONFIG_SOURCE=cmake/autotools/expat-noconfig__linux.cmake.in
+  ])
 AC_CONFIG_FILES([Makefile]
   [expat.pc]
   [cmake/expat-config.cmake]
+  [cmake/autotools/expat.cmake:${CMAKE_SOURCE}]
   [cmake/autotools/expat-config-version.cmake]
   [cmake/autotools/expat-noconfig.cmake:${CMAKE_NOCONFIG_SOURCE}]
   [doc/Makefile]
   [examples/Makefile]
   [lib/Makefile]
+  [lib/libexpat.map]
   [tests/Makefile]
   [tests/benchmark/Makefile]
   [xmlwf/Makefile])
@@ -470,4 +587,17 @@ User flags (override Automake flags on conflict):
      CPPFLAGS: ${CPPFLAGS}
        CFLAGS: ${CFLAGS}
      CXXFLAGS: ${CXXFLAGS}
-      LDFLAGS: ${LDFLAGS}])
+      LDFLAGS: ${LDFLAGS}
+
+Entropy sources:
+             arc4random: ${have_arc4random}
+         arc4random_buf: ${have_arc4random_buf}
+             getentropy: ${have_getentropy}
+              getrandom: ${have_getrandom_function}
+  syscall SYS_getrandom: ${have_getrandom_syscall}
+           /dev/urandom: ${have_dev_urandom}
+
+Continue with e.g.:
+  make -j2
+  make check
+  sudo make install])
