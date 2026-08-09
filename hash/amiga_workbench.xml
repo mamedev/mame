@@ -565,7 +565,27 @@ Below is an incomplete list of Commodore part numbers:
 
 	<!-- 317794-01 Workbench 1.3 (Es) -->
 	<!-- 317795-01 Workbench 1.3 (Ch) -->
-	<!-- 317796-01 Workbench 1.3 (Se/Fi) [label found] -->
+
+	<software name="wb13_se" cloneof="wb13">
+		<description>Workbench 1.3 Rev. 34.20 (Se/Fi)</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3 (Se/Fi)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317796-01_workbench.adf" size="901120" crc="084995a7" sha1="2380ee391588bc7059a41aadbb7d64a8c297a75a" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- 317797-01 Workbench 1.3 (It) [label found] -->
 
 	<software name="wb13_dk" cloneof="wb13">
