@@ -31,10 +31,13 @@ Implementation based on description of the operation, not schematics.
 
 namespace {
 
-// Docs mention a 768x900 display, but this displays the entire screen.
-// CPT monitor was 768x896.
+// CPT monitor raw timing: 64MHz pixel clock, 1024x966 total, 768x896 visible.
+static constexpr u32 PIXEL_CLOCK = 64'000'000;
+static constexpr u16 HTOTAL = 1024;
+static constexpr u16 VTOTAL_60HZ = 1035;
 static constexpr u16 SCREEN_WIDTH = 768;
-static constexpr u16 SCREEN_HEIGHT = 939;
+static constexpr u16 SCREEN_HEIGHT_60HZ = 965;
+
 static constexpr u16 VIDEO_RAM_SIZE = 32 * 1024;
 static constexpr u16 VIDEO_RAM_MASK = VIDEO_RAM_SIZE - 1;
 static constexpr u16 SYNC_RAM_SIZE = 0x200; // Guess, noticed writes up to the 0x01xx range.
@@ -58,11 +61,8 @@ cadr_tv_control_device::cadr_tv_control_device(const machine_config &mconfig, co
 void cadr_tv_control_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(0);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, SCREEN_WIDTH, VTOTAL_60HZ, 0, SCREEN_HEIGHT_60HZ);
 	m_screen->set_screen_update(FUNC(cadr_tv_control_device::screen_update));
-	m_screen->set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
-	m_screen->set_visarea_full();
 }
 
 
