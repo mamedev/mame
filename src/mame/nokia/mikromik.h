@@ -64,7 +64,6 @@ public:
 		m_sasi(*this, "sasi:7:scsicb"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
-		m_rs232c(*this, RS232_C_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, I8085A_TAG),
 		m_mmu_rom(*this, "address"),
@@ -111,7 +110,6 @@ private:
 	optional_device<nscsi_callback_device> m_sasi;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
-	required_device<rs232_port_device> m_rs232c;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
@@ -165,13 +163,16 @@ private:
 	uint8_t mpsc_dack_r();
 	void mpsc_dack_w(uint8_t data);
 	void dma_eop_w(int state);
-	void dack3_w(int state);
-	void itxc_w(int state);
-	void irxc_w(int state);
-	void auxc_w(int state);
-	void drq2_w(int state);
-	void drq1_w(int state);
-	int dsra_r();
+	void dack1_w(int state) { if (!state) m_dmac->dreq1_w(0); }
+	void dack2_w(int state) { if (!state) m_dmac->dreq2_w(0); }
+	void dack3_w(int state) { m_dack3 = state; update_tc(); };
+	void erxc_w(int state) { if (m_intc) { m_mpsc->rxca_w(state); } }
+	void etxc_w(int state) { if (m_intc) { m_mpsc->txca_w(state); } }
+	void itxc_w(int state) { if (!m_intc) { m_mpsc->txca_w(state); } }
+	void irxc_w(int state) { if (!m_intc) { m_mpsc->rxca_w(state); } }
+	void auxc_w(int state) { m_mpsc->txcb_w(state); m_mpsc->rxcb_w(state); }
+	void drq1_w(int state) { if (!state) m_dmac->dreq1_w(1); }
+	void drq2_w(int state) { if (!state) m_dmac->dreq2_w(1); }
 
 	void update_tc();
 
