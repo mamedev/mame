@@ -3934,6 +3934,13 @@ void sh34_base_device::device_start()
 
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));
 
+	m_sh2_state->m_fzero = 0.0f;
+	m_sh2_state->m_fone = 1.0f;
+	m_sh2_state->m_ftrc_smin = -2147483648.0f;
+	m_sh2_state->m_ftrc_smax = 2147483648.0f;
+	m_sh2_state->m_ftrc_dmin = -2147483648.0;
+	m_sh2_state->m_ftrc_dmax = 2147483648.0;
+
 	for (int regnum = 0; regnum < 16; regnum++)
 	{
 		m_fs_regmap[regnum] = uml::mem(((float *)(m_sh2_state->m_fr+(regnum))));
@@ -5648,11 +5655,6 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block &block, 
 
 // out-of-range and infinite operands saturate and NaNs give the negative limit, so the
 // range has to be checked before the host convert
-static constexpr float  S_FTRC_SMIN = -2147483648.0f;
-static constexpr float  S_FTRC_SMAX =  2147483648.0f;
-static constexpr double S_FTRC_DMIN = -2147483648.0;
-static constexpr double S_FTRC_DMAX =  2147483648.0;
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	const int single = compiler.labelnum++;
@@ -5665,19 +5667,19 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block &block, c
 	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, single);
 
-	UML_FDCMP(block, FPD32(REG_N), uml::mem(&S_FTRC_DMIN));
+	UML_FDCMP(block, FPD32(REG_N), uml::mem(&m_sh2_state->m_ftrc_dmin));
 	UML_JMPc(block, COND_U, done);
 	UML_JMPc(block, COND_C, done);
-	UML_FDCMP(block, FPD32(REG_N), uml::mem(&S_FTRC_DMAX));
+	UML_FDCMP(block, FPD32(REG_N), uml::mem(&m_sh2_state->m_ftrc_dmax));
 	UML_JMPc(block, COND_NC, saturate);
 	UML_FDTOINT(block, uml::mem(&m_sh2_state->m_fpul), FPD32(REG_N), SIZE_DWORD, ROUND_TRUNC);
 	UML_JMP(block, done);
 
 	UML_LABEL(block, single);
-	UML_FSCMP(block, FPS32(REG_N), uml::mem(&S_FTRC_SMIN));
+	UML_FSCMP(block, FPS32(REG_N), uml::mem(&m_sh2_state->m_ftrc_smin));
 	UML_JMPc(block, COND_U, done);
 	UML_JMPc(block, COND_C, done);
-	UML_FSCMP(block, FPS32(REG_N), uml::mem(&S_FTRC_SMAX));
+	UML_FSCMP(block, FPS32(REG_N), uml::mem(&m_sh2_state->m_ftrc_smax));
 	UML_JMPc(block, COND_C, convert);
 
 	UML_LABEL(block, saturate);
@@ -5754,12 +5756,10 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block &block, 
 
 // FRSQRT is an estimate on some hosts, so the reciprocal square root is built from an
 // exact square root instead
-static constexpr float S_FP_ONE = 1.0f;
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	UML_FSSQRT(block, F0, FPS32(REG_N));
-	UML_FSDIV(block, FPS32(REG_N), uml::mem(&S_FP_ONE), F0);
+	UML_FSDIV(block, FPS32(REG_N), uml::mem(&m_sh2_state->m_fone), F0);
 	return true;
 }
 
@@ -5896,8 +5896,6 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_b
 	return true;
 }
 
-static const float s_fp_zero = 0.0f;
-
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	const uint32_t n = REG_N & 12;
@@ -5905,7 +5903,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_bl
 	// the whole vector is read before any of it is written back
 	for (int i = 0; i < 4; i++)
 	{
-		UML_FSMOV(block, uml::freg(i), uml::mem(&s_fp_zero));
+		UML_FSMOV(block, uml::freg(i), uml::mem(&m_sh2_state->m_fzero));
 		for (int j = 0; j < 4; j++)
 		{
 			UML_FSMUL(block, F4, uml::mem((float *)(m_sh2_state->m_xf + (j << 2) + i)), FPS32(n + j));
