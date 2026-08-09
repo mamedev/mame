@@ -11,21 +11,12 @@ Implementation based on description of the operation, not schematics.
 
 TODO:
 - Chaosnet
-  - Sys300/301 needs a small hack to continue booting - timing issue with keyboard controller combined with bug in cadr code?
-    The initial 'release' message is sent too soon by the keyboard? or is there communication with other hardware/mcu
-    before the data is presented to the cpu.
-    wpdset 3ff435,1,r
-    wpdset 3ff430,1,rw, wait for write 0090, read 0090
-    wpdset 3ff425,1,r, wait for read from 3ff425, MD=4
-    and continue
 - General purpose I/O
 - Serial I/O
 - Where is the REPEAT key mapped? And how should it be used?
 - Caps lock is not working
 - The keyboard and I/O board actually communicate through a serial connection.
 - Is there another MCU on the I/O board to communicate with the keyboard??
-- How are chaosnet packet checksums calculated?
-  The chaosnet documentation mentions 16 bit CRC checksums, usim uses internet checksum.
 
 **********************************************************************************/
 #include "emu.h"
@@ -81,6 +72,20 @@ static constexpr int CHAOSNET_RESET_BIT = 13;
 static constexpr u16 CHAOSNET_RESET = 1 << CHAOSNET_RESET_BIT;
 static constexpr int CHAOSNET_RECEIVE_DONE_BIT = 15;
 static constexpr u16 CHAOSNET_RECEIVE_DONE = 1 << CHAOSNET_RECEIVE_DONE_BIT;
+
+
+u16 chaos_internet_checksum(const u16 *addr, int word_count)
+{
+	s32 sum = 0;
+	while (word_count-- > 0)
+	{
+		const u16 word = *addr++;
+		sum += u16((word << 8) | (word >> 8));
+	}
+	while (sum >> 16)
+		sum = (sum & 0xffff) + (sum >> 16);
+	return u16(~sum);
+}
 
 } // anonymous namespace
 
@@ -241,12 +246,12 @@ static INPUT_PORTS_START(keyboard)
 	PORT_START("KEY.11")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 b0
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_') // f2 02 b2
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('(') // f2 02 b4
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') // also ", f2 02 b6
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('(') PORT_CHAR('[') // f2 02 b4
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"') // f2 02 b6
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') // f2 02 b8
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 ba
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) // f2 02 bc
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR(')') // f2 02 be
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(')') PORT_CHAR(']') // f2 02 be
 
 	PORT_START("KEY.12")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 c0
@@ -282,7 +287,7 @@ static INPUT_PORTS_START(keyboard)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("STOP OUTPUT") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8)) // STOP-OUTPUT f2 02 f0
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') // also ),  f2 02 f2
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') // f2 02 f4
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR(';') // f2 02 f6
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':') // f2 02 f6
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?') // f2 02 f8
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R.HYPER") // f2 02 fa
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // f2 02 fc
@@ -433,8 +438,8 @@ void cadr_iob_device::chaos_transmit_start()
 	// Add our source address
 	m_chaos_transmit_buffer[m_chaos_transmit_pointer] = m_my_chaos_address->read();
 	m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_BUFFER_SIZE;
-	// TODO Add checksum
-	m_chaos_transmit_buffer[m_chaos_transmit_pointer] = 0xDEAD;
+	m_chaos_transmit_buffer[m_chaos_transmit_pointer] = chaos_internet_checksum(
+			m_chaos_transmit_buffer, m_chaos_transmit_pointer);
 	m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_BUFFER_SIZE;
 
 	LOG("Starting transmit of packet\n");
