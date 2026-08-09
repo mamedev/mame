@@ -69,6 +69,7 @@ public:
 		m_mmu_rom(*this, "address"),
 		m_char_rom(*this, "chargen"),
 		m_video_ram(*this, "video_ram"),
+		m_fdc_view(*this, "fdc"),
 		m_a8(0),
 		m_recall(0),
 		m_dack3(1),
@@ -115,6 +116,7 @@ private:
 	required_memory_region m_mmu_rom;
 	required_memory_region m_char_rom;
 	optional_shared_ptr<uint16_t> m_video_ram;
+	memory_view m_fdc_view;
 
 	bool m_a8;
 

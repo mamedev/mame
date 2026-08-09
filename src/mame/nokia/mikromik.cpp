@@ -55,6 +55,130 @@
 
 */
 
+/*
+
+PCB Layout
+----------
+
+NOKIA 9924570 VDU200A MIKROMIKKO
+
+|-------------------------------------------------------|
+|       RAM     ROM1    LS393   LS08    LS14    PIT     |-
+|       RAM             LS164                           ||
+|       RAM                     MPSC            IOP     ||CON3
+|       RAM             LS132                           ||
+|       RAM             LS244   LS32    LS157   75188   |-
+|       RAM                                             |-
+|       RAM             PROM                    MC1489A ||CON4
+|       RAM     LS373   LS373   LS138   LS125   MC1489A |-
+|                                                       |-
+|       LS157               LS259   LS125               ||
+|       LS157   CPU      18.72MHz   LS11    LS74        ||CON5
+|       LS04                                            ||
+|F      6.144MHz DMA        LS04    LS163   LS32 75188  |-
+|-      LS163   LS374   LS374   LS02    LS175   LS08    |-
+||CON1  LS74    CRTC    LS374   ROM2    LS374           ||CON6
+|-             |-CON2-|                                 |-
+|-------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    RAM     - TMM4164P-3
+    ROM1    - NEC D2764D "9057C"
+    ROM2    - NEC D2732D "6807B"
+    PROM    - "726972B"
+    CPU     - Intel P8085AH
+    DMA     - NEC D8237AC-5
+    CRTC    - Intel P8275
+    PIT     - NEC D8253C-5
+    MPSC    - NEC D7201-C
+    IOP     - NEC uPB7212C
+    CON1    - 1x5 power connector
+    CON2    - 1x20 PCB header for floppy/SASI interface
+    CON3    - DB15 keyboard connector
+    CON4    - DB9 printer connector
+    CON5    - DB25 RS232 connector
+    CON6    - DB9 video connector
+    F       - 2.5A fuse
+
+
+NOKIA 9924494 C
+
+|-----------------------|
+|   |-----CON1------|   |
+| LS14  7406    7445    |
+|       LS123           |
+|                       |
+| 74368 7474    7445    |
+| LS132 LS08    LS04    |
+|       LS74    74221   |
+| LS112                 |
+| LS157                 |
+| LS393                 |
+| LS629         FDC     |
+| LS393                 |
+| 16MHz                 |
+|-----------------------|
+
+Notes:
+    All IC's shown.
+
+    CON1    - 2x22 PCB header for floppy
+    FDC     - NEC D765AC
+
+
+NOKIA 9924913 Z
+
+|---------------------------------------|
+| 7438  -          |-----CON1------|    |
+| 7438  |       LS14    7406    7445    |
+|       |               LS123           |
+| DIP   |CON2                           |
+|       |       74368   7474    7445    |
+| 7438  |       LS132   LS08    LS04    |
+| 7438  -               LS74    74221   |
+| LS240         LS112                   |
+| LS240         LS157                   |
+| LS374         LS393                   |
+| LS374         LS629           FDC     |
+| LS373         LS393                   |
+| LS74  LS04    16MHz                   |
+| LS74  LS74    LS139   LS32    LS257   |
+| LS08  LS257                           |
+|---------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    CON1    - 2x22 PCB header for floppy
+    CON2    - 2x25 PCB header for SASI interface
+    FDC     - NEC D765AC
+
+
+NOKIA 9923204 C
+
+|-----------------------------------------------------------------------------------|
+|       PROM    LS14    XTAL                LS163   LS163           LS123   7438    |
+|                                           LS42    LS151           LS162           |
+|-----------------------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    PROM    - 6349-1J
+    XTAL    - unknown value
+
+*/
+
+/*
+
+    TODO
+
+    - floppy does not work in mm1m7
+
+*/
+
 #include "emu.h"
 #include "mikromik.h"
 #include "softlist_dev.h"
@@ -182,16 +306,7 @@ void mm1_state::switch_w(int state)
 
 	m_switch = state;
 
-	if (m_switch)
-	{
-		m_io->space().install_readwrite_handler(0x50, 0x50, read8sm_delegate(*this, FUNC(mm1_state::sasi_status_r)), write8sm_delegate(*this, FUNC(mm1_state::sasi_cmd_w)));
-		m_io->space().install_readwrite_handler(0x51, 0x51, emu::rw_delegate(*this, FUNC(mm1_state::sasi_data_r)), write8sm_delegate(*this, FUNC(mm1_state::sasi_data_w)));
-	}
-	else
-	{
-		m_io->space().install_device(0x50, 0x51, *m_fdc, &upd765a_device::map);
-	}
-
+	m_fdc_view.select(state);
 	m_floppy[0]->mon_w(state);
 }
 
@@ -327,7 +442,10 @@ void mm1_state::mmu_io_map(address_map &map)
 	map(0x20, 0x21).mirror(0x0e).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x30, 0x33).mirror(0x0c).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x40, 0x40).mirror(0x0f).rw(m_iop, FUNC(i8212_device::read), FUNC(i8212_device::write));
-	map(0x50, 0x51).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x50, 0x51).mirror(0x0e).view(m_fdc_view);
+	m_fdc_view[0](0x50, 0x51).m(m_fdc, FUNC(upd765a_device::map));
+	m_fdc_view[1](0x50, 0x50).rw(FUNC(mm1_state::sasi_status_r), FUNC(mm1_state::sasi_cmd_w));
+	m_fdc_view[1](0x51, 0x51).rw(FUNC(mm1_state::sasi_data_r), FUNC(mm1_state::sasi_data_w));
 	map(0x60, 0x67).mirror(0x08).w(m_outlatch, FUNC(ls259_device::write_d0));
 }
 
