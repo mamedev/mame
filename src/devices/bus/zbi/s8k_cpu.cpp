@@ -223,8 +223,6 @@ z8010_device *s8k_cpu_base::select_code_mmu(offs_t offset)
 		{
 			if (m_normal_mode)  // Trying to access in normal mode?
 			{
-				// SEGTRAP!  (the address latches are captured by the
-				// segment trap flip-flop in segt_interrupt)
 				mmu = nullptr;
 				segt_interrupt(1);
 			}
@@ -570,8 +568,6 @@ bool zbi_s8k_cpu10_card_device::translate_addr(int spacenum, bool write, offs_t 
 						z8002_device::ST_REQ_STACK :
 						z8002_device::ST_REQ_DATA);
 
-		// Board latches and MMU bus snoop see the cycle before any
-		// violation can be raised for it.
 		observe_bus_cycle(offset, st == z8002_device::ST_IFETCH_1);
 
 		z8010_device *mmu = code_access ?
