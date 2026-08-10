@@ -913,10 +913,9 @@ void kingdrby_state::kingdrby_palette(palette_device &palette) const
 	{
 		int bit0, bit1, bit2;
 
-		bit0 = 0;
-		bit1 = BIT(color_prom[0], 1);
-		bit2 = BIT(color_prom[0], 0);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[0], 1);
+		bit1 = BIT(color_prom[0], 0);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		bit0 = BIT(color_prom[0], 4);
 		bit1 = BIT(color_prom[0], 3);
@@ -947,10 +946,9 @@ void kingdrby_state::kingdrbb_palette(palette_device &palette) const
 	{
 		int bit0, bit1, bit2;
 
-		bit0 = 0;
-		bit1 = BIT(prom[i], 1);
-		bit2 = BIT(prom[i], 0);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(prom[i], 1);
+		bit1 = BIT(prom[i], 0);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		bit0 = BIT(prom[i], 4);
 		bit1 = BIT(prom[i], 3);
