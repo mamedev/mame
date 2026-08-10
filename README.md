@@ -13,8 +13,9 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 
 ### Community
 
+* [MAME Forums on bannister.org](https://forums.bannister.org/ubbthreads.php?ubb=cfrm&c=5)
 * [r/MAME](https://www.reddit.com/r/MAME/) on Reddit
-* [MAMEdev Forum](https://forum.mamedev.org/)
+* [Official MAMEdev Forum](https://forum.mamedev.org/)
 * [MAMEdev Discussions](https://github.com/orgs/mamedev/discussions) on GitHub
 
 ## Development
