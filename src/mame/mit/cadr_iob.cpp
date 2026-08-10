@@ -655,7 +655,9 @@ INPUT_CHANGED_MEMBER(cadr_iob_device::mouse_changed)
 
 u8 cadr_iob_device::mcu_bus_r()
 {
-	// bit 0 is checked by mcu (data/clock?)
+	// bit 0 is checked by the mcu firmware right before it scans
+	// the keyboard matrix. Most likely a ready signal from the
+	// external shift register.
 	return 0xff;
 }
 
@@ -688,13 +690,11 @@ void cadr_iob_device::mcu_p1_w(u8 data)
 	// Sequence when a key is pressed:
 	// - bits 5 and 6 get set, r4 is output to bus,
 	// - bit 6 is reset, r3 is output to bus,
-	// - bits 5 and 4 are reset, bit 6 is set, r2 is output to bus 
-	// examples:
-	// 64, bus, 24, bus, 04, 44, bus
-	// 70, bus, 30, bus, 10, 50, bus
-	// 65: 11, bus, 01, bus, 10, bus
-
+	// - bits 5 and 4 are reset, bit 6 is set, r2 is output to bus
+	//
 	// Lowest bit is changed separately, to latch data for reading on p2?
+	//
+	// Bit 7 might be the trigger for the shift register to start shifting out data.
 	m_p1 = data;
 }
 
