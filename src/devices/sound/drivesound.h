@@ -65,8 +65,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_SOUND_FLOPPYSOUND_H
-#define MAME_SOUND_FLOPPYSOUND_H
+#ifndef MAME_SOUND_DRIVESOUND_H
+#define MAME_SOUND_DRIVESOUND_H
 
 #pragma once
 
@@ -205,4 +205,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device)
 
-#endif // MAME_SOUND_FLOPPYSOUND_H
+#endif // MAME_SOUND_DRIVESOUND_H
