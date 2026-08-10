@@ -110,11 +110,28 @@ void octavian_g650_state::octavian_g650(machine_config &config)
    The second HDD have references to both "Admiral Parrot" and "Sweet Street" games (both from Octavian and both from 2007), but 
    seems to be "Sweet Street", and that the "Admiral Parrot" stuff is just a leftover.
 
+   Some partitions use a custom filesystem (or not filesystem at all), but thankfully it also uses grub:
+     title      system
+     root       (hd0,0)
+     kernel     /vmlinuz root=/dev/ram0 vga=769 console=/dev/tty2 CONSOLE=/dev/tty2 ro it821x_noraid=1 ide=nodma
+     initrd     /initrd.gz
+     boot
+
+   It also prints messages in tty2:
+     ./vmlinuz: Linux kernel x86 boot executable, bzImage, version 2.6.20.1 (root@dgsan) #58 PREEMPT Tue Dec 2 16:16:14 MSK 2008,
+                RO-rootFS, root_dev 0X303, Normal VGA, setup size 512*14, syssize 0x25693,
+                jump 0x238 0xe8c50c908db40000 instruction, protocol 2.5
+
+   769 means it wants 640x480x8
+   201:002 = missing network adaptor?
+   201:004 = ?
+
    The encryption is a pre-block Blowfish CBC and 128 bits keys, with the IV depending on the offset.
    Linux uses cryptoloop + Blowfish with the values readed from the Atmel on the USB external board. It skips all-zero blocks.
 
    First partition initrd is decrypted performing a MD5 of /boot/vmlinuz
      key = RIPEMD160( ascii_hex( MD5(/boot/vmlinuz) ) )
+
    Then, the second partition is descrypted using the key at /sbin/init
      #!/bin/sh
      /bin/mount -n -o remount,rw /dev/loop0 /  > /dev/null 2>&1
@@ -130,8 +147,10 @@ void octavian_g650_state::octavian_g650(machine_config &config)
      exec /usr/sbin/chroot . bin/sh -c \
       '/bin/mount -n /proc /proc -t proc;umount -n -lf /initrd; /bin/umount -n /proc; exec /sbin/init' \
       <dev/tty2 >dev/tty2 2>&1
-   Finally, /etc/init.d/mountall.sh does the final step. and /etc/init.d/mountdg.sh mount the third partition (the game itself)
-   at /dgt/distr
+
+   Finally, /etc/init.d/mountall.sh does the final step. and /etc/init.d/mountdg.sh mount the third
+   partition (the game itself) at /dgt/distr
+
    /usr/sbin/key_find is used to look up for the USB external board, sending "test", and receiving
    "3dd0de425ec68a50d498f30cc66b78c79880d0c2" from the MCU.
 
