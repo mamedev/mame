@@ -596,6 +596,7 @@ void cv1k_state::cv1k(machine_config &config)
 	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
 
 	CV1K_BLITTER(config, m_blitter);
+	m_blitter->set_maincpu(m_maincpu); // timing tracking of uncached blitter r/w access
 	m_blitter->set_screen("screen");
 	m_blitter->port_r_callback().set_ioport("DSW");
 	m_blitter->set_mainramsize(0x800000);
