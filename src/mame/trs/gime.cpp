@@ -333,6 +333,7 @@ void gime_device::device_reset()
 	m_ff22_value = 0;
 	m_ff23_value = 0;
 
+	sam6883_friend_device_interface::update_cpu_clock();
 	update_memory();
 	reset_timer();
 }
