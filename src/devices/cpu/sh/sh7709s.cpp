@@ -274,16 +274,15 @@ uint32_t sh7709s_device::sdram_bank(uint32_t address)
 
 	switch (amx)
 	{
-	case 0x4: // row begins with A9: 1M x 16-bit x 4-bank
-	case 0x7: // row begins with A9: 512k x 32-bit x 4-bank
-		return (address >> 7) & 0x3;   // A8:A7
-
-	case 0x5: // row begins with A10: 2M x 8/16-bit x 4-bank
-	case 0xd: // row begins with A10: 4M x 16-bit x 4-bank
-		return (address >> 8) & 0x3;   // A9:A8
-
-	case 0xa: // row begins with A11: 8M x 16-bit x 4-bank
-		return (address >> 9) & 0x3;   // A10:A9
+	case 0x4: // 1M x 16-bit x 4-bank : A23:A22
+		return (address >> 22) & 0x3;
+	case 0x5: // 2M x 8/16-bit x 4-bank : A24:A23
+		return (address >> 23) & 0x3;
+	case 0x7: // 512k x 32-bit x 4-bank : A22:A21
+		return (address >> 21) & 0x3;
+	case 0xd: // 4M x 16-bit x 4-bank : A25:A24
+	case 0xe: // 8M x 16-bit x 4-bank : A25:A24
+		return (address >> 24) & 0x3;
 	}
 
 	return 0;
