@@ -428,4 +428,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, trfruits, 0, trfruits, trfruits, eagle_9619b_state, empty_init, ROT0, "Eagle", "Tropical Fruits (v11.01)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, trfruits, 0, trfruits, trfruits, eagle_9619b_state, empty_init, ROT0, "Eagle", "Tropical Fruits (Eagle, v11.01)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

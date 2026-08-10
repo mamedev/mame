@@ -3034,6 +3034,7 @@ rbtapper
 shollow
 shollow2
 solarfox
+solarfoxc
 sutapper
 tapper
 tappera
@@ -49459,6 +49460,9 @@ wmg
 
 @source:wing/eagle_9619b.cpp
 trfruits
+
+@source:wing/eagle_9715a.cpp
+smflight
 
 @source:wing/luckgrln.cpp
 7smash
