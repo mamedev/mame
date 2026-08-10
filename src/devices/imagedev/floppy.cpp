@@ -702,12 +702,16 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 	}
 
 	char const *const wp = get_feature("write_protected");
-	if (wp && !std::strcmp(wp, "true"))
+	bool const protect = wp && !std::strcmp(wp, "true");
+	if (protect)
 		make_readonly();
 
 	m_output_format = is_readonly() ? nullptr : best_format;
 
 	m_image_dirty = false;
+
+	osd_printf_verbose("%s: Loaded %s, %s\n", tag(), best_format->description(),
+		protect ? "write protected by softlist" : is_readonly() ? "read-only" : "write permitted");
 
 	init_floppy_load(m_output_format != nullptr);
 
