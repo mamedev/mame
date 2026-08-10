@@ -27,8 +27,8 @@ namespace {
 class btoads_state : public driver_device
 {
 public:
-	btoads_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	btoads_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram_fg(*this, "vram_fg%u", 0U, 0x200000U, ENDIANNESS_LITTLE),
 		m_vram_fg_data(*this, "vram_fg_data"),
 		m_vram_bg(*this, "vram_bg%u", 0U, 0x400000U, ENDIANNESS_LITTLE),

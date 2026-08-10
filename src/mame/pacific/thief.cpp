@@ -971,7 +971,7 @@ ROM_START( natodefa )
 	ROM_LOAD( "nato_cop_c8.c8", 0x200, 0x0200, CRC(7ed5c923) SHA1(35757d50bfa9ea3cf916576a148064a0f9be8732) ) // Nato  COP # C8 - PCB silkscreened  PROM 1
 	// C8 is mapped (banked) in the coprocessor's address space; it contains Z80 code
 
-	ROM_REGION( 0x6000, "blitter", 0 ) // image ROMs for coprocessor - same ROMs as natodef, but in a different oder to give different mazes
+	ROM_REGION( 0x6000, "blitter", 0 ) // image ROMs for coprocessor - same ROMs as natodef, but in a different order to give different mazes
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_062182_7058h_cop_d4.d4", 0x0001, 0x1000, CRC(39a868f8) SHA1(870795f18cd8f831b714b809a380e30b5d323a5f) ) // C 1982   P.N.M.  Inc.  NATO  062182  7058H  COP#D4 - PCB silkscreened  O4
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_062182_f67ah_cop_h4.h4", 0x0000, 0x1000, CRC(b6d1623d) SHA1(0aa15db0e1459a6cc7d2a5bc8e588fd514b71d85) ) // C 1982   P.N.M.  Inc.  NATO  062182  F67AH  COP#H4 - PCB silkscreened  E1
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_71fch_cop_b4.b4", 0x2001, 0x1000, CRC(b217909a) SHA1(a26eb5bf2c92d79a75376deb6278710426b34cc5) ) // C 1982   P.N.M.  Inc.  NATO  060982  71FCH  COP#B4 - PCB silkscreened  O2

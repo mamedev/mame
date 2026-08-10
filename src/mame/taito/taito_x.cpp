@@ -3,7 +3,6 @@
 // thanks-to:Richard Bush
 /***************************************************************************
 
-
 Taito X-system
 
 driver by Richard Bush, Howie Cohen and Yochizo

@@ -968,7 +968,6 @@ void cybertnk_state::init_cybertnk()
 		// is along the lines of 04 15 26 37 which is awkward to use
 		m_spr_gfx[x] = bitswap<32>(m_spr_gfx[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
 	}
-
 }
 
 } // anonymous namespace

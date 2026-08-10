@@ -290,6 +290,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??,  phtetris, 0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989?, phpython,  0,     photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           MACHINE_SUPPORTS_SAVE )
-GAME( 19??,  phklad,   0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??,  phtetris, 0, photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989?, phpython, 0, photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           MACHINE_SUPPORTS_SAVE )
+GAME( 19??,  phklad,   0, photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", MACHINE_SUPPORTS_SAVE )

@@ -2120,4 +2120,4 @@ GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_bootleg_state, init
 
 GAME( 1996, tengai,    0,        s1945,    tengai,    s1945_state,          init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   s1945_state,          init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II (Japan) / Tengai (World)", MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
-GAME( 1996, tengaibl,  tengai,   tengaibl, tengaibl,  psikyo_bootleg_state, init_tengaibl, ROT0,   "Psikyo",  "Tengai (bootleg)",                                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tengaibl,  tengai,   tengaibl, tengaibl,  psikyo_bootleg_state, init_tengaibl, ROT0,   "bootleg", "Tengai (bootleg)",                                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
