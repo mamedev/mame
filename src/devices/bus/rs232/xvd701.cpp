@@ -17,7 +17,7 @@ jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, JVC_XVD701, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
-	m_media_type(JVC_MEDIA_VCD), // TODO: This should be changed based on the type of disc inserted or else seeking won't work properly
+	m_media_type(media_type::VCD),
 	m_response_index(0),
 	m_timer_response(nullptr)
 {
@@ -182,7 +182,7 @@ void jvc_xvd701_device::rcv_complete()
 			// FF FF 21 0C 50 20 00 00 00 00 63 SEEK TO SPECIFIC CHAPTER
 			auto chapter = ((m_command[6] % 10) * 100) + ((m_command[7] % 10) * 10) + (m_command[8] % 10);
 
-			if (m_media_type == JVC_MEDIA_VCD)
+			if (m_media_type == media_type::VCD)
 			{
 				// VCD can only go to 99, so it sticks the data in the first two spots
 				chapter /= 10;

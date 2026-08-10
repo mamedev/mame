@@ -328,6 +328,7 @@ public:
 	void twinklex(machine_config &config);
 	void twinklex2(machine_config &config);
 	void twinklei(machine_config &config);
+	void twinklei_dvd(machine_config &config);
 	void twinkle(machine_config &config);
 	void twinkle_dvd_type1(machine_config &config);
 	void twinkle_dvd_type2(machine_config &config);
@@ -1255,6 +1256,17 @@ void twinkle_state::twinklei(machine_config &config)
 	I2C_M24C02(config, "security"); // M24C02-W
 }
 
+void twinkle_state::twinklei_dvd(machine_config &config)
+{
+	twinklei(config);
+
+	// 6th through 8th style use DVD media; earlier versions use Video CD media.
+	subdevice<rs232_port_device>("rs232_dvd")->set_option_machine_config("xvd701", [] (device_t *device)
+	{
+		downcast<jvc_xvd701_device &>(*device).set_media_type(jvc_xvd701_device::media_type::DVD);
+	});
+}
+
 static INPUT_PORTS_START( twinkle )
 
 	PORT_START("IN0")
@@ -1655,8 +1667,8 @@ GAMEL( 2000, bmiidx3b, bmiidx3, twinklei, twinklei, twinkle_state, empty_init, R
 GAMEL( 2000, bmiidx3a, bmiidx3, twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
 GAMEL( 2000, bmiidx4,  gq863,   twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
 GAMEL( 2001, bmiidx5,  gq863,   twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 5th style (GCA17 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
-GAMEL( 2001, bmiidx6,  gq863,   twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAB)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
-GAMEL( 2001, bmiidx6a, bmiidx6, twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
-GAMEL( 2002, bmiidx7,  gq863,   twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAB)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
-GAMEL( 2002, bmiidx7a, bmiidx7, twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
-GAMEL( 2002, bmiidx8,  gq863,   twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 8th style (GCC44 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
+GAMEL( 2001, bmiidx6,  gq863,   twinklei_dvd, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAB)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
+GAMEL( 2001, bmiidx6a, bmiidx6, twinklei_dvd, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
+GAMEL( 2002, bmiidx7,  gq863,   twinklei_dvd, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAB)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
+GAMEL( 2002, bmiidx7a, bmiidx7, twinklei_dvd, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
+GAMEL( 2002, bmiidx8,  gq863,   twinklei_dvd, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 8th style (GCC44 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
