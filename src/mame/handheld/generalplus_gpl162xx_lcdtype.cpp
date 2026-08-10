@@ -840,7 +840,7 @@ void gpl162xx_lcdtype_state::gpl162xx_lcdtype(machine_config &config)
 	UNSP_20(config, m_maincpu, 96000000); // unknown CPU, unsp20 based, 96Mhz is listed as the maximum for most unSP2.0 chips, and appears correct here
 	m_maincpu->set_addrmap(AS_PROGRAM, &gpl162xx_lcdtype_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(64*8, 32*8);

@@ -383,7 +383,7 @@ void exzisus_state::exzisus(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -530,6 +530,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )

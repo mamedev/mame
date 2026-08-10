@@ -1067,7 +1067,7 @@ void segag80r_state::g80r_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segag80r);
 	PALETTE(config, m_palette).set_entries(64);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(segag80r_state::screen_update_segag80r));
 	m_screen->set_palette(m_palette);

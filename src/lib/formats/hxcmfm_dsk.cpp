@@ -113,22 +113,42 @@ bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 	}
 
-	image.set_variant(floppy_image::DSDD);
+	// Match HFE: bitrate in kbit/s selects the media variant
+	if (header.floppyBitRate < 300)
+		image.set_variant((header.number_of_side == 1) ? floppy_image::SSDD : floppy_image::DSDD);
+	else if (header.floppyBitRate < 600)
+		image.set_variant(floppy_image::DSHD);
+	else
+		image.set_variant(floppy_image::DSED);
+
 	return true;
 }
 
 bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	// TODO: HD support
 	MFMIMG header;
 	int track_count, head_count;
 	image.get_actual_geometry(track_count, head_count);
+
+	int cell_size = 2000;
+	uint16_t bitrate = 250;
+	switch (image.get_variant())
+	{
+	case floppy_image::DSHD:
+		cell_size = 1000;
+		bitrate = 500;
+		break;
+	case floppy_image::DSED:
+		cell_size = 500;
+		bitrate = 1000;
+		break;
+	}
 
 	memcpy(&header.headername, MFM_FORMAT_HEADER, 7);
 	header.number_of_track = track_count;
 	header.number_of_side = head_count;
 	header.floppyRPM = 0;
-	header.floppyBitRate = 250;
+	header.floppyBitRate = bitrate;
 	header.floppyiftype = 4;
 	header.mfmtracklistoffset = sizeof(MFMIMG);
 
@@ -139,7 +159,7 @@ bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 	for(int track=0; track < track_count; track++) {
 		for(int side=0; side < head_count; side++) {
-			auto trackbuf = generate_bitstream_from_track(track, side, 2000, image);
+			auto trackbuf = generate_bitstream_from_track(track, side, cell_size, image);
 			std::vector<uint8_t> packed((trackbuf.size() + 7) >> 3, 0);
 			for(uint32_t i = 0; i != trackbuf.size(); i++)
 				if(trackbuf[i])

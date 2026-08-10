@@ -436,7 +436,7 @@ void lw350_state::lw350(machine_config &config) {
 	TIMER(config, "1khz").configure_periodic(FUNC(lw350_state::int1_timer_callback), attotime::from_hz(1000));
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, screen);
 	screen->set_color(rgb_t(6, 245, 206));
 	screen->set_physical_aspect(480, 128);
 	screen->set_refresh_hz(78.1);
@@ -863,7 +863,7 @@ void lw450_state::lw450(machine_config &config) {
 	TIMER(config, "1khz").configure_periodic(FUNC(lw450_state::int1_timer_callback), attotime::from_hz(1000));
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, screen);
 	screen->set_color(rgb_t::white());
 	screen->set_physical_aspect(720, 320);
 	screen->set_screen_update("hd6445", FUNC(hd6345_device::screen_update));

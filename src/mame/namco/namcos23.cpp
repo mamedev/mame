@@ -874,7 +874,7 @@ Notes:
             Angler King     AG1      KC028     -
             Crisis Zone     CSZ1     KC039     -
             Downhill Bikers DH1      KC016     3A, 3C, 2M and 2F not populated.
-            Final Furlong 2 FFS1     KC???     -
+            Final Furlong 2 FFS1     KC031     -
             Gunmen Wars     GM1      KC018     3A, 3C, 4A, 4C, 2A, 2F and 2M not populated.
             Motocross Go!   MG1      KC009     3A, 3C, 4A, 4C, 4F and 7F not populated.
             Panic Park      PNP1     KC015     3A, 3C, 4A, 4C, 2M and 2F not populated.
@@ -1246,6 +1246,7 @@ It can also be used with Final Furlong when wired correctly.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "video.h"
 
 #include "md8412b_s23.h"
 #include "namco_settings.h"
@@ -2179,6 +2180,8 @@ private:
 class namcoss23_gmen_state : public namcoss23_state
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+
 	namcoss23_gmen_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcoss23_state(mconfig, type, tag),
 		m_sh2(*this, "sh2"),
@@ -6669,7 +6672,7 @@ void gorgon_state::gorgon(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gorgon_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(gorgon_state::vblank));
@@ -6745,7 +6748,7 @@ void namcos23_state::s23(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::vblank));

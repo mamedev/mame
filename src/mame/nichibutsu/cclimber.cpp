@@ -2494,7 +2494,7 @@ void cclimber_state::root(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -2676,7 +2676,7 @@ void swimmer_state::swimmer(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_assert), attotime::from_ticks(0x4000, 4_MHz_XTAL));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.57); // verified on pcb
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

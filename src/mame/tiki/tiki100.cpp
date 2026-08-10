@@ -715,7 +715,7 @@ void tiki100_state::tiki100(machine_config &config)
 
 	/* video hardware */
 	TIMER(config, "scantimer").configure_scanline(FUNC(tiki100_state::scanline_start), "screen", 0, 1);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(tiki100_state::screen_update));
 	PALETTE(config, m_palette).set_entries(16);

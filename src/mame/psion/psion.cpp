@@ -778,7 +778,7 @@ GFXDECODE_END
 void psion_state::psion_base(machine_config &config)
 {
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));

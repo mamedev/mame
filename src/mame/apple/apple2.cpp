@@ -419,10 +419,10 @@ u8 apple2_state::flags_r(offs_t offset)
 		return (m_cassette->input() > 0.0 ? 0 : 0x80) | uFloatingBus7;
 
 	case 1:  // button 0
-		return (m_gameio->sw0_r() ? 0x80 : 0) | uFloatingBus7;
+		return ((!m_gameio->has_sw0() || m_gameio->sw0_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
 
 	case 2:  // button 1
-		return (m_gameio->sw1_r() ? 0x80 : 0) | uFloatingBus7;
+		return ((!m_gameio->has_sw1() || m_gameio->sw1_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
 
 	case 3:  // button 2 (or SHIFT key, with SHIFT key mod)
 		return (((m_sysconfig->read() & 0x04) ? m_kbd->shift_r() : m_gameio->sw2_r()) ? 0x80 : 0) | uFloatingBus7;
@@ -731,7 +731,7 @@ void apple2_state::apple2_common(machine_config &config)
 	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);

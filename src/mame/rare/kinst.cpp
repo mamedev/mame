@@ -707,7 +707,7 @@ void kinst_state::kinst(machine_config &config)
 	m_ata->irq_handler().set_inputline(m_maincpu, 1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL/8, 406, 0, 320, 261, 0, 240);
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));

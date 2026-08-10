@@ -826,7 +826,7 @@ void rpunch_state::rpunch(machine_config &config)
 	// video hardware
 	set_sprite_palette(0x300);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(304, 224);
 	m_screen->set_visarea(8, 303-8, 0, 223-8);
@@ -880,7 +880,7 @@ void rpunch_state::svolleybl(machine_config &config)
 	// video hardware
 	set_sprite_palette(0x080);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(304, 224);
 	m_screen->set_visarea(8, 303-8, 0, 223-8);

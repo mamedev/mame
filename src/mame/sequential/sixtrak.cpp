@@ -442,10 +442,13 @@ void sixtrak_state::update_wheel_rc(int which)
 	constexpr const char *WHEEL_NAME[2] = {"Pitch", "Mod"};
 
 	// The real hardware does not use the full range of the wheel potentiometers.
-	// Using the full range results in erratic behavior. The exact range is not
-	// known, but the value used here results in reasonable pitch bend behavior
-	// (+/- ~3 semitones).
-	constexpr double WHEEL_RANGE = 0.25;
+	// Using the full range results in erratic behavior. According to the owner's
+	// manual, the pitch wheel can change the pitch "up or down by about a 3rd",
+	// or 4 semitones assuming a major 3rd. The value chosen here results in
+	// a pitch bend of +/- ~3.75 semitones (the range changes a bit depending on
+	// the base note), which is the closest we can get to +/- 4 while still
+	// having a nearly symmetric bend amount.
+	constexpr double WHEEL_RANGE = 0.3;
 
 	const s32 value = m_wheels[which]->read();
 	if (value <= 0)
@@ -826,9 +829,11 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	// *** Audio configuration ***
 
 	// The audio pipeline operates on current and voltage magnitudes. This
-	// scaler converts the loudest voltage signal to an audio signal within the
-	// range [-1, 1].
-	constexpr double VOLTAGE_TO_AUDIO_SCALER = 0.7;
+	// scaler converts the final voltage to audio within the range [-1, 1]. The
+	// value is chosen such that the demo sequences do not clip at max volume,
+	// with headroom to spare. Also verified with a random selection of patches
+	// in unison mode.
+	constexpr double VOLTAGE_TO_AUDIO_SCALER = 1.4;
 
 	// The typical peak-to-peak current of the CE33394, when all waveforms are
 	// enabled, is 400 uA [-200, 200].
@@ -841,16 +846,25 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	constexpr double C_VCO_JITTER[6] = {-0.9781, 0.0426, 0.6231, -0.4256, 0.2138, -0.0607};
 	constexpr double C_VCO = CAP_U(0.002);
 
+	// ... and similarly for the VCF capacitors.
+	constexpr double C_VCF_JITTER[6] = {-0.3612, -0.8436, -0.2686, -0.1601, 0.7358, 0.7788};
+	constexpr double C_VCF = CAP_U(0.033);
+
+	// The sixtrak schematic does not include tolerance values. Using those from
+	// the parts list on the Sente voice board, which is based on the sixtrak.
+	constexpr double C_VCO_TOL = 0.05;  // 5%
+	constexpr double C_VCF_TOL = 0.10;  // 10%
+
 	for (int i = 0; i < 6; ++i)
 	{
 		VA_RC_EG(config, m_gain_rc[i]).set_r(RES_M(1));
 		VA_RC_EG(config, m_freq_rc[i]).set_r(RES_M(1));
 
-		cem3394_device::components comps =
+		const cem3394_device::components comps =
 		{
 			.r_vco = RES_K(301),
-			.c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * 0.025,  // +/- 2.5%.
-			.c_vcf = CAP_U(0.033),
+			.c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * C_VCO_TOL,
+			.c_vcf = C_VCF + C_VCF * C_VCF_JITTER[i] * C_VCF_TOL,
 			.c_ac = CAP_U(10),
 		};
 
@@ -959,7 +973,7 @@ INPUT_PORTS_START(sixtrak)
 	PORT_START("key_row_1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("SEL 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("SEL 9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PROGRAM") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PROGRAM") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PARAM") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("VALUE") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RECORD") PORT_CODE(KEYCODE_C)
@@ -1010,7 +1024,7 @@ INPUT_PORTS_START(sixtrak)
 
 	PORT_START("key_row_9")  // G#0 - D#1
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS2
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A2
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A2 PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS2
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B2
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C3
@@ -1024,25 +1038,25 @@ INPUT_PORTS_START(sixtrak)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS3
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G3
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS3
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A3
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A3 PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS3
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B3
 
 	PORT_START("key_row_11")  // C2 - G2
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C4
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C4 PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS4
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D4
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_DS4
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E4
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E4 PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_F4
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS4
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G4
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G4 PORT_CODE(KEYCODE_G)
 
 	PORT_START("key_row_12")  // G#2 - D#3
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS4
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A4 PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A4
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS4
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B4
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B4 PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C5
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS5
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D5
@@ -1054,7 +1068,7 @@ INPUT_PORTS_START(sixtrak)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS5
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G5
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS5
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A5
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A5 PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS5
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B5
 
@@ -1112,8 +1126,8 @@ ROM_START(sixtrak)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(be700170) SHA1(fec7c376130acb0c73b69519c46c777b7ef002c9), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(e5965e9d) SHA1(35adff747df1822d30db923793e69407cce1545c), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
 	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))
@@ -1132,8 +1146,8 @@ ROM_START(sixtraka)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(be700170) SHA1(fec7c376130acb0c73b69519c46c777b7ef002c9), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(e5965e9d) SHA1(35adff747df1822d30db923793e69407cce1545c), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
 	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))

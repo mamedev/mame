@@ -2823,7 +2823,7 @@ void tumbleb_state::tumblepb(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	m_screen->set_size(40*8, 32*8);
@@ -2862,7 +2862,7 @@ void tumbleb_state::tumbleb2(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	m_screen->set_size(40*8, 32*8);
@@ -2918,7 +2918,7 @@ void tumbleb_state::jumpkids(machine_config &config) // OSCs: 12MHz, 8MHz & 14.3
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	m_screen->set_size(40*8, 32*8);
@@ -2953,7 +2953,7 @@ void tumbleb_state::fncywld(machine_config &config) // OSCs: 12MHz, 4MHz & 28.63
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	m_screen->set_size(40*8, 32*8);
@@ -2989,7 +2989,7 @@ void tumbleb_state::magipur(machine_config &config) // OSCs: 12MHz, 4MHz, 28.636
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60); // refresh rate not verified
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	m_screen->set_size(40*8, 32*8);
@@ -3044,7 +3044,7 @@ void tumbleb_state::htchctch(machine_config &config) // OSCs: 15MHz, 4.096MHz
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,htchctch)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2400)); // ?? cookbib needs it above ~2400 or the Joystick on the How to Play screen is the wrong colour?!
 	m_screen->set_size(40*8, 32*8);
@@ -3155,7 +3155,7 @@ void tumbleb_state::suprtrio(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
 //  m_screen->set_size(40*8, 32*8);
@@ -3195,7 +3195,7 @@ void tumbleb_state::pangpang(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1529));
 	m_screen->set_size(40*8, 32*8);
@@ -3383,6 +3383,27 @@ ROM_START( fncywld )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "01_fw02.bin", 0x000000, 0x080000, CRC(ecb978c1) SHA1(68fbf93a81875f744c6f9820dc4c7d88e912e0a0) )
 	ROM_LOAD16_BYTE( "02_fw03.bin", 0x000001, 0x080000, CRC(2d233b42) SHA1(aebeb5d3e06e73d14f713f201b25466bcac97a68) )
+
+	ROM_REGION( 0x100000, "sprgfx", 0  )
+	ROM_LOAD16_BYTE( "05_fw06.bin",  0x00000, 0x40000, CRC(e141ecdc) SHA1(fd656ceb2baccefadfa1e9f6932b1e0f0ec0a189) )
+	ROM_LOAD16_BYTE( "06_fw07.bin",  0x00001, 0x40000, CRC(0058a812) SHA1(fc6101a11af63536d0a345c820bcd234bb4ce91a) )
+	ROM_LOAD16_BYTE( "03_fw04.bin",  0x80000, 0x40000, CRC(6ad38c14) SHA1(a9951432c2ec5e07ed2ee5faac3f2558242438f2) )
+	ROM_LOAD16_BYTE( "04_fw05.bin",  0x80001, 0x40000, CRC(b8d079a6) SHA1(8ad63fba26f7588a9764a0585c159fb57cb8c7ed) )
+
+	ROM_REGION( 0x100000, "tilegfx", 0 )
+	ROM_LOAD16_BYTE( "08_fw09.bin", 0x00000, 0x40000, CRC(a4a00de9) SHA1(65f03a65569f70fb6f3a0fc7caf038bb44a7f503) )
+	ROM_LOAD16_BYTE( "07_fw08.bin", 0x00001, 0x40000, CRC(b48cd1d4) SHA1(a95eeba38ae1ce0a2086edb767f636a9cdbd0176) )
+	ROM_LOAD16_BYTE( "10_fw11.bin", 0x80000, 0x40000, CRC(f21bab48) SHA1(84371b31487ca5abcbf57152a64f384959d19209) )
+	ROM_LOAD16_BYTE( "09_fw10.bin", 0x80001, 0x40000, CRC(6aea8e0f) SHA1(91e2eeef001351c73b1bfbc1a7840e37d3f89900) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "00_fw01.bin", 0x000000, 0x040000, CRC(b395fe01) SHA1(ac7f2e21413658f8d2a1abf3a76b7817a4e050c9) )
+ROM_END
+
+ROM_START( fncywlda )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "01_fw02.bin", 0x000000, 0x080000, CRC(9ef06289) SHA1(e1e230b9ac457a8eccfb2b8bf4e83fbd63a94572) ) // sldh
+	ROM_LOAD16_BYTE( "02_fw03.bin", 0x000001, 0x080000, CRC(1b43ad6c) SHA1(d1a0a03422750782cfe23b5b2260ae4977cac332) ) // sldh
 
 	ROM_REGION( 0x100000, "sprgfx", 0  )
 	ROM_LOAD16_BYTE( "05_fw06.bin",  0x00000, 0x40000, CRC(e141ecdc) SHA1(fd656ceb2baccefadfa1e9f6932b1e0f0ec0a189) )
@@ -4550,7 +4571,8 @@ GAME( 1994, pangpang, 0,       pangpang,     tumblepb, tumbleb_state, init_tumbl
 /* Misc 'bootleg' hardware - more changes from base hardware */
 GAME( 1994, suprtrio, 0,       suprtrio,     suprtrio, tumbleb_state, init_suprtrio, ROT0, "Gameace", "Super Trio", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, fncywld,  0,       fncywld,      fncywld, tumbleb_state,  init_fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , MACHINE_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
+GAME( 1996, fncywld,  0,       fncywld,      fncywld, tumbleb_state,  init_fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis (set 1)" , MACHINE_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
+GAME( 1996, fncywlda, fncywld, fncywld,      fncywld, tumbleb_state,  init_fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis (set 2)" , MACHINE_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
 
 GAME( 1996, magipur,  0,       magipur,      magipur, tumbleb_state,  init_magipur,  ROT0, "Unico",   "Magic Purple" , MACHINE_SUPPORTS_SAVE )
 

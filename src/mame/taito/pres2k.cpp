@@ -46,7 +46,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-//	virtual void machine_reset() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -174,7 +174,7 @@ void pres2k_state::pres2k(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(1024 * 128);
 	v9938.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -199,4 +199,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986?, pres2k, 0, pres2k, pres2k, pres2k_state, empty_init, ROT0, "Taito Corporation", "Presenter 2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // A70, fits between bigevglf (A67) and tokio (A71)
+GAME( 1986?, pres2k, 0, pres2k, pres2k, pres2k_state, empty_init, ROT0, "Taito", "Presenter 2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // A70, fits between bigevglf (A67) and tokio (A71)

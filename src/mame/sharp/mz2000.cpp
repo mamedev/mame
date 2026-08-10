@@ -1407,7 +1407,7 @@ void mz80b_state::mz80b(machine_config &config)
 	m_cassette->set_interface("mz_cass");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: unverified, 60 Hz/15.75 kHz according to MZ-80B service manual
 	m_screen->set_raw(XTAL(14'318'181), 910, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(mz80b_state::screen_update));

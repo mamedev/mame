@@ -520,7 +520,7 @@ void bw12_state::common(machine_config &config)
 	m_latch->q_out_cb<7>().set(m_fdc, FUNC(upd765a_device::tc_line_w)); // FDC TC
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::amber()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::amber()));
 	screen.set_raw(XTAL(16'000'000), 904, 0, 640, 271, 0, 225);
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 

@@ -308,7 +308,7 @@ void es9606_state::es9606(machine_config &config)
 	m_vdp2->set_tmap_flip_xoffsets(72,72,72);
 	m_vdp2->set_tmap_flip_yoffsets(39,39,39);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: copied verbatim from vmetal config, unverified
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));

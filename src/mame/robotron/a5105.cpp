@@ -591,7 +591,7 @@ void a5105_state::a5105(machine_config &config)
 	m_maincpu->set_daisy_config(a5105_daisy_chain);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));

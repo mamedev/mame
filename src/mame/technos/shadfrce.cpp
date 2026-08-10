@@ -808,7 +808,7 @@ void shadfrce_state::shadfrce(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248);   // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(shadfrce_state::screen_update));
 	m_screen->screen_vblank().set(m_spvideoram, FUNC(buffered_spriteram16_device::vblank_copy_rising));

@@ -1704,7 +1704,7 @@ void namcos2_base_state::configure_common_standard(machine_config &config)
 
 	NAMCO_C139(config, m_sci);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
 	m_screen->set_palette(m_c116);
 
@@ -5837,7 +5837,7 @@ GAMEL( 1992, finalap3,   0,        finalap3, finalap3, finallap_state, init_fina
 GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3j,  finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3jc, finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, finallap_state, init_finalap3bl,ROT0,  "Namco", "Final Lap 3 (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, finallap_state, init_finalap3bl,ROT0,  "bootleg", "Final Lap 3 (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
 GAME(  1992, luckywld,   0,        luckywld, luckywld, sgunner_state,  init_luckywld, ROT0,   "Namco", "Lucky & Wild", MACHINE_SUPPORTS_SAVE )
 GAME(  1992, luckywldj,  luckywld, luckywld, luckywld, sgunner_state,  init_luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", MACHINE_SUPPORTS_SAVE )

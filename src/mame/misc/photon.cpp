@@ -220,7 +220,7 @@ void photon_state::photon(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(photon_state::irq_callback));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256+32, 192+32);
@@ -290,6 +290,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??,  phtetris, 0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989?, phpython,  0,     photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           MACHINE_SUPPORTS_SAVE )
-GAME( 19??,  phklad,   0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??,  phtetris, 0, photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989?, phpython, 0, photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           MACHINE_SUPPORTS_SAVE )
+GAME( 19??,  phklad,   0, photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", MACHINE_SUPPORTS_SAVE )

@@ -700,7 +700,7 @@ void taitoair_state::airsys(machine_config &config)
 	TAITOIO_YOKE(config, m_yoke);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 //  m_screen->set_size(64*16, 32*16);
@@ -1021,9 +1021,9 @@ ROM_START( ainfernoj )
 ROM_END
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY                      FULLNAME               FLAGS
-GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Air Inferno (World)", MACHINE_NOT_WORKING )
-GAME( 1990, ainfernou, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
-GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY          FULLNAME               FLAGS
+GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito",         "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito",         "Air Inferno (World)", MACHINE_NOT_WORKING )
+GAME( 1990, ainfernou, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito America", "Air Inferno (US)",    MACHINE_NOT_WORKING )
+GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito",         "Air Inferno (Japan)", MACHINE_NOT_WORKING )

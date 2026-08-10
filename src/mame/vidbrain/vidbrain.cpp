@@ -483,7 +483,7 @@ void vidbrain_state::vidbrain(machine_config &config)
 	m_uv->hblank_wr_callback().set(FUNC(vidbrain_state::hblank_w));
 	m_uv->db_rd_callback().set(FUNC(vidbrain_state::memory_read_byte));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(m_uv, FUNC(uv201_device::screen_update));
 	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
 	screen.set_physical_aspect(3, 2);

@@ -715,13 +715,13 @@ void mcr_state::cpu_90009_portmap(address_map &map)
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
-void mcr_state::cpu_90009_dp_map(address_map &map)
+void mcr_dpoker_state::cpu_90009_dp_map(address_map &map)
 {
 	cpu_90009_map(map);
 	map(0x8000, 0x81ff).ram();  // meter ram, is it battery backed?
 }
 
-void mcr_state::cpu_90009_dp_portmap(address_map &map)
+void mcr_dpoker_state::cpu_90009_dp_portmap(address_map &map)
 {
 	cpu_90009_portmap(map);
 	map(0x24, 0x24).portr("P24");
@@ -877,6 +877,34 @@ static INPUT_PORTS_START( solarfox )
 
 	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( solarfoxc ) // cabaret have player controls reversed
+	PORT_INCLUDE( solarfox )
+
+	PORT_MODIFY("ssio:IP0")  /* J4 1-8 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_MODIFY("ssio:IP1")  /* J4 10-13,15-18 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+
+	PORT_MODIFY("ssio:IP2")  /* J5 1-8 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1788,7 +1816,7 @@ void mcr_state::mcr_90009(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(30);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -1812,8 +1840,8 @@ void mcr_dpoker_state::mcr_90009_dp(machine_config &config)
 {
 	mcr_90009(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90009_dp_map);
-	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90009_dp_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_dpoker_state::cpu_90009_dp_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_dpoker_state::cpu_90009_dp_portmap);
 
 	/* basic machine hardware */
 	TIMER(config, "coinin").configure_generic(FUNC(mcr_dpoker_state::coin_in_callback));
@@ -1937,7 +1965,7 @@ void mcr_state::mcr_91490_tcs(machine_config &config)
  *
  *************************************/
 
-ROM_START( solarfox )
+ROM_START( solarfox ) // upright version
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sfcpu.3b",     0x0000, 0x1000, CRC(8c40f6eb) SHA1(a323897cfa8771edd28d58d806913e62110a2689) )
 	ROM_LOAD( "sfcpu.4b",     0x1000, 0x1000, CRC(4d47bd7e) SHA1(0cfa09f2c1fe6d662c3a96abc43edf431ccf6d02) )
@@ -1961,6 +1989,32 @@ ROM_START( solarfox )
 	ROM_LOAD( "sfvid.1b",     0x2000, 0x2000, CRC(78801e83) SHA1(23b5811a03fe4ad576c5313d2205203577300159) )
 	ROM_LOAD( "sfvid.1d",     0x4000, 0x2000, CRC(4d8445cf) SHA1(fbe427da0e758b79eb2230713f2cd12e6f8bdeb7) )
 	ROM_LOAD( "sfvid.1e",     0x6000, 0x2000, CRC(3da25495) SHA1(e7b703bc8caca7497af92efc869c6f1b7dbc8bf1) )
+ROM_END
+
+ROM_START( solarfoxc ) // cabaret version
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sfcpu-0580-00803-2000-a.3b", 0x0000, 0x1000, CRC(68fa7ed2) SHA1(8c9945dbf6575f5d8953e767c8e58b7fc503688a) )
+	ROM_LOAD( "sfcpu-0580-00803-2100-b.4b", 0x1000, 0x1000, CRC(fc1ba250) SHA1(1783976543dee3a2adb950aa89ff0e7264caf32e) )
+	ROM_LOAD( "sfcpu-0580-00803-2200-c.5b", 0x2000, 0x1000, CRC(bb8ff3d4) SHA1(e3fb8c585edb7c4669d6e815cf55f834c5ac837b) )
+	ROM_LOAD( "sfcpu-0580-00803-2300-d.4d", 0x3000, 0x1000, CRC(cb33fe6a) SHA1(1a1d0faa174c32ac1168442fafb821ade930d4f7) )
+	ROM_LOAD( "sfcpu-0580-00803-2400-e.5d", 0x4000, 0x1000, CRC(fec34837) SHA1(4b3a0e03c8c6c2ac6a7ac579138556c0ffde531a) )
+	ROM_LOAD( "sfcpu-0580-00803-2500-f.6d", 0x5000, 0x1000, CRC(8a09bd45) SHA1(55389c0f3d9a09656cfdfbcdf288ea919de14203) )
+	ROM_LOAD( "sfcpu-sf_i_7-12.7d",         0x6000, 0x1000, CRC(679da462) SHA1(dd04346f751e1346626d51de9804c6fd8e474e59) )
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_LOAD( "sfsnd.7a", 0x0000, 0x1000, CRC(cdecf83a) SHA1(5acd2709e214408d756b39916bb98cd4ecda7988) )
+	ROM_LOAD( "sfsnd.8a", 0x1000, 0x1000, CRC(cb7788cb) SHA1(9e86f9131a6f0fc96dd436e21baf45e215ee65f4) )
+	ROM_LOAD( "sfsnd.9a", 0x2000, 0x1000, CRC(304896ce) SHA1(00ff640eab50022da980cdc5ce8cedebaaebc9cf) )
+
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "sfcpu-0580-00803-2600-g.4g", 0x0000, 0x1000, CRC(8d4c32a5) SHA1(531e39c49a50c146d0a473fd232b1a1561ff9579) )
+	ROM_LOAD( "sfcpu-0580-00803-2700-h.5g", 0x1000, 0x1000, CRC(40a7de3b) SHA1(fda6c07b82875ef75937c44512e4ed2cafc375b0) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "sfvid-0982-00803-3500-d.1a", 0x0000, 0x2000, CRC(9d9b5d7e) SHA1(4896c532a3d5763284a4403e8558f634f7b968d8) ) // == sfvid.1a
+	ROM_LOAD( "sfvid-0982-00803-3400-c.1b", 0x2000, 0x2000, CRC(78801e83) SHA1(23b5811a03fe4ad576c5313d2205203577300159) ) // == sfvid.1b
+	ROM_LOAD( "sfvid-0982-00803-3300-b.1d", 0x4000, 0x2000, CRC(4d8445cf) SHA1(fbe427da0e758b79eb2230713f2cd12e6f8bdeb7) ) // == sfvid.1d
+	ROM_LOAD( "sfvid-0982-00803-3200-a.1e", 0x6000, 0x2000, CRC(3da25495) SHA1(e7b703bc8caca7497af92efc869c6f1b7dbc8bf1) ) // == sfvid.1e
 ROM_END
 
 
@@ -2980,6 +3034,15 @@ void mcr_state::init_solarfox()
 }
 
 
+void mcr_state::init_solarfoxc()
+{
+	mcr_init(90009, 91399, 90908);
+
+	m_ssio->set_custom_input(0, 0x1c, *this, FUNC(mcr_state::solarfox_ip0_r));
+	m_ssio->set_custom_input(1, 0xff, *this, FUNC(mcr_state::solarfox_ip1_r));
+}
+
+
 void mcr_state::init_kick()
 {
 	mcr_init(90009, 91399, 90908);
@@ -3107,6 +3170,7 @@ void mcr_state::init_demoderb()
 
 /* 90009 CPU board + 91399 video gen + 90908 sound I/O */
 GAME(  1981, solarfox,  0,        mcr_90009,     solarfox,  mcr_state,         init_solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, solarfoxc, solarfox, mcr_90009,     solarfoxc, mcr_state,         init_solarfoxc, ROT90,  "Bally Midway", "Solar Fox (cabaret)", MACHINE_SUPPORTS_SAVE )
 GAME(  1981, kick,      0,        mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
 GAME(  1981, kickman,   kick,     mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
 GAME(  1981, kickc,     kick,     mcr_90009,     kickc,     mcr_state,         init_kick,      ROT90, "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )

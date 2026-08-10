@@ -111,6 +111,7 @@ so either 6mhz or 4mhz. Schematics show the jumper set to the 6mhz setting.
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "buggychl.lh"
@@ -852,7 +853,7 @@ void buggychl_state::buggychl(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // typical Taito 74ls392
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);
@@ -969,5 +970,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1984, buggychl,  0,        buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
-GAMEL( 1984, buggychlt, buggychl, buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychl,  0,        buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychlt, buggychl, buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )

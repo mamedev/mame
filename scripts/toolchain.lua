@@ -103,13 +103,13 @@ function toolchain(_buildDir, _subDir)
 
 		if "asmjs" == _OPTIONS["gcc"] then
 
-			if not os.getenv("EMSCRIPTEN") then
-				print("Set EMSCRIPTEN enviroment variables.")
+			if not os.getenv("EMSDK") then
+				print("Set EMSDK enviroment variables.")
 			end
 
-			premake.gcc.cc   = "$(EMSCRIPTEN)/emcc"
-			premake.gcc.cxx  = "$(EMSCRIPTEN)/em++"
-			premake.gcc.ar   = "$(EMSCRIPTEN)/emar"
+			premake.gcc.cc   = "$(EMSDK)/upstream/emscripten/emcc"
+			premake.gcc.cxx  = "$(EMSDK)/upstream/emscripten/em++"
+			premake.gcc.ar   = "$(EMSDK)/upstream/emscripten/emar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-asmjs")
 		end

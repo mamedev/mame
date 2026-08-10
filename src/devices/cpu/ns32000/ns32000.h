@@ -137,7 +137,6 @@ protected:
 
 	// other execution helpers
 	bool condition(unsigned const cc);
-	void flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction);
 	void interrupt(unsigned const type);
 	virtual void lpr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);
 	virtual void spr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);

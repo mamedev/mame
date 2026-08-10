@@ -104,9 +104,9 @@
 #include "multibyte.h"
 #include "opresolv.h"
 
-#include "eminline.h"
 #include "osdcore.h" // osd_printf_error
 
+#include <bit>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -249,7 +249,7 @@ void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 {
 	for(int i=0; i<size; i+=2) {
 		chk += get_u16be(&data[i]);
-		chk = rotr_32(chk, 1);
+		chk = std::rotr(chk, 1);
 	}
 }
 

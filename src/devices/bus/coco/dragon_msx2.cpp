@@ -114,7 +114,7 @@ void dragon_msx2_device::device_add_mconfig(machine_config &config)
 	m_v9958->set_screen_pal("screen");
 	m_v9958->set_vram_size(0x20000);
 	m_v9958->int_cb().set([this](int state) { set_line_value(line::NMI, state); });
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "speaker").front_center();
 	YM2413(config, m_ym2413, 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "speaker", 1.0);

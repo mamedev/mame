@@ -54,6 +54,7 @@ protected:
 	unsigned const m_height;
 	std::unique_ptr<uint8_t []> m_buffer;
 	uint8_t m_x_pos;
+	uint8_t m_y_pos;
 
 private:
 	void scroll_line();
@@ -62,7 +63,6 @@ private:
 	uint32_t update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t m_framecnt;
-	uint8_t m_y_pos;
 
 	emu_timer *m_bell_timer;
 	required_device<beep_device> m_beeper;

@@ -1174,7 +1174,7 @@ void gunpey_state::gunpey(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(gunpey_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(57242400/8, 442, 0, 320, 264, 0, 240); /* just to get ~60 Hz */
 	screen.set_screen_update(FUNC(gunpey_state::screen_update));
 	screen.set_palette(m_palette);

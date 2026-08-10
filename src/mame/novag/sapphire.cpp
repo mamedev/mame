@@ -80,7 +80,7 @@ which hardware it runs on, see diamond.cpp for Diamond II.
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include <bit>
@@ -475,10 +475,9 @@ void sapphire_state::sapphire(machine_config &config)
 	m_lcd_pwm->output_x().set(FUNC(sapphire_state::lcd_pwm_w));
 	m_lcd_pwm->set_bri_levels(0.05);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/3, 606/3);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_sapphire);
 
@@ -506,9 +505,8 @@ void sapphire_state::sapphire2(machine_config &config)
 	// video hardware
 	m_lcd_pwm->set_width(16);
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen_svg_device &screen(*subdevice<screen_svg_device>("screen"));
 	screen.set_size(1920/3, 671/3);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_sapphire2);
 }

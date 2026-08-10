@@ -221,6 +221,66 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- CyberVision Monitor 1.33, cybergraphics.library 40.64 -->
+	<software name="cv64_214" supported="no">
+		<description>CyberVision 64 Driver V2.14</description>
+		<year>1995</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64-214.adf" size="901120" crc="63237421" sha1="549eba15eadbc13caee716affd578f17500f8adb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CyberVision Monitor 1.37, cybergraphics.library 40.64, cyberintuition.library: 40.28 -->
+	<software name="cv64_215" supported="no">
+		<description>CyberVision 64 Driver V2.15</description>
+		<year>1995</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64-215.adf" size="901120" crc="f691e45d" sha1="f5f2a825b91a69a93da2f869304c9c4dab8d9653" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CyberVision Monitor 1.39, cybergraphics.library 40.64, cyberintuition.library: 40.30 -->
+	<software name="cv64_216" supported="no">
+		<description>CyberVision 64 Driver V2.16</description>
+		<year>1996</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64-216.adf" size="901120" crc="68fb738e" sha1="95e8512b26f902ad66d6b0b310aeea2346ce329c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CyberVision Monitor 1.62, cybergraphics.library 40.89, cyberintuition.library: 40.31 -->
+	<software name="cv64_218" supported="no">
+		<description>CyberVision 64 Driver V2.18</description>
+		<year>1996</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64_218.adf" size="901120" crc="3870727f" sha1="bc641f37fb5c57d2a6d228a79256cb21a7330004" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- DMS file with bad sectors -->
+	<software name="cv64_photogenics" supported="no">
+		<description>Photogenics Lite for CyberVision 64 V1.2</description>
+		<year>1996</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64_photogenics_lite.adf" size="901120" crc="1cd7b260" sha1="9e3970fddb3580e5b07c1a6206a0ff14a3a50e88" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bschdinst35">
 		<description>bsc HDInstTools Version 3.5 + GigaMem Version 3.0</description>
 		<year>1995</year>
@@ -228,6 +288,53 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="901120">
 				<rom name="bsc_hdinst_35.adf" size="901120" crc="f6e0bb86" sha1="69fb58385cb7caf4e11c337872c3764b22301462" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The following three disks are for use with the ICD Advantage/AdSCSI 2000/AdSCSI 2080 -->
+
+	<!-- Image modified, "AdSpeed" folder copied to disk -->
+	<software name="icdadvantage">
+		<description>ICD Advantage</description>
+		<year>1990</year>
+		<publisher>ICD</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="icd_advantage.adf" size="901120" crc="55c2f08b" sha1="4111340572036a97f0637e2befe377136ce36fd5"  status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icdprephd40">
+		<description>ICD PrepHD v4.0</description>
+		<year>1992</year>
+		<publisher>ICD</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="icd_prephd_40.adf" size="901120" crc="332c9ab5" sha1="2598745ef277de88f6b1cefd310e87e2735ec1c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icdprephd42">
+		<description>ICD PrepHD v4.2</description>
+		<year>1993</year>
+		<publisher>ICD</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="icd_prephd_42.adf" size="901120" crc="01b63e99" sha1="349569b6febf70e0f8001d28f8549c4fcef79608" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icdadram">
+		<description>ICD AdRAM</description>
+		<year>1992</year>
+		<publisher>ICD</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="icd_adram.adf" size="901120" crc="8d10b515" sha1="b8f49baeb3c57df572d7993042968e103a288a5c" />
 			</dataarea>
 		</part>
 	</software>

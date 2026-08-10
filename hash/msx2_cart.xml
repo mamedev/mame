@@ -987,7 +987,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="monmonmo">
 		<description>Mon Mon Monster (Japan)</description>
 		<year>1989</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="モンモンモンスター" />
 		<info name="serial" value="MXHB22003"/>
 		<info name="gtin" value="04967948000249"/>

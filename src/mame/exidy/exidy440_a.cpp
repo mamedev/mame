@@ -14,10 +14,12 @@
 
 #include "cpu/m6809/m6809.h"
 
+#define LOG_SOUND    (1U << 1)
 
-#define SOUND_LOG       0
+//#define VERBOSE (LOG_SOUND)
+#include "logmacro.h"
+
 #define FADE_TO_ZERO    1
-
 
 /* internal caching */
 #define SAMPLE_BUFFER_LENGTH    1024                /* size of temporary decode buffer on the stack */
@@ -141,19 +143,6 @@ void exidy440_sound_device::device_start()
 	/* allocate the mixer buffer */
 	m_mixer_buffer_left.resize(clock());
 	m_mixer_buffer_right.resize(clock());
-
-	if (SOUND_LOG)
-		m_debuglog = fopen("sound.log", "w");
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void exidy440_sound_device::device_stop()
-{
-	if (SOUND_LOG && m_debuglog)
-		fclose(m_debuglog);
 }
 
 /*************************************
@@ -261,8 +250,7 @@ uint8_t exidy440_sound_device::sound_volume_r(offs_t offset)
 
 void exidy440_sound_device::sound_volume_w(offs_t offset, uint8_t data)
 {
-	if (SOUND_LOG && m_debuglog)
-		fprintf(m_debuglog, "Volume %02X=%02X\n", offset, data);
+	LOGMASKED(LOG_SOUND, "Volume %02X=%02X\n", offset, data);
 
 	/* update the stream */
 	m_stream->update();
@@ -589,11 +577,10 @@ void exidy440_sound_device::play_cvsd(int ch)
 		return;
 	}
 
-	if (SOUND_LOG && m_debuglog)
-		fprintf(m_debuglog, "Sound channel %d play at %02X,%04X, length = %04X, volume = %02X/%02X\n",
-				ch, m_sound_banks[ch],
-				m_m6844_channel[ch].address, m_m6844_channel[ch].counter,
-				m_sound_volume[ch * 2], m_sound_volume[ch * 2 + 1]);
+	LOGMASKED(LOG_SOUND, "Sound channel %d play at %02X,%04X, length = %04X, volume = %02X/%02X\n",
+			ch, m_sound_banks[ch],
+			m_m6844_channel[ch].address, m_m6844_channel[ch].counter,
+			m_sound_volume[ch * 2], m_sound_volume[ch * 2 + 1]);
 
 	/* set the pointer and count */
 	channel->base = base;
@@ -611,8 +598,7 @@ void exidy440_sound_device::stop_cvsd(int ch)
 	m_sound_channel[ch].remaining = 0;
 	m_stream->update();
 
-	if (SOUND_LOG && m_debuglog)
-		fprintf(m_debuglog, "Channel %d stop\n", ch);
+	LOGMASKED(LOG_SOUND, "Channel %d stop\n", ch);
 }
 
 
@@ -830,8 +816,7 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream)
 		m_m6844_channel[ch].counter = m_m6844_channel[ch].start_counter - effective_offset / 8;
 		if (m_m6844_channel[ch].counter <= 0)
 		{
-			if (SOUND_LOG && m_debuglog)
-				fprintf(m_debuglog, "Channel %d finished\n", ch);
+			LOGMASKED(LOG_SOUND, "Channel %d finished\n", ch);
 			m6844_finished(&m_m6844_channel[ch]);
 		}
 	}

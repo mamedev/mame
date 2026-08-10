@@ -333,6 +333,7 @@ protected:
 		bool deleted;
 		bool bad_data_crc;
 		bool bad_addr_crc;
+		bool weak;
 	};
 
 	struct desc_gcr_sector

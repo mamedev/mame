@@ -195,3 +195,20 @@ void mm2_keyboard_device::device_reset()
 	reset_key_state();
 	start_processing(attotime::from_hz(600));
 }
+
+void mm2_keyboard_device::received_byte(uint8_t byte)
+{
+	switch (byte)
+	{
+		case 0x78: // initiate self test
+			transmit_byte(0x7a); // self test passed
+			break;
+
+		case 0x7b: // keylock switch status
+			transmit_byte(0);
+			transmit_byte(0);
+			transmit_byte(0);
+			transmit_byte(0);
+			break;
+	}
+}

@@ -1162,7 +1162,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
 	// should be 3 slots for each iteration here
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config, "cbus:0", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:1", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:2", 0, "cbus", pc88va_cbus_devices, nullptr);
@@ -1200,7 +1200,7 @@ void pc88va_state::pc88va(machine_config &config)
 
 	// TODO: pc80s31k here
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
 	m_screen->set_screen_update(FUNC(pc88va_state::screen_update));
 

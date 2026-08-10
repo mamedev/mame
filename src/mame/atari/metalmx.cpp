@@ -748,7 +748,7 @@ void metalmx_state::metalmx(machine_config &config)
 	DSP32C(config, m_dsp32c[1], 40'000'000);      // Unverified
 	m_dsp32c[1]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_2_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 384);

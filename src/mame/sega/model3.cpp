@@ -3411,7 +3411,7 @@ ROM_END
 ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2 VER98 STEP2, Security board ID# 837-13498-COM (317-0237-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-20917.17",  0x400006, 0x100000, CRC(c3bbb270) SHA1(16b2342031ff72408f2290e775df5c8aa344c2e4) )
+	ROM_LOAD64_WORD_SWAP( "epr-20917.17",  0x400006, 0x100000, CRC(969e4bda) SHA1(647f1d78e11c114c63d00c3da747b5119efbe0f0) )
 	ROM_LOAD64_WORD_SWAP( "epr-20918.18",  0x400004, 0x100000, CRC(0e9cdc5b) SHA1(356816d0380c791b9d812ce17fa95123d15bb5e9) )
 	ROM_LOAD64_WORD_SWAP( "epr-20919.19",  0x400002, 0x100000, CRC(7a0713d2) SHA1(595f962ae852e48fb24aa08d0b8603692acfb1b9) )
 	ROM_LOAD64_WORD_SWAP( "epr-20920.20",  0x400000, 0x100000, CRC(428d05fc) SHA1(451e78c7b381e7d84dbac2a3d68ebbd6f1490bad) )
@@ -6266,12 +6266,13 @@ void model3_state::model3snd_ctrl(uint16_t data)
 	}
 }
 
+// We assume using the same waitstate weights as Saturn, applied to SCSP area only
 void model3_state::model3_snd(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("soundram");
-	map(0x100000, 0x100fff).rw(m_scsp1, FUNC(scsp_device::read), FUNC(scsp_device::write));
-	map(0x200000, 0x27ffff).ram().share("soundram2");
-	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x000000, 0x07ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp1, FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x200000, 0x27ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram2");
+	map(0x300000, 0x300fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x400000, 0x400001).w(FUNC(model3_state::model3snd_ctrl));
 	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
 	map(0x800000, 0x9fffff).rom().region("samples", 0);
@@ -6349,7 +6350,7 @@ void model3_state::add_base_devices(machine_config &config)
 	m_io->an_port_callback<6>().set_ioport("AN6");
 	m_io->an_port_callback<7>().set_ioport("AN7");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: runs at 57.5 Hz-ish, same as Model 1/2/System 24?
 	m_screen->set_raw(XTAL(32'000'000)/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
 	m_screen->set_screen_update(FUNC(model3_state::screen_update_model3));

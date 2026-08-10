@@ -259,7 +259,7 @@ void primo_state::primoa32(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &primo_state::primoa_io);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(256, 192);

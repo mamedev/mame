@@ -13,8 +13,8 @@
 
 #include "abckb.h"
 
-#include "bus/abckb/r8.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/quadmouse.h"
 #include "machine/watchdog.h"
 #include "sound/spkrdev.h"
 
@@ -92,10 +92,11 @@ private:
 	required_device<i8035_device> m_mousecpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<luxor_r8_device> m_mouse;
+	required_device<quadmouse_device> m_mouse;
 	required_ioport_array<16> m_x;
 	required_ioport m_z14;
 	required_ioport m_cursor;
+	required_ioport m_mousebtn;
 	output_finder<11> m_leds;
 
 	int m_keylatch;

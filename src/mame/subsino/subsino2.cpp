@@ -2863,7 +2863,7 @@ void subsino2_state::bishjan(machine_config &config)
 	DS2430A(config, m_eeprom).set_timing_scale(0.24);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(60);
@@ -2973,7 +2973,7 @@ void subsino2_state::mtrain(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-32-1);
 	m_screen->set_refresh_hz(58.7270);
@@ -3033,7 +3033,7 @@ void subsino2_state::saklove(machine_config &config)
 	DS2430A(config, m_eeprom);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(58.7270);
@@ -3084,7 +3084,7 @@ void subsino2_state::xplan(machine_config &config)
 	DS2430A(config, m_eeprom);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(58.7270);

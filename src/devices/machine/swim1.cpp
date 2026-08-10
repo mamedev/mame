@@ -17,7 +17,24 @@ DEFINE_DEVICE_TYPE(SWIM1, swim1_device, "swim1", "Apple SWIM1 (Sander/Wozniak In
 swim1_device::swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	applefdintf_device(mconfig, SWIM1, tag, owner, clock),
 	m_floppy(nullptr),
-	m_timer(nullptr)
+	m_timer(nullptr),
+	m_flux_write{},
+	m_last_sync(0),
+	m_ism_error(0),
+	m_ism_fifo_pos(0),
+	m_ism_tss_sr(0), m_ism_tss_output(0), m_ism_current_bit(0xff),
+	m_ism_fifo{},
+	m_ism_sr(0),
+	m_ism_crc(0xcdb4),
+	m_ism_half_cycles_before_change(0),
+	m_ism_correction_factor{},
+	m_ism_latest_edge(0),
+	m_ism_prev_ls((1 << 2) | 1),
+	m_ism_csm_state(CSM_INIT),
+	m_ism_csm_error_counter{},
+	m_ism_csm_pair_side(0), m_ism_csm_min_count(0),
+	m_ism_tsm_out(0), m_ism_tsm_bits(0),
+	m_ism_tsm_mark(false)
 {
 }
 
@@ -623,7 +640,7 @@ void swim1_device::ism_fifo_clear()
 
 bool swim1_device::ism_fifo_push(u16 data)
 {
-	if(m_ism_fifo_pos == 2)
+	if(m_ism_fifo_pos >= 2)
 	{
 		return true;
 	}

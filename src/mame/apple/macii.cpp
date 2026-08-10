@@ -173,7 +173,7 @@ private:
 	void via_irq(int state);
 	void via2_irq(int state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
 	required_device<asc_device> m_asc;
@@ -371,6 +371,7 @@ void macii_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 
 void macii_state::scsi_irq(int state)
 {
+	m_via2->write_cb2(state ^ 1);
 }
 
 void macii_state::scsi_berr_w(u8 data)
@@ -897,8 +898,8 @@ void macii_state::macii_map(address_map &map)
 	map(0x50000000, 0x50001fff).rw(FUNC(macii_state::via_r), FUNC(macii_state::via_w)).mirror(0x00f00000);
 	map(0x50002000, 0x50003fff).rw(FUNC(macii_state::via2_r), FUNC(macii_state::via2_w)).mirror(0x00f00000);
 	map(0x50004000, 0x50005fff).rw(FUNC(macii_state::scc_r), FUNC(macii_state::scc_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50006003).w(FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
-	map(0x50006060, 0x50006063).r(FUNC(macii_state::scsi_drq_r)).mirror(0x00f00000);
+	map(0x50006000, 0x50006003).rw(FUNC(macii_state::scsi_drq_r), FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
+	map(0x50006060, 0x50006063).rw(FUNC(macii_state::scsi_drq_r), FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(macii_state::scsi_r), FUNC(macii_state::scsi_w)).mirror(0x00f00000);
 	map(0x50012000, 0x50013fff).rw(FUNC(macii_state::scsi_drq_r), FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
@@ -957,7 +958,7 @@ void macii_state::macii(machine_config &config)
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
@@ -966,7 +967,7 @@ void macii_state::macii(machine_config &config)
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1); });
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
 	NCR53C80(config, m_ncr5380);
 	scsi.set_external_device(7, m_ncr5380);
 	m_ncr5380->irq_handler().set(DEVICE_SELF, FUNC(macii_state::scsi_irq));
@@ -1107,7 +1108,7 @@ void macii_state::macse30(machine_config &config)
 	m_via2->readpb_handler().set(FUNC(macii_state::iix_via2_in_b));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(macii_state::screen_update_macse30));

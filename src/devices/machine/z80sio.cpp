@@ -1125,7 +1125,7 @@ void z80sio_channel::device_reset()
 	m_wr3 &= ~WR3_RX_ENABLE;
 
 	// disable transmitter
-	m_wr5 &= ~WR5_TX_ENABLE;
+	m_wr5 &= ~(WR5_TX_ENABLE | WR5_RTS | WR5_DTR);
 	m_rr0 |= RR0_TX_BUFFER_EMPTY | RR0_TX_UNDERRUN;
 	m_rr1 |= RR1_ALL_SENT;
 	m_tx_flags = 0U;
@@ -1142,8 +1142,8 @@ void z80sio_channel::device_reset()
 	update_wait_ready();
 
 	// reset external lines
-	out_rts_cb(m_rts = 1);
-	out_dtr_cb(m_dtr = 1);
+	set_rts(1);
+	set_dtr(1);
 
 	// reset interrupts
 	m_uart->clear_interrupt(m_index, INT_TRANSMIT);

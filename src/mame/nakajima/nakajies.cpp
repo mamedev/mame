@@ -848,7 +848,7 @@ void nakajies_state::drwrt100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nakajies_state::nakajies_map);
 	m_maincpu->set_addrmap(AS_IO, &nakajies_state::nakajies_io_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);  // Wild guess
 	m_screen->set_screen_update(FUNC(nakajies_state::screen_update));
 	m_screen->set_size(80 * 6, 8 * 8);

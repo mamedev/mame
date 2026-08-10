@@ -792,7 +792,7 @@ void spdheat_state::spdheat(machine_config &config)
 	PALETTE(config, m_palette3).set_format(palette_device::xBGR_555, 1024);
 	config.set_default_layout(layout_spdheat);
 
-	screen_device &screen0(SCREEN(config, "screen0", SCREEN_TYPE_RASTER));
+	screen_device &screen0(SCREEN(config, "screen0"));
 	screen0.set_refresh_hz(60);
 	screen0.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen0.set_size(256, 256);
@@ -800,7 +800,7 @@ void spdheat_state::spdheat(machine_config &config)
 	screen0.set_screen_update(FUNC(spdheat_state::screen_update<0>));
 	screen0.set_palette(m_palette0);
 
-	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen_device &screen1(SCREEN(config, "screen1"));
 	screen1.set_refresh_hz(60);
 	screen1.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen1.set_size(256, 256);
@@ -808,7 +808,7 @@ void spdheat_state::spdheat(machine_config &config)
 	screen1.set_screen_update(FUNC(spdheat_state::screen_update<1>));
 	screen1.set_palette(m_palette1);
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_refresh_hz(60);
 	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen2.set_size(256, 256);
@@ -816,7 +816,7 @@ void spdheat_state::spdheat(machine_config &config)
 	screen2.set_screen_update(FUNC(spdheat_state::screen_update<2>));
 	screen2.set_palette(m_palette2);
 
-	screen_device &screen3(SCREEN(config, "screen3", SCREEN_TYPE_RASTER));
+	screen_device &screen3(SCREEN(config, "screen3"));
 	screen3.set_refresh_hz(60);
 	screen3.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen3.set_size(256, 256);
@@ -936,5 +936,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, spdheat,  0,       spdheat, spdheat,  spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (World)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spdheatj, spdheat, spdheat, spdheatj, spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdheat,  0,       spdheat, spdheat,  spdheat_state, empty_init, ROT0, "Taito", "Super Dead Heat (World)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdheatj, spdheat, spdheat, spdheatj, spdheat_state, empty_init, ROT0, "Taito", "Super Dead Heat (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

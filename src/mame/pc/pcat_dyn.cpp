@@ -174,7 +174,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 
 	/* video hardware */
 	// TODO: map to ISA bus
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(tvga9000_device::screen_update));
 

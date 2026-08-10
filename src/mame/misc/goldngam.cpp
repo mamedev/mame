@@ -602,7 +602,7 @@ void goldngam_state::base(machine_config &config)
 	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_2);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

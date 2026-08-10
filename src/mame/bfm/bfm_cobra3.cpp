@@ -461,7 +461,7 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15000000, 960, 0, 768, 312, 32, 312);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(FUNC(bfm_cobra3_state::screen_update));

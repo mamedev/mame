@@ -1431,7 +1431,7 @@ void hotsmash_state::pbillian(machine_config &config)
 	mcu.portc_w().set(FUNC(hotsmash_state::hotsmash_68705_portc_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -1480,7 +1480,7 @@ void superqix_state::sqix(machine_config &config)
 	mcu.port_out_cb<3>().set(FUNC(superqix_state::mcu_port3_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(32*8, 32*8);
@@ -1818,15 +1818,15 @@ void hotsmash_state::init_hotsmash()
 	m_invert_p2_spinner = true;
 }
 
-/*    YEAR  NAME       PARENT    MACHINE     INPUT      CLASS           INIT           ROT    COMPANY                             FULLNAME */
-GAME( 1986, pbillian,  0,        pbillian,   pbillian,  hotsmash_state, init_pbillian, ROT0,  "Kaneko / Taito",                   "Prebillian", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pbillianb, pbillian, pbillianb,  pbillianb, hotsmash_state, init_pbillian, ROT0,  "bootleg (Game Corp.)",             "Prebillian (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hotsmash,  0,        pbillian,   hotsmash,  hotsmash_state, init_hotsmash, ROT90, "Kaneko / Taito",                   "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,      0,        sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,    sqix,     sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr0,    sqix,     sqix,       superqix,  superqix_state, init_sqixr0,   ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixu,     sqix,     sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE     INPUT      CLASS           INIT           ROT    COMPANY                             FULLNAME
+GAME( 1986, pbillian,  0,        pbillian,   pbillian,  hotsmash_state, init_pbillian, ROT0,  "Kaneko / Taito",                   "Prebillian",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pbillianb, pbillian, pbillianb,  pbillianb, hotsmash_state, init_pbillian, ROT0,  "bootleg (Game Corp.)",             "Prebillian (bootleg)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hotsmash,  0,        pbillian,   hotsmash,  hotsmash_state, init_hotsmash, ROT90, "Kaneko / Taito",                   "Vs. Hot Smash",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqix,      0,        sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,    sqix,     sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr0,    sqix,     sqix,       superqix,  superqix_state, init_sqixr0,   ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.0)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,     sqix,     sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito (Romstar license)", "Super Qix (US)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, sqixb1,    sqix,     sqix_8031,  superqix,  superqix_state, init_sqixr0,   ROT90, "bootleg",                          "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb2,    sqix,     sqix_nomcu, superqix,  superqix_state, init_sqix,     ROT90, "bootleg",                          "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, perestro,  0,        sqix_nomcu, superqix,  superqix_state, init_perestro, ROT90, "Promat",                           "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, perestrof, perestro, sqix_nomcu, superqix,  superqix_state, init_perestro, ROT90, "Promat (Fuuki license)",           "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb2,    sqix,     sqix_nomcu, superqix,  superqix_state, init_sqix,     ROT90, "bootleg",                          "Super Qix (bootleg, No MCU)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, perestro,  0,        sqix_nomcu, superqix,  superqix_state, init_perestro, ROT90, "Promat",                           "Perestroika Girls",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, perestrof, perestro, sqix_nomcu, superqix,  superqix_state, init_perestro, ROT90, "Promat (Fuuki license)",           "Perestroika Girls (Fuuki license)",     MACHINE_SUPPORTS_SAVE )

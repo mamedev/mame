@@ -190,7 +190,7 @@ void pc88va_sgp_device::start_exec()
 				ptr->hsize = m_data->read_word(vdp_pointer + 4) & 0x0fff;
 				ptr->vsize = m_data->read_word(vdp_pointer + 6) & 0x0fff;
 				// NOTE: & 0xfffc causes pitch issues in boomer intro/title text, shinraba gameplay
-				ptr->fb_pitch = (s16)(m_data->read_word(vdp_pointer + 8) & 0xfffe);
+				ptr->fb_pitch = s16(m_data->read_word(vdp_pointer + 8) & 0xfffe);
 				// rtype sets negative source pitch, needs rolling up by +2
 				if (ptr->fb_pitch < 0)
 					ptr->fb_pitch += 2;
@@ -431,28 +431,28 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 
 	for (int yi = 0; yi < m_src.vsize; yi ++)
 	{
-		const s32 src_line = (vd) ? -(yi) * m_src.fb_pitch : yi * m_src.fb_pitch;
+		const s32 src_line = (vd ? -yi : yi) * m_src.fb_pitch;
 		u32 src_address = m_src.address + src_line;
-		const s32 dst_line = (vd) ? -(yi) * m_dst.fb_pitch : yi * m_dst.fb_pitch;
+		const s32 dst_line = (vd ? -yi : yi) * m_dst.fb_pitch;
 		u32 dst_address = m_dst.address + dst_line;
 
 		// TODO: should fetch on demand, depending on m_dst.pixel_mode etc.
 		// m_src.start_dot is used by famista (pitcher throws)
 		for (int xi = 0; xi < m_src.hsize; xi ++)
 		{
-			switch(m_src.pixel_mode)
+			switch (m_src.pixel_mode)
 			{
 				// 1bpp
 				case 0:
 				{
 					const u32 src_offset = src_address + ((xi + m_src.start_dot) >> 3);
-					const u8 src_nibble = ((xi + m_src.start_dot) ^ 7) & 7;
+					const u8 src_nibble = ~(xi + m_src.start_dot) & 7;
 
 					// famista, before expanding (1bpp -> 1bpp)
 					if (m_dst.pixel_mode == 0)
 					{
 						const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 3);
-						const u8 dst_nibble = ((xi + m_dst.start_dot) ^ 7) & 7;
+						const u8 dst_nibble = ~(xi + m_dst.start_dot) & 7;
 
 						u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0x1;
 						u8 result = m_data->read_byte(dst_offset);
@@ -468,7 +468,7 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 					else if (m_dst.pixel_mode == 1) // famista and pceva2tb:SKYBD.BAT (1bpp -> 4bpp)
 					{
 						const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
-						const u8 dst_nibble = (((xi + m_dst.start_dot) ^ 1) & 1) * 4;
+						const u8 dst_nibble = (~(xi + m_dst.start_dot) & 1) * 4;
 
 						u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0x1;
 						u8 result = m_data->read_byte(dst_offset);
@@ -488,10 +488,10 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 				case 1:
 				{
 					const u32 src_offset = src_address + ((xi + m_src.start_dot) >> 1);
-					const u8 src_nibble = (((xi + m_src.start_dot) ^ 1) & 1) * 4;
+					const u8 src_nibble = (~(xi + m_src.start_dot) & 1) * 4;
 
 					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
-					const u8 dst_nibble = (((xi + m_dst.start_dot) ^ 1) & 1) * 4;
+					const u8 dst_nibble = (~(xi + m_dst.start_dot) & 1) * 4;
 
 					u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0xf;
 					u8 result = m_data->read_byte(dst_offset);

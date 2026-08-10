@@ -1153,7 +1153,7 @@ void mac128_state::mac512ke(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, MAC_V_FIRST, MAC_V_TOTAL);
 	m_screen->set_native_aspect();
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));

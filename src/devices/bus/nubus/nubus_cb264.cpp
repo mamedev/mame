@@ -129,7 +129,7 @@ ioport_constructor nubus_cb264_device::device_input_ports() const
 
 void nubus_cb264_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(nubus_cb264_device::screen_update));
 	screen.set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480); // 35 kHz horizontal rate, 66.67 Hz vertical rate
 
@@ -331,7 +331,7 @@ void nubus_cb264_device::cb264_w(offs_t offset, u32 data, u32 mem_mask)
 				LOG("hres %d vres %d htotal %d vtotal %d\n", hres, vres, htotal, vtotal);
 
 				const rectangle visarea(0, hres - 1, 0, vres - 1);
-				m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, 30'240'000).as_attoseconds());
+				m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, 30'240'000));
 			}
 
 			m_force_blank = data;

@@ -1,12 +1,16 @@
+#ifndef GLM_FORCE_PURE
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+#endif
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/epsilon.hpp>
+#include <glm/gtc/type_precision.hpp>
 #if GLM_LANG & GLM_LANG_CXX0X_FLAG
 #	include <array>
 #endif
 
 std::size_t const TestSamples = 10000;
 
-int test_linearRand()
+static int test_linearRand()
 {
 	int Error = 0;
 
@@ -203,7 +207,7 @@ int test_linearRand()
 
 	{
 		float ResultFloat = 0.0f;
-		double ResultDouble = 0.0f;
+		double ResultDouble = 0.0;
 		for(std::size_t i = 0; i < TestSamples; ++i)
 		{
 			ResultFloat += glm::linearRand(-1.0f, 1.0f);
@@ -218,15 +222,15 @@ int test_linearRand()
 	return Error;
 }
 
-int test_circularRand()
+static int test_circularRand()
 {
 	int Error = 0;
 
 	{
 		std::size_t Max = TestSamples;
 		float ResultFloat = 0.0f;
-		double ResultDouble = 0.0f;
-		double Radius = 2.0f;
+		double ResultDouble = 0.0;
+		double Radius = 2.0;
 
 		for(std::size_t i = 0; i < Max; ++i)
 		{
@@ -242,7 +246,7 @@ int test_circularRand()
 	return Error;
 }
 
-int test_sphericalRand()
+static int test_sphericalRand()
 {
 	int Error = 0;
 
@@ -251,9 +255,9 @@ int test_sphericalRand()
 		float ResultFloatA = 0.0f;
 		float ResultFloatB = 0.0f;
 		float ResultFloatC = 0.0f;
-		double ResultDoubleA = 0.0f;
-		double ResultDoubleB = 0.0f;
-		double ResultDoubleC = 0.0f;
+		double ResultDoubleA = 0.0;
+		double ResultDoubleB = 0.0;
+		double ResultDoubleC = 0.0;
 
 		for(std::size_t i = 0; i < Max; ++i)
 		{
@@ -277,13 +281,13 @@ int test_sphericalRand()
 	return Error;
 }
 
-int test_diskRand()
+static int test_diskRand()
 {
 	int Error = 0;
 
 	{
 		float ResultFloat = 0.0f;
-		double ResultDouble = 0.0f;
+		double ResultDouble = 0.0;
 
 		for(std::size_t i = 0; i < TestSamples; ++i)
 		{
@@ -299,13 +303,13 @@ int test_diskRand()
 	return Error;
 }
 
-int test_ballRand()
+static int test_ballRand()
 {
 	int Error = 0;
 
 	{
 		float ResultFloat = 0.0f;
-		double ResultDouble = 0.0f;
+		double ResultDouble = 0.0;
 
 		for(std::size_t i = 0; i < TestSamples; ++i)
 		{

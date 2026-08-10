@@ -566,7 +566,7 @@ void holeland_state::holeland(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// TODO: 448i, compensate.
 	screen.set_raw((20_MHz_XTAL / 4) * 4, 332 * 2, 0, 256 * 2, 256 * 2, 16 * 2, 240 * 2);
 	screen.set_screen_update(FUNC(holeland_state::screen_update));
@@ -610,7 +610,7 @@ void crzrally_state::crzrally(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(20_MHz_XTAL / 4, 332, 0, 256, 256, 16, 240);
 	screen.set_screen_update(FUNC(crzrally_state::screen_update));
 	screen.set_palette(m_palette);

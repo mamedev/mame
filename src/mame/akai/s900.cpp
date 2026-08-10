@@ -2,18 +2,18 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Akai S900, S950 samplers
+    Akai S900, S950 samplers
 
-	The successors to the S700/X7000 have similar sound hardware, but with 8 voices
-	and increased sample memory limits. The Quick Disk drives were also replaced with
-	standard 3.5" floppies.
+    The successors to the S700/X7000 have similar sound hardware, but with 8 voices
+    and increased sample memory limits. The Quick Disk drives were also replaced with
+    standard 3.5" floppies.
 
-	TODO:
-	- output & input filters (9x MF6-50)
-	- layouts
-	- software list
-	- formatting SCSI drives on S950 doesn't seem to work
-	- RS232 port for S950 (shares 6850 w/ MIDI)
+    TODO:
+    - output & input filters (9x MF6-50)
+    - layouts
+    - software list
+    - formatting SCSI drives on S950 doesn't seem to work
+    - RS232 port for S950 (shares 6850 w/ MIDI)
 ***************************************************************************/
 
 #include "emu.h"
@@ -43,13 +43,15 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/s900_dsk.h"
 #include "formats/hxchfe_dsk.h"
+#include "formats/mfi_dsk.h"
 
 namespace {
-	
+
 class s900_state : public driver_device
 {
 public:
@@ -291,7 +293,7 @@ void s900_state::io_map(address_map &map)
 	common_map(map);
 	map(0x0000, 0x0007).mirror(0xff00).umask16(0x00ff).m(m_fdc, FUNC(upd7265_device::map));
 	map(0x0008, 0x0008).mirror(0xff06).umask16(0x00ff).w(FUNC(s900_state::media_ctrl_w));
-//	map(0x0040, 0x0047).select(0xff00).umask16(0x00ff) - TODO drum trigger unit
+//  map(0x0040, 0x0047).select(0xff00).umask16(0x00ff) - TODO drum trigger unit
 	map(0x0050, 0x0057).mirror(0xff00).umask16(0x00ff).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x0058, 0x005b).mirror(0xff04).umask16(0x00ff).rw("i8251", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
@@ -306,8 +308,8 @@ void s950_state::io_map(address_map &map)
 	map(0x0052, 0x0053).mirror(0xff00).umask16(0x00ff).r(m_acia, FUNC(acia6850_device::status_r));
 	map(0x0054, 0x0055).mirror(0xff00).umask16(0x00ff).w(m_acia, FUNC(acia6850_device::data_w));
 	map(0x0056, 0x0057).mirror(0xff00).umask16(0x00ff).r(m_acia, FUNC(acia6850_device::data_r));
-//	map(0x0058, 0x005f).mirror(0xff00).umask16(0x00ff) - hard disk interface
-//	map(0x01a0, 0x01bf).mirror(0xfe00) - digital audio interface
+//  map(0x0058, 0x005f).mirror(0xff00).umask16(0x00ff) - hard disk interface
+//  map(0x01a0, 0x01bf).mirror(0xfe00) - digital audio interface
 	map(0x01c0, 0x01df).mirror(0xfe00).umask16(0x00ff).w(FUNC(s950_state::bank_w));
 }
 
@@ -383,7 +385,7 @@ void s900_state::base_config(machine_config &config)
 	m_lcdc->set_lcd_size(2, 40);
 	m_lcdc->set_pixel_update_cb(FUNC(s900_state::lcd_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -414,7 +416,7 @@ void s900_state::base_config(machine_config &config)
 
 	auto &mic(MICROPHONE(config, "mic"));
 	mic.add_route(0, "input", 1.0);
-//	mic.add_route(0, "monitor", 1.0 / 6);
+//  mic.add_route(0, "monitor", 1.0 / 6);
 
 	auto& linein(CASSETTE(config, "linein"));
 	linein.set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -494,6 +496,8 @@ void s900_state::base_config(machine_config &config)
 	m_filter_timer[2]->set_clk<0>(clk/4);
 	m_filter_timer[2]->set_clk<1>(clk/4);
 	m_filter_timer[2]->set_clk<2>(clk/32);
+
+	SOFTWARE_LIST(config, "flop_s900").set_original("s900_flop");
 }
 
 /**************************************************************************/

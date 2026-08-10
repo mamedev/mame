@@ -641,39 +641,6 @@ void mc6847_base_device::setup_fixed_mode()
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc6847_base_device::device_config_complete()
-{
-	if (!has_screen())
-		return;
-
-	if (!screen().refresh_attoseconds())
-	{
-		// It is preferred to initialize the screen device using set_raw.
-		// Setting screen device's raw parameters requires values in terms of pixels.
-		// Multiplying the 6847's clock by 2 produces a pixel clock that allows
-		// 256 pixels of active video area per line, with apparently no roundoff
-		// error or drift.
-		screen().set_raw(
-				uint32_t(clock() * 2),
-				456,                                        // htotal
-				0,                                          // hbend
-				BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,   // hbstart
-				m_tpfs,                                     // vtotal
-				0,                                          // vbend
-				m_lines_until_retrace);                     // vbstart
-	}
-
-	if (!screen().has_screen_update())
-		screen().set_screen_update(*this, FUNC(mc6847_base_device::screen_update));
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

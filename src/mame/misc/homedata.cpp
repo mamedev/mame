@@ -1106,7 +1106,7 @@ void mrokumei_state::mrokumei(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &mrokumei_state::mrokumei_sound_io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -1154,7 +1154,7 @@ void homedata_upd7807_state::reikaids(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_upd7807_state,reikaids)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -1209,7 +1209,7 @@ void homedata_upd7807_state::pteacher(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_upd7807_state,pteacher)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

@@ -3578,6 +3578,28 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
+<!-- !Sound players/makers  -->
+
+	<software name="nrtdrv88" supported="partial">
+		<description>NRTDRV88 for JMB-X1</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+FPS counter is too generous (68 in 15 kHz vs expected 62 + 1, 60 in 24 kHz vs expected 55 + 1)
+Utility/Test.UTL draws a blank box (btanb)
+Not extensively tested beyond .nrd songs present on disk
+]]></notes>
+		<info name="alt_title" value="NRTDRV88J"/>
+		<info name="usage" value="Requires PC-8001mkII or PC-8801 as minimum base machine, requires -exp jmbx1 being mounted" />
+		<info name="developer" value="Bookworm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="nrtdrv88j_r1.00.d88" size="348848" crc="93053813" sha1="6a6a14476fd4b9753e6eb0941e85aa455a072c50"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Demo reels -->
 
 	<!-- Converted to 88MC by 1st-Base -->

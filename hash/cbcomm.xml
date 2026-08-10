@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="cbcomm" description="VTech / EG Computer Bit Communicator cartridges">
+
+<!--
+
+Some carts only contain a jumper, probably pointing to code already in the main unit ROM.
+Other carts have ROM and RAM.
+
+The following cartridges have been verified to only contain a jumper:
+
++- - - - - - - - +- - - - - - - - - - - - - - - +- - - - - - - - -
+|   CART CODE    |          CART NAME           |  JUMPER STATUS  |
++- - - - - - - - +- - - - - - - - - - - - - - - +- - - - - - - - -
+|                |                              |                 |
+| 80-9755-2      | Black & White                | all 3 down      |
+| 80-9755-2      | Rally                        | central up      |
+
+The following cartridges have been verified to contain ROM and RAM:
+
++- - - - - - - - - - - - +- - - - - - - - - - - - - - -+- - - - - - +- - - - - - - - +- - - - - - - - -
+|   CART CODE            |          CART NAME          |  EPROM-ID  |  EPROM-TYPE    |    RAM-TYPE     |
++- - - - - - - - - - - - +- - - - - - - - - - - - - - -+- - - - - - +- - - - - - - - +- - - - - - - - -
+|                        |                             |            |                |                 |
+| 35-28000-019 704074-1  | e.mail                      | 27-6445-24 |   LH5V2GT6     | GM76FV18ALLFW70 |
+
+-->
+
+	<software name="email" supported="no">
+		<description>e.mail</description>
+		<year>2000?</year>
+		<publisher>Video Technology / EG</publisher>
+		<part name="rom" interface="genius_rom">
+			<dataarea name="rom" size="0x40000">
+				<rom name="27-6445-24.h2" size="0x40000" crc="53ebfd8b" sha1="1a4d1d55851d5b3434d35e4d53b481b0ca08fd59"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

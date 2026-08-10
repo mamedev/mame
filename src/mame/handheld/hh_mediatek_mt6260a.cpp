@@ -60,7 +60,7 @@ void accutime_smart_watch_state::atw(machine_config &config)
 	ARM7(config, m_maincpu, 72000000); // Mediatek ARM MT6260AH, ARM7EJ-STM core, unknown frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &accutime_smart_watch_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -236,6 +236,6 @@ CONS( 2022, atw_lola, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "A
 CONS( 2022, atw_pepa, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Peppa Pig (Accutime, PPG4086PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // red PCB
-CONS( 2022, atw_swst, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: Stormtropper (Accutime, STM4353PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_swst, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: Stormtrooper (Accutime, STM4353PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2022, atw_swy,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: The Mandalorian (Accutime, MNL4023PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

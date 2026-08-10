@@ -27,14 +27,14 @@ The following dumps are currently missing from this set:
 
     *) These dumps are not included in the official redump.org datfiles as they are marked with "Possible bad dump" status
 
-For an overview of US PS1 discs that have not been dumped and added to redump's database yet, please see http://wiki.redump.org/index.php?title=Sony_Playstation_USA_Missing_Games .
+For an overview of US PS1 discs that have not been dumped and added to redump's database yet, please see https://wiki.redump.info/Sony_PlayStation_-_USA_Undumped_Discs
 
 -->
 
 
 	<software name="007rcng_us" cloneof="007rcng">
 		<!--
-		http://redump.org/disc/633
+		https://redump.info/disc/633
 		<rom name="007 Racing (USA).cue" size="82" crc="5c58d484" sha1="f74c52098f149c91f066b17e9000d5a059ec4405"/>
 		<rom name="007 Racing (USA).bin" size="565011552" crc="5a39ae64" sha1="91c0c4b5c888f074a777f891be5432064678070e"/>
 		-->
@@ -54,7 +54,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="007tnd_us" cloneof="007tnd">
 		<!--
-		http://redump.org/disc/830
+		https://redump.info/disc/830
 		<rom name="007 - Tomorrow Never Dies (USA).cue" size="97" crc="dc22c9e3" sha1="55b145bd5563c4b62cf3fadeda704340824c7b55"/>
 		<rom name="007 - Tomorrow Never Dies (USA).bin" size="573594000" crc="02f976df" sha1="5c635e990dc77c481eb177dc86deb7a198f17cf8"/>
 		-->
@@ -73,7 +73,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="007twine_us" cloneof="007twine">
 		<!--
-		http://redump.org/disc/2387
+		https://redump.info/disc/2387
 		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
 		<rom name="007 - The World Is Not Enough (USA).bin" size="726429312" crc="6e91b75f" sha1="0d6f886485318959b9a86209a91228840b61fbad"/>
 		-->
@@ -92,7 +92,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="007twine_p" cloneof="007twine">
 		<!--
-		http://redump.org/disc/59807
+		https://redump.info/disc/59807
 		<rom name="007 - The World Is Not Enough (USA) (Beta) (2000-08-26).cue" size="121" crc="503a4cf6" sha1="79cf7463d72934e8887c3d9977bb384858588dae"/>
 		<rom name="007 - The World Is Not Enough (USA) (Beta) (2000-08-26).bin" size="750278592" crc="a709d8bd" sha1="edb14c9b988cf2a6052c9f770a0190077bd7de8e"/>
 		-->
@@ -264,7 +264,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="2xtreme_us" cloneof="2xtreme">
 		<!--
-		http://redump.org/disc/2094/
+		https://redump.info/disc/2094/
 		<rom name="2Xtreme (USA).cue" size="700" crc="7e95393e" sha1="ed526fe2905f428530cc001038dd72c413bbe291"/>
 		<rom name="2Xtreme (USA) (Track 1).bin" size="45715824" crc="aad124a6" sha1="3f25e5d1366e60e70a416109711e109d48c9f19b"/>
 		<rom name="2Xtreme (USA) (Track 2).bin" size="56064624" crc="6f8d371b" sha1="9b986d87e8314c72757f629f6d7201bdeb0190b0"/>
@@ -291,7 +291,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="fifa2k2w_us" cloneof="fifa2k2w">
 		<!--
-		http://redump.org/disc/7292/
+		https://redump.info/disc/7292/
 		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
 		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
 		-->
@@ -329,7 +329,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="3dlemmin_us" cloneof="3dlemmin">
 		<!--
-		http://redump.org/disc/14951/
+		https://redump.info/disc/14951/
 		<rom name="3D Lemmings (USA).cue" size="2670" crc="b394a6d2" sha1="b2b3cbba19838d9883c5042f5119a2e531e93484"/>
 		<rom name="3D Lemmings (USA) (Track 01).bin" size="192184272" crc="b7dbfea7" sha1="f713cdcb5d0e3d875031dbdc438dbbab0cdd3340"/>
 		<rom name="3D Lemmings (USA) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
@@ -401,7 +401,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="3xtreme" supported="no">
 		<!--
-		http://redump.org/disc/2715/
+		https://redump.info/disc/2715/
 		<rom name="3Xtreme (USA).cue" size="196" crc="a689937f" sha1="6d16c06c59a0eab13c1364c03dce6db699c5793a"/>
 		<rom name="3Xtreme (USA) (Track 1).bin" size="340649568" crc="c16782c6" sha1="4e6ced10157eda5e1881e95d1bd8363ae6b560f8"/>
 		<rom name="3Xtreme (USA) (Track 2).bin" size="26732832" crc="efb07e5e" sha1="60da792ac141a78f7fe875788d0e73b5bc1b943d"/>
@@ -423,7 +423,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="3xtreme_d" cloneof="3xtreme">
 		<!--
-		http://redump.org/disc/63416/
+		https://redump.info/disc/63416/
 		<rom name="3Xtreme (USA) (Demo).cue" size="210" crc="afd8623e" sha1="bb568da1f73df38143f07e8487fb8b18414f2b23"/>
 		<rom name="3Xtreme (USA) (Demo) (Track 1).bin" size="88625712" crc="a20fb256" sha1="a6f3eb421cab68ad005fab381c634827226f1388"/>
 		<rom name="3Xtreme (USA) (Demo) (Track 2).bin" size="12999504" crc="fe85bf0c" sha1="7744ffae36986f09cc87a649a6a8d44e3756284f"/>
@@ -444,7 +444,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="40winks_us" cloneof="40winks">
 		<!--
-		http://redump.org/disc/583/
+		https://redump.info/disc/583/
 		<rom name="40 Winks (USA).cue" size="80" crc="1d060c48" sha1="327eb468983d8aeebc67998a7e8a017d5c41bdd3"/>
 		<rom name="40 Winks (USA).bin" size="540854160" crc="5b53f0a5" sha1="68b0e80f3f59cb673fc5ae7c4ebb8eba4a7b6a50"/>
 		-->
@@ -548,7 +548,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="acecomb2_us" cloneof="acecomb2">
 		<!--
-		http://redump.org/disc/3415
+		https://redump.info/disc/3415
 		<rom name="Ace Combat 2 (USA).cue" size="84" crc="22809b6a" sha1="4c3d61ca7b95708714738b1a6e341948cfac6745"/>
 		<rom name="Ace Combat 2 (USA).bin" size="580760544" crc="852e5ded" sha1="a441bb9ace9434a6d05d9e846d2b23b9523e2867"/>
 		-->
@@ -568,7 +568,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="acecomb3_us" cloneof="acecomb3">
 		<!--
-		http://redump.org/disc/13105
+		https://redump.info/disc/13105
 		<rom name="Ace Combat 3 - Electrosphere (USA).cue" size="100" crc="b8624d3d" sha1="387418c52e2b7bf02f7187e31274ecff67ce59d5"/>
 		<rom name="Ace Combat 3 - Electrosphere (USA).bin" size="644977200" crc="a9dbe00f" sha1="9b690c02cdb7754f2fa478c4974ec69600f2f269"/>
 		-->
@@ -618,7 +618,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="actbass_us" cloneof="actbass">
 		<!--
-		http://redump.org/disc/11669
+		https://redump.info/disc/11669
 		<rom name="Action Bass (USA).cue" size="83" crc="d5b1c996" sha1="d9679f8edd4825e9815f133f1b9f76378dd09014"/>
 		<rom name="Action Bass (USA).bin" size="171900624" crc="6796d740" sha1="dd12151ef5a9bb8bf6ef9d41d9847341e4dd44e1"/>
 		-->
@@ -638,7 +638,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="actionmn_us" cloneof="actionmn">
 		<!--
-		http://redump.org/disc/10647
+		https://redump.info/disc/10647
 		<rom name="Action Man - Operation Extreme (USA).cue" size="102" crc="cf924cc1" sha1="bd6fbb3575f9a2d3072f2a76de2cbb52f8f4e377"/>
 		<rom name="Action Man - Operation Extreme (USA).bin" size="553089264" crc="9d4dbbcb" sha1="d0e4834cb0ee6aca998223c8068872972da1c869"/>
 		-->
@@ -677,7 +677,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 	<software name="adidas_us" cloneof="adidas" supported="no">
 		<!--
-		http://redump.org/disc/16589
+		https://redump.info/disc/16589
 		<rom name="Adidas Power Soccer (USA).cue" size="458" crc="7d82f282" sha1="492f177c0b0290c7dbd02f851b6307e46e15f974"/>
 		<rom name="Adidas Power Soccer (USA) (Track 1).bin" size="515506656" crc="86794679" sha1="bd8755ef1b00c18b417394b84ca28b5a51967c95"/>
 		<rom name="Adidas Power Soccer (USA) (Track 2).bin" size="43770720" crc="38238ea6" sha1="265db818f73c0995aa1217e80b3b3c3139db0428"/>
@@ -720,7 +720,7 @@ The game freezes when loading (after the intro)
 
 	<software name="aircombt_us" cloneof="aircombt">
 		<!--
-		http://redump.org/disc/2997
+		https://redump.info/disc/2997
 		<rom name="Air Combat (USA).cue" size="6975" crc="6cb0aaa1" md5="ca0eeaac6ffd9061df6fb281631663d3" sha1="6bb0056c230defaa52bc56e86c0f3c00e114b7d6"/>
 		<rom name="Air Combat (USA) (Track 01).bin" size="106249248" crc="719f2efa" md5="5a6e6a68e85925596983799278a5fec6" sha1="fba261a0ca69bed3018d00e89a74aa2921cffd51"/>
 		<rom name="Air Combat (USA) (Track 02).bin" size="36738240" crc="e6604b54" md5="8de4f55b6c6a00d0afc3bdecacd8e243" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
@@ -803,7 +803,7 @@ The game freezes when loading (after the intro)
 
 	<software name="airhckey_us" cloneof="airhckey">
 		<!--
-		http://redump.org/disc/1878
+		https://redump.info/disc/1878
 		<rom name="Air Hockey (USA).cue" size="82" crc="c2df3c01" sha1="9c9e9d36b63a1769adf0a660372da00a13a31e22"/>
 		<rom name="Air Hockey (USA).bin" size="157318224" crc="b453fcb9" sha1="4cdba4e968f03fe26ebe57d4cc02186ddccab64f"/>
 		-->
@@ -843,7 +843,7 @@ The game freezes when loading (after the intro)
 
 	<software name="alienres_us" cloneof="alienres">
 		<!--
-		http://redump.org/disc/7489
+		https://redump.info/disc/7489
 		<rom name="Alien Resurrection (USA).cue" size="454" crc="d97017ce" sha1="63515660b2cea328fded6df84feb9151a3416f87"/>
 		<rom name="Alien Resurrection (USA) (Track 1).bin" size="270035472" crc="f9b6964f" sha1="fd64d8357e90a1a9e9448519835ecee6b65c0cf4"/>
 		<rom name="Alien Resurrection (USA) (Track 2).bin" size="15292704" crc="f3c18581" sha1="7e8fbb82eafff3b68c2a8ea8235af5bb3ddb5c2f"/>
@@ -867,7 +867,7 @@ The game freezes when loading (after the intro)
 
 	<software name="alientri_us" cloneof="alientri">
 		<!--
-		http://redump.org/disc/11034
+		https://redump.info/disc/11034
 		<rom name="Alien Trilogy (USA).cue" size="2946" crc="5c405f2c" sha1="c8b03a82e71770a4145a9cb613333d76ad6b8319"/>
 		<rom name="Alien Trilogy (USA) (Track 01).bin" size="160763904" crc="af79a74f" sha1="6e97cfeb41c9e60ec1b8d1f5c308c7ca450f1f58"/>
 		<rom name="Alien Trilogy (USA) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
@@ -912,7 +912,7 @@ The game freezes when loading (after the intro)
 
 	<software name="alliedgn_us" cloneof="alliedgn" supported="partial">
 		<!--
-		http://redump.org/disc/11549/
+		https://redump.info/disc/11549/
 		<rom name="Allied General (USA).cue" size="780" crc="d6e0f56a" sha1="ba4841b73c22664737f2fb007ec5d9bd85058c6b"/>
 		<rom name="Allied General (USA) (Track 1).bin" size="368033904" crc="e631c283" sha1="0eda7fcaebf7e60efa9444f27b5f658503b0ddcc"/>
 		<rom name="Allied General (USA) (Track 2).bin" size="28318080" crc="da9e7d82" sha1="0193b7ca6ca05cac5c399aa26964080e911a2f60"/>
@@ -941,7 +941,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="aitd2_us" cloneof="aitd2">
 		<!--
-		http://redump.org/disc/3083
+		https://redump.info/disc/3083
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).cue" size="115" crc="e7e7f0de" sha1="4e282f1c2fe8f2252ce18601611673feceb3fb64"/>
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).bin" size="715309056" crc="83f2a2d1" sha1="d928e147ca1ef265929e1c51d8f8ae39de2a24f9"/>
 		-->
@@ -1832,7 +1832,7 @@ doesn't detect dual shock pad even if it's selected, hangs after selecting new g
 
 	<software name="asteroid_us" cloneof="asteroid">
 		<!--
-		http://redump.org/disc/11553/
+		https://redump.info/disc/11553/
 		<rom name="Asteroids (USA).cue" size="200" crc="76ccf0e5" sha1="57e3276a9c53b651b845db1327f346e2bbce78c3"/>
 		<rom name="Asteroids (USA) (Track 1).bin" size="117712896" crc="06ed5e2b" sha1="f577f9f77a65686e94fd4717b2b657a0698da51c"/>
 		<rom name="Asteroids (USA) (Track 2).bin" size="52249680" crc="2a6e4f43" sha1="47ade8eeae8b2d23431e2256aaad46122cd81cb0"/>
@@ -1889,7 +1889,7 @@ doesn't detect dual shock pad even if it's selected, hangs after selecting new g
 
 	<software name="atrain" cloneof="a4evolgl">
 		<!--
-		http://redump.org/disc/13165
+		https://redump.info/disc/13165
 		<rom name="A-Train - Trains, Power, Money (USA) (En,Ja,Fr,De).cue" size="990" crc="672ea3e6" sha1="2385b6ed3d6b31a7bd3a080295e4391361216835"/>
 		<rom name="A-Train - Trains, Power, Money (USA) (En,Ja,Fr,De) (Track 1).bin" size="46277952" crc="6daf2c73" sha1="eb1576521dd8d3860112a9170a595555c8055b1e"/>
 		<rom name="A-Train - Trains, Power, Money (USA) (En,Ja,Fr,De) (Track 2).bin" size="2718912" crc="6aa850d0" sha1="c1b327ef0e3cf88a620799c224b1e769d414d075"/>
@@ -2001,7 +2001,7 @@ doesn't detect dual shock pad even if it's selected, hangs after selecting new g
 
 	<software name="awf111x_us" cloneof="awf111x">
 		<!--
-		http://redump.org/disc/10703/
+		https://redump.info/disc/10703/
 		<rom name="Agile Warrior - F-111X (USA).cue" size="1581" crc="f2c992e1" sha1="95c3befb5d6c3709c1e2a81635a11b090878f319"/>
 		<rom name="Agile Warrior - F-111X (USA) (Track 01).bin" size="293230896" crc="2c08ac77" sha1="2d8dc1289b5b106d2026d4161542acb39cc8790a"/>
 		<rom name="Agile Warrior - F-111X (USA) (Track 02).bin" size="12867792" crc="4b90dc03" sha1="439ff316c72a64805a46ac07aba1ed43a16a3456"/>
@@ -4121,7 +4121,7 @@ boot OK, sprite animations have black dots
 
 	<software name="bublbobl_us" cloneof="bublbobl">
 		<!--
-		http://redump.org/disc/12157/
+		https://redump.info/disc/12157/
 		<rom name="Bubble Bobble also featuring Rainbow Islands (USA).cue" size="270" crc="586d4e7a" sha1="cb253d349d0e5feb14651334be11a15b6d803456"/>
 		<rom name="Bubble Bobble also featuring Rainbow Islands (USA) (Track 1).bin" size="63130032" crc="37c1b316" sha1="7a6e826a8707a64224fcf1e9143e813004ba5cff"/>
 		<rom name="Bubble Bobble also featuring Rainbow Islands (USA) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
@@ -11749,7 +11749,7 @@ boot OK
 
 	<software name="ironblod_us" cloneof="ironblod" supported="partial">
 		<!--
-		http://redump.org/disc/13347/
+		https://redump.info/disc/13347/
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA).cue" size="314" crc="da574c2e" sha1="8ddd831ffe12b85517b13c1d3fbe32476a5b6f86"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Track 1).bin" size="254858016" crc="4cccc5a5" sha1="cc3de5867336c667afdbfea1df2c8f4c18b1a97c"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
@@ -23816,7 +23816,7 @@ boot OK
 
 	<software name="smurfrac_us" cloneof="smurfrac">
 		<!--
-		http://redump.org/disc/7497
+		https://redump.info/disc/7497
 		<rom name="Smurf Racer! (USA) (En,Fr,Es).cue" size="95" crc="cb1eef81" sha1="71192eb409ecf87c41c64795a8943ddd2d00052d"/>
 		<rom name="Smurf Racer! (USA) (En,Fr,Es).bin" size="250480944" crc="42fcf35f" sha1="37a12b2791b2b433fa867f65197c056c5bfb48e1"/>
 		-->
@@ -28930,7 +28930,7 @@ boot OK
 
 	<software name="ult8ball" cloneof="actpool">
 		<!--
-		http://redump.org/disc/7723
+		https://redump.info/disc/7723
 		<rom name="Ultimate 8 Ball (USA).cue" size="2650" crc="f00be595" sha1="058e5414628f6a53e0120328559be5aede8da8c9"/>
 		<rom name="Ultimate 8 Ball (USA) (Track 01).bin" size="63652176" crc="2dbd76d4" sha1="3eebb555ff77f3e873741735155416cb7559d036"/>
 		<rom name="Ultimate 8 Ball (USA) (Track 02).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
@@ -30855,7 +30855,7 @@ boot OK
 
 	<software name="xena_us" cloneof="xena">
 		<!--
-		http://redump.org/disc/5900/
+		https://redump.info/disc/5900/
 		<rom name="Xena - Warrior Princess (USA).cue" size="95" crc="0df509ec" sha1="80d65cad44108b87adc0a5b1170a0f1aeb9d257a"/>
 		<rom name="Xena - Warrior Princess (USA).bin" size="322790832" crc="3ff3122d" sha1="2f7ee5625aaa02c536938fb66fcf06d4d8f6b422"/>
 		-->
@@ -31595,7 +31595,7 @@ boot OK
 
 	<software name="16tales1">
 		<!--
-		http://redump.org/disc/44996/
+		https://redump.info/disc/44996/
 		<rom name="16 Tales 1 (USA).cue" size="82" crc="79224c44" sha1="d887c3ed3f743b8dfe0579db1e4884ab00736f96"/>
 		<rom name="16 Tales 1 (USA).bin" size="622045200" crc="eaba661f" sha1="d57b2141d93c179a638c92cd9dd501fd3ec83c44"/>
 		-->
@@ -33669,7 +33669,7 @@ boot OK
 
 	<software name="ironblodd_us" cloneof="ironblod" supported="partial">
 		<!--
-		http://redump.org/disc/12702/
+		https://redump.info/disc/12702/
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo).cue" size="328" crc="37ddbff7" sha1="f5338f1df9ab91d0dfdb290cf283b2ff31de8faa"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo) (Track 1).bin" size="62683152" crc="28e0137e" sha1="4890dae42b32d2f6951e16e7c8bdd2591bfd04be"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
@@ -37424,7 +37424,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="007tnd_jp" cloneof="007tnd">
 		<!--
-		http://redump.org/disc/20884
+		https://redump.info/disc/20884
 		<rom name="007 - Tomorrow Never Dies (Japan).cue" size="99" crc="424cea74" sha1="a87f7a645cb57ae467656682773ea1e7a926adec"/>
 		<rom name="007 - Tomorrow Never Dies (Japan).bin" size="564764592" crc="da5649d7" sha1="b189c39cde5e35cd1d4f20c912de4aa0e2fc5897"/>
 		-->
@@ -37445,7 +37445,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="3dlemmin_jp" cloneof="3dlemmin">
 		<!--
-		http://redump.org/disc/10867/
+		https://redump.info/disc/10867/
 		<rom name="3D Lemmings (Japan).cue" size="2718" crc="e2404409" sha1="45987f8afb3ea4396b8d8b6dc45cfb4178808d48"/>
 		<rom name="3D Lemmings (Japan) (Track 01).bin" size="192160752" crc="c67ef7af" sha1="f7359b9946dd97e974c37b1d18ea109f87928467"/>
 		<rom name="3D Lemmings (Japan) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
@@ -37488,7 +37488,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="aressh4" cloneof="a4evolgl">
 		<!--
-		http://redump.org/disc/8493
+		https://redump.info/disc/8493
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De).cue" size="1053" crc="38e1543b" sha1="74b73ce187e809cbad379c07a17932a79dd078f5"/>
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 1).bin" size="44107056" crc="37f6f723" sha1="4df18857c44f340a215bbabc42e12ce4396a2c98"/>
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 2).bin" size="7888608" crc="7b223ddf" sha1="9ef79a55725bea41827258083fbfc4de0e825d58"/>
@@ -37517,7 +37517,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="aressh4pb" cloneof="a4evolgl">
 		<!--
-		http://redump.org/disc/8444
+		https://redump.info/disc/8444
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best).cue" size="1214" crc="21cade5a" sha1="11130d6957e03d01660d6cde6c0a773841386271"/>
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 1).bin" size="91422240" crc="0f783082" sha1="2bfc122a3a9f0b662ee84fa5bffc36ce124d1932"/>
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 2).bin" size="2606016" crc="8691e800" sha1="46983681565b3f698abe8a172b3792ee67fddcfa"/>
@@ -37546,7 +37546,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="acecombt" cloneof="aircombt">
 		<!--
-		http://redump.org/disc/1691/
+		https://redump.info/disc/1691/
 		<rom name="Ace Combat (Japan).cue" size="7101" crc="a7a2d0f4" sha1="9230a58f78ddfe09a72cbeba40c447dd845b5501"/>
 		<rom name="Ace Combat (Japan) (Track 01).bin" size="106138704" crc="e57e6e46" sha1="3563f0a9a5c5dec04588347214483f7e8af2cd8e"/>
 		<rom name="Ace Combat (Japan) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
@@ -37630,7 +37630,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="acecomb2_jp" cloneof="acecomb2">
 		<!--
-		http://redump.org/disc/271
+		https://redump.info/disc/271
 		<rom name="Ace Combat 2 (Japan).cue" size="86" crc="2d68070c" sha1="a83b1eda1e94076e4d608d75b5cbf3d383d78654"/>
 		<rom name="Ace Combat 2 (Japan).bin" size="580273680" crc="2f645ad6" sha1="311e51e978b26c971196cae2571b858e72c6d983"/>
 		-->
@@ -37652,7 +37652,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="acecomb2_jp1" cloneof="acecomb2">
 		<!--
-		http://redump.org/disc/2707
+		https://redump.info/disc/2707
 		<rom name="Ace Combat 2 (Japan) (Rev 1).cue" size="94" crc="88674451" sha1="abbe669ce3d639194f772f3f26df7e03042507fe"/>
 		<rom name="Ace Combat 2 (Japan) (Rev 1).bin" size="580271328" crc="0eef1401" sha1="0c556057cda63d629f8950265016de8e27c6ab2f"/>
 		-->
@@ -37674,11 +37674,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="acecomb3_jp" cloneof="acecomb3">
 		<!--
-		http://redump.org/disc/3175
+		https://redump.info/disc/3175
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 1).cue" size="111" crc="21f422b9" sha1="845170f8bc921eedd471c93c50c660935788c791"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 1).bin" size="716240448" crc="b6faa72c" sha1="3b7f4def50008736370e83107a0d50246c1c0aa4"/>
 
-		http://redump.org/disc/3176
+		https://redump.info/disc/3176
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 2).cue" size="111" crc="20a90468" sha1="5aae7e3f872aff697cf909fbaa692030849bf1b0"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 2).bin" size="723766848" crc="c740c3ff" sha1="c86ee2f1970cc06c466a5555c8fe66c4f63a3ee7"/>
 		-->
@@ -37705,11 +37705,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="acecomb3_jp1" cloneof="acecomb3">
 		<!--
-		http://redump.org/disc/582
+		https://redump.info/disc/582
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1).cue" size="125" crc="a8961273" sha1="8dbc7fb3680f066b496ab813597ce2301cf11cf9"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1).bin" size="716287488" crc="ccdda3b5" sha1="8c6d58308eb389a7b18bc213a6d1e23d14fd3c10"/>
 
-		http://redump.org/disc/584
+		https://redump.info/disc/584
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1).cue" size="125" crc="433c5ace" sha1="01ede4ca12e86e45624480f7514e37fbf1bec9b6"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1).bin" size="723813888" crc="b86e0f52" sha1="a23e046b1eb695e02d214d269fca70dbe0a437f7"/>
 		-->
@@ -37736,7 +37736,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="acecomb3da_jp" cloneof="acecomb3">
 		<!--
-		http://redump.org/disc/52896
+		https://redump.info/disc/52896
 		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan).cue" size="2558" crc="c172edf9" sha1="062485585a9d6b25256085d98dd83c2bf5494a49"/>
 		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 01).bin" size="189738192" crc="d6636cac" sha1="168761ee81417fde52845faf7d8ec1141c26c97d"/>
 		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 02).bin" size="7578144" crc="dd1c2f0b" sha1="15e1a7409114304653159a82156d5301ca006e9e"/>
@@ -37772,11 +37772,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<software name="aconcagu" supported="no">
 		<!--
-		http://redump.org/disc/14630
+		https://redump.info/disc/14630
 		<rom name="Aconcagua (Japan) (Disc 1).cue" size="92" crc="f601804b" sha1="069467f35825092dc5fc5e8dc2ff1d8bc3933199"/>
 		<rom name="Aconcagua (Japan) (Disc 1).bin" size="665006832" crc="c262518d" sha1="ea94e096e687c8e8a7c3c99dcdc36d99cd27d8f1"/>
 
-		http://redump.org/disc/14629
+		https://redump.info/disc/14629
 		<rom name="Aconcagua (Japan) (Disc 2).cue" size="92" crc="f75ca69a" sha1="1265ef3a1cac866405c8a50d0780bbd954092c3f"/>
 		<rom name="Aconcagua (Japan) (Disc 2).bin" size="725476752" crc="28783402" sha1="4150b207318d7f5376e43f6301552b28cbee6169"/>
 		-->
@@ -37807,7 +37807,7 @@ The game only boot on PAL
 
 	<software name="actgolf_jp" cloneof="actgolf">
 		<!--
-		http://redump.org/disc/32490
+		https://redump.info/disc/32490
 		<rom name="Actua Golf (Japan).cue" size="206" crc="f0a253e7" sha1="f3bde627da77561a7c62730d20da50724bff737c"/>
 		<rom name="Actua Golf (Japan) (Track 1).bin" size="227861760" crc="20765b8d" sha1="03009357cb1b3756fa3effebd5490a1c97563006"/>
 		<rom name="Actua Golf (Japan) (Track 2).bin" size="34350960" crc="4c9d46fe" sha1="75b6ded9f51980c306ca2f3a40dcd640c0101745"/>
@@ -37829,7 +37829,7 @@ The game only boot on PAL
 
 	<software name="actbass_jp" cloneof="actbass">
 		<!--
-		http://redump.org/disc/39491
+		https://redump.info/disc/39491
 		<rom name="Action Bass (Japan).cue" size="85" crc="10046e54" sha1="67d79df0eab30eadc987803df2cee6a8726a8fc4"/>
 		<rom name="Action Bass (Japan).bin" size="169750896" crc="235db629" sha1="8526c226b1a47286ccdc1bbe9dc1569ab89b8990"/>
 		-->
@@ -37850,7 +37850,7 @@ The game only boot on PAL
 
 	<software name="advanrac">
 		<!--
-		http://redump.org/disc/34512/
+		https://redump.info/disc/34512/
 		<rom name="Advan Racing (Japan).cue" size="210" crc="786a33e3" sha1="df460f1f3aceaac0eeaae3cab86e18563c4d0753"/>
 		<rom name="Advan Racing (Japan) (Track 1).bin" size="565545456" crc="e1c9440b" sha1="b763ac6a0c1461a16f58a7d7af5a84ef5f1fee14"/>
 		<rom name="Advan Racing (Japan) (Track 2).bin" size="34009920" crc="027d3086" sha1="2075a5258c461d30944839758ba2c290a2c456d4"/>
@@ -37872,7 +37872,7 @@ The game only boot on PAL
 
 	<software name="armstrng_jp" cloneof="armstrng">
 		<!--
-		http://redump.org/disc/34392/
+		https://redump.info/disc/34392/
 		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan).cue" size="2464" crc="bd1f1cc4" sha1="f7c6b644e16a32a944612a84288759a913d2fb13"/>
 		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 01).bin" size="179928000" crc="5127e79b" sha1="30af6929705ccf6ddc323f74d314a26928310cdb"/>
 		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 02).bin" size="33106752" crc="93fd7de6" sha1="ed9c6d10f0b9a5671a167123fb19367a59f332c5"/>
@@ -37910,7 +37910,7 @@ The game only boot on PAL
 
 	<software name="awf111x_jp" cloneof="awf111x">
 		<!--
-		http://redump.org/disc/36228/
+		https://redump.info/disc/36228/
 		<rom name="Agile Warrior - F-111X (Japan).cue" size="1607" crc="88c170bc" sha1="3986cb464792b6cd33dbf088b5a63727be61f325"/>
 		<rom name="Agile Warrior - F-111X (Japan) (Track 01).bin" size="292918080" crc="5ce59c36" sha1="94ab4f49174199bcf0d527e869c7c371bec81ced"/>
 		<rom name="Agile Warrior - F-111X (Japan) (Track 02).bin" size="12867792" crc="4b90dc03" sha1="439ff316c72a64805a46ac07aba1ed43a16a3456"/>
@@ -37943,7 +37943,7 @@ The game only boot on PAL
 
 	<software name="airracec">
 		<!--
-		http://redump.org/disc/11035
+		https://redump.info/disc/11035
 		<rom name="AirRace Championship (Japan).cue" size="226" crc="53fd7b94" sha1="073fa73b6ad9ecd93341c4d61d508d75aa450636"/>
 		<rom name="AirRace Championship (Japan) (Track 1).bin" size="582985536" crc="0b749aa9" sha1="c651e847f69edf2c4fbeb8a32577d27ce34e6077"/>
 		<rom name="AirRace Championship (Japan) (Track 2).bin" size="2020368" crc="2896211e" sha1="ba97d343824bf559953d1fc0a6c868aedcbe29d4"/>
@@ -37965,7 +37965,7 @@ The game only boot on PAL
 
 	<software name="alicecyb" supported="partial">
 		<!--
-		http://redump.org/disc/30600
+		https://redump.info/disc/30600
 		<rom name="Alice in Cyberland (Japan).cue" size="92" crc="7816df95" sha1="8b466c13af2b512a4d3fc788936c990c431e658e"/>
 		<rom name="Alice in Cyberland (Japan).bin" size="597330384" crc="393a14a9" sha1="e4adfc633a6f2931fa224ef7a1798440d06ca7e4"/>
 		-->
@@ -37991,7 +37991,7 @@ Battle screen status bar flickers
 
 	<software name="alientri_jp" cloneof="alientri">
 		<!--
-		http://redump.org/disc/7842
+		https://redump.info/disc/7842
 		<rom name="Alien Trilogy (Japan).cue" size="2998" crc="e7c3bc2a" sha1="63a1d6ba5032afcdb3059cbcb437967e8eba6406"/>
 		<rom name="Alien Trilogy (Japan) (Track 01).bin" size="175075824" crc="3fb0fc43" sha1="cd55ce298f15de41e40ece720744fafbd0b37f52"/>
 		<rom name="Alien Trilogy (Japan) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
@@ -38037,15 +38037,15 @@ Battle screen status bar flickers
 
 	<software name="alive">
 		<!--
-		http://redump.org/disc/22866
+		https://redump.info/disc/22866
 		<rom name="Alive (Japan) (Disc 1).cue" size="88" crc="2dd8addc" sha1="10c2804f78fa4d81fe364f5ed7dad88178f2ec8b"/>
 		<rom name="Alive (Japan) (Disc 1).bin" size="726314064" crc="558c21d6" sha1="85af83f53db08e60eafd18e5e557f265ad171a31"/>
 
-		http://redump.org/disc/22867
+		https://redump.info/disc/22867
 		<rom name="Alive (Japan) (Disc 2).cue" size="88" crc="2c858b0d" sha1="41c079a221dbe09b6016522fca63510a33b13460"/>
 		<rom name="Alive (Japan) (Disc 2).bin" size="722473248" crc="5cc244bb" sha1="986d8f4c0817af897c2980f6e92449d2ba858cf7"/>
 
-		http://redump.org/disc/22868
+		https://redump.info/disc/22868
 		<rom name="Alive (Japan) (Disc 3).cue" size="88" crc="9a9e6b7d" sha1="ab7a8a4efeecb03f5ba68d68848089f319b742f1"/>
 		<rom name="Alive (Japan) (Disc 3).bin" size="722242752" crc="ae8706ab" sha1="b752103c873011b18cf9a181148bb38e434a3cac"/>
 		-->
@@ -38083,7 +38083,7 @@ Battle screen status bar flickers
 
 	<software name="alliedgn_jp" cloneof="alliedgn" supported="partial">
 		<!--
-		http://redump.org/disc/36502/
+		https://redump.info/disc/36502/
 		<rom name="Allied General (Japan) (En,Ja).cue" size="974" crc="7d2a7f6e" sha1="3263e257ead925b66800a4d23e61b3873cc30ba0"/>
 		<rom name="Allied General (Japan) (En,Ja) (Track 1).bin" size="320683440" crc="007e3fc1" sha1="ac778357eddf400a943e96b0f7febd074086ceab"/>
 		<rom name="Allied General (Japan) (En,Ja) (Track 2).bin" size="28318080" crc="da9e7d82" sha1="0193b7ca6ca05cac5c399aa26964080e911a2f60"/>
@@ -38115,7 +38115,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="aitd2_jp" cloneof="aitd2">
 		<!--
-		http://redump.org/disc/13174
+		https://redump.info/disc/13174
 		<rom name="Alone in the Dark 2 (Japan).cue" size="93" crc="3eaa5bd8" sha1="8cd56d33586e170116a80e8fb247be26ebadc1d9"/>
 		<rom name="Alone in the Dark 2 (Japan).bin" size="715297296" crc="2bffe515" sha1="e78721a8c4b4d16d846e111928bd7701f85e243b"/>
 		-->
@@ -38137,7 +38137,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="asteroid_jp" cloneof="asteroid">
 		<!--
-		http://redump.org/disc/12336/
+		https://redump.info/disc/12336/
 		<rom name="SuperLite 1500 Series - Asteroids (Japan).cue" size="257" crc="e3da89d5" sha1="51bb6cc9283dfefb895fa64f0c50f41bb56af600"/>
 		<rom name="SuperLite 1500 Series - Asteroids (Japan) (Track 1).bin" size="120349488" crc="837cff54" sha1="892fd09d8ca7e2fc5833954c7af6c9cd45097e60"/>
 		<rom name="SuperLite 1500 Series - Asteroids (Japan) (Track 2).bin" size="49330848" crc="18538a6e" sha1="bd7a68bb32edb2cb05de4e0e38c1665e43898b26"/>
@@ -38160,7 +38160,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="sennakd_jp" cloneof="sennakd">
 		<!--
-		http://redump.org/disc/33627
+		https://redump.info/disc/33627
 		<rom name="Ayrton Senna Kart Duel (Japan).cue" size="850" crc="dff9c82b" md5="87a13ddc3e31a67a0204b32731268d9b" sha1="09c16737269bc1e868d81d92c687ea92e8755959"/>
 		<rom name="Ayrton Senna Kart Duel (Japan) (Track 1).bin" size="58026192" crc="f966e832" md5="17d5857e309f33fa1e6f95b4d6e90ceb" sha1="c0d45ec4fee8e9ae6b4af1010b40d976d612241c"/>
 		<rom name="Ayrton Senna Kart Duel (Japan) (Track 2).bin" size="54046608" crc="2d3ef50e" md5="d1961b5e1e5d884789351629ff63b5f1" sha1="461b77fc68b8b8c49af5b30dccbd3b9ab35cb044"/>
@@ -38187,7 +38187,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="sennakd2_jp" cloneof="sennakd2">
 		<!--
-		http://redump.org/disc/34583/
+		https://redump.info/disc/34583/
 		<rom name="Ayrton Senna KartDuel 2 (Japan).cue" size="732" crc="599c8e94" sha1="c60ed22490c3e27c8c4917a51303b67ec4bf3974"/>
 		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 1).bin" size="116661552" crc="5c13c575" sha1="1d45b0d6b6b5eb62671ad4d42eb7a76854d1ccdc"/>
 		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 2).bin" size="21534912" crc="de4ff27b" sha1="03864a5226476baac2a9ece84ba0bc3aa31417c9"/>
@@ -38213,7 +38213,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="sennakdsp">
 		<!--
-		http://redump.org/disc/35745/
+		https://redump.info/disc/35745/
 		<rom name="Ayrton Senna Kart Duel Special (Japan).cue" size="1038" crc="8fa6ccd8" sha1="71de159cda0f5178303cf816fb61c879baa906b9"/>
 		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 1).bin" size="99774192" crc="010312a0" sha1="648ff2abe6c2203d63f553a46420b46a663ef727"/>
 		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 2).bin" size="23211888" crc="97236094" sha1="27d7b1ad21b07447132bee4b5c2c0abac0f270b8"/>
@@ -38242,7 +38242,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="boxerroad">
 		<!--
-		http://redump.org/disc/2765/
+		https://redump.info/disc/2765/
 		<rom name="Boxer's Road (Japan).cue" size="2512" crc="9d7f13a7" sha1="2f66701a08cd4e739602a7b0bb1e8669399337e4"/>
 		<rom name="Boxer's Road (Japan) (Track 01).bin" size="56716128" crc="aebb7928" sha1="7c4d32d41818c56dce74f30b8b293c4f9ed6dfdd"/>
 		<rom name="Boxer's Road (Japan) (Track 02).bin" size="4101888" crc="90cc6e1d" sha1="11dc04e65590f08eee3da87617da04148158fe10"/>
@@ -38284,7 +38284,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="boxerroad_pb" cloneof="boxerroad">
 		<!--
-		http://redump.org/disc/6537/
+		https://redump.info/disc/6537/
 		<rom name="Boxer's Road (Japan) (Rev 1).cue" size="2688" crc="d8da532a" sha1="a0856292487fe54c109396a4fe9420e82312fb27"/>
 		<rom name="Boxer's Road (Japan) (Rev 1) (Track 01).bin" size="56723184" crc="e3b2e7af" sha1="b0153df85cce35aa3eede5e567b3d2fc6d15d1dc"/>
 		<rom name="Boxer's Road (Japan) (Rev 1) (Track 02).bin" size="4101888" crc="90cc6e1d" sha1="11dc04e65590f08eee3da87617da04148158fe10"/>
@@ -38326,7 +38326,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="cheesy_jp" cloneof="cheesy">
 		<!--
-		http://redump.org/disc/23696/
+		https://redump.info/disc/23696/
 		<rom name="Cheesy (Japan).cue" size="2462" crc="b05983db" sha1="06f9f01c529a544743932119b009361c2782eb6b"/>
 		<rom name="Cheesy (Japan) (Track 01).bin" size="123583488" crc="25c7dfd9" sha1="d6cd42f7a3b23797380e098ba2106ce63746cb17"/>
 		<rom name="Cheesy (Japan) (Track 02).bin" size="48201888" crc="12a2b3fa" sha1="de96feb091ef6194d0e71b5c2821860c0f223094"/>
@@ -38365,8 +38365,8 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="crshock">
-		<!-- http://redump.org/disc/38429/ -->
-		<!-- http://redump.org/disc/38430/ -->
+		<!-- https://redump.info/disc/38429/ -->
+		<!-- https://redump.info/disc/38430/ -->
 		<description>Creature Shock (Japan)</description>
 		<year>1996</year>
 		<publisher>Data East</publisher>
@@ -38392,7 +38392,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="crimecr" supported="no">
 		<!--
-		http://redump.org/disc/5729
+		https://redump.info/disc/5729
 		<rom name="Crime Crackers (Japan).bin" size="451856832" crc="769a374d" sha1="b22009a123bf22730af62295a9c13a9f0339b873"/>
 		<rom name="Crime Crackers (Japan).cue" size="88" crc="a46219f3" sha1="7ff074def82d83d1b16889ef056ad4783869730d"/>
 		-->
@@ -38412,7 +38412,7 @@ Black screen after SCEI logo
 	</software>
 
 	<software name="depth">
-		<!-- http://redump.org/disc/15743/ -->
+		<!-- https://redump.info/disc/15743/ -->
 		<description>Depth (Japan)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment</publisher>
@@ -38474,7 +38474,7 @@ boot OK
 	</software>
 
 	<software name="pitomail">
-		<!-- http://redump.org/disc/1539/ -->
+		<!-- https://redump.info/disc/1539/ -->
 		<description>Pi to Mail (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson</publisher>
@@ -38560,7 +38560,7 @@ this image doesn't boot
 
 	<software name="sampras_jp" cloneof="sampras">
 		<!--
-		http://redump.org/disc/30968/
+		https://redump.info/disc/30968/
 		<rom name="Sampras Extreme Tennis (Japan).cue" size="230" crc="f57276a8" sha1="0bacc6a64b05c566f0e8734b0c491d6f27592ad2"/>
 		<rom name="Sampras Extreme Tennis (Japan) (Track 1).bin" size="544250448" crc="9ef4f8cb" sha1="e00bd7506582d5caf24fa1821bb07ae87cde832d"/>
 		<rom name="Sampras Extreme Tennis (Japan) (Track 2).bin" size="41543376" crc="c206e837" sha1="3d6468863690e21f935f9be3ec961f78ba1493d3"/>
@@ -38582,7 +38582,7 @@ this image doesn't boot
 
 	<software name="rayblade">
 		<!--
-		http://redump.org/disc/11517
+		https://redump.info/disc/11517
 		<rom name="Seireiki Rayblade (Japan) (Track 1).bin" size="643965840" crc="6207c863" sha1="cf33a1b9c0d144205a4da0f53b9339a453e9b591"/>
 		<rom name="Seireiki Rayblade (Japan) (Track 2).bin" size="32104800" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
 		<rom name="Seireiki Rayblade (Japan).cue" size="220" crc="c4abe81d" sha1="55ff32e9c35108f70d726bf743757149c8e688b1"/>
@@ -38600,7 +38600,7 @@ this image doesn't boot
 	</software>
 
 	<software name="sentokka">
-		<!-- http://redump.org/disc/14070/ -->
+		<!-- https://redump.info/disc/14070/ -->
 		<description>Sentou Kokka: Air Land Battle (Japan, rev. 1)</description>
 		<year>1995</year>
 		<publisher>Sony Computer Entertainment</publisher>
@@ -38618,7 +38618,7 @@ this image doesn't boot
 
 	<software name="septentr">
 		<!--
-		http://redump.org/disc/4117/
+		https://redump.info/disc/4117/
 		<rom name="Septentrion - Out of the Blue (Japan).cue" size="103" crc="9978edb1" sha1="6d80c3ad001c3db3fd6eea192119a912386b4f49"/>
 		<rom name="Septentrion - Out of the Blue (Japan).bin" size="198595824" crc="59a2d045" sha1="1db5cc6aefb64bbfb4820d48bcfbb95df77e8bb2"/>
 		-->
@@ -38640,7 +38640,7 @@ this image doesn't boot
 
 	<software name="septentr_mw" cloneof="septentr">
 		<!--
-		http://redump.org/disc/69181/
+		https://redump.info/disc/69181/
 		<rom name="Septentrion - Out of the Blue (Japan) (Major Wave).cue" size="270" crc="dabb84e3" sha1="5a0f3a153bf85aaea22f2b3e6bf6f4ad9dd29a8f"/>
 		<rom name="Septentrion - Out of the Blue (Japan) (Major Wave) (Track 1).bin" size="163473408" crc="31bdff32" sha1="e30efeef3cc1307cd83d5cbf23e217d75d03cfdd"/>
 		<rom name="Septentrion - Out of the Blue (Japan) (Major Wave) (Track 2).bin" size="56535024" crc="a35e373c" sha1="180ae8034534d377f317ef4259b458b0b4be83cb"/>
@@ -38686,7 +38686,7 @@ boot OK
 
 	<software name="smcourt_jp" cloneof="smcourt">
 		<!--
-		http://redump.org/disc/4925
+		https://redump.info/disc/4925
 		<rom name="Smash Court (Japan).cue" size="85" crc="12b91c77" sha1="1dee0b3b8b7749b0734892553a7ba497f2b05a3b"/>
 		<rom name="Smash Court (Japan).bin" size="545515824" crc="5fcdbbe1" sha1="aebe42dc8937301a543e6969afb4016ceb9d06fa"/>
 		-->
@@ -38709,7 +38709,7 @@ boot OK
 
 	<software name="smcourt2_jp" cloneof="smcourt2">
 		<!--
-		http://redump.org/disc/7200
+		https://redump.info/disc/7200
 		<rom name="Smash Court 2 (Japan).cue" size="87" crc="3ff91e56" sha1="02d1acba0dccf0a5aee8326e6b79a051cb146ccb"/>
 		<rom name="Smash Court 2 (Japan).bin" size="381950688" crc="349e8767" sha1="85f98090ca52544d2fcf2c4ed63bd6dbd86dbbcb"/>
 		-->
@@ -38731,7 +38731,7 @@ boot OK
 
 	<software name="smcourt3">
 		<!--
-		http://redump.org/disc/9131
+		https://redump.info/disc/9131
 		<rom name="Smash Court 3 (Japan).cue" size="87" crc="eafc622a" sha1="add24f3b8be35761a0c754e8eaa5e2d65d504ba5"/>
 		<rom name="Smash Court 3 (Japan).bin" size="366312240" crc="a6f77079" sha1="de0d9dd58fea085b56702db6936c7e8697b0ba45"/>
 		-->
@@ -38752,7 +38752,7 @@ boot OK
 	</software>
 
 	<software name="wares">
-		<!-- http://redump.org/disc/7919/ -->
+		<!-- https://redump.info/disc/7919/ -->
 		<description>Wares 1092: Souheiden (Japan)</description>
 		<year>1997</year>
 		<publisher>Yutaka</publisher>
@@ -42953,7 +42953,7 @@ boot OK
 
 	<software name="darkseed">
 		<!--
-		http://redump.org/disc/1640
+		https://redump.info/disc/1640
 		<rom name="Darkseed (Japan).cue" size="82" crc="362cf7d6" sha1="588ba9424ce50e166ec7e0b468f9fec87c7cab18"/>
 		<rom name="Darkseed (Japan).bin" size="67723488" crc="1d33c82d" sha1="c82fc8ab1e92d1837b05cf3dd81ff949f91fc695"/>
 		-->
@@ -42975,7 +42975,7 @@ boot OK
 
 	<software name="darksed2">
 		<!--
-		http://redump.org/disc/13946
+		https://redump.info/disc/13946
 		<rom name="Dark Seed II (Japan).cue" size="86" crc="c588daa2" sha1="38ea9419248d65565f0fa98544b37df40ca0ea94"/>
 		<rom name="Dark Seed II (Japan).bin" size="496504848" crc="1633f553" sha1="08d2212dffa2592c380bd3671ab619ec73b8c2aa"/>
 		-->
@@ -60190,7 +60190,7 @@ boot OK
 
 	<software name="ttycoon_jp" cloneof="ttycoon">
 		<!--
-		http://redump.org/disc/7918
+		https://redump.info/disc/7918
 		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan).cue" size="1566" crc="d2603384" sha1="10fe0343fd0e20e18fd502beb32246f48d2cdf11"/>
 		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 01).bin" size="52242624" crc="9ce74ec3" sha1="a41ead073c5641f9ac87eb9dc87469bd775300e0"/>
 		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 02).bin" size="42858144" crc="3233248e" sha1="571ac211fca70fdf95d8981688664217d889144e"/>
@@ -62565,7 +62565,7 @@ boot OK
 
 	<software name="007tnd">
 		<!--
-		http://redump.org/disc/967
+		https://redump.info/disc/967
 		<rom name="007 - Tomorrow Never Dies (Europe).cue" size="100" crc="765606dd" sha1="fd5f043ce416db55a16a72ea4cd7b408aef20f2f"/>
 		<rom name="007 - Tomorrow Never Dies (Europe).bin" size="572408592" crc="763e4df9" sha1="c7022a564fa7d839f6a84c09c2ec47c96778b7c8"/>
 		-->
@@ -62584,7 +62584,7 @@ boot OK
 
 	<software name="007tnd_fr" cloneof="007tnd">
 		<!--
-		http://redump.org/disc/13398
+		https://redump.info/disc/13398
 		<rom name="007 - Demain ne Meurt Jamais (France).cue" size="103" crc="804de764" sha1="079196f7c1bce6e74a32db7185aa889cd40f634f"/>
 		<rom name="007 - Demain ne Meurt Jamais (France).bin" size="570611664" crc="20d12f7b" sha1="077bddb3f832e3f2ec660634cd37b50f0d927eb9"/>
 		-->
@@ -62603,7 +62603,7 @@ boot OK
 
 	<software name="007tnd_de" cloneof="007tnd">
 		<!--
-		http://redump.org/disc/4003
+		https://redump.info/disc/4003
 		<rom name="007 - Die Welt Ist Nicht Genug (Germany).cue" size="106" crc="4a7ed159" sha1="79eb3b595147b7b1058162d3aa126355a15e448e"/>
 		<rom name="007 - Die Welt Ist Nicht Genug (Germany).bin" size="724728816" crc="40fb0330" sha1="109bb1cb7e7fc9c9305d85a42d19c17bf467060d"/>
 		-->
@@ -62622,7 +62622,7 @@ boot OK
 
 	<software name="007twine">
 		<!--
-		http://redump.org/disc/968
+		https://redump.info/disc/968
 		<rom name="007 - The World Is Not Enough (Europe).cue" size="104" crc="7d9fe2b7" sha1="b46ef39f671f819d7077d38b401d251ebbb208fd"/>
 		<rom name="007 - The World Is Not Enough (Europe).bin" size="727292496" crc="8df63204" sha1="9062140eb4952b3addd0197cb6202723032117f7"/>
 		-->
@@ -62641,7 +62641,7 @@ boot OK
 
 	<software name="007twine_fr" cloneof="007twine">
 		<!--
-		http://redump.org/disc/28132
+		https://redump.info/disc/28132
 		<rom name="007 - Le Monde ne Suffit Pas (France).cue" size="103" crc="b7873d96" sha1="ff26ea5b4c4a840afbdc90123686a3012494b9d8"/>
 		<rom name="007 - Le Monde ne Suffit Pas (France).bin" size="727325424" crc="c2d1c87a" sha1="183815d71895adf29c7111ea9ac57ebdc4df7333"/>
 		-->
@@ -62660,7 +62660,7 @@ boot OK
 
 	<software name="007twine_de" cloneof="007twine">
 		<!--
-		http://redump.org/disc/3271
+		https://redump.info/disc/3271
 		<rom name="007 - Die Welt Ist Nicht Genug (Germany).cue" size="106" crc="4a7ed159" sha1="79eb3b595147b7b1058162d3aa126355a15e448e"/>
 		<rom name="007 - Die Welt Ist Nicht Genug (Germany).bin" size="724728816" crc="40fb0330" sha1="109bb1cb7e7fc9c9305d85a42d19c17bf467060d"/>
 		-->
@@ -62679,7 +62679,7 @@ boot OK
 
 	<software name="007twine_es" cloneof="007twine">
 		<!--
-		http://redump.org/disc/4881
+		https://redump.info/disc/4881
 		<rom name="007 - El Mundo Nunca es Suficiente (Spain).cue" size="108" crc="a0760ab7" sha1="4a3db376fded915a172ff249bd27b2b219c2455f"/>
 		<rom name="007 - El Mundo Nunca es Suficiente (Spain).bin" size="725182752" crc="f2614069" sha1="d058f1ae8891e5dcbb05fd872e2b4cf263be1a00"/>
 		-->
@@ -62698,7 +62698,7 @@ boot OK
 
 	<software name="007twine_sv" cloneof="007twine">
 		<!--
-		http://redump.org/disc/48547
+		https://redump.info/disc/48547
 		<rom name="007 - The World Is Not Enough (Sweden).cue" size="104" crc="02fe70a7" sha1="535fe9288f572c2eff15a7cc1800ce33ec33296b"/>
 		<rom name="007 - The World Is Not Enough (Sweden).bin" size="727299552" crc="b535d4c5" sha1="73376a3287a874068ef32cc3bd2d918fb7f33d2b"/>
 		-->
@@ -62718,7 +62718,7 @@ boot OK
 
 	<software name="007rcng">
 		<!--
-		http://redump.org/disc/6858
+		https://redump.info/disc/6858
 		<rom name="007 Racing (Europe).cue" size="85" crc="74722fc6" sha1="db19e66b47df3b885c8a43d177524eb72cbbb9e8"/>
 		<rom name="007 Racing (Europe).bin" size="565672464" crc="2693623a" sha1="2b6802f8a7dcc28840d4e5e1369a5bd2e90fb5ae"/>
 		-->
@@ -62738,7 +62738,7 @@ boot OK
 
 	<software name="007rcng_fr" cloneof="007rcng">
 		<!--
-		http://redump.org/disc/18697
+		https://redump.info/disc/18697
 		<rom name="007 Racing (France).cue" size="85" crc="527a9ec3" sha1="6566b324e064957a31c7aacaeda10dc13957a626"/>
 		<rom name="007 Racing (France).bin" size="547510320" crc="f8500248" sha1="ca37e0995412d40cecec47c16db5bebf5e6e1b14"/>
 		-->
@@ -62758,7 +62758,7 @@ boot OK
 
 	<software name="007rcng_de" cloneof="007rcng">
 		<!--
-		http://redump.org/disc/17273
+		https://redump.info/disc/17273
 		<rom name="007 Racing (Germany).cue" size="86" crc="66c0c70d" sha1="b8f87935e390d87227779bac72443d20eb2fe5ed"/>
 		<rom name="007 Racing (Germany).bin" size="552463632" crc="bbe6471e" sha1="f440f37ab90c78b022cdb3d8e73575b6f720ce69"/>
 		-->
@@ -62778,7 +62778,7 @@ boot OK
 
 	<software name="fifa2k2w">
 		<!--
-		http://redump.org/disc/1219
+		https://redump.info/disc/1219
 		<rom name="2002 FIFA World Cup (Europe) (En,Sv).cue" size="102" crc="0f104a50" sha1="d30e080e0c3d4f8e1f969b17a06b100ec21c1a96"/>
 		<rom name="2002 FIFA World Cup (Europe) (En,Sv).bin" size="514107216" crc="8034c7ff" sha1="845aa8143ba57a60e61ac91d456d1b22668905d9"/>
 		-->
@@ -62799,7 +62799,7 @@ boot OK
 
 	<software name="fifa2k2w_fr" cloneof="fifa2k2w">
 		<!--
-		http://redump.org/disc/27688
+		https://redump.info/disc/27688
 		<rom name="2002 FIFA World Cup (France).cue" size="94" crc="faa22c68" sha1="e3ad4658dee0ba8f31f742f7308be397f3f2a23f"/>
 		<rom name="2002 FIFA World Cup (France).bin" size="518470176" crc="a1803d25" sha1="600dad6316b61f395e0bf8d237279db7e293147f"/>
 		-->
@@ -62820,7 +62820,7 @@ boot OK
 
 	<software name="fifa2k2w_de" cloneof="fifa2k2w">
 		<!--
-		http://redump.org/disc/7583
+		https://redump.info/disc/7583
 		<rom name="2002 FIFA World Cup (Germany).cue" size="95" crc="276c65df" sha1="0c07d0ff4504548c20609b2fd4b1799e16353e38"/>
 		<rom name="2002 FIFA World Cup (Germany).bin" size="618284352" crc="2b2c62ab" sha1="4c218395a8d58401a25ba361f9148da939361f32"/>
 		-->
@@ -62841,7 +62841,7 @@ boot OK
 
 	<software name="fifa2k2w_it" cloneof="fifa2k2w">
 		<!--
-		http://redump.org/disc/28026
+		https://redump.info/disc/28026
 		<rom name="2002 FIFA World Cup (Italy).cue" size="93" crc="dd742bf0" sha1="0f4816f9d97e6a9079649206305d2cd599871a89"/>
 		<rom name="2002 FIFA World Cup (Italy).bin" size="532488096" crc="6e470a92" sha1="cb559e708f26d3e17f1463ca84d0b21ef2cc803d"/>
 		-->
@@ -62862,7 +62862,7 @@ boot OK
 
 	<software name="fifa2k2w_es" cloneof="fifa2k2w">
 		<!--
-		http://redump.org/disc/29392
+		https://redump.info/disc/29392
 		<rom name="2002 FIFA World Cup (Spain).cue" size="93" crc="8030da28" sha1="66aa099ce4aad0ef3df9fbd65d315de3eb3554a3"/>
 		<rom name="2002 FIFA World Cup (Spain).bin" size="561695232" crc="43b5dcb3" sha1="2bc8097d8306b35e69c293f604dc088f44508c3a"/>
 		-->
@@ -62883,7 +62883,7 @@ boot OK
 
 	<software name="2xtreme">
 		<!--
-		http://redump.org/disc/504/
+		https://redump.info/disc/504/
 		<rom name="2Xtreme (Europe).cue" size="862" crc="4211e6e3" sha1="35b196dfe7cc8b15f22db1474382f9ed43b535b9"/>
 		<rom name="2Xtreme (Europe) (Track 1).bin" size="45511200" crc="f0cfee6d" sha1="cca776ddb1b0142846befd9d5565a43af0ab2197"/>
 		<rom name="2Xtreme (Europe) (Track 2).bin" size="59239824" crc="62b16b5d" sha1="c615beaa8e4aab515aa2473b2d1e4a6482a6ca62"/>
@@ -62910,7 +62910,7 @@ boot OK
 
 	<software name="smurfrac">
 		<!--
-		http://redump.org/disc/6260
+		https://redump.info/disc/6260
 		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).cue" size="131" crc="f564283d" sha1="45b800c86b31bcf7904138f457d4432ae68c74e5"/>
 		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).bin" size="250916064" crc="f17c2a33" sha1="50ea49e56a815f42899d5cebed38483e822244d4"/>
 		-->
@@ -62935,7 +62935,7 @@ boot OK
 
 	<software name="3dlemmin">
 		<!--
-		http://redump.org/disc/1127/
+		https://redump.info/disc/1127/
 		<rom name="3D Lemmings (Europe).cue" size="2742" crc="51c41b34" sha1="28327fb2e596ffeff96db17948b5e3463bf7bf08"/>
 		<rom name="3D Lemmings (Europe) (Track 01).bin" size="191979648" crc="d01f4b54" sha1="4b650f874c19a5526700c8fcfb254947adca0b7a"/>
 		<rom name="3D Lemmings (Europe) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
@@ -62978,7 +62978,7 @@ boot OK
 
 	<software name="442soccr">
 		<!--
-		http://redump.org/disc/26612/
+		https://redump.info/disc/26612/
 		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es).cue" size="1802" crc="66d6bc0d" sha1="aee918fb7a54ca358f4021b817637d2c2348ac2b"/>
 		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 01).bin" size="18846576" crc="f80f364c" sha1="c51ecc78eb1bc377ea20d16ecff5aa7542a016d8"/>
 		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 02).bin" size="30164400" crc="5d496b28" sha1="2a618624fa812be29120fe22c5e2c72abde9cf74"/>
@@ -63014,7 +63014,7 @@ boot OK
 
 	<software name="40winks">
 		<!--
-		http://redump.org/disc/6859/
+		https://redump.info/disc/6859/
 		<rom name="40 Winks (Europe).cue" size="83" crc="29f57347" sha1="4cd2841e565a42c73d4fc00b736c1d2cc8ebd7a6"/>
 		<rom name="40 Winks (Europe).bin" size="551478144" crc="fdcde564" sha1="43fa48364b0693a4b6144b11b010cc80cc5af2c4"/>
 		-->
@@ -63035,7 +63035,7 @@ boot OK
 
 	<software name="40winks_d" cloneof="40winks">
 		<!--
-		http://redump.org/disc/45283/
+		https://redump.info/disc/45283/
 		<rom name="40 Winks (Europe) (Demo).cue" size="90" crc="b254247f" sha1="13baf191b3e859aeec99558a7e821f58b82fbddf"/>
 		<rom name="40 Winks (Europe) (Demo).bin" size="201604032" crc="284dcd3a" sha1="8094ce1df453de43b859a75ab443aff77451f527"/>
 		-->
@@ -63055,7 +63055,7 @@ boot OK
 
 	<software name="40winks_it" cloneof="40winks">
 		<!--
-		http://redump.org/disc/28334/
+		https://redump.info/disc/28334/
 		<rom name="40 Winks (Italy).cue" size="82" crc="8d5e56a7" sha1="23978daf31ac2a0dd20e57f18d8d80e14ee281bb"/>
 		<rom name="40 Winks (Italy).bin" size="551344080" crc="677b7ea9" sha1="70380215dd02ae68cdff88ee29738771f57d0207"/>
 		-->
@@ -63076,7 +63076,7 @@ boot OK
 
 	<software name="40winks_es" cloneof="40winks">
 		<!--
-		http://redump.org/disc/25544/
+		https://redump.info/disc/25544/
 		<rom name="40 Winks (Spain).cue" size="82" crc="d01aa77f" sha1="b11bb31d90d22571e311edc270b4d3044540abe4"/>
 		<rom name="40 Winks (Spain).bin" size="551268816" crc="815a014f" sha1="eac587a040ea4db03772bade7ad4a85ab81fd039"/>
 		-->
@@ -63096,7 +63096,7 @@ boot OK
 
 	<software name="a2racer">
 		<!--
-		http://redump.org/disc/18700/
+		https://redump.info/disc/18700/
 		<rom name="A2 Racer - Europa Tour (Netherlands).cue" size="1423" crc="88bca47b" sha1="3cad9bd17f8f3aefddf8adc40d6110c985eacc90"/>
 		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 01).bin" size="112039872" crc="0a9a490e" sha1="7585131d4ad8556fecb84730c91f02c1122299a0"/>
 		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 02).bin" size="10953264" crc="d5754a6d" sha1="5d8fc55934c8c862d71520b8fab1100145cc0a51"/>
@@ -63126,7 +63126,7 @@ boot OK
 
 	<software name="acecomb2">
 		<!--
-		http://redump.org/disc/27255
+		https://redump.info/disc/27255
 		<rom name="Ace Combat 2 (Europe).cue" size="87" crc="28e7db3e" sha1="4bb2d90ae08650d1667ff1ea667d6dfecc5f8767"/>
 		<rom name="Ace Combat 2 (Europe).bin" size="580831104" crc="c8dd9a12" sha1="ba42b2b1486715ef87ef9615d9f29b2eeba28b32"/>
 		-->
@@ -63146,7 +63146,7 @@ boot OK
 
 	<software name="acecomb2_fr" cloneof="acecomb2">
 		<!--
-		http://redump.org/disc/27814
+		https://redump.info/disc/27814
 		<rom name="Ace Combat 2 (France).cue" size="87" crc="0eef6a3b" sha1="90b5e8abfea7ac73409f5f05a67104997f4d7c41"/>
 		<rom name="Ace Combat 2 (France).bin" size="581028672" crc="9ca78f07" sha1="638e7e1edb006a07554629cd2eb74af6d7c8ef95"/>
 		-->
@@ -63167,7 +63167,7 @@ boot OK
 
 	<software name="acecomb2_de" cloneof="acecomb2">
 		<!--
-		http://redump.org/disc/15498
+		https://redump.info/disc/15498
 		<rom name="Ace Combat 2 (Germany).cue" size="88" crc="d5fa28d7" sha1="3a7dc766bac07c2754fdc998fb74483fde62b0ce"/>
 		<rom name="Ace Combat 2 (Germany).bin" size="581038080" crc="96b3dbe6" sha1="500a51f90ebf3128b90bd9c388b11f09c8b176f8"/>
 		-->
@@ -63188,7 +63188,7 @@ boot OK
 
 	<software name="acecomb3">
 		<!--
-		http://redump.org/disc/2
+		https://redump.info/disc/2
 		<rom name="Ace Combat 3 - Electrosphere (Europe) (En,Fr,De,Es,It).cue" size="120" crc="92b3ff37" sha1="5cc0e2d25792ae13ec7dab7b2ee8974c700c3337"/>
 		<rom name="Ace Combat 3 - Electrosphere (Europe) (En,Fr,De,Es,It).bin" size="470999760" crc="91cad2df" sha1="8c215d983ad7d7f5f8aa122981cbd79d846532ec"/>
 		-->
@@ -63212,7 +63212,7 @@ boot OK
 
 	<software name="actbass">
 		<!--
-		http://redump.org/disc/1274
+		https://redump.info/disc/1274
 		<rom name="Action Bass (Europe).cue" size="86" crc="4d6a6e91" sha1="51eeee5db1e336c2e5629cc3b05162b0edddfb24"/>
 		<rom name="Action Bass (Europe).bin" size="171905328" crc="6c8e92d5" sha1="18a7fa2146b29dcf7b892dcb6f87e4b31862e27d"/>
 		-->
@@ -63232,7 +63232,7 @@ boot OK
 
 	<software name="actionmn2">
 		<!--
-		http://redump.org/disc/7505
+		https://redump.info/disc/7505
 		<rom name="Action Man - Destruction X (Europe) (En,Fr,De,Es,It).cue" size="118" crc="c40e057b" sha1="011eb99c82ca398273c0c87295561eef5ad7c202"/>
 		<rom name="Action Man - Destruction X (Europe) (En,Fr,De,Es,It).bin" size="506507904" crc="0c793c93" sha1="cc050c5bcbac11040c657947ecc8ea45f555ebbe"/>
 		-->
@@ -63256,7 +63256,7 @@ boot OK
 
 	<software name="actionmn">
 		<!--
-		http://redump.org/disc/3337
+		https://redump.info/disc/3337
 		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).cue" size="134" crc="9627581c" sha1="71cf902e43cc04279490996b6c1b4a08778e196c"/>
 		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).bin" size="552705888" crc="01b94ff1" sha1="3cc7c5994cd9af5c177f2b766449bee1e79d8e39"/>
 		-->
@@ -63285,7 +63285,7 @@ boot OK
 
 	<software name="actionmn_a" cloneof="actionmn">
 		<!--
-		http://redump.org/disc/33226
+		https://redump.info/disc/33226
 		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi) (EDC).cue" size="140" crc="d0fe6b50" sha1="e42e554d8d0beebd0df85315219d9b21483e44b9"/>
 		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi) (EDC).bin" size="552705888" crc="34eedfb3" sha1="0b259a00da8ff2f7d3c3da7eb7954e2b30dd0730"/>
 		-->
@@ -63315,7 +63315,7 @@ boot OK
 
 	<software name="actgolf">
 		<!--
-		http://redump.org/disc/26887
+		https://redump.info/disc/26887
 		<rom name="Actua Golf (Europe) (En,Fr,De).cue" size="230" crc="dc8424ff" sha1="19c094f28be0dbd45913de4997498a6e5b9f469e"/>
 		<rom name="Actua Golf (Europe) (En,Fr,De) (Track 1).bin" size="489281856" crc="49825417" sha1="fcac9c694177ff7077ae79d5693b88d32e92fe92"/>
 		<rom name="Actua Golf (Europe) (En,Fr,De) (Track 2).bin" size="34350960" crc="4c9d46fe" sha1="75b6ded9f51980c306ca2f3a40dcd640c0101745"/>
@@ -63338,7 +63338,7 @@ boot OK
 
 	<software name="actgolf2">
 		<!--
-		http://redump.org/disc/25391
+		https://redump.info/disc/25391
 		<rom name="Actua Golf 2 (Europe).cue" size="327" crc="fc7af053" sha1="9841a45e0f2b97b5c1790174c663eab72abd29a1"/>
 		<rom name="Actua Golf 2 (Europe) (Track 1).bin" size="376538736" crc="b1330c67" sha1="1bd438534b63fc0ee498f92602be16d467a251e6"/>
 		<rom name="Actua Golf 2 (Europe) (Track 2).bin" size="31248672" crc="9ee267d5" sha1="3fb66132c709bd012e578f45e638410ffe76ba2c"/>
@@ -63360,7 +63360,7 @@ boot OK
 
 	<software name="actgolf3" supported="partial">
 		<!--
-		http://redump.org/disc/1240
+		https://redump.info/disc/1240
 		<rom name="Actua Golf 3 (Europe).cue" size="327" crc="f649a1db" sha1="a5f55882b69566e13bd2899c94b810421c0b7ac6"/>
 		<rom name="Actua Golf 3 (Europe) (Track 1).bin" size="524987568" crc="73317df6" sha1="e263ff68a25402ce834771c3de9e8fb20c015643"/>
 		<rom name="Actua Golf 3 (Europe) (Track 2).bin" size="30971136" crc="73a866cc" sha1="06d166e9aff4ad151031bd3307e1b1d6a89f856a"/>
@@ -63385,7 +63385,7 @@ Scrambled graphics when shooting the ball
 
 	<software name="actpool">
 		<!--
-		http://redump.org/disc/25691
+		https://redump.info/disc/25691
 		<rom name="Actua Pool (Europe).cue" size="2604" crc="96021278" sha1="e14d6d8fc9dbb7fbcdbbda311050317c70d4aae5"/>
 		<rom name="Actua Pool (Europe) (Track 01).bin" size="59809008" crc="5a4c398f" sha1="511fd8c4d19d067c67cc46c6267e6df0026357c8"/>
 		<rom name="Actua Pool (Europe) (Track 02).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
@@ -63427,7 +63427,7 @@ Scrambled graphics when shooting the ball
 
 	<software name="poolshrk" cloneof="actpool">
 		<!--
-		http://redump.org/disc/15758
+		https://redump.info/disc/15758
 		<rom name="Pool Shark (Europe).cue" size="2604" crc="7b9f3144" sha1="e49907b33d5b2f51c3de1859c3cf9804e232efe6"/>
 		<rom name="Pool Shark (Europe) (Track 01).bin" size="59794896" crc="3a135b33" sha1="7cda0d82668da6fc53c33bf80a9b1a3d61dda138"/>
 		<rom name="Pool Shark (Europe) (Track 02).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
@@ -63470,7 +63470,7 @@ Scrambled graphics when shooting the ball
 
 	<software name="adiboo">
 		<!--
-		http://redump.org/disc/19839
+		https://redump.info/disc/19839
 		<rom name="Adiboo &amp; Paziral's Secret (Europe) (En,Fr,De,Es,It).cue" size="117" crc="5a147324" sha1="5c05f8ed28d6f1cb86b28f499fe063d993361e84"/>
 		<rom name="Adiboo &amp; Paziral's Secret (Europe) (En,Fr,De,Es,It).bin" size="648037152" crc="2ecd2fc7" sha1="acfc342f9ee98a9c65e0aefac919d51ebbab4fe0"/>
 		-->
@@ -63495,7 +63495,7 @@ Scrambled graphics when shooting the ball
 
 	<software name="adibou">
 		<!--
-		http://redump.org/disc/27473
+		https://redump.info/disc/27473
 		<rom name="Adibou et l'Ombre Verte (France).cue" size="98" crc="056e2737" sha1="db59a051b96f4166b6c52302217e642b6c84c70d"/>
 		<rom name="Adibou et l'Ombre Verte (France).bin" size="563162880" crc="23e63cb2" sha1="8a25a2878bf540697a8e25f5fd4c0b7f366ba372"/>
 		-->
@@ -63517,7 +63517,7 @@ Scrambled graphics when shooting the ball
 
 	<software name="adidas" supported= "no">
 		<!--
-		http://redump.org/disc/1283
+		https://redump.info/disc/1283
 		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It).cue" size="538" crc="855c07d2" sha1="cc1c9d8f758f5b5c091e121b20de94159885b031"/>
 		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="516115824" crc="4d359eb9" sha1="20f8f17c2ea76da36da85402980568679f99170a"/>
 		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It) (Track 2).bin" size="43770720" crc="1034724f" sha1="c8bca8677c75c88c35d06f56e3996af4f879f82b"/>
@@ -63547,7 +63547,7 @@ The game freezes when loading (after the intro)
 
 	<software name="adidas2">
 		<!--
-		http://redump.org/disc/11320
+		https://redump.info/disc/11320
 		<rom name="Adidas Power Soccer 2 (Europe) (En,Fr,De,Es,It,Nl).cue" size="270" crc="276a17c4" sha1="07cc6624737fde3dc6477f1a6797b585f223b1d2"/>
 		<rom name="Adidas Power Soccer 2 (Europe) (En,Fr,De,Es,It,Nl) (Track 1).bin" size="580892256" crc="da1723d5" sha1="812a954b2d5bf402b52b29fa27d138d3d1cd61af"/>
 		<rom name="Adidas Power Soccer 2 (Europe) (En,Fr,De,Es,It,Nl) (Track 2).bin" size="33908784" crc="857edda8" sha1="28a06c34d53442f736fed283c086340d7c56321e"/>
@@ -63573,7 +63573,7 @@ The game freezes when loading (after the intro)
 
 	<software name="ironblod" supported="partial">
 		<!--
-		http://redump.org/disc/23066/
+		https://redump.info/disc/23066/
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (Europe).cue" size="320" crc="19a59436" sha1="25eb0d779d524b700cedd9f38e56076c3af10526"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (Europe) (Track 1).bin" size="255034416" crc="2ecbc2ec" sha1="7b618aa1190ecaf46dc40c9e9aa06f497fb2d0f7"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (Europe) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
@@ -63597,7 +63597,7 @@ Corrupted music on title menu and during gameplay
 
 	<software name="afl99" supported="partial">
 		<!--
-		http://redump.org/disc/31412
+		https://redump.info/disc/31412
 		<rom name="AFL 99 (Australia).cue" size="206" crc="f4d35903" sha1="05b938e10dac51deaecc6d28099d99b3d8c8e3b9"/>
 		<rom name="AFL 99 (Australia) (Track 1).bin" size="338015328" crc="fc2a5352" sha1="12aa2564f32874b3054b67b7fb62999794875b64"/>
 		<rom name="AFL 99 (Australia) (Track 2).bin" size="33508944" crc="82ccd767" sha1="26cd8247c03111249119495f64923196f85bc74e"/>
@@ -63621,7 +63621,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="armstrng">
 		<!--
-		http://redump.org/disc/19655/
+		https://redump.info/disc/19655/
 		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es).cue" size="2243" crc="db235923" sha1="dbaf8b33a9b74a7765ef48ea5bad3e617d4b7e1a"/>
 		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 01).bin" size="237392064" crc="ce836f09" sha1="895eb83448ec5ec0acc1f213ab4a869a97172989"/>
 		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 02).bin" size="33106752" crc="93fd7de6" sha1="ed9c6d10f0b9a5671a167123fb19367a59f332c5"/>
@@ -63660,7 +63660,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="awf111x">
 		<!--
-		http://redump.org/disc/29331/
+		https://redump.info/disc/29331/
 		<rom name="Agile Warrior - F-111X (Europe).cue" size="1620" crc="af0e2d64" sha1="c0fec5f06efac670084a9e04090ef6fb9956d6e8"/>
 		<rom name="Agile Warrior - F-111X (Europe) (Track 01).bin" size="293604864" crc="58a78d11" sha1="c39336f239662e77996e7d80cd7ee77e720d4591"/>
 		<rom name="Agile Warrior - F-111X (Europe) (Track 02).bin" size="12867792" crc="4b90dc03" sha1="439ff316c72a64805a46ac07aba1ed43a16a3456"/>
@@ -63692,7 +63692,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="a4evolgl">
 		<!--
-		http://redump.org/disc/25901
+		https://redump.info/disc/25901
 		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De).cue" size="962" crc="e4b052e4" sha1="24aabd7b6daf83154f012d532ce30534391a175e"/>
 		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 1).bin" size="57621648" crc="7c89428c" sha1="56035d31d27b732eed956bb1736a5502f8b326b9"/>
 		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 2).bin" size="4958016" crc="5a4bdaa9" sha1="b3aad8076cd6dce6b3d8fd0bc76b5f7bc54fe8f9"/>
@@ -63721,7 +63721,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<!-- Bundled with "Action Replay 2 Version 2" for PlayStation 2. Should be moved to that list when possible. -->
 	<software name="ar2_223" cloneof="ar2_230">
-		<!-- http://redump.org/disc/19444/ -->
+		<!-- https://redump.info/disc/19444/ -->
 		<description>Action Replay 2 Version 2.23 - Bonus PSone Codes! (Europe)</description>
 		<year>2002</year>
 		<publisher>Datel</publisher>
@@ -63737,7 +63737,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="aircombt">
 		<!--
-		http://redump.org/disc/929
+		https://redump.info/disc/929
 		<rom name="Air Combat (Europe).cue" size="7164" crc="a76704ae" sha1="166d9b3f8eb411ff33c806b01cae1890b3a48e85"/>
 		<rom name="Air Combat (Europe) (Track 01).bin" size="106968960" crc="f59696b1" sha1="834f181b0463f36ef7efc6cc0f50fb7d98d6086c"/>
 		<rom name="Air Combat (Europe) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
@@ -63820,7 +63820,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="aircombt_a" cloneof="aircombt">
 		<!--
-		http://redump.org/disc/15771
+		https://redump.info/disc/15771
 		<rom name="Air Combat (Europe) (EDC).cue" size="7542" crc="abbbca9e" sha1="6509de37b7338511b30b49aba87ee858abb27a94"/>
 		<rom name="Air Combat (Europe) (EDC) (Track 01).bin" size="106968960" crc="41d03f71" sha1="ee99101b8468966919169fe1172c032397761c49"/>
 		<rom name="Air Combat (Europe) (EDC) (Track 02).bin" size="36738240" crc="f6c605d4" sha1="e4baf5fd8fddbf6f32f4591a4683ca8af9079837"/>
@@ -63903,7 +63903,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="airhckey">
 		<!--
-		http://redump.org/disc/21849
+		https://redump.info/disc/21849
 		<rom name="Air Hockey (Europe).cue" size="208" crc="6a973291" sha1="ae7e3b6b25a6d30212b0f71b1245a82a520bb6d7"/>
 		<rom name="Air Hockey (Europe) (Track 1).bin" size="159616128" crc="1f195cf0" sha1="9146986485bc8c362f4aedbf962c77a0fec20cd3"/>
 		<rom name="Air Hockey (Europe) (Track 2).bin" size="42688800" crc="8a322cf1" sha1="632cb32ce4c7edd6cd7e2aa88cd2b631f88d5b96"/>
@@ -63926,7 +63926,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="pm2001">
 		<!--
-		http://redump.org/disc/795
+		https://redump.info/disc/795
 		<rom name="Alex Ferguson's Player Manager 2001 (Europe).cue" size="672" crc="b8883e3e" sha1="a6110b8332a4a927cadfebcafa04d3fdbc78d3e8"/>
 		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 1).bin" size="52221456" crc="b7519ba5" sha1="70008a947c514d3303e230432aa177271755adf3"/>
 		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
@@ -63952,7 +63952,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="pm2002">
 		<!--
-		http://redump.org/disc/3755
+		https://redump.info/disc/3755
 		<rom name="Alex Ferguson's Player Manager 2002 (Europe).cue" size="672" crc="28a4395e" sha1="c8b731eb0af9f90fa9d94f8068fe719a70f8a608"/>
 		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 1).bin" size="63703920" crc="b2a33a55" sha1="433d07c33bfe200bd9cd982318d1564483002d92"/>
 		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
@@ -63978,7 +63978,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="alfredch">
 		<!--
-		http://redump.org/disc/12423
+		https://redump.info/disc/12423
 		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It).cue" size="1737" crc="5011b3ba" sha1="541fcc29ceebe67b3bbac8d59db7a4d5378792a0"/>
 		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="43147440" crc="be439359" sha1="dcde4444488e64246888a665ce5553ef053105db"/>
 		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="21316176" crc="9334a542" sha1="b51f978c485b75f38c57411e77fca65f1652b36b"/>
@@ -64016,7 +64016,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="alienres">
 		<!--
-		http://redump.org/disc/876
+		https://redump.info/disc/876
 		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It).cue" size="534" crc="aacc72e6" sha1="c0ccc7192c4c99a88c3b3f3bd59d36ae52fb6096"/>
 		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="503850144" crc="03e470ae" sha1="5642c4f4ba6f06323778ae29c59c6dc863d49f55"/>
 		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It) (Track 2).bin" size="15292704" crc="f3c18581" sha1="7e8fbb82eafff3b68c2a8ea8235af5bb3ddb5c2f"/>
@@ -64044,7 +64044,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="alientri">
 		<!--
-		http://redump.org/disc/882
+		https://redump.info/disc/882
 		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It).cue" size="3388" crc="e9ed03e7" sha1="75f047e3db8b87f44d9704796df8351e69e27c8c"/>
 		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 01).bin" size="252882336" crc="fbc7c66d" sha1="edb3c1e0569bb5f7fc7af1b0edf665c686dd7004"/>
 		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
@@ -64092,7 +64092,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="alientri_fr" cloneof="alientri">
 		<!--
-		http://redump.org/disc/47280
+		https://redump.info/disc/47280
 		<rom name="Alien Trilogy (France) (Demo).cue" size="474" crc="7bd19bcd" sha1="cdc94df25f3370c9429db98ba92c16e953588cb9"/>
 		<rom name="Alien Trilogy (France) (Demo) (Track 1).bin" size="63355824" crc="165b3bac" sha1="ec076843bb85e3053908f1b24166a0840919da62"/>
 		<rom name="Alien Trilogy (France) (Demo) (Track 2).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
@@ -64115,7 +64115,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="alientri_de" cloneof="alientri">
 		<!--
-		http://redump.org/disc/189
+		https://redump.info/disc/189
 		<rom name="Alien Trilogy (Germany).cue" size="3050" crc="c4d4027c" sha1="1c7303e390a79765ab98765536c03bd76579661f"/>
 		<rom name="Alien Trilogy (Germany) (Track 01).bin" size="251562864" crc="f9679915" sha1="5cebf938d7ba9210958e49a5cc110e98ac435308"/>
 		<rom name="Alien Trilogy (Germany) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
@@ -64160,7 +64160,7 @@ During gameplay, the commentary speech audio is playing too fast
 
 	<software name="alliedgn" supported="partial">
 		<!--
-		http://redump.org/disc/26263/
+		https://redump.info/disc/26263/
 		<rom name="Allied General (Europe).cue" size="918" crc="2d21857c" sha1="3703a846580b7f9232b8c7cbc575ebf02a51653b"/>
 		<rom name="Allied General (Europe) (Track 1).bin" size="361323648" crc="db60c65c" sha1="a4d7b88051de247059043bf4511751ede33742b5"/>
 		<rom name="Allied General (Europe) (Track 2).bin" size="28452144" crc="09e60cab" sha1="57b163e0ee20ff12d6d19423e2f08248a14cca8c"/>
@@ -64191,7 +64191,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="aitd2">
 		<!--
-		http://redump.org/disc/485
+		https://redump.info/disc/485
 		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).cue" size="124" crc="f7ce671d" sha1="6ea73167cc18018d4cd0372d2a4fb990e7f86fd5"/>
 		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).bin" size="714170688" crc="74fbb4a8" sha1="ac18785261cca340268dbd27ee156ca2436fcff2"/>
 		-->
@@ -64216,11 +64216,11 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="amerzone">
 		<!--
-		http://redump.org/disc/31197
+		https://redump.info/disc/31197
 		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 1).cue" size="116" crc="81d37b26" sha1="2a46847352a2752f14933a47337684df59c74c2d"/>
 		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 1).bin" size="683201904" crc="df28a6f4" sha1="9f36bf17afab18f1193465883d3cc7059dae4211"/>
 
-		http://redump.org/disc/31198
+		https://redump.info/disc/31198
 		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 2).cue" size="116" crc="808e5df7" sha1="96a02487f1ed646c4aab2dc08e33e737c3d7fa45"/>
 		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 2).bin" size="517150704" crc="21259fe5" sha1="a3b1f05a896737ffc796f51b004d43ad3d928606"/>
 		-->
@@ -64246,11 +64246,11 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="amerzone_de" cloneof="amerzone">
 		<!--
-		http://redump.org/disc/5515
+		https://redump.info/disc/5515
 		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 1).cue" size="133" crc="bfdaa795" sha1="4e3ab252fc3a327b98a6d196088fcddfebdc6ea6"/>
 		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 1).bin" size="685165824" crc="d4bd767c" sha1="1eeb77107e795252d50ba6f895d089bf16bc8965"/>
 
-		http://redump.org/disc/5516
+		https://redump.info/disc/5516
 		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 2).cue" size="133" crc="be878144" sha1="b287a2271dfb68353411d0dd3dda8118d5caee39"/>
 		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 2).bin" size="517943328" crc="14ed1531" sha1="0619398db19e169dc1b9e6882b4615873e8db40e"/>
 		-->
@@ -64276,11 +64276,11 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="amerzone_es" cloneof="amerzone">
 		<!--
-		http://redump.org/disc/27535
+		https://redump.info/disc/27535
 		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 1).cue" size="118" crc="47aef34e" sha1="500345fcc228e2082fe47006791ed32d74b7574d"/>
 		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 1).bin" size="684107424" crc="e0527dec" sha1="a8e2df17df16095a710052e17fd78bb1298e133c"/>
 
-		http://redump.org/disc/27536
+		https://redump.info/disc/27536
 		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 2).cue" size="118" crc="46f3d59f" sha1="c98a3ab773892fb33932e98cf4be623f5ab43a2e"/>
 		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 2).bin" size="516193440" crc="8fabe501" sha1="88c44c7ea319ed1ce110e2afddf1a81a7c946d57"/>
 		-->
@@ -64306,11 +64306,11 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="amerzone_it" cloneof="amerzone">
 		<!--
-		http://redump.org/disc/35298
+		https://redump.info/disc/35298
 		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 1).cue" size="124" crc="eec8987d" sha1="1e87621eba649f35eef2d1efdced35f848868c00"/>
 		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 1).bin" size="682733856" crc="51d17a34" sha1="b26de149fab1251c41282fecec9370c28623d66b"/>
 
-		http://redump.org/disc/35299
+		https://redump.info/disc/35299
 		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).cue" size="124" crc="ef95beac" sha1="c6dac3b70720f8962c91dced4b561a79c70af683"/>
 		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).bin" size="516520368" crc="2961f496" sha1="e4404580b86604feba74dc61627e0e6f2c8ffcb2"/>
 		-->
@@ -64336,11 +64336,11 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="amerzone_pt" cloneof="amerzone">
 		<!--
-		http://redump.org/disc/64127
+		https://redump.info/disc/64127
 		<rom name="Amerzone - O Testamento do Explorador (Portugal) (Disc 1).cue" size="123" crc="a5d01395" sha1="0c32cb0efb744554212d7841d4eb4996f6b6b33f"/>
 		<rom name="Amerzone - O Testamento do Explorador (Portugal) (Disc 1).bin" size="685932576" crc="516f76b5" sha1="093228b0a7f076816acfb1e954c94f851ff90a4f"/>
 
-		http://redump.org/disc/64128
+		https://redump.info/disc/64128
 		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).cue" size="124" crc="ef95beac" sha1="c6dac3b70720f8962c91dced4b561a79c70af683"/>
 		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).bin" size="516520368" crc="2961f496" sha1="e4404580b86604feba74dc61627e0e6f2c8ffcb2"/>
 		-->
@@ -64366,11 +64366,11 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="amerzone_fr" cloneof="amerzone">
 		<!--
-		http://redump.org/disc/15005
+		https://redump.info/disc/15005
 		<rom name="Amerzone, L' (France) (Disc 1).cue" size="96" crc="c767edbb" sha1="3a1533f7da042fa79cca5b0b337670cea4d3001e"/>
 		<rom name="Amerzone, L' (France) (Disc 1).bin" size="688301040" crc="cb3a508c" sha1="f96b2a612ba4c6cf4c21fcc0d2c1d62947c2b8a6"/>
 
-		http://redump.org/disc/15006
+		https://redump.info/disc/15006
 		<rom name="Amerzone, L' (France) (Disc 2).cue" size="96" crc="c63acb6a" sha1="6e13826fd55b52ee08ab7a951edf981ea89b8346"/>
 		<rom name="Amerzone, L' (France) (Disc 2).bin" size="519796704" crc="38bd90a4" sha1="e2bc390ed4d58aaa2185ebc5692329573e8c65f6"/>
 		-->
@@ -64396,7 +64396,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="anastasia">
 		<!--
-		http://redump.org/disc/6713
+		https://redump.info/disc/6713
 		<rom name="Anastasia (Europe) (En,Fr,De,Nl).cue" size="98" crc="d4be8b7e" sha1="fdea7b6c93669a23f5de2e16a563bf857b72fd20"/>
 		<rom name="Anastasia (Europe) (En,Fr,De,Nl).bin" size="512759520" crc="30735008" sha1="70afcc8eb81584ac18d52f08a77f63e803cd822d"/>
 		-->
@@ -64419,7 +64419,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="animalfb">
 		<!--
-		http://redump.org/disc/15750/
+		https://redump.info/disc/15750/
 		<rom name="Animal Football (Europe) (En,Fr,De).cue" size="101" crc="d6971d65" sha1="7a5edaac263e2ab4ba026bfd95150362c1da5bac"/>
 		<rom name="Animal Football (Europe) (En,Fr,De).bin" size="428974224" crc="553cb437" sha1="7e3cae65567f3c2e1b9dfdad3fc5f90d84026baf"/>
 		-->
@@ -64442,7 +64442,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="smcourt2">
 		<!--
-		http://redump.org/disc/5500
+		https://redump.info/disc/5500
 		<rom name="Anna Kournikova's Smash Court Tennis (Europe) (Rev 1).cue" size="119" crc="8f6ccdab" sha1="99d1f1864e3bce4c8f1e2772a378c2e7d9f23e94"/>
 		<rom name="Anna Kournikova's Smash Court Tennis (Europe) (Rev 1).bin" size="379662192" crc="9b59eec7" sha1="fe27bedeb0160af682be2573733118d52e480202"/>
 		-->
@@ -64463,7 +64463,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="smcourt2_a" cloneof="smcourt2">
 		<!--
-		http://redump.org/disc/61311
+		https://redump.info/disc/61311
 		<rom name="Anna Kournikova's Smash Court Tennis (Europe).cue" size="111" crc="dd7252e5" sha1="49a592cbf2b899e4c483f7226c6dbb40bbfc1e71"/>
 		<rom name="Anna Kournikova's Smash Court Tennis (Europe).bin" size="379662192" crc="ae16491c" sha1="a53cea5320ee73cb31ebde5b74d653a1c2183e36"/>
 		-->
@@ -64483,7 +64483,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="apescapee" cloneof="apescape" supported="no">
-		<!-- http://redump.org/disc/6147/ -->
+		<!-- https://redump.info/disc/6147/ -->
 		<description>Ape Escape (Europe)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -64501,7 +64501,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="archer3d">
 		<!--
-		http://redump.org/disc/4217/
+		https://redump.info/disc/4217/
 		<rom name="Archer Maclean's 3D Pool (Europe).cue" size="744" crc="b786676a" sha1="ab5fbb7ba2ba2edcf5c0d2b1135d4b9f53475943"/>
 		<rom name="Archer Maclean's 3D Pool (Europe) (Track 1).bin" size="50323392" crc="7f01a3b0" sha1="7699da953e9f1b61c3ac7159d7ea9aa9d2570831"/>
 		<rom name="Archer Maclean's 3D Pool (Europe) (Track 2).bin" size="21309120" crc="bd07e39d" sha1="6fb7fc27ec02f9847848ef4f87c0f379cd94542b"/>
@@ -64527,7 +64527,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="asteroid">
 		<!--
-		http://redump.org/disc/31337/
+		https://redump.info/disc/31337/
 		<rom name="Asteroids (Europe).cue" size="206" crc="9ee5b199" sha1="329fdefe6c75fecd216f1927903b374c26876a4e"/>
 		<rom name="Asteroids (Europe) (Track 1).bin" size="118216224" crc="de2aabf5" sha1="9e3de51ba879ff856872880b9f98b022c3e9dbcb"/>
 		<rom name="Asteroids (Europe) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
@@ -64549,7 +64549,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="asteroid_fr" cloneof="asteroid">
 		<!--
-		http://redump.org/disc/29533/
+		https://redump.info/disc/29533/
 		<rom name="Asteroids (France).cue" size="206" crc="16da3e97" sha1="e4e1f8b697a8dadda86cbe4a0c32d29b7c6dfd08"/>
 		<rom name="Asteroids (France) (Track 1).bin" size="195112512" crc="ea93c5ff" sha1="4fca37dc48d6aacc677f4e42c219e57ffeec3cc7"/>
 		<rom name="Asteroids (France) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
@@ -64571,7 +64571,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="asteroid_de" cloneof="asteroid">
 		<!--
-		http://redump.org/disc/23173/
+		https://redump.info/disc/23173/
 		<rom name="Asteroids (Germany).cue" size="208" crc="7de2ef81" sha1="5b504f9c93289f6ae1eb1301077bda51fa1fff27"/>
 		<rom name="Asteroids (Germany) (Track 1).bin" size="195112512" crc="1af8eaed" sha1="58e8f933ce912a624040fd8dccd2eaf11c9d8feb"/>
 		<rom name="Asteroids (Germany) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
@@ -64593,7 +64593,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="asteroid_it" cloneof="asteroid">
 		<!--
-		http://redump.org/disc/27978/
+		https://redump.info/disc/27978/
 		<rom name="Asteroids (Italy).cue" size="204" crc="e2abbc33" sha1="1ae92afe93d51ad1aeb82a7de73c1951bf350032"/>
 		<rom name="Asteroids (Italy) (Track 1).bin" size="195112512" crc="3c01b284" sha1="71c0dc876eb4ae7df3861c7d9c281657b9503bcb"/>
 		<rom name="Asteroids (Italy) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
@@ -64614,7 +64614,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="acrels96">
-		<!-- http://redump.org/disc/1036/ -->
+		<!-- https://redump.info/disc/1036/ -->
 		<!-- Came bundled with releases of "Crash Bandicoot" and "Tekken 2" -->
 		<description>Autumn/Christmas Releases '96 (Europe)</description>
 		<year>1996</year>
@@ -64632,7 +64632,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="sennakd">
 		<!--
-		http://redump.org/disc/25723
+		https://redump.info/disc/25723
 		<rom name="Ayrton Senna Kart Duel (Europe).cue" size="857" crc="04eac66b" sha1="7f3dec2412ad3e2d9ad123fd53585be4f2487de2"/>
 		<rom name="Ayrton Senna Kart Duel (Europe) (Track 1).bin" size="89027904" crc="f3ff3ffe" sha1="d7ac163acd747be965ac9dc5b35cd4abdebe3f64"/>
 		<rom name="Ayrton Senna Kart Duel (Europe) (Track 2).bin" size="54046608" crc="37688641" sha1="7b96f58c601c2e1a9a389f9701ee4440dda7cff8"/>
@@ -64658,7 +64658,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="sennakd2">
 		<!--
-		http://redump.org/disc/23040/
+		https://redump.info/disc/23040/
 		<rom name="Ayrton Senna Kart Duel 2 (Europe).cue" size="744" crc="c222ead2" sha1="55553251fe8bccded1d95356f28cd9ab68027f2d"/>
 		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 1).bin" size="121379664" crc="a7943e29" sha1="a55e9078feeaa8385dd71e96203b2be5f8156b51"/>
 		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 2).bin" size="21534912" crc="de4ff27b" sha1="03864a5226476baac2a9ece84ba0bc3aa31417c9"/>
@@ -64683,7 +64683,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="babyfelx">
 		<!--
-		http://redump.org/disc/15634/
+		https://redump.info/disc/15634/
 		<rom name="Baby Felix Tennis (Europe) (En,Fr,De,Es,It,Nl).cue" size="112" crc="6f7e03a4" sha1="2df76d718f877f40a5c677568e1c4b91b54c04c5"/>
 		<rom name="Baby Felix Tennis (Europe) (En,Fr,De,Es,It,Nl).bin" size="152094432" crc="3ab7f7e9" sha1="fb97aee090eabdd38961720607462a710b8efc37"/>
 		-->
@@ -64708,7 +64708,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="bm">
-		<!-- http://redump.org/disc/3407/ -->
+		<!-- https://redump.info/disc/3407/ -->
 		<description>Beatmania (Europe)</description>
 		<year>2000</year>
 		<publisher>Konami of Europe</publisher>
@@ -64725,7 +64725,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="bedlam" supported="no">
 		<!--
-		http://redump.org/disc/1034
+		https://redump.info/disc/1034
 		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl).cue" size="1014" crc="6e0a59d3" sha1="a94120a4812030448734fefe32f25adde66d021c"/>
 		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 1).bin" size="82157712" crc="725f01ad" sha1="c01f8bd0b5b08b2b8b006fea7d04abb826ed07ff"/>
 		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 2).bin" size="37025184" crc="511ba896" sha1="659ff970996b9aa9f0a4c017ee8ce3502d79e33d"/>
@@ -64759,7 +64759,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="bublbobl">
 		<!--
-		http://redump.org/disc/4225/
+		https://redump.info/disc/4225/
 		<rom name="Bubble Bobble also featuring Rainbow Islands (Europe).cue" size="276" crc="e6758f76" sha1="f21d705692c4019ce24b399c556f67c7bc924785"/>
 		<rom name="Bubble Bobble also featuring Rainbow Islands (Europe) (Track 1).bin" size="63125328" crc="32111834" sha1="5c76166cc09120d955e734aeb643419a9c0bd66f"/>
 		<rom name="Bubble Bobble also featuring Rainbow Islands (Europe) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
@@ -64779,8 +64779,8 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="cte" cloneof="covertop">
-		<!-- http://redump.org/disc/27257/ -->
-		<!-- http://redump.org/disc/27258/ -->
+		<!-- https://redump.info/disc/27257/ -->
+		<!-- https://redump.info/disc/27258/ -->
 		<description>Chase the Express (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -64805,7 +64805,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="cheesy">
 		<!--
-		http://redump.org/disc/27322/
+		https://redump.info/disc/27322/
 		<rom name="Cheesy (Europe) (En,Fr).cue" size="2342" crc="788ddfa4" sha1="1624d915936a55499d57548a97938db7b8d78e67"/>
 		<rom name="Cheesy (Europe) (En,Fr) (Track 01).bin" size="109095168" crc="50078ebd" sha1="8e2f9f1f97e7962efc7179f33198d0cb274a4963"/>
 		<rom name="Cheesy (Europe) (En,Fr) (Track 02).bin" size="48201888" crc="12a2b3fa" sha1="de96feb091ef6194d0e71b5c2821860c0f223094"/>
@@ -64844,7 +64844,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="crashbshe" cloneof="crashbsh" supported="no">
-		<!-- http://redump.org/disc/5483/ -->
+		<!-- https://redump.info/disc/5483/ -->
 		<description>Crash Bash (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -64861,7 +64861,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="demo1_1">
-		<!-- http://redump.org/disc/531/ -->
+		<!-- https://redump.info/disc/531/ -->
 		<description>Demo One (Version 1) (Europe)</description>
 		<year>1995?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -64876,7 +64876,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="demo1_2">
-		<!-- http://redump.org/disc/526/ -->
+		<!-- https://redump.info/disc/526/ -->
 		<description>Demo One (Version 2) (Europe)</description>
 		<year>1995?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -64890,7 +64890,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="demo1_4g">
-		<!-- http://redump.org/disc/1038/ -->
+		<!-- https://redump.info/disc/1038/ -->
 		<description>Demo One (Version 4) (Germany)</description>
 		<year>1996?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -64907,7 +64907,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="fm2001" cloneof="pm2001">
 		<!--
-		http://redump.org/disc/30413
+		https://redump.info/disc/30413
 		<rom name="DSF Fussball Manager 2001 (Germany).cue" size="627" crc="f318f4b1" sha1="209a06d704773240f0c53238cd8ea7faf2599656"/>
 		<rom name="DSF Fussball Manager 2001 (Germany) (Track 1).bin" size="50116416" crc="623d4ace" sha1="935be040f610d2df84e4fc73a01095456da06ba2"/>
 		<rom name="DSF Fussball Manager 2001 (Germany) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
@@ -64934,7 +64934,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="fm2002" cloneof="pm2002">
 		<!--
-		http://redump.org/disc/6113
+		https://redump.info/disc/6113
 		<rom name="DSF Fussball Manager 2002 (Germany).cue" size="627" crc="68c33ee7" sha1="9aaa2399844a02713b60af758871f6593fa59bb5"/>
 		<rom name="DSF Fussball Manager 2002 (Germany) (Track 1).bin" size="63525168" crc="748ab177" sha1="71deadf79aec782c44aeca5da36260b0aefd4fb7"/>
 		<rom name="DSF Fussball Manager 2002 (Germany) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
@@ -64960,7 +64960,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="monstincsw" cloneof="monstinc">
-		<!-- http://redump.org/disc/55136/ -->
+		<!-- https://redump.info/disc/55136/ -->
 		<description>Disney/Pixar Monsters, Inc.: Skrämmarön (Sweden)</description>
 		<year>2002</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -64974,8 +64974,8 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="draculae" cloneof="dracula">
-		<!-- http://redump.org/disc/562/ -->
-		<!-- http://redump.org/disc/563/ -->
+		<!-- https://redump.info/disc/562/ -->
+		<!-- https://redump.info/disc/563/ -->
 		<description>Dracula: The Resurrection (Europe)</description>
 		<year>2000</year>
 		<publisher>Microïds</publisher>
@@ -64999,8 +64999,8 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="driver2e" cloneof="driver2">
-		<!-- http://redump.org/disc/1095/ -->
-		<!-- http://redump.org/disc/1180/ -->
+		<!-- https://redump.info/disc/1095/ -->
+		<!-- https://redump.info/disc/1180/ -->
 		<description>Driver 2: Back on the Streets (Europe, rev. 1)</description>
 		<year>2000</year>
 		<publisher>Infogrames Europe</publisher>
@@ -65024,7 +65024,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo21">
-		<!-- http://redump.org/disc/1022/ -->
+		<!-- https://redump.info/disc/1022/ -->
 		<description>Euro Demo 21 (Europe)</description>
 		<year>1996?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65040,7 +65040,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo22">
-		<!-- http://redump.org/disc/649/ -->
+		<!-- https://redump.info/disc/649/ -->
 		<description>Euro Demo 22 (Europe)</description>
 		<year>1996?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65057,7 +65057,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo28">
-		<!-- http://redump.org/disc/331/ -->
+		<!-- https://redump.info/disc/331/ -->
 		<description>Euro Demo 28 (Europe)</description>
 		<year>1997?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65073,7 +65073,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo58">
-		<!-- http://redump.org/disc/314/ -->
+		<!-- https://redump.info/disc/314/ -->
 		<description>Euro Demo 58 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65089,7 +65089,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo60">
-		<!-- http://redump.org/disc/316/ -->
+		<!-- https://redump.info/disc/316/ -->
 		<description>Euro Demo 60 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65104,7 +65104,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo62">
-		<!-- http://redump.org/disc/574/ -->
+		<!-- https://redump.info/disc/574/ -->
 		<description>Euro Demo 62 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65120,7 +65120,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo63">
-		<!-- http://redump.org/disc/319/ -->
+		<!-- https://redump.info/disc/319/ -->
 		<description>Euro Demo 63 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65136,7 +65136,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo64">
-		<!-- http://redump.org/disc/291/ -->
+		<!-- https://redump.info/disc/291/ -->
 		<description>Euro Demo 64 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65152,7 +65152,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo65">
-		<!-- http://redump.org/disc/288/ -->
+		<!-- https://redump.info/disc/288/ -->
 		<description>Euro Demo 65 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65168,7 +65168,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo66">
-		<!-- http://redump.org/disc/289/ -->
+		<!-- https://redump.info/disc/289/ -->
 		<description>Euro Demo 66 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65183,7 +65183,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo67">
-		<!-- http://redump.org/disc/290/ -->
+		<!-- https://redump.info/disc/290/ -->
 		<description>Euro Demo 67 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65199,7 +65199,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo68">
-		<!-- http://redump.org/disc/1236/ -->
+		<!-- https://redump.info/disc/1236/ -->
 		<description>Euro Demo 68 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65214,7 +65214,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo69">
-		<!-- http://redump.org/disc/322/ -->
+		<!-- https://redump.info/disc/322/ -->
 		<description>Euro Demo 69 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65230,7 +65230,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo70">
-		<!-- http://redump.org/disc/292/ -->
+		<!-- https://redump.info/disc/292/ -->
 		<description>Euro Demo 70 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65245,7 +65245,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo71">
-		<!-- http://redump.org/disc/293/ -->
+		<!-- https://redump.info/disc/293/ -->
 		<description>Euro Demo 71 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65260,7 +65260,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo72">
-		<!-- http://redump.org/disc/294/ -->
+		<!-- https://redump.info/disc/294/ -->
 		<description>Euro Demo 72 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65275,7 +65275,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo73">
-		<!-- http://redump.org/disc/19604/ -->
+		<!-- https://redump.info/disc/19604/ -->
 		<description>Euro Demo 73 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65291,7 +65291,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="edemo74">
-		<!-- http://redump.org/disc/1262/ -->
+		<!-- https://redump.info/disc/1262/ -->
 		<description>Euro Demo 74 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65307,7 +65307,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="evryglf2" cloneof="hotshot2">
-		<!-- http://redump.org/disc/19905/ -->
+		<!-- https://redump.info/disc/19905/ -->
 		<description>Everybody's Golf 2 (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65324,7 +65324,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="f1cs2ke" cloneof="f1cs2k">
-		<!-- http://redump.org/disc/1751/ -->
+		<!-- https://redump.info/disc/1751/ -->
 		<description>F1 Championship Season 2000 (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -65341,10 +65341,10 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="ffant8e" cloneof="ffant8" supported="no">
-		<!-- http://redump.org/disc/866/ -->
-		<!-- http://redump.org/disc/875/ -->
-		<!-- http://redump.org/disc/873/ -->
-		<!-- http://redump.org/disc/874/ -->
+		<!-- https://redump.info/disc/866/ -->
+		<!-- https://redump.info/disc/875/ -->
+		<!-- https://redump.info/disc/873/ -->
+		<!-- https://redump.info/disc/874/ -->
 		<description>Final Fantasy VIII (Europe, Australia)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65381,7 +65381,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="frontms3e" cloneof="frontms3">
-		<!-- http://redump.org/disc/61313/ -->
+		<!-- https://redump.info/disc/61313/ -->
 		<description>Front Mission 3 (Europe, prototype 20000616)</description>
 		<year>2000</year>
 		<publisher>Square Europe</publisher>
@@ -65396,7 +65396,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="ghlpanic">
-		<!-- http://redump.org/disc/19600/ -->
+		<!-- https://redump.info/disc/19600/ -->
 		<description>Ghoul Panic (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65412,7 +65412,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="gt1e" cloneof="gt1">
-		<!-- http://redump.org/disc/81/ -->
+		<!-- https://redump.info/disc/81/ -->
 		<description>Gran Turismo (Europe)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65429,8 +65429,8 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="gt2e" cloneof="gt2">
-		<!-- http://redump.org/disc/82/ -->
-		<!-- http://redump.org/disc/83/ -->
+		<!-- https://redump.info/disc/82/ -->
+		<!-- https://redump.info/disc/83/ -->
 		<description>Gran Turismo 2 (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65454,7 +65454,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="gta2e" cloneof="gta2">
-		<!-- http://redump.org/disc/188/ -->
+		<!-- https://redump.info/disc/188/ -->
 		<description>Grand Theft Auto 2 (Europe, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Rockstar Games</publisher>
@@ -65472,7 +65472,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="grm2001" cloneof="pm2001">
 		<!--
-		http://redump.org/disc/29319
+		https://redump.info/disc/29319
 		<rom name="Guy Roux Manager 2001 (France).cue" size="602" crc="69b3eea3" sha1="64674c287178e9cdd0448d086c04067441cb63f3"/>
 		<rom name="Guy Roux Manager 2001 (France) (Track 1).bin" size="50109360" crc="29941264" sha1="e16f2ee2e3bbbd3527a0c31e67f91306c5e11e86"/>
 		<rom name="Guy Roux Manager 2001 (France) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
@@ -65497,7 +65497,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="lemans24" cloneof="tdlemans" supported="no">
-		<!-- http://redump.org/disc/1659/ -->
+		<!-- https://redump.info/disc/1659/ -->
 		<description>Le Mans 24 Hours (Europe)</description>
 		<year>1999</year>
 		<publisher>Infogrames Europe</publisher>
@@ -65515,7 +65515,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="mhonrunde" cloneof="mhonrund">
-		<!-- http://redump.org/disc/1204/ -->
+		<!-- https://redump.info/disc/1204/ -->
 		<description>Medal of Honor: Underground (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -65532,8 +65532,8 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="mgse" cloneof="mgs">
-		<!-- http://redump.org/disc/597/ -->
-		<!-- http://redump.org/disc/598/ -->
+		<!-- https://redump.info/disc/597/ -->
+		<!-- https://redump.info/disc/598/ -->
 		<description>Metal Gear Solid (Europe)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -65557,7 +65557,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="mgssm" cloneof="mgsvr">
-		<!-- http://redump.org/disc/1167/ -->
+		<!-- https://redump.info/disc/1167/ -->
 		<description>Metal Gear Solid: Special Missions (Europe)</description>
 		<year>1999</year>
 		<publisher>Konami of Europe</publisher>
@@ -65573,7 +65573,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="micromc3e" cloneof="micromc3">
-		<!-- http://redump.org/disc/19601/ -->
+		<!-- https://redump.info/disc/19601/ -->
 		<description>Micro Machines V3 (Europe) (with EDC)</description>
 		<year>1997</year>
 		<publisher>The Codemasters Software Company</publisher>
@@ -65589,7 +65589,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="motorcre" cloneof="motorcr">
-		<!-- http://redump.org/disc/1001/ -->
+		<!-- https://redump.info/disc/1001/ -->
 		<description>Moto Racer (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
@@ -65606,7 +65606,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="motorcwte" cloneof="motorcwt">
-		<!-- http://redump.org/disc/1201/ -->
+		<!-- https://redump.info/disc/1201/ -->
 		<description>Moto Racer World Tour (Europe)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
@@ -65623,7 +65623,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="music">
-		<!-- http://redump.org/disc/110/ -->
+		<!-- https://redump.info/disc/110/ -->
 		<description>Music: Music Creation for the PlayStation (Europe)</description>
 		<year>1998</year>
 		<publisher>Codemasters</publisher>
@@ -65641,7 +65641,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="smcourt">
 		<!--
-		http://redump.org/disc/25906
+		https://redump.info/disc/25906
 		<rom name="Namco Tennis Smash Court (Europe).cue" size="99" crc="a0b01ed8" sha1="1cdc9681b4041a45025b71d6f56b4a5bcdf24781"/>
 		<rom name="Namco Tennis Smash Court (Europe).bin" size="545515824" crc="d4560741" sha1="5d70c9c7a01027702e36ba06b02efd0da4fe0865"/>
 		-->
@@ -65660,7 +65660,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="nfs2e" cloneof="nfs2">
-		<!-- http://redump.org/disc/367/ -->
+		<!-- https://redump.info/disc/367/ -->
 		<description>Need for Speed II (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
@@ -65676,7 +65676,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="nfs3e" cloneof="nfs3">
-		<!-- http://redump.org/disc/1169/ -->
+		<!-- https://redump.info/disc/1169/ -->
 		<description>Need for Speed III: Hot Pursuit (Europe)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
@@ -65692,7 +65692,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="nofeare" cloneof="nofear">
-		<!-- http://redump.org/disc/606/ -->
+		<!-- https://redump.info/disc/606/ -->
 		<description>No Fear Downhill Mountain Biking (Europe)</description>
 		<year>1999</year>
 		<publisher>The Codemasters Software Company</publisher>
@@ -65708,7 +65708,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="abeodysse" cloneof="abeodyss">
-		<!-- http://redump.org/disc/702/ -->
+		<!-- https://redump.info/disc/702/ -->
 		<description>Oddworld: Abe's Oddysee (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive Software Europe / Infogrames</publisher>
@@ -65725,7 +65725,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="ptblanked" cloneof="ptblank">
-		<!-- http://redump.org/disc/323/ -->
+		<!-- https://redump.info/disc/323/ -->
 		<!-- Came bundled with releases of "Treasures of the Deep", "Klonoa: Door to Phantomile" and "Tekken 2" -->
 		<description>Point Blank (Europe, demo)</description>
 		<year>1998</year>
@@ -65741,7 +65741,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="ptblanke" cloneof="ptblank">
-		<!-- http://redump.org/disc/1542/ -->
+		<!-- https://redump.info/disc/1542/ -->
 		<description>Point Blank (Europe, rev. 1)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65757,7 +65757,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="ptblank2e" cloneof="ptblank2">
-		<!-- http://redump.org/disc/226/ -->
+		<!-- https://redump.info/disc/226/ -->
 		<description>Point Blank 2 (Europe, Australia)</description>
 		<year>1999?</year>
 		<publisher>Namco</publisher>
@@ -65773,7 +65773,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="porschece" cloneof="porschec">
-		<!-- http://redump.org/disc/684/ -->
+		<!-- https://redump.info/disc/684/ -->
 		<description>Porsche Challenge (Europe)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65790,7 +65790,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="powrsrc">
-		<!-- http://redump.org/disc/31217/ -->
+		<!-- https://redump.info/disc/31217/ -->
 		<description>Power Source (Europe)</description>
 		<year>1997?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -65806,7 +65806,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="ppinbrue" cloneof="ppinbru">
-		<!-- http://redump.org/disc/26738/ -->
+		<!-- https://redump.info/disc/26738/ -->
 		<description>Pro Pinball: Big Race USA (Europe)</description>
 		<year>1998</year>
 		<publisher>Empire Interactive Entertainment</publisher>
@@ -65823,7 +65823,7 @@ Corrupted sound on title menu and during gameplay
 
 	<!-- A prototype version is also dumped but contains the same data as final version -->
 	<software name="rshot">
-		<!-- http://redump.org/disc/8760/ -->
+		<!-- https://redump.info/disc/8760/ -->
 		<description>Rescue Shot (Europe)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
@@ -65840,7 +65840,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="revile" cloneof="revil">
-		<!-- http://redump.org/disc/19602/ -->
+		<!-- https://redump.info/disc/19602/ -->
 		<description>Resident Evil (Europe, EDC)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
@@ -65856,7 +65856,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="revil3e" cloneof="revil3" supported="no">
-		<!-- http://redump.org/disc/496/ -->
+		<!-- https://redump.info/disc/496/ -->
 		<description>Resident Evil 3: Nemesis (Europe)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
@@ -65872,7 +65872,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="revilsrve" cloneof="revilsrv">
-		<!-- http://redump.org/disc/801/ -->
+		<!-- https://redump.info/disc/801/ -->
 		<description>Resident Evil: Survivor (Europe)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
@@ -65888,7 +65888,7 @@ Corrupted sound on title menu and during gameplay
 
 	<software name="sampras">
 		<!--
-		http://redump.org/disc/7563/
+		https://redump.info/disc/7563/
 		<rom name="Sampras Extreme Tennis (Europe) (En,Fr,De,Es,It).cue" size="266" crc="04480e4e" sha1="ffa5e6c74928f01e470fce1ed11bf9ca9a574e6d"/>
 		<rom name="Sampras Extreme Tennis (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="542827488" crc="366fd133" sha1="dc8e6781f16207776f33daaeb789cfc27f3ae25b"/>
 		<rom name="Sampras Extreme Tennis (Europe) (En,Fr,De,Es,It) (Track 2).bin" size="41543376" crc="c206e837" sha1="3d6468863690e21f935f9be3ec961f78ba1493d3"/>
@@ -65912,7 +65912,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="silenthe" cloneof="silenth">
-		<!-- http://redump.org/disc/135/ -->
+		<!-- https://redump.info/disc/135/ -->
 		<description>Silent Hill (Europe)</description>
 		<year>1999</year>
 		<publisher>Konami Digital Entertainment</publisher>
@@ -65929,7 +65929,7 @@ Corrupted sound on title menu and during gameplay
 	</software>
 
 	<software name="sphere360" supported="partial">
-		<!-- http://redump.org/disc/18437/ -->
+		<!-- https://redump.info/disc/18437/ -->
 		<description>Sphere 360° (Europe)</description>
 		<year>1999?</year>
 		<publisher>ASCII Entertainment Europe</publisher>
@@ -65947,7 +65947,7 @@ Missing optional ASCII Sphere 360° Controller
 	</software>
 
 	<software name="spidermne" cloneof="spidermn">
-		<!-- http://redump.org/disc/907/ -->
+		<!-- https://redump.info/disc/907/ -->
 		<description>Spider-Man (Europe)</description>
 		<year>2000</year>
 		<publisher>Activision Publishing</publisher>
@@ -65964,7 +65964,7 @@ Missing optional ASCII Sphere 360° Controller
 
 	<software name="spm2001" cloneof="pm2001">
 		<!--
-		http://redump.org/disc/29319
+		https://redump.info/disc/29319
 		<rom name="Sportweek Player Manager 2001 (Netherlands).cue" size="667" crc="dfbad3c8" sha1="537b3ab0c5754340e2a446da1c19fd3958f21845"/>
 		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 1).bin" size="50045856" crc="6ba38d2c" sha1="4bf70ce298440212a177ff6b75ce3ebe7c54be66"/>
 		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
@@ -65989,7 +65989,7 @@ Missing optional ASCII Sphere 360° Controller
 	</software>
 
 	<software name="spyroe" cloneof="spyro">
-		<!-- http://redump.org/disc/1184/ -->
+		<!-- https://redump.info/disc/1184/ -->
 		<description>Spyro the Dragon (Europe)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -66006,7 +66006,7 @@ Missing optional ASCII Sphere 360° Controller
 	</software>
 
 	<software name="spyro3e" cloneof="spyro3" supported="no">
-		<!-- http://redump.org/disc/19611/ -->
+		<!-- https://redump.info/disc/19611/ -->
 		<description>Spyro: Year of the Dragon (Europe, rev. 1)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -66024,7 +66024,7 @@ Missing optional ASCII Sphere 360° Controller
 	</software>
 
 	<software name="strskat2" cloneof="strsk8_2">
-		<!-- http://redump.org/disc/26746/ -->
+		<!-- https://redump.info/disc/26746/ -->
 		<description>Street Skater 2 (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -66041,7 +66041,7 @@ Missing optional ASCII Sphere 360° Controller
 
 	<software name="technomg">
 		<!--
-		http://redump.org/disc/12627
+		https://redump.info/disc/12627
 		<rom name="TechnoMage - Return of Eternity (Europe).cue" size="106" crc="6ed71521" sha1="71223456d07192ab9c9a24e814829fa600dd6ce6"/>
 		<rom name="TechnoMage - Return of Eternity (Europe).bin" size="682315200" crc="6010fa91" sha1="790600d94f38efd28519fef767b2c8c52526aadb"/>
 		-->
@@ -66067,7 +66067,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="technomg_nl" cloneof="technomg">
 		<!--
-		http://redump.org/disc/27310
+		https://redump.info/disc/27310
 		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).cue" size="120" crc="5fa9cd4f" sha1="869470d8bf84b0742d3326dc310baa657951a5dd"/>
 		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).bin" size="714481152" crc="1e10a432" sha1="6a9edb882ddaae2f1ae8913e179dc2be30b80e85"/>
 		-->
@@ -66093,7 +66093,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="technomg_de" cloneof="technomg">
 		<!--
-		http://redump.org/disc/25284
+		https://redump.info/disc/25284
 		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).cue" size="115" crc="cf387233" sha1="29692072a8b82d95b696c0740c00023eee52df4d"/>
 		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).bin" size="674652384" crc="9ccd3eac" sha1="5f4727482ba67c11f20f1901c0cc1f382a2f3a09"/>
 		-->
@@ -66119,7 +66119,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="technomg_es" cloneof="technomg">
 		<!--
-		http://redump.org/disc/49569
+		https://redump.info/disc/49569
 		<rom name="Technomage - El Retorno de la Eternidad (Spain).cue" size="113" crc="0b433ae7" sha1="0d4bfd43ff3d2984c862dfbd3f0b674741dedaff"/>
 		<rom name="Technomage - El Retorno de la Eternidad (Spain).bin" size="669393312" crc="0b82d025" sha1="02b2a823f207b1a3e42452a50df5259dbb7cf413"/>
 		-->
@@ -66146,7 +66146,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="technomg_fr" cloneof="technomg">
 		<!--
-		http://redump.org/disc/49569
+		https://redump.info/disc/49569
 		<rom name="TechnoMage - En Quete de L'Eternite (France).cue" size="110" crc="c17633fb" sha1="aefe1d47c49e1ef47bd6c2e059f93d39db238fd5"/>
 		<rom name="TechnoMage - En Quete de L'Eternite (France).bin" size="679666848" crc="a111b887" sha1="c54b68713ff2c4a0f43dff411243bb1ff538e6a8"/>
 		-->
@@ -66172,7 +66172,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="technomg_it" cloneof="technomg">
 		<!--
-		http://redump.org/disc/46130
+		https://redump.info/disc/46130
 		<rom name="TechnoMage - Ritorno all'Eternita (Italy).cue" size="107" crc="3cbf68ca" sha1="69a1e3cad8753b0e82e1cf5ca434d72706a287bb"/>
 		<rom name="TechnoMage - Ritorno all'Eternita (Italy).bin" size="672236880" crc="c28f565a" sha1="a84bdb4eab9571a3baa9a663ce7b93c8c3bb6e06"/>
 		-->
@@ -66197,7 +66197,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="tenchude" cloneof="tenchu">
-		<!-- http://redump.org/disc/19603/ -->
+		<!-- https://redump.info/disc/19603/ -->
 		<description>Tenchu: Stealth Assassins (Europe, demo)</description>
 		<year>1998</year>
 		<publisher>Activision</publisher>
@@ -66212,7 +66212,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="td6e" cloneof="td6">
-		<!-- http://redump.org/disc/7536/ -->
+		<!-- https://redump.info/disc/7536/ -->
 		<description>Test Drive 6 (Europe)</description>
 		<year>2000</year>
 		<publisher>Cryo Interactive Entertainment</publisher>
@@ -66228,7 +66228,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="themehose" cloneof="themehos">
-		<!-- http://redump.org/disc/4787/ -->
+		<!-- https://redump.info/disc/4787/ -->
 		<description>Theme Hospital (Europe)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
@@ -66244,7 +66244,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="themepw" cloneof="simtprk" supported="no">
-		<!-- http://redump.org/disc/910/ -->
+		<!-- https://redump.info/disc/910/ -->
 		<description>Theme Park World (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -66261,7 +66261,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="tocawtc" cloneof="jlstock" supported="no">
-		<!-- http://redump.org/disc/615/ -->
+		<!-- https://redump.info/disc/615/ -->
 		<description>TOCA World Touring Cars (Europe)</description>
 		<year>2000</year>
 		<publisher>The Codemasters Software Company</publisher>
@@ -66278,7 +66278,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="traid4e" cloneof="traid4">
-		<!-- http://redump.org/disc/380/ -->
+		<!-- https://redump.info/disc/380/ -->
 		<description>Tomb Raider: The Last Revelation (Europe, Australia)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
@@ -66295,7 +66295,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="ttycoon">
 		<!--
-		http://redump.org/disc/26603/
+		https://redump.info/disc/26603/
 		<rom name="Transport Tycoon (EU).cue" size="1489" crc="c0d4caef" sha1="c5ad4f1b1b9e23fd775c76bcc993e230b40b0485"/>
 		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="132641040" crc="0e968d6b" sha1="9c79ebcac1d29701c15b2c9fd16564c5089d212e"/>
 		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="42858144" crc="3233248e" sha1="571ac211fca70fdf95d8981688664217d889144e"/>
@@ -66329,7 +66329,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="urbchaose" cloneof="urbchaos" supported="no">
-		<!-- http://redump.org/disc/618/ -->
+		<!-- https://redump.info/disc/618/ -->
 		<description>Urban Chaos (Europe)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
@@ -66346,7 +66346,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="vanishpte" cloneof="vanishpt">
-		<!-- http://redump.org/disc/1313/ -->
+		<!-- https://redump.info/disc/1313/ -->
 		<description>Vanishing Point (Europe)</description>
 		<year>2001</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -66363,7 +66363,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="warpathe" cloneof="warpath">
-		<!-- http://redump.org/disc/3328/ -->
+		<!-- https://redump.info/disc/3328/ -->
 		<description>Warpath: Jurassic Park (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -66379,7 +66379,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="wcwmayhme" cloneof="wcwmayhm">
-		<!-- http://redump.org/disc/474/ -->
+		<!-- https://redump.info/disc/474/ -->
 		<description>WCW Mayhem (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -66396,7 +66396,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="xena">
 		<!--
-		http://redump.org/disc/495/
+		https://redump.info/disc/495/
 		<rom name="Xena - Warrior Princess (Europe).cue" size="98" crc="ae47d108" sha1="584c14f66a7b8d4bcd20e62d3f398085267090a3"/>
 		<rom name="Xena - Warrior Princess (Europe).bin" size="323089536" crc="fa261fdd" sha1="fc941396e2d66dbdeab50a3b46a29c504df46a9d"/>
 		-->
@@ -66417,7 +66417,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="xena_fr" cloneof="xena">
 		<!--
-		http://redump.org/disc/27698/
+		https://redump.info/disc/27698/
 		<rom name="Xena - Warrior Princess (France).cue" size="98" crc="884f600d" sha1="fc8d25f2ed23a9288d293f15650da750b6f04fbe"/>
 		<rom name="Xena - Warrior Princess (France).bin" size="322247520" crc="f0e624a4" sha1="c90d7746d4c04475b08396fc19123bed486223cf"/>
 		-->
@@ -66438,7 +66438,7 @@ Missing subchannel Q LibCrypt protection
 
 	<software name="xena_de" cloneof="xena">
 		<!--
-		http://redump.org/disc/3102/
+		https://redump.info/disc/3102/
 		<rom name="Xena - Warrior Princess (Germany).cue" size="99" crc="1ac61d44" sha1="22ac767a0e7acae3cf7cae83bc78fe91e550ebc9"/>
 		<rom name="Xena - Warrior Princess (Germany).bin" size="322322784" crc="3864ac15" sha1="fbaccb4a05f261b0357dd79ee4f6ee105c161e7f"/>
 		-->
@@ -66458,7 +66458,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="xena_es" cloneof="xena">
-		<!-- http://redump.org/disc/27846/
+		<!-- https://redump.info/disc/27846/
 		<rom name="Xena - Warrior Princess (Spain).cue" size="95" crc="6a1b3aee" sha1="db8298341cf382f1b0f0c8eec91f8c3af7112ba6"/>
 		<rom name="Xena - Warrior Princess (Spain).bin" size="322647360" crc="ae926547" sha1="c29377d3a8a1de78a536461c4b9803fbccad48cb"/>
 		-->
@@ -67359,7 +67359,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 
 	<software name="xenap" cloneof="xena">
 		<!--
-		http://redump.org/disc/73771/
+		https://redump.info/disc/73771/
 		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).cue" size="118" crc="4c3ef6c5" sha1="e550abafa3a232a2251c4a30b8178f88eadccdd3"/>
 		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).bin" size="323089536" crc="c62a1aed" sha1="b08008b525572a1881721841b23e9e9173c13f4f"/>
 		-->

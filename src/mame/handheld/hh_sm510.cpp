@@ -148,7 +148,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 #include "sound/samples.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -417,10 +417,9 @@ void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 heig
 	if (width == 0 || height == 0)
 		return;
 
-	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, tag));
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_sm510_single);
 }

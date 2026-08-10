@@ -569,7 +569,7 @@ void tapatune_state::tapatune(machine_config &config)
 	crtc.out_vsync_callback().set(FUNC(tapatune_state::crtc_vsync));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 }

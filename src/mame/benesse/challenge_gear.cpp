@@ -121,7 +121,7 @@ void challenge_gear_state::challenge_gear(machine_config &config)
 	//I2C_24C16(config, "eeprom"); // "BR24C16FV" silkscreened on PCB
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(100, 64);

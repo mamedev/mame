@@ -372,7 +372,7 @@ void mt32_state::mt32(machine_config &config)
 
 	RAM(config, ram).set_default_size("32K");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(mt32_state::screen_update));
 //  screen.set_size(20*6-1, 9);

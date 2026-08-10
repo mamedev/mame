@@ -94,6 +94,11 @@ if _OPTIONS["gcc"]~=nil then
 		}
 	end
 end
+if _OPTIONS["targetos"]=="asmjs" then
+		buildoptions_c {
+			"-Wno-error=format", -- expat ptrdiff_t format mismatch
+		}
+end
 if _OPTIONS["targetos"]=="windows" then
 		buildoptions_c {
 			"-Wno-error=format", -- GCC with UCRT produces warnings for the non-standard I64 size modifier
@@ -222,6 +227,7 @@ end
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_ldm.c",
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstdmt_compress.c",
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_opt.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_preSplit.c",
 		--MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress_amd64.S", only supports GCC-like assemblers and SysV calling convention
 		MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress.c",
 		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_ddict.c",
@@ -828,7 +834,6 @@ project "7z"
 	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-error=undef",
-			"-Wno-error=strict-prototypes",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") then
@@ -1845,6 +1850,13 @@ project "wdlfft"
 project "ymfm"
 	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
 	kind "StaticLib"
+
+	configuration { "gmake or ninja" }
+		if _OPTIONS["targetos"]=="asmjs" then
+			buildoptions_cpp {
+				"-Wno-array-bounds", -- ymfm_fm.ipp accesses operator array index past 12 in template code clang can't fully analyse
+			}
+		end
 
 	configuration { }
 		defines {

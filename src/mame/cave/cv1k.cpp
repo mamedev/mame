@@ -186,7 +186,6 @@ Remaining Video issues
 
 Timing
  - Experimental SH7709S cache/memory timing
- - Requires to measure screen raw params for correct video timing?
 
 Removed games
  - 31/12/2021, Akai Katana and Dodonpachi Saidaioujou were removed at the request of the current
@@ -457,6 +456,79 @@ static INPUT_PORTS_START( cv1ks )
 	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mmmbanc )
+	PORT_INCLUDE( cv1k )
+
+	PORT_MODIFY("PORT_C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Service coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) // acts as reset key on hopper error
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  )
+	PORT_DIPNAME( 0x08, 0x08, "PORT_C" ) // hopper line_r
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // payout?
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+	PORT_MODIFY("PORT_D")
+	PORT_DIPNAME( 0x01, 0x01, "PORT_D" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE4 ) // touch screen calibration, needs long press
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 ) // actual service mode, needs long press and touch screen
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_F has no equivalent in the bare cross hatch test
+
+	PORT_MODIFY("PORT_L")
+	PORT_DIPNAME( 0x01, 0x01, "PORT_L" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 void cv1k_state::machine_reset()
 {
 	m_blitter->set_rambase(reinterpret_cast<u16 *>(m_ram.target()));
@@ -486,11 +558,12 @@ void cv1k_state::cv1k(machine_config &config)
 	SAMSUNG_K9F1G08U0M(config, m_nand);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(60.024)); // measured from ibara PCB rates - 60.024Hz, 262 total lines
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 512);
-	screen.set_visarea(0, 320-1, 0, 240-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	// Measured from futari15 PCB.
+	// 262 total lines, vsync pulse is 3 lines. 19 non-sync lines are empty.
+	// Each line is 407 pixels, hsync pulse is 29 pixels. 58 non-sync pixels are empty.
+	// Framerate is 60.0183806291 Hz (6,400,000 / (262 * 407) ).
+	screen.set_raw(12.8_MHz_XTAL / 2, 407, 0, 320, 262, 0, 240);
 	screen.set_screen_update(m_blitter, FUNC(cv1k_blitter_device::screen_update));
 
 	SPEAKER(config, "mono").front_center();
@@ -1061,4 +1134,4 @@ GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
 //GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                                           MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
-GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
+GAME( 2007, mmmbanc,    0,        cv1k,   mmmbanc, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )

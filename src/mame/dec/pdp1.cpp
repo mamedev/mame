@@ -1766,7 +1766,7 @@ void pdp1_state::pdp1(machine_config &config)
 	m_maincpu->set_io_sc_callback(FUNC(pdp1_state::io_start_clear));
 
 	/* video hardware (includes the control panel and typewriter output) */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(refresh_rate);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(virtual_width, virtual_height);

@@ -132,7 +132,7 @@ void attckufo_state::attckufo(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(MOS6560_VRETRACERATE);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE);

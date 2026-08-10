@@ -7,6 +7,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "bus/nec_fdd/pc80s31k.h"
+#include "bus/pc8801/pc8801_exp.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -144,6 +145,7 @@ public:
 		, m_beep(*this, "beeper")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, Z80_TAG)
+		, m_exp(*this, "exp")
 		, m_exp_view(*this, "exp_view")
 	{ }
 
@@ -163,6 +165,7 @@ protected:
 	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+	required_device<pc8801_exp_slot_device> m_exp;
 	memory_view m_exp_view;
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);

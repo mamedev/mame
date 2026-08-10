@@ -85,7 +85,7 @@ ioport_constructor rainbow2_device::device_input_ports() const
 void rainbow2_device::device_add_mconfig(machine_config &config)
 {
 	// default to PAL
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(30_MHz_XTAL, 960, 0, 768, 625, 0, 576); // exact values not known
 	m_screen->set_screen_update(FUNC(rainbow2_device::screen_update));
 }
@@ -125,13 +125,13 @@ void rainbow2_device::control_w(offs_t offset, uint8_t data)
 	{
 		// NTSC
 		rectangle v(0, 768 - 1, 0, 480 - 1);
-		m_screen->configure(960, 525, v, attotime::from_ticks(960 * 525, 30_MHz_XTAL).as_attoseconds());
+		m_screen->configure(960, 525, v, attotime::from_ticks(960 * 525, 30_MHz_XTAL));
 	}
 	else
 	{
 		// PAL
 		rectangle v(0, 768 - 1, 0, 576 - 1);
-		m_screen->configure(960, 625, v, attotime::from_ticks(960 * 625, 30_MHz_XTAL).as_attoseconds());
+		m_screen->configure(960, 625, v, attotime::from_ticks(960 * 625, 30_MHz_XTAL));
 	}
 
 	m_control = data & 0x0f;
@@ -180,17 +180,17 @@ void rainbow2_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing rainbow2\n");
 
 	// stop responding to default autoconfig
-	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+	zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// video memory
-	m_zorro->space().install_ram(address, address + 0x1fffff, m_vram.get());
+	zorro_space().install_ram(address, address + 0x1fffff, m_vram.get());
 
 	// control register
-	m_zorro->space().install_write_handler(address + 0x1ffff8, address + 0x1ffff8,
+	zorro_space().install_write_handler(address + 0x1ffff8, address + 0x1ffff8,
 		emu::rw_delegate(*this, FUNC(rainbow2_device::control_w)));
 
 	// we're done
-	m_zorro->cfgout_w(0);
+	cfgout_w(0);
 }
 
 void rainbow2_device::cfgin_w(int state)
@@ -213,7 +213,7 @@ void rainbow2_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}

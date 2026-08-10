@@ -240,7 +240,7 @@ void t7000_state::t7000(machine_config &config)
 	m_outlatch->q_out_cb<6>().set("mainnmi", FUNC(input_merger_device::in_w<0>));
 	m_outlatch->q_out_cb<7>().set("novram", FUNC(x2210_device::store));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green()); // "Phospher Type...P31-green (mediam persistence)" (manual p. 6-2)
 	screen.set_raw(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300);
 	screen.set_screen_update(m_crtc[0], FUNC(i8275_device::screen_update));

@@ -1156,7 +1156,7 @@ void wiz_state::kungfut(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(wiz_state::sound_interrupt), attotime::from_hz(4*60)); // ???
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);

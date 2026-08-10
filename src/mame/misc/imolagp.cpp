@@ -560,7 +560,7 @@ void imolagp_state::imolagp(machine_config &config)
 	/* video hardware */
 	// Part of the screen is obscured by the cabinet - this is handled by the visible area and physical aspect ratio here
 	// It would be better to move this into the layout so that the video output can be used with a restored cabinet.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256,256);

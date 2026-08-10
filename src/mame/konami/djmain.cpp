@@ -1774,7 +1774,7 @@ void djmain_state::djmainj(machine_config &config)
 	m_ata->irq_handler().set(FUNC(djmain_state::ide_interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(32_MHz_XTAL / 2, 660, 0, 512, 418, 0, 384);
 	screen.set_screen_update(FUNC(djmain_state::screen_update));
 

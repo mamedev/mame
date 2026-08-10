@@ -712,7 +712,7 @@ void igs009_state::jingbell(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -879,6 +879,7 @@ ROM_END
 Jingle Bell
 Italy, V133I
 (C) IGS ("COPYRIGHT 1995" in ROM, "FEB. 23 1998" on sticker)
+IGS PCB N0-0102-5
 
 CPU:
     1x HD64180RP8 (u18)(main)

@@ -2781,7 +2781,7 @@ void metro_state::i4100_config(machine_config &config)
 	m_vdp->set_vblank_irq_level(0);
 	m_vdp->set_blit_irq_level(2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);
@@ -2795,7 +2795,7 @@ void metro_state::i4220_config(machine_config &config)
 	m_vdp2->set_vblank_irq_level(0);
 	m_vdp2->set_blit_irq_level(2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);
@@ -2809,7 +2809,7 @@ void metro_state::i4300_config(machine_config &config)
 	m_vdp3->set_vblank_irq_level(1);
 	m_vdp3->set_blit_irq_level(2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);
@@ -3414,7 +3414,7 @@ void blzntrnd_state::blzntrnd(machine_config &config)
 	m_vdp2->set_spriteram_buffered(true); // sprites are 1 frame delayed
 	m_vdp2->ext_ctrl_0_cb().set(FUNC(blzntrnd_state::ext_irq5_enable_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);

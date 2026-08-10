@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "z8010.h"
-#include "cpu/z8000/z8000.h"	// For ST_* status codes
+#include "cpu/z8000/z8000.h"    // For ST_* status codes
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -326,16 +326,16 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 
 	m_bcs = (sys * BCS_N_S) | (write * BCS_R_W) | (st);
 
-	if (!(m_mode & MODE_MSEN) ||										// Master enable?
-		(((m_mode & MODE_URS) != 0) != BIT(offset, 22)) ||				// Upper range select?
-		((m_mode & MODE_MST) && (((m_mode & MODE_NMS) == 0) != sys)))	// System/normal mode?
+	if (!(m_mode & MODE_MSEN) ||                                        // Master enable?
+		(((m_mode & MODE_URS) != 0) != BIT(offset, 22)) ||              // Upper range select?
+		((m_mode & MODE_MST) && (((m_mode & MODE_NMS) == 0) != sys)))   // System/normal mode?
 	{
 		offset = 0;
 		LOG("%s: INVALID MMU STATE! offset: %06x, mode: %02x, sys: %01x\n", machine().describe_context(), offset, m_mode, sys);
 		return false;
 	}
 
-	if (m_mode & MODE_TRNS)	// Is translation on?
+	if (m_mode & MODE_TRNS) // Is translation on?
 	{
 		uint8_t sn = ((uint8_t)(offset >> 16)) & 0x3f;
 		uint8_t so = (uint8_t)(offset >> 8);
@@ -343,10 +343,10 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		bool is_stack = s.attr & SDR_ATTR_DIRW;
 
 		// Check access violations
-		uint8_t viol = (write * VTYPE_RDV) |	// Read-only violation?
-					   ((!sys) * VTYPE_SYSV) |	// System violation?
-					   ((!dma) * VTYPE_CPUIV) |	// CPU-inhibit violation?
-					   ((!exec) * VTYPE_EXCV);	// Execute-only violation?
+		uint8_t viol = (write * VTYPE_RDV) |    // Read-only violation?
+					   ((!sys) * VTYPE_SYSV) |  // System violation?
+					   ((!dma) * VTYPE_CPUIV) | // CPU-inhibit violation?
+					   ((!exec) * VTYPE_EXCV);  // Execute-only violation?
 
 		viol &= s.attr;
 
@@ -364,7 +364,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		}
 
 		if (viol ||
-			(dma && (s.attr & SDR_ATTR_DMAI)))	// DMA-inhibit violaiton?
+			(dma && (s.attr & SDR_ATTR_DMAI)))  // DMA-inhibit violaiton?
 		{
 			nsup = false;
 		}
@@ -372,11 +372,11 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		// Check write warnings
 		if (write && is_stack && (so == s.limit))
 		{
-			if (m_vtype == 0)	// Primary write warning?
+			if (m_vtype == 0)   // Primary write warning?
 				viol |= VTYPE_PWW;
-			else if ((m_vtype < VTYPE_SWW) && sys)	// Secondary write warning?
+			else if ((m_vtype < VTYPE_SWW) && sys)  // Secondary write warning?
 				viol |= VTYPE_SWW;
-			else if (!sys)	// Fatal?
+			else if (!sys)  // Fatal?
 			{
 				nsup = false;
 				viol |= VTYPE_FATL;
@@ -385,7 +385,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 
 		if (viol)
 		{
-			if (m_vtype && !(viol & VTYPE_SWW))	// Fatal?
+			if (m_vtype && !(viol & VTYPE_SWW)) // Fatal?
 			{
 				viol |= VTYPE_FATL;
 			}

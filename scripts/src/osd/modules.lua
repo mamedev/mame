@@ -24,6 +24,17 @@ function addlibfromstring(str)
 	end
 end
 
+function addincludesfromstring(str)
+	if (str==nil) then return  end
+	for w in str:gmatch("%S+") do
+		if string.starts(w,"-I") then
+			includedirs {
+				string.sub(w,3)
+			}
+		end
+	end
+end
+
 function addoptionsfromstring(str)
 	if (str==nil) then return  end
 	for w in str:gmatch("%S+") do

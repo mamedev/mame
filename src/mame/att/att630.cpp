@@ -138,7 +138,7 @@ void att630_state::att630(machine_config &config)
 
 	NVRAM(config, "bram", nvram_device::DEFAULT_ALL_0); // 5264 + battery
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(87.18336_MHz_XTAL, 1376, 0, 1024, 1056, 0, 1024);
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(att630_state::screen_update));

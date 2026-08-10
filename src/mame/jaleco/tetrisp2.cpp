@@ -1807,7 +1807,7 @@ void tetrisp2_state::tetrisp2(machine_config &config)
 
 	/* video hardware */
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
 	m_screen->set_palette(m_palette);
@@ -1841,7 +1841,7 @@ void nndmseal_state::nndmseal(machine_config &config)
 	// An odd one: it uses the faster dot clock divider setting
 	// but they replaced the xtal to a OSC1(42.9545MHz), I guess they compensated to not go out of ~60 Hz
 	constexpr XTAL pixel_clock = XTAL(42'954'545)/6;
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(pixel_clock, 455, 0, 384, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(nndmseal_state::screen_update_tetrisp2));
 	m_screen->set_palette(m_palette);
@@ -1873,7 +1873,7 @@ void rockn_state::rockn(machine_config &config)
 
 	/* video hardware */
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(rockn_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);
@@ -1906,7 +1906,7 @@ void rockn_state::rockn2(machine_config &config)
 
 	/* video hardware */
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(rockn_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);
@@ -1964,12 +1964,12 @@ void rocknms_state::rocknms(machine_config &config)
 	config.set_default_layout(layout_rocknms);
 
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_orientation(ROT0);
 	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(rocknms_state::screen_update_top));
 
-	SCREEN(config, m_sub_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_sub_screen);
 	m_sub_screen->set_orientation(ROT270);
 	m_sub_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_sub_screen->set_screen_update(FUNC(rocknms_state::screen_update_bottom));
@@ -2045,17 +2045,17 @@ void stepstag_state::stepstag(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_orientation(ROT270);
 	setup_non_sysctrl_screen(config, &lscreen, sub_pixel_clock);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
 
-	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	screen_device &mscreen(SCREEN(config, "mscreen"));
 	mscreen.set_orientation(ROT0);
 	setup_non_sysctrl_screen(config, &mscreen, sub_pixel_clock);
 	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
 
-	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_rscreen);
 	m_rscreen->set_orientation(ROT270);
 	setup_non_sysctrl_screen(config, m_rscreen, sub_pixel_clock);
 	m_rscreen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
@@ -2102,7 +2102,7 @@ void stepstag_state::stepstag(machine_config &config)
 	// All video for Stepping Stage comes from subboard's 3 RGB headers so this screen isn't needed
 	// but jaleco_ms32_sysctrl is built such that it requires a screen to work.
 	// TODO: Refactor jaleco_ms32_sysctrl so it doesn't need a dummy screen
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(mainxtal/8, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_nop));
 	setup_main_sysctrl(config, mainxtal);
@@ -2141,20 +2141,20 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(main_pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_vjdash_main));
 	m_screen->set_palette(m_palette);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	setup_non_sysctrl_screen(config, &lscreen, sub_pixel_clock);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_vjdash_left));
 
-	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	screen_device &mscreen(SCREEN(config, "mscreen"));
 	setup_non_sysctrl_screen(config, &mscreen, sub_pixel_clock);
 	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_vjdash_mid));
 
-	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_rscreen);
 	setup_non_sysctrl_screen(config, m_rscreen, sub_pixel_clock);
 	m_rscreen->set_screen_update(FUNC(stepstag_state::screen_update_vjdash_right));
 	m_rscreen->screen_vblank().set(FUNC(stepstag_state::field_cb));

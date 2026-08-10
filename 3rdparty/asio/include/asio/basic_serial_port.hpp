@@ -2,7 +2,7 @@
 // basic_serial_port.hpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,6 +42,16 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
+
+#if !defined(ASIO_BASIC_SERIAL_PORT_FWD_DECL)
+#define ASIO_BASIC_SERIAL_PORT_FWD_DECL
+
+// Forward declaration with defaulted arguments.
+template <typename Executor = any_io_executor>
+class basic_serial_port;
+
+#endif // !defined(ASIO_BASIC_SERIAL_PORT_FWD_DECL)
 
 /// Provides serial port functionality.
 /**
@@ -51,8 +61,10 @@ namespace asio {
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
  * @e Shared @e objects: Unsafe.
+ *
+ * @sa @ref overview_serial_ports "Serial ports"
  */
-template <typename Executor = any_io_executor>
+template <typename Executor>
 class basic_serial_port
   : public serial_port_base
 {
@@ -554,12 +566,12 @@ public:
    *
    * @throws asio::system_error Thrown on failure.
    *
-   * @sa SettableSerialPortOption @n
-   * asio::serial_port_base::baud_rate @n
-   * asio::serial_port_base::flow_control @n
-   * asio::serial_port_base::parity @n
-   * asio::serial_port_base::stop_bits @n
-   * asio::serial_port_base::character_size
+   * @sa
+   * @li asio::serial_port_base::baud_rate
+   * @li asio::serial_port_base::flow_control
+   * @li asio::serial_port_base::parity
+   * @li asio::serial_port_base::stop_bits
+   * @li asio::serial_port_base::character_size
    */
   template <typename SettableSerialPortOption>
   void set_option(const SettableSerialPortOption& option)
@@ -577,12 +589,12 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    *
-   * @sa SettableSerialPortOption @n
-   * asio::serial_port_base::baud_rate @n
-   * asio::serial_port_base::flow_control @n
-   * asio::serial_port_base::parity @n
-   * asio::serial_port_base::stop_bits @n
-   * asio::serial_port_base::character_size
+   * @sa
+   * @li asio::serial_port_base::baud_rate
+   * @li asio::serial_port_base::flow_control
+   * @li asio::serial_port_base::parity
+   * @li asio::serial_port_base::stop_bits
+   * @li asio::serial_port_base::character_size
    */
   template <typename SettableSerialPortOption>
   ASIO_SYNC_OP_VOID set_option(const SettableSerialPortOption& option,
@@ -601,12 +613,12 @@ public:
    *
    * @throws asio::system_error Thrown on failure.
    *
-   * @sa GettableSerialPortOption @n
-   * asio::serial_port_base::baud_rate @n
-   * asio::serial_port_base::flow_control @n
-   * asio::serial_port_base::parity @n
-   * asio::serial_port_base::stop_bits @n
-   * asio::serial_port_base::character_size
+   * @sa
+   * @li asio::serial_port_base::baud_rate
+   * @li asio::serial_port_base::flow_control
+   * @li asio::serial_port_base::parity
+   * @li asio::serial_port_base::stop_bits
+   * @li asio::serial_port_base::character_size
    */
   template <typename GettableSerialPortOption>
   void get_option(GettableSerialPortOption& option) const
@@ -625,12 +637,12 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    *
-   * @sa GettableSerialPortOption @n
-   * asio::serial_port_base::baud_rate @n
-   * asio::serial_port_base::flow_control @n
-   * asio::serial_port_base::parity @n
-   * asio::serial_port_base::stop_bits @n
-   * asio::serial_port_base::character_size
+   * @sa
+   * @li asio::serial_port_base::baud_rate
+   * @li asio::serial_port_base::flow_control
+   * @li asio::serial_port_base::parity
+   * @li asio::serial_port_base::stop_bits
+   * @li asio::serial_port_base::character_size
    */
   template <typename GettableSerialPortOption>
   ASIO_SYNC_OP_VOID get_option(GettableSerialPortOption& option,
@@ -724,7 +736,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -854,7 +866,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -977,6 +989,7 @@ private:
 #endif
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

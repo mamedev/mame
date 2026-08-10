@@ -341,13 +341,14 @@ void rasterizer_params::compute_equations()
 
 u32 rasterizer_params::hash() const
 {
+	using std::rotl;
 	return m_generic ^
-			rotl_32(m_alphamode, 0) ^
-			rotl_32(m_fbzmode, 6) ^
-			rotl_32(m_fbzcp, 12) ^
-			rotl_32(m_fogmode, 18) ^
-			rotl_32(m_texmode0, 24) ^
-			rotl_32(m_texmode1, 30);
+			rotl<u32>(m_alphamode, 0) ^
+			rotl<u32>(m_fbzmode, 6) ^
+			rotl<u32>(m_fbzcp, 12) ^
+			rotl<u32>(m_fogmode, 18) ^
+			rotl<u32>(m_texmode0, 24) ^
+			rotl<u32>(m_texmode1, 30);
 }
 
 
@@ -1380,7 +1381,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::stipple_test(thread_stats_block &
 	// rotate mode
 	if (fbzmode.stipple_pattern() == 0)
 	{
-		stipple = rotr_32(stipple, 1);
+		stipple = std::rotr(stipple, 1);
 		if (s32(stipple) >= 0)
 		{
 			threadstats.stipple_count++;

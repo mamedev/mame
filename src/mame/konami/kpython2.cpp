@@ -1153,7 +1153,7 @@ void kpython2_state::kpython2(machine_config &config)
 	SONYIOP_DMA(config, m_iop_dma, XTAL(67'737'600)/2, m_iop_intc, m_iop_ram, m_sif, m_iop_spu, m_iop_sio2);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(kpython2_state::screen_update));
 	screen.set_size(640, 256);

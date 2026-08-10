@@ -100,10 +100,6 @@ Notes:
 
     TODO
 
-    - screen update is too fast
-    - cursor on text should blink as dark blue
-    - PRWNOISE and PRBEEP return wrong values
-    - CDP1869 white noise
     - connect expansion bus
     - series I ROMs
     - DOS ROMs
@@ -121,6 +117,7 @@ Notes:
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/cdp1869.h"
+#include "sound/flt_rc.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -131,9 +128,6 @@ Notes:
 #define CDP1852_BUS_TAG     "cdp1852_bus"
 #define CDP1852_TMC700_TAG  "cdp1852_printer"
 #define CENTRONICS_TAG      "centronics"
-
-#define TMC600_PAGE_RAM_SIZE    0x400
-#define TMC600_PAGE_RAM_MASK    0x3ff
 
 namespace {
 
@@ -151,7 +145,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_char_rom(*this, "chargen"),
 		m_page_ram(*this, "page_ram"),
-		m_color_ram(*this, "color_ram", TMC600_PAGE_RAM_SIZE, ENDIANNESS_LITTLE),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_run(*this, "RUN"),
 		m_key_row(*this, "Y%u", 0)
 	{ }
@@ -197,7 +191,6 @@ private:
 	bool m_rtc_int = false;
 	u8 m_out3 = 0;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 
@@ -235,12 +228,12 @@ void tmc600_state::vismac_data_w(uint8_t data)
 
 uint8_t tmc600_state::get_color(uint16_t pma)
 {
-	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint16_t pageaddr = pma & 0x3ff;
 	uint8_t color = m_color_ram[pageaddr];
 
 	if (BIT(color, 3) && m_blink)
 	{
-		color = 0;
+		color ^= 0x07;
 	}
 
 	return color;
@@ -259,7 +252,7 @@ void tmc600_state::cdp1869_page_ram(address_map &map)
 
 CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 {
-	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint16_t pageaddr = pma & 0x3ff;
 	uint8_t color = get_color(pageaddr);
 	uint16_t charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
 	uint8_t cdb = m_char_rom[charaddr] & 0x3f;
@@ -272,7 +265,7 @@ CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 
 CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 {
-	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint16_t pageaddr = pma & 0x3ff;
 	uint8_t color = get_color(pageaddr);
 
 	return BIT(color, 0);
@@ -280,6 +273,8 @@ CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 
 void tmc600_state::prd_w(int state)
 {
+	m_maincpu->ef1_w(state);
+
 	if (!state) {
 		m_frame++;
 
@@ -302,8 +297,9 @@ void tmc600_state::video_start()
 	// state saving
 	save_item(NAME(m_vismac_reg_latch));
 	save_item(NAME(m_vismac_color_latch));
-	save_item(NAME(m_frame));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_rtc_int));
 	save_item(NAME(m_out3));
 }
 
@@ -522,7 +518,7 @@ GFXDECODE_END
 void tmc600_state::tmc600(machine_config &config)
 {
 	// CPU
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, 3.57_MHz_XTAL));
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, XTAL(3'579'545)));
 	cpu.set_addrmap(AS_PROGRAM, &tmc600_state::tmc600_map);
 	cpu.set_addrmap(AS_IO, &tmc600_state::tmc600_io_map);
 	cpu.wait_cb().set_constant(1);
@@ -538,7 +534,7 @@ void tmc600_state::tmc600(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	CDP1869(config, m_vis, 3.57_MHz_XTAL, &tmc600_state::cdp1869_page_ram);
+	CDP1869(config, m_vis, XTAL(3'579'545), &tmc600_state::cdp1869_page_ram);
 	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
 	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
 	m_vis->set_pcb_read_callback(FUNC(tmc600_state::tmc600_pcb_r));
@@ -546,7 +542,11 @@ void tmc600_state::tmc600(machine_config &config)
 	m_vis->pal_ntsc_callback().set_constant(1);
 	m_vis->prd_callback().set(FUNC(tmc600_state::prd_w));
 	m_vis->set_screen(SCREEN_TAG);
-	m_vis->add_route(ALL_OUTPUTS, "mono", 0.1);
+	// the SOUND pin is coupled through a capacitor, and its R/2R ladder has an
+	// output impedance of 2.5R (R ~ 2 kOhm), giving a first order high pass at
+	// ~3.2 kHz as measured from a recording of the real machine
+	m_vis->add_route(ALL_OUTPUTS, "sndfilter", 0.1);
+	FILTER_RC(config, "sndfilter").set_rc(filter_rc_device::HIGHPASS, 5000, 0, 0, CAP_N(10)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// keyboard output latch
 	CDP1852(config, m_bwio); // clock is CDP1802 TPB
@@ -632,4 +632,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME                     FLAGS
 //COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_SUPPORTS_SAVE )

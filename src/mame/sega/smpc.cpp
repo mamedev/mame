@@ -35,7 +35,9 @@ SMPC NVRAM contents:
 #define LOG_COMMAND (1U << 1)
 #define LOG_PAD_CMD (1U << 2)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_COMMAND)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
 
@@ -44,11 +46,12 @@ SMPC NVRAM contents:
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE (HD404920FS)")
+DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE (Hitachi HD404920FS 315-5744)")
 
 void smpc_hle_device::io_map(address_map &map)
 {
 	map(0x00, 0x7f).lr8(NAME([this] (offs_t offset) {
+		// TODO: undefined odd addresses really latches whatever was last written
 		logerror("%s: Read to [%02x] open bus address\n", machine().describe_context(), offset & 0x7f);
 		return offset & 1 ? 0x00 : 0xff;
 	}));
@@ -137,6 +140,10 @@ void smpc_hle_device::device_start()
 	save_item(NAME(m_pmode));
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_smem));
+	save_item(NAME(m_ckchg_tick));
+	save_item(NAME(m_prev_sshoff));
+	save_item(NAME(m_prev_sndoff));
+	save_item(NAME(m_prev_cdoff));
 
 	m_cmd_timer = timer_alloc(FUNC(smpc_hle_device::handle_command), this);
 	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
@@ -169,6 +176,9 @@ void smpc_hle_device::device_reset()
 	m_command_in_progress = false;
 	m_NMI_reset = false;
 	m_cur_dotsel = false;
+	m_ckchg_tick = 0;
+	m_prev_sndoff = m_prev_sshoff = 0xff;
+	m_prev_cdoff = 0;
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
@@ -246,7 +256,7 @@ uint8_t smpc_hle_device::status_flag_r()
 
 void smpc_hle_device::status_flag_w(uint8_t data)
 {
-	m_sf = BIT(data,0);
+	m_sf = BIT(data, 0);
 	m_cd_sf = false;
 }
 
@@ -360,51 +370,71 @@ void smpc_hle_device::command_register_w(uint8_t data)
 //  don't send a command if previous one is still in progress
 //  ST-V tries to send a sysres command if OREG31 doesn't return the ack command
 	if(m_command_in_progress == true)
+	{
+		logerror("SMPC: double issuing %02x!\n", data);
 		return;
+	}
 
 	m_comreg = data & 0x1f;
 
 	if(data & 0xe0)
-		logerror("%s COMREG = %02x!?\n",this->tag(),data);
+		logerror("SMPC: COMREG = %02x!?\n", data);
 
 	m_command_in_progress = true;
-	if(m_comreg == 0x0e || m_comreg == 0x0f)
+	switch(m_comreg)
 	{
-		/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
-		 * My current theory is that the PLL device can halt the whole system until the frequency change occurs.
-		 *  (cfr. diagram on page 3 of SMPC manual)
-		 * I really don't think that the system can do an usable mid-frame clock switching anyway.
-		 */
-		m_syshalt(1);
+		// gnine97/gnine98 and spinoffs wants two consecutive SSHON to resolve as a NOP
+		// 3dbball* is more finicky: uses two SSHOFF commands after (skipping) FMV
+		case 0x02:
+		case 0x03:
+			m_cmd_timer->adjust(attotime::from_usec(m_prev_sshoff == (m_comreg & 1) ? 1 : m_cmd_table_timing[m_comreg]));
+			break;
+		case 0x06:
+		case 0x07:
+			m_cmd_timer->adjust(attotime::from_usec(m_prev_sndoff == (m_comreg & 1) ? 1 : m_cmd_table_timing[m_comreg]));
+			break;
+		case 0x0e:
+		case 0x0f:
+			// A PLL change makes the SMPC to stop everything until it can resync everything again.
+			// This takes the equivalent of 3~4 frame cycles.
+			// (cfr. diagram on page 3 of SMPC manual)
+			// - shanhigw/sokyugrt/prikura (would otherwise set 2 credits at startup)
+			m_syshalt(1);
 
-		m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y,0));
+			m_ckchg_tick = 5;
+
+			m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y, 0));
+
+			break;
+		case 0x10:
+		{
+			// TODO: not allowed outside vblank
+
+			// copy ireg to our intback buffer
+			for(int i = 0; i < 3; i++)
+				m_intback_buf[i] = m_ireg[i];
+
+			// calculate the timing for intback command
+			int timing;
+
+			timing = 8;
+
+			if( m_ireg[0] != 0) // non-peripheral data
+				timing += 8;
+
+			// TODO: At vblank-out actually
+			if( m_ireg[1] & 8) // peripheral data
+				timing += 700;
+
+			// TODO: check against ireg2, must be 0xf0
+
+			m_cmd_timer->adjust(attotime::from_usec(timing));
+			break;
+		}
+		default:
+			m_cmd_timer->adjust(attotime::from_usec(m_cmd_table_timing[m_comreg]));
+			break;
 	}
-	else if(m_comreg == 0x10)
-	{
-		// TODO: not allowed outside vblank
-
-		// copy ireg to our intback buffer
-		for(int i=0;i<3;i++)
-			m_intback_buf[i] = m_ireg[i];
-
-		// calculate the timing for intback command
-		int timing;
-
-		timing = 8;
-
-		if( m_ireg[0] != 0) // non-peripheral data
-			timing += 8;
-
-		// TODO: At vblank-out actually
-		if( m_ireg[1] & 8) // peripheral data
-			timing += 700;
-
-		// TODO: check against ireg2, must be 0xf0
-
-		m_cmd_timer->adjust(attotime::from_usec(timing));
-	}
-	else
-		m_cmd_timer->adjust(attotime::from_usec(m_cmd_table_timing[m_comreg]));
 }
 
 
@@ -422,6 +452,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x03: // SSHOFF
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x SSH%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			// enable or disable Slave SH2
+			m_prev_sshoff = m_comreg & 1;
 			m_sshres(m_comreg & 1);
 			break;
 
@@ -429,6 +460,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x07: // SNDOFF
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x SND%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			// enable or disable 68k
+			m_prev_sndoff = m_comreg & 1;
 			m_sndres(m_comreg & 1);
 			break;
 
@@ -436,6 +468,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x09: // CDOFF
 			// ...
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x CD%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
+			m_prev_cdoff = m_comreg & 1;
 			m_command_in_progress = false;
 			m_oreg[31] = m_comreg;
 			// TODO: diagnostic also wants this to have bit 3 high
@@ -465,21 +498,36 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x0e: // CKCHG352
 		case 0x0f: // CKCHG320
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x CKCHG%s\n", m_comreg, m_comreg & 1 ? "320" : "352");
-			m_dotsel(m_comreg & 1);
+			m_ckchg_tick --;
+			if (m_ckchg_tick == 4)
+			{
+				// VDP1, VDP2 and SCU are also reset by this (done in client)
+				m_dotsel(m_comreg & 1);
 
-			// assert Slave SH2 line
-			m_sshres(1);
-			// clear PLL system halt
-			m_syshalt(0);
+				// assert Slave SH2 and sound CPU lines
+				m_prev_sshoff = 1;
+				m_sshres(1);
 
-			// setup the new dot select
-			m_cur_dotsel = (m_comreg & 1) ^ 1;
+				m_prev_sndoff = 1;
+				m_sndres(1);
 
-			// send a NMI to Master SH2 if enabled
-			// it is unconditionally requested:
-			// bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call and expects this to wake them up.
-			//if(m_NMI_reset == false)
-			master_sh2_nmi();
+				// setup the new dot select
+				m_cur_dotsel = (m_comreg & 1) ^ 1;
+			}
+
+			if (m_ckchg_tick >= 1)
+				m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y, 0));
+			else
+			{
+				// send an unconditional NMI to Master SH2
+				// - bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call
+				//   and expects this to wake them up.
+				master_sh2_nmi();
+
+				// clear PLL system halt
+				m_syshalt(0);
+			}
+
 			break;
 
 		case 0x10: // INTBACK
@@ -517,7 +565,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x19: // RESENAB
 		case 0x1a: // RESDISA
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x RES%s\n", m_comreg, m_comreg & 1 ? "DISA" : "ENAB");
-			m_NMI_reset = m_comreg & 1;
+			m_NMI_reset = (m_comreg & 1);
 			break;
 
 		// TODO: undocumented commands SEC_GETSEED (0x1e) and SEC_VERIFY (0x1f)
@@ -526,6 +574,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			return;
 	}
 
+//	LOGMASKED(LOG_COMMAND, "acknowledge for command %02x\n", m_comreg);
 	m_command_in_progress = false;
 	m_oreg[31] = m_comreg;
 	sf_ack(false);
@@ -546,9 +595,9 @@ void smpc_hle_device::resolve_intback()
 
 	if(m_intback_buf[0] != 0)
 	{
-		m_oreg[0] = ((m_smem[4] & 0x80) | ((m_NMI_reset & 1) << 6));
+		m_oreg[0] = ((m_smem[4] & 0x80) | ((!m_NMI_reset & 1) << 6));
 
-		for(i=0;i<7;i++)
+		for(i = 0; i < 7; i++)
 			m_oreg[1+i] = m_rtc_data[i];
 
 		m_oreg[8] = 0; // CTG0 / CTG1?
@@ -556,22 +605,28 @@ void smpc_hle_device::resolve_intback()
 		m_oreg[9] = m_region_code; // TODO: system region on Saturn
 
 		/*
-		 0-11 -1-- unknown
-		 -x-- ---- VDP2 dot select
-		 ---- x--- MSHNMI
-		 ---- --x- SYSRES
-		 ---- ---x SOUNDRES
+		 * 0-1- -1-- unknown
+		 * -x-- ---- VDP2 dot select
+		 * ---x ---- SSHON
+		 * ---- x--- MSHNMI
+		 * ---- --x- SYSRES
+		 * ---- ---x SOUNDRES
 		 */
 		m_oreg[10] = 0 << 7 |
 					 m_cur_dotsel << 6 |
 					 1 << 5 |
-					 1 << 4 |
+					 ((m_prev_sshoff & 1) ^ 1) << 4 |
 					 0 << 3 |
 					 1 << 2 |
 					 0 << 1 |
-					 0 << 0;
+					 ((m_prev_sndoff & 1) ^ 1) << 0;
 
-		m_oreg[11] = 0 << 6; // CDRES
+		/*
+		 * -x-- ---- CDON
+		 * ---- --1- <unknown>
+		 */
+		m_oreg[11] = ((m_prev_cdoff & 1) ^ 1) << 6
+					| (1 << 1);
 
 		for(i=0;i<4;i++)
 			m_oreg[12+i] = m_smem[i];

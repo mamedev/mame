@@ -653,7 +653,7 @@ void marinedt_state::marinedt(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(marinedt_state::irq0_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(marinedt_state::screen_update));
 	// TODO: unverified, template to get ~60 fps
 	m_screen->set_raw(MAIN_CLOCK / 2, 328, 0, 256, 263, 32, 256);

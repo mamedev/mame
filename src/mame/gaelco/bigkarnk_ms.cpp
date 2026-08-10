@@ -717,7 +717,7 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_soundrom).set_map(&bigkarnk_ms_state::soundrom_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);

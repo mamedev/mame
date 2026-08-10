@@ -80,7 +80,7 @@ void amcoe_ha1_state::amcoe_ha1(machine_config &config)
 	R4600BE(config, m_maincpu, 24_MHz_XTAL); // wrong, RMI AU1250 (no CPU core available)
 	m_maincpu->set_addrmap(AS_PROGRAM, &amcoe_ha1_state::program_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

@@ -18596,18 +18596,18 @@ Ingame selections runs too fast, either with [keyboard] or [joystick] (verify)
 		</part>
 	</software>
 
-	<software name="edge" supported="no">
+	<!-- 3.5" version known to exist -->
+	<software name="edge" supported="partial">
 		<description>Edge</description>
 		<year>1993</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<notes><![CDATA[
-Doesn't recognize disk changes (regressed)
-Has gfx glitch when intro scrolls to top-left
-User disk creation screen is offset
-Hangs during intro (regression?)
+Has small line glitch with opening (5th option in main menu), top-right (verify)
+Confirm disks D-F
 ]]></notes>
 		<info name="alt_title" value="エッジ" />
 		<info name="release" value="19930115" />
+		<!-- TODO: at least Disk B and C were swapped -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -18617,13 +18617,13 @@ Hangs during intro (regression?)
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="edgeb.d88" size="1281968" crc="32537419" sha1="8897049f5e9dea9920476d1931bfc9167bb4032f" offset="0" />
+				<rom name="edgec.d88" size="1281968" crc="8685b9f4" sha1="69f3dfc52339d14555537ba4ca7c267ca0e05297" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="edgec.d88" size="1281968" crc="8685b9f4" sha1="69f3dfc52339d14555537ba4ca7c267ca0e05297" offset="0" />
+				<rom name="edgeb.d88" size="1281968" crc="32537419" sha1="8897049f5e9dea9920476d1931bfc9167bb4032f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -35933,6 +35933,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>New 3D Golf Simulation Ver. 2.0</description>
 		<year>1992</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="usage" value="Requires GDC 2.5 MHz" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -43176,6 +43177,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ザ・スクリーマー" />
+		<info name="developer" value="MagicalZoo" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="the screamer (1985)(magical zoo).fdi" size="1265664" crc="86f2163d" sha1="2d73222c8e7372f32b529798d0da60b36c875053" offset="0" />
@@ -52203,6 +52205,39 @@ doesn't boot when converted to d88 (2DD)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="wolfpack.fdi" size="1265664" crc="25e364fb" sha1="b207f112e79290da45660b013767c5605e2ba9f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3d" supported="partial">
+		<description>Wolfenstein 3D</description>
+		<year>1994</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+[SB16] detection doesn't work due of [OPL3]
+https://github.com/aaronsgiles/ymfm/issues/73
+Has no BGM on main menu (verify)
+]]></notes>
+		<info name="alt_title" value="ウルフェンシュタイン3D" />
+		<info name="usage" value="Requires HDD install thru DOS, optionally wants a MS-DOS format disk (safe to skip when prompted to)" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<!-- TODO: Check media labels, is "kidou" actually written with kanji? -->
+			<feature name="part_id" value="Startup disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (kidou disk).hdm" size="1261568" crc="472f5a26" sha1="50b45b06fa005fede60510cb68bebe932bdc080b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (disk 1).hdm" size="1261568" crc="995ac998" sha1="45e0a692cbc553d4cf4a8fd55399d8c3a2993072" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (disk 2).hdm" size="1261568" crc="bf79a9dd" sha1="29e4b8c2ef802566b0dcfce56bd7a0ec2fc2a6b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>

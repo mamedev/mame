@@ -36,6 +36,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
+#include "sound.h"
 #include "speaker.h"
 
 

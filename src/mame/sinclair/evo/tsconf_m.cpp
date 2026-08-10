@@ -94,7 +94,7 @@ void tsconf_state::tsconf_update_video_mode()
 	m_ts_tilemap[TM_TILES1]->set_scrolldx(get_screen_area().left(), 0);
 	m_ts_tilemap[TM_TILES1]->set_scrolldy(get_screen_area().top(), 0);
 
-	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, m_screen->frame_period().as_attoseconds());
+	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, m_screen->frame_period());
 }
 
 u8 tsconf_state::get_border_color(u16 hpos, u16 vpos)

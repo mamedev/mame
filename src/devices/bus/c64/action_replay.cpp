@@ -160,22 +160,22 @@ void c64_action_replay_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, i
 	{
 		/*
 
-			bit		description
+		    bit     description
 
-			0		PLA A2
-			1		PLA A1
-			2		PLA CE1
-			3		ROM A13
-			4		ROM A14
-			5		PLA A0
-			6		U6B CLR
-			7
-	
+		    0       PLA A2
+		    1       PLA A1
+		    2       PLA CE1
+		    3       ROM A13
+		    4       ROM A14
+		    5       PLA A0
+		    6       U6B CLR
+		    7
+
 		*/
 
 		m_bank = data & 0x7f;
 
-		if (BIT(m_bank, 6)) 
+		if (BIT(m_bank, 6))
 		{
 			m_slot->nmi_w(CLEAR_LINE);
 
@@ -235,14 +235,14 @@ u8 c64_action_replay_cartridge_device::read_pla(offs_t offset, int io2)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0	  	ROM CE
-		1       RAM CS1
-		2       GAME
-		3       EXROM
+	    0       ROM CE
+	    1       RAM CS1
+	    2       GAME
+	    3       EXROM
 
- 	*/
+	*/
 
 	offs_t addr = (m_pla_a7 << 7) | (BIT(offset, 14) << 6) | (BIT(offset, 15) << 5) | (BIT(offset, 13) << 4) | (io2 << 3) | (BIT(m_bank, 0) << 2) | (BIT(m_bank, 1) << 1) | BIT(m_bank, 5);
 

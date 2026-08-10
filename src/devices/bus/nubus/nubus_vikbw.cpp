@@ -67,7 +67,7 @@ ROM_END
 
 void nubus_vikbw_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(nubus_vikbw_device::screen_update));
 	screen.set_raw(72000000, 1324, 0, 1024, 803, 0, 768);
 	screen.set_palette("palette");

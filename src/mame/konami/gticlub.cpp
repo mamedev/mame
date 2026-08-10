@@ -897,7 +897,7 @@ void gticlub_state::gticlub(machine_config &config)
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 1024);
 	screen.set_visarea(40, 511+40, 28, 383+28); // needs CRTC emulation
@@ -1005,13 +1005,13 @@ void hangplt_state::hangplt(machine_config &config)
 	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 	PALETTE(config, m_palette[1]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_size(600, 420);
 	lscreen.set_visarea(44, 555, 27, 410);
 	lscreen.set_screen_update(FUNC(hangplt_state::screen_update<0>));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_size(600, 420);
 	rscreen.set_visarea(44, 555, 27, 410);

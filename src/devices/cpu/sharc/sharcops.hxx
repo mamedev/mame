@@ -28,6 +28,7 @@
 
 
 #define REG(x)      (m_core->r[x].r)
+#define UIREG(x)    uint32_t(m_core->r[x].r)
 #define FREG(x)     (m_core->r[x].f)
 
 #define UPDATE_CIRCULAR_BUFFER_PM(x)                        \
@@ -525,11 +526,11 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			if (shift < 0)
 			{
-				REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
+				REG(rn) = (shift > -32 ) ? (UIREG(rx) >> -shift) : 0;
 			}
 			else
 			{
-				REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
+				REG(rn) = (shift < 32) ? (UIREG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
@@ -559,7 +560,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x02:      /* ROT Rx BY <data8> */
 		{
-			REG(rn) = rotl_32(REG(rx), shift);
+			REG(rn) = std::rotl(UIREG(rx), shift);
 			SET_FLAG_SZ(REG(rn));
 			break;
 		}
@@ -569,11 +570,11 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			uint32_t r = 0;
 			if (shift < 0)
 			{
-				r = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
+				r = (shift > -32 ) ? (UIREG(rx) >> -shift) : 0;
 			}
 			else
 			{
-				r = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
+				r = (shift < 32) ? (UIREG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
@@ -621,7 +622,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			if (len == 0 || bit >= 32)
 				REG(rn) = 0;
 			else if (bit+len > 32)
-				REG(rn) = (uint32_t)REG(rx) >> bit;
+				REG(rn) = UIREG(rx) >> bit;
 			else
 				REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
@@ -917,11 +918,11 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						int const shift = REG(ry);
 						if (shift < 0)
 						{
-							REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
+							REG(rn) = (shift > -32 ) ? (UIREG(rx) >> -shift) : 0;
 						}
 						else
 						{
-							REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
+							REG(rn) = (shift < 32) ? (UIREG(rx) << shift) : 0;
 							if (shift > 0)
 							{
 								m_core->astat |= SV;
@@ -934,17 +935,10 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0x02:      /* ROT Rx BY Ry */
 					{
 						int const shift = REG(ry);
-						if (shift < 0)
+						REG(rn) = std::rotl(UIREG(rx), shift);
+						if (shift > 0)
 						{
-							REG(rn) = rotr_32(REG(rx), -shift);
-						}
-						else
-						{
-							REG(rn) = rotl_32(REG(rx), shift);
-							if (shift > 0)
-							{
-								m_core->astat |= SV;
-							}
+							m_core->astat |= SV;
 						}
 						SET_FLAG_SZ(REG(rn));
 						break;
@@ -993,7 +987,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						if (len == 0 || bit >= 32)
 							REG(rn) = 0;
 						else if (bit+len > 32)
-							REG(rn) = (uint32_t)REG(rx) >> bit;
+							REG(rn) = UIREG(rx) >> bit;
 						else
 							REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 

@@ -229,7 +229,7 @@ void gmaster_state::gmaster(machine_config &config)
 	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::portc_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(80, 64);
 	m_screen->set_visarea(0, 64-1-3, 0, 64-1);

@@ -2057,7 +2057,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				const int vdisplay_end = overscan_mode ? 232 : 240;
 
 				visarea.set(0, (h320_mode ? 320 : 256) - 1, vdisplay_start, vdisplay_end - 1);
-				m_screen->configure(htotal, 262, visarea, attotime::from_ticks(htotal * 262, U13_CLOCK / divider).as_attoseconds());
+				m_screen->configure(htotal, 262, visarea, attotime::from_ticks(htotal * 262, U13_CLOCK / divider));
 				//m_screen->reset_origin(0, 0);
 			}
 
@@ -2429,7 +2429,7 @@ void supracan_state::supracan(machine_config &config)
 
 	UMC6650(config, m_lockout);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(U13_CLOCK / 10, 342, 0, 256, 262, 8, 232);
 	m_screen->set_screen_update(FUNC(supracan_state::screen_update));
 	m_screen->set_palette("palette");

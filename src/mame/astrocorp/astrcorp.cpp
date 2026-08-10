@@ -1698,7 +1698,7 @@ void astrocorp_state::showhand(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(26.601712_MHz_XTAL / 4, 433, 0, 320, 261, 0, 240); // ~15.354kHz Hsync, ~58.846Hz Vsync
 	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1749,7 +1749,7 @@ void astrocorp_state::skilldrp(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: verify H/VSync & pixel clock for this type of HW
 	// (most likely different to compensate for the higher HRes)
 	m_screen->set_raw(24_MHz_XTAL / 2, 781, 0, 512, 261, 0, 240); // double horizontal resolution
@@ -3949,6 +3949,7 @@ ROM_START( wwitch )
 	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(05bc898d) SHA1(c88c14e4858943b2ea719abe0cc9ac0738d682dd) ) // silkscreened 'ROM # 3' on PCB under the chip
 	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(d4e7b00d) SHA1(2689d19fcdd828d0d47265362f6625377a90c1e4) ) // silkscreened 'ROM # 4' on PCB under the chip
+	ROM_RELOAD(                  0x0200000, 0x200000 ) // expects to read a part of the pumpkin reel sprites from here
 	ROM_LOAD( "mx29f1610mc.bin", 0x1000000, 0x200000, CRC(8dad2fc0) SHA1(88c4bda8e247839029a8c9a84d3bd598892b1775) ) // no U location on the PCB, silkscreened 'ROM # 7' on PCB under the chip
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3971,6 +3972,7 @@ ROM_START( lwitch )
 	ROM_REGION( 0x18000000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.rom3.u51", 0x0000000, 0x200000, CRC(05bc898d) SHA1(c88c14e4858943b2ea719abe0cc9ac0738d682dd) ) // same as wwitch
 	ROM_LOAD( "mx29f1610mc.rom4.u30", 0x0800000, 0x200000, CRC(cdedc2fc) SHA1(fb4f36a923db3b49e96aa8dde28c862c2ac063e3) )
+	ROM_RELOAD(                       0x0200000, 0x200000 ) // expects to read a part of the pumpkin reel sprites from here
 	ROM_LOAD( "mx29f1610mc.rom7",     0x1000000, 0x200000, CRC(5ac66b7d) SHA1(c5acba5a600e3f6b3b592451fd3897c275bb1851) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4102,6 +4104,7 @@ ROM_START( foxyruby )
 	ROM_REGION( 0x1000000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(f116c767) SHA1(a05abd89d0015831a2953bbf0a7b95178f9ca6e4) ) // silkscreened 'ROM # 3' on PCB under the chip
 	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(820fa9f6) SHA1(ae7fb4f9f4b6321f5c67f3bb563c8622446ef732) ) // silkscreened 'ROM # 4' on PCB under the chip
+	ROM_RELOAD(                  0x0200000, 0x200000 ) // odds table screen expects to read some data from here, too
 	// rom 7 not populated
 
 	ROM_REGION( 0x80000, "oki", 0 )

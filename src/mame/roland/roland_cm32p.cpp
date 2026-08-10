@@ -639,7 +639,7 @@ void cm32p_state::cm32p(machine_config &config)
 
 	RAM(config, some_ram).set_default_size("8K");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(cm32p_state::screen_update));
 	screen.set_size(16*6-1, (16*6-1)*3/4);

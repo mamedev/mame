@@ -54,6 +54,7 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -103,7 +104,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<sed1520_device> m_lcdc;
-	required_device<screen_device> m_screen;
+	required_device<screen_svg_device> m_screen;
 	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<8> m_inputs;
 	output_finder<12, 7, 6> m_lcd_dmz;
@@ -120,7 +121,7 @@ private:
 
 	void risc2500_mem(address_map &map) ATTR_COLD;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_svg_update(screen_svg_device &screen);
 	SED1520_UPDATE_CB(sed1520_update);
 
 	u32 input_r();
@@ -162,20 +163,17 @@ void risc2500_state::machine_reset()
 	m_prev_cycle = m_maincpu->total_cycles();
 }
 
-
-
 /*******************************************************************************
     Video
 *******************************************************************************/
 
-u32 risc2500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	// forward to SED1520
-	return m_lcdc->screen_update(screen, m_screen->curbitmap().as_ind16(), cliprect);
-}
 
-SED1520_UPDATE_CB(risc2500_state::sed1520_update)
+void risc2500_state::screen_svg_update(screen_svg_device &screen)
 {
+	auto [static_drive, lcd_on, dram, start_line, adc, duty] = m_lcdc->render();
+	if (static_drive)
+		return;
+
 	for (int c = 0; c < 12; c++)
 	{
 		u8 data = 0;
@@ -207,10 +205,7 @@ SED1520_UPDATE_CB(risc2500_state::sed1520_update)
 
 	m_lcd_sym[12] = lcd_on ? BIT(dram[0x73], 0) : 0;
 	m_lcd_sym[13] = lcd_on ? BIT(dram[0x5a], 0) : 0;
-
-	return 0;
 }
-
 
 
 /*******************************************************************************
@@ -423,13 +418,11 @@ void risc2500_state::risc2500(machine_config &config)
 
 	// video hardware
 	SED1520(config, m_lcdc);
-	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::sed1520_update));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_SVG);
+	SCREEN_SVG(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(1920/5, 768/5);
-	m_screen->set_visarea_full();
-	m_screen->set_screen_update(FUNC(risc2500_state::screen_update));
+	m_screen->set_screen_svg_update(FUNC(risc2500_state::screen_svg_update));
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_saitek_risc2500);

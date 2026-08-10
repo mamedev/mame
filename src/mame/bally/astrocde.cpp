@@ -1218,7 +1218,7 @@ void astrocde_state::astrocade_base(machine_config &config)
 	/* video hardware */
 	PALETTE(config, m_palette, FUNC(astrocde_state::astrocade_palette), 512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
 	m_screen->set_default_position(1.1, 0.0, 1.18, -0.018); // clip out borders
 	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_astrocde));
@@ -1885,7 +1885,6 @@ GAMEL( 1981, gorfpgm1,  gorf, gorf,     gorf,      astrocde_state, init_gorf,   
 GAMEL( 1981, gorfpgm1f, gorf, gorf,     gorfpgm1f, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with French language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 GAMEL( 1981, gorfpgm1g, gorf, gorf,     gorfpgm1g, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with German language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 GAMEL( 1981, gorfirec,  gorf, gorf,     gorfirec,  astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway (Irecsa license)", "Gorf (Spain, Irecsa license)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
-
 
 // 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board
 GAME(  1981, robby,     0,    robby,    robby,     astrocde_state, init_robby,    ROT0,   "Dave Nutting Associates / Bally Midway", "The Adventures of Robby Roto!", MACHINE_SUPPORTS_SAVE )

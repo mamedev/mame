@@ -89,8 +89,6 @@ private:
 	bool m_c70_50;
 	bool m_cru;
 	bool m_crb;
-	int m_cursor_x;
-	int m_cursor_y;
 
 	static constexpr rgb_t halflit() { return rgb_t(0x7f, 0x7f, 0x7f); }
 };

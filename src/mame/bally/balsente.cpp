@@ -1401,7 +1401,7 @@ void balsente_state::balsente(machine_config &config)
 	m_outlatch->q_out_cb<7>().set(FUNC(balsente_state::nvrecall_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART);
 	m_screen->set_screen_update(FUNC(balsente_state::screen_update_balsente));

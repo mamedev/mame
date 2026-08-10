@@ -66,7 +66,7 @@ ROM_END
 
 void nubus_radiustpd_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_radiustpd_device::screen_update));
 	m_screen->set_raw(99.522_MHz_XTAL, 1536, 0, 1152, 900, 0, 880); // 64.79 kHz horizontal, 72 Hz refresh
 }

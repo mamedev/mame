@@ -73,7 +73,7 @@ static const int pll_post_dividers[8] =
 
 void atirage_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(FUNC(atirage_device::screen_update));
 
@@ -516,7 +516,7 @@ void atirage_device::update_mode()
 	LOGMASKED(LOG_CRTC, "Pixel clock = %d, refresh = %f\n", m_pixel_clock, (double)m_pixel_clock / (double)m_htotal / (double)m_vtotal);
 
 	rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 }
 
 u32 atirage_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

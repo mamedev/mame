@@ -681,7 +681,7 @@ void scyclone_state::scyclone(machine_config &config)
 	MB14241(config, "mb14241");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -753,4 +753,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito", "Space Cyclone (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

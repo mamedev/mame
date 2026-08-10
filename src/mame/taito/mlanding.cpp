@@ -974,7 +974,7 @@ void mlanding_state::mlanding(machine_config &config)
 	TAITOIO_YOKE(config, m_yoke);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 640, 0, 512, 462, 0, 400); // Estimated
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1077,5 +1077,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)",      MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
-GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan, rev 3)", MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America", "Midnight Landing (Germany)",      MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito",         "Midnight Landing (Japan, rev 3)", MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.

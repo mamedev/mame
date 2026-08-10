@@ -646,7 +646,7 @@ void sun3x_state::sun3_80(machine_config &config)
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit
 	TIMER(config, "timer").configure_periodic(FUNC(sun3x_state::sun380_timer), attotime::from_hz(100));
 
-	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	screen_device &bwtwo(SCREEN(config, "bwtwo"));
 	bwtwo.set_screen_update(FUNC(sun3x_state::bw2_update));
 	bwtwo.set_size(1152,900);
 	bwtwo.set_visarea(0, 1152-1, 0, 900-1);

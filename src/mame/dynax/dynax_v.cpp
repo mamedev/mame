@@ -189,6 +189,16 @@ void jantouki_state::dynax_blit_palette67_w(uint8_t data)
 	LOG("P67=%02X ", data);
 }
 
+void dynax_state::mjtkp2_blit_palette12_w(uint8_t data)
+{
+	m_blit_palettes = (m_blit_palettes & 0xf00f) | ((data & 0xf0) << 4) | ((data & 0x0f) << 4);
+}
+
+void dynax_state::mjtkp2_blit_palette30_w(uint8_t data)
+{
+	m_blit_palettes = (m_blit_palettes & 0x0ff0) | ((data & 0x0f) << 12) | ((data & 0xf0) >> 4);
+}
+
 
 /* Layers Palettes (High Bits) */
 void dynax_state::blit_palbank_w(int state)
@@ -428,6 +438,18 @@ void dynax_state::tenkai_blit_scrolly_w(uint8_t data)
 	m_blit_scroll_y = data ^ 0xff;
 }
 
+void dynax_state::mjtkp2_blit_scrollx_w(uint8_t data)
+{
+	tenkai_blit_scrollx_w(data);
+	m_extra_scroll_x = m_blit_scroll_x;
+}
+
+void dynax_state::mjtkp2_blit_scrolly_w(uint8_t data)
+{
+	tenkai_blit_scrolly_w(data);
+	m_extra_scroll_y = m_blit_scroll_y;
+}
+
 
 /***************************************************************************
 
@@ -442,7 +464,7 @@ static const int priority_hnoridur[8] = { 0x0231, 0x2103, 0x3102, 0x2031, 0x3021
 static const int priority_mcnpshnt[8] = { 0x3210, 0x2103, 0x3102, 0x2031, 0x3021, 0x1302, 0x2310, 0x1023 };
 static const int priority_mjelctrn[8] = { 0x0231, 0x0321, 0x2031, 0x2301, 0x3021, 0x3201 ,0x0000, 0x0000 }; // this game doesn't use (hasn't?) layer 1
 static const int priority_mjembase[8] = { 0x0231, 0x2031, 0x0321, 0x3021, 0x2301, 0x3201 ,0x0000, 0x0000 }; // this game doesn't use (hasn't?) layer 1
-
+static const int priority_mjtkp2[8] = { 0x0231, 0x0312, 0x2031, 0x2301, 0x3021, 0x3201, 0x0000, 0x0000 };
 
 void dynax_state::dynax_common_reset()
 {
@@ -640,6 +662,12 @@ VIDEO_START_MEMBER(dynax_adpcm_state, neruton)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 //  m_priority_table = priority_mjelctrn;
+}
+
+VIDEO_START_MEMBER(dynax_state, mjtkp2)
+{
+	VIDEO_START_CALL_MEMBER(mjelctrn);
+	m_priority_table = priority_mjtkp2;
 }
 
 /***************************************************************************
@@ -852,6 +880,33 @@ mjelctrn:   priority: 00 20 10 40 30 50; enable: 1,2,8
 void dynax_adpcm_state::mjembase_priority_w(uint8_t data)
 {
 	m_hanamai_priority = bitswap<8>(data, 6, 5, 4, 3, 2, 7, 1, 0);
+}
+
+void dynax_state::mjtkp2_priority_w(uint8_t data)
+{
+	m_hanamai_priority = ((data & 0x07) << 4) | (data >> 4);
+}
+
+/*
+    On the original Ougon no Pai board a few video registers are inverted with respect
+    to the tenkai ones. The bootleg runs the very same code, just relocated, and writing
+    the same variables straight to the registers, so the difference is in the hardware:
+
+              register        bootleg writes      ougonhai writes
+    dest      $10044/$7FD1    ($7A00)             ($7A00) ^ $0F
+    priority  $10050/$7FD4    ($7A04)             ($7A04) ^ $F0
+    romregion $10058/$7FD6    $00 / $83           $00 / $01
+
+    the last one being handled by using dynax_blit_romregion_w directly in the address map.
+*/
+void dynax_state::ougonhai_blit_dest_w(uint8_t data)
+{
+	tenkai_blit_dest_w(data ^ 0x0f);
+}
+
+void dynax_state::ougonhai_priority_w(uint8_t data)
+{
+	tenkai_priority_w(data ^ 0xf0);
 }
 
 

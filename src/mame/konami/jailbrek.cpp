@@ -386,7 +386,7 @@ void jailbrek_state::jailbrek(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
 	PALETTE(config, m_palette, FUNC(jailbrek_state::palette), 512, 32);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(jailbrek_state::screen_update));
 	screen.set_palette(m_palette);

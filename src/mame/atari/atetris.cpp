@@ -589,7 +589,7 @@ void atetris_state::atetris_base(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::RGB_332, 256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
 	m_screen->set_raw(MASTER_CLOCK / 2, 456, 0, 336, 262, 0, 240);

@@ -376,7 +376,7 @@ void generalplus_gpce4_state::generalplus_gpce4(machine_config &config)
 	m_maincpu->spi_out().set(FUNC(generalplus_gpce4_state::spi_rom_access_from_soc));
 	m_maincpu->spi_reset().set(FUNC(generalplus_gpce4_state::spi_reset));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(128, 128);

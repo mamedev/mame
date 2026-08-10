@@ -217,7 +217,7 @@ void daphor_state::daphor32(machine_config &config)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(daphor_state::kbd_put));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(daphor_state::screen_update));
 	//screen.set_screen_update("ef9364", FUNC(ef9364_device::screen_update));

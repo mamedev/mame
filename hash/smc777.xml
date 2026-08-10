@@ -1054,9 +1054,9 @@ Bad colors on title screen. Happens if mouse is in port 2 (btanb)
 	</software>
 
 	<software name="tsu4mj">
-		<description>Tsukumo Ultra 4-nin Mahjong</description>
+		<description>Ultra Yonin Mahjong</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ツクモ (Tsukumo)</publisher>
 		<notes><![CDATA[
 Standalone version of MAHJONG.COM in compinv
 ]]></notes>

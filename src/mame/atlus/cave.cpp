@@ -2178,7 +2178,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 	TIMER(config, m_int_timer).configure_generic(FUNC(cave_state::vblank_start));
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_refresh_hz(15625/271.5);
 	m_screen[0]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[0]->set_size(320, 240);
@@ -2569,7 +2569,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_top));
 	subdevice<timer_device>("int_timer")->configure_generic(FUNC(ppsatan_state::vblank_start));
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_refresh_hz(15625/271.5);
 	m_screen[1]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[1]->set_size(320, 240);
@@ -2577,7 +2577,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[1]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_left));
 	TIMER(config, "int_timer_left").configure_generic(FUNC(ppsatan_state::vblank_start_left));
 
-	SCREEN(config, m_screen[2], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[2]);
 	m_screen[2]->set_refresh_hz(15625/271.5);
 	m_screen[2]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[2]->set_size(320, 240);
@@ -4367,10 +4367,10 @@ ROM_START( paccarn )
 	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )
 	// empty ROM socket
 
-	ROM_REGION( 0x117 * 3, "plds", 0 ) // all protected
-	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, CRC(5ceb0101) SHA1(ad5d221eb87c52ee558d60e5e44a9933c669dcf2) )
+	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, CRC(4cd79750) SHA1(cfb3331cd8bb2eaaf5d2a80ae76a5a15ae92d379) )
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )
 ROM_END
 
 /***************************************************************************

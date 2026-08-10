@@ -2470,10 +2470,11 @@ void model2_state::model2snd_ctrl(u16 data)
 	}
 }
 
+// We assume using the same waitstate weights as Saturn, applied to SCSP area only
 void model2_state::model2_snd(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("soundram");
-	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x000000, 0x07ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x400000, 0x400001).w(FUNC(model2_state::model2snd_ctrl));
 	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
 	map(0x800000, 0x9fffff).rom().region("samples", 0);
@@ -2512,7 +2513,7 @@ void model2_state::model2_screen(machine_config &config)
 	m_tiles->xhout_write_callback().set(FUNC(model2_state::horizontal_sync_w));
 	m_tiles->xvout_write_callback().set(FUNC(model2_state::vertical_sync_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// TODO: from System 24, might not be accurate for Model 2
 	m_screen->set_raw(32_MHz_XTAL/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);

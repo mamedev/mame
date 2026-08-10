@@ -50,7 +50,7 @@ const tiny_rom_entry *trio64dx_pci_device::device_rom_region() const
 
 void trio64dx_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3trio64_vga_device::screen_update));
 

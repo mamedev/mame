@@ -162,7 +162,7 @@ pc98: has color and graphic issues during gameplay
 		</part>
 	</software>
 
-	<!-- Source: http://redump.org/disc/92228/ -->
+	<!-- Source: https://redump.info/disc/92228/ -->
 	<!-- <rom name="Dig, The (Japan).cue" size="82" crc="7127b717" sha1="d0ffba436592b115b8ab5eb3b400210562d8031e"/> -->
 	<!-- <rom name="Dig, The (Japan).bin" size="778196832" crc="550c8138" sha1="3b3f8c72d86e380142299a91218139f32b34a682"/> -->
 	<!-- Pentium 133 MHz -->
@@ -226,6 +226,28 @@ pc98: [PC-9801-86] offset sound in places (verify)
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
+			</diskarea>
+		</part>
+	</software>
+
+<!-- !Catalogs -->
+
+	<software name="outake1" supported="yes">
+		<description>Ouchi de TAKERU Vol. 1 (Japan)</description>
+		<year>1995</year>
+		<publisher>Xing</publisher>
+		<notes><![CDATA[
+Windows 3.1 Takeru catalog for following systems:
+PC-8801SR, PC-88VA, PC-9801, X68000, Macintosh, MSX, Standard MIDI collections,
+Windows, DOS/V, J3100/SS, FM Towns, X1Turbo
+]]></notes>
+		<info name="alt_title" value="おうちでTAKERU Vol. 1"/>
+		<info name="developer" value="I.Magic"/>
+		<sharedfeat name="compatibility" value="ibmpc,pc98" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ouchi de takeru vol. 1" sha1="2aa0c90cc8ca820963eab1195670a5955944a419"/>
 			</diskarea>
 		</part>
 	</software>

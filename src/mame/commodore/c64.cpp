@@ -1516,7 +1516,7 @@ void c64_state::ntsc(machine_config &config)
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6567_VRETRACERATE);
 	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
 	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
@@ -1690,7 +1690,7 @@ void c64_state::pal(machine_config &config)
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6569_VRETRACERATE);
 	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
 	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
@@ -1840,7 +1840,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6569_VRETRACERATE);
 	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
 	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);

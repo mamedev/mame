@@ -1040,7 +1040,7 @@ fe7e  mulb  indirect_2b
 
 fe7f  mulb  indexed_2b
 	OP2 &= 0xfe;
-	TMP = any_r16(OP1);
+	TMP = any_r8(OP1);
 	TMP = int8_t(reg_r8(OP2)) * int8_t(TMP);
 	reg_w16(OP2, TMP);
 	post_indexed 23 24 // +5 when external

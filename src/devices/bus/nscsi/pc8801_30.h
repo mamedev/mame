@@ -35,12 +35,15 @@ protected:
 //  virtual attotime scsi_data_command_delay() override;
 
 	virtual TIMER_CALLBACK_MEMBER(cdda_fader_cb);
+
 private:
 	void nec_set_audio_start_position();
 	void nec_set_audio_stop_position();
 	void nec_pause();
 	void nec_get_subq();
 	void nec_get_dir_info();
+
+	void cdda_end_mark_cb(int state);
 
 	enum {
 		PCE_CD_CDDA_OFF = 0,
@@ -56,16 +59,13 @@ private:
 
 	u8   m_end_mark;
 
-	void cdda_end_mark_cb(int state);
-
 	u8   m_fader_ctrl;
 	double    m_cdda_volume;
 
 	emu_timer *m_cdda_fader_timer;
 };
 
+
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_PC8801_30, nscsi_cdrom_pc8801_30_device)
 
-
 #endif // MAME_BUS_NSCSI_PC8801_30_H
-

@@ -541,7 +541,9 @@ void coco12_state::coco(machine_config &config)
 	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(rs_printer));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
+	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 0, 372, 262, 0, 243);
+	m_screen->set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);

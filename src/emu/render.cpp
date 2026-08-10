@@ -576,7 +576,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container, u
 //  render_container - constructor
 //-------------------------------------------------
 
-render_container::render_container(render_manager &manager, screen_device *screen)
+render_container::render_container(render_manager &manager, device_video_output_interface *screen)
 	: m_manager(manager)
 	, m_screen(screen)
 	, m_overlaybitmap(nullptr)
@@ -1362,8 +1362,8 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 	}
 
 	// if we don't have a match, default to the nth view
-	std::vector<std::reference_wrapper<screen_device> > screens;
-	for (screen_device &screen : screen_device_enumerator(m_manager.machine().root_device()))
+	std::vector<std::reference_wrapper<device_video_output_interface>> screens;
+	for (device_video_output_interface &screen : video_output_interface_enumerator(m_manager.machine().root_device()))
 		screens.push_back(screen);
 	if (!screens.empty())
 	{
@@ -1372,12 +1372,12 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 		{
 			// find the first view with this screen and this screen only
 			layout_view *view = nullptr;
-			screen_device const &screen = screens[index() % screens.size()];
+			device_video_output_interface const &screen = screens[index() % screens.size()];
 			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
 				for (layout_view_item &viewitem : m_views[i].first.items())
 				{
-					screen_device const *const viewscreen(viewitem.screen());
+					device_video_output_interface const *const viewscreen(viewitem.screen());
 					if (viewscreen == &screen)
 					{
 						view = &m_views[i].first;
@@ -1397,7 +1397,7 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 		for (unsigned i = 0; m_views.size() > i; ++i)
 		{
 			layout_view &curview = m_views[i].first;
-			if (std::find_if(screens.begin(), screens.end(), [&curview] (screen_device &screen) { return !curview.has_screen(screen); }) == screens.end())
+			if (std::find_if(screens.begin(), screens.end(), [&curview] (device_video_output_interface &screen) { return !curview.has_screen(screen); }) == screens.end())
 				return i;
 		}
 	}
@@ -1605,12 +1605,12 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 	// scan the current view for all screens
 	for (layout_view_item &curitem : current_view().items())
 	{
-		screen_device const *const screen = curitem.screen();
+		device_video_output_interface const *const screen = curitem.screen();
 		if (screen)
 		{
 			// use a hard-coded default visible area for vector screens
 			const rectangle vectorvis(0, 639, 0, 479);
-			const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
+			const rectangle &visarea = (screen->is_vector()) ? vectorvis : screen->visible_area();
 
 			// apply target orientation to the bounds
 			render_bounds bounds = curitem.bounds();
@@ -1996,7 +1996,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	class screen_info
 	{
 	public:
-		screen_info(screen_device const &screen)
+		screen_info(device_video_output_interface const &screen)
 			: m_device(screen)
 			, m_rotated(screen.orientation() & ORIENTATION_SWAP_XY)
 			, m_physical(screen.physical_aspect())
@@ -2010,7 +2010,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			}
 		}
 
-		screen_device const &device() const { return m_device.get(); }
+		device_video_output_interface const &device() const { return m_device.get(); }
 		bool rotated() const { return m_rotated; }
 		bool square() const { return m_physical == m_native; }
 		unsigned physical_x() const { return m_physical.first; }
@@ -2029,12 +2029,14 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		}
 
 	private:
-		std::reference_wrapper<screen_device const> m_device;
+		std::reference_wrapper<device_video_output_interface const> m_device;
 		bool m_rotated;
 		std::pair<unsigned, unsigned> m_physical, m_native;
 	};
-	screen_device_enumerator iter(m_manager.machine().root_device());
-	std::vector<screen_info> const screens(std::begin(iter), std::end(iter));
+
+	std::vector<screen_info> screens;
+	for (auto &screen : video_output_interface_enumerator(m_manager.machine().root_device()))
+		screens.emplace_back(screen);
 
 	// need this because views aren't fully set up yet
 	auto const nth_view =
@@ -2164,7 +2166,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			for (layout_view *view = nth_view(viewindex); need_tiles && view; view = nth_view(++viewindex))
 			{
 				bool screen_missing(false);
-				for (screen_device &screen : iter)
+				for (device_video_output_interface &screen : video_output_interface_enumerator(m_manager.machine().root_device()))
 				{
 					if (!view->has_screen(screen))
 					{
@@ -3377,7 +3379,7 @@ render_manager::render_manager(running_machine &machine, ui_event_sink &event_si
 			configuration_manager::save_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
-	for (screen_device &screen : screen_device_enumerator(machine.root_device()))
+	for (device_video_output_interface &screen : video_output_interface_enumerator(machine.root_device()))
 		screen.set_container(m_screen_container_list.emplace_back(*this, &screen));
 }
 
@@ -3401,7 +3403,7 @@ render_manager::~render_manager()
 //  is_live - return if the screen is 'live'
 //-------------------------------------------------
 
-bool render_manager::is_live(screen_device &screen) const
+bool render_manager::is_live(device_video_output_interface &screen) const
 {
 	// iterate over all live targets and or together their screen masks
 	for (render_target const &target : m_targetlist)

@@ -1259,7 +1259,7 @@ void midzunit_state::zunit(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_entries(8192);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// from TMS340 registers
 	screen.set_raw(MEDRES_PIXEL_CLOCK*2, 674, 122, 634, 433, 27, 427);
@@ -1299,7 +1299,7 @@ void midyunit_base_state::yunit_core(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_entries(256);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// from TMS340 registers - visible area varies slightly between games
 	// we use the largest visarea (smashtv's) here so that aviwrite will work nicely

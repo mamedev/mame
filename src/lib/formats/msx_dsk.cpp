@@ -40,6 +40,10 @@ const msx_format::format msx_format::formats[] = {
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000,  9, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
+	{   /*  3 1/2 inch single sided single density */
+		floppy_image::FF_35,  floppy_image::SSSD, floppy_image::MFM,
+		2000,  8, 40, 1, 512, {}, 1, {}, 26, 24, 28, 80
+	},
 	{   /*  3 1/2 inch single sided double density */
 		// 80x4e 12x00 3xf6 fc
 		// 26x4e 12x00 3xf5 fe 2x00 01 02 f7 24x4e 12x00 3xf5 fb 512xe5 f7

@@ -34,7 +34,7 @@ TODO:
 
 #include "machine/timer.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -246,10 +246,9 @@ void rzone_state::rzbatfor(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1368, 1080);
-	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
@@ -270,10 +269,9 @@ void rzone_state::rztoshden(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1392, 1080);
-	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
@@ -294,10 +292,9 @@ void rzone_state::rzindy500(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1425, 1080);
-	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);

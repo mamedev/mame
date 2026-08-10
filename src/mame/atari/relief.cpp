@@ -565,7 +565,7 @@ void relief_state::relief(machine_config &config)
 	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(relief_state::get_playfield2_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived
 	   the board uses a VAD chip to generate video signals */

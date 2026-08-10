@@ -2,7 +2,7 @@
 // experimental/awaitable_operators.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,8 +22,8 @@
 #include <variant>
 #include "asio/awaitable.hpp"
 #include "asio/co_spawn.hpp"
+#include "asio/deferred.hpp"
 #include "asio/detail/type_traits.hpp"
-#include "asio/experimental/deferred.hpp"
 #include "asio/experimental/parallel_group.hpp"
 #include "asio/multiple_exceptions.hpp"
 #include "asio/this_coro.hpp"
@@ -31,6 +31,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace awaitable_operators {
 namespace detail {
@@ -529,6 +530,7 @@ awaitable<std::variant<T..., U>, Executor> operator||(
 
 } // namespace awaitable_operators
 } // namespace experimental
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

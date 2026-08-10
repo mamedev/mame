@@ -20,6 +20,7 @@
 #include "divtlb.h"
 
 #include <algorithm>
+#include <unordered_map>
 
 
 /***************************************************************************
@@ -168,6 +169,7 @@ enum
 #define PPCDRC_ACCURATE_SINGLES       0x0004        // do excessive rounding to make single-precision results "accurate"
 #define PPCDRC_FULL_CACHE_FLUSH       0x0008        // completely flush the DRC cache on ICBI.  Should never be necessary now.
 #define PPCDRC_STRICT_601_SELF_MODIFY 0x0010        // check for self-modifying code on 601 in the write handler (fairly large performance impact & does not work with RAM bypass)
+#define PPCDRC_MACOS_CACHE_HACK       0x0020        // HACK for Mac OS relying on data cache behavior; see ppccom_dcbz_check() for details
 
 // common sets of options
 #define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
@@ -252,6 +254,7 @@ public:
 	void ppccom_tlb_fill();
 	void ppccom_update_fprf();
 	void ppccom_dcstore_callback();
+	void ppccom_dcbz_check();
 	void ppccom_execute_tlbie();
 	void ppccom_execute_tlbia();
 	void ppccom_execute_tlbl();
@@ -615,6 +618,28 @@ protected:
 	// track what logical pages have compiled code
 	std::vector<uint8_t>  m_codepage_bits;              // 1 bit for each 4K page
 	uint32_t              m_codewrite_skip_page = ~uint32_t(0);   // 601 write-watch: page to leave unmarked for one recompile
+
+	// Code reuse cache.  The PCI PowerMac 68K DRC frequently regenerates the exact
+	// same code at the exact same address, so keep a cache of translations.  Entries
+	// record the physical address and a signature over every word of the sequence, and
+	// are dropped when the cache is flushed and the code goes away.  A stale match is
+	// harmless: the reused code still begins with its own translation check and
+	// checksum, so it degrades to an ordinary recompile rather than running stale.
+	//
+	// Reuse must leave the block's entry checks in the same state as a fresh compile,
+	// so the checks are recorded in m_entry_checks and re-verified before the code is handed back.
+	struct reuse_entry
+	{
+		drccodeptr code;
+		offs_t physpc;
+		uint32_t sig;
+		uint32_t checkfirst; // first of this block's entry checks in m_entry_checks
+		uint32_t checkcount; // number of entry checks the block was generated with
+	};
+	std::unordered_map<uint64_t, reuse_entry> m_reuse_cache; // key = (mode << 32) | pc
+	uint64_t m_last_reuse = ~uint64_t(0);					 // key handed back by the last compile, if it was a reuse
+
+	bool reuse_entry_checks(uint32_t first, uint32_t count);
 
 	// After a 601 self-modifying store, we clear the page's code bit and
 	// immediately recompile the store's own block.  We leave the bit clear for

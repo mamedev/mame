@@ -2,7 +2,7 @@
 // detail/socket_option.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,6 +27,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ip {
 namespace detail {
 namespace socket_option {
@@ -39,9 +40,12 @@ public:
 #if defined(__sun) || defined(__osf__)
   typedef unsigned char ipv4_value_type;
   typedef unsigned char ipv6_value_type;
-#elif defined(_AIX) || defined(__hpux) || defined(__QNXNTO__) 
+#elif defined(_AIX) || defined(__hpux) || defined(__QNXNTO__)
   typedef unsigned char ipv4_value_type;
   typedef unsigned int ipv6_value_type;
+#elif defined(__NetBSD__) || defined(__OpenBSD__)
+  typedef unsigned char ipv4_value_type;
+  typedef int ipv6_value_type;
 #else
   typedef int ipv4_value_type;
   typedef int ipv6_value_type;
@@ -559,6 +563,7 @@ private:
 } // namespace socket_option
 } // namespace detail
 } // namespace ip
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

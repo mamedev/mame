@@ -60,7 +60,7 @@ void mac_video_sonora_device::device_reset()
 
 void mac_video_sonora_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	m_screen->set_raw(31334400, 896, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(mac_video_sonora_device::screen_update));
@@ -320,9 +320,9 @@ void mac_video_sonora_device::vctrl_w(offs_t offset, uint8_t data)
 			const modeline &m = modelines[m_modeline_id];
 			rectangle visarea(0, m.htot - m.hfp - m.hs - m.hbp - 1, 0, m.vtot - m.vfp - m.vs - m.vbp - 1);
 			if (m_isPDM) {
-				m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot*m.vtot, m.dotclock).as_attoseconds());
+				m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot*m.vtot, m.dotclock));
 			} else {
-				m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot * m.vtot, m_extPixelClock).as_attoseconds());
+				m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot * m.vtot, m_extPixelClock));
 			}
 		}
 		break;

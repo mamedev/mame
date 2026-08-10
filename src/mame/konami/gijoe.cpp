@@ -516,7 +516,7 @@ void gijoe_state::gijoe(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 24, 312, 262, 16, 240); // measured 59.637Hz
 	screen.set_screen_update(FUNC(gijoe_state::screen_update));
 	screen.set_palette("palette");

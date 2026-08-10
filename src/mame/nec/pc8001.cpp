@@ -22,10 +22,10 @@ References:
     - PC-8011 (expansion unit)
     - PC-8021;
     - PC-8031 (mini disk unit, in progress)
-	- pc8001mk2: implement 1 layer GVRAM;
+    - pc8001mk2: implement 1 layer GVRAM;
     - pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
       (Has 3 bitplane GVRAM like PC-8801 V1 mode + ALU + few unique modes eventually ditched,
-	  mapped at $8000 rather than $c000);
+      mapped at $8000 rather than $c000);
     - waitstates & DMA penalty (some games are suspciously fast);
     - buzzer has pretty ugly aliasing in places;
 
@@ -1259,7 +1259,7 @@ void pc8001_state::pc8001(machine_config &config)
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8001_state::screen_update));
 //  m_screen->set_palette(m_crtc_palette);
@@ -1296,16 +1296,25 @@ void pc8001_state::pc8001(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 0);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 1);
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
 
 	PC8001_KBD(config, "kbd");
 
+	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
+	m_exp->set_iospace(m_maincpu, AS_IO);
+	m_exp->int3_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
+	m_exp->int4_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
+	m_exp->int5_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
+
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "speaker", 2).front();
 	// TODO: unknown clock, is it really a beeper?
-	BEEP(config, m_beep, 2400).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beep, 2400);
+	m_beep->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
+	m_beep->add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,n80", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(pc8001_state::snapshot_cb));
@@ -1334,7 +1343,7 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 
 	PC8801_KBD(config.replace(), "kbd");
 
-//	m_gvram_bank->set_map(&pc8001mk2sr_state::gvram_map);
+//  m_gvram_bank->set_map(&pc8001mk2sr_state::gvram_map);
 	PALETTE(config, m_palette, palette_device::BLACK, 0x8);
 
 	PC88_ALU(config, m_alu, 0);
@@ -1347,8 +1356,9 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 	// OPN/OPNA needs to be moved in a common internal expansion slot
 	m_opn->port_a_read_callback().set([] () { return 0xff; });
 	m_opn->port_b_read_callback().set([] () { return 0xff; });
-//	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
-	m_opn->add_route(ALL_OUTPUTS, "mono", 0.5);
+//  m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
+	m_opn->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_opn->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
 }

@@ -835,11 +835,8 @@ void upd7810_device::write_smh(uint8_t data)
 void upd7810_device::upd7810_take_irq()
 {
 	uint16_t vector = 0;
+	uint16_t irr_mask = 0;
 	int irqline = 0;
-
-	/* global interrupt disable? */
-	if (0 == IFF && !(IRR & INTFNMI))
-		return;
 
 	/* check the interrupts in priority sequence */
 	if (IRR & INTFNMI)
@@ -847,21 +844,21 @@ void upd7810_device::upd7810_take_irq()
 		/* Nonmaskable interrupt */
 		irqline = INPUT_LINE_NMI;
 		vector = 0x0004;
-		IRR &= ~INTFNMI;
+		irr_mask = INTFNMI;
 	}
 	else
 	if ((IRR & INTFT0)  && 0 == (MKL & 0x02))
 	{
 		vector = 0x0008;
 		if (0 != (MKL & 0x04))
-			IRR&=~INTFT0;
+			irr_mask = INTFT0;
 	}
 	else
 	if ((IRR & INTFT1)  && 0 == (MKL & 0x04))
 	{
 		vector = 0x0008;
 		if (0 != (MKL & 0x02))
-			IRR&=~INTFT1;
+			irr_mask = INTFT1;
 	}
 	else
 	if ((IRR & INTF1)   && 0 == (MKL & 0x08))
@@ -869,7 +866,7 @@ void upd7810_device::upd7810_take_irq()
 		irqline = UPD7810_INTF1;
 		vector = 0x0010;
 		if (0 != (MKL & 0x10))
-			IRR&=~INTF1;
+			irr_mask = INTF1;
 	}
 	else
 	if ((IRR & INTF2)   && 0 == (MKL & 0x10))
@@ -877,53 +874,60 @@ void upd7810_device::upd7810_take_irq()
 		irqline = UPD7810_INTF2;
 		vector = 0x0010;
 		if (0 != (MKL & 0x08))
-			IRR&=~INTF2;
+			irr_mask = INTF2;
 	}
 	else
 	if ((IRR & INTFE0)  && 0 == (MKL & 0x20))
 	{
 		vector = 0x0018;
 		if (0 != (MKL & 0x40))
-			IRR&=~INTFE0;
+			irr_mask = INTFE0;
 	}
 	else
 	if ((IRR & INTFE1)  && 0 == (MKL & 0x40))
 	{
 		vector = 0x0018;
 		if (0 != (MKL & 0x20))
-			IRR&=~INTFE1;
+			irr_mask = INTFE1;
 	}
 	else
 	if ((IRR & INTFEIN) && 0 == (MKL & 0x80))
 	{
 		vector = 0x0020;
 		if (0 != (MKH & 0x01))
-			IRR&=~INTFEIN;
+			irr_mask = INTFEIN;
 	}
 	else
 	if ((IRR & INTFAD)  && 0 == (MKH & 0x01))
 	{
 		vector = 0x0020;
 		if (0 != (MKL & 0x80))
-			IRR&=~INTFAD;
+			irr_mask = INTFAD;
 	}
 	else
 	if ((IRR & INTFSR)  && 0 == (MKH & 0x02))
 	{
 		vector = 0x0028;
 		if (0 != (MKH & 0x04))
-			IRR&=~INTFSR;
+			irr_mask = INTFSR;
 	}
 	else
 	if ((IRR & INTFST)  && 0 == (MKH & 0x04))
 	{
 		vector = 0x0028;
 		if (0 != (MKH & 0x02))
-			IRR&=~INTFST;
+			irr_mask = INTFST;
 	}
 
 	if (vector)
 	{
+		// release halt on any non-masked interrupt even when IFF = 0
+		m_halt = 0;
+
+		/* global interrupt disable? */
+		if (0 == IFF && !(IRR & INTFNMI))
+			return;
+
 		/* acknowledge external IRQ */
 		if (irqline)
 			standard_irq_callback(irqline, PC);
@@ -934,6 +938,7 @@ void upd7810_device::upd7810_take_irq()
 		SP--;
 		WM( SP, PCL );
 		IFF = m_iff_pending = 0;
+		IRR &= ~irr_mask;
 		PSW &= ~(SK|L0|L1);
 		PC = vector;
 	}
@@ -942,11 +947,8 @@ void upd7810_device::upd7810_take_irq()
 void upd7801_device::upd7810_take_irq()
 {
 	uint16_t vector = 0;
+	uint16_t irr_mask = 0;
 	int irqline = 0;
-
-	/* global interrupt disable? */
-	if (0 == IFF)
-		return;
 
 	/* 1 - SOFTI - vector at 0x0060 */
 	/* 2 - INT0 - Masked by MK0 bit */
@@ -959,31 +961,38 @@ void upd7801_device::upd7810_take_irq()
 	if ( IRR & INTFT0 && 0 == ( MKL & 0x02 ) )
 	{
 		vector = 0x0008;
-		IRR &= ~INTFT0;
+		irr_mask = INTFT0;
 	}
 	/* 4 - INT1 - Masked by MK1 bit */
 	if ( IRR & INTF1 && 0 == ( MKL & 0x04 ) )
 	{
 		irqline = UPD7810_INTF1;
 		vector = 0x0010;
-		IRR &= ~INTF1;
+		irr_mask = INTF1;
 	}
 	/* 5 - INT2 - Masked by MK2 bit */
 	if ( IRR & INTF2 && 0 == ( MKL & 0x08 ) )
 	{
 		irqline = UPD7810_INTF2;
 		vector = 0x0020;
-		IRR &= ~INTF2;
+		irr_mask = INTF2;
 	}
 	/* 6 - INTS - Masked by MKS bit */
 	if ( IRR & INTFST && 0 == ( MKL & 0x10 ) )
 	{
 		vector = 0x0040;
-		IRR &= ~INTFST;
+		irr_mask = INTFST;
 	}
 
 	if (vector)
 	{
+		// release halt on any non-masked interrupt even when IFF = 0
+		m_halt = 0;
+
+		/* global interrupt disable? */
+		if (0 == IFF)
+			return;
+
 		/* acknowledge external IRQ */
 		if (irqline)
 			standard_irq_callback(irqline, PC);
@@ -994,6 +1003,7 @@ void upd7801_device::upd7810_take_irq()
 		SP--;
 		WM( SP, PCL );
 		IFF = m_iff_pending = 0;
+		IRR &= ~irr_mask;
 		PSW &= ~(SK|L0|L1);
 		PC = vector;
 	}
@@ -1754,6 +1764,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_nmi));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
+	save_item(NAME(m_halt));
 
 	save_item(NAME(m_txs));
 	save_item(NAME(m_rxs));
@@ -1993,6 +2004,7 @@ void upd7810_device::device_reset()
 	m_nmi = 0;
 	m_int1 = 0;
 	m_int2 = 1; // physical (inverted) INT2 line state
+	m_halt = 0;
 
 	m_txs = 0;
 	m_rxs = ~0;
@@ -2036,6 +2048,16 @@ void upd7810_device::execute_run()
 {
 	do
 	{
+		if (m_halt)
+		{
+			debugger_wait_hook();
+			// continue running peripherals until a pending (internal or external) interrupt
+			m_icount--;
+			handle_timers(1);
+			upd7810_take_irq();
+			continue;
+		}
+
 		int cc;
 
 		PPC = PC;

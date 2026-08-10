@@ -344,7 +344,7 @@ void mpc106_host_device::memory_enable_w(offs_t offset, u8 data)
 
 	u64 base = m_memory_starts[0] | ((u64)m_memory_starts[1] << 32);
 	u64 base2 = m_memory_starts[2] | ((u64)m_memory_starts[3] << 32);
-	u64 end = m_memory_ends[0] | ((u64)m_memory_ends[0] << 32);
+	u64 end = m_memory_ends[0] | ((u64)m_memory_ends[1] << 32);
 	u64 end2 = m_memory_ends[2] | ((u64)m_memory_ends[3] << 32);
 	u32 bank_start = 0;
 	u32 bank_end = 0;
@@ -360,10 +360,28 @@ void mpc106_host_device::memory_enable_w(offs_t offset, u8 data)
 			bank_end |= (end2 & 0xff) << 28;
 			bank_end |= 0xfffff;
 
-			LOGMASKED(LOG_RAM, "bank %d: start %08x end %08x, install_ptr = %llx\n", bank, bank_start, bank_end, install_ptr);
+			if ((bank_end >= bank_start) && (m_ram_size > 0))
+			{
+				const u64 bank_size = (u64)(bank_end - bank_start) + 1;
 
-			m_cpu_space->install_ram(bank_start, bank_end, &m_ram[install_ptr]);
-			install_ptr += (bank_end + 1);
+				LOGMASKED(LOG_RAM, "bank %d: start %08x end %08x size %llx, install_ptr = %llx\n", bank, bank_start, bank_end, bank_size, install_ptr);
+
+				// Banks programmed larger than the RAM that's actually present are mirrored.
+				// The iMac boot ROM programs the maximum 4x32MiB geometry and uses the top of
+				// the RAM range as a scratchpad before actually sizing it.
+				u64 ptr = install_ptr % (u64)m_ram_size;
+				u32 start = bank_start;
+				u64 remaining = bank_size;
+				while (remaining > 0)
+				{
+					const u64 chunk = std::min<u64>(remaining, (u64)m_ram_size - ptr);
+					m_cpu_space->install_ram(start, start + chunk - 1, &m_ram[ptr]);
+					start += chunk;
+					remaining -= chunk;
+					ptr = 0;
+				}
+				install_ptr += bank_size;
+			}
 		}
 
 		base >>= 8;

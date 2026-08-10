@@ -825,7 +825,7 @@ static INPUT_PORTS_START( raiden2 )
 	PORT_DIPSETTING(      0x2000, "400000 1000000" )
 	PORT_DIPSETTING(      0x1000, "1000000 3000000" )
 	PORT_DIPSETTING(      0x0000, "No Extend" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Demo Sound" ) PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:!7")  // "Demo Sound"
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW2:!8") /* Test Mode */
@@ -923,7 +923,7 @@ static INPUT_PORTS_START( zeroteam )
 	PORT_DIPSETTING(      0x2000, "2000000" )
 	PORT_DIPSETTING(      0x1000, "Every 1000000" )
 	PORT_DIPSETTING(      0x0000, "No Extend" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Demo Sound" ) PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!8") // marked as unused
@@ -1129,7 +1129,7 @@ void raiden2_state::raiden2(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, raiden2)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 30*8); /* hand-tuned to match ~55.47 */
 	screen.set_screen_update(FUNC(raiden2_state::screen_update));
@@ -1168,7 +1168,7 @@ void xsedae_state::zeroteam_base(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden2_state::vector_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 //  screen.set_refresh_hz(55.47);    /* verified on pcb */
 	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 32*8); /* hand-tuned to match ~55.47 */
 	screen.set_screen_update(FUNC(xsedae_state::screen_update));

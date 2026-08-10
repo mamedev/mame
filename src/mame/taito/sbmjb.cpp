@@ -332,7 +332,7 @@ void sbmjb_state::sbmjb(machine_config &config)
 	TAITOIO_OPTO(config, "opto");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // all wrong
+	screen_device &screen(SCREEN(config, "screen")); // all wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -471,22 +471,22 @@ ROM_START( harikiri )
 	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
 ROM_END
 
-ROM_START( sbmjb ) // all labels were peeled off / unreadable
+ROM_START( sbmjb ) // all labels were peeled off / unreadable, taken from pictures of another PCB (may be incomplete for main and VDP ROMs, cause of possible different revs)
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Main ver. 1.1 1998/08/25
-	ROM_LOAD( "mprog.ic12", 0x00000, 0x10000, CRC(d11f14eb) SHA1(29c4b8e3ebb9ff3c5630c7bb3c8224a2f57e8fe8) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "e62-05.ic12", 0x00000, 0x10000, CRC(d11f14eb) SHA1(29c4b8e3ebb9ff3c5630c7bb3c8224a2f57e8fe8) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sndprog.ic5", 0x00000, 0x10000, CRC(e41575f1) SHA1(66ab1b81a618fe5e676b4f8768a5bee8d189de58) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "e62-04.ic5", 0x00000, 0x10000, CRC(e41575f1) SHA1(66ab1b81a618fe5e676b4f8768a5bee8d189de58) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x80000, "vdpcpu", 0 ) // Video ver. 1.0 1998/06/01
-	ROM_LOAD( "videoprg.ic52", 0x00000, 0x80000, CRC(21ebc096) SHA1(12f0ad4530560782a5b7517557d68526a51091e1) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "e62-01.ic52", 0x00000, 0x80000, CRC(21ebc096) SHA1(12f0ad4530560782a5b7517557d68526a51091e1) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "vdpcpu:gfx", 0 )
-	ROM_LOAD16_BYTE( "chr-l.ic49", 0x00000, 0x80000, CRC(54237760) SHA1(d183d4c3df3222e94219356a39ee5566ebdd54cf) )
-	ROM_LOAD16_BYTE( "chr-h.ic48", 0x00001, 0x80000, CRC(0a815d7c) SHA1(5c2f65ff1f84979993f7c0df8d91ed2cd6f0acd1) )
+	ROM_LOAD16_BYTE( "e62-02.ic49", 0x00000, 0x80000, CRC(54237760) SHA1(d183d4c3df3222e94219356a39ee5566ebdd54cf) )
+	ROM_LOAD16_BYTE( "e62-03.ic48", 0x00001, 0x80000, CRC(0a815d7c) SHA1(5c2f65ff1f84979993f7c0df8d91ed2cd6f0acd1) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "adpcm.ic3", 0x00000, 0x40000, CRC(69158cf3) SHA1(f638bd7b5ef9e400eaa55eb3b4546e881e955087) )
+	ROM_LOAD( "e62-06.ic3", 0x00000, 0x40000, CRC(69158cf3) SHA1(f638bd7b5ef9e400eaa55eb3b4546e881e955087) )
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "e41-02.ic51", 0x000, 0x117, CRC(67fd54e0) SHA1(f64fb33b9a4a935af5662b5103709131727c8411) )
@@ -539,11 +539,11 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1997, honooinv,   0,        honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bubbroul,   0,        sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bubbroul17, bubbroul, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.7, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, packyts,    0,        sbmjb,    packyts,  sbmjb_state, empty_init, ROT0, "Taito Corporation", "Packy no Treasure Slot (Japan, main ver. 1.3, video ver. 1.1)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, harikiri,   0,        sbmjb,    harikiri, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Harikiri Junior Baseball (Japan, main ver. 1.0, video ver. 1.3)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbmjb,      0,        sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man no Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, manpukuh,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Manpuku Hanten (Japan, main ver. 2.00, video ver. 2.00)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, rendfgtr,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Renda Fighter (Japan, main ver. 2.02, video ver. 2.03)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, honooinv,   0,        honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bubbroul,   0,        sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bubbroul17, bubbroul, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito", "Bubblen Roulette (Japan, main ver. 1.7, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, packyts,    0,        sbmjb,    packyts,  sbmjb_state, empty_init, ROT0, "Taito", "Packy no Treasure Slot (Japan, main ver. 1.3, video ver. 1.1)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, harikiri,   0,        sbmjb,    harikiri, sbmjb_state, empty_init, ROT0, "Taito", "Harikiri Junior Baseball (Japan, main ver. 1.0, video ver. 1.3)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbmjb,      0,        sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito", "Sonic Blast Man no Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, manpukuh,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito", "Manpuku Hanten (Japan, main ver. 2.00, video ver. 2.00)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rendfgtr,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito", "Renda Fighter (Japan, main ver. 2.02, video ver. 2.03)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

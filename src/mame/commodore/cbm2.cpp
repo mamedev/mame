@@ -2257,7 +2257,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	mos6567.set_addrmap(0, &p500_state::vic_videoram_map);
 	mos6567.set_addrmap(1, &p500_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6567_VRETRACERATE);
 	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
 	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
@@ -2390,7 +2390,7 @@ void p500_state::p500_pal(machine_config &config)
 	mos6569.set_addrmap(0, &p500_state::vic_videoram_map);
 	mos6569.set_addrmap(1, &p500_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6569_VRETRACERATE);
 	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
 	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
@@ -2513,7 +2513,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_color(rgb_t::green());
 	screen.set_screen_update(MC68B45_TAG, FUNC(mc6845_device::screen_update));
 	screen.set_refresh_hz(60);

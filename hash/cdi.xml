@@ -1879,7 +1879,7 @@ license:CC0-1.0
 	<software name="linkfoeu" cloneof="linkfoe">
 		<!--
 		Origin: Redump
-		http://redump.org/disc/75613/
+		https://redump.info/disc/75613/
 		<rom name="Link - The Faces of Evil (USA).cue" size="117" crc="3f511bd6" md5="b17d9e4d7276c2c30f1546eef2d57437" sha1="bc4ab1e401c39138283afb4538ba8593218f1203"/>
 		<rom name="Link - The Faces of Evil (USA).bin" size="601933248" crc="d7d2dc8a" md5="0785cae36359d0ed6d90a7624a8a8681" sha1="6e280552344a25e4078a12e704e9b753495352d7"/>
 		-->
@@ -10337,8 +10337,8 @@ license:CC0-1.0
 	<software name="valdisc" supported="partial">
 		<!--
 		Origin: Redump
-		http://redump.org/disc/88153/
-		http://redump.org/disc/88154/
+		https://redump.info/disc/88153/
+		https://redump.info/disc/88154/
 		-->
 		<description>Validation Disc (Version 1.0)</description>
 		<!-- '89 for disc 1, '90 for disc 2 -->
@@ -11192,7 +11192,7 @@ Other stuff in between
 	<software name="doorswin">
 		<!-- Rainbow disc (CD-ROM XA / CD-i / VideoCD / CD-DA), CD-i part does not need DVC -->
 		<!--
-		Origin: redump (http://redump.org/disc/54514/)
+		Origin: redump (https://redump.info/disc/54514/)
 		<rom name="Cranberries, The - Doors and Windows (USA) (Track 1).bin" size="553665504" crc="499dc148" md5="ec76c5c41095ce953509bbfb889dd95a"/>
 		<rom name="Cranberries, The - Doors and Windows (USA) (Track 2).bin" size="44528064" crc="ff10d7d3" md5="b66710e4192053062aa80ecf6ea3c1e5"/>
 		<rom name="Cranberries, The - Doors and Windows (USA) (Track 3).bin" size="50516256" crc="aed80da5" md5="07876717d36fa90bdb6e55bbb0b06fc6"/>

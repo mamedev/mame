@@ -185,7 +185,7 @@ void vet3000_state::vet3000(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

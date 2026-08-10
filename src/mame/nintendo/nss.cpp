@@ -860,7 +860,7 @@ void nss_state::nss(machine_config &config)
 	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
 	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	m_screen->set_screen_update(FUNC(snes_state::screen_update));
@@ -871,7 +871,7 @@ void nss_state::nss(machine_config &config)
 	m_ppu->set_screen("screen");
 
 	// NSS
-	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
+	screen_device &osd(SCREEN(config, "osd"));
 	osd.set_refresh_hz(60);
 	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	osd.set_size(288+22, 216+22);

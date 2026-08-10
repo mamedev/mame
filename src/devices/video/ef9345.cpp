@@ -245,7 +245,7 @@ void ef9345_device::set_video_mode()
 		rectangle visarea = screen().visible_area();
 		visarea.max_x = new_width - 1;
 
-		screen().configure(new_width, screen().height(), visarea, screen().frame_period().attoseconds());
+		screen().configure(new_width, screen().height(), visarea, screen().frame_period());
 	}
 
 	//border color

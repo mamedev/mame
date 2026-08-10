@@ -583,7 +583,7 @@ void apple1_state::apple1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple1_state::apple1_map);
 
 	// video timings are identical to the Apple II, unsurprisingly
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple1_state::screen_update));
 	m_screen->set_palette("palette");

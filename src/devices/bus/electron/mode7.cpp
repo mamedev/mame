@@ -63,7 +63,7 @@ ioport_constructor electron_mode7_device::device_input_ports() const
 void electron_mode7_device::device_add_mconfig(machine_config &config)
 {
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 768, 0, 480, 622, 0, 500);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845s_device::screen_update));
 

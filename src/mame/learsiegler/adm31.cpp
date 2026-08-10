@@ -489,7 +489,7 @@ void adm31_state::adm31(machine_config &config)
 	m_brg->ft_handler().set(m_acia[1], FUNC(acia6850_device::write_rxc));
 	m_brg->ft_handler().append(m_acia[1], FUNC(acia6850_device::write_txc));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(19.584_MHz_XTAL, 1020, 0, 800, 320, 0, 288);
 	screen.set_screen_update(FUNC(adm31_state::screen_update));
 

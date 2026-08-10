@@ -1348,7 +1348,7 @@ void namconb1_state::namconb1(machine_config &config)
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namconb1_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(48.384_MHz_XTAL / 8, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namconb1_state::screen_vblank));

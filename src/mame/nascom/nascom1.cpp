@@ -766,7 +766,7 @@ INPUT_CHANGED_MEMBER(nascom2_state::cass_speed)
 void nascom_state::nascom(machine_config &config)
 {
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(48 * 8, 16 * 16);

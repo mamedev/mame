@@ -136,6 +136,8 @@ Methods
 
 output:exists()
     Returns a Boolean indicating whether the output exists.
+output:name()
+    Returns the output’s name if it exists, or ``nil`` otherwise.
 output:get()
     Returns the current value of the output if it exists, or a value stored by
     the output proxy if the output does no exist.

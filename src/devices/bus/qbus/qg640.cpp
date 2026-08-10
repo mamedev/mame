@@ -81,7 +81,7 @@ void qg640_device::device_add_mconfig(machine_config &config)
 
 	IDT7201(config, m_fifo);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL / 2, 816, 0, 640, 510, 0, 480); // 25 MHz pixel clock, 30.63 kHz horizontal, 60.07 Hz vertical
 	screen.set_screen_update(FUNC(qg640_device::screen_update));
 

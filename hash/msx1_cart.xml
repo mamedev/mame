@@ -5507,7 +5507,7 @@ kept for now until finding out what those bytes affect...
 	<software name="flstory">
 		<description>The Fairyland Story (Japan)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<info name="gtin" value="04967948000041"/>
 		<part name="cart" interface="msx_cart">
@@ -5522,7 +5522,7 @@ kept for now until finding out what those bytes affect...
 	<software name="flstorya" cloneof="flstory">
 		<description>The Fairyland Story (Japan, alt)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<info name="gtin" value="04967948000041"/>
 		<part name="cart" interface="msx_cart">
@@ -12292,7 +12292,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	<software name="skygaldo">
 		<description>Skygaldo (Japan)</description>
 		<year>1986</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>MagicalZoo</publisher>
 		<info name="serial" value="MXMH21052" />
 		<info name="alt_title" value="スカイギャルド" />
 		<info name="gtin" value="04988614000011"/>

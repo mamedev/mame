@@ -36,7 +36,7 @@ const tiny_rom_entry *sbus_cgthree_device::device_rom_region() const
 
 void sbus_cgthree_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(sbus_cgthree_device::screen_update));
 	m_screen->set_raw(92.9405_MHz_XTAL, 1504, 0, 1152, 937, 0, 900);
 

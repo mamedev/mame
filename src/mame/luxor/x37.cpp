@@ -13,7 +13,6 @@
 
     TODO
 
-	- loadsys1 unable to mount sasi
     - tst.w 0xfffffc
 
 */
@@ -26,9 +25,9 @@
 #include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/e0516.h"
+#include "machine/eepromser.h"
 #include "machine/hd63450.h"
 #include "machine/input_merger.h"
-#include "machine/nmc9306.h"
 #include "machine/ns32081.h"
 #include "machine/watchdog.h"
 #include "machine/wd_fdc.h"
@@ -88,7 +87,7 @@ private:
 	required_device<ns32081_device> m_fpu;
 	required_device<hd63450_device> m_dmac;
 	required_device<z8536_device> m_cio;
-	required_device<nmc9306_device> m_nvram;
+	required_device<eeprom_serial_93cxx_device> m_nvram;
 	required_device<e0516_device> m_rtc;
 	required_device_array<scc8530_device, 3> m_scc;
 	required_device<fd1797_device> m_fdc;
@@ -213,7 +212,7 @@ uint16_t x37_state::ram_r(offs_t offset, uint16_t mem_mask)
 			// AT1=1, AT0=0: no access
 			if (!m_dmac_own)
 				m_cpu->set_buserror_details(offset << 1, 1, m_cpu->get_fc(), true);
-			logerror("%s: Invalid RAM read at offset %06x (MA %06x, AT1=1, AT0=0)\n", machine().describe_context(), offset<<1, ma);
+			LOG("%s: Invalid RAM read at offset %06x (MA %06x, AT1=1, AT0=0)\n", machine().describe_context(), offset<<1, ma);
 		} else if (ma < 0x400000) {
 			if (ACCESSING_BITS_0_7)
 				data |= m_ram[ma & ~1];
@@ -236,7 +235,7 @@ void x37_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// AT0=0: read-only (AT1=0) or no access (AT1=1)
 		if (!m_dmac_own)
 			m_cpu->set_buserror_details(offset << 1, 0, m_cpu->get_fc(), true);
-		logerror("%s: Invalid RAM write at offset %06x (MA %06x, AT1=%d, AT0=0)\n", machine().describe_context(), offset<<1, ma, at1);
+		LOG("%s: Invalid RAM write at offset %06x (MA %06x, AT1=%d, AT0=0)\n", machine().describe_context(), offset<<1, ma, at1);
 		return;
 	}
 
@@ -389,7 +388,7 @@ uint8_t x37_state::cio_pc_r()
 	uint8_t data = 0x0d;
 
 	// data in
-	data |= (m_rtc->dio_r() || m_nvram->do_r()) << 1;
+	data |= (m_rtc->dio_r() || m_nvram->do_read()) << 1;
 
 	return data;
 }
@@ -416,9 +415,9 @@ void x37_state::cio_pc_w(uint8_t data)
 	m_rtc->dio_w(data_out);
 	m_rtc->clk_w(clock);
 
-	m_nvram->cs_w(nvram_cs);
-	m_nvram->di_w(data_out);
-	m_nvram->sk_w(clock);
+	m_nvram->cs_write(nvram_cs);
+	m_nvram->di_write(data_out);
+	m_nvram->clk_write(clock);
 }
 
 u8 x37_state::scc_irq_ack_r()
@@ -541,7 +540,7 @@ void x37_state::x37(machine_config &config)
 	m_cio->pc_rd_cb().set(FUNC(x37_state::cio_pc_r));
 	m_cio->pc_wr_cb().set(FUNC(x37_state::cio_pc_w));
 
-	NMC9306(config, m_nvram);
+	EEPROM_93C06_16BIT(config, m_nvram);
 
 	E0516(config, m_rtc, XTAL(32'768));
 	m_rtc->outsel_rd_cb().set_constant(0);
@@ -635,8 +634,8 @@ ROM_START( x37 )
 	ROM_REGION( 0x8000, MC68010_TAG, 0 )
 	ROM_LOAD( "x37.07o", 0x0000, 0x8000, CRC(d505e7e7) SHA1(a3ad839e47b1f71c394e5ce28bce199e5e4810d2) )
 
-	//ROM_REGION( 0x20, NMC9306_TAG, 0 )
-	//ROM_LOAD( "nmc9306.05k", 0x00, 0x20, CRC(233e90a6) SHA1(f7e35dc0f2be88a191a9c1ce037e35b91a7cf1c4) )
+	ROM_REGION16_LE( 0x20, NMC9306_TAG, 0 )
+	ROM_LOAD( "nmc9306.05k", 0x00, 0x20, CRC(2a7d409a) SHA1(1bf82daa877c65fae65ebff6181fb7ed5a874797) )
 
 	ROM_REGION( 0xa28, "plds", 0 )
 	//ROM_LOAD( "pat8000", 0x000, 0x104, NO_DUMP ) // Strobe decoder for X35 video adapter
@@ -655,4 +654,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1985, x37, 0,      0,      x37, x37, x37_state, empty_init, "Luxor", "X37 (prototype)", MACHINE_NOT_WORKING )
+COMP( 1985, x37, 0,      0,      x37, x37, x37_state, empty_init, "Luxor", "X37 (prototype)", MACHINE_SUPPORTS_SAVE )

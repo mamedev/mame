@@ -549,7 +549,7 @@ void microterm_f8_state::act5a(machine_config &config)
 
 	//RS232_PORT(config, m_aux, default_rs232_devices, nullptr);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16.572_MHz_XTAL, 918, 0, 720, 301, 0, 288); // more or less guessed
 	screen.set_screen_update(FUNC(microterm_f8_state::screen_update));
 	screen.screen_vblank().set(FUNC(microterm_f8_state::vblank_w));

@@ -504,7 +504,7 @@ void cybstorm_state::round2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_cybstorm);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 32768);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_palette("palette");
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived

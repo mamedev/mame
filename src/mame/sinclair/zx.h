@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "sound/ay8910.h"
 #include "sound/spkrdev.h"
 
 #include "emupal.h"
@@ -34,6 +35,7 @@ public:
 		m_cassette(*this, "cassette"),
 		m_softlist(*this, "cass_list"),
 		m_speaker(*this, "speaker"),
+		m_psg(*this, "psg"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
 		m_io_row(*this, "ROW%u", 0U),
@@ -48,10 +50,12 @@ public:
 	void pow3000(machine_config &config);
 	void ts1500(machine_config &config);
 	void zx80(machine_config &config);
+	void tk85(machine_config &config);
 
 	void init_zx();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -63,16 +67,21 @@ private:
 	void refresh_w(offs_t offset, uint8_t data);
 	uint8_t zx80_io_r(offs_t offset);
 	uint8_t zx81_io_r(offs_t offset);
+	void pc8300_bit7_w(offs_t offset, uint8_t data);
 	uint8_t pc8300_io_r(offs_t offset);
 	uint8_t pow3000_io_r(offs_t offset);
 	void zx80_io_w(offs_t offset, uint8_t data);
 	void zx81_io_w(offs_t offset, uint8_t data);
+	void tk85_io_w(offs_t offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(zx_tape_input);
 	TIMER_CALLBACK_MEMBER(zx_ula_hsync);
 
 	void pc8300_io_map(address_map &map) ATTR_COLD;
+	void pc8300_map(address_map &map) ATTR_COLD;
 	void pow3000_io_map(address_map &map) ATTR_COLD;
+	void tk85_io_map(address_map &map) ATTR_COLD;
+	void tk85_map(address_map &map) ATTR_COLD;
 	void ula_map(address_map &map) ATTR_COLD;
 	void zx80_io_map(address_map &map) ATTR_COLD;
 	void zx80_map(address_map &map) ATTR_COLD;
@@ -84,6 +93,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<software_list_device> m_softlist;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_device<ay8910_device> m_psg;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_gfx1;
 	required_ioport_array<8> m_io_row;
@@ -102,8 +112,8 @@ private:
 	uint8_t m_prev_refresh = 0;
 	uint8_t m_speaker_state = 0;
 
-	std::unique_ptr<bitmap_ind16> m_bitmap_render;
-	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
+	bitmap_ind16 m_bitmap_render;
+	bitmap_ind16 m_bitmap_buffer;
 
 	uint16_t m_ula_char_buffer = 0;
 	double m_cassette_cur_level = 0;

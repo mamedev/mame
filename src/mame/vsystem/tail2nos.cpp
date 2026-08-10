@@ -520,7 +520,7 @@ void tail2nos_state::tail2nos(machine_config &config)
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

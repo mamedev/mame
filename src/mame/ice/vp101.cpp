@@ -563,7 +563,7 @@ void vp10x_state::vp101(machine_config &config)
 	m_maincpu->set_system_clock(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::main_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(vp10x_state::screen_update));
@@ -583,7 +583,7 @@ void vp10x_state::vp50(machine_config &config)
 	m_maincpu->set_system_clock(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::vp50_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(vp10x_state::vp50_screen_update));
@@ -664,8 +664,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2002,  specfrce,  0,          vp101,  specfrce, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002,  specfrceo, specfrce,   vp101,  specfrce, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003,  rhnation,  0,          vp50,   vp50,     vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Rhythm Nation (v01.00.04, boot v3.1.5)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 2004,  jnero,     0,          vp101,  jnero,    vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Johnny Nero Action Hero (v01.01.08)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006,  zoofari,   0,          vp50,   vp50,     vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Zoofari",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2002, specfrce,  0,        vp101, specfrce, vp10x_state, empty_init, ROT0, "ICE / Play Mechanix", "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, specfrceo, specfrce, vp101, specfrce, vp10x_state, empty_init, ROT0, "ICE / Play Mechanix", "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, rhnation,  0,        vp50,  vp50,     vp10x_state, empty_init, ROT0, "ICE / Play Mechanix", "Rhythm Nation (v01.00.04, boot v3.1.5)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, jnero,     0,        vp101, jnero,    vp10x_state, empty_init, ROT0, "ICE / Play Mechanix", "Johnny Nero Action Hero (v01.01.08)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, zoofari,   0,        vp50,  vp50,     vp10x_state, empty_init, ROT0, "ICE / Play Mechanix", "Zoofari",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

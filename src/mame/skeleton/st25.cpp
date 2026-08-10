@@ -129,19 +129,19 @@ void st25_state::io_map(address_map &map)
 
 void st25_state::program_map_st25(address_map &map)
 {
-      // ICC4 74AS138 inputs A17-19
-      // O0 - V62C518256 mirrored 4 times
-      map(0x00000, 0x07fff).ram().mirror(0x18000);
-      // O1-O3, jumper on O1, goes to ROM module
-      map(0x20000, 0x7ffff).rom().region("module", 0x20000);
-      // O4, wrapped around
-      map(0x80000, 0x9ffff).rom().region("module", 0x00000);
-      // O5, 8KB timekeeper on ROM module mirrored
-      map(0xa0000, 0xa1fff).rw(m_rtc, FUNC(m48t58_device::read), FUNC(m48t58_device::write)).mirror(0x1e000);
-      // O6 NC
-      map(0xc0000, 0xdffff).noprw();
-      // internal to CPU
-      map(0xfc000, 0xfffff).rom().region("maskrom", 0);
+	  // ICC4 74AS138 inputs A17-19
+	  // O0 - V62C518256 mirrored 4 times
+	  map(0x00000, 0x07fff).ram().mirror(0x18000);
+	  // O1-O3, jumper on O1, goes to ROM module
+	  map(0x20000, 0x7ffff).rom().region("module", 0x20000);
+	  // O4, wrapped around
+	  map(0x80000, 0x9ffff).rom().region("module", 0x00000);
+	  // O5, 8KB timekeeper on ROM module mirrored
+	  map(0xa0000, 0xa1fff).rw(m_rtc, FUNC(m48t58_device::read), FUNC(m48t58_device::write)).mirror(0x1e000);
+	  // O6 NC
+	  map(0xc0000, 0xdffff).noprw();
+	  // internal to CPU
+	  map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
 
 void st25_state::program_map_st25_1(address_map &map)
@@ -246,7 +246,7 @@ void st25_state::st25_1(machine_config &config)
 	// Serial B: Duo
 
 	// Service (1x16 character LCD)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));

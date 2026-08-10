@@ -1596,7 +1596,7 @@ void casloopy_state::system_control_w(u16 data)
 	// 224/240 line mode
 	if (BIT(m_system_control, 1) != BIT(data, 1))
 	{
-		const attoseconds_t refresh = HZ_TO_ATTOSECONDS(VIDEO_CLOCK / 4) * H_TOTAL * V_TOTAL;
+		const attotime refresh = attotime::from_ticks(H_TOTAL * V_TOTAL, VIDEO_CLOCK / 4);
 		const int v_active = BIT(data, 1) ? V_ACTIVE_1 : V_ACTIVE_0;
 
 		rectangle visarea(0, H_ACTIVE - 1, 0, v_active - 1);
@@ -2074,7 +2074,7 @@ void casloopy_state::casloopy(machine_config &config)
 	SH7021(config, m_maincpu, SH1_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VIDEO_CLOCK / 4, H_TOTAL, 0, H_ACTIVE, V_TOTAL, 0, V_ACTIVE_0);
 	m_screen->set_screen_update(FUNC(casloopy_state::screen_update));
 

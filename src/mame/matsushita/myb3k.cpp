@@ -444,7 +444,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 			{
 			LOGVMOD(" - 640x200 on 80x25  \n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 200, rect, attotime::from_hz(50));
 			break;
 		}
 
@@ -452,7 +452,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD(" - 320x200, 40 char, 8 color or 8 tones of green...\n");
 			rectangle rect(0, 320 - 1, 0, 200 - 1);
-			m_screen->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 200, rect, attotime::from_hz(50));
 		}
 		break;
 
@@ -460,7 +460,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD(" - 640x200, 80 char, white on black...\n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 200, rect, attotime::from_hz(50));
 		}
 		break;
 
@@ -476,7 +476,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD("320x400, 40 char, white on black\n");
 			rectangle rect(0, 320 - 1, 0, 400 - 1);
-			m_screen->configure(320, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 400, rect, attotime::from_hz(50));
 		}
 		break;
 
@@ -484,7 +484,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD("640x400, 80 char, white on black\n");
 			rectangle rect(0, 640 - 1, 0, 400 - 1);
-			m_screen->configure(640, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 400, rect, attotime::from_hz(50));
 		}
 		break;
 
@@ -1024,7 +1024,7 @@ void myb3k_state::myb3k(machine_config &config)
 	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* Monitor */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181) / 3, 600, 0, 600, 400, 0, 400);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 }

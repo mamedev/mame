@@ -1240,7 +1240,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("MikroMikko");
 #ifdef HAS_FORMATS_MM_DSK
 	en.add(FLOPPY_MM1_FORMAT); // mm_dsk.h
-	en.add(FLOPPY_MM2_FORMAT); // mm_dsk.h
 #endif
 
 	en.category("Elektronika");
@@ -1477,9 +1476,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
-//	en.category("NEC");
+//  en.category("NEC");
 //#ifdef HAS_FORMATS_P6001_CAS
-//	en.add(pc6001_cassette_formats); // p6001_cas.h
+//  en.add(pc6001_cassette_formats); // p6001_cas.h
 //#endif
 
 	en.category("Orao");

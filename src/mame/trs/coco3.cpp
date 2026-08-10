@@ -310,7 +310,7 @@ void coco3_state::coco3(machine_config &config)
 	COCO_VHD(config, m_vhd_1, m_maincpu);
 
 	// monitor
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, 640, 262, 1, 240);
 	m_screen->set_screen_update(FUNC(coco3_state::screen_update));
 

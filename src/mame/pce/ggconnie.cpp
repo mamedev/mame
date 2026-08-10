@@ -194,7 +194,7 @@ static INPUT_PORTS_START(ggconnie)
 	PORT_DIPSETTING(0xc0, DEF_STR(Normal))
 
 	PORT_START("SWC")
-	PORT_DIPNAME(0x03, 0x03, "Demo Sound" )  PORT_DIPLOCATION("SWC:1,2")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWC:1,2")  // "Demo Sound"
 	PORT_DIPSETTING(0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(0x01, "3/1" )
 	PORT_DIPSETTING(0x02, "2/1" )
@@ -279,7 +279,7 @@ static INPUT_PORTS_START(smf)
 	PORT_DIPSETTING(0xc0, DEF_STR(Normal))
 
 	PORT_START("SWC")
-	PORT_DIPNAME(0x03, 0x03, "Demo Sound" )  PORT_DIPLOCATION("SWC:1,2")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWC:1,2")
 	PORT_DIPSETTING(0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(0x01, "1/3" )
 	PORT_DIPSETTING(0x02, "1/2" )
@@ -408,7 +408,7 @@ void ggconnie_state::ggconnie(machine_config &config)
 	m_maincpu->add_route(1, "speaker", 1.00, 1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	screen.set_palette(m_huc6260);

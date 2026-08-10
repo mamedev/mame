@@ -267,7 +267,7 @@ void m79amb_state::m79amb(machine_config &config)
 	m_maincpu->in_inta_func().set(FUNC(m79amb_state::inta_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(19.6608_MHz_XTAL / 4, 320, 0, 256, 262, 32, 256);
 	screen.set_screen_update(FUNC(m79amb_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);

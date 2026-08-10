@@ -517,7 +517,7 @@ void psx1_state::psx_base(machine_config &config)
 	sio0.sck_handler().set("controllers", FUNC(psxcontrollerports_device::write_sck));
 	sio0.txd_handler().set("controllers", FUNC(psxcontrollerports_device::write_txd));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

@@ -110,7 +110,7 @@ void hawk_state::hawk(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hawk_state::hawk_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(hawk_state::screen_update));
 	screen.set_size(240, 64);

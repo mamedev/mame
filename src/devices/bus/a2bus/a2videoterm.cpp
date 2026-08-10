@@ -196,7 +196,7 @@ public:
 
 void a2bus_videx80_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME));
 	screen.set_raw(17.43_MHz_XTAL, 1116, 0, 720, 260, 0, 216);
 	//screen.set_raw(17.43_MHz_XTAL, 1107, 0, 720, 315, 0, 216);
 	screen.set_screen_update(VIDEOTERM_MC6845_NAME, FUNC(mc6845_device::screen_update));

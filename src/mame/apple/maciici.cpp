@@ -587,6 +587,8 @@ void maciici_state::maciixi_base(machine_config &config)
 	NCR53C80(config, m_ncr5380);
 	m_scsibus1->set_external_device(7, m_ncr5380);
 	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	m_ncr5380->drq_handler().append(m_rbv, FUNC(rbv_device::scsi_drq_w));
+	m_ncr5380->irq_handler().set(m_rbv, FUNC(rbv_device::scsi_irq_w)).invert();
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));

@@ -320,7 +320,7 @@ void trvmadns_state::trvmadns(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 261, 0, 240); // 5 MHz?
 	screen.set_screen_update(FUNC(trvmadns_state::screen_update));
 	screen.set_palette(m_palette);
@@ -431,5 +431,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY             FULLNAME                                  FLAGS
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmadns,  0,        trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

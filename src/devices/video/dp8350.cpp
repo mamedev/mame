@@ -183,7 +183,7 @@ void dp835x_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (screen().refresh_attoseconds() == 0)
+	if (!screen().configured())
 	{
 		int lines_per_frame = m_video_scan_lines + m_vblank_interval[m_60hz_refresh ? 1 : 0];
 		if (m_half_shift)
@@ -253,9 +253,9 @@ void dp835x_device::reconfigure_screen()
 	attotime refresh = clocks_to_attotime(lines_per_frame * m_dots_per_line);
 
 	if (m_half_shift)
-		screen().configure(2 * m_dots_per_line, lines_per_frame, screen().visible_area(), refresh.as_attoseconds());
+		screen().configure(2 * m_dots_per_line, lines_per_frame, screen().visible_area(), refresh);
 	else
-		screen().configure(m_dots_per_line, lines_per_frame, screen().visible_area(), refresh.as_attoseconds());
+		screen().configure(m_dots_per_line, lines_per_frame, screen().visible_area(), refresh);
 
 	logerror("Frame rate refresh: %.2f Hz (f%d); horizontal rate scan: %.4f kHz; character rate: %.4f MHz; dot rate: %.5f MHz\n",
 		refresh.as_hz(),

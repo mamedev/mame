@@ -409,7 +409,7 @@ void videosaa_state::videosaa(machine_config &config)
 	m_maincpu->portd_r().set(FUNC(videosaa_state::maincpu_portd_r));
 
 	// video hardware
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256); // 5 MHz?
 	screen.set_screen_update(FUNC(videosaa_state::screen_update));
 

@@ -2290,7 +2290,7 @@ void pspikes_banked_sound_state::pspikes(machine_config &config)
 	// IRQs are triggered by the YM2610
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(61.31);  // verified on pcb
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2337,7 +2337,7 @@ void spikes91_state::spikes91(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2366,7 +2366,7 @@ void pspikes_base_state::pspikesb(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pspikes_base_state::irq1_line_hold)); // all irq vectors are the same
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2408,7 +2408,7 @@ void pspikes_sound_cpu_state::kickball(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &pspikes_sound_cpu_state::kickball_sound_portmap);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2449,7 +2449,7 @@ void pspikes_base_state::pspikesc(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pspikes_base_state::irq1_line_hold)); // all irq vectors are the same
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2487,7 +2487,7 @@ void pspikes_banked_sound_state::karatblz(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &pspikes_banked_sound_state::spinlbrk_sound_portmap); // IRQs are triggered by the YM2610
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2535,7 +2535,7 @@ void karatblzbl_state::karatblzbl(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &karatblzbl_state::sound_portmap);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2583,7 +2583,7 @@ void pspikes_banked_sound_state::spinlbrk(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &pspikes_banked_sound_state::spinlbrk_sound_portmap); // IRQs are triggered by the YM2610
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2632,7 +2632,7 @@ void pspikes_banked_sound_state::turbofrc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &pspikes_banked_sound_state::spinlbrk_sound_portmap); // IRQs are triggered by the YM2610
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(61.31);   // verified on pcb
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2680,7 +2680,7 @@ void pspikes_banked_sound_state::aerofgtb(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &pspikes_banked_sound_state::pspikes_sound_portmap); // IRQs are triggered by the YM2610
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); // wrong but improves sprite-background synchronization
 	screen.set_size(64*8, 32*8);
@@ -2729,7 +2729,7 @@ void pspikes_sound_cpu_state::aerfboot(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pspikes_sound_cpu_state::aerfboot_sound_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); // wrong but improves sprite-background synchronization
 	screen.set_size(64*8, 32*8);
@@ -2763,7 +2763,7 @@ void pspikes_base_state::aerfboo2(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pspikes_base_state::irq2_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); // wrong but improves sprite-background synchronization
 	screen.set_size(64*8, 32*8);
@@ -2796,7 +2796,7 @@ void wbbc97_state::wbbc97(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wbbc97_state::sound_map); // IRQs are triggered by the YM3812
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

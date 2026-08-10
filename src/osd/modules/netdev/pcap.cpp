@@ -48,6 +48,7 @@ typedef int (*pcap_setfilter_fn)(pcap_t *, struct bpf_program *);
 typedef int (*pcap_sendpacket_fn)(pcap_t *, const u_char *, int);
 typedef int (*pcap_set_datalink_fn)(pcap_t *, int);
 typedef int (*pcap_dispatch_fn)(pcap_t *, int, pcap_handler, u_char *);
+typedef int (*pcap_setdirection_fn)(pcap_t *, pcap_direction_t);
 
 class pcap_module : public osd_module, public netdev_module
 {
@@ -55,7 +56,8 @@ public:
 	pcap_module() :
 		osd_module(OSD_NETDEV_PROVIDER, "pcap"), netdev_module(),
 		pcap_findalldevs_dl(nullptr), pcap_open_live_dl(nullptr), pcap_next_ex_dl(nullptr), pcap_compile_dl(nullptr),
-		pcap_close_dl(nullptr), pcap_setfilter_dl(nullptr), pcap_sendpacket_dl(nullptr), pcap_set_datalink_dl(nullptr), pcap_dispatch_dl(nullptr)
+		pcap_close_dl(nullptr), pcap_setfilter_dl(nullptr), pcap_sendpacket_dl(nullptr), pcap_set_datalink_dl(nullptr), pcap_dispatch_dl(nullptr),
+		pcap_setdirection_dl(nullptr)
 	{
 	}
 
@@ -77,6 +79,8 @@ public:
 		pcap_sendpacket_dl = pcap_dll->bind<pcap_sendpacket_fn>("pcap_sendpacket");
 		pcap_set_datalink_dl = pcap_dll->bind<pcap_set_datalink_fn>("pcap_set_datalink");
 		pcap_dispatch_dl = pcap_dll->bind<pcap_dispatch_fn>("pcap_dispatch");
+		// Optional: not present in every libpcap; a null pointer here is not an error.
+		pcap_setdirection_dl = pcap_dll->bind<pcap_setdirection_fn>("pcap_setdirection");
 
 		if (!pcap_findalldevs_dl || !pcap_open_live_dl    || !pcap_next_ex_dl   ||
 			!pcap_compile_dl     || !pcap_close_dl        || !pcap_setfilter_dl ||
@@ -114,6 +118,7 @@ private:
 	pcap_sendpacket_fn   pcap_sendpacket_dl;
 	pcap_set_datalink_fn pcap_set_datalink_dl;
 	pcap_dispatch_fn     pcap_dispatch_dl;
+	pcap_setdirection_fn pcap_setdirection_dl;
 };
 
 class pcap_module::netdev_pcap : public network_device_base
@@ -198,6 +203,15 @@ pcap_module::netdev_pcap::netdev_pcap(pcap_module &module, const char *name, net
 		(*m_module.pcap_close_dl)(m_p);
 		m_p = nullptr;
 		return;
+	}
+	// Avoid capturing our own outbound frames. On BSD-derived libpcap (macOS,
+	// FreeBSD) BPF captures both directions by default, which causes the guest
+	// to see its own ARP probes as remote conflicts over point-to-point virtual
+	// interfaces (feth, tap). Harmless on Linux (already the default).
+	if (m_module.pcap_setdirection_dl &&
+		(*m_module.pcap_setdirection_dl)(m_p, PCAP_D_IN) != 0)
+	{
+		osd_printf_warning("pcap_setdirection(PCAP_D_IN) failed on %s\n", name);
 	}
 
 #ifdef SDLMAME_MACOSX

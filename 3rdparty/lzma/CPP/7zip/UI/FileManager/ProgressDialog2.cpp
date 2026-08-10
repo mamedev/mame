@@ -23,6 +23,7 @@
 using namespace NWindows;
 
 extern HINSTANCE g_hInstance;
+extern bool g_DisableUserQuestions;
 
 static const UINT_PTR kTimerID = 3;
 
@@ -77,8 +78,9 @@ static const UInt32 kLangIDs_Colon[] =
 #define IS_DEFINED_VAL(v)     ((v) != UNDEFINED_VAL)
 
 CProgressSync::CProgressSync():
-    _stopped(false), _paused(false),
-    _bytesProgressMode(true),
+    _stopped(false),
+    _paused(false),
+    _filesProgressMode(false),
     _isDir(false),
     _totalBytes(UNDEFINED_VAL), _completedBytes(0),
     _totalFiles(UNDEFINED_VAL), _curFiles(0),
@@ -105,6 +107,13 @@ HRESULT CProgressSync::CheckStop()
     }
     ::Sleep(kPauseSleepTime);
   }
+}
+
+void CProgressSync::Clear_Stop_Status()
+{
+  CRITICAL_LOCK
+  if (_stopped)
+    _stopped = false;
 }
 
 HRESULT CProgressSync::ScanProgress(UInt64 numFiles, UInt64 totalSize, const FString &fileName, bool isDir)
@@ -241,27 +250,27 @@ void CProgressSync::AddError_Code_Name(HRESULT systemError, const wchar_t *name)
 }
 
 CProgressDialog::CProgressDialog():
-   _timer(0),
-   CompressingMode(true),
-   MainWindow(NULL)
+    _isDir(false),
+    _wasCreated(false),
+    _needClose(false),
+    _errorsWereDisplayed(false),
+    _waitCloseByCancelButton(false),
+    _cancelWasPressed(false),
+    _inCancelMessageBox(false),
+    _externalCloseMessageWasReceived(false),
+    _background(false),
+    WaitMode(false),
+    MessagesDisplayed(false),
+    CompressingMode(true),
+    ShowCompressionInfo(true),
+    _numPostedMessages(0),
+    _numAutoSizeMessages(0),
+    _numMessages(0),
+    _timer(0),
+    IconID(-1),
+    MainWindow(NULL)
 {
-  _isDir = false;
 
-  _numMessages = 0;
-  IconID = -1;
-  MessagesDisplayed = false;
-  _wasCreated = false;
-  _needClose = false;
-  _inCancelMessageBox = false;
-  _externalCloseMessageWasReceived = false;
-  
-  _numPostedMessages = 0;
-  _numAutoSizeMessages = 0;
-  _errorsWereDisplayed = false;
-  _waitCloseByCancelButton = false;
-  _cancelWasPressed = false;
-  ShowCompressionInfo = true;
-  WaitMode = false;
   if (_dialogCreatedEvent.Create() != S_OK)
     throw 1334987;
   if (_createDialogEvent.Create() != S_OK)
@@ -356,8 +365,6 @@ bool CProgressDialog::OnInit()
   _filesStr_Prev.Empty();
   _filesTotStr_Prev.Empty();
 
-  _foreground = true;
-
   m_ProgressBar.Attach(GetItem(IDC_PROGRESS1));
   _messageList.Attach(GetItem(IDL_PROGRESS_MESSAGES));
   _messageList.SetUnicodeFormat();
@@ -387,9 +394,8 @@ bool CProgressDialog::OnInit()
   SetPauseText();
   SetPriorityText();
 
-  _messageList.InsertColumn(0, L"", 30);
-  _messageList.InsertColumn(1, L"", 600);
-
+  _messageList.InsertColumn(0, L"", 40);
+  _messageList.InsertColumn(1, L"", 460);
   _messageList.SetColumnWidthAuto(0);
   _messageList.SetColumnWidthAuto(1);
 
@@ -689,7 +695,7 @@ static UInt64 MyMultAndDiv(UInt64 mult1, UInt64 mult2, UInt64 divider)
 void CProgressDialog::UpdateStatInfo(bool showAll)
 {
   UInt64 total, completed, totalFiles, completedFiles, inSize, outSize;
-  bool bytesProgressMode;
+  bool filesProgressMode;
 
   bool titleFileName_Changed;
   bool curFilePath_Changed;
@@ -703,7 +709,7 @@ void CProgressDialog::UpdateStatInfo(bool showAll)
     completedFiles = Sync._curFiles;
     inSize = Sync._inSize;
     outSize = Sync._outSize;
-    bytesProgressMode = Sync._bytesProgressMode;
+    filesProgressMode = Sync._filesProgressMode;
 
     GetChangedString(Sync._titleFileName, _titleFileName, titleFileName_Changed);
     GetChangedString(Sync._filePath, _filePath, curFilePath_Changed);
@@ -718,8 +724,8 @@ void CProgressDialog::UpdateStatInfo(bool showAll)
 
   UInt32 curTime = ::GetTickCount();
 
-  const UInt64 progressTotal = bytesProgressMode ? total : totalFiles;
-  const UInt64 progressCompleted = bytesProgressMode ? completed : completedFiles;
+  const UInt64 progressTotal = filesProgressMode ? totalFiles : total;
+  const UInt64 progressCompleted = filesProgressMode ? completedFiles : completed;
   {
     if (IS_UNDEFINED_VAL(progressTotal))
     {
@@ -899,7 +905,7 @@ void CProgressDialog::UpdateStatInfo(bool showAll)
   {
     UString s = _status;
     ReduceString(s, _numReduceSymbols);
-    SetItemText(IDT_PROGRESS_STATUS, _status);
+    SetItemText(IDT_PROGRESS_STATUS, s);
   }
 
   if (curFilePath_Changed)
@@ -977,6 +983,7 @@ INT_PTR CProgressDialog::Create(const UString &title, NWindows::CThread &thread,
   }
   thread.Wait_Close();
   if (!MessagesDisplayed)
+  if (!g_DisableUserQuestions)
     MessageBoxW(wndParent, L"Progress Error", L"7-Zip", MB_ICONERROR);
   return res;
 }
@@ -1012,7 +1019,8 @@ bool CProgressDialog::OnExternalCloseMessage()
     MessagesDisplayed = true;
     if (fm.ErrorMessage.Title.IsEmpty())
       fm.ErrorMessage.Title = "7-Zip";
-    MessageBoxW(*this, fm.ErrorMessage.Message, fm.ErrorMessage.Title, MB_ICONERROR);
+    if (!g_DisableUserQuestions)
+      MessageBoxW(*this, fm.ErrorMessage.Message, fm.ErrorMessage.Title, MB_ICONERROR);
   }
   else if (!thereAreMessages)
   {
@@ -1022,10 +1030,12 @@ bool CProgressDialog::OnExternalCloseMessage()
     {
       if (fm.OkMessage.Title.IsEmpty())
         fm.OkMessage.Title = "7-Zip";
-      MessageBoxW(*this, fm.OkMessage.Message, fm.OkMessage.Title, MB_OK);
+      if (!g_DisableUserQuestions)
+        MessageBoxW(*this, fm.OkMessage.Message, fm.OkMessage.Title, MB_OK);
     }
   }
 
+  if (!g_DisableUserQuestions)
   if (thereAreMessages && !_cancelWasPressed)
   {
     _waitCloseByCancelButton = true;
@@ -1081,12 +1091,10 @@ void CProgressDialog::SetTitleText()
   }
   if (IS_DEFINED_VAL(_prevPercentValue))
   {
-    char temp[32];
-    ConvertUInt64ToString(_prevPercentValue, temp);
-    s += temp;
-    s += '%';
+    s.Add_UInt64(_prevPercentValue);
+    s.Add_Char('%');
   }
-  if (!_foreground)
+  if (_background)
   {
     s.Add_Space();
     s += _backgrounded_String;
@@ -1133,17 +1141,17 @@ void CProgressDialog::OnPauseButton()
 
 void CProgressDialog::SetPriorityText()
 {
-  SetItemText(IDB_PROGRESS_BACKGROUND, _foreground ?
-      _background_String :
-      _foreground_String);
+  SetItemText(IDB_PROGRESS_BACKGROUND, _background ?
+      _foreground_String :
+      _background_String);
   SetTitleText();
 }
 
 void CProgressDialog::OnPriorityButton()
 {
-  _foreground = !_foreground;
+  _background = !_background;
   #ifndef UNDER_CE
-  SetPriorityClass(GetCurrentProcess(), _foreground ? NORMAL_PRIORITY_CLASS: IDLE_PRIORITY_CLASS);
+  SetPriorityClass(GetCurrentProcess(), _background ? IDLE_PRIORITY_CLASS : NORMAL_PRIORITY_CLASS);
   #endif
   SetPriorityText();
 }
@@ -1179,12 +1187,16 @@ void CProgressDialog::AddMessage(LPCWSTR message)
   _numMessages++;
 }
 
-static unsigned GetNumDigits(UInt32 val)
+static unsigned GetNumDigits(unsigned val)
 {
-  unsigned i;
-  for (i = 0; val >= 10; i++)
+  unsigned i = 0;
+  for (;;)
+  {
+    i++;
     val /= 10;
-  return i;
+    if (val == 0)
+      return i;
+  }
 }
 
 void CProgressDialog::UpdateMessagesDialog()
@@ -1192,7 +1204,7 @@ void CProgressDialog::UpdateMessagesDialog()
   UStringVector messages;
   {
     NSynchronization::CCriticalSectionLock lock(Sync._cs);
-    unsigned num = Sync.Messages.Size();
+    const unsigned num = Sync.Messages.Size();
     if (num > _numPostedMessages)
     {
       messages.ClearAndReserve(num - _numPostedMessages);
@@ -1205,7 +1217,11 @@ void CProgressDialog::UpdateMessagesDialog()
   {
     FOR_VECTOR (i, messages)
       AddMessage(messages[i]);
-    if (_numAutoSizeMessages < 256 || GetNumDigits(_numPostedMessages) > GetNumDigits(_numAutoSizeMessages))
+    // SetColumnWidthAuto() can be slow for big number of files.
+    if (_numPostedMessages < 1000000 || _numAutoSizeMessages < 100)
+    if (_numAutoSizeMessages < 100 ||
+        GetNumDigits(_numPostedMessages) >
+        GetNumDigits(_numAutoSizeMessages))
     {
       _messageList.SetColumnWidthAuto(0);
       _messageList.SetColumnWidthAuto(1);

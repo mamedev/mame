@@ -1560,7 +1560,7 @@ void ninjakd2_state::ninjakd2_core(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &ninjakd2_state::ninjakd2_sound_io);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.61);    // verified on pcb
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);

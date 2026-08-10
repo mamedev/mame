@@ -83,7 +83,6 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 	m_tms->add_route(5, "speaker", 0.5, 1);
 	m_tms->add_route(6, "speaker", 0.5, 1);
 	m_tms->add_route(7, "speaker", 0.5, 1);
-
 }
 
 ROM_START( pc9801_14 )

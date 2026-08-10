@@ -178,7 +178,7 @@ void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl32612_game_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -217,7 +217,7 @@ void generalplus_zippity_game_state::zippity(machine_config &config)
 	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_zippity_game_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

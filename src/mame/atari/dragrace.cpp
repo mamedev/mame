@@ -439,7 +439,7 @@ void dragrace_state::dragrace(machine_config &config)
 	TIMER(config, "frame_timer").configure_periodic(FUNC(dragrace_state::frame_callback), attotime::from_hz(60));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // vertical timings determined by sync PROM
 	m_screen->set_screen_update(FUNC(dragrace_state::screen_update));
 	m_screen->set_palette("palette");

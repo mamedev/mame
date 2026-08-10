@@ -10,16 +10,16 @@ TK80 driver by Robbbert
 Mikrolab driver by Micko
 Merged by Robbbert.
 
-TK80 (Training Kit 80) considered to be Japan's first home computer.
+TK-80 (Training Kit 80) considered to be Japan's first home computer.
 It consisted of 25 keys and 8 LED digits, and was programmed in hex.
+The PCB also features a small breadboard area.
 The Mikrolab is a Russian clone which appears to be almost completely identical.
 
-TK85 seems to be the same as TK80, except it has a 8085 and a larger ROM.
-No schematics etc are available. Thanks to 'Nama' who dumped the rom.
-It has 25 keys, so a few aren't defined yet.
+TK-85 has a faster 8085 CPU, larger ROM and RAM chips and an edge connector
+for expansion. Thanks to 'Nama' who dumped the ROM.
 
 ND-80Z : http://www.alles.or.jp/~thisida/nd80z3syokai.html (newer version)
-Like the TK85, it has a 2KB rom. Thanks again to 'Nama' who dumped it.
+Like the TK-85, it has a 2KB rom. Thanks again to 'Nama' who dumped it.
 
 When booted, the system begins at 0000 which is ROM. You need to change the
 address to 8000 before entering a program. Here is a test to paste in:
@@ -36,6 +36,7 @@ to scan through data without updating it. Other keys unknown/not implemented.
 
 ToDo:
 - Add storage
+- Add single step feature (causes INT on TK-80 and INT 7.5 on TK-85)
 
 
 
@@ -71,6 +72,8 @@ public:
 	void mikrolab(machine_config &config);
 	void nd80z(machine_config &config);
 	void tk85(machine_config &config);
+
+	void tk85_trap_w(int state);
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -121,6 +124,11 @@ void tk80_state::display_w(offs_t offset, uint8_t data)
 	m_digit[offset & 0x7] = data;
 }
 
+void tk80_state::tk85_trap_w(int state)
+{
+	m_maincpu->set_input_line(I8085_TRAP_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 void tk80_state::tk80_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -134,7 +142,7 @@ void tk80_state::tk80_mem(address_map &map)
 void tk80_state::tk85_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0x87ff); // A10-14 not connected
+	// upper address lines are all decoded here
 	map(0x0000, 0x07ff).rom();
 	map(0x8000, 0x83f7).ram();
 	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
@@ -260,6 +268,9 @@ static INPUT_PORTS_START( tk85 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("WR / ENT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
+
+	PORT_START("INT")
+	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MON") PORT_CODE(KEYCODE_T) PORT_WRITE_LINE_MEMBER(FUNC(tk80_state::tk85_trap_w))
 INPUT_PORTS_END
 
 uint8_t tk80_state::key_matrix_r()

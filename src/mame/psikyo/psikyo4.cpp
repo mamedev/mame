@@ -540,7 +540,7 @@ void psikyo4_state::ps4big(machine_config &config)
 	PALETTE(config, m_palette[0]).set_entries((0x2000/4) + 1); /* palette + clear colour */
 	PALETTE(config, m_palette[1]).set_entries((0x2000/4) + 1);
 
-	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lscreen);
 	m_lscreen->set_refresh_hz(60);
 	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lscreen->set_size(40*8, 32*8);
@@ -548,7 +548,7 @@ void psikyo4_state::ps4big(machine_config &config)
 	m_lscreen->set_screen_update(FUNC(psikyo4_state::screen_update<0>));
 	m_lscreen->set_palette(m_palette[0]);
 
-	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_rscreen);
 	m_rscreen->set_refresh_hz(60);
 	m_rscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_rscreen->set_size(40*8, 32*8);

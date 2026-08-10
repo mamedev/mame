@@ -1716,7 +1716,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 263);

@@ -103,7 +103,7 @@ void tamagotchi_pix_state::tamapix(machine_config &config)
 	ARM9(config, m_maincpu, 12'000'000); // not correct, needs a core with Thumb-2 support
 	m_maincpu->set_addrmap(AS_PROGRAM, &tamagotchi_pix_state::mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 256); // unknown resolution
 	m_screen->set_visarea(0, 255-1, 0, 255-1);

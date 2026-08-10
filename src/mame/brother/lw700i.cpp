@@ -284,7 +284,7 @@ void lw700i_state::lw700i(machine_config &config)
 	m_maincpu->tend2().set(m_fdc, FUNC(hd63266f_device::tc_line_w));
 	TIMER(config, "scantimer").configure_scanline(FUNC(lw700i_state::vbl_interrupt), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_screen_update(FUNC(lw700i_state::screen_update));

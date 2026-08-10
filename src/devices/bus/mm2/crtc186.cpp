@@ -30,7 +30,7 @@ crtc186_device::crtc186_device(const machine_config &mconfig, const char *tag, d
 
 void crtc186_device::map(address_map &map)
 {
-	map(0x00, 0x3f).rw(FUNC(crtc186_device::vpac_r), FUNC(crtc186_device::vpac_w));
+	map(0x00, 0x7f).rw(FUNC(crtc186_device::vpac_r), FUNC(crtc186_device::vpac_w));
 	//map(0x00, 0x01).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
 	//map(0x02, 0x03).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
 	//map(0x00, 0x3f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
@@ -62,11 +62,11 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 {
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set(FUNC(crtc186_device::int_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(71.77);
-	m_screen->set_screen_update(FUNC(crtc186_device::screen_update));
 	m_screen->set_size(800, 420);
 	m_screen->set_visarea(0, 800-1, 0, 420-1);
+	m_screen->set_screen_update(FUNC(crtc186_device::screen_update));
 
 	CRT9007(config, m_vpac, XTAL(35'452'500)/8);
 	m_vpac->set_addrmap(0, &crtc186_device::vpac_mem);
@@ -114,6 +114,8 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 
 void crtc186_device::device_start()
 {
+	m_sio->write_cts(0);
+
 	m_bus->memspace().install_ram(0xd0000, 0xd3fff, m_video_ram);
 	m_bus->memspace().install_read_tap(0xd8000, 0xdbfff, "charrom", [this](offs_t offset, uint16_t &data, uint16_t mem_mask) {
 		if (ACCESSING_BITS_0_7) {
@@ -131,8 +133,6 @@ void crtc186_device::device_start()
 	save_item(NAME(m_c70_50));
 	save_item(NAME(m_cru));
 	save_item(NAME(m_crb));
-	save_item(NAME(m_cursor_x));
-	save_item(NAME(m_cursor_y));
 }
 
 uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -150,28 +150,53 @@ uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		{
 			for (int sx = 0; sx < 80; sx++)
 			{
-				bool const cursor = (sx == m_cursor_x) && (sy == m_cursor_y);
+				bool const cursor = m_vpac->cursor_active(sx, sy);
 				offs_t const vram_addr = (sy * 80) + sx;
 				u16 const data = m_video_ram[vram_addr & 0x1fff];
 
 				offs_t const char_addr = ((data & 0x1ff) << 4) + y;
-				u8 char_data = m_char_rom->base()[char_addr & 0x1fff];
+				u8 const char_data = m_char_rom->base()[char_addr & 0x1fff];
 
 				rgb_t const bgcolor = BIT(data, 11) ? halflit() : rgb_t::white();
 
+				bool const lnel = BIT(data, 9);
+				bool const revl = BIT(data, 10);
+				bool const none = BIT(data, 12);
+				bool const bldl = BIT(data, 13);
+				bool const undl = BIT(data, 14);
+				//bool const blink = BIT(data, 15);
+
+				offs_t const attr_addr = (m_modeg << 12) | (lnel << 11) | (revl << 10) | (none << 9) | (bldl << 8) | char_data;
+				u8 attr_data = m_attr_rom->base()[attr_addr];
+
+				u8 const gap_data = bldl ? m_attr_rom->base()[attr_addr & ~0x100] : 0;
+
+				bool pixel = m_cpl;
+
 				for (int bit = 0; bit < 10; bit++)
 				{
-					bool pixel = m_cpl;
+					if (lnel && bit == 0) {
+						pixel = BIT(attr_data, 7) ^ m_cpl;
+					}
+
 					if (bit > 0 && bit < 9) {
-						pixel = BIT(char_data, 0) ^ m_cpl;
-						char_data >>= 1;
+						pixel = BIT(attr_data, 7) ^ m_cpl;
+						attr_data <<= 1;
+					}
+
+					if (!lnel && bit == 9) {
+						pixel = BIT(gap_data, 0) ^ m_cpl;
+					}
+
+					if (undl && y == 14) {
+						pixel = 1 ^ m_cpl;
 					}
 
 					if (cursor) {
 						if (!m_cru)
 							pixel ^= 1;
 						else if (m_cru && y == 14)
-							pixel = 1;
+							pixel = 1 ^ m_cpl;
 					}
 
 					bitmap.pix((sy * 15) + y, (sx * 10) + bit) = pixel ? rgb_t::black() : bgcolor;
@@ -188,7 +213,7 @@ uint16_t crtc186_device::vpac_r(offs_t offset, uint16_t mem_mask)
 	uint16_t data = 0;
 
 	if (ACCESSING_BITS_0_7) {
-		data |= m_vpac->read(offset);
+		data |= m_vpac->read(0x20 | offset);
 	}
 
 	if (ACCESSING_BITS_8_15) {
@@ -205,11 +230,6 @@ void crtc186_device::vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_vpac->write(offset, data & 0xff);
-
-		if (offset == 0x18)
-			m_cursor_y = data & 0xff;
-		else if (offset == 0x19)
-			m_cursor_x = data & 0xff;
 	}
 
 	if (ACCESSING_BITS_8_15) {

@@ -466,7 +466,7 @@ void srumbler_state::srumbler(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL / 2, 512, 80, 432, 272, 8, 248); // ~57.5Hz according to PCB video
 	screen.set_screen_update(FUNC(srumbler_state::screen_update));
 	screen.screen_vblank().set(FUNC(srumbler_state::interrupt));

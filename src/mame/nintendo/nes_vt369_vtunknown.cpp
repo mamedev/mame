@@ -1825,7 +1825,7 @@ CONS( 2018, rtvgc300pj,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
 
-	further case variations of supported units may exist with different product numbers and slightly different ROM data 
+    further case variations of supported units may exist with different product numbers and slightly different ROM data
 */
 
 // uncertain, NOT SPI ROM

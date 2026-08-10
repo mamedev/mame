@@ -1148,7 +1148,7 @@ void taitojc_state::taitojc(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(54_MHz_XTAL/3, 720, 0, 512, 449, 0, 400);
 	m_screen->set_screen_update(FUNC(taitojc_state::screen_update));
 	m_screen->set_palette(m_palette);

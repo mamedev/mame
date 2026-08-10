@@ -196,7 +196,7 @@ GFXDECODE_END
 
 void dg640_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256); // 15625 Hz horizontal
 	screen.set_screen_update(FUNC(dg640_device::screen_update));

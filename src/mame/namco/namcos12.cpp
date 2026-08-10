@@ -18,7 +18,7 @@
     - sws2001 crashes at random times in-game, and always after the opening video. You can spam insert coin and start to get in-game.
     - sws2000 also crashes after opening video
     - toukon3 has garbage graphics
-	- kartduel has unemulated link support
+    - kartduel has unemulated link support
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
@@ -1152,7 +1152,7 @@ public:
 		m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::maincpu_map);
 		m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
 
-		SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
+		SCREEN(config, "screen").screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 
 		/* basic machine hardware */
 		H83002(config, m_sub, 16934400); // frequency based on research (superctr)

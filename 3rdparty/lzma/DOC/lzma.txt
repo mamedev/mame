@@ -1,6 +1,6 @@
 LZMA compression
 ----------------
-Version: 23.01
+Version: 24.07
 
 This file describes LZMA encoding and decoding functions written in C language.
 

@@ -2,7 +2,7 @@
 // copyright-holders:A. Lenard
 /**********************************************************************
 
-	Storage Module Device Controller
+    Storage Module Device Controller
 
 Based on prior work by Christian Corti
 
@@ -48,123 +48,123 @@ been dumped yet, so currently only high-level emulation is possible.
 /* Command Register */
 enum : uint16_t
 {
-	SMD_CR_CMD_MASK	= 0x0007,
-	SMD_CR_WK		= 0x0008,	/* wakeup */
-	SMD_CR_EI		= 0x0010,	/* enable interrupts (reset by IUS) */
-	SMD_CR_DI		= 0x0020,	/* disable interrupts */
-	SMD_CR_RI		= 0x0040,	/* reset IP and IUS */
-	SMD_CR_INIT		= 0x0080,	/* initialze controller */
-	SMD_CR_DTA		= 0x0100,	/* dispatch table address or interrupt vector */
-	SMD_CR_DTA_MASK	= 0xff00
+	SMD_CR_CMD_MASK = 0x0007,
+	SMD_CR_WK       = 0x0008,   /* wakeup */
+	SMD_CR_EI       = 0x0010,   /* enable interrupts (reset by IUS) */
+	SMD_CR_DI       = 0x0020,   /* disable interrupts */
+	SMD_CR_RI       = 0x0040,   /* reset IP and IUS */
+	SMD_CR_INIT     = 0x0080,   /* initialze controller */
+	SMD_CR_DTA      = 0x0100,   /* dispatch table address or interrupt vector */
+	SMD_CR_DTA_MASK = 0xff00
 };
 
 /* Command Register Command */
 enum
 {
-	SMD_CR_CMD_NOP	= 0,
-	SMD_CR_CMD_RPA	= 1,	/* read packet address from DT */
-	SMD_CR_CMD_DTA0	= 4,	/* dispatch table address byte 0 (lsb) */
-	SMD_CR_CMD_DTA1	= 5,	/* dispatch table address byte 1 */
-	SMD_CR_CMD_DTA2	= 6,	/* dispatch table address byte 2 (msb)  */
-	SMD_CR_CMD_IV	= 7		/* interrupt vector */
+	SMD_CR_CMD_NOP  = 0,
+	SMD_CR_CMD_RPA  = 1,    /* read packet address from DT */
+	SMD_CR_CMD_DTA0 = 4,    /* dispatch table address byte 0 (lsb) */
+	SMD_CR_CMD_DTA1 = 5,    /* dispatch table address byte 1 */
+	SMD_CR_CMD_DTA2 = 6,    /* dispatch table address byte 2 (msb)  */
+	SMD_CR_CMD_IV   = 7     /* interrupt vector */
 };
 
 /* Status Register */
 enum : uint16_t
 {
-	SMD_SR_BZ		= 0x0001,	/* controller busy from CR_CMD */
-	SMD_SR_IUS		= 0x0002,	/* interrupt under service */
-	SMD_SR_IP		= 0x0004,	/* interrupt pending */
-	SMD_SR_NDT		= 0x0080,	/* no dispatch table/interrupt vector */
-	SMD_SR_ES		= 0x0100,	/* packet ST or selftest code */
-	SMD_SR_DRV		= 0x4000	/* drive number 0-3 */
+	SMD_SR_BZ       = 0x0001,   /* controller busy from CR_CMD */
+	SMD_SR_IUS      = 0x0002,   /* interrupt under service */
+	SMD_SR_IP       = 0x0004,   /* interrupt pending */
+	SMD_SR_NDT      = 0x0080,   /* no dispatch table/interrupt vector */
+	SMD_SR_ES       = 0x0100,   /* packet ST or selftest code */
+	SMD_SR_DRV      = 0x4000    /* drive number 0-3 */
 };
 
 /* Dipatch Table Packet Status */
 enum : uint16_t
 {
 	/* set by host */
-	SMD_DT_PS_IDLE	= 0,
-	SMD_DT_PS_GO	= 1,
+	SMD_DT_PS_IDLE  = 0,
+	SMD_DT_PS_GO    = 1,
 	/* set by SMDC */
-	SMD_DT_PS_BUSY	= 2,
-	SMD_DT_PS_DONE	= 4
+	SMD_DT_PS_BUSY  = 2,
+	SMD_DT_PS_DONE  = 4
 };
 
 /* Current Command */
 enum : uint16_t
 {
-	SMD_CM_CMD_MASK	= 0x00ff,
-	SMD_CM_NO		= 0x0100,	/* no offsets during retries */
-	SMD_CM_NE		= 0x0200,	/* no error correction */
-	SMD_CM_NR		= 0x0400	/* no retries, use pkt.OF */
+	SMD_CM_CMD_MASK = 0x00ff,
+	SMD_CM_NO       = 0x0100,   /* no offsets during retries */
+	SMD_CM_NE       = 0x0200,   /* no error correction */
+	SMD_CM_NR       = 0x0400    /* no retries, use pkt.OF */
 };
 
 /* Curent Command Code */
 enum
 {
-	SMD_CM_CMD_NOP	= 0,
-	SMD_CM_CMD_WRAM,		/* write RAM */
-	SMD_CM_CMD_RRAM,		/* read RAM */
-	SMD_CM_CMD_SELECT,		/* select drive */
-	SMD_CM_CMD_PRISEL,		/* priority select */
-	SMD_CM_CMD_RELEASE,		/* release */
-	SMD_CM_CMD_RESET,		/* reset fault */
-	SMD_CM_CMD_SEEK,		/* position (seek/rezero) */
-	SMD_CM_CMD_WFMT,		/* write format */
-	SMD_CM_CMD_WLONG,		/* write long */
-	SMD_CM_CMD_WRITE,		/* write */
+	SMD_CM_CMD_NOP  = 0,
+	SMD_CM_CMD_WRAM,        /* write RAM */
+	SMD_CM_CMD_RRAM,        /* read RAM */
+	SMD_CM_CMD_SELECT,      /* select drive */
+	SMD_CM_CMD_PRISEL,      /* priority select */
+	SMD_CM_CMD_RELEASE,     /* release */
+	SMD_CM_CMD_RESET,       /* reset fault */
+	SMD_CM_CMD_SEEK,        /* position (seek/rezero) */
+	SMD_CM_CMD_WFMT,        /* write format */
+	SMD_CM_CMD_WLONG,       /* write long */
+	SMD_CM_CMD_WRITE,       /* write */
 	/* 11 = reserved */
-	SMD_CM_CMD_RFMT	= 12,	/* read format */
-	SMD_CM_CMD_RLONG,		/* read long */
-	SMD_CM_CMD_READ,		/* read */
-	SMD_CM_CMD_SIZE			/* size disk */
+	SMD_CM_CMD_RFMT = 12,   /* read format */
+	SMD_CM_CMD_RLONG,       /* read long */
+	SMD_CM_CMD_READ,        /* read */
+	SMD_CM_CMD_SIZE         /* size disk */
 };
 
 /* Ending Status */
 enum : uint8_t
 {
-	SMD_ES_NOERR 	= 0,	/* no error */
-	SMD_ES_ERRINIT,			/* initialization error (no DT, IV or bad CR) */
-	SMD_ES_ERRSECTOR,		/* sector overrun error */
-	SMD_ES_ERRDMA,			/* DMA memory error returned in SR_ES */
-	SMD_ES_ERRSEL,			/* select error */
-	SMD_ES_BADCT,			/* CT invalid */
-	SMD_ES_BUSY,			/* SMD dual access busy */
-	SMD_ES_ERRSEEK,			/* multiple rezero error */
-	SMD_ES_ERRST,			/* SMD status error (see DS) */
-	SMD_ES_BADDMA,			/* odd DMA address */
-	SMD_ES_OVERFLOW,		/* pack overflow error */
-	SMD_ES_PWRFAIL,			/* power failure during read/write */
-	SMD_ES_BADCMD,			/* undefined CM_CMD */
-	SMD_ES_ERRDATA,			/* unrecovered data error */
-	SMD_ES_NOSECTOR,		/* sector not found */
-	SMD_ES_VIOL,			/* write protect violation */
+	SMD_ES_NOERR    = 0,    /* no error */
+	SMD_ES_ERRINIT,         /* initialization error (no DT, IV or bad CR) */
+	SMD_ES_ERRSECTOR,       /* sector overrun error */
+	SMD_ES_ERRDMA,          /* DMA memory error returned in SR_ES */
+	SMD_ES_ERRSEL,          /* select error */
+	SMD_ES_BADCT,           /* CT invalid */
+	SMD_ES_BUSY,            /* SMD dual access busy */
+	SMD_ES_ERRSEEK,         /* multiple rezero error */
+	SMD_ES_ERRST,           /* SMD status error (see DS) */
+	SMD_ES_BADDMA,          /* odd DMA address */
+	SMD_ES_OVERFLOW,        /* pack overflow error */
+	SMD_ES_PWRFAIL,         /* power failure during read/write */
+	SMD_ES_BADCMD,          /* undefined CM_CMD */
+	SMD_ES_ERRDATA,         /* unrecovered data error */
+	SMD_ES_NOSECTOR,        /* sector not found */
+	SMD_ES_VIOL,            /* write protect violation */
 	/* timeout errors */
-	SMD_ES_WAITIDLE = 32,	/* idle loop */
-	SMD_ES_WAITINT,			/* waiting for IP and IUS to clear */
-	SMD_ES_WAITDMA,			/* waiting for DMA to complete */
-	SMD_ES_WAITCYL,			/* waiting for SMD on-cylinder */
-	SMD_ES_WAITSRV,			/* waiting for SMD servo clock */
-	SMD_ES_WAITDCLK,		/* waiting for SMD data clock */
-	SMD_ES_WAITSECTOR,		/* waiting for sector/index mark */
-	SMD_ES_WAITID,			/* waiting for ID sync */
-	SMD_ES_WAITDATA			/* waiting for data sync */
+	SMD_ES_WAITIDLE = 32,   /* idle loop */
+	SMD_ES_WAITINT,         /* waiting for IP and IUS to clear */
+	SMD_ES_WAITDMA,         /* waiting for DMA to complete */
+	SMD_ES_WAITCYL,         /* waiting for SMD on-cylinder */
+	SMD_ES_WAITSRV,         /* waiting for SMD servo clock */
+	SMD_ES_WAITDCLK,        /* waiting for SMD data clock */
+	SMD_ES_WAITSECTOR,      /* waiting for sector/index mark */
+	SMD_ES_WAITID,          /* waiting for ID sync */
+	SMD_ES_WAITDATA         /* waiting for data sync */
 };
 
 /* Drive Select */
 enum : uint16_t
 {
-	SMD_DS_RY		= 0x0001,	/* selected drive ready */
-	SMD_DS_OC		= 0x0002,	/* selected drive on cylinder */
-	SMD_DS_SE		= 0x0004,	/* selected drive seek error */
-	SMD_DS_FT		= 0x0008,	/* selected drive fault */
-	SMD_DS_RO		= 0x0010,	/* selected drive read only */
-	SMD_DS_BZ		= 0x0020,	/* selected drive busy (dual access) */
-	SMD_DS_XM		= 0x0040,	/* index mark */
-	SMD_DS_SM		= 0x0080,	/* sector mark */
-	SMD_DS_SEL		= 0x0100,	/* ports 0-3 selected */
-	SMD_DS_SKE		= 0x1000	/* ports 0-3 seek end */
+	SMD_DS_RY       = 0x0001,   /* selected drive ready */
+	SMD_DS_OC       = 0x0002,   /* selected drive on cylinder */
+	SMD_DS_SE       = 0x0004,   /* selected drive seek error */
+	SMD_DS_FT       = 0x0008,   /* selected drive fault */
+	SMD_DS_RO       = 0x0010,   /* selected drive read only */
+	SMD_DS_BZ       = 0x0020,   /* selected drive busy (dual access) */
+	SMD_DS_XM       = 0x0040,   /* index mark */
+	SMD_DS_SM       = 0x0080,   /* sector mark */
+	SMD_DS_SEL      = 0x0100,   /* ports 0-3 selected */
+	SMD_DS_SKE      = 0x1000    /* ports 0-3 seek end */
 };
 
 constexpr uint16_t SMD_FW_VERSION = 0x1234;
@@ -198,11 +198,11 @@ protected:
 private:
 	struct smd_dispatch_table
 	{
-		uint16_t PS[4];		/* packet status */
+		uint16_t PS[4];     /* packet status */
 		struct
 		{
-			uint16_t PH;	/* packet address msh */
-			uint16_t PL;	/* packet address lsh */
+			uint16_t PH;    /* packet address msh */
+			uint16_t PL;    /* packet address lsh */
 		} PA[4];
 	};
 
@@ -226,19 +226,19 @@ private:
 
 	/* data buffers */
 	uint8_t m_buffer[512];
-	uint16_t m_dt[12];	/* dispatch table */
-	uint16_t m_pkt[16];	/* packet */
+	uint16_t m_dt[12];  /* dispatch table */
+	uint16_t m_pkt[16]; /* packet */
 
 	/* dispatch table address */
-	uint16_t m_dta_seg;	/* address high word */
+	uint16_t m_dta_seg; /* address high word */
 	uint16_t m_dta_ofs; /* address low word */
 	offs_t m_dta_idx;
 
-	uint16_t m_status;	/* status register */
-	uint8_t m_drv;		/* drive number 0-3 */
-	uint8_t m_es;		/* packet command ending status */
-	uint8_t m_iv;		/* interrupt vector */
-	bool m_ie;			/* interrupt enable */
+	uint16_t m_status;  /* status register */
+	uint8_t m_drv;      /* drive number 0-3 */
+	uint8_t m_es;       /* packet command ending status */
+	uint8_t m_iv;       /* interrupt vector */
+	bool m_ie;          /* interrupt enable */
 	bool m_wakeup;
 
 	int m_init_left;
@@ -341,7 +341,7 @@ void zbi_s8k_smdc_card_device::write(uint16_t data)
 	{
 		m_wakeup = true;
 		m_status |= SMD_SR_BZ;
-		m_update_timer->adjust(attotime::from_nsec(180));	/* bus frequency */
+		m_update_timer->adjust(attotime::from_nsec(180));   /* bus frequency */
 	}
 
 	if (data & SMD_CR_EI)
@@ -527,7 +527,7 @@ void zbi_s8k_smdc_card_device::busdaisy_req_ack()
 	m_busreq_state = CLEAR_LINE;
 	m_bus->busreq_w(m_busreq_state);
 
-	m_update_timer->adjust(attotime::from_nsec(180));	/* bus frequency */
+	m_update_timer->adjust(attotime::from_nsec(180));   /* bus frequency */
 }
 
 //-------------------------------------------------
@@ -597,11 +597,11 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 
 	switch (pkt->CM & SMD_CM_CMD_MASK)
 	{
-	case SMD_CM_CMD_NOP:		/* NOP */
+	case SMD_CM_CMD_NOP:        /* NOP */
 		pkt->CT = SMD_FW_VERSION;
 		break;
 
-	case SMD_CM_CMD_SELECT:		/* select drive */
+	case SMD_CM_CMD_SELECT:     /* select drive */
 		LOGCMD("%s SMDC select unit %d\n", machine().describe_context(), unit);
 		if (!drv_good)
 		{
@@ -610,11 +610,11 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		}
 		break;
 
-	case SMD_CM_CMD_RESET:		/* reset fault */
+	case SMD_CM_CMD_RESET:      /* reset fault */
 		pkt->DS &= ~SMD_DS_FT;
 		break;
 
-	case SMD_CM_CMD_SEEK:		/* seek */
+	case SMD_CM_CMD_SEEK:       /* seek */
 		if (pkt->CY == 0xffff)
 		{
 			/* rezero drive and reset fault */
@@ -631,7 +631,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		}
 		break;
 
-	case SMD_CM_CMD_WRITE:		/* write */
+	case SMD_CM_CMD_WRITE:      /* write */
 		LOGWRITE("%s SMD write: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				 unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
@@ -676,7 +676,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		}
 		break;
 
-	case SMD_CM_CMD_READ:		/* read */
+	case SMD_CM_CMD_READ:       /* read */
 		LOGREAD("%s SMD read: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
@@ -723,7 +723,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		}
 		break;
 
-	case SMD_CM_CMD_SIZE:	/* size disk */
+	case SMD_CM_CMD_SIZE:   /* size disk */
 		if (drv_good)
 		{
 			pkt->CY = file->get_info().cylinders;

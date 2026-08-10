@@ -566,7 +566,7 @@ void groundfx_state::groundfx(machine_config &config)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -668,4 +668,4 @@ void groundfx_state::init_groundfx()
 } // anonymous namespace
 
 
-GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, init_groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, init_groundfx, ROT0, "Taito", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

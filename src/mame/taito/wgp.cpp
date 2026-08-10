@@ -1663,7 +1663,7 @@ void wgp_state::wgp(machine_config &config)
 	adc.in_callback<5>().set(FUNC(wgp_state::unknown_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -2014,11 +2014,11 @@ void wgp_state::init_wgp2()
 } // anonymous namespace
 
 
-GAME( 1989, wgp,     0,    wgp,  wgp,    wgp_state, init_wgp,  ROT0, "Taito Corporation Japan",   "WGP: Real Race Feeling (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpu,    wgp,  wgp,  wgpu,   wgp_state, init_wgp,  ROT0, "Taito America Corporation", "WGP: Real Race Feeling (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpj,    wgp,  wgp,  wgpj,   wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpjoy,  wgp,  wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpjoya, wgp,  wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgp,     0,    wgp,  wgp,    wgp_state, init_wgp,  ROT0, "Taito",         "WGP: Real Race Feeling (World)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpu,    wgp,  wgp,  wgpu,   wgp_state, init_wgp,  ROT0, "Taito America", "WGP: Real Race Feeling (US)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpj,    wgp,  wgp,  wgpj,   wgp_state, init_wgp,  ROT0, "Taito",         "WGP: Real Race Feeling (Japan)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoy,  wgp,  wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito",         "WGP: Real Race Feeling (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoya, wgp,  wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito",         "WGP: Real Race Feeling (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, wgp2,    0,    wgp2, wgp,    wgp_state, init_wgp2, ROT0, "Taito Corporation Japan",   "WGP 2: Real Race Feeling (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wgp2j,   wgp2, wgp2, wgp2,   wgp_state, init_wgp2, ROT0, "Taito Corporation",         "WGP 2: Real Race Feeling (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wgp2,    0,    wgp2, wgp,    wgp_state, init_wgp2, ROT0, "Taito",         "WGP 2: Real Race Feeling (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wgp2j,   wgp2, wgp2, wgp2,   wgp_state, init_wgp2, ROT0, "Taito",         "WGP 2: Real Race Feeling (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

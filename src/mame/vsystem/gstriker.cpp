@@ -653,7 +653,7 @@ void gstriker_state::base(machine_config &config)
 
 	MB3773(config, m_watchdog);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5000)); // hand-tuned, it needs a bit
@@ -1292,9 +1292,10 @@ void gstriker_state::init_vgoalsoc()
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Europe, Oceania)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Americas)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Japan)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// on flyer, company name is "Human Entertainment" and subtitle is "Human Cup '93"
+GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Europe, Oceania)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Americas)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Japan)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Similar, but not identical hardware, appear to be protected by an MCU
 GAME( 1994, vgoalsoc,  0,        vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra

@@ -22,6 +22,7 @@
 #include "fileio.h"
 #include "main.h"
 #include "screen.h"
+#include "sound.h"
 #include "uiinput.h"
 
 #include "corestr.h"

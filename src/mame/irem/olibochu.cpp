@@ -576,7 +576,7 @@ void olibochu_state::olibochu(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &olibochu_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 256, 256, 8, 248);
 	m_screen->set_screen_update(FUNC(olibochu_state::screen_update));
 	m_screen->set_palette(m_palette);

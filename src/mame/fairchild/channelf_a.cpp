@@ -98,7 +98,7 @@ void channelf_sound_device::sound_stream_update(sound_stream &stream)
 		if ((m_forced_ontime > 0) || ((m_sample_counter & mask) == target))   //  change made for improved sound
 			stream.put_int(0, sampindex, m_envelope, 32768);
 		else
-			stream.put(1, sampindex, 0);
+			stream.put(0, sampindex, 0);
 		m_sample_counter += m_incr;
 		m_envelope *= m_decay_mult;
 		if (m_forced_ontime > 0)          //  added for improved sound

@@ -618,7 +618,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 
 	I2C_24C01(config, m_i2cmem);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");

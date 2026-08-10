@@ -191,7 +191,7 @@
 #include "video/hd44780.h"
 #include "video/pwm.h"
 #include "emupal.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include "ap10.lh"
@@ -294,7 +294,7 @@ private:
 	uint8_t m_lcd_data{};
 	uint32_t m_dsp_data{};
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_update(screen_svg_device &screen);
 };
 
 INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
@@ -375,7 +375,7 @@ void ctk551_state::apo_w(int state)
 }
 
 
-u32 ctk551_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void ctk551_state::screen_update(screen_svg_device &screen)
 {
 	const u8 *render = m_lcdc->render();
 	for(int x=0; x != 64; x++) {
@@ -386,8 +386,6 @@ u32 ctk551_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		}
 		render += 8;
 	}
-
-	return 0;
 }
 
 
@@ -564,11 +562,10 @@ void ctk551_state::ctk601(machine_config& config)
 	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be SED1278F2A (custom mask variant of SED1278F0A?); clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
-	auto& screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto& screen = SCREEN_SVG(config, "screen");
 	screen.set_refresh_hz(60);
 	screen.set_size(1000, 424);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(ctk551_state::screen_update));
+	screen.set_screen_svg_update(FUNC(ctk551_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -605,11 +602,10 @@ void ctk551_state::ctk551(machine_config &config)
 	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be SED1278F2A (custom mask variant of SED1278F0A?); clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto &screen = SCREEN_SVG(config, "screen");
 	screen.set_refresh_hz(60);
 	screen.set_size(1000, 737);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(ctk551_state::screen_update));
+	screen.set_screen_svg_update(FUNC(ctk551_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 

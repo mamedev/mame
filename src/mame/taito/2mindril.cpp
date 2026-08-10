@@ -364,7 +364,7 @@ void _2mindril_state::drill(machine_config &config)
 	tc0510nio.write_4_callback().set(FUNC(_2mindril_state::coins_w));
 	tc0510nio.read_7_callback().set_ioport("COINS");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
 	m_screen->set_size(40*8+48*2, 32*8);
@@ -432,6 +432,6 @@ void _2mindril_state::init_drill()
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT    MACHINE  INPUT  CLASS            INIT        ROT   COMPANY                      FULLNAME                                   FLAGS
-GAME( 1993, 2mindril,  0,        drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
-GAME( 1993, 2mindrila, 2mindril, drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.2A 1993/10/18)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+//    YEAR  NAME       PARENT    MACHINE  INPUT  CLASS            INIT        ROT   COMPANY          FULLNAME                                   FLAGS
+GAME( 1993, 2mindril,  0,        drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+GAME( 1993, 2mindrila, 2mindril, drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America", "Two Minute Drill (Ver 2.2A 1993/10/18)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

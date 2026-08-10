@@ -372,7 +372,7 @@ void cheekyms_state::cheekyms(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cheekyms_state::io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10.816_MHz_XTAL / 2, 352, 0, 256, 262, 32, 224);
 	m_screen->set_screen_update(FUNC(cheekyms_state::screen_update));
 	m_screen->set_palette(m_palette);

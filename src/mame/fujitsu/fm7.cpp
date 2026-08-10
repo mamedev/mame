@@ -1896,7 +1896,7 @@ void fm7_state::fm7(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200); // H = 15.75 KHz, V = 60.1145 Hz
 	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
@@ -1949,7 +1949,7 @@ void fm7_state::fm8(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
@@ -2008,7 +2008,7 @@ void fm77_state::fm77av(machine_config &config)
 	}
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(fm77_state::screen_update_fm7));
 
@@ -2071,7 +2071,7 @@ void fm11_state::fm11(machine_config &config)
 	}
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(fm11_state::screen_update_fm7));
 
@@ -2118,7 +2118,7 @@ void fm7_state::fm16beta(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
