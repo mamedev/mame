@@ -231,7 +231,7 @@ int pcap_module::netdev_pcap::send(void const *buf, int len)
 	}
 	int ret = (*m_module.pcap_sendpacket_dl)(m_p, reinterpret_cast<const u_char *>(buf), len);
 	printf("sent packet length %d, returned %d\n", len, ret);
-	return ret ? len : 0;
+	return !ret ? len : 0;
 	//return (!pcap_sendpacket_dl(m_p, reinterpret_cast<const u_char *>(buf), len)) ? len : 0;
 }
 
