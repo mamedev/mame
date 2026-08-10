@@ -8636,6 +8636,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	// several games attempt to use sprite window with an illegal type 1
 	// even if document explicitly states they won't work.
 	// (reportedly seen with a SPCTL of 0x30f1, and bits 7 & 6 are <undefined> there).
+	// - kingbox (gameplay, sets 0x3031)
 	// - raymanj (corrupted tiles when showing stage intro)
 	// - sandor (player feet during attract intro)
 	// - samsho4 (character select & gameplay)
@@ -8705,7 +8706,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						// TODO: Pretty Fighter X doesn't read what's behind on title screen, VDP1 bug?
 						// TODO: seldomly Game Tengoku shadows aren't drawn properly
 						// TODO: allegedly can't enable this with sprite window (verify)
-						if(pix & 0x8000 && VDP2_SDCTL & 0x100 && !VDP2_SPWINEN)
+						if(pix & 0x8000 && VDP2_SDCTL & 0x100 && !sprite_window)
 						{
 							rgb_t p = bitmap_line[x];
 							bitmap_line[x] = rgb_t(p.r() >> 1, p.g() >> 1, p.b() >> 1);

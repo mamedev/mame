@@ -2647,6 +2647,7 @@ saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_filterdata(filterT *f
 	{
 		// FAD range check?
 		/* according to an obscure document note, this switches the filter connector to be false if the range fails ... I think ... */
+		// timegal, falcom2 uses this
 		if (flt->mode & 0x40)
 		{
 			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))

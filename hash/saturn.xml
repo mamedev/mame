@@ -1275,7 +1275,7 @@ Randomly crashes between startup and gameplay [CD-Block]
 		<year>1996</year>
 		<publisher>Game Studio</publisher>
 		<notes><![CDATA[
-[VDP1] or [VDP2] missing cursor for name entry
+[VDP1] or [VDP2] missing cursor for name entry (btanb, cursor is the pink princess)
 Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-20301G"/>
@@ -1294,9 +1294,12 @@ Not extensively tested
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
-Offset cursor in name select [VDP1]
+[VDP1] offset cursor in name select
 [VDP1] currently too fast in places
+[VDP1] water steps in Underground Caverns doesn't clamp nearby (cfr. https://www.youtube.com/watch?v=H6Db-Z8QIbI&t=8468s)
 [VDP2] doesn't cut off top of GFXs in magic device screen (3rd option in pause menu, scroll up/down)
+[VDP2] has weird full screen Color Calculation yellow in Mermaid room at Castle Entrance (TODO: check inverted castle)
+No overscan in places (cfr. Underground Caverns near boss room)
 ]]></notes>
 		<info name="serial" value="T-9527G (VS010-J1)"/>
 		<info name="release" value="19980625"/>
@@ -1451,13 +1454,13 @@ Hardlocks at boot, [SCU] DMA-ing in VDP2 RAM with max sizes
 		</part>
 	</software>
 
-	<software name="wonder3" supported="no">
+	<software name="wonder3" supported="partial">
 		<description>Arcade Gears Vol. 3 - Wonder 3 (Japan)</description>
 		<year>1998</year>
 		<publisher>Xing</publisher>
 		<notes><![CDATA[
-Rooster: unstable, randomly hangs particularly with game overs, [DRC]?
-Chariot and Don't Pull untested
+Rooster: has [VDP1] [VDP2] priority bugs in places, cfr. stage 1-2
+Chariot: [VDP1] sprites are one frame ahead (cfr. stage 1 big sprite boss)
 ]]></notes>
 		<info name="serial" value="T-26107G"/>
 		<info name="release" value="19980305"/>
@@ -1476,7 +1479,6 @@ Chariot and Don't Pull untested
 		<publisher>Xing</publisher>
 		<notes><![CDATA[
 Image Fight has serious [VDP1] [VDP2] video bugs (missing layers, misaligned layers, no options text is displayed ...)
-Crashes often after Xing logo with [DRC]
 ]]></notes>
 		<info name="serial" value="T-26110G"/>
 		<info name="release" value="19980820"/>
@@ -1944,8 +1946,8 @@ Black screen when accessing collection menu
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
-[DRC] abruptly abort Konami logo FMV, crashes
 FMV logo and in-game speeches are off-sync [CD-Block]
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-9507G (VS026-J1)"/>
 		<info name="release" value="19951215"/>
@@ -2033,7 +2035,7 @@ FMV logo and in-game speeches are off-sync [CD-Block]
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen (and SIGSEGV with [DRC]) on FMVs, [CD-Block] transfers 1 sector at a time but actual transfers are way ahead.
+Black screen on FMVs (or SIGSEGV crash), [CD-Block] transfers 1 sector at a time but actual transfers are way ahead.
 Runs slow in gameplay
 ]]></notes>
 		<info name="serial" value="GS-9131"/>
@@ -2220,7 +2222,7 @@ Not extensively tested
 		<publisher>Climax</publisher>
 		<notes><![CDATA[
 CHD is missing index data from track 2
-[DRC] crashes after pressing start
+Black screens after initial intro [CD-Block]?
 Sound test is incredibly dark [VDP2]
 Some kanji drawings are dubious (verify)
 ]]></notes>
@@ -2528,7 +2530,8 @@ https://segaretro.org/Delisoba_Deluxe
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<notes><![CDATA[
-Crashes with [DRC] if FMV is left playing for a bit, skipped then starting a new game
+Crashes with DRC if FMV is left playing for a bit, skipped then starting a new game (can't repro, assume fixed)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-14420G"/>
 		<info name="release" value="19971113"/>
@@ -2657,14 +2660,15 @@ Crashes with [DRC] if FMV is left playing for a bit, skipped then starting a new
 		</part>
 	</software>
 
-	<!-- Hangs at now loading screen with Cave logo with [DRC] on -->
-	<!-- Right edge of screen has empty blue line on gameplay [VDP2] -->
-	<!-- Setting game in Tate Mode will often black screen Arcade Mode attract, sometimes gameplay too. -->
-	<!-- First boss initial GFX composition diverges compared to Arcade version [VDP1] -->
 	<software name="ddonpach" supported="no">
 		<description>DoDonPachi (Japan)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+Right edge of screen has empty blue line on gameplay [VDP2]
+Setting game in Tate Mode will mostly black screen, possibly unemulated [VDP1] framebuffer rotation
+First boss initial GFX composition diverges compared to Arcade version [VDP1]
+]]></notes>
 		<info name="serial" value="T-14419G"/>
 		<info name="release" value="19970918"/>
 		<info name="alt_title" value="怒首領蜂"/>
@@ -3065,7 +3069,6 @@ Serious [VDP2] Window clipping issues
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Dragon Slayer crashes with [DRC] during the initial loading (known to execute in cache on slave CPU while [CD-Block] updates code)
 Dragon Slayer [SCSP] sound eventually dies during gameplay.
 Xanadu/Ys 1 not extensively tested
 ]]></notes>
@@ -3085,7 +3088,10 @@ Xanadu/Ys 1 not extensively tested
 		<year>1998</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Doesn't recognize start button on title screen, [CD-Block] related
+Doesn't recognize start button on title screen, [CD-Block] related (fixed)
+Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV [CD-Block]
+Asteka II: requires [VDP1] sprite delay (cfr. main map scrolling)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-31505G"/>
 		<info name="release" value="19981029"/>
@@ -3114,14 +3120,16 @@ Doesn't recognize start button on title screen, [CD-Block] related
 		</part>
 	</software>
 
-	<!-- On gameplay most characters draw garbage, [CD-Block] never starts most transfers -->
-	<!-- redbook audio don't playback, probably related to above. -->
-	<!-- Clears [VDP1] framebuffer every 2 frames, intentional? -->
-	<!-- Accesses ROM space at first boot, disabled debugging code? -->
 	<software name="fhdyna" supported="no">
 		<description>Fighter's History Dynamite (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+On gameplay most characters draw garbage, [CD-Block] never starts most transfers (fixed?)
+Clears [VDP1] framebuffer every 2 frames, intentional? (can't repro, assume fixed)
+Accesses ROM space at first boot, disabled debugging code?
+[SCSP] or [CD-Block] throws corrupted samples here and there (cfr. announcer "round N, fight")
+]]></notes>
 		<info name="serial" value="GS-9107"/>
 		<info name="release" value="19970704"/>
 		<info name="alt_title" value="ファイターズヒストリー・ダイナマイト"/>
@@ -3409,12 +3417,14 @@ Visible sprite/background desync during gameplay
 		</part>
 	</software>
 
-	<!-- Black screen after "Lotte Green Gum" FMV with [DRC] -->
-	<!-- Triggers fnum rejects [CD-Block] -->
 	<software name="gware3" supported="no">
 		<description>Game-Ware Vol. 3 (Japan)</description>
 		<year>1996</year>
 		<publisher>General Entertainment</publisher>
+		<notes><![CDATA[
+Triggers fnum rejects [CD-Block]
+Not extensively tested (Torico FMV playback works)
+]]></notes>
 		<info name="serial" value="T-17004G"/>
 		<info name="release" value="19961004"/>
 		<info name="alt_title" value="ゲームウェア3号"/>
@@ -3617,13 +3627,15 @@ Visible sprite/background desync during gameplay
 		</part>
 	</software>
 
-	<!-- SIGSEGV with [DRC] after starting a game -->
-	<!-- Selected team flags and in-game shadows sports zooming errors [VDP1] -->
-	<!-- Stadium select wireframes sports stippled oblique polylines [VDP1] -->
 	<software name="gnine96" supported="no">
 		<description>Greatest Nine '96 (Japan, 2M)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+SIGSEGV with [DRC] after starting a game, check [CD-Block] too
+Selected team flags and in-game shadows sports zooming errors [VDP1]
+Stadium select wireframes sports stippled oblique polylines [VDP1]
+]]></notes>
 		<info name="serial" value="GS-9086"/>
 		<info name="release" value="19960719"/>
 		<info name="alt_title" value="グレイテストナイン'96"/>
@@ -3667,11 +3679,14 @@ Visible sprite/background desync during gameplay
 		</part>
 	</software>
 
-	<!-- Doesn't read file ID of "Illust Gallery" / "Charactor Index" / ending(s?), [CD-Block] doesn't read root directory properly -->
 	<software name="gunbird" supported="no">
 		<description>Gunbird (Japan)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+Randomly fatalerror in [CD-Block] XFERTYPE_FILEINFO_1 with read file ID not found when accessing "Illust Gallery" / "Charactor Index" / ending(s?)
+"Charactor Index" has no [CD-Block] redbook playback
+]]></notes>
 		<info name="serial" value="T-14402G"/>
 		<info name="release" value="19951215"/>
 		<info name="alt_title" value="ガンバード"/>
@@ -3782,12 +3797,14 @@ Visible sprite/background desync during gameplay
 		</part>
 	</software>
 
-	<!-- Black screen after Sega logo with [DRC] -->
-	<!-- "Hold Your Fire" screen has empty last screen line, TODO: verify on real HW -->
 	<software name="hotdj" cloneof="hotd" supported="no">
 		<description>The House of the Dead (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen after Sega logo with [DRC], check [CD-Block] too
+"Hold Your Fire" screen has empty last screen line, TODO: verify on real HW
+]]></notes>
 		<info name="serial" value="GS-9173"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="ザ ハウス オブ ザ デッド"/>
@@ -4293,9 +4310,9 @@ May hang after skipping initial FMV (random)
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<notes><![CDATA[
-FMV playback is very glitchy [CD-Block]
-Gameplay back layer still shows the main menu instead of being black filled [VDP2]
+FMV playback glitches out a few frames [CD-Block]
 Known to use [SCUDSP]
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-6001G"/>
 		<info name="release" value="19951020"/>
@@ -4619,7 +4636,8 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		<year>1998</year>
 		<publisher>Asmik</publisher>
 		<notes><![CDATA[
-Crashes after FMV in [DRC], either by skipping it or not
+[VDP2] Fujiko now loading screen has cutoff tiles on bottom (verify)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-2004G"/>
 		<info name="release" value="19980806"/>
@@ -4696,11 +4714,14 @@ Crashes after FMV in [DRC], either by skipping it or not
 		</part>
 	</software>
 
-	<!-- Identifying Magical Drop III - Toretate Zoukangou! (Japan) (2M)... -->
 	<software name="magdrop3" supported="no">
 		<description>Magical Drop III - Toretate Zoukangou! (Japan, 2M)</description>
 		<year>1997</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Startup logos and character select have incorrect [VDP2] color calculation
+Colors are blackened on intro (can be skipped with start button), [VDP2] or [CD-Block]
+]]></notes>
 		<info name="serial" value="T-1313G"/>
 		<info name="release" value="19970620"/>
 		<info name="alt_title" value="マジカルドロップⅢ とれたて増刊号!"/>
@@ -4878,11 +4899,14 @@ Crashes after FMV in [DRC], either by skipping it or not
 		</part>
 	</software>
 
-	<!-- Identifying Marvel Super Heroes (Japan)... -->
-	<software name="mshj" cloneof="msh" supported="no">
+	<software name="mshj" cloneof="msh" supported="partial">
 		<description>Marvel Super Heroes (Japan)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+May hang when trying to save (verify)
+After ending, cuts off "Today's Result" [VDP2] gfx text on right side (btanb, not adapted to H352 properly)
+]]></notes>
 		<info name="serial" value="T-1215G"/>
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="マーヴル・スーパーヒーローズ"/>
@@ -4894,12 +4918,12 @@ Crashes after FMV in [DRC], either by skipping it or not
 		</part>
 	</software>
 
-	<software name="mshvssf" supported="no">
+	<software name="mshvssf" supported="partial">
 		<description>Marvel Super Heroes vs. Street Fighter (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-Not extensively tested
+Can randomly fail with A+B+C+Start resets
 ]]></notes>
 		<info name="serial" value="T-1239G"/>
 		<info name="release" value="19981022"/>
@@ -4929,8 +4953,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Metal Slug - Super Vehicle-001 (Japan)... -->
-	<software name="mslug" supported="no">
+	<software name="mslug" supported="partial">
 		<description>Metal Slug - Super Vehicle-001 (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
@@ -5022,11 +5045,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Mr. Bones (Japan) (Disc 1)... -->
 	<software name="mrbonesj" cloneof="mrbones" supported="no">
 		<description>Mr. Bones (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[CD-Block] hangs during intro FMV
+TODO: checkout why this set has 1 disc only
+]]></notes>
 		<info name="serial" value="GS-9127"/>
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ミスター・ボーンズ"/>
@@ -6846,7 +6872,7 @@ Not extensively tested
 		<year>1997</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
-Crashes in [DRC] when accessing options menu
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-4804G"/>
 		<info name="release" value="19970117"/>
@@ -7735,11 +7761,14 @@ Black screen, known to issue a double 0x04 software reset in [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Time Bokan Series - Bokan to Ippatsu! Doronboo Kanpekiban (Japan)... -->
-	<software name="timeboka" supported="no">
+	<software name="timeboka" supported="partial">
 		<description>Time Bokan Series - Bokan to Ippatsu! Doronboo Kanpekiban (Japan)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
+		<notes><![CDATA[
+Throws harmless [VDP1] illegal 0f on game overs
+Mednafen claims 68k should address error before stage 1 boss, can't repro
+]]></notes>
 		<info name="serial" value="T-20607G"/>
 		<info name="release" value="19970925"/>
 		<info name="alt_title" value="タイムボカンシリーズ ボカンと一発!ドロンボー 完璧版"/>
@@ -9042,14 +9071,16 @@ Performance is dire in gameplay [VDP2]
 		</part>
 	</software>
 
-	<!-- FMV playbacks are jumpy [CD-Block] -->
-	<!-- Crashes in [DRC] after FMV playback -->
-	<!-- Can trip illegal sprite entries at FMV playback after beating prologue boss [VDP1] -->
-	<!-- [VDP2] window effect is doubled in X axis on world map, it also doesn't sport the leftmost unmasked line (real HW bug) -->
 	<software name="cknight2j" cloneof="cknight2" supported="no">
 		<description>Clockwork Knight - Pepperouchau no Daibouken Gekan (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+FMV playbacks are jumpy [CD-Block]
+Can trip illegal sprite entries 0b at FMV playback after beating prologue boss [VDP1]
+[VDP2] window effect is doubled in X axis on world map, it also doesn't sport the leftmost unmasked line (real HW bug)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9029"/>
 		<info name="release" value="19950728"/>
 		<info name="alt_title" value="クロックワーク ナイト 〜ペパルーチョの大冒険・下巻〜"/>
@@ -9431,8 +9462,7 @@ Performance is dire in gameplay [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Doukonban ~ Metal Slug (JAP) (v1.002) (DW0073)... -->
-	<software name="mslugdouk" cloneof="mslug" supported="no">
+	<software name="mslugdouk" cloneof="mslug" supported="partial">
 		<description>Metal Slug - Kakuchou Ram Doukon Okaidoku Set!! (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
@@ -9502,22 +9532,25 @@ Performance is dire in gameplay [VDP2]
 		</part>
 	</software>
 
-	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
-	<!-- Moans about modem not connected off the bat, pings [CD-Block] specific I/O for status (kludged to work) -->
-	<!-- With [DRC] on it moans that the "backup RAM is unformatted", it actually tries to access wrong pointers and eventually corrupts it out -->
-	<!-- Title screen drawing cuts off backgrounds with black pens [VDP2] -->
-	<!-- Options menu doesn't show background layer(s) [VDP2] -->
-	<!-- Keyboard inputs doesn't work -->
-	<!-- Presumably dies when actually accessing Nifty Serve details -->
-	<!-- Attract mode draws only skill names and attribute bars over a black BG, enables [VDP2] Sprite Window -->
 	<software name="dragndrm" supported="no">
 		<description>Dragon's Dream (Japan)</description>
 		<year>1997?</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Dragon%27s_Dream
+https://github.com/likeagfeld/DragonsDreamDecomp
+Pings [CD-Block] HIRM register, no noticeable effect?
+Moans about [modem] not connected off the bat, pings [CD-Block] specific I/O for status (allegedly kludged to work, but doesn't work anymore?)
+Title screen drawing cuts off backgrounds with black pens [VDP2]
+Options menu doesn't show background layer(s) [VDP2]
+Keyboard inputs doesn't work (verify, should be fixed)
+Presumably dies when actually accessing Nifty Serve details
+Attract mode draws only skill names and attribute bars over a black BG, enables [VDP2] Sprite Window
+]]></notes>
 		<info name="serial" value="GS-7114"/>
 		<info name="release" value="19971220?"/>
 		<info name="alt_title" value="ドラゴンズドリーム"/>
-		<info name="usage" value="Needs Netlink modem and keyboard connected to port 2"/>
+		<info name="usage" value="Needs Sega Saturn Modem and keyboard connected to port 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9763,7 +9796,6 @@ Performance is dire in gameplay [VDP2]
 		<notes><![CDATA[
 Sound balancing on main menu is quite off bass wise (verified on real HW) [SCSP]
 Shows incorrect tilemap wrapping transitions on main menu [VDP2]
-SIGSEGV in Circuit Mode before the "now loading" screen with [DRC]
 Shows inaccurate fully transparent blending for lights on the Circuit Mode "now loading" screens [VDP1] [VDP2]
 Circuit Mode "now loading" background meshes for wrestlers have wrong patterns (expected: squared NxN, actual: oblique, verified on real HW) [VDP1]
 Circuit Mode "now loading" start skip is available too early (expected: around the second character to be presented, actual: in the middle of first character, verified on real HW) [CD-Block]
@@ -10441,7 +10473,7 @@ Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loop
 		<year>1998</year>
 		<publisher>Altron</publisher>
 		<notes><![CDATA[
-Crashes when restarting a stage, [CD-Block] seek times
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-16607G"/>
 		<info name="release" value="19980115"/>
@@ -15488,11 +15520,13 @@ TODO: how to reload with [mouse]?
 		</part>
 	</software>
 
-	<!-- Black screen after Kaze logo with [DRC] option. -->
 	<software name="digipinj97" cloneof="digipin" supported="no">
 		<description>Digital Pinball - Last Gladiators Ver. 9.7 (Japan)</description>
 		<year>1997</year>
 		<publisher>Kaze</publisher>
+		<notes><![CDATA[
+Black screen after Kaze logo with [DRC] option, check also [CD-Block]
+]]></notes>
 		<info name="serial" value="T-18903G"/>
 		<info name="release" value="19970911"/>
 		<info name="alt_title" value="デジタルピンボール ラストグラディエーターズ Ver.9.7"/>
@@ -16431,7 +16465,6 @@ TODO: how to reload with [mouse]?
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
 		<notes><![CDATA[
-Crashes often when entering gameplay with [DRC]
 Spurious [SCSP] voice sample playbacks (keeps repeating "i~ni", shouldn't from name entry at very least)
 ]]></notes>
 		<info name="serial" value="T-1509G"/>
@@ -16710,12 +16743,15 @@ Spurious [SCSP] voice sample playbacks (keeps repeating "i~ni", shouldn't from n
 		</part>
 	</software>
 
-	<!-- SIGSEGV at KSS logo or during intro with [DRC] on -->
-	<!-- Voice samples are too high pitched [SCSP] -->
 	<software name="anarchy" supported="no">
 		<description>Goiken Muyou - Anarchy in the Nippon (Japan)</description>
 		<year>1997</year>
 		<publisher>KSS</publisher>
+		<notes><![CDATA[
+Voice samples are too high pitched [SCSP]
+Performance is awful
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-28902G"/>
 		<info name="release" value="19971002"/>
 		<info name="alt_title" value="御意見無用 Anarchy in the NIPPON"/>
@@ -19996,8 +20032,7 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Vic Tokai</publisher>
 		<notes><![CDATA[
-Throws "Error Trap Vector 4" with [DRC] off the bat
-Has garbage pixels all over the place [VDP1/VDP2]
+Has garbage pixels all over the place [VDP1] [VDP2]
 Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 1
 ]]></notes>
 		<info name="serial" value="T-2301G"/>
@@ -20180,12 +20215,11 @@ Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 
 		</part>
 	</software>
 
-	<software name="tfgold1" supported="no">
+	<software name="tfgold1" supported="partial">
 		<description>Thunder Force Gold Pack 1 (Japan)</description>
 		<year>1996</year>
 		<publisher>Technosoft</publisher>
 		<notes><![CDATA[
-TF2: crashes with [DRC]
 TF2: shows [VDP1] sprite wobbling, particularly noticeable with overhead stage bases
 Both games: bad [CD-Block] redbook on BGM repeats (cross borders with the successive track)
 ]]></notes>
@@ -21689,21 +21723,20 @@ Triggers [VDP2] window enabled for RGB888 tiles on FMVs
 		</part>
 	</software>
 
-	<software name="dejigaqw" supported="no">
+	<software name="dejigaqw" supported="partial">
 		<description>Dejig Aqua World (Japan)</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
 		<notes><![CDATA[
-Bad reference graphics after completing a puzzle, [CD-Block]?
+Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC changes)
 ]]></notes>
 		<info name="serial" value="T-30303G"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="デジグ アクアワールド"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<!-- baddump: cfr. notes -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="dejig aqua world (t-30303g)" sha1="66ba3e4b5c8dfcbd6686db0ee68d278c4334d0c0" status="baddump" />
+				<disk name="dejig aqua world (t-30303g)" sha1="66ba3e4b5c8dfcbd6686db0ee68d278c4334d0c0" />
 			</diskarea>
 		</part>
 	</software>
@@ -21713,8 +21746,8 @@ Bad reference graphics after completing a puzzle, [CD-Block]?
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
 		<notes><![CDATA[
-Shows black [VDP2] on stage intros
-Bad reference graphics after completing a puzzle, [CD-Block]?
+Shows black [VDP2] on stage intros, uses CCRTMD color calculation
+Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC changes)
 ]]></notes>
 		<info name="serial" value="T-30305G"/>
 		<info name="release" value="19971204"/>
@@ -22108,9 +22141,9 @@ Randomly doesn't boot
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Hangs on first frame after loading match, trips illegal opcode on [DRC]
 Selected team flags sports zooming errors [VDP1]
 Stadium select wireframes sports stippled oblique polylines [VDP1]
+Has [SCSP] sample playback issues in gameplay (never completes umpire calls)
 ]]></notes>
 		<info name="serial" value="GS-9017"/>
 		<info name="release" value="19950526"/>
@@ -22187,16 +22220,20 @@ Stadium select wireframes sports stippled oblique polylines [VDP1]
 		</part>
 	</software>
 
-	<!-- NetLink game -->
-	<!-- Black screen on [DRC] when accessing "NIFTY" option on title menu -->
-	<!-- Triggers "0 trans no cc zoom" [VDP2] message -->
 	<software name="habitat2" supported="no">
 		<description>Habitat II (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Habitat_II
+Moans off the bat that a [modem] isn't connected
+Black screen on [DRC] when accessing "NIFTY" option on title menu (verify, should be fixed)
+Triggers "0 trans no cc zoom" [VDP2] message (verify, should be fixed by arcadegh)
+]]></notes>
 		<info name="serial" value="GS-7105"/>
 		<info name="release" value="19960727"/>
 		<info name="alt_title" value="ハビタット2"/>
+		<info name="usage" value="Requires Sega Saturn Modem connected" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27301,12 +27338,13 @@ Not extensively tested
 		</part>
 	</software>
 
+	<!-- TODO: move me up, it's a redump image -->
 	<software name="blastwnd" supported="no">
 		<description>Blast Wind (Japan)</description>
 		<year>1997</year>
 		<publisher>Technosoft</publisher>
 		<notes><![CDATA[
-Black screen after Techno Soft logo with [DRC] option and Machine Config comms hack disabled.
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-1810G"/>
 		<info name="release" value="19970117"/>
@@ -27588,13 +27626,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="dejigtin" supported="no">
+	<software name="dejigtin" supported="partial">
 		<description>Dejig Tin Toy</description>
 		<year>1997</year>
 		<publisher>Masudaya</publisher>
 		<notes><![CDATA[
-[DRC] hangs at end of movie playback
-Bad reference graphics after completing a puzzle, [CD-Block]? (untested, assume same as other DeJig)
+Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC changes)
 ]]></notes>
 		<info name="serial" value="T-30302G"/>
 		<info name="release" value="19970425"/>
@@ -27943,12 +27980,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Hangs at "Now loading" screen with [DRC], trips illegal opcode -->
-	<!-- 10 Yard Fight doesn't show sprites on the left portion of screen [VDP1] -->
 	<software name="iremac" supported="no">
 		<description>Irem Arcade Classics</description>
 		<year>1996</year>
 		<publisher>I'Max</publisher>
+		<notes><![CDATA[
+10 Yard Fight: doesn't show sprites on the left portion of screen [VDP1]
+Not extensively tested (all the other games)
+]]></notes>
 		<info name="serial" value="T-22403G"/>
 		<info name="release" value="19960426"/>
 		<info name="alt_title" value="アイレムアーケードクラシックス"/>
@@ -28550,7 +28589,6 @@ Not extensively tested
 		<year>1998</year>
 		<publisher>Hudson</publisher>
 		<notes><![CDATA[
-[DRC] crashes after title screen
 Currently untested in gameplay
 ]]></notes>
 		<info name="serial" value="T-14319G"/>
@@ -28622,8 +28660,7 @@ Currently untested in gameplay
 		<year>1997</year>
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
-Crashes at initial loading with [DRC]
-Draws [VDP2] garbage layer covering everything (can't reproduce)
+Draws [VDP2] garbage layer covering everything (can't reproduce, assume fixed)
 Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-1311G"/>
@@ -29008,12 +29045,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Doesn't boot with [DRC] -->
-	<!-- has no audio redbook playback [CD-Block] -->
 	<software name="vfkidsk" cloneof="vfkids" supported="no">
 		<description>Virtua Fighter Kids (Korea)</description>
 		<year>1996?</year>
 		<publisher>Samsung</publisher>
+		<notes><![CDATA[
+Has no audio redbook playback [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="MK-81049-08"/>
 		<info name="alt_title" value="버쳐파이터키즈"/>
 		<sharedfeat name="compatibility" value="NTSC-K,NTSC-J"/>
@@ -33824,10 +33863,8 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		<publisher>Midway</publisher>
 		<notes><![CDATA[
 No sound in gameplay, enables [SCSP] SCIPD bit 5 (master to sound irq)
-Has [VDP2] visible layer of garbage on credits menu and Digital Eclipse logo
-Crashes on attract mode
+Has [VDP2] visible layer of garbage on credits menu
 Joust: going up causes [VDP1] player to disappear, enemies flicker
-Defender II: crashes after a short while with trailing [VDP1] sprites, actually [DRC]
 Sinistar: hangs with bezel drawn only
 ]]></notes>
 		<info name="serial" value="T-9703H"/>
