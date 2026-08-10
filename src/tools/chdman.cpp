@@ -103,8 +103,6 @@ constexpr bool OSD_PRINTF_VERBOSE = false;
 #define OPTION_OUTPUT "output"
 #define OPTION_OUTPUT_BIN "outputbin"
 #define OPTION_OUTPUT_SPLITBIN "splitbin"
-#define OPTION_OUTPUT_REMOVEPREGAP "removepregap"
-#define OPTION_OUTPUT_ADDPREGAP "addpregap"
 #define OPTION_OUTPUT_FORCE "force"
 #define OPTION_INPUT_START_BYTE "inputstartbyte"
 #define OPTION_INPUT_START_HUNK "inputstarthunk"
@@ -678,8 +676,6 @@ static const option_description s_options[] =
 	{ OPTION_OUTPUT,                "o",    true, " <filename>: output file name" },
 	{ OPTION_OUTPUT_BIN,            "ob",   true, " <filename>: output file name for binary data" },
 	{ OPTION_OUTPUT_SPLITBIN,       "sb",   false, ": output one binary file per track" },
-	{ OPTION_OUTPUT_REMOVEPREGAP,   "rp",   false, ": modify TOC to match TOSEC format (GD-ROM only)" },
-	{ OPTION_OUTPUT_ADDPREGAP,      "ap",   false, ": modify TOC to match Redump format (GD-ROM only)" },
 	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting an existing file" },
 	{ OPTION_OUTPUT_PARENT,         "op",   true, " <filename>: parent file name for output CHD" },
 	{ OPTION_INPUT_START_BYTE,      "isb",  true, " <offset>: starting byte offset within the input" },
@@ -768,7 +764,6 @@ static const command_description s_commands[] =
 			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
-			OPTION_OUTPUT_REMOVEPREGAP,
 			REQUIRED OPTION_INPUT,
 			OPTION_HUNK_SIZE,
 			OPTION_COMPRESSION,
@@ -837,7 +832,6 @@ static const command_description s_commands[] =
 			OPTION_OUTPUT_BIN,
 			OPTION_OUTPUT_SPLITBIN,
 			OPTION_OUTPUT_FORCE,
-			OPTION_OUTPUT_ADDPREGAP,
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
 		}
@@ -1539,6 +1533,10 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		const int tracktype = info.trktype == cdrom_file::CD_TRACK_AUDIO ? 0 : 4;
 		const bool needquote = filename.find(' ') != std::string::npos;
 		const char *const quotestr = needquote ? "\"" : "";
+
+		if (info.pregap > 0 && info.pgdatasize == 0)
+			frameoffs += info.pregap;
+
 		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, tracktype, info.datasize, quotestr, filename, quotestr, outputoffs);
 	}
 	else if (mode == MODE_CUEBIN)
@@ -2186,16 +2184,6 @@ static void do_create_cd(parameters_map &params)
 
 	if (is_gdrom)
 	{
-		bool is_removepregap = params.find(OPTION_OUTPUT_REMOVEPREGAP) != params.end();
-
-		if (is_removepregap)
-		{
-			std::error_condition err = cdrom_file::remove_pregap(toc, track_info);
-		
-			if (err)
-				report_error(1, "Error stripping pregap: (%s: %s)\n", *input_file_str->second, err.message());
-		}
-
 		std::error_condition err = cdrom_file::adjust_high_density_area(toc, track_info);
 		if (err)
 			report_error(1, "Error adjusting high density area: (%s: %s)\n", *input_file_str->second, err.message());
@@ -2873,75 +2861,7 @@ static void do_extract_cd(parameters_map &params)
 			else
 				output_toc_file->printf("CD_ROM\n\n\n");
 		}
-
-		bool is_addpregap = cdrom->is_gdrom() && mode == MODE_CUEBIN && params.find(OPTION_OUTPUT_ADDPREGAP) != params.end();
-
-		if (is_addpregap)
-		{
-			// modify TOC to match Redump cue/bin format as best as possible
-			cdrom_file::toc *trackinfo = (cdrom_file::toc*)&toc;
-
-			// TOSEC GDI-based CHDs have the padframes field set to non-0 where the pregaps for the next track would be
-			const bool has_physical_pregap = trackinfo->tracks[0].padframes == 0;
-
-			for (int tracknum = 1; tracknum < toc.numtrks; tracknum++)
-			{
-				// pgdatasize should never be set in GD-ROMs currently, so if it is set then assume the TOC has proper pregap values
-				if (trackinfo->tracks[tracknum].pgdatasize != 0)
-					break;
-
-				// don't adjust the first track of the single-density and high-density areas
-				if (toc.tracks[tracknum].physframeofs == 45000)
-					continue;
-
-				if (!has_physical_pregap)
-				{
-					// NOTE: This will generate a cue with PREGAP commands instead of INDEX 00 because the pregap data isn't baked into the bins
-					trackinfo->tracks[tracknum].pregap += trackinfo->tracks[tracknum-1].padframes;
-
-					// "type 1" (only one data track in high-density area) and "type 2" (1 data and then the rest of the tracks being audio tracks in high-density area) don't require any adjustments
-					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum].trktype != cdrom_file::CD_TRACK_AUDIO)
-					{
-						if (toc.tracks[tracknum-1].trktype != cdrom_file::CD_TRACK_AUDIO)
-						{
-							// "type 3" where the high-density area is just two data tracks
-							// there shouldn't be any pregap in the padframes from the previous track in this case, and the full 3s pregap is baked into the previous track
-							// Only known to be used by Shenmue II JP's discs 2, 3, 4 and Virtua Fighter History & VF4
-							trackinfo->tracks[tracknum-1].padframes += 225;
-
-							trackinfo->tracks[tracknum].pregap += 225;
-							trackinfo->tracks[tracknum].splitframes = 225;
-							trackinfo->tracks[tracknum].pgdatasize = trackinfo->tracks[tracknum].datasize;
-							trackinfo->tracks[tracknum].pgtype = trackinfo->tracks[tracknum].trktype;
-						}
-						else
-						{
-							// "type 3 split" where the first track and last of the high-density area are data tracks and in between is audio tracks
-							// TODO: These 75 frames are actually included at the end of the previous track so should be written
-							// It's currently not possible to format it as expected without hacky code because the 150 pregap for the last track
-							// is sandwiched between these 75 frames and the actual track data.
-							// The 75 frames seems to normally be 0s so this should be ok for now until a use case is found.
-							trackinfo->tracks[tracknum-1].frames -= 75;
-							trackinfo->tracks[tracknum].pregap += 75;
-						}
-					}
-				}
-				else
-				{
-					int curextra = 150; // 00:02:00
-					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum].trktype != cdrom_file::CD_TRACK_AUDIO)
-						curextra += 75; // 00:01:00, special case when last track is data
-
-					trackinfo->tracks[tracknum-1].padframes = curextra;
-
-					trackinfo->tracks[tracknum].pregap += curextra;
-					trackinfo->tracks[tracknum].splitframes = curextra;
-					trackinfo->tracks[tracknum].pgdatasize = trackinfo->tracks[tracknum].datasize;
-					trackinfo->tracks[tracknum].pgtype = trackinfo->tracks[tracknum].trktype;
-				}
-			}
-		}
-
+		
 		// iterate over tracks and copy all data
 		uint64_t totaloutputoffs = 0;
 		uint64_t outputoffs = 0;
@@ -2973,7 +2893,7 @@ static void do_extract_cd(parameters_map &params)
 			{
 				if (tracknum == 0)
 					output_toc_file->printf("REM SINGLE-DENSITY AREA\n");
-				else if (toc.tracks[tracknum].physframeofs == 45000)
+				else if (toc.tracks[tracknum].physframeofs == cdrom_file::GDI_HIGH_DENSITY_AREA)
 					output_toc_file->printf("REM HIGH-DENSITY AREA\n");
 			}
 
