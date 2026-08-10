@@ -111,11 +111,6 @@ public:
 
 	bool translate(offs_t &offset, bool write, bool sys, bool dma, int st);
 
-	// Bus snoop: latch the address of an IFETCH1 cycle observed on the
-	// address bus.  Every MMU on the bus sees every cycle, including ones
-	// it does not qualify to translate; the board must report each first
-	// instruction word fetch here so the instruction seg/offset status
-	// registers can be frozen from it on a violation.
 	void ifetch1_observed(offs_t offset);
 
 protected:
