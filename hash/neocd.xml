@@ -638,7 +638,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="karnovr">
+	<software name="karnovr" supported="no">
 		<description>Karnov's Revenge (USA) ~ Fighter's History Dynamite (Japan)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
