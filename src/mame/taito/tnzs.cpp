@@ -2264,7 +2264,7 @@ void insectx_state::tnzs_base(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::base_sub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(insectx_state::irq0_line_hold));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	/* video hardware */
 	X1_001(config, m_spritegen, 12'000'000, m_palette, gfx_tnzs);
