@@ -106,9 +106,9 @@ class cmmb_state : public driver_device
 public:
 	cmmb_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	void cmmb(machine_config &config);
-	void cmmb103(machine_config &config);
-	void cmmb162(machine_config &config);
+	void cmmb(machine_config &config) ATTR_COLD;
+	void cmmb103(machine_config &config) ATTR_COLD;
+	void cmmb162(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -670,7 +670,7 @@ void cmmb_state::missile_vram_mad_w(offs_t offset, u8 data)
 	// Same packing as missile_state::vram_mad_w.  Write-enable masks match the
 	// read-side layout (pixel n occupies bits n and n+4); the real board uses
 	// PROM 035826-01 for this.
-	static const u8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
+	constexpr u8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	const offs_t vramaddr = (offset >> 2) & 0xffff;
 	const u8 vramdata = data_lookup[data >> 6];
 	const u8 writemask = u8(0x11 << (offset & 3)); // bits updated for this pixel

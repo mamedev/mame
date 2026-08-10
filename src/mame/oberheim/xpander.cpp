@@ -18,7 +18,7 @@ presses, drives the VFDs, interprets the digital and analog inputs (MIDI, CVs,
 triggers, etc.), and sends parameters to the voice computer.
 
 The voice board consists of 6 analog voices controlled by the voice computer.
-The main computer communicates with the voice board by accessing it's RAM after
+The main computer communicates with the voice board by accessing its RAM after
 halting its CPU.
 
 Each voice is built around a CEM3374 (dual oscillator) and a CEM3372 (VCF and
