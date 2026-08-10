@@ -513,6 +513,8 @@ void dragon_state::dragon_base(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen);
+	m_screen->set_raw(XTAL(14'218'000) / 2, 456, 0, 372, 312, 0, 293);
+	m_screen->set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 14.218_MHz_XTAL / 4, true);
 	m_vdg->set_screen(m_screen);
@@ -624,6 +626,10 @@ void dragon64_state::tanodr64(machine_config &config)
 	this->set_clock(14.318181_MHz_XTAL / 16);
 
 	m_sam->set_clock(14.318181_MHz_XTAL);
+
+	SCREEN(config.replace(), m_screen);
+	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 0, 372, 262, 0, 243);
+	m_screen->set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	// video hardware
 	MC6847(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
