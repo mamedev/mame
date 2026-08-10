@@ -57,12 +57,125 @@
 
 /*
 
-    TODO:
+PCB Layout
+----------
 
-    - M7 boot floppy
-    - accurate video timing
-    - PCB layouts
-    - NEC uPD7201 MPSC
+NOKIA 9924570 VDU200A MIKROMIKKO
+
+|-------------------------------------------------------|
+|       RAM     ROM1    LS393   LS08    LS14    PIT     |-
+|       RAM             LS164                           ||
+|       RAM                     MPSC            IOP     ||CON3
+|       RAM             LS132                           ||
+|       RAM             LS244   LS32    LS157   75188   |-
+|       RAM                                             |-
+|       RAM             PROM                    MC1489A ||CON4
+|       RAM     LS373   LS373   LS138   LS125   MC1489A |-
+|                                                       |-
+|       LS157               LS259   LS125               ||
+|       LS157   CPU      18.72MHz   LS11    LS74        ||CON5
+|       LS04                                            ||
+|F      6.144MHz DMA        LS04    LS163   LS32 75188  |-
+|-      LS163   LS374   LS374   LS02    LS175   LS08    |-
+||CON1  LS74    CRTC    LS374   ROM2    LS374           ||CON6
+|-             |-CON2-|                                 |-
+|-------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    RAM     - TMM4164P-3
+    ROM1    - NEC D2764D "9057C"
+    ROM2    - NEC D2732D "6807B"
+    PROM    - "726972B"
+    CPU     - Intel P8085AH
+    DMA     - NEC D8237AC-5
+    CRTC    - Intel P8275
+    PIT     - NEC D8253C-5
+    MPSC    - NEC D7201-C
+    IOP     - NEC uPB7212C
+    CON1    - 1x5 power connector
+    CON2    - 1x20 PCB header for floppy/SASI interface
+    CON3    - DB15 keyboard connector
+    CON4    - DB9 printer connector
+    CON5    - DB25 RS232 connector
+    CON6    - DB9 video connector
+    F       - 2.5A fuse
+
+
+NOKIA 9924494 C
+
+|-----------------------|
+|   |-----CON1------|   |
+| LS14  7406    7445    |
+|       LS123           |
+|                       |
+| 74368 7474    7445    |
+| LS132 LS08    LS04    |
+|       LS74    74221   |
+| LS112                 |
+| LS157                 |
+| LS393                 |
+| LS629         FDC     |
+| LS393                 |
+| 16MHz                 |
+|-----------------------|
+
+Notes:
+    All IC's shown.
+
+    CON1    - 2x22 PCB header for floppy
+    FDC     - NEC D765AC
+
+
+NOKIA 9924913 Z
+
+|---------------------------------------|
+| 7438  -          |-----CON1------|    |
+| 7438  |       LS14    7406    7445    |
+|       |               LS123           |
+| DIP   |CON2                           |
+|       |       74368   7474    7445    |
+| 7438  |       LS132   LS08    LS04    |
+| 7438  -               LS74    74221   |
+| LS240         LS112                   |
+| LS240         LS157                   |
+| LS374         LS393                   |
+| LS374         LS629           FDC     |
+| LS373         LS393                   |
+| LS74  LS04    16MHz                   |
+| LS74  LS74    LS139   LS32    LS257   |
+| LS08  LS257                           |
+|---------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    CON1    - 2x22 PCB header for floppy
+    CON2    - 2x25 PCB header for SASI interface
+    FDC     - NEC D765AC
+
+
+NOKIA 9923204 C
+
+|-----------------------------------------------------------------------------------|
+|       PROM    LS14    XTAL                LS163   LS163           LS123   7438    |
+|                                           LS42    LS151           LS162           |
+|-----------------------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    PROM    - 6349-1J
+    XTAL    - unknown value
+
+*/
+
+/*
+
+    TODO
+
+    - floppy does not work in mm1m7
 
 */
 
@@ -155,6 +268,7 @@ void mm1_state::write(offs_t offset, uint8_t data)
 void mm1_state::recall_w(int state)
 {
 	LOG("RECALL %u\n", state);
+
 	m_recall = state;
 	m_fdc->reset_w(state);
 
@@ -192,16 +306,7 @@ void mm1_state::switch_w(int state)
 
 	m_switch = state;
 
-	if (m_switch)
-	{
-		m_io->space().install_readwrite_handler(0x50, 0x50, read8sm_delegate(*this, FUNC(mm1_state::sasi_status_r)), write8sm_delegate(*this, FUNC(mm1_state::sasi_cmd_w)));
-		m_io->space().install_readwrite_handler(0x51, 0x51, emu::rw_delegate(*this, FUNC(mm1_state::sasi_data_r)), write8sm_delegate(*this, FUNC(mm1_state::sasi_data_w)));
-	}
-	else
-	{
-		m_io->space().install_device(0x50, 0x51, *m_fdc, &upd765a_device::map);
-	}
-
+	m_fdc_view.select(state);
 	m_floppy[0]->mon_w(state);
 }
 
@@ -337,7 +442,10 @@ void mm1_state::mmu_io_map(address_map &map)
 	map(0x20, 0x21).mirror(0x0e).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x30, 0x33).mirror(0x0c).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x40, 0x40).mirror(0x0f).rw(m_iop, FUNC(i8212_device::read), FUNC(i8212_device::write));
-	map(0x50, 0x51).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x50, 0x51).mirror(0x0e).view(m_fdc_view);
+	m_fdc_view[0](0x50, 0x51).m(m_fdc, FUNC(upd765a_device::map));
+	m_fdc_view[1](0x50, 0x50).rw(FUNC(mm1_state::sasi_status_r), FUNC(mm1_state::sasi_cmd_w));
+	m_fdc_view[1](0x51, 0x51).rw(FUNC(mm1_state::sasi_data_r), FUNC(mm1_state::sasi_data_w));
 	map(0x60, 0x67).mirror(0x08).w(m_outlatch, FUNC(ls259_device::write_d0));
 }
 
@@ -395,21 +503,6 @@ void mm1_state::dma_hrq_w(int state)
 	m_dmac->hack_w(state);
 }
 
-uint8_t mm1_state::mpsc_dack_r()
-{
-	// clear data request
-	m_dmac->dreq2_w(CLEAR_LINE);
-
-	return 1;//m_mpsc->dtra_r();
-}
-
-void mm1_state::mpsc_dack_w(uint8_t data)
-{
-	//m_mpsc->hai_w(data);
-
-	// clear data request
-	m_dmac->dreq1_w(CLEAR_LINE);
-}
 
 void mm1_state::dma_eop_w(int state)
 {
@@ -417,59 +510,6 @@ void mm1_state::dma_eop_w(int state)
 
 	m_tc = state;
 	update_tc();
-}
-
-void mm1_state::dack3_w(int state)
-{
-	m_dack3 = state;
-	update_tc();
-}
-
-void mm1_state::itxc_w(int state)
-{
-	if (!m_intc)
-	{
-		m_mpsc->txca_w(state);
-	}
-}
-
-void mm1_state::irxc_w(int state)
-{
-	if (!m_intc)
-	{
-		m_mpsc->rxca_w(state);
-	}
-}
-
-void mm1_state::auxc_w(int state)
-{
-	m_mpsc->txcb_w(state);
-	m_mpsc->rxcb_w(state);
-}
-
-//-------------------------------------------------
-//  UPD7201
-//-------------------------------------------------
-
-void mm1_state::drq2_w(int state)
-{
-	if (state)
-	{
-		m_dmac->dreq2_w(ASSERT_LINE);
-	}
-}
-
-void mm1_state::drq1_w(int state)
-{
-	if (state)
-	{
-		m_dmac->dreq1_w(ASSERT_LINE);
-	}
-}
-
-int mm1_state::dsra_r()
-{
-	return 1;
 }
 
 
@@ -524,9 +564,10 @@ void mm1_state::machine_start()
 void mm1_state::common(machine_config &config)
 {
 	// basic system hardware
-	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	I8085A(config, m_maincpu, XTAL(6'144'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
-	m_maincpu->in_sid_func().set(FUNC(mm1_state::dsra_r));
+	m_maincpu->in_inta_func().set(m_mpsc, FUNC(upd7201_device::inta_r));
+	m_maincpu->in_sid_func().set(m_rs232a, FUNC(rs232_port_device::dsr_r));
 	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w)).invert();
 
 	config.set_perfect_quantum(m_maincpu);
@@ -542,53 +583,63 @@ void mm1_state::common(machine_config &config)
 	m_iop->di_rd_callback().set(KB_TAG, FUNC(mm1_keyboard_device::read));
 
 	LS259(config, m_outlatch);
-	m_outlatch->q_out_cb<0>().set(FUNC(mm1_state::a8_w)); // IC24 A8
-	m_outlatch->q_out_cb<1>().set(FUNC(mm1_state::recall_w)); // RECALL
-	m_outlatch->q_out_cb<2>().set(FUNC(mm1_state::rx21_w)); // _RV28/RX21
-	m_outlatch->q_out_cb<3>().set(FUNC(mm1_state::tx21_w)); // _TX21
-	m_outlatch->q_out_cb<4>().set(FUNC(mm1_state::rcl_w)); // _RCL
-	m_outlatch->q_out_cb<5>().set(FUNC(mm1_state::intc_w)); // _INTC
-	m_outlatch->q_out_cb<6>().set(FUNC(mm1_state::leen_w)); // LEEN
-	m_outlatch->q_out_cb<7>().set(FUNC(mm1_state::motor_on_w)); // MOTOR ON
+	m_outlatch->q_out_cb<0>().set(FUNC(mm1_state::a8_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(mm1_state::recall_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(mm1_state::rx21_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(mm1_state::tx21_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(mm1_state::rcl_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(mm1_state::intc_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(mm1_state::leen_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(mm1_state::motor_on_w));
 
-	AM9517A(config, m_dmac, 6.144_MHz_XTAL/2);
+	AM9517A(config, m_dmac, XTAL(6'144'000)/2);
 	m_dmac->out_hreq_callback().set(FUNC(mm1_state::dma_hrq_w));
 	m_dmac->out_eop_callback().set(FUNC(mm1_state::dma_eop_w));
 	m_dmac->in_memr_callback().set(FUNC(mm1_state::read));
 	m_dmac->out_memw_callback().set(FUNC(mm1_state::write));
-	m_dmac->in_ior_callback<2>().set(FUNC(mm1_state::mpsc_dack_r));
+	m_dmac->in_ior_callback<2>().set(m_mpsc, FUNC(upd7201_device::da_r));
 	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(upd765_family_device::dma_r));
 	m_dmac->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
-	m_dmac->out_iow_callback<1>().set(FUNC(mm1_state::mpsc_dack_w));
+	m_dmac->out_iow_callback<1>().set(m_mpsc, FUNC(upd7201_device::da_w));
 	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(upd765_family_device::dma_w));
+	m_dmac->out_dack_callback<1>().set(FUNC(mm1_state::dack1_w));
+	m_dmac->out_dack_callback<2>().set(FUNC(mm1_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(mm1_state::dack3_w));
 
 	PIT8253(config, m_pit);
-	m_pit->set_clk<0>(6.144_MHz_XTAL/2/2);
+	m_pit->set_clk<0>(XTAL(6'144'000)/2/2);
 	m_pit->out_handler<0>().set(FUNC(mm1_state::itxc_w));
-	m_pit->set_clk<1>(6.144_MHz_XTAL/2/2);
+	m_pit->set_clk<1>(XTAL(6'144'000)/2/2);
 	m_pit->out_handler<1>().set(FUNC(mm1_state::irxc_w));
-	m_pit->set_clk<2>(6.144_MHz_XTAL/2/2);
+	m_pit->set_clk<2>(XTAL(6'144'000)/2/2);
 	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
 	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 
-	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
-	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
-	m_mpsc->out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
-	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	UPD7201(config, m_mpsc, XTAL(6'144'000)/2);
+	m_mpsc->out_int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 	m_mpsc->out_rxdrqa_callback().set(FUNC(mm1_state::drq2_w));
 	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
+	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->cts_handler().set(m_mpsc, FUNC(upd7201_device::rxa_w));
-	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
-	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
-	m_rs232c->cts_handler().set(m_mpsc, FUNC(upd7201_device::ctsb_w));
+	m_rs232a->rxd_handler().set(m_mpsc, FUNC(upd7201_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_mpsc, FUNC(upd7201_device::dcda_w));
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(upd7201_device::ctsa_w));
+	m_rs232a->rxc_handler().set(FUNC(mm1_state::erxc_w));
+	m_rs232a->txc_handler().set(FUNC(mm1_state::etxc_w));
 
-	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	m_rs232b->rxd_handler().set(m_mpsc, FUNC(upd7201_device::rxb_w));
+	m_rs232b->dcd_handler().set(m_mpsc, FUNC(upd7201_device::dcdb_w));
+	m_rs232b->cts_handler().set(m_mpsc, FUNC(upd7201_device::ctsb_w));
+
+	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is XTAL(6'144'000)/2/16
 	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));
 
 	// internal ram

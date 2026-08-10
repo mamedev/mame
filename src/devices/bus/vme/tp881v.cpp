@@ -10,6 +10,7 @@
  *
  * TODO:
  *  - scsi dma controllers
+ *  - networking
  *  - serial dma
  *  - vme interface
  *  - interrupt enables/masking
@@ -19,77 +20,120 @@
 #include "emu.h"
 #include "tp881v.h"
 
+#include "bus/rs232/rs232.h"
+#include "bus/nscsi/devices.h"
+#include "cpu/m88000/m88000.h"
+#include "machine/eepromser.h"
+#include "machine/i82586.h"
 #include "machine/input_merger.h"
-
-#include "bus/nscsi/hd.h"
-#include "bus/nscsi/cd.h"
+#include "machine/hd63450.h"
+#include "machine/mc88200.h"
+#include "machine/ncr53c90.h"
+#include "machine/timekpr.h"
+#include "machine/z80scc.h"
+#include "machine/z8536.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VME_TP881V, vme_tp881v_card_device, "tp881v", "Tadpole Technology TP881V")
+namespace {
 
-vme_tp881v_card_device::vme_tp881v_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, VME_TP881V, tag, owner, clock)
-	, device_vme_card_interface(mconfig, *this)
-	, m_cpu(*this, "cpu")
-	, m_mmu(*this, "mmu%u", 0U)
-	, m_cio(*this, "cio%u", 0U)
-	, m_rtc(*this, "rtc")
-	, m_scsi(*this, "ncr53c90a_%u", 0U)
-	, m_net(*this, "net")
-	, m_scc(*this, "scc%u", 0U)
-	, m_scc_dma(*this, "scc_dma")
-	, m_vcs(*this, "vcs")
-	, m_gcs(*this, "gcs%u", 0U)
-	, m_eeprom(*this, "eeprom")
-	, m_serial(*this, "serial%u", 0U)
+class vme_tp881v_device
+	: public device_t
+	, public device_vme_card_interface
 {
+public:
+	vme_tp881v_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, VME_TP881V, tag, owner, clock)
+		, device_vme_card_interface(mconfig, *this)
+		, m_cpu(*this, "cpu")
+		, m_mmu(*this, "mmu%u", 0U)
+		, m_cio(*this, "cio%u", 0U)
+		, m_rtc(*this, "rtc")
+		, m_scsi(*this, "ncr53c90a%u", 0U)
+		, m_net(*this, "net")
+		, m_scc(*this, "scc%u", 0U)
+		, m_scc_dma(*this, "scc_dma")
+		, m_vcs(*this, "vcs")
+		, m_gcs(*this, "gcs%u", 0U)
+		, m_eeprom(*this, "eeprom")
+		, m_serial(*this, "serial%u", 0U)
+	{}
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	void cpu_mem(address_map &map) ATTR_COLD;
+	void net_mem(address_map &map) ATTR_COLD;
+
+	template <unsigned IRQ> void cio0_pa_w(int state);
+	u8 cio0_pa_r() { return m_cio0_pa; }
+
+	required_device<mc88100_device> m_cpu;
+	required_device_array<mc88200_device, 2> m_mmu;
+	required_device_array<z8036_device, 8> m_cio;
+
+	required_device<m48t02_device> m_rtc;
+	required_device_array<ncr53c90a_device, 2> m_scsi;
+	required_device<i82596_device> m_net;
+	required_device_array<scc8030_device, 2> m_scc;
+	required_device<hd63450_device> m_scc_dma;
+
+	required_device<z8036_device> m_vcs; // vme control and status cio
+	required_device_array<z8036_device, 2> m_gcs; // global control and status cio
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+
+	required_device_array<rs232_port_device, 4> m_serial;
+
+	u8 m_cio0_pa;
+	u8 m_gcs0_pb;
+};
+
+void vme_tp881v_device::device_start()
+{
+	save_item(NAME(m_cio0_pa));
+	save_item(NAME(m_gcs0_pb));
 }
 
-ROM_START(tp881v)
-	ROM_REGION32_BE(0x40000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "v504", "TP881 Multiprocessor Monitor V5.04")
-	ROMX_LOAD("881v__5.04l.bin", 0x0002, 0x20000, CRC(d9027c64) SHA1(88cca011dee005d273a1cd7048480ff3fac9c06a), ROM_REVERSE | ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROMX_LOAD("881v__5.04h.bin", 0x0000, 0x20000, CRC(74de0772) SHA1(8e5bfd427c0bdea4ab350333fd5a814712014302), ROM_REVERSE | ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-ROM_END
-
-static INPUT_PORTS_START(tp881v)
-INPUT_PORTS_END
-
-const tiny_rom_entry *vme_tp881v_card_device::device_rom_region() const
+void vme_tp881v_device::device_reset()
 {
-	return ROM_NAME(tp881v);
+	m_cio0_pa = 0xfe;
+	m_gcs0_pb = 0;
 }
 
-ioport_constructor vme_tp881v_card_device::device_input_ports() const
+template <unsigned IRQ> void vme_tp881v_device::cio0_pa_w(int state)
 {
-	return INPUT_PORTS_NAME(tp881v);
+	if (state)
+		m_cio0_pa &= u8(~(1U << IRQ));
+	else
+		m_cio0_pa |= u8(1U << IRQ);
+
+	switch (IRQ)
+	{
+	case 1: m_cio[0]->pa1_w(!state); break;
+	case 2: m_cio[0]->pa2_w(!state); break;
+	case 3: m_cio[0]->pa3_w(!state); break;
+	case 4: m_cio[0]->pa4_w(!state); break;
+	case 5: m_cio[0]->pa5_w(!state); break;
+	case 6: m_cio[0]->pa6_w(!state); break;
+	case 7: m_cio[0]->pa7_w(!state); break;
+	}
 }
 
-void vme_tp881v_card_device::device_start()
-{
-}
-
-void vme_tp881v_card_device::device_reset()
-{
-}
-
-static void scsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("harddisk", NSCSI_HARDDISK);
-}
-
-void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
+void vme_tp881v_device::device_add_mconfig(machine_config &config)
 {
 	MC88100(config, m_cpu, 40_MHz_XTAL / 2);
-	m_cpu->set_addrmap(AS_PROGRAM, &vme_tp881v_card_device::cpu_mem);
+	m_cpu->set_addrmap(AS_PROGRAM, &vme_tp881v_device::cpu_mem);
 	m_cpu->set_cmmu_code([this](u32 const address) -> mc88200_device & { return *m_mmu[0]; });
 	m_cpu->set_cmmu_data([this](u32 const address) -> mc88200_device & { return *m_mmu[1]; });
 
 	MC88200(config, m_mmu[0], 40_MHz_XTAL / 2, 0x00).set_mbus(m_cpu, AS_PROGRAM);
-	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x01).set_mbus(m_cpu, AS_PROGRAM);
+	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x08).set_mbus(m_cpu, AS_PROGRAM);
 
 	// per-jp interrupt controllers
 	// 4MHz input clock, ct3 gives 100Hz clock, ct2 counts at 10kHz
@@ -97,7 +141,7 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	/*
 	 * port a bit mode ddr 0xff
 	 * bit  i/o  function
-	 *  0    i   porta int?
+	 *  0    i   cpu present
 	 *  1    i   ethernet
 	 *  2    i   scc dma
 	 *  3    i   scsi0
@@ -124,6 +168,8 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	 *  2    i
 	 *  3    i
 	 */
+	m_cio[0]->pa_rd_cb().set(FUNC(vme_tp881v_device::cio0_pa_r));
+	m_cio[0]->pb_rd_cb().set_constant(0xff);
 	m_cio[0]->irq_wr_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	Z8036(config, m_cio[1], 4'000'000); // Z0803606VSC
@@ -137,37 +183,37 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	M48T02(config, m_rtc);
 
 	auto &scsi0(NSCSI_BUS(config, "scsi0"));
-	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:1", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:2", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:4", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:5", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi0:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi0:1", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi0:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi0:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi0:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi0:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi0:6", default_scsi_devices, nullptr, false);
 
 	NCR53C90A(config, m_scsi[0], 20'000'000);
 	scsi0.set_external_device(7, m_scsi[0]);
-	m_scsi[0]->irq_handler_cb().set(m_cio[0], FUNC(z8036_device::pa3_w));
+	m_scsi[0]->irq_handler_cb().set(FUNC(vme_tp881v_device::cio0_pa_w<3>));
 
 	auto &scsi1(NSCSI_BUS(config, "scsi1"));
-	NSCSI_CONNECTOR(config, "scsi1:0", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:1", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:2", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:4", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:5", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi1:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi1:1", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi1:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi1:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi1:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi1:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi1:6", default_scsi_devices, nullptr, false);
 
 	NCR53C90A(config, m_scsi[1], 20'000'000);
 	scsi1.set_external_device(7, m_scsi[1]);
-	m_scsi[1]->irq_handler_cb().set(m_cio[0], FUNC(z8036_device::pa4_w));
+	m_scsi[1]->irq_handler_cb().set(FUNC(vme_tp881v_device::cio0_pa_w<4>));
 
 	I82596_BE32(config, m_net, 20'000'000); // A82596DX-25
-	m_net->out_irq_cb().set(m_cio[0], FUNC(z8036_device::pa1_w));
-	m_net->set_addrmap(0, &vme_tp881v_card_device::net_mem);
+	m_net->out_irq_cb().set(FUNC(vme_tp881v_device::cio0_pa_w<1>)).invert();
+	m_net->set_addrmap(0, &vme_tp881v_device::net_mem);
 
 	input_merger_any_high_device &scc_irq(INPUT_MERGER_ANY_HIGH(config, "scc_irq"));
-	scc_irq.output_handler().set(m_cio[0], FUNC(z8036_device::pa5_w));
+	scc_irq.output_handler().set(FUNC(vme_tp881v_device::cio0_pa_w<5>));
 
 	SCC8030(config, m_scc[0], 3.6864_MHz_XTAL); // Z0803006VSC
 	m_scc[0]->configure_channels(m_scc[0]->clock(), m_scc[0]->clock(), m_scc[0]->clock(), m_scc[0]->clock());
@@ -214,7 +260,7 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	// TODO: MC68440 is function and pin compatible with MC68450/HD63450, but
 	// has only two DMA channels instead of four.
 	HD63450(config, m_scc_dma, 10'000'000, m_cpu, AS_PROGRAM); // MC68440FN10
-	m_scc_dma->irq_callback().set(m_cio[0], FUNC(z8036_device::pa2_w));
+	m_scc_dma->irq_callback().set(FUNC(vme_tp881v_device::cio0_pa_w<2>));
 
 	// VME control and status CIO
 	Z8036(config, m_vcs, 4'000'000); // Z0803606VSC
@@ -233,6 +279,7 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 
 	// general control and status CIO 0
 	Z8036(config, m_gcs[0], 4'000'000); // Z0803606VSC
+	m_gcs[0]->pb_wr_cb().set([this](u8 data) { m_gcs0_pb = data; });
 	/*
 	 * port a ddr 0x01
 	 * bit  i/o  function
@@ -295,14 +342,18 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	EEPROM_93C06_16BIT(config, m_eeprom);
 }
 
-void vme_tp881v_card_device::cpu_mem(address_map &map)
+void vme_tp881v_device::cpu_mem(address_map &map)
 {
 	map(0x0000'0000, 0x0003'ffff).rom().region("eprom", 0);
 	//map(0x2000'0000, 0x20ff'ffff); // vme short space (a24 d32)
 
+	//map(0x4000'0000, 0x7fff'ffff); // ram space
 	map(0x4000'0000, 0x41ff'ffff).ram().share("ram");
+
 	//map(0x8000'0000, 0xbfff'ffff); // vme extended space (a32 d32)
 	//map(0xc000'0000, 0xc0ff'ffff); // vsb space
+
+	map(0xfff0'0000, 0xfff1'ffff).noprw(); // silence control space
 
 	map(0xfff3'0000, 0xfff3'003f).m(m_scsi[0], FUNC(ncr53c90a_device::map)).umask32(0x000000ff);
 	//0xfff30080; // dmac scsi0
@@ -316,6 +367,7 @@ void vme_tp881v_card_device::cpu_mem(address_map &map)
 	map(0xfff5'a000, 0xfff5'a0bf).rw(m_vcs, FUNC(z8036_device::read), FUNC(z8036_device::write)).umask32(0x000000ff);
 	map(0xfff5'e000, 0xfff5'ffff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
 	//0xfff60000; // vme iack
+	map(0xfff7'0000, 0xfff7'00ff).rw(m_scc_dma, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	//map(0xfff7'8002, 0xfff7'8003).w(m_net, FUNC(i82596_device::port));
 	//map(0xfff7'c000, 0xfffc'0000).lw8([this](u8 data) { m_net->ca(1); }, "net_ca");
 	map(0xfff8'0000, 0xfff8'00bf).rw(m_cio[0], FUNC(z8036_device::read), FUNC(z8036_device::write)).umask32(0x000000ff);
@@ -328,7 +380,31 @@ void vme_tp881v_card_device::cpu_mem(address_map &map)
 	map(0xfff9'0c00, 0xfff9'0cbf).rw(m_cio[7], FUNC(z8036_device::read), FUNC(z8036_device::write)).umask32(0x000000ff);
 }
 
-void vme_tp881v_card_device::net_mem(address_map &map)
+void vme_tp881v_device::net_mem(address_map &map)
 {
 	map(0x4000'0000, 0x41ff'ffff).ram().share("ram");
 }
+
+ROM_START(tp881v)
+	ROM_REGION32_BE(0x40000, "eprom", 0)
+	ROM_SYSTEM_BIOS(0, "v504", "TP881 Multiprocessor Monitor V5.04")
+	ROMX_LOAD("881v__5.04l.bin", 0x0002, 0x20000, CRC(d9027c64) SHA1(88cca011dee005d273a1cd7048480ff3fac9c06a), ROM_REVERSE | ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("881v__5.04h.bin", 0x0000, 0x20000, CRC(74de0772) SHA1(8e5bfd427c0bdea4ab350333fd5a814712014302), ROM_REVERSE | ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+ROM_END
+
+const tiny_rom_entry *vme_tp881v_device::device_rom_region() const
+{
+	return ROM_NAME(tp881v);
+}
+
+static INPUT_PORTS_START(tp881v)
+INPUT_PORTS_END
+
+ioport_constructor vme_tp881v_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tp881v);
+}
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(VME_TP881V, device_vme_card_interface, vme_tp881v_device, "tp881v", "Tadpole Technology TP881V")
