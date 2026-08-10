@@ -159,7 +159,7 @@ Notes:
 NOKIA 9923204 C
 
 |-----------------------------------------------------------------------------------|
-|       PROM    LS14    XTAL                LS163   LS163           LS123   7438    |
+|       PROM    LS14    SPKR                LS163   LS163           LS123   7438    |
 |                                           LS42    LS151           LS162           |
 |-----------------------------------------------------------------------------------|
 
@@ -167,7 +167,7 @@ Notes:
     All IC's shown.
 
     PROM    - 6349-1J
-    XTAL    - unknown value
+    SPKR    - piezo speaker
 
 */
 
@@ -175,7 +175,9 @@ Notes:
 
     TODO
 
-    - floppy does not work in mm1m7
+	- upd765 FIFO underrun on floppy write due to CRTC hogging DMA
+	- "movcpm * *" syncronization error on mm1m6
+	- MPSC test fails
 
 */
 
@@ -307,7 +309,7 @@ void mm1_state::switch_w(int state)
 	m_switch = state;
 
 	m_fdc_view.select(state);
-	m_floppy[0]->mon_w(state);
+	m_floppy[0]->mon_w(0);
 }
 
 uint8_t mm1_state::sasi_status_r(offs_t offset)
@@ -525,6 +527,11 @@ void mm1_state::floppy_formats(format_registration &fr)
 
 static void mm1m4_floppies(device_slot_interface &device)
 {
+	device.option_add("525", FLOPPY_525_SSQD);
+}
+
+static void mm1m6_floppies(device_slot_interface &device)
+{
 	device.option_add("525", FLOPPY_525_QD);
 }
 
@@ -553,6 +560,8 @@ void mm1_state::machine_start()
 	save_item(NAME(m_fdc_tc));
 	save_item(NAME(m_switch));
 	save_item(NAME(m_sasi_data));
+
+	m_fdc_view.select(0);
 }
 
 
@@ -614,7 +623,7 @@ void mm1_state::common(machine_config &config)
 	m_pit->set_clk<2>(XTAL(6'144'000)/2/2);
 	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
-	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
+	UPD765A(config, m_fdc, XTAL(16'000'000)/4, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 
@@ -683,8 +692,8 @@ void mm1_state::mm1m4g(machine_config &config)
 
 void mm1_state::mm1_640k_dual(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1m4_floppies, "525", mm1_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1m4_floppies, "525", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1m6_floppies, "525", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1m6_floppies, "525", mm1_state::floppy_formats).enable_sound(true);
 }
 
 void mm1_state::mm1m6(machine_config &config)
@@ -701,7 +710,7 @@ void mm1_state::mm1m6g(machine_config &config)
 
 void mm1_state::mm1_640k_winchester(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1m4_floppies, "525", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1m6_floppies, "525", mm1_state::floppy_formats).enable_sound(true);
 
 	NSCSI_BUS(config, "sasi");
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");

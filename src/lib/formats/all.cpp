@@ -1240,7 +1240,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("MikroMikko");
 #ifdef HAS_FORMATS_MM_DSK
 	en.add(FLOPPY_MM1_FORMAT); // mm_dsk.h
-	en.add(FLOPPY_MM2_FORMAT); // mm_dsk.h
 #endif
 
 	en.category("Elektronika");
