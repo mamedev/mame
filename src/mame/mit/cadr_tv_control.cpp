@@ -154,5 +154,5 @@ void cadr_tv_control_device::map(address_map &map)
 		// 200 is written to enable Sync RAM, disable SYNC, and/or enable SYNC.
 		m_sync_csr = data;
 	}));
-	// 0x04 / 0x10 - 0x13 - Relarted to writing the color map
+	// 0x04 / 0x10 - 0x13 - Related to writing the color map
 }

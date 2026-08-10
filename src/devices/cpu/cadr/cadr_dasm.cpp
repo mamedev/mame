@@ -77,7 +77,7 @@ static const char *const map_dispatch[0x04] =
 
 void output(std::ostream &stream, bool &need_sp, const char * const string)
 {
-	if (need_sp) stream << " ";
+	if (need_sp) stream << ' ';
 	stream << string;
 	need_sp = true;
 }
@@ -86,7 +86,7 @@ void output(std::ostream &stream, bool &need_sp, const char * const string)
 template <typename Stream, typename Format, typename... Params>
 typename Stream::off_type output(Stream &stream, bool &need_sp, Format const &fmt, Params &&... args)
 {
-	if (need_sp) stream << " ";
+	if (need_sp) stream << ' ';
 	need_sp = true;
 	return util::stream_format(stream, fmt, std::forward<Params>(args)...);
 }
@@ -194,7 +194,7 @@ void disassemble_destination(std::ostream &stream, bool &need_sp, u64 op)
 	{
 		output(stream, need_sp, "Q-R");
 	}
-	stream << ")";
+	stream << ')';
 	need_sp = true;
 }
 
@@ -249,7 +249,7 @@ offs_t cadr_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	if (BIT(op, 42))
 		output(stream, need_sp, "(POPJ-AFTER-NEXT");
 	else
-		stream << "(";
+		stream << '(';
 
 	switch ((op >> 43) & 0x03)
 	{
@@ -297,7 +297,7 @@ offs_t cadr_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		output(stream, need_sp, "MF-%o", (op >> 10) & 0x03);
 	if (BIT(op, 45))
 		output(stream, need_sp, "ILONG");
-	stream << ")";
+	stream << ')';
 
 	return (cpc - pc) | flags | SUPPORTED;
 }

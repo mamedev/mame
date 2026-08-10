@@ -7,11 +7,10 @@ MIT CADR emulation
 TODO:
 - Keyboard sometimes becomes unresponsive.
 - Network not supported yet.
-- Add support for a second disk controller board.
+- Add support for a second disk controller board? It is in mentioned in the
+  description of the hardware but no evidence of it ever being used.
 - System 100 errors not being able to communicatie to another host but it never
   tries to transmit anything.
-- System 300 and 301 will not boot due to a timing/communication/bug issue with
-  the keyboard.
 
 **********************************************************************************/
 #include "emu.h"
@@ -43,7 +42,8 @@ public:
 		, m_tv_control(*this, "display")
 	{ }
 
-	void cadr(machine_config &config);
+	void cadr(machine_config &config) ATTR_COLD;
+	void cadr_init() ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -133,15 +133,15 @@ void cadr_state::unibus_map(address_map &map)
 	map(0766000 << 1, 766016 << 1).m(m_maincpu, FUNC(cadr_cpu_device::diag_map)).cswidth(32);
 
 	// 3ff610/3ff611 - 766040/766042 - interrupt status
-	map(0766040 << 1, 0766040 << 1).lrw16(
+	map(0766040 << 1, 0766040 << 1).umask32(0x0000'ffff).lrw16(
 		NAME([this] () {
 			return m_interrupt_status;
 		}),
 		NAME([this] (u16 data) {
 			m_interrupt_status = (m_interrupt_status & ~0x3c01) | (data & 0x3c01);
 		})
-	).umask32(0xffff);
-	map(0766042 << 1, 0766042 << 1).lrw16(
+	);
+	map(0766042 << 1, 0766042 << 1).umask32(0x0000'ffff).lrw16(
 		NAME([this] () {
 			return m_interrupt_status;
 		}),
@@ -150,17 +150,17 @@ void cadr_state::unibus_map(address_map &map)
 			if (!BIT(m_interrupt_status, 15))
 				m_mainirq->in_w<IRQ_SOURCE_UNIBUS>(CLEAR_LINE);
 		})
-	).umask32(0xffff);
+	);
 
 	// 3ff612 - 766044 - (clear) bus error status
-	map(0766044 << 1, 0766044 << 1).lrw16(
+	map(0766044 << 1, 0766044 << 1).umask32(0x0000'ffff).lrw16(
 		NAME([this] () {
 			return m_bus_error_status;
 		}),
 		NAME([this] (u16 data) {
 			m_bus_error_status = 0;
 		})
-	).umask32(0xffff);
+	);
 
 	// This diagnostics interface is not described in AI Memo 528, but it
 	// is used by the CC-TEST_MACHINE program to test another machine.
@@ -179,7 +179,7 @@ static INPUT_PORTS_START(cadr)
 INPUT_PORTS_END
 
 
-void cadr_state::machine_start()
+void cadr_state::cadr_init()
 {
 	u8 *maincpu = memregion("maincpu")->base();
 	u8 *prom = memregion("proms")->base();
@@ -192,7 +192,11 @@ void cadr_state::machine_start()
 			maincpu[((0x1ff - i) * 8) + b] = prom[(i * 8) + b];
 		}
 	}
+}
 
+
+void cadr_state::machine_start()
+{
 	save_item(NAME(m_interrupt_status));
 	save_item(NAME(m_bus_error_status));
 }
@@ -262,4 +266,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1978, cadr, 0, 0, cadr, cadr, cadr_state, empty_init, "MIT", "CADR", MACHINE_NOT_WORKING)
+COMP(1978, cadr, 0, 0, cadr, cadr, cadr_state, cadr_init, "MIT", "CADR", MACHINE_NOT_WORKING)

@@ -135,8 +135,8 @@ const tiny_rom_entry *cadr_iob_device::device_rom_region() const
 static INPUT_PORTS_START(keyboard)
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 00
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ⅱ")// f2 02 02
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ⅳ") // f2 02 04
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2161")// f2 02 02 (Ⅱ)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2163")// f2 02 04 (Ⅳ)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MODE LOCK") // f2 02 06
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 08
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L.SUPER") PORT_CODE(KEYCODE_LWIN) // f2 02 0a
@@ -155,7 +155,7 @@ static INPUT_PORTS_START(keyboard)
 
 	PORT_START("KEY.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L.CONTROL") PORT_CODE(KEYCODE_LCONTROL) // f2 02 20
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(": ±") // f2 02 22
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8": \u00B1")// f2 02 22 (: ±)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t') // f2 02 24
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RUB OUT") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) // f2 02 26
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L.SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1) // f2 02 28
@@ -215,8 +215,8 @@ static INPUT_PORTS_START(keyboard)
 
 	PORT_START("KEY.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MACRO") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) // f2 02 80
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ⅰ") // f2 02 82
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ⅲ") // f2 02 84
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2160")// f2 02 82 (Ⅰ)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2162")// f2 02 84 (Ⅲ)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 86
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L.TOP") // f2 02 88
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 8a
@@ -386,6 +386,9 @@ ioport_constructor cadr_iob_device::device_input_ports() const
 
 void cadr_iob_device::device_start()
 {
+	m_p1 = 0;
+	m_bus = 0xffffffff;
+
 	save_item(NAME(m_p1));
 	save_item(NAME(m_bus));
 	save_item(NAME(m_keyboard_data));
@@ -418,8 +421,6 @@ TIMER_CALLBACK_MEMBER(cadr_iob_device::clock_callback)
 
 void cadr_iob_device::device_reset()
 {
-	m_p1 = 0;
-	m_bus = 0xffffffff;
 	m_csr = 0;
 	m_microsecond_clock_buffer = 0;
 	m_clock = 0;
@@ -495,16 +496,16 @@ TIMER_CALLBACK_MEMBER(cadr_iob_device::transmit_callback)
 void cadr_iob_device::map(address_map &map)
 {
 	// When installing through a map these must be byte addresses
-	map(0x00 << 4, 0x00 << 4).lr16(NAME([this] {
+	map(0x00 << 4, 0x00 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// keyboard low
 		m_csr &= ~CSR_KEYBOARD_READY;
 		return u16(m_keyboard_data);
-	})).umask32(0xffff);
-	map(0x01 << 4, 0x01 << 4).lr16(NAME([this] {
+	}));
+	map(0x01 << 4, 0x01 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// keyboard high
 		return u16(m_keyboard_data >> 16);
-	})).umask32(0xffff);
-	map(0x02 << 4, 0x02 << 4).lr16(NAME([this] {
+	}));
+	map(0x02 << 4, 0x02 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// mouse y
 		// 0------- --------
 		// -x------ -------- - head switch
@@ -513,15 +514,15 @@ void cadr_iob_device::map(address_map &map)
 		// ----xxxx xxxxxxxx - Y position of the mouse
 		m_csr &= ~CSR_MOUSE_READY;
 		return u16(((m_mouse_buttons->read() & 0x07) << 12) | (m_mouse_y->read() & 0xfff));
-	})).umask32(0xffff);
-	map(0x03 << 4, 0x03 << 4).lr16(NAME([this] {
+	}));
+	map(0x03 << 4, 0x03 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// mouse x
 		// xx------ -------- - raw Y encoder inputs
 		// --xx---- -------- - raw X encoder inputs
 		// ----xxxx xxxxxxxx - X position of the mouse
 		return u16(m_mouse_x->read() & 0xfff);
-	})).umask32(0xffff);
-	map(0x04 << 4, 0x04 << 4).lrw16(NAME([this] {
+	}));
+	map(0x04 << 4, 0x04 << 4).umask32(0x0000'ffff).lrw16(NAME([this] {
 		if (!machine().side_effects_disabled()) {
 			m_speaker_data ^= 1;
 			m_speaker->level_w(m_speaker_data);
@@ -530,32 +531,32 @@ void cadr_iob_device::map(address_map &map)
 	}), NAME([this] (u16 data) {
 		m_speaker_data ^= 1;
 		m_speaker->level_w(m_speaker_data);
-	})).umask32(0xffff);
-	map(0x05 << 4, 0x05 << 4).lrw16(NAME([this] {
+	}));
+	map(0x05 << 4, 0x05 << 4).umask32(0x0000'ffff).lrw16(NAME([this] {
 		return m_csr;
 	}), NAME([this] (u16 data) {
 		m_csr = (m_csr & 0xf0) | (data & 0x0f);
-	})).umask32(0xffff);
-	map(0x08 << 4, 0x08 << 4).lr16(NAME([this] {
+	}));
+	map(0x08 << 4, 0x08 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// microsecond counter low
 		m_microsecond_clock_buffer = machine().time().as_ticks(1e6);
 		return u16(m_microsecond_clock_buffer);
-	})).umask32(0xffff);
-	map(0x09 << 4, 0x09 << 4).lr16(NAME([this] {
+	}));
+	map(0x09 << 4, 0x09 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// microsecond counter high
 		return u16(m_microsecond_clock_buffer >> 16);
-	})).umask32(0xffff);
-	map(0x0a << 4, 0x0a << 4).lrw16(NAME([this] {
+	}));
+	map(0x0a << 4, 0x0a << 4).umask32(0x0000'ffff).lrw16(NAME([this] {
 		// 60hz clock
 		return u16(machine().time().as_ticks(60));
 	}),NAME([this] (u16 data) {
 		m_csr &= ~CSR_CLOCK_READY;
 		m_clock = data;
 		m_clock_timer->adjust(attotime::from_msec(m_clock << 4));
-	})).umask32(0xffff);
+	}));
 	// 0x0b - general purpose I/O
 	// chaosnet csr 764140
-	map(0x10 << 4, 0x10 << 4).lrw16(NAME([this] {
+	map(0x10 << 4, 0x10 << 4).umask32(0x0000'ffff).lrw16(NAME([this] {
 		// x------- -------- Receive done
 		// -x------ -------- CRC error
 		// ---xxxx- -------- Lost count
@@ -605,8 +606,8 @@ void cadr_iob_device::map(address_map &map)
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
 			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RESET | CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
 		}
-	})).umask32(0xffff);
-	map(0x11 << 4, 0x11 << 4).lrw16(NAME([this] {
+	}));
+	map(0x11 << 4, 0x11 << 4).umask32(0x0000'ffff).lrw16(NAME([this] {
 		// chaos net my address
 		return u16(m_my_chaos_address->read());
 	}),NAME([this] (u16 data) {
@@ -614,8 +615,8 @@ void cadr_iob_device::map(address_map &map)
 		m_chaos_transmit_buffer[m_chaos_transmit_pointer] = data;
 		m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_BUFFER_SIZE;
 		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
-	})).umask32(0xffff);
-	map(0x12 << 4, 0x12 << 4).lr16(NAME([this] {
+	}));
+	map(0x12 << 4, 0x12 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// next word from receive buffer
 		if (m_chaos_receive_pointer < m_chaos_receive_size)
 		{
@@ -626,20 +627,20 @@ void cadr_iob_device::map(address_map &map)
 		m_chaos_csr &= ~CHAOSNET_RECEIVE_DONE;
 		m_chaos_receive_size = 0;
 		return u16(0);
-	})).umask32(0xffff);
-	map(0x13 << 4, 0x13 << 4).lr16(NAME([this] {
+	}));
+	map(0x13 << 4, 0x13 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		// count of bits remaining in the receive buffer
 		if (m_chaos_receive_pointer < m_chaos_receive_size)
 		{
 			return m_chaos_receive_bit_count;
 		}
 		return u16(0xfff);
-	})).umask32(0xffff);
-	map(0x15 << 4, 0x15 << 4).lr16(NAME([this] {
+	}));
+	map(0x15 << 4, 0x15 << 4).umask32(0x0000'ffff).lr16(NAME([this] {
 		 // host number of this interface
 		chaos_transmit_start();
 		return u16(m_my_chaos_address->read());
-	})).umask32(0xffff);
+	}));
 }
 
 

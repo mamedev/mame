@@ -334,6 +334,5 @@ void cadr_disk_device::start_w(u32 data)
 	case 0x004: // 0004 - Seek
 	default:
 		fatalerror("Unknown disk controller command %03x initiated\n", m_command & 0x3ff);
-		break;
 	}
 }

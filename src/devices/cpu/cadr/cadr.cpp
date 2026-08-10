@@ -71,7 +71,8 @@ cadr_cpu_device::cadr_cpu_device(const machine_config &mconfig, const char *tag,
 
 device_memory_interface::space_config_vector cadr_cpu_device::memory_space_config() const
 {
-	return space_config_vector {
+	return space_config_vector
+	{
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};
@@ -170,7 +171,8 @@ void cadr_cpu_device::program_map(address_map &map)
 }
 
 
-void cadr_cpu_device::diag_map(address_map &map) {
+void cadr_cpu_device::diag_map(address_map &map)
+{
 	// 0x00 - debug ir 15-0
 	// 0x01 - debug ir 31-16
 	// 0x02 - debug ir 47-32
@@ -178,16 +180,18 @@ void cadr_cpu_device::diag_map(address_map &map) {
 	// 0x04 - OPC control register
 
 	// When installing through a map these must be byte addresses
-	map(0x00 << 4, 0x07 << 4).lrw16(NAME([this] (offs_t offset) {
-		LOGMASKED(LOG_TRACE, "diag register read %02x\n", offset);
-		return 0;
+	map(0x00 << 4, 0x07 << 4).umask32(0x0000'ffff).lrw16(NAME([this] (offs_t offset) {
+		if (!machine().side_effects_disabled())
+			LOGMASKED(LOG_TRACE, "diag register read %02x\n", offset);
+		return u16(0);
 	}), NAME([this] (offs_t offset, u16 data) {
 		LOGMASKED(LOG_TRACE, "diag register write: %02x, %04x\n", offset, data);
-		if (offset < 0x05) {
+		if (offset < 0x05)
+		{
 			fatalerror("%x(%o): diag register write: write to %02x not implemented", m_prev_pc, m_prev_pc, offset);
 		}
-	})).umask32(0xffff);
-	map(0x05 << 4, 0x05 << 4).lw16(NAME([this] (u16 data) {
+	}));
+	map(0x05 << 4, 0x05 << 4).umask32(0x0000'ffff).lw16(NAME([this] (u16 data) {
 		LOGMASKED(LOG_TRACE, "diag mode register write: %04x\n", data);
 		// mode register
 		// x------- PROG.BOOT
@@ -199,7 +203,7 @@ void cadr_cpu_device::diag_map(address_map &map) {
 		// ------xx SPEED 00 - extra slow, 01 - slow, 10 - normal, 11 - fast
 		m_diag_mode = data;
 		m_inst_view.select(BIT(m_diag_mode, 5));
-	})).umask32(0xffff);
+	}));
 }
 
 
@@ -695,7 +699,8 @@ void cadr_cpu_device::instruction_stream()
 void cadr_cpu_device::execute_alu()
 {
 	// TODO Misc functions
-	if ((m_ir >> 10) & 0x03) {
+	if ((m_ir >> 10) & 0x03)
+	{
 		fatalerror("%x(%o): alu misc function %d not implemented", m_prev_pc, m_prev_pc, (m_ir >> 10) & 0x03);
 	}
 
@@ -717,7 +722,8 @@ void cadr_cpu_device::execute_alu()
 void cadr_cpu_device::execute_jump()
 {
 	// TODO Misc functions
-	if (((m_ir >> 10) & 0x03) > 0x01) {
+	if (((m_ir >> 10) & 0x03) > 0x01)
+	{
 		fatalerror("%x(%o): jump misc function %d not implemented", m_prev_pc, m_prev_pc, (m_ir >> 10) & 0x03);
 	}
 
@@ -779,7 +785,8 @@ void cadr_cpu_device::execute_dispatch()
 	u8 rotation = m_ir & 0x1f;
 
 	// TODO Misc functions
-	if (((m_ir >> 10) & 0x03) == 0x03) {
+	if (((m_ir >> 10) & 0x03) == 0x03)
+	{
 		if (BIT(m_ic, 29))
 		{
 			rotation = rotation ^ ((BIT(m_lc, 1) ^ BIT(m_lc, 0)) << 4);
@@ -799,7 +806,8 @@ void cadr_cpu_device::execute_dispatch()
 	const u32 m = std::rotl(m_m, rotation) & dispatch_mask[(m_ir >> 5) & 0x07];
 	u32 index = ((m_ir >> 12) & 0x7ff) | m;
 
-	if ((m_ir >> 8) & 0x03) {
+	if ((m_ir >> 8) & 0x03)
+	{
 		const u8 l1 = m_vma_map_l1[(m_md >> 13) & 0x7ff];
 		const u16 l2_index = (l1 << 5) | ((m_md >> 8) & 0x1f);
 		const u32 l2 = m_vma_map_l2[l2_index] & 0xffffff;
