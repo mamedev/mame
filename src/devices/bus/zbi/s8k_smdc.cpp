@@ -728,7 +728,6 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 
 		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
 
-		// CT is the total transfer size and may span sectors (swap I/O uses up to 0xfe00 bytes).
 		for (unsigned remaining = pkt->CT; remaining != 0; block++)
 		{
 			unsigned const count = std::min<unsigned>(remaining, file->get_info().sectorbytes);
