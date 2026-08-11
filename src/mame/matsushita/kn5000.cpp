@@ -727,7 +727,7 @@ ROM_START(kn5000)
 	ROMX_LOAD("kn5000_subprogram_v140_compressed.rom", 0x0e0000, 0x16bc4, CRC(5b182629) SHA1(13098dd150c5a6083a5d15a63d5d785802d8e8ae), ROM_BIOS(5)) // v5
 
 	ROM_REGION16_LE(0x400000, "rhythm_data", 0)
-	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(76d11a5e) SHA1(e4b572d318c9fe7ba00e5b44ea783e89da9c68bd))
+	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(aa4917ce) SHA1(fef7f1927935d8fdada2afbdbfac29aac56e1c3c))
 
 	ROM_REGION16_LE(0x1000000, "waveform", 0)
 	ROM_LOAD("kn5000_waveform_rom.ic304", 0x000000, 0x400000, NO_DUMP)
