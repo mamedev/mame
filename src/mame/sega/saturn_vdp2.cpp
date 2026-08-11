@@ -79,10 +79,9 @@ void saturn_vdp2_device::device_reset()
 
 void saturn_vdp2_device::init_vcounter_table()
 {
-	u16 i;
 	// put vcounter inside a table
 	// 224 mode
-	for(i = 0; i < 263; i++)
+	for(u16 i = 0; i < 263; i++)
 	{
 		true_vcount[i][0] = i;
 		if(i > 0xec)
@@ -90,7 +89,7 @@ void saturn_vdp2_device::init_vcounter_table()
 	}
 
 	// 240 mode
-	for(i = 0; i < 263; i++)
+	for(u16 i = 0; i < 263; i++)
 	{
 		true_vcount[i][1] = i;
 		if(i > 0xf5)
@@ -98,7 +97,7 @@ void saturn_vdp2_device::init_vcounter_table()
 	}
 
 	// TODO: PAL only 256 mode
-	for(i = 0; i < 313; i++)
+	for(u16 i = 0; i < 313; i++)
 	{
 		true_vcount[i][2] = i;
 		true_vcount[i][3] = i;

@@ -66,33 +66,34 @@ saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *
 //  LIVE DEVICE
 //**************************************************************************
 
-template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
+template <unsigned Level>
+void saturn_scu_device::dma_map(address_map &map)
 {
 	map(0x00, 0x03).lrw32(
 		NAME([this] (offs_t offset) {
-			return m_dma[level].src;
+			return m_dma[Level].src;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_dma[level].src);
-			m_dma[level].src &= 0x27ff'ffff;
+			COMBINE_DATA(&m_dma[Level].src);
+			m_dma[Level].src &= 0x27ff'ffff;
 		})
 	);
 	map(0x04, 0x07).lrw32(
 		NAME([this] (offs_t offset) {
-			return m_dma[level].dst;
+			return m_dma[Level].dst;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_dma[level].dst);
-			m_dma[level].dst &= 0x27ff'ffff;
+			COMBINE_DATA(&m_dma[Level].dst);
+			m_dma[Level].dst &= 0x27ff'ffff;
 		})
 	);
 	map(0x08, 0x0b).lrw32(
 		NAME([this] (offs_t offset) {
-			return m_dma[level].size;
+			return m_dma[Level].size;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_dma[level].size);
-			m_dma[level].size &= ((level == 0) ? 0x000fffff : 0xfff);
+			COMBINE_DATA(&m_dma[Level].size);
+			m_dma[Level].size &= ((Level == 0) ? 0x000fffff : 0xfff);
 		})
 	);
 	// everything else is write only
@@ -101,11 +102,11 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 	map(0x0c, 0x0f).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_8_15)
-				m_dma[level].src_add = BIT(data, 8) * 4;
+				m_dma[Level].src_add = BIT(data, 8) * 4;
 			if (ACCESSING_BITS_0_7)
 			{
-				m_dma[level].dst_add = 1 << (data & 7);
-				if(m_dma[level].dst_add == 1) { m_dma[level].dst_add = 0; }
+				m_dma[Level].dst_add = 1 << (data & 7);
+				if(m_dma[Level].dst_add == 1) { m_dma[Level].dst_add = 0; }
 			}
 		})
 	);
@@ -113,15 +114,15 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 	map(0x10, 0x13).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_8_15)
-				m_dma[level].enable_mask = BIT(data, 8);
+				m_dma[Level].enable_mask = BIT(data, 8);
 
 			// check if DxGO is enabled for start factor = 7
-			if(ACCESSING_BITS_0_7 && m_dma[level].enable_mask == true && BIT(data, 0) && m_dma[level].start_factor == DMA_EVENT_TRIGGER)
+			if(ACCESSING_BITS_0_7 && m_dma[Level].enable_mask == true && BIT(data, 0) && m_dma[Level].start_factor == DMA_EVENT_TRIGGER)
 			{
-				if(m_dma[level].indirect_mode == true)
-					trigger_dma_indirect(level);
+				if(m_dma[Level].indirect_mode == true)
+					trigger_dma_indirect(Level);
 				else
-					trigger_dma_direct(level);
+					trigger_dma_direct(Level);
 			}
 		})
 	);
@@ -129,16 +130,16 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 	map(0x14, 0x17).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_24_31)
-				m_dma[level].indirect_mode = BIT(data, 24);
+				m_dma[Level].indirect_mode = BIT(data, 24);
 			if (ACCESSING_BITS_16_23)
-				m_dma[level].rup = BIT(data, 16);
+				m_dma[Level].rup = BIT(data, 16);
 			if (ACCESSING_BITS_8_15)
-				m_dma[level].wup = BIT(data, 8);
+				m_dma[Level].wup = BIT(data, 8);
 			if (ACCESSING_BITS_0_7)
 			{
-				m_dma[level].start_factor = data & 7;
-				if (m_dma[level].start_factor != 7)
-					LOG("DMA%d start factor set %02x\n", level, m_dma[level].start_factor);
+				m_dma[Level].start_factor = data & 7;
+				if (m_dma[Level].start_factor != 7)
+					LOG("DMA%d start factor set %02x\n", Level, m_dma[Level].start_factor);
 			}
 		})
 	);
@@ -368,8 +369,8 @@ void saturn_scu_device::device_reset_after_children()
 
 inline void saturn_scu_device::update_dma_status(int level, dma_state_t new_state)
 {
-	const std::string status_names[] = { "IDLE", "MOVE", "WAIT", "????" };
-	const int log_shifts[] = { 4, 8, 12 };
+	char const *const status_names[] = { "IDLE", "MOVE", "WAIT", "????" };
+	constexpr int log_shifts[] = { 4, 8, 12 };
 	assert(level >= 0);
 
 	LOGMASKED(LOG_DMA_STATE, "DMA%d state change %s -> ", level, status_names[(m_dma_status >> log_shifts[level]) & 0x3]);
@@ -472,9 +473,8 @@ void saturn_scu_device::trigger_dma_direct(uint8_t level)
 		return;
 	}
 
-	u16 src_flags, dst_flags, src_penalty, dst_penalty;
-	std::tie(src_flags, src_penalty) = get_address_flags(m_dma[level].src, false);
-	std::tie(dst_flags, dst_penalty) = get_address_flags(m_dma[level].dst, true);
+	auto const [src_flags, src_penalty] = get_address_flags(m_dma[level].src, false);
+	auto const [dst_flags, dst_penalty] = get_address_flags(m_dma[level].dst, true);
 
 //  printf("%04x %04x\n", src_flags, dst_flags);
 
@@ -653,9 +653,8 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 					level, m_dma[level].index, indirect_src, indirect_dst, indirect_size,
 					m_dma[level].indirect_end_flag ? "END" : "");
 
-				u16 src_flags, dst_flags, src_penalty, dst_penalty;
-				std::tie(src_flags, src_penalty) = get_address_flags(indirect_src, false);
-				std::tie(dst_flags, dst_penalty) = get_address_flags(indirect_dst, true);
+				auto const [src_flags, src_penalty] = get_address_flags(indirect_src, false);
+				auto const [dst_flags, dst_penalty] = get_address_flags(indirect_dst, true);
 
 				m_dma[level].bbus_sound_access = src_flags == B_BUS_SCSP || dst_flags == B_BUS_SCSP;
 

@@ -9,6 +9,9 @@
 #include "cpu/sh/sh7604.h"
 #include "cpu/scudsp/scudsp.h"
 
+#include <tuple>
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -21,6 +24,12 @@ public:
 	// construction/destruction
 	saturn_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
+	auto main_dtack_cb()  { return m_main_dtack_cb.bind(); }
+	auto main_steal_cb()  { return m_main_steal_cb.bind(); }
+	auto sound_dtack_cb() { return m_sound_dtack_cb.bind(); }
+	auto sound_steal_cb() { return m_sound_steal_cb.bind(); }
+
 	// I/O operations
 	void regs_map(address_map &map) ATTR_COLD;
 
@@ -30,12 +39,6 @@ public:
 	void vdp1_end_w(int state);
 	void sound_req_w(int state);
 	void smpc_irq_w(int state);
-
-	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
-	auto main_dtack_cb()  { return m_main_dtack_cb.bind(); }
-	auto main_steal_cb()  { return m_main_steal_cb.bind(); }
-	auto sound_dtack_cb() { return m_sound_dtack_cb.bind(); }
-	auto sound_steal_cb() { return m_sound_steal_cb.bind(); }
 
 	IRQ_CALLBACK_MEMBER(irq_ack_cb);
 
@@ -183,7 +186,7 @@ private:
 		int         transfer_penalty;
 	}m_dma[3];
 
-	typedef void (saturn_scu_device::*dma_transfer_func)(dma_channel_t &ch);
+	using dma_transfer_func = void (saturn_scu_device::*)(dma_channel_t &ch);
 	static const dma_transfer_func dma_transfer_table[4];
 
 	std::tuple<u16, int> get_address_flags(u32 address, bool write_op);
@@ -204,7 +207,7 @@ private:
 	void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// DMA
-	template <unsigned level> void dma_map(address_map &map);
+	template <unsigned Level> void dma_map(address_map &map);
 	uint32_t dma_status_r();
 
 	// Timers

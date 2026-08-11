@@ -40,68 +40,69 @@ public:
 	{
 	}
 
-	void stv_slot(machine_config &config);
-	void stv_cartslot(machine_config &config);
-	void stv(machine_config &config);
-	void critcrsh(machine_config &config);
-	void magzun(machine_config &config);
-	void stvmp(machine_config &config);
-	void hopper(machine_config &config);
-	void batmanfr(machine_config &config);
-	void shienryu(machine_config &config);
-	void stv_5838(machine_config &config);
-	void stv_5881(machine_config &config);
-	void stvcd(machine_config &config);
+	void stv_slot(machine_config &config) ATTR_COLD;
+	void stv(machine_config &config) ATTR_COLD;
+	void critcrsh(machine_config &config) ATTR_COLD;
+	void magzun(machine_config &config) ATTR_COLD;
+	void stvmp(machine_config &config) ATTR_COLD;
+	void hopper(machine_config &config) ATTR_COLD;
+	void batmanfr(machine_config &config) ATTR_COLD;
+	void shienryu(machine_config &config) ATTR_COLD;
+	void stv_5838(machine_config &config) ATTR_COLD;
+	void stv_5881(machine_config &config) ATTR_COLD;
+	void stvcd(machine_config &config) ATTR_COLD;
 
-	void init_astrass();
-	void init_batmanfr();
-	void init_finlarch();
-	void init_decathlt();
-	void init_decathlt_nokey();
-	void init_sanjeon();
-	void init_puyosun();
-	void init_winterht();
-	void init_gaxeduel();
-	void init_rsgun();
-	void init_groovef();
-	void init_sandor();
-	void init_cottonbm();
-	void init_smleague();
-	void init_nameclv3();
-	void init_danchiq();
-	void init_hanagumi();
-	void init_cotton2();
-	void init_seabass();
-	void init_stv();
-	void init_thunt();
-	void init_sasissu();
-	void init_dnmtdeka();
-	void init_ffreveng();
-	void init_fhboxers();
-	void init_pblbeach();
-	void init_sss();
-	void init_diehard();
-	void init_danchih();
-	void init_shienryu();
-	void init_elandore();
-	void init_prikura();
-	void init_maruchan();
-	void init_colmns97();
-	void init_grdforce();
-	void init_suikoenb();
-	void init_magzun();
-	void init_shanhigw();
-	void init_sokyugrt();
-	void init_vfremix();
-	void init_twcup98();
-	void init_znpwfv();
-	void init_othellos();
-	void init_mausuke();
-	void init_stv_us();
+	void init_astrass() ATTR_COLD;
+	void init_batmanfr() ATTR_COLD;
+	void init_finlarch() ATTR_COLD;
+	void init_decathlt() ATTR_COLD;
+	void init_decathlt_nokey() ATTR_COLD;
+	void init_sanjeon() ATTR_COLD;
+	void init_puyosun() ATTR_COLD;
+	void init_winterht() ATTR_COLD;
+	void init_gaxeduel() ATTR_COLD;
+	void init_rsgun() ATTR_COLD;
+	void init_groovef() ATTR_COLD;
+	void init_sandor() ATTR_COLD;
+	void init_cottonbm() ATTR_COLD;
+	void init_smleague() ATTR_COLD;
+	void init_nameclv3() ATTR_COLD;
+	void init_danchiq() ATTR_COLD;
+	void init_hanagumi() ATTR_COLD;
+	void init_cotton2() ATTR_COLD;
+	void init_seabass() ATTR_COLD;
+	void init_stv() ATTR_COLD;
+	void init_thunt() ATTR_COLD;
+	void init_sasissu() ATTR_COLD;
+	void init_dnmtdeka() ATTR_COLD;
+	void init_ffreveng() ATTR_COLD;
+	void init_fhboxers() ATTR_COLD;
+	void init_pblbeach() ATTR_COLD;
+	void init_sss() ATTR_COLD;
+	void init_diehard() ATTR_COLD;
+	void init_danchih() ATTR_COLD;
+	void init_shienryu() ATTR_COLD;
+	void init_elandore() ATTR_COLD;
+	void init_prikura() ATTR_COLD;
+	void init_maruchan() ATTR_COLD;
+	void init_colmns97() ATTR_COLD;
+	void init_grdforce() ATTR_COLD;
+	void init_suikoenb() ATTR_COLD;
+	void init_magzun() ATTR_COLD;
+	void init_shanhigw() ATTR_COLD;
+	void init_sokyugrt() ATTR_COLD;
+	void init_vfremix() ATTR_COLD;
+	void init_twcup98() ATTR_COLD;
+	void init_znpwfv() ATTR_COLD;
+	void init_othellos() ATTR_COLD;
+	void init_mausuke() ATTR_COLD;
+	void init_stv_us() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void stv_cartslot(machine_config &config) ATTR_COLD;
 
 private:
 	uint8_t ioga_r(offs_t offset);
@@ -124,7 +125,7 @@ private:
 	optional_device<generic_slot_device> m_cart3;
 	optional_device<generic_slot_device> m_cart4;
 
-	void install_stvbios_speedups( void );
+	void install_stvbios_speedups();
 
 	void batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	optional_device<acclaim_rax_device> m_rax;

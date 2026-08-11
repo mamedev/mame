@@ -1125,13 +1125,13 @@ void stv_state::stv(machine_config &config)
 	m_smpc_hle->pdr2_in_handler().set(FUNC(stv_state::pdr2_input_r));
 	m_smpc_hle->pdr1_out_handler().set(FUNC(stv_state::pdr1_output_w));
 	m_smpc_hle->pdr2_out_handler().set(FUNC(stv_state::pdr2_output_w));
-	m_smpc_hle->master_reset_handler().set(FUNC(saturn_state::master_sh2_reset_w));
-	m_smpc_hle->master_nmi_handler().set(FUNC(saturn_state::master_sh2_nmi_w));
-	m_smpc_hle->slave_reset_handler().set(FUNC(saturn_state::slave_sh2_reset_w));
-//  m_smpc_hle->sound_reset_handler().set(FUNC(saturn_state::sound_68k_reset_w)); // ST-V games controls reset line via PDR2
-	m_smpc_hle->system_reset_handler().set(FUNC(saturn_state::system_reset_w));
-	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
-	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
+	m_smpc_hle->master_reset_handler().set(FUNC(stv_state::master_sh2_reset_w));
+	m_smpc_hle->master_nmi_handler().set(FUNC(stv_state::master_sh2_nmi_w));
+	m_smpc_hle->slave_reset_handler().set(FUNC(stv_state::slave_sh2_reset_w));
+//  m_smpc_hle->sound_reset_handler().set(FUNC(stv_state::sound_68k_reset_w)); // ST-V games controls reset line via PDR2
+	m_smpc_hle->system_reset_handler().set(FUNC(stv_state::system_reset_w));
+	m_smpc_hle->system_halt_handler().set(FUNC(stv_state::system_halt_w));
+	m_smpc_hle->dot_select_handler().set(FUNC(stv_state::dot_select_w));
 	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(saturn_scu_device::smpc_irq_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
@@ -1177,7 +1177,7 @@ void stv_state::stv(machine_config &config)
 
 	SCSP(config, m_scsp, 22579200); // TODO : Unknown clock, divider
 	m_scsp->set_addrmap(0, &stv_state::scsp_mem);
-	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
+	m_scsp->irq_cb().set(FUNC(stv_state::scsp_irq));
 	m_scsp->main_irq_cb().set(m_scu, FUNC(saturn_scu_device::sound_req_w));
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
@@ -1308,11 +1308,7 @@ void stv_state::hopper(machine_config &config)
 
 void stv_state::machine_reset()
 {
-	m_scsp_last_line = 0;
-
-	// don't let the slave cpu and the 68k go anywhere
-	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	saturn_state::machine_reset();
 
 	std::string region_tag;
 	if (m_cart1)
@@ -1332,17 +1328,9 @@ void stv_state::machine_reset()
 	else
 		m_cart_reg[3] = nullptr;
 
-
-	m_en_68k = 0;
-
 	m_port_sel = m_mux_data = 0;
 
-	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
-	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
-
 	m_prev_gamebank_select = 0xff;
-
-	m_vdp2_legacy.old_crmd = -1;
 }
 
 std::pair<std::error_condition, std::string> stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
@@ -1379,6 +1367,8 @@ std::pair<std::error_condition, std::string> stv_state::load_cart(device_image_i
 
 void stv_state::machine_start()
 {
+	saturn_state::machine_start();
+
 	// save states
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));

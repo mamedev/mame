@@ -259,12 +259,12 @@ void saturn_cd_hle_device::amap(address_map &map)
 	map(0x18000, 0x18003).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
 	// normally read at $58900xx, test1f probes $58800xx instead
 	map(0x80000, 0x80003).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
-	map(0x80008, 0x8000b).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::hirq_r), FUNC(saturn_cd_hle_device::hirq_w)).umask32(0xffffffff);
-	map(0x8000c, 0x8000f).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::hirqmask_r), FUNC(saturn_cd_hle_device::hirqmask_w)).umask32(0xffffffff);
-	map(0x80018, 0x8001b).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr1_r), FUNC(saturn_cd_hle_device::cr1_w)).umask32(0xffffffff);
-	map(0x8001c, 0x8001f).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr2_r), FUNC(saturn_cd_hle_device::cr2_w)).umask32(0xffffffff);
-	map(0x80020, 0x80023).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr3_r), FUNC(saturn_cd_hle_device::cr3_w)).umask32(0xffffffff);
-	map(0x80024, 0x80027).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr4_r), FUNC(saturn_cd_hle_device::cr4_w)).umask32(0xffffffff);
+	map(0x80008, 0x8000b).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::hirq_r), FUNC(saturn_cd_hle_device::hirq_w));
+	map(0x8000c, 0x8000f).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::hirqmask_r), FUNC(saturn_cd_hle_device::hirqmask_w));
+	map(0x80018, 0x8001b).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr1_r), FUNC(saturn_cd_hle_device::cr1_w));
+	map(0x8001c, 0x8001f).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr2_r), FUNC(saturn_cd_hle_device::cr2_w));
+	map(0x80020, 0x80023).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr3_r), FUNC(saturn_cd_hle_device::cr3_w));
+	map(0x80024, 0x80027).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr4_r), FUNC(saturn_cd_hle_device::cr4_w));
 
 	// NetLink access
 	// dragndrm expects this value, most likely for status
@@ -653,7 +653,7 @@ void saturn_cd_hle_device::cd_change_status(u16 new_status)
 {
 	// BUSY over BUSY is an unexpected condition hence the !
 	// The "???" are just to avoid making a division in this hot path
-	const std::string status_names[16] = {
+	char const *const status_names[16] = {
 		"BUSY (!)",  "PAUSE", "STANDBY", "PLAY", "SEEK", "SCAN", "OPEN", "NODISC",
 		"RETRY",     "ERROR", "FATAL",   "???",  "???",  "???",  "???",  "???"
 	};

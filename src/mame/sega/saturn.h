@@ -5,14 +5,6 @@
 
 #pragma once
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-
-#include "cpu/m68000/m68000.h"
-#include "cpu/sh/sh7604.h"
-#include "machine/timer.h"
-#include "sound/scsp.h"
-
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
 #include "saturn_dcc.h"
@@ -21,45 +13,40 @@
 #include "saturn_vdp2.h"
 #include "smpc.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/sh/sh7604.h"
+#include "machine/timer.h"
+#include "sound/scsp.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 class saturn_state : public driver_device
 {
 public:
-	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_rom(*this, "bios"),
-			m_workram_l(*this, "workram_l"),
-			m_workram_h(*this, "workram_h"),
-			m_sound_ram(*this, "sound_ram"),
-			m_maincpu(*this, "maincpu"),
-			m_slave(*this, "slave"),
-			m_audiocpu(*this, "audiocpu"),
-			m_dcc(*this, "dcc"),
-			m_scsp(*this, "scsp"),
-			m_smpc_hle(*this, "smpc"),
-			m_scu(*this, "scu"),
-			//m_vdp1(*this, "vdp1"),
-			m_vdp2(*this, "vdp2"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+	saturn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_rom(*this, "bios"),
+		m_workram_l(*this, "workram_l"),
+		m_workram_h(*this, "workram_h"),
+		m_sound_ram(*this, "sound_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_slave(*this, "slave"),
+		m_audiocpu(*this, "audiocpu"),
+		m_dcc(*this, "dcc"),
+		m_scsp(*this, "scsp"),
+		m_smpc_hle(*this, "smpc"),
+		m_scu(*this, "scu"),
+		//m_vdp1(*this, "vdp1"),
+		m_vdp2(*this, "vdp2"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{
 	}
-
-	void scsp_irq(offs_t offset, uint8_t data);
-
-	// SMPC HLE delegates
-	void master_sh2_reset_w(int state);
-	void master_sh2_nmi_w(int state);
-	void slave_sh2_reset_w(int state);
-	void sound_68k_reset_w(int state);
-	void system_reset_w(int state);
-	void system_halt_w(int state);
-	void dot_select_w(int state);
-
-	void m68k_reset_callback(int state);
 
 protected:
 	required_region_ptr<uint32_t> m_rom;
@@ -76,6 +63,11 @@ protected:
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
 	uint8_t     m_en_68k = 0;
+
+	struct spoint {
+		int32_t x, y;
+		int32_t u, v;
+	};
 
 	struct {
 		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
@@ -124,6 +116,21 @@ protected:
 	bitmap_rgb32 m_tmpbitmap;
 
 	int m_scsp_last_line = 0;
+
+	virtual void machine_reset() override ATTR_COLD;
+
+	void scsp_irq(offs_t offset, uint8_t data);
+
+	// SMPC HLE delegates
+	void master_sh2_reset_w(int state);
+	void master_sh2_nmi_w(int state);
+	void slave_sh2_reset_w(int state);
+	void sound_68k_reset_w(int state);
+	void system_reset_w(int state);
+	void system_halt_w(int state);
+	void dot_select_w(int state);
+
+	void m68k_reset_callback(int state);
 
 	void CEF_1() { m_vdp1_regs[0x010/2] |= 0x0002; }
 	void CEF_0() { m_vdp1_regs[0x010/2] &= ~0x0002; }
