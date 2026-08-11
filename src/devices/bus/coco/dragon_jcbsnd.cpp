@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "dragon_jcbsnd.h"
-#include "speaker.h"
 
 
 ROM_START( dragon_jcbsnd )
@@ -81,9 +80,17 @@ memory_region *dragon_jcbsnd_device::get_cart_memregion()
 
 void dragon_jcbsnd_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay8910, DERIVED_CLOCK(1, 1)); /* AY-3-8910 - clock not verified */
-	m_ay8910->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+
+//-------------------------------------------------
+//  device_resolve_objects
+//-------------------------------------------------
+
+void dragon_jcbsnd_device::device_resolve_objects()
+{
+	// mono back to the Dragon system cartridge audio input line
+	add_sound_route(*m_ay8910, ALL_OUTPUTS, 1.0);
 }
 
 //-------------------------------------------------

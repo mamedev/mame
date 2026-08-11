@@ -50,7 +50,7 @@ public:
 	void dragon_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void pia1_pa_changed(uint8_t data) override;
+	virtual void pia1_pa_w(uint8_t data) override;
 
 	static void dragon_cart(device_slot_interface &device);
 
@@ -83,7 +83,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void pia1_pb_changed(uint8_t data) override;
+	virtual void pia1_pb_w(uint8_t data) override;
 	void page_rom(bool romswitch);
 
 private:

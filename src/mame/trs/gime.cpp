@@ -216,7 +216,25 @@ void gime_device::device_start()
 	save_item(NAME(m_firq));
 	save_item(NAME(m_timer_value));
 	save_item(NAME(m_is_blinking));
-	save_pointer(NAME(m_palette_rotated[0]), 16);
+	save_item(NAME(m_palette_rotated));
+	save_item(NAME(m_composite_phase_invert));
+	save_item(NAME(m_video_position));
+	save_item(NAME(m_line_in_row));
+	save_item(NAME(m_legacy_video));
+	save_item(NAME(m_palette_rotated_position));
+	save_item(NAME(m_palette_rotated_position_used));
+
+	for (int i = 0; i < std::size(m_scanlines); i++)
+	{
+		save_item(NAME(m_scanlines[i].m_border), i);
+		save_item(NAME(m_scanlines[i].m_line_in_row), i);
+		save_item(NAME(m_scanlines[i].m_ff22_value), i);
+		save_item(NAME(m_scanlines[i].m_ff98_value), i);
+		save_item(NAME(m_scanlines[i].m_ff99_value), i);
+		save_item(NAME(m_scanlines[i].m_mode), i);
+		save_item(NAME(m_scanlines[i].m_data), i);
+		save_item(NAME(m_scanlines[i].m_palette), i);
+	}
 }
 
 

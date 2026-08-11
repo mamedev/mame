@@ -3356,6 +3356,36 @@ ioport_configurer& ioport_configurer::port_modify(const char *tag)
 
 
 //-------------------------------------------------
+//  field_modify - find an existing field and
+//  modify it
+//-------------------------------------------------
+
+ioport_configurer &ioport_configurer::field_modify(ioport_value mask)
+{
+	if (m_curport == nullptr)
+	{
+		osd_printf_error("PORT_BIT_MODIFY used without an active port!\n");
+		m_curfield = nullptr;
+		return *this;
+	}
+
+	m_curfield = nullptr;
+	for (ioport_field &field : m_curport->fields())
+	{
+		if ((field.mask() & mask) == mask)
+		{
+			m_curfield = &field;
+			return *this;
+		}
+	}
+
+	osd_printf_error("PORT_BIT_MODIFY failed to find field matching mask 0x%X in port '%s'\n",
+		mask, m_curport->tag());
+	return *this;
+}
+
+
+//-------------------------------------------------
 //  field_alloc - allocate a new field
 //-------------------------------------------------
 

@@ -1045,6 +1045,7 @@ public:
 	// port helpers
 	ioport_configurer& port_alloc(const char *tag);
 	ioport_configurer& port_modify(const char *tag);
+	ioport_configurer& field_modify(ioport_value mask);
 
 	// field helpers
 	ioport_configurer& field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
@@ -1157,6 +1158,8 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_alloc((_type), (_default), (_mask));
 #define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) \
 	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, nullptr)
+#define PORT_BIT_MODIFY(mask) \
+	configurer.field_modify(mask);
 
 #define PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, _diploc) \
 	configurer.onoff_alloc(DEF_STR(_strindex), _default, _mask, _diploc);
