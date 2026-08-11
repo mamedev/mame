@@ -5795,15 +5795,17 @@ void z8002_device::ZAF_dddd_cccc()
 void z8002_device::ZB0_dddd_0000()
 {
 	GET_DST(OP0,NIB2);
-	uint8_t result;
-	uint16_t idx = RB(dst);
-	if (m_fcw & F_C)    idx |= 0x100;
-	if (m_fcw & F_H)    idx |= 0x200;
-	if (m_fcw & F_DA) idx |= 0x400;
-	result = Z8000_dab[idx];
+	uint8_t result = RB(dst);
+	bool const subtract = m_fcw & F_DA;
+	bool const lowfix = (m_fcw & F_H) || ((result & 0x0f) > 0x09);
+	if (lowfix)
+		result = subtract ? result - 0x06 : result + 0x06;
+	bool const highfix = (m_fcw & F_C) || (((result >> 4) & 0x0f) > 0x09);
+	if (highfix)
+		result = subtract ? result - 0x60 : result + 0x60;
 	CLR_CZS;
 	CHK_XXXB_ZS;
-	if (Z8000_dab[idx] & 0x100) SET_C;
+	if (highfix) SET_C;
 	RB(dst) = result;
 }
 
