@@ -1860,7 +1860,11 @@ void saturn_state::vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite
 	}
 	if ( y < cliprect.min_y ) //clip y
 	{
-		u += xsize*(cliprect.min_y - y);
+		// draculax user clips a 320x240 sprite for inverted castle map (obviously x & y flipped)
+		// we need to adjust U calculation only to make it align properly,
+		// adjusting ysize will already glitch out flipped doors in gameplay.
+		const int adjust_y = direction & 2 ? y - cliprect.min_y : cliprect.min_y - y;
+		u += xsize * (adjust_y);
 		ysize -= (cliprect.min_y - y);
 		y = cliprect.min_y;
 	}

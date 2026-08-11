@@ -1297,6 +1297,10 @@ Not extensively tested
 [VDP1] offset cursor in name select
 [VDP1] currently too fast in places
 [VDP1] water steps in Underground Caverns doesn't clamp nearby (cfr. https://www.youtube.com/watch?v=H6Db-Z8QIbI&t=8468s)
+[VDP1] Were Bane (Nemesis sword drop) special attack has stippled oblique polylines (TODO: check Rapier too)
+[VDP1] verify bat sonar room in Catacombs (cfr. https://youtu.be/H6Db-Z8QIbI?t=19845)
+[VDP1] static clouds background in Royal Chapel have scaling gaps (cfr. https://youtu.be/H6Db-Z8QIbI?t=20871)
+[VDP1] or [VDP2] Maria fight in Alucard mode has color mixing bug when she starts using star shaped magics (https://youtu.be/H6Db-Z8QIbI?t=21298)
 [VDP2] doesn't cut off top of GFXs in magic device screen (3rd option in pause menu, scroll up/down)
 [VDP2] has weird full screen Color Calculation yellow in Mermaid room at Castle Entrance (TODO: check inverted castle)
 No overscan in places (cfr. Underground Caverns near boss room)
@@ -1998,8 +2002,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Cleopatra Fortune (Japan)... -->
-	<software name="cleopatr" supported="no">
+	<software name="cleopatr" supported="partial">
 		<description>Cleopatra Fortune (Japan)</description>
 		<year>1997</year>
 		<publisher>Taito</publisher>
