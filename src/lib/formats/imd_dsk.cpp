@@ -517,7 +517,8 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	{
 		// On 5.25, check if the drive is QD or HD but we're a 40 track
 		// image.  If so, put the image on even tracks.
-		if ((has_variant(variants, floppy_image::DSQD)) ||
+		if ((has_variant(variants, floppy_image::SSQD)) ||
+			(has_variant(variants, floppy_image::DSQD)) ||
 			(has_variant(variants, floppy_image::DSHD)))
 		{
 			if (maxtrack <= 39)
@@ -613,6 +614,7 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[i].deleted = stype == 3 || stype == 4 || stype == 7 || stype == 8;
 				sects[i].bad_data_crc = stype == 5 || stype == 6 || stype == 7 || stype == 8;
 				sects[i].bad_addr_crc = false;
+				sects[i].weak = false;
 
 				if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
 					sects[i].data = new uint8_t [actual_size];

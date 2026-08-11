@@ -30,19 +30,6 @@
 
 */
 
-/*
-
-    TODO:
-
-    - systest1600 failures
-        - CIO timer (works if CIO clock is 4219000)
-        - DMA (expects to read 0xff from 0x18000..)
-    - [:2a:chb] - TX FIFO is full, discarding data
-        [:] SCC write 000003
-        [:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
-
-*/
-
 #include "emu.h"
 #include "abc1600_v.h"
 #include "abc1600_mmu.h"

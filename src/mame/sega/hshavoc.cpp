@@ -467,9 +467,9 @@ None of this has been confirmed on the board.  The discriminating measurement
 is whether any of the PEEL I/O pins reach the 68000 data bus at all: if none
 do, the scrambling was applied to the ROM image when it was built, the PEELs do
 something else, and the match between the 4b counter decode and the pattern
-this driver applies is a remarkable coincidence rather than an explanation.  The PIC's port A pins are
-worth tracing at the same time - see 'The 0x3d000 block' below for why they
-look like the thing that picks among these six.
+this driver applies is a remarkable coincidence rather than an explanation.
+The PIC's port A pins are worth tracing at the same time - see 'The 0x3d000 block'
+below for why they look like the thing that picks among these six.
 
 
 The 0x3d000 block

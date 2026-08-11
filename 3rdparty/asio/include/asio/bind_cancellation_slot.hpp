@@ -2,7 +2,7 @@
 // bind_cancellation_slot.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,14 +16,17 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-#include "asio/detail/type_traits.hpp"
 #include "asio/associated_cancellation_slot.hpp"
+#include "asio/associated_executor.hpp"
 #include "asio/associator.hpp"
 #include "asio/async_result.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/type_traits.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 // Helper to automatically define nested typedef result_type.
@@ -147,6 +150,10 @@ struct cancellation_slot_binder_argument_type<R(&)(A1, A2)>
 
 /// A call wrapper type to bind a cancellation slot of type @c CancellationSlot
 /// to an object of type @c T.
+/**
+ * @sa @ref overview_associators "Associators",
+ * @ref overview_token_adapters "Completion token adapters"
+ */
 template <typename T, typename CancellationSlot>
 class cancellation_slot_binder
 #if !defined(GENERATING_DOCUMENTATION)
@@ -349,14 +356,21 @@ public:
 
   /// Forwarding function call operator.
   template <typename... Args>
-  result_of_t<T(Args...)> operator()(Args&&... args)
+  result_of_t<T(Args...)> operator()(Args&&... args) &
   {
     return target_(static_cast<Args&&>(args)...);
   }
 
   /// Forwarding function call operator.
   template <typename... Args>
-  result_of_t<T(Args...)> operator()(Args&&... args) const
+  result_of_t<T(Args...)> operator()(Args&&... args) &&
+  {
+    return static_cast<T&&>(target_)(static_cast<Args&&>(args)...);
+  }
+
+  /// Forwarding function call operator.
+  template <typename... Args>
+  result_of_t<T(Args...)> operator()(Args&&... args) const&
   {
     return target_(static_cast<Args&&>(args)...);
   }
@@ -365,6 +379,46 @@ private:
   CancellationSlot slot_;
   T target_;
 };
+
+/// A function object type that adapts a @ref completion_token to specify that
+/// the completion handler should have the supplied cancellation slot as its
+/// associated cancellation slot.
+/**
+ * May also be used directly as a completion token, in which case it adapts the
+ * asynchronous operation's default completion token (or asio::deferred
+ * if no default is available).
+ */
+template <typename CancellationSlot>
+struct partial_cancellation_slot_binder
+{
+  /// Constructor that specifies associated cancellation slot.
+  explicit partial_cancellation_slot_binder(const CancellationSlot& ex)
+    : cancellation_slot_(ex)
+  {
+  }
+
+  /// Adapt a @ref completion_token to specify that the completion handler
+  /// should have the cancellation slot as its associated cancellation slot.
+  template <typename CompletionToken>
+  ASIO_NODISCARD inline
+  constexpr cancellation_slot_binder<decay_t<CompletionToken>, CancellationSlot>
+  operator()(CompletionToken&& completion_token) const
+  {
+    return cancellation_slot_binder<decay_t<CompletionToken>, CancellationSlot>(
+        static_cast<CompletionToken&&>(completion_token), cancellation_slot_);
+  }
+
+//private:
+  CancellationSlot cancellation_slot_;
+};
+
+/// Create a partial completion token that associates a cancellation slot.
+template <typename CancellationSlot>
+ASIO_NODISCARD inline partial_cancellation_slot_binder<CancellationSlot>
+bind_cancellation_slot(const CancellationSlot& ex)
+{
+  return partial_cancellation_slot_binder<CancellationSlot>(ex);
+}
 
 /// Associate an object of type @c T with a cancellation slot of type
 /// @c CancellationSlot.
@@ -446,50 +500,51 @@ public:
   }
 
   template <typename Initiation>
-  struct init_wrapper
+  struct init_wrapper : detail::initiation_base<Initiation>
   {
-    template <typename Init>
-    init_wrapper(const CancellationSlot& slot, Init&& init)
-      : slot_(slot),
-        initiation_(static_cast<Init&&>(init))
-    {
-    }
+    using detail::initiation_base<Initiation>::initiation_base;
 
     template <typename Handler, typename... Args>
-    void operator()(Handler&& handler, Args&&... args)
+    void operator()(Handler&& handler,
+        const CancellationSlot& slot, Args&&... args) &&
     {
-      static_cast<Initiation&&>(initiation_)(
+      static_cast<Initiation&&>(*this)(
           cancellation_slot_binder<decay_t<Handler>, CancellationSlot>(
-              slot_, static_cast<Handler&&>(handler)),
+              slot, static_cast<Handler&&>(handler)),
           static_cast<Args&&>(args)...);
     }
 
     template <typename Handler, typename... Args>
-    void operator()(Handler&& handler, Args&&... args) const
+    void operator()(Handler&& handler,
+        const CancellationSlot& slot, Args&&... args) const &
     {
-      initiation_(
+      static_cast<const Initiation&>(*this)(
           cancellation_slot_binder<decay_t<Handler>, CancellationSlot>(
-              slot_, static_cast<Handler&&>(handler)),
+              slot, static_cast<Handler&&>(handler)),
           static_cast<Args&&>(args)...);
     }
-
-    CancellationSlot slot_;
-    Initiation initiation_;
   };
 
   template <typename Initiation, typename RawCompletionToken, typename... Args>
   static auto initiate(Initiation&& initiation,
       RawCompletionToken&& token, Args&&... args)
     -> decltype(
-      async_initiate<T, Signature>(
+      async_initiate<
+        conditional_t<
+          is_const<remove_reference_t<RawCompletionToken>>::value, const T, T>,
+        Signature>(
         declval<init_wrapper<decay_t<Initiation>>>(),
-        token.get(), static_cast<Args&&>(args)...))
+        token.get(), token.get_cancellation_slot(),
+        static_cast<Args&&>(args)...))
   {
-    return async_initiate<T, Signature>(
+    return async_initiate<
+      conditional_t<
+        is_const<remove_reference_t<RawCompletionToken>>::value, const T, T>,
+      Signature>(
         init_wrapper<decay_t<Initiation>>(
-          token.get_cancellation_slot(),
           static_cast<Initiation&&>(initiation)),
-        token.get(), static_cast<Args&&>(args)...);
+        token.get(), token.get_cancellation_slot(),
+        static_cast<Args&&>(args)...);
   }
 
 private:
@@ -497,6 +552,32 @@ private:
   async_result& operator=(const async_result&) = delete;
 
   async_result<T, Signature> target_;
+};
+
+template <typename CancellationSlot, typename... Signatures>
+struct async_result<partial_cancellation_slot_binder<CancellationSlot>,
+    Signatures...>
+{
+  template <typename Initiation, typename RawCompletionToken, typename... Args>
+  static auto initiate(Initiation&& initiation,
+      RawCompletionToken&& token, Args&&... args)
+    -> decltype(
+      async_initiate<Signatures...>(
+        static_cast<Initiation&&>(initiation),
+        cancellation_slot_binder<
+          default_completion_token_t<associated_executor_t<Initiation>>,
+          CancellationSlot>(token.cancellation_slot_,
+            default_completion_token_t<associated_executor_t<Initiation>>{}),
+        static_cast<Args&&>(args)...))
+  {
+    return async_initiate<Signatures...>(
+        static_cast<Initiation&&>(initiation),
+        cancellation_slot_binder<
+          default_completion_token_t<associated_executor_t<Initiation>>,
+          CancellationSlot>(token.cancellation_slot_,
+            default_completion_token_t<associated_executor_t<Initiation>>{}),
+        static_cast<Args&&>(args)...);
+  }
 };
 
 template <template <typename, typename> class Associator,
@@ -537,6 +618,7 @@ struct associated_cancellation_slot<
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

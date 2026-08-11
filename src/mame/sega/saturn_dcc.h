@@ -35,7 +35,9 @@ private:
 	void handle_frt_cb(s32 param);
 
 	// amount of slices vs. SH-2 reference clock
-	static constexpr int INTERLEAVE_DIV = 128;
+	// - 6inchmyd wants at least 64 at startup
+	// - stv:sandor wants 32
+	static constexpr int INTERLEAVE_DIV = 32;
 	// quantum interleave duration, in usec
 	static constexpr int INTERLEAVE_DURATION = 1666;
 };

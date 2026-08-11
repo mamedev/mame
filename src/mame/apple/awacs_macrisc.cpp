@@ -24,6 +24,21 @@
 
 constexpr u16 REGISTER_1_MUTE = 0x100;
 
+constexpr u32 STATUS_CODEC_READY = 1 << 22;     // subframe bit 21
+constexpr u32 STATUS_REVISION_SHIFT = 12;       // subframe bits 28-31
+constexpr u32 STATUS_MFG_SHIFT = 8;             // subframe bits 52-55
+
+constexpr u32 MFG_CRYSTAL_SEMI = 1;             // 2 would be National Semiconductor
+constexpr u32 REVISION_AWACS = 2;
+constexpr u32 REVISION_SCREAMER = 3;
+
+constexpr u16 REGISTER_6_DOZE = 1 << 0;
+constexpr u16 REGISTER_6_IDLE = 1 << 1;
+
+constexpr u16 REGISTER_7_READBACK = 1 << 0;
+constexpr u16 REGISTER_7_ADDRESS_SHIFT = 1;
+constexpr u32 STATUS_READBACK_SHIFT = 4;
+
 // device type definition
 DEFINE_DEVICE_TYPE(AWACS_MACRISC, awacs_macrisc_device, "awacsmr", "AWACS MacRisc audio I/O")
 DEFINE_DEVICE_TYPE(SCREAMER, screamer_device, "screamer", "Screamer audio I/O")
@@ -77,7 +92,7 @@ void awacs_macrisc_device::device_start()
 void awacs_macrisc_device::device_reset()
 {
 	m_phase = 0;
-	m_active = ACTIVE_OUT;      // AWACS is always running, Screamer has a real enable/disable bit
+	m_active = ACTIVE_OUT | ACTIVE_IN;
 	m_registers[1] = REGISTER_1_MUTE;
 	m_snd_control = 0;
 	m_stream->set_sample_rate(clock() / 1024);
@@ -86,7 +101,9 @@ void awacs_macrisc_device::device_reset()
 void screamer_device::device_reset()
 {
 	awacs_macrisc_device::device_reset();
-	m_active = 0;
+
+	m_registers[6] = REGISTER_6_IDLE;
+	m_active = ACTIVE_IN;
 }
 
 //-------------------------------------------------
@@ -117,6 +134,11 @@ void awacs_macrisc_device::sound_stream_update(sound_stream &stream)
 		stream.put_int(1, 0, 0, 32768);
 	}
 
+	if (m_active & ACTIVE_IN)
+	{
+		m_input_cb(m_phase, 0);
+	}
+
 	m_phase = (m_phase + 1) & 0xfff;
 }
 
@@ -132,7 +154,7 @@ uint32_t awacs_macrisc_device::read_macrisc(offs_t offset)
 			return 0;
 
 		case 8:     // Audio CODEC Status
-			return 0x314000;    // Screamer info
+			return STATUS_CODEC_READY | (MFG_CRYSTAL_SEMI << STATUS_MFG_SHIFT) | (REVISION_AWACS << STATUS_REVISION_SHIFT);
 	}
 
 	return 0;
@@ -183,10 +205,12 @@ uint32_t screamer_device::read_macrisc(offs_t offset)
 		case 4: // Audio CODEC Control
 				return 0;
 
-		case 8:                  // Audio CODEC Status
-				return (0x40 << 8) |    // indicate CODEC is present
-				(1 << 16) |             // manufacturer is Crystal Semiconductor
-				(3 << 20);              // CODEC version 3 (Screamer)
+		case 8: // Audio CODEC Status
+				if (m_registers[7] & REGISTER_7_READBACK)
+				{
+					return STATUS_CODEC_READY | (m_registers[(m_registers[7] >> REGISTER_7_ADDRESS_SHIFT) & 7] << STATUS_READBACK_SHIFT);
+				}
+				return STATUS_CODEC_READY | (MFG_CRYSTAL_SEMI << STATUS_MFG_SHIFT) | (REVISION_SCREAMER << STATUS_REVISION_SHIFT);
 	}
 
 	return 0;
@@ -196,8 +220,11 @@ void screamer_device::write_macrisc(offs_t offset, uint32_t data)
 {
 	awacs_macrisc_device::write_macrisc(offset, data);
 
-	// if IDLE bit is off, we're active
-	if (!BIT(m_registers[6], 1))
+	const bool idle = (m_registers[6] & REGISTER_6_IDLE);
+	const bool doze = (m_registers[6] & REGISTER_6_DOZE);
+	const bool run = (idle == doze);
+
+	if (run)
 	{
 		m_active |= ACTIVE_OUT;
 	}
@@ -205,5 +232,5 @@ void screamer_device::write_macrisc(offs_t offset, uint32_t data)
 	{
 		m_active &= ~ACTIVE_OUT;
 	}
-	LOG("%s: Playback %s reg 6 %x)\n", tag(), !BIT(m_registers[6], 1) ? "on" : "off", m_registers[6]);
+	LOG("%s: Playback %s reg 6 %x)\n", tag(), run ? "on" : "off", m_registers[6]);
 }

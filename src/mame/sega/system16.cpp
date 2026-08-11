@@ -616,6 +616,21 @@ void segas1x_bootleg_state::s16bl_bgscrolly_w(uint16_t data)
 }
 
 
+void segas1x_bootleg_state::beautyb_fgscrollx_w(uint16_t data)
+{
+	int scroll = data & 0x1ff;
+	scroll -= 1;
+	m_fg_scrollx = -scroll;
+}
+
+void segas1x_bootleg_state::beautyb_bgscrollx_w(uint16_t data)
+{
+	int scroll = data & 0x1ff;
+	scroll += 1;
+	m_bg_scrollx = -scroll;
+}
+
+
 void segas1x_bootleg_state::goldnaxeb1_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
@@ -1043,11 +1058,11 @@ void segas1x_bootleg_state::beautyb_map(address_map &map)
 	map(0x410000, 0x413fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 
 	map(0x418000, 0x418001).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x418008, 0x418009).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0x418008, 0x418009).w(FUNC(segas1x_bootleg_state::beautyb_bgscrollx_w));
 	map(0x418010, 0x418011).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x418018, 0x418019).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
-	map(0x418020, 0x418021).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
-	map(0x418028, 0x418029).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x418018, 0x418019).w(FUNC(segas1x_bootleg_state::beautyb_fgscrollx_w));
+	map(0x418020, 0x418021).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x418028, 0x418029).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
 
 	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 
@@ -2532,6 +2547,8 @@ void segas1x_bootleg_state::beautyb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::beautyb_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segas1x_bootleg_state::beautyb_opcodes_map);
 
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,beautyb)
+
 	// no sprites
 
 	z80_ym2151(config);
@@ -2542,6 +2559,8 @@ void segas1x_bootleg_state::iqpipe(machine_config &config)
 	beautyb(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::iqpipe_map);
+
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,iqpipe)
 }
 
 /* System 18 Bootlegs */

@@ -126,6 +126,8 @@ private:
 	u32 m_IrqTimA;
 	u32 m_IrqTimBC;
 	u32 m_IrqMidi;
+	u32 m_IrqCPU;
+	u32 m_IrqDMA;
 
 	u8 m_latched_MSLC;
 	u16 m_latched_MSLC_data;

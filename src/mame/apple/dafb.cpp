@@ -83,22 +83,21 @@ dafb_base::dafb_base(const machine_config &mconfig, device_type type, const char
 	m_vram_size(0x200000),
 	m_dafb_version(1),
 	m_pixel_clock(31334400),
+	m_reg_shift(0),
 	m_pal_address(0), m_pal_idx(0), m_ac842_pbctrl(0), m_mode(0),
-	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
+	m_timing_control(0), m_monitor_id(0),
+	m_base(0), m_stride(1024), m_swatch_mode(1),
+	m_hres(0), m_vres(0), m_config(0),
+	m_screen(*this, "screen"),
 	m_monitor_config(*this, "monitor"),
 	m_irq(*this),
-	m_vram_offset(0), m_timing_control(0), m_monitor_id(0),
-	m_base(0), m_stride(1024), m_test(0), m_swatch_mode(1),
-	m_cursor_line(0), m_anim_line(0), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
-	m_config(0), m_block_control(0), m_swatch_test(0)
+	m_vram_offset(0), m_test(0),
+	m_cursor_line(0), m_anim_line(0), m_int_status(0),
+	m_htotal(0), m_vtotal(0), m_block_control(0), m_swatch_test(0)
 {
 	std::fill(std::begin(m_horizontal_params), std::end(m_horizontal_params), 0);
 	std::fill(std::begin(m_vertical_params), std::end(m_vertical_params), 0);
-	m_scsi_read_cycles[0] = m_scsi_read_cycles[1] = 3;
-	m_scsi_write_cycles[0] = m_scsi_write_cycles[1] = 3,
-	m_scsi_dma_read_cycles[0] = m_scsi_dma_read_cycles[1] = 3;
-	m_scsi_dma_write_cycles[0] = m_scsi_dma_write_cycles[1] = 3;
 }
 
 dafb_device::dafb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -112,6 +111,11 @@ dafb_device::dafb_device(const machine_config &mconfig, device_type type, const 
 {
 	m_drq[0] = m_drq[1] = 0;
 	m_ncr[0] = m_ncr[1] = nullptr;
+	m_scsi_ctrl[0] = m_scsi_ctrl[1] = 0;
+	m_scsi_read_cycles[0] = m_scsi_read_cycles[1] = 3;
+	m_scsi_write_cycles[0] = m_scsi_write_cycles[1] = 3;
+	m_scsi_dma_read_cycles[0] = m_scsi_dma_read_cycles[1] = 3;
+	m_scsi_dma_write_cycles[0] = m_scsi_dma_write_cycles[1] = 3;
 }
 
 
@@ -367,9 +371,43 @@ u32 dafb_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const 
 	return 0;
 }
 
+// Apple assigns 3 pins for monitor IDs; for the extended codes you drive one of the 3 pins at a
+// time and read the 2 undriven pins.  The value the host sees is the inverse of the sense bits.
+u8 dafb_base::read_monitor_sense()
+{
+	u8 const mon = m_monitor_config->read();
+	u8 res;
+
+	LOGMASKED(LOG_MONSENSE, "mon = %02x, m_monitor_id = %02x\n", mon, m_monitor_id);
+	if (mon & 0x40)
+	{
+		res = 7;
+
+		if (m_monitor_id == 0x4)
+		{
+			res &= 4 | (BIT(mon, 5) << 1) | BIT(mon, 4);
+		}
+		if (m_monitor_id == 0x2)
+		{
+			res &= (BIT(mon, 3) << 2) | 2 | BIT(mon, 2);
+		}
+		if (m_monitor_id == 0x1)
+		{
+			res &= (BIT(mon, 1) << 2) | (BIT(mon, 0) << 1) | 1;
+		}
+	}
+	else
+	{
+		res = mon;
+	}
+
+	LOGMASKED(LOG_MONSENSE, "sense result = %x\n", res);
+	return res ^ 7;
+}
+
 u32 dafb_base::dafb_r(offs_t offset)
 {
-	switch (offset<<2)
+	switch (reg_offset(offset))
 	{
 		case 0: // framebuffer base, bits 20-9
 			return (m_base >> 9) & 0xfff;
@@ -387,41 +425,7 @@ u32 dafb_base::dafb_r(offs_t offset)
 			return m_config;
 
 		case 0x1c:  // inverse of monitor sense
-			{
-				u8 mon = m_monitor_config->read();
-				u8 res;
-				LOGMASKED(LOG_MONSENSE, "mon = %02x, m_monitor_id = %02x\n", mon, m_monitor_id);
-				if (mon & 0x40)
-				{
-					res = 7;
-					if (m_monitor_id == 0x4)
-					{
-						res &= 4 | (BIT(mon, 5) << 1) | BIT(mon, 4);
-					}
-					if (m_monitor_id == 0x2)
-					{
-						res &= (BIT(mon, 3) << 2) | 2 | BIT(mon, 2);
-					}
-					if (m_monitor_id == 0x1)
-					{
-						res &= (BIT(mon, 1) << 2) | (BIT(mon, 0) << 1) | 1;
-					}
-				}
-				else
-				{
-					res = mon;
-				}
-
-				LOGMASKED(LOG_MONSENSE, "sense result = %x\n", res);
-				return res ^ 7; // return value is the inverse of the sense bits
-			}
-			break;
-
-		case 0x24: // SCSI 539x #1 status
-			return m_scsi_ctrl[0] | (m_drq[0] << 9);
-
-		case 0x28: // SCSI 539x #2 status
-			return m_scsi_ctrl[1] | (m_drq[1] << 9);
+			return read_monitor_sense();
 
 		case 0x2c: // test / version (0 = original, 1 = NTSC and PAL fix, 2 = discrete DAFB II, 3 = MEMC/MEMCjr integrated DAFB cell)
 			return (m_test & 0x1ff) | (m_dafb_version<<9);
@@ -433,7 +437,7 @@ u32 dafb_base::dafb_r(offs_t offset)
 void dafb_base::dafb_w(offs_t offset, u32 data)
 {
 	data &= 0xfff;
-	switch (offset << 2)
+	switch (reg_offset(offset))
 	{
 		case 0: // bits 20-9 of base
 			m_base &= 0x1e0;
@@ -473,108 +477,6 @@ void dafb_base::dafb_w(offs_t offset, u32 data)
 			LOGMASKED(LOG_MONSENSE, "%x to sense drive\n", data & 0xf);
 			break;
 
-		/*
-		    SCSI bus 1 control:
-		    bit 0 = SCSI register read is 6 clocks (if neither bit 0 or 1 are set, 3 clocks?)
-		    bit 1 = SCSI register read is 4 clocks
-		    bit 2 = SCSI register write is 3 clocks (else what?)
-		    bit 3 = SCSI pseudo-DMA read is 3 clocks (else what?)
-		    bit 4 = SCSI pseudo-DMA write is 5 clocks
-		    bit 5 = SCSI pseudo-DMA write is 3 clocks
-		    bit 6 = CS PW Check (?)
-		    bit 7 = DRQ Check Read (PDMA reads wait if DRQ isn't set and bus error on timeout)
-		    bit 8 = DRQ Check Write
-		    bit 9 = DREQ status read
-		*/
-		case 0x24:
-			m_scsi_ctrl[0] = data;
-			if (BIT(data, 0))
-			{
-				m_scsi_read_cycles[0] = 6;
-			}
-			else if (BIT(data, 1))
-			{
-				m_scsi_read_cycles[0] = 4;
-			}
-			else
-			{
-				m_scsi_read_cycles[0] = 3;
-			}
-
-			if (BIT(data, 2))
-			{
-				m_scsi_write_cycles[0] = 3;
-			}
-			else
-			{
-				m_scsi_write_cycles[0] = 4;
-			}
-
-			if (BIT(data, 3))
-			{
-				m_scsi_dma_read_cycles[0] = 3;
-			}
-			else
-			{
-				m_scsi_dma_read_cycles[0] = 4;
-			}
-
-			if (BIT(data, 4))
-			{
-				m_scsi_dma_write_cycles[0] = 5;
-			}
-			else if (BIT(data, 5))
-			{
-				m_scsi_dma_write_cycles[0] = 3;
-			}
-			LOGMASKED(LOG_TURBOSCSI, "SCSI bus 1 timings: R %d W %d DMAR %d DMAW %d\n", m_scsi_read_cycles[0], m_scsi_write_cycles[0], m_scsi_dma_read_cycles[0], m_scsi_dma_write_cycles[0]);
-			break;
-
-		// SCSI bus 2 control, same definitions as above
-		case 0x28:
-			m_scsi_ctrl[1] = data;
-			if (BIT(data, 0))
-			{
-				m_scsi_read_cycles[1] = 6;
-			}
-			else if (BIT(data, 1))
-			{
-				m_scsi_read_cycles[1] = 4;
-			}
-			else
-			{
-				m_scsi_read_cycles[1] = 3;
-			}
-
-			if (BIT(data, 2))
-			{
-				m_scsi_write_cycles[1] = 3;
-			}
-			else
-			{
-				m_scsi_write_cycles[1] = 4;
-			}
-
-			if (BIT(data, 3))
-			{
-				m_scsi_dma_read_cycles[1] = 3;
-			}
-			else
-			{
-				m_scsi_dma_read_cycles[1] = 4;
-			}
-
-			if (BIT(data, 4))
-			{
-				m_scsi_dma_write_cycles[1] = 5;
-			}
-			else if (BIT(data, 5))
-			{
-				m_scsi_dma_write_cycles[1] = 3;
-			}
-			LOGMASKED(LOG_TURBOSCSI, "SCSI bus 2 timings: R %d W %d DMAR %d DMAW %d\n", m_scsi_read_cycles[1], m_scsi_write_cycles[1], m_scsi_dma_read_cycles[1], m_scsi_dma_write_cycles[1]);
-			break;
-
 		// TEST register.  Bit 0 is supposedly the value to drive on the monitor sense pins, but that's not what
 		// the code does on the Q700.
 		case 0x2c:
@@ -586,7 +488,9 @@ void dafb_base::dafb_w(offs_t offset, u32 data)
 
 u32 dafb_base::swatch_r(offs_t offset)
 {
-	switch (offset << 2)
+	const u32 reg = reg_offset(offset);
+
+	switch (reg)
 	{
 		case 0x8: // IRQ/VBL status
 			return m_int_status;
@@ -612,10 +516,10 @@ u32 dafb_base::swatch_r(offs_t offset)
 
 		case 0x24: case 0x28: case 0x2c: case 0x30: case 0x34: case 0x38: case 0x3c:
 		case 0x40: case 0x44: case 0x48:
-			return m_horizontal_params[offset - (0x24 / 4)];
+			return m_horizontal_params[(reg - 0x24) >> 2];
 
 		case 0x4c: case 0x50: case 0x54: case 0x58: case 0x5c: case 0x60: case 0x64:
-			return m_vertical_params[offset - (0x4c / 4)];
+			return m_vertical_params[(reg - 0x4c) >> 2];
 	}
 	return 0;
 }
@@ -625,7 +529,9 @@ void dafb_base::swatch_w(offs_t offset, u32 data)
 	// registers are all 12 bits wide
 	data &= 0xfff;
 
-	switch (offset << 2)
+	const u32 reg = reg_offset(offset);
+
+	switch (reg)
 	{
 		case 0x0:           // Swatch mode
 			m_swatch_mode = data;
@@ -692,8 +598,8 @@ void dafb_base::swatch_w(offs_t offset, u32 data)
 		case 0x40: // HAL - Horizontal active line (start of active display area)
 		case 0x44: // HFP - Horizontal front porch (end of active display area)
 		case 0x48: // HPIX - Horizontal pixels - total # of pixel locations in a line minus 2
-			LOGMASKED(LOG_SWATCH, "%d to horiz param offset %02x\n", data, offset);
-			m_horizontal_params[offset - (0x24 / 4)] = data;
+			LOGMASKED(LOG_SWATCH, "%d to horiz param offset %02x\n", data, reg);
+			m_horizontal_params[(reg - 0x24) >> 2] = data;
 			break;
 
 		case 0x4c: // VHLINE - Vertical half-lines, the total # of half-lines in a field (odd for interlaced, even for NI)
@@ -703,8 +609,8 @@ void dafb_base::swatch_w(offs_t offset, u32 data)
 		case 0x5c: // VAL - Vertical Active Lines (end of active display area)
 		case 0x60: // VFP - Vertical Front Porch
 		case 0x64: // VFPEQ - Vertical Front Porch Equalization
-			LOGMASKED(LOG_SWATCH, "%d to vertical param offset %02x\n", data, offset);
-			m_vertical_params[offset - (0x4c / 4)] = data;
+			LOGMASKED(LOG_SWATCH, "%d to vertical param offset %02x\n", data, reg);
+			m_vertical_params[(reg - 0x4c) >> 2] = data;
 			break;
 	}
 }
@@ -838,7 +744,7 @@ void dafb_base::recalc_mode()
 			m_vres = 384;
 		}
 
-		const int clockdiv = 1 << ((m_ac842_pbctrl & 0x60) >> 5);
+		const int clockdiv = clock_divider();
 		LOGMASKED(LOG_SWATCH, "RAW hres %d vres %d htotal %d vtotal %d (clockdiv %d conv %d)\n", m_hres, m_vres, m_htotal, m_vtotal, clockdiv, BIT(m_config, 3));
 
 		// If convolution is active, divide the horiz. res and stride by the clock divider.
@@ -967,6 +873,135 @@ void dafb_device::device_start()
 {
 	dafb_base::device_start();
 	m_maincpu->set_emmu_enable(true);
+}
+
+// The Turbo SCSI control registers exist only on the discrete DAFB and DAFB II;
+// on the MEMC/MEMCjr parts the block moved into IOSB/PrimeTime instead.
+u32 dafb_device::dafb_r(offs_t offset)
+{
+	switch (reg_offset(offset))
+	{
+		case 0x24: // SCSI 539x #1 status
+			return m_scsi_ctrl[0] | (m_drq[0] << 9);
+
+		case 0x28: // SCSI 539x #2 status
+			return m_scsi_ctrl[1] | (m_drq[1] << 9);
+	}
+
+	return dafb_base::dafb_r(offset);
+}
+
+void dafb_device::dafb_w(offs_t offset, u32 data)
+{
+	data &= 0xfff;
+	switch (reg_offset(offset))
+	{
+		/*
+		    SCSI bus 1 control:
+		    bit 0 = SCSI register read is 6 clocks (if neither bit 0 or 1 are set, 3 clocks?)
+		    bit 1 = SCSI register read is 4 clocks
+		    bit 2 = SCSI register write is 3 clocks (else what?)
+		    bit 3 = SCSI pseudo-DMA read is 3 clocks (else what?)
+		    bit 4 = SCSI pseudo-DMA write is 5 clocks
+		    bit 5 = SCSI pseudo-DMA write is 3 clocks
+		    bit 6 = CS PW Check (?)
+		    bit 7 = DRQ Check Read (PDMA reads wait if DRQ isn't set and bus error on timeout)
+		    bit 8 = DRQ Check Write
+		    bit 9 = DREQ status read
+		*/
+		case 0x24:
+			m_scsi_ctrl[0] = data;
+			if (BIT(data, 0))
+			{
+				m_scsi_read_cycles[0] = 6;
+			}
+			else if (BIT(data, 1))
+			{
+				m_scsi_read_cycles[0] = 4;
+			}
+			else
+			{
+				m_scsi_read_cycles[0] = 3;
+			}
+
+			if (BIT(data, 2))
+			{
+				m_scsi_write_cycles[0] = 3;
+			}
+			else
+			{
+				m_scsi_write_cycles[0] = 4;
+			}
+
+			if (BIT(data, 3))
+			{
+				m_scsi_dma_read_cycles[0] = 3;
+			}
+			else
+			{
+				m_scsi_dma_read_cycles[0] = 4;
+			}
+
+			if (BIT(data, 4))
+			{
+				m_scsi_dma_write_cycles[0] = 5;
+			}
+			else if (BIT(data, 5))
+			{
+				m_scsi_dma_write_cycles[0] = 3;
+			}
+			LOGMASKED(LOG_TURBOSCSI, "SCSI bus 1 timings: R %d W %d DMAR %d DMAW %d\n", m_scsi_read_cycles[0], m_scsi_write_cycles[0], m_scsi_dma_read_cycles[0], m_scsi_dma_write_cycles[0]);
+			break;
+
+		// SCSI bus 2 control, same definitions as above
+		case 0x28:
+			m_scsi_ctrl[1] = data;
+			if (BIT(data, 0))
+			{
+				m_scsi_read_cycles[1] = 6;
+			}
+			else if (BIT(data, 1))
+			{
+				m_scsi_read_cycles[1] = 4;
+			}
+			else
+			{
+				m_scsi_read_cycles[1] = 3;
+			}
+
+			if (BIT(data, 2))
+			{
+				m_scsi_write_cycles[1] = 3;
+			}
+			else
+			{
+				m_scsi_write_cycles[1] = 4;
+			}
+
+			if (BIT(data, 3))
+			{
+				m_scsi_dma_read_cycles[1] = 3;
+			}
+			else
+			{
+				m_scsi_dma_read_cycles[1] = 4;
+			}
+
+			if (BIT(data, 4))
+			{
+				m_scsi_dma_write_cycles[1] = 5;
+			}
+			else if (BIT(data, 5))
+			{
+				m_scsi_dma_write_cycles[1] = 3;
+			}
+			LOGMASKED(LOG_TURBOSCSI, "SCSI bus 2 timings: R %d W %d DMAR %d DMAW %d\n", m_scsi_read_cycles[1], m_scsi_write_cycles[1], m_scsi_dma_read_cycles[1], m_scsi_dma_write_cycles[1]);
+			break;
+
+		default:
+			dafb_base::dafb_w(offset, data);
+			break;
+	}
 }
 
 template <int bus>

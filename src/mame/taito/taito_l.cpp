@@ -1519,18 +1519,18 @@ void taitol_state::l_system_video(machine_config &config)
 void fhawk_state::fhawk(machine_config &config)
 {
 	// basic machine hardware
-	TC0090LVC(config, m_maincpu, 13.33056_MHz_XTAL / 2);    // verified freq on pin122 of TC0090LVC CPU
+	TC0090LVC(config, m_maincpu, 13.33056_MHz_XTAL / 2); // verified freq on pin122 of TC0090LVC CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(fhawk_state::irq_callback));
 
-	Z80(config, m_audiocpu, 12_MHz_XTAL / 3);        // verified on PCB
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 3); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_3_map);
 
 	z80_device &slave(Z80(config, "slave", 12_MHz_XTAL / 3)); // verified on PCB
 	slave.set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_2_map);
 	slave.set_vblank_int("screen", FUNC(fhawk_state::irq0_line_hold));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
 	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
@@ -1592,7 +1592,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	slave.set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_2_map);
 	slave.set_vblank_int("screen", FUNC(taitol_2cpu_state::irq0_line_hold));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");

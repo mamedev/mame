@@ -1345,7 +1345,6 @@ uint8_t dynax_state::mjtkp2_dsw_r()
 
 void dynax_state::mjtkp2_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x00000, 0x05fff).rom();
 	map(0x06000, 0x07fff).ram().share("nvram");
 	map(0x08000, 0x0ffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
@@ -1355,16 +1354,12 @@ void dynax_state::mjtkp2_map(address_map &map)
 	map(0x14081, 0x14087).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));    // Blitter (inverted scroll values)
 	map(0x14100, 0x14100).w(FUNC(dynax_state::tenkai_dswsel_w));
 	map(0x14180, 0x14180).r(FUNC(dynax_state::mjtkp2_dsw_r));
-	map(0x14200, 0x14200).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w)); // maybe
-	map(0x14210, 0x14210).w(FUNC(dynax_state::dynax_blit_dest_w)); // maybe
+	map(0x14200, 0x14200).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));
+	map(0x14210, 0x14210).w(FUNC(dynax_state::dynax_blit_dest_w));
 	map(0x14220, 0x14220).w(FUNC(dynax_state::mjtkp2_blit_palette12_w));
 	map(0x14230, 0x14230).w(FUNC(dynax_state::mjtkp2_blit_palette30_w));
 	map(0x14240, 0x14240).w(FUNC(dynax_state::mjtkp2_priority_w));
-	map(0x14250, 0x14250).w(FUNC(dynax_state::dynax_blit_backpen_w)); // maybe
-	// The PCB only has a single 1MB blitter ROM bank. The game writes $80 here to
-	// point the blitter at a non existent bank: the next blit then reads $00, i.e.
-	// the "stop" command, and draws nothing. This is used to suppress single blits.
-	map(0x14260, 0x14260).lw8(NAME([this] (uint8_t data) { m_blitter->set_rom_bank(BIT(data, 7)); }));
+	map(0x14250, 0x14250).w(FUNC(dynax_state::dynax_blit_backpen_w));
 	map(0x14280, 0x142ff).lw8(NAME([this] (offs_t offset, uint8_t data) { m_mainlatch->write_d1(offset >> 4, data); }));
 	map(0x14310, 0x14310).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x14320, 0x14320).w("aysnd", FUNC(ay8910_device::address_w));
@@ -4722,10 +4717,16 @@ void dynax_state::mjtkp2(machine_config &config)
 {
 	ougonhaib1(config);
 
-	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
+	tmp90840_device &tmp(TMP90840(config.replace(), m_maincpu, 21472700 / 2));
 	tmp.set_addrmap(AS_PROGRAM, &dynax_state::mjtkp2_map);
+	tmp.port_read<3>().set(FUNC(dynax_state::tenkai_p3_r));
+	tmp.port_write<3>().set(FUNC(dynax_state::tenkai_p3_w));
+	tmp.port_write<4>().set(FUNC(dynax_state::tenkai_p4_w));
+	tmp.port_read<5>().set(FUNC(dynax_state::tenkai_p5_r));
 	tmp.port_write<6>().set(FUNC(dynax_state::mjtkp2_p6_w));
-	tmp.port_write<7>().set_nop(); // P70-P73 are stripped out, they never reach the PCB
+	// P70-P73 are stripped out, they never reach the PCB
+	tmp.port_read<8>().set(FUNC(dynax_state::tenkai_p8_r));
+	tmp.port_write<8>().set(FUNC(dynax_state::tenkai_p8_w));
 
 	m_bankdev->set_map(&dynax_state::mjtkp2_banked_map);
 
@@ -7255,9 +7256,9 @@ ROM_START( mjtkp2 )
 	ROM_LOAD( "5909c_dynax.5a", 0x00000, 0x20000, CRC(61916017) SHA1(2f39749512a3e36966e3bd787f1fa3378e96b4bb) )
 	ROM_RELOAD(                 0x10000, 0x20000 )
 	ROM_RELOAD(                 0x30000, 0x20000 )
-	ROM_LOAD( "tmp91c640n.2c",  0x00000, 0x04000, CRC(8fe634dd) SHA1(f11cd2160ecabe71edfddc956c323ff2e75d6cce) ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
+	ROM_LOAD( "tmp98040.2c",    0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
 
-	ROM_REGION( 0x200000, "blitter", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "blitter", 0 )
 	ROM_LOAD( "5901_dynax.15a", 0x00000, 0x20000, CRC(8b9d0192) SHA1(77ba366c87d3f1eb5549de30a1d066684950622a) ) // points, bets
 	ROM_LOAD( "5902_dynax.13a", 0x20000, 0x20000, CRC(c053ba24) SHA1(76524a5a8f727c50be13adbca5eb9388c1f9887c) ) // text and mahjong tiles
 	ROM_LOAD( "5903_dynax.12a", 0x40000, 0x20000, CRC(20f68aa7) SHA1(e18d39962caefb22c1ff39fd0fda0563877fa79c) )

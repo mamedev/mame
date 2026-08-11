@@ -1998,11 +1998,28 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 			cpos = track_data.size();
 			for(int j=0; j< 3; j++) raw_w(track_data, 16, 0x4489);
 			mfm_w(track_data, 8, sects[i].deleted ? 0xf8 : 0xfb);
+
+			size_t data_cpos = track_data.size();
 			for(int j=0; j<sects[i].actual_size; j++) mfm_w(track_data, 8, sects[i].data[j]);
 			crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 			if(sects[i].bad_data_crc)
 				crc = 0xffff^crc;
 			mfm_w(track_data, 16, crc);
+
+			if(sects[i].weak) {
+				// Encode bytes 256+ as a single MG_N span.  Speedlock
+				// compares successive reads at byte position 256+;
+				// per-revolution randomness makes them differ naturally.
+				size_t weak_start = data_cpos + 256 * 16;
+				size_t weak_end = track_data.size();
+				if(weak_start < weak_end) {
+					track_data[weak_start] = (track_data[weak_start] & floppy_image::TIME_MASK) | floppy_image::MG_N;
+					track_data[weak_end - 1] = (track_data[weak_end - 1] & floppy_image::TIME_MASK) | floppy_image::MG_E;
+					for(size_t j=weak_start+1; j<weak_end-1; j++)
+						track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | MG_0;
+				}
+			}
+
 			if(i != sector_count-1)
 				for(int j=0; j<gap_3; j++) mfm_w(track_data, 8, 0x4e);
 		}

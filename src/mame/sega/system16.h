@@ -117,6 +117,9 @@ private:
 	void s16bl_fgscrolly_w(uint16_t data);
 	void s16bl_bgscrollx_w(uint16_t data);
 	void s16bl_bgscrolly_w(uint16_t data);
+	void beautyb_fgscrollx_w(uint16_t data);
+	void beautyb_bgscrollx_w(uint16_t data);
+
 	template<int Page> void datsu_page_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void goldnaxeb2_fgscrollx_w(uint16_t data);
 	void goldnaxeb2_bgscrollx_w(uint16_t data);
@@ -164,6 +167,9 @@ private:
 	DECLARE_VIDEO_START(s16a_bootleg_passsht);
 	DECLARE_VIDEO_START(s16a_bootleg_wb3bl);
 	DECLARE_VIDEO_START(s16a_bootleg);
+	DECLARE_VIDEO_START(beautyb);
+	DECLARE_VIDEO_START(iqpipe);
+
 	uint32_t screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

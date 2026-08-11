@@ -509,7 +509,9 @@ void mc10_state::mc10_video(machine_config &config)
 	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K,20K,32K");
 
 	/* video hardware */
-	SCREEN(config, "screen");
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update("mc6847", FUNC(mc6847_base_device::screen_update));
 
 	mc6847_device &vdg(MC6847(config, "mc6847", XTAL(3'579'545)));
 	vdg.set_screen("screen");

@@ -63,6 +63,10 @@
 
 #define SH_FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
+// Special meanings for the delay slot PC value.  Odd numbers were chosen because they're not valid otherwise.
+#define SH_OVRPC_NONE       0xffffffff  // We aren't in a delay slot, use desc->pc
+#define SH_OVRPC_DYNAMIC    0xfffffffd  // In the delay slot of a register-indirect branch, base is runtime m_sh2_state->target
+
 /* SR shift values */
 #define T_SHIFT 0
 #define S_SHIFT 1
@@ -132,6 +136,15 @@ public:
 		uint32_t  m_fpscr;
 		uint32_t  m_fpul;
 		uint32_t  m_dbr;
+
+		// SH3/4 floating point constants the generated code refers to by address
+		double  m_ftrc_dmin;         // FTRC double-precision range check
+		double  m_ftrc_dmax;
+		float   m_ftrc_smin;         // FTRC single-precision range check
+		float   m_ftrc_smax;
+		float   m_fzero;             // FTRV accumulator initialiser
+		float   m_fone;              // FSRRA reciprocal numerator
+		uint8_t m_fpmode[4];         // FPSCR.RM -> UML rounding mode
 
 		int     m_frt_input;
 		int     m_fpu_sz;

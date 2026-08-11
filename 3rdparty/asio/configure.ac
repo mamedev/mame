@@ -1,4 +1,4 @@
-AC_INIT(asio, [1.30.2])
+AC_INIT([asio],[1.38.2])
 AC_CONFIG_SRCDIR(include/asio.hpp)
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([tar-pax])
@@ -8,12 +8,12 @@ AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_LANG(C++)
 AC_PROG_RANLIB
-PKG_INSTALLDIR
+PKG_NOARCH_INSTALLDIR
 
 AC_DEFINE(_REENTRANT, [1], [Define this])
 
 AC_ARG_WITH(boost,
-  AC_HELP_STRING([--with-boost=DIR],[location of boost distribution]),
+  AS_HELP_STRING([--with-boost=DIR],[location of boost distribution]),
 [
   if test "${withval}" = no; then
     STANDALONE="yes"
@@ -41,6 +41,13 @@ AC_ARG_ENABLE(boost-coroutine,
   HAVE_BOOST_COROUTINE=yes
 ])
 
+if test "$HAVE_BOOST_COROUTINE" = yes; then
+  AC_CHECK_LIB([boost_system], [main],
+  [
+    HAVE_BOOST_SYSTEM=yes
+  ])
+fi
+
 if test "$STANDALONE" != yes; then
   AC_CHECK_HEADER([boost/noncopyable.hpp],,
   [
@@ -52,7 +59,7 @@ if test "$STANDALONE" != yes; then
 fi
 
 AC_ARG_WITH(openssl,
-  AC_HELP_STRING([--with-openssl=DIR],[location of openssl]),
+  AS_HELP_STRING([--with-openssl=DIR],[location of openssl]),
 [
   CPPFLAGS="$CPPFLAGS -I${withval}/include"
   LIBS="$LIBS -L${withval}/lib"
@@ -68,6 +75,12 @@ if test x$OPENSSL_FOUND != xno; then
 fi
 
 AM_CONDITIONAL(HAVE_OPENSSL,test x$OPENSSL_FOUND != xno)
+
+AC_ARG_ENABLE(cygwin-w32-sockets,
+[  --enable-cygwin-w32-sockets enable native Windows sockets support when using Cygwin],
+[
+  HAVE_CYGWIN_W32_SOCKETS=yes
+])
 
 WINDOWS=no
 case $host in
@@ -88,19 +101,24 @@ case $host in
   *-*-mingw32*)
     CXXFLAGS="$CXXFLAGS -mthreads"
     LDFLAGS="$LDFLAGS -mthreads"
-    LIBS="$LIBS -lws2_32 -lmswsock"
+    LIBS="$LIBS -lws2_32 -lmswsock -lbcrypt"
     WINDOWS=yes
     ;;
   *-*-mingw64*)
     CXXFLAGS="$CXXFLAGS -mthreads"
     LDFLAGS="$LDFLAGS -mthreads"
-    LIBS="$LIBS -lws2_32 -lmswsock"
+    LIBS="$LIBS -lws2_32 -lmswsock -lbcrypt"
     WINDOWS=yes
     ;;
   *-pc-cygwin*)
-    CXXFLAGS="$CXXFLAGS -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601"
-    LIBS="$LIBS -lws2_32 -lmswsock"
-    WINDOWS=yes
+    if test "$HAVE_CYGWIN_W32_SOCKETS" = yes; then
+      CXXFLAGS="$CXXFLAGS -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601"
+      LIBS="$LIBS -lws2_32 -lmswsock -lbcrypt"
+      WINDOWS=yes
+    else
+      CXXFLAGS="$CXXFLAGS"
+      LDFLAGS="$LDFLAGS"
+    fi
     ;;
   *-apple-darwin*)
     CXXFLAGS="$CXXFLAGS"
@@ -232,6 +250,8 @@ AM_CONDITIONAL(SEPARATE_COMPILATION,test x$SEPARATE_COMPILATION = xyes)
 
 AM_CONDITIONAL(HAVE_BOOST_COROUTINE,test x$HAVE_BOOST_COROUTINE = xyes)
 
+AM_CONDITIONAL(HAVE_BOOST_SYSTEM,test x$HAVE_BOOST_SYSTEM = xyes)
+
 AM_CONDITIONAL(WINDOWS_TARGET,test x$WINDOWS != xno)
 
 AM_CONDITIONAL(HAVE_CXX11,test x$HAVE_CXX11 = xyes)
@@ -246,7 +266,7 @@ AM_CONDITIONAL(HAVE_COROUTINES,test x$HAVE_COROUTINES = xyes)
 
 AC_CONFIG_FILES([asio.pc])
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
   Makefile
   include/Makefile
   src/Makefile
@@ -256,3 +276,4 @@ AC_OUTPUT([
   src/examples/cpp14/Makefile
   src/examples/cpp17/Makefile
   src/examples/cpp20/Makefile])
+AC_OUTPUT

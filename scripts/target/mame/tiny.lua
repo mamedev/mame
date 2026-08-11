@@ -37,6 +37,7 @@ SOUNDS["AY8910"] = true
 SOUNDS["CEM3394"] = true
 SOUNDS["DAC"] = true
 SOUNDS["DISCRETE"] = true
+SOUNDS["FLOPPYSOUND"] = true
 SOUNDS["HC55516"] = true
 SOUNDS["OKIM6295"] = true
 SOUNDS["SAMPLES"] = true

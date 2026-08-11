@@ -25,6 +25,9 @@
     — Press Alt and the digit to invoke the key macro.
     — Press Ctrl and UCLR together to clear all macros.
 
+    The BOSS-1 Personal Computer used an unbranded version of this
+    keyboard. The MPF-III keyboard has the same physical layout.
+
 *********************************************************************/
 
 #include "emu.h"

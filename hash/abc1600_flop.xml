@@ -172,11 +172,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="systest">
+	<software name="systest" supported="partial">
 		<description>ABC1600 Test Program v5.0</description>
 		<year>1985</year>
 		<publisher>Luxor</publisher>
 		<info name="usage" value="mf(2,0)&#10;mf(2,0)&#10;systest1600" />
+		<!-- 
+		Failing tests:
+        - CIO timer (works if CIO clock is 4219000)
+        - DMA (expects to read 0xff from 0x18000..)
+		-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Binary"/>

@@ -270,7 +270,8 @@ public:
 		m_printer_conn(*this, "parallel"),
 		m_printer_out(*this, "laserprnout"),
 		m_kbdcpu(*this, "kbdcpu"),
-		m_kbdlatch(*this, "kbdlatch")
+		m_kbdlatch(*this, "kbdlatch"),
+		m_kbdmcu(*this, "kbdmcu")
 	{
 		m_isiic = false;
 		m_isiicplus = false;
@@ -289,6 +290,8 @@ public:
 		m_laser_speed = 0;
 		m_laser_fdc_on = false;
 	}
+
+	void laser128_ctrl_w(int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -324,6 +327,7 @@ public:
 	optional_device<output_latch_device>    m_printer_out;
 	optional_device<cpu_device> m_kbdcpu;
 	optional_device<ls259_device> m_kbdlatch;
+	optional_device<mcs48_cpu_device> m_kbdmcu;
 
 	// align VBL to the end of active video
 	static constexpr int HPOS_VBL = 40 * 14;
@@ -426,6 +430,9 @@ public:
 	u8 tk3000_kbdmatrix_r(offs_t offset);
 	void tk3000_kbdlatch_w(offs_t offset, u8 data);
 	void tk3000_kstrb_w(int state);
+	void laser128_kbdstb_w(u8 data);
+	u8 laser128_x1_x8_r();
+	u8 laser128_x0_shift_r();
 
 	void apple2cp(machine_config &config) ATTR_COLD;
 	void spectred(machine_config &config) ATTR_COLD;
@@ -461,6 +468,7 @@ public:
 	void ace2200_map(address_map &map) ATTR_COLD;
 	void tk3000_keyb_map(address_map &map) ATTR_COLD;
 	void tk3000_keybio_map(address_map &map) ATTR_COLD;
+	void laser128_keybio_map(address_map &map) ATTR_COLD;
 
 	bool m_35sel, m_hdsel, m_intdrive;
 
@@ -1458,6 +1466,9 @@ void apple2e_state::reset_w(int state)
 				m_prav8c_kbd->softsw_w(1);
 			}
 
+			if (m_kbdmcu.found())
+				m_kbdmcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
 			lcrom_update();
 			auxbank_update();
 			update_slotrom_banks();
@@ -1471,6 +1482,8 @@ void apple2e_state::reset_w(int state)
 			// allow cards to see reset
 			m_a2bus->reset_bus();
 			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			if (m_kbdmcu.found())
+				m_kbdmcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 	}
 }
@@ -3732,6 +3745,46 @@ void apple2e_state::spectred_kbdout_w(u8 data)
 	m_spectred_kbdout = data;
 }
 
+void apple2e_state::laser128_keybio_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).w(FUNC(apple2e_state::laser128_kbdstb_w));
+}
+
+void apple2e_state::laser128_kbdstb_w(u8 data)
+{
+	m_transchar = data & 0x7f;
+	m_strobe = 0x80;
+}
+
+u8 apple2e_state::laser128_x1_x8_r()
+{
+	int y = m_kbdmcu->p2_r() & 0x0f;
+	if (y < 10)
+	{
+		u8 ret = 0;
+		for (int x = 1; x <= 8; x++)
+			if (!BIT(m_kbdmatrix[x]->read(), y))
+				ret |= 1 << (x - 1);
+		return ret;
+	}
+	else
+		return 0xff;
+}
+
+u8 apple2e_state::laser128_x0_shift_r()
+{
+	u8 ret = (m_kbspecial->read() & 0x06) == 0 ? 0xef : 0xaf;
+	int y = m_kbdmcu->p2_r() & 0x0f;
+	if (y >= 10 || !BIT(m_kbdmatrix[0]->read(), y))
+		ret |= 0x10;
+	return ret;
+}
+
+void apple2e_state::laser128_ctrl_w(int state)
+{
+	m_kbdmcu->set_input_line(MCS48_INPUT_IRQ, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -4451,10 +4504,7 @@ static INPUT_PORTS_START( apple2e )
 	PORT_INCLUDE( apple2_sysconfig_accel )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( apple2c )
-	PORT_INCLUDE( apple2e_special )
-	PORT_INCLUDE( apple2c_common_config )
-
+static INPUT_PORTS_START( apple2c_mouse )
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
@@ -4463,6 +4513,12 @@ static INPUT_PORTS_START( apple2c )
 
 	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2c )
+	PORT_INCLUDE( apple2e_special )
+	PORT_INCLUDE( apple2c_common_config )
+	PORT_INCLUDE( apple2c_mouse )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2cus_sysconfig )
@@ -4499,27 +4555,146 @@ static INPUT_PORTS_START( apple2ese_sysconfig )
 	PORT_CONFSETTING(0x12, "US English")
 INPUT_PORTS_END
 
+// French, Italian, German layouts are also documented
+static INPUT_PORTS_START( laser128_us_kbd )
+	PORT_START("X0")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) 	  PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) 	  PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) 	  PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) 	  PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) 	  PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) 	  PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) 	  PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)       PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)       PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)	  PORT_CHAR(UCHAR_MAMEKEY(F10))
+
+	PORT_START("X1")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)  PORT_CHAR('0') PORT_CHAR(')')
+
+	PORT_START("X2")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break")    PORT_CODE(KEYCODE_END)      PORT_CHAR(3)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pause")    PORT_CODE(KEYCODE_HOME)     PORT_CHAR(19)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)  PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Delete")   PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHAR(8)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
+
+	PORT_START("X3")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('o') PORT_CHAR('O')
+
+	PORT_START("X4")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)  PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)  PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)  PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)  PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('p') PORT_CHAR('P')
+
+	PORT_START("X5")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)  PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
+
+	PORT_START("X6")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
+
+	PORT_START("X7")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)  PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)  PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)  PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)  PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)  PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)  PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(13)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('"')
+
+	PORT_START("X8")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)  PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)  PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)       PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( laser128 )
-	PORT_INCLUDE( apple2e_nam_us_kbd )
+	PORT_INCLUDE( laser128_us_kbd )
 	PORT_INCLUDE( laser128_sysconfig )
+	PORT_INCLUDE( apple2c_mouse )
 
 	PORT_START("keyb_special")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl")         PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2) PORT_WRITE_LINE_MEMBER(FUNC(apple2e_state::laser128_ctrl_w))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Triangle")   PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Triangle")  PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset")        PORT_CODE(KEYCODE_F12)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( laser128o )
+	PORT_INCLUDE( apple2e_nam_us_kbd )
+	PORT_INCLUDE( laser128_sysconfig )
+	PORT_INCLUDE( apple2c_mouse )
+
+	PORT_START("keyb_special")
+	// TODO: not supposed to be a physical toggle; flip-flop directly controls LED
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl")         PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Triangle")   PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Triangle")  PORT_CODE(KEYCODE_RALT)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-
-	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset")        PORT_CODE(KEYCODE_F12)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ace_common )
@@ -4553,14 +4728,7 @@ static INPUT_PORTS_START( ace_common )
 	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)      PORT_CHAR(UCHAR_MAMEKEY(F11))
 	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)      PORT_CHAR(UCHAR_MAMEKEY(F12))
 
-	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-
-	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_INCLUDE( apple2c_mouse )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ace2200 )
@@ -4588,15 +4756,7 @@ static INPUT_PORTS_START( apple2cp )
 	PORT_INCLUDE( apple2e_nam_us_kbd )
 	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2cus_sysconfig )
-
-	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-
-	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_INCLUDE( apple2c_mouse )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2eus_sysconfig )
@@ -5371,6 +5531,18 @@ void apple2e_state::laser128(machine_config &config)
 	m_isiic = false;
 	m_has_laser_mouse = true;
 
+	config.device_remove("ay3600");
+	config.device_remove("repttmr");
+
+	I8048(config, m_kbdmcu, A2BUS_7M_CLOCK / 2);
+	m_kbdmcu->set_addrmap(AS_IO, &apple2e_state::laser128_keybio_map);
+	m_kbdmcu->p1_in_cb().set(FUNC(apple2e_state::laser128_x1_x8_r));
+	m_kbdmcu->p2_in_cb().set(FUNC(apple2e_state::laser128_x0_shift_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(apple2e_state::ay3600_ako_w)).bit(5);
+	m_kbdmcu->p2_out_cb().append_output("caps_led").bit(7).invert();
+	m_kbdmcu->t0_in_cb().set_ioport("kbd_lang_select").bit(4).invert();
+	m_kbdmcu->t1_in_cb().set_ioport("keyb_special").bit(0);
+
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IIE, true, false>)));
 
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
@@ -5405,6 +5577,8 @@ void apple2e_state::laser128o(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 	m_isiic = false;
 	m_has_laser_mouse = true;
+
+	// original Laser 128 still uses the AY-5-3600-PRO keyboard encoder
 
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IIE, true, false>)));
 
@@ -6093,8 +6267,8 @@ ROM_START(laser128)
 	ROM_SYSTEM_BIOS(2, "870724", "v4.1")
 	ROMX_LOAD( "laser 128 v4.1 870724.bin", 0x000000, 0x008000, CRC(ce087911) SHA1(f6dba711f0d727f1d13b0256f10ba62bde6d7f5b), ROM_BIOS(2) )
 
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
+	ROM_REGION( 0x400, "kbdmcu", 0 )
+	ROM_LOAD( "p8048ah-1114_27-0703-00-00.bin", 0x000, 0x400, CRC(46c7fe75) SHA1(db6e59e3414b535f32d1a719273f6cc9859c05fd) )
 ROM_END
 
 ROM_START(laser128o)
@@ -6136,8 +6310,8 @@ ROM_START(las128ex)
 	ROM_SYSTEM_BIOS(1, "880301", "v4.5")
 	ROMX_LOAD( "laser 128ex v4.5 880301.bin", 0x000000, 0x008000, CRC(b67c8ba1) SHA1(8bd5f82a501b1cf9d988c7207da81e514ca254b0), ROM_BIOS(1) )
 
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
+	ROM_REGION( 0x400, "kbdmcu", 0 )
+	ROM_LOAD( "p8048ah-1114_27-0703-00-00.bin", 0x000, 0x400, CRC(46c7fe75) SHA1(db6e59e3414b535f32d1a719273f6cc9859c05fd) )
 ROM_END
 
 ROM_START(las128e2)
@@ -6149,8 +6323,8 @@ ROM_START(las128e2)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD( "laser 128ex2 rom version 6.1.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) )
 
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
+	ROM_REGION( 0x400, "kbdmcu", 0 )
+	ROM_LOAD( "p8048ah-1114_27-0703-00-00.bin", 0x000, 0x400, CRC(46c7fe75) SHA1(db6e59e3414b535f32d1a719273f6cc9859c05fd) )
 ROM_END
 
 ROM_START(apple2cp)
@@ -6393,7 +6567,7 @@ COMP( 1984, apple2cde,  apple2c, 0,      apple2cpal,      apple2cde,  apple2e_st
 COMP( 1984, apple2cse,  apple2c, 0,      apple2cpal,      apple2cse,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (Sweden)" , MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2cfr,  apple2c, 0,      apple2cpal,      apple2cfr,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (France)" , MACHINE_SUPPORTS_SAVE )
 COMP( 1987, laser128,   apple2c, 0,      laser128,        laser128,   apple2e_state, empty_init,    "Video Technology",                  "Laser 128", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, laser128o,  apple2c, 0,      laser128o,       laser128,   apple2e_state, empty_init,    "Video Technology",                  "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, laser128o,  apple2c, 0,      laser128o,       laser128o,  apple2e_state, empty_init,    "Video Technology",                  "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, las128ex,   apple2c, 0,      laser128ex,      laser128,   apple2e_state, empty_init,    "Video Technology",                  "Laser 128EX", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, las128e2,   apple2c, 0,      laser128ex2,     laser128,   apple2e_state, empty_init,    "Video Technology",                  "Laser 128EX/2", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )

@@ -59,7 +59,7 @@ AES-256-CBC
 Copyright (c) 2024 Hallo Weeks
 
 Asio C++ Library
-Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 
 Permission is hereby granted, free of charge, to any person or
 organization obtaining a copy of the software and accompanying
@@ -192,7 +192,7 @@ Copyright (c) 1999-2000 Ross Bencina and Phil Burk
 Copyright (c) 2001-2009 Roger B. Dannenberg
 
 pugixml - a C++ XML processing library
-Copyright (c) 2006-2019 Arseny Kapoulkine
+Copyright (c) 2006-2026 Arseny Kapoulkine
 
 RapidJSON - A fast JSON parser/generator for C++ with both SAX/DOM style API
 Copyright (c) 2015 THL A29 Limited, a Tencent company, and Milo Yip.

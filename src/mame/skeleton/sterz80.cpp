@@ -231,10 +231,10 @@ uint32_t sterz80_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(0, cliprect);
 
 	// background plane first (C000 + E000), then the overlay (D000 + F000)
-	static const int order[4] = { 0, 2, 1, 3 };
+	constexpr int order[4] = { 0, 2, 1, 3 };
 
-	for (int i = 0; i < 4; i++)
-		draw_layer(bitmap, cliprect, order[i]);
+	for (int i : order)
+		draw_layer(bitmap, cliprect, i);
 
 	return 0;
 }

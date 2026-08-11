@@ -78,10 +78,10 @@ void vector_device::device_start()
 	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
 
 	// register items for saving
-	save_item(STRUCT_MEMBER(m_prevpoint, x));
-	save_item(STRUCT_MEMBER(m_prevpoint, y));
-	save_item(STRUCT_MEMBER(m_prevpoint, col));
-	save_item(STRUCT_MEMBER(m_prevpoint, intensity));
+	save_item(NAME(m_prevpoint.x));
+	save_item(NAME(m_prevpoint.y));
+	save_item(NAME(m_prevpoint.col));
+	save_item(NAME(m_prevpoint.intensity));
 	save_item(NAME(m_frame_period));
 
 	/* allocate and start the vblank timer */

@@ -199,6 +199,7 @@ public:
 	template <typename X, unsigned... N> class output_finder;
 	template <typename X> class output_finder<X>;
 	class output_proxy;
+	class output_iterator;
 
 	// construction/destruction
 	output_manager(running_machine &machine);
@@ -208,6 +209,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+	std::pair<output_iterator, output_iterator> device_outputs(device_t &device);
 
 	// set a notifier on a particular output
 	void add_notifier(device_t &device, std::string_view name, notifier_func callback, void *param);

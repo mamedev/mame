@@ -248,6 +248,8 @@ void scsp_device::device_start()
 	save_item(NAME(m_IrqTimA));
 	save_item(NAME(m_IrqTimBC));
 	save_item(NAME(m_IrqMidi));
+	save_item(NAME(m_IrqCPU));
+	save_item(NAME(m_IrqDMA));
 
 	save_item(NAME(m_MidiOutStack));
 	save_item(NAME(m_MidiOutW));
@@ -370,6 +372,11 @@ void scsp_device::CheckPendingIRQ()
 	}
 	if (!pend)
 		return;
+	if (pend & en & 0x20)
+	{
+		m_irq_cb(m_IrqCPU, ASSERT_LINE);
+		return;
+	}
 	if (pend & 0x40)
 		if (en & 0x40)
 		{
@@ -422,6 +429,12 @@ void scsp_device::ResetInterrupts()
 	{
 		m_irq_cb(m_IrqTimBC, CLEAR_LINE);
 	}
+	if (reset & 0x20)
+	{
+		m_udata.data[0x20/2] &= ~0x20;
+		m_irq_cb(m_IrqCPU, CLEAR_LINE);
+	}
+
 	if (reset & 0x8)
 	{
 		m_irq_cb(m_IrqMidi, CLEAR_LINE);
@@ -602,8 +615,8 @@ void scsp_device::init()
 
 	m_DSP.Init();
 
-	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
-	m_MidiR=m_MidiW = 0;
+	m_IrqTimA = m_IrqTimBC = m_IrqMidi = m_IrqCPU = m_IrqDMA = 0;
+	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
 
 	m_DSP.space = &this->space();
@@ -866,7 +879,14 @@ void scsp_device::UpdateReg(int reg)
 			if (!m_irq_cb.isunset())
 			{
 				if (m_udata.data[0x1e/2] & m_udata.data[0x20/2] & 0x20)
-					popmessage("SCSP SCIPD write %04x", m_udata.data[0x20/2]);
+				{
+					// TODO: our use case (arcadegh) still doesn't have sound (but clearly executes irq 7s)
+					// log it anyway so we can validate the behaviour with anything else using this
+					// - documentation claims 7 to "not use because tied to dev board irq",
+					//   that doesn't stop this game using it anyway.
+					popmessage("SCSP SCIPD write CPU irq 0x20");
+					CheckPendingIRQ();
+				}
 			}
 			break;
 		case 0x22:  //SCIRE
@@ -878,6 +898,7 @@ void scsp_device::UpdateReg(int reg)
 
 				// behavior from real hardware: if you SCIRE a timer that's expired,
 				// it'll immediately pop up again in SCIPD.  cfr. saturn:sakurat
+				// TODO: crocj disagrees with this (keeps going spurious irqs)
 				if (m_TimCnt[0] == 0xffff)
 				{
 					m_udata.data[0x20/2] |= 0x40;
@@ -903,6 +924,8 @@ void scsp_device::UpdateReg(int reg)
 				m_IrqTimA = DecodeSCI(SCITMA);
 				m_IrqTimBC = DecodeSCI(SCITMB);
 				m_IrqMidi = DecodeSCI(SCIMID);
+				m_IrqCPU = DecodeSCI(SCIIRQ);
+				m_IrqDMA = DecodeSCI(SCIDMA);
 			}
 			break;
 		case 0x2a:
@@ -1004,7 +1027,13 @@ void scsp_device::w16(u32 addr, u16 val)
 	{
 		if (addr < 0x430)
 		{
-			*((u16 *) (m_udata.datab + ((addr & 0x3f)))) = val;
+			// SCIPD and MCIPD are r/o except for bit 5 CPU irqs
+			if (addr == 0x420 || addr == 0x42e)
+			{
+				*((u16 *) (m_udata.datab + ((addr & 0x3f)))) |= val & 0x20;
+			}
+			else
+				*((u16 *) (m_udata.datab + ((addr & 0x3f)))) = val;
 			UpdateReg(addr & 0x3f);
 		}
 	}
@@ -1393,7 +1422,8 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 	}
 }
 
-/* TODO: this needs to be timer-ized */
+// TODO: this needs to be timer-ized
+// Very likely this is burst too.
 void scsp_device::exec_dma()
 {
 	static u16 tmp_dma[3];
@@ -1468,11 +1498,12 @@ void scsp_device::exec_dma()
 
 	/* Job done */
 	m_udata.data[0x16/2] &= ~0x1000;
-	/* request a dma end irq (TODO: make it inside the interface) */
+	/* request a dma end irq */
+	// TODO: do it inside CheckPendingIRQ
 	if (m_udata.data[0x1e/2] & 0x10)
 	{
-		popmessage("SCSP DMA IRQ triggered");
-		m_irq_cb(DecodeSCI(SCIDMA), HOLD_LINE);
+		popmessage("SCSP DMA IRQ triggered lv%d", m_IrqDMA);
+		m_irq_cb(m_IrqDMA, HOLD_LINE);
 	}
 }
 

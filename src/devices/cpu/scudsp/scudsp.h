@@ -157,8 +157,8 @@ private:
 	void set_dest_mem_reg( uint32_t mode, uint32_t value );
 	void set_dest_mem_reg_2( uint32_t mode, uint32_t value );
 	uint32_t compute_condition( uint32_t condition );
-	uint32_t get_mem_source_dma( uint32_t memcode, uint32_t counter );
-	void set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter );
+	uint32_t get_mem_source_dma( uint32_t memcode );
+	void set_dest_dma_mem( uint32_t memcode, uint32_t value );
 
 	void op_illegal(uint32_t opcode);
 	void op_alu(uint32_t opcode);

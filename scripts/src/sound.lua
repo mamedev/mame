@@ -1986,3 +1986,15 @@ if SOUNDS["L6009"] then
 		MAME_DIR .. "src/devices/sound/l6009.h",
 	}
 end
+
+---------------------------------------------------
+-- Mechanical drive sound simulation
+--@src/devices/sound/drivesound.h,SOUNDS["FLOPPYSOUND"] = true
+---------------------------------------------------
+
+if SOUNDS["FLOPPYSOUND"] then
+	files {
+		MAME_DIR .. "src/devices/sound/drivesound.cpp",
+		MAME_DIR .. "src/devices/sound/drivesound.h",
+	}
+end

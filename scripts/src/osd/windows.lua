@@ -39,6 +39,7 @@ function maintargetosdoptions(_target,_subtarget)
 	end
 
 	links {
+		"bcrypt",
 		"comctl32",
 		"comdlg32",
 		"dinput8",
@@ -218,6 +219,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/file",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
+		ext_includedir("asio"),
 	}
 
 	BASE_TARGETOS = "win32"
@@ -228,6 +230,8 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	files {
+		MAME_DIR .. "src/osd/asio.cpp",
+		MAME_DIR .. "src/osd/asio.h",
 		MAME_DIR .. "src/osd/eigccppc.h",
 		MAME_DIR .. "src/osd/eigccx86.h",
 		MAME_DIR .. "src/osd/eivc.h",

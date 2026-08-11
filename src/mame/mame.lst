@@ -1320,6 +1320,12 @@ macsefd
 unitron
 utrn1024
 
+@source:apple/maccatalyst.cpp
+pmac7200
+pmac7200_90
+pmac7200_100
+pmac7200_120
+
 @source:apple/macii.cpp
 mac2fdhd
 macii
@@ -3028,6 +3034,7 @@ rbtapper
 shollow
 shollow2
 solarfox
+solarfoxc
 sutapper
 tapper
 tappera
@@ -39990,6 +39997,9 @@ rfsantafeg
 
 @source:regnecentralen/rc702.cpp
 rc702
+rc702mini
+rc702sem702
+rc703
 
 @source:regnecentralen/rc759.cpp
 rc759
@@ -40519,8 +40529,10 @@ kofxi
 kov7sprt
 maxspeed
 mslug6
+mirstad
 ngbc
 ngbcj
+prem11
 rangrmsn
 rumblef
 rumblef2
@@ -49112,13 +49124,6 @@ t7000
 @source:wicat/wicat.cpp
 wicat
 
-@source:wing/luckgrln.cpp
-7smash
-7smasha
-luckgrln
-luckstrn
-luckstrna
-
 @source:williams/atlantis.cpp
 mwskins
 mwskinsa
@@ -49455,6 +49460,19 @@ zero2
 
 @source:williams/wmg.cpp
 wmg
+
+@source:wing/eagle_9619b.cpp
+trfruits
+
+@source:wing/eagle_9715a.cpp
+smflight
+
+@source:wing/luckgrln.cpp
+7smash
+7smasha
+luckgrln
+luckstrn
+luckstrna
 
 @source:wing/lucky37.cpp
 bingo75

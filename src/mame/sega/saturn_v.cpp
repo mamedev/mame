@@ -1860,7 +1860,11 @@ void saturn_state::vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite
 	}
 	if ( y < cliprect.min_y ) //clip y
 	{
-		u += xsize*(cliprect.min_y - y);
+		// draculax user clips a 320x240 sprite for inverted castle map (obviously x & y flipped)
+		// we need to adjust U calculation only to make it align properly,
+		// adjusting ysize will already glitch out flipped doors in gameplay.
+		const int adjust_y = direction & 2 ? y - cliprect.min_y : cliprect.min_y - y;
+		u += xsize * (adjust_y);
 		ysize -= (cliprect.min_y - y);
 		y = cliprect.min_y;
 	}
@@ -2123,6 +2127,9 @@ void saturn_state::vdp1_process_list()
 					break;
 
 				default:
+					// asenna 0x0c or 0x0d (transition from title screen)
+					// raymanj 0x0d (at startup)
+					// albodysj 0x0f (always)
 					popmessage ("VDP1: Sprite List Illegal %02x (%d)",current_sprite.CMDCTRL & 0xf,spritecount);
 					m_vdp1_legacy.lopr = (position * 0x20) >> 3;
 					//m_vdp1_legacy.copr = (position * 0x20) >> 3;
@@ -5411,6 +5418,7 @@ void saturn_state::vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle 
 	}
 }
 
+// - arcadegh uses incy zoom for most games but Joust
 void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int xsize, ysize, xsize_mask, ysize_mask;
@@ -5422,6 +5430,7 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	int scrolly = current_tilemap.scrolly;
 	uint16_t dot_data;
 	uint16_t pal_bank;
+	int xf, yf;
 
 	xsize = (current_tilemap.bitmap_size & 2) ? 1024 : 512;
 	ysize = (current_tilemap.bitmap_size & 1) ? 512 : 256;
@@ -5443,8 +5452,13 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 			if(!vdp2_window_process(xdst,ydst))
 				continue;
 
-			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize_mask-1);
+			xf = current_tilemap.incx * xdst;
+			xf>>=16;
+			yf = current_tilemap.incy * ydst;
+			yf>>=16;
+
+			xsrc = (xf + scrollx) & (xsize_mask-1);
+			ysrc = (yf + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs/= 2;
 			src_offs += map_offset;
@@ -5727,9 +5741,9 @@ void saturn_state::vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectangle 
 	{
 		switch(current_tilemap.colour_depth)
 		{
-		//  case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
+			case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
 			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
-		//  case 2: draw_11bpp_bitmap(bitmap, cliprect); return;
+		//  case 2: draw_11bpp_bitmap(bitmap,cliprect); return;
 			case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
 			case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
@@ -6717,10 +6731,6 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 //      if(VDP2_SCXDN0 || VDP2_SCXDN1 || VDP2_SCYDN0 || VDP2_SCYDN1)
 //          popmessage("Fractional part scrolling write");
 
-		/* pukunpa */
-		//if(VDP2_SPWINEN)
-		//  popmessage("Sprite Window enabled");
-
 		/* capgen2 - Choh Makaimura (obviously) */
 		if(VDP2_MZCTL & 0x1f && POPMESSAGE_DEBUG)
 			popmessage("Mosaic control enabled = %04x\n",VDP2_MZCTL);
@@ -6750,7 +6760,7 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 		/* lengris3 bit 3 normal, bit 1 during battle field */
 		/* mslug bit 0 during gameplay */
 		/* bugu Sega Away Logo onward 0x470 */
-		/* cncu 0x0004 0xc000 */
+		/* cncu 0x0004 0xc000, azelpanztai 0x0004 0x0000 (FMV) */
 		if(VDP2_SFSEL & ~0x47f)
 			popmessage("Special Function Code Select enable %04x %04x",VDP2_SFSEL,VDP2_SFCODE);
 
@@ -8627,8 +8637,23 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	current_tilemap.window_control.area[1] = VDP2_SPW1A;
 //  current_tilemap.window_control.? = VDP2_SPSWA;
 
+	// several games attempt to use sprite window with an illegal type 1
+	// even if document explicitly states they won't work.
+	// (reportedly seen with a SPCTL of 0x30f1, and bits 7 & 6 are <undefined> there).
+	// - kingbox (gameplay, sets 0x3031)
+	// - raymanj (corrupted tiles when showing stage intro)
+	// - sandor (player feet during attract intro)
+	// - samsho4 (character select & gameplay)
+	// TODO: document also states that color mode must be zero
+	// - but pukunpa (already) uses mode 1 and wants this enabled, mistake?
+	const bool sprite_window = VDP2_SPWINEN && sprite_type >= 2 && sprite_type <= 7;
+
 //  vdp2_apply_window_on_layer(mycliprect);
 
+	//if (VDP2_SPWINEN)
+	//	popmessage("(%d %d) enable mask %d type %d | color %d alpha %d shadow %d", interlace_framebuffer, double_x,	sprite_window, sprite_type, sprite_color_mode, alpha_enabled, sprite_shadow);
+
+	// TODO: reminder that this is an unfollowable snippet ...
 	if (interlace_framebuffer == 0 && double_x == 0 )
 	{
 		if ( alpha_enabled == 0 )
@@ -8648,6 +8673,10 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						continue;
 
 					pix = framebuffer_line[x];
+					// pukunpa, no alpha no framebuffer bumps
+					if(sprite_window && pix == 0x8000)
+						continue;
+
 					if ( (pix & 0x8000) && sprite_color_mode)
 					{
 						if ( sprite_priorities[0] != pri )
@@ -8656,9 +8685,6 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 							vdp1_sprite_priorities_in_fb_line[y][sprite_priorities[0]] = 1;
 							continue;
 						};
-
-						if(VDP2_SPWINEN && pix == 0x8000) /* Pukunpa */
-							continue;
 
 						b = pal5bit((pix & 0x7c00) >> 10);
 						g = pal5bit((pix & 0x03e0) >> 5);
@@ -8683,7 +8709,8 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						// Pretty Fighter X, Game Tengoku shadows
 						// TODO: Pretty Fighter X doesn't read what's behind on title screen, VDP1 bug?
 						// TODO: seldomly Game Tengoku shadows aren't drawn properly
-						if(pix & 0x8000 && VDP2_SDCTL & 0x100)
+						// TODO: allegedly can't enable this with sprite window (verify)
+						if(pix & 0x8000 && VDP2_SDCTL & 0x100 && !sprite_window)
 						{
 							rgb_t p = bitmap_line[x];
 							bitmap_line[x] = rgb_t(p.r() >> 1, p.g() >> 1, p.b() >> 1);
@@ -8741,6 +8768,10 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						continue;
 
 					pix = framebuffer_line[x];
+					// raymanj on FMV, alpha enabled (no noticeable difference?)
+					if(sprite_window && pix == 0x8000)
+						continue;
+
 					if ( (pix & 0x8000) && sprite_color_mode)
 					{
 						if ( sprite_priorities[0] != pri )
@@ -8749,6 +8780,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 							vdp1_sprite_priorities_in_fb_line[y][sprite_priorities[0]] = 1;
 							continue;
 						};
+
 
 						b = pal5bit((pix & 0x7c00) >> 10);
 						g = pal5bit((pix & 0x03e0) >> 5);
@@ -8858,6 +8890,10 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					continue;
 
 				pix = framebuffer_line[x];
+				// amoudan, interlaced case
+				if(sprite_window && pix == 0x8000)
+					continue;
+
 				if ( (pix & 0x8000) && sprite_color_mode)
 				{
 					if ( sprite_priorities[0] != pri )

@@ -97,7 +97,6 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Some 3d geometry bugs when [-drc] is used
 Accesses [cart] backup RAM
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1737,7 +1736,7 @@ Reportedly runs at 30 FPS on real HW
 		<year>1994</year>
 		<publisher>Koei</publisher>
 		<notes><![CDATA[
-Black screen after Sega logo, [Master SH-2] corrupts stack
+Black screen after Sega logo
 Accesses [cart] backup RAM
 ]]></notes>
 		<info name="serial" value="T-7601A (JPN)"/>
@@ -2436,7 +2435,6 @@ Writes 0x0f1f to $a130e0 in undefined [cart] area
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Some 3d geometry bugs with [-drc]
 Accesses [cart] backup RAM
 ]]></notes>
 		<info name="serial" value="GM-5001 (JPN)"/>
@@ -2455,7 +2453,6 @@ Accesses [cart] backup RAM
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Some 3d geometry bugs when [-drc] is used
 Accesses [cart] backup RAM
 ]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>

@@ -63,7 +63,9 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set(FUNC(crtc186_device::int_w));
 
 	SCREEN(config, m_screen);
-	m_screen->set_raw(XTAL(35'452'500), 106*10, 18*10, (18+80)*10, 466, 29, 29+28*15);
+	m_screen->set_refresh_hz(71.77);
+	m_screen->set_size(800, 420);
+	m_screen->set_visarea(0, 800-1, 0, 420-1);
 	m_screen->set_screen_update(FUNC(crtc186_device::screen_update));
 
 	CRT9007(config, m_vpac, XTAL(35'452'500)/8);

@@ -711,5 +711,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT   MACHINE       INPUT       CLASS              INIT     MONITOR   COMPANY  FULLNAME      FLAGS
-GAME( 1998, flsbeats, 0,    flashbeats,   flashbeats, flashbeats_state,  empty_init, ROT0,    "Sega", "Flash Beats", 0 )
+//    YEAR  NAME      PARENT  MACHINE     INPUT       CLASS             INIT        MONITOR  COMPANY  FULLNAME       FLAGS
+GAME( 1998, flsbeats, 0,      flashbeats, flashbeats, flashbeats_state, empty_init, ROT0,    "Sega",  "Flash Beats", 0 )

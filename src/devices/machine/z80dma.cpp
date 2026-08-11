@@ -499,6 +499,24 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 		}
 		break;
 
+	case SEQ_TRANS1_SAMPLE_READY:
+		// RDY is sampled at the end of the transfer cycle, one clock after the data
+		// has been written. A destination which drops RDY while it is being written
+		// and asserts it again right away (e.g. the i8275 in zorba) is therefore
+		// still seen as ready, while one which leaves RDY inactive until it has more
+		// data (e.g. the WD FDC in abc1600) ends the transfer after a single byte.
+		if (!is_ready())
+		{
+			if (OPERATING_MODE == 0b10) // Burst/Demand gives the bus back
+			{
+				set_busrq(CLEAR_LINE);
+			}
+			m_dma_seq = SEQ_WAIT_READY;
+			break;
+		}
+		m_dma_seq = SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS;
+		[[fallthrough]];
+
 	case SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS:
 		{
 			if (PULSE_GENERATED && (m_byte_counter & 0xff) == PULSE_CTRL)
@@ -560,19 +578,8 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 				break;
 
 			case 0b10: // Burst/Demand
-				if (is_ready())
-				{
-					m_dma_seq = SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS;
-				}
-				else
-				{
-					set_busrq(CLEAR_LINE);
-					m_dma_seq = SEQ_WAIT_READY;
-				}
-				break;
-
 			case 0b01: // Continuous/Block
-				m_dma_seq = is_ready() ? SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS : SEQ_WAIT_READY;
+				m_dma_seq = SEQ_TRANS1_SAMPLE_READY;
 				break;
 
 			default: // Undefined || final
@@ -901,10 +908,10 @@ void z80dma_device::write(u8 data)
 TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 {
 	// normalize state
-	m_rdy = param;
-	m_status = (m_status & 0xfd) | (!is_ready() << 1);
+	const bool ready = m_force_ready || (param == READY_ACTIVE_HIGH);
+	m_status = (m_status & 0xfd) | (!ready << 1);
 
-	if (is_ready() && INT_ON_READY)
+	if (ready && INT_ON_READY)
 	{
 		trigger_interrupt(INT_RDY);
 	}
@@ -916,6 +923,11 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 void z80dma_device::rdy_w(int state)
 {
 	LOGLINE("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
+
+	// the sequencer looks at the live pin state
+	m_rdy = state;
+
+	// but the status bit and the interrupt are updated out of line
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback), this), state);
 }
 

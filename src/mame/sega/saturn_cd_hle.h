@@ -167,6 +167,7 @@ private:
 	uint16_t hirqmask, hirqreg;
 	uint16_t cd_stat;
 	uint16_t cd_next_stat;
+	uint16_t cd_seek_stat;
 	uint32_t cd_curfad;// = 0;
 	uint32_t cd_fad_seek;
 	uint32_t fadstoplay;// = 0;
@@ -178,6 +179,7 @@ private:
 	uint8_t cdda_maxrepeat;
 	uint8_t cdda_repeat_count;
 	uint8_t tray_is_closed;
+	bool m_status_change_in_progress, m_seek_in_progress;
 	int get_timing_command( void );
 
 	direntryT curroot;       // root entry of current filesystem

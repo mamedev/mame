@@ -2,7 +2,7 @@
 // impl/buffered_write_stream.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 template <typename Stream>
 std::size_t buffered_write_stream<Stream>::flush()
@@ -84,7 +85,7 @@ namespace detail
   inline bool asio_handler_is_continuation(
       buffered_flush_handler<WriteHandler>* this_handler)
   {
-    return asio_handler_cont_helpers::is_continuation(
+    return ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
           this_handler->handler_);
   }
 
@@ -260,7 +261,7 @@ namespace detail
       buffered_write_some_handler<
         ConstBufferSequence, WriteHandler>* this_handler)
   {
-    return asio_handler_cont_helpers::is_continuation(
+    return ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
           this_handler->handler_);
   }
 
@@ -295,7 +296,7 @@ namespace detail
       non_const_lvalue<WriteHandler> handler2(handler);
       if (buffer_size(buffers) == 0 || storage->size() < storage->capacity())
       {
-        next_layer_.async_write_some(ASIO_CONST_BUFFER(0, 0),
+        next_layer_.async_write_some(const_buffer(0, 0),
             buffered_write_some_handler<ConstBufferSequence,
               decay_t<WriteHandler>>(
                 *storage, buffers, handler2.value));
@@ -377,6 +378,7 @@ std::size_t buffered_write_stream<Stream>::copy(
       storage_.data() + orig_size, buffers, length);
 }
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
