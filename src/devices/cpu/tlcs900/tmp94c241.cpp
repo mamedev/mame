@@ -1343,13 +1343,29 @@ void tmp94c241_device::tlcs900_check_irqs()
 		// flags are continuously driven by the input level. Clearing the flag
 		// during dispatch has no lasting effect if the input is still asserted.
 		// Re-assert INT0 flag if input is still active in level-detect mode.
+		// Only the ISR-driven path may re-assert. When a micro-DMA channel is
+		// armed on the INT0 start vector the DMA engine consumes each request and
+		// manages the flag itself; re-asserting there makes it read stale latch
+		// data.
 		if (irq_vector_map[irq].reg == INTE0AD &&
 			irq_vector_map[irq].iff == 0x08 &&
 			!(m_iimc & 0x02) &&
 			m_level[TLCS900_INT0] == ASSERT_LINE)
 		{
-			m_int_reg[INTE0AD] |= 0x08;
-			m_check_irqs = 1;
+			bool hdma_steals_int0 = false;
+			for (int ch = 0; ch < 4; ch++)
+			{
+				if (m_dma_vector[ch] == 0x0a)
+				{
+					hdma_steals_int0 = true;
+					break;
+				}
+			}
+			if (!hdma_steals_int0)
+			{
+				m_int_reg[INTE0AD] |= 0x08;
+				m_check_irqs = 1;
+			}
 		}
 
 		// Compute the default priority index from the vector table.
