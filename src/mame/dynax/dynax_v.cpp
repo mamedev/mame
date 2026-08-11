@@ -120,6 +120,12 @@ void dynax_adpcm_state::mjembase_blit_dest_w(uint8_t data)
 	dynax_blit_dest_w(bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0));
 }
 
+void dynax_state::baoqingt_blit_dest_w(uint8_t data)
+{
+	// bootleg hardware only has 3 layers
+	m_blit_dest = bitswap<8>(data ^ 0x0b, 7, 6, 5, 4, 0, 1, 2, 3);
+}
+
 
 /* Background Color */
 void dynax_state::dynax_blit_backpen_w(uint8_t data)

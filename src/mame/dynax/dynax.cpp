@@ -1009,7 +1009,12 @@ void dynax_state::baoqingt_io_map(address_map &map)
 {
 	qyjdzjp_io_map(map);
 
-	map(0x82, 0x82).lr8(NAME([] () -> uint8_t { return 0x80; })); // blitter busy line?
+	map(0x0c, 0x0c).unmapw();
+	map(0x20, 0x20).w("oki", FUNC(okim6295_device::write));
+	map(0x60, 0x61).nopr(); // CPLD?
+	map(0x62, 0x63).nopw(); // CPLD?
+	map(0x82, 0x82).lr8(NAME([this] () -> uint8_t { return m_screen->vblank() ? 0x00 : 0x80; }));
+	map(0xe1, 0xe1).w(FUNC(dynax_state::baoqingt_blit_dest_w));
 }
 
 void dynax_adpcm_state::mjembase_io_map(address_map &map)
@@ -7498,7 +7503,7 @@ GAME( 1990, neruton,    0,        neruton,    neruton,  dynax_adpcm_state, init_
 GAME( 1990, nerutona,   neruton,  neruton,    nerutona, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjempror,   0,        neruton,    mjempror, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong Emperor (Japan, ver. 1.01)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs inputs checking / DIP definitions
 GAME( 1997, qyjdzjp,    mjelctrn, qyjdzjp,    mjelct3,  dynax_state,       empty_init,    ROT180, "bootleg (Hom Inn)",         "Que You Ji - Dian Zi Ji Pan Jiaqiang Ban (v201)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1995, baoqingt,   0,        baoqingt,   mjelct3,  dynax_state,       empty_init,    ROT0,   "TIC",                       "Bao Qing Tian (TIC)",                                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, baoqingt,   0,        baoqingt,   mjelct3,  dynax_state,       empty_init,    ROT0,   "TIC",                       "Bao Qing Tian (TIC)",                                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs inputs checking / DIP definitions
 GAME( 1991, hanayara,   0,        yarunara,   hanayara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjcomv1,    0,        mjangels,   mjcomv1,  dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkai,     0,        tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tenkaigen (Japan)",                                     MACHINE_SUPPORTS_SAVE )

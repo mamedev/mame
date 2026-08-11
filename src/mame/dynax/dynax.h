@@ -97,6 +97,8 @@ protected:
 	void dynax_extra_scrollx_w(uint8_t data);
 	void dynax_extra_scrolly_w(uint8_t data);
 
+	void baoqingt_blit_dest_w(uint8_t data);
+
 	void tenkai_palette_w(offs_t offset, uint8_t data);
 
 	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i);
