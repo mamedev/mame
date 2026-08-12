@@ -75,17 +75,7 @@ private:
 
 	devcb_write_line m_up_cb, m_down_cb, m_left_cb, m_right_cb;
 
-	emu_timer *m_x_timer, *m_y_timer;
-	attotime m_x_time, m_y_time;
-	s32 m_x_delta, m_y_delta;
-	bool m_down, m_up, m_left, m_right;
 	ioport_constructor m_ports;
-
-	TIMER_CALLBACK_MEMBER(x_tick);
-	TIMER_CALLBACK_MEMBER(y_tick);
-
-	void changed(s32 oldval, s32 newval, s32 &delta, attotime &time, emu_timer *timer);
-	void step(s32 &delta, bool &mn, bool &pl, devcb_write_line &mn_cb, devcb_write_line &pl_cb);
 };
 
 INPUT_PORTS_EXTERN(quadmouse);
