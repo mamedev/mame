@@ -154,7 +154,7 @@ u32 oscar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 TILE_GET_INFO_MEMBER(oscar_state::get_fix_tile_info)
 {
 	const u32 offs = tile_index << 1;
-	const u16 tile = get_u16b(&m_videoram[offs]);
+	const u16 tile = get_u16be(&m_videoram[offs]);
 	const u8 color = (tile & 0xf000) >> 14;
 
 	tileinfo.set(0, tile & 0xfff, color, 0);
