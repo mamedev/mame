@@ -6,7 +6,7 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017-2024 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2017-2026 Sebastian Pipping <sebastian@pipping.org>
 # Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
 # Copyright (c) 2020      Jeffrey Walton <noloader@gmail.com>
 # Copyright (c) 2024      Dag-Erling Smørgrav <des@des.dev>
@@ -35,8 +35,8 @@ SUBDIRS = . benchmark
 
 AM_CPPFLAGS = @AM_CPPFLAGS@ -I$(srcdir)/../lib -DXML_TESTING
 
-check_PROGRAMS = runtests runtests_cxx
-TESTS = runtests runtests_cxx
+check_PROGRAMS = runtests
+TESTS = runtests
 
 # To support MinGW and Non-MinGW at the same time:
 LOG_DRIVER = $(srcdir)/../test-driver-wrapper.sh
@@ -57,27 +57,9 @@ runtests_SOURCES = \
     runtests.c \
     structdata.c
 
-runtests_cxx_SOURCES = \
-    acc_tests_cxx.cpp \
-    alloc_tests_cxx.cpp \
-    basic_tests_cxx.cpp \
-    chardata_cxx.cpp \
-    common_cxx.cpp \
-    dummy_cxx.cpp \
-    handlers_cxx.cpp \
-    memcheck_cxx.cpp \
-    minicheck_cxx.cpp \
-    misc_tests_cxx.cpp \
-    nsalloc_tests_cxx.cpp \
-    ns_tests_cxx.cpp \
-    runtests_cxx.cpp \
-    structdata_cxx.cpp
-
 runtests_LDADD = ../lib/libtestpat.la
-runtests_cxx_LDADD = ../lib/libtestpat.la
 
 runtests_LDFLAGS = @AM_LDFLAGS@ @LIBM@
-runtests_cxx_LDFLAGS = @AM_LDFLAGS@ @LIBM@
 
 EXTRA_DIST = \
     acc_tests.h \

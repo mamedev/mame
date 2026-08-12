@@ -22,21 +22,6 @@ project "expat"
 	-- fake out the enough of expat_config.h to get by
 	-- could possibly add more defines here for specific targets
 	defines {
-		"HAVE_CXX11",
-		"HAVE_MEMMOVE",
-		"HAVE_STDINT_H",
-		"HAVE_STDIO_H",
-		"HAVE_STDLIB_H",
-		"HAVE_STRING_H",
-		"PACKAGE=\"expat\"",
-		"PACKAGE_BUGREPORT=\"https://github.com/libexpat/libexpat/issues\"",
-		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat-2.7.1\"",
-		"PACKAGE_TARNAME=\"expat\"",
-		"PACKAGE_URL=\"\"",
-		"PACKAGE_VERSION=\"2.7.1\"",
-		"STDC_HEADERS",
-		"VERSION=\"2.7.1\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
 		"XML_GE=1",
@@ -45,7 +30,6 @@ project "expat"
 if _OPTIONS["BIGENDIAN"]=="1" then
 	defines {
 		"BYTEORDER=4321",
-		"WORDS_BIGENDIAN",
 	}
 else
 	defines {
@@ -64,12 +48,6 @@ if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" then
 end
 if BASE_TARGETOS=="unix" then
 	defines {
-		"HAVE_DLFCN_H",
-		"HAVE_FCNTL_H",
-		"HAVE_MMAP",
-		"HAVE_SYS_STAT_H",
-		"HAVE_SYS_TYPES_H",
-		"HAVE_UNISTD_H",
 		"XML_DEV_URANDOM",
 	}
 end
@@ -85,15 +63,6 @@ if _OPTIONS["vs"]==nil then
 end
 
 	configuration { "gmake or ninja" }
-if _OPTIONS["gcc"]~=nil then
-	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
-
-	else
-		buildoptions_c {
-			"-Wno-error=maybe-uninitialized", -- expat in GCC 11.1
-		}
-	end
-end
 if _OPTIONS["targetos"]=="asmjs" then
 		buildoptions_c {
 			"-Wno-error=format", -- expat ptrdiff_t format mismatch
@@ -103,12 +72,17 @@ if _OPTIONS["targetos"]=="windows" then
 		buildoptions_c {
 			"-Wno-error=format", -- GCC with UCRT produces warnings for the non-standard I64 size modifier
 			"-Wno-error=format-extra-args",
+			"-Wno-error=implicit-function-declaration",
+		}
+		files {
+			MAME_DIR .. "3rdparty/expat/lib/random_rand_s.c",
 		}
 end
 
 	configuration { }
 
 	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random_buf.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmlparse.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
