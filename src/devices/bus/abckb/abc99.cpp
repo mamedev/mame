@@ -517,7 +517,9 @@ void abc99_device::device_reset()
 	m_maincpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 
+	m_slot->keydown_w(1);
 	m_slot->write_rx(1);
+	m_slot->trxc_w(1);
 	m_rxtxc = 0;
 }
 

@@ -173,8 +173,8 @@ private:
 	void itxc_w(int state) { if (!m_intc) { m_mpsc->txca_w(state); } }
 	void irxc_w(int state) { if (!m_intc) { m_mpsc->rxca_w(state); } }
 	void auxc_w(int state) { m_mpsc->txcb_w(state); m_mpsc->rxcb_w(state); }
-	void drq1_w(int state) { if (!state) m_dmac->dreq1_w(1); }
-	void drq2_w(int state) { if (!state) m_dmac->dreq2_w(1); }
+	void drq1_w(int state) { if (state) m_dmac->dreq1_w(1); }
+	void drq2_w(int state) { if (state) m_dmac->dreq2_w(1); }
 
 	void update_tc();
 

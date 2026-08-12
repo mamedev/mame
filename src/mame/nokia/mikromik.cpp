@@ -562,6 +562,8 @@ void mm1_state::machine_start()
 	save_item(NAME(m_sasi_data));
 
 	m_fdc_view.select(0);
+
+	m_mpsc->synca_w(1);
 }
 
 
@@ -633,8 +635,10 @@ void mm1_state::common(machine_config &config)
 	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
 	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
 	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_dtrb_callback().set(m_rs232b, FUNC(rs232_port_device::write_dtr));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
 	m_rs232a->rxd_handler().set(m_mpsc, FUNC(upd7201_device::rxa_w));
