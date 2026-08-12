@@ -2,10 +2,7 @@
 // copyright-holders:Philip Bennett
 /*********************************************************************
 
-    53c7xx.c
-
-    NCR 53C700 SCSI I/O Processor
-
+    NCR 53C700/53C710 SCSI I/O Processors
 
     TODO:
     * Low-level register accesses
@@ -33,62 +30,69 @@
 
 
 //**************************************************************************
-//  REGISTER DEFINES (INCOMPLETE)
+//  REGISTER CONSTANTS (INCOMPLETE)
 //**************************************************************************
 
-#define SCNTL0_TRG          0x01
-#define SCNTL0_AAP          0x02
-#define SCNTL0_EPG          0x04
-#define SCNTL0_EPC          0x08
-#define SCNTL0_WATN         0x10
-#define SCNTL0_START        0x20
-#define SCNTL0_ARB_MASK     3
-#define SCNTL0_ARB_SHIFT    6
+namespace {
 
-#define SSTAT0_PAR          0x01
-#define SSTAT0_RST          0x02
-#define SSTAT0_UDC          0x04
-#define SSTAT0_SGE          0x08
-#define SSTAT0_SEL          0x10
-#define SSTAT0_STO          0x20
-#define SSTAT0_CMP          0x40
-#define SSTAT0_MA           0x80
+constexpr uint8_t SCNTL0_TRG       = 0x01;
+[[maybe_unused]] constexpr uint8_t SCNTL0_AAP = 0x02;
+[[maybe_unused]] constexpr uint8_t SCNTL0_EPG = 0x04;
+[[maybe_unused]] constexpr uint8_t SCNTL0_EPC = 0x08;
+constexpr uint8_t SCNTL0_WATN      = 0x10;
+constexpr uint8_t SCNTL0_START     = 0x20;
+constexpr uint8_t SCNTL0_ARB_MASK  = 0x03;
+constexpr uint8_t SCNTL0_ARB_SHIFT = 6;
 
-#define SSTAT1_SDP          0x01
-#define SSTAT1_RST          0x02
-#define SSTAT1_WOA          0x04
-#define SSTAT1_LOA          0x08
-#define SSTAT1_AIP          0x10
-#define SSTAT1_ORF          0x20
-#define SSTAT1_OLF          0x40
-#define SSTAT1_ILF          0x80
+constexpr uint8_t DSTAT_OPC  = 0x01;
+[[maybe_unused]] constexpr uint8_t DSTAT_WTD = 0x02;
+constexpr uint8_t DSTAT_SIR  = 0x04;
+[[maybe_unused]] constexpr uint8_t DSTAT_SSI  = 0x08;
+[[maybe_unused]] constexpr uint8_t DSTAT_ABRT = 0x10;
+constexpr uint8_t DSTAT_DFE  = 0x80;
 
-#define ISTAT_DIP           0x01
-#define ISTAT_SIP           0x02
-#define ISTAT_PRE           0x04
-#define ISTAT_CON           0x08
-#define ISTAT_ABRT          0x80
+[[maybe_unused]] constexpr uint8_t SSTAT0_PAR = 0x01;
+[[maybe_unused]] constexpr uint8_t SSTAT0_RST = 0x02;
+[[maybe_unused]] constexpr uint8_t SSTAT0_UDC = 0x04;
+[[maybe_unused]] constexpr uint8_t SSTAT0_SGE = 0x08;
+[[maybe_unused]] constexpr uint8_t SSTAT0_SEL = 0x10;
+constexpr uint8_t SSTAT0_STO = 0x20;
+constexpr uint8_t SSTAT0_CMP = 0x40;
+[[maybe_unused]] constexpr uint8_t SSTAT0_MA = 0x80;
 
-#define DSTAT_OPC           0x01
-#define DSTAT_WTD           0x02
-#define DSTAT_SIR           0x04
-#define DSTAT_SSI           0x08
-#define DSTAT_ABRT          0x10
-#define DSTAT_DFE           0x80
+[[maybe_unused]] constexpr uint8_t SSTAT1_SDP = 0x01;
+[[maybe_unused]] constexpr uint8_t SSTAT1_RST = 0x02;
+constexpr uint8_t SSTAT1_WOA = 0x04;
+constexpr uint8_t SSTAT1_LOA = 0x08;
+[[maybe_unused]] constexpr uint8_t SSTAT1_AIP = 0x10;
+constexpr uint8_t SSTAT1_ORF = 0x20;
+constexpr uint8_t SSTAT1_OLF = 0x40;
+constexpr uint8_t SSTAT1_ILF = 0x80;
+
+constexpr uint8_t CTEST4_NOTIME = 0x10;
+
+constexpr uint8_t ISTAT_DIP  = 0x01;
+constexpr uint8_t ISTAT_SIP  = 0x02;
+[[maybe_unused]] constexpr uint8_t ISTAT_PRE = 0x04;
+constexpr uint8_t ISTAT_CON  = 0x08;
+constexpr uint8_t ISTAT_ABRT = 0x80;
+
+constexpr uint8_t DCNTL_STD = 0x04;
+constexpr uint8_t DCNTL_LLM = 0x08;
+constexpr uint8_t DCNTL_SSM = 0x10;
+
+} // anonymous namespace
 
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NCR53C7XX, ncr53c7xx_device, "ncr537xx", "NCR 53C7xx SCSI")
+DEFINE_DEVICE_TYPE(NCR53C700, ncr53c700_device, "ncr53c700", "NCR 53C700 SCSI")
+DEFINE_DEVICE_TYPE(NCR53C710, ncr53c710_device, "ncr53c710", "NCR 53C710 SCSI")
 
-//-------------------------------------------------
-//  ncr53c7xx_device - constructor/destructor
-//-------------------------------------------------
-
-ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NCR53C7XX, tag, owner, clock),
+ncr53c700_device::ncr53c700_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	nscsi_device_interface(mconfig, *this),
 	device_execute_interface(mconfig, *this),
 	m_icount(0),
@@ -98,17 +102,23 @@ ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *ta
 {
 }
 
+ncr53c700_device::ncr53c700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ncr53c700_device(mconfig, NCR53C700, tag, owner, clock)
+{
+}
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+ncr53c710_device::ncr53c710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ncr53c700_device(mconfig, NCR53C710, tag, owner, clock),
+	m_big_lit_handler(*this, 0)
+{
+}
 
-void ncr53c7xx_device::device_start()
+void ncr53c700_device::device_start()
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	m_tm = timer_alloc(FUNC(ncr53c7xx_device::step_timer), this);
+	m_tm = timer_alloc(FUNC(ncr53c700_device::step_timer), this);
 
 	// The SCRIPTS processor runs at ~2 MIPS so approximate this
 	set_unscaled_clock(2000000);
@@ -145,18 +155,24 @@ void ncr53c7xx_device::device_start()
 	save_item(NAME(m_scsi_state));
 	save_item(NAME(m_connected));
 	save_item(NAME(m_finished));
-	save_item(NAME(m_last_data));
+	save_item(NAME(m_first_byte_received));
 	save_item(NAME(m_xfr_phase));
 
 	save_item(NAME(m_scripts_state));
 }
 
+void ncr53c710_device::device_start()
+{
+	ncr53c700_device::device_start();
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
+	save_item(NAME(m_dsa));
+	save_item(NAME(m_ctest8));
+	save_item(NAME(m_lcrc));
+	save_item(NAME(m_scratch));
+	save_item(NAME(m_carry));
+}
 
-void ncr53c7xx_device::device_reset()
+void ncr53c700_device::device_reset()
 {
 	// Reset registers to defaults
 	m_scntl[0]  = 3 << SCNTL0_ARB_SHIFT;
@@ -183,20 +199,39 @@ void ncr53c7xx_device::device_reset()
 	m_ctest[5]  = 0;
 	m_ctest[6]  = 0;
 	m_ctest[7]  = 0;
+	m_temp      = 0;
 	m_dfifo     = 0;
 	m_istat     = 0;//ISTAT_PRE;
+	m_dbc       = 0;
+	m_dcmd      = 0;
+	m_dnad      = 0;
+	m_dsp       = 0;
+	m_dsps      = 0;
 	m_dmode     = 0;
 	m_dien      = 0;
+	m_dwt       = 0;
 	m_dcntl     = 0;
 
 	m_finished = false;
 	m_connected = false;
+	m_first_byte_received = false;
 
 	m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL | S_BSY | S_RST, S_ALL);
 	set_scripts_state(SCRIPTS_IDLE);
 	set_scsi_state(IDLE);
 
 	m_irq_handler(CLEAR_LINE);
+}
+
+void ncr53c710_device::device_reset()
+{
+	ncr53c700_device::device_reset();
+
+	m_dsa = 0;
+	m_ctest8 = CTEST8_REVISION;
+	m_lcrc = 0;
+	m_scratch = 0;
+	m_carry = false;
 }
 
 
@@ -208,7 +243,7 @@ void ncr53c7xx_device::device_reset()
 //  read - Host read handler
 //-------------------------------------------------
 
-uint32_t ncr53c7xx_device::read(offs_t offset, uint32_t mem_mask)
+uint32_t ncr53c700_device::read(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_HOST, "%s: REG R: [%x] (%08X)\n", machine().describe_context(), offset, mem_mask);
 
@@ -423,7 +458,7 @@ uint32_t ncr53c7xx_device::read(offs_t offset, uint32_t mem_mask)
 		{
 			if (ACCESSING_BITS_8_15)
 			{
-				ret = m_dien << 8;
+				ret |= m_dien << 8;
 			}
 			if (ACCESSING_BITS_16_23)
 			{
@@ -449,12 +484,70 @@ uint32_t ncr53c7xx_device::read(offs_t offset, uint32_t mem_mask)
 
 
 //-------------------------------------------------
+//  read - 53C710 host read handler
+//-------------------------------------------------
+
+uint32_t ncr53c710_device::read(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+		case 0x4:
+			LOGMASKED(LOG_HOST, "%s: REG R: [%x] (%08X)\n", machine().describe_context(), offset, mem_mask);
+			return m_dsa;
+
+		case 0x5:
+		{
+			uint32_t ret = ncr53c700_device::read(offset, mem_mask);
+
+			if (ACCESSING_BITS_16_23)
+			{
+				uint8_t const value = (m_ctest[2] & ~CTEST2_SIGP) | (m_istat & ISTAT_SIGP ? CTEST2_SIGP : 0);
+				ret = (ret & 0xff00ffff) | (uint32_t(value) << 16);
+				m_istat &= ~ISTAT_SIGP;
+			}
+
+			return ret;
+		}
+
+		case 0x8:
+		{
+			uint32_t ret = ncr53c700_device::read(offset, mem_mask);
+
+			if (ACCESSING_BITS_16_23)
+				ret |= m_ctest8 << 16;
+			if (ACCESSING_BITS_24_31)
+				ret |= m_lcrc << 24;
+
+			return ret;
+		}
+
+		case 0xd:
+			LOGMASKED(LOG_HOST, "%s: REG R: [%x] (%08X)\n", machine().describe_context(), offset, mem_mask);
+			return m_scratch;
+
+		case 0xe:
+		{
+			uint32_t ret = ncr53c700_device::read(offset, mem_mask);
+
+			if (ACCESSING_BITS_0_7)
+				ret |= m_dmode;
+
+			return ret;
+		}
+
+		default:
+			return ncr53c700_device::read(offset, mem_mask);
+	}
+}
+
+
+//-------------------------------------------------
 //  write - Host write handler
 //-------------------------------------------------
 
-void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
+void ncr53c700_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", offset, mem_mask, data, machine().describe_context());
+	LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", machine().describe_context(), offset, mem_mask, data);
 
 	switch (offset)
 	{
@@ -512,6 +605,14 @@ void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 		}
 
+		case 0x5:
+		{
+			if (ACCESSING_BITS_0_7)
+				m_ctest[0] = data;
+
+			break;
+		}
+
 		case 0x6:
 		{
 			if (ACCESSING_BITS_0_7)
@@ -549,9 +650,8 @@ void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				m_istat = data >> 8;
+				istat_w(data >> 8);
 			}
-
 			break;
 		}
 
@@ -605,6 +705,9 @@ void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_dmode = data;
+
+				if (m_dmode & DMODE_PIPE)
+					fatalerror("53c700: DMA pipeline mode not supported!");
 			}
 
 			break;
@@ -625,27 +728,7 @@ void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			if (ACCESSING_BITS_24_31)
 			{
-				m_dcntl = data >> 24;
-
-				// Note: not self-clearing
-				if (m_dcntl & 1) // RST
-				{
-					device_reset();
-				}
-				else if (m_dcntl & 2) // STD
-				{
-					// Only applies to these modes:
-					// * Manual Start
-					// * Single Step
-					// * Pipeline
-					fatalerror("53c7xx: Start DMA");
-				}
-				else if (m_dcntl & 4)
-				{
-					fatalerror("53c7xx: SCSI Low-Level Mode not supported!");
-				}
-
-				// TODO: Update clocking
+				dcntl_w(data >> 24);
 			}
 
 			break;
@@ -659,6 +742,135 @@ void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 
+//-------------------------------------------------
+//  write - 53C710 host write handler
+//-------------------------------------------------
+
+void ncr53c710_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+		case 0x4:
+			LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", machine().describe_context(), offset, mem_mask, data);
+			COMBINE_DATA(&m_dsa);
+			break;
+
+		case 0x8:
+			ncr53c700_device::write(offset, data, mem_mask);
+
+			if (ACCESSING_BITS_16_23)
+			{
+				uint8_t const value = data >> 16;
+				m_ctest8 = CTEST8_REVISION | (value & CTEST8_WRITABLE);
+
+				if (value & CTEST8_CLF)
+				{
+					m_dfifo = 0;
+					m_sstat[1] &= ~(SSTAT1_ORF | SSTAT1_OLF | SSTAT1_ILF);
+				}
+			}
+			if (ACCESSING_BITS_24_31)
+				m_lcrc = data >> 24;
+			break;
+
+		case 0xd:
+			LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", machine().describe_context(), offset, mem_mask, data);
+			COMBINE_DATA(&m_scratch);
+			break;
+
+		case 0xe:
+			ncr53c700_device::write(offset, data, mem_mask);
+
+			if (ACCESSING_BITS_0_7)
+				m_dmode = data;
+			break;
+
+		default:
+			ncr53c700_device::write(offset, data, mem_mask);
+	}
+}
+
+
+//-------------------------------------------------
+//  dcntl_w - handle 53C700 DMA control
+//-------------------------------------------------
+
+void ncr53c700_device::dcntl_w(uint8_t data)
+{
+	m_dcntl = data;
+
+	if (m_dcntl & DCNTL_RST)
+	{
+		device_reset();
+		return;
+	}
+
+	if (m_dcntl & DCNTL_SSM)
+		fatalerror("53c7xx: DMA single-step mode not supported!");
+
+	if ((m_dcntl & DCNTL_STD) && (m_scripts_state == SCRIPTS_WAIT_MANUAL_START))
+		set_scripts_state(SCRIPTS_FETCH);
+
+	if (m_dcntl & DCNTL_LLM)
+		fatalerror("53c7xx: SCSI Low-Level Mode not supported!");
+
+	// TODO: Update clocking
+}
+
+
+//-------------------------------------------------
+//  dcntl_w - handle 53C710 DMA control
+//-------------------------------------------------
+
+void ncr53c710_device::dcntl_w(uint8_t data)
+{
+	m_dcntl = data;
+
+	if (m_dcntl & DCNTL_SSM)
+		fatalerror("53c7xx: DMA single-step mode not supported!");
+
+	if ((m_dcntl & DCNTL_STD) && (m_scripts_state == SCRIPTS_WAIT_MANUAL_START))
+		set_scripts_state(SCRIPTS_FETCH);
+
+	if (m_dcntl & DCNTL_LLM)
+		fatalerror("53c7xx: SCSI Low-Level Mode not supported!");
+
+	// TODO: Update clocking
+}
+
+
+//-------------------------------------------------
+//  istat_w - handle model-specific interrupt status
+//-------------------------------------------------
+
+void ncr53c700_device::istat_w(uint8_t data)
+{
+	m_istat = data;
+}
+
+
+//-------------------------------------------------
+//  istat_w - handle 53C710 interrupt status
+//-------------------------------------------------
+
+void ncr53c710_device::istat_w(uint8_t data)
+{
+	m_istat = (m_istat & (ISTAT_CON | ISTAT_SIP | ISTAT_DIP)) | (data & (ISTAT_ABRT | ISTAT_RST | ISTAT_SIGP));
+
+	if (m_istat & ISTAT_RST)
+	{
+		uint8_t const dcntl = m_dcntl & DCNTL_EA;
+		uint8_t const dmode = m_dmode & DMODE_FC1;
+
+		device_reset();
+
+		m_dcntl = dcntl;
+		m_dmode = dmode;
+		m_istat = ISTAT_RST;
+	}
+}
+
+
 
 //**************************************************************************
 //  SCSI STATE MACHINE
@@ -667,7 +879,7 @@ void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 //-------------------------------------------------
 //  update_irqs -
 //-------------------------------------------------
-void ncr53c7xx_device::update_irqs()
+void ncr53c700_device::update_irqs()
 {
 	if (m_sstat[0] & m_sien)
 		m_istat |= ISTAT_SIP;
@@ -679,14 +891,14 @@ void ncr53c7xx_device::update_irqs()
 	else
 		m_istat &= ~ISTAT_DIP;
 
-	m_irq_handler(m_istat ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_handler(m_istat & (ISTAT_SIP | ISTAT_DIP) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 //-------------------------------------------------
 //  set_scsi_state - change SCSI state
 //-------------------------------------------------
 
-void ncr53c7xx_device::set_scsi_state(int state)
+void ncr53c700_device::set_scsi_state(int state)
 {
 	LOGMASKED(LOG_STATE, "SCSI state change: %x to %x\n", m_scsi_state, state);
 
@@ -699,7 +911,7 @@ void ncr53c7xx_device::set_scsi_state(int state)
 //  a time delay
 //-------------------------------------------------
 
-void ncr53c7xx_device::delay(const attotime &delay)
+void ncr53c700_device::delay(const attotime &delay)
 {
 	m_tm->adjust(delay);
 }
@@ -709,9 +921,81 @@ void ncr53c7xx_device::delay(const attotime &delay)
 //  scsi_ctrl_changed - callback from nscsi_device
 //-------------------------------------------------
 
-void ncr53c7xx_device::scsi_ctrl_changed()
+void ncr53c700_device::scsi_ctrl_changed()
 {
 	step(false);
+}
+
+
+//-------------------------------------------------
+//  host_byte_shift - locate a byte within a host
+//  memory longword
+//-------------------------------------------------
+
+unsigned ncr53c700_device::host_byte_shift(offs_t address)
+{
+	return 8 * (address & 3);
+}
+
+
+//-------------------------------------------------
+//  host_byte_shift - locate a byte within a host
+//  memory longword with selectable endianness
+//-------------------------------------------------
+
+unsigned ncr53c710_device::host_byte_shift(offs_t address)
+{
+	return 8 * ((address & 3) ^ (m_big_lit_handler() ? 3 : 0));
+}
+
+
+//-------------------------------------------------
+//  transfer_control_address - resolve an absolute
+//  53C700 transfer-control address
+//-------------------------------------------------
+
+uint32_t ncr53c700_device::transfer_control_address()
+{
+	return m_dsps;
+}
+
+
+//-------------------------------------------------
+//  transfer_control_address - resolve an absolute
+//  or relative 53C710 transfer-control address
+//-------------------------------------------------
+
+uint32_t ncr53c710_device::transfer_control_address()
+{
+	if (BIT(m_dbc, 23))
+	{
+		int32_t const displacement = util::sext(m_dsps, 24);
+		return m_dsp + displacement;
+	}
+
+	return m_dsps;
+}
+
+
+//-------------------------------------------------
+//  host_memory_read - read host memory on behalf
+//  of the DMA engine
+//-------------------------------------------------
+
+uint32_t ncr53c700_device::host_memory_read(offs_t address, uint32_t mem_mask)
+{
+	return m_host_read(address, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  host_memory_write - write host memory on behalf
+//  of the DMA engine
+//-------------------------------------------------
+
+void ncr53c700_device::host_memory_write(offs_t address, uint32_t data, uint32_t mem_mask)
+{
+	m_host_write(address, data, mem_mask);
 }
 
 
@@ -719,15 +1003,15 @@ void ncr53c7xx_device::scsi_ctrl_changed()
 //  send_byte - send data to a SCSI device
 //-------------------------------------------------
 
-void ncr53c7xx_device::send_byte()
+void ncr53c700_device::send_byte()
 {
 	if (m_dbc == 0)
 		fatalerror("53C7XX: send_byte() - DBC should not be 0\n");
 
 	set_scsi_state( (m_scsi_state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT) );
 
-	uint32_t data = m_host_read(m_dnad & ~3, 0xffffffff);
-	data = data >> ((m_dnad & 3) * 8) & 0xff;
+	uint32_t data = host_memory_read(m_dnad & ~3, 0xffffffff);
+	data = data >> host_byte_shift(m_dnad) & 0xff;
 
 	++m_dnad;
 	--m_dbc;
@@ -743,7 +1027,7 @@ void ncr53c7xx_device::send_byte()
 //  recv_byte - receive data from a SCSI device
 //-------------------------------------------------
 
-void ncr53c7xx_device::recv_byte()
+void ncr53c700_device::recv_byte()
 {
 	m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 	set_scsi_state( (m_scsi_state & STATE_MASK) | (RECV_WAIT_REQ_1 << SUB_SHIFT) );
@@ -756,7 +1040,7 @@ void ncr53c7xx_device::recv_byte()
 //  state machine
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(ncr53c7xx_device::step_timer)
+TIMER_CALLBACK_MEMBER(ncr53c700_device::step_timer)
 {
 	step(true);
 }
@@ -766,7 +1050,7 @@ TIMER_CALLBACK_MEMBER(ncr53c7xx_device::step_timer)
 //  step - advance the SCSI state machine
 //-------------------------------------------------
 
-void ncr53c7xx_device::step(bool timeout)
+void ncr53c700_device::step(bool timeout)
 {
 	uint32_t ctrl = m_scsi_bus->ctrl_r();
 	uint32_t data = m_scsi_bus->data_r();
@@ -915,8 +1199,8 @@ void ncr53c7xx_device::step(bool timeout)
 			if (!timeout)
 				break;
 
-			// Activate data line of the thing
-			m_scsi_bus->data_w(m_scsi_refid, m_sdid);
+			// selection identifies both the initiator and the target
+			m_scsi_bus->data_w(m_scsi_refid, m_scid | m_sdid);
 
 			set_scsi_state(ARBITRATE_SELECT_DEST);
 			delay(attotime::from_nsec(2));
@@ -942,8 +1226,43 @@ void ncr53c7xx_device::step(bool timeout)
 			if (!timeout)
 				break;
 
-			set_scsi_state(ARBITRATE_DESKEW_WAIT);
-			delay(attotime::from_nsec(500));
+			if (ctrl & S_BSY)
+			{
+				set_scsi_state(ARBITRATE_DESKEW_WAIT);
+				delay(attotime::from_nsec(500));
+			}
+			else
+			{
+				set_scsi_state(ARBITRATE_WAIT_BSY);
+
+				if (!(m_ctest[4] & CTEST4_NOTIME))
+					delay(attotime::from_msec(250));
+			}
+
+			break;
+		}
+
+		case ARBITRATE_WAIT_BSY:
+		{
+			if (ctrl & S_BSY)
+			{
+				set_scsi_state(ARBITRATE_DESKEW_WAIT);
+				delay(attotime::from_nsec(500));
+			}
+			else if (timeout)
+			{
+				LOGMASKED(LOG_STATE, "Selection timeout selecting ID %02x\n", m_sdid);
+
+				m_scntl[0] &= ~SCNTL0_START;
+				m_sstat[0] |= SSTAT0_STO;
+				m_connected = false;
+				set_scsi_state(IDLE);
+				set_scripts_state(SCRIPTS_IDLE);
+
+				m_scsi_bus->data_w(m_scsi_refid, 0);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL | S_ATN | S_BSY);
+				update_irqs();
+			}
 
 			break;
 		}
@@ -1082,11 +1401,15 @@ void ncr53c7xx_device::step(bool timeout)
 
 			if ((m_scsi_state & STATE_MASK) != INIT_XFER_RECV_PAD)
 			{
-				m_last_data = m_scsi_bus->data_r();
+				if (!m_first_byte_received)
+				{
+					m_sfbr = m_scsi_bus->data_r();
+					m_first_byte_received = true;
+				}
 
-				uint32_t shift = (8 * (m_dnad & 3));
+				uint32_t shift = host_byte_shift(m_dnad);
 				uint32_t mem_mask = 0xff << shift;
-				m_host_write(m_dnad & ~3, data << shift, mem_mask);
+				host_memory_write(m_dnad & ~3, data << shift, mem_mask);
 
 				++m_dnad;
 				--m_dbc;
@@ -1121,13 +1444,11 @@ void ncr53c7xx_device::step(bool timeout)
 //  SCSI SCRIPTS
 //**************************************************************************
 
-#define     UNIMPLEMENTED   fatalerror("%s is unimplemented\n", __FUNCTION__)
-
 //-------------------------------------------------
 //  set_scripts_state -
 //-------------------------------------------------
 
-void ncr53c7xx_device::set_scripts_state(scripts_state state)
+void ncr53c700_device::set_scripts_state(scripts_state state)
 {
 	m_scripts_state = state;
 }
@@ -1136,7 +1457,7 @@ void ncr53c7xx_device::set_scripts_state(scripts_state state)
 //-------------------------------------------------
 //  scripts_yield - suspend execution
 //-------------------------------------------------
-void ncr53c7xx_device::scripts_yield()
+void ncr53c700_device::scripts_yield()
 {
 	m_icount = 0;
 }
@@ -1146,7 +1467,7 @@ void ncr53c7xx_device::scripts_yield()
 //  execute_run - SCRIPTS execution loop
 //-------------------------------------------------
 
-void ncr53c7xx_device::execute_run()
+void ncr53c700_device::execute_run()
 {
 	// Not processing anything so bail
 	if (m_scripts_state < SCRIPTS_FETCH)
@@ -1164,7 +1485,9 @@ void ncr53c7xx_device::execute_run()
 				m_finished = false;
 
 				// Fetch the instruction
-				uint32_t inst = m_host_read(m_dsp, 0xffffffff);
+				uint32_t inst = host_memory_read(m_dsp, 0xffffffff);
+
+				LOGMASKED(LOG_SCRIPTS, "FETCH dsp=%08x inst=%08x istat=%02x dstat=%02x\n", m_dsp, inst, m_istat, m_dstat);
 
 				m_dcmd = inst >> 24;
 				m_dbc = inst & 0xffffff;
@@ -1188,7 +1511,7 @@ void ncr53c7xx_device::execute_run()
 						break;
 
 					case 3:
-						illegal();
+						scripts_decode_memory_move();
 				}
 
 				LOGMASKED(LOG_SCRIPTS, "%s", disassemble_scripts());
@@ -1211,16 +1534,16 @@ void ncr53c7xx_device::execute_run()
 //  scripts_decode_bm - decode block move
 //-------------------------------------------------
 
-void ncr53c7xx_device::scripts_decode_bm(void)
+void ncr53c700_device::scripts_decode_bm(void)
 {
 	// Decode our instruction
 	if (m_scntl[0] & SCNTL0_TRG)
 	{
 		// Target mode
-		switch ((m_dcmd >> 3) & 3)
+		switch (block_move_opcode())
 		{
 			case 0:
-				m_scripts_op = &ncr53c7xx_device::bm_t_move;
+				m_scripts_op = &ncr53c700_device::bm_t_move;
 				break;
 
 			default:
@@ -1231,14 +1554,10 @@ void ncr53c7xx_device::scripts_decode_bm(void)
 	else
 	{
 		// Initiator mode
-		switch ((m_dcmd >> 3) & 3)
+		switch (block_move_opcode())
 		{
-			case 0:
-				m_scripts_op = &ncr53c7xx_device::bm_i_move;
-				break;
-
 			case 1:
-				m_scripts_op = &ncr53c7xx_device::bm_i_wmov;
+				m_scripts_op = &ncr53c700_device::bm_i_wmov;
 				break;
 
 			default:
@@ -1247,8 +1566,60 @@ void ncr53c7xx_device::scripts_decode_bm(void)
 		}
 	}
 
-	m_dnad = m_host_read(m_dsp + 4, 0xffffffff);
+	m_dnad = host_memory_read(m_dsp + 4, 0xffffffff);
 	m_dsp += 8;
+	configure_block_move();
+}
+
+
+//-------------------------------------------------
+//  block_move_opcode - decode the 53C700 two-bit
+//  Block Move opcode
+//-------------------------------------------------
+
+unsigned ncr53c700_device::block_move_opcode() const
+{
+	return (m_dcmd >> 3) & 3;
+}
+
+
+//-------------------------------------------------
+//  block_move_opcode - decode the 53C710 one-bit
+//  Block Move opcode
+//-------------------------------------------------
+
+unsigned ncr53c710_device::block_move_opcode() const
+{
+	return BIT(m_dcmd, 3);
+}
+
+
+//-------------------------------------------------
+//  configure_block_move - no additional 53C700
+//  Block Move operands
+//-------------------------------------------------
+
+void ncr53c700_device::configure_block_move()
+{
+}
+
+
+//-------------------------------------------------
+//  configure_block_move - resolve a 53C710 table
+//  indirect byte count and data address
+//-------------------------------------------------
+
+void ncr53c710_device::configure_block_move()
+{
+	if (!BIT(m_dcmd, 4))
+		return;
+
+	// load from table indirect
+	uint32_t const table_address = m_dsa + util::sext(m_dnad, 24);
+	m_dbc = host_memory_read(table_address, 0xffffffff) & 0xffffff;
+	m_dnad = host_memory_read(table_address + 4, 0xffffffff);
+
+	LOGMASKED(LOG_SCRIPTS, "BM table [%08x]: count=%06x address=%08x\n", table_address, m_dbc, m_dnad);
 }
 
 
@@ -1256,8 +1627,12 @@ void ncr53c7xx_device::scripts_decode_bm(void)
 //  scripts_decode_io - decode IO
 //-------------------------------------------------
 
-void ncr53c7xx_device::scripts_decode_io(void)
+void ncr53c700_device::scripts_decode_io(void)
 {
+	// exit if scripts_decode_read_write() already handled this instruction
+	if (scripts_decode_read_write())
+		return;
+
 	// Set Target Mode?
 	if (m_dbc & (1 << 9))
 		m_scntl[0] |= SCNTL0_TRG;
@@ -1269,23 +1644,23 @@ void ncr53c7xx_device::scripts_decode_io(void)
 		switch ((m_dcmd >> 3) & 7)
 		{
 			case 0:
-				m_scripts_op = &ncr53c7xx_device::io_t_reselect;
+				m_scripts_op = &ncr53c700_device::io_t_reselect;
 				break;
 
 			case 1:
-				m_scripts_op = &ncr53c7xx_device::io_t_disconnect;
+				m_scripts_op = &ncr53c700_device::io_t_disconnect;
 				break;
 
 			case 2:
-				m_scripts_op = &ncr53c7xx_device::io_t_waitselect;
+				m_scripts_op = &ncr53c700_device::io_t_waitselect;
 				break;
 
 			case 3:
-				m_scripts_op = &ncr53c7xx_device::io_t_set;
+				m_scripts_op = &ncr53c700_device::io_t_set;
 				break;
 
 			case 4:
-				m_scripts_op = &ncr53c7xx_device::io_t_clear;
+				m_scripts_op = &ncr53c700_device::io_t_clear;
 				break;
 
 			default:
@@ -1299,23 +1674,23 @@ void ncr53c7xx_device::scripts_decode_io(void)
 		switch ((m_dcmd >> 3) & 7)
 		{
 			case 0:
-				m_scripts_op = &ncr53c7xx_device::io_i_select;
+				m_scripts_op = &ncr53c700_device::io_i_select;
 				break;
 
 			case 1:
-				m_scripts_op = &ncr53c7xx_device::io_i_waitdisconnect;
+				m_scripts_op = &ncr53c700_device::io_i_waitdisconnect;
 				break;
 
 			case 2:
-				m_scripts_op = &ncr53c7xx_device::io_i_waitreselect;
+				m_scripts_op = &ncr53c700_device::io_i_waitreselect;
 				break;
 
 			case 3:
-				m_scripts_op = &ncr53c7xx_device::io_i_set;
+				m_scripts_op = &ncr53c700_device::io_i_set;
 				break;
 
 			case 4:
-				m_scripts_op = &ncr53c7xx_device::io_i_clear;
+				m_scripts_op = &ncr53c700_device::io_i_clear;
 				break;
 
 			default:
@@ -1325,8 +1700,140 @@ void ncr53c7xx_device::scripts_decode_io(void)
 	}
 
 	// Set some additional registers
-	m_dnad = m_dsps = m_host_read(m_dsp + 4, 0xffffffff);
+	m_dnad = m_dsps = host_memory_read(m_dsp + 4, 0xffffffff);
 	m_dsp += 8;
+	load_io_operands();
+}
+
+
+//-------------------------------------------------
+//  load_io_operands - load a direct 53C700 SCSI ID
+//-------------------------------------------------
+
+void ncr53c700_device::load_io_operands()
+{
+	m_sdid = m_dbc >> 16;
+}
+
+
+//-------------------------------------------------
+//  load_io_operands - load direct or table indirect
+//  53C710 selection parameters
+//-------------------------------------------------
+
+void ncr53c710_device::load_io_operands()
+{
+	m_sdid = m_dbc >> 16;
+
+	if (!BIT(m_dcmd, 1))
+		return;
+
+	// load from table indirect
+	uint32_t const table_address = m_dsa + util::sext(m_dbc, 24);
+	uint32_t const table_data = host_memory_read(table_address, 0xffffffff);
+	m_sdid = table_data >> host_byte_shift(table_address + 1);
+	m_sxfer = table_data >> host_byte_shift(table_address + 2);
+
+	LOGMASKED(LOG_SCRIPTS, "IO table [%08x]: data=%08x id=%02x sxfer=%02x\n", table_address, table_data, m_sdid, m_sxfer);
+}
+
+
+//-------------------------------------------------
+//  scripts_decode_read_write - read/write SCRIPTS
+//  instructions are not available on the 53C700
+//-------------------------------------------------
+
+bool ncr53c700_device::scripts_decode_read_write()
+{
+	return false;
+}
+
+
+//-------------------------------------------------
+//  scripts_register_read - read a byte using the
+//  fixed little-endian SCRIPTS register addresses
+//-------------------------------------------------
+
+uint8_t ncr53c710_device::scripts_register_read(uint8_t address)
+{
+	unsigned const shift = 8 * (address & 3);
+	uint32_t const mem_mask = 0xffU << shift;
+	return read(address >> 2, mem_mask) >> shift;
+}
+
+
+//-------------------------------------------------
+//  scripts_register_write - write a byte using the
+//  fixed little-endian SCRIPTS register addresses
+//-------------------------------------------------
+
+void ncr53c710_device::scripts_register_write(uint8_t address, uint8_t data)
+{
+	unsigned const shift = 8 * (address & 3);
+	uint32_t const mem_mask = 0xffU << shift;
+	write(address >> 2, uint32_t(data) << shift, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  scripts_decode_read_write - execute a 53C710
+//  register read/write instruction
+//-------------------------------------------------
+
+bool ncr53c710_device::scripts_decode_read_write()
+{
+	unsigned const opcode = (m_dcmd >> 3) & 7;
+
+	if (opcode < 5)
+		return false;
+
+	m_dsps = host_memory_read(m_dsp + 4, 0xffffffff);
+	m_dsp += 8;
+
+	uint8_t const address = (m_dbc >> 16) & 0x3f;
+	uint8_t const immediate = m_dbc >> 8;
+
+	// DBC bits 23-22 and 7-0 and the entire second word are reserved
+	// ISTAT cannot be accessed by a read/write instruction
+	if ((m_dbc & 0xc000ff) || m_dsps || (address == 0x21))
+	{
+		illegal();
+		return true;
+	}
+
+	uint8_t value = immediate;
+
+	if (((m_dcmd >> 1) & 3) != 0)
+	{
+		uint8_t const operand = (opcode == 5) ? m_sfbr : scripts_register_read(address);
+
+		switch ((m_dcmd >> 1) & 3)
+		{
+			case 1:
+				value = operand | immediate;
+				break;
+
+			case 2:
+				value = operand & immediate;
+				break;
+
+			case 3:
+			{
+				uint16_t const result = uint16_t(operand) + immediate + (BIT(m_dcmd, 0) && m_carry ? 1 : 0);
+				value = result;
+				m_carry = BIT(result, 8);
+				break;
+			}
+		}
+	}
+
+	if (opcode == 6)
+		m_sfbr = value;
+	else
+		scripts_register_write(address, value);
+
+	set_scripts_state(SCRIPTS_FETCH);
+	return true;
 }
 
 
@@ -1334,25 +1841,25 @@ void ncr53c7xx_device::scripts_decode_io(void)
 //  scripts_decode_tc - decode transfer control
 //-------------------------------------------------
 
-void ncr53c7xx_device::scripts_decode_tc(void)
+void ncr53c700_device::scripts_decode_tc(void)
 {
 	// Decode our instruction
 	switch ((m_dcmd >> 3) & 7)
 	{
 		case 0:
-			m_scripts_op = &ncr53c7xx_device::tc_jump;
+			m_scripts_op = &ncr53c700_device::tc_jump;
 			break;
 
 		case 1:
-			m_scripts_op = &ncr53c7xx_device::tc_call;
+			m_scripts_op = &ncr53c700_device::tc_call;
 			break;
 
 		case 2:
-			m_scripts_op = &ncr53c7xx_device::tc_return;
+			m_scripts_op = &ncr53c700_device::tc_return;
 			break;
 
 		case 3:
-			m_scripts_op = &ncr53c7xx_device::tc_int;
+			m_scripts_op = &ncr53c700_device::tc_int;
 			break;
 
 		default:
@@ -1360,8 +1867,86 @@ void ncr53c7xx_device::scripts_decode_tc(void)
 			break;
 	}
 
-	m_dnad = m_dsps = m_host_read(m_dsp + 4, 0xffffffff);
+	m_dnad = m_dsps = host_memory_read(m_dsp + 4, 0xffffffff);
 	m_dsp += 8;
+}
+
+
+//-------------------------------------------------
+//  scripts_decode_memory_move - memory move is not
+//  available on the 53C700
+//-------------------------------------------------
+
+void ncr53c700_device::scripts_decode_memory_move()
+{
+	illegal();
+}
+
+
+//-------------------------------------------------
+//  scripts_decode_memory_move - execute a 53C710
+//  memory-to-memory move
+//-------------------------------------------------
+
+void ncr53c710_device::scripts_decode_memory_move()
+{
+	// bits 29-24 are reserved for this instruction
+	if (m_dcmd & 0x3f)
+	{
+		illegal();
+		return;
+	}
+
+	m_dsps = host_memory_read(m_dsp + 4, 0xffffffff);
+	m_temp = host_memory_read(m_dsp + 8, 0xffffffff);
+	m_dsp += 12;
+
+	uint32_t source = m_dsps;
+	uint32_t destination = m_temp;
+
+	// make sure we are aligned
+	if ((source ^ destination) & 3)
+	{
+		illegal();
+		return;
+	}
+
+	// DSA is overwritten before the source is read, but its exact use for the move isn't known
+	m_dsa = destination;
+
+	// moves a single byte for the non-aligned cases
+	auto move_byte = [this, &source, &destination]()
+	{
+		unsigned const source_shift = host_byte_shift(source);
+		uint32_t const source_mask = 0xffU << source_shift;
+		uint8_t const data = host_memory_read(source & ~3U, source_mask) >> source_shift;
+		unsigned const destination_shift = host_byte_shift(destination);
+		uint32_t const destination_mask = 0xffU << destination_shift;
+
+		host_memory_write(destination & ~3U, uint32_t(data) << destination_shift, destination_mask);
+		++source;
+		++destination;
+		--m_dbc;
+	};
+
+	// copy the leading bytes until we are 32-bit aligned
+	while (m_dbc && (source & 3))
+		move_byte();
+
+	// move as many 32-bit values as possible
+	while (m_dbc >= 4)
+	{
+		host_memory_write(destination, host_memory_read(source, 0xffffffff), 0xffffffff);
+		source += 4;
+		destination += 4;
+		m_dbc -= 4;
+	}
+
+	// move the trailing bytes if necessary
+	while (m_dbc)
+		move_byte();
+
+	set_scripts_state(SCRIPTS_FETCH);
 }
 
 //**************************************************************************
@@ -1372,12 +1957,24 @@ void ncr53c7xx_device::scripts_decode_tc(void)
 //  illegal - illegal instruction
 //-------------------------------------------------
 
-void ncr53c7xx_device::illegal()
+void ncr53c700_device::illegal()
 {
+	LOGMASKED(LOG_UNHANDLED, "Illegal SCRIPT: dcmd=%02x dbc=%06x dsp=%08x dsps=%08x\n", m_dcmd, m_dbc, m_dsp, m_dsps);
+
 	m_dstat |= DSTAT_OPC;
 	update_irqs();
 	set_scripts_state(SCRIPTS_IDLE);
+}
 
+
+//-------------------------------------------------
+//  unimplemented - report an unimplemented valid
+//  SCRIPTS operation
+//-------------------------------------------------
+
+[[noreturn]] void ncr53c700_device::unimplemented(char const *operation) const
+{
+	fatalerror("%s is unimplemented: dcmd=%02x dbc=%06x dsp=%08x dsps=%08x\n", operation, m_dcmd, m_dbc, m_dsp, m_dsps);
 }
 
 
@@ -1385,19 +1982,9 @@ void ncr53c7xx_device::illegal()
 //  bm_t_move - block move (target)
 //-------------------------------------------------
 
-void ncr53c7xx_device::bm_t_move()
+void ncr53c700_device::bm_t_move()
 {
-	UNIMPLEMENTED;
-}
-
-
-//-------------------------------------------------
-//  bm_i_move - block move (initiator)
-//-------------------------------------------------
-
-void ncr53c7xx_device::bm_i_move()
-{
-	UNIMPLEMENTED;
+	unimplemented(__func__);
 }
 
 
@@ -1405,12 +1992,14 @@ void ncr53c7xx_device::bm_i_move()
 //  bm_i_wmov - wait block move (initiator)
 //-------------------------------------------------
 
-void ncr53c7xx_device::bm_i_wmov()
+void ncr53c700_device::bm_i_wmov()
 {
 	if (!m_finished)
 	{
 		if (m_scsi_state == IDLE)
 		{
+			m_first_byte_received = false;
+
 			if (m_dbc == 0)
 			{
 				LOGMASKED(LOG_UNHANDLED, "DBC should not be 0\n");
@@ -1419,7 +2008,7 @@ void ncr53c7xx_device::bm_i_wmov()
 
 			// Indirect addressing
 			if (m_dcmd & (1 << 5))
-				m_dnad = m_host_read(m_dnad, 0xffffffff);
+				m_dnad = host_memory_read(m_dnad, 0xffffffff);
 
 			// Compare the phase bits
 			if ((m_scsi_bus->ctrl_r() & 7) == (m_dcmd & 7))
@@ -1452,9 +2041,9 @@ void ncr53c7xx_device::bm_i_wmov()
 //  io_t_reselect -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_t_reselect()
+void ncr53c700_device::io_t_reselect()
 {
-	UNIMPLEMENTED;
+	unimplemented(__func__);
 }
 
 
@@ -1462,9 +2051,9 @@ void ncr53c7xx_device::io_t_reselect()
 //  io_t_disconnect -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_t_disconnect()
+void ncr53c700_device::io_t_disconnect()
 {
-	UNIMPLEMENTED;
+	unimplemented(__func__);
 }
 
 
@@ -1472,9 +2061,9 @@ void ncr53c7xx_device::io_t_disconnect()
 //  io_t_waitselect -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_t_waitselect()
+void ncr53c700_device::io_t_waitselect()
 {
-	UNIMPLEMENTED;
+	unimplemented(__func__);
 }
 
 
@@ -1482,9 +2071,9 @@ void ncr53c7xx_device::io_t_waitselect()
 //  io_t_set -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_t_set()
+void ncr53c700_device::io_t_set()
 {
-	UNIMPLEMENTED;
+	unimplemented(__func__);
 }
 
 
@@ -1492,9 +2081,9 @@ void ncr53c7xx_device::io_t_set()
 //  io_t_clear -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_t_clear()
+void ncr53c700_device::io_t_clear()
 {
-	UNIMPLEMENTED;
+	unimplemented(__func__);
 }
 
 
@@ -1502,13 +2091,12 @@ void ncr53c7xx_device::io_t_clear()
 //  io_i_select -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_i_select()
+void ncr53c700_device::io_i_select()
 {
 	if (!m_finished)
 	{
 		if (m_scsi_state == IDLE)
 		{
-			m_sdid = m_dbc >> 16;
 			m_scntl[0] |= (3 << SCNTL0_ARB_SHIFT) | SCNTL0_START;
 
 			// Set select with ATN bit
@@ -1535,7 +2123,7 @@ void ncr53c7xx_device::io_i_select()
 //  io_i_waitdisconnect -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_i_waitdisconnect()
+void ncr53c700_device::io_i_waitdisconnect()
 {
 	if (m_scsi_bus->ctrl_r() & (S_BSY | S_SEL))
 		scripts_yield();
@@ -1548,9 +2136,39 @@ void ncr53c7xx_device::io_i_waitdisconnect()
 //  io_i_waitreselect -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_i_waitreselect()
+void ncr53c700_device::io_i_waitreselect()
 {
-	UNIMPLEMENTED;
+	unimplemented(__func__);
+}
+
+
+//-------------------------------------------------
+//  io_i_waitreselect - 53C710 signal-process wakeup
+//-------------------------------------------------
+
+void ncr53c710_device::io_i_waitreselect()
+{
+	// kickstart 3.1 on the a4000t uses waitreselect to idle SCRIPTS
+	// and will wake it up with SIGP once more work is ready
+	// actual reselection is unimplemented like for the base 53C700
+
+	if (!(m_istat & ISTAT_SIGP))
+	{
+		m_icount = 0;
+		return;
+	}
+
+	if (BIT(m_dcmd, 2))
+	{
+		int32_t const displacement = util::sext(m_dnad, 24);
+		m_dsp += displacement;
+	}
+	else
+	{
+		m_dsp = m_dnad;
+	}
+
+	set_scripts_state(SCRIPTS_FETCH);
 }
 
 
@@ -1558,7 +2176,7 @@ void ncr53c7xx_device::io_i_waitreselect()
 //  io_i_set -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_i_set()
+void ncr53c700_device::io_i_set()
 {
 	uint32_t mask = 0;
 
@@ -1578,7 +2196,7 @@ void ncr53c7xx_device::io_i_set()
 //  io_i_clear -
 //-------------------------------------------------
 
-void ncr53c7xx_device::io_i_clear()
+void ncr53c700_device::io_i_clear()
 {
 	uint32_t mask = 0;
 
@@ -1595,10 +2213,22 @@ void ncr53c7xx_device::io_i_clear()
 
 
 //-------------------------------------------------
+//  scripts_data_compare - compare SFBR with the
+//  masked Transfer Control data value
+//-------------------------------------------------
+
+bool ncr53c700_device::scripts_data_compare() const
+{
+	uint8_t const mask = m_dbc >> 8;
+	return ((m_sfbr ^ uint8_t(m_dbc)) & uint8_t(~mask)) == 0;
+}
+
+
+//-------------------------------------------------
 //  tc_jump -
 //-------------------------------------------------
 
-void ncr53c7xx_device::tc_jump()
+void ncr53c700_device::tc_jump()
 {
 //  if (m_dbc & (1 << 16))
 //      printf("Must wait for valid phase?\n");
@@ -1613,7 +2243,7 @@ void ncr53c7xx_device::tc_jump()
 	if (m_dbc & (1 << 18))
 	{
 		// Data
-		jump &= (m_dbc & 0xff) == m_last_data;
+		jump &= scripts_data_compare();
 	}
 
 	if (!(m_dbc & (1 << 19)))
@@ -1621,7 +2251,7 @@ void ncr53c7xx_device::tc_jump()
 
 	if (jump)
 	{
-		m_dsp = m_dsps;
+		m_dsp = transfer_control_address();
 	}
 	set_scripts_state(SCRIPTS_FETCH);
 }
@@ -1631,7 +2261,7 @@ void ncr53c7xx_device::tc_jump()
 //  tc_call -
 //-------------------------------------------------
 
-void ncr53c7xx_device::tc_call()
+void ncr53c700_device::tc_call()
 {
 	bool jump = true;
 
@@ -1643,7 +2273,7 @@ void ncr53c7xx_device::tc_call()
 	if (m_dbc & (1 << 18))
 	{
 		// Data
-		jump &= (m_dbc & 0xff) == m_last_data;
+		jump &= scripts_data_compare();
 	}
 
 	if (!(m_dbc & (1 << 19)))
@@ -1652,7 +2282,7 @@ void ncr53c7xx_device::tc_call()
 	if (jump)
 	{
 		m_temp = m_dsp;
-		m_dsp = m_dsps;
+		m_dsp = transfer_control_address();
 	}
 	set_scripts_state(SCRIPTS_FETCH);
 }
@@ -1662,7 +2292,7 @@ void ncr53c7xx_device::tc_call()
 //  tc_return -
 //-------------------------------------------------
 
-void ncr53c7xx_device::tc_return()
+void ncr53c700_device::tc_return()
 {
 	bool jump = true;
 
@@ -1674,7 +2304,7 @@ void ncr53c7xx_device::tc_return()
 	if (m_dbc & (1 << 18))
 	{
 		// Data
-		jump &= (m_dbc & 0xff) == m_last_data;
+		jump &= scripts_data_compare();
 	}
 
 	if (!(m_dbc & (1 << 19)))
@@ -1692,7 +2322,7 @@ void ncr53c7xx_device::tc_return()
 //  tc_int -
 //-------------------------------------------------
 
-void ncr53c7xx_device::tc_int()
+void ncr53c700_device::tc_int()
 {
 	bool jump = true;
 
@@ -1704,7 +2334,7 @@ void ncr53c7xx_device::tc_int()
 	if (m_dbc & (1 << 18))
 	{
 		// Data
-		jump &= (m_dbc & 0xff) == m_last_data;
+		jump &= scripts_data_compare();
 	}
 
 	if (!(m_dbc & (1 << 19)))
@@ -1731,7 +2361,7 @@ void ncr53c7xx_device::tc_int()
 //  disassemble_scripts -
 //-------------------------------------------------
 
-std::string ncr53c7xx_device::disassemble_scripts()
+std::string ncr53c700_device::disassemble_scripts()
 {
 	static char const *const phases[] =
 	{
@@ -1796,4 +2426,32 @@ std::string ncr53c7xx_device::disassemble_scripts()
 	}
 
 	return util::string_format("SCRIPTS [%08x]: %s", m_dsp - 8, opstring);
+}
+
+
+//-------------------------------------------------
+//  disassemble_scripts - add 53C710-only SCRIPTS
+//  instruction groups
+//-------------------------------------------------
+
+std::string ncr53c710_device::disassemble_scripts()
+{
+	if (((m_dcmd >> 6) & 3) == 3)
+		return util::string_format("SCRIPTS [%08x]: MMOV: [%08x] -> [%08x]\n", m_dsp - 12, m_dsps, m_temp);
+
+	if ((((m_dcmd >> 6) & 3) == 1) && (((m_dcmd >> 3) & 7) >= 5))
+	{
+		static char const *const opcodes[] = { "SFBR->REG", "REG->SFBR", "RMW" };
+		static char const *const operators[] = { "MOV", "OR", "AND", "ADD" };
+
+		return util::string_format(
+			"SCRIPTS [%08x]: RW: %s %s reg=%02x data=%02x\n",
+			m_dsp - 8,
+			opcodes[((m_dcmd >> 3) & 7) - 5],
+			operators[(m_dcmd >> 1) & 3],
+			(m_dbc >> 16) & 0x3f,
+			(m_dbc >> 8) & 0xff);
+	}
+
+	return ncr53c700_device::disassemble_scripts();
 }

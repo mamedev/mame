@@ -1104,7 +1104,7 @@ void rastersp_state::cpu_map_base(address_map &map)
 {
 	map(0x02200000, 0x022fffff).rw(FUNC(rastersp_state::nvram_r), FUNC(rastersp_state::nvram_w)).umask32(0x000000ff);
 	map(0x02200800, 0x02200803).rw(FUNC(rastersp_state::interrupt_ctrl_r),FUNC(rastersp_state::interrupt_ctrl_w));
-	map(0x02208000, 0x02208fff).rw("ncr53c700", FUNC(ncr53c7xx_device::read), FUNC(ncr53c7xx_device::write));
+	map(0x02208000, 0x02208fff).rw("ncr53c700", FUNC(ncr53c700_device::read), FUNC(ncr53c700_device::write));
 	map(0x0220e000, 0x0220e003).w(FUNC(rastersp_state::dpylist_w));
 	map(0xfff00000, 0xffffffff).bankrw("bank1");//was 3
 }
@@ -1443,7 +1443,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 
 	(NSCSI_BUS(config, m_scsibus));
 
-	auto &scsictrl(NCR53C7XX(config, "ncr53c700",66'000'000));
+	auto &scsictrl(NCR53C700(config, "ncr53c700",66'000'000));
 	m_scsibus->set_external_device(7, scsictrl);
 	scsictrl.irq_handler().set(DEVICE_SELF, FUNC(rastersp_state::scsi_irq));
 	scsictrl.host_read().set(DEVICE_SELF, FUNC(rastersp_state::ncr53c700_read));
