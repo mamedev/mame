@@ -3250,9 +3250,7 @@ if CPUS["Z8000"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z8000/z8000.cpp",
 		MAME_DIR .. "src/devices/cpu/z8000/z8000.h",
-		--MAME_DIR .. "src/devices/cpu/z8000/makedab.cpp",
 		MAME_DIR .. "src/devices/cpu/z8000/z8000cpu.h",
-		MAME_DIR .. "src/devices/cpu/z8000/z8000dab.h",
 		MAME_DIR .. "src/devices/cpu/z8000/z8000ops.hxx",
 		MAME_DIR .. "src/devices/cpu/z8000/z8000tbl.hxx",
 	}

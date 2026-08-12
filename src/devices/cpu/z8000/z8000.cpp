@@ -90,9 +90,6 @@ uint32_t z8002_device::addr_sub(uint32_t addr, uint32_t subtrahend)
 	return (addr & 0xffff0000) | ((addr - subtrahend) & 0xffff);
 }
 
-/* conversion table for Z8000 DAB opcode */
-#include "z8000dab.h"
-
 uint16_t z8002_device::RDOP()
 {
 	uint16_t res = m_opcache.read_word(m_pc);

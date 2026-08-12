@@ -87,7 +87,9 @@ z8010_device::z8010_device(const machine_config &mconfig, const char *tag, devic
 	m_vhoffs(0),
 	m_bcs(0),
 	m_iseg(0),
-	m_ihoffs(0)
+	m_ihoffs(0),
+	m_if1_seg(0),
+	m_if1_hoffs(0)
 {
 }
 
@@ -109,6 +111,8 @@ void z8010_device::device_start()
 	save_item(NAME(m_bcs));
 	save_item(NAME(m_iseg));
 	save_item(NAME(m_ihoffs));
+	save_item(NAME(m_if1_seg));
+	save_item(NAME(m_if1_hoffs));
 }
 
 //-------------------------------------------------
@@ -128,6 +132,24 @@ void z8010_device::device_reset()
 	m_bcs = 0;
 	m_iseg = 0;
 	m_ihoffs = 0;
+	m_if1_seg = 0;
+	m_if1_hoffs = 0;
+}
+
+//-------------------------------------------------
+//  ifetch1_observed - bus snoop of an Instruction
+//  Fetch 1 cycle
+//-------------------------------------------------
+
+// The MMU sits on the CPU's multiplexed address/data bus and sees the
+// segment number, offset and status of every transaction, whether or not
+// it qualifies to translate it.  It keeps a running latch of the last
+// IFETCH1 (first instruction word fetch) address it observed; a violation
+// freezes a copy into the instruction seg/offset status registers.
+void z8010_device::ifetch1_observed(offs_t offset)
+{
+	m_if1_seg = (uint8_t)(offset >> 16) & 0x7f;
+	m_if1_hoffs = (uint8_t)(offset >> 8);
 }
 
 //-------------------------------------------------
@@ -320,11 +342,20 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 {
 	bool nsup = true;
 	bool exec;
+	bool const side_effects = !machine().side_effects_disabled();
 
 	st &= BCS_CPU_MASK;
 	exec = (st == z8002_device::ST_IFETCH_N) || (st == z8002_device::ST_IFETCH_1);
 
-	m_bcs = (sys * BCS_N_S) | (write * BCS_R_W) | (st);
+	// The BCS register latches the Z-Bus pin levels: N/S~ is LOW in system mode and
+	// R/W~ is LOW for a write, so both bits read back 0 for a system-mode write.
+	// The violation status registers (VTR/seg/offset/BCS/instr) FREEZE once a
+	// violation is latched (until VTR is cleared via reg 0x11) — that is their
+	// diagnostic purpose.  So BCS tracks the bus live only while no violation is
+	// pending; the violating cycle's own status is the last one stored.  (UC3003
+	// TST01 validates BCS == 0x08 = ST_REQ_DATA after a provoked write violation.)
+	if (side_effects && !m_vtype)
+		m_bcs = ((!sys) * BCS_N_S) | ((!write) * BCS_R_W) | (st);
 
 	if (!(m_mode & MODE_MSEN) ||                                        // Master enable?
 		(((m_mode & MODE_URS) != 0) != BIT(offset, 22)) ||              // Upper range select?
@@ -342,13 +373,14 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		sdr_entry &s = SDR_ENTRY(sn);
 		bool is_stack = s.attr & SDR_ATTR_DIRW;
 
-		// Check access violations
-		uint8_t viol = (write * VTYPE_RDV) |    // Read-only violation?
-					   ((!sys) * VTYPE_SYSV) |  // System violation?
-					   ((!dma) * VTYPE_CPUIV) | // CPU-inhibit violation?
-					   ((!exec) * VTYPE_EXCV);  // Execute-only violation?
-
-		viol &= s.attr;
+		// Check access violations.  The attribute bits and the VTR bits are NOT
+		// 1:1 (VTR bit 2 is the length violation, which has no attribute), so map
+		// each attribute to its violation-type bit explicitly.
+		uint8_t viol = 0;
+		if (write && (s.attr & SDR_ATTR_RD))   viol |= VTYPE_RDV;   // Read-only violation?
+		if (!sys  && (s.attr & SDR_ATTR_SYS))  viol |= VTYPE_SYSV;  // System violation?
+		if (!dma  && (s.attr & SDR_ATTR_CPUI)) viol |= VTYPE_CPUIV; // CPU-inhibit violation?
+		if (!exec && (s.attr & SDR_ATTR_EXC))  viol |= VTYPE_EXCV;  // Execute-only violation?
 
 		// Length violation?
 		if (is_stack)
@@ -363,14 +395,14 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			viol |= VTYPE_SLV;
 		}
 
-		if (viol ||
-			(dma && (s.attr & SDR_ATTR_DMAI)))  // DMA-inhibit violaiton?
+		if (side_effects && (viol ||
+			(dma && (s.attr & SDR_ATTR_DMAI)))) // DMA-inhibit violation?
 		{
 			nsup = false;
 		}
 
 		// Check write warnings
-		if (write && is_stack && (so == s.limit))
+		if (side_effects && write && is_stack && (so == s.limit))
 		{
 			if (m_vtype == 0)   // Primary write warning?
 				viol |= VTYPE_PWW;
@@ -383,15 +415,24 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			}
 		}
 
-		if (viol)
+		if (side_effects && viol)
 		{
 			if (m_vtype && !(viol & VTYPE_SWW)) // Fatal?
 			{
-				viol |= VTYPE_FATL;
+				// A violation while one is already latched records ONLY the fatal
+				// condition — the new violation's type bits are not accumulated
+				// (UC3003 TST01: RDV latched, then SYSV provoked -> VTR must show
+				// RDV|FATL with the SYSV bit clear).
+				viol = VTYPE_FATL;
 			}
 
 			m_vseg = sn;
 			m_vhoffs = so;
+			// Freeze the last IFETCH1 address observed on the bus into the
+			// instruction seg/offset status registers (UC3003 TST01 validates
+			// these against the PC of its deliberate violating write).
+			m_iseg = m_if1_seg;
+			m_ihoffs = m_if1_hoffs;
 
 			// No trap if in DMA mode or repeated SWW and FATL violations
 			if ((!dma) && ((m_vtype & viol) & (VTYPE_SWW | VTYPE_FATL)) == 0)
@@ -403,7 +444,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			m_vtype |= viol;
 		}
 
-		if (!m_vtype || ((m_vtype >= VTYPE_PWW) && !(m_vtype & VTYPE_FATL)))
+		if (side_effects && (!m_vtype || ((m_vtype >= VTYPE_PWW) && !(m_vtype & VTYPE_FATL))))
 		{
 			if (write)
 			{

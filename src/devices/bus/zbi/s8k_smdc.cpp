@@ -556,12 +556,6 @@ int zbi_s8k_smdc_card_device::get_lbasector()
 		LOGDATA("%s: Unexpected sector number %d for range 0 to %d\n", machine().describe_context(), pkt->SC, info.sectors - 1);
 	}
 
-	if ((pkt->CT == 0) || (pkt->CT > info.sectorbytes))
-	{
-		LOGDATA("%s: Unexpected sector bytes %d for range 1 to %d\n", machine().describe_context(), pkt->CT, info.sectorbytes);
-		pkt->CT = 512;
-	}
-
 	lbasector = pkt->CY;
 	lbasector *= info.heads;
 	lbasector += pkt->HD;
@@ -635,7 +629,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		LOGWRITE("%s SMD write: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				 unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
-		if (pkt->CT & 1)
+		if ((pkt->CT == 0) || (pkt->CT & 1))
 		{
 			m_es = SMD_ES_BADCT;
 			pkt->DS |= SMD_DS_FT;
@@ -649,6 +643,12 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			pkt->DS |= SMD_DS_FT;
 			break;
 		}
+		if (file->get_info().sectorbytes > sizeof(m_buffer))
+		{
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
 
 		dma_idx = (pkt->AH << 16) | pkt->AL;
 
@@ -663,16 +663,30 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 
 		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
 
-		/* DMA from main memory */
-		for (unsigned int n = 0; n < pkt->CT; n++)
+		// CT is the total transfer size and may span sectors (swap I/O uses up to 0xfe00 bytes).
+		for (unsigned remaining = pkt->CT; remaining != 0; block++)
 		{
-			m_buffer[n] = m_bus->ram8_r(dma_idx++);
-		}
+			unsigned const count = std::min<unsigned>(remaining, file->get_info().sectorbytes);
 
-		if (!file->write(block, m_buffer))
-		{
-			m_es = SMD_ES_NOSECTOR;
-			pkt->DS |= SMD_DS_FT;
+			// Preserve the unused part of a sector for a short final transfer.
+			if ((count != file->get_info().sectorbytes) && !file->read(block, m_buffer))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			for (unsigned n = 0; n < count; n++)
+				m_buffer[n] = m_bus->ram8_r(dma_idx++);
+
+			if (!file->write(block, m_buffer))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			remaining -= count;
 		}
 		break;
 
@@ -680,7 +694,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		LOGREAD("%s SMD read: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
-		if (pkt->CT & 1)
+		if ((pkt->CT == 0) || (pkt->CT & 1))
 		{
 			m_es = SMD_ES_BADCT;
 			pkt->DS |= SMD_DS_FT;
@@ -694,6 +708,12 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			pkt->DS |= SMD_DS_FT;
 			break;
 		}
+		if (file->get_info().sectorbytes > sizeof(m_buffer))
+		{
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
 
 		dma_idx = (pkt->AH << 16) | pkt->AL;
 
@@ -708,18 +728,21 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 
 		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
 
-		if (!file->read(block, m_buffer))
+		for (unsigned remaining = pkt->CT; remaining != 0; block++)
 		{
-			m_es = SMD_ES_NOSECTOR;
-			pkt->DS |= SMD_DS_FT;
-		}
-		else
-		{
-			/* DMA to main memory */
-			for (unsigned int n = 0; n < pkt->CT; n++)
+			unsigned const count = std::min<unsigned>(remaining, file->get_info().sectorbytes);
+
+			if (!file->read(block, m_buffer))
 			{
-				m_bus->ram8_w(dma_idx++, m_buffer[n]);
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
 			}
+
+			for (unsigned n = 0; n < count; n++)
+				m_bus->ram8_w(dma_idx++, m_buffer[n]);
+
+			remaining -= count;
 		}
 		break;
 
@@ -742,11 +765,13 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		pkt->DS = SMD_DS_FT;
 	}
 
-	if (drv_good)
-		pkt->DS |= SMD_DS_OC;
-
 	pkt->DS &= 0x003f;
-	pkt->DS |= SMD_DS_RY | ((1<<drv) << 8) | ((1<<drv) << 12);
+	pkt->DS |= ((1<<drv) << 8) | ((1<<drv) << 12);
+	// Only report the drive ready / on-cylinder when a disk is actually present.
+	// Reporting RY for an empty unit makes ZEUS's disk-config probe treat the 3
+	// unpopulated SMD units as real (size 0) drives and spin on them.
+	if (drv_good)
+		pkt->DS |= SMD_DS_RY | SMD_DS_OC;
 }
 
 //**************************************************************************
