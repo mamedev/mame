@@ -177,7 +177,7 @@ private:
 void rc759_state::rc759_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram();
-	map(0x40000, 0x7ffff).ram();
+	map(0x40000, 0x5ffff).ram(); // 384K total, matches working PCE rc759 cfg.ram=384K
 	map(0xd0000, 0xd7fff).mirror(0x08000).ram().share("vram");
 	map(0xe8000, 0xeffff).mirror(0x10000).rom().region("bios", 0);
 }
@@ -363,7 +363,7 @@ uint8_t rc759_state::ppi_porta_r()
 	data |= m_isbx->opt0_r() << 2;
 	data |= m_isbx->opt1_r() << 3;
 	data |= 1 << 4; // mem ident0
-	data |= 1 << 5; // mem ident1 (both 1 = 256k installed)
+	data |= 0 << 5; // mem ident1 (bit4=1,bit5=0 = 384k installed, matches working PCE cfg.ram=384K)
 	data |= 0 << 6; // dpc connect (0 = external floppy/printer installed)
 	data |= 1 << 7; // not used
 
@@ -528,11 +528,38 @@ void rc759_state::i186_timer1_w(int state)
 	m_speaker->level_w(state);
 }
 
-// 256x4 nvram is bank-switched using ppi port c, bit 4 and 5
+// 256x4 nvram is bank-switched using ppi port c, bit 4 and 5.
+// The RC759 PROM/XIOS reads its configuration (memory size, disk/data/dir
+// buffer counts, autostart command, checksum in byte 0) from this NVRAM.
+// A factory-blank NVRAM lacks that config, which makes the CCP/M-86 XIOS
+// derail during memory setup. Seed a known-good configuration (identical to
+// the working PCE rc759 nvm.dat) so the machine boots to A> out of the box.
+// Nibble order here matches PCE / real hardware (even index -> high nibble).
 void rc759_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
+	// byte 0x00 is the checksum (sum of bytes[0..95] == byte0 mod 256), byte
+	// 0x19 is DEFAULT LOAD encoded as the load-medium ASCII letter: 'M'=PROM,
+	// 'N'=NET, 'A'=DRIVE A, 'B'=DRIVE B. PCE's nvm.dat ships 'M' (PROM), which
+	// makes the bootloader stop at the "SELECT LOADMEDIUM" prompt. Seed 'A'
+	// (DRIVE A) instead so the machine boots straight to A> from the floppy;
+	// byte 0 is the matching checksum (0xd3 + ('M'-'A') == 0xdf).
+	static const uint8_t defaults[128] =
+	{
+		0xdf, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x90, 0x04, 0x00, 0x00, 0xc0, 0x00, 0x21, 0x05, 0x00, 0x07, 0x07,
+		0x01, 0x41, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	};
+
 	memset(data, 0x00, size);
-	memset(data, 0xaa, 1);
+	memcpy(data, defaults, std::min(size, sizeof(defaults)));
 }
 
 uint8_t rc759_state::nvram_r(offs_t offset)
@@ -541,10 +568,11 @@ uint8_t rc759_state::nvram_r(offs_t offset)
 
 	logerror("nvram_r(%02x)\n", addr);
 
+	// nibble order matches PCE / real RC759: even index -> high nibble, odd -> low
 	if (addr & 1)
-		return (m_nvram_mem[addr >> 1] & 0xf0) >> 4;
-	else
 		return (m_nvram_mem[addr >> 1] & 0x0f) >> 0;
+	else
+		return (m_nvram_mem[addr >> 1] & 0xf0) >> 4;
 }
 
 void rc759_state::nvram_w(offs_t offset, uint8_t data)
@@ -553,10 +581,11 @@ void rc759_state::nvram_w(offs_t offset, uint8_t data)
 
 	logerror("nvram_w(%02x): %02x\n", addr, data);
 
+	// nibble order matches PCE / real RC759: even index -> high nibble, odd -> low
 	if (addr & 1)
-		m_nvram_mem[addr >> 1] = ((data << 4) & 0xf0) | (m_nvram_mem[addr >> 1] & 0x0f);
-	else
 		m_nvram_mem[addr >> 1] = (m_nvram_mem[addr >> 1] & 0xf0) | (data & 0x0f);
+	else
+		m_nvram_mem[addr >> 1] = ((data << 4) & 0xf0) | (m_nvram_mem[addr >> 1] & 0x0f);
 }
 
 uint8_t rc759_state::irq_callback()
@@ -680,4 +709,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1984, rc759, 0,      0,      rc759,   rc759, rc759_state, empty_init, "Regnecentralen", "RC759 Piccoline", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, rc759, 0,      0,      rc759,   rc759, rc759_state, empty_init, "Regnecentralen", "RC759 Piccoline", MACHINE_SUPPORTS_SAVE )

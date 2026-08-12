@@ -28,7 +28,23 @@ public:
 
 	IRQ_CALLBACK_MEMBER(int_callback);
 	IRQ_CALLBACK_MEMBER(inta_callback);
-	void drq0_w(int state) { m_dma[0].drq_state = state; }
+	void drq0_w(int state)
+	{
+		m_dma[0].drq_state = state;
+		// Respond to DREQ immediately, like real 80186 internal DMA (and the
+		// working PCE rc759, which clocks its DMA every emulation step): drain
+		// the byte the instant a fast source-synchronized peripheral asserts
+		// DREQ instead of deferring to the next execute_run() iteration. For a
+		// WD2797 floppy read feeding ch0 (~16us between bytes) the scheduling
+		// gap otherwise occasionally exceeds the FDC byte window -> a spurious
+		// WD2797 LOST DATA, and because set_drq() suppresses all further DRQs
+		// once S_LOST is set, one slip poisons the whole sector (every
+		// post-boot read fails -> dir/programs unusable). ST_STOP(0x0002)=armed,
+		// SYNC_MASK(0x00C0)!=0 = synchronized transfer (one byte per DREQ).
+		if (state && !m_dma_latency
+			&& (m_dma[0].control & 0x0002) && (m_dma[0].control & 0x00c0))
+			drq_callback(0);
+	}
 	void drq1_w(int state) { m_dma[1].drq_state = state; }
 	void tmrin0_w(int state) { external_tmrin(0, state); }
 	void tmrin1_w(int state) { external_tmrin(1, state); }
