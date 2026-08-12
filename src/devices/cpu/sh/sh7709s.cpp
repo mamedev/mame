@@ -208,10 +208,8 @@ bool can_use_burst(uint32_t address)
 	return is_sdram_region(address);
 }
 
-uint32_t sh7709s_device::get_wcr1_timing(uint32_t address)
+uint32_t sh7709s_device::get_wcr1_timing(uint32_t area)
 {
-	uint32_t area = get_area(address);
-
 	if (area > 6 || area == 1)
 		return 0;
 
@@ -392,7 +390,12 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// add wcr1 on area swap, because this fetch is a cache miss read wcr1 doesnt apply from write->read swap
 	// only handle the case where uncached write follows a read, writeback handles wcr1 after read fetch below
 	if (area != m_last_area_accessed || (!m_last_area_accessed_was_write && !is_cacheable(address) && write))
-		bus_penalty += get_wcr1_timing(address);
+	{
+		uint32_t wcr1_idle_cycles = get_wcr1_timing(m_last_area_accessed) * 2;
+		uint64_t wcr1_idle_cycles_left = remaining_cycles(elapsed_cycles, wcr1_idle_cycles);
+		cpu_penalty += wcr1_idle_cycles_left;
+		elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, wcr1_idle_cycles);
+	}
 
 	m_last_area_accessed = area;
 	// cacheable access miss will be a read, write flag set in writeback
@@ -446,12 +449,12 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 			m_burst_continuation_remaining_cycles = 0;
 			// since this is a dirty cache line eviction we always add wcr1 as it's handled after the miss fetch read
 			// and we're switching from read->write
-			m_wb_active_cycles += (1 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(m_wb_address)) * 2;
+			m_wb_active_cycles += (1 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(3)) * 2;
 			m_last_sdram_bank = bank_write;
 		}
 		else
 		{
-			m_wb_active_cycles += get_wcr1_timing(m_wb_address) * 2;
+			m_wb_active_cycles += get_wcr1_timing(3) * 2;
 			m_wb_active_cycles += ((2 + get_wcr2_timing(m_wb_address)) * cache_line_fetch_count(m_wb_address)) * 2;
 		}
 
@@ -736,7 +739,7 @@ void sh7709s_device::cache_address_array_w(offs_t offset, uint32_t data, uint32_
 			uint32_t wb_address = m_cache[entry_block][way].tag * SH7709S_CACHE_LINE_SIZE;
 			m_cache[entry_block][way].dirty = 0;
 			// Always add wcr1 timing here, accesses to the cache address mappings have to be done via instruction from an uncached region
-			m_sh2_state->icount -= (1 + mcr_rcd() + 4 + mcr_trwl() + mcr_tpc() + get_wcr1_timing(wb_address)) * 2;
+			m_sh2_state->icount -= (1 + mcr_rcd() + 4 + mcr_trwl() + mcr_tpc() + get_wcr1_timing(3)) * 2;
 			// Followup access is likely to area swap as well so those will also need to pay the wait state cost in wcr1 on the instruction fetch
 			m_last_area_accessed = get_area(wb_address);
 			LOG("Flushing dirty cache entry idx: %u\n", cache_entry_index);

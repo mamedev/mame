@@ -69,7 +69,7 @@ private:
 	unsigned int access_penalty(uint32_t address, bool write);
 
 	// Timing calculation/decode related functions
-	uint32_t get_wcr1_timing(uint32_t address);
+	uint32_t get_wcr1_timing(uint32_t area);
 	uint32_t get_wcr2_timing(uint32_t address);
 	uint32_t mcr_tpc();
 	uint32_t mcr_rcd();
