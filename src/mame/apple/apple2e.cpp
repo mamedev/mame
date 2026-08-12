@@ -2845,36 +2845,35 @@ void apple2e_state::laser_mouse_w(offs_t offset, u8 data)
 
 u8 apple2e_state::c080_r(offs_t offset)
 {
-	if(!machine().side_effects_disabled())
+	int slot;
+
+	offset &= 0x7F;
+	slot = offset / 0x10;
+
+	if (slot == 0)
 	{
-		int slot;
-
-		offset &= 0x7F;
-		slot = offset / 0x10;
-
-		if (slot == 0)
-		{
+		if (!machine().side_effects_disabled())
 			lc_update(offset & 0xf, false);
+	}
+	else
+	{
+		if (!machine().side_effects_disabled())
+			accel_slot(slot);
+
+		if (m_isiicplus && (slot == 6))
+		{
+			return m_iwm->read(offset % 0x10);
+		}
+
+		if (m_slotdevice[slot] != nullptr)
+		{
+			return m_slotdevice[slot]->read_c0nx(offset % 0x10);
 		}
 		else
 		{
-			accel_slot(slot);
-
-			if (m_isiicplus && (slot == 6))
+			if (m_iscec && (slot == 3))
 			{
-				return m_iwm->read(offset % 0x10);
-			}
-
-			if (m_slotdevice[slot] != nullptr)
-			{
-				return m_slotdevice[slot]->read_c0nx(offset % 0x10);
-			}
-			else
-			{
-				if (m_iscec && (slot == 3))
-				{
-					return m_cec_bank;
-				}
+				return m_cec_bank;
 			}
 		}
 	}
@@ -5248,6 +5247,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_a2bus->open_bus_r().set(FUNC(apple2e_state::read_floatingbus));
 	A2BUS_SLOT(config, "sl1", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);

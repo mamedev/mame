@@ -171,7 +171,7 @@ u8 a2bus_parprn_device::read_c0nx(u8 offset)
 		write_c0nx(offset, 0xffU);
 	}
 
-	return 0x00U;
+	return get_open_bus();
 }
 
 

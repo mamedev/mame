@@ -218,7 +218,7 @@ u8 a2bus_pic_device::read_c0nx(u8 offset)
 		return 0x97U | (m_perror_in << 5) | (m_select_in << 6) | (m_fault_in << 3);
 
 	case 4U:
-		return (m_ack_latch << 7) | (m_ack_in ^ BIT(m_input_sw1->read(), 4));
+		return (m_ack_latch << 7) | (get_open_bus() & 0x7eU) | (m_ack_in ^ BIT(m_input_sw1->read(), 4));
 
 	case 5U:
 		logerror("500ns negative strobe not implemented\n");
@@ -235,7 +235,7 @@ u8 a2bus_pic_device::read_c0nx(u8 offset)
 		break;
 	}
 
-	return 0x00U;
+	return get_open_bus();
 }
 
 void a2bus_pic_device::write_c0nx(u8 offset, u8 data)

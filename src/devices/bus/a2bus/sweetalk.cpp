@@ -48,8 +48,7 @@ void sweetalk_device::device_start()
 
 u8 sweetalk_device::read_cnxx(u8 offset)
 {
-	// lower 7 bits are actually open bus
-	return m_sc01->request() ? 0x80 : 0;
+	return (m_sc01->request() ? 0x80 : 0) | (get_open_bus() & 0x7f);
 }
 
 void sweetalk_device::write_cnxx(u8 offset, u8 data)

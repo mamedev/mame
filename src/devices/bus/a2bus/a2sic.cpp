@@ -117,7 +117,7 @@ u8 a2sic_device::read_cnxx(u8 offset)
 u8 a2sic_device::read_c800(u16 offset)
 {
 	if (BIT(offset, 9))
-		return 0xff; // TODO: select open bus
+		return get_open_bus(); // TODO: deselect card
 	else
 		return m_p8[offset & 0x1ff];
 }

@@ -2242,20 +2242,22 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 u8 apple2gs_state::c080_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
-	{
-		int slot;
+	int slot;
 
+	if (!machine().side_effects_disabled())
 		slow_cycle();
 
-		offset &= 0x7f;
-		slot = offset / 0x10;
+	offset &= 0x7f;
+	slot = offset / 0x10;
 
-		if (slot == 0)
-		{
+	if (slot == 0)
+	{
+		if (!machine().side_effects_disabled())
 			lc_update(offset & 0xf, false);
-		}
-		else
+	}
+	else
+	{
+		if (!machine().side_effects_disabled())
 		{
 			accel_slot(slot);
 
@@ -2272,21 +2274,21 @@ u8 apple2gs_state::c080_r(offs_t offset)
 
 				update_speed();
 			}
+		}
 
-			// slot 3 always has I/O go to the external card
-			if ((slot != 3) && ((m_slotromsel & (1 << slot)) == 0))
+		// slot 3 always has I/O go to the external card
+		if ((slot != 3) && ((m_slotromsel & (1 << slot)) == 0))
+		{
+			if (slot == 6)
 			{
-				if (slot == 6)
-				{
-					return m_iwm->read(offset & 0xf);
-				}
+				return m_iwm->read(offset & 0xf);
 			}
-			else
+		}
+		else
+		{
+			if (m_slotdevice[slot] != nullptr)
 			{
-				if (m_slotdevice[slot] != nullptr)
-				{
-					return m_slotdevice[slot]->read_c0nx(offset % 0x10);
-				}
+				return m_slotdevice[slot]->read_c0nx(offset % 0x10);
 			}
 		}
 	}
@@ -3884,6 +3886,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2gs_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_a2bus->open_bus_r().set(FUNC(apple2gs_state::read_floatingbus));
 	A2BUS_SLOT(config, "sl1", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);

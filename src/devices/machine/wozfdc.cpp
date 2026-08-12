@@ -203,6 +203,9 @@ TIMER_CALLBACK_MEMBER(wozfdc_device::delayed_tick)
 
 uint8_t wozfdc_device::read(offs_t offset)
 {
+	if (machine().side_effects_disabled())
+		return (offset & 1) ? 0xff : data_reg;
+
 	lss_sync();
 	control(offset);
 

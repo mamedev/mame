@@ -388,7 +388,7 @@ uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 		return m_crtc->register_r();   // status_r?
 	}
 
-	return 0xff;
+	return get_open_bus();
 }
 
 
@@ -450,10 +450,12 @@ uint8_t a2bus_videx80_device::read_c800(uint16_t offset)
 //        printf("Read VRAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
 		return m_rom[offset];
 	}
-	else
+	else if (offset < 0x600)
 	{
 		return m_ram[(offset & 0x1ff) + m_rambank];
 	}
+	else
+		return get_open_bus();
 }
 
 /*-------------------------------------------------

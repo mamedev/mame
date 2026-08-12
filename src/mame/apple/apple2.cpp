@@ -481,17 +481,14 @@ void apple2_state::controller_strobe_w(u8 data)
 
 u8 apple2_state::c080_r(offs_t offset)
 {
-	if(!machine().side_effects_disabled())
+	int slot;
+
+	offset &= 0x7F;
+	slot = offset / 0x10;
+
+	if (m_slotdevice[slot] != nullptr)
 	{
-		int slot;
-
-		offset &= 0x7F;
-		slot = offset / 0x10;
-
-		if (m_slotdevice[slot] != nullptr)
-		{
-			return m_slotdevice[slot]->read_c0nx(offset % 0x10);
-		}
+		return m_slotdevice[slot]->read_c0nx(offset % 0x10);
 	}
 
 	return read_floatingbus();
@@ -767,6 +764,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_a2bus->open_bus_r().set(FUNC(apple2_state::read_floatingbus));
 	A2BUS_SLOT(config, "sl0", XTAL(14'318'181) / 2, m_a2bus, apple2_slot0_cards, "lang");
 	A2BUS_SLOT(config, "sl1", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
