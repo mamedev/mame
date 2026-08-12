@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,Stephane Humbert
+// copyright-holders:Bryan McPhail, Stephane Humbert
 /***************************************************************************
 
 Last Mission (rev 6)        (c) 1986 Data East USA (2*6809 + I8751)
@@ -15,7 +15,7 @@ Emulation by Bryan McPhail, mish@tendril.co.uk
 TODO:
 - shackled continue after game over does not work, see MT0418. It's not that
   big of an issue user-wise, since credits add more health. For breywood, it
-  appears to work ok after the 1st level.
+  appears to work OK after the 1st level.
 
 ***************************************************************************/
 
@@ -34,9 +34,10 @@ TODO:
 #include "sound/ymopl.h"
 
 #include "screen.h"
+#include "speaker.h"
 #include "tilemap.h"
 
-#include "speaker.h"
+#include "multibyte.h"
 
 
 namespace {
@@ -63,8 +64,8 @@ public:
 		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_BIG)
 	{ }
 
-	void lastmisn(machine_config &config);
-	void shackled(machine_config &config);
+	void lastmisn(machine_config &config) ATTR_COLD;
+	void shackled(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -143,7 +144,7 @@ protected:
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fix_tilemap = nullptr;
-	u16 m_scroll[4]{};
+	u8 m_scroll[4]{};
 	u8 m_game_uses_priority = 0;
 
 	// misc
@@ -168,7 +169,7 @@ public:
 		m_soundbank(*this, "soundbank")
 	{ }
 
-	void csilver(machine_config &config);
+	void csilver(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -200,7 +201,7 @@ void lastmisn_state::buffer_spriteram16_w(u8 data)
 {
 	// copy to a 16-bit region for the sprite chip
 	for (int i = 0; i < 0x800/2 ; i++)
-		m_spriteram16[i] = m_spriteram[(i * 2) + 1] | (m_spriteram[(i * 2) + 0] << 8);
+		m_spriteram16[i] = get_u16be(&m_spriteram[i * 2]);
 }
 
 void lastmisn_state::bg_ram_w(offs_t offset, u8 data)
@@ -269,8 +270,8 @@ void lastmisn_state::lastmisn_scrolly_w(u8 data)
 
 u32 lastmisn_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0, ((m_scroll[0] << 8)+ m_scroll[1]));
-	m_bg_tilemap->set_scrolly(0, ((m_scroll[2] << 8)+ m_scroll[3]));
+	m_bg_tilemap->set_scrollx(0, get_u16be(&m_scroll[0]));
+	m_bg_tilemap->set_scrolly(0, get_u16be(&m_scroll[2]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram16.target(), 0x400);
@@ -280,8 +281,8 @@ u32 lastmisn_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &
 
 u32 lastmisn_state::screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0, ((m_scroll[0] << 8) + m_scroll[1]));
-	m_bg_tilemap->set_scrolly(0, ((m_scroll[2] << 8) + m_scroll[3]));
+	m_bg_tilemap->set_scrollx(0, get_u16be(&m_scroll[0]));
+	m_bg_tilemap->set_scrolly(0, get_u16be(&m_scroll[2]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
@@ -301,7 +302,7 @@ TILEMAP_MAPPER_MEMBER(lastmisn_state::scan_rows)
 TILE_GET_INFO_MEMBER(lastmisn_state::get_bg_tile_info)
 {
 	const u32 offs = tile_index * 2;
-	const u16 tile = m_bg_ram[offs + 1] + (m_bg_ram[offs] << 8);
+	const u16 tile = get_u16be(&m_bg_ram[offs]);
 	const u8 color = tile >> 12;
 
 	if (color & 8 && m_game_uses_priority)
@@ -315,7 +316,7 @@ TILE_GET_INFO_MEMBER(lastmisn_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(lastmisn_state::get_fix_tile_info)
 {
 	const u32 offs = tile_index << 1;
-	const u16 tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
+	const u16 tile = get_u16be(&m_bg_ram[offs]);
 	const u8 color = (tile & 0xc000) >> 14;
 
 	tileinfo.set(0, tile & 0xfff, color, 0);
@@ -367,7 +368,7 @@ void lastmisn_state::i8751_lo_w(u8 data)
 
 void lastmisn_state::i8751_hi_w(u8 data)
 {
-	m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+	m_i8751_value = (m_i8751_value & 0xff) | (u16(data) << 8);
 
 	// SECIRQ is triggered on activating this latch
 	if (m_i8751_p2 & 2)
@@ -679,7 +680,7 @@ void lastmisn_state::mcu_to_main_w(u8 data)
 	if (BIT(fall, 5))
 		m_i8751_port1 = m_i8751_value & 0xff;
 	if (BIT(fall, 6))
-		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+		m_i8751_return = (m_i8751_return & 0xff) | (u16(m_i8751_port0) << 8);
 	if (BIT(fall, 7))
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 
@@ -710,7 +711,7 @@ void csilver_state::mcu_to_main_w(u8 data)
 	if (BIT(fall, 5))
 		m_i8751_port1 = m_i8751_value & 0xff;
 	if (BIT(fall, 6))
-		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+		m_i8751_return = (m_i8751_return & 0xff) | (u16(m_i8751_port0) << 8);
 	if (BIT(fall, 7))
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 
@@ -876,7 +877,7 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:2")
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4")
-	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                     PORT_DIPLOCATION("SW1:5") // game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page
+	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                     PORT_DIPLOCATION("SW1:5") // game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in DIP Switches page
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:6")
@@ -887,7 +888,7 @@ static INPUT_PORTS_START( shackled )
 
 	PORT_START("DSW1")
 	// tables in main CPU : 0x859b (Help), 0x85e9 (6-Help), 0x8fbe (Coin), 0x91b6 (Heart)
-	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )        PORT_DIPLOCATION("SW2:1,2,3") // name from Dip Switches page
+	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )        PORT_DIPLOCATION("SW2:1,2,3") // name from DIP Switches page
 	PORT_DIPSETTING( 0x00, "2/100/50/200" )
 	PORT_DIPSETTING( 0x01, "4/100/60/300" )
 	PORT_DIPSETTING( 0x02, "6/200/70/300" )
@@ -1591,7 +1592,7 @@ Top board (DATA EAST DE-0250-3):
 1x JAMMA edge connector
 2x 25x2 legs connectors to lower board (cn1,cn2)
 1x trimmer (volume)
-2x 8 switches dip (7k,16k)
+2x 8 switches DIP (7k,16k)
 
 Lower board (DATA EAST DE-0251-2):
 2x 25x2 legs connectors to top board (cn1,cn2)

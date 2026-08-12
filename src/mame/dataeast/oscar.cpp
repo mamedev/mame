@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,Stephane Humbert
+// copyright-holders:Bryan McPhail, Stephane Humbert
 /***************************************************************************
 
 Psycho-Nics Oscar (World)   (c) 1987 Data East Corporation
@@ -25,9 +25,10 @@ Emulation by Bryan McPhail, mish@tendril.co.uk
 #include "sound/ymopl.h"
 
 #include "screen.h"
+#include "speaker.h"
 #include "tilemap.h"
 
-#include "speaker.h"
+#include "multibyte.h"
 
 
 namespace {
@@ -117,7 +118,7 @@ void oscar_state::buffer_spriteram16_w(u8 data)
 {
 	// copy to a 16-bit region for the sprite chip
 	for (int i = 0; i < 0x800/2 ; i++)
-		m_spriteram16[i] = m_spriteram[(i * 2) + 1] | (m_spriteram[(i * 2) + 0] << 8);
+		m_spriteram16[i] = get_u16be(&m_spriteram[i * 2]);
 }
 
 void oscar_state::videoram_w(offs_t offset, u8 data)
@@ -153,7 +154,7 @@ u32 oscar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 TILE_GET_INFO_MEMBER(oscar_state::get_fix_tile_info)
 {
 	const u32 offs = tile_index << 1;
-	const u16 tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
+	const u16 tile = get_u16b(&m_videoram[offs]);
 	const u8 color = (tile & 0xf000) >> 14;
 
 	tileinfo.set(0, tile & 0xfff, color, 0);

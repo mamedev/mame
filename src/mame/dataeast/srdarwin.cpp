@@ -14,6 +14,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "deco222.h"
 #include "decrmc3.h"
 
@@ -26,9 +27,10 @@ TODO:
 #include "video/bufsprite.h"
 
 #include "screen.h"
+#include "speaker.h"
 #include "tilemap.h"
 
-#include "speaker.h"
+#include "multibyte.h"
 
 
 namespace {
@@ -213,11 +215,13 @@ void srdarwin_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				fx,flip_screen(),
 				sx,sy,primap,pri_mask,0);
 		if (multi)
+		{
 			m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
-				code+1,
-				color,
-				fx,flip_screen(),
-				sx,sy2,primap,pri_mask,0);
+					code+1,
+					color,
+					fx,flip_screen(),
+					sx,sy2,primap,pri_mask,0);
+		}
 	}
 }
 
@@ -227,7 +231,7 @@ void srdarwin_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 u32 srdarwin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
-	m_bg_tilemap->set_scrollx(0, (m_scroll[0] << 8) + m_scroll[1]);
+	m_bg_tilemap->set_scrollx(0, get_u16be(&m_scroll[0]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 1);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 2);
@@ -248,7 +252,7 @@ TILE_GET_INFO_MEMBER(srdarwin_state::get_fix_tile_info)
 
 TILE_GET_INFO_MEMBER(srdarwin_state::get_bg_tile_info)
 {
-	const u16 tile = m_bg_ram[2 * tile_index + 1] + (m_bg_ram[2 * tile_index] << 8);
+	const u16 tile = get_u16be(&m_bg_ram[2 * tile_index]);
 	const u8 color = (tile >> 12) & 3;
 	const u8 bank = ((tile >> 8) & 3) + 2;
 
@@ -295,7 +299,7 @@ void srdarwin_mcu_state::i8751_lo_w(u8 data)
 
 void srdarwin_mcu_state::i8751_hi_w(u8 data)
 {
-	m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+	m_i8751_value = (m_i8751_value & 0xff) | (u16(data) << 8);
 
 	// SECIRQ is triggered on activating this latch
 	if (m_i8751_p2 & 2)
@@ -390,7 +394,7 @@ void srdarwin_mcu_state::mcu_to_main_w(u8 data)
 	if (BIT(fall, 5))
 		m_i8751_port0 = m_i8751_value & 0xff;
 	if (BIT(fall, 6))
-		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+		m_i8751_return = (m_i8751_return & 0xff) | (u16(m_i8751_port0) << 8);
 	if (BIT(fall, 7))
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port0;
 

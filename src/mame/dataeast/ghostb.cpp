@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,Stephane Humbert
+// copyright-holders:Bryan McPhail, Stephane Humbert
 /***************************************************************************
 
 Gondomania                  (c) 1987 Data East USA
@@ -56,8 +56,10 @@ TODO:
 #include "sound/ymopl.h"
 
 #include "screen.h"
-#include "tilemap.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+#include "multibyte.h"
 
 
 namespace {
@@ -153,7 +155,7 @@ protected:
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fix_tilemap = nullptr;
-	u16 m_scroll[4]{};
+	u8 m_scroll[4]{};
 	u8 m_game_uses_priority = 0;
 
 	// misc
@@ -191,7 +193,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	template<unsigned Which> u8 player_io_r(offs_t offset);
+	template <unsigned Which> u8 player_io_r(offs_t offset);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -244,7 +246,7 @@ void garyoret_state::buffer_spriteram_w(int state)
 	{
 		// copy to a 16-bit region for the sprite chip
 		for (int i = 0; i < 0x800/2 ; i++)
-			m_spriteram16[i] = m_spriteram[(i * 2) + 1] | (m_spriteram[(i * 2) + 0] << 8);
+			m_spriteram16[i] = get_u16be(&m_spriteram[i * 2]);
 	}
 
 	m_buffer_strobe = bool(state);
@@ -299,7 +301,7 @@ u32 ghostb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 TILE_GET_INFO_MEMBER(ghostb_state::get_fix_tile_info)
 {
 	const u32 offs = tile_index << 1;
-	const u16 tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
+	const u16 tile = get_u16be(&m_videoram[offs]);
 	const u8 color = (tile & 0xc00) >> 10;
 
 	tileinfo.set(0, tile & 0x3ff, color, 0);
@@ -323,8 +325,8 @@ void gondo_state::colpri_cb(u32 &colour, u32 &pri_mask)
 u32 gondo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
-	m_bg_tilemap->set_scrollx(0, ((m_scroll[0] << 8) + m_scroll[1]));
-	m_bg_tilemap->set_scrolly(0, ((m_scroll[2] << 8) + m_scroll[3]));
+	m_bg_tilemap->set_scrollx(0, get_u16be(&m_scroll[0]));
+	m_bg_tilemap->set_scrolly(0, get_u16be(&m_scroll[2]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 1);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 2);
@@ -335,8 +337,8 @@ u32 gondo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 u32 garyoret_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0, ((m_scroll[0] << 8) + m_scroll[1]));
-	m_bg_tilemap->set_scrolly(0, ((m_scroll[2] << 8) + m_scroll[3]));
+	m_bg_tilemap->set_scrollx(0, get_u16be(&m_scroll[0]));
+	m_bg_tilemap->set_scrolly(0, get_u16be(&m_scroll[2]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram16.target(), 0x400);
@@ -348,7 +350,7 @@ u32 garyoret_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 &
 TILE_GET_INFO_MEMBER(garyoret_state::get_gondo_fix_tile_info)
 {
 	const u32 offs = tile_index * 2;
-	const u16 tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
+	const u16 tile = get_u16be(&m_videoram[offs]);
 	const u8 color = (tile & 0x7000) >> 12;
 
 	tileinfo.set(0, tile & 0xfff, color, 0);
@@ -357,7 +359,7 @@ TILE_GET_INFO_MEMBER(garyoret_state::get_gondo_fix_tile_info)
 TILE_GET_INFO_MEMBER(garyoret_state::get_gondo_tile_info)
 {
 	const u32 offs = tile_index * 2;
-	const u16 tile = m_bg_ram[offs + 1] + (m_bg_ram[offs] << 8);
+	const u16 tile = get_u16be(&m_bg_ram[offs]);
 	const u8 color = tile >> 12;
 
 	if (color & 8 && m_game_uses_priority)
@@ -403,7 +405,7 @@ u8 garyoret_state::i8751_lo_r()
 
 /******************************************************************************/
 
-template<unsigned Which>
+template <unsigned Which>
 u8 gondo_state::player_io_r(offs_t offset)
 {
 	const int val = 1 << m_analog_io[Which]->read();
@@ -473,7 +475,7 @@ void garyoret_state::gondo_bank_w(u8 data)
 	   Bit 3: Screen flip
 	   Bits 4-7: Bank switch
 	*/
-	m_mainbank->set_entry(data >> 4 & m_bank_mask);
+	m_mainbank->set_entry((data >> 4) & m_bank_mask);
 
 	m_secclr = BIT(data, 0);
 	if (!m_secclr)
@@ -650,7 +652,7 @@ void garyoret_state::mcu_to_main_w(u8 data)
 	if (BIT(fall, 5))
 		m_i8751_port1 = m_i8751_value & 0xff;
 	if (BIT(fall, 6))
-		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+		m_i8751_return = (m_i8751_return & 0xff) | (u16(m_i8751_port0) << 8);
 	if (BIT(fall, 7))
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 

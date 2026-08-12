@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,Stephane Humbert
+// copyright-holders:Bryan McPhail, Stephane Humbert
 /***************************************************************************
 
 Cobra Command (World)       (c) 1988 Data East Corporation
@@ -23,9 +23,10 @@ Emulation by Bryan McPhail, mish@tendril.co.uk
 #include "sound/ymopl.h"
 
 #include "screen.h"
+#include "speaker.h"
 #include "tilemap.h"
 
-#include "speaker.h"
+#include "multibyte.h"
 
 
 namespace {
@@ -100,7 +101,7 @@ void cobracom_state::buffer_spriteram16_w(u8 data)
 {
 	// copy to a 16-bit region for the sprite chip
 	for (int i = 0; i < 0x800/2 ; i++)
-		m_spriteram16[i] = m_spriteram[(i * 2) + 1] | (m_spriteram[(i * 2) + 0] << 8);
+		m_spriteram16[i] = get_u16be(&m_spriteram[i * 2]);
 }
 
 void cobracom_state::videoram_w(offs_t offset, u8 data)
@@ -142,7 +143,7 @@ u32 cobracom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 TILE_GET_INFO_MEMBER(cobracom_state::get_fix_tile_info)
 {
 	const int offs = tile_index << 1;
-	const int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
+	const int tile = get_u16be(&m_videoram[offs]);
 	const int color = (tile & 0xe000) >> 13;
 
 	tileinfo.set(0, tile & 0xfff, color, 0);
