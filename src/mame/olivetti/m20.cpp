@@ -122,6 +122,8 @@ private:
 	void install_memory();
 
 	static void floppy_formats(format_registration &fr);
+	uint16_t segment_r();
+	uint16_t segtack_r();
 	uint16_t viack_r();
 	uint16_t nviack_r();
 };
@@ -330,12 +332,14 @@ void m20_state::m20_program_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+	map(0x7f0000, 0x7fffff).r(FUNC(m20_state::segment_r));
 }
 
 void m20_state::m20_data_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+	map(0x7f0000, 0x7fffff).r(FUNC(m20_state::segment_r));
 }
 
 
@@ -692,6 +696,20 @@ uint16_t m20_state::viack_r()
 	return m_i8259->acknowledge()<<1;
 }
 
+uint16_t m20_state::segment_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(z8001_device::SEGT_LINE, ASSERT_LINE);
+
+	return 0xffff;
+}
+
+uint16_t m20_state::segtack_r()
+{
+	m_maincpu->set_input_line(z8001_device::SEGT_LINE, CLEAR_LINE);
+	return 0xffff;
+}
+
 uint16_t m20_state::nviack_r()
 {
 	m_maincpu->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
@@ -770,6 +788,7 @@ void m20_state::m20(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m20_state::m20_program_mem);
 	m_maincpu->set_addrmap(AS_DATA, &m20_state::m20_data_mem);
 	m_maincpu->set_addrmap(AS_IO, &m20_state::m20_io);
+	m_maincpu->segtack().set(FUNC(m20_state::segtack_r));
 	m_maincpu->viack().set(FUNC(m20_state::viack_r));
 	m_maincpu->nviack().set(FUNC(m20_state::nviack_r));
 
