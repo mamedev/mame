@@ -602,23 +602,23 @@ void deco16ic_device::deco16_tmap::update()
 			m_tilemap_16x16->enable(BIT(m_control0, 7));
 	}
 
-	/* Rowscroll enable */
+	// Rowscroll enable
 	if (m_rowscroll_ptr && (m_control1 & 0x60) == 0x40)
 	{
 		int rows;
-		/* Several different rowscroll styles */
+		// Several different rowscroll styles
 		switch ((m_control0 >> 3) & 0xf)
 		{
-			case 0:     rows = 512;     break;/* Every line of 512 height bitmap */
+			case 0:     rows = 512;     break; // Every line of 512 height bitmap
 			case 1:     rows = 256;     break;
 			case 2:     rows = 128;     break;
-			case 3:     rows = 64;      break;
-			case 4:     rows = 32;      break;
-			case 5:     rows = 16;      break;
-			case 6:     rows = 8;       break;
-			case 7:     rows = 4;       break;
-			case 8:     rows = 2;       break;
-			default:    rows = 1;       break;
+			case 3:     rows =  64;     break;
+			case 4:     rows =  32;     break;
+			case 5:     rows =  16;     break;
+			case 6:     rows =   8;     break;
+			case 7:     rows =   4;     break;
+			case 8:     rows =   2;     break;
+			default:    rows =   1;     break;
 		}
 
 		if (m_tilemap_16x16)
@@ -642,7 +642,7 @@ void deco16ic_device::deco16_tmap::update()
 			int numrows = rows;
 
 			// wolffang uses a larger 8x8 tilemap for the Japanese intro text, everything else seems to need this logic tho?
-			if (!(m_size & deco16ic_device::DECO_32x64))
+			if (!(m_size & deco16ic_device::DECO_32x64) && (rows > 1))
 				numrows = rows >> 1;
 
 			// cap at tilemap size
