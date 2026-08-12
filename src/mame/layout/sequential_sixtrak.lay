@@ -1093,7 +1093,7 @@ copyright-holders:m1macrophage
 				add_sixtrak_knob(view, "tune_knob", 2)
 				add_sixtrak_knob(view, "master_volume_knob", 1.2)
 
-				add_slider(view, "pitch_wheel", "pitch_wheel_dent", "wheel_0")
+				add_sprung_slider(view, "pitch_wheel", "pitch_wheel_dent", "wheel_0")
 				add_slider(view, "mod_wheel", "mod_wheel_dent", "wheel_1")
 
 				view.items["script_warning"]:set_state(0)
@@ -1111,7 +1111,7 @@ copyright-holders:m1macrophage
 		-----------------------------------------------------------------------
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
-		-- version: 11
+		-- version: 12
 		-----------------------------------------------------------------------
 
 		-- Global configuration. Can be overwritten in the resolve_tags callback.
@@ -1124,16 +1124,31 @@ copyright-holders:m1macrophage
 
 		local widgets = {}   -- Stores slider and knob information.
 		local pointers = {}  -- Tracks pointer state.
+		local frame_id = 0   -- Current frame identifier.
 
 		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
 		-- The click area's vertical size must exactly span the range of the
 		-- knob's movement.
 		function add_slider(view, clickarea_id, knob_id, port_name)
-			table.insert(widgets, {
-				clickarea   = get_layout_item(view, clickarea_id),
-				slider_knob = get_layout_item(view, knob_id),
-				field       = get_port_field(port_name),
-				is_knob     = false })
+			local field = get_port_field(port_name)
+			if not field or field.is_analog or field.analog_wraps then
+				emu.print_error("Slider port '" .. port_name .. "' must be " ..
+					"an IPT_ADJUSTER. It must not use PORT_WRAPS.")
+				return
+			end
+			add_slider_internal(view, clickarea_id, knob_id, field)
+		end
+
+		-- A spring-loaded slider or wheel.
+		-- See docs for `add_slider()`.
+		function add_sprung_slider(view, clickarea_id, knob_id, port_name)
+			local field = get_port_field(port_name)
+			if not field or not field.is_analog or not field.centerdelta or field.centerdelta == 0 or field.analog_wraps then
+				emu.print_error("Slider port '" .. port_name .. "' must be " ..
+					"an analog port that auto-centers. It must not use PORT_WRAPS.")
+				return
+			end
+			add_slider_internal(view, clickarea_id, knob_id, field)
 		end
 
 		-- A sweep between the attached field's min and max values requires
@@ -1145,9 +1160,40 @@ copyright-holders:m1macrophage
 		-- the center of `clickarea` will be preserved during rotation.
 		-- It is suggested you place the dot at the top-center of the knob.
 		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
+			local field = get_port_field(port_name)
+			if not field or field.is_analog or field.analog_wraps then
+				emu.print_error("Knob port '" .. port_name .."' must be an " ..
+					"IPT_ADJUSTER and must not use PORT_WRAPS.")
+				return
+			end
+			add_knob_internal(view, clickarea_id, field, scale, drag_direction, dot_id)
+		end
+
+		-- See `add_knob()` for info on `scale` and `dot_id`.
+		-- It is assumed a full turn of the encoder changes the port value by:
+		-- (maxvalue - minvalue).
+		function add_encoder(view, clickarea_id, port_name, scale, drag_direction, dot_id)
+			local field = get_port_field(port_name)
+			if not field or not field.analog_wraps then
+				emu.print_error("Encoder port '" .. port_name .."' must either be " ..
+					"an IPT_ADJUSTER or IPT_POSITIONAL[_V], and it must use PORT_WRAPS.")
+				return
+			end
+			add_knob_internal(view, clickarea_id, field, scale, drag_direction, dot_id)
+		end
+
+		function add_slider_internal(view, clickarea_id, knob_id, field)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = field,
+				is_knob     = false })
+		end
+
+		function add_knob_internal(view, clickarea_id, field, scale, drag_direction, dot_id)
 			table.insert(widgets, {
 				clickarea     = get_layout_item(view, clickarea_id),
-				field         = get_port_field(port_name),
+				field         = field,
 				is_knob       = true,
 				scale         = scale,
 				is_horizontal = (drag_direction == HORIZONTAL),
@@ -1169,20 +1215,30 @@ copyright-holders:m1macrophage
 				return nil
 			end
 			local field = nil
+			local num_fields = 0
 			for k, val in pairs(port.fields) do
 				field = val
-				break
+				num_fields = num_fields + 1
 			end
-			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
-			if field == nil then
-				emu.print_error("Port '" .. port_name .."' " .. field_msg)
-				return nil
+			if not field then
+				emu.print_error("Port '" .. port_name .. "' does not contain a field.")
+				return null
 			end
-			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
-				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+			if num_fields > 1 then
+				emu.print_error("Port '" .. port_name .. "' contains more than 1 field.")
 				return nil
 			end
 			return field
+		end
+
+		local function clamp(x, minval, maxval)
+			if x < minval then
+				return minval
+			elseif x > maxval then
+				return maxval
+			else
+				return x
+			end
 		end
 
 		local function set_click_state(widget, state)
@@ -1200,7 +1256,7 @@ copyright-holders:m1macrophage
 				local widget = widgets[pointers[pointer_id].selected_widget]
 				set_click_state(widget, 0)
 				local field = widget.field
-				if field.is_analog then
+				if field.is_analog and not field.analog_wraps then
 					field:clear_value()
 				end
 			end
@@ -1227,12 +1283,15 @@ copyright-holders:m1macrophage
 					end
 					if found then
 						set_click_state(widgets[i], 1)
+						local start_value = widgets[i].field.port:read()
 						pointers[id] = {
 							selected_widget = i,
 							relative = relative,
 							start_x = x,
 							start_y = y,
-							start_value = widgets[i].field.port:read() }
+							start_value = start_value,
+							last_frame_value = start_value,
+							last_frame_id = frame_id }
 						break
 					end
 				end
@@ -1261,6 +1320,22 @@ copyright-holders:m1macrophage
 					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
 					new_value = pointer.start_value + (pointer.start_y - y) * step_y
 				end
+
+				-- Limit large changes for encoder inputs on a single frame, to ensure
+				-- that the direction of change is not ambiguous to the driver.
+				if widget.field.analog_wraps then
+					-- If frame tracking was perfect, the limit could be (value_range / 2 - 1).
+					-- But, occasionally, the frame boundary won't exactly match the change of
+					-- frame_id. Using the max_delta below ensures there is no ambiguity even
+					-- in those cases.
+					local max_delta = (value_range / 2.0 - 1.0) / 2.0
+					new_value = clamp(new_value, pointer.last_frame_value - max_delta, pointer.last_frame_value + max_delta)
+
+					if frame_id ~= pointer.last_frame_id then
+						pointer.last_frame_id = frame_id
+						pointer.last_frame_value = new_value
+					end
+				end
 			else
 				local knob_half_height = widget.slider_knob.bounds.height / 2
 				local min_y = widget.clickarea.bounds.y0 + knob_half_height
@@ -1278,8 +1353,11 @@ copyright-holders:m1macrophage
 			end
 
 			new_value = math.floor(new_value + 0.5)
-			if new_value < min_value then new_value = min_value end
-			if new_value > max_value then new_value = max_value end
+			if widget.field.analog_wraps then
+				new_value = (new_value - min_value) % (value_range + 1) + min_value
+			else
+				new_value = clamp(new_value, min_value, max_value)
+			end
 
 			if widget.field.is_analog then
 				widget.field:set_value(new_value)
@@ -1288,6 +1366,9 @@ copyright-holders:m1macrophage
 			end
 		end
 
+		-- Rotates the position of the knob indicator around the knob's center.
+		-- This will only work well for circular indicators (dots), since the
+		-- indicator itself is not being rotated.
 		local function get_knob_dot_bounds(widget)
 			local dot = widget.knob_dot_cache
 			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
@@ -1310,7 +1391,15 @@ copyright-holders:m1macrophage
 					local field = widgets[i].field
 					local knob_bounds = widgets[i].clickarea.bounds
 					local dot_bounds = dot.bounds
-					local max_angle = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+
+					local angle_max, angle_min
+					if field.analog_wraps then
+						angle_max = 2.0 * math.pi
+						angle_min = 0
+					else
+						angle_max = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+						angle_min = -angle_max
+					end
 
 					-- Compute the distance of the knob dot from the knob center.
 					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
@@ -1325,8 +1414,8 @@ copyright-holders:m1macrophage
 						aspect      = dot_bounds.aspect,
 						value_min   = field.minvalue,
 						value_range = field.maxvalue - field.minvalue,
-						angle_min   = -max_angle,
-						angle_range = 2.0 * max_angle,
+						angle_min   = angle_min,
+						angle_range = angle_max - angle_min,
 						center_y    = -radius,
 						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
 						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
@@ -1354,7 +1443,14 @@ copyright-holders:m1macrophage
 			pointers = {}
 		end
 
+		local function track_frame_id()
+			frame_id = (frame_id + 1) % 1000000
+			-- 1M is arbitrary. Just need to ensure the same frame ID does not
+			-- repeat between a pointer press and release.
+		end
+
 		function install_slider_callbacks(view)
+			view:set_prepare_items_callback(track_frame_id)
 			view:set_recomputed_callback(configure_knob_dots)
 			view:set_pointer_updated_callback(pointer_updated)
 			view:set_pointer_left_callback(pointer_left)
