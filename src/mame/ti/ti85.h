@@ -23,6 +23,7 @@
 
 /* model */
 enum ti85_model {
+    TI73,
 	TI81,
 	TI81v2,
 	TI82,
@@ -123,7 +124,10 @@ private:
 	uint8_t m_PCR = 0;
 	uint8_t m_ti8x_port2 = 0;
 	uint8_t m_ti83p_port4 = 0;
+    uint8_t m_ti83p_port5 = 0;
 	uint8_t m_ti83pse_port21 = 0;
+	uint8_t m_ti83pse_port27 = 0;
+	uint8_t m_ti83pse_port28 = 0;
     uint8_t m_ti84p_rtc_control = 0;
 	uint8_t m_ti84pcse_portE = 0;
 	uint8_t m_ti84pcse_portF = 0;
@@ -161,10 +165,10 @@ private:
 	void ti82_port_0002_w(uint8_t data);
 	void ti83_port_0000_w(uint8_t data);
 	void ti83_port_0002_w(uint8_t data);
-	void ti83_port_0003_w(uint8_t data);
+	void ti83_int_mask_w(uint8_t data);
 	void ti8x_plus_serial_w(uint8_t data);
-	void ti83p_int_mask_w(uint8_t data);
 	void ti83p_port_0004_w(uint8_t data);
+    void ti83p_port_0005_w(uint8_t data);
 	void ti83p_port_0006_w(uint8_t data);
 	void ti83p_port_0007_w(uint8_t data);
 	void ti83pse_int_ack_w(uint8_t data);
@@ -175,6 +179,8 @@ private:
 	void ti83p_port_0014_w(uint8_t data);
 	void ti83pse_port_0020_w(uint8_t data);
 	void ti83pse_port_0021_w(uint8_t data);
+	void ti83pse_port_0027_w(uint8_t data);
+	void ti83pse_port_0028_w(uint8_t data);
     void ti84p_rtc_control_w(uint8_t data);
 	void ti84p_rtc_basetime_w(offs_t offset, uint8_t data);
 	void ti84p_rtc_currtime_w(offs_t offset, uint8_t data);
@@ -190,12 +196,15 @@ private:
 	uint8_t ti83_port_0003_r();
 	uint8_t ti83p_port_0002_r();
 	uint8_t ti83p_port_0004_r();
+    uint8_t ti83p_port_0005_r();
 	uint8_t ti83pse_port_0002_r();
 	uint8_t ti83pse_port_0005_r();
 	uint8_t ti83pse_port_0009_r();
 	uint8_t ti83pse_port_0015_r();
 	uint8_t ti83pse_port_0020_r();
 	uint8_t ti83pse_port_0021_r();
+	uint8_t ti83pse_port_0027_r();
+	uint8_t ti83pse_port_0028_r();
     uint8_t ti84p_rtc_control_r();
 	uint8_t ti84p_rtc_basetime_r(offs_t offset);
 	uint8_t ti84p_rtc_currtime_r(offs_t offset);
@@ -208,6 +217,7 @@ private:
 	void ti85_palette(palette_device &palette);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_MACHINE_RESET(ti83p);
+	DECLARE_MACHINE_START(ti73);
 	void ti82_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(ti86);
 	DECLARE_MACHINE_START(ti83);
@@ -216,6 +226,7 @@ private:
 	DECLARE_MACHINE_START(ti84pse);
 	DECLARE_MACHINE_START(ti84pcse);
 	DECLARE_MACHINE_START(ti84p);
+	void ti83p_init_common();
 	void ti8xpse_init_common();
 
 	uint32_t screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -252,9 +263,14 @@ private:
 	void ti83pse_ctimer3_count_w(uint8_t data);
     inline uint8_t ti84p_rtc_r(uint32_t timer, uint8_t offset);
     inline void ti84p_rtc_w(uint32_t &timer, uint8_t offset, uint8_t data);
+    void ti8x_flash_write(offs_t offset, uint8_t data);
+	uint8_t ti83p_membank1_r(offs_t offset);
 	uint8_t ti83p_membank2_r(offs_t offset);
-	uint8_t ti83p_membank3_r(offs_t offset);
+    uint8_t ti83p_membank3_r(offs_t offset);
+	void ti83p_membank2_w(offs_t offset, uint8_t data);
+    void ti83p_membank3_w(offs_t offset, uint8_t data);
 
+    void ti8x_update_int();
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();
     void update_ti83_memory();

@@ -3,6 +3,7 @@
 /***************************************************************************
 TI-85 and TI-86 drivers by Krzysztof Strzecha
 TI-83 Plus, TI-84 Plus, and Silver Edition support by Jon Sturm
+TI-84 Plus C Silver Edition support by grubbyplaya
 
 Notes:
 1. After start TI-85 waits for ON key interrupt, so press ON key to start
@@ -266,7 +267,7 @@ void ti85_state::ti83_io(address_map &map)
 	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti83_port_0000_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83_port_0002_r), FUNC(ti85_state::ti83_port_0002_w));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_port_0003_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
 	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti85_port_0004_w));
 	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
 	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
@@ -282,13 +283,14 @@ void ti85_state::ti83p_io(address_map &map)
 	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).r(FUNC(ti85_state::ti83p_port_0002_r));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
 	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83p_port_0004_w));
+    map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83p_port_0005_r), FUNC(ti85_state::ti83p_port_0005_w));
 	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83p_port_0006_w));
 	map(0x0007, 0x0007).rw(FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti83p_port_0007_w));
 	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
 	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
-//  map(0x0014, 0x0014).w(FUNC(ti85_state::ti83p_port_0014_w));
+    map(0x0014, 0x0014).w(FUNC(ti85_state::ti83p_port_0014_w));
 }
 
 void ti85_state::ti83pse_io(address_map &map)
@@ -297,7 +299,7 @@ void ti85_state::ti83pse_io(address_map &map)
 	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83pse_port_0002_r), FUNC(ti85_state::ti83pse_int_ack_w));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
 	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83pse_port_0004_w));
 	map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83pse_port_0005_r), FUNC(ti85_state::ti83pse_port_0005_w));
 	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83pse_port_0006_w));
@@ -311,6 +313,8 @@ void ti85_state::ti83pse_io(address_map &map)
 	map(0x0015, 0x0015).r(FUNC(ti85_state::ti83pse_port_0015_r));
 	map(0x0020, 0x0020).rw(FUNC(ti85_state::ti83pse_port_0020_r), FUNC(ti85_state::ti83pse_port_0020_w));
 	map(0x0021, 0x0021).rw(FUNC(ti85_state::ti83pse_port_0021_r), FUNC(ti85_state::ti83pse_port_0021_w));
+    map(0x0027, 0x0027).rw(FUNC(ti85_state::ti83pse_port_0027_r), FUNC(ti85_state::ti83pse_port_0027_w));
+    map(0x0028, 0x0028).rw(FUNC(ti85_state::ti83pse_port_0028_r), FUNC(ti85_state::ti83pse_port_0028_w));
 
 	map(0x0030, 0x0030).rw(FUNC(ti85_state::ti83pse_ctimer1_setup_r), FUNC(ti85_state::ti83pse_ctimer1_setup_w));
 	map(0x0031, 0x0031).rw(FUNC(ti85_state::ti83pse_ctimer1_loop_r), FUNC(ti85_state::ti83pse_ctimer1_loop_w));
@@ -332,7 +336,7 @@ void ti85_state::ti84p_io(address_map &map)
 	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83pse_port_0002_r), FUNC(ti85_state::ti83pse_int_ack_w));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
 	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83pse_port_0004_w));
 	map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83pse_port_0005_r), FUNC(ti85_state::ti83pse_port_0005_w));
 	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83pse_port_0006_w));
@@ -346,6 +350,8 @@ void ti85_state::ti84p_io(address_map &map)
 	map(0x0015, 0x0015).r(FUNC(ti85_state::ti83pse_port_0015_r));
 	map(0x0020, 0x0020).rw(FUNC(ti85_state::ti83pse_port_0020_r), FUNC(ti85_state::ti83pse_port_0020_w));
 	map(0x0021, 0x0021).rw(FUNC(ti85_state::ti83pse_port_0021_r), FUNC(ti85_state::ti83pse_port_0021_w));
+    map(0x0027, 0x0027).rw(FUNC(ti85_state::ti83pse_port_0027_r), FUNC(ti85_state::ti83pse_port_0027_w));
+    map(0x0028, 0x0028).rw(FUNC(ti85_state::ti83pse_port_0028_r), FUNC(ti85_state::ti83pse_port_0028_w));
 
 	map(0x0030, 0x0030).rw(FUNC(ti85_state::ti83pse_ctimer1_setup_r), FUNC(ti85_state::ti83pse_ctimer1_setup_w));
 	map(0x0031, 0x0031).rw(FUNC(ti85_state::ti83pse_ctimer1_loop_r), FUNC(ti85_state::ti83pse_ctimer1_loop_w));
@@ -371,7 +377,7 @@ void ti85_state::ti84pcse_io(address_map &map)
 	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83pse_port_0002_r), FUNC(ti85_state::ti83pse_int_ack_w));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
 	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83pse_port_0004_w));
 	map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83pse_port_0005_r), FUNC(ti85_state::ti83pse_port_0005_w));
 	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83pse_port_0006_w));
@@ -387,6 +393,8 @@ void ti85_state::ti84pcse_io(address_map &map)
 	map(0x0015, 0x0015).r(FUNC(ti85_state::ti83pse_port_0015_r));
 	map(0x0020, 0x0020).rw(FUNC(ti85_state::ti83pse_port_0020_r), FUNC(ti85_state::ti83pse_port_0020_w));
 	map(0x0021, 0x0021).rw(FUNC(ti85_state::ti83pse_port_0021_r), FUNC(ti85_state::ti83pse_port_0021_w));
+    map(0x0027, 0x0027).rw(FUNC(ti85_state::ti83pse_port_0027_r), FUNC(ti85_state::ti83pse_port_0027_w));
+    map(0x0028, 0x0028).rw(FUNC(ti85_state::ti83pse_port_0028_r), FUNC(ti85_state::ti83pse_port_0028_w));
 
 	map(0x0030, 0x0030).rw(FUNC(ti85_state::ti83pse_ctimer1_setup_r), FUNC(ti85_state::ti83pse_ctimer1_setup_w));
 	map(0x0031, 0x0031).rw(FUNC(ti85_state::ti83pse_ctimer1_loop_r), FUNC(ti85_state::ti83pse_ctimer1_loop_w));
@@ -438,34 +446,34 @@ void ti85_state::ti86_mem(address_map &map)
 
 void ti85_state::ti83pse_banked_mem(address_map &map)
 {
-	map(0x0000, 0x1fffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0000, 0x1fffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
 	map(0x200000, 0x21BFFF).ram().share("nvram");
 }
 
 void ti85_state::ti84p_banked_mem(address_map &map)
 {
-	map(0x0000, 0xfffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0000, 0xfffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
 	map(0x200000, 0x21BFFF).ram().share("nvram");
 }
 
 void ti85_state::ti83p_banked_mem(address_map &map)
 {
-	map(0x00000, 0x7ffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x00000, 0x7ffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
 	map(0x100000, 0x107fff).ram().share("nvram");
 }
 
 void ti85_state::ti84pcse_banked_mem(address_map &map)
 {
-	map(0x0000, 0x3fffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0000, 0x3fffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
 	map(0x400000, 0x41FFFF).ram().share("nvram");
 }
 
 void ti85_state::ti83p_asic_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(m_membank[0], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x7fff).w(m_membank[1], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank2_r));
-	map(0x8000, 0xbfff).w(m_membank[2], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank3_r));
-	map(0xc000, 0xffff).rw(m_membank[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).w(m_membank[1], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank1_r));
+	map(0x8000, 0xbfff).rw(FUNC(ti85_state::ti83p_membank2_r), FUNC(ti85_state::ti83p_membank2_w));
+	map(0xc000, 0xffff).rw(FUNC(ti85_state::ti83p_membank3_r), FUNC(ti85_state::ti83p_membank3_w));
 }
 
 /* keyboard input */
@@ -847,7 +855,7 @@ void ti85_state::ti84pcse(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_membank[2]).set_map(&ti85_state::ti84pcse_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, m_membank[3]).set_map(&ti85_state::ti84pcse_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-    screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
 	screen.set_size(240, 320);
@@ -877,8 +885,8 @@ void ti85_state::ti84pce(machine_config &config)
 void ti85_state::ti73(machine_config &config)
 {
 	ti83p(config);
-	config.device_remove("linkport");
-	//TI73SERIAL(config, "tiserial");
+    
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti73 )
 }
 
 ROM_START (ti73)
