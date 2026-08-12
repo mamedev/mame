@@ -140,6 +140,14 @@ void i8291a_device::device_reset()
 	update_state(m_sh_state, source_handshake_state::SIDS);
 	update_state(m_ah_state, acceptor_handshake_state::AIDS);
 	update_state(m_lp_state, listener_primary_state::LPIS);
+
+	// The clears above are the input shadows; the level this chip drives lives in m_*_out, which
+	// nothing here touches, so a line it was holding stays held.
+	set_nrfd(false);
+	set_ndac(false);
+	set_dav(false);
+	set_eoi(false);
+	m_dio_write_func(0xff);
 }
 
 void i8291a_device::device_start()
