@@ -178,7 +178,7 @@ private:
 	void free_scenenode(struct namcos22_scenenode *node);
 	struct namcos22_scenenode *alloc_scenenode(running_machine &machine, struct namcos22_scenenode *node);
 
-	using scanline_func = void (*)(int32_t, extent_t const &, ObjectType const &, int);
+	using scanline_func = void (*)(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 
 	void dispatch_scanline_poly(scanline_func callback, int clipverts, vertex_t const *clipv);
 	void renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
