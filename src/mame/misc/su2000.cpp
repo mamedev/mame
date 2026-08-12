@@ -25,19 +25,39 @@
         An owner's breakdown of system: http://arianchen.de/su2000/status.html
         Technical Manual: http://arianchen.de/su2000/files/su2000tech.pdf
 
-   SU2000 and SD2000 share the same base hardware:
-        -Intel 486 DX-33 processor
-        -8MB RAM
-        -customised `Expality PIX 1000` card with 16MB Video RAM
-         (has Dual Motorola MC88110 CPU, and each game comes with independent firmware for both CPUs)
+	SU2000 hardware:
+	* Intel 486DX-33 host processor
+	* 8 MB system RAM
+	* Expality PIX1000 graphics subsystem
+	* 16 MB graphics memory
+	* Two Motorola MC88110 processors at 40 MHz
+	* Tracker card using a TMS320C31
+	* Format card using a Motorola 68000
+	* VID1000 video hardware
 
+	The PIX1000 runs game-specific firmware on its two MC88110 processors.
+	Complete game software therefore includes firmware for both PIX1000
+	processors (typically MAINA.OUT and MAINB.OUT), in addition to the
+	host-side software.
+
+	The SU2000 and SD2000 are members of Virtuality's 2000-series
+	architecture. The exact SD2000 board configuration, including whether
+	it uses the same PIX1000 configuration as the SU2000, needs further
+	verification from hardware or technical documentation.
+
+	Current MAME device support relevant to this system:
+	* Intel 486 CPU core: implemented
+	* TMS320C31 CPU core: implemented
+	* Motorola 68000 CPU core: implemented
+	* Motorola MC88100 CPU core: implemented
+	* Motorola MC88110 disassembler: implemented
+	* Motorola MC88110 CPU core: not implemented
 
     TODO:
         * Get system booting
         * Add game software
-        * Fix i386 core issues (e.g. protected mode)
-        * Write MC88110 CPU core
-        * Emulate HDD and CD drive
+        * Emulate MC88110 CPU core
+        * Configure HDD and CD drive
         * Emulate PIX 1000 card
         * Emulate VID 1000 card
         * Emulate tracker card
