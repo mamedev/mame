@@ -17563,6 +17563,13 @@ gekitsui
 zerotrgt
 zerotrgta
 
+@source:dataeast/cobracom.cpp
+cobracom
+cobracoma
+cobracomb
+cobracomj
+cobracomjbl
+
 @source:dataeast/compgolf.cpp
 compgolf
 compgolfo
@@ -17627,40 +17634,6 @@ secretagj
 slyspy
 slyspy2
 slyspy3
-
-@source:dataeast/dec8.cpp
-breywood
-cobracom
-cobracoma
-cobracomb
-cobracomj
-cobracomjb
-csilver
-csilverj
-csilverja
-garyoret
-ghostb
-ghostb2a
-ghostb3
-ghostb3a
-gondo
-gondou
-lastmisn
-lastmisnj
-lastmisnu5
-lastmisnu6
-makyosen
-meikyuh
-meikyuhbl
-oscar
-oscarbl
-oscarj1
-oscarj2
-oscaru
-shackled
-srdarwin
-srdarwinj
-srdarwinb
 
 @source:dataeast/deco_ld.cpp
 begas
@@ -17822,6 +17795,18 @@ funkyjetj
 sotsugyo
 sotsugyok
 
+@source:dataeast/ghostb.cpp
+garyoret
+ghostb
+ghostb2a
+ghostb3
+ghostb3a
+gondo
+gondou
+makyosen
+meikyuh
+meikyuhbl
+
 @source:dataeast/hvysmsh.cpp
 hvysmsh
 hvysmsha
@@ -17863,6 +17848,17 @@ ringking2
 ringking3
 ringkingw
 
+@source:dataeast/lastmisn.cpp
+breywood
+csilver
+csilverj
+csilverja
+lastmisn
+lastmisnj
+lastmisnu5
+lastmisnu6
+shackled
+
 @source:dataeast/lemmings.cpp
 lemmings
 
@@ -17893,6 +17889,13 @@ metlclsh
 
 @source:dataeast/mirage.cpp
 mirage
+
+@source:dataeast/oscar.cpp
+oscar
+oscarbl
+oscarj1
+oscarj2
+oscaru
 
 @source:dataeast/pcktgal.cpp
 pcktgal
@@ -17953,6 +17956,11 @@ magdrop
 magdropp
 osman
 prtytime
+
+@source:dataeast/srdarwin.cpp
+srdarwin
+srdarwinj
+srdarwinjbl
 
 @source:dataeast/sshangha.cpp
 sshangha
