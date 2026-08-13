@@ -1724,12 +1724,12 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 	// sort the array
 	if (!hasharray.empty())
 		std::sort(
-        hasharray.begin(),
-        hasharray.end(),
-        [] (metadata_hash const &a, metadata_hash const &b)
-        {
-            return memcmp(&a, &b, sizeof(metadata_hash)) < 0;
-        });
+				hasharray.begin(),
+				hasharray.end(),
+				[] (metadata_hash const &a, metadata_hash const &b)
+				{
+					return memcmp(&a, &b, sizeof(metadata_hash)) < 0;
+				});
 
 	// read the raw data hash from our header and start a new SHA1 with that data
 	util::sha1_creator overall_sha1;
