@@ -377,7 +377,7 @@ public:
 		}
 
 		// encode the base portion
-		uint32_t complen = m_base_compressor.compress(&m_buffer[0], frames * cdrom_file::MAX_SECTOR_DATA, &dest[header_bytes]);
+		uint32_t complen = m_base_compressor.compress(m_buffer.data(), frames * cdrom_file::MAX_SECTOR_DATA, &dest[header_bytes]);
 		if (complen >= srclen)
 			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
@@ -430,7 +430,7 @@ public:
 		uint32_t complen_base = (complen_bytes > 2) ? get_u24be(&src[ecc_bytes]) : get_u16be(&src[ecc_bytes]);
 
 		// reset and decode
-		m_base_decompressor.decompress(&src[header_bytes], complen_base, &m_buffer[0], frames * cdrom_file::MAX_SECTOR_DATA);
+		m_base_decompressor.decompress(&src[header_bytes], complen_base, m_buffer.data(), frames * cdrom_file::MAX_SECTOR_DATA);
 		m_subcode_decompressor.decompress(&src[header_bytes + complen_base], complen - complen_base - header_bytes, &m_buffer[frames * cdrom_file::MAX_SECTOR_DATA], frames * cdrom_file::MAX_SUBCODE_DATA);
 
 		// reassemble the data
@@ -747,7 +747,7 @@ int8_t chd_compressor_group::find_best_compressor(const uint8_t *src, uint8_t *c
 			try
 			{
 				// if this is the best one, copy the data into the permanent buffer
-				uint32_t compbytes = m_compressor[codecnum]->compress(src, m_hunkbytes, &m_compress_test[0]);
+				uint32_t compbytes = m_compressor[codecnum]->compress(src, m_hunkbytes, m_compress_test.data());
 #if CHDCODEC_VERIFY_COMPRESSION
 				try
 				{
@@ -776,7 +776,7 @@ printf("   codec%d=%d bytes            \n", codecnum, compbytes);
 				{
 					compression = codecnum;
 					complen = compbytes;
-					memcpy(compressed, &m_compress_test[0], compbytes);
+					memcpy(compressed, m_compress_test.data(), compbytes);
 				}
 			}
 			catch (...)
@@ -1644,7 +1644,7 @@ uint32_t chd_cd_flac_compressor::compress(const uint8_t *src, uint32_t srclen, u
 
 	// reset and encode the audio portion
 	m_encoder.reset(dest, hunkbytes());
-	uint8_t *buffer = &m_buffer[0];
+	uint8_t *buffer = m_buffer.data();
 	if (!m_encoder.encode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * cdrom_file::MAX_SECTOR_DATA/4, m_swap_endian))
 		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
@@ -1774,7 +1774,7 @@ void chd_cd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, 
 	uint32_t frames = destlen / cdrom_file::FRAME_SIZE;
 	if (!m_decoder.reset(44100, 2, chd_cd_flac_compressor::blocksize(frames * cdrom_file::MAX_SECTOR_DATA), src, complen))
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
-	uint8_t *buffer = &m_buffer[0];
+	uint8_t *buffer = m_buffer.data();
 	if (!m_decoder.decode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * cdrom_file::MAX_SECTOR_DATA/4, m_swap_endian))
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
