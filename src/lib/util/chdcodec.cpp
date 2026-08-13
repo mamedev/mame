@@ -21,6 +21,7 @@
 #include <zlib.h>
 #include <zstd.h>
 
+#include <bit>
 #include <cstring>
 #include <new>
 
@@ -1465,9 +1466,7 @@ chd_flac_compressor::chd_flac_compressor(chd_file &chd, uint32_t hunkbytes, bool
 	: chd_compressor(chd, hunkbytes, lossy)
 {
 	// determine whether we want native or swapped samples
-	uint16_t native_endian = 0;
-	*reinterpret_cast<uint8_t *>(&native_endian) = 1;
-	m_big_endian = (native_endian == 0x100);
+	m_big_endian = (std::endian::native == std::endian::big);
 
 	// configure the encoder
 	m_encoder.set_sample_rate(44100);
@@ -1542,9 +1541,7 @@ chd_flac_decompressor::chd_flac_decompressor(chd_file &chd, uint32_t hunkbytes, 
 	: chd_decompressor(chd, hunkbytes, lossy)
 {
 	// determine whether we want native or swapped samples
-	uint16_t native_endian = 0;
-	*reinterpret_cast<uint8_t *>(&native_endian) = 1;
-	m_big_endian = (native_endian == 0x100);
+	m_big_endian = (std::endian::native == std::endian::big);
 }
 
 
@@ -1593,9 +1590,7 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, uint32_t hunkbytes
 		throw std::error_condition(chd_file::error::CODEC_ERROR);
 
 	// determine whether we want native or swapped samples
-	uint16_t native_endian = 0;
-	*reinterpret_cast<uint8_t *>(&native_endian) = 1;
-	m_swap_endian = (native_endian == 1);
+	m_swap_endian = (std::endian::native == std::endian::little);
 
 	// configure the encoder
 	m_encoder.set_sample_rate(44100);
@@ -1722,9 +1717,7 @@ chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, uint32_t hunkb
 		throw std::error_condition(chd_file::error::CODEC_ERROR);
 
 	// determine whether we want native or swapped samples
-	uint16_t native_endian = 0;
-	*reinterpret_cast<uint8_t *>(&native_endian) = 1;
-	m_swap_endian = (native_endian == 1);
+	m_swap_endian = (std::endian::native == std::endian::little);
 
 	// init the inflater
 	m_inflater.next_in = (Bytef *)this; // bogus, but that's ok
