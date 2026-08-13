@@ -2431,8 +2431,8 @@ std::error_condition chd_file::create_common()
 		if (UNEXPECTED(m_parent && m_parent->version() < 3))
 			throw std::error_condition(error::UNSUPPORTED_VERSION);
 
-		// must be an even number of units per hunk
-		if (UNEXPECTED(m_hunkbytes % m_unitbytes != 0))
+		// must have valid sizes and a whole number of units per hunk
+		if (UNEXPECTED(!m_hunkbytes || !m_unitbytes || (m_hunkbytes % m_unitbytes != 0)))
 			throw std::error_condition(std::errc::invalid_argument);
 		if (UNEXPECTED(m_parent && m_unitbytes != m_parent->unit_bytes()))
 			throw std::error_condition(std::errc::invalid_argument);
