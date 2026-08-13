@@ -618,7 +618,7 @@ int saturn_cd_hle_device::get_track_index(uint32_t fad)
 
 int saturn_cd_hle_device::sega_cdrom_get_adr_control(int track)
 {
-	return bitswap<8>(m_cdrom_image->get_adr_control(cur_track),3,2,1,0,7,6,5,4);
+	return bitswap<8>(m_cdrom_image->get_adr_control(track),3,2,1,0,7,6,5,4);
 }
 
 void saturn_cd_hle_device::cr_standard_return(uint16_t cur_status)
@@ -2587,9 +2587,7 @@ void saturn_cd_hle_device::cd_readTOC(void)
 	{
 		if (m_cdrom_image->exists())
 		{
-			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
-			// HACK: ddsom does not enter ingame with the line above
-			tocbuf[tocptr] = m_cdrom_image->get_adr_control(i)<<4 | 0x01;
+			tocbuf[tocptr] = sega_cdrom_get_adr_control(i);
 		}
 		else
 		{
