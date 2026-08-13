@@ -297,9 +297,7 @@ void nscsi_cdrom_device::update_directory()
 
 		while ((ourEntry = directory->read()) != nullptr)
 		{
-			// FIXME: use-after-free
-			// the directory entry's name is not valid after a subsequent call to read()
-			m_directory.push_back(*ourEntry);
+			m_directory.push_back({ ourEntry->name, ourEntry->type, ourEntry->size });
 
 			// API version 0 has a hard cap of 100 files
 			if (m_directory.size() >= 99)
@@ -970,13 +968,13 @@ void nscsi_cdrom_device::scsi_command()
 				m_scsi_cmdbuf[pos] = index;
 				m_scsi_cmdbuf[pos + 1] = m_directory[index].type != osd::directory::entry::entry_type::DIR;
 				// There's a guaranteed null terminator one byte after the name field
-				strncpy(reinterpret_cast<char *>(&m_scsi_cmdbuf[pos + 2]), m_directory[index].name, 31);
+				strncpy(reinterpret_cast<char *>(&m_scsi_cmdbuf[pos + 2]), m_directory[index].name.c_str(), 31);
 				m_scsi_cmdbuf[pos + 36] = (m_directory[index].size >> 24) & 0xff;
 				m_scsi_cmdbuf[pos + 37] = (m_directory[index].size >> 16) & 0xff;
 				m_scsi_cmdbuf[pos + 38] = (m_directory[index].size >> 8) & 0xff;
 				m_scsi_cmdbuf[pos + 39] = m_directory[index].size & 0xff;
 
-				LOG("%02d: %s %08x\n", index, m_directory[index].name, (uint32_t)m_directory[index].size);
+				LOG("%02d: %s %08x\n", index, m_directory[index].name.c_str(), (uint32_t)m_directory[index].size);
 
 				index++;
 				pos += 40;
@@ -1002,7 +1000,7 @@ void nscsi_cdrom_device::scsi_command()
 
 		uint32_t offset = m_scsi_cmdbuf[2] << 24 | m_scsi_cmdbuf[3] << 16 | m_scsi_cmdbuf[4] << 8 | m_scsi_cmdbuf[5];
 		uint32_t blocks = m_scsi_cmdbuf[6];
-		LOG("TOOLBOX_GET_FILE: file # %d (%s), offset %08x, blocks %d\n", m_scsi_cmdbuf[1], m_directory[m_scsi_cmdbuf[1]].name, offset, blocks);
+		LOG("TOOLBOX_GET_FILE: file # %d (%s), offset %08x, blocks %d\n", m_scsi_cmdbuf[1], m_directory[m_scsi_cmdbuf[1]].name.c_str(), offset, blocks);
 		if (blocks == 0)
 		{
 			blocks = 1;
