@@ -1285,6 +1285,9 @@ std::error_condition chd_file::write_units(uint64_t unitnum, const void *buffer,
 
 std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 {
+	if (!bytes)
+		return std::error_condition();
+	
 	// iterate over hunks
 	uint32_t const first_hunk = offset / m_hunkbytes;
 	uint32_t const last_hunk = (offset + bytes - 1) / m_hunkbytes;
@@ -1338,6 +1341,9 @@ std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_
 
 std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t bytes)
 {
+	if (!bytes)
+		return std::error_condition();
+	
 	// iterate over hunks
 	uint32_t const first_hunk = offset / m_hunkbytes;
 	uint32_t const last_hunk = (offset + bytes - 1) / m_hunkbytes;
