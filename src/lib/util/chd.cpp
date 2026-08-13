@@ -2105,7 +2105,7 @@ std::error_condition chd_file::compress_v5_map()
 			else if (curcomp == COMPRESSION_PARENT)
 			{
 				// promote parent block references to more compact forms
-				uint32_t refunit = get_u48be(&m_rawmap[hunknum * 12 + 4]);
+				uint64_t const refunit = get_u48be(&m_rawmap[hunknum * 12 + 4]);
 				if (refunit == mulu_32x32(hunknum, m_hunkbytes) / m_unitbytes)
 					curcomp = COMPRESSION_PARENT_SELF;
 				else if (refunit == last_parent)
@@ -3069,7 +3069,7 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			for (uint32_t unit = 0; unit < units; unit++)
 			{
 				if (m_parent_map.find(item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1) == hashmap::NOT_FOUND)
-					m_parent_map.add(item.m_hunknum * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
+					m_parent_map.add(uint64_t(item.m_hunknum) * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
 			}
 		}
 		else if (!compressed())
