@@ -2655,11 +2655,12 @@ saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_filterdata(filterT *f
 	do
 	{
 		// FAD range check?
-		/* according to an obscure document note, this switches the filter connector to be false if the range fails ... I think ... */
-		// timegal, falcom2 uses this
+		// reject and try on the other filter connection
+		// - sfz2 and sonicjamj wouldn't repeat BGMs properly
+		// - timegal, falcom2 also uses this at very least
 		if (flt->mode & 0x40)
 		{
-			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
+			if ((cd_curfad < flt->fad) || (cd_curfad >= (flt->fad + flt->range)))
 			{
 				LOGWARN("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
 				match = 0;
@@ -2708,6 +2709,7 @@ saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_filterdata(filterT *f
 
 			if (flt->mode & 0x10)   // reverse subheader conditions
 			{
+				// TODO: this may not play well with curfad rejection
 				match ^= 1;
 			}
 		}

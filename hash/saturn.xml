@@ -1445,14 +1445,13 @@ Hardlocks at boot, [SCU] DMA-ing in VDP2 RAM with max sizes
 		</part>
 	</software>
 
-	<!-- Identifying Arcade Gears Vol.1 - Pu Li Ru La (Japan)... -->
 	<software name="pulirula" supported="no">
 		<description>Arcade Gears Vol. 1 - Pu Li Ru La (Japan)</description>
 		<year>1997</year>
 		<publisher>Xing</publisher>
 		<notes><![CDATA[
 [CD-Block] Playbacks the wrong track on (flickery) Xing logo (cfr. pulirulaa)
-[CD-Block] Slave SH-2 crashes afterwards
+[CD-Block] Slave SH-2 randomly crashes afterwards
 ]]></notes>
 		<info name="serial" value="T-26106G"/>
 		<info name="release" value="19970828"/>
@@ -3497,11 +3496,13 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Stop BGMs sound playback during gameplay in both games, [CD-Block] uses curfad filter rejection -->
 	<software name="gokuparo" cloneof="parodius" supported="no">
 		<description>Gokujou Parodius Da! Deluxe Pack (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Stop BGMs sound playback during gameplay in both games, [CD-Block] uses curfad filter rejection (should be fixed)
+]]></notes>
 		<info name="serial" value="T-9501G (VS003-J1)"/>
 		<info name="release" value="19950519"/>
 		<info name="alt_title" value="極上パロディウスだ! DELUXE PACK"/>
@@ -3513,11 +3514,13 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Returns to Sega MultiPlayer menu after [CD-Block] reads FAD=474 (COLOR.BIN) a second time around (upload failed?) -->
 	<software name="gaxeduelj" cloneof="gaxeduel" supported="no">
 		<description>Golden Axe - The Duel (Japan, 2M)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Punts to Sega MultiPlayer menu after [CD-Block] reads FAD=474 (COLOR.BIN) a second time around (upload failed?)
+]]></notes>
 		<info name="serial" value="GS-9041"/>
 		<info name="release" value="19950929"/>
 		<info name="alt_title" value="ゴールデンアックス・ザ・デュエル"/>
@@ -3577,11 +3580,14 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Hangs on Sega logo with [CD-Block] keeps looping with command 0x51 (regression) -->
 	<software name="grandia" supported="no">
 		<description>Grandia (Japan, 1M)</description>
 		<year>1997</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Hangs on FMV opening playback [CD-Block]
+Untested in gameplay
+]]></notes>
 		<info name="serial" value="T-4507G"/>
 		<info name="release" value="19971218"/>
 		<info name="alt_title" value="グランディア"/>
@@ -3608,11 +3614,14 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Hangs on Sega logo with [CD-Block] keeps looping with command 0x51 (regression) -->
 	<software name="granddm" supported="no">
 		<description>Grandia - Digital Museum (Japan, rev. A)</description>
 		<year>1998</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Horrible [VDP2] floor effect at the very start of a new game
+Untested in gameplay
+]]></notes>
 		<info name="serial" value="T-4512G"/>
 		<info name="release" value="19980528"/>
 		<info name="alt_title" value="グランディア ～デジタル ミュージアム～"/>
@@ -4733,7 +4742,7 @@ Not extensively tested
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
 Startup logos and character select have incorrect [VDP2] color calculation
-Colors are blackened on intro (can be skipped with start button), [VDP2] or [CD-Block]
+Colors are blackened on intro FMV (can be skipped with start button), [VDP2] or [CD-Block]
 ]]></notes>
 		<info name="serial" value="T-1313G"/>
 		<info name="release" value="19970620"/>
@@ -5211,7 +5220,8 @@ TODO: checkout why this set has 1 disc only
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen, fnum reject in [CD-Block]
+Doesn't playback initial FMV [CD-Block] with fnum reject, bypass with start button
+Checkout [VDP1] stretched mesh sprites in gameplay
 ]]></notes>
 		<info name="serial" value="GS-9046"/>
 		<info name="release" value="19960705"/>
@@ -5473,7 +5483,6 @@ Not extensively tested
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
 Runs too slow, enables [SCU] hblank-in irq
-[CD-Block] BGMs don't repeat
 ]]></notes>
 		<info name="serial" value="T-1230G"/>
 		<info name="release" value="19980709"/>
@@ -6357,7 +6366,8 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 TODO: Verify initial Sega logo animation
-BGMs are mostly silent, never completes underlying [CD-Block] transfer
+BGMs are mostly silent, never completes underlying [CD-Block] transfer (fixed, curfad reject)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="GS-9136"/>
 		<info name="release" value="19970221"/>
@@ -7339,7 +7349,7 @@ TODO: test Sonic 2, 3 and Knuckles
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
 Black screen at startup, tight loops with $6057bb4 never high
-Punts to Multiplayer at end of first new game FMV
+Punts to Multiplayer at end of first new game FMV (fixed, curfad reject handling)
 ]]></notes>
 		<info name="serial" value="T-1204G"/>
 		<info name="release" value="19960315"/>
@@ -7395,7 +7405,7 @@ Punts to Multiplayer at end of first new game FMV
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
 Runs too slow, enables [SCU] hblank-in irq
-[CD-Block] BGMs don't repeat
+[CD-Block] BGMs don't repeat (fixed, curfad reject)
 ]]></notes>
 		<info name="serial" value="T-1212G"/>
 		<info name="release" value="19960914"/>
@@ -16883,12 +16893,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- AI never moves, not even at "Abnormal" difficulty. [CD-Block] skips loading a file? -->
-	<!-- Ready text on start of round sports zooming errors [VDP1] -->
 	<software name="groovef" supported="no">
 		<description>Groove on Fight - Gouketsuji Ichizoku 3 - Kakuchou Ram Cartridge-tsuki! (Japan)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+AI never moves, not even at "Abnormal" difficulty. [CD-Block] skips loading a file?
+Ready text on start of round sports zooming errors [VDP1]
+]]></notes>
 		<info name="serial" value="T-14413G"/>
 		<info name="release" value="19970516"/>
 		<info name="alt_title" value="グルーヴ オン ファイト 豪血寺一族3 (拡張ラムカートリッジ付き!)"/>
@@ -24713,11 +24725,14 @@ Glitchy [VDP1] sprites during gameplay
 		</part>
 	</software>
 
-	<!-- Returns to Sega MultiPlayer menu just after first transfer at FAD=172, bad [CD-Block] file parsing? -->
 	<software name="intrnet1" supported="no">
 		<description>Sega Saturn Internet Vol. 1 (Japan)</description>
 		<year>1997</year>
 		<publisher>Aplix</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Likely warrants keyboard + mouse
+]]></notes>
 		<info name="serial" value="T-31301G"/>
 		<info name="alt_title" value="SEGASATURN インターネット Vol.1"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -27518,11 +27533,13 @@ Box Art shows 'Remix' Title, game reprogrammed from previous version
 		</part>
 	</software>
 
-	<!-- Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause? -->
 	<software name="ccrisisj" cloneof="ccrisis" supported="no">
 		<description>Courier Crisis (Japan)</description>
 		<year>1998</year>
 		<publisher>BMG Japan</publisher>
+		<notes><![CDATA[
+Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause?
+]]></notes>
 		<info name="serial" value="T-18010G"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="クーリエ・クライシス"/>
@@ -27632,11 +27649,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Hangs on FMV opening, [CD-Block] never completes transfer after FAD=3460 -->
 	<software name="defcon5j" cloneof="defcon5" supported="no">
 		<description>Defcon 5 (Japan)</description>
 		<year>1996</year>
 		<publisher>Multisoft</publisher>
+		<notes><![CDATA[
+Corrupted sound on FMV [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-24101G"/>
 		<info name="release" value="19960607"/>
 		<info name="alt_title" value="デフコン5"/>
@@ -29020,7 +29040,7 @@ Not extensively tested
 		<year>1997</year>
 		<publisher>Ecseco Development</publisher>
 		<notes><![CDATA[
-[CD-Block] Locks up on several scenes, fills buffer and never reaches target FAD.
+Not extensively tested (should work after curfad reject fix)
 ]]></notes>
 		<info name="serial" value="T-20702G"/>
 		<info name="release" value="19970117"/>
@@ -29038,7 +29058,7 @@ Not extensively tested
 		<year>1997</year>
 		<publisher>Ecseco Development</publisher>
 		<notes><![CDATA[
-[CD-Block] Hangs during some scenes
+Not extensively tested (should work after curfad reject fix)
 ]]></notes>
 		<info name="serial" value="T-20702G"/>
 		<info name="release" value="19970117"/>
@@ -33964,8 +33984,9 @@ Sinistar: hangs with bezel drawn only
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<notes><![CDATA[
-Glitchy [VDP2] batmobile at startup, [CD-Block] seek times?
-Crashes if left in attract mode, after title screen
+Glitchy [VDP2] batmobile at startup, [CD-Block] seek times? (fixed)
+Crashes if left in attract mode, after title screen (can't reproduce, fixed?)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-8140H"/>
 		<info name="release" value="199611xx"/>
@@ -37180,7 +37201,8 @@ Not extensively tested
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen [CD-Block] keeps pinging command 0x51 with playback already ended
+Black screen [CD-Block] keeps pinging command 0x51 with playback already ended (can't repro, fixed?)
+No [SCSP] and [CD-Block] sound except announcer samples
 ]]></notes>
 		<info name="serial" value="81014"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
