@@ -121,6 +121,11 @@ struct chd_file::metadata_hash
 {
 	uint8_t                 tag[4];         // tag of the metadata in big-endian
 	util::sha1_t            sha1;           // hash data
+
+	bool operator<(const metadata_hash &other) const noexcept
+	{
+		return memcmp(this, &other, sizeof(*this)) < 0;
+	}
 };
 
 
@@ -1740,7 +1745,7 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 
 	// sort the array
 	if (!hasharray.empty())
-		qsort(hasharray.data(), hasharray.size(), sizeof(hasharray[0]), metadata_hash_compare);
+		std::sort(hasharray.begin(), hasharray.end());
 
 	// read the raw data hash from our header and start a new SHA1 with that data
 	util::sha1_creator overall_sha1;
@@ -2906,23 +2911,6 @@ void chd_file::metadata_update_hash()
 		throw err;
 }
 
-/**
- * @fn  int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *elem2)
- *
- * @brief   -------------------------------------------------
- *            metadata_hash_compare - compare two hash entries
- *          -------------------------------------------------.
- *
- * @param   elem1   The first element.
- * @param   elem2   The second element.
- *
- * @return  A CLIB_DECL.
- */
-
-int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *elem2)
-{
-	return memcmp(elem1, elem2, sizeof(metadata_hash));
-}
 
 
 
