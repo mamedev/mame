@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
   sega/saturn_cd_hle.cpp - Sega Saturn and ST-V CD-ROM handling
 
@@ -21,7 +21,8 @@
   LBA except it counts starting at absolute zero instead of
   the first sector (00:02:00 in MSF format).
 
-============================================================================
+===================================================================================================
+
 TODO:
 - finish off code cleanups (repetition etc.);
 - improve debugging;
@@ -30,6 +31,7 @@ TODO:
 - fix startup, cfr. cdblock branch;
 - merge common components with lle version via superclass (i.e. comms);
 - derive MPEG commands in a subdevice;
+- startup with NODISC currently glitches out after splash screen;
 
 DASM notes:
 * whizzj:
@@ -38,7 +40,7 @@ DASM notes:
 - write to 0x605e498 -> 1
   (PUBLISH.CPK tries to playback a few frames then keeps looping)
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "saturn_cd_hle.h"
@@ -125,6 +127,9 @@ void saturn_cd_hle_device::device_start()
 	m_sh1_timer = timer_alloc(FUNC(saturn_cd_hle_device::sh1_command_cb), this);
 	m_sector_timer = timer_alloc(FUNC(saturn_cd_hle_device::cd_sector_cb), this);
 
+	// initialize at power on only
+	tray_is_closed = 1;
+
 	save_item(NAME(sectlenin));
 	save_item(NAME(sectlenout));
 	save_item(NAME(lastbuf));
@@ -180,9 +185,10 @@ void saturn_cd_hle_device::device_reset()
 	cr2 = ('D'<<8) | 'B';
 	cr3 = ('L'<<8) | 'O';
 	cr4 = ('C'<<8) | 'K';
-	cd_stat = CD_STAT_PAUSE;
-	cd_stat |= CD_STAT_PERI;
-	cd_next_stat = CD_STAT_PAUSE;
+
+//	cd_stat = CD_STAT_PAUSE;
+//	cd_stat |= CD_STAT_PERI;
+//	cd_next_stat = CD_STAT_PAUSE;
 	// clear, not supposed to be used until actual command issued
 	cd_seek_stat = CD_STAT_BUSY;
 	cur_track = 0xff;
@@ -235,16 +241,16 @@ void saturn_cd_hle_device::device_reset()
 		read_new_dir(0xffffff);    // read root directory
 		cd_curfad = 150;
 		fadstoplay = -1;
+		cd_change_status(CD_STAT_PAUSE);
 	}
 	else
 	{
-		cd_stat = CD_STAT_NODISC;
+		cd_change_status(tray_is_closed ? CD_STAT_NODISC : CD_STAT_OPEN);
 	}
 
 	buffull = 0;
 	cd_speed = 2;
 	cdda_repeat_count = 0;
-	tray_is_closed = 1;
 
 	m_sector_timer->adjust(attotime::from_hz(150));   // 150 sectors / second = 300kBytes/second
 }
@@ -617,7 +623,8 @@ void saturn_cd_hle_device::cr_standard_return(uint16_t cur_status)
 {
 	if (!m_cdrom_image->exists())
 	{
-		cr1 = cur_status;
+		// TODO: are low byte + cr2~cr4 0, 0xff or preserve previous pickup values?
+		cr1 = cd_stat;
 		cr2 = 0;
 		cr3 = 0;
 		cr4 = 0;
@@ -2219,9 +2226,6 @@ TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::sh1_command_cb )
 
 TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::cd_sector_cb )
 {
-	if(!m_cdrom_image->exists())
-		return;
-
 	//m_sector_timer->reset();
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
@@ -2236,11 +2240,14 @@ TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::cd_sector_cb )
 	// TODO: Saturn refuses to boot with this if a disk isn't in and condition is applied!?
 	// TODO: Check out actual timing of SCDQ acquisition.
 	// (daytonau definitely wants it to be on).
+	//if(m_cdrom_image->exists())
 	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-	if (!buffull)
-		hirqreg |= SCDQ;
-	else
-		hirqreg &= ~SCDQ;
+	{
+		if (!buffull)
+			hirqreg |= SCDQ;
+		else
+			hirqreg &= ~SCDQ;
+	}
 
 	if(cd_stat & CD_STAT_PERI)
 	{
@@ -2893,6 +2900,9 @@ void saturn_cd_hle_device::cd_playdata()
 		}
 		case CD_STAT_PAUSE:
 		{
+			if(!m_cdrom_image->exists())
+				return;
+
 			if (buffull_temp_pause && !buffull && fadstoplay)
 			{
 				buffull_temp_pause = false;
@@ -2902,6 +2912,9 @@ void saturn_cd_hle_device::cd_playdata()
 		}
 		case CD_STAT_PLAY:
 		{
+			if(!m_cdrom_image->exists())
+				return;
+
 			if (fadstoplay)
 			{
 				LOGXFER("SATURN_CD_HLE: Reading FAD %d\n", cd_curfad);

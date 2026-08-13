@@ -1296,13 +1296,14 @@ Not extensively tested
 		<notes><![CDATA[
 [VDP1] offset cursor in name select
 [VDP1] currently too fast in places
-[VDP1] water steps in Underground Caverns doesn't clamp nearby (cfr. https://www.youtube.com/watch?v=H6Db-Z8QIbI&t=8468s)
+[VDP1] water steps in Underground Caverns draws erratic full screen columns (cfr. https://www.youtube.com/watch?v=H6Db-Z8QIbI&t=8468s)
 [VDP1] Were Bane (Nemesis sword drop) special attack has stippled oblique polylines (TODO: check Rapier too)
 [VDP1] verify bat sonar room in Catacombs (cfr. https://youtu.be/H6Db-Z8QIbI?t=19845)
 [VDP1] static clouds background in Royal Chapel have scaling gaps (cfr. https://youtu.be/H6Db-Z8QIbI?t=20871)
 [VDP1] or [VDP2] Maria fight in Alucard mode has color mixing bug when she starts using star shaped magics (https://youtu.be/H6Db-Z8QIbI?t=21298)
 [VDP2] doesn't cut off top of GFXs in magic device screen (3rd option in pause menu, scroll up/down)
-[VDP2] has weird full screen Color Calculation yellow in Mermaid room at Castle Entrance (TODO: check inverted castle)
+[VDP2] has weird full screen Color Calculation yellow in Mermaid room at Castle Entrance (including Inverted Castle)
+Putting pause in aforementioned screen bogusly draws Alucard portrait with extra glitched GFX (only place where it does)
 No overscan in places (cfr. Underground Caverns near boss room)
 ]]></notes>
 		<info name="serial" value="T-9527G (VS010-J1)"/>
@@ -1344,7 +1345,8 @@ Reportedly should slowdown [VDP1] command execution on battles (unverified, assu
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
 		<notes><![CDATA[
-Color masks energy/ammo bars badly, [VDP2] line window?
+Color masks energy/ammo bars badly, [VDP2] enables special color calculation over [VDP1]
+[VDP1] on briefing "loading" and "press button" messages overlaps
 Not extensively tested
 ]]></notes>
 		<info name="language" value="Japanese" />
@@ -1365,6 +1367,7 @@ Not extensively tested
 		<publisher>Electronic Arts Victor</publisher>
 		<notes><![CDATA[
 Black screen, enables [SCU] Timer 1
+[VDP1] draws blank on last frame of transitions
 ]]></notes>
 		<info name="serial" value="T-10602G"/>
 		<info name="release" value="19960223"/>
@@ -1447,6 +1450,10 @@ Hardlocks at boot, [SCU] DMA-ing in VDP2 RAM with max sizes
 		<description>Arcade Gears Vol. 1 - Pu Li Ru La (Japan)</description>
 		<year>1997</year>
 		<publisher>Xing</publisher>
+		<notes><![CDATA[
+[CD-Block] Playbacks the wrong track on (flickery) Xing logo (cfr. pulirulaa)
+[CD-Block] Slave SH-2 crashes afterwards
+]]></notes>
 		<info name="serial" value="T-26106G"/>
 		<info name="release" value="19970828"/>
 		<info name="alt_title" value="ブリルラ アーケードギアーズ"/>
@@ -3067,13 +3074,12 @@ Serious [VDP2] Window clipping issues
 		</part>
 	</software>
 
-	<software name="falcom1" supported="no">
+	<software name="falcom1" supported="partial">
 		<description>Falcom Classics (Japan)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Dragon Slayer [SCSP] sound eventually dies during gameplay.
-Xanadu/Ys 1 not extensively tested
+Dragon Slayer/Ys 1: [SCSP] sound has several hiccups
 ]]></notes>
 		<info name="serial" value="T-31502G"/>
 		<info name="release" value="19971106"/>
@@ -3241,11 +3247,15 @@ Accesses ROM space at first boot, disabled debugging code?
 		</part>
 	</software>
 
-	<!-- title screen effect glitches out [VDP1] -->
 	<software name="fishk" supported="no">
 		<description>Fishing Koushien (Japan)</description>
 		<year>1996</year>
 		<publisher>King Records</publisher>
+		<notes><![CDATA[
+[VDP1] title screen transition glitches out
+[VDP2] second attract cycle doesn't draw boat properly (window effect? color calculation?)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-24901G"/>
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="フィッシング甲子園"/>
@@ -7323,12 +7333,14 @@ TODO: test Sonic 2, 3 and Knuckles
 		</part>
 	</software>
 
-	<!-- Identifying Street Fighter II Movie (Japan) (Disc 1)... -->
-	<!-- Identifying Street Fighter II Movie (Japan) (Disc 2)... -->
 	<software name="sf2mov" supported="no">
 		<description>Street Fighter II Movie (Japan)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Black screen at startup, tight loops with $6057bb4 never high
+Punts to Multiplayer at end of first new game FMV
+]]></notes>
 		<info name="serial" value="T-1204G"/>
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="ストリートファイターⅡムービー"/>
@@ -7416,11 +7428,14 @@ Crashes when reaching gameplay (or left in attract mode after title), [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Street Racer Extra (Japan)... -->
 	<software name="sracerj" cloneof="sracer" supported="no">
 		<description>Street Racer Extra (Japan)</description>
 		<year>1996</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+[VDP2] needs raster effect for ROZ enable around landscape line (flickers madly atm)
+[CD-Block] redbook is silent
+]]></notes>
 		<info name="serial" value="T-17702G"/>
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="ストリート レーサー エクストラ"/>
@@ -7432,11 +7447,14 @@ Crashes when reaching gameplay (or left in attract mode after title), [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Strikers 1945 (Japan)... -->
 	<software name="s1945" supported="no">
 		<description>Strikers 1945 (Japan)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+[VDP1] Air Fortress boss glitches out on transitions
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-14407G"/>
 		<info name="release" value="19960628"/>
 		<info name="alt_title" value="ストライカーズ 1945"/>
@@ -7514,11 +7532,14 @@ Crashes when reaching gameplay (or left in attract mode after title), [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Super Puzzle Fighter II X (Japan)... -->
 	<software name="spf2x" cloneof="spf2t" supported="no">
 		<description>Super Puzzle Fighter II X (Japan)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Runs too slow (presumably same issue as pfght)
+[SCSP] stuck note in character select
+]]></notes>
 		<info name="serial" value="T-1213G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="スーパーパズルファイターⅡX"/>
@@ -7612,11 +7633,13 @@ Crashes after now loading screen, [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Takuramakan - Tonkou Denki (Japan)... -->
 	<software name="takurama" supported="no">
 		<description>Takuramakan - Tonkou Denki (Japan)</description>
 		<year>1996</year>
 		<publisher>Patra</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-25102G"/>
 		<info name="release" value="19961227"/>
 		<info name="alt_title" value="タクラマカン 敦煌傅奇"/>
