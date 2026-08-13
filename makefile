@@ -1468,7 +1468,7 @@ $(GENIE): $(GENIE_SRC)
 genieclean:
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
-clean:
+clean: genieclean
 	@echo Cleaning...
 	-$(SILENT)rm -f language/*/*.mo
 	-$(SILENT)rm -rf $(BUILDDIR)
@@ -1492,22 +1492,12 @@ $(GEN_FOLDERS):
 
 genie: $(GENIE)
 
-ifdef SOURCES
-comma := ,
-SRC_LIST := $(subst $(comma), ,$(SOURCES))
-COMPILER_DEPS := $(shell g++ -MM -MG $(SRC_LIST))
-FILTER_LAYOUTS := $(sort $(filter %.lh,$(COMPILER_DEPS)))
-GENERATED_LAYOUTS := $(addprefix $(GENDIR)/mame/layout/, $(FILTER_LAYOUTS))
-else
-GENERATED_LAYOUTS := $(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
-endif
-
 generate: \
 		genie \
 		$(GEN_FOLDERS) \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
-		$(GENERATED_LAYOUTS)
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
 
 ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
 stale:
