@@ -395,7 +395,6 @@ private:
 	std::error_condition metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const noexcept;
 	std::error_condition metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset) noexcept;
 	void metadata_update_hash();
-	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
 	// file characteristics
 	util::random_read_write::ptr m_file;        // handle to the open core file
