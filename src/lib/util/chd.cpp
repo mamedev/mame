@@ -20,6 +20,7 @@
 #include <zlib.h>
 
 #include <algorithm>
+#include <bit>
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -247,23 +248,6 @@ inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint3
 	if (UNEXPECTED(err))
 		throw err;
 	return offset;
-}
-
-
-//-------------------------------------------------
-//  bits_for_value - return the number of bits
-//  necessary to represent all numbers 0..value
-//-------------------------------------------------
-
-inline uint8_t chd_file::bits_for_value(uint64_t value) noexcept
-{
-	uint8_t result = 0;
-	while (value != 0)
-	{
-		value >>= 1;
-		result++;
-	}
-	return result;
 }
 
 
@@ -2163,9 +2147,9 @@ std::error_condition chd_file::compress_v5_map()
 		}
 
 		// determine the number of bits we need to hold the a length and a hunk index
-		const uint8_t lengthbits = bits_for_value(max_complen);
-		const uint8_t selfbits = bits_for_value(max_self);
-		const uint8_t parentbits = bits_for_value(max_parent);
+		const uint8_t lengthbits = std::bit_width(max_complen);
+		const uint8_t selfbits = std::bit_width(max_self);
+		const uint8_t parentbits = std::bit_width(max_parent);
 
 		// determine the needed size of the output buffer
 		// 16 bytes is required for the header
