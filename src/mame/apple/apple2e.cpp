@@ -5623,6 +5623,18 @@ void apple2e_state::laser128ex2(machine_config &config)
 	m_accel_laser = true;
 	m_has_laser_mouse = true;
 
+	config.device_remove("ay3600");
+	config.device_remove("repttmr");
+
+	I8048(config, m_kbdmcu, A2BUS_7M_CLOCK / 2);
+	m_kbdmcu->set_addrmap(AS_IO, &apple2e_state::laser128_keybio_map);
+	m_kbdmcu->p1_in_cb().set(FUNC(apple2e_state::laser128_x1_x8_r));
+	m_kbdmcu->p2_in_cb().set(FUNC(apple2e_state::laser128_x0_shift_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(apple2e_state::ay3600_ako_w)).bit(5);
+	m_kbdmcu->p2_out_cb().append_output("caps_led").bit(7).invert();
+	m_kbdmcu->t0_in_cb().set_ioport("kbd_lang_select").bit(4).invert();
+	m_kbdmcu->t1_in_cb().set_ioport("keyb_special").bit(0);
+
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IIE, true, false>)));
 
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
