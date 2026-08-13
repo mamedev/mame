@@ -1189,16 +1189,11 @@ std::error_condition chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 	if (rawentry == 0)
 	{
 		// first make sure we need to allocate it
-		bool all_zeros = true;
-		const auto *scan = reinterpret_cast<const uint32_t *>(buffer);
-		for (uint32_t index = 0; index < m_hunkbytes / 4; index++)
-		{
-			if (scan[index] != 0)
-			{
-				all_zeros = false;
-				break;
-			}
-		}
+		const auto *scan = static_cast<const uint8_t *>(buffer);
+		const bool all_zeros = std::all_of(
+				scan,
+				scan + m_hunkbytes,
+				[] (uint8_t value) { return value == 0; });
 
 		// if it's all zeros, do nothing more
 		if (all_zeros)
