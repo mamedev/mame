@@ -31,7 +31,8 @@ TODO:
 - fix startup, cfr. cdblock branch;
 - merge common components with lle version via superclass (i.e. comms);
 - derive MPEG commands in a subdevice;
-- startup with NODISC currently glitches out after splash screen;
+- startup with NODISC/OPEN states currently takes a bit too much wall clock time
+  (should be rather instant not take ~14 seconds);
 
 DASM notes:
 * whizzj:
@@ -260,6 +261,7 @@ void saturn_cd_hle_device::device_reset()
  * Block interface
  */
 
+// base 0x05800000
 void saturn_cd_hle_device::amap(address_map &map)
 {
 	map(0x18000, 0x18003).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
@@ -275,7 +277,7 @@ void saturn_cd_hle_device::amap(address_map &map)
 	// NetLink access
 	// dragndrm expects this value, most likely for status
 	// TODO: move out of here
-	map(0x8502a, 0x8502a).lr8(NAME([] () -> u8 { return 0x11; }));
+	map(0x85029, 0x85029).lr8(NAME([] () -> u8 { return 0x11; }));
 }
 
 u32 saturn_cd_hle_device::datatrns_r(offs_t offset, uint32_t mem_mask)
@@ -623,11 +625,11 @@ void saturn_cd_hle_device::cr_standard_return(uint16_t cur_status)
 {
 	if (!m_cdrom_image->exists())
 	{
-		// TODO: are low byte + cr2~cr4 0, 0xff or preserve previous pickup values?
-		cr1 = cd_stat;
-		cr2 = 0;
-		cr3 = 0;
-		cr4 = 0;
+		// preserve whatever command is currently set
+		cr1 = cd_stat | (cr1 & 0xff);
+		//cr2 = 0;
+		//cr3 = 0;
+		//cr4 = 0;
 	}
 	else if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
@@ -2124,10 +2126,12 @@ void saturn_cd_hle_device::cd_exec_command()
 		1)
 		logerror("Command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
-	if(!m_cdrom_image->exists() && ((cr1 >> 8) & 0xff) != 0x00) {
-		hirqreg |= (CMOK);
-		return;
-	}
+	// execute the command even if CD isn't in tray
+	// - BIOS will otherwise draw VDP2 garbage if tray is closed (seen commands: 0x01, 0x75, 0x67)
+	//if(!m_cdrom_image->exists() && ((cr1 >> 8) & 0xff) != 0x00) {
+	//	hirqreg |= (CMOK);
+	//	return;
+	//}
 
 	switch ((cr1 >> 8) & 0xff)
 	{
@@ -2863,6 +2867,9 @@ void saturn_cd_hle_device::cd_playdata()
 		}
 		case CD_STAT_SEEK:
 		{
+			if(!m_cdrom_image->exists())
+				return;
+
 			int32_t fad_diff;
 			// zdivide
 			// TODO: timings, may be too fast

@@ -9566,10 +9566,7 @@ Not extensively tested
 https://segaretro.org/Dragon%27s_Dream
 https://github.com/likeagfeld/DragonsDreamDecomp
 Pings [CD-Block] HIRM register, no noticeable effect?
-Moans about [modem] not connected off the bat, pings [CD-Block] specific I/O for status (allegedly kludged to work, but doesn't work anymore?)
-Title screen drawing cuts off backgrounds with black pens [VDP2]
-Options menu doesn't show background layer(s) [VDP2]
-Keyboard inputs doesn't work (verify, should be fixed)
+Requires actual Sega Saturn [modem] to do something (status currently kludged in [CD-Block])
 Presumably dies when actually accessing Nifty Serve details
 Attract mode draws only skill names and attribute bars over a black BG, enables [VDP2] Sprite Window
 ]]></notes>
@@ -9578,6 +9575,7 @@ Attract mode draws only skill names and attribute bars over a black BG, enables 
 		<info name="alt_title" value="ドラゴンズドリーム"/>
 		<info name="usage" value="Needs Sega Saturn Modem and keyboard connected to port 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="ctrl2_default" value="keyboard"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dragon's dream (jpn) (dw0874)" sha1="7fa6b9bd0c8d3f03420290bc2f0909186c18d2bd" />
@@ -22252,9 +22250,7 @@ Has [SCSP] sample playback issues in gameplay (never completes umpire calls)
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Habitat_II
-Moans off the bat that a [modem] isn't connected
-Black screen on [DRC] when accessing "NIFTY" option on title menu (verify, should be fixed)
-Triggers "0 trans no cc zoom" [VDP2] message (verify, should be fixed by arcadegh)
+Requires actual Sega Saturn [modem] to do something (status currently kludged in [CD-Block])
 ]]></notes>
 		<info name="serial" value="GS-7105"/>
 		<info name="release" value="19960727"/>
