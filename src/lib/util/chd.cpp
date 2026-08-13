@@ -2013,8 +2013,13 @@ void chd_file::parse_v5_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 	m_mapoffset = get_u64be(&rawheader[40]);
 	m_metaoffset = get_u64be(&rawheader[48]);
 	m_hunkbytes = get_u32be(&rawheader[56]);
-	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitbytes = get_u32be(&rawheader[60]);
+
+	// hunk and unit sizes must be non-zero before calculating counts
+	if (UNEXPECTED(!m_hunkbytes || !m_unitbytes))
+		throw std::error_condition(error::INVALID_FILE);
+
+	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
 
 	// determine compression
