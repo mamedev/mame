@@ -376,7 +376,6 @@ private:
 	std::error_condition file_read(uint64_t offset, void *dest, uint32_t length) const noexcept;
 	std::error_condition file_write(uint64_t offset, const void *source, uint32_t length) noexcept;
 	uint64_t file_append(const void *source, uint32_t length, uint32_t alignment = 0);
-	static uint8_t bits_for_value(uint64_t value) noexcept;
 
 	// internal helpers
 	uint32_t guess_unitbytes();
