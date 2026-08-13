@@ -1296,13 +1296,14 @@ Not extensively tested
 		<notes><![CDATA[
 [VDP1] offset cursor in name select
 [VDP1] currently too fast in places
-[VDP1] water steps in Underground Caverns doesn't clamp nearby (cfr. https://www.youtube.com/watch?v=H6Db-Z8QIbI&t=8468s)
+[VDP1] water steps in Underground Caverns draws erratic full screen columns (cfr. https://www.youtube.com/watch?v=H6Db-Z8QIbI&t=8468s)
 [VDP1] Were Bane (Nemesis sword drop) special attack has stippled oblique polylines (TODO: check Rapier too)
 [VDP1] verify bat sonar room in Catacombs (cfr. https://youtu.be/H6Db-Z8QIbI?t=19845)
 [VDP1] static clouds background in Royal Chapel have scaling gaps (cfr. https://youtu.be/H6Db-Z8QIbI?t=20871)
 [VDP1] or [VDP2] Maria fight in Alucard mode has color mixing bug when she starts using star shaped magics (https://youtu.be/H6Db-Z8QIbI?t=21298)
 [VDP2] doesn't cut off top of GFXs in magic device screen (3rd option in pause menu, scroll up/down)
-[VDP2] has weird full screen Color Calculation yellow in Mermaid room at Castle Entrance (TODO: check inverted castle)
+[VDP2] has weird full screen Color Calculation yellow in Mermaid room at Castle Entrance (including Inverted Castle)
+Putting pause in aforementioned screen bogusly draws Alucard portrait with extra glitched GFX (only place where it does)
 No overscan in places (cfr. Underground Caverns near boss room)
 ]]></notes>
 		<info name="serial" value="T-9527G (VS010-J1)"/>
@@ -1344,7 +1345,8 @@ Reportedly should slowdown [VDP1] command execution on battles (unverified, assu
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
 		<notes><![CDATA[
-Color masks energy/ammo bars badly, [VDP2] line window?
+Color masks energy/ammo bars badly, [VDP2] enables special color calculation over [VDP1]
+[VDP1] on briefing "loading" and "press button" messages overlaps
 Not extensively tested
 ]]></notes>
 		<info name="language" value="Japanese" />
@@ -1365,6 +1367,7 @@ Not extensively tested
 		<publisher>Electronic Arts Victor</publisher>
 		<notes><![CDATA[
 Black screen, enables [SCU] Timer 1
+[VDP1] draws blank on last frame of transitions
 ]]></notes>
 		<info name="serial" value="T-10602G"/>
 		<info name="release" value="19960223"/>
@@ -1442,11 +1445,14 @@ Hardlocks at boot, [SCU] DMA-ing in VDP2 RAM with max sizes
 		</part>
 	</software>
 
-	<!-- Identifying Arcade Gears Vol.1 - Pu Li Ru La (Japan)... -->
 	<software name="pulirula" supported="no">
 		<description>Arcade Gears Vol. 1 - Pu Li Ru La (Japan)</description>
 		<year>1997</year>
 		<publisher>Xing</publisher>
+		<notes><![CDATA[
+[CD-Block] Playbacks the wrong track on (flickery) Xing logo (cfr. pulirulaa)
+[CD-Block] Slave SH-2 randomly crashes afterwards
+]]></notes>
 		<info name="serial" value="T-26106G"/>
 		<info name="release" value="19970828"/>
 		<info name="alt_title" value="ブリルラ アーケードギアーズ"/>
@@ -3067,13 +3073,12 @@ Serious [VDP2] Window clipping issues
 		</part>
 	</software>
 
-	<software name="falcom1" supported="no">
+	<software name="falcom1" supported="partial">
 		<description>Falcom Classics (Japan)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Dragon Slayer [SCSP] sound eventually dies during gameplay.
-Xanadu/Ys 1 not extensively tested
+Dragon Slayer/Ys 1: [SCSP] sound has several hiccups
 ]]></notes>
 		<info name="serial" value="T-31502G"/>
 		<info name="release" value="19971106"/>
@@ -3241,11 +3246,15 @@ Accesses ROM space at first boot, disabled debugging code?
 		</part>
 	</software>
 
-	<!-- title screen effect glitches out [VDP1] -->
 	<software name="fishk" supported="no">
 		<description>Fishing Koushien (Japan)</description>
 		<year>1996</year>
 		<publisher>King Records</publisher>
+		<notes><![CDATA[
+[VDP1] title screen transition glitches out
+[VDP2] second attract cycle doesn't draw boat properly (window effect? color calculation?)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-24901G"/>
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="フィッシング甲子園"/>
@@ -3487,11 +3496,13 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Stop BGMs sound playback during gameplay in both games, [CD-Block] uses curfad filter rejection -->
 	<software name="gokuparo" cloneof="parodius" supported="no">
 		<description>Gokujou Parodius Da! Deluxe Pack (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Stop BGMs sound playback during gameplay in both games, [CD-Block] uses curfad filter rejection (should be fixed)
+]]></notes>
 		<info name="serial" value="T-9501G (VS003-J1)"/>
 		<info name="release" value="19950519"/>
 		<info name="alt_title" value="極上パロディウスだ! DELUXE PACK"/>
@@ -3503,11 +3514,13 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Returns to Sega MultiPlayer menu after [CD-Block] reads FAD=474 (COLOR.BIN) a second time around (upload failed?) -->
 	<software name="gaxeduelj" cloneof="gaxeduel" supported="no">
 		<description>Golden Axe - The Duel (Japan, 2M)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Punts to Sega MultiPlayer menu after [CD-Block] reads FAD=474 (COLOR.BIN) a second time around (upload failed?)
+]]></notes>
 		<info name="serial" value="GS-9041"/>
 		<info name="release" value="19950929"/>
 		<info name="alt_title" value="ゴールデンアックス・ザ・デュエル"/>
@@ -3567,11 +3580,14 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Hangs on Sega logo with [CD-Block] keeps looping with command 0x51 (regression) -->
 	<software name="grandia" supported="no">
 		<description>Grandia (Japan, 1M)</description>
 		<year>1997</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Hangs on FMV opening playback [CD-Block]
+Untested in gameplay
+]]></notes>
 		<info name="serial" value="T-4507G"/>
 		<info name="release" value="19971218"/>
 		<info name="alt_title" value="グランディア"/>
@@ -3598,11 +3614,14 @@ Not extensively tested (Torico FMV playback works)
 		</part>
 	</software>
 
-	<!-- Hangs on Sega logo with [CD-Block] keeps looping with command 0x51 (regression) -->
 	<software name="granddm" supported="no">
 		<description>Grandia - Digital Museum (Japan, rev. A)</description>
 		<year>1998</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Horrible [VDP2] floor effect at the very start of a new game
+Untested in gameplay
+]]></notes>
 		<info name="serial" value="T-4512G"/>
 		<info name="release" value="19980528"/>
 		<info name="alt_title" value="グランディア ～デジタル ミュージアム～"/>
@@ -4723,7 +4742,7 @@ Not extensively tested
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
 Startup logos and character select have incorrect [VDP2] color calculation
-Colors are blackened on intro (can be skipped with start button), [VDP2] or [CD-Block]
+Colors are blackened on intro FMV (can be skipped with start button), [VDP2] or [CD-Block]
 ]]></notes>
 		<info name="serial" value="T-1313G"/>
 		<info name="release" value="19970620"/>
@@ -5201,7 +5220,8 @@ TODO: checkout why this set has 1 disc only
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen, fnum reject in [CD-Block]
+Doesn't playback initial FMV [CD-Block] with fnum reject, bypass with start button
+Checkout [VDP1] stretched mesh sprites in gameplay
 ]]></notes>
 		<info name="serial" value="GS-9046"/>
 		<info name="release" value="19960705"/>
@@ -5463,7 +5483,6 @@ Not extensively tested
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
 Runs too slow, enables [SCU] hblank-in irq
-[CD-Block] BGMs don't repeat
 ]]></notes>
 		<info name="serial" value="T-1230G"/>
 		<info name="release" value="19980709"/>
@@ -6347,7 +6366,8 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 TODO: Verify initial Sega logo animation
-BGMs are mostly silent, never completes underlying [CD-Block] transfer
+BGMs are mostly silent, never completes underlying [CD-Block] transfer (fixed, curfad reject)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="GS-9136"/>
 		<info name="release" value="19970221"/>
@@ -7323,12 +7343,14 @@ TODO: test Sonic 2, 3 and Knuckles
 		</part>
 	</software>
 
-	<!-- Identifying Street Fighter II Movie (Japan) (Disc 1)... -->
-	<!-- Identifying Street Fighter II Movie (Japan) (Disc 2)... -->
 	<software name="sf2mov" supported="no">
 		<description>Street Fighter II Movie (Japan)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Black screen at startup, tight loops with $6057bb4 never high
+Punts to Multiplayer at end of first new game FMV (fixed, curfad reject handling)
+]]></notes>
 		<info name="serial" value="T-1204G"/>
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="ストリートファイターⅡムービー"/>
@@ -7383,7 +7405,7 @@ TODO: test Sonic 2, 3 and Knuckles
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
 Runs too slow, enables [SCU] hblank-in irq
-[CD-Block] BGMs don't repeat
+[CD-Block] BGMs don't repeat (fixed, curfad reject)
 ]]></notes>
 		<info name="serial" value="T-1212G"/>
 		<info name="release" value="19960914"/>
@@ -7416,11 +7438,14 @@ Crashes when reaching gameplay (or left in attract mode after title), [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Street Racer Extra (Japan)... -->
 	<software name="sracerj" cloneof="sracer" supported="no">
 		<description>Street Racer Extra (Japan)</description>
 		<year>1996</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+[VDP2] needs raster effect for ROZ enable around landscape line (flickers madly atm)
+[CD-Block] redbook is silent
+]]></notes>
 		<info name="serial" value="T-17702G"/>
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="ストリート レーサー エクストラ"/>
@@ -7432,11 +7457,14 @@ Crashes when reaching gameplay (or left in attract mode after title), [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Strikers 1945 (Japan)... -->
 	<software name="s1945" supported="no">
 		<description>Strikers 1945 (Japan)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+[VDP1] Air Fortress boss glitches out on transitions
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-14407G"/>
 		<info name="release" value="19960628"/>
 		<info name="alt_title" value="ストライカーズ 1945"/>
@@ -7514,11 +7542,14 @@ Crashes when reaching gameplay (or left in attract mode after title), [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Super Puzzle Fighter II X (Japan)... -->
 	<software name="spf2x" cloneof="spf2t" supported="no">
 		<description>Super Puzzle Fighter II X (Japan)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Runs too slow (presumably same issue as pfght)
+[SCSP] stuck note in character select
+]]></notes>
 		<info name="serial" value="T-1213G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="スーパーパズルファイターⅡX"/>
@@ -7612,11 +7643,13 @@ Crashes after now loading screen, [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Takuramakan - Tonkou Denki (Japan)... -->
 	<software name="takurama" supported="no">
 		<description>Takuramakan - Tonkou Denki (Japan)</description>
 		<year>1996</year>
 		<publisher>Patra</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-25102G"/>
 		<info name="release" value="19961227"/>
 		<info name="alt_title" value="タクラマカン 敦煌傅奇"/>
@@ -9543,10 +9576,7 @@ Not extensively tested
 https://segaretro.org/Dragon%27s_Dream
 https://github.com/likeagfeld/DragonsDreamDecomp
 Pings [CD-Block] HIRM register, no noticeable effect?
-Moans about [modem] not connected off the bat, pings [CD-Block] specific I/O for status (allegedly kludged to work, but doesn't work anymore?)
-Title screen drawing cuts off backgrounds with black pens [VDP2]
-Options menu doesn't show background layer(s) [VDP2]
-Keyboard inputs doesn't work (verify, should be fixed)
+Requires actual Sega Saturn [modem] to do something (status currently kludged in [CD-Block])
 Presumably dies when actually accessing Nifty Serve details
 Attract mode draws only skill names and attribute bars over a black BG, enables [VDP2] Sprite Window
 ]]></notes>
@@ -9555,6 +9585,7 @@ Attract mode draws only skill names and attribute bars over a black BG, enables 
 		<info name="alt_title" value="ドラゴンズドリーム"/>
 		<info name="usage" value="Needs Sega Saturn Modem and keyboard connected to port 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="ctrl2_default" value="keyboard"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dragon's dream (jpn) (dw0874)" sha1="7fa6b9bd0c8d3f03420290bc2f0909186c18d2bd" />
@@ -16862,12 +16893,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- AI never moves, not even at "Abnormal" difficulty. [CD-Block] skips loading a file? -->
-	<!-- Ready text on start of round sports zooming errors [VDP1] -->
 	<software name="groovef" supported="no">
 		<description>Groove on Fight - Gouketsuji Ichizoku 3 - Kakuchou Ram Cartridge-tsuki! (Japan)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+AI never moves, not even at "Abnormal" difficulty. [CD-Block] skips loading a file?
+Ready text on start of round sports zooming errors [VDP1]
+]]></notes>
 		<info name="serial" value="T-14413G"/>
 		<info name="release" value="19970516"/>
 		<info name="alt_title" value="グルーヴ オン ファイト 豪血寺一族3 (拡張ラムカートリッジ付き!)"/>
@@ -22229,9 +22262,7 @@ Has [SCSP] sample playback issues in gameplay (never completes umpire calls)
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Habitat_II
-Moans off the bat that a [modem] isn't connected
-Black screen on [DRC] when accessing "NIFTY" option on title menu (verify, should be fixed)
-Triggers "0 trans no cc zoom" [VDP2] message (verify, should be fixed by arcadegh)
+Requires actual Sega Saturn [modem] to do something (status currently kludged in [CD-Block])
 ]]></notes>
 		<info name="serial" value="GS-7105"/>
 		<info name="release" value="19960727"/>
@@ -24694,11 +24725,14 @@ Glitchy [VDP1] sprites during gameplay
 		</part>
 	</software>
 
-	<!-- Returns to Sega MultiPlayer menu just after first transfer at FAD=172, bad [CD-Block] file parsing? -->
 	<software name="intrnet1" supported="no">
 		<description>Sega Saturn Internet Vol. 1 (Japan)</description>
 		<year>1997</year>
 		<publisher>Aplix</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Likely warrants keyboard + mouse
+]]></notes>
 		<info name="serial" value="T-31301G"/>
 		<info name="alt_title" value="SEGASATURN インターネット Vol.1"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -27499,11 +27533,13 @@ Box Art shows 'Remix' Title, game reprogrammed from previous version
 		</part>
 	</software>
 
-	<!-- Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause? -->
 	<software name="ccrisisj" cloneof="ccrisis" supported="no">
 		<description>Courier Crisis (Japan)</description>
 		<year>1998</year>
 		<publisher>BMG Japan</publisher>
+		<notes><![CDATA[
+Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause?
+]]></notes>
 		<info name="serial" value="T-18010G"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="クーリエ・クライシス"/>
@@ -27613,11 +27649,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Hangs on FMV opening, [CD-Block] never completes transfer after FAD=3460 -->
 	<software name="defcon5j" cloneof="defcon5" supported="no">
 		<description>Defcon 5 (Japan)</description>
 		<year>1996</year>
 		<publisher>Multisoft</publisher>
+		<notes><![CDATA[
+Corrupted sound on FMV [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-24101G"/>
 		<info name="release" value="19960607"/>
 		<info name="alt_title" value="デフコン5"/>
@@ -29001,7 +29040,7 @@ Not extensively tested
 		<year>1997</year>
 		<publisher>Ecseco Development</publisher>
 		<notes><![CDATA[
-[CD-Block] Locks up on several scenes, fills buffer and never reaches target FAD.
+Not extensively tested (should work after curfad reject fix)
 ]]></notes>
 		<info name="serial" value="T-20702G"/>
 		<info name="release" value="19970117"/>
@@ -29019,7 +29058,7 @@ Not extensively tested
 		<year>1997</year>
 		<publisher>Ecseco Development</publisher>
 		<notes><![CDATA[
-[CD-Block] Hangs during some scenes
+Not extensively tested (should work after curfad reject fix)
 ]]></notes>
 		<info name="serial" value="T-20702G"/>
 		<info name="release" value="19970117"/>
@@ -33945,8 +33984,9 @@ Sinistar: hangs with bezel drawn only
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<notes><![CDATA[
-Glitchy [VDP2] batmobile at startup, [CD-Block] seek times?
-Crashes if left in attract mode, after title screen
+Glitchy [VDP2] batmobile at startup, [CD-Block] seek times? (fixed)
+Crashes if left in attract mode, after title screen (can't reproduce, fixed?)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-8140H"/>
 		<info name="release" value="199611xx"/>
@@ -37161,7 +37201,8 @@ Not extensively tested
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen [CD-Block] keeps pinging command 0x51 with playback already ended
+Black screen [CD-Block] keeps pinging command 0x51 with playback already ended (can't repro, fixed?)
+No [SCSP] and [CD-Block] sound except announcer samples
 ]]></notes>
 		<info name="serial" value="81014"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>

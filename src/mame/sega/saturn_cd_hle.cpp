@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
   sega/saturn_cd_hle.cpp - Sega Saturn and ST-V CD-ROM handling
 
@@ -21,7 +21,8 @@
   LBA except it counts starting at absolute zero instead of
   the first sector (00:02:00 in MSF format).
 
-============================================================================
+===================================================================================================
+
 TODO:
 - finish off code cleanups (repetition etc.);
 - improve debugging;
@@ -30,6 +31,8 @@ TODO:
 - fix startup, cfr. cdblock branch;
 - merge common components with lle version via superclass (i.e. comms);
 - derive MPEG commands in a subdevice;
+- startup with NODISC/OPEN states currently takes a bit too much wall clock time
+  (should be rather instant not take ~14 seconds);
 
 DASM notes:
 * whizzj:
@@ -38,7 +41,7 @@ DASM notes:
 - write to 0x605e498 -> 1
   (PUBLISH.CPK tries to playback a few frames then keeps looping)
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "saturn_cd_hle.h"
@@ -125,6 +128,9 @@ void saturn_cd_hle_device::device_start()
 	m_sh1_timer = timer_alloc(FUNC(saturn_cd_hle_device::sh1_command_cb), this);
 	m_sector_timer = timer_alloc(FUNC(saturn_cd_hle_device::cd_sector_cb), this);
 
+	// initialize at power on only
+	tray_is_closed = 1;
+
 	save_item(NAME(sectlenin));
 	save_item(NAME(sectlenout));
 	save_item(NAME(lastbuf));
@@ -180,9 +186,10 @@ void saturn_cd_hle_device::device_reset()
 	cr2 = ('D'<<8) | 'B';
 	cr3 = ('L'<<8) | 'O';
 	cr4 = ('C'<<8) | 'K';
-	cd_stat = CD_STAT_PAUSE;
-	cd_stat |= CD_STAT_PERI;
-	cd_next_stat = CD_STAT_PAUSE;
+
+//	cd_stat = CD_STAT_PAUSE;
+//	cd_stat |= CD_STAT_PERI;
+//	cd_next_stat = CD_STAT_PAUSE;
 	// clear, not supposed to be used until actual command issued
 	cd_seek_stat = CD_STAT_BUSY;
 	cur_track = 0xff;
@@ -235,16 +242,16 @@ void saturn_cd_hle_device::device_reset()
 		read_new_dir(0xffffff);    // read root directory
 		cd_curfad = 150;
 		fadstoplay = -1;
+		cd_change_status(CD_STAT_PAUSE);
 	}
 	else
 	{
-		cd_stat = CD_STAT_NODISC;
+		cd_change_status(tray_is_closed ? CD_STAT_NODISC : CD_STAT_OPEN);
 	}
 
 	buffull = 0;
 	cd_speed = 2;
 	cdda_repeat_count = 0;
-	tray_is_closed = 1;
 
 	m_sector_timer->adjust(attotime::from_hz(150));   // 150 sectors / second = 300kBytes/second
 }
@@ -254,6 +261,7 @@ void saturn_cd_hle_device::device_reset()
  * Block interface
  */
 
+// base 0x05800000
 void saturn_cd_hle_device::amap(address_map &map)
 {
 	map(0x18000, 0x18003).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
@@ -269,7 +277,7 @@ void saturn_cd_hle_device::amap(address_map &map)
 	// NetLink access
 	// dragndrm expects this value, most likely for status
 	// TODO: move out of here
-	map(0x8502a, 0x8502a).lr8(NAME([] () -> u8 { return 0x11; }));
+	map(0x85029, 0x85029).lr8(NAME([] () -> u8 { return 0x11; }));
 }
 
 u32 saturn_cd_hle_device::datatrns_r(offs_t offset, uint32_t mem_mask)
@@ -610,17 +618,18 @@ int saturn_cd_hle_device::get_track_index(uint32_t fad)
 
 int saturn_cd_hle_device::sega_cdrom_get_adr_control(int track)
 {
-	return bitswap<8>(m_cdrom_image->get_adr_control(cur_track),3,2,1,0,7,6,5,4);
+	return bitswap<8>(m_cdrom_image->get_adr_control(track),3,2,1,0,7,6,5,4);
 }
 
 void saturn_cd_hle_device::cr_standard_return(uint16_t cur_status)
 {
 	if (!m_cdrom_image->exists())
 	{
-		cr1 = cur_status;
-		cr2 = 0;
-		cr3 = 0;
-		cr4 = 0;
+		// preserve whatever command is currently set
+		cr1 = cd_stat | (cr1 & 0xff);
+		//cr2 = 0;
+		//cr3 = 0;
+		//cr4 = 0;
 	}
 	else if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
@@ -2117,10 +2126,12 @@ void saturn_cd_hle_device::cd_exec_command()
 		1)
 		logerror("Command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
-	if(!m_cdrom_image->exists() && ((cr1 >> 8) & 0xff) != 0x00) {
-		hirqreg |= (CMOK);
-		return;
-	}
+	// execute the command even if CD isn't in tray
+	// - BIOS will otherwise draw VDP2 garbage if tray is closed (seen commands: 0x01, 0x75, 0x67)
+	//if(!m_cdrom_image->exists() && ((cr1 >> 8) & 0xff) != 0x00) {
+	//	hirqreg |= (CMOK);
+	//	return;
+	//}
 
 	switch ((cr1 >> 8) & 0xff)
 	{
@@ -2219,9 +2230,6 @@ TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::sh1_command_cb )
 
 TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::cd_sector_cb )
 {
-	if(!m_cdrom_image->exists())
-		return;
-
 	//m_sector_timer->reset();
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
@@ -2236,11 +2244,14 @@ TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::cd_sector_cb )
 	// TODO: Saturn refuses to boot with this if a disk isn't in and condition is applied!?
 	// TODO: Check out actual timing of SCDQ acquisition.
 	// (daytonau definitely wants it to be on).
+	//if(m_cdrom_image->exists())
 	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-	if (!buffull)
-		hirqreg |= SCDQ;
-	else
-		hirqreg &= ~SCDQ;
+	{
+		if (!buffull)
+			hirqreg |= SCDQ;
+		else
+			hirqreg &= ~SCDQ;
+	}
 
 	if(cd_stat & CD_STAT_PERI)
 	{
@@ -2576,9 +2587,7 @@ void saturn_cd_hle_device::cd_readTOC(void)
 	{
 		if (m_cdrom_image->exists())
 		{
-			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
-			// HACK: ddsom does not enter ingame with the line above
-			tocbuf[tocptr] = m_cdrom_image->get_adr_control(i)<<4 | 0x01;
+			tocbuf[tocptr] = sega_cdrom_get_adr_control(i);
 		}
 		else
 		{
@@ -2646,11 +2655,12 @@ saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_filterdata(filterT *f
 	do
 	{
 		// FAD range check?
-		/* according to an obscure document note, this switches the filter connector to be false if the range fails ... I think ... */
-		// timegal, falcom2 uses this
+		// reject and try on the other filter connection
+		// - sfz2 and sonicjamj wouldn't repeat BGMs properly
+		// - timegal, falcom2 also uses this at very least
 		if (flt->mode & 0x40)
 		{
-			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
+			if ((cd_curfad < flt->fad) || (cd_curfad >= (flt->fad + flt->range)))
 			{
 				LOGWARN("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
 				match = 0;
@@ -2699,6 +2709,7 @@ saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_filterdata(filterT *f
 
 			if (flt->mode & 0x10)   // reverse subheader conditions
 			{
+				// TODO: this may not play well with curfad rejection
 				match ^= 1;
 			}
 		}
@@ -2856,6 +2867,9 @@ void saturn_cd_hle_device::cd_playdata()
 		}
 		case CD_STAT_SEEK:
 		{
+			if(!m_cdrom_image->exists())
+				return;
+
 			int32_t fad_diff;
 			// zdivide
 			// TODO: timings, may be too fast
@@ -2893,6 +2907,9 @@ void saturn_cd_hle_device::cd_playdata()
 		}
 		case CD_STAT_PAUSE:
 		{
+			if(!m_cdrom_image->exists())
+				return;
+
 			if (buffull_temp_pause && !buffull && fadstoplay)
 			{
 				buffull_temp_pause = false;
@@ -2902,6 +2919,9 @@ void saturn_cd_hle_device::cd_playdata()
 		}
 		case CD_STAT_PLAY:
 		{
+			if(!m_cdrom_image->exists())
+				return;
+
 			if (fadstoplay)
 			{
 				LOGXFER("SATURN_CD_HLE: Reading FAD %d\n", cd_curfad);

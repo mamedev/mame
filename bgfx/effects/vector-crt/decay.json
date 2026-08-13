@@ -1,0 +1,12 @@
+{
+	"blend": { "equation": "add", "srcColor": "1", "dstColor": "0", "srcAlpha": "1", "dstAlpha": "0" },
+	"depth": { "function": "always", "writeenable": false },
+	"cull": { "mode": "none" },
+	"write": { "rgb": true, "alpha": true },
+	"vertex": "chains/vector-crt/vs_post",
+	"fragment": "chains/vector-crt/fs_decay",
+	"uniforms": [
+		{ "name": "s_accum", "type": "int", "values": [ 0 ] },
+		{ "name": "u_decay", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] }
+	]
+}

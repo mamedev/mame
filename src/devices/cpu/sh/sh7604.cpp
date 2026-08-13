@@ -419,7 +419,8 @@ void sh7604_device::sh2_timer_activate()
 		}
 		else
 		{
-			logerror("SH2.%s: Timer event in %d cycles of external clock", tag(), max_delta);
+			// TODO: saturn:pulirula on slave CPU (0 cycles)
+			logerror("SH2.%s: Timer event in %d cycles of external clock\n", tag(), max_delta);
 		}
 	}
 }
