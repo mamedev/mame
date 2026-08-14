@@ -72,6 +72,9 @@ protected:
 		M68HC05_PS,
 		M68HC05_TR,
 
+		M68HC05_BAUD,
+		M68HC05_SCCR1,
+
 		M68HC05_COPRST,
 		M68HC05_COPCR,
 		M68HC05_PCOP,
@@ -108,6 +111,10 @@ protected:
 	void ocr_w(offs_t offset, u8 data);
 	u8 timer_r(offs_t offset);
 
+	u8 baud_r();
+	void baud_w(u8 data);
+	u8 sccr1_r();
+	void sccr1_w(u8 data);
 	void set_ncope(bool state) { m_ncope = state ? 1 : 0; }
 	void coprst_w(u8 data);
 	u8 copcr_r();
@@ -129,6 +136,7 @@ protected:
 
 	void add_port_state(std::array<bool, PORT_COUNT> const &ddr);
 	void add_timer_state();
+	void add_sci_state();
 	void add_pcop_state();
 	void add_ncop_state();
 
@@ -162,6 +170,9 @@ private:
 	bool                m_port_irq_state, m_irq_line_state;
 	u8                  m_irq_latch;
 
+	// serial communications interface
+	u8                  m_baud;
+	u8                  m_sccr1;
 	// timer/counter
 	devcb_write_line    m_tcmp_cb;
 	bool                m_tcap_state;
