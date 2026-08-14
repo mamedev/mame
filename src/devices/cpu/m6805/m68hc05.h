@@ -72,6 +72,7 @@ protected:
 		M68HC05_PS,
 		M68HC05_TR,
 
+		M68HC05_BAUD,
 		M68HC05_SCCR1,
 
 		M68HC05_COPRST,
@@ -110,6 +111,8 @@ protected:
 	void ocr_w(offs_t offset, u8 data);
 	u8 timer_r(offs_t offset);
 
+	u8 baud_r();
+	void baud_w(u8 data);
 	u8 sccr1_r();
 	void sccr1_w(u8 data);
 	void set_ncope(bool state) { m_ncope = state ? 1 : 0; }
@@ -168,6 +171,7 @@ private:
 	u8                  m_irq_latch;
 
 	// serial communications interface
+	u8                  m_baud;
 	u8                  m_sccr1;
 	// timer/counter
 	devcb_write_line    m_tcmp_cb;
