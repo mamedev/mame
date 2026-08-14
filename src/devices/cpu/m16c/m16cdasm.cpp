@@ -41,7 +41,7 @@ const char *const m16c_disassembler::s_bit_ops[14] =
 	"bor", "bnor",
 	"bclr", "bset",
 	"bnot", "btst",
-	"bxor", "bxnor"
+	"bxor", "bnxor"
 };
 
 const char *const m16c_disassembler::s_cnds[16] =
@@ -50,6 +50,14 @@ const char *const m16c_disassembler::s_cnds[16] =
 	"nc", "leu", "nz", "pz", // LTU = NC, NE = NZ
 	"le", "o", "ge", "",
 	"gt", "no", "lt", ""
+};
+
+const char *const m16c_disassembler::s_bmcnd[16] =
+{
+	"c", "gtu", "z", "n", // dest-form CND 00-03
+	"le", "o", "ge", "", // dest-form CND 04-06
+	"nc", "leu", "nz", "pz", // dest-form CND F8-FB
+	"gt", "no", "lt", "" // dest-form CND FC-FE
 };
 
 const char *const m16c_disassembler::s_imm76_ops[2][9] =
@@ -131,6 +139,19 @@ void m16c_disassembler::format_relative(std::ostream &stream, const char *reg, s
 		util::stream_format(stream, "%d[%s]", disp, reg);
 }
 
+int m16c_disassembler::shift_count(u8 imm4)
+{
+	return BIT(imm4, 3) ? -((imm4 & 7) + 1) : imm4 + 1;
+}
+
+void m16c_disassembler::dasm_reg32(std::ostream &stream, u8 mode) const
+{
+	if (mode < 2)
+		stream << s_regs[1][mode + 2];
+	else if (mode == 4)
+		stream << s_regs[1][5];
+}
+
 void m16c_disassembler::dasm_ea(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, u8 mode, bool size) const
 {
 	if (mode < 6)
@@ -144,7 +165,7 @@ void m16c_disassembler::dasm_ea(std::ostream &stream, offs_t &pc, const data_buf
 		if (mode == 0xf)
 			format_label(stream, opcodes.r16(pc));
 		else
-			format_relative(stream, mode < 0xe ? s_regs[1][mode - 8] : s_cregs[mode - 8], s16(opcodes.r16(pc)));
+			format_relative(stream, mode < 0xe ? s_regs[1][mode - 8] : s_cregs[mode - 8], opcodes.r16(pc));
 		pc += 2;
 	}
 }
@@ -167,7 +188,7 @@ void m16c_disassembler::dasm_quick(std::ostream &stream, offs_t &pc, const data_
 void m16c_disassembler::dasm_shift(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, bool size) const
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "#%d, ", s8(op2) < 0 ? s8(op2) >> 4 : (op2 >> 4) + 1);
+	util::stream_format(stream, "#%d, ", shift_count(op2 >> 4));
 	dasm_ea(stream, pc, opcodes, op2 & 0x0f, size);
 }
 
@@ -409,9 +430,8 @@ void m16c_disassembler::dasm_7c(std::ostream &stream, offs_t &pc, const data_buf
 	else if ((op2 & 0xf0) == 0xc0)
 	{
 		util::stream_format(stream, "%-8sPC, ", "stc");
+		dasm_reg32(stream, op2 & 0x0f);
 		dasm_ea(stream, pc, opcodes, op2 & 0x0f, true);
-		if ((op2 & 0x0e) < 0x06)
-			stream << s_regs[1][(op2 & 0x0e) | BIT(op2, 2) ? 1 : 2];
 	}
 	else if ((op2 & 0xf4) == 0xe4)
 	{
@@ -510,8 +530,8 @@ void m16c_disassembler::dasm_7d(std::ostream &stream, offs_t &pc, offs_t &flags,
 		}
 		else
 		{
-			if (!BIT(op2, 5) && (op2 & 0x0e) < 0x06)
-				stream << s_regs[1][(op2 & 0x0e) | BIT(op2, 2) ? 1 : 2];
+			if (!BIT(op2, 5))
+				dasm_reg32(stream, op2 & 0x0f);
 			dasm_ea(stream, pc, opcodes, op2 & 0x0f, true);
 		}
 	}
@@ -539,7 +559,7 @@ void m16c_disassembler::dasm_7d(std::ostream &stream, offs_t &pc, offs_t &flags,
 	else if ((op2 & 0xf8) == 0xc8 && s_cnds[op2 & 0x0f][0] != '\0')
 	{
 		util::stream_format(stream, "j%-7s", s_cnds[op2 & 0x0f]);
-		format_label(stream, pc + opcodes.r8(pc));
+		format_label(stream, pc + s8(opcodes.r8(pc)));
 		++pc;
 		flags |= STEP_COND;
 	}
@@ -639,8 +659,8 @@ void m16c_disassembler::dasm_7e(std::ostream &stream, offs_t &pc, const data_buf
 		{
 			const int offset = (op2 & 0x0e) == 0x06 ? 0 : (op2 & 0x0c) == 0x0c ? 2 : 1;
 			const u8 cnd = opcodes.r8(pc + offset);
-			if (cnd < 0x08 || (cnd >= 0xf8 && s_cnds[cnd & 0x0f][0] != '\0'))
-				util::stream_format(stream, "bm%-6s", s_cnds[cnd & 0x0f]);
+			if ((cnd < 0x08 || cnd >= 0xf8) && s_bmcnd[cnd & 0x0f][0] != '\0')
+				util::stream_format(stream, "bm%-6s", s_bmcnd[cnd & 0x0f]);
 			else
 			{
 				--pc;
@@ -662,14 +682,17 @@ void m16c_disassembler::dasm_7e(std::ostream &stream, offs_t &pc, const data_buf
 		}
 		else if (BIT(op2, 2))
 		{
-			if ((op2 & 0x0f) == 0x0f)
+			if ((op2 & 0x0f) >= 0x0e)
 			{
 				const u16 abs = opcodes.r16(pc);
 				util::stream_format(stream, "%d, ", abs & 0x07);
-				format_label(stream, abs >> 3);
+				if ((op2 & 0x0f) == 0x0f)
+					format_label(stream, abs >> 3);
+				else
+					format_relative(stream, s_cregs[6], abs >> 3);
 			}
 			else
-				format_relative(stream, BIT(op2, 1) ? s_cregs[6] : s_regs[1][op2 & 0x07], s16(opcodes.r16(pc)));
+				format_relative(stream, s_regs[1][op2 & 0x07], opcodes.r16(pc));
 			pc += 2;
 		}
 		else if (BIT(op2, 1))
@@ -701,7 +724,7 @@ void m16c_disassembler::dasm_eb(std::ostream &stream, offs_t &pc, offs_t &flags,
 	}
 	else if (op2 >= 0x80)
 		util::stream_format(stream, "%-8s#%d, %s%s", BIT(op2, 5) ? "sha.l" : "shl.l",
-							BIT(op2, 3) ? util::sext(op2, 4) : (op2 & 0x0f) + 1,
+							shift_count(op2 & 0x0f),
 							s_regs[1][2 + BIT(op2, 4)], s_regs[1][BIT(op2, 4)]);
 	else if ((op2 & 0x4f) == 0x01)
 		util::stream_format(stream, "%-8s%s, %s%s", BIT(op2, 5) ? "sha.l" : "shl.l",
@@ -839,7 +862,7 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 	case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 	case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 		util::stream_format(stream, "%-8s", BIT(op1, 3) ? "sub.b" : "add.b");
-		format_imm_signed(stream, opcodes.r8(pc++));
+		format_imm_signed(stream, s8(opcodes.r8(pc++)));
 		stream << ", ";
 		switch (op1 & 0x07)
 		{
@@ -1119,12 +1142,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 	{
 		const u8 op2 = opcodes.r8(pc++);
 		util::stream_format(stream, "%-8s", "pushm");
-		for (int i = 0; i < 8; i++)
+		for (int i = 7; i >= 0; i--)
 		{
 			if (BIT(op2, i))
 			{
 				stream << (i < 2 ? s_cregs[7 - i] : s_regs[1][7 - i]);
-				if ((op2 >> i) != 1)
+				if (op2 & ((1 << i) - 1))
 					stream << ", ";
 			}
 		}
@@ -1139,7 +1162,7 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 		{
 			if (BIT(op2, i))
 			{
-				stream << (i > 6 ? s_cregs[i] : s_regs[1][i]);
+				stream << (i > 5 ? s_cregs[i] : s_regs[1][i]);
 				if ((op2 >> i) != 1)
 					stream << ", ";
 			}
@@ -1173,7 +1196,7 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 		format_label(stream, pc + s16(opcodes.r16(pc)));
 		pc += 2;
 		if (BIT(op1, 0))
-			flags |= STEP_COND;
+			flags |= STEP_OVER;
 		break;
 
 	case 0xf6:
@@ -1184,10 +1207,7 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 	case 0xf8: case 0xf9:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-		if (BIT(op2, 3))
-			util::stream_format(stream, "%-8s#%d, ", BIT(op1, 0) ? "adjnz.w" : "adjnz.b", 8 - (op2 & 0x07));
-		else
-			util::stream_format(stream, "%-8s#%d, ", BIT(op1, 0) ? "sbjnz.w" : "sbjnz.b", op2 & 0x07);
+		util::stream_format(stream, "%-8s#%d, ", BIT(op1, 0) ? "adjnz.w" : "adjnz.b", s8(op2) >> 4);
 		dasm_ea(stream, pc, opcodes, op2 & 0x0f, BIT(op1, 0));
 		stream << ", ";
 		format_label(stream, pc0 + 2 + s8(opcodes.r8(pc)));
@@ -1206,7 +1226,7 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 		format_label(stream, u32(opcodes.r8(pc + 2)) << 16 | opcodes.r16(pc));
 		pc += 3;
 		if (BIT(op1, 0))
-			flags |= STEP_COND;
+			flags |= STEP_OVER;
 		break;
 
 	case 0xfe:
@@ -1216,6 +1236,10 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 		break;
 
 	case 0xff:
+		stream << "und";
+		flags |= STEP_OVER;
+		break;
+
 	default:
 		util::stream_format(stream, "%-8s%0*Xh ; und", ".byte", op1 >= 0xa0 ? 3 : 2, op1);
 		break;
