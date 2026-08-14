@@ -536,7 +536,7 @@ void pasogo_state::machine_reset()
 {
 	std::string region_tag;
 	ioport_port *color = ioport("COLOR");
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (!m_cart_rom) // even with mandatory carts, debug will crash without anything at the boot vector
 		m_cart_rom = memregion("empty");
 

@@ -660,7 +660,7 @@ void ngp_state::machine_start()
 	if (m_cart->exists())
 	{
 		std::string region_tag;
-		uint8_t *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
+		uint8_t *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG))->base();
 
 		m_maincpu->space(AS_PROGRAM).install_rom(0x200000, 0x3fffff, cart);
 		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x9fffff, cart + 0x200000);

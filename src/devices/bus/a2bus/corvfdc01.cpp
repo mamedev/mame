@@ -126,7 +126,7 @@ a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, co
 
 void a2bus_corvfdc01_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(FDC01_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(FDC01_ROM_REGION))->base();
 
 	save_item(NAME(m_fdc_local_status));
 	save_item(NAME(m_fdc_local_command));

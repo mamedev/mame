@@ -593,7 +593,7 @@ void tvc_state::machine_start()
 	m_vram_bank = 0;
 
 	std::string region_tag;
-	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (cart_rom != nullptr)
 	{
 		m_bank1->space(0).install_rom(0x4000, 0x7fff, cart_rom->base());

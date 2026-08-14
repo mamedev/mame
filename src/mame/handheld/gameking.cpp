@@ -268,7 +268,7 @@ DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 void gameking_state::machine_start()
 {
 	std::string region_tag;
-	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (cart_rom)
 		m_maincpu->space(AS_DATA).install_rom(0x400000, 0x400000 + cart_rom->bytes() - 1, cart_rom->base()); // FIXME: gamekin3 wants Flash cartridges, not plain ROM
 

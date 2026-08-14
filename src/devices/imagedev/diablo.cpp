@@ -206,7 +206,7 @@ std::error_condition diablo_image_device::internal_load_dsk()
 	// open the CHD file
 	if (loaded_through_softlist())
 	{
-		m_chd = device().machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
+		m_chd = device().machine().rom_load().get_disk_handle(device().subtag("harddriv"));
 	}
 	else
 	{

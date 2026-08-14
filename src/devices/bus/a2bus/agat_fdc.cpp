@@ -132,8 +132,8 @@ void a2bus_agat_fdc_device::device_start()
 {
 	set_unscaled_clock((XTAL(14'300'000) / 14.0) * 4.0);
 
-	m_rom = device().machine().root_device().memregion(this->subtag(AGAT_FDC_ROM_REGION).c_str())->base();
-	m_rom_d6 = device().machine().root_device().memregion(this->subtag(AGAT_FDC_ROM_D6_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(AGAT_FDC_ROM_REGION))->base();
+	m_rom_d6 = device().machine().root_device().memregion(this->subtag(AGAT_FDC_ROM_D6_REGION))->base();
 
 	floppy = nullptr;
 	if (floppy0)

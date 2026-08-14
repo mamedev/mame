@@ -87,7 +87,7 @@ void bdsm_state::machine_start()
 	if (m_cartslot && m_cartslot->exists())
 	{
 		std::string region_tag;
-		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG));
 		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x8000), m_cartslot_region->base(), 0x8000);
 
 		// Only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.

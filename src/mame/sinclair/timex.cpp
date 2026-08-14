@@ -551,7 +551,7 @@ void ts2068_state::machine_reset()
 	m_port_f4_data = 0;
 
 	std::string region_tag;
-	m_dock_crt = memregion(region_tag.assign(m_dock->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_dock_crt = memregion(region_tag.assign(m_dock->tag()).append(GENERIC_ROM_REGION_TAG));
 	m_dock_cart_type = m_dock_crt ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
 
 	ts2068_update_memory();

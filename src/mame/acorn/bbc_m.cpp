@@ -207,7 +207,7 @@ void bbc_state::insert_device_rom(memory_region *rom)
 	for (int bank = 15; bank >= 0; bank--)
 	{
 		// if bank has socket and is empty
-		if (m_rom[bank] && !memregion(region_tag.assign(m_rom[bank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
+		if (m_rom[bank] && !memregion(region_tag.assign(m_rom[bank]->tag()).append(BBC_ROM_REGION_TAG)))
 		{
 			uint8_t *swr = m_region_rom->base() + (bank * 0x4000);
 			switch (rom->bytes())
@@ -264,7 +264,7 @@ void bbc_state::setup_device_roms()
 	// configure romslots
 	for (int i = 0; i < 16; i++)
 	{
-		if (m_rom[i] && (rom_region = memregion(region_tag.assign(m_rom[i]->tag()).append(BBC_ROM_REGION_TAG).c_str())))
+		if (m_rom[i] && (rom_region = memregion(region_tag.assign(m_rom[i]->tag()).append(BBC_ROM_REGION_TAG))))
 		{
 			if (m_rom[i]->get_rom_size())
 				memcpy(m_region_rom->base() + (i * 0x4000), rom_region->base(), std::min((int32_t)m_rom[i]->get_slot_size(), (int32_t)m_rom[i]->get_rom_size()));
@@ -276,7 +276,7 @@ void bbc_state::setup_device_roms()
 	// configure cartslots
 	for (int i = 0; i < 2; i++)
 	{
-		if (m_cart[i] && (rom_region = memregion(region_tag.assign(m_cart[i]->tag()).append(ELECTRON_CART_ROM_REGION_TAG).c_str())))
+		if (m_cart[i] && (rom_region = memregion(region_tag.assign(m_cart[i]->tag()).append(ELECTRON_CART_ROM_REGION_TAG))))
 		{
 			memcpy(m_region_rom->base() + (i * 0x8000), rom_region->base(), rom_region->bytes());
 		}

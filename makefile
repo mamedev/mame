@@ -1603,6 +1603,7 @@ doxygen:
 .PHONY: cppcheck
 
 CPPCHECK_PARAMS  = -Isrc/osd
+CPPCHECK_PARAMS += -Isrc/devices
 CPPCHECK_PARAMS += -Isrc/emu
 CPPCHECK_PARAMS += -Isrc/lib
 CPPCHECK_PARAMS += -Isrc/lib/util
@@ -1632,6 +1633,8 @@ CPPCHECK_PARAMS += -DLUA_COMPAT_APIINTCASTS
 CPPCHECK_PARAMS += -DWIN32
 CPPCHECK_PARAMS += -D__GNUC__
 CPPCHECK_PARAMS += -D__x86_64__
+CPPCHECK_PARAMS += --suppress=missingIncludeSystem
+CPPCHECK_PARAMS += --suppress=normalCheckLevelMaxBranches
 ifndef VERBOSE
 CPPCHECK_PARAMS += --quiet
 endif

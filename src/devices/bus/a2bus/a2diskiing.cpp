@@ -174,7 +174,7 @@ a2bus_agat9flop_device::a2bus_agat9flop_device(const machine_config &mconfig, co
 
 void diskiing_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION))->base();
 }
 
 void diskiing_device::device_reset()

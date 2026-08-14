@@ -166,7 +166,7 @@ void deco_rmc3_device::device_start()
 	{
 		// find the extended (split) memory, if present
 		std::string tag_ext = std::string(tag()).append("_ext");
-		const memory_share *share_ext = memshare(tag_ext.c_str());
+		const memory_share *share_ext = memshare(tag_ext);
 
 		// determine bytes per entry and configure
 		int bytes_per_entry = 2;

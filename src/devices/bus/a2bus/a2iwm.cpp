@@ -88,7 +88,7 @@ void a2bus_iwm_device::device_start()
 void a2bus_iwm_card_device::device_start()
 {
 	a2bus_iwm_device::device_start();
-	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION))->base();
 }
 
 void a2bus_iwm_device::device_reset()

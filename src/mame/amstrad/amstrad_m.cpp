@@ -2997,7 +2997,7 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 	m_centronics->write_data7(0);
 
 	std::string region_tag;
-	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (!m_region_cart) // this should never happen, since we make carts mandatory!
 	{
 		m_region_cart = memregion("maincpu");
@@ -3044,7 +3044,7 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 	m_system_type = SYSTEM_GX4000;
 
 	std::string region_tag;
-	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (!m_region_cart) // this should never happen, since we make carts mandatory!
 		m_region_cart = memregion("maincpu");
 }
