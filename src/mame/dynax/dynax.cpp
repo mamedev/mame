@@ -5467,6 +5467,28 @@ ROM_START( yarunara )
 	ROM_LOAD( "5510m.2a",  0x380000, 0x20000, CRC(bb9c71e1) SHA1(21f2977196aaa27b76ee6547a08aba8da7aba76c) )
 ROM_END
 
+ROM_START( mjwitomo ) // D5512068L1-1 + D4508308L-2 (same as yarunara, of which it reuses almost all GFX assets)
+	ROM_REGION( 0x50000, "maincpu", 0 )   // Z80 Code
+	ROM_LOAD( "dynax_5601m.2d",  0x00000, 0x20000, CRC(4ae60579) SHA1(ce2175199d2964e777524176e85381c662169e1a) )
+	ROM_RELOAD(                  0x10000, 0x20000 )
+	ROM_LOAD( "dynax_5602m.4d",  0x30000, 0x20000, CRC(0949d7dd) SHA1(90604101161beec37b5f77531fa1bc0198985df3) )
+
+	ROM_REGION( 0x400000, "blitter", 0 )    // blitter data
+	ROM_LOAD( "dynax_5607.13c", 0x000000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )
+	ROM_LOAD( "dynax_5608.16c", 0x100000, 0x20000, CRC(ced3155b) SHA1(658e3947781f1be2ee87b43952999281c66683a6) )
+	ROM_LOAD( "dynax_5609.17c", 0x120000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
+	ROM_LOAD( "dynax_5606.11c", 0x140000, 0x20000, CRC(161058fd) SHA1(cfc21abdc036e874d34bfa3c60486a5ab87cf9cd) )
+	ROM_LOAD( "dynax_5605.10c", 0x160000, 0x20000, CRC(b2ca9838) SHA1(7104697802a0466fab40414a467146a224eb6a74) )
+	ROM_LOAD( "dynax_5604.9c",  0x180000, 0x20000, CRC(6ac42304) SHA1(ce822da6d61e68578c08c9f1d0af1557c64ac5ae) )
+	ROM_LOAD( "dynax_5603.8c",  0x1a0000, 0x20000, CRC(9276a10a) SHA1(5a68fff20631a2002509d6cace06b5a9fa0e75d2) )
+	ROM_LOAD( "dynax_5615m.4b", 0x200000, 0x80000, CRC(94c721db) SHA1(36439a9ea9a6a07e59bbe1b616dee4b31eaeecff) )
+	ROM_LOAD( "dynax_5614.2b",  0x300000, 0x20000, CRC(ac714bb7) SHA1(64056cbed9d0c4f68611921754c3e6a9bb14f7cc) )
+	ROM_LOAD( "dynax_5613.1b",  0x320000, 0x20000, CRC(32b7bcbd) SHA1(13277ae3f158da332e69c6f4f8828dfabbf3ea0a) )
+	ROM_LOAD( "dynax_5612.4a",  0x340000, 0x20000, CRC(b4220316) SHA1(b0797c9c6ab226520d29c780ea709f62e02dd268) )
+	ROM_LOAD( "dynax_5611.3a",  0x360000, 0x20000, CRC(40ee77d8) SHA1(e0dd9750d8b7b7dd9695a8365bdc926bd6d9f886) )
+	ROM_LOAD( "dynax_5610.2a",  0x380000, 0x20000, CRC(bb9c71e1) SHA1(21f2977196aaa27b76ee6547a08aba8da7aba76c) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -7485,7 +7507,8 @@ GAME( 1990, 7jigen,     0,        nanajign,   nanajign, dynax_adpcm_state, empty
 GAME( 1990, jantouki,   0,        jantouki,   jantouki, jantouki_state,    empty_init,    ROT0,   "Dynax",                     "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjdialq2,   0,        mjdialq2,   mjdialq2, dynax_state,       empty_init,    ROT180, "Dynax",                     "Mahjong Dial Q2 (Japan set 1)",                                 MACHINE_SUPPORTS_SAVE ) // "VER. 1.00" at bootup
 GAME( 1991, mjdialq2a,  mjdialq2, mjdialq2,   mjdialq2, dynax_state,       empty_init,    ROT180, "Dynax",                     "Mahjong Dial Q2 (Japan set 2)",                                 MACHINE_SUPPORTS_SAVE ) // "VER. 1.00" at bootup
-GAME( 1991, yarunara,   0,        yarunara,   yarunara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yarunara,   0,        yarunara,   yarunara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Mahjong Yarunara (Japan, ver. 1.00)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjwitomo,   0,        yarunara,   yarunara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Mahjong Waratte Ii Tomo (Japan, ver. 1.00)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // probably works fine, needs DSW and testing
 GAME( 1991, mjangels,   0,        mjangels,   yarunara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, warahana,   0,        mjangels,   warahana, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Warai no Hana Tenshi (Japan)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1992, quiztvqq,   0,        quiztvqq,   quiztvqq, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )

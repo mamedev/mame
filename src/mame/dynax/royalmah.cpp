@@ -4714,6 +4714,14 @@ ROM_START( janyou )
 	ROM_LOAD( "mb7051",  0x0000, 0x0020, CRC(bc9b0be5) SHA1(dbbf0639c5928abe175578439009a45a3298b316) ) // no label
 ROM_END
 
+ROM_START( janyoua ) // on small Paradise PS-8907 riser PCB, along with a scratched off 40-pin chip, 3 banks of 8 switches and various scratched off other smaller chips
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b.u5", 0x0000, 0x8000, CRC(54f27f8c) SHA1(27693e6c633ef5c1e655269d83b4a0161f581be3) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051", 0x0000, 0x0020, CRC(bc9b0be5) SHA1(dbbf0639c5928abe175578439009a45a3298b316) BAD_DUMP ) // not dumped for this set (PROM was rusty)
+ROM_END
+
 /***************************************************************************
 Janyou Part II
 (c)1984 Cosmo Denshi
@@ -6681,7 +6689,8 @@ GAME( 1981?, openmj,      royalmj,  royalmah, royalmah,   royalmah_state,       
 GAME( 1982,  royalmah,    royalmj,  royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1984?, chalgirl,    0,        chalgirl, royalmah,   royalmah_prgbank_state, init_chalgirl, ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // verify ROM loading / banking, bad girl colors
 GAME( 1983,  seljan,      0,        seljan,   seljan,     royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan (Japan)",                       0 )
-GAME( 1983,  janyou,      royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Shonan",                     "Janyou Part I (Double Bet)",            0 )
+GAME( 1983,  janyou,      royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Shonan",                     "Janyou Part I (Double Bet, set 1)",     0 )
+GAME( 1983,  janyoua,     royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Shonan",                     "Janyou Part I (Double Bet, set 2)",     MACHINE_NOT_WORKING ) // resets in various places, probably protected
 GAME( 1983,  janyoup2,    royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1983,  janyoup2a,   royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983, no title screen)",0 )
 GAME( 1983,  janyoup2702, royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.02, July 1 1983)",0 )

@@ -27473,7 +27473,7 @@ ROM_END
 
 ROM_START( eldoraddoac )  // Dyna ELD2 V1.2D (string in ROM)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "512.h12", 0x00000, 0x10000, CRC(4d6fce75) SHA1(4a3bb668add4ccb6b144ca26bfc8fa4b40f883f2) )
+	ROM_LOAD( "el10u.h12", 0x00000, 0x10000, CRC(4d6fce75) SHA1(4a3bb668add4ccb6b144ca26bfc8fa4b40f883f2) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "el9a.d10", 0x00000, 0x20000, CRC(ee7b1537) SHA1(e10b2f3c9291d836782148c4ae388c94ee47a964) )
