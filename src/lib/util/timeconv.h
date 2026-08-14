@@ -50,7 +50,7 @@ struct arbitrary_datetime
 	int minute;         // minute (0-59)
 	int second;         // second (0-59)
 
-	static struct arbitrary_datetime now();
+	static struct arbitrary_datetime now() noexcept;
 };
 
 

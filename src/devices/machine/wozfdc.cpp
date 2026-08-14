@@ -58,7 +58,8 @@ void wozfdc_device::device_add_mconfig(machine_config &config)
 
 wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-		m_phaselatch(*this, "phaselatch")
+	m_rom_p6(*this, DISKII_P6_REGION),
+	m_phaselatch(*this, "phaselatch")
 {
 }
 
@@ -78,8 +79,6 @@ appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const ch
 
 void wozfdc_device::device_start()
 {
-	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION).c_str())->base();
-
 	timer = timer_alloc(FUNC(wozfdc_device::generic_tick), this);
 	delay_timer = timer_alloc(FUNC(wozfdc_device::delayed_tick), this);
 

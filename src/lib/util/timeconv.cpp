@@ -17,6 +17,9 @@ namespace util {
 
 namespace {
 
+using ntfs_clock = arbitrary_clock<std::uint64_t, 1601, 1, 1, 0, 0, 0, std::ratio<1, 10'000'000 > >;
+
+
 std::chrono::system_clock::duration calculate_system_clock_adjustment()
 {
 	constexpr auto days_in_year(365);
@@ -68,7 +71,7 @@ std::chrono::system_clock::duration system_clock_adjustment(calculate_system_clo
     IMPLEMENTATION
 ***************************************************************************/
 
-arbitrary_datetime arbitrary_datetime::now()
+arbitrary_datetime arbitrary_datetime::now() noexcept
 {
 	time_t sec;
 	time(&sec);
@@ -93,7 +96,6 @@ arbitrary_datetime arbitrary_datetime::now()
 
 std::chrono::system_clock::time_point system_clock_time_point_from_ntfs_duration(ntfs_duration d)
 {
-	typedef arbitrary_clock<std::uint64_t, 1601, 1, 1, 0, 0, 0, std::ratio<1, 10000000 > > ntfs_clock;
 	const std::chrono::time_point<ntfs_clock> tp(d);
 	return ntfs_clock::to_system_clock(tp);
 }

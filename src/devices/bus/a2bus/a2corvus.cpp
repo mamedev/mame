@@ -42,20 +42,18 @@
 
 #include "emu.h"
 #include "a2corvus.h"
+
+#include "machine/corvushd.h"
 #include "imagedev/harddriv.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+namespace {
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_CORVUS, a2bus_corvus_device, "a2corvus", "Corvus Flat Cable interface")
-
 #define CORVUS_ROM_REGION  "corvus_rom"
-#define CORVUS_HD_TAG      "corvushd"
 
 
 ROM_START( corvus )
@@ -63,9 +61,37 @@ ROM_START( corvus )
 	ROM_LOAD( "a4.7.u10", 0x0000, 0x0800, CRC(1cf6e32a) SHA1(dbd6efeb3b54c0523b8b4eda8b3d737413f6a91a) )
 ROM_END
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_corvus_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_corvus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_corvus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual bool take_c800() const override { return true; }
+
+	required_region_ptr<uint8_t> m_rom;
+	required_device<corvus_hdc_device> m_corvushd;
+};
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -96,7 +122,8 @@ const tiny_rom_entry *a2bus_corvus_device::device_rom_region() const
 a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
-	m_corvushd(*this, CORVUS_HD_TAG), m_rom(nullptr)
+	m_rom(*this, CORVUS_ROM_REGION),
+	m_corvushd(*this, "corvushd")
 {
 }
 
@@ -111,7 +138,6 @@ a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, const ch
 
 void a2bus_corvus_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(CORVUS_ROM_REGION).c_str())->base();
 }
 
 void a2bus_corvus_device::device_reset()
@@ -161,7 +187,7 @@ void a2bus_corvus_device::write_c0nx(uint8_t offset, uint8_t data)
 uint8_t a2bus_corvus_device::read_cnxx(uint8_t offset)
 {
 	// one slot image at the end of the ROM, it appears
-	return m_rom[offset+0x700];
+	return m_rom[offset + 0x700];
 }
 
 /*-------------------------------------------------
@@ -172,3 +198,8 @@ uint8_t a2bus_corvus_device::read_c800(uint16_t offset)
 {
 	return m_rom[offset & 0x7ff];
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_CORVUS, device_a2bus_card_interface, a2bus_corvus_device, "a2corvus", "Corvus Flat Cable interface")

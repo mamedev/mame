@@ -64,7 +64,7 @@ DISCRETE_RESET(dss_adjustment)
 {
 	double min, max;
 
-	m_port = m_device->machine().root_device().ioport(m_device->siblingtag((const char *)this->custom_data()).c_str());
+	m_port = m_device->owner()->ioport((const char *)this->custom_data());
 	if (m_port == nullptr)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag\n", this->index());
 

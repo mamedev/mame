@@ -139,7 +139,7 @@ void image_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			{
 				for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name().c_str()))
+					if (image.instance_name() == dev_instance)
 					{
 						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
@@ -300,7 +300,7 @@ bool image_manager::try_change_working_directory(std::string &working_directory,
 		bool done = false;
 		while (!done && (entry = directory->read()) != nullptr)
 		{
-			if (!core_stricmp(subdir.c_str(), entry->name))
+			if (!core_stricmp(subdir, entry->name))
 			{
 				done = true;
 				success = entry->type == osd::directory::entry::entry_type::DIR;

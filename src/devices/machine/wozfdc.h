@@ -25,10 +25,6 @@ class wozfdc_device:
 	public device_t
 {
 public:
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -36,6 +32,9 @@ protected:
 	// construction/destruction
 	wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -58,6 +57,7 @@ protected:
 	floppy_connector *floppy0, *floppy1, *floppy2, *floppy3;
 	floppy_image_device *floppy;
 
+	required_region_ptr<uint8_t> m_rom_p6;
 	required_device<addressable_latch_device> m_phaselatch;
 
 	uint64_t cycles;
@@ -67,7 +67,6 @@ protected:
 	int write_position;
 	bool write_line_active;
 
-	const uint8_t *m_rom_p6;
 	uint8_t last_6502_write;
 	bool mode_write, mode_load;
 	int active;

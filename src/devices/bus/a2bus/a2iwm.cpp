@@ -14,17 +14,19 @@
 #include "emu.h"
 #include "a2iwm.h"
 
+#include "imagedev/floppy.h"
 #include "machine/applefdintf.h"
+#include "machine/iwm.h"
+
 #include "formats/ap2_dsk.h"
 #include "formats/as_dsk.h"
 
 
+namespace {
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_IWM, a2bus_iwm_int_device, "a2iwmint", "Apple IWM controller")
-DEFINE_DEVICE_TYPE(A2BUS_IWM_CARD, a2bus_iwm_card_device, "a2iwm", "Apple Disk II IWM controller")
 
 #define DISKII_ROM_REGION  "diskii_rom"
 
@@ -32,6 +34,56 @@ ROM_START( iwm )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
 	ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
 ROM_END
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_iwm_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+protected:
+	// construction/destruction
+	a2bus_iwm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
+
+	required_device<iwm_device> m_iwm;
+	required_device_array<floppy_connector, 2> m_floppy;
+
+private:
+	void devsel_w(u8 data);
+	void phases_w(u8 data);
+};
+
+class a2bus_iwm_int_device: public a2bus_iwm_device
+{
+public:
+	a2bus_iwm_int_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class a2bus_iwm_card_device: public a2bus_iwm_device
+{
+public:
+	a2bus_iwm_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+
+private:
+	required_region_ptr<uint8_t> m_rom;
+};
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -73,7 +125,8 @@ a2bus_iwm_int_device::a2bus_iwm_int_device(const machine_config &mconfig, const 
 }
 
 a2bus_iwm_card_device::a2bus_iwm_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_iwm_device(mconfig, A2BUS_IWM_CARD, tag, owner, clock)
+	a2bus_iwm_device(mconfig, A2BUS_IWM_CARD, tag, owner, clock),
+	m_rom(*this, DISKII_ROM_REGION)
 {
 }
 
@@ -83,12 +136,6 @@ a2bus_iwm_card_device::a2bus_iwm_card_device(const machine_config &mconfig, cons
 
 void a2bus_iwm_device::device_start()
 {
-}
-
-void a2bus_iwm_card_device::device_start()
-{
-	a2bus_iwm_device::device_start();
-	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION).c_str())->base();
 }
 
 void a2bus_iwm_device::device_reset()
@@ -144,3 +191,9 @@ void a2bus_iwm_device::phases_w(u8 data)
 	if(flp)
 		flp->seek_phase_w(data);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_IWM,      device_a2bus_card_interface, a2bus_iwm_int_device,  "a2iwmint", "Apple IWM controller")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_IWM_CARD, device_a2bus_card_interface, a2bus_iwm_card_device, "a2iwm", "Apple Disk II IWM controller")

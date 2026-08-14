@@ -767,7 +767,7 @@ void emu_options::reevaluate_default_card_software()
 				// values representing cartridge types and such
 				if (default_card_software.empty())
 				{
-					auto *opt = slot.option(slot_opt.default_card_software().c_str());
+					auto *opt = slot.option(slot_opt.default_card_software());
 					if (opt && opt->selectable())
 						continue;
 				}
@@ -986,11 +986,11 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 								std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
 
 								// only add defaults if they exist in this configuration
-								device_t *device = config.root_device().subdevice(slot_name.c_str());
+								device_t *device = config.root_device().subdevice(slot_name);
 								if (device)
 								{
 									device_slot_interface *intf;
-									if (device->interface(intf) && intf->option(fi.value().c_str()))
+									if (device->interface(intf) && intf->option(fi.value()))
 										results.slot_defaults[slot_name] = fi.value();
 								}
 							}
