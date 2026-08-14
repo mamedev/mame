@@ -613,8 +613,8 @@ void isa8_ega_device::device_start()
 
 	if(m_default_bios_tag != "iskr3104")
 	{
-		uint8_t   *dst = memregion(subtag("user2").c_str())->base() + 0x0000;
-		uint8_t   *src = memregion(subtag("user1").c_str())->base() + 0x3fff;
+		uint8_t   *dst = memregion(subtag("user2"))->base() + 0x0000;
+		uint8_t   *src = memregion(subtag("user1"))->base() + 0x3fff;
 		int     i;
 
 		/* Perform the EGA bios address line swaps */
@@ -624,7 +624,7 @@ void isa8_ega_device::device_start()
 		}
 	}
 	else
-		memcpy(memregion(subtag("user2").c_str())->base(), memregion(subtag("user1").c_str())->base(), 0x4000);
+		memcpy(memregion(subtag("user2"))->base(), memregion(subtag("user1"))->base(), 0x4000);
 
 	/* Install 256KB Video ram on our EGA card */
 	m_vram = make_unique_clear<uint8_t[]>(256 * 1024);

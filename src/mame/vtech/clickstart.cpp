@@ -157,7 +157,7 @@ void clickstart_state::machine_start()
 	if (m_cart && m_cart->exists())
 	{
 		std::string region_tag;
-		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 	}
 
 	save_item(NAME(m_mouse_x));

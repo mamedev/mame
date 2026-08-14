@@ -300,7 +300,7 @@ bool image_manager::try_change_working_directory(std::string &working_directory,
 		bool done = false;
 		while (!done && (entry = directory->read()) != nullptr)
 		{
-			if (!core_stricmp(subdir.c_str(), entry->name))
+			if (!core_stricmp(subdir, entry->name))
 			{
 				done = true;
 				success = entry->type == osd::directory::entry::entry_type::DIR;

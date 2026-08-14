@@ -327,7 +327,7 @@ void beta_state::machine_start()
 	else
 	{
 		std::string region_tag;
-		memcpy(&m_eprom_rom[0], memregion(region_tag.assign(m_eprom->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base(), 0x800);
+		memcpy(&m_eprom_rom[0], memregion(region_tag.assign(m_eprom->tag()).append(GENERIC_ROM_REGION_TAG))->base(), 0x800);
 	}
 
 	// state saving

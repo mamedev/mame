@@ -135,7 +135,7 @@ void a2bus_agat840k_hle_device::index_callback(int unit, int state)
 
 void a2bus_agat840k_hle_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(AGAT840K_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(AGAT840K_ROM_REGION))->base();
 
 	m_mxcs = MXCSR_SYNC;
 

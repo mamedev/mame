@@ -78,7 +78,7 @@ appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const ch
 
 void wozfdc_device::device_start()
 {
-	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION).c_str())->base();
+	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION))->base();
 
 	timer = timer_alloc(FUNC(wozfdc_device::generic_tick), this);
 	delay_timer = timer_alloc(FUNC(wozfdc_device::delayed_tick), this);

@@ -1149,7 +1149,7 @@ void kc85_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	std::string region_tag;
-	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -1192,7 +1192,7 @@ void pc8201_state::machine_start()
 	uint8_t *ram = m_ram->pointer();
 
 	std::string region_tag;
-	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -1228,7 +1228,7 @@ void trsm100_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	std::string region_tag;
-	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);

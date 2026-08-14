@@ -366,7 +366,7 @@ void socrates_state::machine_start()
 
 void socrates_state::machine_reset()
 {
-	m_cart_reg = m_cart ? memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str()) : nullptr;
+	m_cart_reg = m_cart ? memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG)) : nullptr;
 	kbmcu_sim_reset();
 	m_kb_spi_request = true;
 	m_oldkeyvalue = 0;

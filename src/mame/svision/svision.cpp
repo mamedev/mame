@@ -634,7 +634,7 @@ void svision_state::machine_start()
 
 	std::string region_tag(m_cart->tag());
 	region_tag.append(GENERIC_ROM_REGION_TAG);
-	m_cart_rom = memregion(region_tag.c_str());
+	m_cart_rom = memregion(region_tag);
 
 	if (m_cart_rom)
 	{

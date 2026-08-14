@@ -99,7 +99,7 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, co
 
 void a2bus_corvfdc02_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(FDC02_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(FDC02_ROM_REGION))->base();
 
 	m_timer = timer_alloc(FUNC(a2bus_corvfdc02_device::tc_tick), this);
 

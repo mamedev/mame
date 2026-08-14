@@ -111,7 +111,7 @@ a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, const ch
 
 void a2bus_corvus_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(CORVUS_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(CORVUS_ROM_REGION))->base();
 }
 
 void a2bus_corvus_device::device_reset()

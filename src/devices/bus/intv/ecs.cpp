@@ -49,7 +49,7 @@ void intv_ecs_device::device_start()
 	if (m_rom == nullptr)
 	{
 		std::string region_tag;
-		m_rom = memregion(region_tag.assign(tag()).append(":ecs").c_str())->base();
+		m_rom = memregion(region_tag.assign(tag()).append(":ecs"))->base();
 	}
 	if (m_ram.empty())
 	{

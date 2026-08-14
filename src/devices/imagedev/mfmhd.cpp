@@ -420,7 +420,7 @@ std::pair<std::error_condition, std::string> mfm_harddisk_device::call_load()
 	/* open the CHD file */
 	if (loaded_through_softlist())
 	{
-		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
+		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv"));
 	}
 	else
 	{

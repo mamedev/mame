@@ -100,7 +100,7 @@ uint16_t m24_z8000_device::pmem_r(offs_t offset, uint16_t mem_mask)
 {
 	offset <<= 1;
 	if(!m_z8000_mem)
-		return memregion(subtag("z8000").c_str())->as_u16(offset >> 1);
+		return memregion(subtag("z8000"))->as_u16(offset >> 1);
 
 	uint8_t hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)

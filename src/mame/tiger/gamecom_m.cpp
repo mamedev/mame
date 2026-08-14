@@ -70,8 +70,8 @@ void gamecom_state::machine_reset()
 	m_sound1_cnt = 0x40;
 
 	std::string region_tag;
-	m_cart1_rom = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	m_cart2_rom = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_cart1_rom = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG));
+	m_cart2_rom = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG));
 }
 
 void gamecom_state::gamecom_set_mmu(uint8_t mmu, uint8_t data)
