@@ -284,10 +284,21 @@ inline void namcos22_renderer::dispatch_scanline_poly(scanline_func callback, in
 {
 	switch (clipverts)
 	{
-		case 3: render_triangle<4>(m_cliprect, render_delegate(callback, this), clipv[0], clipv[1], clipv[2]); break;
-		case 4: render_polygon<4,4>(m_cliprect, render_delegate(callback, this), clipv); break;
-		case 5: render_polygon<5,4>(m_cliprect, render_delegate(callback, this), clipv); break;
-		case 6: render_polygon<6,4>(m_cliprect, render_delegate(callback, this), clipv); break;
+		case 3:
+			render_triangle<4>(m_cliprect, render_delegate(callback, this), clipv[0], clipv[1], clipv[2]);
+			break;
+
+		case 4:
+			render_polygon<4,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+
+		case 5:
+			render_polygon<5,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+
+		case 6:
+			render_polygon<6,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
 	}
 }
 
