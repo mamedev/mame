@@ -221,6 +221,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Available on GitHub: https://github.com/paulroberthill/BlueSCSI-toolbox-Amiga -->
+	<!-- Image created with amitools: "xdftool bluescsi-toolbox-13.adf pack BlueSCSI-toolbox-Amiga_v1.3" -->
+	<software name="bluescsi13">
+		<description>BlueSCSI Toolbox v1.3</description>
+		<year>2026</year>
+		<publisher>paulroberthill</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="bluescsi-toolbox-13.adf" size="901120" crc="42502738" sha1="5316587e2f2096f06dcd0886b486d102b03c09c0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- CyberVision Monitor 1.33, cybergraphics.library 40.64 -->
 	<software name="cv64_214" supported="no">
 		<description>CyberVision 64 Driver V2.14</description>
