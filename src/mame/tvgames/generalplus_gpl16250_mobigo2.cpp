@@ -86,4 +86,4 @@ ROM_END
 // could be GPL16230A, GPL16240A or GPL16250A
 // ----------------------------------------------------
 
-CONS( 2013, mobigo2, 0,      0, mobigo2,  mobigo2, generalplus_mobigo2_state, init_spi, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2013, mobigo2, 0, 0, mobigo2, mobigo2, generalplus_mobigo2_state, init_spi, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

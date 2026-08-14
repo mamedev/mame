@@ -216,27 +216,27 @@ ROM_END
 // see evolution_handheld.cpp
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
-CONS( 2019, smksagas,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan, set 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a standard unit
-CONS( 2019, smksagasa,        smksagas, 0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan, set 2)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a 'Deluxe' unit
+CONS( 2019, smksagas,  0,        0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Sagashi (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a standard unit
+CONS( 2019, smksagasa, smksagas, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Sagashi (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a 'Deluxe' unit
 // or Sumikko Gurashi - Sumikko Sagashi DX (すみっコぐらし すみっコさがしDX "Sumikko Gurashi the movie" alt version)
 
 // 2020 version - Sumikko Gurashi - Sumikko Catch, see generalplus_gpl16250_spi_direct.cpp
 
 // 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
 // or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
-CONS( 2021, smkmikke,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a 'Deluxe' unit
-CONS( 2021, smkmikkea,       smkmikke, 0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a standard unit
+CONS( 2021, smkmikke,  0,        0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Mikke DX (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a 'Deluxe' unit
+CONS( 2021, smkmikkea, smkmikke, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Mikke (Japan)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a standard unit
 
 // other devices on the same Soc
 
 // キラッとプリ☆チャン プリたまGO ミスティパープル
 // the product page seems to indicate that the different colours get different bonus items but the main code looks the same
 // so it could be different factory default data
-CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2019, tomyegga,        tomyegg,  0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Powder Pink (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2019, tomyeggb,        tomyegg,  0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Mint Blue (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, tomyegg,  0,       0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "Takara Tomy", "Kiratto Pri-Chan - PritamaGO: Misty Purple (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2019, tomyegga, tomyegg, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "Takara Tomy", "Kiratto Pri-Chan - PritamaGO: Powder Pink (Japan)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2019, tomyeggb, tomyegg, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "Takara Tomy", "Kiratto Pri-Chan - PritamaGO: Mint Blue (Japan)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, chikawac, 0, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "Takara Tomy", "Chiikawa Camera De Ya-! (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // リルリルフェアリル　フェアリルカメラ
-CONS( 2016, fairicam,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Sega Toys",        "Rilu Rilu Fairilu Camera (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2016, fairicam, 0, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "Sega Toys", "Rilu Rilu Fairilu Camera (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

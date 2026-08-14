@@ -199,12 +199,12 @@ void elan_ep3a19a_state::init_tvbg()
 } // anonymous namespace
 
 
-CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
-CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
+CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Hasbro license)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
+CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Hasbro license)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
 
-CONS( 2007, tvbg3a, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, tvbg3b, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Simon, Battleship, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=Q7nwKJfVavU
-CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
+CONS( 2007, tvbg3a, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Hasbro license)", "TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, tvbg3b, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Hasbro license)", "TV Board Games 3-in-1: Simon, Battleship, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=Q7nwKJfVavU
+CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Hasbro license)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
 
 // The back of the Silly 6 Pins 3-in-1 packaging suggests a Monopoly TV Board Game device was planned, but this does not appear to have been released.
 

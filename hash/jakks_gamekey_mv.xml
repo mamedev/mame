@@ -10,7 +10,8 @@ license:CC0-1.0
 	<software name="bcatdoc">
 		<description>Black Cat &amp; Doc Ock</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / Digital Eclipse</publisher>
+		<publisher>JAKKS Pacific, Inc.</publisher>
+		<info name="developer" value="Digital Eclipse"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">

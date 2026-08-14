@@ -242,5 +242,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                FULLNAME         FLAGS
 SYST( 1982, mmahjong, 0,      0,      mmahjong, mmahjong, mmahjong_state, empty_init, "Nippon Mail Service", "Micom Mahjong", MACHINE_SUPPORTS_SAVE )

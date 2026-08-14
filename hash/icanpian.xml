@@ -6,20 +6,17 @@ license:CC0-1.0
     Cartridges supported
 
     Piano Favourites (J7522)
-    Dora the Explorer Musical Adventure (J7523)
+    Dora the Explorer: Dora's Musical Adventure (J7523)
     Jungle Boogie (J7524)
     Scooby-Doo! Monster Mayhem (J7525)
-    Barbie Princess Enchanted Sounds (J7526)
+    Barbie: Princess Enchanted Sounds (J7526)
     Nicktoons Show Tunes (J7527)
     Holiday Wonderland (J7528)
-
     Rockin' Dance Party (J8715)
-
     Pop Hits (K0653)
-
-    Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan) (K4653)
-    The Wizard of Oz - We're Off to Play the Piano (K4654)
-    American Idol - Take The Stage (K4655)
+    Disney Jammin' Jungle Safari (K4653)
+    The Wizard of Oz: We're Off to Play the Piano (K4654)
+    American Idol: Take The Stage (K4655)
     Disney Princess Magical Melodies (K4656)
 
 
@@ -32,7 +29,6 @@ license:CC0-1.0
 
     Dora Aventura Musical (J9947)  - Dora the Explorer Musical Adventure
     Ritmos de la Selva  (J9948)  - Jungle Boogie
-
 
 
     cartridge pinout (not identical to I Can Play Guitar)
@@ -63,7 +59,7 @@ license:CC0-1.0
     47 ground   48 Gnd
 -->
 
-<softwarelist name="icanpian" description="Fisher-Price / Mattel I Can Play Piano cartridges">
+<softwarelist name="icanpian" description="Fisher-Price I Can Play Piano cartridges">
 	<software name="pianfav">
 		<description>Piano Favorites (J7522)</description>
 		<year>2005</year>
@@ -76,7 +72,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dora">
-		<description>Dora the Explorer Musical Adventure (J7523)</description>
+		<description>Dora the Explorer: Dora's Musical Adventure (J7523)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
@@ -109,7 +105,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="barbie">
-		<description>Barbie Princess Enchanted Sounds (J7526)</description>
+		<description>Barbie: Princess Enchanted Sounds (J7526)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
@@ -164,7 +160,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jjs">
-		<description>Jammin' Jungle Safari (Disney's The Lion King, Jungle Book, Tarzan) (K4653)</description> <!-- Tarzan is shown on the cart, but none of the songs are from it? -->
+		<description>Disney Jammin' Jungle Safari (K4653)</description> <!-- Movie titles on cart: The Lion King, The Jungle Book, and Tarzan; Tarzan is shown on the cart, but none of the songs are from it? -->
 		<year>2005</year>
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
@@ -175,7 +171,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wizardoz">
-		<description>The Wizard of Oz - We're Off to Play the Piano (K4654)</description>
+		<description>The Wizard of Oz: We're Off to Play the Piano (K4654)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
@@ -186,7 +182,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aitts">
-		<description>American Idol Take the Stage (K4655)</description>
+		<description>American Idol: Take the Stage (K4655)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">

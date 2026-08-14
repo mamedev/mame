@@ -2807,278 +2807,279 @@ ROM_END
 
 */
 
-CONS( 1999, pl1000, 0,         0,  xavix_pl1000, pl1000,xavix_pl1000_state,      init_pl1000,    "Pelican Accessories / Mani Industries / Gameone Systems",             "Video Challenger (PL-1000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 1999,  pl1000, 0,         0,  xavix_pl1000,           pl1000,    xavix_pl1000_state,        init_pl1000,        "Pelican Accessories / Mani Industries / Gameone Systems", "Video Challenger (PL-1000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // product code 80-32705.
 // Some sites say 1997, but 1999 is what SSD had listed, and seems more fitting.
 // Also exists as
 // 80-32703 Hippo's Alphabet Adventure (UK)
 // 80-32700 ABC Jungle Fun (US?)
-CONS( 1999, hippofr,  0,          0,  xavix_2mb, xavix,xavix_state,      init_xavix,    "VTech",             "2 en 1 Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
+CONS( 1999,  hippofr,   0,        0,  xavix_2mb,            xavix,     xavix_state,               init_xavix,         "VTech", "2 en 1 Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
 
-CONS( 1999?, multiplt, 0,         0,  xavix_2mb, multiplt,xavix_state,      init_xavix,    "VTech",             "2 en 1 Multi'Pilote (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1999?, multiplt,  0,        0,  xavix_2mb,            multiplt,  xavix_state,               init_xavix,         "VTech", "2 en 1 Multi'Pilote (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア1
-CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006,  taitons1,  0,        0,  xavix_i2c_24lc04_2mb, nostalgia, xavix_i2c_state,           init_xavix,         "Bandai / SSD Company Ltd. / Taito", "Let's! TV Play Classic: Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア2
-CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006,  taitons2,  0,        0,  xavix_i2c_24lc04_2mb, nostalgia, xavix_i2c_state,           init_xavix,         "Bandai / SSD Company Ltd. / Taito", "Let's! TV Play Classic: Taito Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC ナムコノスタルジア1
-CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006,  namcons1,  0,        0,  xavix_i2c_24lc04_1mb, nostalgia, xavix_i2c_state,           init_xavix,         "Bandai / SSD Company Ltd. / Namco", "Let's! TV Play Classic: Namco Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC ナムコノスタルジア2
-CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006,  namcons2,  0,        0,  xavix_i2c_24lc04_1mb, nostalgia, xavix_i2c_state,           init_xavix,         "Bandai / SSD Company Ltd. / Namco", "Let's! TV Play Classic: Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2000, rad_ping,  0,          0,  xavix_1mb,        rad_ping, xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
-CONS( 2000, rad_pingp, rad_ping,   0,  xavixp_1mb,       rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000,  rad_ping,  0,        0,  xavix_1mb,            rad_ping,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd. / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2000,  rad_pingp, rad_ping, 0,  xavixp_1mb,           rad_pingp, xavix_state,               init_xavix,         "Radica / SSD Company Ltd. / Simmer Technology", "Connectv Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// this set reads the region byte and will show either 'RADICA: Play TV Opus' or 'RADICA: ConnecTV Opus' as the title
-CONS( 2000, rad_opus,  0,          0,  xavix_1mb_nv,     rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
-CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_1mb_nv,    rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// this set reads the region byte and will show either 'RADICA: Play TV Opus' or 'RADICA: Connectv Opus' as the title
+CONS( 2000,  rad_opus,  0,        0,  xavix_1mb_nv,         rad_opus,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
+CONS( 2000,  rad_opusp, rad_opus, 0,  xavixp_1mb_nv,        rad_opusp, xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Connectv Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // the set below does NOT read the PAL/NTSC flag, and will only display 'RADICA: Plug & Play Opus' as the title
-// older release, or region where the Play TV / ConnecTV trademarks weren't used?
-CONS( 2000, rad_opusa, rad_opus,   0,  xavixp_1mb_nv,    rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// older release, or region where the Play TV / Connectv trademarks weren't used?
+CONS( 2000,  rad_opusa, rad_opus, 0,  xavixp_1mb_nv,        rad_opus,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2000, rad_hnt,   0,          0,  xavix_1mb_nv,     rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
+CONS( 2000,  rad_hnt,   0,        0,  xavix_1mb_nv,         rad_hnt,   xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
 
-CONS( 2003, rad_hnt2,  0,          0,  xavix_2mb_nv,     rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun, crashes on pause
+CONS( 2003,  rad_hnt2,  0,        0,  xavix_2mb_nv,         rad_hnt,   xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun, crashes on pause
 
-CONS( 2003, rad_mtrk,  0,          0,  xavix_mtrk,       rad_mtrk, xavix_mtrk_state,     init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp,      rad_mtrkp,xavix_mtrk_state,     init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  rad_mtrk,  0,        0, xavix_mtrk,            rad_mtrk,  xavix_mtrk_state,          init_xavix,         "Radica / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_mtrkp,           rad_mtrkp, xavix_mtrk_state,          init_xavix,         "Radica / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, rad_box,   0,          0,  xavix_2mb,        rad_box,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, rad_boxp,  rad_box,    0,  xavixp_2mb,       rad_boxp, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?,  rad_box,   0,        0, xavix_2mb,             rad_box,   xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_2mb,            rad_boxp,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, rad_crdn,  0,          0,  xavix_1mb,        rad_crdn, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp_1mb,       rad_crdnp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?,  rad_crdn,  0,        0, xavix_1mb,             rad_crdn,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Card Night (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?,  rad_crdnp, rad_crdn, 0, xavixp_1mb,            rad_crdnp, xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Connectv Card Night (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2000, rad_bb,    0,          0,  xavix_1mb,        rad_bb,   xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
+CONS( 2000,  rad_bb,    0,        0, xavix_1mb,             rad_bb,    xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
 
-CONS( 2001, rad_bass,  0,          0,  xavix_1mb,        rad_bass, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp_1mb,       rad_bassp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  rad_bass,  0,        0, xavix_1mb,             rad_bass,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  rad_bassp, rad_bass, 0, xavixp_1mb,            rad_bassp, xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Connectv Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
-CONS( 2001, rad_snow,  0,          0,  xavix_1mb_nv,     rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp_1mb_nv,    rad_snowp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  rad_snow,  0,        0, xavix_1mb_nv,          rad_snow,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  rad_snowp, rad_snow, 0, xavixp_1mb_nv,         rad_snowp, xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Connectv Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, rad_madf,  0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
+CONS( 2003,  rad_madf,  0,        0, xavix_madfb,           rad_fb,    xavix_madfb_state,         init_xavix,         "Radica / Electronic Arts / SSD Company Ltd.", "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,    0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // USA only release? doesn't change logo for PAL.
+CONS( 200?,  rad_fb,    0,        0, xavix_madfb,           rad_fb,    xavix_madfb_state,         init_xavix,         "Radica / SSD Company Ltd.", "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // USA only release? doesn't change logo for PAL.
 
-CONS( 200?, rad_rh,    0,          0,  xavix_2mb,        rad_rh,   xavix_state,          init_xavix,    "Radica / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  rad_rh,    0,        0, xavix_2mb,             rad_rh,    xavix_state,               init_xavix,         "Radica / Fisher-Price / Pronto Games / SSD Company Ltd.", "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, rad_ssx,   0,          0,  xavix_4mb,        rad_snow, xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp_4mb,       rad_snowp,xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004,  rad_ssx,   0,        0, xavix_4mb,             rad_snow,  xavix_state,               init_xavix,         "Radica / Electronic Arts / SSD Company Ltd.", "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004,  rad_ssxp,  rad_ssx,  0, xavixp_4mb,            rad_snowp, xavix_state,               init_xavix,         "Radica / Electronic Arts / SSD Company Ltd.", "Connectv SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
 
 // basically a reissue of SSX but without the license
-CONS( 2006, rad_sbw,   0,          0,  xavix_4mb,        rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (White) (NTSC)", MACHINE_IMPERFECT_SOUND )
-// doesn't exist with ConnecTV branding?
+CONS( 2006,  rad_sbw,   0,        0, xavix_4mb,             rad_snow,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Snowboarder (White) (NTSC)", MACHINE_IMPERFECT_SOUND )
+// doesn't exist with Connectv branding?
 
-CONS( 2002, rad_bdp,   0,          0,  xavix_2mb,        rad_bdp,  xavix_state,          init_xavix,    "Radica / Mattel / SSD Company LTD",            "Barbie Dance Party", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  rad_bdp,   0,        0, xavix_2mb,             rad_bdp,   xavix_state,               init_xavix,         "Radica / Mattel / SSD Company Ltd.", "Barbie Dance Party", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ゴール決めるぜ！ エキサイトストライカー
-CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Goal Kimeruze! Excite Striker (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2002, epo_strkp, epo_strk,   0,  xavixp,           epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Let's Play Excite Striker (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2002, rad_socr,  epo_strk,   0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  epo_strk,  0,        0, xavix,                 epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.",          "Goal Kimeruze! Excite Striker (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  epo_strkp, epo_strk, 0, xavixp,                epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.",          "Let's Play Excite Striker (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  rad_socr,  epo_strk, 0, xavix,                 epo_epp,   xavix_state,               init_xavix,         "Radica / Epoch / SSD Company Ltd.", "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// まちをつくろう 工事のくるま５
-CONS( 2001, tak_town,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Machi o Tsukurou: Kouji no Kuruma 5 (Japan)", MACHINE_IMPERFECT_SOUND )
+// いろいろうんてん 工事のくるま5
+CONS( 2001,  tak_town,  0,        0, xavix,                 rad_jcon,  xavix_state,               init_xavix,         "Takara / SSD Company Ltd.",          "Iroiro Unten: Kouji no Kuruma 5 (Japan)", MACHINE_IMPERFECT_SOUND )
 // this is roughly based on tak_town above
-CONS( 2002, rad_jcon,  tak_town,   0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  rad_jcon,  tak_town, 0, xavix,                 rad_jcon,  xavix_state,               init_xavix,         "Radica / Takara / SSD Company Ltd.", "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
 
 // ホームラン打とうぜ! エキサイトスタジアム
-CONS( 2000, epo_stad,  0,          0,  xavix_2mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Home Run Datouze! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000,  epo_stad,  0,        0, xavix_2mb,             epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.",  "Home Run Datouze! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // this seems to be based off the epo_stad code, but heavily modified
-CONS( 2002, rad_bb2,   0,          0,  xavix_2mb,        rad_bb2,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
+CONS( 2002,  rad_bb2,   0,        0, xavix_2mb,             rad_bb2,   xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
 
 // 勝負しようぜ！ エキサイトスタジアムDX
-CONS( 2002, epo_esdx,  0,          0,  xavix_4mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Shoubu Shiyouze! Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  epo_esdx,  0,        0, xavix_4mb,             epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Shoubu Shiyouze! Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 阪神タイガース エキサイトスタジアムＤＸ
-CONS( 2003, epo_esht,  0,          0,  xavix_4mb_nv,     epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Hanshin Tigers Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  epo_esht,  0,        0, xavix_4mb_nv,          epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Hanshin Tigers Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // interrupt issues after the title screen cause it to hang
 // エースきめるぜ！エキサイトテニス
-CONS( 2002, epo_tenn,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ace Kimeruze! Excite Tennis (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  epo_tenn,  0,        0, xavix,                 epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Ace Kimeruze! Excite Tennis (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ハムちゃんず大集合 ダンスするのだ！走るのだ！
-CONS( 2001, epo_hamd,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ham-chans Dai Shuugou Dance Surunoda! Hashirunoda! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  epo_hamd,  0,        0, xavix,                 xavix,     xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Ham-chans Dai Shuugou: Dance Surunoda! Hashirunoda! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 卓球やろうぜ！ エキサイトピンポン
-CONS( 2000, epo_epp,   0,          0,  xavix_1mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2000, epo_eppk,  epo_epp,    0,  xavix_1mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000,  epo_epp,   0,        0, xavix_1mb,             epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.",                     "Takkyuu Yarouze! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// 리얼핑퐁
+CONS( 2000,  epo_eppk,  epo_epp,  0, xavix_1mb,             epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd. / D-Gate / Sonokong", "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // しゃもじdeピンポン
-// This special version of Excite Ping Pong was a competition prize, not a retail product.  The competition was sponsored by ミツカン (Mizkan)
-CONS( 2001, epo_epps,  0,          0,  xavix_1mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / Mizkan / SSD Company LTD",             "Shamoji de Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// This special version of Excite Ping Pong was a competition prize, not a retail product. The competition was sponsored by ミツカン (Mizkan)
+CONS( 2001,  epo_epps,  0,        0, xavix_1mb,             epo_epp,   xavix_state,               init_xavix,         "Epoch / Mizkan / SSD Company Ltd.", "Shamoji de Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 卓球やろうぜ！ エキサイトピンポン2
-CONS( 2003, epo_epp2,   0,         0,  xavix_2mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  epo_epp2,  0,        0, xavix_2mb,             epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Takkyuu Yarouze! Excite Ping Pong 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 愛ちゃんに挑戦！エキサイトピンポン
-CONS( 2006, epo_epp3,   0,         0,  xavix_2mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006,  epo_epp3,  0,        0, xavix_2mb,             epo_epp,   xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // TV麻雀 昇段対局～4人打ち
-CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24lc02_mj,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Shoudan Taikyoku - 4-nin Uchi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  epo_mj,    0,        0, xavix_i2c_24lc02_mj,   epo_mj,    xavix_i2c_mj_state,        init_xavix,         "Epoch / SSD Company Ltd.", "TV Mahjong Shoudan Taikyoku: 4-nin Uchi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// ブラックバス釣ろうぜ！ エキサイトフィッシング
-CONS( 2001, epo_fish,  0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Black Bass Tsurouze! Excite Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// ブラックバス釣ろうぜ エキサイトフィッシング
+CONS( 2001,  epo_fish,  0,        0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Black Bass Tsurouze: Excite Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ
-CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08_4mb,epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  epo_efdx,  0,        0, xavix_i2c_24c08_4mb,   epo_efdx,  xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ぐるりんワールド
-CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru, xavix_guru_state,     init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005,  epo_guru,  0,        0, xavix_guru,            epo_guru,  xavix_guru_state,          init_xavix,         "Epoch / SSD Company Ltd.", "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// ドラえもん こえでドカン！わくわくくうきほう！！
-CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02_4mb,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
+// ドラえもん こえでドカン！ わくわくくうきほう！！
+CONS( 2002,  epo_dmon,  0,        0, xavix_i2c_24c02_4mb,   xavix_i2c, xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "Doraemon-goe de Dokan! Wakuwaku Kuukihou!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // コロッケ！いただ禁貨！バンカーバトル!!
-CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04_4mb, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  epo_crok,  0,        0, xavix_i2c_24lc04_4mb,  xavix_i2c, xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。ステージ！ダンスだぴょん！
-CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02_4mb,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  epo_mms,   0,        0, xavix_i2c_24c02_4mb,   epo_mms,   xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "mini-moni. Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // ズバズバブレード
-CONS( 2002, tak_zuba,  0,          0,  xavix_i2c_24c02_4mb,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  tak_zuba,  0,        0, xavix_i2c_24c02_4mb,   xavix_i2c, xavix_i2c_state,           init_xavix,         "Takara / SSD Company Ltd.", "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。ステージ！ダンスだぴょん！ぷらすっ
-CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02_4mb,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  epo_mmsp,  0,        0, xavix_i2c_24c02_4mb,   epo_mms,   xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "mini-moni. Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
 
-// Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります
-CONS( 2006, ban_krrj,  0,          0,  xavix_4mb,        ban_krrj, xavix_state,          init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu (Japan)",  MACHINE_IMPERFECT_SOUND )
+// Let's!TVプレイ ケロロ小隊大パニック！ドタバタ大決戦であります
+CONS( 2006,  ban_krrj,  0,        0, xavix_4mb,             ban_krrj,  xavix_state,               init_xavix,         "Bandai / SSD Company Ltd.", "Let's! TV Play Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
-CONS( 2004, epo_quiz,  0,          0,  xavix_4mb,        epo_quiz, xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "All-Star Kansha-sai Chou Gouka! Quiz Kettieban: Akasaka 5-choume Taikan Studio (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004,  epo_quiz,  0,        0, xavix_4mb,             epo_quiz,  xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "All-Star Kansha-sai Chou Gouka! Quiz Kettieban: Akasaka 5-choume Taikan Studio (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, has_wamg,  0,          0,  xavix_4mb,        has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005,  has_wamg,  0,        0, xavix_4mb,             has_wamg,  xavix_state,               init_xavix,         "Hasbro / Milton Bradley / SSD Company Ltd.", "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // GEIGEKI ゴーゴーシューティング
-CONS( 2002, tak_geig,  0,          0,  xavix_4mb_nv,     tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  tak_geig,  0,        0, xavix_4mb_nv,          tak_geig,  xavix_state,               init_xavix,         "Takara / SSD Company Ltd.", "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // some unemulated connectivity features to add other robots into the game
-CONS( 2001, tak_wdg,   0,          0,  xavix_2mb_nv,     tak_wdg,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Webdiver DX W-05 Gladion (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  tak_wdg,   0,        0, xavix_2mb_nv,          tak_wdg,   xavix_state,               init_xavix,         "Takara / SSD Company Ltd.", "Webdiver DX W-05 Gladion (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// TVホッケー
+// ティービーホッケー
 // playable but could do with better deadzome handling on the controls at least
 // the trackball functionality works well in the menus, but not the games
-CONS( 2001, tom_tvho,  0,          0,  xavix_tom_tvho,   tom_tvho, xavix_tom_tvho_state, init_xavix,    "Tomy / SSD Company LTD",                       "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  tom_tvho,  0,        0, xavix_tom_tvho,        tom_tvho,  xavix_tom_tvho_state,      init_xavix,         "Tomy / SSD Company Ltd.", "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // コメットさん☆ラブリンバトン
-CONS( 2001, tak_comt,  0,          0,  xavix_2mb_nv,     tak_comt,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  tak_comt,  0,        0, xavix_2mb_nv,          tak_comt,  xavix_state,               init_xavix,         "Takara / SSD Company Ltd.", "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 爆進スノボ ギンギンボーダーズ
-CONS( 2001, tak_gin,   0,          0,  xavix_2mb,        tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Bakushin Sno-Bo - Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
+CONS( 2001,  tak_gin,   0,        0, xavix_2mb,             tak_gin,   xavix_state,               init_xavix,         "Takara / SSD Company Ltd.", "Bakushin Sno-Bo: Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 
 // ぽこぽこハンマーズ
-CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02_4mb,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  tak_hamr,  0,        0, xavix_i2c_24c02_4mb,   tak_hamr,  xavix_i2c_state,           init_xavix,         "Takara / SSD Company Ltd.", "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, tak_beyu,  0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Takara / Hasbro / SSD Company LTD",            "Beyblade Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  tak_beyu,  0,        0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Takara / Hasbro / SSD Company Ltd.", "Beyblade Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 //ベイブレード　アルティメットシューター
-CONS( 2002, tak_beyb,  tak_beyu,   0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Takara / SSD Company Ltd.",          "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド
-CONS( 2003, jarajal,   0,          0,  xavix_2mb_nv,     jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  jarajal,   0,        0, xavix_2mb_nv,          jarajal,   xavix_state,               init_xavix,         "Takara / SSD Company Ltd.", "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// 近代撃ちまくりバラエティ 射的王(シャテキング)
-CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02_2mb,  tomshoot,xavix_i2c_tomshoot_state,  init_xavix,    "Tomy / SSD Company LTD",                   "Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 近代撃ちまくりバラエティ 射的王(シャテキング)
+CONS( 2002,  tomshoot,  0,        0, xavix_i2c_24c02_2mb,   tomshoot,  xavix_i2c_tomshoot_state,  init_xavix,         "Tomy / SSD Company Ltd.", "TV de Asobitai Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// トミカ カーナビドライブ / トミー
-CONS( 2003, tcarnavi,  0,          0,  xavix_4mb_nv,     tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 トミカ カーナビドライブ / トミー
+CONS( 2003,  tcarnavi,  0,        0, xavix_4mb_nv,          tcarnavi,  xavix_state,               init_xavix,         "Tomy / SSD Company Ltd.", "TV de Asobitai Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// 痛快！娯楽活劇 ちゃんぴよんピンボール
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,  init_xavix,    "Tomy / SSD Company LTD",                       "Tsuukai! Goraku Katsugeki - Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 痛快！娯楽活劇 ちゃんぴよんピンボール
+CONS( 2003,  tomcpin,   0,        0, xavix_i2c_24c08_4mb,   tomcpin,   xavix_i2c_state,           init_xavix,         "Tomy / SSD Company Ltd.", "TV de Asobitai Tsuukai! Goraku Katsugeki: Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// 日本一周 僕はプラレール運転士
-CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 日本一周 僕はプラレール運転士
+CONS( 2004,  tomplc,    0,        0, xavix_i2c_24c02_43mhz, tomplc,    xavix_i2c_state,           init_xavix,         "Tomy / SSD Company Ltd.", "TV de Asobitai Nihon Isshuu: Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
 // the demos in attract mode end instantly as if a button was being held, but not sure where it's read
-CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Asobitai Hyper Rescue - Boku wa Kyuujotai! (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006,  tomthr,    0,        0, xavix_43mhz,           tomthr,    xavix_state,               init_xavix,         "Takara Tomy / SSD Company Ltd.", "TV de Asobitai Hyper Rescue: Boku wa Kyuujotai! (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // ガンガンアドベンチャー
-CONS( 2001, gungunad,  0,          0,  xavix_2mb_nv,     xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  gungunad,  0,        0, xavix_2mb_nv,          xavix,     xavix_state,               init_xavix,         "Takara / SSD Company Ltd.", "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ガンガンレボリューション
-CONS( 2004, gungunrv,  0,          0,  xavix_i2c_24lc04_4mb, gungunrv, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004,  gungunrv,  0,        0, xavix_i2c_24lc04_4mb,  gungunrv,  xavix_i2c_state,           init_xavix,         "Takara / SSD Company Ltd.", "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ビストロキッズ ぼくもわたしもコックさん！
-CONS( 2001, bistro,    0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Sega Toys / SSD Company LTD",                  "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  bistro,    0,        0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Sega Toys / SSD Company Ltd.", "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
 /* Music titles: Emulation note:
    Timers might not be 100%, PAL stuff uses different ways to do timing.
 */
-CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
-CONS( 2000, ekaraa,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turning on e-kara" without cart
-CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
-CONS( 2002, ekarag,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
-CONS( 2002, ekaras,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD / newgent",           "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2000,  ekara,     0,        0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd. / Hasbro",   "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
+CONS( 2000,  ekaraa,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd. / Hasbro",   "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turning on e-kara" without cart
+CONS( 2000,  ekaraj,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd.",            "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
+CONS( 2002,  ekarag,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd.",            "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
+CONS( 2002,  ekaras,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd. / newgent",  "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 // the Korean i-singer release from Sonokong has a unique bios and different data resources, meaning carts are not fully compatible between it and e-kara
-CONS( 2000, isinger,  ekara,       0,  xavix_cart_isinger, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Sonokong / SSD Company LTD",                   "i-Singer (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2000,  isinger,   ekara,    0, xavix_cart_isinger,    ekara,     xavix_ekara_state,         init_xavix_slowenv, "Sonokong / SSD Company Ltd. / D-Gate", "i-Singer (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
-CONS( 2002, ekaraphs, ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2002,  ekaraphs,  ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd.", "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // epitch (at least the pichi pichi pitch mermaid starter pack) uses the same internal rom as the Japanese ekara, but has less buttons, so some features aren't available (some games also seem to expect to read it with a different layout eg 'a7' cart, but 'a5' cart doesn't, so must be a way to enable that mode, or bug in code?)
-CONS( 2003, epitch,   0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-pitch (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
+CONS( 2003,  epitch,    0,        0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd.", "e-pitch (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
 
 // e-kara mix was another unit that allowed you to connect to a PC, unlike e-kara web it also functions as a regular device
-CONS( 200?, ekaramix, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara Mix (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 200?,  ekaramix,  0,        0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Ltd.", "e-kara Mix (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // ダンスダンスレボリューション　ふぁみマット
-CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2001,  ddrfammt,  0,        0, xavix_cart_ddrfammt,   ddrfammt,  xavix_cart_state,          init_xavix,         "Takara / Konami / SSD Company Ltd.", "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ
-CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
+CONS( 2000,  popira,    0,        0, xavix_cart_popira,     popira,    xavix_cart_state,          init_xavix,         "Takara / SSD Company Ltd.",            "Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
 // the Korean release is not properly compatible with the usual Popira carts, although some of the Korean i-singer range are compatible
-CONS( 2001, popirak,  popira,      0,  xavix_cart_popirak,popira,   xavix_cart_state,     init_xavix,    "Sonokong / SSD Company LTD",                   "PoPiRa - Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2001,  popirak,   popira,   0, xavix_cart_popirak,    popira,    xavix_cart_state,          init_xavix,         "Sonokong / SSD Company Ltd. / D-Gate", "PoPiRa: Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ2
-CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
+CONS( 2002,  popira2,   0,        0, xavix_cart_popira2,    popira2,   xavix_popira2_cart_state,  init_xavix,         "Takara / SSD Company Ltd.", "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
 
 // たいこでポピラ
-CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko de Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
+CONS( 2003,  taikodp,   0,        0, xavix_i2c_taiko,       taikodp,   xavix_i2c_cart_state,      init_xavix,         "Takara / SSD Company Ltd.", "Taiko de Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
 // ジャンピンポピラ
-CONS( 2004, jpopira,  0,           0,  xavix_i2c_jpopira,jpopira,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Jumping Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2004,  jpopira,   0,        0, xavix_i2c_jpopira,     jpopira,   xavix_i2c_cart_state,      init_xavix,         "Takara / SSD Company Ltd.", "Jumping Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // evio
-CONS( 2003, evio,     0,           0,  xavix_cart_evio,  evio,     xavix_evio_cart_state,init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
+CONS( 2003,  evio,      0,        0, xavix_cart_evio,       evio,      xavix_evio_cart_state,     init_xavix,         "Tomy / SSD Company Ltd.", "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
 
 
 // 2 ROM expansion cartridges were available for this, in the form of other robots (the heads acts as cartridges) see takara_daigunder_dx_cart.xml
 // a number of other robots were also available, but those act as controllers and don't plug into the ROM slot (presumably the signal sent is used to determine the character)
-CONS( 2002, tak_daig, 0,           0,  xavix_cart_daig,  daig,     xavix_daig_cart_state,init_xavix,    "Takara / SSD Company LTD",                     "Bakutou Sengen Daigunder DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? maybe IO interrupt?
+CONS( 2002,  tak_daig,  0,        0, xavix_cart_daig,       daig,      xavix_daig_cart_state,     init_xavix,         "Takara / SSD Company Ltd.", "Bakutou Sengen Daigunder DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? maybe IO interrupt?
 
-CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix_cart_gcslottv_state,     init_xavix,    "Takara / Sammy / DCT / SSD Company LTD",       "Gachinko Shoubu! PachisloTV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2002,  gcslottv,  0,        0, xavix_cart_gcslottv,   gcslottv,  xavix_cart_gcslottv_state, init_xavix,         "Takara / Sammy / DCT / SSD Company Ltd.", "Gachinko Shoubu! PachisloTV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
-CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006,  ltv_tam,   0,        0, xavix_i2c_24lc04_tam,  ltv_tam,   xavix_i2c_ltv_tam_state,   init_xavix,         "Bandai / SSD Company Ltd.", "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix_slowenv,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2008,  hikara,    0,        0, xavix_cart_hikara,     hikara,    xavix_hikara_state,        init_xavix_slowenv, "Takara Tomy / SSD Company Ltd.", "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // 東京フレンドパーク2
-CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08_4mb,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
+CONS( 2003,  epo_tfp2,  0,        0, xavix_i2c_24c08_4mb,   epo_tfp2,  xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "Tokyo Friend Park II (Japan)", MACHINE_IMPERFECT_SOUND ) // uses in24lc08b
 
 // 東京フレンドパーク2スペシャル
-CONS( 2005, epo_tp2s,  0,          0,  xavix_4mb,        epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Special! (Japan)", MACHINE_IMPERFECT_SOUND)
+CONS( 2005,  epo_tp2s,  0,        0, xavix_4mb,             epo_tp2p,  xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Tokyo Friend Park II Special! (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
-CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", MACHINE_IMPERFECT_SOUND)
+CONS( 2007,  epo_tp2p,  0,        0, xavix,                 epo_tp2p,  xavix_state,               init_xavix,         "Epoch / SSD Company Ltd.", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // きかんしゃトーマス テレビパソコン
-CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2005,  tvpc_tom,  0,        0, xavix_i2c_24c16_4mb,   tvpc_tom,  xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // ドラえもん テレビパソコン
-CONS( 2003, tvpc_dor,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2003,  tvpc_dor,  0,        0, xavix_i2c_24c16_4mb,   tvpc_tom,  xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // とっとこハム太郎 テレビパソコン
-CONS( 2003, tvpc_ham,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Tottoko Hamutaro (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2003,  tvpc_ham,  0,        0, xavix_i2c_24c16_4mb,   tvpc_tom,  xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "TV-PC Tottoko Hamutaro (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, tvpc_hk,   0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Hello Kitty (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2004,  tvpc_hk,   0,        0, xavix_i2c_24c16_4mb,   tvpc_tom,  xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "TV-PC Hello Kitty (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // TVメールPC mail*cot メルコット
 // has a 74HC541D (maybe keyboard related?)
-CONS( 2004, epo_mail,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV Mail PC mail*cot (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2004,  epo_mail,  0,        0, xavix_i2c_24c16_4mb,   tvpc_tom,  xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Ltd.", "TV Mail PC mail*cot (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
