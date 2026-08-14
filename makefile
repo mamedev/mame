@@ -1603,6 +1603,7 @@ doxygen:
 .PHONY: cppcheck
 
 CPPCHECK_PARAMS  = -Isrc/osd
+CPPCHECK_PARAMS += -Isrc/devices
 CPPCHECK_PARAMS += -Isrc/emu
 CPPCHECK_PARAMS += -Isrc/lib
 CPPCHECK_PARAMS += -Isrc/lib/util
