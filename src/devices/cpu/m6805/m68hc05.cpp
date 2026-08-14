@@ -160,6 +160,7 @@ m68hc05_device::m68hc05_device(
 	, m_port_irq_state(false)
 	, m_irq_line_state(false)
 	, m_irq_latch(0)
+	, m_sccr1(0x00)
 	, m_tcmp_cb(*this)
 	, m_tcap_state(false)
 	, m_tcr(0x00)
@@ -411,6 +412,18 @@ u8 m68hc05_device::timer_r(offs_t offset)
 }
 
 
+u8 m68hc05_device::sccr1_r()
+{
+	return m_sccr1 & 0xd1;
+}
+
+void m68hc05_device::sccr1_w(u8 data)
+{
+	if (BIT(data, 4) && !BIT(m_sccr1, 4))
+		logerror("m68hc05: 9-bit SCI characters selected (SCCR1 M), not supported\n");
+	m_sccr1 = (m_sccr1 & 0x80) | (data & 0x51);
+}
+
 void m68hc05_device::coprst_w(u8 data)
 {
 	LOGCOP("write COPRST=%02x%s\n", data, ((0xaa == data) && (0x55 == m_coprst)) ? ", reset" : "");
@@ -477,6 +490,7 @@ void m68hc05_device::device_start()
 	save_item(NAME(m_trl_buf));
 	save_item(NAME(m_trl_latched));
 
+	save_item(NAME(m_sccr1));
 	// save COP watchdogs
 	save_item(NAME(m_pcop_cnt));
 	save_item(NAME(m_ncop_cnt));
@@ -496,6 +510,9 @@ void m68hc05_device::device_start()
 	m_tsr = 0x00;
 	m_icr = 0x0000;
 	m_ocr = 0x0000;
+
+	// SCI state unaffected by reset
+	m_sccr1 = 0x00;
 
 	// COP watchdog state unaffected by reset
 	m_pcop_cnt = 0;
@@ -696,6 +713,11 @@ void m68hc05_device::add_port_state(std::array<bool, PORT_COUNT> const &ddr)
 	}
 }
 
+void m68hc05_device::add_sci_state()
+{
+	state_add(M68HC05_SCCR1, "SCCR1", m_sccr1).mask(0xd1);
+}
+
 void m68hc05_device::add_timer_state()
 {
 	state_add(M68HC05_TCR, "TCR", m_tcr).mask(0x7f);
@@ -780,7 +802,7 @@ void m68hc05c4_device::c4_map(address_map &map)
 	// 0x000b SPSR
 	// 0x000c SPDR
 	// 0x000d BAUD
-	// 0x000e SCCR1
+	map(0x000e, 0x000e).rw(FUNC(m68hc05c4_device::sccr1_r), FUNC(m68hc05c4_device::sccr1_w));
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
@@ -848,7 +870,7 @@ void m68hc05c8_device::c8_map(address_map &map)
 	// 0x000b SPSR
 	// 0x000c SPDR
 	// 0x000d BAUD
-	// 0x000e SCCR1
+	map(0x000e, 0x000e).rw(FUNC(m68hc05c8_device::sccr1_r), FUNC(m68hc05c8_device::sccr1_w));
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
@@ -888,6 +910,7 @@ void m68hc05c8_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_sci_state();
 }
 
 
@@ -915,7 +938,7 @@ void m68hc705c4a_device::c4a_map(address_map &map)
 	// 0x000b SPSR
 	// 0x000c SPDR
 	// 0x000d BAUD
-	// 0x000e SCCR1
+	map(0x000e, 0x000e).rw(FUNC(m68hc705c4a_device::sccr1_r), FUNC(m68hc705c4a_device::sccr1_w));
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
@@ -1009,7 +1032,7 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	// 0x000b SPSR
 	// 0x000c SPDR
 	// 0x000d BAUD
-	// 0x000e SCCR1
+	map(0x000e, 0x000e).rw(FUNC(m68hc705c8a_device::sccr1_r), FUNC(m68hc705c8a_device::sccr1_w));
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
@@ -1204,7 +1227,7 @@ void m68hc05l9_device::l9_map(address_map &map)
 	// 0x000b minute alarm
 	// 0x000c hour alarm
 	// 0x000d BAUD
-	// 0x000e SCCR1
+	map(0x000e, 0x000e).rw(FUNC(m68hc05l9_device::sccr1_r), FUNC(m68hc05l9_device::sccr1_w));
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
@@ -1277,7 +1300,7 @@ void m68hc05l11_device::l11_map(address_map &map)
 	// 0x000b minute alarm
 	// 0x000c hour alarm
 	// 0x000d BAUD
-	// 0x000e SCCR1
+	map(0x000e, 0x000e).rw(FUNC(m68hc05l11_device::sccr1_r), FUNC(m68hc05l11_device::sccr1_w));
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
