@@ -280,7 +280,27 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 	}
 }
 
+inline void namcos22_renderer::dispatch_scanline_poly(scanline_func callback, int clipverts, vertex_t const *clipv)
+{
+	switch (clipverts)
+	{
+		case 3:
+			render_triangle<4>(m_cliprect, render_delegate(callback, this), clipv[0], clipv[1], clipv[2]);
+			break;
 
+		case 4:
+			render_polygon<4,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+
+		case 5:
+			render_polygon<5,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+
+		case 6:
+			render_polygon<6,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+	}
+}
 
 /*********************************************************************************************/
 
@@ -453,9 +473,9 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	}
 
 	if (m_state.m_is_ss22)
-		render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_poly_ss22, this), clipverts, clipv);
+		dispatch_scanline_poly(&namcos22_renderer::renderscanline_poly_ss22, clipverts, clipv);
 	else
-		render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_poly, this), clipverts, clipv);
+		dispatch_scanline_poly(&namcos22_renderer::renderscanline_poly, clipverts, clipv);
 }
 
 
