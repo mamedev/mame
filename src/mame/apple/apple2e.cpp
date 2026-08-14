@@ -140,6 +140,7 @@ Ctrl+Mode sets up default keyboard macros (most of which use Ctrl+Shift).
 
 #include "apple2video.h"
 #include "apple2common.h"
+#include "mpf3kbd.h"
 #include "prav8ckb.h"
 #include "spectred_kbd.h"
 
@@ -156,6 +157,7 @@ Ctrl+Mode sets up default keyboard macros (most of which use Ctrl+Shift).
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "sound/ay8910.h"
 #include "sound/spkrdev.h"
 
 #include "bus/a2bus/cards.h"
@@ -233,6 +235,7 @@ public:
 		m_a2common(*this, "a2common"),
 		m_cecbanks(*this, "cecexp"),
 		m_ay3600(*this, "ay3600"),
+		m_mpf3_kbd(*this, "mpf3kbd"),
 		m_prav8c_kbd(*this, "kbd"),
 		m_video(*this, A2_VIDEO_TAG),
 		m_a2bus(*this, A2_BUS_TAG),
@@ -271,7 +274,8 @@ public:
 		m_printer_out(*this, "laserprnout"),
 		m_kbdcpu(*this, "kbdcpu"),
 		m_kbdlatch(*this, "kbdlatch"),
-		m_kbdmcu(*this, "kbdmcu")
+		m_kbdmcu(*this, "kbdmcu"),
+		m_psg(*this, "psg")
 	{
 		m_isiic = false;
 		m_isiicplus = false;
@@ -282,6 +286,7 @@ public:
 		m_isace2200 = false;
 		m_ace2200_axxx_bank = false;
 		m_isspectred = false;
+		m_mpf3_altcode = false;
 		m_pal = false;
 		m_cur_floppy = nullptr;
 		m_devsel = 0;
@@ -301,6 +306,7 @@ public:
 	required_device<apple2_common_device> m_a2common;
 	optional_memory_region m_cecbanks;
 	optional_device<ay3600_device> m_ay3600;
+	optional_device<mpf3kbd_device> m_mpf3_kbd;
 	optional_device<prav8ckb_device> m_prav8c_kbd;
 	required_device<a2_video_device> m_video;
 	required_device<a2bus_device> m_a2bus;
@@ -328,6 +334,7 @@ public:
 	optional_device<cpu_device> m_kbdcpu;
 	optional_device<ls259_device> m_kbdlatch;
 	optional_device<mcs48_cpu_device> m_kbdmcu;
+	optional_device<ay8912_device> m_psg;
 
 	// align VBL to the end of active video
 	static constexpr int HPOS_VBL = 40 * 14;
@@ -421,6 +428,7 @@ public:
 	void reset_w(int state);
 	void prav8c_kdata_w(u8 data);
 	void prav8c_kstrb_w(int state);
+	void mpf3_kbdout_w(u8 data);
 	void spectred_kbdout_w(u8 data);
 	u8 memexp_r(offs_t offset);
 	void memexp_w(offs_t offset, u8 data);
@@ -449,7 +457,7 @@ public:
 	void cec(machine_config &config) ATTR_COLD;
 	void cecm(machine_config &config) ATTR_COLD;
 	void cec2000(machine_config &config) ATTR_COLD;
-	void mprof3(machine_config &config) ATTR_COLD;
+	void mpf3(machine_config &config) ATTR_COLD;
 	void apple2e(machine_config &config) ATTR_COLD;
 	void apple2epal(machine_config &config) ATTR_COLD;
 	void apple2c(machine_config &config) ATTR_COLD;
@@ -464,6 +472,7 @@ public:
 	void apple2c_memexp_map(address_map &map) ATTR_COLD;
 	void base_map(address_map &map) ATTR_COLD;
 	void laser128_map(address_map &map) ATTR_COLD;
+	void mpf3_map(address_map &map) ATTR_COLD;
 	void ace500_map(address_map &map) ATTR_COLD;
 	void ace2200_map(address_map &map) ATTR_COLD;
 	void tk3000_keyb_map(address_map &map) ATTR_COLD;
@@ -518,7 +527,9 @@ private:
 	u16 m_ace500rombank;
 
 	bool m_isspectred;
-	u8 m_spectred_kbdout, m_spectred_kbdshift, m_spectred_kbctrl;
+	u8 m_kbdout, m_kbdshift, m_spectred_kbctrl;
+
+	bool m_mpf3_altcode;
 
 	bool m_has_laser_mouse;
 	bool m_laser_fdc_on;
@@ -1116,8 +1127,8 @@ void apple2e_state::machine_start()
 	m_prav8c_kdata = 0;
 	m_prav8c_kstrb = true;
 
-	m_spectred_kbdout = 0xf0;
-	m_spectred_kbdshift = 0;
+	m_kbdout = 0xf0;
+	m_kbdshift = 0;
 	m_spectred_kbctrl = 0;
 
 	// setup save states
@@ -1138,11 +1149,14 @@ void apple2e_state::machine_start()
 		save_item(NAME(m_prav8c_kstrb));
 		save_item(NAME(m_prav8c_c060));
 	}
-	if (m_isspectred)
+	if (m_isspectred || m_mpf3_kbd.found())
 	{
-		save_item(NAME(m_spectred_kbdout));
-		save_item(NAME(m_spectred_kbdshift));
-		save_item(NAME(m_spectred_kbctrl));
+		save_item(NAME(m_kbdout));
+		save_item(NAME(m_kbdshift));
+		if (m_isspectred)
+			save_item(NAME(m_spectred_kbctrl));
+		if (m_mpf3_kbd.found())
+			save_item(NAME(m_mpf3_altcode));
 	}
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
@@ -1468,6 +1482,9 @@ void apple2e_state::reset_w(int state)
 
 			if (m_kbdmcu.found())
 				m_kbdmcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+			if (m_psg.found())
+				m_psg->reset();
 
 			lcrom_update();
 			auxbank_update();
@@ -2123,8 +2140,18 @@ u8 apple2e_state::c000_r(offs_t offset)
 		case 0x1f:  // read 80COL
 			return (m_video->get_80col() ? 0x80 : 0x00) | m_transchar;
 
+		case 0x22:
+			if (m_mpf3_kbd.found())
+				return (m_ace2200_axxx_bank ? 0x80 : 0) | uFloatingBus7;
+			break;
+
+		case 0x25:
+			if (m_mpf3_kbd.found())
+				return (m_sysconfig->read() & 0x40) << 1 | uFloatingBus7;
+			break;
+
 		case 0x26:  // Ace 2x00 DIP switches
-			if (m_isace2200)
+			if (m_isace2200 || m_mpf3_kbd.found())
 				return (m_sysconfig->read() & 0x80) | uFloatingBus7;
 			break;
 
@@ -2139,6 +2166,8 @@ u8 apple2e_state::c000_r(offs_t offset)
 				}
 				return rv;
 			}
+			else if (m_mpf3_kbd.found())
+				return (m_mpf3_altcode ? 0x80 : 0) | uFloatingBus7;
 			break;
 
 		case 0x60: // cassette in, inverted
@@ -2154,6 +2183,8 @@ u8 apple2e_state::c000_r(offs_t offset)
 		case 0x69:
 			if (m_prav8c_kbd.found())
 				return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || m_prav8c_kbd->sw0_r()) ? 0x80 : 0) | (m_prav8c_c060 & 0x40) | (uFloatingBus7 & 0x3f);
+			else if (m_mpf3_kbd.found())
+				return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || m_mpf3_kbd->pb0_r()) ? 0x80 : 0) | uFloatingBus7;
 			else if (m_isspectred)
 				return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || BIT(m_spectred_kbctrl, 0)) ? 0x80 : 0) | uFloatingBus7;
 			else
@@ -2163,6 +2194,8 @@ u8 apple2e_state::c000_r(offs_t offset)
 		case 0x6a:
 			if (m_prav8c_kbd.found())
 				return (((m_gameio->has_sw1() && m_gameio->sw1_r()) || m_prav8c_kbd->sw1_r()) ? 0x80 : 0) | (m_prav8c_c060 & 0x40) | (uFloatingBus7 & 0x3f);
+			else if (m_mpf3_kbd.found())
+				return (((m_gameio->has_sw1() && m_gameio->sw1_r()) || m_mpf3_kbd->pb1_r()) ? 0x80 : 0) | uFloatingBus7;
 			else if (m_isspectred)
 				return (((m_gameio->has_sw1() && m_gameio->sw1_r()) || BIT(m_spectred_kbctrl, 1)) ? 0x80 : 0) | uFloatingBus7;
 			else
@@ -2612,7 +2645,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			if (m_isace2200)
+			if (m_isace2200 || m_mpf3_kbd.found())
 			{
 				if (offset == 0x78)
 				{
@@ -3542,6 +3575,18 @@ void apple2e_state::base_map(address_map &map)
 	m_lcbank[5](0x0d000, 0x1ffff).rom().region("maincpu", 0xd000).w(FUNC(apple2e_state::lc_w));
 }
 
+void apple2e_state::mpf3_map(address_map &map)
+{
+	base_map(map);
+
+	m_4000bank[0](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_ace2200_r), FUNC(apple2e_state::ram4000_w));
+	map(0xc075, 0xc075).r(m_psg, FUNC(ay8912_device::data_r));
+	map(0xc076, 0xc077).w(m_psg, FUNC(ay8912_device::data_address_w));
+
+	//map(0xc090, 0xc093).w(FUNC(apple2e_state::laserprn_w));
+	//map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::franklin_busy_r));
+}
+
 void apple2e_state::apple2c_map(address_map &map)
 {
 	base_map(map);
@@ -3718,30 +3763,51 @@ void apple2e_state::prav8c_kstrb_w(int state)
 	m_prav8c_kstrb = bool(state);
 }
 
+void apple2e_state::mpf3_kbdout_w(u8 data)
+{
+	if (BIT(~m_kbdout & data, 6))
+	{
+		// Latch bit 7 into strobe
+		if (BIT(m_kbdout, 7))
+		{
+			m_transchar = m_kbdshift & 0x7f;
+			m_mpf3_altcode = BIT(m_kbdshift, 7);
+			m_strobe = 0x80;
+		}
+	}
+
+	if (BIT(~m_kbdout & data, 5))
+		m_kbdshift = (m_kbdout & 0x80) | (m_kbdshift >> 1);
+
+	m_anykeydown = BIT(data, 4);
+
+	m_kbdout = data;
+}
+
 void apple2e_state::spectred_kbdout_w(u8 data)
 {
-	if (BIT(data, 7) && !BIT(m_spectred_kbdout, 7))
+	if (BIT(data, 7) && !BIT(m_kbdout, 7))
 	{
-		m_transchar = m_spectred_kbdshift & 0x7f;
+		m_transchar = m_kbdshift & 0x7f;
 		m_strobe = 0x80;
 	}
 
-	if (BIT(data, 4) && !BIT(m_spectred_kbdout, 4))
+	if (BIT(data, 4) && !BIT(m_kbdout, 4))
 	{
-		m_spectred_kbctrl = m_spectred_kbdshift & 0x0f;
+		m_spectred_kbctrl = m_kbdshift & 0x0f;
 		m_anykeydown = BIT(m_spectred_kbctrl, 2);
 		reset_w(!BIT(m_spectred_kbctrl, 3));
 	}
 
 	// Convert serial to parallel
-	if (!BIT(data, 6) && BIT(m_spectred_kbdout, 6))
+	if (!BIT(data, 6) && BIT(m_kbdout, 6))
 	{
-		m_spectred_kbdshift >>= 1;
-		if (!BIT(m_spectred_kbdout, 5))
-			m_spectred_kbdshift |= 0x80;
+		m_kbdshift >>= 1;
+		if (!BIT(m_kbdout, 5))
+			m_kbdshift |= 0x80;
 	}
 
-	m_spectred_kbdout = data;
+	m_kbdout = data;
 }
 
 void apple2e_state::laser128_keybio_map(address_map &map)
@@ -4836,6 +4902,20 @@ static INPUT_PORTS_START( tk3000 )
 	PORT_CONFSETTING(0x40, "DVORAK")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mpf3 )
+	PORT_INCLUDE( apple2_sysconfig_accel )
+
+	PORT_MODIFY("a2_config")
+	PORT_DIPNAME(0x40, 0x40, "40/80 Columns") PORT_DIPLOCATION("U55:1")
+	PORT_DIPSETTING(0x40, "40 columns")
+	PORT_DIPSETTING(0x00, "Reserved")
+	PORT_DIPNAME(0x80, 0x00, "Printer Type") PORT_DIPLOCATION("U55:2")
+	PORT_DIPSETTING(0x00, "Epson/CP-80")
+	PORT_DIPSETTING(0x80, "C. Itoh")
+	// S3: Channel 3 or 4 (NTSC)
+	// S4: 64K or 48K RAM
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( spectred )
 	PORT_INCLUDE( apple2_sysconfig_accel )
 
@@ -5286,11 +5366,24 @@ void apple2e_state::apple2epal(machine_config &config)
 	m_pal = true;
 }
 
-void apple2e_state::mprof3(machine_config &config)
+void apple2e_state::mpf3(machine_config &config)
 {
 	apple2e(config);
-	/* internal ram */
-	m_ram->set_default_size("128K");
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::mpf3_map);
+
+	config.device_remove("ay3600");
+	config.device_remove("repttmr");
+
+	MPF3_KEYBOARD(config, m_mpf3_kbd);
+	m_mpf3_kbd->kbdout_callback().set(FUNC(apple2e_state::mpf3_kbdout_w));
+	m_mpf3_kbd->reset_callback().set(FUNC(apple2e_state::reset_w));
+
+	AY8912(config, m_psg, A2BUS_7M_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.2);
+
+	//CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	//m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	//OUTPUT_LATCH(config, m_printer_out);
+	//m_printer_conn->set_output_latch(*m_printer_out);
 }
 
 void apple2e_state::apple2ee(machine_config &config)
@@ -5858,17 +5951,37 @@ ROM_START(apple2ees)
 	ROM_LOAD( "341-0211-a.f12", 0x000000, 0x000800, CRC(fac15d54) SHA1(abe019de22641b0647e829a1d4745759bdffe86a) )
 ROM_END
 
-ROM_START(mprof3)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "mpf3.chr", 0x0000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
+ROM_START(mpf3)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("rom_video_u20_2732.bin", 0x0000, 0x1000, CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
 	ROM_RELOAD(0x1000, 0x1000)
 
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD ( "mpf3-cd.rom", 0x0000, 0x2000, CRC(5b662e06) SHA1(aa0db775ca78986480829fcc10f00e57629e1a7c))
-	ROM_LOAD ( "mpf3-ef.rom", 0x2000, 0x2000, CRC(2c5e8b92) SHA1(befeb03e04b7c3ef36ef5829948a53880df85e92))
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS(0, "mos13", "MOS 1.3")
+	ROMX_LOAD("rom_cd_u25_mos13_2764.bin", 0x0000, 0x2000, CRC(fccc5c7d) SHA1(3f91af61576d15abeb71e6da39bdf6a29c01100d), ROM_BIOS(0))
+	ROMX_LOAD("rom_ef_u26_mos13_2764.bin", 0x2000, 0x2000, CRC(56afe670) SHA1(d83e109b121066bd529ef5d16ce9c94aaa28e5e3), ROM_BIOS(0))
+	ROMX_LOAD("rom_ab_u24_mos13_2764.bin", 0x4000, 0x2000, CRC(4c3ecb15) SHA1(4a8033ad51b205f01f2b5056d61822391c7548eb), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "rom312", "ROM 3.1.2")
+	ROMX_LOAD("mpf3-cd.u25", 0x0000, 0x2000, CRC(5b662e06) SHA1(aa0db775ca78986480829fcc10f00e57629e1a7c), ROM_BIOS(1))
+	ROMX_LOAD("mpf3-ef.u26", 0x2000, 0x2000, CRC(2c5e8b92) SHA1(befeb03e04b7c3ef36ef5829948a53880df85e92), ROM_BIOS(1))
+	ROMX_LOAD("mpf3-ab.u24", 0x4000, 0x2000, BAD_DUMP CRC(b265a0e0) SHA1(ff05093efa5de9d900f22206004b3cd064fa6a8a), ROM_BIOS(1)) // needs proper dump (hacked from MOS13 AB ROM)
+	ROM_SYSTEM_BIOS(2, "mos11", "MOS 1.1")
+	ROMX_LOAD("rom_cd_u25_mos11_2764.bin", 0x0000, 0x2000, CRC(3d507b48) SHA1(af3e0308396aefb6b633d653066bfdb2737ad6f4), ROM_BIOS(2))
+	ROMX_LOAD("rom_ef_u26_mos11_2764.bin", 0x2000, 0x2000, CRC(71b9783d) SHA1(5617b2a5ffe167aa4bf43dd7a24672b362a737ba), ROM_BIOS(2))
+	ROMX_LOAD("rom_ab_u24_mos11_2764.bin", 0x4000, 0x2000, CRC(304b62e0) SHA1(72cf1c86c048d554f9ae236e17e6f6dcb88d4de3), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "apple2e", "Apple IIe")
+	ROMX_LOAD("rom_cd_u25_apple2e_2764.bin", 0x0000, 0x2000, CRC(6a54e1aa) SHA1(9abe9e736bf77b4c73f30744ae63493d505a08cb), ROM_BIOS(3))
+	ROMX_LOAD("rom_ef_u26_apple2e_2764.bin", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54), ROM_BIOS(3))
 
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real mprof keyboard ROM
+	ROM_REGION(0x200, "rompal", 0)
+	ROM_LOAD("pal14l4cn_u29.bin", 0x000, 0x200, CRC(c09ee203) SHA1(1bbdef7e032b6bf8cb89a7507dacdb86db37f650))
+
+	ROM_REGION(0x400, "rampal", 0)
+	ROM_LOAD("pal14l4cn_u30.bin", 0x000, 0x400, CRC(6d914281) SHA1(17bff890159a10d001e81f20167bfd236273e554))
+
+	ROM_REGION(0x400, "fdd", 0)
+	ROM_LOAD("dm74s274_u10_fdd.bin", 0x000, 0x200, CRC(cf528c37) SHA1(93284c284971d80ed90a6d843759f9650d347e03))
+	ROM_LOAD("dm74s274_u7_fdd.bin", 0x200, 0x200, CRC(c7e54371) SHA1(ec1b658cce2949c055973e774357bd8b891983c0))
 ROM_END
 
 ROM_START(apple2ee)
@@ -6556,7 +6669,7 @@ COMP( 1983, apple2ede,  apple2e, 0,      apple2epal,      apple2ede,  apple2e_st
 COMP( 1983, apple2ese,  apple2e, 0,      apple2epal,      apple2ese,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2efr,  apple2e, 0,      apple2epal,      apple2efr,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2ees,  apple2e, 0,      apple2epal,      apple2ees,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, mprof3,     apple2e, 0,      mprof3,          apple2e,    apple2e_state, empty_init,    "Multitech",                         "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, mpf3,       apple2e, 0,      mpf3,            mpf3,       apple2e_state, empty_init,    "Multitech Industrial",              "MicroProfessor MPF-III", MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,        apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal,     apple2euk,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2eede, apple2e, 0,      apple2eepal,     apple2ede,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced, Germany)", MACHINE_SUPPORTS_SAVE )
