@@ -453,7 +453,7 @@ void telestrat_state::machine_start()
 {
 	machine_start_common();
 	m_fdc_irq = m_fdc_drq = m_fdc_hld = false;
-	m_acia_irq = false;
+	m_acia_irq = m_via2_irq = false;
 
 	save_item(NAME(m_port_314));
 	save_item(NAME(m_via2_a));
