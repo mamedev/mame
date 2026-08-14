@@ -21,11 +21,8 @@
 *   to the iconic slingshotting in early titles such as Mushihimesama + Futari where you go from
 *   sections of slowdown right back to regular speed as bullets leave the screen.
 *
-* - There seems to be a bug in the ROM read code in cv1k titles that is present in all of them.
-*   This code when ROM reads are queued for whatever reason doesn't check if a read or write
-*   is done and always ends up doing an expensive cache flush + invalidate that isn't required.
-*   The processor ends up churning a bunch of cycles on uncached fetches and then also has to repopulate
-*   the cache.
+* - Graphics contents are stored compressed in the ROM and must be pulled into SDRAM, uncompressed,
+*   and flushed to SDRAM before upload to the blitter.
 *
 *   This requires looping 1024 times over every cache entry from an uncached aliased mapping in SDRAM
 *   which comes with hefty access penalties due to all the instruction fetches + some data fetches.
@@ -320,10 +317,12 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 
 	uint32_t bcr2_val = (m_bcr2 >> (area * 2)) & 0x3;
 
-	return SH7709S_CACHE_LINE_SIZE >> bcr2_val;
+	return SH7709S_CACHE_LINE_SIZE >> (bcr2_val - 1);
 }
 
-#define CACHE_MISS_STALL (1) // Miss detection in 1 cpu cycle, the rest of the ops (wb buffer movement, etc..) happen in the background
+// Unconfirmed behavior but the math works out based on comparison of misses in a frame to pcb footage
+// This covers a pipeline where we go from miss detect -> victim select -> address to BSC
+#define CACHE_MISS_STALL (3)
 
 static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
 {
@@ -342,7 +341,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	uint64_t elapsed_cycles = total_cycles() - m_last_op_cycle_count;
 	uint32_t cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
 	uint32_t bank_read = sdram_bank(address);
-	uint32_t bus_penalty = 0;
+	uint32_t bus_penalty = 1; // CPU -> BSC sync cost
 
 	// SDRAM timing based on SH7709S documentation
 	// These are copied from the timing charts. These are all in bus cycles
@@ -376,22 +375,31 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// The remaining burst words keep transferring on the bus after that and
 	// must block any subsequent bus access; that's tracked separately below
 	// via m_burst_continuation_remaining_cycles.
+	// Unconfirmed : precharge likely not tracked per bank on this cpu, its possible you can
+	// have multiple banks active in bank active mode but a tpc holds up some internal engine state
+	// This is only based on observation comparing gameplay footage to cache miss/eviction count
+	// in a good bit of sampled frames
 
 	if (is_sdram_region(address))
-		bus_penalty = 1 + mcr_rcd() + get_wcr2_timing(address);
+	{
+		if (is_cacheable(address) || !write)
+			bus_penalty += 1 + mcr_rcd() + get_wcr2_timing(address);
+		else
+			bus_penalty += 1 + mcr_rcd() + mcr_trwl();
+	}
 	else
 	{
 		if (is_cacheable(address))
-			bus_penalty = (2 + get_wcr2_timing(address)) * cache_line_fetch_count(address);
+			bus_penalty += (2 + get_wcr2_timing(address)) * cache_line_fetch_count(address);
 		else
-			bus_penalty = 2 + get_wcr2_timing(address);
+			bus_penalty += 2 + get_wcr2_timing(address);
 	}
 
 	// add wcr1 on area swap, because this fetch is a cache miss read wcr1 doesnt apply from write->read swap
 	// only handle the case where uncached write follows a read, writeback handles wcr1 after read fetch below
 	if (area != m_last_area_accessed || (!m_last_area_accessed_was_write && !is_cacheable(address) && write))
 	{
-		uint32_t wcr1_idle_cycles = get_wcr1_timing(m_last_area_accessed) * 2;
+		uint32_t wcr1_idle_cycles = get_wcr1_timing(area) * 2;
 		uint64_t wcr1_idle_cycles_left = remaining_cycles(elapsed_cycles, wcr1_idle_cycles);
 		cpu_penalty += wcr1_idle_cycles_left;
 		elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, wcr1_idle_cycles);
@@ -403,22 +411,13 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	m_last_area_accessed_was_write = (!is_cacheable(address) && write);
 
 	// The remaining burst words of a prior cache fill still occupy the bus, so
-	// any subsequent access must wait for them to drain regardless of bank.
+	// any subsequent access must wait for them to drain
 	if (m_burst_continuation_remaining_cycles > 0)
 	{
 		uint64_t burst_cycles_left = remaining_cycles(elapsed_cycles, m_burst_continuation_remaining_cycles);
 		cpu_penalty += burst_cycles_left;
 		elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, m_burst_continuation_remaining_cycles);
 		m_burst_continuation_remaining_cycles = 0;
-	}
-
-	// The burst bank precharge only starts after the burst drains, so measure its
-	// remaining cycles from burst completion instead of from the access start.
-	if (is_sdram_region(address) && bank_read == m_last_sdram_bank)
-	{
-		uint64_t precharge_cycles_left = remaining_cycles(elapsed_cycles, (mcr_tpc() * 2));
-		cpu_penalty += precharge_cycles_left;
-		elapsed_cycles -= std::min<uint64_t>(precharge_cycles_left, (mcr_tpc() * 2));
 	}
 
 	// We hit another bus operation before a writeback eviction finished, calculate remaining stall time
@@ -439,22 +438,19 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	{
 		if (is_sdram_region(m_wb_address))
 		{
-			uint32_t bank_write = sdram_bank(m_wb_address);
-			// no tpc wait if there's no bank conflict
-			if (bank_read == bank_write)
-				m_wb_active_cycles += mcr_tpc() * 2;
+			// stall waiting on read precharge close
+			m_wb_active_cycles += mcr_tpc() * 2;
 			// wait on burst completion of the read
 			m_wb_active_cycles += 3 * 2;
 			// Write back folded the cost in for the burst wait
 			m_burst_continuation_remaining_cycles = 0;
 			// since this is a dirty cache line eviction we always add wcr1 as it's handled after the miss fetch read
 			// and we're switching from read->write
-			m_wb_active_cycles += (1 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(3)) * 2;
-			m_last_sdram_bank = bank_write;
+			m_wb_active_cycles += (2 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(area) + mcr_tpc()) * 2;
 		}
 		else
 		{
-			m_wb_active_cycles += get_wcr1_timing(3) * 2;
+			m_wb_active_cycles += get_wcr1_timing(area) * 2;
 			m_wb_active_cycles += ((2 + get_wcr2_timing(m_wb_address)) * cache_line_fetch_count(m_wb_address)) * 2;
 		}
 
@@ -463,7 +459,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	}
 	// Account for the burst continuation and read close after the critical word lands, writebacks include the cost in the background cycles if there is a conflict
 	else if (is_sdram_region(address) && is_cacheable(address))
-		m_burst_continuation_remaining_cycles = 3 * 2;
+		m_burst_continuation_remaining_cycles = (3 + mcr_tpc()) * 2;
 
 	return cpu_penalty + (bus_penalty * 2);
 }
@@ -699,7 +695,7 @@ void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// BFS $AC002A66
 		// ADD #$10, R1
 		m_sh2_state->icount -= (2 /*fetches*/ * 2 /*bus cycle convert*/ * 1024 /*loop iterations*/) *
-			(1 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
+			(2 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
 #endif
 	}
 	COMBINE_DATA(&m_ccr);
@@ -739,8 +735,7 @@ void sh7709s_device::cache_address_array_w(offs_t offset, uint32_t data, uint32_
 			uint32_t wb_address = m_cache[entry_block][way].tag * SH7709S_CACHE_LINE_SIZE;
 			m_cache[entry_block][way].dirty = 0;
 			// Always add wcr1 timing here, accesses to the cache address mappings have to be done via instruction from an uncached region
-			m_sh2_state->icount -= (1 + mcr_rcd() + 4 + mcr_trwl() + mcr_tpc() + get_wcr1_timing(3)) * 2;
-			// Followup access is likely to area swap as well so those will also need to pay the wait state cost in wcr1 on the instruction fetch
+			m_sh2_state->icount -= (2 + mcr_rcd() + 4 + mcr_trwl() + mcr_tpc() + get_wcr1_timing(3)) * 2;
 			m_last_area_accessed = get_area(wb_address);
 			LOG("Flushing dirty cache entry idx: %u\n", cache_entry_index);
 		}
