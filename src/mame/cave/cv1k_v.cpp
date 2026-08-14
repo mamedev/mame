@@ -884,7 +884,7 @@ u32 cv1k_blitter_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 	if ((m_prev_screen_height != curr_height) || (m_prev_screen_width != curr_width))
 	{
-		screen.configure(curr_width, curr_height, curr_visarea, screen.refresh_attoseconds());
+		screen.configure(curr_width, curr_height, curr_visarea, screen.frame_period());
 		m_prev_screen_height = curr_height;
 		m_prev_screen_width = curr_width;
 	}
