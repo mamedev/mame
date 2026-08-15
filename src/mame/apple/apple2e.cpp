@@ -1102,10 +1102,11 @@ void apple2e_state::machine_start()
 		}
 	}
 
-	if (m_has_laser_mouse || m_isace500 || m_isace2200)
+	if (m_printer_out.found())
 	{
 		m_strobe_timer = timer_alloc(FUNC(apple2e_state::update_laserprn_strobe), this);
 		m_next_strobe = 1U;
+		m_strobe_timer->adjust(attotime::zero); // make sure the line goes high
 	}
 
 	m_ace_cnxx_bank = false;
@@ -3583,8 +3584,9 @@ void apple2e_state::mpf3_map(address_map &map)
 	map(0xc075, 0xc075).r(m_psg, FUNC(ay8912_device::data_r));
 	map(0xc076, 0xc077).w(m_psg, FUNC(ay8912_device::data_address_w));
 
-	//map(0xc090, 0xc093).w(FUNC(apple2e_state::laserprn_w));
-	//map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::franklin_busy_r));
+	map(0xc090, 0xc093).w(FUNC(apple2e_state::laserprn_w));
+	m_c100bank[0](0xc100, 0xc1ff).rom().region("maincpu", 0).nopw();
+	m_c100bank[0](0xc1c1, 0xc1c1).r(FUNC(apple2e_state::franklin_busy_r));
 }
 
 void apple2e_state::apple2c_map(address_map &map)
@@ -5380,10 +5382,12 @@ void apple2e_state::mpf3(machine_config &config)
 
 	AY8912(config, m_psg, A2BUS_7M_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	//CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
-	//m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
-	//OUTPUT_LATCH(config, m_printer_out);
-	//m_printer_conn->set_output_latch(*m_printer_out);
+	config.device_remove("sl1");
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
 }
 
 void apple2e_state::apple2ee(machine_config &config)
@@ -5969,9 +5973,10 @@ ROM_START(mpf3)
 	ROMX_LOAD("rom_cd_u25_mos11_2764.bin", 0x0000, 0x2000, CRC(3d507b48) SHA1(af3e0308396aefb6b633d653066bfdb2737ad6f4), ROM_BIOS(2))
 	ROMX_LOAD("rom_ef_u26_mos11_2764.bin", 0x2000, 0x2000, CRC(71b9783d) SHA1(5617b2a5ffe167aa4bf43dd7a24672b362a737ba), ROM_BIOS(2))
 	ROMX_LOAD("rom_ab_u24_mos11_2764.bin", 0x4000, 0x2000, CRC(304b62e0) SHA1(72cf1c86c048d554f9ae236e17e6f6dcb88d4de3), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "apple2e", "Apple IIe")
+	ROM_SYSTEM_BIOS(3, "apple2e", "Apple IIe firmware")
 	ROMX_LOAD("rom_cd_u25_apple2e_2764.bin", 0x0000, 0x2000, CRC(6a54e1aa) SHA1(9abe9e736bf77b4c73f30744ae63493d505a08cb), ROM_BIOS(3))
 	ROMX_LOAD("rom_ef_u26_apple2e_2764.bin", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54), ROM_BIOS(3))
+	ROMX_LOAD("rom_ab_u24_mos13_2764.bin", 0x4000, 0x2000, CRC(4c3ecb15) SHA1(4a8033ad51b205f01f2b5056d61822391c7548eb), ROM_BIOS(3))
 
 	ROM_REGION(0x200, "rompal", 0)
 	ROM_LOAD("pal14l4cn_u29.bin", 0x000, 0x200, CRC(c09ee203) SHA1(1bbdef7e032b6bf8cb89a7507dacdb86db37f650))
@@ -6669,7 +6674,7 @@ COMP( 1983, apple2ede,  apple2e, 0,      apple2epal,      apple2ede,  apple2e_st
 COMP( 1983, apple2ese,  apple2e, 0,      apple2epal,      apple2ese,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2efr,  apple2e, 0,      apple2epal,      apple2efr,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2ees,  apple2e, 0,      apple2epal,      apple2ees,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, mpf3,       apple2e, 0,      mpf3,            mpf3,       apple2e_state, empty_init,    "Multitech Industrial",              "MicroProfessor MPF-III", MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, mpf3,       apple2e, 0,      mpf3,            mpf3,       apple2e_state, empty_init,    "Multitech Industrial",              "MicroProfessor MPF-III", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,        apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal,     apple2euk,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2eede, apple2e, 0,      apple2eepal,     apple2ede,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced, Germany)", MACHINE_SUPPORTS_SAVE )
