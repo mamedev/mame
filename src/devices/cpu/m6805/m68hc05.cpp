@@ -948,8 +948,7 @@ void m68hc05c4_device::c4_map(address_map &map)
 	map(0x0100, 0x10ff).rom(); // user ROM
 	// 0x1100-0x1eff unused
 	map(0x1f00, 0x1fef).rom(); // self-check
-	// 0x1ff0-0x1ff3 unused
-	map(0x1ff4, 0x1fff).rom(); // user vectors
+	map(0x1ff0, 0x1fff).rom(); // user vectors
 }
 
 
@@ -1016,8 +1015,7 @@ void m68hc05c8_device::c8_map(address_map &map)
 	map(0x0050, 0x00ff).ram(); // RAM/stack
 	map(0x0100, 0x1eff).rom(); // user ROM
 	map(0x1f00, 0x1fef).rom(); // self-check
-	// 0x1ff0-0x1ff3 unused
-	map(0x1ff4, 0x1fff).rom(); // user vectors
+	map(0x1ff0, 0x1fff).rom(); // user vectors
 }
 
 
