@@ -56,8 +56,6 @@ public:
 	void scsi0_irq(int state) { set_irq_line<12>(state); }
 	void scsi0_drq(int state);
 
-	void fdc_drq(int state);
-
 protected:
 	// device_t implementattion
 	virtual void device_reset() override ATTR_COLD;
@@ -94,15 +92,12 @@ protected:
 	devcb_read32 read_codec;
 	devcb_write32 write_codec;
 
-	devcb_read8 read_fdc_dma;
-	devcb_write8 write_fdc_dma;
-
 	devcb_read32 read_iobus_a, read_iobus_b, read_iobus_c, read_iobus_d;
 	devcb_write32 write_iobus_a, write_iobus_b, write_iobus_c, write_iobus_d;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via1;
-	required_device<applefdintf_device> m_fdc;
+	required_device<swim3_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<z80scc_device> m_scc;
 	required_device<dbdma_device> m_dma_scsi0, m_dma_floppy, m_dma_sccatx, m_dma_sccarx;
@@ -114,8 +109,8 @@ private:
 
 	u8 via_in_a();
 	u8 via_in_b();
-	void via_out_a(u8 data);
 	void via_out_b(u8 data);
+	void hdsel_w(int hdsel);
 	void via_sync();
 	void field_interrupts();
 	void via_out_cb2(int state);

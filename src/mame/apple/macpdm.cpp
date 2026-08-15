@@ -1064,8 +1064,22 @@ void macpdm_state::dma_floppy_step()
 
 	if (m_dma_floppy_ctrl & 0x40)
 	{
-		fatalerror("floppy dma write\n");
-
+		while (m_floppy_drq)
+		{
+			u8 r = m_maincpu->space().read_byte(m_dma_floppy_adr + m_dma_floppy_offset);
+			m_fdc->dma_w(r);
+			m_dma_floppy_offset++;
+			m_dma_floppy_byte_count--;
+			LOGMASKED(LOG_DMA, "dma_r %03x, %02x\n", m_dma_floppy_offset, r);
+			if (m_dma_floppy_byte_count == 0)
+			{
+				m_dma_floppy_ctrl &= ~0x02;
+				m_dma_floppy_ctrl |= 0x80;
+				LOGMASKED(LOG_DMA, "dma floppy done\n");
+				// todo irq dma
+				break;
+			}
+		}
 	}
 	else
 	{
@@ -1370,7 +1384,7 @@ void macpdm_state::pmac6100(machine_config &config)
 	// 6100 with the NuBus adapter has one slot, slot $E
 	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
 
-	MACADB(config, m_macadb, IO_CLOCK/2);
+	MACADB(config, m_macadb, IO_CLOCK / 2);
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->zero_default_pram();                    // the default PRAM that's OK for 68k is bad for PowerMacs
 	m_cuda->set_default_bios_tag("341s0060");

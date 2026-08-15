@@ -22,7 +22,6 @@
 #include "emu.h"
 #include "heathrow.h"
 
-#include "bus/ata/atapicdr.h"
 #include "bus/rs232/rs232.h"
 #include "formats/ap_dsk35.h"
 
@@ -34,6 +33,7 @@
 
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
+static constexpr u32 C31M = (C15M * 2);
 
 static constexpr u32 DMA_IRQ_MASK = 0x000007ff;
 
@@ -128,7 +128,6 @@ void macio_device::device_add_mconfig(machine_config &config)
 	R65NC22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(macio_device::via_in_a));
 	m_via1->readpb_handler().set(FUNC(macio_device::via_in_b));
-	m_via1->writepa_handler().set(FUNC(macio_device::via_out_a));
 	m_via1->writepb_handler().set(FUNC(macio_device::via_out_b));
 	m_via1->cb2_handler().set(FUNC(macio_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(macio_device::set_irq_line<18>));
@@ -165,9 +164,14 @@ void macio_device::device_add_mconfig(machine_config &config)
 	m_dma_audio_in->set_width(4);
 	m_dma_audio_in->irq_callback().set(FUNC(macio_device::set_irq_line<9>));
 
-	SWIM3(config, m_fdc, C15M);
+	SWIM3(config, m_fdc, C31M);
 	m_fdc->devsel_cb().set(FUNC(macio_device::devsel_w));
 	m_fdc->phases_cb().set(FUNC(macio_device::phases_w));
+	m_fdc->hdsel_cb().set(FUNC(macio_device::hdsel_w));
+	m_fdc->irq_cb().set(FUNC(macio_device::set_irq_line<19>));
+	m_fdc->drq_cb().set(m_dma_floppy, FUNC(dbdma_device::drq_w));
+	m_dma_floppy->dma_r().set(m_fdc, FUNC(swim3_device::dma_r));
+	m_dma_floppy->dma_w().set(m_fdc, FUNC(swim3_device::dma_w));
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
@@ -233,8 +237,6 @@ void ohare_device::device_add_mconfig(machine_config &config)
 	m_dma_ata0->dma_w().set(m_ata[0], FUNC(ata_interface_device::write_dma));
 
 	ATA_INTERFACE(config, m_ata[1]).options(ata_devices, nullptr, nullptr, false);
-	m_ata[1]->slot(0).set_option_machine_config("cdrom", [](device_t *device)
-			{ downcast<atapi_cdrom_device &>(*device).set_is_ready(true); });
 	m_ata[1]->irq_handler().set(FUNC(macio_device::set_irq_line<14>));
 	m_ata[1]->dmarq_handler().set(FUNC(ohare_device::ata_dmarq<1>));
 	m_dma_ata1->dma_r().set(m_ata[1], FUNC(ata_interface_device::read_dma));
@@ -259,8 +261,6 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	read_pb3(*this, 0),
 	read_codec(*this, 0),
 	write_codec(*this),
-	read_fdc_dma(*this, 0),
-	write_fdc_dma(*this),
 	read_iobus_a(*this, 0),
 	read_iobus_b(*this, 0),
 	read_iobus_c(*this, 0),
@@ -439,9 +439,8 @@ void macio_device::via_out_cb2(int state)
 	write_cb2(state & 1);
 }
 
-void macio_device::via_out_a(u8 data)
+void macio_device::hdsel_w(int hdsel)
 {
-	int hdsel = BIT(data, 5);
 	if (hdsel != m_hdsel)
 	{
 		if (m_cur_floppy)
@@ -741,21 +740,6 @@ u8 macio_device::fdc_r(offs_t offset)
 void macio_device::fdc_w(offs_t offset, u8 data)
 {
 	m_fdc->write(offset >> 4, data);
-}
-
-void macio_device::fdc_drq(int state)
-{
-	if (state)
-	{
-		if (m_dma_floppy->is_to_memory())
-		{
-			m_dma_floppy->dma_write(0, read_fdc_dma(0));
-		}
-		else
-		{
-			write_fdc_dma(0, m_dma_floppy->dma_read(0));
-		}
-	}
 }
 
 u16 macio_device::scc_r(offs_t offset)

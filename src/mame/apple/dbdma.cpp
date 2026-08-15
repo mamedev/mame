@@ -327,11 +327,11 @@ void dbdma_device::step_program()
 					break;
 
 				case 2:
-					m_xfer_word = m_pci_memory->read_word(m_address);
+					m_xfer_word = m_pci_memory->read_word_unaligned(m_address);
 					break;
 
 				case 4:
-					m_xfer_word = m_pci_memory->read_dword(m_address);
+					m_xfer_word = m_pci_memory->read_dword_unaligned(m_address);
 					break;
 			}
 			m_address += m_width;
@@ -348,11 +348,11 @@ void dbdma_device::step_program()
 					break;
 
 				case 2:
-					m_pci_memory->write_word(m_address, m_xfer_word);
+					m_pci_memory->write_word_unaligned(m_address, m_xfer_word);
 					break;
 
 				case 4:
-					m_pci_memory->write_dword(m_address, m_xfer_word);
+					m_pci_memory->write_dword_unaligned(m_address, m_xfer_word);
 					break;
 			}
 			m_address += m_width;
