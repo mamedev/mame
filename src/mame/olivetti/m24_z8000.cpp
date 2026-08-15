@@ -46,6 +46,7 @@ void m24_z8000_device::z8000_prog(address_map &map)
 	map(0x040000, 0x043fff).rom().region("z8000", 0);
 	map(0x050000, 0x053fff).rom().region("z8000", 0);
 	map(0x070000, 0x073fff).rom().region("z8000", 0);
+	map(0x7f0000, 0x7fffff).r(FUNC(m24_z8000_device::segment_r));
 	// TODO: segments 0x10 and higher are trapped
 }
 
@@ -55,6 +56,7 @@ void m24_z8000_device::z8000_data(address_map &map)
 
 	map(0x040000, 0x043fff).rom().region("z8000", 0);
 	map(0x070000, 0x073fff).rom().region("z8000", 0);
+	map(0x7f0000, 0x7fffff).r(FUNC(m24_z8000_device::segment_r));
 	// TODO: segments 0x10 and higher are trapped
 }
 
@@ -77,6 +79,7 @@ void m24_z8000_device::device_add_mconfig(machine_config &config)
 	m_z8000->set_addrmap(AS_IO, &m24_z8000_device::z8000_io);
 	m_z8000->nviack().set(FUNC(m24_z8000_device::nviack_r));
 	m_z8000->viack().set(FUNC(m24_z8000_device::viack_r));
+	m_z8000->segtack().set(FUNC(m24_z8000_device::segtack_r));
 	m_z8000->mo().set(FUNC(m24_z8000_device::mo_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253"));
@@ -187,6 +190,19 @@ uint16_t m24_z8000_device::viack_r()
 	return m_pic->acknowledge() << 1;
 }
 
+uint16_t m24_z8000_device::segment_r()
+{
+	if (!machine().side_effects_disabled())
+		m_z8000->set_input_line(z8001_device::SEGT_LINE, ASSERT_LINE);
+
+	return 0xffff;
+}
+
+uint16_t m24_z8000_device::segtack_r()
+{
+	m_z8000->set_input_line(z8001_device::SEGT_LINE, CLEAR_LINE);
+	return 0xffff;
+}
 uint8_t m24_z8000_device::handshake_r()
 {
 	return 0;
