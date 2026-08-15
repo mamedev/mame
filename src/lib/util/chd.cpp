@@ -1189,16 +1189,11 @@ std::error_condition chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 	if (rawentry == 0)
 	{
 		// first make sure we need to allocate it
-		bool all_zeros = true;
-		const auto *scan = reinterpret_cast<const uint32_t *>(buffer);
-		for (uint32_t index = 0; index < m_hunkbytes / 4; index++)
-		{
-			if (scan[index] != 0)
-			{
-				all_zeros = false;
-				break;
-			}
-		}
+		const auto *scan = static_cast<const uint8_t *>(buffer);
+		const bool all_zeros = std::all_of(
+				scan,
+				scan + m_hunkbytes,
+				[] (uint8_t value) { return value == 0; });
 
 		// if it's all zeros, do nothing more
 		if (all_zeros)
@@ -1290,6 +1285,9 @@ std::error_condition chd_file::write_units(uint64_t unitnum, const void *buffer,
 
 std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 {
+	if (!bytes)
+		return std::error_condition();
+	
 	// iterate over hunks
 	uint32_t const first_hunk = offset / m_hunkbytes;
 	uint32_t const last_hunk = (offset + bytes - 1) / m_hunkbytes;
@@ -1343,6 +1341,9 @@ std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_
 
 std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t bytes)
 {
+	if (!bytes)
+		return std::error_condition();
+	
 	// iterate over hunks
 	uint32_t const first_hunk = offset / m_hunkbytes;
 	uint32_t const last_hunk = (offset + bytes - 1) / m_hunkbytes;
@@ -2018,8 +2019,13 @@ void chd_file::parse_v5_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 	m_mapoffset = get_u64be(&rawheader[40]);
 	m_metaoffset = get_u64be(&rawheader[48]);
 	m_hunkbytes = get_u32be(&rawheader[56]);
-	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitbytes = get_u32be(&rawheader[60]);
+
+	// hunk and unit sizes must be non-zero before calculating counts
+	if (UNEXPECTED(!m_hunkbytes || !m_unitbytes))
+		throw std::error_condition(error::INVALID_FILE);
+
+	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
 
 	// determine compression
@@ -2099,7 +2105,7 @@ std::error_condition chd_file::compress_v5_map()
 			else if (curcomp == COMPRESSION_PARENT)
 			{
 				// promote parent block references to more compact forms
-				uint32_t refunit = get_u48be(&m_rawmap[hunknum * 12 + 4]);
+				uint64_t const refunit = get_u48be(&m_rawmap[hunknum * 12 + 4]);
 				if (refunit == mulu_32x32(hunknum, m_hunkbytes) / m_unitbytes)
 					curcomp = COMPRESSION_PARENT_SELF;
 				else if (refunit == last_parent)
@@ -2431,8 +2437,8 @@ std::error_condition chd_file::create_common()
 		if (UNEXPECTED(m_parent && m_parent->version() < 3))
 			throw std::error_condition(error::UNSUPPORTED_VERSION);
 
-		// must be an even number of units per hunk
-		if (UNEXPECTED(m_hunkbytes % m_unitbytes != 0))
+		// must have valid sizes and a whole number of units per hunk
+		if (UNEXPECTED(!m_hunkbytes || !m_unitbytes || (m_hunkbytes % m_unitbytes != 0)))
 			throw std::error_condition(std::errc::invalid_argument);
 		if (UNEXPECTED(m_parent && m_unitbytes != m_parent->unit_bytes()))
 			throw std::error_condition(std::errc::invalid_argument);
@@ -3063,7 +3069,7 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			for (uint32_t unit = 0; unit < units; unit++)
 			{
 				if (m_parent_map.find(item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1) == hashmap::NOT_FOUND)
-					m_parent_map.add(item.m_hunknum * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
+					m_parent_map.add(uint64_t(item.m_hunknum) * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
 			}
 		}
 		else if (!compressed())
