@@ -29,7 +29,7 @@ protected:
 	virtual void device_clock_changed() override { reinit(); }
 
 	TIMER_CALLBACK_MEMBER(clock_init);
-	TIMER_CALLBACK_MEMBER(clock_tick);
+	template<bool High> TIMER_CALLBACK_MEMBER(clock_tick);
 
 private:
 	void reinit();
@@ -40,11 +40,10 @@ private:
 	double m_duty;
 	attotime m_period;
 	attotime m_pw;
-	attotime m_thigh;
-	attotime m_tlow;
 
 	emu_timer *m_timer_init;
-	emu_timer *m_timer_tick;
+	emu_timer *m_timer_tick_low;
+	emu_timer *m_timer_tick_high;
 
 	devcb_write_line m_signal_handler;
 };

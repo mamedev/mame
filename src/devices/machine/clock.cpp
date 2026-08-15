@@ -27,7 +27,8 @@ clock_device::clock_device(const machine_config &mconfig, const char *tag, devic
 	m_period(attotime::never),
 	m_pw(attotime::never),
 	m_timer_init(nullptr),
-	m_timer_tick(nullptr),
+	m_timer_tick_low(nullptr),
+	m_timer_tick_high(nullptr),
 	m_signal_handler(*this)
 {
 }
@@ -39,11 +40,10 @@ void clock_device::device_start()
 	save_item(NAME(m_duty));
 	save_item(NAME(m_period));
 	save_item(NAME(m_pw));
-	save_item(NAME(m_thigh));
-	save_item(NAME(m_tlow));
 
 	m_timer_init = timer_alloc(FUNC(clock_device::clock_init), this);
-	m_timer_tick = timer_alloc(FUNC(clock_device::clock_tick), this);
+	m_timer_tick_low  = timer_alloc(FUNC(clock_device::clock_tick<false>), this);
+	m_timer_tick_high = timer_alloc(FUNC(clock_device::clock_tick<true>), this);
 	reinit();
 }
 
@@ -67,12 +67,14 @@ void clock_device::output()
 
 TIMER_CALLBACK_MEMBER(clock_device::clock_init)
 {
+	attotime thigh, tlow;
 	attotime period = (m_clock > 0) ? attotime::from_hz(m_clock) : m_period;
 	assert(!period.is_zero());
 
 	if (period.is_never())
 	{
-		m_timer_tick->adjust(attotime::never);
+		m_timer_tick_low->adjust(attotime::never);
+		m_timer_tick_high->adjust(attotime::never);
 		return;
 	}
 
@@ -83,49 +85,57 @@ TIMER_CALLBACK_MEMBER(clock_device::clock_init)
 		if (pw > period)
 			pw = period;
 
-		m_thigh = pw;
-		m_tlow = period - pw;
+		thigh = pw;
+		tlow = period - pw;
 	}
 	else
 	{
 		// set timing via duty cycle
 		if (m_duty == 0.5)
 		{
-			m_thigh = period / 2;
-			m_tlow = m_thigh;
+			thigh = period / 2;
+			tlow = thigh;
 		}
 		else if (m_duty == 0.0)
 		{
-			m_thigh = attotime::zero;
-			m_tlow = period;
+			thigh = attotime::zero;
+			tlow = period;
 		}
 		else if (m_duty == 1.0)
 		{
-			m_thigh = period;
-			m_tlow = attotime::zero;
+			thigh = period;
+			tlow = attotime::zero;
 		}
 		else
 		{
 			double p = period.as_double();
-			m_thigh = attotime::from_double(m_duty * p);
-			m_tlow = attotime::from_double((1.0 - m_duty) * p);
+			thigh = attotime::from_double(m_duty * p);
+			tlow = attotime::from_double((1.0 - m_duty) * p);
 		}
 	}
 
-	attotime next = m_signal ? m_thigh : m_tlow;
-	if (next < m_timer_tick->remaining())
-		m_timer_tick->adjust(next);
+	attotime tcycle = thigh + tlow;
+	if (m_signal)
+	{
+		m_timer_tick_high->adjust(attotime::zero, 0, tcycle);
+		m_timer_tick_low->adjust(thigh, 0, tcycle);
+	}
+	else
+	{
+		m_timer_tick_low->adjust(attotime::zero, 0, tcycle);
+		m_timer_tick_high->adjust(tlow, 0, tcycle);
+	}
+
+	if (tlow.is_zero())
+		m_timer_tick_low->adjust(attotime::never);
+
+	if (thigh.is_zero())
+		m_timer_tick_high->adjust(attotime::never);
 }
 
+template<bool High>
 TIMER_CALLBACK_MEMBER(clock_device::clock_tick)
 {
-	if (m_thigh.is_zero())
-		m_signal = 0;
-	else if (m_tlow.is_zero())
-		m_signal = 1;
-	else
-		m_signal ^= 1;
-
-	m_timer_tick->adjust(m_signal ? m_thigh : m_tlow);
+	m_signal = High ? 1 : 0;
 	output();
 }
