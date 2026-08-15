@@ -162,6 +162,8 @@ protected:
 private:
 	u8 port_value(unsigned offset) const;
 	void update_port_irq();
+	void update_sci_irq();
+	void update_spi_irq();
 
 	bool    tcr_icie() const    { return BIT(m_tcr, 7); }
 	bool    tcr_ocie() const    { return BIT(m_tcr, 6); }
