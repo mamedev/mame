@@ -166,6 +166,8 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_data_bits(data_bits)
 	, c_system_clock(0)
 	, m_pfnmask(flavor == MIPS3_TYPE_VR4300 ? 0x000fffff : 0x00ffffff)
+	, m_pagemask_mask(flavor == MIPS3_TYPE_VR5500 ? u64(0x7fffe000) : u64(0x01ffe000))
+	, m_config_wmask(flavor == MIPS3_TYPE_VR5500 ? 0x0fc00007 : 0x00000007)
 	, m_tlbentries(flavor == MIPS3_TYPE_VR4300 ? 32 : MIPS3_MAX_TLB_ENTRIES)
 	, m_bigendian(endianness == ENDIANNESS_BIG)
 	, m_byte_xor(data_bits == 64 ? (m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0)) : (m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)))
@@ -2037,8 +2039,12 @@ void mips3_device::set_cop0_reg(int idx, uint64_t val)
 		case COP0_PRId:
 			break;
 
+		case COP0_PageMask:
+			m_core->cpr[0][idx] = val & m_pagemask_mask;
+			break;
+
 		case COP0_Config:
-			m_core->cpr[0][idx] = (m_core->cpr[0][idx] & ~7) | (val & 7);
+			m_core->cpr[0][idx] = (m_core->cpr[0][idx] & ~uint64_t(m_config_wmask)) | (val & m_config_wmask);
 			break;
 
 		case COP0_EntryHi:

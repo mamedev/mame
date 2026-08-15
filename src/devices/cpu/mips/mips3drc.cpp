@@ -2629,8 +2629,12 @@ bool mips3_device::generate_set_cop0_reg(drcuml_block &block, compiler_state &co
 		case COP0_PRId:
 			return true;
 
+		case COP0_PageMask:
+			UML_DAND(block, CPR064(reg), I0, m_pagemask_mask);                   // dand    cpr0[reg],i0,m_pagemask_mask
+			return true;
+
 		case COP0_Config:
-			UML_ROLINS(block, CPR032(COP0_Config), I0, 0, 0x0007);              // rolins  [Config],i0,0,0x0007
+			UML_ROLINS(block, CPR032(COP0_Config), I0, 0, m_config_wmask);      // rolins  [Config],i0,0,m_config_wmask
 			return true;
 
 		case COP0_EntryHi:
