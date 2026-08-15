@@ -72,21 +72,22 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 		return m_dma_sel;
 	});
 	m_mixer->irq_status_cb().set([this] () {
-		//return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
-		return (m_irq8 << 0) | (m_irq16 << 1) | (0x8 << 4);
+		/*
+		return (m_irqs->in_r<IRQS_IRQ8>() << 0) |
+				(m_irqs->in_r<IRQS_IRQ16>() << 1) |
+				(m_irqs->in_r<IRQS_IRQ_MIDI>() << 2) |
+				(0x8 << 4);
+		*/
+		return (m_irqs->in_r<IRQS_IRQ8>() << 0) |
+				(m_irqs->in_r<IRQS_IRQ16>() << 1) |
+				(0x8 << 4);
 	});
 
 	CT1741(config, m_dsp, XTAL(24'000'000));
 	m_dsp->ldac_write_cb().set(m_ldac, FUNC(dac_16bit_r2r_device::write));
 	m_dsp->rdac_write_cb().set(m_rdac, FUNC(dac_16bit_r2r_device::write));
-	m_dsp->irq8_cb().set([this] (int state) {
-		m_irq8 = state;
-		m_irqs->in_w<0>(state);
-	});
-	m_dsp->irq16_cb().set([this] (int state) {
-		m_irq16 = state;
-		m_irqs->in_w<1>(state);
-	});
+	m_dsp->irq8_cb().set(m_irqs, FUNC(input_merger_device::in_w<IRQS_IRQ8>));
+	m_dsp->irq16_cb().set(m_irqs, FUNC(input_merger_device::in_w<IRQS_IRQ16>));
 	m_dsp->drq8_cb().set(m_dmas, FUNC(input_merger_any_high_device::in_w<0>));
 	// assuming it just go over the same DMA channel
 	m_dsp->drq16_cb().set([this] (int state) {
@@ -133,9 +134,6 @@ void sb16_ct2720_device::device_start()
 	m_dma_sel = 0x02;
 
 	m_bus->set_dma_channel(3, this, false);
-
-	save_item(NAME(m_irq8));
-	save_item(NAME(m_irq16));
 
 	save_item(NAME(m_irq_sel));
 	save_item(NAME(m_dma_sel));
