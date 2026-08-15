@@ -177,6 +177,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- A4091Setup 40.8, 68040.library 37.30, SetPatch 40.2, Format 40.1, HDToolBox 40.3 -->
+	<software name="a4091_4002">
+		<description>A4091 Install Disk (SetPatch 40.2)</description>
+		<year>1993</year>
+		<publisher>Commodore</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="a4091_4002.adf" size="901120" crc="41debbf7" sha1="6d156a4fecbf9692b310bfaba991d02705ba045d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- A4091Setup 40.8, 68040.library 37.30, SetPatch 40.14, Format 40.2, HDToolBox 40.3 -->
+	<software name="a4091_4014" cloneof="a4091_4002">
+		<description>A4091 Install Disk (SetPatch 40.14)</description>
+		<year>1993</year>
+		<publisher>Commodore</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="a4091_4014.adf" size="901120" crc="f962885b" sha1="3387a4f8062d0f61a12ea10d54de20f378e2b2c9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bscscsi13">
 		<description>bsc SCSI Installation Disk Version 1.3</description>
 		<year>1992</year>

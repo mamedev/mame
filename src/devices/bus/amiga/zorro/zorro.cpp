@@ -197,7 +197,9 @@ DEFINE_DEVICE_TYPE(ZORRO3_BUS, zorro3_bus_device, "zorro3", "Zorro-III Bus")
 
 zorro3_bus_device::zorro3_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	zorro2_bus_device(mconfig, ZORRO3_BUS, tag, owner, clock),
-	m_zorro3_space_config("zorro3", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
+	m_zorro3_space_config("zorro3", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor()),
+	m_dma_read(*this, 0xffffffff),
+	m_dma_write(*this)
 {
 }
 
@@ -281,6 +283,17 @@ uint32_t zorro3_bus_device::zorro3_io_r(offs_t offset, uint32_t mem_mask)
 void zorro3_bus_device::zorro3_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	zorro3_space().write_dword(0xff000000 + (offset << 2), data, mem_mask);
+}
+
+// from card
+uint32_t zorro3_bus_device::dma_r(offs_t offset, uint32_t mem_mask)
+{
+	return m_dma_read(offset, mem_mask);
+}
+
+void zorro3_bus_device::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_dma_write(offset, data, mem_mask);
 }
 
 

@@ -250,6 +250,9 @@ class zorro3_bus_device : public zorro2_bus_device
 public:
 	zorro3_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto dma_read_callback() { return m_dma_read.bind(); }
+	auto dma_write_callback() { return m_dma_write.bind(); }
+
 	// zorro2 support
 	uint32_t zorro2_mem_r(offs_t offset, uint32_t mem_mask);
 	void zorro2_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask);
@@ -266,6 +269,10 @@ public:
 	uint32_t zorro3_io_r(offs_t offset, uint32_t mem_mask);
 	void zorro3_io_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
+	// bus-master access to the host address space
+	uint32_t dma_r(offs_t offset, uint32_t mem_mask);
+	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
 	// access to the zorro3 space
 	address_space &zorro3_space() const { return device_memory_interface::space(1); }
 
@@ -279,6 +286,8 @@ private:
 	void zorro2_w(offs_t base, offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	address_space_config m_zorro3_space_config;
+	devcb_read32 m_dma_read;
+	devcb_write32 m_dma_write;
 };
 
 DECLARE_DEVICE_TYPE(ZORRO3_BUS, zorro3_bus_device)
@@ -389,6 +398,8 @@ protected:
 	virtual void interface_pre_start() override;
 
 	address_space &zorro3_space();
+	uint32_t zorro3_dma_r(offs_t offset, uint32_t mem_mask) { return m_zorro3->dma_r(offset, mem_mask); }
+	void zorro3_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask) { m_zorro3->dma_w(offset, data, mem_mask); }
 
 private:
 	zorro3_bus_device *m_zorro3;

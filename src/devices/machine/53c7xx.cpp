@@ -24,7 +24,8 @@
 #define LOG_HOST            (1U << 2)
 #define LOG_STATE           (1U << 3)
 #define LOG_SCRIPTS         (1U << 4)
-#define VERBOSE             (0)
+#define LOG_FETCH           (1U << 5)
+//#define VERBOSE             (LOG_SCRIPTS | LOG_UNHANDLED | LOG_STATE)
 
 #include "logmacro.h"
 
@@ -1487,7 +1488,7 @@ void ncr53c700_device::execute_run()
 				// Fetch the instruction
 				uint32_t inst = host_memory_read(m_dsp, 0xffffffff);
 
-				LOGMASKED(LOG_SCRIPTS, "FETCH dsp=%08x inst=%08x istat=%02x dstat=%02x\n", m_dsp, inst, m_istat, m_dstat);
+				LOGMASKED(LOG_FETCH, "FETCH dsp=%08x inst=%08x istat=%02x dstat=%02x\n", m_dsp, inst, m_istat, m_dstat);
 
 				m_dcmd = inst >> 24;
 				m_dbc = inst & 0xffffff;

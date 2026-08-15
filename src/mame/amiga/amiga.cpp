@@ -478,6 +478,8 @@ private:
 	void zorro_int2_w(int state);
 	void zorro_int6_w(int state);
 	void zorro_xrdy_w(int state);
+	uint32_t zorro_dma_r(offs_t offset, uint32_t mem_mask);
+	void zorro_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	required_device<zorro3_bus_device> m_zorro;
 
@@ -646,6 +648,8 @@ private:
 	void zorro_int2_w(int state);
 	void zorro_int6_w(int state);
 	void zorro_xrdy_w(int state);
+	uint32_t zorro_dma_r(offs_t offset, uint32_t mem_mask);
+	void zorro_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	uint8_t m_ramsey_config;
 	bool m_gary_coldboot;
@@ -1353,6 +1357,16 @@ void a3000_state::zorro_xrdy_w(int state)
 	}
 }
 
+uint32_t a3000_state::zorro_dma_r(offs_t offset, uint32_t mem_mask)
+{
+	return m_maincpu->space(AS_PROGRAM).read_dword(offset, mem_mask);
+}
+
+void a3000_state::zorro_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
+}
+
 void a500p_state::machine_reset()
 {
 	// base reset
@@ -1573,6 +1587,16 @@ void a4000_state::zorro_xrdy_w(int state)
 	{
 		m_maincpu->trigger(1);
 	}
+}
+
+uint32_t a4000_state::zorro_dma_r(offs_t offset, uint32_t mem_mask)
+{
+	return m_maincpu->space(AS_PROGRAM).read_dword(offset, mem_mask);
+}
+
+void a4000_state::zorro_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
 
 void a4000t_state::machine_start()
@@ -2530,6 +2554,8 @@ void a3000_state::a3000(machine_config &config)
 	// TODO: super dmac, scsi
 
 	ZORRO3_BUS(config, m_zorro, amiga_state::CLK_7M_PAL);
+	m_zorro->dma_read_callback().set(FUNC(a3000_state::zorro_dma_r));
+	m_zorro->dma_write_callback().set(FUNC(a3000_state::zorro_dma_w));
 	m_zorro->int2_handler().set(FUNC(a3000_state::zorro_int2_w));
 	m_zorro->int6_handler().set(FUNC(a3000_state::zorro_int6_w));
 	m_zorro->xrdy_handler().set(FUNC(a3000_state::zorro_xrdy_w));
@@ -2775,6 +2801,8 @@ void a4000_state::a4000(machine_config &config)
 	m_ata->irq_handler().set(FUNC(a4000_state::ide_interrupt_w));
 
 	ZORRO3_BUS(config, m_zorro, amiga_state::CLK_7M_PAL);
+	m_zorro->dma_read_callback().set(FUNC(a4000_state::zorro_dma_r));
+	m_zorro->dma_write_callback().set(FUNC(a4000_state::zorro_dma_w));
 	m_zorro->int2_handler().set(FUNC(a4000_state::zorro_int2_w));
 	m_zorro->int6_handler().set(FUNC(a4000_state::zorro_int6_w));
 	m_zorro->xrdy_handler().set(FUNC(a4000_state::zorro_xrdy_w));

@@ -25,6 +25,7 @@
 #include "toccata.h"
 
 // zorro3
+#include "a4091.h"
 #include "cybervision64.h"
 #include "dkb3128.h"
 
@@ -51,6 +52,7 @@ void zorro2_cards(device_slot_interface &device)
 void zorro3_cards(device_slot_interface &device)
 {
 	zorro2_cards(device);
+	device.option_add("a4091", AMIGA_A4091);
 	device.option_add("cybervision64", AMIGA_CYBERVISION64);
 	device.option_add("dkb3128", AMIGA_DKB3128);
 }
