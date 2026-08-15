@@ -71,6 +71,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_width(100)
 	, m_height(100)
 	, m_visarea(0, 99, 0, 99)
+	, m_has_setup(false)
 	, m_texformat()
 	, m_curbitmap(0)
 	, m_curtexture(0)

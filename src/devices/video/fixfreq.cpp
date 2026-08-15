@@ -268,7 +268,7 @@ void fixedfreq_device::device_config_complete()
 	// However the width and height determine the width of the mame window.
 	// It is therefore recommended to use `set_raw` in the mame driver
 	// to specify the window size.
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 	{
 		screen().set_raw(
 				m_monitor.m_monitor_clock, m_monitor.htotal(), 0,

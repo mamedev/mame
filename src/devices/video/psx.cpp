@@ -3539,7 +3539,7 @@ void psxgpu_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 	{
 		screen().set_refresh_hz(60);
 		screen().set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);

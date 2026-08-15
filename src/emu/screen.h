@@ -175,6 +175,7 @@ public:
 	float xscale() const { return m_xscale; }
 	float yscale() const { return m_yscale; }
 	bool has_screen_update() const { return !m_screen_update_ind16.isnull() || !m_screen_update_rgb32.isnull(); }
+	bool has_been_setup() const { return m_has_setup; }
 
 	// inline configuration helpers
 	screen_device &set_lcd() { assert(!configured()); m_is_lcd = true; return *this; }
@@ -201,6 +202,7 @@ public:
 	screen_device &set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		assert(pixclock != 0);
+		m_has_setup = true;
 		set_clock(pixclock);
 		m_frame_period = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
 		m_vblank = m_frame_period / vtotal * (vtotal - (vbstart - vbend));
@@ -219,7 +221,10 @@ public:
 	{
 		return set_raw(xtal, htotal, visarea.left(), visarea.right() + 1, vtotal, visarea.top(), visarea.bottom() + 1);
 	}
-	void set_refresh(attotime period) { m_frame_period = period.as_attoseconds(); }
+	void set_refresh(attotime period) {
+		m_has_setup = true;
+		m_frame_period = period.as_attoseconds();
+	}
 
 	/// \brief Set refresh rate in Hertz
 	///
@@ -445,6 +450,7 @@ private:
 	int                 m_height;                   // current height (VTOTAL)
 	rectangle           m_visarea;                  // current visible area (HBLANK end/start, VBLANK end/start)
 	std::vector<int>    m_scan_widths;              // current width, in samples, of each individual scanline
+	bool                m_has_setup;                // screen characteristics have been defined
 
 	// textures and bitmaps
 	texture_format      m_texformat;                // texture format

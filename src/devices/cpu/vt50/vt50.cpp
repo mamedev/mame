@@ -159,7 +159,7 @@ void vt5x_cpu_device::device_config_complete()
 	if (!screen().has_screen_update())
 		screen().set_screen_update(*this, FUNC(vt5x_cpu_device::screen_update));
 
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 		screen().set_raw(clock(), 900, 128, 848, 256, 4, 244); // 60 Hz default parameters
 }
 

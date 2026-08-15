@@ -96,7 +96,7 @@ void thomson_video_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 		screen().set_raw(clock(), 1024, 0, THOM_TOTAL_WIDTH * 2, 312, 0, THOM_TOTAL_HEIGHT);
 
 	if (!screen().has_screen_update())

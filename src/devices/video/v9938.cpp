@@ -158,7 +158,7 @@ void v99x8_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 		screen().set_raw(clock(),
 			HTOTAL,
 			0,

@@ -133,7 +133,7 @@ void acorn_vidc10_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())
@@ -594,7 +594,7 @@ void arm_vidc20_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())

@@ -183,7 +183,7 @@ void dp835x_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().configured())
+	if (!screen().has_been_setup())
 	{
 		int lines_per_frame = m_video_scan_lines + m_vblank_interval[m_60hz_refresh ? 1 : 0];
 		if (m_half_shift)
