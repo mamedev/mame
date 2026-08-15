@@ -2867,6 +2867,7 @@ static void do_extract_cd(parameters_map &params)
 		uint64_t outputoffs = 0;
 		uint32_t discoffs = 0;
 		std::vector<uint8_t> buffer;
+		int sessionnum = -1;
 
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
@@ -2899,6 +2900,13 @@ static void do_extract_cd(parameters_map &params)
 
 			// output the metadata about the track to the TOC file
 			const cdrom_file::track_info &trackinfo = toc.tracks[tracknum];
+
+			if (mode == MODE_CUEBIN && toc.numsessions > 1 && sessionnum != trackinfo.session)
+			{
+				output_toc_file->printf("REM SESSION %02d\n", trackinfo.session+1);
+				sessionnum = trackinfo.session;
+			}
+			
 			output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
