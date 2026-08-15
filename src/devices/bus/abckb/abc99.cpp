@@ -43,8 +43,7 @@ Notes:
 
     TODO:
 
-    - watchdog clock
-    - output leds
+    - watchdog period (R/C values for Z9 are not given on the schematic)
 
 */
 
@@ -154,9 +153,6 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	m_mousecpu->set_t0_clk_cb(I8035_Z2_TAG, FUNC(device_t::set_unscaled_clock_int));
 	m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
 
-	// watchdog
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(0));
-
 	// mouse
 	QUADMOUSE(config, m_mouse);
 
@@ -241,7 +237,7 @@ static INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ALT") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad CE") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad RETURN") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -437,6 +433,21 @@ void abc99_device::serial_input()
 
 
 //-------------------------------------------------
+//  set_keydown -
+//-------------------------------------------------
+
+void abc99_device::set_keydown(int state)
+{
+	if (m_keydown != bool(state))
+	{
+		m_keydown = state;
+		
+		m_slot->keydown_w(state);
+	}
+}
+
+
+//-------------------------------------------------
 //  serial_clock -
 //-------------------------------------------------
 
@@ -444,6 +455,18 @@ TIMER_CALLBACK_MEMBER(abc99_device::serial_clock)
 {
 	m_slot->trxc_w(m_rxtxc);
 	m_rxtxc = !m_rxtxc;
+}
+
+
+//-------------------------------------------------
+//  watchdog_expired -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(abc99_device::watchdog_expired)
+{
+	m_z2_reset = 1;
+
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -459,9 +482,9 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, ABC99, tag, owner, clock),
 	abc_keyboard_interface(mconfig, *this),
 	m_serial_timer(nullptr),
+	m_watchdog_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
 	m_mousecpu(*this, I8035_Z5_TAG),
-	m_watchdog(*this, "watchdog"),
 	m_speaker(*this, "speaker"),
 	m_mouse(*this, "mouse"),
 	m_x(*this, "X%u", 0),
@@ -470,6 +493,8 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_mousebtn(*this, "MOUSE"),
 	m_leds(*this, "led%u", 0U),
 	m_keylatch(0),
+	m_keydown(1),
+	m_z2_reset(1),
 	m_si(1),
 	m_si_en(1),
 	m_so_z2(1),
@@ -477,7 +502,8 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_t1_z2(0),
 	m_t1_z5(0),
 	m_led_en(1),
-	m_reset(1)
+	m_reset(1),
+	m_rxtxc(0)
 {
 }
 
@@ -493,8 +519,12 @@ void abc99_device::device_start()
 	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock() * 2); // 8333 bps x16
 	m_serial_timer->adjust(serial_clock, 0, serial_clock);
 
+	m_watchdog_timer = timer_alloc(FUNC(abc99_device::watchdog_expired), this);
+
 	// state saving
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_keydown));
+	save_item(NAME(m_z2_reset));
 	save_item(NAME(m_si));
 	save_item(NAME(m_si_en));
 	save_item(NAME(m_so_z2));
@@ -513,14 +543,25 @@ void abc99_device::device_start()
 
 void abc99_device::device_reset()
 {
-	// external access
-	m_maincpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_EA, BIT(m_z14->read(), 3) ? ASSERT_LINE : CLEAR_LINE);
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
+
+	m_keylatch = 0;
+	m_si = 1;
+	m_si_en = 1;
+	m_so_z2 = 1;
+	m_so_z5 = 1;
+	m_t1_z2 = 0;
+	m_t1_z5 = 0;
+	m_led_en = 1;
+	m_reset = 1;
+	m_keydown = 1;
+	m_rxtxc = 0;
+	m_z2_reset = 1;
 
 	m_slot->keydown_w(1);
 	m_slot->write_rx(1);
 	m_slot->trxc_w(1);
-	m_rxtxc = 0;
 }
 
 
@@ -587,7 +628,7 @@ void abc99_device::key_x_w(offs_t offset, uint8_t data)
 
 	if (m_keylatch == 14)
 	{
-		m_watchdog->watchdog_reset();
+		m_watchdog_timer->adjust(attotime::never);
 	}
 }
 
@@ -606,8 +647,8 @@ void abc99_device::z2_p1_w(uint8_t data)
 	    P11     KEY DOWN
 	    P12     transmit -> Z5 T1
 	    P13     INS led
-	    P14     ALT led
-	    P15     CAPS LOCK led
+	    P14     CAPS LOCK led
+	    P15     ALT led
 	    P16     speaker output
 	    P17     Z8 enable
 
@@ -618,15 +659,24 @@ void abc99_device::z2_p1_w(uint8_t data)
 	m_slot->write_rx(m_so_z2 && m_so_z5);
 
 	// key down
-	m_slot->keydown_w(!BIT(data, 1));
+	if (m_z2_reset && data == 0xff)
+	{
+		m_z2_reset = 0;
+	}
+	else
+	{
+		m_z2_reset = 0;
+
+		set_keydown(!BIT(data, 1));
+	}
 
 	// master T1
 	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
 	m_leds[LED_INS] = !BIT(data, 3);
-	m_leds[LED_ALT] = !BIT(data, 4);
-	m_leds[LED_CAPS_LOCK] = !BIT(data, 5);
+	m_leds[LED_CAPS_LOCK] = !BIT(data, 4);
+	m_leds[LED_ALT] = !BIT(data, 5);
 
 	// speaker output
 	m_speaker->level_w(!BIT(data, 6));
@@ -657,7 +707,7 @@ uint8_t abc99_device::z2_p2_r()
 
 	*/
 
-	uint8_t data = m_z14->read() << 5;
+	uint8_t data = (m_z14->read() & 0x07) << 5;
 
 	return data;
 }
@@ -735,10 +785,10 @@ void abc99_device::z5_p2_w(uint8_t data)
 
 	if (m_reset != reset)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_RESET, reset ? CLEAR_LINE : ASSERT_LINE);
-	}
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(abc99_device::z2_reset_sync), this), reset);
 
-	m_reset = reset;
+		m_reset = reset;
+	}
 
 	// serial output
 	m_so_z5 = BIT(data, 6);
@@ -746,4 +796,16 @@ void abc99_device::z5_p2_w(uint8_t data)
 
 	// keyboard CPU T1
 	m_t1_z2 = BIT(data, 7);
+}
+
+//-------------------------------------------------
+//  z2_reset_sync -
+//-------------------------------------------------
+
+void abc99_device::z2_reset_sync(s32 param)
+{
+	if (!param)
+		m_z2_reset = 1;
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, param ? CLEAR_LINE : ASSERT_LINE);
 }

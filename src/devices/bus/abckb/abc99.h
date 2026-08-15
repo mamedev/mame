@@ -15,7 +15,6 @@
 
 #include "cpu/mcs48/mcs48.h"
 #include "machine/quadmouse.h"
-#include "machine/watchdog.h"
 #include "sound/spkrdev.h"
 
 
@@ -69,7 +68,9 @@ private:
 	};
 
 	void serial_input();
+	void set_keydown(int state);
 	TIMER_CALLBACK_MEMBER(serial_clock);
+	TIMER_CALLBACK_MEMBER(watchdog_expired);
 
 	uint8_t key_y_r();
 	void key_x_w(offs_t offset, uint8_t data);
@@ -86,11 +87,13 @@ private:
 	void keyboard_mem(address_map &map) ATTR_COLD;
 	void mouse_mem(address_map &map) ATTR_COLD;
 
+	void z2_reset_sync(s32 param);
+
 	emu_timer *m_serial_timer;
+	emu_timer *m_watchdog_timer;
 
 	required_device<i8035_device> m_maincpu;
 	required_device<i8035_device> m_mousecpu;
-	required_device<watchdog_timer_device> m_watchdog;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<quadmouse_device> m_mouse;
 	required_ioport_array<16> m_x;
@@ -100,6 +103,8 @@ private:
 	output_finder<11> m_leds;
 
 	int m_keylatch;
+	bool m_keydown;
+	bool m_z2_reset;
 	bool m_si;
 	bool m_si_en;
 	bool m_so_z2;
