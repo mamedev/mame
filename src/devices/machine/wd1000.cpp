@@ -538,7 +538,7 @@ void wd1000_device::write(offs_t offset, uint8_t data)
 				// transferred, so just start the transfer
 				// here.
 				m_buffer_index = 0;
-				m_buffer_end = 512;
+				m_buffer_end = sector_bytes();
 				set_drq();
 				break;
 			}
@@ -572,7 +572,7 @@ void wd1000_device::cmd_read_sector()
 	file->read(get_lbasector(), m_buffer);
 
 	m_buffer_index = 0;
-	m_buffer_end = 512;
+	m_buffer_end = sector_bytes();
 
 	m_status &= ~S_BSY;
 

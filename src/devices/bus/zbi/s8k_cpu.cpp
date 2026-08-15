@@ -656,7 +656,6 @@ void zbi_s8k_cpu10_card_device::centronics_ack_w(uint8_t data)
 void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 {
 	Z8001(config, m_maincpu, CLK_CPU);
-	m_maincpu->set_m20_hack(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zbi_s8k_cpu10_card_device::addrmap_program);
 	m_maincpu->set_addrmap(AS_DATA, &zbi_s8k_cpu10_card_device::addrmap_data);
 	m_maincpu->set_addrmap(z8001_device::AS_STACK, &zbi_s8k_cpu10_card_device::addrmap_stack);
@@ -1228,7 +1227,6 @@ void zbi_s8k_hpcpu_card_device::device_resolve_objects()
 void zbi_s8k_hpcpu_card_device::device_add_mconfig(machine_config &config)
 {
 	Z8001(config, m_maincpu, CLK_HPCPU);
-	m_maincpu->set_m20_hack(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zbi_s8k_hpcpu_card_device::addrmap_program);
 	m_maincpu->set_addrmap(AS_DATA, &zbi_s8k_hpcpu_card_device::addrmap_data);
 	m_maincpu->set_addrmap(z8001_device::AS_STACK, &zbi_s8k_hpcpu_card_device::addrmap_stack);
