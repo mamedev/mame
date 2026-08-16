@@ -59,6 +59,12 @@ static constexpr u8 SCCDMA_RELOAD               = 0x40;
 static constexpr u8 SCCDMA_IRQ                  = 0x80;
 static constexpr u8 SCCDMA_WRITE_MASK           = (SCCDMA_RELOAD|SCCDMA_PAUSE|SCCDMA_IRQENABLE|SCCDMA_CONTINUE|SCCDMA_RUN);
 
+// Triggers used to release the CPU when a 53C9x raises DRQ again during a
+// pseudo-DMA transfer, plus the maximum time we're willing to wait for it.
+static constexpr int TRIGGER_SCSI_A_DRQ         = 1000;
+static constexpr int TRIGGER_SCSI_B_DRQ         = 1001;
+static constexpr int SCSI_DRQ_TIMEOUT_US        = 100;
+
 class macpdm_state : public driver_device
 {
 public:
@@ -126,6 +132,9 @@ private:
 
 	bool m_dma_scsi_a_in_step = false, m_dma_scsi_b_in_step = false;
 	bool m_dma_floppy_in_step = false, m_floppy_drq = false;
+
+	emu_timer *m_scsi_a_drq_timeout_timer = nullptr;
+	emu_timer *m_scsi_b_drq_timeout_timer = nullptr;
 
 	void pdm_map(address_map &map) ATTR_COLD;
 	void pdm_8100map(address_map &map) ATTR_COLD;
@@ -207,6 +216,14 @@ private:
 	void scsi_a_w(offs_t offset, uint8_t data);
 	uint8_t scsi_b_r(offs_t offset);
 	void scsi_b_w(offs_t offset, uint8_t data);
+
+	uint16_t scsi_a_pdma_r();
+	void scsi_a_pdma_w(uint16_t data);
+	uint16_t scsi_b_pdma_r();
+	void scsi_b_pdma_w(uint16_t data);
+	void scsi_pdma_wait(uint8_t drq_mask, int trigger, emu_timer *timeout_timer);
+	TIMER_CALLBACK_MEMBER(scsi_a_drq_timeout);
+	TIMER_CALLBACK_MEMBER(scsi_b_drq_timeout);
 
 	uint8_t hmc_r(offs_t offset);
 	void hmc_w(offs_t offset, uint8_t data);
@@ -296,6 +313,9 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 void macpdm_state::driver_init()
 {
 	m_maincpu->space().install_ram(0, m_ram->mask(), 0, m_ram->pointer());
+
+	m_scsi_a_drq_timeout_timer = timer_alloc(FUNC(macpdm_state::scsi_a_drq_timeout), this);
+	m_scsi_b_drq_timeout_timer = timer_alloc(FUNC(macpdm_state::scsi_b_drq_timeout), this);
 
 	save_item(NAME(m_hmc_reg));
 	save_item(NAME(m_hmc_buffer));
@@ -655,6 +675,51 @@ void macpdm_state::scsi_b_w(offs_t offset, uint8_t data)
 	m_ncr53cf96->write(offset >> 4, data);
 }
 
+void macpdm_state::scsi_pdma_wait(uint8_t drq_mask, int trigger, emu_timer *timeout_timer)
+{
+	if (machine().side_effects_disabled() || (m_via2_ifr & drq_mask))
+		return;
+
+	m_maincpu->spin_until_trigger(trigger);
+	timeout_timer->adjust(attotime::from_usec(SCSI_DRQ_TIMEOUT_US));
+}
+
+uint16_t macpdm_state::scsi_a_pdma_r()
+{
+	const uint16_t data = m_ncr53c94->dma16_swap_r();
+	scsi_pdma_wait(0x01, TRIGGER_SCSI_A_DRQ, m_scsi_a_drq_timeout_timer);
+	return data;
+}
+
+void macpdm_state::scsi_a_pdma_w(uint16_t data)
+{
+	m_ncr53c94->dma16_swap_w(data);
+	scsi_pdma_wait(0x01, TRIGGER_SCSI_A_DRQ, m_scsi_a_drq_timeout_timer);
+}
+
+uint16_t macpdm_state::scsi_b_pdma_r()
+{
+	const uint16_t data = m_ncr53cf96->dma16_swap_r();
+	scsi_pdma_wait(0x04, TRIGGER_SCSI_B_DRQ, m_scsi_b_drq_timeout_timer);
+	return data;
+}
+
+void macpdm_state::scsi_b_pdma_w(uint16_t data)
+{
+	m_ncr53cf96->dma16_swap_w(data);
+	scsi_pdma_wait(0x04, TRIGGER_SCSI_B_DRQ, m_scsi_b_drq_timeout_timer);
+}
+
+TIMER_CALLBACK_MEMBER(macpdm_state::scsi_a_drq_timeout)
+{
+	machine().scheduler().trigger(TRIGGER_SCSI_A_DRQ);
+}
+
+TIMER_CALLBACK_MEMBER(macpdm_state::scsi_b_drq_timeout)
+{
+	machine().scheduler().trigger(TRIGGER_SCSI_B_DRQ);
+}
+
 uint8_t macpdm_state::hmc_r(offs_t offset)
 {
 	const uint8_t rv = (m_hmc_reg >> m_hmc_bit) & 1;
@@ -1008,6 +1073,8 @@ void macpdm_state::scsi_a_irq(int state)
 void macpdm_state::scsi_a_drq(int state)
 {
 	via2_irq_main_set(0x01, state);
+	if (state)
+		machine().scheduler().trigger(TRIGGER_SCSI_A_DRQ);
 	if ((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
 		dma_scsi_a_step();
 }
@@ -1020,6 +1087,8 @@ void macpdm_state::scsi_b_irq(int state)
 void macpdm_state::scsi_b_drq(int state)
 {
 	via2_irq_main_set(0x04, state);
+	if (state)
+		machine().scheduler().trigger(TRIGGER_SCSI_B_DRQ);
 	if ((m_dma_scsi_b_ctrl & 0x02) && (m_via2_ifr & 0x04) && !m_dma_scsi_b_in_step)
 		dma_scsi_b_step();
 }
@@ -1384,7 +1453,7 @@ void macpdm_state::pdm_map(address_map &map)
 	// 50f08000 = ethernet ID PROM
 	// 50f0a000 = MACE ethernet controller
 	map(0x50f10000, 0x50f100ff).rw(FUNC(macpdm_state::scsi_a_r), FUNC(macpdm_state::scsi_a_w));
-	map(0x50f10100, 0x50f10101).rw(m_ncr53c94, FUNC(ncr53c94_device::dma16_swap_r), FUNC(ncr53c94_device::dma16_swap_w));
+	map(0x50f10100, 0x50f10101).rw(FUNC(macpdm_state::scsi_a_pdma_r), FUNC(macpdm_state::scsi_a_pdma_w));
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
 
@@ -1436,7 +1505,7 @@ void macpdm_state::pdm_8100map(address_map &map)
 	pdm_map(map);
 
 	map(0x50f11000, 0x50f110ff).rw(FUNC(macpdm_state::scsi_b_r), FUNC(macpdm_state::scsi_b_w));
-	map(0x50f11100, 0x50f11101).rw(m_ncr53cf96, FUNC(ncr53cf96_device::dma16_swap_r), FUNC(ncr53cf96_device::dma16_swap_w));
+	map(0x50f11100, 0x50f11101).rw(FUNC(macpdm_state::scsi_b_pdma_r), FUNC(macpdm_state::scsi_b_pdma_w));
 }
 
 void macpdm_state::pdm_base(machine_config &config)
