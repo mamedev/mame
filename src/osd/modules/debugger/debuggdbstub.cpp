@@ -359,7 +359,7 @@ static const gdb_register_map gdb_register_map_z80 =
 	"z80",
 	{
 		{
-			"mame.z80",
+			"org.gnu.gdb.z80.cpu",
 			{
 				{ "AF",  "af",  false, TYPE_INT },
 				{ "BC",  "bc",  false, TYPE_INT },
@@ -373,6 +373,7 @@ static const gdb_register_map gdb_register_map_z80 =
 				{ "IY",  "iy",  false, TYPE_INT },
 				{ "SP",  "sp",  true,  TYPE_DATA_POINTER },
 				{ "PC",  "pc",  true,  TYPE_CODE_POINTER },
+				{ "IR",  "ir",  false, TYPE_INT },
 			}
 		}
 	}
