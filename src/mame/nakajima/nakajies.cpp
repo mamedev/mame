@@ -6,9 +6,9 @@
 
 Nakajima was the OEM manufacturer for a series of typewriters which were
 sold by different brands around the world. The PCB layouts for these
-machines are the same. The models differed in the amount of RAM, presence
-of PC Card slot, or 1.44MB Floppy drive; and in the system rom (mainly
-only different language support).
+machines are the same. The models differed in the amount of (static) RAM:
+128KB or 256KB, presence of PC Card slot or 1.44MB floppy drive, and in the
+system rom (mainly only different language support).
 
 
 Model   |  SRAM | PC Card | FDD   | Language | Branded model
@@ -19,6 +19,7 @@ ES-210N | 128KB | Yes     | No    | English  | NTS DreamWriter 325
 ES-220  | 128KB | No      | No    | English  | NTS DreamWriter T100
 ES-220  | 256KB | Yes     | No    | English  | NTS DreamWriter T400
 ES-250  | 256KB | Yes     | 1.44M | English  | NTS DreamWriter T200
+
 
 The LCD is driven by 6x Sanyo LC7940 and 1x Sanyo LC7942.
 
@@ -53,6 +54,8 @@ The keyboard matrix:
 
 NTS information from http://web.archive.org/web/19980205154137/nts.dreamwriter.com/dreamwt4.html:
 
+DreamWriter T400 v2.1 ROM decode notes at https://github.com/RealDeuce/dreamwriter
+
 File Management & Memory:
 
 - Uniquely name up to 128 files
@@ -83,61 +86,131 @@ Hardware:
 
 I/O Map:
 
-0000 - unknown
-       0x00 written during boot sequence
+0000 - LCD scanout base select
+       MAME renders from main RAM + (data << 9). Boot writes 0x08, so the
+       visible framebuffer starts at 0x1000.
 
-0010-0017 - control banking:
-  0010 - 00000 - 1ffff
-  0011 - 20000 - 3ffff
-  0012 - 40000 - 5ffff
-  0013 - 60000 - 7ffff
-  0014 - 80000 - 9ffff
-  0015 - a0000 - bffff
-  0016 - c0000 - dffff
-  0017 - e0000 - fffff
+0010-0017 - bank select registers for eight 128 KiB CPU windows
+       0010 controls 00000-1ffff, 0011 controls 20000-3ffff, etc.
+       Values 00-07 select ROM banks. Values with bit 4 set select RAM banks.
+       Some DreamWriter configs also treat bit 3 as a RAM window select; T400
+       needs 0x0e for its built-in 160 KiB storage formatter, while 1 MiB
+       DreamWriter ROMs seed 0x0f for the same 20000-3ffff window.
 
-  values 00-07 select a ROM bank
-        00 - selects last 20000h region of ROM
-        01 - 20000h region before last
-        02 - etc
-  values 08-0f select additinal RAM (on models that have 256KB RAM)
-  values 10-17 select internal RAM
-  values 18-1f select a PC Card card bank
-
-  on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
+       T400 startup mapping:
+       10 = 17 -> RAM 00000-1ffff
+       11 = 0e -> RAM 20000-3ffff
+       12 = 1f -> RAM 00000-1ffff
+       13 = 1e -> RAM 20000-3ffff
+       14 = 1d -> RAM 00000-1ffff
+       15 = 1c -> RAM 20000-3ffff
+       16 = 01 -> ROM file 40000-5ffff
+       17 = 00 -> ROM file 60000-7ffff
 
 0020 - unknown
-       0x00 written during boot sequence
+       Startup writes 0x00.
 
-0030 - parallel/printer related?
+0030 - control latch mirrored at 6D94
+       Bits 0-2 select the external RS-232 baud-clock divider, bit 4 is set
+       during RS-232 setup, bit 5 is pulsed for Centronics -STB, and bit 7 is
+       toggled by diagnostic commands.
 
-0040 - parallel/printer related?
+0040 - Centronics parallel data output latch
+       Startup/idle writes 0xff. Printer output writes bytes here.
 
-0050 - 0051 - Beeper frequency
-0052 - Beeper control
+0050 - buzzer/tone counter low byte
+0051 - buzzer/tone counter high byte
+0052 - buzzer/tone gate/control
+       Firmware writes a 16-bit divisor to 50/51, writes 0x7f to 52 to enable,
+       and writes 0xff to 52 to disable.
 
-0053 - unknown
+0060 - IRQ/source control latch
+       Firmware mirrors writes at 6D4F. It appears to use the opposite bit
+       order from the 0x90 active/clear latch, and clear bits enable sources.
+       The exact source-control hardware is not fully understood.
+       The low-level idle path writes 6D4F immediately before sti/hlt;
+       Centronics ACK output clears bit 6 while the byte feeder is active and
+       sets it when the buffer ends.
 
-0060 - Irq enable/disable
+0061 - keyboard scan/idle control candidate
+       Keyboard scan helpers write 0xfe and 0xff here. Exact hardware role is
+       still unconfirmed.
 
-0061 - Reset keyboard scan row
+0070 - warm/reset/power transition control candidate
+       Warm diagnostic and auto-off paths write 0x01 before halting in a loop.
 
-0070 - 0x01 (probably any value) powers the unit down. The system will have already
-       stored enough information to allow it to continue execution when started
-       again.
+0090 - interrupt source clear
+       b7 clears irq vector f8
+       b6 clears irq vector f9
+       b5 clears irq vector fa, keyboard scan-cycle/reset
+       b4 clears irq vector fb, keyboard row scan
+       b3 clears irq vector fc, RS-232 receive
+       b2 clears irq vector fd
+       b1 clears irq vector fe, Centronics ACK
+       b0 clears irq vector ff
 
-0090 - Interrupt source clear
+00A0 - shared status input
+       b7 - PC Card absent/not-ready gate (when set)
+       b6 - PC Card SRAM write-protect candidate
+       b4 - PC Card SRAM battery status, low when clear and card present
+       b3 - main battery low, active high
+       b2 - CR2032 memory-retention battery low, active high
+       b1 - Centronics BUSY, active high
+       b5,b0 - unknown
 
-00A0 - System status
+00B0 - keyboard row input
+       Returns the row selected by the keyboard scan state.
 
-00B0 - Keyboard
+00C0 - RS-232 USART data register
+00C1 - RS-232 USART status/control register
+       Firmware programming sequence matches an 8251/8251A-style USART.
 
-00C0 - 00C1 - serial/rs232c communication
-  00C0 - data port
-  00C1 - control/status
+00D0-00DF - RTC register block
+       MAME maps this to RP5C01. Firmware reads/writes D0-DC as 4-bit BCD
+       time/date registers and uses DD-DF as RTC control/mode registers.
 
-00D0 - 00DF - RTC
 
+IRQ 0xF8:
+The handler clears the irq active bit and copies a word from 6D79 to 6D85 and
+from 6D7B to 6D87 then enters an endless loop (with interrupts disabled).
+Perhaps power on/off related??
+
+
+IRQ 0xF9: (T400: C049A)
+Timer wake source. Firmware arms it by writing a count to port 0x53; the
+handler clears bit 0 of 6DA9.
+
+
+IRQ 0xFA: (T400: C04AE)
+Keyboard scan-cycle/reset helper. Expects 6D4F to be set up properly, updates
+the IRQ mask, clears the keyboard idle counter, then calls C106F to reset the
+keyboard row scan state.
+
+
+IRQ 0xFB: (T400: C04D1)
+Keyboard row scan. Reads from input port 0xB0, stores the current row in
+6D06..6D0F, and calls the higher-level keyboard processor after the tenth row.
+
+
+IRQ 0xFC: (T400: C0550)
+RS-232 receive. Reads USART status from port 0xC1, records error bits, reads
+received data from port 0xC0, acknowledges with command 0x37 when needed, and
+queues the byte for the firmware event/serial path.
+
+
+IRQ 0xFD: (T400: C0724)
+Purpose unknown. Clears bit 3 of 70A5.
+
+
+IRQ 0xFE: (T400: C0738)
+Centronics ACK-driven output. Expects 6D4F to be set up properly, reads the
+next byte from the buffer pointer at 6D92, outputs it on port 0x40, and pulses
+the strobe latch on port 0x30. No endless loop.
+
+
+IRQ 0xFF:
+This does some simple processing and then enters an endless loop (with interrupts
+disabled). Perhaps power on/off related??
 
 Notes:
 - drwrt200,drwrt400, and drwrt450 only go up to 512KB to initialize pccard card.
@@ -162,12 +235,15 @@ TODO:
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/nvram.h"
+#include "machine/output_latch.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
+#include "sound/beep.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -201,6 +277,7 @@ public:
 		, m_uart_clock(*this, "uart_clock")
 		, m_serial(*this, "serial")
 		, m_pccard(*this, "pccard")
+		, m_beeper(*this, "beeper")
 	{
 	}
 
@@ -208,6 +285,9 @@ public:
 	void nakajies210(machine_config &config) ATTR_COLD;
 	void nakajies220(machine_config &config) ATTR_COLD;
 	void dator3k(machine_config &config) ATTR_COLD;
+	void nakajies220_t100(machine_config &config) ATTR_COLD;
+	void nakajies220_t450(machine_config &config) ATTR_COLD;
+	void nakajies220_256(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_button_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(power_button_irq);
@@ -224,6 +304,7 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void set_irq(u8 data);
 	void nakajies_update_irqs();
 	u8 sys_stat_r();
 	u8 keyboard_r();
@@ -242,16 +323,22 @@ protected:
 	template<int Bank> u8 pccard_r(offs_t offset);
 	template<int Bank> void pccard_w(offs_t offset, u8 data);
 
+	void sample_keyboard_rows();
+	void buzzer_low_w(u8 data);
+	void buzzer_high_w(u8 data);
+	void buzzer_gate_w(u8 data);
+	void buzzer_update_clock();
+	void timer_count_w(u8 data);
+
 	void nakajies_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(hz10_timer);
+	TIMER_CALLBACK_MEMBER(f9_timer);
 	void nakajies_io_map(address_map &map) ATTR_COLD;
 	void nakajies_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
 	memory_view m_view[NUMBER_OF_AREAS];
-
 	required_ioport_array<10> m_port_row;
 	required_ioport m_port_status;
 	memory_bank_array_creator<NUMBER_OF_AREAS> m_rombank;
@@ -267,23 +354,29 @@ protected:
 	required_device<clock_device> m_uart_clock;
 	required_device<rs232_port_device> m_serial;
 	optional_device<pccard_slot_device> m_pccard;
+	required_device<beep_device> m_beeper;
 
+	emu_timer *m_f9_timer = nullptr;
 	u8 m_irq_enabled = 0;
 	u8 m_irq_active = 0;
 	u8 m_lcd_memory_start = 0;
 	u8 m_keyboard_row = 0;
-	u8 m_keyboard_row_reset = 0;
+	u8 m_keyboard_row_reset = 0xff;
 	std::unique_ptr<u8[]> m_ram_base;
 	u32 m_ram_size = 0;
 	u8 m_uart_control = 0;
+	u8 m_buzzer_low = 0;
+	u8 m_buzzer_high = 0;
 	u32 m_centronics_busy = 0;
 	u32 m_centronics_ack = 0;
 	u32 m_uart_rxrdy = 0;
 	u32 m_uart_txrdy = 0;
-	bool m_lcd_on = false;
+	bool m_lcd_on = true;
 	u32 m_pccard_card_detect = 1;
 	u32 m_pccard_write_protect = 1;
 	u32 m_pccard_battery_failed = 1;
+	u8 m_bank_select[NUMBER_OF_AREAS]{};
+	bool m_bank_bit3_selects_ram = false;
 };
 
 
@@ -296,13 +389,31 @@ public:
 		, m_floppy(*this, "fdc:0")
 	{ }
 
-	void nakajies250(machine_config &config);
+	void nakajies250(machine_config &config) ATTR_COLD;
 
 protected:
 	required_device<n82077aa_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 
+	u8 m_fdc_dor = 0;
+	u8 m_fdc_cmd[9] = {};
+	u8 m_fdc_cmd_len = 0;
+	u8 m_fdc_cmd_pos = 0;
+	u8 m_fdc_reset_sense_data[2] = {};
+	u8 m_fdc_reset_sense_count = 0;
+	u8 m_fdc_reset_sense_pos = 0;
+	u8 m_fdc_sense_interrupt_pos = 0;
+	u16 m_fdc_data_fifo_reads = 0;
+	u16 m_fdc_data_fifo_writes = 0;
+	bool m_fdc_reset_sense_active = false;
+	bool m_fdc_sense_interrupt_active = false;
+
 	void nakajies_io_map_fdc(address_map &map) ATTR_COLD;
+
+	void fdc_dor_w(u8 data);
+	u8 fdc_msr_r();
+	u8 fdc_fifo_r();
+	void fdc_fifo_w(u8 data);
 };
 
 
@@ -332,7 +443,6 @@ void nakajies_state::nakajies_io_map(address_map &map)
 {
 	map(0x0000, 0x0000).lw8(
 		NAME([this](u8 data) {
-			// TODO: Not yet identified where or what enables the lcd display.
 			m_lcd_on = true;
 			m_lcd_memory_start = data;
 		})
@@ -340,8 +450,10 @@ void nakajies_state::nakajies_io_map(address_map &map)
 	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
 	map(0x30, 0x30).w(FUNC(nakajies_state::uart_control_w));
 	map(0x40, 0x40).w(m_cent_data_out, FUNC(output_latch_device::write));
-	// Unknown
-	map(0x0053, 0x0053).noprw();
+	map(0x0050, 0x0050).w(FUNC(nakajies_state::buzzer_low_w));
+	map(0x0051, 0x0051).w(FUNC(nakajies_state::buzzer_high_w));
+	map(0x0052, 0x0052).w(FUNC(nakajies_state::buzzer_gate_w));
+	map(0x0053, 0x0053).w(FUNC(nakajies_state::timer_count_w));
 	map(0x0060, 0x0060).lrw8(
 		NAME([this] { return m_irq_enabled; }),
 		NAME([this](u8 data) {
@@ -352,8 +464,13 @@ void nakajies_state::nakajies_io_map(address_map &map)
 	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
 	map(0x0070, 0x0070).lw8(
 		NAME([this](u8 data) {
-			m_lcd_on = false;
-			m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+			// Firmware writes 0x01 here immediately before entering the retained
+			// power-off loop.
+			if (BIT(data, 0))
+			{
+				m_lcd_on = false;
+				m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			}
 		})
 	);
 	map(0x0090, 0x0090).lw8(
@@ -372,13 +489,228 @@ void nakajies_state::nakajies_io_map(address_map &map)
 void nakajies_fdc_state::nakajies_io_map_fdc(address_map &map)
 {
 	nakajies_io_map(map);
-	map(0x00e0, 0x00ef).m(m_fdc, FUNC(n82077aa_device::map));
+	map(0x00e0, 0x00e0).r(m_fdc, FUNC(n82077aa_device::sra_r));
+	map(0x00e1, 0x00e1).r(m_fdc, FUNC(n82077aa_device::srb_r));
+	map(0x00e2, 0x00e2).r(m_fdc, FUNC(n82077aa_device::dor_r));
+	map(0x00e2, 0x00e2).w(FUNC(nakajies_fdc_state::fdc_dor_w));
+	map(0x00e3, 0x00e3).rw(m_fdc, FUNC(n82077aa_device::tdr_r), FUNC(n82077aa_device::tdr_w));
+	map(0x00e4, 0x00e4).r(FUNC(nakajies_fdc_state::fdc_msr_r));
+	map(0x00e4, 0x00e4).w(m_fdc, FUNC(n82077aa_device::dsr_w));
+	map(0x00e5, 0x00e5).rw(FUNC(nakajies_fdc_state::fdc_fifo_r), FUNC(nakajies_fdc_state::fdc_fifo_w));
+	map(0x00e7, 0x00e7).rw(m_fdc, FUNC(n82077aa_device::dir_r), FUNC(n82077aa_device::ccr_w));
+}
+
+
+static u8 t200_fdc_command_length(u8 command)
+{
+	switch (command & 0x1f)
+	{
+	case 0x03: // specify
+	case 0x0f: // seek
+		return 3;
+	case 0x04: // sense drive status
+	case 0x07: // recalibrate
+	case 0x0a: // read ID
+	case 0x12: // perpendicular mode
+		return 2;
+	case 0x05: // write data
+	case 0x06: // read data
+	case 0x09: // write deleted data
+	case 0x0c: // read deleted data
+		return 9;
+	case 0x0d: // format track
+		return 6;
+	case 0x13: // configure
+		return 4;
+	default:
+		return 1;
+	}
+}
+
+
+static u16 t200_fdc_sector_size(u8 n, u8 dtl)
+{
+	return n ? (128U << n) : dtl;
+}
+
+
+void nakajies_fdc_state::fdc_dor_w(u8 data)
+{
+	const bool reset_released = !BIT(m_fdc_dor, 2) && BIT(data, 2);
+
+	m_fdc_dor = data;
+	m_fdc->dor_w(data);
+
+	if (reset_released)
+	{
+		// The T200 ROM immediately polls Sense Interrupt Status after
+		// releasing reset and expects reset-complete status bytes.
+		m_fdc_cmd_len = 0;
+		m_fdc_cmd_pos = 0;
+		m_fdc_data_fifo_reads = 0;
+		m_fdc_data_fifo_writes = 0;
+		m_fdc_reset_sense_count = 4;
+		m_fdc_reset_sense_pos = 0;
+		m_fdc_sense_interrupt_pos = 0;
+		m_fdc_reset_sense_active = false;
+		m_fdc_sense_interrupt_active = false;
+	}
+}
+
+
+u8 nakajies_fdc_state::fdc_msr_r()
+{
+	if (m_fdc_reset_sense_active)
+		return 0xd0; // RQM | DIO | CB: result byte ready.
+
+	return m_fdc->msr_r();
+}
+
+
+u8 nakajies_fdc_state::fdc_fifo_r()
+{
+	if (m_fdc_reset_sense_active)
+	{
+		const u8 data = m_fdc_reset_sense_data[m_fdc_reset_sense_pos & 1];
+
+		if (!machine().side_effects_disabled())
+		{
+			m_fdc_reset_sense_pos++;
+			if (m_fdc_reset_sense_pos == 2)
+			{
+				m_fdc_reset_sense_pos = 0;
+				m_fdc_reset_sense_active = false;
+			}
+		}
+
+		return data;
+	}
+
+	if (m_fdc_data_fifo_reads)
+	{
+		const u8 data = m_fdc->fifo_r();
+
+		if (!machine().side_effects_disabled())
+		{
+			m_fdc_data_fifo_reads--;
+
+			if (!m_fdc_data_fifo_reads)
+			{
+				m_fdc->tc_w(true);
+				m_fdc->tc_w(false);
+			}
+		}
+
+		return data;
+	}
+
+	u8 data = m_fdc->fifo_r();
+	if (m_fdc_sense_interrupt_active)
+	{
+		if (!m_fdc_sense_interrupt_pos)
+		{
+			data &= ~0x04;
+		}
+
+		if (!machine().side_effects_disabled())
+		{
+			m_fdc_sense_interrupt_pos++;
+			if (data == 0x80 || m_fdc_sense_interrupt_pos == 2)
+			{
+				m_fdc_sense_interrupt_active = false;
+				m_fdc_sense_interrupt_pos = 0;
+			}
+		}
+	}
+
+	return data;
+}
+
+
+void nakajies_fdc_state::fdc_fifo_w(u8 data)
+{
+	if (data == 0x08 && m_fdc_reset_sense_count)
+	{
+		m_fdc->fifo_w(data);
+
+		const u8 core_st0 = m_fdc->fifo_r();
+		u8 core_pcn = 0x00;
+		bool core_has_pcn = false;
+		if (core_st0 != 0x80 && (m_fdc->msr_r() & 0xc0) == 0xc0)
+		{
+			core_pcn = m_fdc->fifo_r();
+			core_has_pcn = true;
+		}
+
+		m_fdc_reset_sense_data[0] = core_st0 != 0x80 ? core_st0 : (0xc0 | (4 - m_fdc_reset_sense_count));
+		m_fdc_reset_sense_data[1] = core_has_pcn ? core_pcn : 0x00;
+
+		m_fdc_reset_sense_count--;
+		if (!m_fdc_reset_sense_count && (m_fdc->msr_r() & 0xc0) == 0x80)
+		{
+			m_fdc->fifo_w(0x08);
+			const u8 drain_st0 = m_fdc->fifo_r();
+			if (drain_st0 != 0x80 && (m_fdc->msr_r() & 0xc0) == 0xc0)
+				m_fdc->fifo_r();
+		}
+		m_fdc_reset_sense_pos = 0;
+		m_fdc_reset_sense_active = true;
+		return;
+	}
+
+	if (m_fdc_data_fifo_writes)
+	{
+		m_fdc->fifo_w(data);
+
+		m_fdc_data_fifo_writes--;
+
+		if (!m_fdc_data_fifo_writes)
+		{
+			m_fdc->tc_w(true);
+			m_fdc->tc_w(false);
+		}
+
+		return;
+	}
+
+	if (!m_fdc_cmd_pos)
+	{
+		m_fdc_cmd_len = t200_fdc_command_length(data);
+		m_fdc_sense_interrupt_active = data == 0x08;
+		m_fdc_sense_interrupt_pos = 0;
+	}
+
+	m_fdc_cmd[m_fdc_cmd_pos++] = data;
+
+	m_fdc->fifo_w(data);
+
+	if (m_fdc_cmd_pos >= m_fdc_cmd_len)
+	{
+		switch (m_fdc_cmd[0] & 0x1f)
+		{
+		case 0x05:
+			m_fdc_data_fifo_writes = t200_fdc_sector_size(m_fdc_cmd[5], m_fdc_cmd[8]);
+			break;
+		case 0x06:
+			m_fdc_data_fifo_reads = t200_fdc_sector_size(m_fdc_cmd[5], m_fdc_cmd[8]);
+			break;
+		case 0x0d:
+			m_fdc_data_fifo_writes = m_fdc_cmd[3] * 4;
+			break;
+		}
+
+		m_fdc_cmd_len = 0;
+		m_fdc_cmd_pos = 0;
+	}
 }
 
 
 template<int Bank>
 u8 nakajies_state::pccard_r(offs_t offset)
 {
+	if (!m_pccard)
+		return 0xff;
+
 	return m_pccard->read_memory_byte((Bank * 0x20000) + offset);
 }
 
@@ -386,13 +718,14 @@ u8 nakajies_state::pccard_r(offs_t offset)
 template<int Bank>
 void nakajies_state::pccard_w(offs_t offset, u8 data)
 {
-	m_pccard->write_memory_byte((Bank * 0x20000) + offset, data);
+	if (m_pccard)
+		m_pccard->write_memory_byte((Bank * 0x20000) + offset, data);
 }
 
 
 void nakajies_state::nakajies_update_irqs()
 {
-	uint8_t irq = m_irq_active & m_irq_enabled;
+	uint8_t irq = m_irq_active & ~bitswap<8>(m_irq_enabled, 0, 1, 2, 3, 4, 5, 6, 7);
 	uint8_t vector = 0xFF;
 
 	if (LOG)
@@ -416,6 +749,20 @@ void nakajies_state::nakajies_update_irqs()
 }
 
 
+void nakajies_state::set_irq(u8 data)
+{
+	m_irq_active |= data;
+	nakajies_update_irqs();
+}
+
+
+void nakajies_state::sample_keyboard_rows()
+{
+	for (unsigned row = 0; row < std::size(m_port_row); row++)
+		m_ram_base[0x6d06 + row] = m_port_row[row]->read();
+}
+
+
 /*
   System status:
   7------- PC Card present. 0 = present, 1 = no card present.
@@ -424,32 +771,42 @@ void nakajies_state::nakajies_update_irqs()
   ---4---- PC Card battery status. 0 = ok, 1 = battery low/failed.
   ----3--- Battery pack ok. 0 = ok, 1 = low.
   -----2-- Lithium coin battery ok. 0 = ok, 1 = low.
-  ------1- centronics busy? when set to 1 no parallel communication is performed.
+  ------1- centronics busy. when set to 1 no parallel communication is performed.
   -------0 unknown
 */
 u8 nakajies_state::sys_stat_r()
 {
 	return
 		(m_pccard_card_detect ? 0x80 : 0x00) |
-		(m_pccard_write_protect ? 0x40 : 0x00) |
+		(!m_pccard_card_detect && m_pccard_write_protect ? 0x40 : 0x00) |
 		(m_pccard_battery_failed ? 0x10 : 0x00) |
-		m_port_status->read() |
-		(m_centronics_busy ? 0x02 : 0x00) |
-		0x21;
+		(m_port_status->read() & ~(0xd2)) |
+		(m_centronics_busy ? 0x02 : 0x00);
 }
 
 
 void nakajies_state::banking_w(offs_t offset, u8 data)
 {
+	m_bank_select[offset] = data;
+
+	const u8 internal_ram_pages = std::max<u8>(1, m_ram_size / 0x20000);
+	m_rombank[offset]->set_entry((data & 0x0f) ^ 0xf);
+	m_rambank[offset]->set_entry(((data & 0x0f) ^ 0xf) % internal_ram_pages);
+
 	if (!BIT(data, 4))
 	{
 		// ROM or extra RAM
 		if (BIT(data, 3))
 		{
-			if (m_ram_size >= 256 * 1024)
+			if (m_bank_bit3_selects_ram)
 			{
+				m_rambank[offset]->set_entry(offset % internal_ram_pages);
 				m_view[offset].select(VIEW_RAM);
+			}
+			else if (m_ram_size >= 256 * 1024)
+			{
 				m_rambank[offset]->set_entry(1);
+				m_view[offset].select(VIEW_RAM);
 			}
 			else
 			{
@@ -458,7 +815,6 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 		}
 		else
 		{
-			m_rombank[offset]->set_entry((data & 0x07) ^ 0x07);
 			m_view[offset].select(VIEW_ROM);
 		}
 	}
@@ -467,15 +823,12 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 		if (!m_pccard.found() || !BIT(data, 3))
 		{
 			// Internal (S)RAM
-			// Banking and actual storage not verified
-			m_rambank[offset]->set_entry(0);
 			m_view[offset].select(VIEW_RAM);
 		}
 		else
 		{
-			// External (S)RAM
-			// Banking and actual storage not verified
-			m_view[offset].select(VIEW_EXT + ((data & 0x07) & 0x07));
+			// External PC Card space
+			m_view[offset].select(VIEW_EXT + (0x0f - (data & 0x0f)));
 		}
 	}
 }
@@ -484,18 +837,29 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 u8 nakajies_state::keyboard_r()
 {
 	const u8 row = m_keyboard_row;
-	m_keyboard_row++;
-	return (row < 10) ? m_port_row[row]->read() : 0;
+	return (row > 0) ? m_port_row[row - 1]->read() : 0;
 }
 
 
 void nakajies_state::keyboard_row_reset(u8 data)
 {
-	if (!BIT(m_keyboard_row_reset, 0) && BIT(data, 0))
+	// Bit 0 appears to hold/release the external row-scan counter.  The
+	// firmware pulses FE->FF when starting a scan and writes FE after repeated
+	// empty scans, switching back to the scan-cycle IRQ source.
+	const bool was_enabled = BIT(m_keyboard_row_reset, 0);
+	const bool enabled = BIT(data, 0);
+
+	m_keyboard_row_reset = data;
+
+	if (enabled && !was_enabled)
+		sample_keyboard_rows();
+
+	if (!enabled || !was_enabled)
 	{
 		m_keyboard_row = 0;
+		m_irq_active &= ~0x30;
+		nakajies_update_irqs();
 	}
-	m_keyboard_row_reset = data;
 }
 
 
@@ -512,13 +876,13 @@ void nakajies_state::uart_control_w(u8 data)
 	//          011 - 2400
 	//          100 - 1200
 
-	m_centronics->write_strobe(BIT(data, 5));
+	const bool reset_uart = BIT(m_uart_control, 3) && !BIT(data, 3);
 	m_uart_control = data;
 
-	if (BIT(m_uart_control, 3) == 1 && BIT(data, 3) == 0)
+	m_centronics->write_strobe(BIT(data, 5));
+	if (reset_uart)
 		m_uart->reset();
-
-	m_uart_clock->set_clock_scale(1 << (data & 0x07));
+	m_uart_clock->set_clock_scale(1.0 / double(1 << (data & 0x07)));
 }
 
 
@@ -531,32 +895,62 @@ void nakajies_state::centronics_busy_w(int state)
 void nakajies_state::centronics_ack_w(int state)
 {
 	m_centronics_ack = state;
+
+	if (state)
+		set_irq(0x02); // IRQ vector 0xfe: ACK-driven printer byte feeder.
 }
 
 
 void nakajies_state::uart_txrdy_w(int state)
 {
-	if (!m_uart_rxrdy && state)
-	{
-		m_irq_active |= 0x08;
-		nakajies_update_irqs();
-	}
+	if (!m_uart_txrdy && state)
+		set_irq(0x04);
 
-	m_uart_rxrdy = state;
+	m_uart_txrdy = state;
 }
 
 
 void nakajies_state::uart_rxrdy_w(int state)
 {
 	if (!m_uart_rxrdy && state)
-	{
-		m_irq_active |= 0x08;
-		nakajies_update_irqs();
-	}
+		set_irq(0x08);
 
 	m_uart_rxrdy = state;
 }
 
+
+void nakajies_state::buzzer_update_clock()
+{
+	const u16 divisor = m_buzzer_low | (m_buzzer_high << 8);
+
+	m_beeper->set_clock(divisor ? (X301 / 64) / divisor : 0);
+}
+
+
+void nakajies_state::buzzer_low_w(u8 data)
+{
+	m_buzzer_low = data;
+	buzzer_update_clock();
+}
+
+
+void nakajies_state::buzzer_high_w(u8 data)
+{
+	m_buzzer_high = data;
+	buzzer_update_clock();
+}
+
+
+void nakajies_state::buzzer_gate_w(u8 data)
+{
+	m_beeper->set_state(data == 0x7f);
+}
+
+
+void nakajies_state::timer_count_w(u8 data)
+{
+	m_f9_timer->adjust(data ? attotime::from_ticks(data, X301 / 20480) : attotime::never);
+}
 
 static INPUT_PORTS_START(nakajies)
 	PORT_START("status")
@@ -566,13 +960,14 @@ static INPUT_PORTS_START(nakajies)
 	PORT_CONFNAME(0x04, 0x00, "Coin battery Failed")
 	PORT_CONFSETTING(0x00, DEF_STR(No))
 	PORT_CONFSETTING(0x04, DEF_STR(Yes))
+	PORT_BIT(0x21, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START("ROW0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LEFT")        PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER")       PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER")       PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -633,38 +1028,38 @@ static INPUT_PORTS_START(nakajies)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INSERT")      PORT_CODE(KEYCODE_INSERT)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RIGHT")       PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\")          PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/")           PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/")           PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H")           PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N")           PORT_CODE(KEYCODE_N)
 
 	PORT_START("ROW7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=")           PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7")           PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7")           PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ORGN")        PORT_CODE(KEYCODE_PGUP)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UP")          PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("WP")          PORT_CODE(KEYCODE_PGDN)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U")           PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")           PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K")           PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U")           PORT_CODE(KEYCODE_U) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")           PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K")           PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_2_PAD)
 
 	PORT_START("ROW8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8")           PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8")           PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-")           PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("]")           PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[")           PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\'")          PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I")           PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")           PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",")           PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I")           PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")           PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",")           PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_DEL_PAD)
 
 	PORT_START("ROW9")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9")           PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9")           PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BACK")        PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";")           PORT_CODE(KEYCODE_COLON)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L")           PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O")           PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P) PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";")           PORT_CODE(KEYCODE_COLON) PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L")           PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O")           PORT_CODE(KEYCODE_O) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".")           PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
@@ -685,14 +1080,66 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(nakajies_state::power_button_nmi)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (!newval)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		return;
+	}
+
+	sample_keyboard_rows();
+
+	if (m_lcd_on)
+	{
+		address_space &program = m_maincpu->space(AS_PROGRAM);
+		const auto read_vector = [&program](offs_t address) -> std::pair<u16, u16>
+		{
+			return std::make_pair(
+					program.read_byte(address) | (program.read_byte(address + 1) << 8),
+					program.read_byte(address + 2) | (program.read_byte(address + 3) << 8));
+		};
+		const auto physical = [](u16 segment, u16 offset) -> offs_t { return (u32(segment) << 4) + offset; };
+
+		auto const [nmi_offset, nmi_segment] = read_vector(0x0008);
+		auto const [f8_offset, f8_segment] = read_vector(0x03e0);
+		u16 f8_handler_offset = f8_offset;
+		const offs_t f8_target = physical(f8_segment, f8_offset);
+
+		if (f8_target <= 0xffffd && program.read_byte(f8_target) == 0xe9)
+		{
+			const s16 displacement = s16(u16(program.read_byte(f8_target + 1) | (program.read_byte(f8_target + 2) << 8)));
+			f8_handler_offset = u16(f8_offset + 3 + displacement);
+		}
+
+		// The ES-210/Dator/325/T100/T400 v2.1-style ROMs do not route NMI to
+		// the power path.  T400 v3.1, T450 and T200 install NMI to the same
+		// save/suspend handler reached by IRQ F8.
+		if (nmi_segment == f8_segment && nmi_offset == f8_handler_offset)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		else
+			set_irq(0x01); // IRQ vector 0xff: warm/power-management source.
+	}
+	else
+	{
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine().schedule_soft_reset();
+	}
 }
 
 
 INPUT_CHANGED_MEMBER(nakajies_state::power_button_irq)
 {
-	m_irq_active |= 0x01;
-	nakajies_update_irqs();
+	if (!newval)
+		return;
+
+	sample_keyboard_rows();
+
+	if (m_lcd_on)
+		set_irq(0x01); // IRQ vector 0xff: warm/power-management source.
+	else
+	{
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine().schedule_soft_reset();
+	}
 }
 
 
@@ -701,24 +1148,31 @@ void nakajies_state::machine_start()
 	u32 rom_size = m_rom_region->bytes();
 
 	m_ram_base = make_unique_clear<uint8_t[]>(m_ram_size);
-	m_nvram->set_base(&m_ram_base[0], m_ram_size);
+	m_nvram->set_base(m_ram_base.get(), m_ram_size);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUMBER_OF_AREAS; i++)
 	{
 		// TODO: rom banks outside max bank size; assuming the banks are simply mirrored
-		for (int j = 0; j < 8; j += rom_size / 0x20000)
+		for (int j = 0; j < 16; j += rom_size / 0x20000)
 			m_rombank[i]->configure_entries(j, rom_size / 0x20000, m_rom_region->base(), 0x20000);
-
-		for (int j = 0; j < 2; j += m_ram_size / 0x20000)
+		// TODO: ram banks outside max bank size; assuming the banks are simply mirrored
+		// how would that work for a system with 160KB RAM?
+		for (int j = 0; j < 16; j += m_ram_size / 0x20000)
 			m_rambank[i]->configure_entries(j, m_ram_size / 0x20000, &m_ram_base[0], 0x20000);
 	}
+
+	m_f9_timer = timer_alloc(FUNC(nakajies_state::f9_timer), this);
 
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_lcd_memory_start));
+	save_item(NAME(m_lcd_on));
 	save_item(NAME(m_keyboard_row));
 	save_item(NAME(m_keyboard_row_reset));
 	save_item(NAME(m_uart_control));
+	save_item(NAME(m_buzzer_low));
+	save_item(NAME(m_buzzer_high));
+	save_item(NAME(m_bank_select));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_ack));
 	save_item(NAME(m_uart_rxrdy));
@@ -731,46 +1185,55 @@ void nakajies_state::machine_start()
 
 void nakajies_state::machine_reset()
 {
-	m_irq_enabled = 0;
+	m_irq_enabled = m_ram_base[0x6d4f];
 	m_irq_active = 0;
 	m_lcd_memory_start = 0;
-	m_keyboard_row = 0;
+	m_lcd_on = true;
+	m_keyboard_row_reset = BIT(m_irq_enabled, 3) ? 0xfe : 0xff;
+	m_keyboard_row = (BIT(m_keyboard_row_reset, 0) && (m_ram_base[0x6d29] <= 0x09)) ? m_ram_base[0x6d29] : 0;
+	m_uart_control = 0;
+	m_buzzer_low = 0;
+	m_buzzer_high = 0;
+	std::fill(std::begin(m_bank_select), std::end(m_bank_select), 0);
+	m_centronics_busy = 0;
+	m_uart_rxrdy = 0;
+	m_uart_txrdy = 0;
+	m_f9_timer->adjust(attotime::never);
+	m_beeper->set_clock(0);
+	m_beeper->set_state(0);
 
 	for (auto &view : m_view)
-		view.select(VIEW_ROM);
+		view.select(0);
 
 	for (auto &bank : m_rombank)
-		bank->set_entry(0x07);
+		bank->set_entry(0x0f);
 
 	for (auto &bank : m_rambank)
-		bank->set_entry(0);
+		bank->set_entry(0x0f);
 }
 
 u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (!m_lcd_on)
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
 	uint8_t* lcd_memory_start = &m_ram_base[m_lcd_memory_start << 9];
 	int height = screen.height();
 
-	if (m_lcd_on)
-	{
-		for (int y = 0; y < height; y++)
+	for (int y = 0; y < height; y++)
+		for (int x = 0; x < 60; x++)
 		{
-			for (int x = 0; x < 60; x++)
-			{
-				u8 data = lcd_memory_start[y*64 + x];
+			u8 data = lcd_memory_start[y*64 + x];
 
-				for (int px = 0; px < 8; px++)
-				{
-					bitmap.pix(y, (x * 8) + px) = BIT(data, 7);
-					data <<= 1;
-				}
+			for (int px = 0; px < 8; px++)
+			{
+				bitmap.pix(y, (x * 8) + px) = BIT(data, 7);
+				data <<= 1;
 			}
 		}
-	}
-	else
-	{
-		bitmap.fill(0);
-	}
 
 	return 0;
 }
@@ -778,14 +1241,22 @@ u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 {
+	if (!BIT(m_keyboard_row_reset, 0))
+	{
+		set_irq(0x20); // IRQ vector 0xfa: scan-cycle/reset source.
+		return;
+	}
+
 	if (m_keyboard_row > 0x09)
 	{
 		// trigger reset of keyboard scan
+		m_keyboard_row = 0;
 		m_irq_active |= 0x20;
 	}
 	else
 	{
 		// trigger handling of keyboard row
+		m_keyboard_row++;
 		m_irq_active |= 0x10;
 	}
 
@@ -793,10 +1264,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::hz10_timer)
+TIMER_CALLBACK_MEMBER(nakajies_state::f9_timer)
 {
-	m_irq_active |= 0x40;
-	nakajies_update_irqs();
+	set_irq(0x40); // IRQ vector 0xf9: short timer wake/acknowledge handler.
 }
 
 
@@ -837,10 +1307,15 @@ static GFXDECODE_START(gfx_drwrt400)
 	GFXDECODE_ENTRY("bios", 0x580b6, nakajies_charlayout, 0, 1)
 GFXDECODE_END
 
+
 static void pccard_devices(device_slot_interface &device)
 {
+	device.option_add("melcard_1m", PCCARD_SRAM_MITSUBISHI_1M);
 	device.option_add("sram_1m", PCCARD_SRAM_CENTENNIAL_1M);
+	device.option_add("sram_2m", PCCARD_SRAM_CENTENNIAL_2M);
+	device.option_add("sram_4m", PCCARD_SRAM_CENTENNIAL_4M);
 }
+
 
 void nakajies_state::drwrt100(machine_config &config)
 {
@@ -858,12 +1333,12 @@ void nakajies_state::drwrt100(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wales210);
 	PALETTE(config, m_palette, FUNC(nakajies_state::nakajies_palette), 2);
 
+	/* sound */
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.05);
+
 	/* rtc */
 	RP5C01(config, m_rtc, XTAL(32'768));
-
-	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(500));
-	TIMER(config, "10hz_timer").configure_periodic(FUNC(nakajies_state::hz10_timer), attotime::from_hz(10));
-
 	NVRAM(config, m_nvram);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -873,6 +1348,7 @@ void nakajies_state::drwrt100(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
+	// NEC uPD71051-compatible USART.
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(m_serial, FUNC(rs232_port_device::write_txd));
 	m_uart->rts_handler().set(m_serial, FUNC(rs232_port_device::write_rts));
@@ -880,7 +1356,7 @@ void nakajies_state::drwrt100(machine_config &config)
 	m_uart->rxrdy_handler().set(FUNC(nakajies_state::uart_rxrdy_w));
 	m_uart->txrdy_handler().set(FUNC(nakajies_state::uart_txrdy_w));
 
-	CLOCK(config, m_uart_clock, 150 * 16);
+	CLOCK(config, m_uart_clock, 19200 * 16);
 	m_uart_clock->signal_handler().set(m_uart, FUNC(i8251_device::write_rxc));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_txc));
 
@@ -888,6 +1364,8 @@ void nakajies_state::drwrt100(machine_config &config)
 	m_serial->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 	m_serial->cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 	m_serial->dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
+
+	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(X301 / 20480));
 
 	m_ram_size = 128 * 1024;
 }
@@ -899,8 +1377,7 @@ void nakajies_state::nakajies210(machine_config &config)
 	PCCARD_SLOT(config, m_pccard, pccard_devices, nullptr);
 	m_pccard->cd1().set(FUNC(nakajies_state::pccard_card_detect_w));
 	m_pccard->wp().set(FUNC(nakajies_state::pccard_write_protect_w));
-	m_pccard->bvd1().set(FUNC(nakajies_state::pccard_battery_failed_w));
-
+	m_pccard->bvd2().set(FUNC(nakajies_state::pccard_battery_failed_w));
 }
 
 void nakajies_state::dator3k(machine_config &config)
@@ -913,20 +1390,40 @@ void nakajies_state::nakajies220(machine_config &config)
 {
 	nakajies210(config);
 	m_gfxdecode->set_info(gfx_drwrt400);
-	m_ram_size = 256 * 1024;
 }
 
 void nakajies_fdc_state::nakajies250(machine_config &config)
 {
-	nakajies220(config);
+	nakajies220_256(config);
 	m_maincpu->set_addrmap(AS_IO, &nakajies_fdc_state::nakajies_io_map_fdc);
 
 	m_screen->set_size(80 * 6, 16 * 8);
 	m_screen->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
 	m_gfxdecode->set_info(gfx_drwrt200);
 
-	N82077AA(config, m_fdc, 24_MHz_XTAL);  // Actually Intel N82877SL
+	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);  // Actually Intel N82877SL
 	FLOPPY_CONNECTOR(config, m_floppy, "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
+}
+
+void nakajies_state::nakajies220_t100(machine_config &config)
+{
+	drwrt100(config);
+	m_gfxdecode->set_info(gfx_drwrt400);
+	m_bank_bit3_selects_ram = true;
+}
+
+void nakajies_state::nakajies220_t450(machine_config &config)
+{
+	nakajies220(config);
+	m_ram_size = 256 * 1024;
+	m_bank_bit3_selects_ram = true;
+}
+
+void nakajies_state::nakajies220_256(machine_config &config)
+{
+	nakajies220(config);
+	m_ram_size = 256 * 1024;
+	m_bank_bit3_selects_ram = true;
 }
 
 
@@ -990,11 +1487,11 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT         CLASS               INIT        COMPANY     FULLNAME            FLAGS
-COMP( 199?, wales210, 0,        0,      nakajies210, nakajies_irq, nakajies_state,     empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies_irq, nakajies_state,     empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies_irq, nakajies_state,     empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies_irq, nakajies_state,     empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state,     empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state,     empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
-COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies_nmi, nakajies_fdc_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+//    YEAR  NAME      PARENT    COMPAT  MACHINE          INPUT         CLASS           INIT        COMPANY     FULLNAME            FLAGS
+COMP( 199?, wales210, 0,        0,      nakajies210,     nakajies_irq, nakajies_state, empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING ) // German, 128KB RAM
+COMP( 199?, dator3k,  wales210, 0,      dator3k,         nakajies_irq, nakajies_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING ) // Spanish, 128KB RAM
+COMP( 199?, es210_es, wales210, 0,      nakajies210,     nakajies_irq, nakajies_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING ) // Spanish, 128KB RAM
+COMP( 199?, drwrt100, wales210, 0,      nakajies220_t100, nakajies_irq, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220_256, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter T400", 0 ) // English, 256KB RAM; built-in store formats as 160KB
+COMP( 199?, drwrt450, wales210, 0,      nakajies220_t450, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING ) // English, 256KB? RAM
+COMP( 199?, drwrt200, wales210, 0,      nakajies250,     nakajies_nmi, nakajies_fdc_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING ) // English, 256KB? RAM
