@@ -1363,9 +1363,6 @@ void apple2gs_state::do_io(int offset)
 			accel_temp_delay(5, (m_accel_slotspk & 1));
 			break;
 
-		case 0x37:  // DMAREG, 16-bit access to CYAREG
-			break;
-
 		case 0x47:  // CLRVBLINT
 			m_intflag &= ~(INTFLAG_VBL | INTFLAG_QUARTER);
 			lower_irq(IRQS_VBL);
@@ -1704,6 +1701,9 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x36:  // SPEED/CYAREG
 			return m_speed;
 
+		case 0x37:  // DMAREG
+			return m_a2bus->get_dma_bank();
+
 		case 0x3c:  // SOUNDCTL
 			return m_sndglu_ctrl | 0x1f; // "write only" bits read as 1
 
@@ -2039,6 +2039,11 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x36:  // SPEED
 			m_speed = data; // bits 5-6 are not forced to zero
 			update_speed();
+			break;
+
+		case 0x37: // DMAREG
+			// bank for DMA transfers
+			m_a2bus->set_dma_bank(data);
 			break;
 
 		case 0x38:  // SCCBREG

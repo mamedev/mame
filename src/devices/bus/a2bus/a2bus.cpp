@@ -169,7 +169,7 @@ a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, cons
 	, m_out_inh_cb(*this)
 	, m_out_dma_cb(*this)
 	, m_in_open_bus_cb(*this, 0xff)
-	, m_slot_irq_mask(0), m_slot_nmi_mask(0)
+	, m_slot_irq_mask(0), m_slot_nmi_mask(0), m_dma_bank(0)
 {
 }
 
@@ -183,6 +183,9 @@ void a2bus_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_slot_irq_mask = m_slot_nmi_mask = 0;
+	m_dma_bank = 0;
+
+	save_item(NAME(m_dma_bank));
 }
 
 //-------------------------------------------------
@@ -270,12 +273,23 @@ void a2bus_device::set_dma_line(int state)
 
 uint8_t a2bus_device::dma_r(uint16_t offset)
 {
-	return m_maincpu_space->read_byte(offset);
+	return m_maincpu_space->read_byte((uint32_t(m_dma_bank) << 16) | offset);
 }
 
 void a2bus_device::dma_w(uint16_t offset, uint8_t data)
 {
-	m_maincpu_space->write_byte(offset, data);
+	m_maincpu_space->write_byte((uint32_t(m_dma_bank) << 16) | offset, data);
+}
+
+// Cards that hold the Apple in wait states until they're ready use this
+void a2bus_device::defer_host_access()
+{
+	cpu_device &cpu = downcast<cpu_device &>(m_maincpu_space->device());
+
+	if (cpu.cpu_is_interruptible())
+	{
+		cpu.defer_access();
+	}
 }
 
 void a2bus_device::recalc_inh(int slot)

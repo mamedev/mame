@@ -88,8 +88,13 @@ public:
 	void recalc_inh(int slot);
 	uint8_t dma_r(uint16_t offset);
 	void dma_w(uint16_t offset, uint8_t data);
+	void set_dma_bank(uint8_t bank) { m_dma_bank = bank; }
+	uint8_t get_dma_bank() const { return m_dma_bank; }
+
 	void reset_bus();
 	uint8_t get_open_bus() { return m_in_open_bus_cb(); }
+
+	void defer_host_access();
 
 	void irq_w(int state);
 	void nmi_w(int state);
@@ -114,6 +119,7 @@ protected:
 
 	uint8_t m_slot_irq_mask;
 	uint8_t m_slot_nmi_mask;
+	uint8_t m_dma_bank;
 };
 
 
@@ -153,6 +159,7 @@ public:
 
 	uint8_t slot_dma_read(uint16_t offset) { return m_a2bus->dma_r(offset); }
 	void slot_dma_write(uint16_t offset, uint8_t data) { m_a2bus->dma_w(offset, data); }
+	void defer_host_access() { m_a2bus->defer_host_access(); }
 
 protected:
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
