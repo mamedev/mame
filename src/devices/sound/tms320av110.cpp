@@ -65,12 +65,6 @@ constexpr offs_t REG_PCM_DIV = 0x6e;  // PCM clock divider
 constexpr offs_t REG_DIF = 0x6f;      // 18-bit PCM justification
 constexpr offs_t REG_SIN_EN = 0x70;   // serial compressed-data input enable
 
-constexpr u8 SINGLE_BIT_MASK = 0x01;
-constexpr u8 TWO_BIT_MASK = 0x03;
-constexpr u8 THREE_BIT_MASK = 0x07;
-constexpr u8 FIVE_BIT_MASK = 0x1f;
-constexpr u8 SIX_BIT_MASK = 0x3f;
-
 // Without external DRAM, the on-chip compressed-data input SRAM is 256 bytes.
 constexpr unsigned INPUT_BUFFER_BYTES_WITHOUT_DRAM = 256;
 // The supported external DRAM is 256K locations by four bits.
@@ -501,24 +495,24 @@ void tms320av110_device::write(offs_t offset, u8 data)
 		break;
 
 	case REG_FREE_FORM_H:
-		m_decoder->registers[offset] = data & THREE_BIT_MASK;
+		m_decoder->registers[offset] = data & 0x07;
 		break;
 
 	case REG_SYNC_LCK:
 	case REG_CRC_ECM:
 	case REG_SYNC_ECM:
 	case REG_STR_SEL:
-		m_decoder->registers[offset] = data & TWO_BIT_MASK;
+		m_decoder->registers[offset] = data & 0x03;
 		break;
 
 	case REG_AUD_ID:
-		m_decoder->registers[offset] = data & FIVE_BIT_MASK;
+		m_decoder->registers[offset] = data & 0x1f;
 		break;
 
 	case REG_ATTEN_L:
 	case REG_ATTEN_R:
 	case REG_PCM_DIV:
-		m_decoder->registers[offset] = data & SIX_BIT_MASK;
+		m_decoder->registers[offset] = data & 0x3f;
 		break;
 
 	case REG_PCM_18:
@@ -531,16 +525,16 @@ void tms320av110_device::write(offs_t offset, u8 data)
 	case REG_LATENCY:
 	case REG_DIF:
 	case REG_SIN_EN:
-		m_decoder->registers[offset] = data & SINGLE_BIT_MASK;
+		m_decoder->registers[offset] = data & 0x01;
 		break;
 
 	case REG_RESET:
-		if (data & SINGLE_BIT_MASK)
+		if (data & 0x01)
 			start_reset(false);
 		break;
 
 	case REG_RESTART:
-		if (data & SINGLE_BIT_MASK)
+		if (data & 0x01)
 			start_restart();
 		break;
 
