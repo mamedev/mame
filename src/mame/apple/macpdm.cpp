@@ -42,6 +42,8 @@ namespace {
 static constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
 static constexpr auto ENET_CLOCK = 20_MHz_XTAL;
 static constexpr auto SOUND_CLOCK = 45.1584_MHz_XTAL;
+static constexpr auto SCSI_CLOCK = ENET_CLOCK;
+static constexpr auto SCSI_FAST_CLOCK = 40_MHz_XTAL;
 
 static constexpr u8 DMA2_IRQ_SND_IN             = 0x01;
 static constexpr u8 DMA2_IRQ_SND_OUT            = 0x02;
@@ -1467,7 +1469,7 @@ void macpdm_state::pdm_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
 
-	NCR53C94(config, m_ncr53c94, ENET_CLOCK/2);
+	NCR53C94(config, m_ncr53c94, SCSI_CLOCK);
 	m_scsibus_a->set_external_device(7, m_ncr53c94);
 	m_ncr53c94->set_busmd(ncr53c94_device::BUSMD_3);
 	m_ncr53c94->drq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_a_drq));
@@ -1586,7 +1588,7 @@ void macpdm_state::pmac8100(machine_config &config)
 	NSCSI_CONNECTOR(config, "fastscsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "fastscsi:6", default_scsi_devices, nullptr);
 
-	NCR53CF96(config, m_ncr53cf96, ENET_CLOCK);
+	NCR53CF96(config, m_ncr53cf96, SCSI_FAST_CLOCK);
 	m_scsibus_b->set_external_device(7, m_ncr53cf96);
 	m_ncr53cf96->set_busmd(ncr53cf96_device::BUSMD_3);
 	m_ncr53cf96->drq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_b_drq));
