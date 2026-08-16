@@ -4,23 +4,44 @@
 
     Wang PC-PM001 Winchester Disk Controller emulation
 
-    Hardware model reconstructed from the 378-9040 R9 Z80 firmware
-    and the system BIOS (no schematics are known to survive).
+    The programming interface is documented in chapter 10 of the Wang
+    Professional Computer Technical Reference Manual (2nd edition,
+    August 1985, 715-0080A): table 10-1 the host ports, table 10-2 the
+    main status register, tables 10-3/10-4 the command set and the
+    status bytes each command returns, table 10-5 the recording format
+    - which matches the firmware byte for byte, down to the 4-byte
+    header ID and the 256-byte data field. What the manual does not
+    describe is anything behind that interface, so the board itself is
+    modelled from the 378-9040 R9 Z80 firmware and the system BIOS; no
+    schematics are known to survive.
 
     Host interface (I/O window selected by the slot):
     - +0x00 read: status latch (Z80 port 0x03); bit 0 is a busy
       flip-flop, set in hardware by a command latch write or a
-      response latch read, cleared by the next Z80 status write.
+      response latch read, cleared by the next Z80 status write. The
+      firmware supplies the other bits documented in table 10-2:
+      controller fault, read status, drive size, and a 4-bit count of
+      the command or status bytes transferred so far.
     - +0x02 write: command latch (Z80 port 0x01); commands are 8-byte
       blocks, each byte handshaked through the busy bit. The write
       also strobes a CTC trigger to wake the Z80 from HALT.
     - +0x02 read: response latch (Z80 port 0x20); result blocks are
       8 bytes, and the read strobes the same trigger for the next one.
     - +0x04 read: clears the host interrupt.
-    - +0x06 write: DMA/IRQ channel select, 1 << channel. The DREQ
-      bits of the option register (+0xFE) route the channel too.
+    - +0x06 write: DMA/IRQ channel select, 1 << channel. This one is
+      absent from table 10-1, which assigns the channel through bits
+      1-3 of the option register instead; the diagnostic uses +0x06
+      and the operational path uses +0xFE, so the board decodes both.
+    - +0xFC write: board reset, running the power-on diagnostic.
     - +0xFE: option register (ID 0x01 in the low bits, interrupt
-      status in bit 7).
+      status in bit 7); a write assigns the interrupt level and DMA
+      channel together, bit 1 giving channel 1 / level 5, bit 2
+      channel 2 / level 6, bit 3 channel 3 / level 7.
+
+    Table 10-1 also gives a write to +0x00 as "abort the operation in
+    progress and initialize for a new command". No software seen so
+    far uses it - the BIOS and the Wang utilities reset through +0xFC
+    - so it is left unimplemented rather than guessed at.
 
     DMA data path: a Z80 read anywhere in the 0x2000-0x27FF sector
     buffer loads the DMA address counter (the firmware deliberately
