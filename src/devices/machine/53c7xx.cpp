@@ -25,7 +25,7 @@
 #define LOG_STATE           (1U << 3)
 #define LOG_SCRIPTS         (1U << 4)
 #define LOG_FETCH           (1U << 5)
-//#define VERBOSE             (LOG_SCRIPTS | LOG_UNHANDLED | LOG_STATE)
+//#define VERBOSE             (LOG_SCRIPTS | LOG_UNHANDLED)
 
 #include "logmacro.h"
 
@@ -49,7 +49,8 @@ constexpr uint8_t DSTAT_OPC  = 0x01;
 [[maybe_unused]] constexpr uint8_t DSTAT_WTD = 0x02;
 constexpr uint8_t DSTAT_SIR  = 0x04;
 [[maybe_unused]] constexpr uint8_t DSTAT_SSI  = 0x08;
-[[maybe_unused]] constexpr uint8_t DSTAT_ABRT = 0x10;
+constexpr uint8_t DSTAT_ABRT = 0x10;
+constexpr uint8_t DSTAT_IRQ_MASK = 0x3f;
 constexpr uint8_t DSTAT_DFE  = 0x80;
 
 [[maybe_unused]] constexpr uint8_t SSTAT0_PAR = 0x01;
@@ -158,7 +159,6 @@ void ncr53c700_device::device_start()
 	save_item(NAME(m_finished));
 	save_item(NAME(m_first_byte_received));
 	save_item(NAME(m_xfr_phase));
-
 	save_item(NAME(m_scripts_state));
 }
 
@@ -212,7 +212,6 @@ void ncr53c700_device::device_reset()
 	m_dien      = 0;
 	m_dwt       = 0;
 	m_dcntl     = 0;
-
 	m_finished = false;
 	m_connected = false;
 	m_first_byte_received = false;
@@ -638,7 +637,7 @@ void ncr53c700_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 		case 0x7:
 		{
-			m_temp = data;
+			COMBINE_DATA(&m_temp);
 
 			break;
 		}
@@ -723,9 +722,7 @@ void ncr53c700_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			if (ACCESSING_BITS_16_23)
 			{
 				m_dwt = data >> 16;
-
-				if (m_dwt)
-					fatalerror("53c7xx: DMA Watchdog Timer enabled!");
+				// our dma callbacks never timeout, so we don't need to do anything here
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -754,6 +751,35 @@ void ncr53c710_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case 0x4:
 			LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", machine().describe_context(), offset, mem_mask, data);
 			COMBINE_DATA(&m_dsa);
+			break;
+
+		case 0x6:
+			ncr53c700_device::write(offset, data, mem_mask);
+
+			if (ACCESSING_BITS_8_15)
+			{
+				uint8_t const value = data >> 8;
+				unsigned size = 0;
+
+				// determine the size of the next dma transfer
+				if (m_dbc)
+				{
+					size = 4;
+					if (BIT(m_dnad, 0) || m_dbc == 1)
+						size = 1;
+					else if (BIT(m_dnad, 1) || m_dbc < 4)
+						size = 2;
+				}
+
+				// apply adjustments to DNAD and DBC if required
+				if (value & CTEST5_ADCK)
+					m_dnad += size;
+				if (value & CTEST5_BBCK)
+					m_dbc -= size;
+
+				// ADCK and BBCK automatically clear
+				m_ctest[5] &= ~(CTEST5_ADCK | CTEST5_BBCK);
+			}
 			break;
 
 		case 0x8:
@@ -868,7 +894,16 @@ void ncr53c710_device::istat_w(uint8_t data)
 		m_dcntl = dcntl;
 		m_dmode = dmode;
 		m_istat = ISTAT_RST;
+		return;
 	}
+
+	if (m_istat & ISTAT_ABRT)
+	{
+		m_dstat |= DSTAT_ABRT;
+		set_scripts_state(SCRIPTS_IDLE);
+	}
+
+	update_irqs();
 }
 
 
@@ -887,12 +922,14 @@ void ncr53c700_device::update_irqs()
 	else
 		m_istat &= ~ISTAT_SIP;
 
-	if (m_dstat & m_dien)
+	if (m_dstat & DSTAT_IRQ_MASK)
 		m_istat |= ISTAT_DIP;
 	else
 		m_istat &= ~ISTAT_DIP;
 
-	m_irq_handler(m_istat & (ISTAT_SIP | ISTAT_DIP) ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_handler(
+		((m_sstat[0] & m_sien) || (m_dstat & m_dien & DSTAT_IRQ_MASK))
+			? ASSERT_LINE : CLEAR_LINE);
 }
 
 //-------------------------------------------------

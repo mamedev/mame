@@ -14,6 +14,7 @@
 
     Notes:
     - Also sold by DKB in license
+    - Open source firmware available at https://github.com/A4091/a4091-software
 
     TODO:
     - Map dip switch ID to actually used ID
@@ -112,16 +113,16 @@ static INPUT_PORTS_START( a4091 )
 	PORT_DIPSETTING(0x05, "5")
 	PORT_DIPSETTING(0x06, "6")
 	PORT_DIPSETTING(0x07, "7")
-	PORT_DIPNAME(0x08, 0x08, "SCSI Fast Bus") PORT_DIPLOCATION("DIP:4")
+	PORT_DIPNAME(0x08, 0x08, "SCSI Fast Bus Disable") PORT_DIPLOCATION("DIP:4")
 	PORT_DIPSETTING(0x08, DEF_STR( Off ))
 	PORT_DIPSETTING(0x00, DEF_STR( On ))
-	PORT_DIPNAME(0x10, 0x10, "Short/Long Spinup") PORT_DIPLOCATION("DIP:5")
+	PORT_DIPNAME(0x10, 0x10, "Short Spinup Disable") PORT_DIPLOCATION("DIP:5")
 	PORT_DIPSETTING(0x10, DEF_STR( Off ))
 	PORT_DIPSETTING(0x00, DEF_STR( On ))
-	PORT_DIPNAME(0x20, 0x20, "Synchronous Mode") PORT_DIPLOCATION("DIP:6")
+	PORT_DIPNAME(0x20, 0x20, "Synchronous Mode Disable") PORT_DIPLOCATION("DIP:6")
 	PORT_DIPSETTING(0x20, DEF_STR( Off ))
 	PORT_DIPSETTING(0x00, DEF_STR( On ))
-	PORT_DIPNAME(0x40, 0x40, "External SCSI Termination") PORT_DIPLOCATION("DIP:7")
+	PORT_DIPNAME(0x40, 0x40, "External SCSI Termination Disable") PORT_DIPLOCATION("DIP:7")
 	PORT_DIPSETTING(0x40, DEF_STR( Off ))
 	PORT_DIPSETTING(0x00, DEF_STR( On ))
 	PORT_DIPNAME(0x80, 0x80, "Logical Unit (LUN) Enable") PORT_DIPLOCATION("DIP:8")
@@ -293,15 +294,26 @@ ROM_START( a4091 )
 	ROM_REGION(0x10000, "rom", 0)
 	ROM_DEFAULT_BIOS("v4013")
 
+	// commercial rom versions
 	ROM_SYSTEM_BIOS(0, "v404", "v40.4")
-	ROMX_LOAD("a4091_v404.u206", 0x0000, 0x8000, CRC(9ba7e7dc) SHA1(18985b7ec95239da21a242a4fc42f13496434534), ROM_BIOS(0))
-	ROM_RELOAD(                  0x8000, 0x8000)
+	ROMX_LOAD("a4091_v404.u206",            0x0000, 0x8000, CRC(9ba7e7dc) SHA1(18985b7ec95239da21a242a4fc42f13496434534), ROM_BIOS(0))
+	ROM_RELOAD(                             0x8000, 0x8000)
 	ROM_SYSTEM_BIOS(1, "v409", "v40.9")
-	ROMX_LOAD("a4091_v409.u206", 0x0000, 0x8000, CRC(7e12a120) SHA1(a411d5726801dc443d41428f382ae3d56f44ef27), ROM_BIOS(1))
-	ROM_RELOAD(                  0x8000, 0x8000)
+	ROMX_LOAD("a4091_v409.u206",            0x0000, 0x8000, CRC(7e12a120) SHA1(a411d5726801dc443d41428f382ae3d56f44ef27), ROM_BIOS(1))
+	ROM_RELOAD(                             0x8000, 0x8000)
 	ROM_SYSTEM_BIOS(2, "v4013", "v40.13")
 	ROMX_LOAD("391592-02_a4091_v4013.u206", 0x0000, 0x8000, CRC(54cb9e85) SHA1(3ce66919f6fd67974923a12d91b730f1ffb4a7ba), ROM_BIOS(2))
 	ROM_RELOAD(                             0x8000, 0x8000)
+
+	// open source firmware
+	ROM_SYSTEM_BIOS(3, "reamiga",          "ReAmiga v42.39")
+	ROMX_LOAD("a4091_reamiga_v4239.rom",          0x0000, 0x10000, CRC(4eb0a490) SHA1(261dafaf0f4fa80348f1a31680b4345e15bc60ae), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "reamiga_cdfs",     "ReAmiga v42.39 (CDFS)")
+	ROMX_LOAD("a4091_reamiga_v4239_cdfs.rom",     0x0000, 0x10000, CRC(22668dbf) SHA1(b4ee1016604c0c8f8229e9812ebe49e47224dd94), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "reamiga_debug",    "ReAmiga v42.39 (debug)")
+	ROMX_LOAD("a4091_reamiga_v4239_debug.rom",    0x0000, 0x10000, CRC(d6096270) SHA1(e0642104ac05f8e495325719d2d52c5bd4047b63), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "reamiga_nodriver", "ReAmiga v42.39 (no driver)")
+	ROMX_LOAD("a4091_reamiga_v4239_nodriver.rom", 0x0000, 0x10000, CRC(ecbfc55d) SHA1(9c8b269e7b3b7f179cf9c1ff418e911078776297), ROM_BIOS(6))
 ROM_END
 
 const tiny_rom_entry *a4091_device::device_rom_region() const

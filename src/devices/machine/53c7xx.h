@@ -88,6 +88,8 @@ protected:
 	uint8_t   m_dwt;
 	uint8_t   m_dcntl;
 
+	void update_irqs();
+
 private:
 	static constexpr uint8_t DMODE_PIPE = 0x02;
 	static constexpr uint8_t DCNTL_RST = 0x01;
@@ -131,7 +133,6 @@ private:
 		RECV_WAIT_REQ_1
 	};
 
-	void update_irqs();
 	void set_scsi_state(int state);
 	void delay(const attotime &delay);
 	void scsi_ctrl_changed() override;
@@ -211,6 +212,8 @@ private:
 	static constexpr uint8_t CTEST8_CLF = 0x04;
 	static constexpr uint8_t CTEST8_WRITABLE = 0x0b;
 	static constexpr uint8_t CTEST2_SIGP = 0x40;
+	static constexpr uint8_t CTEST5_BBCK = 0x40;
+	static constexpr uint8_t CTEST5_ADCK = 0x80;
 
 	virtual void dcntl_w(uint8_t data) override;
 	virtual void istat_w(uint8_t data) override;
