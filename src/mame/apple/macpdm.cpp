@@ -103,6 +103,7 @@ private:
 	floppy_image_device *m_cur_floppy = nullptr;
 
 	uint32_t m_model_id = 0;
+	uint8_t m_simm_sockets = 2;
 	uint64_t m_hmc_reg = 0, m_hmc_buffer = 0;
 	uint8_t m_hmc_bit = 0;
 
@@ -229,6 +230,8 @@ private:
 	void hmc_w(offs_t offset, uint8_t data);
 
 	void ram_size();
+	void ram_size_6100();
+	void ram_size_7100_8100();
 
 	uint32_t id_r(offs_t offset, uint32_t mem_mask);
 
@@ -780,13 +783,72 @@ void macpdm_state::hmc_w(offs_t offset, uint8_t data)
     PDM uses a variant on the V8/Sonora style memory controller.
     - Motherboard RAM can be 4 or 8 MiB
     - The hardware officially limits SIMMs to 2, 8, or 32 MiB, and SIMMs must be installed in pairs
-    - In reality, 128 MiB SIMMs will also work.
+    - In reality, 128 MiB SIMMs will also work on the 6100.
     - 6100 has only 2 SIMM slots, so valid sizes are 8MiB (no SIMMs), 12MiB (2 MiB SIMM x2),
       24MiB (8 MiB SIMM x2), 72MiB (32 MiB SIMM x2), and 264MiB (128 MiB SIMM x2)
-    - 7100 has 4 SIMM slots, allowing RAM up to 520MiB (128 MiB SIMM x4)
+    - 7100 has 4 SIMM slots, but not 520MiB (128 MiB SIMM x4) as one might expect: the
+      7100 and 8100 decode each socket into its own 64 MiB window, so a SIMM larger than
+      that would overlap the socket above it, and the ROM only probes 32 MiB of each
+      window anyway.
     - 8100 has 8 SIMM slots, which add valid sizes up to 264 MiB (32 MiB SIMM x8)
 */
-void macpdm_state::ram_size(){
+void macpdm_state::ram_size()
+{
+	if (m_simm_sockets > 2)
+		ram_size_7100_8100();
+	else
+		ram_size_6100();
+}
+
+void macpdm_state::ram_size_7100_8100()
+{
+	static constexpr u32 SOCKET_BASE   = 0x01000000;
+	static constexpr u32 SOCKET_STRIDE = 0x04000000;
+	static constexpr u32 SOCKET_MAX    = 32*1024*1024;
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	const u32 total_ram = m_ram->size();
+	const u32 mb_ram_size = 8*1024*1024;
+	const u32 simm_total = total_ram - mb_ram_size;
+
+	space.unmap_readwrite(0x00000000, 0x3fffffff);
+
+	u8 *const mb_ram = (u8 *)m_ram->pointer();
+	space.install_ram(0x00000000, mb_ram_size - 1, 0, (void *)mb_ram);
+
+	if (!simm_total)
+	{
+		LOGMASKED(LOG_MEMORY_SIZING, "Total RAM: %08x, motherboard RAM: %08x, no SIMMs\n", total_ram, mb_ram_size);
+		return;
+	}
+
+	u32 sockets = 2;
+	while ((sockets < m_simm_sockets) && ((simm_total / sockets) > SOCKET_MAX))
+		sockets *= 2;
+
+	u32 simm_size = simm_total / sockets;
+
+	if (simm_size > SOCKET_STRIDE)
+	{
+		LOGMASKED(LOG_MEMORY_SIZING, "SIMM size %08x exceeds the %08x socket window, clamping\n", simm_size, SOCKET_STRIDE);
+		simm_size = SOCKET_STRIDE;
+	}
+
+	LOGMASKED(LOG_MEMORY_SIZING, "Total RAM: %08x, motherboard RAM: %08x, SIMM size: %08x x%d\n", total_ram, mb_ram_size, simm_size, sockets);
+
+	u8 *simm = mb_ram + mb_ram_size;
+	for (u32 i = 0; i < sockets; i++)
+	{
+		const u32 base = SOCKET_BASE + (i * SOCKET_STRIDE);
+		LOGMASKED(LOG_MEMORY_SIZING, "SIMM %d at %08x - %08x\n", i, base, base + simm_size - 1);
+		space.install_ram(base, base + simm_size - 1, 0, (void *)simm);
+
+		simm += simm_size;
+	}
+}
+
+void macpdm_state::ram_size_6100()
+{
 	static const uint32_t sizes[4] = { 128*1024*1024, 2*1024*1024, 8*1024*1024, 32*1024*1024 };
 	const u8 config = (m_hmc_reg >> 29) & 3;        // 0 = 128MiB, 1 = 2MiB, 2 = 8MiB, 3 = 32MiB
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -1594,7 +1656,6 @@ void macpdm_state::pdm_base(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("16M,24M,40M,72M,136M");
 
 	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -1627,6 +1688,10 @@ void macpdm_state::pmac6100(machine_config &config)
 
 	m_model_id = 0xa55a3010;
 
+	// 2 SIMM sockets, supporting up to 128 MiB per SIMM
+	m_simm_sockets = 2;
+	m_ram->set_extra_options("12M,16M,24M,40M,72M,136M,264M");
+
 	// 6100 with the NuBus adapter has one slot, slot $E
 	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
 }
@@ -1645,6 +1710,10 @@ void macpdm_state::pmac7100(machine_config &config)
 	m_maincpu->set_clock(66'000'000);
 
 	m_model_id = 0xa55a3012;
+
+	// 4 SIMM sockets, supporting up to 32 MiB per SIMM
+	m_simm_sockets = 4;
+	m_ram->set_extra_options("12M,16M,24M,40M,72M,136M");
 
 	NUBUS_SLOT(config, "nbc", "nubus", powermac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbd", "nubus", powermac_nubus_cards, nullptr);
@@ -1666,6 +1735,10 @@ void macpdm_state::pmac8100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_8100map);
 
 	m_model_id = 0xa55a3013;
+
+	// 8 SIMM sockets, supporting up to 32 MiB per SIMM
+	m_simm_sockets = 8;
+	m_ram->set_extra_options("12M,16M,24M,40M,72M,136M,264M");
 
 	// On the 8100 the hard drive is connected to the fast SCSI bus instead
 	subdevice<nscsi_connector>("scsi:0")->set_default_option(nullptr);
