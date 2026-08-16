@@ -62,9 +62,6 @@ protected:
 
 	uint64_t cycles;
 	uint8_t data_reg, address;
-	attotime write_start_time;
-	attotime write_buffer[32];
-	int write_position;
 	bool write_line_active;
 
 	uint8_t last_6502_write;

@@ -563,6 +563,7 @@ void i8271_device::live_run(attotime limit)
 			return;
 
 		case WRITE_SECTOR_DATA:
+			cur_live.pll.start_writing(cur_live.tm, cur_live.fi->dev);
 			if(cur_live.byte_counter < 6)
 				live_write_fm(0x00);
 			else if(cur_live.byte_counter < 7) {
@@ -1416,7 +1417,7 @@ void i8271_device::format_track_continue(floppy_info &fi)
 		case WAIT_INDEX_DONE:
 			logerror("index found, writing track\n");
 			fi.sub_state = TRACK_DONE;
-			cur_live.pll.start_writing(machine().time());
+			cur_live.pll.start_writing(machine().time(), cur_live.fi->dev);
 			set_drq(true);
 			live_start(fi, WRITE_TRACK_PRE_SECTORS);
 			return;
