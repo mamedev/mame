@@ -493,7 +493,9 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	m_ymz->add_route(0, "lspeaker", 1.0);
 	m_ymz->add_route(1, "rspeaker", 1.0);
 
-	TMS320AV110(config, m_av110, 0);
+	TMS320AV110(config, m_av110, 24_MHz_XTAL);
+	// Cobra enables decoder modes that require the optional external DRAM.
+	m_av110->set_external_dram(true);
 	// AV110 REQ and MC68340 DREQ2 are both active low.
 	m_av110->req().set(m_maincpu, FUNC(m68340_cpu_device::dma_dreq2_w));
 	m_av110->add_route(0, "lspeaker", 1.0);
