@@ -66,8 +66,12 @@ public:
 
 	void pdm_base(machine_config &config) ATTR_COLD;
 	void pmac6100(machine_config &config) ATTR_COLD;
+	void pmac6100_66(machine_config &config) ATTR_COLD;
 	void pmac7100(machine_config &config) ATTR_COLD;
+	void pmac7100_80(machine_config &config) ATTR_COLD;
 	void pmac8100(machine_config &config) ATTR_COLD;
+	void pmac8100_100(machine_config &config) ATTR_COLD;
+	void pmac8100_110(machine_config &config) ATTR_COLD;
 
 	void driver_init() ATTR_COLD;
 
@@ -1558,6 +1562,13 @@ void macpdm_state::pmac6100(machine_config &config)
 	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
 }
 
+void macpdm_state::pmac6100_66(machine_config &config)
+{
+	pmac6100(config);
+
+	m_maincpu->set_clock(66'000'000);
+}
+
 void macpdm_state::pmac7100(machine_config &config)
 {
 	pdm_base(config);
@@ -1569,6 +1580,13 @@ void macpdm_state::pmac7100(machine_config &config)
 	NUBUS_SLOT(config, "nbc", "nubus", powermac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbd", "nubus", powermac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
+}
+
+void macpdm_state::pmac7100_80(machine_config &config)
+{
+	pmac7100(config);
+
+	m_maincpu->set_clock(80'000'000);
 }
 
 void macpdm_state::pmac8100(machine_config &config)
@@ -1603,6 +1621,20 @@ void macpdm_state::pmac8100(machine_config &config)
 	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
 }
 
+void macpdm_state::pmac8100_100(machine_config &config)
+{
+	pmac8100(config);
+
+	m_maincpu->set_clock(100'000'000);
+}
+
+void macpdm_state::pmac8100_110(machine_config &config)
+{
+	pmac8100(config);
+
+	m_maincpu->set_clock(110'000'000);
+}
+
 static INPUT_PORTS_START( macpdm )
 INPUT_PORTS_END
 
@@ -1611,12 +1643,26 @@ ROM_START( pmac6100 )
 	ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
 ROM_END
 
+ROM_START( pmac6100_66 )
+	ROM_REGION64_BE(0x400000, "bootrom", 0)
+	ROM_LOAD( "9b7a3aad.rom", 0x000000, 0x400000, CRC(22ef0260) SHA1(ec58cdb4b7fe3282b2fb76bf9a39f1ec9c9635d7) )
+ROM_END
+
 #define rom_pmac7100 rom_pmac6100
 #define rom_pmac8100 rom_pmac6100
+
+#define rom_pmac7100_80 rom_pmac6100_66
+#define rom_pmac8100_100 rom_pmac6100_66
+#define rom_pmac8100_110 rom_pmac6100_66
 
 } // anonymous namespace
 
 
-COMP( 1994, pmac6100,  0,        0, pmac6100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_SUPPORTS_SAVE )
-COMP( 1994, pmac7100,  0,        0, pmac7100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/66",  MACHINE_SUPPORTS_SAVE )
-COMP( 1994, pmac8100,  0,        0, pmac8100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/80",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME          PARENT    COMPAT  MACHINE        INPUT   CLASS         INIT         COMPANY           FULLNAME                    FLAGS
+COMP( 1994, pmac6100,     0,        0,      pmac6100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_SUPPORTS_SAVE )
+COMP( 1995, pmac6100_66,  pmac6100, 0,      pmac6100_66,   macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/66",  MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac7100,     0,        0,      pmac7100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/66",  MACHINE_SUPPORTS_SAVE )
+COMP( 1995, pmac7100_80,  pmac7100, 0,      pmac7100_80,   macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/80",  MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac8100,     0,        0,      pmac8100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/80",  MACHINE_SUPPORTS_SAVE )
+COMP( 1995, pmac8100_100, pmac8100, 0,      pmac8100_100,  macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/100", MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac8100_110, pmac8100, 0,      pmac8100_110,  macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/110", MACHINE_SUPPORTS_SAVE )
