@@ -61,7 +61,10 @@ class macpdm_state : public driver_device
 public:
 	macpdm_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void pdm_base(machine_config &config) ATTR_COLD;
 	void pmac6100(machine_config &config) ATTR_COLD;
+	void pmac7100(machine_config &config) ATTR_COLD;
+	void pmac8100(machine_config &config) ATTR_COLD;
 
 	void driver_init() ATTR_COLD;
 
@@ -118,6 +121,7 @@ private:
 	bool m_dma_floppy_in_step = false, m_floppy_drq = false;
 
 	void pdm_map(address_map &map) ATTR_COLD;
+	void pdm_8100map(address_map &map) ATTR_COLD;
 
 	void nmi_irq(int state);
 	void dma_irq(int state);
@@ -285,10 +289,6 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 void macpdm_state::driver_init()
 {
 	m_maincpu->space().install_ram(0, m_ram->mask(), 0, m_ram->pointer());
-
-	m_model_id = 0xa55a3010;
-	// 7100 = a55a3012
-	// 8100 = a55a3013
 
 	save_item(NAME(m_hmc_reg));
 	save_item(NAME(m_hmc_buffer));
@@ -1378,7 +1378,6 @@ void macpdm_state::pdm_map(address_map &map)
 	// 50f0a000 = MACE ethernet controller
 	map(0x50f10000, 0x50f100ff).rw(FUNC(macpdm_state::scsi_a_r), FUNC(macpdm_state::scsi_a_w));
 	map(0x50f10100, 0x50f10101).rw(m_ncr53c94, FUNC(ncr53c94_device::dma16_swap_r), FUNC(ncr53c94_device::dma16_swap_w));
-	// 50f11000 = 53CF94 on 8100
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
 
@@ -1425,7 +1424,15 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
 
-void macpdm_state::pmac6100(machine_config &config)
+void macpdm_state::pdm_8100map(address_map &map)
+{
+	pdm_map(map);
+
+	map(0x50f11000, 0x50f110ff).rw(FUNC(macpdm_state::scsi_b_r), FUNC(macpdm_state::scsi_b_w));
+	map(0x50f11100, 0x50f11101).rw(m_ncr53cf96, FUNC(ncr53cf96_device::dma16_swap_r), FUNC(ncr53cf96_device::dma16_swap_w));
+}
+
+void macpdm_state::pdm_base(machine_config &config)
 {
 	PPC601(config, m_maincpu, 60'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
@@ -1519,9 +1526,6 @@ void macpdm_state::pmac6100(machine_config &config)
 	nubus.out_irqd_callback().set(FUNC(macpdm_state::slot1_irq_w));
 	nubus.out_irqe_callback().set(FUNC(macpdm_state::slot2_irq_w));
 
-	// 6100 with the NuBus adapter has one slot, slot $E
-	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
-
 	MACADB(config, m_macadb, IO_CLOCK / 2);
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->zero_default_pram();                    // the default PRAM that's OK for 68k is bad for PowerMacs
@@ -1538,6 +1542,61 @@ void macpdm_state::pmac6100(machine_config &config)
 	TIMER(config, "beat_60_15").configure_periodic(FUNC(macpdm_state::via1_60_15_timer), attotime::from_double(1/60.15));
 }
 
+void macpdm_state::pmac6100(machine_config &config)
+{
+	pdm_base(config);
+
+	m_model_id = 0xa55a3010;
+
+	// 6100 with the NuBus adapter has one slot, slot $E
+	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
+}
+
+void macpdm_state::pmac7100(machine_config &config)
+{
+	pdm_base(config);
+
+	m_maincpu->set_clock(66'000'000);
+
+	m_model_id = 0xa55a3012;
+
+	NUBUS_SLOT(config, "nbc", "nubus", powermac_nubus_cards, nullptr);
+	NUBUS_SLOT(config, "nbd", "nubus", powermac_nubus_cards, nullptr);
+	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
+}
+
+void macpdm_state::pmac8100(machine_config &config)
+{
+	pdm_base(config);
+
+	m_maincpu->set_clock(80'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_8100map);
+
+	m_model_id = 0xa55a3013;
+
+	// On the 8100 the hard drive is connected to the fast SCSI bus instead
+	subdevice<nscsi_connector>("scsi:0")->set_default_option(nullptr);
+
+	NSCSI_BUS(config, m_scsibus_b);
+	NSCSI_CONNECTOR(config, "fastscsi:0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "fastscsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "fastscsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "fastscsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "fastscsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "fastscsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "fastscsi:6", default_scsi_devices, nullptr);
+
+	NCR53CF96(config, m_ncr53cf96, ENET_CLOCK);
+	m_scsibus_b->set_external_device(7, m_ncr53cf96);
+	m_ncr53cf96->set_busmd(ncr53cf96_device::BUSMD_3);
+	m_ncr53cf96->drq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_b_drq));
+	m_ncr53cf96->irq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_b_irq));
+
+	NUBUS_SLOT(config, "nbc", "nubus", powermac_nubus_cards, nullptr);
+	NUBUS_SLOT(config, "nbd", "nubus", powermac_nubus_cards, nullptr);
+	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
+}
+
 static INPUT_PORTS_START( macpdm )
 INPUT_PORTS_END
 
@@ -1546,7 +1605,12 @@ ROM_START( pmac6100 )
 	ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
 ROM_END
 
+#define rom_pmac7100 rom_pmac6100
+#define rom_pmac8100 rom_pmac6100
+
 } // anonymous namespace
 
 
 COMP( 1994, pmac6100,  0,        0, pmac6100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac7100,  0,        0, pmac7100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/66",  MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac8100,  0,        0, pmac8100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/80",  MACHINE_SUPPORTS_SAVE )
