@@ -77,8 +77,10 @@ private:
 	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<z80scc_device> m_scc;
-	required_device<nscsi_bus_device> m_scsibus;
+	required_device<nscsi_bus_device> m_scsibus_a;
 	required_device<ncr53c94_device> m_ncr53c94;
+	optional_device<nscsi_bus_device> m_scsibus_b; // 8100 only
+	optional_device<ncr53cf96_device> m_ncr53cf96; // 8100 only
 	required_device<swim3_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mac_video_sonora_device> m_video;
@@ -95,7 +97,8 @@ private:
 
 	uint8_t m_via2_ier = 0, m_via2_ifr = 0, m_via2_sier = 0, m_via2_sifr = 0;
 
-	uint64_t m_dma_scsi_buffer = 0;
+	uint64_t m_dma_scsi_a_buffer = 0;
+	uint64_t m_dma_scsi_b_buffer = 0;
 
 	uint32_t m_dma_badr = 0, m_dma_floppy_adr = 0;
 	uint16_t m_dma_floppy_byte_count = 0, m_dma_floppy_offset = 0;
@@ -106,12 +109,14 @@ private:
 	uint32_t m_dma_scsi_a_cur_offset = 0, m_dma_scsi_b_cur_offset = 0;
 
 	uint8_t m_dma_scsi_a_ctrl = 0, m_dma_scsi_b_ctrl = 0, m_dma_floppy_ctrl = 0;
-	uint8_t m_dma_scsi_buffer_word_count = 0;
+	uint8_t m_dma_scsi_a_buffer_word_count = 0;
+	uint8_t m_dma_scsi_b_buffer_word_count = 0;
 
 	uint8_t m_dma_scc_txa_ctrl = 0, m_dma_scc_rxa_ctrl = 0, m_dma_scc_txb_ctrl = 0, m_dma_scc_rxb_ctrl = 0;
 	uint8_t m_dma_enet_rx_ctrl = 0, m_dma_enet_tx_ctrl = 0;
 
-	bool m_dma_scsi_a_in_step = false, m_dma_floppy_in_step = false, m_floppy_drq = false;
+	bool m_dma_scsi_a_in_step = false, m_dma_scsi_b_in_step = false;
+	bool m_dma_floppy_in_step = false, m_floppy_drq = false;
 
 	void pdm_map(address_map &map) ATTR_COLD;
 
@@ -141,7 +146,8 @@ private:
 	void txb_err_irq(int state);
 	void rxb_err_irq(int state);
 
-	void scsi_err_irq(int state);
+	void scsi_a_err_irq(int state);
+	void scsi_b_err_irq(int state);
 	void sndo_err_irq(int state);
 	void sndi_err_irq(int state);
 
@@ -153,8 +159,10 @@ private:
 	void fdc_irq(int state);
 	void fdc_drq(int state);
 	void recalc_dma_irqs();
-	void scsi_irq(int state);
-	void scsi_drq(int state);
+	void scsi_a_irq(int state);
+	void scsi_a_drq(int state);
+	void scsi_b_irq(int state);
+	void scsi_b_drq(int state);
 
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);
@@ -185,8 +193,10 @@ private:
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 
-	uint8_t scsi_r(offs_t offset);
-	void scsi_w(offs_t offset, uint8_t data);
+	uint8_t scsi_a_r(offs_t offset);
+	void scsi_a_w(offs_t offset, uint8_t data);
+	uint8_t scsi_b_r(offs_t offset);
+	void scsi_b_w(offs_t offset, uint8_t data);
 
 	uint8_t hmc_r(offs_t offset);
 	void hmc_w(offs_t offset, uint8_t data);
@@ -211,6 +221,7 @@ private:
 	void dma_berr_flag_w(offs_t, uint16_t data, uint16_t mem_mask);
 
 	void dma_scsi_a_step();
+	void dma_scsi_b_step();
 	uint32_t dma_scsi_a_base_adr_r();
 	void dma_scsi_a_base_adr_w(offs_t, uint32_t data, uint32_t mem_mask);
 	uint32_t dma_scsi_b_base_adr_r();
@@ -259,8 +270,10 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 	m_adbbus(*this, "adb"),
 	m_ram(*this, RAM_TAG),
 	m_scc(*this, "scc"),
-	m_scsibus(*this, "scsi"),
+	m_scsibus_a(*this, "scsi"),
 	m_ncr53c94(*this, "ncr53c94"),
+	m_scsibus_b(*this, "fastscsi"),
+	m_ncr53cf96(*this, "ncr53cf96"),
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
 	m_video(*this, "video"),
@@ -292,9 +305,12 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_dma_badr));
 	save_item(NAME(m_dma_berr_en));
 	save_item(NAME(m_dma_berr_flag));
-	save_item(NAME(m_dma_scsi_buffer));
-	save_item(NAME(m_dma_scsi_buffer_word_count));
+	save_item(NAME(m_dma_scsi_a_buffer));
+	save_item(NAME(m_dma_scsi_b_buffer));
+	save_item(NAME(m_dma_scsi_a_buffer_word_count));
+	save_item(NAME(m_dma_scsi_b_buffer_word_count));
 	save_item(NAME(m_dma_scsi_a_in_step));
+	save_item(NAME(m_dma_scsi_b_in_step));
 	save_item(NAME(m_dma_scsi_a_base_adr));
 	save_item(NAME(m_dma_scsi_b_base_adr));
 	save_item(NAME(m_dma_scsi_a_ctrl));
@@ -332,9 +348,12 @@ void macpdm_state::driver_reset()
 	m_dma_badr = 0;
 	m_dma_berr_en = 0;
 	m_dma_berr_flag = 0;
-	m_dma_scsi_buffer = 0;
-	m_dma_scsi_buffer_word_count = 0;
+	m_dma_scsi_a_buffer = 0;
+	m_dma_scsi_b_buffer = 0;
+	m_dma_scsi_a_buffer_word_count = 0;
+	m_dma_scsi_b_buffer_word_count = 0;
 	m_dma_scsi_a_in_step = false;
+	m_dma_scsi_b_in_step = false;
 	m_dma_scsi_a_base_adr = 0;
 	m_dma_scsi_b_base_adr = 0;
 	m_dma_scsi_a_ctrl = 0;
@@ -543,16 +562,18 @@ uint8_t macpdm_state::via2_ier_r()
 void macpdm_state::via2_ier_w(uint8_t data)
 {
 	if (data & 0x80)
-		m_via2_ier |= data & 0x3b;
+		m_via2_ier |= data & 0x7f;
 	else
 		m_via2_ier &= ~data;
 
-	LOGMASKED(LOG_VIA2, "via2 ier %s %s %s %s\n",
+	LOGMASKED(LOG_VIA2, "via2 ier %s %s %s %s %s %s %s\n",
+			 m_via2_ier & 0x40 ? "scsi_b" : "-",
 			 m_via2_ier & 0x20 ? "fdc" : "-",
 			 m_via2_ier & 0x10 ? "sound" : "-",
-			 m_via2_ier & 0x08 ? "scsi" : "-",
+			 m_via2_ier & 0x08 ? "scsi_a" : "-",
+			 m_via2_ier & 0x04 ? "scsidrq_b" : "-",
 			 m_via2_ier & 0x02 ? "slot" : "-",
-			 m_via2_ier & 0x01 ? "scsidrq" : "-");
+			 m_via2_ier & 0x01 ? "scsidrq_a" : "-");
 
 	irq_main_set(0x02, (m_via2_ifr & m_via2_ier) != 0);
 }
@@ -608,14 +629,24 @@ void macpdm_state::fdc_w(offs_t offset, uint8_t data)
 	m_fdc->write(offset >> 9, data);
 }
 
-uint8_t macpdm_state::scsi_r(offs_t offset)
+uint8_t macpdm_state::scsi_a_r(offs_t offset)
 {
 	return m_ncr53c94->read(offset >> 4);
 }
 
-void macpdm_state::scsi_w(offs_t offset, uint8_t data)
+void macpdm_state::scsi_a_w(offs_t offset, uint8_t data)
 {
 	m_ncr53c94->write(offset >> 4, data);
+}
+
+uint8_t macpdm_state::scsi_b_r(offs_t offset)
+{
+	return m_ncr53cf96->read(offset >> 4);
+}
+
+void macpdm_state::scsi_b_w(offs_t offset, uint8_t data)
+{
+	m_ncr53cf96->write(offset >> 4, data);
 }
 
 uint8_t macpdm_state::hmc_r(offs_t offset)
@@ -897,14 +928,14 @@ void macpdm_state::dma_scsi_a_step()
 	{
 		while (m_via2_ifr & 0x01)
 		{
-			if (m_dma_scsi_buffer_word_count == 0)
+			if (m_dma_scsi_a_buffer_word_count == 0)
 			{
-				m_dma_scsi_buffer_word_count = 4;
-				m_dma_scsi_buffer = m_maincpu->space().read_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset);
+				m_dma_scsi_a_buffer_word_count = 4;
+				m_dma_scsi_a_buffer = m_maincpu->space().read_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset);
 				m_dma_scsi_a_cur_offset += 8;
 			}
-			m_dma_scsi_buffer_word_count--;
-			m_ncr53c94->dma16_swap_w(m_dma_scsi_buffer >> (16*m_dma_scsi_buffer_word_count));
+			m_dma_scsi_a_buffer_word_count--;
+			m_ncr53c94->dma16_swap_w(m_dma_scsi_a_buffer >> (16*m_dma_scsi_a_buffer_word_count));
 		}
 	}
 	else
@@ -912,12 +943,12 @@ void macpdm_state::dma_scsi_a_step()
 		while (m_via2_ifr & 0x01)
 		{
 			uint16_t w = m_ncr53c94->dma16_swap_r();
-			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_buffer_word_count));
-			m_dma_scsi_buffer_word_count++;
-			if(m_dma_scsi_buffer_word_count == 4)
+			m_dma_scsi_a_buffer = (m_dma_scsi_a_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_a_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_a_buffer_word_count));
+			m_dma_scsi_a_buffer_word_count++;
+			if (m_dma_scsi_a_buffer_word_count == 4)
 			{
-				m_dma_scsi_buffer_word_count = 0;
-				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
+				m_dma_scsi_a_buffer_word_count = 0;
+				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_a_buffer);
 				m_dma_scsi_a_cur_offset += 8;
 			}
 		}
@@ -926,16 +957,65 @@ void macpdm_state::dma_scsi_a_step()
 	m_dma_scsi_a_in_step = false;
 }
 
-void macpdm_state::scsi_irq(int state)
+void macpdm_state::dma_scsi_b_step()
+{
+	m_dma_scsi_b_in_step = true;
+
+	if (m_dma_scsi_b_ctrl & 0x40)
+	{
+		while (m_via2_ifr & 0x04)
+		{
+			if (m_dma_scsi_b_buffer_word_count == 0)
+			{
+				m_dma_scsi_b_buffer_word_count = 4;
+				m_dma_scsi_b_buffer = m_maincpu->space().read_qword(m_dma_scsi_b_base_adr + m_dma_scsi_b_cur_offset);
+				m_dma_scsi_b_cur_offset += 8;
+			}
+			m_dma_scsi_b_buffer_word_count--;
+			m_ncr53cf96->dma16_swap_w(m_dma_scsi_b_buffer >> (16*m_dma_scsi_b_buffer_word_count));
+		}
+	}
+	else
+	{
+		while (m_via2_ifr & 0x04)
+		{
+			uint16_t w = m_ncr53cf96->dma16_swap_r();
+			m_dma_scsi_b_buffer = (m_dma_scsi_b_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_b_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_b_buffer_word_count));
+			m_dma_scsi_b_buffer_word_count++;
+			if (m_dma_scsi_b_buffer_word_count == 4)
+			{
+				m_dma_scsi_b_buffer_word_count = 0;
+				m_maincpu->space().write_qword(m_dma_scsi_b_base_adr + m_dma_scsi_b_cur_offset, m_dma_scsi_b_buffer);
+				m_dma_scsi_b_cur_offset += 8;
+			}
+		}
+	}
+
+	m_dma_scsi_b_in_step = false;
+}
+
+void macpdm_state::scsi_a_irq(int state)
 {
 	via2_irq_main_set(0x08, state);
 }
 
-void macpdm_state::scsi_drq(int state)
+void macpdm_state::scsi_a_drq(int state)
 {
 	via2_irq_main_set(0x01, state);
 	if ((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
 		dma_scsi_a_step();
+}
+
+void macpdm_state::scsi_b_irq(int state)
+{
+	via2_irq_main_set(0x40, state);
+}
+
+void macpdm_state::scsi_b_drq(int state)
+{
+	via2_irq_main_set(0x04, state);
+	if ((m_dma_scsi_b_ctrl & 0x02) && (m_via2_ifr & 0x04) && !m_dma_scsi_b_in_step)
+		dma_scsi_b_step();
 }
 
 uint32_t macpdm_state::dma_scsi_a_base_adr_r()
@@ -948,7 +1028,7 @@ void macpdm_state::dma_scsi_a_base_adr_w(offs_t, uint32_t data, uint32_t mem_mas
 	COMBINE_DATA(&m_dma_scsi_a_base_adr);
 	m_dma_scsi_a_base_adr &= ~7;
 	m_dma_scsi_a_cur_offset = 0;
-	m_dma_scsi_buffer_word_count = 0;
+	m_dma_scsi_a_buffer_word_count = 0;
 	LOGMASKED(LOG_DMA, "dma_scsi_a_base_adr_w %08x\n", m_dma_scsi_a_base_adr);
 }
 
@@ -962,6 +1042,7 @@ void macpdm_state::dma_scsi_b_base_adr_w(offs_t, uint32_t data, uint32_t mem_mas
 	COMBINE_DATA(&m_dma_scsi_b_base_adr);
 	m_dma_scsi_b_base_adr &= ~7;
 	m_dma_scsi_b_cur_offset = 0;
+	m_dma_scsi_b_buffer_word_count = 0;
 	LOGMASKED(LOG_DMA, "dma_scsi_b_base_adr_w %08x\n", m_dma_scsi_b_base_adr);
 }
 
@@ -978,26 +1059,26 @@ void macpdm_state::dma_scsi_a_ctrl_w(uint8_t data)
 	{
 		m_dma_scsi_a_ctrl &= 0x40;
 		m_dma_scsi_a_cur_offset = 0;
-		m_dma_scsi_buffer_word_count = 0;
+		m_dma_scsi_a_buffer_word_count = 0;
 	}
 	if (data & 0x10)
 	{
 		while (m_via2_ifr & 0x01)
 		{
 			uint16_t w = m_ncr53c94->dma16_swap_r();
-			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_buffer_word_count));
-			m_dma_scsi_buffer_word_count++;
-			if (m_dma_scsi_buffer_word_count == 4)
+			m_dma_scsi_a_buffer = (m_dma_scsi_a_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_a_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_a_buffer_word_count));
+			m_dma_scsi_a_buffer_word_count++;
+			if (m_dma_scsi_a_buffer_word_count == 4)
 			{
-				m_dma_scsi_buffer_word_count = 0;
-				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
+				m_dma_scsi_a_buffer_word_count = 0;
+				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_a_buffer);
 				m_dma_scsi_a_cur_offset += 8;
 			}
 		}
-		if (m_dma_scsi_buffer_word_count)
+		if (m_dma_scsi_a_buffer_word_count)
 		{
-			m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
-			m_dma_scsi_buffer_word_count = 0;
+			m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_a_buffer);
+			m_dma_scsi_a_buffer_word_count = 0;
 		}
 	}
 
@@ -1014,13 +1095,42 @@ uint8_t macpdm_state::dma_scsi_b_ctrl_r()
 
 void macpdm_state::dma_scsi_b_ctrl_w(uint8_t data)
 {
-	// Channel B is not actually connected to anything
-	m_dma_scsi_b_ctrl = data & 0x42;
+	// Channel B is only used on the 8100 for the fast SCSI controller
+	m_dma_scsi_b_ctrl = data & 0x4e;
 	if (data & 1)
 	{
 		m_dma_scsi_b_ctrl &= 0x40;
 		m_dma_scsi_b_cur_offset = 0;
+		m_dma_scsi_b_buffer_word_count = 0;
 	}
+
+	if (m_ncr53cf96)
+	{
+		if (data & 0x10)
+		{
+			while (m_via2_ifr & 0x04)
+			{
+				uint16_t w = m_ncr53cf96->dma16_swap_r();
+				m_dma_scsi_b_buffer = (m_dma_scsi_b_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_b_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_b_buffer_word_count));
+				m_dma_scsi_b_buffer_word_count++;
+				if (m_dma_scsi_b_buffer_word_count == 4)
+				{
+					m_dma_scsi_b_buffer_word_count = 0;
+					m_maincpu->space().write_qword(m_dma_scsi_b_base_adr + m_dma_scsi_b_cur_offset, m_dma_scsi_b_buffer);
+					m_dma_scsi_b_cur_offset += 8;
+				}
+			}
+			if (m_dma_scsi_b_buffer_word_count)
+			{
+				m_maincpu->space().write_qword(m_dma_scsi_b_base_adr + m_dma_scsi_b_cur_offset, m_dma_scsi_b_buffer);
+				m_dma_scsi_b_buffer_word_count = 0;
+			}
+		}
+
+		if ((m_dma_scsi_b_ctrl & 0x02) && (m_via2_ifr & 0x04) && !m_dma_scsi_b_in_step)
+			dma_scsi_b_step();
+	}
+
 	LOGMASKED(LOG_DMA,
 		"dma_scsi_b_ctrl_w %02x\n", m_dma_scsi_b_ctrl);
 }
@@ -1267,7 +1377,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x50f04000, 0x50f04007).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask64(0xff00ff00ff00ff00);
 	// 50f08000 = ethernet ID PROM
 	// 50f0a000 = MACE ethernet controller
-	map(0x50f10000, 0x50f100ff).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w));
+	map(0x50f10000, 0x50f100ff).rw(FUNC(macpdm_state::scsi_a_r), FUNC(macpdm_state::scsi_a_w));
 	map(0x50f10100, 0x50f10101).rw(m_ncr53c94, FUNC(ncr53c94_device::dma16_swap_r), FUNC(ncr53c94_device::dma16_swap_w));
 	// 50f11000 = 53CF94 on 8100
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
@@ -1337,7 +1447,7 @@ void macpdm_state::pmac6100(machine_config &config)
 	m_awacs->add_route(0, "speaker", 1.0, 0);
 	m_awacs->add_route(1, "speaker", 1.0, 1);
 
-	NSCSI_BUS(config, m_scsibus);
+	NSCSI_BUS(config, m_scsibus_a);
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -1352,10 +1462,10 @@ void macpdm_state::pmac6100(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
 
 	NCR53C94(config, m_ncr53c94, ENET_CLOCK/2);
-	m_scsibus->set_external_device(7, m_ncr53c94);
+	m_scsibus_a->set_external_device(7, m_ncr53c94);
 	m_ncr53c94->set_busmd(ncr53c94_device::BUSMD_3);
-	m_ncr53c94->drq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_drq));
-	m_ncr53c94->irq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_irq));
+	m_ncr53c94->drq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_a_drq));
+	m_ncr53c94->irq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_a_irq));
 
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
