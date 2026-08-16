@@ -932,7 +932,7 @@ void macpdm_state::dma_scsi_b_base_adr_w(offs_t, uint32_t data, uint32_t mem_mas
 {
 	COMBINE_DATA(&m_dma_scsi_b_base_adr);
 	m_dma_scsi_b_base_adr &= ~7;
-	m_dma_scsi_a_cur_offset = 0;
+	m_dma_scsi_b_cur_offset = 0;
 	LOGMASKED(LOG_DMA, "dma_scsi_b_base_adr_w %08x\n", m_dma_scsi_b_base_adr);
 }
 
