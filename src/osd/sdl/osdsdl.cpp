@@ -480,6 +480,18 @@ void sdl_osd_interface::process_events()
 		// handle UI events
 		switch (event.type)
 		{
+#if defined(__APPLE__) && defined(__MACH__)
+		case SDL_QUIT:
+			// macOS only: Cmd-Q (and the app "Quit" menu) arrives as SDL_QUIT
+			// rather than a per-window close event. In fullscreen there is no
+			// window close button, so without handling this there is no way to
+			// quit with Cmd-Q. schedule_exit() shuts down cleanly (flushes
+			// NVRAM etc.). Left macOS-only so other SDL platforms keep their
+			// existing SDL_WINDOWEVENT_CLOSE-driven exit behaviour unchanged.
+			machine().schedule_exit();
+			break;
+#endif
+
 		case SDL_WINDOWEVENT:
 			process_window_event(event);
 			break;
