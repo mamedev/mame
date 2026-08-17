@@ -51,6 +51,13 @@
     Notes:
     - Press SPACE during self-test for an extended menu
 
+    References:
+    - Intel 82730 Text Coprocessor datasheet (Preliminary), for the CRT
+      controller programming model (mode block, cursor, soft scroll, etc.):
+      https://archive.org/details/Intel-82730TextCoprocessor-PreliminaryOCR
+    - PICCOLINE Programmer's Guide v2 (CCP/M-86 3.1 / XIOS 2.3) for the
+      RC759-specific I/O map, NVM config layout and console escapes.
+
 ***************************************************************************/
 
 #include "emu.h"
