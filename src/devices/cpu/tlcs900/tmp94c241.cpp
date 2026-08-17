@@ -1343,13 +1343,29 @@ void tmp94c241_device::tlcs900_check_irqs()
 		// flags are continuously driven by the input level. Clearing the flag
 		// during dispatch has no lasting effect if the input is still asserted.
 		// Re-assert INT0 flag if input is still active in level-detect mode.
+		// Only the ISR-driven path may re-assert. When a micro-DMA channel is
+		// armed on the INT0 start vector the DMA engine consumes each request and
+		// manages the flag itself; re-asserting there makes it read stale latch
+		// data.
 		if (irq_vector_map[irq].reg == INTE0AD &&
 			irq_vector_map[irq].iff == 0x08 &&
 			!(m_iimc & 0x02) &&
 			m_level[TLCS900_INT0] == ASSERT_LINE)
 		{
-			m_int_reg[INTE0AD] |= 0x08;
-			m_check_irqs = 1;
+			bool hdma_steals_int0 = false;
+			for (int ch = 0; ch < 4; ch++)
+			{
+				if (m_dma_vector[ch] == 0x0a)
+				{
+					hdma_steals_int0 = true;
+					break;
+				}
+			}
+			if (!hdma_steals_int0)
+			{
+				m_int_reg[INTE0AD] |= 0x08;
+				m_check_irqs = 1;
+			}
 		}
 
 		// Compute the default priority index from the vector table.
@@ -1467,6 +1483,9 @@ void tmp94c241_device::tlcs900_handle_timers()
 				    timer_id 6  =>  m_timer_16[1]  m_timer_change[5]
 				    timer_id 8  =>  m_timer_16[2]  m_timer_change[6]
 				    timer_id A  =>  m_timer_16[3]  m_timer_change[7]
+
+				    TREG_HIGH match generates the upper interrupt (e.g., INTTR5).
+				    TREG_LOW match generates the lower interrupt (e.g., INTTR4).
 				*/
 				uint8_t timer_index = (timer_id - 4)/2;
 
@@ -1474,11 +1493,18 @@ void tmp94c241_device::tlcs900_handle_timers()
 				{
 					m_timer_16[timer_index]++;
 					// TODO: also check for criteria of up counter matching CAPn registers
-					if (((m_timer_16[timer_index] == m_treg_16[timer_reg_high]) && BIT(tffcr, 3)) ||
-							((m_timer_16[timer_index] == m_treg_16[timer_reg_low]) && BIT(tffcr, 2)) )
+					if (m_timer_16[timer_index] == m_treg_16[timer_reg_high])
 					{
-						change_timer_flipflop(timer_id, FF_INVERT);
+						if (BIT(tffcr, 3))
+							change_timer_flipflop(timer_id, FF_INVERT);
 						m_timer_16[timer_index] = 0;
+						m_int_reg[interrupt] |= 0x80;
+						m_check_irqs = 1;
+					}
+					else if (m_timer_16[timer_index] == m_treg_16[timer_reg_low])
+					{
+						if (BIT(tffcr, 2))
+							change_timer_flipflop(timer_id, FF_INVERT);
 						m_int_reg[interrupt] |= 0x08;
 						m_check_irqs = 1;
 					}
