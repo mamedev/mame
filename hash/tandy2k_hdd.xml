@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="tandy2k_hdd" description="Tandy 2000 hard disk images">
+
+	<software name="msdos2113">
+		<description>MS-DOS v2.11.3</description>
+		<year>1983</year>
+		<publisher>Tandy</publisher>
+
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos2113" sha1="476388a70a78f811cac7f81fb9f9c290f93807d4" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

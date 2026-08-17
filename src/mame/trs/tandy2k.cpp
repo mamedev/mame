@@ -15,8 +15,8 @@
         - 3 second motor off delay timer
     - video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
     - keyboard ROM, same as earlier tandy 1000
-    - WD1010
-    - hard disk
+    - 2000HD hard disk controller DMA acknowledge at 0x0e0-0x0ff, not used by
+      Tandy MS-DOS 2.11, which moves sectors through the buffer with the CPU
     - clock/mouse 8042 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
     - sab3019 rtc
 
@@ -386,12 +386,11 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x002fc, 0x002ff).rw(FUNC(tandy2k_state::clkmouse_r), FUNC(tandy2k_state::clkmouse_w));
 }
 
-void tandy2k_state::tandy2k_hd_io(address_map &map)
+void tandy2k_hd_state::tandy2k_hd_io(address_map &map)
 {
 	tandy2k_io(map);
-//  map(0x000e0, 0x000ff).w(FUNC(tandy2k_state::hdc_dack_w).umask16(0x00ff));
-//  map(0x0026c, 0x0026c).rw(WD1010_TAG, FUNC(wd1010_device::hdc_reset_r), FUNC(wd1010_device::hdc_reset_w));
-//  map(0x0026e, 0x0027e).rw(WD1010_TAG, FUNC(wd1010_device::wd1010_r), FUNC(wd1010_device::wd1010_w));
+	map(0x0026c, 0x0026c).rw(m_hdc, FUNC(tandy2k_hdc_device::reset_r), FUNC(tandy2k_hdc_device::reset_w));
+	map(0x00270, 0x0027f).rw(m_hdc, FUNC(tandy2k_hdc_device::read), FUNC(tandy2k_hdc_device::write)).umask16(0x00ff);
 }
 
 void tandy2k_state::vpac_mem(address_map &map)
@@ -1119,22 +1118,25 @@ void tandy2k_state::tandy2k(machine_config &config)
 	TANDY2K_HLE_KEYB(config, m_pc_keyboard).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
 
 	// software lists
-	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k");
+	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k_flop");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,384K,512K,640K,768K,896K");
 }
 
-void tandy2k_state::tandy2k_hd(machine_config &config)
+void tandy2k_hd_state::tandy2k_hd(machine_config &config)
 {
 	tandy2k(config);
+	
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_IO, &tandy2k_state::tandy2k_hd_io);
+	m_maincpu->set_addrmap(AS_IO, &tandy2k_hd_state::tandy2k_hd_io);
 
-	// Tandon TM502 hard disk
-	HARDDISK(config, "harddisk0", 0);
-	//MCFG_WD1010_ADD(WD1010_TAG, wd1010_intf)
-	//MCFG_WD1100_11_ADD(WD1100_11_TAG, wd1100_11_intf)
+	// WD1010 (u18) and WD1100-11 (u12) hard disk controller with a Tandon TM502 drive
+	// INTRQ is not connected, the MS-DOS driver polls the status register
+	TANDY2K_HDC(config, m_hdc);
+
+	// software lists
+	SOFTWARE_LIST(config, "hdd_list").set_original("tandy2k_hdd");
 }
 
 // ROMs
@@ -1159,6 +1161,6 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    CLASS          INIT        COMPANY              FULLNAME        FLAGS
-COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_SUPPORTS_SAVE )
-COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY              FULLNAME        FLAGS
+COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state,    empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_SUPPORTS_SAVE )
+COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_hd_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_SUPPORTS_SAVE )

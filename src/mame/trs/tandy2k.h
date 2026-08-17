@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "tandy2k_hdc.h"
 #include "tandy2kb.h"
 
 #include "bus/centronics/ctronics.h"
@@ -12,7 +13,6 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
-#include "imagedev/harddriv.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -43,8 +43,6 @@
 #define CRT9212_0_TAG   "u55"
 #define CRT9212_1_TAG   "u15"
 #define CRT9021B_TAG    "u14"
-#define WD1010_TAG      "u18"
-#define WD1100_11_TAG   "u12"
 #define CENTRONICS_TAG  "centronics"
 #define RS232_TAG       "rs232"
 
@@ -116,17 +114,14 @@ public:
 		}
 	}
 
-	void tandy2k_hd(machine_config &config);
 	void tandy2k(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
-private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	void tandy2k_mem(address_map &map) ATTR_COLD;
 	void tandy2k_io(address_map &map) ATTR_COLD;
-	void tandy2k_hd_io(address_map &map) ATTR_COLD;
 	void vpac_mem(address_map &map) ATTR_COLD;
 	void vrambank_mem(address_map &map) ATTR_COLD;
 
@@ -276,6 +271,24 @@ private:
 	required_ioport m_buttons;
 	required_ioport m_x_axis;
 	required_ioport m_y_axis;
+};
+
+class tandy2k_hd_state : public tandy2k_state
+{
+public:
+	tandy2k_hd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tandy2k_state(mconfig, type, tag),
+		m_hdc(*this, "hdc")
+	{
+	}
+	
+	void tandy2k_hd(machine_config &config);
+	
+protected:
+	required_device<tandy2k_hdc_device> m_hdc;
+
+private:
+	void tandy2k_hd_io(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TRS_TANDY2K_H
