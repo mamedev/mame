@@ -571,10 +571,14 @@ bool i82730_device::dscmd_repeat(uint8_t param)
 
 	while (param--)
 	{
-		if (--m_dma_count && m_row_count < 200)
-			m_row[m_row_count++] = data;
-		else
+		// Same accounting as the data-word path in load_row: stop once the DMA
+		// count is spent (or the row buffer is full), storing exactly
+		// m_dma_count characters -- do not pre-decrement past the last slot.
+		if (m_dma_count == 0 || m_row_count >= 200)
 			return true;
+
+		m_row[m_row_count++] = data;
+		m_dma_count--;
 	}
 
 	return false;
@@ -671,6 +675,32 @@ void i82730_device::load_row()
 
 	while (!finished)
 	{
+		// MAX DMA COUNT is the exact number of character words to DMA into this
+		// row. Terminate BEFORE reading another word once the count is spent --
+		// do not consume an extra "terminator" word from the stream. This
+		// matters in both list layouts:
+		//   - auto_line_feed = 0 (menu): each row is a separate string of
+		//     exactly 80 words with no EOL command (reason=dma-exhaust). We must
+		//     store all 80 (the 80th = screen column 79, the right menu border)
+		//     and then load the next string pointer from the list.
+		//   - auto_line_feed = 1 (boot console): the string is CONTINUOUS across
+		//     rows, so over-reading even one word per row (an earlier
+		//     post-decrement fix did) skips a character and shifts every
+		//     following row left, splitting words like "READING" across two
+		//     lines. Consuming exactly m_dma_count words keeps the stream
+		//     aligned.
+		if (m_dma_count == 0)
+		{
+			if (!m_auto_line_feed)
+			{
+				m_sptr = (read_word(m_lptr + 2) << 16) | read_word(m_lptr);
+				m_lptr += 4;
+			}
+
+			finished = true;
+			break;
+		}
+
 		uint16_t data = read_word(m_sptr);
 		m_sptr += 2;
 
@@ -680,35 +710,17 @@ void i82730_device::load_row()
 		}
 		else
 		{
-			// fetch data. MAX DMA COUNT is the number of characters to DMA per
-			// row, so all m_max_dma_count characters must be stored. Post-
-			// decrement (not pre-) is required: the RC759 firmware programs
-			// MAX DMA COUNT = 80 and emits exactly 80 character words with no
-			// trailing EOL command, relying purely on the count to bound the
-			// row. A pre-decrement dropped the 80th character (screen column
-			// 79), which cut the right edge off full-width frames (menu box).
-			if (m_dma_count-- > 0)
+			// store one character and account for it against the DMA count
+			if (m_row_count < 200)
 			{
-				if (m_row_count < 200)
-				{
-					m_row[m_row_count++] = data;
-				}
-				else
-				{
-					// buffer overrun
-					m_status |= DBOR;
-					update_interrupts();
-					finished = true;
-				}
+				m_row[m_row_count++] = data;
+				m_dma_count--;
 			}
 			else
 			{
-				if (!m_auto_line_feed)
-				{
-					m_sptr = (read_word(m_lptr + 2) << 16) | read_word(m_lptr);
-					m_lptr += 4;
-				}
-
+				// buffer overrun
+				m_status |= DBOR;
+				update_interrupts();
 				finished = true;
 			}
 		}
