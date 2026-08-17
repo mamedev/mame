@@ -22,10 +22,13 @@ I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 {
 	for (int i = 0; i < x_count; i++)
 	{
+		bool cursor_here = (cursor == i);
 		uint16_t gfx = m_vram[(data[i] & 0x3ff) << 4 | lc];
 
-		// pretty crude detection if char sizes have been initialized, need something better
-		if ((gfx & 0xff) == 0)
+		// pretty crude detection if char sizes have been initialized, need
+		// something better -- but never skip the cell under the cursor, so the
+		// cursor stays visible even on a blank/space position.
+		if ((gfx & 0xff) == 0 && !cursor_here)
 			continue;
 
 		// figure out char width
@@ -36,8 +39,18 @@ I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 
 		width = 15 - width;
 
+		// nominal cell width when the cursor sits on an otherwise empty cell
+		// (no guard bits to measure); 560 px / 80 cols = 7.
+		if (width <= 0)
+			width = 7;
+
 		for (int p = 0; p < width; p++)
-			bitmap.pix(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white() : rgb_t::black();
+		{
+			bool on = BIT(gfx, 15 - p);
+			if (cursor_here)
+				on = !on; // reverse-video the cell under the cursor
+			bitmap.pix(y, i * width + p) = on ? rgb_t::white() : rgb_t::black();
+		}
 	}
 }
 

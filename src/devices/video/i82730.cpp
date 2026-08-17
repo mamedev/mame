@@ -60,7 +60,8 @@ i82730_device::i82730_device(const machine_config &mconfig, const char *tag, dev
 	m_row(nullptr),
 	m_dma_count(0),
 	m_row_count(0),
-	m_row_index(0)
+	m_row_index(0),
+	m_current_row(0)
 {
 }
 
@@ -153,6 +154,17 @@ void i82730_device::update_interrupts()
 
 	if (code)
 		m_sint_handler(1);
+}
+
+bool i82730_device::cursor_visible()
+{
+	// CR1_BE enables blinking of cursor 1; CURSOR_BLINK sets the blink rate in
+	// frames. When blinking is disabled (or the rate is 0) the cursor is shown
+	// steady. The 50%-duty phase below keeps it comfortably visible.
+	if (!m_mb.cr1_be || m_mb.cursor_blink == 0)
+		return true;
+
+	return ((screen().frame_number() / m_mb.cursor_blink) & 1) == 0;
 }
 
 void i82730_device::mode_set()
@@ -713,6 +725,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 
 		// fetch initial row
 		m_row_index = 0;
+		m_current_row = 0;
 		m_row = &m_row_buffer[m_row_index][0];
 		load_row();
 	}
@@ -724,8 +737,18 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 	{
 		uint8_t lc = (y - m_mb.vfldstrt) % (m_mb.lpr + 1);
 
+		// Composite the hardware cursor. It shows on the character row it was
+		// positioned on by LD CUR POS (m_cursor[0].y), on the intra-row scan
+		// lines cur1strt..cur1stp, subject to its blink phase. Passing the
+		// column to the driver (or -1 for "no cursor here") lets the driver
+		// reverse-video that cell -- the device owns cursor position/blink,
+		// the driver owns pixel geometry.
+		int cursor_x = -1;
+		if (m_current_row == m_cursor[0].y && lc >= m_mb.cur1strt && lc <= m_mb.cur1stp && cursor_visible())
+			cursor_x = m_cursor[0].x;
+
 		// call driver
-		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count);
+		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count, cursor_x);
 
 		// swap buffers at end of row
 		if (lc == m_mb.lpr)
@@ -738,6 +761,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 				m_sptr = (read_word(m_cbp + 36) << 16) | read_word(m_cbp + 34);
 
 			load_row();
+			m_current_row++;
 		}
 	}
 	else if (y >= m_mb.vfldstp && y < m_mb.vfldstp + m_mb.scroll_margin + 1)
@@ -748,8 +772,8 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 	{
 		uint8_t lc = (y - (m_mb.vfldstp + m_mb.scroll_margin + 1)) % (m_mb.lpr + 1);
 
-		// call driver
-		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count);
+		// call driver (no cursor on the status row)
+		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count, -1);
 	}
 	else if (y == m_mb.vfldstp + m_mb.scroll_margin + 1 + m_mb.lpr + 1)
 	{
