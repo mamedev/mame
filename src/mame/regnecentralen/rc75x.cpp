@@ -31,7 +31,9 @@ I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 		if ((gfx & 0xff) == 0 && !cursor_here)
 			continue;
 
-		// figure out char width
+		// figure out char width. The font word packs 7 pixel columns in the
+		// high bits (bit 15 = leftmost) and a unary width guard in the low
+		// byte; a normal cell measures 7 (560 px / 80 cols).
 		int width;
 		for (width = 0; width < 16; width++)
 			if (BIT(gfx, width) == 0)
@@ -39,9 +41,10 @@ I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 
 		width = 15 - width;
 
-		// nominal cell width when the cursor sits on an otherwise empty cell
-		// (no guard bits to measure); 560 px / 80 cols = 7.
-		if (width <= 0)
+		// clamp to the nominal 7-px cell. A cursor sitting on an otherwise
+		// empty cell (gfx == 0) has no guard bits, which would otherwise
+		// mis-measure as 15 and draw a double-wide reverse-video block.
+		if (width <= 0 || width > 7)
 			width = 7;
 
 		for (int p = 0; p < width; p++)
@@ -49,9 +52,12 @@ I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 			bool on = BIT(gfx, 15 - p);
 			if (cursor_here)
 				on = !on; // reverse-video the cell under the cursor
+			// Fixed 7-px cell pitch for the column origin (i * 7), so a cell
+			// whose measured width differs never shifts the columns after it.
 			// The RC759/RC750 shipped with an amber (P3-phosphor) monitor, not
-			// a white one -- render lit pixels in amber on a black background.
-			bitmap.pix(y, i * width + p) = on ? rgb_t(0xff, 0xb0, 0x00) : rgb_t::black();
+			// a white one -- lit pixels amber, unlit a very dark amber (the
+			// glass is never truly black on a P3 tube), not pure black.
+			bitmap.pix(y, i * 7 + p) = on ? rgb_t(0xff, 0xb0, 0x00) : rgb_t(0x1a, 0x12, 0x00);
 		}
 	}
 }
