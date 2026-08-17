@@ -240,13 +240,21 @@ void rc75x_state::add_common_devices(machine_config &config)
 
 	MM58167(config, m_rtc, 32.768_kHz_XTAL).irq().set(m_pic, FUNC(pic8259_device::ir3_w));
 
-	// video
+	// video. The RC759 Piccoline shipped with the standard (~62.5 Hz, ~19.5 kHz)
+	// monochrome screen -- the higher-quality 73 Hz / 22 kHz screen was the
+	// RC750 Partner's, only later back-ported to the Piccoline. The firmware's
+	// mode block programs 47*16 = 752 total dots per line and 312 lines, so the
+	// 82730 character clock must be 62.5 * 47 * 312 = 916'500 Hz for the field
+	// rate to be 62.5 Hz (a 16 ms frame period -- the firmware's system tick,
+	// driven here via screen_vblank -> TMRIN0, assumes exactly 16 ms). The
+	// set_raw values below are only the pre-modeset placeholder; the 82730
+	// overrides them via screen().configure() at mode-set.
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(1'250'000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
+	screen.set_raw(916'500 * 16, 752, 112, 672, 312, 31, 291);
 	screen.set_screen_update(m_txt, FUNC(i82730_device::screen_update));
 	screen.screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::tmrin0_w)); // TMRIN0 source not documented, but self-test needs something like this
 
-	I82730(config, m_txt, 1'250'000, m_maincpu);
+	I82730(config, m_txt, 916'500, m_maincpu);
 	m_txt->set_screen("screen");
 	m_txt->set_update_row_callback(FUNC(rc75x_state::txt_update_row));
 	m_txt->sint().set(m_pic, FUNC(pic8259_device::ir4_w));
