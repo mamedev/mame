@@ -26851,6 +26851,13 @@ jr200u
 @source:matsushita/kn5000.cpp
 kn5000
 
+@source:matsushita/kn7000.cpp
+kn6000
+kn2400
+kn2600                          // SX-KN2600, same firmware as SX-KN2400
+kn6500
+kn7000
+
 @source:matsushita/myb3k.cpp
 myb3k
 jb3000
