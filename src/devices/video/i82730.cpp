@@ -268,8 +268,15 @@ void i82730_device::mode_set()
 	m_mb.underline2 = (tmp >> 4) & 0x0f;
 	m_mb.underline1 = tmp & 0x0f;
 
-	// setup screen mode
-	rectangle visarea(m_mb.hbrdstrt * 16, m_mb.hbrdstp * 16 - 1, m_mb.vsyncstp, m_mb.vfldstp + m_mb.scroll_margin + 1 + m_mb.lpr - 1);
+	// setup screen mode. The row renderer writes content into m_bitmap at
+	// row (scanline - vsyncstp) and screen_update copies it with desty 0, so
+	// the visible rectangle must be expressed in that same content coordinate
+	// space (subtract vsyncstp). min_y is the field top (vfldstrt - vsyncstp)
+	// so the text hugs the top edge, symmetric with the horizontal field which
+	// hugs the left edge (hbrdstrt == hfldstrt here) -- previously min_y was
+	// left in raw scanline space (vsyncstp), leaving a spurious top gap of
+	// (vfldstrt - vsyncstp) px between the window edge and the first char row.
+	rectangle visarea(m_mb.hbrdstrt * 16, m_mb.hbrdstp * 16 - 1, m_mb.vfldstrt - m_mb.vsyncstp, m_mb.vfldstp + m_mb.scroll_margin + 1 + m_mb.lpr - 1 - m_mb.vsyncstp);
 	attotime period = attotime::from_ticks(m_mb.line_length * 16 * m_mb.frame_length, clock() * 16);
 	screen().configure(m_mb.line_length * 16, m_mb.frame_length, visarea, period);
 
@@ -673,8 +680,14 @@ void i82730_device::load_row()
 		}
 		else
 		{
-			// fetch data
-			if (--m_dma_count > 0)
+			// fetch data. MAX DMA COUNT is the number of characters to DMA per
+			// row, so all m_max_dma_count characters must be stored. Post-
+			// decrement (not pre-) is required: the RC759 firmware programs
+			// MAX DMA COUNT = 80 and emits exactly 80 character words with no
+			// trailing EOL command, relying purely on the count to bound the
+			// row. A pre-decrement dropped the 80th character (screen column
+			// 79), which cut the right edge off full-width frames (menu box).
+			if (m_dma_count-- > 0)
 			{
 				if (m_row_count < 200)
 				{
