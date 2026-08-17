@@ -49,7 +49,9 @@ I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 			bool on = BIT(gfx, 15 - p);
 			if (cursor_here)
 				on = !on; // reverse-video the cell under the cursor
-			bitmap.pix(y, i * width + p) = on ? rgb_t::white() : rgb_t::black();
+			// The RC759/RC750 shipped with an amber (P3-phosphor) monitor, not
+			// a white one -- render lit pixels in amber on a black background.
+			bitmap.pix(y, i * width + p) = on ? rgb_t(0xff, 0xb0, 0x00) : rgb_t::black();
 		}
 	}
 }
