@@ -19,14 +19,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "gt913_snd.h"
+#include "gt913.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(GT913_SOUND, gt913_sound_device, "gt913_sound_hle", "Casio GT913F sound")
+DEFINE_DEVICE_TYPE(GT913_SOUND, gt913_sound_device, "gt913_sound_hle", "Casio GT913 sound")
 
 // expand 2-bit exponent deltas
 const u8 gt913_sound_device::exp_2_to_3[4] = { 0, 1, 2, 7 };
@@ -62,11 +62,11 @@ gt913_sound_device::gt913_sound_device(const machine_config &mconfig, const char
 void gt913_sound_device::device_start()
 {
 	/*
-	generate sound at 104 cycles per sample (~= 144.231 kHz sample clock to the DAC)
+	generate sound at 208 cycles per sample (~= 144.231 kHz sample clock to the DAC)
 	on keyboard models that include a DSP, this also results in a multiple
 	of the 36.058 kHz CPU->DSP sync signal shown in some schematics (WK-1200 and others)
 	*/
-	m_stream = stream_alloc(0, 2, clock() / 104);
+	m_stream = stream_alloc(0, 2, clock() / CLOCKS_PER_SAMPLE);
 
 	save_item(NAME(m_gain));
 	save_item(NAME(m_data));
@@ -100,6 +100,11 @@ void gt913_sound_device::device_reset()
 	std::memset(m_data, 0, sizeof(m_data));
 
 	std::memset(m_voices, 0, sizeof(m_voices));
+}
+
+void gt913_sound_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / CLOCKS_PER_SAMPLE);
 }
 
 void gt913_sound_device::sound_stream_update(sound_stream& stream)

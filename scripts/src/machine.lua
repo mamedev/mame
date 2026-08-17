@@ -1527,19 +1527,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/gt913_io.h,MACHINES["GT913"] = true
---@src/devices/machine/gt913_kbd.h,MACHINES["GT913"] = true
---@src/devices/machine/gt913_snd.h,MACHINES["GT913"] = true
+--@src/devices/machine/gt913_kbd.h,MACHINES["GT913_KBD"] = true
 ---------------------------------------------------
 
-if MACHINES["GT913"] then
+if MACHINES["GT913_KBD"] then
 	files {
-		MAME_DIR .. "src/devices/machine/gt913_io.cpp",
-		MAME_DIR .. "src/devices/machine/gt913_io.h",
 		MAME_DIR .. "src/devices/machine/gt913_kbd.cpp",
 		MAME_DIR .. "src/devices/machine/gt913_kbd.h",
-		MAME_DIR .. "src/devices/machine/gt913_snd.cpp",
-		MAME_DIR .. "src/devices/machine/gt913_snd.h",
 	}
 end
 
