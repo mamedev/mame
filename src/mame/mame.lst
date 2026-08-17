@@ -29307,6 +29307,7 @@ blueshrkmr2
 boothill
 bowler
 checkmat
+checkmata
 clowns
 clowns1
 desertgu
@@ -36414,6 +36415,9 @@ obdmx
 
 @source:oberheim/ob8.cpp
 ob8
+
+@source:oberheim/obsx.cpp
+obsx
 
 @source:oberheim/xpander.cpp
 xpander

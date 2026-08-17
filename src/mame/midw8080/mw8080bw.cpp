@@ -2991,6 +2991,19 @@ ROM_START( checkmat )
 ROM_END
 
 
+ROM_START( checkmata ) // 80-900E PCB, no labels, only a red number stamped on the ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.h", 0x0000, 0x0200, CRC(15c90cde) SHA1(4721d7bd6331af71bbf51187d770f3f82324c030) )
+	ROM_LOAD( "2.g", 0x0200, 0x0200, CRC(af52a8d0) SHA1(a12c761544fb765afd5e0fd5ae25fdb7e272ace0) )
+	ROM_LOAD( "3.f", 0x0400, 0x0200, CRC(a4650524) SHA1(ef10ba1c57c98a7f323791a892c352936e181426) )
+	ROM_LOAD( "4.e", 0x0600, 0x0200, CRC(d02488c9) SHA1(8080e1c370f431c206a0a62e48157ac0c45cfaf0) )
+	ROM_LOAD( "5.d", 0x0800, 0x0200, CRC(a0477f03) SHA1(67f45468d58d3a1c9f5d24013416cc15231ec0db) )
+	ROM_LOAD( "6.c", 0x0a00, 0x0200, CRC(1ae4e225) SHA1(43476faccc361aacc68b8eca956d7e9b62607901) )
+	ROM_LOAD( "7.b", 0x0c00, 0x0200, CRC(1eb04641) SHA1(f956784cd80a817fe51f0c6c017eabcba203d352) )
+	ROM_LOAD( "8.a", 0x0e00, 0x0200, CRC(b5ce1a2a) SHA1(fe35bddf0ef558743ffc63ac46a1298d82a74df4) )
+ROM_END
+
+
 ROM_START( desertgu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9316.1h",    0x0000, 0x0800, CRC(c0030d7c) SHA1(4d0a3a59d4f8181c6e30966a6b1d19ba5b29c398) )
@@ -3255,7 +3268,8 @@ ROM_END
 /* 610 */ GAMEL( 1976, 280zzzapa,   280zzzap, zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway",         "280-ZZZAP (set 2)",                              MACHINE_SUPPORTS_SAVE,                           layout_280zzzap )
 /* 611 */ GAMEL( 1976, maze,        0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway",                                   "Amazing Maze",                                   MACHINE_SUPPORTS_SAVE,                           layout_maze )
 /* 612 */ GAME(  1977, boothill,    0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Boot Hill",                                      MACHINE_SUPPORTS_SAVE )
-/* 615 */ GAME(  1977, checkmat,    0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Checkmate",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 615 */ GAME(  1977, checkmat,    0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Checkmate (set 1)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 615 */ GAME(  1977, checkmata,   checkmat, checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Checkmate (set 2)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, desertgu,    0,        desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Desert Gun",                                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, roadrunm,    desertgu, desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Midway",                                   "Road Runner (Midway)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 619 */ GAME(  1977, dplay,       0,        dplay,    dplay,    dplay_state,    empty_init, ROT0,   "Midway",                                   "Double Play",                                    MACHINE_SUPPORTS_SAVE )
