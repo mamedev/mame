@@ -929,6 +929,7 @@ void tandy2k_state::machine_start()
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
+	save_item(NAME(m_busdmarq));
 	save_item(NAME(m_kbdclk));
 	save_item(NAME(m_kbddat));
 	save_item(NAME(m_kbdin));
@@ -936,17 +937,33 @@ void tandy2k_state::machine_start()
 	save_item(NAME(m_rxrdy));
 	save_item(NAME(m_txrdy));
 	save_item(NAME(m_pb_sel));
+	save_item(NAME(m_vram_base));
 	save_item(NAME(m_vidouts));
 	save_item(NAME(m_clkspd));
 	save_item(NAME(m_clkcnt));
+	save_item(NAME(m_blc));
+	save_item(NAME(m_bkc));
+	save_item(NAME(m_cblank));
+	save_item(NAME(m_dblc));
+	save_item(NAME(m_dbkc));
+	save_item(NAME(m_dblank));
+	save_item(NAME(m_slg));
+	save_item(NAME(m_sld));
+	save_item(NAME(m_cgra));
+	save_item(NAME(m_vidla));
+	save_item(NAME(m_hires_en));
 	save_item(NAME(m_outspkr));
 	save_item(NAME(m_spkrdata));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_fault));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_centronics_perror));
+	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_clkmouse_cmd));
 	save_item(NAME(m_clkmouse_cnt));
 	save_item(NAME(m_clkmouse_irq));
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
-	save_item(NAME(m_hires_en));
 }
 
 void tandy2k_state::machine_reset()
@@ -1143,5 +1160,5 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    CLASS          INIT        COMPANY              FULLNAME        FLAGS
-COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
-COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )
+COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_SUPPORTS_SAVE )
+COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
