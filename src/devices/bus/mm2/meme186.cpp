@@ -6,6 +6,14 @@
 
 *********************************************************************/
 
+/*
+
+    TODO:
+
+    - DIP switches for memory size and wait states
+
+*/
+
 #include "emu.h"
 #include "meme186.h"
 

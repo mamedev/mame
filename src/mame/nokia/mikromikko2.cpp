@@ -77,21 +77,6 @@
 
 */
 
-/*
-
-    TODO:
-
-    - keyboard ROM is not dumped
-    - MPSC
-		- CRC
-		- PAR OVR CRC
-		- LINE OFF
-		- DMA is not implemented in z80sio.cpp
-    - CRTC186 video using CRT9007
-    - IOE186 card
-
-*/
-
 #include "emu.h"
 #include "bus/mm2/exp.h"
 #include "bus/rs232/rs232.h"

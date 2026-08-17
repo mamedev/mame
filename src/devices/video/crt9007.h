@@ -154,6 +154,7 @@ private:
 	// DMA
 	bool m_dmar;
 	bool m_ack;
+	uint16_t m_dma_addr;
 	uint16_t m_dma_count;
 	uint16_t m_dma_burst;
 	uint8_t m_dma_delay;

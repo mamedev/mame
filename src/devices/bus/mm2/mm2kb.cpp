@@ -6,6 +6,14 @@
 
 *********************************************************************/
 
+/*
+
+    TODO:
+
+    - keyboard ROM is not dumped
+
+*/
+
 #include "emu.h"
 #include "mm2kb.h"
 #include "machine/keyboard.ipp"
