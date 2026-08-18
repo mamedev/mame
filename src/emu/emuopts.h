@@ -174,7 +174,6 @@
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
 #define OPTION_UI_FONT              "uifont"
 #define OPTION_UI                   "ui"
-#define OPTION_RAMSIZE              "ramsize"
 #define OPTION_NVRAM_SAVE           "nvram_save"
 #define OPTION_RTC_TIME             "rtc"
 
@@ -458,7 +457,6 @@ public:
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	ui_option ui() const { return m_ui; }
-	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 	bool nvram_save() const { return bool_value(OPTION_NVRAM_SAVE); }
 	const char *rtc_time() const { return value(OPTION_RTC_TIME); }
 

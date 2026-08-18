@@ -148,7 +148,6 @@ void output_features(std::ostream &out, device_type type, device_t::feature_type
 void output_images(std::ostream &out, device_t &device, const char *root_tag);
 void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
 void output_software_lists(std::ostream &out, device_t &root, const char *root_tag);
-void output_ramoptions(std::ostream &out, device_t &root);
 
 void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag, device_type_set *devtypes);
 void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set *filter);
@@ -169,7 +168,7 @@ constexpr char f_dtd_string[] =
 		"\t<!ATTLIST __XML_ROOT__ build CDATA #IMPLIED>\n"
 		"\t<!ATTLIST __XML_ROOT__ debug (yes|no) \"no\">\n"
 		"\t<!ATTLIST __XML_ROOT__ mameconfig CDATA #REQUIRED>\n"
-		"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>\n"
+		"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*)>\n"
 		"\t\t<!ATTLIST __XML_TOP__ name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST __XML_TOP__ sourcefile CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST __XML_TOP__ isbios (yes|no) \"no\">\n"
@@ -321,9 +320,6 @@ constexpr char f_dtd_string[] =
 		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
-		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
-		"\t\t\t<!ATTLIST ramoption name CDATA #REQUIRED>\n"
-		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 		"]>";
 
 
@@ -798,7 +794,6 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_images(out, config.root_device(), "");
 	output_slots(out, config, config.root_device(), "", devtypes);
 	output_software_lists(out, config.root_device(), "");
-	output_ramoptions(out, config.root_device());
 
 	// close the topmost tag
 	util::stream_format(out, "\t</%s>\n", XML_TOP);
@@ -2197,40 +2192,6 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 	}
 }
 
-
-
-//-------------------------------------------------
-//  output_ramoptions - prints m_output all RAM
-//  options for this system
-//-------------------------------------------------
-
-void output_ramoptions(std::ostream &out, device_t &root)
-{
-	for (const ram_device &ram : ram_device_enumerator(root, 1))
-	{
-		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
-		{
-			uint32_t const defsize(ram.default_size());
-			bool havedefault(false);
-			for (ram_device::extra_option const &option : ram.extra_options())
-			{
-				if (defsize == option.second)
-				{
-					assert(!havedefault);
-					havedefault = true;
-					util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
-				}
-				else
-				{
-					util::stream_format(out, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
-				}
-			}
-			if (!havedefault)
-				util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
-			break;
-		}
-	}
-}
 
 
 //-------------------------------------------------

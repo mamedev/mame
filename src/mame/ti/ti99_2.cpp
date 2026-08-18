@@ -246,7 +246,7 @@ private:
 
 void ti99_2_state::driver_start()
 {
-	m_ram_start = 0xf000 - m_ram->default_size();
+	m_ram_start = 0xf000 - m_ram->size();
 	m_first_ram_page = m_ram_start >> 12;
 }
 
