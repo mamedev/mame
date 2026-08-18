@@ -107,6 +107,7 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 	m_vpac->drb_callback().set(FUNC(crtc186_device::vpac_drb_w));
 	m_vpac->wben_callback().set(FUNC(crtc186_device::vpac_wben_w));
 	m_vpac->cblank_callback().set(FUNC(crtc186_device::vpac_cblank_w));
+	m_vpac->curs_callback().set(FUNC(crtc186_device::vpac_curs_w));
 	m_vpac->vs_callback().set(FUNC(crtc186_device::vpac_vs_w));
 	m_vpac->slg_callback().set(FUNC(crtc186_device::vpac_slg_w));
 	m_vpac->sld_callback().set(FUNC(crtc186_device::vpac_sld_w));
@@ -168,6 +169,7 @@ void crtc186_device::device_start()
 	save_item(NAME(m_c70_50));
 	save_item(NAME(m_cru));
 	save_item(NAME(m_crb));
+	save_item(NAME(m_curs));
 	save_item(NAME(m_drb));
 	save_item(NAME(m_vs));
 	save_item(NAME(m_frame));
@@ -181,6 +183,7 @@ void crtc186_device::device_reset()
 {
 	m_vidla = 0;
 	m_vidat = 0;
+	m_curs = false;
 	m_drb = true;
 	m_dout = false;
 	m_vs = true;
@@ -273,6 +276,11 @@ void crtc186_device::vpac_wben_w(int state)
 
 void crtc186_device::vpac_cblank_w(int state)
 {
+}
+
+void crtc186_device::vpac_curs_w(int state)
+{
+	m_curs = bool(state);
 }
 
 void crtc186_device::vpac_vs_w(int state)
@@ -386,7 +394,7 @@ void crtc186_device::draw_character(int x, int y)
 	bool const last = lnel ? bool(BIT(video, 0)) : (bldl ? bool(BIT(unbold, 0)) : bool(BIT(background, 0)));
 
 	// the control latch inhibits the blinking of the cursor
-	bool const cursor = (m_crb || blink) && m_vpac->cursor_active(m_col, m_row);
+	bool const cursor = (m_crb || blink) && m_curs;
 
 	// the underline attribute and the underline cursor light up the whole
 	// character time of the last scan line of the data row

@@ -10,10 +10,8 @@
 
     TODO:
 
-    - cursor timer
     - light pen
     - non-DMA mode
-    - DMA mode
     - cursor/blank skew
     - sequential breaks
     - interlaced mode
@@ -25,7 +23,6 @@
     - operation modes 0,4,7
     - address modes 1,3
     - light pen
-    - state saving
 
 */
 
@@ -344,7 +341,26 @@ inline void crt9007_device::update_vlt_timer(bool state)
 inline void crt9007_device::update_curs_timer(bool state)
 {
 	// this signal is active for 1 character time for all scanlines within the data row
-	// TODO
+	int y = screen().vpos();
+
+	if (state)
+	{
+		// the signal is deasserted at the end of the cursor character time
+		m_curs_timer->adjust(screen().time_until_pos(y, m_curs_end), 0);
+	}
+	else if (VERTICAL_CURSOR < VISIBLE_DATA_ROWS_PER_FRAME)
+	{
+		// the signal is asserted again on the next scan line of the cursor data row,
+		// or on the top scan line of the cursor data row of the next frame
+		int next_y = ((y >= m_curs_top) && (y < m_curs_bottom)) ? (y + 1) : m_curs_top;
+
+		m_curs_timer->adjust(screen().time_until_pos(next_y, m_curs_start), 1);
+	}
+	else
+	{
+		// the cursor is outside of the visible data rows
+		m_curs_timer->enable(false);
+	}
 }
 
 
@@ -391,6 +407,36 @@ inline void crt9007_device::update_dma_timer()
 {
 	// TODO burst count and burst delay
 	m_dma_timer->adjust(clocks_to_attotime(1));
+}
+
+
+//-------------------------------------------------
+//  recompute_cursor -
+//-------------------------------------------------
+
+inline void crt9007_device::recompute_cursor()
+{
+	// check that necessary registers have been loaded
+	if (!HAS_VALID_PARAMETERS) return;
+
+	// the cursor is displayed for 1 character time on every scan line of the data
+	// row it is located on
+	// TODO cursor skew, double height cursor
+	m_curs_start = (HORIZONTAL_DELAY + HORIZONTAL_CURSOR) * m_hpixels_per_column;
+	m_curs_end = m_curs_start + m_hpixels_per_column;
+
+	m_curs_top = VERTICAL_DELAY + (VERTICAL_CURSOR * SCAN_LINES_PER_DATA_ROW);
+	m_curs_bottom = m_curs_top + SCAN_LINES_PER_DATA_ROW - 1;
+
+	// the cursor registers may have been changed while the cursor was displayed
+	if (m_curs)
+	{
+		m_curs = false;
+
+		m_write_curs(0);
+	}
+
+	update_curs_timer(false);
 }
 
 
@@ -442,6 +488,8 @@ inline void crt9007_device::recompute_parameters()
 
 	int frame_timer_line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
 	m_frame_timer->adjust(screen().time_until_pos(frame_timer_line, 0), 0, refresh);
+
+	recompute_cursor();
 }
 
 
@@ -499,14 +547,15 @@ void crt9007_device::device_start()
 	save_item(NAME(m_vs));
 	save_item(NAME(m_cblank));
 	save_item(NAME(m_vlt));
+	save_item(NAME(m_curs));
 	save_item(NAME(m_drb));
 	save_item(NAME(m_lpstb));
 	save_item(NAME(m_dmar));
+	save_item(NAME(m_ack));
 	save_item(NAME(m_dma_addr));
 	save_item(NAME(m_table_addr));
 	save_item(NAME(m_row_addr));
 	save_item(NAME(m_table_count));
-	save_item(NAME(m_ack));
 	save_item(NAME(m_dma_count));
 	save_item(NAME(m_dma_burst));
 	save_item(NAME(m_dma_delay));
@@ -535,6 +584,7 @@ void crt9007_device::device_reset()
 	m_write_cblank(0);
 
 	// CURS = 0
+	m_curs = false;
 	m_write_curs(0);
 
 	// VLT = 0
@@ -643,11 +693,13 @@ TIMER_CALLBACK_MEMBER(crt9007_device::vlt_update)
 
 TIMER_CALLBACK_MEMBER(crt9007_device::cursor_update)
 {
-	LOG("CRT9007 y %03u x %04u : CURS %u\n", screen().vpos(), screen().hpos(), param);
+	m_curs = bool(param);
 
-	m_write_curs(param);
+	LOG("CRT9007 y %03u x %04u : CURS %u\n", screen().vpos(), screen().hpos(), m_curs);
 
-	update_curs_timer(param);
+	m_write_curs(m_curs);
+
+	update_curs_timer(m_curs);
 }
 
 TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
@@ -965,10 +1017,12 @@ void crt9007_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 0x18:
+		recompute_cursor();
 		LOG("CRT9007 Vertical Cursor Register: %u\n", VERTICAL_CURSOR);
 		break;
 
 	case 0x19:
+		recompute_cursor();
 		LOG("CRT9007 Horizontal Cursor Register: %u\n", HORIZONTAL_CURSOR);
 		break;
 
@@ -1040,3 +1094,4 @@ bool crt9007_device::cursor_active(unsigned x, unsigned y)
 {
 	return (x == HORIZONTAL_CURSOR && y == VERTICAL_CURSOR);
 }
+

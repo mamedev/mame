@@ -71,7 +71,7 @@ public:
 	void ack_w(int state);
 	void lpstb_w(int state);
 
-	// cursor location
+	// cursor location, for drivers that do not use the CURS output
 	bool cursor_active(unsigned x, unsigned y);
 
 protected:
@@ -106,6 +106,7 @@ private:
 	inline void update_drb_timer(bool state);
 	inline void update_dma_timer();
 
+	inline void recompute_cursor();
 	inline void recompute_parameters();
 
 	// address space configurations
@@ -135,6 +136,7 @@ private:
 	bool m_vs;
 	bool m_cblank;
 	bool m_vlt;
+	bool m_curs;
 	bool m_drb;
 	bool m_lpstb;
 
@@ -146,6 +148,10 @@ private:
 	int m_vlt_start;
 	int m_vlt_end;
 	int m_vlt_bottom;
+	int m_curs_start;
+	int m_curs_end;
+	int m_curs_top;
+	int m_curs_bottom;
 	int m_drb_bottom;
 	//int m_wben;
 	//int m_slg;

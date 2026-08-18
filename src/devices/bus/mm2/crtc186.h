@@ -74,6 +74,7 @@ private:
 	void vpac_drb_w(int state);
 	void vpac_wben_w(int state);
 	void vpac_cblank_w(int state);
+	void vpac_curs_w(int state);
 	void vpac_vs_w(int state);
 	void vpac_slg_w(int state);
 	void vpac_sld_w(int state);
@@ -94,6 +95,7 @@ private:
 	bool m_c70_50;
 	bool m_cru;
 	bool m_crb;
+	bool m_curs;
 	bool m_drb;
 	bool m_dout;
 	bool m_vs;

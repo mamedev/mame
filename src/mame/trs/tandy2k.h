@@ -97,6 +97,7 @@ public:
 		m_dblank(0),
 		m_slg(0),
 		m_sld(0),
+		m_curs(0),
 		m_cgra(0),
 		m_vidla(0),
 		m_outspkr(0),
@@ -184,6 +185,7 @@ public:
 	void vpac_drb_w(int state);
 	void vpac_wben_w(int state);
 	void vpac_cblank_w(int state);
+	void vpac_curs_w(int state);
 	void vpac_vs_w(int state);
 	void vpac_slg_w(int state);
 	void vpac_sld_w(int state);
@@ -247,6 +249,7 @@ public:
 	uint8_t m_dblank;
 	int m_slg;
 	int m_sld;
+	int m_curs;
 	uint8_t m_cgra;
 	uint8_t m_vidla;
 	uint8_t m_hires_en = 0;
