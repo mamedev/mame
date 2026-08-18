@@ -4520,6 +4520,26 @@ ROM_START( jhg3d ) // IGS PCB-0376-01-FS. 3 banks of 8 switches. 1 PPI.
 	ROM_LOAD( "v-445cn.u20", 0x00000, 0x40000, CRC(e6aac74d) SHA1(b8f88b894383cd3eab4b00a20b74ee84dea61672) )
 ROM_END
 
+// 泰山五线 (Tàishān Wǔxiàn)
+ROM_START( tswx ) // IGS PCB-0489-10-FM-1. 3 banks of 8 switches. 1 PPI.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "m3_027a.u20", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u17", 0x00000, 0x80000, CRC(ddfb4cbb) SHA1(e1a435f7d6a08bdf81f4e523f8dcb7082a907db8) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x000000, 0x200000, CRC(18fe9b5e) SHA1(dbcc6bf7a649dd07bad68add9b63a39a92e9f363) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(d2b6358a) SHA1(e24aef98a06ea3bb8ce23ced2027de82a58e8a15) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_RELOAD(      0x200000, 0x200000 ) // game expects to read the ROM at this offset? Gameplay doesn't show missing GFX, so may be right size anyway
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u4", 0x000000, 0x200000, CRC(3976780a) SHA1(3229e58f096e298ce9545e1e85bbf7f067f10699) )
+ROM_END
+
 // 泰山五线 加强版 (Tàishān Wǔxiàn Jiāqiáng Bǎn)
 ROM_START( tswxp ) // IGS PCB-0489-17-FM-1. 2 banks of 8 switches (1 unpopulated). 1 PPI.
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -4946,3 +4966,4 @@ GAME(  2001, cjdh6tha,      cjdh6th,  m027_1ppi<false>, base,     igs_m027_state
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
 GAME(  200?, tarzan2,       jking02,  m027_1ppi<false>, base,     igs_m027_state, init_tarzan2,  ROT0, "IGS", "Tarzan II (V101XB)", MACHINE_NOT_WORKING )
 GAME(  2006, magtree,       crzybugs, m027_1ppi<false>, base,     igs_m027_state, init_magtree,  ROT0, "IGS", "Magic Tree (V200PR)", MACHINE_NOT_WORKING )
+GAME(  2006, tswx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian", MACHINE_NOT_WORKING )
