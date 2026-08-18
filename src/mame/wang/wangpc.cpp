@@ -855,8 +855,13 @@ void wangpc_state::wangpc_io(address_map &map)
 {
 	map.unmap_value_high();
 
-	// the keyboard answers IBM PC style down here, as the port scan run on
-	// real hardware shows
+	// the machine also answers IBM PC style down here, as the port scan run
+	// on real hardware shows: the same peripherals, but at consecutive byte
+	// addresses instead of every other word.  IBM software that drives the
+	// hardware directly - Flight Simulator reprogramming timer 0 to its own
+	// tick rate, for one - depends on this.
+	map(0x0020, 0x0021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x0043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0061).r(FUNC(wangpc_state::ibm_kb_r));
 
 	map(0x1000, 0x1000).w(FUNC(wangpc_state::fdc_ctrl_w));
