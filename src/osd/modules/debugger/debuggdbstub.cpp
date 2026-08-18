@@ -1330,8 +1330,13 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	if ( name == "Supported" )
 	{
 		std::string reply = string_format("PacketSize=%x", MAX_PACKET_SIZE);
-		reply += ";qXfer:features:read+";
+		reply += ";qXfer:features:read+;qOffsets+";
 		send_reply(reply);
+		return REPLY_NONE;
+	}
+	else if ( name == "Offsets" )
+	{
+		send_reply("Text=0;Data=0;Bss=0");
 		return REPLY_NONE;
 	}
 	else if ( name == "Xfer" )
