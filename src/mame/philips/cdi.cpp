@@ -145,6 +145,11 @@ static INPUT_PORTS_START( cdi )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Button 2")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Button 3")
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("TESTPLUG")
+	PORT_CONFNAME( 0x01, 0x00, "Test plug" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
@@ -525,6 +530,7 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousex().set_ioport("MOUSEX");
 	m_slave_hle->read_mousey().set_ioport("MOUSEY");
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
+	m_slave_hle->testplug_callback().set_ioport("TESTPLUG");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
