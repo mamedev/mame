@@ -209,10 +209,20 @@ uint8_t tandy2k_state::kbint_clr_r()
 		m_kb->busy_w(1);
 		m_pic1->ir0_w(CLEAR_LINE);
 
-		return m_pc_keyboard->read();
+		return m_kbdin;
 	}
 
 	return 0xff;
+}
+
+void tandy2k_state::hle_keypress_w(int state)
+{
+	if (state)
+	{
+		m_kbdin = m_pc_keyboard->read();
+
+		m_pic1->ir0_w(ASSERT_LINE);
+	}
 }
 
 uint8_t tandy2k_state::clkmouse_r(offs_t offset)
@@ -1218,7 +1228,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	m_kb->data_wr_callback().set(FUNC(tandy2k_state::kbddat_w));
 
 	// temporary until the tandy keyboard has a rom dump
-	TANDY2K_HLE_KEYB(config, m_pc_keyboard).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
+	TANDY2K_HLE_KEYB(config, m_pc_keyboard).keypress().set(FUNC(tandy2k_state::hle_keypress_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k_flop");

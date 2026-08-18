@@ -169,6 +169,7 @@ public:
 	void enable_w(uint8_t data);
 	void dma_mux_w(uint8_t data);
 	uint8_t kbint_clr_r();
+	void hle_keypress_w(int state);
 	uint8_t fldtc_r();
 	void fldtc_w(uint8_t data);
 	void addr_ctrl_w(uint8_t data);
