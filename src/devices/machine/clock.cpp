@@ -56,7 +56,7 @@ void clock_device::reinit()
 	m_timer_init->adjust(attotime::zero);
 }
 
-void clock_device::output()
+inline void clock_device::output()
 {
 	if (m_signal != m_output)
 	{
@@ -112,20 +112,24 @@ TIMER_CALLBACK_MEMBER(clock_device::clock_init)
 		}
 	}
 
-	attotime next = m_signal ? m_thigh : m_tlow;
-	if (next < m_timer_tick->remaining())
-		m_timer_tick->adjust(next);
+	if (m_thigh.is_zero() || m_tlow.is_zero())
+	{
+		// signal is stuck high or low
+		m_signal = m_tlow.is_zero() ? 1 : 0;
+		m_timer_tick->adjust(attotime::never);
+		output();
+	}
+	else
+	{
+		attotime next = m_signal ? m_thigh : m_tlow;
+		if (next < m_timer_tick->remaining())
+			m_timer_tick->adjust(next);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(clock_device::clock_tick)
 {
-	if (m_thigh.is_zero())
-		m_signal = 0;
-	else if (m_tlow.is_zero())
-		m_signal = 1;
-	else
-		m_signal ^= 1;
-
+	m_signal ^= 1;
 	m_timer_tick->adjust(m_signal ? m_thigh : m_tlow);
 	output();
 }
