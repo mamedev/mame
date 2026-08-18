@@ -99,8 +99,8 @@ ROM_START( m68hc705c8a )
 ROM_END
 
 
-//constexpr u16 M68HC05_VECTOR_SPI        = 0xfff4;
-//constexpr u16 M68HC05_VECTOR_SCI        = 0xfff6;
+constexpr u16 M68HC05_VECTOR_F4         = 0xfff4;
+constexpr u16 M68HC05_VECTOR_F6         = 0xfff6;
 constexpr u16 M68HC05_VECTOR_TIMER      = 0xfff8;
 constexpr u16 M68HC05_VECTOR_IRQ        = 0xfffa;
 constexpr u16 M68HC05_VECTOR_SWI        = 0xfffc;
@@ -108,8 +108,10 @@ constexpr u16 M68HC05_VECTOR_SWI        = 0xfffc;
 
 constexpr u16 M68HC05_INT_IRQ           = u16(1) << 0;
 constexpr u16 M68HC05_INT_TIMER         = u16(1) << 1;
+constexpr u16 M68HC05_INT_F4            = u16(1) << 2;
+constexpr u16 M68HC05_INT_F6            = u16(1) << 3;
 
-constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
+constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER | M68HC05_INT_F4 | M68HC05_INT_F6;
 
 } // anonymous namespace
 
@@ -432,6 +434,7 @@ void m68hc05_device::spcr_w(u8 data)
 		m_spsr_seen &= 0xc0;
 	}
 	m_spcr = data & 0xdf;
+	update_spi_irq();
 }
 
 u8 m68hc05_device::spsr_r()
@@ -447,6 +450,7 @@ u8 m68hc05_device::spdr_r()
 	{
 		m_spsr &= ~(m_spsr_seen & 0xc0);
 		m_spsr_seen &= 0x10;
+		update_spi_irq();
 	}
 	return m_spdr;
 }
@@ -457,6 +461,7 @@ void m68hc05_device::spdr_w(u8 data)
 	{
 		m_spsr &= ~(m_spsr_seen & 0xc0);
 		m_spsr_seen &= 0x10;
+		update_spi_irq();
 	}
 	m_spdr = data;
 }
@@ -491,6 +496,7 @@ u8 m68hc05_device::sccr2_r()
 void m68hc05_device::sccr2_w(u8 data)
 {
 	m_sccr2 = data;
+	update_sci_irq();
 }
 
 u8 m68hc05_device::scsr_r()
@@ -506,6 +512,7 @@ u8 m68hc05_device::scdr_r()
 	{
 		m_scsr &= ~(m_scsr_seen & 0x3e);
 		m_scsr_seen &= 0xc0;
+		update_sci_irq();
 	}
 	return m_scdr;
 }
@@ -516,6 +523,7 @@ void m68hc05_device::scdr_w(u8 data)
 	{
 		m_scsr &= ~(m_scsr_seen & 0xc0);
 		m_scsr_seen &= 0x3e;
+		update_sci_irq();
 	}
 	m_scdr = data;
 }
@@ -757,6 +765,24 @@ void m68hc05_device::interrupt()
 			else
 				rm16<false>(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
 		}
+		else if (m_pending_interrupts & M68HC05_INT_F6)
+		{
+			LOGINT("servicing SCI interrupt\n");
+			standard_irq_callback(2, m_pc.w.l);
+			if (m_params.m_addr_width > 13)
+				rm16<true>(M68HC05_VECTOR_F6 & m_params.m_vector_mask, m_pc);
+			else
+				rm16<false>(M68HC05_VECTOR_F6 & m_params.m_vector_mask, m_pc);
+		}
+		else if (m_pending_interrupts & M68HC05_INT_F4)
+		{
+			LOGINT("servicing SPI interrupt\n");
+			standard_irq_callback(3, m_pc.w.l);
+			if (m_params.m_addr_width > 13)
+				rm16<true>(M68HC05_VECTOR_F4 & m_params.m_vector_mask, m_pc);
+			else
+				rm16<false>(M68HC05_VECTOR_F4 & m_params.m_vector_mask, m_pc);
+		}
 		else
 		{
 			fatalerror("m68hc05[%s]: unknown pending interrupt(s) %x", tag(), m_pending_interrupts);
@@ -876,6 +902,23 @@ void m68hc05_device::add_ncop_state()
 u8 m68hc05_device::port_value(unsigned offset) const
 {
 	return (m_port_latch[offset] & m_port_ddr[offset]) | (m_port_input[offset] & ~m_port_ddr[offset]);
+}
+
+void m68hc05_device::update_sci_irq()
+{
+	// OR is gated by RIE
+	if ((m_scsr & m_sccr2 & 0xf0) || (BIT(m_scsr, 3) && BIT(m_sccr2, 5)))
+		m_pending_interrupts |= M68HC05_INT_F6;
+	else
+		m_pending_interrupts &= ~M68HC05_INT_F6;
+}
+
+void m68hc05_device::update_spi_irq()
+{
+	if (BIT(m_spcr, 7) && (m_spsr & 0x90))
+		m_pending_interrupts |= M68HC05_INT_F4;
+	else
+		m_pending_interrupts &= ~M68HC05_INT_F4;
 }
 
 void m68hc05_device::update_port_irq()
