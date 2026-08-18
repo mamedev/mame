@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="jr200_cass" description="National JR-200 cassettes">
+
+	<software name="aldebar" supported="no">
+		<description>Aldebaran</description>
+		<year>198?</year>
+		<publisher>ナショナル (National)</publisher>
+		<info name="alt_title" value="アルデバラン"/>
+		<info name="serial" value="JR-TB01"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="5193772">
+				<rom name="aldebaran (2400 baud).wav" size="5193772" crc="67772e9a" sha1="86e61fcd301374828af9414169d9eb1ca5c7bcec" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="17547308">
+				<rom name="aldebaran (600 baud).wav" size="17547308" crc="4ed68475" sha1="8698a0a8f6c9886a49866a2cb2c32d794513a52b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bingo25" supported="no">
+		<description>Bingo 25</description>
+		<year>198?</year>
+		<publisher>ナショナル (National)</publisher>
+		<info name="alt_title" value="ビンゴ２５"/>
+		<info name="serial" value="JR-TB03"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="4856876">
+				<rom name="bingo25 (2400 baud).wav" size="4856876" crc="6b68181d" sha1="c879790f4f7065fba9912c65760e9a030e40f962" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="16316460">
+				<rom name="bingo25 (600 baud).wav" size="16316460" crc="e466faa9" sha1="6dcb2b2b2615b8b3935e420e976ba2d96389a8e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackjck" supported="no">
+		<description>Blackjack</description>
+		<year>198?</year>
+		<publisher>ナショナル (National)</publisher>
+		<info name="alt_title" value="ブラックジャック"/>
+		<info name="serial" value="JR-TB06"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="6730796">
+				<rom name="blackjack (2400 baud).wav" size="6730796" crc="c6c21f9f" sha1="132acd1d173d83e76d184846ef5b7f9cbcb3b0c6" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="23138348">
+				<rom name="blackjack (600 baud).wav" size="23138348" crc="b1c549c3" sha1="a773f806bb56b3e7f7c594f8dd214b4822a28d65" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakdwn" supported="no">
+		<description>Breakdown</description>
+		<year>198?</year>
+		<publisher>ナショナル (National)</publisher>
+		<info name="alt_title" value="ブレークダウン"/>
+		<info name="serial" value="JR-TB10"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="5581868">
+				<rom name="breakdown (2400 baud).wav" size="5581868" crc="ccda4d34" sha1="f0028c6535d0e6a2844d611cb0509b99a8f7bae6" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="18731052">
+				<rom name="breakdown (600 baud).wav" size="18731052" crc="976f8776" sha1="d568b6103ffae2b76bb1ef48d6bd0c8d757775a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="germkdai" supported="no">
+		<description>German Kugun Daisakusen</description>
+		<year>1983</year>
+		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
+		<info name="alt_title" value="ドイツ空軍大作戦"/>
+		<info name="serial" value="JR-TB30"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="10008760">
+				<rom name="german kugun daisakusen (2400 baud).wav" size="10008760" crc="8a472d8f" sha1="d06ec79c62ce464b9ee30945fa7a4476b750f5c7" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="35622956">
+				<rom name="german kugun daisakusen (600 baud).wav" size="35622956" crc="27a362aa" sha1="d22c9e65f08e3430f3d129b6aa8390802675672b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nihondai" supported="no">
+		<description>Nihonkai Daisakusen</description>
+		<year>1983</year>
+		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
+		<info name="alt_title" value="日本海大作戦"/>
+		<info name="serial" value="JR-TB28"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="14430252">
+				<rom name="nihonkai daisakusen (2400 baud).wav" size="14430252" crc="9fd842c9" sha1="6b924e2bc16bf1ac0d61e16ed25826fdbc4fba34" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="50778156">
+				<rom name="nihonkai daisakusen (600 baud).wav" size="50778156" crc="1258e522" sha1="cc1a219cec9d5ae28a9138af250810290bd2cf56" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="okedaik" supported="no">
+		<description>Okehazama Daikassen</description>
+		<year>1983</year>
+		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
+		<info name="alt_title" value="桶狭間大合戦"/>
+		<info name="serial" value="JR-TB29"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="11453484">
+				<rom name="okehazama daikassen (2400 baud).wav" size="11453484" crc="a43c5c5b" sha1="546eeeb98ef82bc2220ac30bc4e76ee252b8222e" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="42793004">
+				<rom name="okehazama daikassen (600 baud).wav" size="42793004" crc="f836533f" sha1="f916736a7adaacf439a3f4628f8df117ceb05834" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pharbdai" supported="no">
+		<description>Pearl Harbor Daisakusen</description>
+		<year>1983</year>
+		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
+		<info name="alt_title" value="パールハーバー大作戦"/>
+		<info name="serial" value="JR-TB26"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="9315372">
+				<rom name="pearl harbor daisakusen (2400 baud).wav" size="9315372" crc="becc3e32" sha1="9a8c64cd9b37c1adf87d2bc4b709c0561be0adc8" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="34852908">
+				<rom name="pearl harbor daisakusen (600 baud).wav" size="34852908" crc="8b23ef03" sha1="ec10f1f955a18162b06a3c5d6e22b6e4c2589530" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shinseng" supported="no">
+		<description>Shinsengumi</description>
+		<year>1983</year>
+		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
+		<info name="alt_title" value="新選組"/>
+		<info name="serial" value="JR-TB27"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="8516236">
+				<rom name="shinsengumi (2400 baud).wav" size="8516236" crc="b9ab9393" sha1="d9975c09a95dd85b57d242e87445f92412349ce3" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="31903788">
+				<rom name="shinsengumi (600 baud).wav" size="31903788" crc="823802cc" sha1="72a80afba4c5e73cb0b21a217ace55ac9fe41879" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsumesho" supported="no">
+		<description>Tsume Shougi</description>
+		<year>198?</year>
+		<publisher>ナショナル (National)</publisher>
+		<info name="alt_title" value="詰将棋"/>
+		<info name="serial" value="JR-TB21"/>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="11085868">
+				<rom name="tsume shogi (2400 baud).wav" size="11085868" crc="8bf58e1e" sha1="6e9f53c7f501549e270d08da3830a9cbf1481626" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="29469740">
+				<rom name="tsume shogi (600 baud).wav" size="29469740" crc="db550fa6" sha1="f53d502e938fde7268690808316e0d4d8820bd5d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trapit" supported="no">
+		<description>Trapit (US?)</description>
+		<year></year>
+		<publisher>Panasonic</publisher>
+		<part name="cass1" interface="jr200_cass">
+			<dataarea name="cass" size="16257068">
+				<rom name="trapit (2400 baud).wav" size="16257068" crc="20d8f541" sha1="adc9140465eadeb8f83e45c824baab011fa10baf" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="jr200_cass">
+			<dataarea name="cass" size="26454060">
+				<rom name="trapit (600 baud).wav" size="26454060" crc="2341c3c1" sha1="8dafda8cdf9dd2fd77b8130a91a8b3da6a1dd5ee" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>
