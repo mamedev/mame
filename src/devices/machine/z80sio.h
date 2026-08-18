@@ -205,8 +205,8 @@ public:
 	void write_rx(int state) { m_rxd = state; }
 	void cts_w(int state);
 	void dcd_w(int state);
-	void rxc_w(int state);
-	void txc_w(int state);
+	virtual void rxc_w(int state);
+	virtual void txc_w(int state);
 	void sync_w(int state);
 
 	// Register state
@@ -442,6 +442,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool transmit_allowed() const override;
+	virtual void rxc_w(int state) override;
+	virtual void txc_w(int state) override;
 
 private:
 	uint8_t cmdreg_r();
@@ -467,6 +469,7 @@ private:
 	TIMER_CALLBACK_MEMBER(brg_timeout);
 
 	bool m_tx_auto_enable;
+	bool m_loop_mode;
 	uint8_t m_brg_tc;
 	uint8_t m_brg_control;
 	bool m_brg_state;
@@ -555,6 +558,7 @@ protected:
 	void trigger_interrupt(int index, int type);
 	void clear_interrupt(int index, int type);
 	void return_from_interrupt();
+	virtual void update_interrupt_pending(int index);
 	virtual uint8_t read_vector();
 	virtual int const *interrupt_priorities() const;
 
@@ -640,7 +644,7 @@ public:
 	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class mk68564_device : public i8274_device
+class mk68564_device : public z80sio_device
 {
 public:
 	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -654,6 +658,14 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// device_z80daisy_interface implementation
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
+
+	virtual void update_interrupt_pending(int index) override;
+	virtual uint8_t read_vector() override;
 
 private:
 	void vectrg_w(uint8_t data);

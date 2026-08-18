@@ -383,6 +383,25 @@ bool mk68564_channel::transmit_allowed() const
 	return (m_wr5 & WR5_TX_ENABLE) && (!m_tx_auto_enable || !m_cts);
 }
 
+void mk68564_channel::rxc_w(int state)
+{
+	if (!m_loop_mode)
+		z80sio_channel::rxc_w(state);
+}
+
+void mk68564_channel::txc_w(int state)
+{
+	z80sio_channel::txc_w(state);
+
+	if (m_loop_mode)
+	{
+		// we can't use m_txd here since this external value is slightly delayed
+		// we use bit 0 of m_tx_delay instead which contains the current bit
+		write_rx((m_wr5 & WR5_SEND_BREAK) ? 0 : BIT(m_tx_delay, 0));
+		z80sio_channel::rxc_w(state);
+	}
+}
+
 inline void z80sio_channel::set_rts(int state)
 {
 	if (bool(m_rts) != bool(state))
@@ -540,8 +559,103 @@ upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, d
 }
 
 mk68564_device::mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8274_device(mconfig, MK68564, tag, owner, clock)
+	z80sio_device(mconfig, MK68564, tag, owner, clock)
 {
+}
+
+int mk68564_device::z80daisy_irq_state()
+{
+	// check Z80_DAISY_INT but skip acknowledged sources
+	bool const interrupt_pending = std::any_of(std::begin(m_int_state), std::end(m_int_state),
+			[] (int state) { return (state & (Z80_DAISY_INT | Z80_DAISY_IEO)) == Z80_DAISY_INT; });
+	int const state = interrupt_pending ? Z80_DAISY_INT : 0;
+	LOGINT("%s %s Interrupt State %u\n", tag(), FUNCNAME, state);
+	return state;
+}
+
+int mk68564_device::z80daisy_irq_ack()
+{
+	LOGINT("%s \n", FUNCNAME);
+
+	int const *const priority = interrupt_priorities();
+	for (int index = 0; std::size(m_int_state) > index; ++index)
+	{
+		int &state = m_int_state[priority[index]];
+		if ((state & (Z80_DAISY_INT | Z80_DAISY_IEO)) == Z80_DAISY_INT)
+		{
+			uint8_t const vector = read_vector();
+			state |= Z80_DAISY_IEO; // suppress this source until its pending condition is cleared
+			LOGINT(" - Found an INT request, returning RR2: %02x\n", vector);
+			check_interrupts();
+			return vector;
+		}
+	}
+
+	logerror(" - failed to find an interrupt to ack!\n");
+	if (m_hostcpu)
+		return m_hostcpu->default_irq_vector(INPUT_LINE_IRQ0);
+
+	return -1;
+}
+
+void mk68564_device::z80daisy_irq_reti()
+{
+	LOGINT("%s - MK68564 lacks RETI detection, no action taken\n", FUNCNAME);
+}
+
+void mk68564_device::update_interrupt_pending(int index)
+{
+	// we operate on the three conditions (INT_TRANSMIT, INT_EXTERNAL or INT_RECEIVE)
+	// for either channel A or B
+	int *const first = &m_int_state[index * 3];
+	int *const last = first + 3;
+
+	// clear Z80_DAISY_IEO when this interrupt condition is no longer active
+	for (int *state = first; state != last; ++state)
+	{
+		if (!(*state & Z80_DAISY_INT))
+			*state &= ~Z80_DAISY_IEO;
+	}
+
+	// set pending flag if Z80_DAISY_INT is set for any interrupt condition for this channel
+	z80sio_channel &channel = (index == CHANNEL_A) ? *m_chanA : *m_chanB;
+	if (std::find_if(first, last, [] (int state) { return bool(state & Z80_DAISY_INT); }) != last)
+		channel.m_rr0 |= RR0_INTERRUPT_PENDING;
+	else
+		channel.m_rr0 &= ~RR0_INTERRUPT_PENDING;
+}
+
+uint8_t mk68564_device::read_vector()
+{
+	uint8_t vector = m_chanB->m_wr2;
+	if (!((m_chanA->m_wr1 | m_chanB->m_wr1) & WR1_STATUS_VECTOR))
+		return vector;
+
+	vector &= ~0x07U;
+	int const *const priority = interrupt_priorities();
+	for (int index = 0; std::size(m_int_state) > index; ++index)
+	{
+		if ((m_int_state[priority[index]] & (Z80_DAISY_INT | Z80_DAISY_IEO)) == Z80_DAISY_INT)
+		{
+			switch (priority[index])
+			{
+			case 0 + z80sio_channel::INT_TRANSMIT:
+				return vector | 0x04U;
+			case 0 + z80sio_channel::INT_EXTERNAL:
+				return vector | 0x05U;
+			case 0 + z80sio_channel::INT_RECEIVE:
+				return vector | ((m_chanA->m_rr1 & m_chanA->get_special_rx_mask()) ? 0x07U : 0x06U);
+			case 3 + z80sio_channel::INT_TRANSMIT:
+				return vector | 0x00U;
+			case 3 + z80sio_channel::INT_EXTERNAL:
+				return vector | 0x01U;
+			case 3 + z80sio_channel::INT_RECEIVE:
+				return vector | ((m_chanB->m_rr1 & m_chanB->get_special_rx_mask()) ? 0x03U : 0x02U);
+			}
+		}
+	}
+
+	return vector | 0x03U;
 }
 
 //-------------------------------------------------
@@ -767,7 +881,17 @@ void z80sio_device::reset_interrupts()
 		elem = 0;
 	}
 
+	update_interrupt_pending(CHANNEL_A);
+	update_interrupt_pending(CHANNEL_B);
 	check_interrupts();
+}
+
+void z80sio_device::update_interrupt_pending(int index)
+{
+	if (std::find_if(std::begin(m_int_state), std::end(m_int_state), [] (int state) { return bool(state & Z80_DAISY_INT); }) != std::end(m_int_state))
+		m_chanA->m_rr0 |= RR0_INTERRUPT_PENDING;
+	else
+		m_chanA->m_rr0 &= ~RR0_INTERRUPT_PENDING;
 }
 
 //-------------------------------------------------
@@ -782,7 +906,7 @@ void z80sio_device::trigger_interrupt(int index, int type)
 	if (m_int_state[(index * 3) + type] & Z80_DAISY_INT)
 		return;
 	m_int_state[(index * 3) + type] |= Z80_DAISY_INT;
-	m_chanA->m_rr0 |= RR0_INTERRUPT_PENDING;
+	update_interrupt_pending(index);
 
 	// check for interrupt
 	check_interrupts();
@@ -801,8 +925,7 @@ void z80sio_device::clear_interrupt(int index, int type)
 	if (!(m_int_state[(index * 3) + type] & Z80_DAISY_INT))
 		return;
 	m_int_state[(index * 3) + type] &= ~Z80_DAISY_INT;
-	if (std::find_if(std::begin(m_int_state), std::end(m_int_state), [] (int state) { return bool(state & Z80_DAISY_INT); }) == std::end(m_int_state))
-		m_chanA->m_rr0 &= ~RR0_INTERRUPT_PENDING;
+	update_interrupt_pending(index);
 
 	// update interrupt output
 	check_interrupts();
@@ -1193,6 +1316,7 @@ void mk68564_channel::device_start()
 	m_brg_timer = timer_alloc(FUNC(mk68564_channel::brg_timeout), this);
 
 	save_item(NAME(m_tx_auto_enable));
+	save_item(NAME(m_loop_mode));
 	save_item(NAME(m_brg_tc));
 	save_item(NAME(m_brg_control));
 	save_item(NAME(m_brg_state));
@@ -1261,6 +1385,7 @@ void mk68564_channel::device_reset()
 	z80sio_channel::device_reset();
 
 	m_tx_auto_enable = false;
+	m_loop_mode = false;
 	m_brg_tc = 0;
 	m_brg_control = 0;
 	m_brg_state = false;
@@ -1294,7 +1419,11 @@ void z80sio_channel::transmit_enable()
 				update_wait_ready();
 			}
 			else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
+			{
 				async_tx_setup();
+				// when starting from idle reset m_tx_count
+				m_tx_count = 0;
+			}
 		}
 	}
 	else
@@ -2064,7 +2193,11 @@ void z80sio_channel::data_write(uint8_t data)
 
 	// may be possible to transmit immediately (synchronous mode will load when sync pattern completes)
 	if (async && is_tx_idle() && transmit_allowed())
+	{
 		async_tx_setup();
+		// when starting from idle reset m_tx_count
+		m_tx_count = 0;
+	}
 }
 
 
@@ -2856,7 +2989,7 @@ void z80sio_channel::txc_w(int state)
 //-------------------------------------------------
 uint8_t mk68564_channel::cmdreg_r()
 {
-	return m_wr0;
+	return m_loop_mode ? 0x01 : 0x00;
 }
 
 
@@ -2865,9 +2998,9 @@ uint8_t mk68564_channel::cmdreg_r()
 //-------------------------------------------------
 void mk68564_channel::cmdreg_w(uint8_t data)
 {
-	// TODO: bit 0 sets loop mode (no register select)
-	// FIXME: no return from interrupt command
-	do_sioreg_wr0(data);
+	do_sioreg_wr0(data & 0xfe);
+	m_loop_mode = BIT(data, 0);
+	LOGSETUP("MK68564 \"%s\" Channel %c : Loop Mode %u\n", owner()->tag(), 'A' + m_index, m_loop_mode);
 }
 
 
@@ -2986,8 +3119,8 @@ uint8_t mk68564_channel::xmtctl_r()
 		xmtctl |= 0x10;
 	if (m_tx_auto_enable)
 		xmtctl |= 0x20;
-	xmtctl |= (m_wr5 & 0x40) << 1;
-	xmtctl |= (m_wr5 & 0x80) >> 1;
+	xmtctl |= m_wr5 & 0x40;
+	xmtctl |= (m_wr5 & 0x20) << 2;
 	return xmtctl;
 }
 
@@ -3004,8 +3137,8 @@ void mk68564_channel::xmtctl_w(uint8_t data)
 		(BIT(data, 2) ? WR5_DTR : 0) |
 		(BIT(data, 3) ? WR5_TX_CRC_ENABLE : 0) |
 		(BIT(data, 4) ? WR5_SEND_BREAK : 0) |
-		(data & 0x40) << 1 |
-		(data & 0x80) >> 1 |
+		(data & 0x40) |
+		(data & 0x80) >> 2 |
 		(m_wr5 & WR5_CRC16);
 	do_sioreg_wr5(control);
 
