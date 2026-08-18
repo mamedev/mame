@@ -471,6 +471,9 @@ public:
 		, m_sharedram(*this, "sharedram")
 		, m_maincpu(*this, "maincpu")
 		, m_mcu(*this, "c76")
+		, m_gpu(*this, "gpu")
+		, m_ram(*this, "ram")
+		, m_gpu_ram(*this, "gpu_ram")
 		, m_bankedroms(*this, "bankedroms")
 		, m_bank(*this, "bank%u", 1)
 		, m_lightgun_io(*this, {"GUN1X", "GUN1Y", "GUN2X", "GUN2Y"})
@@ -517,8 +520,11 @@ private:
 	virtual void driver_start() override;
 
 	required_shared_ptr<uint16_t> m_sharedram;
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 	required_device<m37710_cpu_device> m_mcu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
 
 	optional_memory_region m_bankedroms;
 	optional_memory_bank_array<8> m_bank;
@@ -738,9 +744,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq2_cb)
 
 void namcos11_state::coh110(machine_config &config)
 {
-	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530CQ(config, m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+	m_maincpu->set_ram(m_ram);
+
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	/* basic machine hardware */
 	NAMCO_C76(config, m_mcu, 16934400);
@@ -758,7 +766,13 @@ void namcos11_state::coh110(machine_config &config)
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcos11_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcos11_state::mcu_irq2_cb), attotime::from_hz(60));
 
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
+
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0);
 
 	SCREEN(config, "screen");
 
@@ -776,11 +790,14 @@ void namcos11_state::coh110(machine_config &config)
 void namcos11_state::coh100(machine_config &config)
 {
 	coh110(config);
-	CXD8530AQ(config.replace(), m_maincpu, XTAL(67'737'600));
+	CXD8530AQ(config.replace(), m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+	m_maincpu->set_ram(m_ram);
 
-	CXD8538Q(config.replace(), "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8538Q(config.replace(), m_gpu, 53.693175_MHz_XTAL);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_screen("screen");
+	m_gpu->set_ram(m_gpu_ram);
 }
 
 void namcos11_state::tekken(machine_config &config)

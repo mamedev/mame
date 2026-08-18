@@ -31,23 +31,23 @@ DEFINE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device, "cxd8561bq", "CXD8561BQ GPU") //
 DEFINE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device, "cxd8561cq", "CXD8561CQ GPU") // SGRAM
 DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU") // SGRAM
 
-psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
-	: psxgpu_device(mconfig, type, tag, owner, clock)
-{
-	vramSize = vram_size;
-	cpu->gpu_read().set(tag, FUNC(psxgpu_device::read));
-	cpu->gpu_write().set(tag, FUNC(psxgpu_device::write));
-	cpu->subdevice<psxdma_device>("dma")->install_read_handler(2, psxdma_device::read_delegate(&psxgpu_device::dma_read, this));
-	cpu->subdevice<psxdma_device>("dma")->install_write_handler(2, psxdma_device::write_delegate(&psxgpu_device::dma_write, this));
-	vblank_callback().set(*cpu->subdevice<psxirq_device>("irq"), FUNC(psxirq_device::intin0));
-}
-
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
+	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_vblank_handler(*this)
+	, m_vclk{ 0, 0 }
 {
+}
+
+void psxgpu_device::set_cpu(psxcpu_device* cpu)
+{
+	cpu->gpu_read().set(*this, FUNC(psxgpu_device::read));
+	cpu->gpu_write().set(*this, FUNC(psxgpu_device::write));
+	cpu->subdevice<psxdma_device>("dma")->install_read_handler(2, psxdma_device::read_delegate(&psxgpu_device::dma_read, this));
+	cpu->subdevice<psxdma_device>("dma")->install_write_handler(2, psxdma_device::write_delegate(&psxgpu_device::dma_write, this));
+	vblank_callback().set(*cpu->subdevice<psxirq_device>("irq"), FUNC(psxirq_device::intin0));
 }
 
 void psxgpu_device::device_start()
@@ -74,18 +74,8 @@ void psxgpu_device::device_reset()
 	gpu_reset();
 }
 
-cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
-	: psxgpu_device(mconfig, CXD8514Q, tag, owner, clock, vram_size, cpu)
-{
-}
-
 cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: psxgpu_device(mconfig, CXD8514Q, tag, owner, clock)
-{
-}
-
-cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
-	: psxgpu_device(mconfig, CXD8538Q, tag, owner, clock, vram_size, cpu)
 {
 }
 
@@ -94,18 +84,8 @@ cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
-	: psxgpu_device(mconfig, CXD8561Q, tag, owner, clock, vram_size, cpu)
-{
-}
-
 cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: psxgpu_device(mconfig, CXD8561Q, tag, owner, clock)
-{
-}
-
-cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
-	: psxgpu_device(mconfig, CXD8561BQ, tag, owner, clock, vram_size, cpu)
 {
 }
 
@@ -114,18 +94,8 @@ cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *ta
 {
 }
 
-cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
-	: psxgpu_device(mconfig, CXD8561CQ, tag, owner, clock, vram_size, cpu)
-{
-}
-
 cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: psxgpu_device(mconfig, CXD8561CQ, tag, owner, clock)
-{
-}
-
-cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
-	: psxgpu_device(mconfig, CXD8654Q, tag, owner, clock, vram_size, cpu)
 {
 }
 
@@ -488,7 +458,7 @@ void psxgpu_device::updatevisiblearea()
 void psxgpu_device::psx_gpu_init( int n_gputype )
 {
 	int width = 1024;
-	int height = ( vramSize / width ) / sizeof( uint16_t );
+	int height = ( m_ram->size() / width ) / sizeof( uint16_t );
 
 	m_n_gputype = n_gputype;
 
@@ -503,7 +473,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	n_lightgun_y = 0;
 	b_reverseflag = 0;
 
-	p_vram = make_unique_clear<uint16_t[]>(width * height );
+	uint16_t* p_vram = m_ram->pointer<uint16_t>();
 
 	for( int n_line = 0; n_line < 1024; n_line++ )
 	{
@@ -601,7 +571,6 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 		}
 	}
 
-	save_pointer(NAME(p_vram), width * height );
 	save_item(NAME(m_packet.n_entry));
 	save_item(NAME(n_gpu_buffer_offset));
 	save_item(NAME(n_vramx));

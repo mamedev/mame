@@ -689,6 +689,11 @@ public:
 	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_gpu(*this, "gpu")
+		, m_spu(*this, "spu")
+		, m_ram(*this, "ram")
+		, m_gpu_ram(*this, "gpu_ram")
+		, m_spu_ram(*this, "spu_ram")
 		, m_decrypter(*this, "decrypter")
 		, m_ata(*this, "ata")
 		, m_io_update_interrupt(*this)
@@ -724,6 +729,11 @@ protected:
 	void namcos10_map_mgexio(address_map &map) ATTR_COLD;
 
 	required_device<psxcpu_device> m_maincpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	optional_device<ns10_decrypter_device> m_decrypter;
 
 	unscramble_func m_unscrambler;
@@ -923,7 +933,6 @@ class namcos10_memp3_state : public namcos10_memn_state
 public:
 	namcos10_memp3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_memn_state(mconfig, type, tag)
-		, m_ram(*this, "maincpu:ram")
 		, m_memp3_mcu(*this, "memp3_mcu")
 		, m_lc82310(*this, "mp3_decoder")
 		, m_mcu_ram(*this, "mcu_ram")
@@ -980,7 +989,6 @@ private:
 
 	void mp3_data_w(uint16_t data);
 
-	required_device<ram_device> m_ram;
 	required_device<tmp95c061_device> m_memp3_mcu;
 	required_device<lc82310_device> m_lc82310;
 	required_shared_ptr<uint16_t> m_mcu_ram;
@@ -1090,12 +1098,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 void namcos10_state::namcos10_base(machine_config &config)
 {
 	/* basic machine hardware */
-	CXD8606BQ(config, m_maincpu, XTAL(101'491'200));
+	CXD8606BQ(config, m_maincpu, 101.4912_MHz_XTAL);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->set_disable_rom_berr(true);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	/* video hardware */
-	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 54V25632s
+	CXD8561CQ(config, m_gpu, 101.4912_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
+
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0); // 2 54V25632s
 
 	SCREEN(config, "screen");
 
@@ -1104,10 +1120,14 @@ void namcos10_state::namcos10_base(machine_config &config)
 
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
 	// TODO: This must be replaced with a proper CXD2938Q device, CD-ROM functionality of chip not used
-	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
-	spu.set_stream_flags(STREAM_SYNCHRONOUS);
-	spu.add_route(0, "speaker", 0.75, 0);
-	spu.add_route(1, "speaker", 0.75, 1);
+	SPU(config, m_spu, 101.4912_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->set_stream_flags(STREAM_SYNCHRONOUS);
+	m_spu->add_route(0, "speaker", 0.75, 0);
+	m_spu->add_route(1, "speaker", 0.75, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_default_value(0); // ram is external on CXD2938Q, internal on CXD2941R. Both limited to 512k
 
 	// TODO: Trace main PCB to see where JAMMA I/O goes and/or how int10 can be triggered (SM10MA3?)
 	m_io_update_interrupt.bind().set("maincpu:irq", FUNC(psxirq_device::intin10));

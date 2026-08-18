@@ -256,6 +256,11 @@ public:
 		, m_ncr53cf96(*this, "ncr53cf96")
 		, m_btc_trackball(*this, "upd%u", 1)
 		, m_maincpu(*this, "maincpu")
+		, m_gpu(*this, "gpu")
+		, m_spu(*this, "spu")
+		, m_ram(*this, "ram")
+		, m_gpu_ram(*this, "gpu_ram")
+		, m_spu_ram(*this, "spu_ram")
 		, m_duart(*this, "duart")
 	{
 	}
@@ -286,7 +291,12 @@ protected:
 	required_device<ncr53cf96_device> m_ncr53cf96;
 	optional_device_array<upd4701_device, 2> m_btc_trackball;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	required_device<mb89371_device> m_duart;
 
 	uint32_t *m_dma_data_ptr;
@@ -572,11 +582,13 @@ void tokimeki_state::machine_reset()
 void konamigv_state::konamigv(machine_config &config)
 {
 	// basic machine hardware
-	CXD8530BQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530BQ(config, m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::konamigv_map);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this));
 	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this));
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
+
+	RAM(config, m_ram).set_bits(32).set_default_size("2M").set_extra_options("2M,4M,8M,16M").set_default_value(0);
 
 	MB89371(config, m_duart, 4_MHz_XTAL);
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -593,16 +605,26 @@ void konamigv_state::konamigv(machine_config &config)
 	m_ncr53cf96->drq_handler_cb().set(DEVICE_SELF, FUNC(konamigv_state::scsi_drq));
 
 	// video hardware
-	CXD8514Q(config, "gpu", XTAL(53'693'175), 0x100000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8514Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen(m_screen);
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
+
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("1M").set_default_value(0);
 
 	SCREEN(config, m_screen);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(1, "speaker", 0.75, 0); // to verify the channels, btchamp's "game sound test" in the sound test menu speaks the words left, right, center
-	spu.add_route(0, "speaker", 0.75, 1);
+	SPU(config, m_spu, 67.7376_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->add_route(1, "speaker", 0.75, 0); // to verify the channels, btchamp's "game sound test" in the sound test menu speaks the words left, right, center
+	m_spu->add_route(0, "speaker", 0.75, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K,1M,2M,4M").set_default_value(0);
 }
 
 

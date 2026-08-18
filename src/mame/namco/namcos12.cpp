@@ -1085,7 +1085,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_ram(*this, "maincpu:ram"),
+		m_ram(*this, "ram"),
+		m_gpu_ram(*this, "gpu_ram"),
 		m_gpu(*this, "gpu"),
 		m_sub(*this, "sub"),
 		m_adc(*this, "sub:adc"),
@@ -1114,10 +1115,10 @@ public:
 		/* basic machine hardware */
 		CXD8661R(config, m_maincpu, XTAL(100'000'000));
 
-		subdevice<ram_device>("maincpu:ram")->set_default_size("4M"); // 2x KM416V1204s
+		RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0); // 2x KM416V1204s
 
 		/* video hardware */
-		CXD8654Q(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu.target()).set_screen("screen"); // 2x KM4132G271Qs
+		CXD8654Q(config, m_gpu, 100_MHz_XTAL / 2);
 
 		namcos12_base(config);
 	}
@@ -1135,12 +1136,12 @@ public:
 	void coh716(machine_config &config) ATTR_COLD
 	{
 		/* basic machine hardware */
-		CXD8606BQ(config, m_maincpu, XTAL(100'000'000));
+		CXD8606BQ(config, m_maincpu, 100_MHz_XTAL);
 
-		subdevice<ram_device>("maincpu:ram")->set_default_size("16M"); // 2x K4E6416120Ds
+		RAM(config, m_ram).set_bits(32).set_default_size("16M").set_extra_options("4M,8M,16M").set_default_value(0); // 2x K4E6416120Ds
 
 		/* video hardware */
-		CXD8561CQ(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu.target()).set_screen("screen"); // 2x 54V25632As
+		CXD8561CQ(config, m_gpu, 100_MHz_XTAL / 2);
 
 		namcos12_base(config);
 
@@ -1150,7 +1151,15 @@ public:
 	void namcos12_base(machine_config &config) ATTR_COLD
 	{
 		m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::maincpu_map);
+		m_maincpu->set_ram(m_ram);
 		m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
+
+		m_gpu->set_cpu(m_maincpu);
+		m_gpu->set_ram(m_gpu_ram);
+		m_gpu->set_screen("screen");
+		m_gpu->set_vclkn(53.693175_MHz_XTAL);
+
+		RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0); // 2x KM4132G271Qs
 
 		SCREEN(config, "screen").screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 
@@ -1458,6 +1467,7 @@ protected:
 	required_device<psxcpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
 	required_device<psxgpu_device> m_gpu;
 	required_device<h83002_device> m_sub;
 	required_device<h8_adc_device> m_adc;
