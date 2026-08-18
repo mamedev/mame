@@ -325,7 +325,7 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 					case 0xf4: // Request Test Plug Status
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request Test Plug Status (0xf4)\n", offset);
 						m_in_index = 0;
-						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf4, 0, 0, 0, 0xf4);
+						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf4, m_testplug_cb() ? 1 : 0, 0, 0, 0xf4);
 						break;
 					case 0xf6: // Request NTSC/PAL Status
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request NTSC/PAL Status (0xf6)\n", offset);
@@ -370,6 +370,7 @@ cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const ch
 	, m_read_mousebtn(*this, 0x00)
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_atten_w(*this)
+	, m_testplug_cb(*this, 0)
 {
 }
 
