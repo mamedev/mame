@@ -28,6 +28,7 @@
 #include "video/crt9212.h"
 
 #include "emupal.h"
+#include "screen.h"
 
 #include "formats/tandy2k_dsk.h"
 
@@ -62,6 +63,7 @@ public:
 		m_drb0(*this, CRT9212_0_TAG),
 		m_drb1(*this, CRT9212_1_TAG),
 		m_vac(*this, CRT9021B_TAG),
+		m_screen(*this, SCREEN_TAG),
 		m_colpal(*this, "colpal"),
 		m_vrambank(*this, "vrambank"),
 		m_timer_vidldsh(*this, "vidldsh"),
@@ -139,6 +141,7 @@ public:
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_colpal;
 	required_device<address_map_bank_device> m_vrambank;
 	required_device<timer_device> m_timer_vidldsh;
@@ -180,12 +183,15 @@ public:
 	void vpac_drb_w(int state);
 	void vpac_wben_w(int state);
 	void vpac_cblank_w(int state);
+	void vpac_vs_w(int state);
 	void vpac_slg_w(int state);
 	void vpac_sld_w(int state);
 	uint8_t hires_status_r();
 	void hires_plane_w(uint8_t data);
 	void vidla_w(uint8_t data);
 	void drb_attr_w(uint8_t data);
+	int character_width() const { return m_clkcnt ? 8 : 10; }
+	void set_vidldsh_timer();
 	void kbdclk_w(int state);
 	void kbddat_w(int state);
 	uint8_t clkmouse_r(offs_t offset);
@@ -243,6 +249,15 @@ public:
 	uint8_t m_cgra;
 	uint8_t m_vidla;
 	uint8_t m_hires_en = 0;
+	bitmap_rgb32 m_bitmap;
+	bool m_drb = true;
+	bool m_dout = false;
+	bool m_vs = true;
+	bool m_frame = false;
+	int m_int = 0;
+	int m_col = 0;
+	int m_row = 0;
+	int m_scanline = 0;
 
 	/* sound state */
 	int m_outspkr;

@@ -23,7 +23,7 @@
     - row attributes
     - pin configuration
     - operation modes 0,4,7
-    - address modes 1,2,3
+    - address modes 1,3
     - light pen
     - state saving
 
@@ -196,7 +196,7 @@ enum
 {
 	ADDRESS_MODE_SEQUENTIAL_ADDRESSING = 0,
 	ADDRESS_MODE_SEQUENTIAL_ROLL_ADDRESSING,            // not implemented
-	ADDRESS_MODE_CONTIGUOUS_ROW_TABLE,                  // not implemented
+	ADDRESS_MODE_CONTIGUOUS_ROW_TABLE,
 	ADDRESS_MODE_LINKED_LIST_ROW_TABLE                  // not implemented
 };
 
@@ -503,6 +503,9 @@ void crt9007_device::device_start()
 	save_item(NAME(m_lpstb));
 	save_item(NAME(m_dmar));
 	save_item(NAME(m_dma_addr));
+	save_item(NAME(m_table_addr));
+	save_item(NAME(m_row_addr));
+	save_item(NAME(m_table_count));
 	save_item(NAME(m_ack));
 	save_item(NAME(m_dma_count));
 	save_item(NAME(m_dma_burst));
@@ -547,6 +550,9 @@ void crt9007_device::device_reset()
 	m_dmar = false;
 	m_write_dmar(CLEAR_LINE);
 	m_dma_addr = 0;
+	m_table_addr = 0;
+	m_row_addr = 0;
+	m_table_count = 0;
 	m_dma_count = 0;
 
 	// 29 (WBEN) = 0
@@ -659,6 +665,19 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 		{
 			// the first row buffer transfer of the frame starts at the top of the display
 			m_dma_addr = TABLE_START;
+			m_table_addr = TABLE_START;
+		}
+
+		if (ADDRESS_MODE == ADDRESS_MODE_CONTIGUOUS_ROW_TABLE)
+		{
+			// the address of the data row is fetched from the row table, one entry
+			// of two bytes per data row, before the characters of the row
+			m_dma_addr = m_table_addr;
+			m_table_count = 2;
+		}
+		else
+		{
+			m_table_count = 0;
 		}
 
 		// start DMA burst sequence
@@ -680,7 +699,30 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 
 TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
 {
-	if (m_dma_count)
+	if (m_table_count)
+	{
+		// the row table entry is transferred low byte first, and the row buffer
+		// write is not enabled for it
+		uint8_t const data = readbyte(m_dma_addr++);
+
+		m_table_count--;
+
+		if (m_table_count)
+		{
+			m_row_addr = data;
+		}
+		else
+		{
+			m_row_addr |= data << 8;
+			m_table_addr = m_dma_addr;
+			m_dma_addr = m_row_addr & 0x3fff;
+
+			LOG("CRT9007 Data Row Address: %04x\n", m_dma_addr);
+		}
+
+		update_dma_timer();
+	}
+	else if (m_dma_count)
 	{
 		// the row buffer write is enabled with the first character, so that the
 		// write clock edge following it is the one that stores it in the buffer
