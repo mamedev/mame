@@ -665,9 +665,9 @@ void cps_state::qsound_sub_map(address_map &map) // used by capcom/cps2.cpp too
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr(m_audiobank);    /* banked (contains music data) */
 	map(0xc000, 0xcfff).ram().share(m_qsound_sharedram[0]);
-	map(0xd000, 0xd002).w(m_qsound, FUNC(qsound_device::qsound_w));
+	map(0xd000, 0xd002).w(m_qsound, FUNC(capcom_q1_device::write));
 	map(0xd003, 0xd003).w(FUNC(cps_state::qsound_banksw_w));
-	map(0xd007, 0xd007).r(m_qsound, FUNC(qsound_device::qsound_r));
+	map(0xd007, 0xd007).r(m_qsound, FUNC(capcom_q1_device::read));
 	map(0xf000, 0xffff).ram().share(m_qsound_sharedram[1]);
 }
 
@@ -4010,7 +4010,7 @@ void cps_state::qsound(machine_config &config)
 	config.device_remove("2151");
 	config.device_remove("oki");
 
-	QSOUND(config, m_qsound);
+	CAPCOM_Q1(config, m_qsound, XTAL(60'000'000));
 	m_qsound->add_route(0, "speaker", 1.0, 0);
 	m_qsound->add_route(1, "speaker", 1.0, 1);
 }

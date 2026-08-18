@@ -26,8 +26,8 @@
 #include "machine/nvram.h"
 #include "machine/vt83c461.h"
 #include "machine/watchdog.h"
+#include "sound/capcom_q1.h"
 #include "sound/okim6295.h"
-#include "sound/qsound.h"
 #include "sound/ymf271.h"
 #include "sound/ymopn.h"
 #include "sound/ymz280b.h"
@@ -581,7 +581,7 @@ protected:
 
 		m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-		QSOUND(config, m_qsound);
+		CAPCOM_Q1(config, m_qsound, XTAL(60'000'000));
 		m_qsound->add_route(0, m_speaker, 1.0, 0);
 		m_qsound->add_route(1, m_speaker, 1.0, 1);
 	}
@@ -619,9 +619,9 @@ protected:
 	{
 		map(0x0000, 0x7fff).rom();
 		map(0x8000, 0xbfff).bankr(m_soundbank);
-		map(0xd000, 0xd002).w(m_qsound, FUNC(qsound_device::qsound_w));
+		map(0xd000, 0xd002).w(m_qsound, FUNC(capcom_q1_device::write));
 		map(0xd003, 0xd003).w(FUNC(capcom_zn_state::qsound_bankswitch_w));
-		map(0xd007, 0xd007).r(m_qsound, FUNC(qsound_device::qsound_r));
+		map(0xd007, 0xd007).r(m_qsound, FUNC(capcom_q1_device::read));
 		map(0xf000, 0xffff).ram();
 	}
 
@@ -650,7 +650,7 @@ protected:
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
 	required_device<z80_device> m_audiocpu;
-	required_device<qsound_device> m_qsound;
+	required_device<capcom_q1_device> m_qsound;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_soundbank;
 };
