@@ -27,7 +27,7 @@ Supported games:
     sstrikera   RA-MA7893-01  Raizing       Sorcer Striker (Unite Trading license)
     mahoudai    RA-MA7893-01  Raizing       Mahou Daisakusen (Japan)
     kingdmgp    RA-MA9402-03  Raizing/8ing  Kingdom Grandprix
-    shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen (Japan)
+    shippumd    RA-MA9402-03  Raizing/8ing  Shippuu Mahou Daisakusen (Japan)
     bgaregga    RA9503        Raizing/8ing  Battle Garegga (World - Sat Feb 3 1996)
     bgareggat   RA9503        Raizing/8ing  Battle Garegga (location test - Wed Jan 17 1996)
     bgareggahk  RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
@@ -1273,7 +1273,7 @@ GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  sstriker_state, empty
 GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   sstriker_state, empty_init,      ROT270, "Raizing (Able license)",          "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
-GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Shippuu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kingdmgpbl,  kingdmgp, shippumd,   kingdmgp,   sstriker_state, empty_init,      ROT270, "bootleg", "Kingdom Grandprix (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   bgaregga_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)",            MACHINE_SUPPORTS_SAVE )

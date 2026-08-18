@@ -32817,12 +32817,12 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 	</software>
 
 	<software name="sakigake">
-		<description>Sakigake!! Otoko Juku - Shippu Ichi Gou Sei (Japan)</description>
+		<description>Sakigake!! Otokojuku: Shippuu Ichi Gou Sei (Japan)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-SAKI"/>
 		<info name="release" value="19890303"/>
-		<info name="alt_title" value="魁!男塾 疾風一号生"/>
+		<info name="alt_title" value="魁!!男塾 疾風一号生"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="fcg" />
 			<feature name="pcb" value="BANDAI-FCG-1" />

@@ -6940,9 +6940,9 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Shippuu Mahou Daisakusen - Kingdom Grandprix (Japan)... -->
 	<software name="mahoudai" supported="no">
-		<description>Shippuu Mahou Daisakusen - Kingdom Grandprix (Japan)</description>
+		<!-- Kingdom Grandprix as subtitle on this version, on both title and cover art -->
+		<description>Shippuu Mahou Daisakusen: Kingdom Grandprix (Japan)</description>
 		<year>1996</year>
 		<publisher>GAGA Communications</publisher>
 		<info name="serial" value="T-18506G"/>
@@ -12212,9 +12212,8 @@ Missing elements during gameplay [VDP2] priorities?
 		</part>
 	</software>
 
-	<!-- Identifying Shippuu Mahou Daisakusen (JAP) (DW0181)... -->
 	<software name="mahoudaia" cloneof="mahoudai" supported="no">
-		<description>Shippuu Mahou Daisakusen - Kingdom Grandprix (Japan, alt)</description>
+		<description>Shippuu Mahou Daisakusen: Kingdom Grandprix (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>GAGA Communications</publisher>
 		<info name="serial" value="T-18506G"/>
