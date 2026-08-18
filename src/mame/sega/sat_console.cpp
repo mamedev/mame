@@ -2,14 +2,19 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /**************************************************************************************************
 
-    Driver by David Haywood, Angelo Salese, Olivier Galibert & Mariusz Wojcieszek
-    SCSP driver provided by R. Belmont, based on ElSemi's SCSP sound chip emulator
-    Many thanks to Guru, Fabien, Runik and Charles MacDonald for the help given.
-
-***************************************************************************************************
-
 Sega Saturn
 (C) Sega 1994/1995/1996/1997
+
+Notes:
+- A successfully loaded game will write its header at $6002000
+- "Multiplayer" is the name of the BIOS menu (the one where you can playback an Audio CD,
+  boot a game loaded in CD tray or access Memory Manager)
+- Hold A at startup to skip auto booting a game (i.e. go in Multiplayer)
+
+TODO:
+- https://github.com/mamedev/mame/issues/15773
+
+===================================================================================================
 
 The Sega Saturn is a 32-bit 5th-generation home video game console that was developed by Sega and released
 on November 22nd 1994 in Japan, May 11th 1995 in North America, and July 8th 1995 in Europe as the successor
@@ -397,12 +402,6 @@ Optical pickups used - JVC drive: Optima-6, Hitachi drive: HOP-6, Sanyo drive: S
 
 ****************************************************************************************************
 
-Emulation Notes:
--To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
--Memo: Some tests done on the original & working PCB,to be implemented:
- -The AD-Stick returns 0x00 or a similar value.
- -The Ports E,F & G must return 0xff
-
 TODO:
 (Main issues)
 - decap the SH-1, used for CD block (needed especially for Sega Saturn)
@@ -551,6 +550,12 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x00100000, 0x0010007f).mirror(0x2007ff80).m(m_smpc_hle, FUNC(smpc_hle_device::io_map));
 	map(0x00180000, 0x0018ffff).rw(FUNC(sat_console_state::backupram_r), FUNC(sat_console_state::backupram_w)).share("share1");
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
+	map(0x00400000, 0x00400001).lr16(NAME([this] (offs_t offset, u16 mem_mask) {
+		// avoid trying to test an unknown device in A-Bus CS2 area with -bios 1
+		// https://github.com/mamedev/mame/issues/15891#issuecomment-5319402851
+		logerror("Unknown read ID at %08x & %08x\n", offset * 2 + 0x00400000, mem_mask);
+		return 0xffff;
+	}));
 	map(0x01000000, 0x017fffff).w("dcc", FUNC(saturn_dcc_device::minit_w));
 	map(0x01800000, 0x01ffffff).w("dcc", FUNC(saturn_dcc_device::sinit_w));
 //  map(0x02000000, 0x023fffff).rom().mirror(0x20000000); // Cartridge area

@@ -534,7 +534,8 @@ void saturn_cd_hle_device::hirq_w(uint16_t data) { hirqreg &= data; }
 // TODO: these two are actually never read or written to by host?
 uint16_t saturn_cd_hle_device::hirqmask_r()
 {
-	LOGWARN("RW HIRM: %04x\n", hirqmask);
+	if (!machine().side_effects_disabled())
+		LOGWARN("RW HIRM: %04x\n", hirqmask);
 	return hirqmask;
 }
 

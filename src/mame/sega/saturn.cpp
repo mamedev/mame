@@ -1,6 +1,6 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
-// Contains STV1 and STV2 code. STV2 starts at line 2210.
+// Contains VDP1 and VDP2 code. Use "Sega Saturn VDP2" marker for start of VDP2 code
 /**************************************************************************************************
 
     Sega Saturn (c) 1994 Sega

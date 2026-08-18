@@ -1177,11 +1177,14 @@ Olympic Soccer (Fra) T-7904H-09
 
 <!-- !ReDump images -->
 
-	<!-- Identifying 2do Arukotoha Sand-R (Japan)... -->
-	<software name="sandr" supported="no">
+	<software name="sandr" supported="partial">
 		<description>2do Arukotoha Sand-R (Japan)</description>
 		<year>1996</year>
 		<publisher>CRI</publisher>
+		<notes><![CDATA[
+Equivalent to stv:sandor, essentially sharing the same issues if any.
+https://mametesters.org/view.php?id=7417
+]]></notes>
 		<info name="serial" value="T-6802G"/>
 		<info name="release" value="19960405"/>
 		<info name="alt_title" value="2度あることはサンドアール"/>
@@ -1399,9 +1402,14 @@ Black screen, enables [SCU] Timer 1
 		<description>AnEarth Fantasy Stories: The First Volume (Japan)</description>
 		<year>1997</year>
 		<publisher>Media Works</publisher>
+		<notes><![CDATA[
+[VDP2] has most tiles half transparent in gameplay, making them way darker than actually are
+NOTE: it starts up differently depending on some condition (RTC seed?)
+]]></notes>
 		<info name="serial" value="T-27801G"/>
 		<info name="release" value="19970328"/>
 		<info name="alt_title" value="エイナス ファンタジー・ストーリーズ"/>
+		<info name="developer" value="Hudson Soft"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="T-27801GP-01400-P1K   V"/>
@@ -1411,11 +1419,13 @@ Black screen, enables [SCU] Timer 1
 		</part>
 	</software>
 
-	<!-- Identifying Angel Graffiti S - Anata e no Profile (Japan)... -->
 	<software name="angelgrf" supported="no">
 		<description>Angel Graffiti S - Anata e no Profile (Japan)</description>
 		<year>1997</year>
 		<publisher>Coconuts Japan</publisher>
+		<notes><![CDATA[
+Not extensively tested (video needs to be checked against a ref)
+]]></notes>
 		<info name="serial" value="T-7308G"/>
 		<info name="release" value="19970725"/>
 		<info name="alt_title" value="エンジェルグラフィティS あなたへのプロフィール"/>
@@ -1652,11 +1662,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Game immediately crashes MAME. -->
 	<software name="baldylnd" supported="no">
 		<description>Baldy Land (Japan)</description>
 		<year>1998</year>
 		<publisher>Banpresto</publisher>
+		<notes><![CDATA[
+[VDP1] don't erase sprites properly in gameplay when scrolling (leaves trails)
+]]></notes>
 		<info name="serial" value="T-20608G"/>
 		<info name="release" value="19981126"/>
 		<info name="alt_title" value="ボールディランド"/>
@@ -1769,6 +1781,24 @@ Options menu is too large [VDP1], sports [VDP1] zooming error for the background
 		</part>
 	</software>
 
+	<software name="blastwnd" supported="no">
+		<description>Blast Wind (Japan)</description>
+		<year>1997</year>
+		<publisher>Technosoft</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="serial" value="T-1810G"/>
+		<info name="release" value="19970117"/>
+		<info name="alt_title" value="ブラストウインド"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blast wind (japan)" sha1="e60c7cbc0e74f16dee836444a38634ff02aab1ac"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Identifying Blue Breaker - Ken Yori mo Hohoemi wo (Japan)... -->
 	<software name="bluebrkr" supported="no">
 		<description>Blue Breaker - Ken Yori mo Hohoemi wo (Japan)</description>
@@ -1785,11 +1815,13 @@ Options menu is too large [VDP1], sports [VDP1] zooming error for the background
 		</part>
 	</software>
 
-	<!-- Game has severe transparency issues that make the game difficult to play. -->
 	<software name="bombwars" supported="no">
 		<description>Bomberman Wars (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+[VDP2] enables Color Calculation with CCMD additive blending (game unplayable, too bright)
+]]></notes>
 		<info name="serial" value="T-14320G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="ボンバーマンウォーズ"/>
@@ -2097,6 +2129,24 @@ Runs slow in gameplay
 		</part>
 	</software>
 
+	<software name="crows" supported="no">
+		<description>Crows The Battle Action for Sega Saturn (Japan)</description>
+		<year>1997</year>
+		<publisher>Athena</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="serial" value="T-16806G"/>
+		<info name="release" value="19971218"/>
+		<info name="alt_title" value="クローズ ～THE BATTLE ACTION FOR SEGASATURN～"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crows - the battle action for segasaturn (japan)" sha1="f0eae046584bbe0aa2f0a1aaa7de09c9a3a9f592"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="cyberdol" supported="no">
 		<description>Cyber Doll (Japan)</description>
 		<year>1996</year>
@@ -2299,6 +2349,9 @@ Some kanji drawings are dubious (verify)
 		<description>Dark Seed (Japan)</description>
 		<year>1995</year>
 		<publisher>GAGA Communications</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-18501G"/>
 		<info name="release" value="19950707"/>
 		<info name="alt_title" value="ダークシード"/>
@@ -2311,11 +2364,13 @@ Some kanji drawings are dubious (verify)
 		</part>
 	</software>
 
-	<!-- Hangs at now loading screen, [SH2] $60ffc13 comms -->
 	<software name="darksed2" supported="no">
 		<description>Dark Seed II (Japan)</description>
 		<year>1997</year>
 		<publisher>B-Factory</publisher>
+		<notes><![CDATA[
+Hangs at now loading screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]?)
+]]></notes>
 		<info name="serial" value="T-36101G"/>
 		<info name="release" value="19970829"/>
 		<info name="alt_title" value="ダークシードⅡ"/>
@@ -3850,6 +3905,26 @@ Black screen after Sega logo with [DRC], check [CD-Block] too
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="hyper duel (japan)" sha1="c9bd9b7bb2e9dd98e5015b871e604898b288932b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fromanc2" supported="no">
+		<description>Idol Mahjong Final Romance 2 (Japan)</description>
+		<year>1995</year>
+		<publisher>ASK Kodansha</publisher>
+		<notes><![CDATA[
+Triggers [VDP1] illegal sprite list 0c when exiting options menu
+[VDP1] transparent pen issues on powerup menu and for gameplay scores
+Not extensively tested
+]]></notes>
+		<info name="serial" value="T-16702G"/>
+		<info name="release" value="19950812"/>
+		<info name="alt_title" value="アイドル麻雀 ファイナルロマンス2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="idol mahjong - final romance 2 (japan)" sha1="4157da22b85b90c343cd3bbe5a84bd0f3200612a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5477,6 +5552,25 @@ Not extensively tested
 		</part>
 	</software>
 
+	<software name="planetjk" supported="no">
+		<description>Planet Joker (Japan)</description>
+		<year>1997</year>
+		<publisher>Naxat Soft</publisher>
+		<notes><![CDATA[
+Corrupt [VDP2] layer on now loading screens
+Not extensively tested
+]]></notes>
+		<info name="serial" value="T-18711G"/>
+		<info name="release" value="19970307"/>
+		<info name="alt_title" value="プラネット・ジョーカー"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="planet joker (japan)" sha1="9cb5410d8338df632c2c896fe186b516d7056470"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="pfght" supported="no">
 		<description>Pocket Fighter (Japan)</description>
 		<year>1998</year>
@@ -7029,6 +7123,25 @@ Not extensively tested
 		</part>
 	</software>
 
+	<software name="skullfng" supported="no">
+		<description>Skull Fang - Kuuga Gaiden (Japan)</description>
+		<year>1997</year>
+		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Draws [VDP2] garbage layer covering everything (can't reproduce, assume fixed)
+Not extensively tested
+]]></notes>
+		<info name="serial" value="T-1311G"/>
+		<info name="release" value="19970530"/>
+		<info name="alt_title" value="スカルファング ～空牙外伝～"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="skull fang - kuuga gaiden (japan)" sha1="54e715f97180f6fdc791c7ec1cb6b806ede371c1"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Identifying Sky Target (Japan)... -->
 	<software name="skytargtj" cloneof="skytargt" supported="no">
 		<description>Sky Target (Japan)</description>
@@ -7073,6 +7186,26 @@ Not extensively tested
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="slayers royal 2 (japan) (1m, 2m)" sha1="d37043923f30547703c7779be4fba2edbe383a58" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="scouncil" supported="no">
+		<description>Sokkou Seitokai - Sonic Council (Japan)</description>
+		<year>1998</year>
+		<publisher>Banpresto</publisher>
+		<notes><![CDATA[
+[VDP2] Gradiation enabled a042 on now loading screen and gameplay
+[SCSP] cuts off voice samples during gameplay
+[SCSP] character select BGM notes are off
+]]></notes>
+		<info name="serial" value="T-20611G"/>
+		<info name="release" value="19980129"/>
+		<info name="alt_title" value="速攻生徒会"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sokkou seitokai - sonic council (japan)" sha1="2418567e064d054e88fa21af4b2860dd4670ec03"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7141,6 +7274,24 @@ TODO: test Sonic 2, 3 and Knuckles
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sonic r (japan) (1m)" sha1="a1941d8df182f5fdb1008546a2265b1ddd9452d0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sonicwin" supported="no">
+		<description>Sonic Wings Special (Japan)</description>
+		<year>1996</year>
+		<publisher>Media Quest</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="serial" value="T-26402G"/>
+		<info name="release" value="19960705"/>
+		<info name="alt_title" value="ソニックウイングス・スペシャル"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic wings special (japan)" sha1="a49d5da2d8e80a6622c5532d3466c47d6c348150"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8301,6 +8452,24 @@ Mednafen claims 68k should address error before stage 1 boss, can't repro
 			<feature name="cd_matrix" value="MK-81023P-00484-P1K   V"/>
 			<diskarea name="cdrom">
 				<disk name="virtua fighter remix (korea)" sha1="4d5c22230eb87de20a6364232b6283158290414d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="vkyoute2" supported="no">
+		<description>Virtual Kyoutei 2 (Japan)</description>
+		<year>1997</year>
+		<publisher>Nihon Bussan</publisher>
+		<notes><![CDATA[
+Has severe [VDP1] glitches during intro and gameplay, [SCUDSP] related
+]]></notes>
+		<info name="serial" value="T-7104G"/>
+		<info name="release" value="19971204"/>
+		<info name="alt_title" value="バーチャル競艇2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtual kyoutei 2 (japan) (2m)" sha1="9e8c68afe9bfcc1c158f0ac3ca840aeea62455ff"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21783,6 +21952,8 @@ Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC chan
 		<notes><![CDATA[
 Shows black [VDP2] on stage intros, uses CCRTMD color calculation
 Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC changes)
+[VDP1] doesn't draw "Congratulations" message on puzzle completions
+[VDP1] some white dots in Temple Precinct 1991 gallery image (verify)
 ]]></notes>
 		<info name="serial" value="T-30305G"/>
 		<info name="release" value="19971204"/>
@@ -27374,25 +27545,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- TODO: move me up, it's a redump image -->
-	<software name="blastwnd" supported="no">
-		<description>Blast Wind (Japan)</description>
-		<year>1997</year>
-		<publisher>Technosoft</publisher>
-		<notes><![CDATA[
-Not extensively tested
-]]></notes>
-		<info name="serial" value="T-1810G"/>
-		<info name="release" value="19970117"/>
-		<info name="alt_title" value="ブラストウインド"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="blast wind (japan)" sha1="e60c7cbc0e74f16dee836444a38634ff02aab1ac"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying Body Special 264 Girls in Motion Puzzle Vol. 2 (Japan) [T-21003G]... -->
 	<software name="girlpuz2" supported="no">
 		<description>Body Special 264 - Girls in Motion Puzzle Vol. 2 (Japan)</description>
@@ -27546,24 +27698,6 @@ Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause?
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="couriercrisis" sha1="5d345ac37d2f670f0f8f358a350a65897e90b63a" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="crows" supported="no">
-		<description>Crows The Battle Action for Sega Saturn (Japan)</description>
-		<year>1997</year>
-		<publisher>Athena</publisher>
-		<notes><![CDATA[
-Not extensively tested
-]]></notes>
-		<info name="serial" value="T-16806G"/>
-		<info name="release" value="19971218"/>
-		<info name="alt_title" value="クローズ ～THE BATTLE ACTION FOR SEGASATURN～"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="crows - the battle action for segasaturn (japan)" sha1="f0eae046584bbe0aa2f0a1aaa7de09c9a3a9f592"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27985,28 +28119,8 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="fromanc2" supported="no">
-		<description>Idol Mahjong Final Romance 2 (Japan)</description>
-		<year>1995</year>
-		<publisher>ASK Kodansha</publisher>
-		<notes><![CDATA[
-Triggers [VDP1] illegal sprite list 0c when exiting options menu
-[VDP1] transparent pen issues on powerup menu and for gameplay scores
-Not extensively tested
-]]></notes>
-		<info name="serial" value="T-16702G"/>
-		<info name="release" value="19950812"/>
-		<info name="alt_title" value="アイドル麻雀 ファイナルロマンス2"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="idol mahjong - final romance 2 (japan)" sha1="4157da22b85b90c343cd3bbe5a84bd0f3200612a"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Initial D Koudou Sai Densetsu (Japan) [T-25503G]... -->
 	<software name="initiald" supported="no">
+		<!-- TODO: shouldn't have the Kashiramoji part -->
 		<description>Koudou Saisoku Densetsu - Kashiramoji D ~ Initial D (Japan)</description>
 		<year>1998</year>
 		<publisher>Kodansha</publisher>
@@ -28396,25 +28510,6 @@ Not extensively tested (all the other games)
 		</part>
 	</software>
 
-	<software name="planetjk" supported="no">
-		<description>Planet Joker (Japan)</description>
-		<year>1997</year>
-		<publisher>Naxat Soft</publisher>
-		<notes><![CDATA[
-Corrupt [VDP2] layer on now loading screens
-Not extensively tested
-]]></notes>
-		<info name="serial" value="T-18711G"/>
-		<info name="release" value="19970307"/>
-		<info name="alt_title" value="プラネット・ジョーカー"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="planet joker (japan)" sha1="9cb5410d8338df632c2c896fe186b516d7056470"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying playboy1... -->
 	<software name="pboyk1" supported="no">
 		<description>Playboy Karaoke Collection Volume 1 (Japan)</description>
@@ -28696,45 +28791,6 @@ Currently untested in gameplay
 		</part>
 	</software>
 
-	<software name="skullfng" supported="no">
-		<description>Skull Fang - Kuuga Gaiden (Japan)</description>
-		<year>1997</year>
-		<publisher>Data East</publisher>
-		<notes><![CDATA[
-Draws [VDP2] garbage layer covering everything (can't reproduce, assume fixed)
-Not extensively tested
-]]></notes>
-		<info name="serial" value="T-1311G"/>
-		<info name="release" value="19970530"/>
-		<info name="alt_title" value="スカルファング ～空牙外伝～"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="skull fang - kuuga gaiden (japan)" sha1="54e715f97180f6fdc791c7ec1cb6b806ede371c1"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="scouncil" supported="no">
-		<description>Sokkou Seitokai - Sonic Council (Japan)</description>
-		<year>1998</year>
-		<publisher>Banpresto</publisher>
-		<notes><![CDATA[
-[VDP2] Gradiation enabled a042 on now loading screen and gameplay
-[SCSP] cuts off voice samples during gameplay
-[SCSP] character select BGM notes are off
-]]></notes>
-		<info name="serial" value="T-20611G"/>
-		<info name="release" value="19980129"/>
-		<info name="alt_title" value="速攻生徒会"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="sokkou seitokai - sonic council (japan)" sha1="2418567e064d054e88fa21af4b2860dd4670ec03"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying Sonic 3D Flickies' Island (Japan) [GS-9143]... -->
 	<software name="sonic3dj" cloneof="sonic3d" supported="no">
 		<description>Sonic 3D - Flickies' Island (Japan)</description>
@@ -28760,24 +28816,6 @@ Not extensively tested
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sonic extreme beta" sha1="7cfd42d74500df7149120f68297060f05d08a543" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="sonicwin" supported="no">
-		<description>Sonic Wings Special (Japan)</description>
-		<year>1996</year>
-		<publisher>Media Quest</publisher>
-		<notes><![CDATA[
-Not extensively tested
-]]></notes>
-		<info name="serial" value="T-26402G"/>
-		<info name="release" value="19960705"/>
-		<info name="alt_title" value="ソニックウイングス・スペシャル"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="sonic wings special (japan)" sha1="a49d5da2d8e80a6622c5532d3466c47d6c348150"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29100,24 +29138,6 @@ Not extensively tested
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtua_fighter_kids(kor)" sha1="48bbdd59caa47e3a950bfb1610b4e86656a0e08e" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="vkyoute2" supported="no">
-		<description>Virtual Kyoutei 2 (Japan)</description>
-		<year>1997</year>
-		<publisher>Nihon Bussan</publisher>
-		<notes><![CDATA[
-Has severe [VDP1] glitches during intro and gameplay, [SCUDSP] related
-]]></notes>
-		<info name="serial" value="T-7104G"/>
-		<info name="release" value="19971204"/>
-		<info name="alt_title" value="バーチャル競艇2"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="virtual kyoutei 2 (japan) (2m)" sha1="9e8c68afe9bfcc1c158f0ac3ca840aeea62455ff"/>
 			</diskarea>
 		</part>
 	</software>

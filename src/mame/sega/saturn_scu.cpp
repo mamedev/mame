@@ -169,7 +169,7 @@ void saturn_scu_device::regs_map(address_map &map)
 	map(0x009a, 0x009b).w(FUNC(saturn_scu_device::t1_mode_w));
 	map(0x00a0, 0x00a3).rw(FUNC(saturn_scu_device::irq_mask_r), FUNC(saturn_scu_device::irq_mask_w));
 	map(0x00a4, 0x00a7).rw(FUNC(saturn_scu_device::irq_status_r), FUNC(saturn_scu_device::irq_status_w));
-//  map(0x00a8, 0x00ab).w(FUNC(saturn_scu_device::abus_irqack_w));
+	map(0x00a8, 0x00ab).w(FUNC(saturn_scu_device::abus_irqack_w));
 //  map(0x00b0, 0x00b7).rw(FUNC(saturn_scu_device::abus_set_r), FUNC(saturn_scu_device::abus_set_w));
 //  map(0x00b8, 0x00bb).rw(FUNC(saturn_scu_device::abus_refresh_r), FUNC(saturn_scu_device::abus_refresh_w));
 //  map(0x00c4, 0x00c7).rw(FUNC(saturn_scu_device::sdram_r), FUNC(saturn_scu_device::sdram_w));
@@ -1074,6 +1074,15 @@ void saturn_scu_device::scudsp_end_w(int state)
 
 	m_ist |= IST_DSP_END;
 	test_pending_irqs();
+}
+
+//**************************************************************************
+//  A-Bus section
+//**************************************************************************
+
+void saturn_scu_device::abus_irqack_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	// ignore for now, verbose in places
 }
 
 //**************************************************************************

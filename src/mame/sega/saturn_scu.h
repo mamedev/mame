@@ -220,6 +220,8 @@ private:
 	void irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t version_r();
+	// A-Bus section
+	void abus_irqack_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
 // device type definition

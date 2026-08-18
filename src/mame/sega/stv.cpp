@@ -1,8 +1,12 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+// thanks-to: Guru, Fabien, Runik, Charles MacDonald
 /**************************************************************************************************
 
-stv.cpp
+Sega Titan Video
+
+Notes:
+- To enter into an Advanced Test Mode, hold Test Button (F2) at start-up.
 
 TODO:
 - colmns97: has a bit of stuck envelope sound in places (i.e. coin in once at title screen);
