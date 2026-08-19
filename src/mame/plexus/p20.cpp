@@ -55,7 +55,7 @@ public:
 		m_jobcpu(*this, "jobcpu"),
 		m_sio(*this, "sio%u", 0U),
 		m_sio_irqs(*this, "sio_irqs"),
-		m_console(*this, "console"),
+		m_serial0(*this, "serial0"),
 		m_rtc(*this, "rtc"),
 		m_leds(*this, "led%u", 0U),
 		m_dma_boot(*this, "boot"),
@@ -121,7 +121,7 @@ private:
 	required_device<m68010_device> m_jobcpu;
 	required_device_array<mk68564_device, 4> m_sio;
 	required_device<input_merger_device> m_sio_irqs;
-	required_device<rs232_port_device> m_console;
+	required_device<rs232_port_device> m_serial0;
 	required_device<mc146818_device> m_rtc;
 	output_finder<8> m_leds;
 
@@ -638,8 +638,8 @@ void p20_state::p20(machine_config &config)
 	MK68564(config, m_sio[0], 3'000'000);
 	m_sio[0]->set_xtal(9.8304_MHz_XTAL / 4);
 	m_sio[0]->out_int_callback().set(m_sio_irqs, FUNC(input_merger_device::in_w<0>));
-	m_sio[0]->out_txdb_callback().set(m_console, FUNC(rs232_port_device::write_txd));
-	m_sio[0]->out_rtsb_callback().set(m_console, FUNC(rs232_port_device::write_rts));
+	m_sio[0]->out_txdb_callback().set(m_serial0, FUNC(rs232_port_device::write_txd));
+	m_sio[0]->out_rtsb_callback().set(m_serial0, FUNC(rs232_port_device::write_rts));
 
 	MK68564(config, m_sio[1], 3'000'000);
 	m_sio[1]->set_xtal(9.8304_MHz_XTAL / 4);
@@ -653,10 +653,10 @@ void p20_state::p20(machine_config &config)
 	m_sio[3]->out_int_callback().set(m_sio_irqs, FUNC(input_merger_device::in_w<3>));
 	m_sio[3]->set_xtal(9.8304_MHz_XTAL / 4);
 
-	RS232_PORT(config, m_console, default_rs232_devices, "terminal");
-	m_console->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_defaults));
-	m_console->rxd_handler().set(m_sio[0], FUNC(mk68564_device::rxb_w));
-	m_console->cts_handler().set(m_sio[0], FUNC(mk68564_device::ctsb_w));
+	RS232_PORT(config, m_serial0, default_rs232_devices, "terminal");
+	m_serial0->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_defaults));
+	m_serial0->rxd_handler().set(m_sio[0], FUNC(mk68564_device::rxb_w));
+	m_serial0->cts_handler().set(m_sio[0], FUNC(mk68564_device::ctsb_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL); // XTAL unreadable, clock guessed
 
