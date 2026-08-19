@@ -439,7 +439,7 @@ void ctk551_state::driver_start()
 void ctk551_state::ap10(machine_config& config)
 {
 	// CPU
-	GT913(config, m_maincpu, 24_MHz_XTAL / 2);
+	GT913(config, m_maincpu, 24_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ap10_map);
 	m_maincpu->add_route(0, "speaker", 1.0, 0);
 	m_maincpu->add_route(1, "speaker", 1.0, 1);
@@ -474,7 +474,7 @@ void ctk551_state::ap10(machine_config& config)
 void ctk551_state::ctk530(machine_config& config)
 {
 	// CPU
-	GT913(config, m_maincpu, 20_MHz_XTAL / 2);
+	GT913(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
 	m_maincpu->add_route(0, "speaker", 1.0, 0);
 	m_maincpu->add_route(1, "speaker", 1.0, 1);
@@ -508,7 +508,7 @@ void ctk551_state::ctk530(machine_config& config)
 void ctk551_state::gz70sp(machine_config& config)
 {
 	// CPU
-	GT913(config, m_maincpu, 30_MHz_XTAL / 2);
+	GT913(config, m_maincpu, 30_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::gz70sp_map);
 	m_maincpu->add_route(0, "speaker", 1.0, 0);
 	m_maincpu->add_route(1, "speaker", 1.0, 1);
@@ -533,7 +533,7 @@ void ctk551_state::gz70sp(machine_config& config)
 void ctk551_state::ctk601(machine_config& config)
 {
 	// CPU
-	GT913(config, m_maincpu, 30_MHz_XTAL / 2);
+	GT913(config, m_maincpu, 30_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk601_map);
 	m_maincpu->add_route(0, "speaker", 1.0, 0);
 	m_maincpu->add_route(1, "speaker", 1.0, 1);
@@ -575,7 +575,7 @@ void ctk551_state::ctk601(machine_config& config)
 void ctk551_state::ctk551(machine_config &config)
 {
 	// CPU
-	GT913(config, m_maincpu, 30'000'000 / 2);
+	GT913(config, m_maincpu, 30_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
 	m_maincpu->add_route(0, "speaker", 1.0, 0);
 	m_maincpu->add_route(1, "speaker", 1.0, 1);
