@@ -451,7 +451,7 @@ void hp9845_base_state::machine_start()
 	m_t15->set_name("T15");
 	m_t14->set_name("T14");
 
-	// setup RAM dynamically for -ramsize
+	// setup RAM dynamically for -ram
 	// 0K..64K
 	setup_ram_block(0 , 0);
 	if (m_ram->size() >= 192 * 1024) {
@@ -3600,7 +3600,7 @@ void hp9845_state::hp9835a(machine_config &config)
     - block 45 is reserved for the Test ROM
     - memory addresses are continuous (for convenience, the mapping below uses block numbers as
       address part above 0xffff, so there are gaps between 0x8000 and 0xffff which are masked out).
-    - all LPU RAM is dynamically mapped at machine start according to -ramsize option
+    - all LPU RAM is dynamically mapped at machine start according to -ram option
 */
 
 void hp9845_base_state::global_mem_map(address_map &map)

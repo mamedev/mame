@@ -4051,17 +4051,6 @@ Core Misc Options
 
             mame -ui simple
 
-.. _mame-commandline-ramsize:
-
-**-ramsize** *[n]*
-
-    Allows you to change the default RAM size (if supported by driver).
-
-    Example:
-        .. code-block:: bash
-
-            mame coco -ramsize 16K
-
 .. _mame-commandline-confirmquit:
 
 **\-[no]confirm_quit**
