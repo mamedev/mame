@@ -1127,7 +1127,7 @@ void namcos10_state::namcos10_base(machine_config &config)
 	m_spu->add_route(0, "speaker", 0.75, 0);
 	m_spu->add_route(1, "speaker", 0.75, 1);
 
-	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_default_value(0); // ram is external on CXD2938Q, internal on CXD2941R. Both limited to 512k
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K").set_default_value(0); // ram is external on CXD2938Q, internal on CXD2941R. Both limited to 512k
 
 	// TODO: Trace main PCB to see where JAMMA I/O goes and/or how int10 can be triggered (SM10MA3?)
 	m_io_update_interrupt.bind().set("maincpu:irq", FUNC(psxirq_device::intin10));

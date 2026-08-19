@@ -1988,3 +1988,15 @@ if SOUNDS["L6009"] then
 		MAME_DIR .. "src/devices/sound/l6009.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/gt913.h,SOUNDS["GT913"] = true
+---------------------------------------------------
+
+if SOUNDS["GT913"] then
+	files {
+		MAME_DIR .. "src/devices/sound/gt913.cpp",
+		MAME_DIR .. "src/devices/sound/gt913.h",
+	}
+end

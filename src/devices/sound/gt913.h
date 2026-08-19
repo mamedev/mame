@@ -4,8 +4,8 @@
     Casio GT913 sound (HLE)
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_GT913_SND_H
-#define MAME_MACHINE_GT913_SND_H
+#ifndef MAME_SOUND_GT913_H
+#define MAME_SOUND_GT913_H
 
 #pragma once
 
@@ -36,6 +36,7 @@ protected:
 	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -44,6 +45,8 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 private:
+	static constexpr unsigned CLOCKS_PER_SAMPLE = 208;
+
 	sound_stream *m_stream;
 
 	u8 m_gain;
@@ -85,4 +88,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(GT913_SOUND, gt913_sound_device)
 
-#endif // MAME_MACHINE_GT913_SND_H
+#endif // MAME_SOUND_GT913_H

@@ -100,7 +100,7 @@ license:CC0-1.0
 		<description>Olivetti PCOS 2.0f</description>
 		<year>1982</year>
 		<publisher>Olivetti</publisher>
-		<info name="usage" value="Boot with: -ramsize 512k" />
+		<info name="usage" value="Boot with: -ram 512k" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
@@ -179,7 +179,7 @@ license:CC0-1.0
 		<description>CP/M 8000</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Boot with: -ramsize 512k" />
+		<info name="usage" value="Boot with: -ram 512k" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
@@ -242,7 +242,7 @@ license:CC0-1.0
 		<description>ASM Utilities?</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Boots pcos2.0h; Boot with -ramsize 512k; Run with > asm" />
+		<info name="usage" value="Boots pcos2.0h; Boot with -ram 512k; Run with > asm" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
@@ -256,7 +256,7 @@ license:CC0-1.0
 		<description>Olivetti Pascal</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
-		<info name="usage" value="Boot together with PCOS and -ramsize 512k; Run with > pas1" />
+		<info name="usage" value="Boot together with PCOS and -ram 512k; Run with > pas1" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
@@ -303,7 +303,7 @@ license:CC0-1.0
 		<description>Olivetti Index Sequential Acces Method 2.1.6</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
-		<info name="usage" value="Boot together with PCOS and -ramsize 512k; Run with > mplan" />
+		<info name="usage" value="Boot together with PCOS and -ram 512k; Run with > mplan" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">

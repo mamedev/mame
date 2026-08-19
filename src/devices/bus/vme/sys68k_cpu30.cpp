@@ -489,7 +489,7 @@ uint8_t sys68k_cpu30_device_base::board_mem_id_rd()
 	//  return 0x57; // blankt 53 56
 	//      return 0x36; // CPU-26 1Mb 36 MHz
 	//      return 0x35; // CPU-26 1Mb 36 MHz
-	// calculate response from m_ram (default 4M or command line -ramsize) Bit 2 is reserved and always 0 on CPU-30
+	// calculate response from m_ram (default 4M or command line -ram) Bit 2 is reserved and always 0 on CPU-30
 	// return 0x6B;// CPU-33, 4Mb, 36MHz p4
 	// return 0x6B;// CPU-33, 4Mb, 36MHz p4
 	// return 0x99;// CPU-26, 4Mb, 36MHz p4

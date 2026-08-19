@@ -604,7 +604,7 @@ class a4000_state : public amiga_state
 public:
 	a4000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
-		, m_fastram(*this, "ram") // tag needs to be "ram" for -ramsize
+		, m_fastram(*this, "ram")
 		, m_ata(*this, "ata")
 		, m_zorro(*this, "zorro3")
 		, m_ramsey_config(0)
