@@ -1417,7 +1417,7 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
 }
 
 /**
- * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
+ * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index)
  *
  * @brief   -------------------------------------------------
  *            read_metadata - read the indexed metadata of the given type
@@ -1434,7 +1434,7 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
  * @return  An error condition.
  */
 
-std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag,uint32_t searchindex,std::string &output,uint32_t &index)
+std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index)
 {
 	// if we didn't find it, just return
 	metadata_entry metaentry;
