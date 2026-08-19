@@ -168,9 +168,7 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 	m_rxd(0),
 	m_rxc(0),
 	m_flen(0),
-	m_fpos(0),
-	m_stall_fpos(0xffffffff),
-	m_stall_count(0)
+	m_fpos(0)
 {
 	for (int i = 0; i < FIFO_SIZE; i++)
 	{
@@ -586,7 +584,7 @@ uint8_t mc6854_device::rfifo_pop( )
 /* One byte off the wire.  This is what a real line does and what the pop-driven
    refill cannot do: it keeps arriving whether or not anybody is reading, so a
    reader that has stopped overruns the three-byte FIFO by itself, which is
-   exactly how the chip behaves and removes the need to guess at a stall. */
+   how the chip behaves. */
 TIMER_CALLBACK_MEMBER(mc6854_device::wire_feed)
 {
 	if ( m_flen == 0 || m_fpos >= m_flen )
@@ -628,50 +626,9 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 		return -2; /* transmitted on the wire, but the receiver is in reset or
 		              has no carrier: the frame is simply not seen */
 
-	/* A frame mid-drain normally just means the reader has not caught up yet:
-	   report busy and let the sender retry.  But if the drain makes no
-	   progress over many consecutive offers, nobody is reading any more (e.g.
-	   the DMA count ran out mid-frame because the frame was not addressed to
-	   this station).  On the real line that frame finished arriving long ago:
-	   the FIFO overran and the closing flag went by unseen.  Latch the
-	   overrun so the CPU gets its interrupt, resets the receiver and re-arms.
-	   The threshold is deliberately generous: a receiver whose DMA controller
-	   is briefly busy elsewhere (a disk transfer on another channel) stalls
-	   legitimately for a few ms; the broken state is a *permanent* stall.
-
-	   AND IT IS LOAD-BEARING, measured.  Every stall this reports sits at 65
-	   or 66 bytes of a long frame, which is the receiver's 64-byte DMA buffer
-	   running out - and that ONE signature covers two opposite cases: a frame
-	   not addressed to this station, which will never be drained further and
-	   for which the overrun is right, and a frame that is addressed to it,
-	   where the CPU is about to re-arm the controller and the overrun is FALSE.
-	   Making the threshold a generous 500 ms of no progress removed the false
-	   ones (77 stalls down to 10 with the drain paced) and broke the load: the
-	   recovery from a foreign frame then costs half a second each time and the
-	   display never gets its emulation, falling back to the function menu.
-	   So the two cases cannot be told apart by time.  Telling them apart needs
-	   the ADDRESS, which the device does not have and the driver does - see the
-	   note on pacing in alfaskop41xx.cpp. */
+	/* a frame is still being drained: report busy and let the sender retry */
 	if ( m_flen > 0 )
-	{
-		if ( m_fpos == m_stall_fpos )
-		{
-			if ( ++m_stall_count >= 25 )
-			{
-				if ( m_stall_count == 25 )
-					logerror( "receiver stalled mid-frame (%u of %u bytes drained): latching overrun\n", m_fpos, m_flen );
-				m_sr2 |= OVRN;
-				update_sr1(); /* recompute S2RQ and raise the interrupt */
-			}
-		}
-		else
-		{
-			m_stall_fpos = m_fpos;
-			m_stall_count = 0;
-			m_stall_since = machine().time();
-		}
 		return -1;
-	}
 
 	/* the RTS output does not gate the receiver section: a master that keeps
 	   RTS raised while it waits for an answer still hears it */
@@ -696,9 +653,6 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 	}
 	m_flen = len;
 	m_fpos = 0;
-	m_stall_fpos = 0xffffffff; /* no stall recorded yet for this frame */
-	m_stall_count = 0;
-	m_stall_since = machine().time();
 	/* the address and control bytes are in the FIFO as soon as the frame
 	   starts arriving; from there the wire either clocks the rest in on its
 	   own timer, or - the original behaviour - the reader pulls it */

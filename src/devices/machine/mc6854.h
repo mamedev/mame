@@ -117,9 +117,6 @@ private:
 	/* frame-based interface*/
 	uint8_t  m_frame[MAX_FRAME_LENGTH];
 	uint32_t m_flen, m_fpos;
-	uint32_t m_stall_fpos;  /* drain progress marker: detects a receiver stalled mid-frame */
-	uint32_t m_stall_count; /* offers seen with no progress (kept for the log) */
-	attotime m_stall_since; /* when the drain last made progress */
 
 
 	/* meaning of tstate / rtate:
