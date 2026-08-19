@@ -169,6 +169,40 @@ void hd61830_device::set_busy_flag()
 
 
 //-------------------------------------------------
+//  read - read from the device
+//-------------------------------------------------
+
+uint8_t hd61830_device::read(offs_t offset)
+{
+	if (offset & 0x01)
+	{
+		return status_r();
+	}
+	else
+	{
+		return data_r();
+	}
+}
+
+
+//-------------------------------------------------
+//  write - write to the device
+//-------------------------------------------------
+
+void hd61830_device::write(offs_t offset, uint8_t data)
+{
+	if (offset & 0x01)
+	{
+		control_w(data);
+	}
+	else
+	{
+		data_w(data);
+	}
+}
+
+
+//-------------------------------------------------
 //  status_r - status register read
 //-------------------------------------------------
 

@@ -36,9 +36,8 @@ void pofo_hpc104_device::device_add_mconfig(machine_config &config)
 	PORTFOLIO_MEMORY_CARD_SLOT(config, m_ccm, portfolio_memory_cards, nullptr);
 
 	PORTFOLIO_EXPANSION_SLOT(config, m_exp, XTAL(4'915'200), portfolio_expansion_cards, nullptr);
-	m_exp->eint_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::eint_w));
-	m_exp->nmio_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::nmio_w));
-	m_exp->wake_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::wake_w));
+	m_exp->eint_wr_cb().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::eint_w));
+	m_exp->wake_wr_cb().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::wake_w));
 }
 
 
@@ -123,11 +122,31 @@ pofo_hpc104_2_device::pofo_hpc104_2_device(const machine_config &mconfig, const 
 
 
 //-------------------------------------------------
+//  device_resolve_objects - forward the inherited
+//  address spaces down into the nested CCM/EXP slots
+//-------------------------------------------------
+
+void pofo_hpc104_device::device_resolve_objects()
+{
+	m_ccm->set_memspace(m_slot->memspace());
+	m_exp->set_memspace(m_slot->memspace());
+	m_exp->set_iospace(m_slot->iospace());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void pofo_hpc104_device::device_start()
 {
+	m_slot->iospace().install_write_tap(0x807c, 0x807c, "hpc104_ncc1",
+		[this] (offs_t offset, u8 &data, u8)
+		{
+			m_ncc1_out = BIT(data, 0);
+			if (LOG) osd_printf_info("%s %s [%s] NCC1 out %u\n", machine().time().as_string(), machine().describe_context(), tag(), m_ncc1_out);
+			update_ccm_b_tap();
+		});
 }
 
 
@@ -138,6 +157,13 @@ void pofo_hpc104_device::device_start()
 void pofo_hpc104_device::device_reset()
 {
 	m_sw1 = BIT(m_io_sw1->read(), 0);
+
+	const offs_t base = m_sw1 ? 0x5f000 : 0x1f000;
+	m_slot->memspace().install_ram(base, base + 0x3ffff, m_nvram);
+
+	m_ncc1_out = false;
+	m_upstream_ccm_b = false;
+	update_ccm_b_tap();
 }
 
 
@@ -160,85 +186,18 @@ bool pofo_hpc104_device::nvram_write(util::write_stream &file)
 }
 
 
-//-------------------------------------------------
-//  nrdi_r - read
-//-------------------------------------------------
-
-uint8_t pofo_hpc104_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+void pofo_hpc104_device::ncc1_w(int state)
 {
-	data = m_exp->nrdi_r(offset, data, iom, bcom, m_ncc1_out || ncc1);
+	if (LOG) osd_printf_info("%s %s [%s] ncc1_w %d\n", machine().time().as_string(), machine().describe_context(), tag(), state);
 
-	if (!iom)
-	{
-		if (!(!m_ncc1_out || ncc1))
-		{
-			data = m_ccm->nrdi_r(offset & 0x1ffff);
-
-			if (LOG) logerror("%s %s CCM1 read %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
-		}
-
-		if (m_sw1)
-		{
-			if (offset >= 0x5f000 && offset < 0x9f000)
-			{
-				data = m_nvram[offset - 0x5f000];
-			}
-		}
-		else
-		{
-			if (offset >= 0x1f000 && offset < 0x5f000)
-			{
-				data = m_nvram[offset - 0x1f000];
-			}
-		}
-	}
-
-	return data;
+	m_upstream_ccm_b = state;
+	update_ccm_b_tap();
 }
 
 
-//-------------------------------------------------
-//  nwri_w - write
-//-------------------------------------------------
-
-void pofo_hpc104_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+void pofo_hpc104_device::update_ccm_b_tap()
 {
-	m_exp->nwri_w(offset, data, iom, bcom, m_ncc1_out || ncc1);
+	if (LOG) osd_printf_info("%s %s [%s] update_ccm_b_tap ncc1_out=%d upstream_ccm_b=%d -> select=%d\n", machine().time().as_string(), machine().describe_context(), tag(), m_ncc1_out, m_upstream_ccm_b, m_ncc1_out && m_upstream_ccm_b);
 
-	if (!iom)
-	{
-		if (!(!m_ncc1_out || ncc1))
-		{
-			if (LOG) logerror("%s %s CCM1 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
-
-			m_ccm->nwri_w(offset & 0x1ffff, data);
-		}
-
-		if (m_sw1)
-		{
-			if (offset >= 0x5f000 && offset < 0x9f000)
-			{
-				m_nvram[offset - 0x5f000] = data;
-			}
-		}
-		else
-		{
-			if (offset >= 0x1f000 && offset < 0x5f000)
-			{
-				m_nvram[offset - 0x1f000] = data;
-			}
-		}
-	}
-	else
-	{
-		if (!bcom)
-		{
-			if ((offset & 0x0f) == 0x0c)
-			{
-				m_ncc1_out = BIT(data, 0);
-
-				if (LOG) logerror("%s %s NCC1 out %u\n", machine().time().as_string(), machine().describe_context(), m_ncc1_out);
-			}
-		}
-	}
+	m_ccm->ncc2_w(m_ncc1_out && m_upstream_ccm_b);
 }

@@ -22,8 +22,8 @@
 // ======================> portfolio_ram_card_device
 
 class portfolio_ram_card_device :  public device_t,
-							  public device_portfolio_memory_card_slot_interface,
-							  public device_nvram_interface
+							  	   public device_portfolio_memory_card_slot_interface,
+							  	   public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -34,17 +34,17 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface implementation
-	virtual void nvram_default() override;
+	virtual void nvram_default() override {}
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
 	// device_portfolio_memory_card_slot_interface implementation
 	virtual bool cdet() override { return 0; }
 
-	virtual uint8_t nrdi_r(offs_t offset) override;
-	virtual void nwri_w(offs_t offset, uint8_t data) override;
+	virtual void ncc2_w(int state) override { m_selected = state; }
 
 	memory_share_creator<uint8_t> m_nvram;
+	bool m_selected = false;
 };
 
 
