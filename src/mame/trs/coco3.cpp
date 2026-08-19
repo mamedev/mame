@@ -275,30 +275,6 @@ INPUT_PORTS_END
 //  The Rat Mouse axis and buttons
 //-------------------------------------------------
 
-static INPUT_PORTS_START(ratmouse_r)
-	PORT_INCLUDE( quadmouse )
-
-	PORT_MODIFY("x")
-		PORT_BIT_MODIFY(0x0fff)
-		PORT_CONDITION(":" CTRL_SEL_RIGHT, 0x0f, EQUALS, coco_state::JOY_DEVICE_RAT_MOUSE)
-
-	PORT_MODIFY("y")
-		PORT_BIT_MODIFY(0x0fff)
-		PORT_CONDITION(":" CTRL_SEL_RIGHT, 0x0f, EQUALS, coco_state::JOY_DEVICE_RAT_MOUSE)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START(ratmouse_l)
-	PORT_INCLUDE( quadmouse )
-
-	PORT_MODIFY("x")
-		PORT_BIT_MODIFY(0x0fff)
-		PORT_CONDITION(":" CTRL_SEL_LEFT, 0x0f, EQUALS, coco_state::JOY_DEVICE_RAT_MOUSE)
-
-	PORT_MODIFY("y")
-		PORT_BIT_MODIFY(0x0fff)
-		PORT_CONDITION(":" CTRL_SEL_LEFT, 0x0f, EQUALS, coco_state::JOY_DEVICE_RAT_MOUSE)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( coco_rat_mouse )
 	PORT_START(RAT_MOUSE_BUTTONS_TAG)
 		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)
@@ -498,11 +474,9 @@ void coco3_state::coco3(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("coco_flop").set_filter("COCO3");
 
 	// RAT Mouse devices
-	QUADMOUSE(config, m_ratmouse_r, 0, INPUT_PORTS_NAME(ratmouse_r));
-// 	QUADMOUSE(config, m_ratmouse_r);
+ 	QUADMOUSE(config, m_ratmouse_r);
 	bind_rat_mouse(*m_ratmouse_r, 0);
-	QUADMOUSE(config, m_ratmouse_l, 0, INPUT_PORTS_NAME(ratmouse_l));
-// 	QUADMOUSE(config, m_ratmouse_l);
+ 	QUADMOUSE(config, m_ratmouse_l);
 	bind_rat_mouse(*m_ratmouse_l, 1);
 }
 

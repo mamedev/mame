@@ -48,7 +48,7 @@ class quadmouse_device : public device_t
 {
 public:
 	// construction/destruction
-	quadmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0, ioport_constructor ports = nullptr);
+	quadmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto write_up()    { return m_up_cb.bind();    }
 	auto write_down()  { return m_down_cb.bind();  }
@@ -74,11 +74,7 @@ private:
 	required_ioport m_port_x, m_port_y;
 
 	devcb_write_line m_up_cb, m_down_cb, m_left_cb, m_right_cb;
-
-	ioport_constructor m_ports;
 };
-
-INPUT_PORTS_EXTERN(quadmouse);
 
 DECLARE_DEVICE_TYPE(QUADENCODER, quadencoder_device)
 DECLARE_DEVICE_TYPE(QUADMOUSE, quadmouse_device)
