@@ -14,7 +14,7 @@
     a dump of it
 
     LeapLand Adventures - GPM4530A
-    Paw Patrol - GPM4532C
+    PAW Patrol - GPM4532C
 
 *****************************************************************************/
 
@@ -107,4 +107,4 @@ ROM_END
 } // anonymous namespace
 
 CONS( 2021, leapland, 0, 0, gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init, "LeapFrog", "LeapLand Adventures (UK)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, leappawp, 0, 0, gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init, "LeapFrog", "PAW Patrol: To The Rescue! (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, leappawp, 0, 0, gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init, "LeapFrog", "PAW Patrol: To the Rescue! (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

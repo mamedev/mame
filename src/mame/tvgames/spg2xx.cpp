@@ -3209,11 +3209,11 @@ void spg2xx_game_state::init_itvphone()
 	rom[0xf152] = 0xee08;
 }
 
-//    Year  Name       Parent     Compat  Machine     Input       Class                            Init           Company   Fullname                       Flags
+//    Year  Name       Parent     Compat  Machine     Input       Class                       Init           Company   Fullname                       Flags
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,         0,      rad_skat,   rad_skat,   spg2xx_game_state,               init_crc,      "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat,  0,      rad_skatp,  rad_skatp,  spg2xx_game_state,               init_crc,      "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skat,  0,         0,      rad_skat,   rad_skat,   spg2xx_game_state,          init_crc,      "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat,  0,      rad_skatp,  rad_skatp,  spg2xx_game_state,          init_crc,      "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, rad_crik,  0,         0, rad_crik,   rad_crik,   spg2xx_game_state,               init_crc,      "Radica", "Connectv Cricket (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
 
@@ -3251,8 +3251,8 @@ CONS( 2007, guitarfv,  0,         0, guitarfv,   guitarfv,   spg2xx_game_state, 
 CONS( 200?, guitarss,  0,         0, spg28x,     guitarss,   spg2xx_game_state,               empty_init,    "Senario", "Guitar Super Star ('Fender Stratocaster' style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, guitarssa, guitarss,  0, spg28x,     guitarss,   spg2xx_game_state,               empty_init,    "Senario", "Guitar Super Star (red 'Gibson Flying V' style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// The sequel has 'You Take The Stage' on both the box and title screen
-CONS( 2009, gssytts,   0,         0, gssytts,    guitarss,   spg2xx_game_gssytts_state,       empty_init,    "Senario", "Guitar Super Star: You Take The Stage", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// The sequel has 'You Take the Stage' on both the box and title screen
+CONS( 2009, gssytts,   0,         0, gssytts,    guitarss,   spg2xx_game_gssytts_state,       empty_init,    "Senario", "Guitar Super Star: You Take the Stage", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2007, drumsups,  0,         0, spg28x,     drumsups,   spg2xx_game_state,               empty_init,    "Senario", "Drum Super Star", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
