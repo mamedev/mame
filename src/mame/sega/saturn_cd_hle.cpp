@@ -24,12 +24,9 @@
 ===================================================================================================
 
 TODO:
-- finish off code cleanups (repetition etc.);
-- improve debugging;
-- fix DRQ behaviour, several softwares gets to the point of filling
-  the buffer (and probably don't know what to do);
-- fix startup, cfr. cdblock branch;
-- merge common components with lle version via superclass (i.e. comms);
+- fix DRDY behaviour, several softwares gets to the point of filling the buffer
+  (and probably don't know what to do);
+- fix startup not really reading the initial ID setup in device_reset, cfr. cdblock branch;
 - derive MPEG commands in a subdevice;
 - startup with NODISC/OPEN states currently takes a bit too much wall clock time
   (should be rather instant not take ~14 seconds);
@@ -716,7 +713,9 @@ void saturn_cd_hle_device::cmd_get_toc()
 {
 	LOGCMD("%s: Get TOC\n", machine().describe_context());
 	cd_readTOC();
-	cd_stat = CD_STAT_TRANS | CD_STAT_PAUSE;
+	// nope, hisspach wants just the DTREQ, otherwise hangs at Sega logo
+	//cd_stat = CD_STAT_TRANS | CD_STAT_PAUSE;
+	cd_stat |= CD_STAT_TRANS;
 	cr1 = cd_stat;
 	cr2 = 102*2;    // TOC length in words (102 entries @ 2 words/4bytes each)
 	cr3 = 0;
@@ -982,6 +981,7 @@ void saturn_cd_hle_device::cmd_play_disc()
 					fadstoplay = (m_cdrom_image->get_track_start((end_pos & 0xff00) >> 8)) - cd_curfad;
 			}
 			LOGCMD("\ttrack mode %08x %08x\n", cd_curfad, fadstoplay);
+			cd_change_status(CD_STAT_PLAY);
 		}
 		else
 		{
@@ -1002,7 +1002,7 @@ void saturn_cd_hle_device::cmd_play_disc()
 		}
 	}
 
-	LOGCMD("\tPlay Disc: start %x length %x\n", cd_curfad, fadstoplay);
+	LOGCMD("\tPlay Disc: current %x -> start %x length %x\n", cd_curfad, cd_fad_seek, fadstoplay);
 
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK);
@@ -1108,12 +1108,15 @@ void saturn_cd_hle_device::cmd_ffwd_rew_disc()
 {
 	// FFWD / REW
 	// cr1 bit 0 determines if this is a Fast Forward (0) or a Rewind (1) command
-	// TODO: unemulated, can be triggered thru BIOS player
+	// TODO: unemulated, can be triggered thru Multiplayer by holding on relevant keys
 	// ...
 }
 
 void saturn_cd_hle_device::cmd_get_subcode_q_rw_channel()
 {
+	// untested, assume it should set DTREQ
+	cd_stat |= CD_STAT_TRANS;
+	cd_stat &= 0xff00;
 	// Get SubCode Q / RW Channel
 	switch(cr1 & 0xff)
 	{
@@ -1141,8 +1144,8 @@ void saturn_cd_hle_device::cmd_get_subcode_q_rw_channel()
 			xxxx xxxx [7] Absolute M
 			xxxx xxxx [8] Absolute S
 			xxxx xxxx [9] Absolute F
-			xxxx xxxx [10] CRCC
-			xxxx xxxx [11] CRCC
+			xxxx xxxx [10] CRCC - (omitted in this implementation)
+			xxxx xxxx [11] CRCC /
 			*/
 
 			msf_abs = cdrom_file::lba_to_msf_alt( cd_curfad - 150 );
@@ -1161,7 +1164,6 @@ void saturn_cd_hle_device::cmd_get_subcode_q_rw_channel()
 			subqbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xff);
 			subqbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xff);
 			subqbuf[9] = dec_2_bcd((msf_abs >> 0) & 0xff);
-			// TODO: CRCC calculation, we are short of 2 bytes here.
 		}
 		break;
 
@@ -1178,19 +1180,17 @@ void saturn_cd_hle_device::cmd_get_subcode_q_rw_channel()
 			{
 				int i;
 
-				for(i=0;i<12*2;i++)
-					subrwbuf[i] = 0;
+				for(i = 0; i < 12 * 2; i++)
+					subrwbuf[i] = 0xff;
 			}
 			break;
 	}
 	hirqreg |= CMOK|DRDY;
 	status_type = 0;
-	//cr_standard_return(cd_stat);
 }
 
 void saturn_cd_hle_device::cmd_set_cddevice_connection()
 {
-	// Set CD Device connection
 	uint8_t param;
 
 	// get operation
@@ -1200,6 +1200,7 @@ void saturn_cd_hle_device::cmd_set_cddevice_connection()
 
 	cddevicenum = param;
 
+	// a param of 0xff disconnects
 	if (param == 0xff)
 	{
 		cddevice = (filterT *)nullptr;
@@ -1209,6 +1210,11 @@ void saturn_cd_hle_device::cmd_set_cddevice_connection()
 		if (param < MAX_FILTERS)
 		{
 			cddevice = &filters[param];
+		}
+		else
+		{
+			// TODO: should just require a rejection
+			popmessage("saturn_cd_hle.cpp: cmd_set_cddevice_connection() with param %02x", param);
 		}
 	}
 
@@ -1231,7 +1237,6 @@ void saturn_cd_hle_device::cmd_get_cddevice_connection()
 
 void saturn_cd_hle_device::cmd_last_buffer_destination()
 {
-	// Last Buffer Destination
 	cr1 = cd_stat | 0;
 	cr2 = 0;
 	cr3 = lastbuf << 8;
@@ -1242,7 +1247,6 @@ void saturn_cd_hle_device::cmd_last_buffer_destination()
 
 void saturn_cd_hle_device::cmd_set_filter_range()
 {
-	// Set Filter Range
 	// cr1 low + cr2 = FAD0, cr3 low + cr4 = FAD1
 	// cr3 hi = filter num.
 	uint8_t fnum = (cr3 >> 8) & 0xff;
@@ -1261,13 +1265,12 @@ void saturn_cd_hle_device::cmd_set_filter_range()
 
 void saturn_cd_hle_device::cmd_get_filter_range()
 {
-	popmessage("Get Filter Range");
+	popmessage("saturn_cd_hle.cpp: cmd_get_filter_range() (unemulated)");
 	hirqreg |= CMOK;
 }
 
 void saturn_cd_hle_device::cmd_set_filter_subheader_conditions()
 {
-	// Set Filter Subheader conditions
 	uint8_t fnum = (cr3 >> 8) & 0xff;
 
 	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1 & 0xff, cr2, cr3 & 0xff, cr4);
@@ -1290,7 +1293,7 @@ void saturn_cd_hle_device::cmd_get_filter_subheader_conditions()
 	// Get Filter Subheader conditions
 	uint8_t fnum = (cr3 >> 8) & 0xff;
 
-	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1 & 0xff, cr2, cr3 & 0xff, cr4);
+	LOGCMD("%s: Get Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1 & 0xff, cr2, cr3 & 0xff, cr4);
 
 	cr1 = cd_stat | (filters[fnum].chan & 0xff);
 	cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
@@ -1325,8 +1328,9 @@ void saturn_cd_hle_device::cmd_set_filter_mode()
 
 void saturn_cd_hle_device::cmd_get_filter_mode()
 {
-	// Get Filter Mode
 	uint8_t fnum = (cr3 >> 8) & 0xff;
+
+	LOGCMD("%s: Get Filter Mode fnum %x\n", machine().describe_context(), fnum);
 
 	cr1 = cd_stat | (filters[fnum].mode & 0xff);
 	cr2 = 0;
@@ -1474,7 +1478,7 @@ void saturn_cd_hle_device::cmd_get_buffer_size()
 	cr2 = (freeblocks > MAX_BLOCKS) ? MAX_BLOCKS : freeblocks;
 	cr3 = 0x1800;
 	cr4 = 200;
-	LOG("Get Buffer Size = %d\n", cr2);
+	LOGCMD("%s: Get Buffer Size = %d\n", machine().describe_context(), cr2);
 	hirqreg |= (CMOK);
 	status_type = 0;
 }
@@ -1540,11 +1544,11 @@ void saturn_cd_hle_device::cmd_calculate_actual_data_size()
 void saturn_cd_hle_device::cmd_get_actual_data_size()
 {
 	// get actual block size
-	LOGCMD("%s: Get actual block size\n", machine().describe_context());
 	cr1 = cd_stat | ((calcsize >> 16) & 0xff);
 	cr2 = (calcsize & 0xffff);
 	cr3 = 0;
 	cr4 = 0;
+	LOGCMD("%s: Get actual block size %06x\n", machine().describe_context(), calcsize);
 	hirqreg |= (CMOK);
 	status_type = 1;
 }
@@ -1807,7 +1811,7 @@ void saturn_cd_hle_device::cmd_put_sector_data()
 
 void saturn_cd_hle_device::cmd_move_sector_data()
 {
-	popmessage("Move Sector data");
+	popmessage("saturn_cd_hle.cpp: cmd_move_sector_data() (unemulated)");
 	hirqreg |= (CMOK);
 }
 
@@ -2199,7 +2203,7 @@ void saturn_cd_hle_device::cd_exec_command()
 
 		default:
 			LOG("Unknown command %04x\n", cr1>>8);
-			popmessage("CD Block unknown command %02x",cr1>>8);
+			popmessage("saturn_cd_hle.cpp: Unknown command %02x",cr1>>8);
 
 			hirqreg |= (CMOK);
 			break;
@@ -2366,7 +2370,7 @@ void saturn_cd_hle_device::read_new_dir(uint32_t fileno)
 		while ((!foundpd) && (cfad < 200))
 		{
 			if(sectlenin != 2048)
-				popmessage("Sector Length %d (0)",sectlenin);
+				popmessage("saturn_cd_hle.cpp: read_new_dir with Sector Length %d (0)",sectlenin);
 
 			memset(sect, 0, 2048);
 			cd_readblock(cfad++, sect);
@@ -2443,7 +2447,7 @@ void saturn_cd_hle_device::make_dir_current(uint32_t fad)
 
 	memset(&sect[0], 0, MAX_DIR_SIZE);
 	if(sectlenin != 2048)
-		popmessage("Sector Length %d (1)",sectlenin);
+		popmessage("saturn_cd_hle.cpp: make_dir_current Sector Length %d (1)",sectlenin);
 
 	for (i = 0; i < (curroot.length/2048); i++)
 	{

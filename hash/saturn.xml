@@ -1788,11 +1788,13 @@ Options menu is too large [VDP1], sports [VDP1] zooming error for the background
 		</part>
 	</software>
 
-	<!-- Black screen after selecting new game, [CD-Block] reads FAD=165482 then jumps to lalaland -->
 	<software name="blckmtxa" cloneof="blckmtx" supported="no">
 		<description>Black/Matrix (Japan, reprint)</description>
 		<year>1998</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Black screen after selecting new game, [CD-Block] reads FAD=165482 then jumps to lalaland (TODO: check file structure)
+]]></notes>
 		<info name="serial" value="T-20115G?"/>
 		<info name="release" value="19981106"/>
 		<info name="alt_title" value="ブラックマトリクス"/>
@@ -22555,9 +22557,10 @@ Requires actual Sega Saturn [modem] to do something (status currently kludged in
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
 		<notes><![CDATA[
-Hangs at Sega logo, expects to change [CD-Block] status after every loading phase
-Draws no text in menu [VDP1] [VDP2]
-Has Nifty Serve option, [NetLink] support?
+No sound on FMV (btanb, cfr. https://youtu.be/Qoj7qYXQORs)
+[SCSP] stuck envelope notes on main menu
+Draws no text in menu and gameplay [VDP1] [VDP2]
+Has Nifty Serve option, [modem] support?
 ]]></notes>
 		<info name="serial" value="T-1503G"/>
 		<info name="release" value="19960119"/>
@@ -22570,9 +22573,8 @@ Has Nifty Serve option, [NetLink] support?
 		</part>
 	</software>
 
-	<!-- Identifying Hiyake no Omoide + Himekuri - Girls In Motion Puzzle Vol 1 (T-21002G)... -->
-	<software name="girlpuz1" supported="no">
-		<description>Hiyake no Omoide + Himekuri - Girls in Motion Puzzle Vol. 1 (Japan)</description>
+	<software name="girlpuz1" supported="partial">
+		<description>Hiyake no Omoide + Himekuri: Girls in Motion Puzzle Vol. 1 (Japan)</description>
 		<year>1995</year>
 		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21002G"/>
