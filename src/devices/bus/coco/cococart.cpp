@@ -141,7 +141,7 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 
 void cococart_slot_device::device_start()
 {
-	for(int i=0; i < TIMER_POOL; i++ )
+	for (int i=0; i < TIMER_POOL; i++)
 	{
 		m_cart_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::cart_line_timer_tick), this);
 		m_nmi_line.timer[i]     = timer_alloc(FUNC(cococart_slot_device::nmi_line_timer_tick), this);
@@ -319,8 +319,6 @@ void cococart_slot_device::set_line(line ln, coco_cartridge_line &line, cococart
 		case line::HALT:
 			LOGHALT( "set_line: HALT, value: %s\n", line_value_string(value));
 			break;
-		case line::SOUND_ENABLE:
-			break;
 		}
 
 		// engage in a bit of gymnastics for this odious 'Q' value
@@ -410,11 +408,6 @@ void cococart_slot_device::set_line_value(cococart_slot_device::line which, coco
 
 	case cococart_slot_device::line::HALT:
 		set_line_timer(m_halt_line, value);
-		break;
-
-	case cococart_slot_device::line::SOUND_ENABLE:
-		if (m_cart)
-			m_cart->set_sound_enable(value != cococart_slot_device::line_value::CLEAR);
 		break;
 	}
 }
@@ -737,15 +730,6 @@ void device_cococart_interface::scs_write(offs_t offset, u8 data)
 
 
 //-------------------------------------------------
-//  set_sound_enable
-//-------------------------------------------------
-
-void device_cococart_interface::set_sound_enable(bool sound_enable)
-{
-}
-
-
-//-------------------------------------------------
 //  get_cart_base
 //-------------------------------------------------
 
@@ -811,6 +795,25 @@ address_space &device_cococart_interface::cartridge_space()
 
 
 //-------------------------------------------------
+//  add_sound_route
+//-------------------------------------------------
+
+void device_cococart_interface::add_sound_route(device_sound_interface &sound_device, int output_index, double gain)
+{
+	host().add_sound_route(sound_device, output_index, gain);
+}
+
+
+//-------------------------------------------------
+//  set_sound_gain
+//-------------------------------------------------
+
+void device_cococart_interface::set_sound_gain(device_sound_interface &sound_device, int output_index, double gain)
+{
+	host().set_sound_gain(sound_device, output_index, gain);
+}
+
+//-------------------------------------------------
 //  set_line_value
 //-------------------------------------------------
 
@@ -827,8 +830,7 @@ void device_cococart_interface::set_line_value(cococart_slot_device::line line, 
 void coco_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices, on both the main slot and the Multi-Pak interface
-	device.option_add_internal("banked_16k", COCO_PAK_BANKED);
-	device.option_add_internal("pak", COCO_PAK);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("ccpsg", COCO_PSG);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("gmc", COCO_PAK_GMC);
@@ -836,6 +838,7 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("max", COCO_PAK_MAX);
 	device.option_add("midi", COCO_MIDI);
 	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("pak", COCO_PAK);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
@@ -844,8 +847,8 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("sym12", COCO_SYM12);
 	device.option_add("wpk", COCO_WPK);
 	device.option_add("wpk2", COCO_WPK2);
-	device.option_add("wpkrs", COCO_WPKRS);
 	device.option_add("wpk2p", COCO_WPK2P);
+	device.option_add("wpkrs", COCO_WPKRS);
 	device.option_add("xsid", COCO_XSID);
 }
 
