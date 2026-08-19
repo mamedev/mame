@@ -514,7 +514,7 @@ void psx1_state::psx_base(machine_config &config)
 	m_maincpu->cd_read().set(m_psxcd, FUNC(psxcd_device::read));
 	m_maincpu->cd_write().set(m_psxcd, FUNC(psxcd_device::write));
 
-	RAM(config, m_ram).set_bits(32).set_default_size("2M").set_extra_options("4M,8M,16M").set_default_value(0);
+	RAM(config, m_ram).set_bits(32).set_default_size("2M").set_extra_options("2M,4M,8M,16M").set_default_value(0);
 
 	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers"));
 	controllers.rxd().set("maincpu:sio0", FUNC(psxsio0_device::write_rxd));

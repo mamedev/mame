@@ -611,7 +611,7 @@ void konamigv_state::konamigv(machine_config &config)
 	m_gpu->set_screen(m_screen);
 	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	RAM(config, m_gpu_ram).set_bits(16).set_default_size("1M").set_default_value(0);
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("1M").set_extra_options("1M").set_default_value(0);
 
 	SCREEN(config, m_screen);
 
