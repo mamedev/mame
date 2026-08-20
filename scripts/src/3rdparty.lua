@@ -1063,11 +1063,11 @@ project "sqlite3"
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-bad-function-cast",
+			"-Wno-error=bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
@@ -1076,16 +1076,16 @@ if _OPTIONS["gcc"]~=nil then
 		}
 	else
 		buildoptions_c {
-			"-Wno-return-local-addr", -- sqlite3.c in GCC 10
-			"-Wno-misleading-indentation",  -- sqlite3.c in GCC 11.1
+			"-Wno-error=return-local-addr", -- sqlite3.c in GCC 10
+			"-Wno-error=misleading-indentation",  -- sqlite3.c in GCC 11.1
 		}
 	end
 end
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 end
 
