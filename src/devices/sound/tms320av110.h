@@ -154,7 +154,7 @@ private:
 	bool m_reset_asserted;
 	bool m_reset_cycle;
 	bool m_data_access;
-	int m_req_state;
+	u8 m_req_state;
 };
 
 DECLARE_DEVICE_TYPE(TMS320AV110, tms320av110_device)
