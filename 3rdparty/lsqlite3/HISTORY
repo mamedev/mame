@@ -1,3 +1,12 @@
+2023-June-06
+
+Version "0.9.6"
+
+Added parameterised iterators.
+Added documentation warning static link issues.
+Fixed old links in docs.
+Added support for comercial CEROD feature.
+
 2018-June-30
 
 Version "0.9.5"

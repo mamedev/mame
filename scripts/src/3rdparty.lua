@@ -1008,9 +1008,6 @@ project "lualibs"
 	}
 
 	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-error=unused-variable",
-		}
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -1018,15 +1015,10 @@ project "lualibs"
 	configuration { "vs*" }
 if _OPTIONS["vs"]==nil then
 		buildoptions {
-			"/wd4101", -- warning C4101: 'identifier': unreferenced local variable
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
 			"/wd4152", -- warning C4152: nonstandard extension, function/data pointer conversion in expression
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
-		}
-elseif _OPTIONS["vs"]=="clangcl" then
-		buildoptions {
-			"-Wno-error=unused-variable",
 		}
 end
 
