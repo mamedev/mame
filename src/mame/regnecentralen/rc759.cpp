@@ -4,35 +4,71 @@
 
     Regnecentralen RC759 Piccoline
 
+    16-bit school/office micro (1984), sibling of the RC750 Partner (see
+    rc750.cpp). Both derive from rc75x_state (see rc75x.h), which holds the
+    shared 80186 + 8259A + 8255 + 82730 + MM58167 + NVM + sound + keyboard
+    core; this file adds the Piccoline-specific floppy/cassette/expansion
+    side. Runs Concurrent CP/M-86.
+
+    HARDWARE OVERVIEW (from the PICCOLINE Programmer's Guide v2,
+    CCP/M-86 3.1 / XIOS 2.3; verified against this driver):
+
+      CPU            Intel 80186 @ 6 MHz (2 DMA ch, 3 timers, PIC on-chip)
+      Extra PIC      Intel 8259A            I/O 0x00,  cascaded to 80186 INT0
+      Keyboard       HLE serial kbd         I/O 0x20,  8259A IR1
+      Sound          SN76489A               I/O 0x56
+      RTC            MM58167 (32.768 kHz)   I/O 0x5a/0x5c, 8259A IR3
+      CRT control    Intel 82730 text proc  I/O 0x60 (ctrl), 0x230 reset,
+                                             0x240 chan-attn, sint -> IR4;
+                                             32 KB pixel RAM @ 0xD0000
+      Palette        32 cells x 2 IRGB nib  I/O 0x180-0x1be (even)
+      PPI            Intel 8255             I/O 0x70-0x76 (port C bit6 = gfx)
+      NVM            256x4 CMOS, bank-sw     I/O 0x80-0xfe
+      Floppy         WD2797                 I/O 0x280-0x286, ctrl 0x288,
+                                             reserve/release 0x28e-0x290,
+                                             intrq -> IR0
+      Parallel print Centronics (local)     I/O 0x250/0x260
+      Cassette tape  (Piccoline only)       via PPI port A / port C
+      Serial         iSBX serial module     iSBX slot 0x300-0x330
+                     (optional; the Partner has a built-in 8274 instead)
+      Net (optional) Intel 82586 Ethernet   I/O 0x100, IR5 (not emulated)
+      DPC (optional) Disk/Printer-Adaptor   0x28a-0x28c, IR2 (not emulated)
+
+    Video modes (82730, per the guide) -- only alphanumeric is currently
+    emulated, and only in monochrome (see rc75x.cpp txt_update_row):
+      alphanumeric        560x250, char cell from 32 KB pixel RAM
+      high-res graphics   560x256, 1 bit/pixel   (m_gfx_mode, not emulated)
+      medium-res graphics 280x256, 2 bits/pixel  (m_gfx_mode, not emulated)
+
     TODO:
-    - Needs better I82730 emulation
+    - Needs better I82730 emulation: use the 32-entry IRGB palette + the
+      per-character palette-select bits instead of hard-coded black/white;
+      implement the graphics (bitmap) mode selected via PPI port C bit 6
+      (OUT 76H,0CH = graphics / 0DH = alphanumeric).
     - Floppy I/O errors
     - Many more things
 
     Notes:
     - Press SPACE during self-test for an extended menu
 
+    References:
+    - Intel 82730 Text Coprocessor datasheet (Preliminary), for the CRT
+      controller programming model (mode block, cursor, soft scroll, etc.):
+      https://archive.org/details/Intel-82730TextCoprocessor-PreliminaryOCR
+    - PICCOLINE Programmer's Guide v2 (CCP/M-86 3.1 / XIOS 2.3) for the
+      RC759-specific I/O map, NVM config layout and console escapes.
+
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
-#include "machine/i8255.h"
-#include "machine/mm58167.h"
-#include "machine/nvram.h"
-#include "machine/pic8259.h"
-#include "machine/ram.h"
+#include "rc75x.h"
+
 #include "machine/wd_fdc.h"
-#include "rc759_kbd.h"
-#include "sound/sn76496.h"
-#include "sound/spkrdev.h"
-#include "video/i82730.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "formats/rc759_dsk.h"
-#include "emupal.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -43,32 +79,17 @@ namespace {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class rc759_state : public driver_device
+class rc759_state : public rc75x_state
 {
 public:
 	rc759_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pic(*this, "pic"),
-		m_nvram(*this, "nvram"),
-		m_ppi(*this, "ppi"),
-		m_txt(*this, "txt"),
-		m_palette(*this, "palette"),
+		rc75x_state(mconfig, type, tag),
 		m_cas(*this, "cas"),
 		m_isbx(*this, "isbx"),
-		m_speaker(*this, "speaker"),
-		m_snd(*this, "snd"),
-		m_rtc(*this, "rtc"),
 		m_centronics(*this, "centronics"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%u", 0),
-		m_vram(*this, "vram"),
-		m_config(*this, "config"),
-		m_kbd(*this, "kbd"),
 		m_cas_enabled(0), m_cas_data(0),
-		m_drq_source(0),
-		m_nvram_bank(0),
-		m_gfx_mode(0),
 		m_centronics_strobe(0), m_centronics_init(0), m_centronics_select_in(0), m_centronics_busy(0),
 		m_centronics_ack(0), m_centronics_fault(0), m_centronics_perror(0), m_centronics_select(0),
 		m_centronics_data(0xff)
@@ -76,28 +97,12 @@ public:
 
 	void rc759(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 private:
-	required_device<i80186_cpu_device> m_maincpu;
-	required_device<pic8259_device> m_pic;
-	required_device<nvram_device> m_nvram;
-	required_device<i8255_device> m_ppi;
-	required_device<i82730_device> m_txt;
-	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cas;
 	required_device<isbx_slot_device> m_isbx;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<sn76489a_device> m_snd;
-	required_device<mm58167_device> m_rtc;
 	required_device<centronics_device> m_centronics;
 	required_device<wd2797_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	required_shared_ptr<uint16_t> m_vram;
-	required_ioport m_config;
-	required_device<rc759_kbd_hle_device> m_kbd;
 
 	static void floppy_formats(format_registration &fr);
 	void floppy_control_w(uint8_t data);
@@ -120,43 +125,15 @@ private:
 	uint8_t centronics_control_r();
 	void centronics_control_w(uint8_t data);
 
-	I82730_UPDATE_ROW(txt_update_row);
-	void txt_ca_w(uint16_t data);
-	void txt_irst_w(uint16_t data);
-	uint8_t palette_r(offs_t offset);
-	void palette_w(offs_t offset, uint8_t data);
-
 	void i186_timer0_w(int state);
-	void i186_timer1_w(int state);
-
-	void nvram_init(nvram_device &nvram, void *data, size_t size);
-	uint8_t nvram_r(offs_t offset);
-	void nvram_w(offs_t offset, uint8_t data);
-
-	void rtc_data_w(uint8_t data);
-	uint8_t rtc_data_r();
-	void rtc_addr_w(uint8_t data);
-
-	uint8_t irq_callback();
 
 	void rc759_io(address_map &map) ATTR_COLD;
 	void rc759_map(address_map &map) ATTR_COLD;
 
-	std::vector<uint8_t> m_nvram_mem;
-
 	int m_cas_enabled;
 	int m_cas_data;
-	int m_drq_source;
-	int m_nvram_bank;
-	int m_gfx_mode;
 
-	bool m_floppy_reserved;
-
-	uint8_t m_rtc_read_addr;
-	uint8_t m_rtc_read_data;
-	uint8_t m_rtc_write_addr;
-	uint8_t m_rtc_write_data;
-	uint8_t m_rtc_strobe;
+	bool m_floppy_reserved = false;
 
 	int m_centronics_strobe;
 	int m_centronics_init;
@@ -177,7 +154,7 @@ private:
 void rc759_state::rc759_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram();
-	map(0x40000, 0x7ffff).ram();
+	map(0x40000, 0x5ffff).ram(); // 384K total, matches working PCE rc759 cfg.ram=384K
 	map(0xd0000, 0xd7fff).mirror(0x08000).ram().share("vram");
 	map(0xe8000, 0xeffff).mirror(0x10000).rom().region("bios", 0);
 }
@@ -228,74 +205,6 @@ static INPUT_PORTS_START( rc759 )
 	PORT_CONFSETTING(0x00, "15 kHz")
 	PORT_CONFSETTING(0x40, "22 kHz")
 INPUT_PORTS_END
-
-
-//**************************************************************************
-//  VIDEO EMULATION
-//**************************************************************************
-
-I82730_UPDATE_ROW( rc759_state::txt_update_row )
-{
-	for (int i = 0; i < x_count; i++)
-	{
-		uint16_t gfx = m_vram[(data[i] & 0x3ff) << 4 | lc];
-
-		// pretty crude detection if char sizes have been initialized, need something better
-		if ((gfx & 0xff) == 0)
-			continue;
-
-		// figure out char width
-		int width;
-		for (width = 0; width < 16; width++)
-			if (BIT(gfx, width) == 0)
-				break;
-
-		width = 15 - width;
-
-		for (int p = 0; p < width; p++)
-			bitmap.pix(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white() : rgb_t::black();
-	}
-}
-
-void rc759_state::txt_ca_w(uint16_t data)
-{
-	m_txt->ca_w(1);
-	m_txt->ca_w(0);
-}
-
-void rc759_state::txt_irst_w(uint16_t data)
-{
-	m_txt->irst_w(1);
-	m_txt->irst_w(0);
-}
-
-uint8_t rc759_state::palette_r(offs_t offset)
-{
-	// not sure if it's possible to read back
-	logerror("palette_r(%02x)\n", offset);
-	return 0xff;
-}
-
-void rc759_state::palette_w(offs_t offset, uint8_t data)
-{
-	logerror("palette_w(%02x): %02x\n", offset, data);
-
-	// two colors/byte. format: IRGBIRGB
-	static constexpr uint8_t val[4] = { 0x00, 0x55, 0xaa, 0xff };
-	int r, g, b;
-
-	r = (BIT(data, 2) << 1) | BIT(data, 3);
-	g = (BIT(data, 1) << 1) | BIT(data, 3);
-	b = (BIT(data, 0) << 1) | BIT(data, 3);
-
-	m_palette->set_pen_color(offset * 2 + 0, rgb_t(val[r], val[g], val[b]));
-
-	r = (BIT(data, 6) << 1) | BIT(data, 7);
-	g = (BIT(data, 5) << 1) | BIT(data, 7);
-	b = (BIT(data, 4) << 1) | BIT(data, 7);
-
-	m_palette->set_pen_color(offset * 2 + 1, rgb_t(val[r], val[g], val[b]));
-}
 
 
 //**************************************************************************
@@ -363,7 +272,7 @@ uint8_t rc759_state::ppi_porta_r()
 	data |= m_isbx->opt0_r() << 2;
 	data |= m_isbx->opt1_r() << 3;
 	data |= 1 << 4; // mem ident0
-	data |= 1 << 5; // mem ident1 (both 1 = 256k installed)
+	data |= 0 << 5; // mem ident1 (bit4=1,bit5=0 = 384k installed, matches working PCE cfg.ram=384K)
 	data |= 0 << 6; // dpc connect (0 = external floppy/printer installed)
 	data |= 1 << 7; // not used
 
@@ -479,37 +388,6 @@ void rc759_state::centronics_control_w(uint8_t data)
 
 
 //**************************************************************************
-//  SOUND/RTC
-//**************************************************************************
-
-void rc759_state::rtc_data_w(uint8_t data)
-{
-	m_rtc_write_data = data;
-}
-
-uint8_t rc759_state::rtc_data_r()
-{
-	return m_rtc_read_data;
-}
-
-void rc759_state::rtc_addr_w(uint8_t data)
-{
-	if (BIT(data, 7))
-		m_rtc_read_addr = data & 0x1f;
-	else
-		m_rtc_write_addr = data & 0x1f;
-
-	if (BIT(data, 6) && BIT(m_rtc_strobe, 6) == 0)
-		m_rtc->write(m_rtc_write_addr, m_rtc_write_data);
-
-	if (BIT(data, 5) && BIT(m_rtc_strobe, 5) == 0)
-		m_rtc_read_data = m_rtc->read(m_rtc_read_addr);
-
-	m_rtc_strobe = data;
-}
-
-
-//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
@@ -521,57 +399,6 @@ void rc759_state::i186_timer0_w(int state)
 		m_cas_data = state ? 0 : 1;
 
 	m_cas->output(m_cas_data ? -1.0 : 1.0);
-}
-
-void rc759_state::i186_timer1_w(int state)
-{
-	m_speaker->level_w(state);
-}
-
-// 256x4 nvram is bank-switched using ppi port c, bit 4 and 5
-void rc759_state::nvram_init(nvram_device &nvram, void *data, size_t size)
-{
-	memset(data, 0x00, size);
-	memset(data, 0xaa, 1);
-}
-
-uint8_t rc759_state::nvram_r(offs_t offset)
-{
-	offs_t addr = (m_nvram_bank << 6) | offset;
-
-	logerror("nvram_r(%02x)\n", addr);
-
-	if (addr & 1)
-		return (m_nvram_mem[addr >> 1] & 0xf0) >> 4;
-	else
-		return (m_nvram_mem[addr >> 1] & 0x0f) >> 0;
-}
-
-void rc759_state::nvram_w(offs_t offset, uint8_t data)
-{
-	offs_t addr = (m_nvram_bank << 6) | offset;
-
-	logerror("nvram_w(%02x): %02x\n", addr, data);
-
-	if (addr & 1)
-		m_nvram_mem[addr >> 1] = ((data << 4) & 0xf0) | (m_nvram_mem[addr >> 1] & 0x0f);
-	else
-		m_nvram_mem[addr >> 1] = (m_nvram_mem[addr >> 1] & 0xf0) | (data & 0x0f);
-}
-
-uint8_t rc759_state::irq_callback()
-{
-	return m_pic->acknowledge();
-}
-
-void rc759_state::machine_start()
-{
-	m_nvram_mem.resize(256 / 2);
-	m_nvram->set_base(&m_nvram_mem[0], 256 / 2);
-}
-
-void rc759_state::machine_reset()
-{
 }
 
 
@@ -589,21 +416,15 @@ void rc759_state::rc759(machine_config &config)
 	I80186(config, m_maincpu, 6'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc759_state::rc759_map);
 	m_maincpu->set_addrmap(AS_IO, &rc759_state::rc759_io);
-	m_maincpu->read_slave_ack_callback().set(FUNC(rc759_state::irq_callback));
-	m_maincpu->tmrout0_handler().set(FUNC(rc759_state::i186_timer0_w));
-	m_maincpu->tmrout1_handler().set(FUNC(rc759_state::i186_timer1_w));
+	m_maincpu->tmrout0_handler().set(FUNC(rc759_state::i186_timer0_w)); // cassette (Piccoline only)
 
-	PIC8259(config, m_pic);
-	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
-
-	NVRAM(config, "nvram").set_custom_handler(FUNC(rc759_state::nvram_init));
+	// shared 80186/8259/8255-slave/82730/rtc/nvm/sound/keyboard core
+	add_common_devices(config);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(rc759_state::ppi_porta_r));
 	m_ppi->in_pb_callback().set(FUNC(rc759_state::ppi_portb_r));
 	m_ppi->out_pc_callback().set(FUNC(rc759_state::ppi_portc_w));
-
-	MM58167(config, "rtc", 32.768_kHz_XTAL).irq().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(rc759_state::centronics_busy_w));
@@ -611,24 +432,6 @@ void rc759_state::rc759(machine_config &config)
 	m_centronics->fault_handler().set(FUNC(rc759_state::centronics_fault_w));
 	m_centronics->perror_handler().set(FUNC(rc759_state::centronics_perror_w));
 	m_centronics->select_handler().set(FUNC(rc759_state::centronics_select_w));
-
-	// video
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(1'250'000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
-	screen.set_screen_update("txt", FUNC(i82730_device::screen_update));
-	screen.screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::tmrin0_w)); // TMRIN0 source not documented, but self-test needs something like this
-
-	I82730(config, m_txt, 1'250'000, m_maincpu);
-	m_txt->set_screen("screen");
-	m_txt->set_update_row_callback(FUNC(rc759_state::txt_update_row));
-	m_txt->sint().set(m_pic, FUNC(pic8259_device::ir4_w));
-
-	PALETTE(config, m_palette).set_entries(64);
-
-	// sound
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76489A(config, m_snd, 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	CASSETTE(config, m_cas);
 	m_cas->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
@@ -648,10 +451,6 @@ void rc759_state::rc759(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, "fdc:0", rc759_floppies, "hd", rc759_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc759_floppies, "hd", rc759_state::floppy_formats);
-
-	// keyboard
-	RC759_KBD_HLE(config, m_kbd);
-	m_kbd->int_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 }
 
 
@@ -680,4 +479,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1984, rc759, 0,      0,      rc759,   rc759, rc759_state, empty_init, "Regnecentralen", "RC759 Piccoline", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, rc759, 0,      0,      rc759,   rc759, rc759_state, empty_init, "Regnecentralen", "RC759 Piccoline", MACHINE_SUPPORTS_SAVE )

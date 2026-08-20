@@ -85,14 +85,39 @@ ls -l $OUTPUT_DIR
 Now build MAME using something like (-j10 requires a modern machine):
 
 ```sh
-make SUBTARGET=regnecentralen DEBUG=1 SOURCES=src/mame/regnecentralen/rc759.cpp TOOLS=1 SYMLEVEL=3  SYMBOLS=1  OSD=sdl -j 10
+make SUBTARGET=regnecentralen DEBUG=1 SOURCES="src/mame/regnecentralen/rc759.cpp,src/mame/regnecentralen/rc750.cpp" TOOLS=1 SYMLEVEL=3  SYMBOLS=1  OSD=sdl -j 10
 ```
+
+(add `REGENIE=1` the first time after adding/removing a source file in this
+folder, so the generated project picks up the new files).
 
 and run it similar to:
 
 ```sh
 ./regnecentralend rc759 -window
 ```
+
+## RC750 Partner
+
+The RC750 Partner is the sibling of the RC759 Piccoline. Both are driven
+from the shared base class `rc75x_state` (`rc75x.h` / `rc75x.cpp`): the
+common Intel 80186 + 8259A + 8255 + 82730 + MM58167 + NVM + SN76489A +
+keyboard core lives in the base, and each model's `.cpp` adds only its own
+floppy/serial/expansion side. `rc750.cpp` is NOT a subclass of `rc759.cpp`
+- both derive independently from `rc75x_state`.
+
+Partner-specific hardware (from the PARTNER Programmer's Guide v3, jun 1986,
+saved in `rc700-gensmedet/docs/`): WD1797 FDC (modelled as `FD1797`), an
+Intel 8274 dual serial controller, a SCSI host adapter and an optional 8087,
+instead of the Piccoline's cassette / iSBX slot. It runs Concurrent DOS.
+
+The driver is marked `MACHINE_NOT_WORKING`: no Partner boot ROM dump is
+available yet (none on hampa.ch/pce or rc700.dk), and Appendix B of the
+guide - the I/O port map - is an OCR-blank scanned figure, so the
+Partner-specific WD1797/8274/SCSI port addresses in the driver are
+provisional placeholders. The shared core is verified against the working
+RC759. Once a ROM dump and the real port map surface, drop `rc750.rom`
+into `roms/rc750/` and revisit `rc750_io()`.
 
 ## References:
 

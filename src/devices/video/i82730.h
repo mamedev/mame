@@ -18,14 +18,14 @@
 //**************************************************************************
 
 #define I82730_UPDATE_ROW(name) \
-	   void name(bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)
+	   void name(bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count, int cursor)
 
 // ======================> i82730_device
 
 class i82730_device : public device_t, public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)> update_row_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count, int cursor)> update_row_delegate;
 
 	// construction/destruction
 	template <typename T>
@@ -75,6 +75,7 @@ private:
 
 	void update_interrupts();
 	void mode_set();
+	bool cursor_visible();
 	void execute_command();
 
 	bool dscmd_endrow();
@@ -198,6 +199,7 @@ private:
 	uint8_t m_dma_count;
 	uint8_t m_row_count; // maximum 200
 	int m_row_index; // 0 or 1
+	int m_current_row; // character row currently being drawn (for cursor compositing)
 
 	struct cursor
 	{

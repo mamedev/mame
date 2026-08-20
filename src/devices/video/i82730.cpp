@@ -60,7 +60,8 @@ i82730_device::i82730_device(const machine_config &mconfig, const char *tag, dev
 	m_row(nullptr),
 	m_dma_count(0),
 	m_row_count(0),
-	m_row_index(0)
+	m_row_index(0),
+	m_current_row(0)
 {
 }
 
@@ -153,6 +154,17 @@ void i82730_device::update_interrupts()
 
 	if (code)
 		m_sint_handler(1);
+}
+
+bool i82730_device::cursor_visible()
+{
+	// CR1_BE enables blinking of cursor 1; CURSOR_BLINK sets the blink rate in
+	// frames. When blinking is disabled (or the rate is 0) the cursor is shown
+	// steady. The 50%-duty phase below keeps it comfortably visible.
+	if (!m_mb.cr1_be || m_mb.cursor_blink == 0)
+		return true;
+
+	return ((screen().frame_number() / m_mb.cursor_blink) & 1) == 0;
 }
 
 void i82730_device::mode_set()
@@ -256,8 +268,15 @@ void i82730_device::mode_set()
 	m_mb.underline2 = (tmp >> 4) & 0x0f;
 	m_mb.underline1 = tmp & 0x0f;
 
-	// setup screen mode
-	rectangle visarea(m_mb.hbrdstrt * 16, m_mb.hbrdstp * 16 - 1, m_mb.vsyncstp, m_mb.vfldstp + m_mb.scroll_margin + 1 + m_mb.lpr - 1);
+	// setup screen mode. The row renderer writes content into m_bitmap at
+	// row (scanline - vsyncstp) and screen_update copies it with desty 0, so
+	// the visible rectangle must be expressed in that same content coordinate
+	// space (subtract vsyncstp). min_y is the field top (vfldstrt - vsyncstp)
+	// so the text hugs the top edge, symmetric with the horizontal field which
+	// hugs the left edge (hbrdstrt == hfldstrt here) -- previously min_y was
+	// left in raw scanline space (vsyncstp), leaving a spurious top gap of
+	// (vfldstrt - vsyncstp) px between the window edge and the first char row.
+	rectangle visarea(m_mb.hbrdstrt * 16, m_mb.hbrdstp * 16 - 1, m_mb.vfldstrt - m_mb.vsyncstp, m_mb.vfldstp + m_mb.scroll_margin + 1 + m_mb.lpr - 1 - m_mb.vsyncstp);
 	attotime period = attotime::from_ticks(m_mb.line_length * 16 * m_mb.frame_length, clock() * 16);
 	screen().configure(m_mb.line_length * 16, m_mb.frame_length, visarea, period);
 
@@ -552,10 +571,14 @@ bool i82730_device::dscmd_repeat(uint8_t param)
 
 	while (param--)
 	{
-		if (--m_dma_count && m_row_count < 200)
-			m_row[m_row_count++] = data;
-		else
+		// Same accounting as the data-word path in load_row: stop once the DMA
+		// count is spent (or the row buffer is full), storing exactly
+		// m_dma_count characters -- do not pre-decrement past the last slot.
+		if (m_dma_count == 0 || m_row_count >= 200)
 			return true;
+
+		m_row[m_row_count++] = data;
+		m_dma_count--;
 	}
 
 	return false;
@@ -652,6 +675,32 @@ void i82730_device::load_row()
 
 	while (!finished)
 	{
+		// MAX DMA COUNT is the exact number of character words to DMA into this
+		// row. Terminate BEFORE reading another word once the count is spent --
+		// do not consume an extra "terminator" word from the stream. This
+		// matters in both list layouts:
+		//   - auto_line_feed = 0 (menu): each row is a separate string of
+		//     exactly 80 words with no EOL command (reason=dma-exhaust). We must
+		//     store all 80 (the 80th = screen column 79, the right menu border)
+		//     and then load the next string pointer from the list.
+		//   - auto_line_feed = 1 (boot console): the string is CONTINUOUS across
+		//     rows, so over-reading even one word per row (an earlier
+		//     post-decrement fix did) skips a character and shifts every
+		//     following row left, splitting words like "READING" across two
+		//     lines. Consuming exactly m_dma_count words keeps the stream
+		//     aligned.
+		if (m_dma_count == 0)
+		{
+			if (!m_auto_line_feed)
+			{
+				m_sptr = (read_word(m_lptr + 2) << 16) | read_word(m_lptr);
+				m_lptr += 4;
+			}
+
+			finished = true;
+			break;
+		}
+
 		uint16_t data = read_word(m_sptr);
 		m_sptr += 2;
 
@@ -661,29 +710,17 @@ void i82730_device::load_row()
 		}
 		else
 		{
-			// fetch data
-			if (--m_dma_count > 0)
+			// store one character and account for it against the DMA count
+			if (m_row_count < 200)
 			{
-				if (m_row_count < 200)
-				{
-					m_row[m_row_count++] = data;
-				}
-				else
-				{
-					// buffer overrun
-					m_status |= DBOR;
-					update_interrupts();
-					finished = true;
-				}
+				m_row[m_row_count++] = data;
+				m_dma_count--;
 			}
 			else
 			{
-				if (!m_auto_line_feed)
-				{
-					m_sptr = (read_word(m_lptr + 2) << 16) | read_word(m_lptr);
-					m_lptr += 4;
-				}
-
+				// buffer overrun
+				m_status |= DBOR;
+				update_interrupts();
 				finished = true;
 			}
 		}
@@ -713,6 +750,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 
 		// fetch initial row
 		m_row_index = 0;
+		m_current_row = 0;
 		m_row = &m_row_buffer[m_row_index][0];
 		load_row();
 	}
@@ -724,8 +762,18 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 	{
 		uint8_t lc = (y - m_mb.vfldstrt) % (m_mb.lpr + 1);
 
+		// Composite the hardware cursor. It shows on the character row it was
+		// positioned on by LD CUR POS (m_cursor[0].y), on the intra-row scan
+		// lines cur1strt..cur1stp, subject to its blink phase. Passing the
+		// column to the driver (or -1 for "no cursor here") lets the driver
+		// reverse-video that cell -- the device owns cursor position/blink,
+		// the driver owns pixel geometry.
+		int cursor_x = -1;
+		if (m_current_row == m_cursor[0].y && lc >= m_mb.cur1strt && lc <= m_mb.cur1stp && cursor_visible())
+			cursor_x = m_cursor[0].x;
+
 		// call driver
-		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count);
+		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count, cursor_x);
 
 		// swap buffers at end of row
 		if (lc == m_mb.lpr)
@@ -738,6 +786,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 				m_sptr = (read_word(m_cbp + 36) << 16) | read_word(m_cbp + 34);
 
 			load_row();
+			m_current_row++;
 		}
 	}
 	else if (y >= m_mb.vfldstp && y < m_mb.vfldstp + m_mb.scroll_margin + 1)
@@ -748,8 +797,8 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 	{
 		uint8_t lc = (y - (m_mb.vfldstp + m_mb.scroll_margin + 1)) % (m_mb.lpr + 1);
 
-		// call driver
-		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count);
+		// call driver (no cursor on the status row)
+		m_update_row_cb(m_bitmap, m_row, lc, y - m_mb.vsyncstp, m_row_count, -1);
 	}
 	else if (y == m_mb.vfldstp + m_mb.scroll_margin + 1 + m_mb.lpr + 1)
 	{
