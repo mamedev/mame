@@ -2027,11 +2027,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Choro Q Park (Japan)... -->
 	<software name="choroqpk" supported="no">
 		<description>Choro Q Park (Japan)</description>
 		<year>1998</year>
 		<publisher>Takara</publisher>
+		<notes><![CDATA[
+Some transitional screens have color or GFX issues, [CD-Block] or [SCU]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-10314G"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="チョロＱパーク"/>
@@ -3176,7 +3179,6 @@ Dragon Slayer/Ys 1: [SCSP] sound has several hiccups
 		<year>1998</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Doesn't recognize start button on title screen, [CD-Block] related (fixed)
 Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV [CD-Block]
 Asteka II: requires [VDP1] sprite delay (cfr. main map scrolling)
 Not extensively tested
@@ -4581,11 +4583,14 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		</part>
 	</software>
 
-	<!-- Identifying Kyuutenkai (Japan)... -->
 	<software name="kyutnkai" supported="no">
 		<description>Kyuutenkai (Japan)</description>
 		<year>1995</year>
 		<publisher>Technosoft</publisher>
+		<notes><![CDATA[
+[SCUDSP] polygon glitch on Tecno Soft logo transition
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1801G"/>
 		<info name="release" value="19950825"/>
 		<info name="alt_title" value="球転界 / Fantastic Pinball 球転界 ~ Fantastic Pinball Kyuutenkai (Box)"/>
@@ -6462,12 +6467,16 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Doesn't draw the Sega Ages logo at boot [VDP2?] -->
-	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
 	<software name="columns" supported="no">
 		<description>Sega Ages: Columns Arcade Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Doesn't draw the Sega Ages logo at boot [VDP2?]
+Sets [CD-Block] HIRM with DCHG, wants the A-Bus irq if user hits the tray open
+Stack Columns: playback the wrong redbook track in gameplay [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9161"/>
 		<info name="release" value="19971030"/>
 		<info name="alt_title" value="コラムス アーケードコレクション"/>
@@ -15086,11 +15095,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Crimewave (T-7018G)... -->
 	<software name="crimewavj" cloneof="crimewav" supported="no">
 		<description>CrimeWave (Japan)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Hangs after intro FMV [CD-Block]
+]]></notes>
 		<info name="serial" value="T-7018G"/>
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="クライムウェーブ"/>
