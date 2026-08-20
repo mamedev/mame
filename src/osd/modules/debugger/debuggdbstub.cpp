@@ -850,6 +850,21 @@ void debug_gdbstub::exit()
 void debug_gdbstub::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
+
+	// the fatal error is deferred to a reset notifier: throwing from
+	// here or from an instruction hook crashes on exit
+	std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
+	std::error_condition const filerr = m_socket.open(socket_name);
+	if ( filerr )
+	{
+		osd_printf_error("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+		machine.add_notifier(MACHINE_NOTIFY_RESET,
+			machine_notify_delegate([this]() {
+				fatalerror("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+			}));
+		return;
+	}
+	osd_printf_info("gdbstub: listening on address %s port %d\n", m_debugger_host, m_debugger_port);
 }
 
 //-------------------------------------------------------------------------
@@ -997,12 +1012,6 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
 #endif
 
-		std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
-		std::error_condition const filerr = m_socket.open(socket_name);
-		if ( filerr )
-			fatalerror("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
-		osd_printf_info("gdbstub: listening on address %s port %d\n", m_debugger_host, m_debugger_port);
-
 		m_initialized = true;
 	}
 	else
@@ -1042,6 +1051,9 @@ void debug_gdbstub::debugger_update()
 			break;
 		handle_character((char) ch);
 	}
+
+	if ( m_dettached && m_socket.is_open() )
+		m_socket.close();
 }
 
 //-------------------------------------------------------------------------
