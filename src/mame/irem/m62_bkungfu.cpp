@@ -18,6 +18,11 @@ NOTES ON MCU DATA ROM FORMAT
 
 command 0x01 at offset 0x00 uses the table at 0x200
 
+The Z80 parameter is the direct table index and advances modulo eight in the
+order 1,2,3,4,5,6,7,0.  Consequently slot 0 below is gameplay stage 8, slots
+1-7 are gameplay stages 1-7, and redraw slots 8-15 have the same ordering.
+Older notes below use "Stage 1-8" as shorthand for table slots 0-7.
+
 Table for levels, initial state
 0200  4D 18 | 184d
 0202  DD 17 | 17dd
@@ -150,6 +155,9 @@ private:
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram);
 	void bkungfu_blitter_draw_text();
 	void bkungfu_blitter_clear_tilemap();
+	uint8_t bkungfu_blitter_decode_payload(uint16_t address) const;
+	uint16_t bkungfu_blitter_decode_payload_word(uint16_t address) const;
+	void bkungfu_blitter_draw_object(uint8_t id);
 	void bkungfu_blitter_set_number(int x, int y, uint8_t num);
 	void bkungfu_blitter_set_player_energy(int x, int y, uint8_t num, bool is_boss);
 	void bkungfu_blitter_set_floor_state(int which, int state);
@@ -182,6 +190,7 @@ private:
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
 	required_region_ptr<uint8_t> m_blitterdatarom;
+	std::unique_ptr<uint8_t []> m_blitterdecrypted;
 };
 
 
@@ -197,7 +206,11 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 
 	tileinfo.set(0, code | ((color & 0xe0) << 3) | (m_kidniki_background_bank << 11), color & 0x1f, 0);
 
-	if ((tile_index / 256) < 6 || ((color & 0x1f) >> 1) > 0x0c)
+	// The title flame uses palette pair 0x0d and is visibly behind the player
+	// sprite in the reference footage.  Beyond Kung-Fu therefore has the M62
+	// tile-priority threshold strapped one step above Kung-Fu Master: only
+	// palette pairs 0x0e-0x0f (colors 0x1c-0x1f) cover sprites.
+	if ((tile_index / 256) < 6 || ((color & 0x1f) >> 1) > 0x0d)
 		tileinfo.category = 1;
 	else
 		tileinfo.category = 0;
@@ -318,6 +331,82 @@ void m62_bkungfu_state::bkungfu_blitter_clear_tilemap()
 	}
 }
 
+uint8_t m62_bkungfu_state::bkungfu_blitter_decode_payload(uint16_t address) const
+{
+	uint8_t const value = m_blitterdecrypted[address];
+	uint8_t const sum = uint8_t((address & 0xff) + (address >> 8));
+	if (sum & 1)
+		return uint8_t(0x60 - value);
+
+	uint8_t const base = (value & 0x20) ? 0xa0 : 0x60;
+	return uint8_t(base - value - ((value & 1) ? 0 : 2));
+}
+
+uint16_t m62_bkungfu_state::bkungfu_blitter_decode_payload_word(uint16_t address) const
+{
+	return bkungfu_blitter_decode_payload(address) | (bkungfu_blitter_decode_payload(address + 1) << 8);
+}
+
+void m62_bkungfu_state::bkungfu_blitter_draw_object(uint8_t id)
+{
+	// cmd 0x0f objects (0x80-0x90): decrypted table at 0x100 + 2*(id-0x80) points to a
+	// 5-byte record [width, pos_lo, pos_hi, ptr_lo, ptr_hi]; the data stream at ptr is
+	// '5f xx' attribute tokens + one byte per cell, terminated by 0x5e/0x60.
+	//
+	// Payload bytes have one more small address-dependent transform after the data-ROM
+	// decryption.  The exact same transform is used for tile and attribute bytes; the
+	// decoded attribute is already in M62 tile-RAM format.  This reproduces both title
+	// objects and both flame frames without object-specific masks, cursors or palettes.
+	if (id < 0x80 || id > 0x90)
+		return;
+
+	uint16_t const recaddr = m_blitterdecrypted[0x100 + 2 * (id - 0x80)] | (m_blitterdecrypted[0x100 + 2 * (id - 0x80) + 1] << 8);
+	if (recaddr == 0 || recaddr >= 0x8000 - 5)
+		return;
+
+	uint8_t const width = m_blitterdecrypted[recaddr];
+	uint16_t const pos = (m_blitterdecrypted[recaddr + 1] | (m_blitterdecrypted[recaddr + 2] << 8)) & 0xfff;
+	uint16_t dataptr = m_blitterdecrypted[recaddr + 3] | (m_blitterdecrypted[recaddr + 4] << 8);
+	if (width == 0 || width > 0x20 || dataptr >= 0x8000)
+		return;
+
+	// Collect decoded tile-RAM bytes.  Control bytes are part of the stream grammar
+	// and are not payload-decoded.
+	uint8_t attrs[512], tiles[512];
+	int count = 0;
+	uint8_t attr = 0;
+	while (dataptr < 0x8000 && count < 512)
+	{
+		uint16_t const address = dataptr;
+		uint8_t const b = m_blitterdecrypted[dataptr++];
+		if (b == 0x5f)
+		{
+			if (dataptr >= 0x8000)
+				break;
+			attr = bkungfu_blitter_decode_payload(dataptr);
+			dataptr++;
+			continue;
+		}
+		if (b == 0x5e || b == 0x60)
+			break;
+		tiles[count] = bkungfu_blitter_decode_payload(address);
+		attrs[count] = attr;
+		count++;
+	}
+
+	int const height = count / width;
+	for (int k = 0; k < count; k++)
+	{
+		int const col = k % width;
+		int const y = k / width;
+		uint16_t const cell = (pos + y * 0x80 + col * 2) & 0xfff;
+		bkungfu_blitter_tilemap_w(cell, tiles[k]);
+		bkungfu_blitter_tilemap_w(cell + 1, attrs[k]);
+	}
+
+	logerror("blitter: draw object %02x rec@%04x w=%d h=%d pos=%03x count=%d\n", id, recaddr, width, height, pos, count);
+}
+
 void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column_row(int column, int row, uint8_t tile, uint8_t attr)
 {
 	// rows below 6 are the HUD
@@ -339,19 +428,88 @@ void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column_row(int column, int r
 
 void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column(int column, int row)
 {
-	// this just writes column (4 tile block) numbers into the tilemap for the background for now.
-	int tile;
-	if (row & 1)
-		tile = column & 0x0f;
-	else
-		tile = (column >> 4) & 0x0f;
+	// The level table is consumed in pairs.  The even record decodes to 20 rows
+	// and supplies ten upper rows to each of two adjacent destination strips.
+	// The odd record decodes to 32 rows and supplies sixteen lower rows to each:
+	//
+	//   destination even = even[0..9]  + odd[0..15]
+	//   destination odd  = even[10..19] + odd[16..31]
+	//
+	// Thus each record pair expands to two 4-tile-wide by 26-row playfield
+	// strips.  The six HUD rows are not present in this level payload.
+	int const destcolumn = column;
+	bkungfu_blitter_draw_4_tile_column_row(destcolumn, row, 0x05, 0x19);
 
-	if (tile <= 0x9)
-		tile += 0x30;
-	else
-		tile += 0x37;
+	int const source_entry = (column & ~1) + ((row >= 10) ? 1 : 0);
+	int const source_row = (row < 10)
+		? row + ((column & 1) ? 10 : 0)
+		: row - 10 + ((column & 1) ? 16 : 0);
 
-	bkungfu_blitter_draw_4_tile_column_row(column, row, tile, m_leveldraw_number & 7);
+	// The Z80 advances its level value modulo eight, so gameplay order is
+	// 1,2,...,7,0 rather than 0,1,...,7.  The MCU uses that value directly as
+	// the master-table index.  Redraw values are the same indices plus eight.
+	// Consequently table slot 0 is gameplay stage 8, not stage 1.
+	uint16_t const table = 0x200 + ((m_leveldraw_number & 0x0f) << 1);
+	uint16_t const block = m_blitterdecrypted[table] | (m_blitterdecrypted[table + 1] << 8);
+	uint16_t const entry = block + source_entry * 2;
+	if (block < 0x153d || entry >= 0x8000 - 1)
+		return;
+
+	uint16_t const record = bkungfu_blitter_decode_payload_word(entry);
+	if (record < 0x1aed || record >= 0x8000 - 8)
+		return;
+
+	uint8_t tiles[4][64];
+	uint8_t attrs[4][64];
+	int count = -1;
+	for (int stream = 0; stream < 4; stream++)
+	{
+		uint16_t dataptr = bkungfu_blitter_decode_payload_word(record + stream * 2);
+		if (dataptr < 0x2349 || dataptr >= 0x8000)
+			return;
+
+		uint8_t attr = 0;
+		int streamcount = 0;
+		while (dataptr < 0x8000 && streamcount < 64)
+		{
+			uint8_t const value = bkungfu_blitter_decode_payload(dataptr++);
+			if (value == 0x00)
+				break;
+			if (value == 0x01)
+			{
+				if (dataptr >= 0x8000)
+					return;
+				attr = bkungfu_blitter_decode_payload(dataptr++);
+				continue;
+			}
+
+			tiles[stream][streamcount] = value;
+			attrs[stream][streamcount] = attr;
+			streamcount++;
+		}
+
+		if (count < 0)
+			count = streamcount;
+		else if (count != streamcount)
+			return;
+	}
+
+	int const expected_count = (source_entry & 1) ? 32 : 20;
+	if (count != expected_count)
+		return;
+
+	int const halfheight = count / 2;
+	int const band = source_row / halfheight;
+	int const bandrow = source_row % halfheight;
+	int const offset = ((row + 6) * 256 + destcolumn * 4) * 2;
+	for (int x = 0; x < 4; x++)
+	{
+		int const stream = band * 2 + x / 2;
+		int const index = bandrow * 2 + x % 2;
+		m_bkungfu_tileram[offset + x * 2] = tiles[stream][index];
+		m_bkungfu_tileram[offset + x * 2 + 1] = attrs[stream][index];
+		m_bg_tilemap->mark_tile_dirty((offset + x * 2) >> 1);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(m62_bkungfu_state::leveldraw_next)
@@ -372,7 +530,6 @@ TIMER_CALLBACK_MEMBER(m62_bkungfu_state::leveldraw_next)
 	}
 	else
 	{
-		// done
 		m_blittercmdram[0x00] = 0xfe;
 	}
 }
@@ -421,6 +578,39 @@ void m62_bkungfu_state::machine_start()
 	save_item(NAME(m_leveldraw_number));
 
 	m_leveldraw_timer = timer_alloc(FUNC(m62_bkungfu_state::leveldraw_next), this);
+
+	// decrypt the blitter data ROM (0x153d-0x7fff): key index s = (lo+hi)&0xff of the
+	// byte address; even s: plain = cipher ^ K[s], odd s: plain = (K[s] - cipher) & 0xff
+	static const uint8_t blitter_key[256] = {
+	0xae, 0xf3, 0x5c, 0x5d, 0xaa, 0xf7, 0x58, 0x59, 0xa6, 0xfb, 0x54, 0x55, 0xa2, 0xff, 0x50, 0x51,
+	0xbe, 0xe3, 0x4c, 0x4d, 0xba, 0xe7, 0x48, 0x49, 0xb6, 0xeb, 0x44, 0x45, 0xb2, 0xef, 0x40, 0x41,
+	0x8e, 0x13, 0x7c, 0x3d, 0x8a, 0x17, 0x78, 0x39, 0x86, 0x1b, 0x74, 0x35, 0x82, 0x1f, 0x70, 0x31,
+	0x9e, 0x03, 0x6c, 0x2d, 0x9a, 0x07, 0x68, 0x29, 0x96, 0x0b, 0x64, 0x25, 0x92, 0x0f, 0x60, 0x21,
+	0xee, 0x33, 0x1c, 0x1d, 0xea, 0x37, 0x18, 0x19, 0xe6, 0x3b, 0x14, 0x15, 0xe2, 0x3f, 0x10, 0x11,
+	0xfe, 0x23, 0x0c, 0x0d, 0xfa, 0x27, 0x08, 0x09, 0xf6, 0x2b, 0x04, 0x05, 0xf2, 0x2f, 0x00, 0x01,
+	0xce, 0x53, 0x3c, 0xfd, 0xca, 0x57, 0x38, 0xf9, 0xc6, 0x5b, 0x34, 0xf5, 0xc2, 0x5f, 0x30, 0xf1,
+	0xde, 0x43, 0x2c, 0xed, 0xda, 0x47, 0x28, 0xe9, 0xd6, 0x4b, 0x24, 0xe5, 0xd2, 0x4f, 0x20, 0xe1,
+	0x2e, 0x73, 0xdc, 0xdd, 0x2a, 0x77, 0xd8, 0xd9, 0x26, 0x7b, 0xd4, 0xd5, 0x22, 0x7f, 0xd0, 0xd1,
+	0x3e, 0x63, 0xcc, 0xcd, 0x3a, 0x67, 0xc8, 0xc9, 0x36, 0x6b, 0xc4, 0xc5, 0x32, 0x6f, 0xc0, 0xc1,
+	0x0e, 0x93, 0xfc, 0xbd, 0x0a, 0x97, 0xf8, 0xb9, 0x06, 0x9b, 0xf4, 0xb5, 0x02, 0x9f, 0xf0, 0xb1,
+	0x1e, 0x83, 0xec, 0xad, 0x1a, 0x87, 0xe8, 0xa9, 0x16, 0x8b, 0xe4, 0xa5, 0x12, 0x8f, 0xe0, 0xa1,
+	0x6e, 0xb3, 0x9c, 0x9d, 0x6a, 0xb7, 0x98, 0x99, 0x66, 0xbb, 0x94, 0x95, 0x62, 0xbf, 0x90, 0x91,
+	0x7e, 0xa3, 0x8c, 0x8d, 0x7a, 0xa7, 0x88, 0x89, 0x76, 0xab, 0x84, 0x85, 0x72, 0xaf, 0x80, 0x81,
+	0x4e, 0xd3, 0xbc, 0x7d, 0x4a, 0xd7, 0xb8, 0x79, 0x46, 0xdb, 0xb4, 0x75, 0x42, 0xdf, 0xb0, 0x71,
+	0x5e, 0xc3, 0xac, 0x6d, 0x5a, 0xc7, 0xa8, 0x69, 0x56, 0xcb, 0xa4, 0x65, 0x52, 0xcf, 0xa0, 0x61,
+	};
+	m_blitterdecrypted = std::make_unique<uint8_t []>(0x8000);
+	for (int a = 0; a < 0x8000; a++)
+	{
+		uint8_t const c = m_blitterdatarom[a];
+		if (a < 0x153d)
+			m_blitterdecrypted[a] = c;
+		else
+		{
+			uint8_t const s = ((a & 0xff) + (a >> 8)) & 0xff;
+			m_blitterdecrypted[a] = (s & 1) ? uint8_t(blitter_key[s] - c) : uint8_t(c ^ blitter_key[s]);
+		}
+	}
 }
 
 void m62_bkungfu_state::machine_reset()
@@ -736,6 +926,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// definitions are either coming from internal MCU ROM or the encrypted area
 
 			logerror("%s: Command %02x: blitter: draw title animation element (flames / level animations) %02x %02x\n", machine().describe_context(), data, m_blittercmdram[0x001], m_blittercmdram[0x002]);
+			bkungfu_blitter_draw_object(m_blittercmdram[0x001]);
 			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0xfe)
