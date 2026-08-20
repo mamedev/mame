@@ -966,6 +966,21 @@ static INPUT_PORTS_START( doyousud )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mgarage )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Left")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Enter")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Back")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Accelerate")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Right")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
 ioport_value spg2xx_game_fordrace_state::wheel_r()
 {
 	return ioport("WHEEL_REAL")->read() >> 1;
@@ -3130,6 +3145,16 @@ ROM_START( dinothun )
 	ROM_LOAD16_WORD_SWAP( "dinothunder.bin", 0x000000, 0x400000, CRC(03e82604) SHA1(c39d72aa8a0750ee38ab01b317e77a46e1d6004e) )
 ROM_END
 
+ROM_START( nvpoker )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "poker.bin", 0x000000, 0x400000, CRC(0efbe6a7) SHA1(f266fac7a35535d37557604c782091222830d3d7) )
+ROM_END
+
+ROM_START( mgarage )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "monstergarage.bin", 0x000000, 0x400000, CRC(3a69ca21) SHA1(fc04d40d895db4a66cbb2c573d08041278cd2e2e) )
+ROM_END
+
 ROM_START( pdcj )
 	ROM_REGION( 0xc00000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "chip1.u2", 0x000000, 0x800000, CRC(ba4f2279) SHA1(cd6bc20f21e096251ca43b539c46cb51c790769c) )
@@ -3379,6 +3404,10 @@ CONS( 2007, smartcyc,   0,        0, smartcycle, smartcyc,   spg2xx_game_smartcy
 CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,     spg2xx_game_state,               empty_init,    "N-Vision", "Spider-Man 2 Web Action", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2004, dinothun,   0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "N-Vision / Toy Quest", "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
+
+CONS( 2004, nvpoker,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               init_crc,      "N-Vision / Toy Quest", "Texas Hold'em Poker: World Poker Challenge - Las Vegas Edition", MACHINE_NOT_WORKING )
+
+CONS( 2004, mgarage,    0,        0, spg2xx,     mgarage,    spg2xx_game_state,               empty_init,    "N-Vision / Toy Quest", "Monster Garage", MACHINE_SUPPORTS_SAVE )
 
 // this Japan version uses different banking to spg2xx_pdc.cpp so is in here instead
 CONS( 2006, pdcj,       0,        0, pdcj,       pdcj,       spg2xx_game_pdcj_state,          empty_init,    "Conny / Takara", "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )
