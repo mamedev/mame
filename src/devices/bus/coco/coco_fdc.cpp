@@ -79,7 +79,6 @@
 
 #include "imagedev/floppy.h"
 #include "machine/input_merger.h"
-#include "machine/msm6242.h"
 #include "machine/wd_fdc.h"
 
 #include "formats/dmk_dsk.h"

@@ -35004,10 +35004,13 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="accelebr">
+	<software name="accelebr" supported="no">
 		<description>Accele Brid (Japan)</description>
 		<year>1993</year>
 		<publisher>Tomy</publisher>
+		<notes><![CDATA[
+Hangs after few seconds of gameplay, [open bus]
+]]></notes>
 		<info name="serial" value="SHVC-AY" />
 		<info name="release" value="19931126" />
 		<info name="alt_title" value="アクセルブリッド" />

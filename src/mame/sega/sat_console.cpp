@@ -10,6 +10,8 @@ Notes:
 - "Multiplayer" is the name of the BIOS menu (the one where you can playback an Audio CD,
   boot a game loaded in CD tray or access Memory Manager)
 - Hold A at startup to skip auto booting a game (i.e. go in Multiplayer)
+- A+B+C+Start is the canonical way to reset a SW user side (where multigames will reset selected
+  game first, then go back to game select by pressing it a second time around)
 
 TODO:
 - https://github.com/mamedev/mame/issues/15773

@@ -1,8 +1,8 @@
 package = "lsqlite3complete"
-version = "0.9.5-1"
+version = "0.9.7-1"
 source = {
-    url = "http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y",
-    file = "lsqlite3_fsl09y.zip"
+    url = "https://lua.sqlite.org/home/zip/lsqlite3_v097.zip?uuid=v0.9.7",
+    file = "lsqlite3_v097.zip",
 }
 description = {
     summary = "A binding for Lua to the SQLite3 database library",
@@ -14,27 +14,27 @@ description = {
         or SQL statement objects.
     ]],
     license = "MIT",
-    homepage = "http://lua.sqlite.org/"
+    homepage = "https://lua.sqlite.org/",
 }
 dependencies = {
-    "lua >= 5.1, < 5.5"
+    "lua >= 5.1, < 5.6",
 }
 build = {
     type = "builtin",
     modules = {
         lsqlite3complete = {
             sources = { "lsqlite3.c", "sqlite3.c" },
-            defines = {'LSQLITE_VERSION="0.9.5"', 'luaopen_lsqlite3=luaopen_lsqlite3complete'}
+            defines = {'LSQLITE_VERSION="0.9.7"', 'luaopen_lsqlite3=luaopen_lsqlite3complete'},
         },
     },
     platforms = {
         unix = {
             modules = {
                 lsqlite3complete = {
-                    libraries = { "pthread", "m", "dl" }
-                }
-            }
-        }
+                    libraries = { "pthread", "m", "dl" },
+                },
+            },
+        },
     },
     copy_directories = { 'doc', 'examples' }
 }

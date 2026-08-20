@@ -172,8 +172,8 @@ Copyright (c) 1994-2025 Lua.org, PUC-Rio
 LuaFileSystem - File System Library for Lua
 Copyright (c) 2003-2015 Kepler Project
 
-LuaSQLite 3 - a Lua 5.1 to 5.3 wrapper for the SQLite3 library
-Copyright (c) 2002-2016 Tiago Dionizio, Doug Currie
+lsqlite3 - an SQLite 3 database binding for Lua 5
+Copyright (C) 2002-2016 Tiago Dionizio, Doug Currie
 
 lua-linenoise
 Copyright (c) 2011-2015 Rob Hoelz <rob@hoelz.ro>

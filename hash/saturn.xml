@@ -1552,6 +1552,9 @@ Not extensively tested
 		<description>Asuka 120% Limited: Burning Fest. Limited (Japan)</description>
 		<year>1997</year>
 		<publisher>ASK Kodansha</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-16708G"/>
 		<info name="release" value="19971009"/>
 		<info name="alt_title" value="あすか120%リミテッド"/>
@@ -1564,18 +1567,26 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Ayakashi Ninden Kunoichiban Plus (Japan) (Disc 1)... -->
 	<software name="ankplsa" cloneof="ankpls" supported="no">
 		<description>Ayakashi Ninden Kunoichiban Plus (Japan, alt disc 1)</description>
 		<year>1998</year>
 		<publisher>Shoeisha</publisher>
+		<notes><![CDATA[
+Doesn't playback voices properly, [SCSP] or [CD-Block]
+Disc 2 is missing from this set (there's no single CD version on Saturn)
+]]></notes>
 		<info name="serial" value="T-21512G"/>
 		<info name="release" value="19980409"/>
 		<info name="alt_title" value="あやかし忍伝くの一番 プラス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ayakashi ninden kunoichiban plus (japan) (disc 1)" sha1="c92971b46172b7d04b9d2a1f6d17d8af8b52a732" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ayakashi ninden kunoichiban plus (japan) (disc 2)" status="nodump" />
 			</diskarea>
 		</part>
 	</software>
@@ -1592,7 +1603,7 @@ Not extensively tested
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="アゼル ―パンツァードラグーンＲＰＧ―"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="azel - panzer dragoon rpg (japan) (disc 1) (1m)" sha1="69c2d528b6b78de3a37596979523003a2d9be359" />
 			</diskarea>
@@ -1614,11 +1625,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Baku Baku Animal - Sekai Shiiku Gakari Senshuken (Japan) (Rev A)... -->
 	<software name="bakubakuj" cloneof="bakubaku" supported="no">
 		<description>Baku Baku Animal - Sekai Shiiku Gakari Senshuken (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, it does boot if [SMPC] pad 2 is unconnected (verify)
+]]></notes>
 		<info name="serial" value="GS-9040"/>
 		<info name="release" value="19951110"/>
 		<info name="alt_title" value="ばくばくアニマル 世界飼育係選手権"/>
@@ -1630,16 +1643,25 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Bakuretsu Hunter (Japan) (Disc 2) (Omake CD)... -->
 	<software name="bakhunta" cloneof="bakhunt" supported="no">
 		<description>Bakuretsu Hunter (Japan, alt Omake CD)</description>
 		<year>1996</year>
 		<publisher>I'Max</publisher>
+		<notes><![CDATA[
+Set is incomplete
+]]></notes>
 		<info name="serial" value="T-22402G"/>
 		<info name="release" value="19960426"/>
 		<info name="alt_title" value="爆れつハンター"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Game CD (Pink label)"/>
+			<diskarea name="cdrom">
+				<disk name="bakuretsu hunter (japan)" status="nodump" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Omake CD (Orange label)"/>
 			<diskarea name="cdrom">
 				<disk name="bakuretsu hunter (japan) (omake cd)" sha1="9a7c64a92b42aaf84d864166956afa18fdc95718" />
 			</diskarea>
@@ -1765,11 +1787,13 @@ Options menu is too large [VDP1], sports [VDP1] zooming error for the background
 		</part>
 	</software>
 
-	<!-- Black screen after selecting new game, [CD-Block] reads FAD=165482 then jumps to lalaland -->
 	<software name="blckmtxa" cloneof="blckmtx" supported="no">
 		<description>Black/Matrix (Japan, reprint)</description>
 		<year>1998</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Black screen after selecting new game, [CD-Block] reads FAD=165482 then jumps to lalaland (TODO: check file structure)
+]]></notes>
 		<info name="serial" value="T-20115G?"/>
 		<info name="release" value="19981106"/>
 		<info name="alt_title" value="ブラックマトリクス"/>
@@ -1850,11 +1874,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Burning Rangers (Japan)... -->
 	<software name="burningrj" cloneof="burningr" supported="no">
 		<description>Burning Rangers (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[VDP2] too dim in gameplay
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9174"/>
 		<info name="release" value="19980226"/>
 		<info name="alt_title" value="バーニングレンジャー"/>
@@ -2002,11 +2029,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Choro Q Park (Japan)... -->
 	<software name="choroqpk" supported="no">
 		<description>Choro Q Park (Japan)</description>
 		<year>1998</year>
 		<publisher>Takara</publisher>
+		<notes><![CDATA[
+Some transitional screens have color or GFX issues, [CD-Block] or [SCU]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-10314G"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="チョロＱパーク"/>
@@ -2028,7 +2058,7 @@ Not extensively tested
 		<info name="release" value="19970606"/>
 		<info name="alt_title" value="超時空要塞マクロス 愛・おぼえていますか"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 1)" sha1="a2e4df63369d370a24f4e5ef289c64182f951ff5" />
 			</diskarea>
@@ -2083,7 +2113,7 @@ Runs slow in gameplay
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="コマンド &amp; コンカー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="GDI Disc"/>
 			<diskarea name="cdrom">
 				<disk name="command &amp; conquer (japan) (disc 1) (gdi disc)" sha1="9b04a76bc0289063f0596e8d303b06218d2e7227" />
@@ -2192,7 +2222,7 @@ Not extensively tested
 		<info name="release" value="19950728"/>
 		<info name="alt_title" value="Dの食卓"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="d no shokutaku (japan) (disc 1)" sha1="5102191e0f2a2df11e903c7af5c4dfaa236566a0" />
 			</diskarea>
@@ -2230,7 +2260,7 @@ Not extensively tested
 		<info name="release" value="19970704"/>
 		<info name="alt_title" value="だいすき"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="daisuki (japan) (disc 1)" sha1="f854a884f03cdcf65535948a0a48275652768a49" />
 			</diskarea>
@@ -2242,11 +2272,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Several sprites in intro have wrong colors (cfr. first mech exiting the planet, lasers when Silver Hawk is introduced, Golden Ogre) [VDP1] -->
 	<software name="dariusgj" cloneof="dariusg" supported="no">
 		<description>Darius Gaiden (Japan, 3M)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+Several sprites in intro have wrong colors (cfr. first mech exiting the planet, lasers when Silver Hawk is introduced, Golden Ogre) [VDP1]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1102G"/>
 		<info name="release" value="19951215"/>
 		<info name="alt_title" value="ダライアス外伝"/>
@@ -2281,7 +2314,7 @@ Not extensively tested
 		<publisher>Climax</publisher>
 		<notes><![CDATA[
 CHD is missing index data from track 2
-Black screens after initial intro [CD-Block]?
+Black screens after new game initial intro [VDP1] CEF?
 Sound test is incredibly dark [VDP2]
 Some kanji drawings are dubious (verify)
 ]]></notes>
@@ -2399,11 +2432,13 @@ Hangs at now loading screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]?)
 		</part>
 	</software>
 
-	<!-- Identifying Daytona USA - Circuit Edition (Japan)... -->
 	<software name="daytoncej" cloneof="daytonce" supported="no">
 		<description>Daytona USA - Circuit Edition (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Currently hangs at [modem] not connected unskippable screen
+]]></notes>
 		<info name="serial" value="GS-9100"/>
 		<info name="release" value="19970124"/>
 		<info name="alt_title" value="デイトナUSA サーキット エディション"/>
@@ -2476,7 +2511,7 @@ Hangs at now loading screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]?)
 		<info name="release" value="19980716"/>
 		<info name="alt_title" value="ディープフィアー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="deep fear (japan) (disc 1)" sha1="cabfcc22a0e99c00f9a3321c482084e1fd8da61c" />
 			</diskarea>
@@ -2526,11 +2561,14 @@ https://segaretro.org/Delisoba_Deluxe
 		</part>
 	</software>
 
-	<!-- Identifying Densetsu no Ogre Battle (Japan)... -->
 	<software name="ogrebatl" supported="no">
 		<description>Densetsu no Ogre Battle (Japan)</description>
 		<year>1996</year>
 		<publisher>Riverhill Software</publisher>
+		<notes><![CDATA[
+Should use a [VDP2] color offset raster after character creation screen
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-5305G"/>
 		<info name="release" value="19961101"/>
 		<info name="alt_title" value="伝説のオウガバトル"/>
@@ -2601,7 +2639,7 @@ Not extensively tested
 		<info name="release" value="19971113"/>
 		<info name="alt_title" value="デビルサマナー ソウル ハッカーズ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="devil summoner - soul hackers (japan) (disc 1)" sha1="36beb7844c0a5de3e698e8f841e38e8b188093ea" />
 			</diskarea>
@@ -2786,7 +2824,7 @@ First boss initial GFX composition diverges compared to Arcade version [VDP1]
 		<info name="release" value="19970711"/>
 		<info name="alt_title" value="同級生2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doukyuusei 2 (japan) (disc 1)" sha1="4de8aec510a34f17a41df49eebed11bd5340f21d" />
 			</diskarea>
@@ -2898,13 +2936,16 @@ Serious [VDP2] Window clipping issues
 	</software>
 
 	<!-- The Dungeons and Dragons collection is a 2 disk set, but each disk is an independent game so I've left them separate -->
-	<!-- Glitchy sprites [VDP1] -->
-	<!-- No SFXs [CD-Block/SCSP] -->
-	<!-- Hangs often -->
+	<!-- TODO: bad idea, merge back -->
 	<software name="ddtod" supported="no">
 		<description>Dungeon's &amp; Dragons - Tower of Doom (Dungeons &amp; Dragons Collection Disc 1) (Japan)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Glitchy sprites [VDP1]
+No SFXs [CD-Block] or [SCSP]
+Hangs often (retest me)
+]]></notes>
 		<info name="serial" value="T-1224G"/>
 		<info name="release" value="19990304"/>
 		<info name="alt_title" value="ダンジョンズ&amp;ドラゴンズ コレクション"/>
@@ -2916,12 +2957,14 @@ Serious [VDP2] Window clipping issues
 		</part>
 	</software>
 
-	<!-- Identifying Dungeons &amp; Dragons Collection (Japan) (Disc 2) (Shadow over Mystara)... -->
-	<!-- Glitchy sprites [VDP1] -->
 	<software name="ddsom" supported="no">
 		<description>Dungeons &amp; Dragons - Shadow over Mystara (Dungeons &amp; Dragons Collection Disc 2) (Japan)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Glitchy sprites [VDP1]
+Hangs on river stage (retest me)
+]]></notes>
 		<info name="serial" value="T-1224G"/>
 		<info name="release" value="19990304"/>
 		<info name="alt_title" value="ダンジョンズ&amp;ドラゴンズ コレクション"/>
@@ -3072,7 +3115,7 @@ Serious [VDP2] Window clipping issues
 		<info name="release" value="19970124"/>
 		<info name="alt_title" value="イヴ・バーストエラー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="eve - burst error (japan) (disc 1) (kojiroh disc)" sha1="f94e7cb6b0d93ada709fa26edae25ddbc3589c26" />
 			</diskarea>
@@ -3106,7 +3149,7 @@ Serious [VDP2] Window clipping issues
 		<info name="release" value="19980312"/>
 		<info name="alt_title" value="イヴ・ザ・ロストワン"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="eve - the lost one (japan) (disc 1) (kyoko disc) (1m)" sha1="43b93fc8d8844b6b9fb0676d73d8ca3f7adba727" />
 			</diskarea>
@@ -3151,7 +3194,6 @@ Dragon Slayer/Ys 1: [SCSP] sound has several hiccups
 		<year>1998</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Doesn't recognize start button on title screen, [CD-Block] related (fixed)
 Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV [CD-Block]
 Asteka II: requires [VDP1] sprite delay (cfr. main map scrolling)
 Not extensively tested
@@ -3453,7 +3495,7 @@ DEMO.B has [VDP1] issue with down-left cat box vertex
 		<info name="usage" value="Needs keyboard connected"/>
 		<sharedfeat name="ctrl1_default" value="keyboard"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="game basic for segasaturn (japan)" sha1="bda219fae902fbe1c5bc5c95226b038fc2733031" />
 			</diskarea>
@@ -3939,7 +3981,7 @@ Not extensively tested
 		<info name="release" value="19951020"/>
 		<info name="alt_title" value="サンダーストーム&amp;ロードブラスター"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Thunder Storm"/>
 			<diskarea name="cdrom">
 				<disk name="interactive movie action - thunder storm &amp; road blaster (japan) (disc 1) (thunder storm)" sha1="101e38b89cb8ebb0ce4de480994a1bd14521a1c6" />
@@ -4127,7 +4169,7 @@ May hang after skipping initial FMV (random)
 		<info name="release" value="19950922"/>
 		<info name="alt_title" value="J.B.ハロルド ブルー・シカゴ・ブルース"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="j.b. harold - blue chicago blues (japan) (disc 1)" sha1="08e32cd5a3d9f4e9f50c09b42b30926318fb4b89" />
 			</diskarea>
@@ -4165,7 +4207,7 @@ May hang after skipping initial FMV (random)
 		<info name="release" value="19960726"/>
 		<info name="alt_title" value="時空探偵DD 〜幻のローレライ〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jikuu tantei dd - maboroshi no lorelei (japan) (disc a)" sha1="957ed82ec13ffcd0523b19c7a12090fbbf1306f4" />
 			</diskarea>
@@ -4556,11 +4598,14 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		</part>
 	</software>
 
-	<!-- Identifying Kyuutenkai (Japan)... -->
 	<software name="kyutnkai" supported="no">
 		<description>Kyuutenkai (Japan)</description>
 		<year>1995</year>
 		<publisher>Technosoft</publisher>
+		<notes><![CDATA[
+[SCUDSP] polygon glitch on Tecno Soft logo transition
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1801G"/>
 		<info name="release" value="19950825"/>
 		<info name="alt_title" value="球転界 / Fantastic Pinball 球転界 ~ Fantastic Pinball Kyuutenkai (Box)"/>
@@ -4588,11 +4633,13 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		</part>
 	</software>
 
-	<!-- Identifying Last Bronx (Japan) (Disc 1) (Arcade Disc)... -->
 	<software name="lastbrnxj" cloneof="lastbrnx" supported="no">
 		<description>Last Bronx (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, [CD-Block] crashes at startup (regression)
+]]></notes>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ラストブロンクス"/>
@@ -4646,7 +4693,7 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		<info name="release" value="19960524"/>
 		<info name="alt_title" value="ライフスケイプ 生命40億年はるかな旅"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lifescape - seimei 40 okunen haruka na tabi (japan) (disc 1) (aquasphere) (4m)" sha1="2d9f533944b3398c2c504cdf2094c8eaa5032669" />
 			</diskarea>
@@ -4716,7 +4763,7 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		<info name="release" value="19980723"/>
 		<info name="alt_title" value="ルナ2 エターナルブルー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar 2 - eternal blue (japan) (disc 1)" sha1="b52ed5962a0e7a81dde5b3bebdb9cc9714d3325c" />
 			</diskarea>
@@ -4920,7 +4967,7 @@ Colors are blackened on intro FMV (can be skipped with start button), [VDP2] or 
 		<info name="release" value="19960719"/>
 		<info name="alt_title" value="麻雀狂時代 セブアイランド'96"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mahjong-kyou jidai cebu island '96 (japan) (disc 1)" sha1="b8470eafd5ff44e66fa1fb89efa555e264779bca" />
 			</diskarea>
@@ -5125,7 +5172,7 @@ Can randomly fail with A+B+C+Start resets
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ムーンクレイドル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="moon cradle (japan) (disc 1)" sha1="4d7e7bd5e62f7433450df26373e7430bfc9fb9b3" />
 			</diskarea>
@@ -5203,7 +5250,7 @@ TODO: checkout why this set has 1 disc only
 		<info name="release" value="19960405"/>
 		<info name="alt_title" value="七つの秘館"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="nanatsu no hikan (japan) (disc 1) (2m)" sha1="fcb6be94306c5a4b20d266c8d18bd66839ec4f3d" />
 			</diskarea>
@@ -5230,7 +5277,7 @@ TODO: checkout why this set has 1 disc only
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="新世紀エヴァンゲリオン 鋼鉄のガールフレンド ~ Shinseiki Evangelion - Koutetsu no Girlfriend"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="neon genesis - evangelion - koutetsu no girlfriend (japan) (disc 1)" sha1="f2ea089059bc0d799788da680bfc5a835ef16575" />
 			</diskarea>
@@ -5600,7 +5647,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		<info name="release" value="19960913"/>
 		<info name="alt_title" value="ポリスノーツ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="policenauts (japan) (disc 1)" sha1="8a32204bf034279d5888575fe51b38135c33c5fc" />
 			</diskarea>
@@ -5928,7 +5975,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		<info name="serial" value="GS-9011"/>
 		<info name="release" value="19950224"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rampo (japan) (disc 1)" sha1="815961036b1a24e8feff0fd634b980acdbfba7f8" />
 			</diskarea>
@@ -6002,7 +6049,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		<info name="release" value="19970718"/>
 		<info name="alt_title" value="リアルサウンド ～風のリグレット～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="real sound - kaze no regret (japan) (disc 1) (2m)" sha1="9324ec8bd0e4a0c8171938a8b6a33ce756dbbd3d" />
 			</diskarea>
@@ -6135,7 +6182,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		<info name="release" value="19971030"/>
 		<info name="alt_title" value="RONDE〜輪舞曲〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ronde (japan) (disc 1)" sha1="8e7516997aad239ace78419929b2d3e64f2239dd" />
 			</diskarea>
@@ -6175,7 +6222,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="サクラ大戦"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen (japan) (disc 1) (7m, 9m)" sha1="81274d1a206d7900d740a72f12e73507654ce9b0" />
 			</diskarea>
@@ -6239,7 +6286,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		<info name="release" value="19981223"/>
 		<info name="alt_title" value="サクラ大戦 帝撃グラフ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen - teigeki graph (japan) (disc 1)" sha1="0e6a6d0fdce7eed56d5920b4886268303dfa6438" />
 			</diskarea>
@@ -6269,7 +6316,7 @@ Runs too slow, enables [SCU] hblank-in irq
 		<info name="release" value="19980404"/>
 		<info name="alt_title" value="サクラ大戦2 〜君、死にたもうことなかれ〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen 2 - kimi, shini tamou kotonakare (japan) (disc 1) (3m, 4m)" sha1="5a1b17db44a08800857fb6389f068109b6fe5da5" />
 			</diskarea>
@@ -6437,12 +6484,16 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Doesn't draw the Sega Ages logo at boot [VDP2?] -->
-	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
 	<software name="columns" supported="no">
 		<description>Sega Ages: Columns Arcade Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Doesn't draw the Sega Ages logo at boot [VDP2?]
+Sets [CD-Block] HIRM with DCHG, wants the A-Bus irq if user hits the tray open
+Stack Columns: playback the wrong redbook track in gameplay [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9161"/>
 		<info name="release" value="19971030"/>
 		<info name="alt_title" value="コラムス アーケードコレクション"/>
@@ -6490,11 +6541,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages: I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)... -->
 	<software name="mickdnld" supported="no">
 		<description>Sega Ages: I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Both games: various examples of [VDP1] to [VDP2] priority bugs (intro in Castle of Illusion, sand in Quack Shot Mexico stage)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9179"/>
 		<info name="release" value="19981015"/>
 		<info name="alt_title" value="アイラブ ミッキーマウス ふしぎのお城 大冒険 / アイラブ ドナルドダック グルジア王の秘宝"/>
@@ -6640,11 +6694,13 @@ TODO: verify PS1/PS3/PS4
 		</part>
 	</software>
 
-	<!-- Identifying Sega Touring Car Championship (Japan)... -->
 	<software name="stccj" cloneof="stcc" supported="no">
 		<description>Sega Touring Car Championship (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[VDP1] no 3d in gameplay
+]]></notes>
 		<info name="serial" value="GS-9164"/>
 		<info name="release" value="19971127"/>
 		<info name="alt_title" value="セガ ツーリングカーチャンピオンシップ"/>
@@ -6683,7 +6739,7 @@ Missing elements during gameplay [VDP2] priorities?
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="戦国ブレード"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sengoku blade - sengoku ace episode ii (japan) (disc 1)" sha1="f5200b65ee5ce92b58c23cf863b60dba4387e3dd" />
 			</diskarea>
@@ -6707,7 +6763,7 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="仙窟活龍大戦 カオスシード"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="senkutsu katsuryu taisen - chaos seed (japan) (disc 1) (rev a) (10m)" sha1="a94a4852b2684c31a95bb8df1e7df334dc4abe81" />
 			</diskarea>
@@ -6729,7 +6785,7 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		<info name="release" value="19980122"/>
 		<info name="alt_title" value="センチメンタルグラフティ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sentimental graffiti (japan) (disc 1) (game disc) (1m)" sha1="f7af15f7263d55cf74928d1af81d531f00852a30" />
 			</diskarea>
@@ -6853,11 +6909,13 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		</part>
 	</software>
 
-	<!-- Identifying Shin Seiki Evangelion (Japan)... -->
 	<software name="shinev" supported="no">
 		<description>Shinseiki Evangelion (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen after initial tree logo [CD-Block]
+]]></notes>
 		<info name="serial" value="GS-9051"/>
 		<info name="release" value="19960301"/>
 		<info name="alt_title" value="新世紀エヴァンゲリオン"/>
@@ -7060,7 +7118,7 @@ Not extensively tested
 		<info name="release" value="19980226"/>
 		<info name="alt_title" value="白き魔女 ～もうひとつの英雄伝説～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shiroki majo - mou hitotsu no eiyuu densetsu (japan) (disc 1)" sha1="a87de2020bbdec16dda10892f274b78debc5496b" />
 			</diskarea>
@@ -7091,11 +7149,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Silhouette Mirage (Japan)... -->
 	<software name="silhouet" supported="no">
 		<description>Silhouette Mirage (Japan)</description>
 		<year>1997</year>
 		<publisher>ESP</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-32901G"/>
 		<info name="release" value="19970911"/>
 		<info name="alt_title" value="シルエットミラージュ"/>
@@ -7402,7 +7462,7 @@ Not extensively tested
 		<info name="release" value="19980122"/>
 		<info name="alt_title" value="サウンドノベル街"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sound novel machi (japan) (disc 1) (10.11-10.13 incl.)" sha1="b90603785a917eac4f1800e057f66364c97da66c" />
 			</diskarea>
@@ -7506,7 +7566,7 @@ Punts to Multiplayer at end of first new game FMV (fixed, curfad reject handling
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="ストリートファイターⅡムービー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="street fighter ii movie (japan) (disc 1)" sha1="acec60acea3f185f1f1a4b212e9c609307d22aa2" />
 			</diskarea>
@@ -7653,7 +7713,7 @@ Not extensively tested
 		<info name="release" value="19980226"/>
 		<info name="alt_title" value="スーチーパイ アドベンチャー ドキドキ♥ナイトメア"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="suchie-pai adventure - doki doki nightmare (japan) (disc 1)" sha1="adcc903cec1aa921d4eb72f2813df07931635288" />
 			</diskarea>
@@ -7676,7 +7736,7 @@ Not extensively tested
 		<info name="release" value="19980923"/>
 		<info name="alt_title" value="スーパーアドベンチャーロックマン"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super adventure rockman (japan) (disc 1)" sha1="802907a8dd2a9b7a021cab124b3e902f6a8727eb" />
 			</diskarea>
@@ -7872,7 +7932,7 @@ Black screen, known to issue a double 0x04 software reset in [CD-Block]
 		<info name="release" value="19970114"/>
 		<info name="alt_title" value="天外魔境 第四の黙示録"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tengai makyou - daishi no mokushiroku - the apocalypse iv (japan) (disc 1)" sha1="57533d62730597134ede620265b5cf0a2a268cd6" />
 			</diskarea>
@@ -7967,11 +8027,14 @@ Mednafen claims 68k should address error before stage 1 boss, can't repro
 		</part>
 	</software>
 
-	<!-- Identifying Tokimeki Memorial - Forever with You (Japan) (2M)... -->
 	<software name="tokimfwy" supported="no">
 		<description>Tokimeki Memorial - Forever with You (Japan, 2M)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[VDP1] intro photo polygons have some corrupted GFXs (timing?)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-9504G (VS009-J1)"/>
 		<info name="release" value="19960719"/>
 		<info name="alt_title" value="ときめきメモリアル ～forever with you～"/>
@@ -8169,7 +8232,7 @@ Mednafen claims 68k should address error before stage 1 boss, can't repro
 		<info name="release" value="19971218"/>
 		<info name="alt_title" value="ティンクルスタースプライツ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="twinkle star sprites (japan) (disc 1)" sha1="d449eeec829e7e3ff5f08779c2a4e5eee7e0f811" />
 			</diskarea>
@@ -8501,7 +8564,7 @@ Has severe [VDP1] glitches during intro and gameplay, [SCUDSP] related
 		<info name="release" value="19970822"/>
 		<info name="alt_title" value="ウイルス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virus (japan) (disc 1)" sha1="499d94352cae54d77845c9ec86c65ac821aec824" />
 			</diskarea>
@@ -8560,7 +8623,7 @@ Has severe [VDP1] glitches during intro and gameplay, [SCUDSP] related
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="湾岸デッドヒート+リアルアレンジ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wangan dead heat + real arrange (japan) (disc 1)" sha1="c16721e3f5f5d8b3c30645971a01cc2b7d8af649" />
 			</diskarea>
@@ -8702,11 +8765,13 @@ Black screen at boot, [CD-Block] never completes first FMV transfer after FAD=55
 		</part>
 	</software>
 
-	<!-- Identifying World Cup France '98 - Road to Win (Japan)... -->
 	<software name="wc98" supported="no">
 		<description>World Cup France '98 - Road to Win (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[CD-Block] or [SCU] shows bad intro logos, eventually crashes (regression)
+]]></notes>
 		<info name="serial" value="GS-9196"/>
 		<info name="release" value="19980611"/>
 		<info name="alt_title" value="ワールドカップ '98フランス ～Road to Win～"/>
@@ -9223,11 +9288,13 @@ Performance is dire in gameplay [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Chaos Control (JAP) (DW0504)... -->
 	<software name="chaosconj" cloneof="chaoscon" supported="no">
 		<description>Chaos Control (Japan)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-7002G"/>
 		<info name="release" value="19951229"/>
 		<info name="alt_title" value="カオスコントロール"/>
@@ -9249,7 +9316,7 @@ Performance is dire in gameplay [VDP2]
 		<info name="release" value="19970606"/>
 		<info name="alt_title" value="超時空要塞マクロス 愛・おぼえていますか"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="choujikuu yousai macross (disc 1 of 2) (jpn) (dw0183)" sha1="51795e43275c0c71d7bc2bcb3eb9da79b9e9d05b" />
 			</diskarea>
@@ -9470,7 +9537,7 @@ Not extensively tested
 		<info name="release" value="19980716"/>
 		<info name="alt_title" value="ディープフィアー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="deep fear (disc 1 of 2) (jpn) (dw0638)" sha1="25f090e7ad42ac3327b42698f523361d919bc3a5" />
 			</diskarea>
@@ -9524,7 +9591,7 @@ Not extensively tested
 		<info name="release" value="19970911"/>
 		<info name="alt_title" value="デザイア"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="desire (disc 1 of 2) (jpn) (dw0241)" sha1="5eb61102f8516c1ba3fd8bccbb30a87063502d5e" />
 			</diskarea>
@@ -9546,7 +9613,7 @@ Not extensively tested
 		<info name="release" value="19971113"/>
 		<info name="alt_title" value="デビルサマナー ソウル ハッカーズ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="devil summoner soul hackers (disc 1 of 2) (jpn) (dw0483)" sha1="233d4f7d30ce104cd5a7b428f78308b705d292da" />
 			</diskarea>
@@ -9693,7 +9760,7 @@ Not extensively tested
 		<info name="release" value="19970711"/>
 		<info name="alt_title" value="同級生2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doukyuusei 2 (disc 1 of 2) (jpn) (dw0307)" sha1="8b6fcf94f7dc5913cd2cc24ce16e2128a2d7d146" />
 			</diskarea>
@@ -9788,7 +9855,7 @@ Attract mode draws only skill names and attribute bars over a black BG, enables 
 		<info name="release" value="19970530"/>
 		<info name="alt_title" value="エーベルージュ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="eberouge (disc 1 of 2) (jpn) (dw0419)" sha1="0ce9a07afb50304f45b857d5a7adafc194c020cd" />
 			</diskarea>
@@ -9860,7 +9927,7 @@ Attract mode draws only skill names and attribute bars over a black BG, enables 
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="エネミー・ゼロ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="enemy zero (disc 0 of 4) (jpn) (dw0512)" sha1="6379fb365e308ebcbf3f25daa9f9126fc692ceb3" />
 			</diskarea>
@@ -10057,7 +10124,7 @@ Elimination Mode presentation screens shows HUD for 1 frame then layer gets eras
 		<info name="alt_title" value="フレンズ ～青春の輝き～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<sharedfeat name="requirement" value="sat_cart:ram32"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="friends - seishun no kagayaki (disc 1 of 2) (jpn) (dw0602)" sha1="7ade215fb7f07d4fb8adb6422fc91a67eb9a67e7" />
 			</diskarea>
@@ -10208,7 +10275,7 @@ Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loop
 		<info name="release" value="19970307"/>
 		<info name="alt_title" value="ゲームウェア4号"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="game-ware 4 (disc 1 of 2) (jpn) (dw0562)" sha1="86a822dfb2823dfe9ec4bf30179e20423afcf1ab" />
 			</diskarea>
@@ -10230,7 +10297,7 @@ Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loop
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ゲームウェア5号"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="game-ware 5 (disc 1 of 2) (jpn) (dw0583)" sha1="8a5ba45ac627cbd911da58b3fafecbef11ed1ef8" />
 			</diskarea>
@@ -10346,7 +10413,7 @@ Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loop
 		<info name="release" value="19971218"/>
 		<info name="alt_title" value="グランディア"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="grandia (disc 1 of 2) (jpn) (dw0080)" sha1="2d910e4e55df84d5970ed9f2ca8d48c08bf5a726" />
 			</diskarea>
@@ -10546,11 +10613,13 @@ Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loop
 		</part>
 	</software>
 
-	<!-- Identifying Hokuto No Ken (JAP) (DW0006)... -->
 	<software name="hokuto" supported="no">
 		<description>Hokuto no Ken (Japan)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-20601G"/>
 		<info name="release" value="19951222"/>
 		<info name="alt_title" value="北斗の拳"/>
@@ -10848,7 +10917,7 @@ Not extensively tested
 		<info name="release" value="19971204"/>
 		<info name="alt_title" value="この世の果てで恋を唄う少女YU−NO"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kono yo no hate de koi wo utau shoujo yu-no (disc 1 of 3) (jpn) (dw0938)" sha1="8ffbb999ea69f6d819ccafc88d1a69e8292a62d1" />
 			</diskarea>
@@ -10875,7 +10944,7 @@ Not extensively tested
 		<info name="release" value="19960322"/>
 		<info name="alt_title" value="空想科学世界ガリバーボーイ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kuusou kagaku sekai gulliver boy (disc 1 of 2) (jpn) (dw0527)" sha1="f14796d6ca356dfebc634e8ff9e36bc329c2e568" />
 			</diskarea>
@@ -10897,7 +10966,7 @@ Not extensively tested
 		<info name="release" value="19980226"/>
 		<info name="alt_title" value="ラングリッサー ドラマティックエディション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="langrisser dramatic edition (main disc) (jpn) (dw0563)" sha1="4c555633f653fd5b3d1cdec42698e09629a0b356" />
 			</diskarea>
@@ -10925,11 +10994,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Langrisser IV (JAP) (DW0374)... -->
 	<software name="langris4" supported="no">
 		<description>Langrisser IV (Japan)</description>
 		<year>1997</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Throws plenty of [CD-Block] track mode == 0
+[SCSP] awful sound scratch at very start of new game
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-2506G"/>
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ラングリッサーⅣ"/>
@@ -10967,7 +11040,7 @@ Not extensively tested
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="last bronx (disc 1 of 2) (jpn) (dw0293)" sha1="7a9ace6f3a22929132f159450fecc602702185dc" />
 			</diskarea>
@@ -10989,7 +11062,7 @@ Not extensively tested
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="黒の断章"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="literary fragment (disc 1 of 2) (jpn) (dw0311)" sha1="262198f1a11ee0ec6326ed297d48a9f9cb74220c" />
 			</diskarea>
@@ -11011,7 +11084,7 @@ Not extensively tested
 		<info name="release" value="19980723"/>
 		<info name="alt_title" value="ルナ2 エターナルブルー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar 2 - eternal blue (disc 1 of 2) (jpn) (dw0391)" sha1="70cd59182dc4657895aee38c0f012b30fd54b4f6" />
 			</diskarea>
@@ -11039,11 +11112,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Lunar Silver Star Story Complete MPEG (JAP) (DW0559)... -->
 	<software name="lunarmpg" cloneof="lunar" supported="no">
 		<description>Lunar - Silver Star Story Complete - MPEG-ban (Japan)</description>
 		<year>1997</year>
 		<publisher>Kadokawa Shoten</publisher>
+		<notes><![CDATA[
+Requires [MPEG] Movie Card module, moans at startup
+]]></notes>
 		<info name="serial" value="T-27904G"/>
 		<info name="release" value="19970704"/>
 		<info name="alt_title" value="ルナ シルバースターストーリー ＭＰＥＧ版"/>
@@ -11223,7 +11298,7 @@ Not extensively tested
 		<info name="release" value="19980521"/>
 		<info name="alt_title" value="メルティランサー り・インフォース スペシャルエディション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="meltylancer re-inforce (disc 1 of 3) (jpn) (dw0939)" sha1="6d1c7b57f472bdaf015df3630e4e5a53468977f5" />
 			</diskarea>
@@ -11287,7 +11362,7 @@ Not extensively tested
 		<info name="release" value="199805xx"/>
 		<info name="alt_title" value="モギタテセガサターン Vol.3 1998.5"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mogitate segasaturn vol.3 1998.5 (jpn) (dw0908)" sha1="b65d3c5b6d2b9760fc9f1d1ce48357026e442789" />
 			</diskarea>
@@ -11373,7 +11448,7 @@ Not extensively tested
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ミスター・ボーンズ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mr. bones (disc 1 of 2) (jpn) (dw0424)" sha1="0c0b0431559901f9ce99069febf6a7632cc9cb6f" />
 			</diskarea>
@@ -11589,7 +11664,7 @@ Not extensively tested
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="ファンタズム"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="phantasm (disc 1 of 8) (jpn) (dw0615)" sha1="8a05e5480a1ba58c8dc56712cc11c1e9044900c0" />
 			</diskarea>
@@ -11658,7 +11733,7 @@ Not extensively tested
 		<info name="release" value="19960913"/>
 		<info name="alt_title" value="ポリスノーツ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="policenauts (disc 1 of 3) (jpn) (dw0319)" sha1="06b1e6290d49fb74696385cc1ecfc720a51e1f22" />
 			</diskarea>
@@ -11844,7 +11919,7 @@ Not extensively tested
 		<info name="serial" value="GS-9011"/>
 		<info name="release" value="19950224"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rampo (disc 1 of 2) (jpn) (dw0418)" sha1="66df5c032cd7b7c074b1a80f4a999c583b213097" />
 			</diskarea>
@@ -11885,7 +11960,7 @@ Not extensively tested
 		<info name="release" value="19970718"/>
 		<info name="alt_title" value="リアルサウンド ～風のリグレット～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="real sound kaze no regret (disc 1 of 4) (dw0386) (jpn) (dw0386)" sha1="920094f280878aba703897f36a2947ceb825e7a0" />
 			</diskarea>
@@ -11933,7 +12008,7 @@ Not extensively tested
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="サクラ大戦"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen (disc 1 of 2) (jpn) (dw0317)" sha1="8b88c7a447c607dc3252d44435395d32898b40fe" />
 			</diskarea>
@@ -11956,7 +12031,7 @@ Not extensively tested
 		<info name="release" value="19980404"/>
 		<info name="alt_title" value="サクラ大戦2 〜君、死にたもうことなかれ〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen 2 (disc 1 of 3) (jpn) (dw0561)" sha1="209102a318fd9bc323534b465880e532e29ba747" />
 			</diskarea>
@@ -12188,7 +12263,7 @@ Missing elements during gameplay [VDP2] priorities?
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="戦国ブレード"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sengoku blade (disc 1 of 2) (jpn) (dw0190)" sha1="4adf0ed678c4e6128ec37e4da86a280d4b55e500" />
 			</diskarea>
@@ -12516,7 +12591,7 @@ Missing elements during gameplay [VDP2] priorities?
 		<info name="release" value="19980122"/>
 		<info name="alt_title" value="サウンドノベル街"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sound novel machi (disc 1 of 2) (jpn) (dw0481)" sha1="da732a09e875e5b96563a7d7854467f459dc6ca3" />
 			</diskarea>
@@ -13048,7 +13123,7 @@ Missing elements during gameplay [VDP2] priorities?
 		<info name="release" value="19970114"/>
 		<info name="alt_title" value="天外魔境 第四の黙示録"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tengai makyou dai - the apocalypse iv (disc 1 of 2) (jpn) (dw0262)" sha1="a0939e8a98b03dfdf9e543fc0250aafb5a66bea3" />
 			</diskarea>
@@ -13706,7 +13781,7 @@ Missing elements during gameplay [VDP2] priorities?
 		<info name="release" value="19970822"/>
 		<info name="alt_title" value="ウイルス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virus (disc 1 of 3) (jpn) (dw0296)" sha1="d11c141ae9f1bf66b97fab2092c5df2e4407c9d6" />
 			</diskarea>
@@ -13733,7 +13808,7 @@ Missing elements during gameplay [VDP2] priorities?
 		<info name="release" value="19941122"/>
 		<info name="alt_title" value="ワンチャイ コネクション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wanchai connection (disc 1 of 2) (jpn) (dw0547)" sha1="5ceb24ce9038c548aa586d2624d5e42250d87201" />
 			</diskarea>
@@ -14035,7 +14110,7 @@ Several [VDP1] and [VDP2] glitches
 		<info name="release" value="19960419"/>
 		<info name="alt_title" value="3×3EYES ～吸精公主～S"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="3x3 eyes disc 1 (j) (t-21301g)" sha1="0b614b3509f3c08f23128e118ec7ec27154ac687" />
 			</diskarea>
@@ -14052,11 +14127,14 @@ Several [VDP1] and [VDP2] glitches
 		</part>
 	</software>
 
-	<!-- Identifying Actua Soccer (T-18706G)... -->
 	<software name="actuasocj" cloneof="actuasoc" supported="no">
 		<description>Actua Soccer (Japan)</description>
 		<year>1996</year>
 		<publisher>Naxat Soft</publisher>
+		<notes><![CDATA[
+No shadows (btanb)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-18706G"/>
 		<info name="release" value="19961004"/>
 		<info name="alt_title" value="アクチャーサッカー"/>
@@ -14239,11 +14317,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Another Memories (J) (T-38001G)... -->
 	<software name="amemorie" supported="no">
 		<description>Another Memories (Japan)</description>
 		<year>1998</year>
 		<publisher>Starlight Marry</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-38001G"/>
 		<info name="release" value="19980702"/>
 		<info name="alt_title" value="アナザー・メモリーズ"/>
@@ -14273,7 +14353,7 @@ Not extensively tested
 
 	<!-- Identifying Aquazone - Desktop Life (J) (T-24001G)... -->
 	<software name="aquazonea" cloneof="aquazone" supported="no">
-		<description>Aquazone - Desktop Life (Japan, alt)</description>
+		<description>Aquazone: Desktop Life (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Open Book 9003</publisher>
 		<info name="serial" value="T-24001G"/>
@@ -14371,7 +14451,7 @@ Throws harmless [VDP1] illegal 0xc/0xd when pressing start on main menu
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="アゼル ―パンツァードラグーンＲＰＧ―"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="azel panzer dragoon rpg disc 1 (gs-9076)" sha1="88c32b163d7467e7215622d1ade1c3b43fc290df" />
 			</diskarea>
@@ -14405,7 +14485,7 @@ Otherwise same as backghh
 		<info name="release" value="19980730"/>
 		<info name="alt_title" value="バックガイナー ～よみがえる勇者たち～ 覚醒編「ガイナー転生」"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="backguiner - yomi gaeru yuusya tati - kakusei hen guiner tensei disc 1 (t-19906g)" sha1="e6b49cdc611f31a45fa71f34620bbeb99cba79de" />
 			</diskarea>
@@ -14417,8 +14497,6 @@ Otherwise same as backghh
 		</part>
 	</software>
 
-	<!-- Identifying Bakuretsu Hunter Disc 1 (J) (T-22402G)... -->
-	<!-- Identifying Bakuretsu Hunter Disc 2 (J) (T-22402G)... -->
 	<software name="bakhunt" supported="no">
 		<description>Bakuretsu Hunter (Japan)</description>
 		<year>1996</year>
@@ -14428,11 +14506,14 @@ Otherwise same as backghh
 		<info name="alt_title" value="爆れつハンター"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
+			<!-- NOTE: has no explicit label -->
+			<feature name="part_id" value="Game CD (Pink label)"/>
 			<diskarea name="cdrom">
 				<disk name="bakuretsu hunter disc 1 (j) (t-22402g)" sha1="6b237eda6e71eb46f5e8b9432c81ee54451b1e1a" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Omake CD (Orange label)"/>
 			<diskarea name="cdrom">
 				<disk name="bakuretsu hunter disc 2 (j) (t-22402g)" sha1="bbe112c14d35cb50f49c47ad52b74a2dff27440c" />
 			</diskarea>
@@ -14486,11 +14567,13 @@ Otherwise same as backghh
 		</part>
 	</software>
 
-	<!-- Identifying Battle Athletess Daiundoukai (T-24601G)... -->
 	<software name="btathlet" supported="no">
 		<description>Battle Athletess Daiundoukai (Japan)</description>
 		<year>1996</year>
 		<publisher>Increment P</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-24601G"/>
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="バトルアスリーテス 大運動会"/>
@@ -14518,11 +14601,15 @@ Otherwise same as backghh
 		</part>
 	</software>
 
-	<!-- Identifying Big Hurt Baseball (J) (T-8111G)... -->
 	<software name="bighurtj" cloneof="bighurt" supported="no">
 		<description>Frank Thomas Big Hurt Baseball (Japan)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<notes><![CDATA[
+[VDP1] stadium select flickers
+[VDP2] background has a layer of garbage
+[VDP2] has incorrectly colored shadows
+]]></notes>
 		<info name="serial" value="T-8111G"/>
 		<info name="release" value="19960802"/>
 		<info name="alt_title" value="フランク・トーマス ビッグ・ハート ベースボール"/>
@@ -14661,11 +14748,14 @@ Otherwise same as backghh
 		</part>
 	</software>
 
-	<!-- Identifying Blam Machinehead (T-7015G)... -->
 	<software name="blamja" cloneof="blam" supported="no">
 		<description>Blam! Machinehead (Japan, alt)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+[VDP2] Gradiation enabled on Core FMV logo and title screen
+[VDP1] Enables outside area user cliprect mode on title screen, black screen
+]]></notes>
 		<info name="serial" value="T-7015G"/>
 		<info name="release" value="19970523"/>
 		<info name="alt_title" value="ブラム!マシーンヘッド"/>
@@ -14703,7 +14793,7 @@ Otherwise same as backghh
 		<info name="release" value="19950922"/>
 		<info name="alt_title" value="J.B.ハロルド ブルー・シカゴ・ブルース"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="blue chicago blues disc 1 (j) (t-5302g)" sha1="a520c611c31416954431bb4ed076331063c66941" />
 			</diskarea>
@@ -14797,11 +14887,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Bug! Jump Shite, Fundzukechatte, Pecchanko (GS-9063)... -->
 	<software name="bugj" cloneof="bug2" supported="no">
 		<description>Bug! - Jump Shite, Fundzukechatte, Pecchanko (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen on (skippable) intro FMV with scratchy sounds [CD-Block]
+]]></notes>
 		<info name="serial" value="GS-9063"/>
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="バグ! ジャンプして、ふんづけちゃって、ぺっちゃんこ"/>
@@ -14857,7 +14949,7 @@ Not extensively tested
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="きゃんきゃんバニー プルミエール 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="can can bunny premiere 2 disc 1 (t-19703g)" sha1="fa85566e1e3b9e729c7debc331ab73ea8d91d16b" />
 			</diskarea>
@@ -14869,11 +14961,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Casper (T-12503G)... -->
 	<software name="casperj" cloneof="casper" supported="no">
 		<description>Casper (Japan)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+[CD-Block] jumpy intro FMV sound
+[VDP2] "Window enabled for RGB555 tiles"
+Black screen on skippable FMV after starting a new game
+]]></notes>
 		<info name="serial" value="T-12503G"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="キャスパー"/>
@@ -14929,7 +15025,7 @@ Not extensively tested
 		<info name="release" value="19970606"/>
 		<info name="alt_title" value="超時空要塞マクロス 愛・おぼえていますか"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="choujikuu yousei macross - ai oboete imasu ka disc 1 (t-23403g)" sha1="01852f46f26df6c48918dd2bc2d94727b0990c30" />
 			</diskarea>
@@ -15047,7 +15143,7 @@ Not extensively tested
 		<info name="release" value="19960119"/>
 		<info name="alt_title" value="クリーチャーショック"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="creature shock disc 1 (t-1303g)" sha1="0ddb81253529bc42928c5a3b3d0f53a2b7052956" />
 			</diskarea>
@@ -15059,11 +15155,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Crimewave (T-7018G)... -->
 	<software name="crimewavj" cloneof="crimewav" supported="no">
 		<description>CrimeWave (Japan)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Hangs after intro FMV [CD-Block]
+]]></notes>
 		<info name="serial" value="T-7018G"/>
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="クライムウェーブ"/>
@@ -15111,11 +15209,13 @@ Known to use [SCUDSP]
 		</part>
 	</software>
 
-	<!-- Identifying Cross Romance - Ai to Maajan to Hanafuda to (T-7103G)... -->
 	<software name="xromance" supported="no">
 		<description>Cross Romance - Ai to Mahjong to Hanafuda to (Japan)</description>
 		<year>1997</year>
 		<publisher>Nihon Bussan</publisher>
+		<notes><![CDATA[
+[VDP1] [VDP2] Black screen on title screen
+]]></notes>
 		<info name="serial" value="T-7103G"/>
 		<info name="release" value="19971009"/>
 		<info name="alt_title" value="クロス・ロマンス 恋と麻雀と花札と"/>
@@ -15127,17 +15227,18 @@ Known to use [SCUDSP]
 		</part>
 	</software>
 
-	<!-- Identifying Cross Tantei Monogatari - Motsureta 7tsu no Labyrinth Disc 1 (T-36401G)... -->
-	<!-- Identifying Cross Tantei Monogatari - Motsureta 7tsu no Labyrinth Disc 2 (T-36401G)... -->
 	<software name="crtantei" supported="no">
 		<description>Cross Tantei Monogatari - Motsureta 7tsu no Labyrinth (Japan)</description>
 		<year>1998</year>
 		<publisher>WorkJam</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-36401G"/>
 		<info name="release" value="19980625"/>
 		<info name="alt_title" value="クロス探偵物語 〜もつれた7つのラビリンス〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cross tantei monogatari - motsureta 7tsu no labyrinth disc 1 (t-36401g)" sha1="776c7c58556a97fe751d9c1a9a307b5b21f67253" />
 			</diskarea>
@@ -15306,7 +15407,7 @@ Opening FMV has visible screen tearing [CD-Block] (verify)
 		<info name="release" value="19970704"/>
 		<info name="alt_title" value="だいすき"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="daisuki disc 1 (t-18510g)" sha1="b3cd93f744d43cd6116d4433c83b7b134eb081dd" />
 			</diskarea>
@@ -15414,7 +15515,7 @@ TODO: how to reload with [mouse]?
 		<info name="release" value="19960216"/>
 		<info name="alt_title" value="デスマスク"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="death mask disc 1 (j) (t-22701g)" sha1="390716ef86817e3fe286687d41b9c78286d12f01" />
 			</diskarea>
@@ -15562,11 +15663,14 @@ TODO: how to reload with [mouse]?
 		</part>
 	</software>
 
-	<!-- Identifying Densha de Go EX (T-10317G)... -->
 	<software name="dendego" supported="no">
 		<description>Densha de Go! EX (Japan)</description>
 		<year>1998</year>
 		<publisher>Takara</publisher>
+		<notes><![CDATA[
+[CD-Block] attempts to playback a redbook on title screen, goes silent
+Heavy 3D corruption in gameplay [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-10317G"/>
 		<info name="release" value="19981001"/>
 		<info name="alt_title" value="電車でGO!EX"/>
@@ -15765,7 +15869,7 @@ Black screen after Kaze logo with [DRC] option, check also [CD-Block]
 		<info name="release" value="19980226"/>
 		<info name="alt_title" value="慟哭そして・・・"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doukoku soshite disc 1 (t-1315g)" sha1="ac771689127cc3fd18e86efe60aec2e84ffd0f48" />
 			</diskarea>
@@ -15803,7 +15907,7 @@ Black screen after Kaze logo with [DRC] option, check also [CD-Block]
 		<info name="release" value="19970711"/>
 		<info name="alt_title" value="同級生2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doukyuusei 2 disc 1 (t-20104g)" sha1="ff82775e47d3155c8643ef429fb103a12f08cbe2" />
 			</diskarea>
@@ -15959,11 +16063,14 @@ Black screen after Kaze logo with [DRC] option, check also [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Earthworm Jim 2 (T-10304G)... -->
 	<software name="ejim2j" cloneof="ejim2" supported="no">
 		<description>Earthworm Jim 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
+		<notes><![CDATA[
+No [VDP1] sprites on Sega logo (uses type 3, displays with type 5)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-10304G"/>
 		<info name="release" value="19961101"/>
 		<info name="alt_title" value="アースワーム・ジム2"/>
@@ -16089,7 +16196,7 @@ Black screen after Kaze logo with [DRC] option, check also [CD-Block]
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="エネミー・ゼロ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="enemy zero disc 1 (t-30001g)" sha1="0fb57e054bdda040abdaa51f79d38eaa823293db" />
 			</diskarea>
@@ -16201,7 +16308,7 @@ Black screen after Kaze logo with [DRC] option, check also [CD-Block]
 		<info name="release" value="19981126"/>
 		<info name="alt_title" value="ファインドラブ2 ～ラプソディ～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="find love 2 - rhapsody disc 1 (t-34605g)" sha1="21ecdcf603906c7f9bf1f88ab1a35a69b621baca" />
 			</diskarea>
@@ -16271,7 +16378,7 @@ Black screen after Kaze logo with [DRC] option, check also [CD-Block]
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="フィスト"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fist (t-15015g)" sha1="c469ed86b0dd316ca2f6975378b0b5927700b604" />
 			</diskarea>
@@ -16721,7 +16828,7 @@ Spurious [SCSP] voice sample playbacks (keeps repeating "i~ni", shouldn't from n
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ゲームウェア5号"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="game ware volume 5 disc 1 (t-17006g)" sha1="5ffa0a065a9d00a669820a0d41d1bedb32a17686" />
 			</diskarea>
@@ -17143,7 +17250,7 @@ Offset dots on map during gameplay
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="はるかぜ戦隊 Vフォース"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="harukaze sentai v-force disc 1 (t-19904g)" sha1="649d98ddd28e44b98b6b6414a378b196728186db" />
 			</diskarea>
@@ -17176,11 +17283,13 @@ Offset dots on map during gameplay
 		</part>
 	</software>
 
-	<!-- No crowd is shown, particularly noticeable in intro (where performance dips) [VDP2] -->
 	<software name="htheros" supported="no">
 		<description>HatTrick Hero S (Japan)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+No crowd is shown, particularly noticeable in intro (where performance dips) [VDP2]
+]]></notes>
 		<info name="serial" value="T-1103G"/>
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="ハットトリックヒーローS"/>
@@ -17316,7 +17425,7 @@ Not extensively tested
 		<info name="release" value="19980115"/>
 		<info name="alt_title" value="放課後恋愛クラブ ～恋のエチュード～ (限定版)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="houkago ren-ai club - ren no etude (genteiban) disc 1 (t-19714g)" sha1="c89caeb43ae1ba9e7b1182feeb3500775dc67e6c" />
 			</diskarea>
@@ -17339,7 +17448,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19980115"/>
 		<info name="alt_title" value="放課後恋愛クラブ ～恋のエチュード～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="houkago renai club ~koi no etude~ disc 1 (t-19713g)" sha1="ef373a8f8dadc9fa06ca3bc3718c7be7584be89a" />
 			</diskarea>
@@ -17360,7 +17469,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19950929"/>
 		<info name="alt_title" value="宝魔ハンター ライム Perfect Collection"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="houma hunter lime perfect collection disc 1 (t-2001g)" sha1="392d977f4e5a923973ff861a5ab6b256e5c174a7" />
 			</diskarea>
@@ -17414,7 +17523,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19990318"/>
 		<info name="alt_title" value="アイドル雀士スーチーパイ シークレットアルバム"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="idol janshi suchie-pai secret album disc 1 (t-5717g)" sha1="c9adef692851af3cdd802deda87188c09b340552" />
 			</diskarea>
@@ -17436,7 +17545,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19960531"/>
 		<info name="alt_title" value="アイドル麻雀 ファイナルロマンスＲ プレミアムパッケージ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="idol maajan final romance r premium package disc 1 (t-16705g-01)" sha1="5a7c7cafd69db526f69860146ac52ecd738055d1" />
 			</diskarea>
@@ -17820,7 +17929,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19980820"/>
 		<info name="alt_title" value="古伝降霊術 百物語 ～ほんとにあった怖い話～ (サタコレ)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
 			</diskarea>
@@ -17874,7 +17983,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="黒の断章 (限定版)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kuro no danshou - the literary fragment (genteiban) disc 1 (t-21203g)" sha1="e1adde3d2d57201d4561c85136ad4817df850ae5" />
 			</diskarea>
@@ -17976,7 +18085,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19960524"/>
 		<info name="alt_title" value="ライフスケイプ 生命40億年はるかな旅"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lifescape seimei 40 okunen harukana tabi disc 1 (t-26405g)" sha1="f414e2d071fb46560df6124349bbe67571ba326c" />
 			</diskarea>
@@ -18030,7 +18139,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="ルパン三世 クロニクル (ルパン+不二子 バージョン)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lupin the 3rd chronicles (lupin + fujiko version) disc 1 (t-18805g)" sha1="be906349c26b77c350e8f8605d901713e5f7e8b2" />
 			</diskarea>
@@ -18042,11 +18151,13 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		</part>
 	</software>
 
-	<!-- Identifying Maboroshi no Black Bass (T-25303G)... -->
 	<software name="blackbas" supported="no">
 		<description>Maboroshi no Black Bass (Japan)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+No [VDP2] GFXs on main map right after starting a new game
+]]></notes>
 		<info name="serial" value="T-25303G"/>
 		<info name="release" value="19970328"/>
 		<info name="alt_title" value="幻のブラックバス"/>
@@ -18164,7 +18275,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19970807"/>
 		<info name="alt_title" value="南方珀堂登場"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="minakata hakudou toujou disc 1 (t-14414g)" sha1="bdbef86b3a75be0f12c8f08c3d4315952670ad42" />
 			</diskarea>
@@ -18202,7 +18313,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ミスター・ボーンズ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mr bones disc 1 (gs-9127)" sha1="70222e2367f57f9acf6eb63abca27903682dec2c" />
 			</diskarea>
@@ -18346,11 +18457,14 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		</part>
 	</software>
 
-	<!-- Identifying Nissan Presents Over Drivin GT-R (T-10613G)... -->
 	<software name="nissangt" cloneof="nfs" supported="no">
 		<description>Nissan Presents Over Drivin' GT-R (Japan)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+[CD-Block] black screen at startup, crashes
+Known to use [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-10613G"/>
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="オーバードライビング GT-R"/>
@@ -18436,7 +18550,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		<info name="release" value="19980528"/>
 		<info name="alt_title" value="王様げーむ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ousama game disc 1 (t-21904g)" sha1="b34a7fcdc2d2fd72cb4664b757ff5dea2508c50b" />
 			</diskarea>
@@ -18523,7 +18637,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		<info name="alt_title" value="Pia♥キャロットへようこそ!!2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<sharedfeat name="requirement" value="sat_cart:ram32"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pia carrot e youkoso 2 disc 1 (t-20114g)" sha1="eeacac1c1a8140953b958f91642f3b102cfdf603" />
 			</diskarea>
@@ -18915,7 +19029,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		<info name="release" value="19971127"/>
 		<info name="alt_title" value="リフレインラブ ～あなたに逢いたい～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="refrain love ~anatani aitai~ disc 1 (t-5308g)" sha1="34ddff78338818deb55a59df7820c84b0972e7a5" />
 			</diskarea>
@@ -18973,7 +19087,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		<info name="release" value="19990114"/>
 		<info name="alt_title" value="ルームメイトＷ ～ふたり～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="roommate w - futari disc 1 (t-19508g)" sha1="15a08509ef0166d1aa758a0ec8653ccaa524b74a" />
 			</diskarea>
@@ -19026,7 +19140,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		<info name="release" value="19980211"/>
 		<info name="alt_title" value="サクラ大戦 (サタコレ)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen (satakore) disc 1 (gs-9191)" sha1="85e82efc20c28e82ed8699a893b7b13f77927b0c" />
 			</diskarea>
@@ -19206,11 +19320,13 @@ Has [VDP2] color calculation bugs for dialogue boxes
 		</part>
 	</software>
 
-	<!-- Identifying SD Gundam G Century S (T-13324G)... -->
 	<software name="sdgundam" supported="no">
 		<description>SD Gundam G Century S (Japan)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Black screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]?)
+]]></notes>
 		<info name="serial" value="T-13324G"/>
 		<info name="release" value="19980211"/>
 		<info name="alt_title" value="SDガンダム ジーセンチュリーS"/>
@@ -19323,11 +19439,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Seireki 1999 - Pharaoh no Fukkatsu (T-18001G)... -->
 	<software name="seireki" cloneof="exhumed" supported="no">
 		<description>Seireki 1999 - Pharaoh no Fukkatsu (Japan)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
+		<notes><![CDATA[
+[CD-Block] Hangs on initial FMV (press A button to bypass)
+Was known to draw smiles as enemy shadows, https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=101474#Post101474 (assume fixed)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-18001G"/>
 		<info name="release" value="19961129"/>
 		<info name="alt_title" value="西暦1999 ファラオの復活"/>
@@ -19430,7 +19550,7 @@ Not extensively tested
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="真・女神転生デビルサマナー スペシャルボックス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shin megami tensei devil summoner special box disc 1 (t-14408g)" sha1="c49a21f16458b1b1bfae2238583b9c8dba38ac75" />
 			</diskarea>
@@ -19521,7 +19641,7 @@ Not extensively tested
 		<info name="release" value="19970925"/>
 		<info name="alt_title" value="出動!ミニスカポリス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shutsudou mini-skirt police disc 1 (t-30812g)" sha1="b4d4f9310884a1298ab4896c2dcc75ce291ba3b8" />
 			</diskarea>
@@ -19596,11 +19716,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Slam'n Jam '96 featuring Magic &amp; Kareem (T-15905G)... -->
 	<software name="slamnjamj" cloneof="slamnjam" supported="no">
 		<description>Slam 'n Jam '96 featuring Magic &amp; Kareem (Japan)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
+		<notes><![CDATA[
+Heavy [VDP1] timing problems, main menu doesn't show what you select, gameplay gets stuck with first frame of animation
+]]></notes>
 		<info name="serial" value="T-15905G"/>
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="マジック・ジョンソンとカリーム・アブドュール・ジャバーのスラムジャム'96"/>
@@ -19936,7 +20058,7 @@ Not extensively tested
 		<info name="release" value="19970613"/>
 		<info name="alt_title" value="太平洋の嵐2 疾風の艨艟"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="taiheiyou no arashi 2 disc 1 (j) (t-15024g)" sha1="0292325dce9f03285a7c7c962fe77bb59e424e56" />
 			</diskarea>
@@ -20022,7 +20144,7 @@ Not extensively tested
 		<info name="release" value="19980709"/>
 		<info name="alt_title" value="探偵 神宮寺三郎 夢の終わりに"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tantei jinguuji saburou - yume no owari ni disc 1 (t-1316g)" sha1="8d702da286ea3b22469cc42214fb76fba54af999" />
 			</diskarea>
@@ -20214,11 +20336,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying The Crow - City of Angels (T-8123G)... -->
 	<software name="crowj" cloneof="crow" supported="no">
 		<description>The Crow - City of Angels (Japan)</description>
 		<year>1997</year>
 		<publisher>Acclaim Japan</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-8123G"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="ザ・クロウ"/>
@@ -20352,7 +20476,7 @@ Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 
 		<info name="release" value="19971113"/>
 		<info name="alt_title" value="ザ・スターボーリング"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="the star bowling disc 1 (t-21804g)" sha1="8fd222f741555a023b0d0ece8b0724a7e6e1726f" />
 			</diskarea>
@@ -20374,7 +20498,7 @@ Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 
 		<info name="release" value="19980115"/>
 		<info name="alt_title" value="ザ・スターボーリング Vol.2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="the star bowling vol 2 disc 1 (t-21805g)" sha1="32b6aa55cca0dcbb60c380813849b32fdf9ffeb7" />
 			</diskarea>
@@ -20519,7 +20643,7 @@ Both games: bad [CD-Block] redbook on BGM repeats (cross borders with the succes
 		<info name="release" value="19990401"/>
 		<info name="alt_title" value="ときめきメモリアル ドラマシリーズVol.3 ～旅立ちの詩～ (卒業記念セット)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tokimeki memorial drama series vol 3 ~tabidachi no uta~ disc 1 (t-9532g)" sha1="506fc9adafba71eddeaea5e91527ce9fcb5c3431" />
 			</diskarea>
@@ -20606,7 +20730,7 @@ Both games: bad [CD-Block] redbook on BGM repeats (cross borders with the succes
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="東京シャドウ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tokyo shadow disc 1 (t-1110g)" sha1="12a42fd659c5662ef27743ceb8a7ac17ec991de0" />
 			</diskarea>
@@ -20745,7 +20869,7 @@ Both games: bad [CD-Block] redbook on BGM repeats (cross borders with the succes
 		<info name="release" value="19971120"/>
 		<info name="alt_title" value="ツタンカーメンの謎 ～アンク～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tutankamen no nazo a.n.k.h disc 1 (t-35601g)" sha1="1289d2c55524e1ca45393a398adfb3b230e62b6c" />
 			</diskarea>
@@ -20757,11 +20881,14 @@ Both games: bad [CD-Block] redbook on BGM repeats (cross borders with the succes
 		</part>
 	</software>
 
-	<!-- Identifying Ultraman (J) (T-13308G)... -->
 	<software name="ultraman" supported="no">
 		<description>Ultraman - Hikari no Kyojin Densetsu (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+[VDP2] offset window effect circle when losing
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-13308G"/>
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="ウルトラマン 光の巨人伝説"/>
@@ -21136,7 +21263,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		<info name="release" value="19970725"/>
 		<info name="alt_title" value="ボイスファンタジアS 失われたボイスパワー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="voice fantasia s - ushinawareta voice power disc 1 (t-16706g)" sha1="9ccaf4c8f96ceb8e3ca57b5a0f994b9c01b8bf1c" />
 			</diskarea>
@@ -21158,7 +21285,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		<info name="release" value="19970404"/>
 		<info name="alt_title" value="ボイスアイドルマニアックス 〜プールバーストーリー〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="voice idol maniacs - pool bar story disc 1 (t-1312g)" sha1="e7f1a9c51c4bccd07dc80b1b3983d85207f1cbd3" />
 			</diskarea>
@@ -21196,7 +21323,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		<info name="release" value="19941122"/>
 		<info name="alt_title" value="ワンチャイ コネクション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wanchai connection disc 1 (j) (gs-9007)" sha1="76135ed5c862f2d3d52279df02de231e015858f7" />
 			</diskarea>
@@ -21234,7 +21361,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="湾岸デッドヒート+リアルアレンジ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wangan dead heat plus real arrange disc 1 (t-9103g)" sha1="b1724c45b6066e38d0aac51cf6a5e76dce5ceea7" />
 			</diskarea>
@@ -21384,7 +21511,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		<info name="release" value="19980122"/>
 		<info name="alt_title" value="ウィザードリィ ネメシス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wizardry nemesis - the wizardry adventure disc 1 (t-37001g)" sha1="15e847fe46b007fe575f908da864bed17ecebac2" />
 			</diskarea>
@@ -21717,11 +21844,13 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		</part>
 	</software>
 
-	<!-- Identifying Zero4 Champ DooZy-J Type-R (T-21401G)... -->
 	<software name="zero4" supported="no">
 		<description>Zero4 Champ DooZy-J Type-R (Japan)</description>
 		<year>1997</year>
 		<publisher>Media Rings Corporation</publisher>
+		<notes><![CDATA[
+Black screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]? regression?)
+]]></notes>
 		<info name="serial" value="T-21401G"/>
 		<info name="release" value="19970620"/>
 		<info name="alt_title" value="ゼロヨンチャンプ ドゥーヅィージェイ タイプ−アール"/>
@@ -21745,7 +21874,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		<info name="release" value="19981203"/>
 		<info name="alt_title" value="続 初恋物語 ～修学旅行～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zoku hatsukoi monogatari ~shuugakuryokou~ disc 1 (t-33005g)" sha1="2a983c9dadbf65247854051bcb9bdc309dabde7a" />
 			</diskarea>
@@ -21829,7 +21958,7 @@ Triggers [VDP2] window enabled for RGB888 tiles on FMVs
 		<info name="release" value="19981001"/>
 		<info name="alt_title" value="バックガイナー ～よみがえる勇者たち～ 飛翔編「うらぎりの戦場」"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="backguiner ~yomi gaeru yuusya tati~ hishou hen uragiri no senjou disc 1 (t-19907g)" sha1="d29559e66567ae76eb71cdd1b3ac9fc13cd091e3" />
 			</diskarea>
@@ -21991,7 +22120,7 @@ Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC chan
 		<info name="release" value="19970911"/>
 		<info name="alt_title" value="デザイア"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="desire disc 1 (t-15031g)" sha1="9dc08ba54a9ba8d7df3c75c88a0476da64ec4814" />
 			</diskarea>
@@ -22028,7 +22157,7 @@ Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC chan
 		<info name="release" value="19971113"/>
 		<info name="alt_title" value="デビルサマナー ソウル ハッカーズ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="devil summoner soul hackers disc 1 (t-14420g)" sha1="66d84a44ee8b518dd64536fba2623f415fe4b21d" />
 			</diskarea>
@@ -22274,7 +22403,7 @@ Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC chan
 		<info name="release" value="19971106"/>
 		<info name="alt_title" value="蒼空の翼 ～GOTHA WORLD～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gotha world disc 1 (j) (t-2205g)" sha1="86b1e870c5a84360435b3e5344937d6033663e1c" />
 			</diskarea>
@@ -22530,9 +22659,10 @@ Requires actual Sega Saturn [modem] to do something (status currently kludged in
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
 		<notes><![CDATA[
-Hangs at Sega logo, expects to change [CD-Block] status after every loading phase
-Draws no text in menu [VDP1] [VDP2]
-Has Nifty Serve option, [NetLink] support?
+No sound on FMV (btanb, cfr. https://youtu.be/Qoj7qYXQORs)
+[SCSP] stuck envelope notes on main menu
+Draws no text in menu and gameplay [VDP1] [VDP2]
+Has Nifty Serve option, [modem] support?
 ]]></notes>
 		<info name="serial" value="T-1503G"/>
 		<info name="release" value="19960119"/>
@@ -22545,9 +22675,8 @@ Has Nifty Serve option, [NetLink] support?
 		</part>
 	</software>
 
-	<!-- Identifying Hiyake no Omoide + Himekuri - Girls In Motion Puzzle Vol 1 (T-21002G)... -->
-	<software name="girlpuz1" supported="no">
-		<description>Hiyake no Omoide + Himekuri - Girls in Motion Puzzle Vol. 1 (Japan)</description>
+	<software name="girlpuz1" supported="partial">
+		<description>Hiyake no Omoide + Himekuri: Girls in Motion Puzzle Vol. 1 (Japan)</description>
 		<year>1995</year>
 		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21002G"/>
@@ -22678,7 +22807,7 @@ Not extensively tested
 		<info name="release" value="19981126"/>
 		<info name="alt_title" value="アイドル雀士スーチーパイめちゃ限定版 ～発売5周年 得 パッケージ～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="idol jansi suchie-pai mecha genteiban - hatsubai 5 shuunen (toku) package disc 1 (t-5716g)" sha1="a8883603eaaedf8cc67c71c9ca883a43679b33f7" />
 			</diskarea>
@@ -22803,7 +22932,7 @@ Not extensively tested
 		<info name="release" value="19970418"/>
 		<info name="alt_title" value="雀帝バトルコスプレイヤー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jantei battle cos-player disc 1 (t-34601g)" sha1="78127a5a26333b6bcbad80e36de122b027c18825" />
 			</diskarea>
@@ -22825,7 +22954,7 @@ Not extensively tested
 		<info name="release" value="19960726"/>
 		<info name="alt_title" value="時空探偵DD 〜幻のローレライ〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jikuu tantei dd disc 1 (j) (t-2103g)" sha1="a13e25a4994dc1e91a70fc6bb3994e6dfe0210ac" />
 			</diskarea>
@@ -23115,7 +23244,7 @@ Not extensively tested
 		<info name="release" value="19960322"/>
 		<info name="alt_title" value="空想科学世界ガリバーボーイ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kuusou kagaku sekai gulliver boy disc 1 (t-14303g)" sha1="f59b2ba5c7676965c6b040a35e58905636796bf4" />
 			</diskarea>
@@ -23153,7 +23282,7 @@ Not extensively tested
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="last bronx disc 1 (gs-9152)" sha1="f75e72f338471b0c7b504f9f4b97e3cb36f9ddf9" />
 			</diskarea>
@@ -23287,7 +23416,7 @@ Not extensively tested
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="ルパン三世 クロニクル (ルパン+次元+五ェ門 バージョン)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lupin the 3rd chronicles (lupin + jigen + goemon version) disc 1 (t-18806g)" sha1="6cfa0522df2d2995056e212f8bc3e2d91757ace5" />
 			</diskarea>
@@ -23309,7 +23438,7 @@ Not extensively tested
 		<info name="release" value="19960329"/>
 		<info name="alt_title" value="麻雀同級生Special (ポートレートCD付初回限定版)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="maajan doukyuusei special (genteiban) disc 1 (t-25302g)" sha1="815cf7fb7447041f504ee83af43c2752d2512ce3" />
 			</diskarea>
@@ -23347,7 +23476,7 @@ Not extensively tested
 		<info name="release" value="19971106"/>
 		<info name="alt_title" value="麻雀 学園祭 (声優インタビュー秘CD付初回限定版)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="maajan gakuensai (genteiban) disc 1 (j) (t-25305g)" sha1="9b60666aa365c0b9224be7de71341545fee12443" />
 			</diskarea>
@@ -23513,7 +23642,7 @@ Not extensively tested
 		<info name="release" value="19960719"/>
 		<info name="alt_title" value="麻雀狂時代 セブアイランド'96"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="maajankyou jidai cebu island 96 disc 1 (j) (t-2204g)" sha1="5d905bf2f6cd48e992c2861da12e21cd75695845" />
 			</diskarea>
@@ -23647,7 +23776,7 @@ Not extensively tested
 		<info name="release" value="19971211"/>
 		<info name="alt_title" value="マリア〜君たちが生まれた理由〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="maria disc 1 (j) (t-36302g)" sha1="814b4924fa814566723ca3cdfafab902603e95cb" />
 			</diskarea>
@@ -23708,14 +23837,17 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Masters Harukanaru Augusta 3 (J) (T-11401G)... -->
 	<software name="augusta3" supported="no">
 		<description>Masters Harukanaru Augusta 3 (Japan)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 1
+]]></notes>
 		<info name="serial" value="T-11401G"/>
 		<info name="release" value="19950922"/>
 		<info name="alt_title" value="マスターズ 遥かなるオーガスタ3"/>
+		<info name="usage" value="Requires 186 blocks of free backup RAM (otherwise moans until user frees the requested memory amount)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -23768,7 +23900,7 @@ Not extensively tested
 		<info name="release" value="19980521"/>
 		<info name="alt_title" value="メルティランサー り・インフォース スペシャルエディション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="meltylancer re-inforce special edition disc 1 (j) (t-15039g)" sha1="fb516367dd26502c7744a32ce0340839b670b8f5" />
 			</diskarea>
@@ -23884,7 +24016,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ムーンクレイドル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="moon cradle disc1 (j) (t-9109g)" sha1="b29b0e4e7b821acc6ea855fcbb45e2a77d936be2" />
 			</diskarea>
@@ -23943,7 +24075,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19970918"/>
 		<info name="alt_title" value="マイ・ドリーム オンエアが待てなくて"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="my dream disc 1 (j) (t-21303g)" sha1="931522f8262ffc85ae96f27bb8b86f071d02d0f9" />
 			</diskarea>
@@ -24015,7 +24147,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19960405"/>
 		<info name="alt_title" value="七つの秘館"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="nanatsu no hikan disc 1 (j) (t-7616g)" sha1="a189088e757c5574904645efaf0b303cc3c0df68" />
 			</diskarea>
@@ -24128,7 +24260,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="ナイトゥルース #01闇の扉"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="nighttruth explaination of the paranormal 01 yami no tobira disc 1 (t-20204g)" sha1="78ac1184df9907912c916e321a0d59ef359b2365" />
 			</diskarea>
@@ -24199,7 +24331,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19981210"/>
 		<info name="alt_title" value="ノエル3 (初回限定版)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="noel 3 special edition disc 1 (j) (t-22205g)" sha1="fb4fd21fb82b171c2cef1b1cb0c53a255f8c8f3a" />
 			</diskarea>
@@ -24465,7 +24597,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19970404"/>
 		<info name="alt_title" value="クォヴァディス2～惑星強襲オヴァン・レイ～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="quovadis 2 disc 1 (j) (t-17402g)" sha1="7b78d6b174899aa5e4c695bbfb468ff8ef259351" />
 			</diskarea>
@@ -24486,7 +24618,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="serial" value="GS-9011"/>
 		<info name="release" value="19950224"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rampo disc 1 (gs-9011)" sha1="4dd370c9c6e933c3692f185b06289e5259b541a7" />
 			</diskarea>
@@ -24526,7 +24658,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19970718"/>
 		<info name="alt_title" value="リアルサウンド ～風のリグレット～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="real sound - kaze no regret disc 1 (t-30002g)" sha1="ef9620e1ad169657a73e4bf49ea353b912000091" />
 			</diskarea>
@@ -24688,7 +24820,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19971030"/>
 		<info name="alt_title" value="RONDE〜輪舞曲〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ronde disc 1 (t-14415g)" sha1="a7f6773bc2278a35d11ee627e1b8a2abebedd32b" />
 			</diskarea>
@@ -24743,7 +24875,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19980404"/>
 		<info name="alt_title" value="サクラ大戦2 〜君、死にたもうことなかれ〜 (初回特典版)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen 2 - kimi, shini tamou kotonakare (shokai tokutenban) disc 1 (gs-9169)" sha1="758683e6913a7c3a841016313cbe308dc8877156" />
 			</diskarea>
@@ -24770,7 +24902,7 @@ Glitchy [VDP1] sprites during gameplay
 		<info name="release" value="19971113"/>
 		<info name="alt_title" value="サクラ大戦 蒸気ラジヲショウ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sakura taisen jouki radio show disc 1 (gs-9160)" sha1="24f779f8fa581057037d8ace906832a1ecd6d996" />
 			</diskarea>
@@ -25066,7 +25198,7 @@ Likely warrants keyboard + mouse
 		<info name="release" value="19970307"/>
 		<info name="alt_title" value="新世紀エヴァンゲリオン・セカンドインプレッション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shinseiki evangelion 2nd impression disc 1 (gs-9129)" sha1="9ac7e227e19dc4513c25f370184330696b8ff2c8" />
 			</diskarea>
@@ -25216,7 +25348,7 @@ Likely warrants keyboard + mouse
 		<info name="release" value="19980122"/>
 		<info name="alt_title" value="サウンドノベル街"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sound novel machi disc 1 (j) (t-34001g)" sha1="0174f2028cf41563218c85a2c04a6593062a4852" />
 			</diskarea>
@@ -25592,7 +25724,7 @@ Not extensively tested
 		<info name="release" value="19960209"/>
 		<info name="alt_title" value="天地無用!魅御理温泉 湯けむりの旅"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tenchi muyou mimiri onsen - yukemuri no tabi disc 1 (t-21802g)" sha1="5dc0596617c8a08a8b95b677557d3ac758187a82" />
 			</diskarea>
@@ -25614,7 +25746,7 @@ Not extensively tested
 		<info name="release" value="19970117"/>
 		<info name="alt_title" value="天地無用!登校無用 ～アニラジコレクション～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tenchi muyou toukou muyou - aniraji collection disc 1 (t-26103g)" sha1="36af9e97cfe84df964e25ce82e8aeba29f3a6b46" />
 			</diskarea>
@@ -25748,7 +25880,7 @@ Not extensively tested
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="ときめきメモリアル ドラマシリーズVol.2 ～彩のラブソング～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tokimeki memorial drama series vol 2 disc 1 (j) (t-9529g)" sha1="c7967e73414ad1e02aae34878adf09bd557c6a30" />
 			</diskarea>
@@ -25803,7 +25935,7 @@ Not extensively tested
 		<info name="release" value="19970502"/>
 		<info name="alt_title" value="ジ アンソルブド"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="unsolved disc 1 (j) (t-7017g)" sha1="f13389de03528cb57d14ccc5f58150ee0e9f9e7b" />
 			</diskarea>
@@ -25894,7 +26026,7 @@ Not extensively tested
 		<info name="release" value="19981029"/>
 		<info name="alt_title" value="バーチャコールS 初回限定 スイートボイス「よびかけ君」同梱"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtuacall s (shokai gentei sweet voice yobikake kimi doukon) disc 1 (t-19718g)" sha1="5a628e504c8a7b97aefd83e3bcfbec47b3dd58d5" />
 			</diskarea>
@@ -25933,7 +26065,7 @@ Not extensively tested
 		<info name="release" value="19970822"/>
 		<info name="alt_title" value="ウイルス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virus disc 1 (j) (t-14304g)" sha1="d97fdc8bd64b2be87c70e51e87529d87e7f2dc03" />
 			</diskarea>
@@ -26040,7 +26172,7 @@ Not extensively tested
 		<info name="release" value="19990729"/>
 		<info name="alt_title" value="WithYou ～みつめていたい～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="with you - mitsumete itai disc 1 (t-20117g)" sha1="9f8b2dcb2dcd499362c5b81ea8a3ef462527591a" />
 			</diskarea>
@@ -26330,11 +26462,13 @@ Heavily broken [SCSP] in gameplay
 		</part>
 	</software>
 
-	<!-- Identifying Gekiretsu Pachinkers (T-29601G)... -->
 	<software name="gepachin" supported="no">
 		<description>Gekiretsu Pachinkers (Japan)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-29601G"/>
 		<info name="release" value="19960802"/>
 		<info name="alt_title" value="激烈パチンカーズ"/>
@@ -26374,7 +26508,7 @@ Heavily broken [SCSP] in gameplay
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="下級生"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kakyuusei disc 1 t-28002g" sha1="9ba807f265552681404795b929dc8758c226d3cc" />
 			</diskarea>
@@ -26402,7 +26536,7 @@ Heavily broken [SCSP] in gameplay
 		<info name="release" value="19980923"/>
 		<info name="alt_title" value="機動戦艦ナデシコ The blank of 3years"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kidou senkan nadesico - the blank of 3 years disc 1 (gs-9195)" sha1="1a2b355bdfee81e1715b35bfa0c2073f49a47a6f" />
 			</diskarea>
@@ -26942,7 +27076,7 @@ Heavily broken [SCSP] in gameplay
 		<info name="release" value="19980122"/>
 		<info name="alt_title" value="センチメンタルグラフティ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sentimental graffiti disc 1 (t-20106g)" sha1="4fb62f5f1fcf1278857df572d8469e452ec4f87a" />
 			</diskarea>
@@ -27076,7 +27210,7 @@ Heavily broken [SCSP] in gameplay
 		<info name="release" value="19980226"/>
 		<info name="alt_title" value="スーチーパイ アドベンチャー ドキドキ♥ナイトメア"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="suchie-pai adventure doki doki nightmare disc 1 (t-5713g)" sha1="bd9950a54681614b5d4f45abb333faed3cac75ee" />
 			</diskarea>
@@ -27148,7 +27282,7 @@ Heavily broken [SCSP] in gameplay
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="エルフを狩るモノたち"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="elf wo karu mono-tachi v1.001 (1997)(altron)(ntsc)(jp)(disc 1 of 2)" sha1="233c4a4eefc7fae89d4fc559943e2b999ce5a0e1" />
 			</diskarea>
@@ -27170,7 +27304,7 @@ Heavily broken [SCSP] in gameplay
 		<info name="release" value="19960628"/>
 		<info name="alt_title" value="月花霧幻譚 TORICO"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gekka mugentan torico (japan) [gs-9056] (disc 1)" sha1="d94b3c828ed7f9f355aa772133c2dd913aff812b" />
 			</diskarea>
@@ -27400,7 +27534,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-1-angel-fish-jp... -->
 	<software name="aquaopt1" supported="no">
 		<description>Aquazone Option Disc 1 - Angel Fish</description>
 		<year>1996</year>
@@ -27408,6 +27541,7 @@ Not extensively tested
 		<info name="serial" value="T-24002G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ1 エンゼルフィッシュ"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27416,7 +27550,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-2-black-molly-jp... -->
 	<software name="aquaopt2" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 2 - Black Molly</description>
 		<year>1996</year>
@@ -27424,6 +27557,7 @@ Not extensively tested
 		<info name="serial" value="T-24003G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ2 ブラックモーリー"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27432,7 +27566,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-3-blue-emperor-jp... -->
 	<software name="aquaopt3" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 3 - Blue Emperor</description>
 		<year>1996</year>
@@ -27440,6 +27573,7 @@ Not extensively tested
 		<info name="serial" value="T-24004G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ3 ブルーエンペラー"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27448,7 +27582,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-4-clown-loach-jp... -->
 	<software name="aquaopt4" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 4 - Clown Loach</description>
 		<year>1996</year>
@@ -27456,6 +27589,7 @@ Not extensively tested
 		<info name="serial" value="T-24005G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ4 クラウンローチ"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27464,7 +27598,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-5-false-rummy-nose-jp... -->
 	<software name="aquaopt5" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 5 - False Rummy Nose</description>
 		<year>1996</year>
@@ -27472,6 +27605,7 @@ Not extensively tested
 		<info name="serial" value="T-24006G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ5 ラミーノーズテトラ"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27639,7 +27773,7 @@ Box Art shows 'Remix' Title, game reprogrammed from previous version
 		<info name="release" value="19970911"/>
 		<info name="alt_title" value="森高千里 渡良瀬橋/ララサンシャイン"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chisato moritaka" sha1="7ebb0dcf16a824f8e6a8b789cb3b5baba0dfb17b" />
 			</diskarea>
@@ -27749,11 +27883,13 @@ Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause?
 		</part>
 	</software>
 
-	<!-- Identifying Darius II (Japan) [T-1104G] (iso-ogg sourced)... -->
 	<software name="darius2j" cloneof="darius2" supported="no">
 		<description>Darius II (Japan)</description>
 		<year>1996</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1104G"/>
 		<info name="release" value="19960607"/>
 		<info name="alt_title" value="ダライアスⅡ"/>
@@ -27837,15 +27973,17 @@ Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC chan
 	<!-- There are rumours that the Japan version should be different (containing Williams logos and such)
 	     I believe rumours to be false.  If you watch the movie linked from http://www.segagagadomain.com/saturn10/doom.htm
 	     it does not have a Williams logo ingame, and the footage is taken from a genuine Japanese CD -->
-	<!-- Black screen after GT Interactive logo, expects [VDP1] CEF to be 1 (in manual mode, without writing to the port first) -->
-	<!-- Title screen flames are white for the first few frames, [VDP2] -->
-	<!-- Hangs during gameplay expecting Work RAM H $260666b0 to be zero, cache access? -->
-	<!-- Incorrectly blends several polygons -->
-	<!-- gameplay performance is poor [VDP2?] -->
 	<software name="doomj" cloneof="doom" supported="no">
 		<description>Doom (Japan)</description>
 		<year>1997</year>
 		<publisher>Soft Bank</publisher>
+		<notes><![CDATA[
+Black screen after GT Interactive logo, expects [VDP1] CEF to be 1 (in manual mode, without writing to the port first)
+Title screen flames are white for the first few frames, [VDP2]
+Hangs during gameplay expecting Work RAM H $260666b0 to be zero, cache access?
+Incorrectly blends several polygons
+gameplay performance is poor [VDP2]?
+]]></notes>
 		<info name="serial" value="T-18610G"/>
 		<info name="release" value="19970711"/>
 		<info name="alt_title" value="ドゥーム"/>
@@ -27915,7 +28053,7 @@ Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC chan
 		<info name="release" value="19980716"/>
 		<info name="alt_title" value="エルフを狩るモノたちⅡ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="elves2-cd1" sha1="a87004f2b71839f140036abb2265989d05a25f49" />
 			</diskarea>
@@ -28069,7 +28207,7 @@ Not extensively tested
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="ホーンテッド カジノ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="haunted casino cd1" sha1="1c9807e533bc3875290b9b86c23d5d734d9c9a9d" />
 			</diskarea>
@@ -28434,7 +28572,7 @@ Not extensively tested (all the other games)
 		<info name="release" value="19980730"/>
 		<info name="alt_title" value="お嬢様特急 ~ Ojousama Tokkyuu (Box)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ojyousama tokkyuu cd1" sha1="23e2dfab3794b76ea56a67dbf7525b58f41ee45a" />
 			</diskarea>
@@ -28778,7 +28916,7 @@ Currently untested in gameplay
 		<info name="release" value="19980528"/>
 		<info name="alt_title" value="少女革命ウテナ いつか革命される物語"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shoujo kakumei utena itsuka kakumei sareru monogatari (japan) [gs-9182] (disc 1)" sha1="9ed07dc24f1f92846ea14ca4f67e37e5a1fee7ca" />
 			</diskarea>
@@ -28893,7 +29031,7 @@ Currently untested in gameplay
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="ストリートファイターⅡムービー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="street fighter 2 movie disc1 (t-1204g)" sha1="ee314963e45b9892bbf2d40ad38599790f5dcb9b" />
 			</diskarea>
@@ -28994,7 +29132,7 @@ Currently untested in gameplay
 		<info name="release" value="19970117"/>
 		<info name="alt_title" value="天地無用!登校無用 ～アニラジコレクション～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tenchi_muyo_disk1" sha1="cf2f4cd455db0e269977f5b1eb77107550e5a54a" />
 			</diskarea>
@@ -29471,7 +29609,7 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atlantis - the lost tales v1.200 (1998)(sega)(pal)(m3)(disc 1 of 2)" sha1="bf9f8736e131da6b685519154e397adad242f351" />
 			</diskarea>
@@ -29491,7 +29629,7 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-09"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="0691-atlantis-fre-cd1" sha1="9e2797a3b9020307eb5b853181c4d34f36ecac9b" />
 			</diskarea>
@@ -30095,7 +30233,7 @@ Not extensively tested
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8106H-50 E"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="d v1.000 (1995)(acclaim)(pal)(disc 1 of 2)" sha1="42639b46f848dfd55d4a7c0c37d6e7158cbd8093" />
 			</diskarea>
@@ -30115,7 +30253,7 @@ Not extensively tested
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8106H-50 F"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="d cd1 eur fr" sha1="08f6a88889cb9f04079a2eedd0b19c53d8695cf1" />
 			</diskarea>
@@ -30135,7 +30273,7 @@ Not extensively tested
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8106H-50 G"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="d v1.000 (1995)(acclaim)(pal)(de)(disc 1 of 2)" sha1="c22eb646dcd89aee8cb16eaa2a9b1c5e30881170" />
 			</diskarea>
@@ -30225,7 +30363,7 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81804-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="deepfear1" sha1="ef50c2d6ed281f55b373d2926fd35e6b28d0b39c" />
 			</diskarea>
@@ -30431,7 +30569,7 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81076-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="enemyzerodisk0" sha1="6af5b2c6e3e0cd090b8dd02c316117077cab72bc" />
 			</diskarea>
@@ -31414,7 +31552,7 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81016-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mr bones - cd1 (e)" sha1="765576d955392eb84049e684c7e49aee0daeeffd" />
 			</diskarea>
@@ -31856,7 +31994,7 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81307-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="azel_1" sha1="9f2182a48182eb9fb9a50c8c3ced98a3ca9044c9" />
 			</diskarea>
@@ -31920,11 +32058,13 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		</part>
 	</software>
 
-	<!-- Identifying PHOTO_CD_OPERATING_SYSTEM... -->
 	<software name="photocdo" supported="no">
 		<description>Photo CD Operating System (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Often hangs on title screen [CD-Block]?
+]]></notes>
 		<info name="serial" value="MK81681-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -32870,7 +33010,7 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81053-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="torico cd1 (e)" sha1="22094ccf6ee0c8ffcac36da8bbbb7630ffa80cf0" />
 			</diskarea>
@@ -34422,7 +34562,7 @@ Not extensively tested
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-16201H"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sat-0861-corpse_killer-usa-cd1" sha1="7d513c307dca3835182ae79135d0801ba4682b12" />
 			</diskarea>
@@ -34456,7 +34596,7 @@ Not extensively tested
 		<publisher>Data East</publisher>
 		<info name="serial" value="T-1304H"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sat-0757-creature_shock-usa-cd1" sha1="1e003df48983a0664d8f09506b3e4634ef5f9d14" />
 			</diskarea>
@@ -34620,7 +34760,7 @@ Not extensively tested
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8106H"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ddisk1" sha1="60083c0364d2da1c0b31ab5dacbbeb7c40e80b49" />
 			</diskarea>
@@ -34801,7 +34941,7 @@ Not extensively tested
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-16207H"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="double switch v1.000 (1995)(digital pictures)(ntsc)(us)(disc 1 of 2)" sha1="6627dbae0141ad75463e40420c05f3787672eae8" />
 			</diskarea>
@@ -34881,7 +35021,7 @@ Not extensively tested
 		<info name="serial" value="81076"/>
 		<info name="release" value="199710xx"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sat-0775-enemy_zero-usa-cd1" sha1="f3d42a84f94fa6587f995d85a422bf7c738efcd7" />
 			</diskarea>
@@ -35476,7 +35616,7 @@ Cross-border [SH2]: DMA 0 start 25818000, 25e40000, 1000000, 4a01, 0, 1, 2
 		<info name="serial" value="T-14403H"/>
 		<info name="release" value="199705xx"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sat-0689-lunacy-usa-cd1" sha1="4692cd4d1e65374b21353fb7bfc1474e7a49d357" />
 			</diskarea>
@@ -35732,7 +35872,7 @@ Cross-border [SH2]: DMA 0 start 25818000, 25e40000, 1000000, 4a01, 0, 1, 2
 		<info name="serial" value="81016"/>
 		<info name="release" value="199609xx"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sat-0760-mr_bones-usa-cd1" sha1="ed0dc7c3703f2644af6c0826f973b86c40ea935c" />
 			</diskarea>
@@ -37560,7 +37700,7 @@ Doesn't accept any input on System Memory requirement screen
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sat-0840-deep_fear_prototype-usa-cd1" sha1="e37c09ab491c5d4f56e96bd461190abcc948a1de" />
 			</diskarea>
@@ -37752,7 +37892,7 @@ Doesn't accept any input on System Memory requirement screen
 Game will freeze if you let the intro video play and press start. You can skip it at the start or let it finish to play normally.
 ]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="prize fighter - heavyweight edition (usa) (proto) (1996-03-25) (disc 1)" sha1="dc333b7ea68a9a42f9a0baefe1a6e075ae9b6bee" />
 			</diskarea>
@@ -37773,7 +37913,7 @@ Game will freeze if you let the intro video play and press start. You can skip i
 Game will freeze if you let the intro video play and press start. You can skip it at the start or let it finish to play normally.
 ]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="prize fighter - heavyweight edition (japan) (proto) (1996-04-18) (disc 1)" sha1="04c2357ab28a1842e3c7e9942fd1eb9e233da372" />
 			</diskarea>
@@ -38118,7 +38258,7 @@ Game will freeze if you let the intro video play and press start. You can skip i
 		<publisher>Sega</publisher>
 
 		<!-- no discs 1 + 2 dumped? -->
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="panzer dragoon saga (prototype - dec 30, 1997) (disc 3)" sha1="078cccaa977c29a8a774b311bf4adb4edc63caea" />
 			</diskarea>
@@ -38150,7 +38290,7 @@ Game will freeze if you let the intro video play and press start. You can skip i
 		<description>Panzer Dragoon Saga (discs 1&amp;2&amp;3, prototype 19971130)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="panzer dragoon saga (prototype - nov 30, 1997) (disc 1)" sha1="2216d711c522c8fd9035e1a0743604422cab0fac" />
 			</diskarea>

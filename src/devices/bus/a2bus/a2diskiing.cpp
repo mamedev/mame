@@ -15,6 +15,7 @@
 #include "imagedev/floppy.h"
 
 #include "formats/ap2_dsk.h"
+#include "formats/ap_dsk35.h"
 #include "formats/as_dsk.h"
 #include "formats/fs_prodos.h"
 
@@ -163,6 +164,7 @@ void diskiing_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_EDD_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
 	fr.add(FLOPPY_NIB_FORMAT);
+	fr.add(FLOPPY_APPLE_2MG_FORMAT);
 
 	fr.add(fs::PRODOS);
 }

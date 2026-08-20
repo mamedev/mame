@@ -1008,9 +1008,6 @@ project "lualibs"
 	}
 
 	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-error=unused-variable",
-		}
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -1018,15 +1015,10 @@ project "lualibs"
 	configuration { "vs*" }
 if _OPTIONS["vs"]==nil then
 		buildoptions {
-			"/wd4101", -- warning C4101: 'identifier': unreferenced local variable
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
 			"/wd4152", -- warning C4152: nonstandard extension, function/data pointer conversion in expression
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
-		}
-elseif _OPTIONS["vs"]=="clangcl" then
-		buildoptions {
-			"-Wno-error=unused-variable",
 		}
 end
 
@@ -1063,11 +1055,11 @@ project "sqlite3"
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-bad-function-cast",
+			"-Wno-error=bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
@@ -1076,16 +1068,16 @@ if _OPTIONS["gcc"]~=nil then
 		}
 	else
 		buildoptions_c {
-			"-Wno-return-local-addr", -- sqlite3.c in GCC 10
-			"-Wno-misleading-indentation",  -- sqlite3.c in GCC 11.1
+			"-Wno-error=return-local-addr", -- sqlite3.c in GCC 10
+			"-Wno-error=misleading-indentation",  -- sqlite3.c in GCC 11.1
 		}
 	end
 end
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 end
 

@@ -11,7 +11,6 @@
 #include "dragon_msx2.h"
 #include "render.h"
 #include "screen.h"
-#include "speaker.h"
 
 
 //**************************************************************************
@@ -116,11 +115,21 @@ void dragon_msx2_device::device_add_mconfig(machine_config &config)
 	m_v9958->int_cb().set([this](int state) { set_line_value(line::NMI, state); });
 	SCREEN(config, "screen");
 
-	SPEAKER(config, "speaker").front_center();
-	YM2413(config, m_ym2413, 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	YM2149(config, m_ym2149, 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM2413(config, m_ym2413, 21.477272_MHz_XTAL / 6);
+	YM2149(config, m_ym2149, 21.477272_MHz_XTAL / 6);
 }
 
+
+//-------------------------------------------------
+//  device_resolve_objects
+//-------------------------------------------------
+
+void dragon_msx2_device::device_resolve_objects()
+{
+	// mono back to the CoCo system cartridge audio input line
+	add_sound_route(*m_ym2413, ALL_OUTPUTS, 1.0);
+	add_sound_route(*m_ym2149, ALL_OUTPUTS, 1.0);
+}
 
 //-------------------------------------------------
 //  scs_read

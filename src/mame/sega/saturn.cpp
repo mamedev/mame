@@ -2457,8 +2457,10 @@ void saturn_state::vdp1_process_list()
 				default:
 					// asenna 0x0c or 0x0d (transition from title screen)
 					// raymanj 0x0d (at startup)
+					// choroqpk 0x0e (when selecting island in main menu)
 					// albodysj 0x0f (always)
-					popmessage ("VDP1: Sprite List Illegal %02x (%d)",current_sprite.CMDCTRL & 0xf,spritecount);
+					if ((current_sprite.CMDCTRL & 0x000f) < 0xc)
+						popmessage ("VDP1: Sprite List Illegal %02x (%d)",current_sprite.CMDCTRL & 0xf,spritecount);
 					m_vdp1_legacy.lopr = (position * 0x20) >> 3;
 					//m_vdp1_legacy.copr = (position * 0x20) >> 3;
 					// prematurely kill the VDP1 process if an illegal opcode is executed
