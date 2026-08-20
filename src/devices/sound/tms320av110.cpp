@@ -14,121 +14,29 @@
 #include "emu.h"
 #include "tms320av110.h"
 
-#include "mpeg_audio.h"
-
 #include <cmath>
 
-#define LOG_REQUESTS (1U << 0)
-#define LOG_REGISTERS (1U << 1)
+#define LOG_REQUESTS (1U << 1)
+#define LOG_REGISTERS (1U << 2)
 
 #define VERBOSE (0)
 #include "logmacro.h"
 
-namespace {
-
-// The host interface has seven address pins, SADDR6 through SADDR0.
-constexpr unsigned HOST_ADDRESS_BITS = 7;
-constexpr unsigned HOST_REGISTER_COUNT = 1U << HOST_ADDRESS_BITS;
-constexpr offs_t HOST_ADDRESS_MASK = HOST_REGISTER_COUNT - 1;
-
-// Host-interface register addresses from the data sheet.
-constexpr offs_t REG_BUFF_L = 0x12;   // input buffer word count, bits 7:0
-constexpr offs_t REG_BUFF_H = 0x13;   // input buffer word count, bits 14:8
-constexpr offs_t REG_FREE_FORM_L = 0x14; // free-format frame length, bits 7:0
-constexpr offs_t REG_FREE_FORM_H = 0x15; // free-format frame length, bits 10:8
-constexpr offs_t REG_PCM_18 = 0x16;   // PCM output precision
-constexpr offs_t REG_DATAIN = 0x18;   // memory-mapped compressed-data input
-constexpr offs_t REG_INTR_L = 0x1a;   // interrupt status, bits 7:0
-constexpr offs_t REG_INTR_H = 0x1b;   // interrupt status, bits 15:8
-constexpr offs_t REG_INTR_EN_L = 0x1c; // interrupt enable, bits 7:0
-constexpr offs_t REG_INTR_EN_H = 0x1d; // interrupt enable, bits 15:8
-constexpr offs_t REG_ATTEN_L = 0x1e;  // left output attenuation
-constexpr offs_t REG_ATTEN_R = 0x20;  // right output attenuation
-constexpr offs_t REG_AUD_ID = 0x22;   // MPEG system/packet audio stream ID
-constexpr offs_t REG_AUD_ID_EN = 0x24; // audio stream ID filtering enable
-constexpr offs_t REG_SYNC_ST = 0x26;  // synchronization status
-constexpr offs_t REG_SYNC_LCK = 0x28; // required additional synchronization words
-constexpr offs_t REG_CRC_ECM = 0x2a;  // CRC error concealment mode
-constexpr offs_t REG_SYNC_ECM = 0x2c; // synchronization error concealment mode
-constexpr offs_t REG_PLAY = 0x2e;     // decoded audio output enable
-constexpr offs_t REG_MUTE = 0x30;     // decoded audio mute
-constexpr offs_t REG_SKIP = 0x32;     // skip next audio frame
-constexpr offs_t REG_REPEAT = 0x34;   // repeat next audio frame
-constexpr offs_t REG_STR_SEL = 0x36;  // compressed input stream format
-constexpr offs_t REG_PCM_ORD = 0x38;  // PCM output bit order
-constexpr offs_t REG_LATENCY = 0x3c;  // synchronization lookahead enable
-constexpr offs_t REG_DRAM_EXT = 0x3e; // external input-buffer DRAM present
-constexpr offs_t REG_RESET = 0x40;    // decoder reset command/status
-constexpr offs_t REG_RESTART = 0x42;  // data-buffer flush command/status
-constexpr offs_t REG_PCM_FS = 0x44;   // decoded sampling frequency
-constexpr offs_t REG_PCM_DIV = 0x6e;  // PCM clock divider
-constexpr offs_t REG_DIF = 0x6f;      // 18-bit PCM justification
-constexpr offs_t REG_SIN_EN = 0x70;   // serial compressed-data input enable
-
-// Without external DRAM, the on-chip compressed-data input SRAM is 256 bytes.
-constexpr unsigned INPUT_BUFFER_BYTES_WITHOUT_DRAM = 256;
-// The supported external DRAM is 256K locations by four bits.
-constexpr unsigned INPUT_BUFFER_BYTES_WITH_DRAM = 256 * 1024 * 4 / 8;
-// The interface permits one further byte after REQ reports full, held
-// separately from the selected input buffer.
-constexpr unsigned INPUT_FIFO_BYTES = INPUT_BUFFER_BYTES_WITH_DRAM + 1;
-
-// A no-DRAM reset takes approximately 700 microseconds at the nominal 24 MHz
-// OSCIN frequency, corresponding to 16,800 oscillator clocks.
-constexpr unsigned RESET_CYCLES_WITHOUT_DRAM = 16'800;
-// With external DRAM, reset takes approximately 3.7 ms at 24 MHz.
-constexpr unsigned RESET_CYCLES_WITH_DRAM = 88'800;
-
-// MPEG audio is presented as left and right PCM output slots, including mono streams.
-constexpr unsigned LEFT_CHANNEL = 0;
-constexpr unsigned RIGHT_CHANNEL = 1;
-constexpr unsigned OUTPUT_CHANNELS = 2;
-
-// Used for sound scheduling until an MPEG header supplies the stream rate.
-constexpr u32 INITIAL_SAMPLE_RATE = 44'100;
-
-// MPEG-1 Layer II produces 1,152 samples per channel for each decoded frame.
-constexpr unsigned MPEG_LAYER_II_SAMPLES_PER_FRAME = 1'152;
-
-// A Layer II frame is largest at the maximum bit rate and minimum sample rate.
-constexpr unsigned MAX_MPEG1_LAYER_II_BIT_RATE = 384'000;
-constexpr unsigned MIN_MPEG1_SAMPLE_RATE = 32'000;
-constexpr unsigned MPEG1_LAYER_II_FRAME_SCALE = 144;
-constexpr unsigned MPEG_FRAME_PADDING_BYTES = 1;
-constexpr unsigned MAX_MPEG_AUDIO_FRAME_BYTES =
-	(MPEG1_LAYER_II_FRAME_SCALE * MAX_MPEG1_LAYER_II_BIT_RATE / MIN_MPEG1_SAMPLE_RATE) + MPEG_FRAME_PADDING_BYTES;
-
-// This is private storage for adapting the streaming device to the frame-based
-// MPEG helper.  It is not the AV110's hardware-visible compressed-data SRAM.
-constexpr unsigned DECODER_INPUT_BYTES = 2 * MAX_MPEG_AUDIO_FRAME_BYTES;
-
-} // anonymous namespace
-
 DEFINE_DEVICE_TYPE(TMS320AV110, tms320av110_device, "tms320av110", "Texas Instruments TMS320AV110 MPEG Audio Decoder")
-
-struct tms320av110_device::decoder_state
-{
-	std::array<u8, HOST_REGISTER_COUNT> registers{};
-	std::array<u8, INPUT_FIFO_BYTES> input_fifo{};
-	std::array<u8, DECODER_INPUT_BYTES> input{};
-	std::array<s16, MPEG_LAYER_II_SAMPLES_PER_FRAME * OUTPUT_CHANNELS> pcm{};
-	std::unique_ptr<mpeg_audio> decoder;
-	unsigned input_fifo_read = 0;
-	unsigned input_fifo_write = 0;
-	unsigned input_fifo_count = 0;
-	unsigned input_bytes = 0;
-	unsigned input_bit_position = 0;
-	unsigned pcm_position = 0;
-	unsigned pcm_count = 0;
-	unsigned pcm_channels = 0;
-};
 
 tms320av110_device::tms320av110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, TMS320AV110, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),
 	m_req_cb(*this),
-	m_decoder(std::make_unique<decoder_state>()),
+	m_input_fifo_read(0),
+	m_input_fifo_write(0),
+	m_input_fifo_count(0),
+	m_input_bytes(0),
+	m_input_bit_position(0),
+	m_pcm_position(0),
+	m_pcm_count(0),
+	m_pcm_channels(0),
 	m_external_dram(false),
 	m_input_timer(nullptr),
 	m_reset_timer(nullptr),
@@ -139,28 +47,27 @@ tms320av110_device::tms320av110_device(const machine_config &mconfig, const char
 {
 }
 
-tms320av110_device::~tms320av110_device() = default;
-
 void tms320av110_device::device_start()
 {
 	m_stream = stream_alloc(0, OUTPUT_CHANNELS, INITIAL_SAMPLE_RATE);
 	m_input_timer = timer_alloc(FUNC(tms320av110_device::input_tick), this);
 	m_reset_timer = timer_alloc(FUNC(tms320av110_device::reset_complete), this);
-	decoder_create();
-	m_decoder->decoder->register_save_state(*this);
+	m_input_fifo = std::make_unique<u8[]>(INPUT_FIFO_BYTES);
+	m_decoder = std::make_unique<mpeg_audio>(m_input, mpeg_audio::L2, false, 0);
+	m_decoder->register_save_state(*this);
 
-	save_item(NAME(m_decoder->registers));
-	save_item(NAME(m_decoder->input_fifo));
-	save_item(NAME(m_decoder->input));
-	save_item(NAME(m_decoder->pcm));
-	save_item(NAME(m_decoder->input_fifo_read));
-	save_item(NAME(m_decoder->input_fifo_write));
-	save_item(NAME(m_decoder->input_fifo_count));
-	save_item(NAME(m_decoder->input_bytes));
-	save_item(NAME(m_decoder->input_bit_position));
-	save_item(NAME(m_decoder->pcm_position));
-	save_item(NAME(m_decoder->pcm_count));
-	save_item(NAME(m_decoder->pcm_channels));
+	save_item(NAME(m_registers));
+	save_pointer(NAME(m_input_fifo), INPUT_FIFO_BYTES);
+	save_item(NAME(m_input));
+	save_item(NAME(m_pcm));
+	save_item(NAME(m_input_fifo_read));
+	save_item(NAME(m_input_fifo_write));
+	save_item(NAME(m_input_fifo_count));
+	save_item(NAME(m_input_bytes));
+	save_item(NAME(m_input_bit_position));
+	save_item(NAME(m_pcm_position));
+	save_item(NAME(m_pcm_count));
+	save_item(NAME(m_pcm_channels));
 	save_item(NAME(m_reset_asserted));
 	save_item(NAME(m_reset_cycle));
 	save_item(NAME(m_data_access));
@@ -171,7 +78,7 @@ void tms320av110_device::device_reset()
 {
 	m_input_timer->adjust(attotime::never);
 	m_reset_timer->adjust(attotime::never);
-	m_decoder->registers.fill(0);
+	std::fill(std::begin(m_registers), std::end(m_registers), 0);
 	m_reset_asserted = false;
 	m_reset_cycle = false;
 	start_reset(true);
@@ -182,11 +89,6 @@ void tms320av110_device::device_post_load()
 	m_req_cb(m_req_state);
 }
 
-void tms320av110_device::decoder_create()
-{
-	m_decoder->decoder = std::make_unique<mpeg_audio>(m_decoder->input.data(), mpeg_audio::L2, false, 0);
-}
-
 void tms320av110_device::decoder_reset()
 {
 	if (m_stream)
@@ -195,25 +97,25 @@ void tms320av110_device::decoder_reset()
 		m_stream->set_sample_rate(INITIAL_SAMPLE_RATE);
 	}
 
-	m_decoder->input.fill(0);
-	m_decoder->pcm.fill(0);
-	m_decoder->input_bytes = 0;
-	m_decoder->input_bit_position = 0;
-	m_decoder->pcm_position = 0;
-	m_decoder->pcm_count = 0;
-	m_decoder->pcm_channels = 0;
-	m_decoder->registers[REG_SYNC_ST] = 0;
-	m_decoder->registers[REG_PCM_FS] = 0;
-	m_decoder->decoder->clear();
+	std::fill(std::begin(m_input), std::end(m_input), 0);
+	std::fill(std::begin(m_pcm), std::end(m_pcm), 0);
+	m_input_bytes = 0;
+	m_input_bit_position = 0;
+	m_pcm_position = 0;
+	m_pcm_count = 0;
+	m_pcm_channels = 0;
+	m_registers[REG_SYNC_ST] = 0;
+	m_registers[REG_PCM_FS] = 0;
+	m_decoder->clear();
 }
 
 void tms320av110_device::input_fifo_reset()
 {
 	m_input_timer->adjust(attotime::never);
-	m_decoder->input_fifo.fill(0);
-	m_decoder->input_fifo_read = 0;
-	m_decoder->input_fifo_write = 0;
-	m_decoder->input_fifo_count = 0;
+	std::fill_n(m_input_fifo.get(), INPUT_FIFO_BYTES, 0);
+	m_input_fifo_read = 0;
+	m_input_fifo_write = 0;
+	m_input_fifo_count = 0;
 	m_data_access = false;
 }
 
@@ -221,17 +123,17 @@ void tms320av110_device::start_reset(bool pin_reset)
 {
 	decoder_reset();
 	input_fifo_reset();
-	m_decoder->registers[REG_INTR_L] = 0;
-	m_decoder->registers[REG_INTR_H] = 0;
-	m_decoder->registers[REG_INTR_EN_L] = 0;
-	m_decoder->registers[REG_INTR_EN_H] = 0;
-	m_decoder->registers[REG_RESET] = 1;
-	m_decoder->registers[REG_RESTART] = 0;
+	m_registers[REG_INTR_L] = 0;
+	m_registers[REG_INTR_H] = 0;
+	m_registers[REG_INTR_EN_L] = 0;
+	m_registers[REG_INTR_EN_H] = 0;
+	m_registers[REG_RESET] = 1;
+	m_registers[REG_RESTART] = 0;
 	if (pin_reset)
 	{
-		m_decoder->registers[REG_PLAY] = 0;
-		m_decoder->registers[REG_MUTE] = 0;
-		m_decoder->registers[REG_PCM_DIV] = 0;
+		m_registers[REG_PLAY] = 0;
+		m_registers[REG_MUTE] = 0;
+		m_registers[REG_PCM_DIV] = 0;
 	}
 
 	m_reset_cycle = true;
@@ -244,11 +146,11 @@ void tms320av110_device::start_restart()
 {
 	decoder_reset();
 	input_fifo_reset();
-	m_decoder->registers[REG_INTR_L] = 0;
-	m_decoder->registers[REG_INTR_H] = 0;
-	m_decoder->registers[REG_INTR_EN_L] = 0;
-	m_decoder->registers[REG_INTR_EN_H] = 0;
-	m_decoder->registers[REG_RESTART] = 1;
+	m_registers[REG_INTR_L] = 0;
+	m_registers[REG_INTR_H] = 0;
+	m_registers[REG_INTR_EN_L] = 0;
+	m_registers[REG_INTR_EN_H] = 0;
+	m_registers[REG_RESTART] = 1;
 	m_reset_cycle = true;
 
 	// Restart completion timing is not specified.  Complete it on the next
@@ -259,8 +161,8 @@ void tms320av110_device::start_restart()
 
 TIMER_CALLBACK_MEMBER(tms320av110_device::reset_complete)
 {
-	m_decoder->registers[REG_RESET] = 0;
-	m_decoder->registers[REG_RESTART] = 0;
+	m_registers[REG_RESET] = 0;
+	m_registers[REG_RESTART] = 0;
 	m_reset_cycle = false;
 	update_req();
 	start_input_timer();
@@ -268,14 +170,14 @@ TIMER_CALLBACK_MEMBER(tms320av110_device::reset_complete)
 
 bool tms320av110_device::decode_frame()
 {
-	int position = m_decoder->input_bit_position;
+	int position = m_input_bit_position;
 	int sample_count = 0;
 	int sample_rate = 0;
 	int channels = 0;
-	if (!m_decoder->decoder->decode_buffer(
+	if (!m_decoder->decode_buffer(
 			position,
-			m_decoder->input_bytes * 8,
-			m_decoder->pcm.data(),
+			m_input_bytes * 8,
+			m_pcm,
 			sample_count,
 			sample_rate,
 			channels))
@@ -285,30 +187,27 @@ bool tms320av110_device::decode_frame()
 
 	assert(sample_count <= MPEG_LAYER_II_SAMPLES_PER_FRAME);
 	assert((channels == 1) || (channels == OUTPUT_CHANNELS));
-	m_decoder->pcm_position = 0;
-	m_decoder->pcm_count = sample_count;
-	m_decoder->pcm_channels = channels;
-	m_decoder->registers[REG_SYNC_ST] = 0x03;
+	m_pcm_position = 0;
+	m_pcm_count = sample_count;
+	m_pcm_channels = channels;
+	m_registers[REG_SYNC_ST] = 0x03;
 
-	const unsigned bytes_consumed = position / 8;
+	const u32 bytes_consumed = position / 8;
 	if (bytes_consumed)
 	{
-		std::move(
-			m_decoder->input.begin() + bytes_consumed,
-			m_decoder->input.begin() + m_decoder->input_bytes,
-			m_decoder->input.begin());
-		m_decoder->input_bytes -= bytes_consumed;
+		std::move(m_input + bytes_consumed, m_input + m_input_bytes, m_input);
+		m_input_bytes -= bytes_consumed;
 	}
-	m_decoder->input_bit_position = position & 7;
+	m_input_bit_position = position & 7;
 	start_input_timer();
 
 	if (sample_rate)
 	{
 		switch (sample_rate)
 		{
-		case 44'100: m_decoder->registers[REG_PCM_FS] = 0; break;
-		case 48'000: m_decoder->registers[REG_PCM_FS] = 1; break;
-		case 32'000: m_decoder->registers[REG_PCM_FS] = 2; break;
+		case 44'100: m_registers[REG_PCM_FS] = 0; break;
+		case 48'000: m_registers[REG_PCM_FS] = 1; break;
+		case 32'000: m_registers[REG_PCM_FS] = 2; break;
 		default: break;
 		}
 
@@ -321,8 +220,8 @@ bool tms320av110_device::decode_frame()
 
 void tms320av110_device::start_input_timer()
 {
-	if (!m_reset_asserted && !m_reset_cycle && m_decoder->input_fifo_count &&
-		(m_data_access || (m_decoder->input_bytes != m_decoder->input.size())))
+	if (!m_reset_asserted && !m_reset_cycle && m_input_fifo_count &&
+		(m_data_access || (m_input_bytes != DECODER_INPUT_BYTES)))
 	{
 		m_input_timer->adjust(clocks_to_attotime(1));
 	}
@@ -331,16 +230,15 @@ void tms320av110_device::start_input_timer()
 TIMER_CALLBACK_MEMBER(tms320av110_device::input_tick)
 {
 	LOGMASKED(LOG_REQUESTS, "%s: input tick, FIFO=%u staging=%u\n", machine().describe_context(),
-		m_decoder->input_fifo_count, m_decoder->input_bytes);
+		m_input_fifo_count, m_input_bytes);
 	m_stream->update();
-	if (m_decoder->input_fifo_count && (m_decoder->input_bytes != m_decoder->input.size()))
+	if (m_input_fifo_count && (m_input_bytes != DECODER_INPUT_BYTES))
 	{
-		m_decoder->input[m_decoder->input_bytes++] = m_decoder->input_fifo[m_decoder->input_fifo_read];
-		m_decoder->input_fifo_read = (m_decoder->input_fifo_read + 1) % m_decoder->input_fifo.size();
-		m_decoder->input_fifo_count--;
+		m_input[m_input_bytes++] = m_input_fifo[m_input_fifo_read];
+		m_input_fifo_read = (m_input_fifo_read + 1) % INPUT_FIFO_BYTES;
+		m_input_fifo_count--;
 	}
-	if ((m_decoder->pcm_position == m_decoder->pcm_count) &&
-		(m_decoder->input_bytes == m_decoder->input.size()))
+	if ((m_pcm_position == m_pcm_count) && (m_input_bytes == DECODER_INPUT_BYTES))
 	{
 		decode_frame();
 	}
@@ -353,7 +251,7 @@ TIMER_CALLBACK_MEMBER(tms320av110_device::input_tick)
 void tms320av110_device::fifo_w(u8 data)
 {
 	LOGMASKED(LOG_REQUESTS, "%s: DATAIN %02x, FIFO=%u staging=%u\n", machine().describe_context(), data,
-		m_decoder->input_fifo_count, m_decoder->input_bytes);
+		m_input_fifo_count, m_input_bytes);
 	if (m_reset_cycle)
 	{
 		LOGMASKED(LOG_REGISTERS, "%s: DATAIN write %02x during reset/restart\n", machine().describe_context(), data);
@@ -361,16 +259,16 @@ void tms320av110_device::fifo_w(u8 data)
 	}
 
 	m_stream->update();
-	const unsigned capacity = m_external_dram ? INPUT_BUFFER_BYTES_WITH_DRAM : INPUT_BUFFER_BYTES_WITHOUT_DRAM;
-	if (m_decoder->input_fifo_count > capacity)
+	const u32 capacity = m_external_dram ? INPUT_BUFFER_BYTES_WITH_DRAM : INPUT_BUFFER_BYTES_WITHOUT_DRAM;
+	if (m_input_fifo_count > capacity)
 	{
 		logerror("%s: compressed-audio input overflow\n", machine().describe_context());
 		return;
 	}
 
-	m_decoder->input_fifo[m_decoder->input_fifo_write] = data;
-	m_decoder->input_fifo_write = (m_decoder->input_fifo_write + 1) % m_decoder->input_fifo.size();
-	m_decoder->input_fifo_count++;
+	m_input_fifo[m_input_fifo_write] = data;
+	m_input_fifo_write = (m_input_fifo_write + 1) % INPUT_FIFO_BYTES;
+	m_input_fifo_count++;
 	m_data_access = true;
 	update_req();
 	start_input_timer();
@@ -390,9 +288,9 @@ void tms320av110_device::update_req()
 {
 	// REQ is active low.  DATAIN raises it for the access handshake, and it
 	// remains high while reset is active or the selected input buffer is full.
-	const unsigned capacity = m_external_dram ? INPUT_BUFFER_BYTES_WITH_DRAM : INPUT_BUFFER_BYTES_WITHOUT_DRAM;
+	const u32 capacity = m_external_dram ? INPUT_BUFFER_BYTES_WITH_DRAM : INPUT_BUFFER_BYTES_WITHOUT_DRAM;
 	set_req((m_reset_asserted || m_reset_cycle || m_data_access ||
-		(m_decoder->input_fifo_count >= capacity)) ? ASSERT_LINE : CLEAR_LINE);
+		(m_input_fifo_count >= capacity)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void tms320av110_device::reset_w(int state)
@@ -419,10 +317,10 @@ u8 tms320av110_device::read(offs_t offset)
 	switch (offset)
 	{
 	case REG_BUFF_L:
-		return (m_decoder->input_fifo_count / 4) & 0xff;
+		return (m_input_fifo_count / 4) & 0xff;
 
 	case REG_BUFF_H:
-		return (m_decoder->input_fifo_count / 4) >> 8;
+		return (m_input_fifo_count / 4) >> 8;
 
 	case REG_DRAM_EXT:
 		return m_external_dram;
@@ -455,7 +353,7 @@ u8 tms320av110_device::read(offs_t offset)
 	case REG_PCM_DIV:
 	case REG_DIF:
 	case REG_SIN_EN:
-		return m_decoder->registers[offset];
+		return m_registers[offset];
 	}
 
 	if (!machine().side_effects_disabled())
@@ -491,28 +389,28 @@ void tms320av110_device::write(offs_t offset, u8 data)
 	case REG_FREE_FORM_L:
 	case REG_INTR_EN_L:
 	case REG_INTR_EN_H:
-		m_decoder->registers[offset] = data;
+		m_registers[offset] = data;
 		break;
 
 	case REG_FREE_FORM_H:
-		m_decoder->registers[offset] = data & 0x07;
+		m_registers[offset] = data & 0x07;
 		break;
 
 	case REG_SYNC_LCK:
 	case REG_CRC_ECM:
 	case REG_SYNC_ECM:
 	case REG_STR_SEL:
-		m_decoder->registers[offset] = data & 0x03;
+		m_registers[offset] = data & 0x03;
 		break;
 
 	case REG_AUD_ID:
-		m_decoder->registers[offset] = data & 0x1f;
+		m_registers[offset] = data & 0x1f;
 		break;
 
 	case REG_ATTEN_L:
 	case REG_ATTEN_R:
 	case REG_PCM_DIV:
-		m_decoder->registers[offset] = data & 0x3f;
+		m_registers[offset] = data & 0x3f;
 		break;
 
 	case REG_PCM_18:
@@ -525,7 +423,7 @@ void tms320av110_device::write(offs_t offset, u8 data)
 	case REG_LATENCY:
 	case REG_DIF:
 	case REG_SIN_EN:
-		m_decoder->registers[offset] = data & 0x01;
+		m_registers[offset] = data & 0x01;
 		break;
 
 	case REG_RESET:
@@ -545,27 +443,27 @@ void tms320av110_device::write(offs_t offset, u8 data)
 
 void tms320av110_device::sound_stream_update(sound_stream &stream)
 {
-	const bool playing = BIT(m_decoder->registers[REG_PLAY], 0) && !m_reset_asserted && !m_reset_cycle;
-	const bool muted = BIT(m_decoder->registers[REG_MUTE], 0);
-	const float left_gain = std::pow(10.0F, -float(m_decoder->registers[REG_ATTEN_L]) / 10.0F);
-	const float right_gain = std::pow(10.0F, -float(m_decoder->registers[REG_ATTEN_R]) / 10.0F);
+	const bool playing = BIT(m_registers[REG_PLAY], 0) && !m_reset_asserted && !m_reset_cycle;
+	const bool muted = BIT(m_registers[REG_MUTE], 0);
+	const float left_gain = std::pow(10.0F, -float(m_registers[REG_ATTEN_L]) / 10.0F);
+	const float right_gain = std::pow(10.0F, -float(m_registers[REG_ATTEN_R]) / 10.0F);
 
 	for (int sample = 0; sample < stream.samples(); sample++)
 	{
-		if (!playing || ((m_decoder->pcm_position == m_decoder->pcm_count) && !decode_frame()))
+		if (!playing || ((m_pcm_position == m_pcm_count) && !decode_frame()))
 		{
 			stream.put(LEFT_CHANNEL, sample, 0.0F);
 			stream.put(RIGHT_CHANNEL, sample, 0.0F);
 			continue;
 		}
 
-		const unsigned position = m_decoder->pcm_position * m_decoder->pcm_channels;
-		const s16 left = m_decoder->pcm[position];
-		const s16 right = (m_decoder->pcm_channels == OUTPUT_CHANNELS)
-			? m_decoder->pcm[position + RIGHT_CHANNEL]
+		const u32 position = m_pcm_position * m_pcm_channels;
+		const s16 left = m_pcm[position];
+		const s16 right = (m_pcm_channels == OUTPUT_CHANNELS)
+			? m_pcm[position + RIGHT_CHANNEL]
 			: left;
 		stream.put(LEFT_CHANNEL, sample, muted ? 0.0F : (float(left) / 32'768.0F) * left_gain);
 		stream.put(RIGHT_CHANNEL, sample, muted ? 0.0F : (float(right) / 32'768.0F) * right_gain);
-		m_decoder->pcm_position++;
+		m_pcm_position++;
 	}
 }
