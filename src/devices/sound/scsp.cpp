@@ -1388,6 +1388,7 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 
 // TODO: this needs to be timer-ized
 // Very likely this is burst too.
+// - darius2j uses this at startup with DGATE enabled
 void scsp_device::exec_dma()
 {
 	static u16 tmp_dma[3];
@@ -1411,7 +1412,6 @@ void scsp_device::exec_dma()
 	{
 		if (m_dma.dgate)
 		{
-			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for (i = 0; i < m_dma.dtlg; i += 2)
 			{
 				this->space().write_word(m_dma.dmea, 0);
@@ -1434,7 +1434,6 @@ void scsp_device::exec_dma()
 	{
 		if (m_dma.dgate)
 		{
-			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for (i = 0; i < m_dma.dtlg; i += 2)
 			{
 				w16(m_dma.drga, 0);
