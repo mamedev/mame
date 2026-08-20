@@ -18,9 +18,8 @@ public:
 	auto req() { return m_req_cb.bind(); } // active-low compressed-data request output
 	void set_external_dram(bool external) { m_external_dram = external; }
 
+	void map(address_map &map) ATTR_COLD;
 	void reset_w(int state); // active-low RESET input
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -31,7 +30,6 @@ protected:
 private:
 	// The host interface has seven address pins, SADDR6 through SADDR0.
 	static constexpr u32 HOST_REGISTER_COUNT = 0x80;
-	static constexpr offs_t HOST_ADDRESS_MASK = HOST_REGISTER_COUNT - 1;
 
 	// Host-interface register addresses from the data sheet.
 	static constexpr offs_t REG_BUFF_L = 0x12;   // input buffer word count, bits 7:0
@@ -94,6 +92,37 @@ private:
 
 	void decoder_reset();
 	bool decode_frame();
+	u8 buffer_low_r();
+	u8 buffer_high_r();
+	u8 external_dram_r();
+	void data_w(u8 data);
+	void reset_command_w(u8 data);
+	void restart_command_w(u8 data);
+	u8 unimplemented_r(offs_t offset);
+	void unimplemented_w(offs_t offset, u8 data);
+	void store_register(offs_t reg, u8 data, u8 mask, bool update_stream);
+	template <offs_t Register> u8 register_r();
+	void free_form_low_w(u8 data);
+	void free_form_high_w(u8 data);
+	void pcm_precision_w(u8 data);
+	void interrupt_enable_w(offs_t offset, u8 data);
+	void left_attenuation_w(u8 data);
+	void right_attenuation_w(u8 data);
+	void audio_id_w(u8 data);
+	void audio_id_enable_w(u8 data);
+	void sync_words_w(u8 data);
+	void crc_error_concealment_w(u8 data);
+	void sync_error_concealment_w(u8 data);
+	void play_w(u8 data);
+	void mute_w(u8 data);
+	void skip_w(u8 data);
+	void repeat_w(u8 data);
+	void stream_select_w(u8 data);
+	void pcm_order_w(u8 data);
+	void latency_w(u8 data);
+	void pcm_divider_w(u8 data);
+	void pcm_justification_w(u8 data);
+	void serial_input_enable_w(u8 data);
 	void fifo_w(u8 data);
 	void input_fifo_reset();
 	void start_input_timer();

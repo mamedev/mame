@@ -308,137 +308,221 @@ void tms320av110_device::reset_w(int state)
 	}
 }
 
-u8 tms320av110_device::read(offs_t offset)
+template <offs_t Register>
+u8 tms320av110_device::register_r()
 {
 	if (m_reset_asserted)
 		return 0; // The data sheet specifies that RESET low disables host accesses.
 
-	offset &= HOST_ADDRESS_MASK;
-	switch (offset)
-	{
-	case REG_BUFF_L:
-		return (m_input_fifo_count / 4) & 0xff;
-
-	case REG_BUFF_H:
-		return (m_input_fifo_count / 4) >> 8;
-
-	case REG_DRAM_EXT:
-		return m_external_dram;
-
-	case REG_SYNC_ST:
-	case REG_PCM_FS:
-	case REG_FREE_FORM_L:
-	case REG_FREE_FORM_H:
-	case REG_PCM_18:
-	case REG_INTR_L:
-	case REG_INTR_H:
-	case REG_INTR_EN_L:
-	case REG_INTR_EN_H:
-	case REG_ATTEN_L:
-	case REG_ATTEN_R:
-	case REG_AUD_ID:
-	case REG_AUD_ID_EN:
-	case REG_SYNC_LCK:
-	case REG_CRC_ECM:
-	case REG_SYNC_ECM:
-	case REG_PLAY:
-	case REG_MUTE:
-	case REG_SKIP:
-	case REG_REPEAT:
-	case REG_STR_SEL:
-	case REG_PCM_ORD:
-	case REG_LATENCY:
-	case REG_RESET:
-	case REG_RESTART:
-	case REG_PCM_DIV:
-	case REG_DIF:
-	case REG_SIN_EN:
-		return m_registers[offset];
-	}
-
-	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_REGISTERS, "%s: unimplemented register read %02x\n", machine().describe_context(), offset);
-	return 0;
+	return m_registers[Register];
 }
 
-void tms320av110_device::write(offs_t offset, u8 data)
+void tms320av110_device::store_register(offs_t reg, u8 data, u8 mask, bool update_stream)
 {
 	if (m_reset_asserted)
 		return; // The data sheet specifies that RESET low disables host accesses.
 
-	offset &= HOST_ADDRESS_MASK;
-	if (offset == REG_DATAIN)
-	{
-		fifo_w(data);
-		return;
-	}
-
-	LOGMASKED(LOG_REGISTERS, "%s: register write %02x = %02x\n", machine().describe_context(), offset, data);
-	switch (offset)
-	{
-	case REG_PLAY:
-	case REG_MUTE:
-	case REG_ATTEN_L:
-	case REG_ATTEN_R:
+	LOGMASKED(LOG_REGISTERS, "%s: register write %02x = %02x\n", machine().describe_context(), reg, data);
+	if (update_stream)
 		m_stream->update();
-		break;
-	}
+	m_registers[reg] = data & mask;
+}
 
-	switch (offset)
-	{
-	case REG_FREE_FORM_L:
-	case REG_INTR_EN_L:
-	case REG_INTR_EN_H:
-		m_registers[offset] = data;
-		break;
+void tms320av110_device::free_form_low_w(u8 data)
+{
+	store_register(REG_FREE_FORM_L, data, 0xff, false);
+}
 
-	case REG_FREE_FORM_H:
-		m_registers[offset] = data & 0x07;
-		break;
+void tms320av110_device::free_form_high_w(u8 data)
+{
+	store_register(REG_FREE_FORM_H, data, 0x07, false);
+}
 
-	case REG_SYNC_LCK:
-	case REG_CRC_ECM:
-	case REG_SYNC_ECM:
-	case REG_STR_SEL:
-		m_registers[offset] = data & 0x03;
-		break;
+void tms320av110_device::pcm_precision_w(u8 data)
+{
+	store_register(REG_PCM_18, data, 0x01, false);
+}
 
-	case REG_AUD_ID:
-		m_registers[offset] = data & 0x1f;
-		break;
+void tms320av110_device::interrupt_enable_w(offs_t offset, u8 data)
+{
+	store_register(REG_INTR_EN_L + offset, data, 0xff, false);
+}
 
-	case REG_ATTEN_L:
-	case REG_ATTEN_R:
-	case REG_PCM_DIV:
-		m_registers[offset] = data & 0x3f;
-		break;
+void tms320av110_device::left_attenuation_w(u8 data)
+{
+	store_register(REG_ATTEN_L, data, 0x3f, true);
+}
 
-	case REG_PCM_18:
-	case REG_AUD_ID_EN:
-	case REG_PLAY:
-	case REG_MUTE:
-	case REG_SKIP:
-	case REG_REPEAT:
-	case REG_PCM_ORD:
-	case REG_LATENCY:
-	case REG_DIF:
-	case REG_SIN_EN:
-		m_registers[offset] = data & 0x01;
-		break;
+void tms320av110_device::right_attenuation_w(u8 data)
+{
+	store_register(REG_ATTEN_R, data, 0x3f, true);
+}
 
-	case REG_RESET:
-		if (data & 0x01)
-			start_reset(false);
-		break;
+void tms320av110_device::audio_id_w(u8 data)
+{
+	store_register(REG_AUD_ID, data, 0x1f, false);
+}
 
-	case REG_RESTART:
-		if (data & 0x01)
-			start_restart();
-		break;
+void tms320av110_device::audio_id_enable_w(u8 data)
+{
+	store_register(REG_AUD_ID_EN, data, 0x01, false);
+}
 
-	default:
-		break;
-	}
+void tms320av110_device::sync_words_w(u8 data)
+{
+	store_register(REG_SYNC_LCK, data, 0x03, false);
+}
+
+void tms320av110_device::crc_error_concealment_w(u8 data)
+{
+	store_register(REG_CRC_ECM, data, 0x03, false);
+}
+
+void tms320av110_device::sync_error_concealment_w(u8 data)
+{
+	store_register(REG_SYNC_ECM, data, 0x03, false);
+}
+
+void tms320av110_device::play_w(u8 data)
+{
+	store_register(REG_PLAY, data, 0x01, true);
+}
+
+void tms320av110_device::mute_w(u8 data)
+{
+	store_register(REG_MUTE, data, 0x01, true);
+}
+
+void tms320av110_device::skip_w(u8 data)
+{
+	store_register(REG_SKIP, data, 0x01, false);
+}
+
+void tms320av110_device::repeat_w(u8 data)
+{
+	store_register(REG_REPEAT, data, 0x01, false);
+}
+
+void tms320av110_device::stream_select_w(u8 data)
+{
+	store_register(REG_STR_SEL, data, 0x03, false);
+}
+
+void tms320av110_device::pcm_order_w(u8 data)
+{
+	store_register(REG_PCM_ORD, data, 0x01, false);
+}
+
+void tms320av110_device::latency_w(u8 data)
+{
+	store_register(REG_LATENCY, data, 0x01, false);
+}
+
+void tms320av110_device::pcm_divider_w(u8 data)
+{
+	store_register(REG_PCM_DIV, data, 0x3f, false);
+}
+
+void tms320av110_device::pcm_justification_w(u8 data)
+{
+	store_register(REG_DIF, data, 0x01, false);
+}
+
+void tms320av110_device::serial_input_enable_w(u8 data)
+{
+	store_register(REG_SIN_EN, data, 0x01, false);
+}
+
+u8 tms320av110_device::buffer_low_r()
+{
+	return m_reset_asserted ? 0 : (m_input_fifo_count / 4) & 0xff;
+}
+
+u8 tms320av110_device::buffer_high_r()
+{
+	return m_reset_asserted ? 0 : (m_input_fifo_count / 4) >> 8;
+}
+
+u8 tms320av110_device::external_dram_r()
+{
+	return m_reset_asserted ? 0 : m_external_dram;
+}
+
+void tms320av110_device::data_w(u8 data)
+{
+	if (!m_reset_asserted)
+		fifo_w(data);
+}
+
+void tms320av110_device::reset_command_w(u8 data)
+{
+	if (m_reset_asserted)
+		return;
+
+	LOGMASKED(LOG_REGISTERS, "%s: register write %02x = %02x\n", machine().describe_context(), REG_RESET, data);
+	if (data & 0x01)
+		start_reset(false);
+}
+
+void tms320av110_device::restart_command_w(u8 data)
+{
+	if (m_reset_asserted)
+		return;
+
+	LOGMASKED(LOG_REGISTERS, "%s: register write %02x = %02x\n", machine().describe_context(), REG_RESTART, data);
+	if (data & 0x01)
+		start_restart();
+}
+
+u8 tms320av110_device::unimplemented_r(offs_t offset)
+{
+	if (!m_reset_asserted && !machine().side_effects_disabled())
+		LOGMASKED(LOG_REGISTERS, "%s: unimplemented register read %02x\n", machine().describe_context(), offset);
+	return 0;
+}
+
+void tms320av110_device::unimplemented_w(offs_t offset, u8 data)
+{
+	if (!m_reset_asserted)
+		LOGMASKED(LOG_REGISTERS, "%s: register write %02x = %02x\n", machine().describe_context(), offset, data);
+}
+
+void tms320av110_device::map(address_map &map)
+{
+	map(0x00, 0x7f).rw(FUNC(tms320av110_device::unimplemented_r), FUNC(tms320av110_device::unimplemented_w));
+	map(0x12, 0x12).r(FUNC(tms320av110_device::buffer_low_r));
+	map(0x13, 0x13).r(FUNC(tms320av110_device::buffer_high_r));
+	map(0x14, 0x14).rw(FUNC(tms320av110_device::register_r<REG_FREE_FORM_L>), FUNC(tms320av110_device::free_form_low_w));
+	map(0x15, 0x15).rw(FUNC(tms320av110_device::register_r<REG_FREE_FORM_H>), FUNC(tms320av110_device::free_form_high_w));
+	map(0x16, 0x16).rw(FUNC(tms320av110_device::register_r<REG_PCM_18>), FUNC(tms320av110_device::pcm_precision_w));
+	map(0x18, 0x18).w(FUNC(tms320av110_device::data_w));
+	map(0x1a, 0x1a).r(FUNC(tms320av110_device::register_r<REG_INTR_L>));
+	map(0x1b, 0x1b).r(FUNC(tms320av110_device::register_r<REG_INTR_H>));
+	map(0x1c, 0x1d).w(FUNC(tms320av110_device::interrupt_enable_w));
+	map(0x1c, 0x1c).r(FUNC(tms320av110_device::register_r<REG_INTR_EN_L>));
+	map(0x1d, 0x1d).r(FUNC(tms320av110_device::register_r<REG_INTR_EN_H>));
+	map(0x1e, 0x1e).rw(FUNC(tms320av110_device::register_r<REG_ATTEN_L>), FUNC(tms320av110_device::left_attenuation_w));
+	map(0x20, 0x20).rw(FUNC(tms320av110_device::register_r<REG_ATTEN_R>), FUNC(tms320av110_device::right_attenuation_w));
+	map(0x22, 0x22).rw(FUNC(tms320av110_device::register_r<REG_AUD_ID>), FUNC(tms320av110_device::audio_id_w));
+	map(0x24, 0x24).rw(FUNC(tms320av110_device::register_r<REG_AUD_ID_EN>), FUNC(tms320av110_device::audio_id_enable_w));
+	map(0x26, 0x26).r(FUNC(tms320av110_device::register_r<REG_SYNC_ST>));
+	map(0x28, 0x28).rw(FUNC(tms320av110_device::register_r<REG_SYNC_LCK>), FUNC(tms320av110_device::sync_words_w));
+	map(0x2a, 0x2a).rw(FUNC(tms320av110_device::register_r<REG_CRC_ECM>), FUNC(tms320av110_device::crc_error_concealment_w));
+	map(0x2c, 0x2c).rw(FUNC(tms320av110_device::register_r<REG_SYNC_ECM>), FUNC(tms320av110_device::sync_error_concealment_w));
+	map(0x2e, 0x2e).rw(FUNC(tms320av110_device::register_r<REG_PLAY>), FUNC(tms320av110_device::play_w));
+	map(0x30, 0x30).rw(FUNC(tms320av110_device::register_r<REG_MUTE>), FUNC(tms320av110_device::mute_w));
+	map(0x32, 0x32).rw(FUNC(tms320av110_device::register_r<REG_SKIP>), FUNC(tms320av110_device::skip_w));
+	map(0x34, 0x34).rw(FUNC(tms320av110_device::register_r<REG_REPEAT>), FUNC(tms320av110_device::repeat_w));
+	map(0x36, 0x36).rw(FUNC(tms320av110_device::register_r<REG_STR_SEL>), FUNC(tms320av110_device::stream_select_w));
+	map(0x38, 0x38).rw(FUNC(tms320av110_device::register_r<REG_PCM_ORD>), FUNC(tms320av110_device::pcm_order_w));
+	map(0x3c, 0x3c).rw(FUNC(tms320av110_device::register_r<REG_LATENCY>), FUNC(tms320av110_device::latency_w));
+	map(0x3e, 0x3e).r(FUNC(tms320av110_device::external_dram_r));
+	map(0x40, 0x40).rw(FUNC(tms320av110_device::register_r<REG_RESET>), FUNC(tms320av110_device::reset_command_w));
+	map(0x42, 0x42).rw(FUNC(tms320av110_device::register_r<REG_RESTART>), FUNC(tms320av110_device::restart_command_w));
+	map(0x44, 0x44).r(FUNC(tms320av110_device::register_r<REG_PCM_FS>));
+	map(0x6e, 0x6e).rw(FUNC(tms320av110_device::register_r<REG_PCM_DIV>), FUNC(tms320av110_device::pcm_divider_w));
+	map(0x6f, 0x6f).rw(FUNC(tms320av110_device::register_r<REG_DIF>), FUNC(tms320av110_device::pcm_justification_w));
+	map(0x70, 0x70).rw(FUNC(tms320av110_device::register_r<REG_SIN_EN>), FUNC(tms320av110_device::serial_input_enable_w));
 }
 
 void tms320av110_device::sound_stream_update(sound_stream &stream)
