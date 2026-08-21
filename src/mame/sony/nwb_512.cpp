@@ -43,7 +43,7 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	// NWP-512D 15" Monochrome CRT Monitor
 	constexpr uint16_t HORIZONTAL = 816; // make this 1024 instead of 816 to view offscreen area
 	constexpr uint16_t VERTICAL = 1024;
-	SCREEN(config, m_nwp_512d, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_nwp_512d);
 	m_nwp_512d->set_screen_update(FUNC(nwb_512_device::screen_update));
 	m_nwp_512d->set_raw(HORIZONTAL * VERTICAL * 60,
 	                    HORIZONTAL, 0, HORIZONTAL,
