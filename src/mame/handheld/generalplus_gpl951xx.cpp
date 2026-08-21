@@ -37,8 +37,9 @@ public:
 	void bubltea(machine_config &config) ATTR_COLD;
 	void dsgnpal(machine_config &config) ATTR_COLD;
 	void bftetris(machine_config &config) ATTR_COLD;
-
+	
 	void init_fif() ATTR_COLD;
+	void init_pink218() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -616,6 +617,12 @@ ROM_START( bubltea )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(56549fa7) SHA1(4a03b4c69035baa48b146ecee3912a3b0672b845) )
 ROM_END
 
+ROM_START( pink218 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "p25q64h.u2", 0x000000, 0x800000, CRC(7209e7bf) SHA1(1cc0a0b74d3f373dae18b52b3f7014d56f0d9b51) )
+ROM_END
+
+
 void generalplus_gpl951xx_game_state::init_fif()
 {
 	u16 *spirom16 = (u16*)memregion("spi")->base();
@@ -625,6 +632,21 @@ void generalplus_gpl951xx_game_state::init_fif()
 			3, 1, 11, 9, 6, 14, 0, 2, 8, 7, 13, 15, 4, 5, 12, 10);
 	}
 }
+
+
+void generalplus_gpl951xx_game_state::init_pink218()
+{
+	u16 *romdata = (u16*)memregion("spi")->base();
+	int romsize = memregion("spi")->bytes();
+
+	for (offs_t i = 0; i < romsize / 2; i++)
+	{
+		romdata[i] = romdata[i] ^ 0xc8a9;
+		romdata[i] = bitswap<16>(romdata[i], 11,1,3,9,8,14,0,2,6,7,13,15,4,5,12,10);
+		// something more?
+	}
+}
+
 
 } // anonymous namespace
 
@@ -707,3 +729,7 @@ CONS( 2020, segapet3a, segapet3, 0, puni, base, generalplus_gpl951xx_game_state,
 
 // まぜまぜミックス！ぷにタピちゃん
 CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// this one has 2 checksums in service mode (like the generalplus_gp3x_unknown.cpp sets) but one is 00000000 and there is only a single ROM
+// BL-519-V1.2 20220822 on PCB
+CONS( 2022, pink218,      0,       0,      bftetris,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

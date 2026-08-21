@@ -885,43 +885,9 @@ ROM_START( bkid218 )
 	ROM_LOAD( "218n1_25q64csig_c84017.bin", 0x000000, 0x800000, CRC(94f35dbd) SHA1(a1bd6defd2465ae14753cd83be5c31f99e9158ec) )
 ROM_END
 
-ROM_START( pink218 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "internal.rom", 0x000000, 0x2000, NO_DUMP )
-
-	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
-	ROM_LOAD( "p25q64h.u2", 0x000000, 0x800000, CRC(7209e7bf) SHA1(1cc0a0b74d3f373dae18b52b3f7014d56f0d9b51) )
-ROM_END
-
-
-void gpl162xx_lcdtype_state::init_pink218()
-{
-	// this might be done in software if the internal ROM is different
-	u16 *romdata = (u16*)memregion("spi")->base();
-	int romsize = memregion("spi")->bytes();
-
-	for (offs_t i = 0; i < romsize / 2; i++)
-	{
-		romdata[i] = romdata[i] ^ 0xc8a9;
-	}
-
-	// there's also a bitswap
-	// 
-	// compare 0x34430 in this unit
-	// with    0x26498 in pcp8718
-	// or      0x30020 in bkid218
-
-}
-
-
 } // anonymous namespace
 
 
 CONS( 200?, pcp8718,      0,       0,      gpl162xx_lcdtype,   gpl162xx_lcdtype, gpl162xx_lcdtype_state, empty_init, "PCP", "PCP 8718 - HD 360 Degrees Rocker Palm Eyecare Console - 788 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 200?, pcp8728,      0,       0,      gpl162xx_lcdtype,   gpl162xx_lcdtype, gpl162xx_lcdtype_state, empty_init, "PCP", "PCP 8728 - 788 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // what name was this sold under?
 CONS( 200?, bkid218,      0,       0,      gpl162xx_lcdtype,   gpl162xx_lcdtype, gpl162xx_lcdtype_state, empty_init, "BornKid", "Handheld Game Console BC-19 - 218 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
-// this one has 2 checksums in service mode (like the generalplus_gp3x_unknown.cpp sets) but one is 00000000 and there is only a single ROM
-// but unlike the above sets the ROM is scrambled
-// BL-519-V1.2 20220822 on PCB
-CONS( 2022, pink218,      0,       0,      gpl162xx_lcdtype,   gpl162xx_lcdtype, gpl162xx_lcdtype_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
