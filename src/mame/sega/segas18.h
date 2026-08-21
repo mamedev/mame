@@ -76,6 +76,7 @@ public:
 	void system18_i8751(machine_config &config);
 	void ddcrew4p(machine_config &config);
 	void ddcrew4p_fd1094(machine_config &config);
+	void aquario_fd1094(machine_config &config);
 
 	// driver init
 	void init_ddcrew4p();
@@ -83,6 +84,7 @@ public:
 	void init_generic_shad();
 	void init_generic_5874();
 	void init_wwally();
+	void init_aquario();
 	void init_generic_5987();
 	void init_hamaway();
 
@@ -142,6 +144,7 @@ private:
 		ROM_BOARD_171_SHADOW,   // 171-???? -- used by shadow dancer
 		ROM_BOARD_171_5874,     // 171-5874
 		ROM_BOARD_171_5987,     // 171-5987
+		ROM_BOARD_171_5987_A,   // Aquario proto
 		ROM_BOARD_837_7525      // Hammer Away proto
 	};
 
