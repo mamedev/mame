@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="mobigo_cart" description="VTech MobiGo cartridges">
 
 	<!-- known software
-	
+
 	80-2500xx - Shrek - Forever After
 	80-2501xx - Disney/Pixar Toy Story 3
 	80-2502xx - Mr.Men Little Miss - Adventures in Dillydale
@@ -17,7 +17,7 @@ license:CC0-1.0
 	80-2507xx - Touch & Learn - Game Pack / MobiGo 2 pack-in cart (ROMless, at least for US and Germany carts, see note below)
 	80-2508xx - Nickelodeon Dora the Explorer - Twins' Day
 	80-2509xx - Disney Fairies Explore Your Talents
-	80-2510xx - >	
+	80-2510xx - NASCAR Champion's Touch **
 	80-2511xx - Disney Princess
 	80-2512xx - Disney/Pixar Cars Toon
 	80-2513xx - ?
@@ -45,7 +45,7 @@ license:CC0-1.0
 	80-2535xx - ?
 	80-2536xx - Marvel Ultimate Spider-Man
 	(any more?)
-	
+
 	x is region
 	00 = USA
 	01 = ? (not seen)
@@ -53,9 +53,9 @@ license:CC0-1.0
 	03 = UK
 	04 = Germany
 	05 = France
-	
+
 	** = no versions in software list
-	
+
 	-->
 
 	<!-- Dummy carts (just a jumper PCB, without ROM) that enable internal games in the BIOS:
@@ -338,7 +338,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="doraf" cloneof="dora" supported="no">
 		<description>Nickelodeon Dora L' Exploratrice - Dora et Babouche a la fete des jumeaux (France)</description>
 		<year>2010</year>
@@ -349,7 +349,7 @@ license:CC0-1.0
 				<rom name="80-250805 - Dora L' Exploratrice - Dora et Babouche a la fete des jumeaux (France).bin" size="0x1000000" crc="79a36bd2" sha1="9cf46eb3d5504fd2920a50dcfbd1cbe5ae9c1508"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="hkitty" supported="no">
 		<description>Hello Kitty - Hello Kitty Birthday Party! (UK)</description>
@@ -458,7 +458,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="minnief" cloneof="minnieg" supported="no">
 		<description>La Boutique de Minnie (France)</description>
 		<year>2013</year>
@@ -469,7 +469,7 @@ license:CC0-1.0
 				<rom name="80-252905 - La Boutique de Minnie (France).bin" size="0x1000000" crc="32c1578d" sha1="c3122b012c04ec11c0699b49df39323333722d45"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="penmad" supported="no">
 		<description>DreamWorks/Nickelodeon The Penguins of Madagascar - Mission Madness (USA)</description>
@@ -846,7 +846,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mmclub" supported="no">
 		<description>Mickey Mouse - Clubhouse (UK)</description>
 		<year>201?</year>
@@ -857,7 +857,7 @@ license:CC0-1.0
 				<rom name="80-250503 - Mickey Mouse - Clubhouse (UK).bin" size="0x1000000" crc="282b8e08" sha1="f9dc340551c02c5a2dc79190a985229bea5205e3"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mmclubf" cloneof="mmclub" supported="no">
 		<description>La Maison de Mickey - La Balle de Pluto (France)</description>
