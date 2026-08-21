@@ -348,7 +348,17 @@ INPUT_PORTS_END
 
 void crospuzl_state::crospuzl(machine_config &config)
 {
+	// The real part runs somewhere around 80 MHz but averages about five cycles
+	// per instruction, while this core retires one per cycle, so it is clocked
+	// at a fifth of that to execute at the right rate.  The software timed delay
+	// loop at 0x024052e6 is the yardstick: sixteen instructions per turn, called
+	// with counts meant to be microseconds - 480 for the 1-Wire reset, 70 for
+	// the presence sample, 6 and 10 for the bit slots - so one microsecond per
+	// turn works out at exactly 16 MHz.  Clock it any faster and the DS2401
+	// never sees a reset long enough to answer.  Revisit once the core counts
+	// cycles.
 	SE3208(config, m_maincpu, 14318180 * 3); // FIXME: 72 MHz-ish
+	m_maincpu->set_clock_scale(0.26);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
@@ -364,12 +374,6 @@ void crospuzl_state::crospuzl(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	DS2401(config, m_serial_id);
-	// The SE3208 core isn't cycle accurate. Every software timed delay in this
-	// program comes out roughly 2.7x short of the datasheet windows at the clock
-	// set above: the 480us reset the loader generates lasts about 179us here, and
-	// the stock part would never leave its idle state.  Anything between 0.20 and
-	// 0.37 keeps every window satisfied; drop this once the core counts cycles.
-	m_serial_id->set_timing_scale(0.30);
 
 	SPEAKER(config, "speaker", 2).front();
 	m_vr0soc->add_route(0, "speaker", 1.0, 0);

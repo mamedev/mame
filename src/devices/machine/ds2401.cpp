@@ -41,19 +41,16 @@ ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, dev
 	, m_tx(false)
 	, m_timer_main(nullptr)
 	, m_timer_reset(nullptr)
-	, m_timing_scale(1.0)
 {
 }
 
 void ds2401_device::device_start()
 {
-	auto const scaled = [this] (double usec) { return attotime::from_nsec(u64(usec * 1000.0 * m_timing_scale)); };
-
-	t_samp = scaled( 30);
-	t_rdv  = scaled( 30);
-	t_rstl = scaled(480);
-	t_pdh  = scaled( 30);
-	t_pdl  = scaled(120);
+	t_samp = attotime::from_usec( 30);
+	t_rdv  = attotime::from_usec( 30);
+	t_rstl = attotime::from_usec(480);
+	t_pdh  = attotime::from_usec( 30);
+	t_pdl  = attotime::from_usec(120);
 
 	m_rx = true;
 	m_tx = true;

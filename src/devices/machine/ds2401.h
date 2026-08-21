@@ -28,11 +28,6 @@ public:
 	int read();
 	uint8_t direct_read(int index);
 
-	// Scales every 1-Wire timing constant.  Meant for hosts whose CPU core has
-	// no cycle timing, so that software timed bit banging comes out shorter
-	// than the datasheet windows and the part would never see a valid reset.
-	void set_timing_scale(double scale) { m_timing_scale = scale; }
-
 protected:
 	enum {
 		SIZE_DATA = 8,
@@ -64,7 +59,6 @@ protected:
 	uint8_t m_data[SIZE_DATA];
 	emu_timer *m_timer_main, *m_timer_reset;
 	attotime t_samp, t_rdv, t_rstl, t_pdh, t_pdl;
-	double m_timing_scale = 1.0;
 
 private:
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
