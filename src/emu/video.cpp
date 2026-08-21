@@ -329,7 +329,7 @@ std::string video_manager::speed_text()
 //  file handle
 //-------------------------------------------------
 
-void video_manager::save_snapshot(screen_device *screen, util::core_file &file)
+void video_manager::save_snapshot(screen_device *screen, util::random_write &file)
 {
 	// validate
 	assert(!m_snap_native || screen != nullptr);

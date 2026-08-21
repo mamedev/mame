@@ -129,7 +129,7 @@ struct cbm_crt_chip
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-std::string cbm_crt_get_card(util::core_file &file);
+std::string cbm_crt_get_card(util::read_stream &file);
 bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_size, int *exrom, int *game);
 bool cbm_crt_read_data(util::core_file &file, uint8_t *roml, uint8_t *romh);
 

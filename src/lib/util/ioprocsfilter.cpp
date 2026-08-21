@@ -171,8 +171,10 @@ protected:
 	std::pair<void *, std::size_t> get_unfilled_input() noexcept
 	{
 		assert(get_buffer());
-		Bytef *const base = get_z_stream().next_in + get_z_stream().avail_in;
-		return std::make_pair(base, get_buffer() + get_buffer_size() - base);
+		assert(get_buffer() <= get_z_stream().next_in);
+		assert((get_buffer() + get_buffer_size()) >= get_z_stream().next_in);
+		auto const occupied = (get_z_stream().next_in - get_buffer()) + get_z_stream().avail_in;
+		return std::make_pair(get_buffer() + occupied, get_buffer_size() - occupied);
 	}
 
 	void add_input(std::size_t length) noexcept

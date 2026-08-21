@@ -3223,9 +3223,9 @@ CONS( 2007, rad_fb2,   0,         0, rad_skat,   rad_fb2,    spg2xx_game_state, 
 CONS( 2006, rad_jib,   0,         0, spg28x,     spg2xx,     spg2xx_game_state,               init_crc,      "Radica",  "Jibbi", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // ABL TV games
-CONS( 2006, abltenni,  0,         0, spg2xx,     abltenni,   spg2xx_game_state,               empty_init,    "Advance Bright Ltd / V-Tac Technology", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, abltenni,  0,         0, spg2xx,     abltenni,   spg2xx_game_state,               empty_init,    "Advance Bright Ltd / V-TAC Technology", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, ablkickb,  0,         0, ablkickb,   ablkickb,   spg2xx_game_albkickb_state,      init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology", "Kick Boxing (BJ8888, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
+CONS( 2006, ablkickb,  0,         0, ablkickb,   ablkickb,   spg2xx_game_albkickb_state,      init_ablkickb, "Advance Bright Ltd / Coleco / V-TAC Technology", "Kick Boxing (BJ8888, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
 CONS( 2007, lxspidaj,  0,         0, spg2xx_pal, lxspidaj,   spg2xx_game_albkickb_state,      init_ablkickb, "Lexibook", "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -3240,10 +3240,10 @@ CONS( 200?, carled99,  0,         0, spg2xx,     carled99,   spg2xx_game_state, 
 CONS( 2008, comil,     0,         0, comil,      comil,      spg2xx_game_comil_state,         empty_init,    "Character Options", "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Same as Excalibur Decathlon? Not identical to the ABL game below, but built on the same engine
-CONS( 2006, tvsprt10,  0,         0, tvsprt10,   tvsprt10,   spg2xx_game_state,               init_tvsprt10, "Simba / V-Tac Technology", "TV Sports 10-in-1 / Decathlon Athletic Sport Games", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, tvsprt10,  0,         0, tvsprt10,   tvsprt10,   spg2xx_game_state,               init_tvsprt10, "Simba / V-TAC Technology", "TV Sports 10-in-1 / Decathlon Athletic Sport Games", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, decathln,  0,         0, tvsprt10,   decathln,   spg2xx_game_state,               init_tvsprt10, "Advance Bright Ltd / V-Tac Technology", "Decathlon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
-CONS( 200?, decathlna, decathln,  0, tvsprt10,   decathln,   spg2xx_game_state,               init_tvsprt10, "Advance Bright Ltd / V-Tac Technology", "Decathlon (set 2, SM570, ABL TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in UK
+CONS( 200?, decathln,  0,         0, tvsprt10,   decathln,   spg2xx_game_state,               init_tvsprt10, "Advance Bright Ltd / V-TAC Technology", "Decathlon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
+CONS( 200?, decathlna, decathln,  0, tvsprt10,   decathln,   spg2xx_game_state,               init_tvsprt10, "Advance Bright Ltd / V-TAC Technology", "Decathlon (set 2, SM570, ABL TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in UK
 
 CONS( 2007, guitarfv,  0,         0, guitarfv,   guitarfv,   spg2xx_game_state,               empty_init,    "Advance Bright Ltd", "Guitar Fever (2007.07.03 Ver 2.7)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -3263,7 +3263,7 @@ CONS( 2006, genitvp,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state, 
 CONS( 2006, vtechtvssp, genitvp,  0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "VTech", "TV Station (VTech, Spain)",            MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, genitvp,  0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "VTech", "TV Learning Station (VTech, Germany)", MACHINE_NOT_WORKING )
 
-CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone,   spg2xx_game_state,               init_itvphone, "Taikee / Oregon Scientific / V-Tac Technology", u8"Teléfono interactivo de TV (Spain)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone,   spg2xx_game_state,               init_itvphone, "Taikee / Oregon Scientific / V-TAC Technology", u8"Teléfono interactivo de TV (Spain)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
 CONS( 2006, doraphon,   0,        0, doraphone,  doraphone,  spg2xx_game_doraphone_state,     empty_init,    "VTech", "Dora the Explorer: Dora TV Explorer Phone / Boots's Special Day (US/UK)",         MACHINE_IMPERFECT_SOUND ) // same ROM confirmed on both US and UK units
@@ -3313,8 +3313,8 @@ CONS( 2006, hotwhl2p,   0,        0, hotwheels,  hotwheels,  spg2xx_game_hotwhee
 CONS( 2006, rocksock,   0,        0, spg2xx,     rocksock,   spg2xx_game_state,               empty_init,    "Mattel", "Rock 'Em Sock 'Em Robots (TV Game)", MACHINE_IMPERFECT_SOUND )
 
 // there was also an English release of this, simply titled "Interactive TV Computer"
-CONS( 2007, ordentv,    0,        0, ordentv,    ordentv,    spg2xx_game_ordentv_state,       init_ordentv,  "Taikee / V-Tac", "Ordenador-TV (Spain)",         MACHINE_NOT_WORKING )
-CONS( 2007, jeuint,     ordentv,  0, ordentv,    ordentv,    spg2xx_game_ordentv_state,       init_jeuint,   "Taikee / V-Tac", u8"Jeu Intéractif TV (France)", MACHINE_NOT_WORKING )
+CONS( 2007, ordentv,    0,        0, ordentv,    ordentv,    spg2xx_game_ordentv_state,       init_ordentv,  "Taikee / V-TAC", "Ordenador-TV (Spain)",         MACHINE_NOT_WORKING )
+CONS( 2007, jeuint,     ordentv,  0, ordentv,    ordentv,    spg2xx_game_ordentv_state,       init_jeuint,   "Taikee / V-TAC", u8"Jeu Intéractif TV (France)", MACHINE_NOT_WORKING )
 
 CONS( 200?, wfart,      0,        0, wfcentro,   spg2xx,     spg2xx_game_wfcentro_state,      empty_init,    "WinFun", "TV Art Design Center",                    MACHINE_NOT_WORKING )
 CONS( 200?, wfcentro,   wfart,    0, wfcentro,   spg2xx,     spg2xx_game_wfcentro_state,      empty_init,    "WinFun", u8"Centro TV de Diseño Artistico (Spain)", MACHINE_NOT_WORKING )

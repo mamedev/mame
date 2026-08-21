@@ -10,8 +10,8 @@ license:CC0-1.0
 		<description>Aldebaran</description>
 		<year>198?</year>
 		<publisher>ナショナル (National)</publisher>
-		<info name="alt_title" value="アルデバラン"/>
-		<info name="serial" value="JR-TB01"/>
+		<info name="alt_title" value="アルデバラン" />
+		<info name="serial" value="JR-TB01" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="5193772">
 				<rom name="aldebaran (2400 baud).wav" size="5193772" crc="67772e9a" sha1="86e61fcd301374828af9414169d9eb1ca5c7bcec" />
@@ -28,8 +28,8 @@ license:CC0-1.0
 		<description>Bingo 25</description>
 		<year>198?</year>
 		<publisher>ナショナル (National)</publisher>
-		<info name="alt_title" value="ビンゴ２５"/>
-		<info name="serial" value="JR-TB03"/>
+		<info name="alt_title" value="ビンゴ２５" />
+		<info name="serial" value="JR-TB03" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="4856876">
 				<rom name="bingo25 (2400 baud).wav" size="4856876" crc="6b68181d" sha1="c879790f4f7065fba9912c65760e9a030e40f962" />
@@ -46,8 +46,8 @@ license:CC0-1.0
 		<description>Blackjack</description>
 		<year>198?</year>
 		<publisher>ナショナル (National)</publisher>
-		<info name="alt_title" value="ブラックジャック"/>
-		<info name="serial" value="JR-TB06"/>
+		<info name="alt_title" value="ブラックジャック" />
+		<info name="serial" value="JR-TB06" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="6730796">
 				<rom name="blackjack (2400 baud).wav" size="6730796" crc="c6c21f9f" sha1="132acd1d173d83e76d184846ef5b7f9cbcb3b0c6" />
@@ -64,8 +64,8 @@ license:CC0-1.0
 		<description>Breakdown</description>
 		<year>198?</year>
 		<publisher>ナショナル (National)</publisher>
-		<info name="alt_title" value="ブレークダウン"/>
-		<info name="serial" value="JR-TB10"/>
+		<info name="alt_title" value="ブレークダウン" />
+		<info name="serial" value="JR-TB10" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="5581868">
 				<rom name="breakdown (2400 baud).wav" size="5581868" crc="ccda4d34" sha1="f0028c6535d0e6a2844d611cb0509b99a8f7bae6" />
@@ -79,11 +79,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="germkdai" supported="no">
-		<description>German Kugun Daisakusen</description>
+		<description>Deutsch Kugun Daisakusen</description>
 		<year>1983</year>
 		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
-		<info name="alt_title" value="ドイツ空軍大作戦"/>
-		<info name="serial" value="JR-TB30"/>
+		<info name="alt_title" value="ドイツ空軍大作戦" />
+		<info name="serial" value="JR-TB30" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="10008760">
 				<rom name="german kugun daisakusen (2400 baud).wav" size="10008760" crc="8a472d8f" sha1="d06ec79c62ce464b9ee30945fa7a4476b750f5c7" />
@@ -100,8 +100,8 @@ license:CC0-1.0
 		<description>Nihonkai Daisakusen</description>
 		<year>1983</year>
 		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
-		<info name="alt_title" value="日本海大作戦"/>
-		<info name="serial" value="JR-TB28"/>
+		<info name="alt_title" value="日本海大作戦" />
+		<info name="serial" value="JR-TB28" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="14430252">
 				<rom name="nihonkai daisakusen (2400 baud).wav" size="14430252" crc="9fd842c9" sha1="6b924e2bc16bf1ac0d61e16ed25826fdbc4fba34" />
@@ -118,8 +118,8 @@ license:CC0-1.0
 		<description>Okehazama Daikassen</description>
 		<year>1983</year>
 		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
-		<info name="alt_title" value="桶狭間大合戦"/>
-		<info name="serial" value="JR-TB29"/>
+		<info name="alt_title" value="桶狭間大合戦" />
+		<info name="serial" value="JR-TB29" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="11453484">
 				<rom name="okehazama daikassen (2400 baud).wav" size="11453484" crc="a43c5c5b" sha1="546eeeb98ef82bc2220ac30bc4e76ee252b8222e" />
@@ -136,8 +136,8 @@ license:CC0-1.0
 		<description>Pearl Harbor Daisakusen</description>
 		<year>1983</year>
 		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
-		<info name="alt_title" value="パールハーバー大作戦"/>
-		<info name="serial" value="JR-TB26"/>
+		<info name="alt_title" value="パールハーバー大作戦" />
+		<info name="serial" value="JR-TB26" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="9315372">
 				<rom name="pearl harbor daisakusen (2400 baud).wav" size="9315372" crc="becc3e32" sha1="9a8c64cd9b37c1adf87d2bc4b709c0561be0adc8" />
@@ -154,8 +154,8 @@ license:CC0-1.0
 		<description>Shinsengumi</description>
 		<year>1983</year>
 		<publisher>ナショナル (National) / CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
-		<info name="alt_title" value="新選組"/>
-		<info name="serial" value="JR-TB27"/>
+		<info name="alt_title" value="新選組" />
+		<info name="serial" value="JR-TB27" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="8516236">
 				<rom name="shinsengumi (2400 baud).wav" size="8516236" crc="b9ab9393" sha1="d9975c09a95dd85b57d242e87445f92412349ce3" />
@@ -172,8 +172,8 @@ license:CC0-1.0
 		<description>Tsume Shougi</description>
 		<year>198?</year>
 		<publisher>ナショナル (National)</publisher>
-		<info name="alt_title" value="詰将棋"/>
-		<info name="serial" value="JR-TB21"/>
+		<info name="alt_title" value="詰将棋" />
+		<info name="serial" value="JR-TB21" />
 		<part name="cass1" interface="jr200_cass">
 			<dataarea name="cass" size="11085868">
 				<rom name="tsume shogi (2400 baud).wav" size="11085868" crc="8bf58e1e" sha1="6e9f53c7f501549e270d08da3830a9cbf1481626" />

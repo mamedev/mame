@@ -26,6 +26,9 @@ project "utils"
 		ext_includedir("utf8proc"),
 	}
 
+	defines {
+		"ZLIB_CONST",
+	}
 if _OPTIONS["with-system-utf8proc"] ~= "1" then
 	defines {
 		"UTF8PROC_STATIC",
@@ -116,6 +119,7 @@ end
 		MAME_DIR .. "src/lib/util/path.h",
 		MAME_DIR .. "src/lib/util/path_to_regex.cpp",
 		MAME_DIR .. "src/lib/util/path_to_regex.hpp",
+		MAME_DIR .. "src/lib/util/pkzipdefs.h",
 		MAME_DIR .. "src/lib/util/plaparse.cpp",
 		MAME_DIR .. "src/lib/util/plaparse.h",
 		MAME_DIR .. "src/lib/util/png.cpp",

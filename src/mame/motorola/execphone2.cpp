@@ -57,11 +57,11 @@ namespace {
 class execphone2_state : public driver_device
 {
 public:
-	execphone2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_mic(*this, "mic"),
-			m_speaker(*this, "speaker")
+	execphone2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mic(*this, "mic"),
+		m_speaker(*this, "speaker")
 	{ }
 
 	void execphone2(machine_config &config) ATTR_COLD;
@@ -96,7 +96,7 @@ ROM_START( execphone2 )
 	ROM_LOAD( "a33a00_motorola_v.9550_sci9632ca_34c63_27c1001.bin", 0x00000, 0x20000, CRC(8361099a) SHA1(3deeea8a9429a3bb15cdb8303a5f961c40dd8e44) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME             FLAGS
 SYST( 1994, execphone2, 0,      0,      execphone2, execphone2, execphone2_state, empty_init, "Motorola", "Executive Phone 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

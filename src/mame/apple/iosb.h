@@ -49,7 +49,7 @@ public:
 	void scsi_irq_w(int state);
 	void scc_irq_w(int state);
 
-	template <u8 mask>
+	template <u8 Mask>
 	void via2_irq_w(int state);
 
 	void via_sync();
