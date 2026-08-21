@@ -11,6 +11,7 @@ TODO:
 #include "emu.h"
 #include "moonsound.h"
 
+#include "machine/ram.h"
 #include "sound/ymopl.h"
 
 #include "speaker.h"
@@ -28,6 +29,7 @@ public:
 		: device_t(mconfig, MSX_CART_MOONSOUND, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
 		, m_ymf278b(*this, "ymf278b")
+		, m_pcmram(*this, "pcmram")
 	{ }
 
 protected:
@@ -46,16 +48,19 @@ private:
 	void ymf278b_map(address_map &map) ATTR_COLD;
 
 	required_device<ymf278b_device> m_ymf278b;
+	required_device<ram_device> m_pcmram;
 };
 
 void msx_cart_moonsound_device::ymf278b_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x3fffff).ram();  // 2MB sram for testing
+	map(0x000000, 0x1fffff).rom().region("ymf278b", 0);
 }
 
 void msx_cart_moonsound_device::device_add_mconfig(machine_config &config)
 {
+	// 2 128K/512K SRAM socket on PCB, Some compatible cartridge supports up to 2MB
+	RAM(config, m_pcmram).set_default_size("128K").set_extra_options("256K,512K,640K,1M,2M").set_default_value(0);
+
 	// The moonsound cartridge has a separate stereo output.
 	SPEAKER(config, "speaker", 2).front();
 
@@ -71,7 +76,7 @@ void msx_cart_moonsound_device::device_add_mconfig(machine_config &config)
 }
 
 ROM_START(msx_cart_moonsound)
-	ROM_REGION(0x400000, "ymf278b", 0)
+	ROM_REGION(0x200000, "ymf278b", 0)
 	ROM_LOAD("yrw801.rom", 0x0, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca))
 ROM_END
 
@@ -82,6 +87,9 @@ const tiny_rom_entry *msx_cart_moonsound_device::device_rom_region() const
 
 void msx_cart_moonsound_device::device_start()
 {
+	// install YMF278B PCM RAM
+	m_ymf278b->space(0).install_ram(0x200000, 0x200000 + (m_pcmram->size() - 1), m_pcmram->pointer());
+
 	// Install IO read/write handlers
 	io_space().install_readwrite_handler(0x7e, 0x7f, emu::rw_delegate(*this, FUNC(msx_cart_moonsound_device::read_ymf278b_pcm)), emu::rw_delegate(*this, FUNC(msx_cart_moonsound_device::write_ymf278b_pcm)));
 	io_space().install_readwrite_handler(0xc4, 0xc7, emu::rw_delegate(m_ymf278b, FUNC(ymf278b_device::read)), emu::rw_delegate(m_ymf278b, FUNC(ymf278b_device::write)));
@@ -106,14 +114,16 @@ void msx_cart_moonsound_device::write_ymf278b_pcm(offs_t offset, u8 data)
 
 u8 msx_cart_moonsound_device::read_ymf278b_pcm(offs_t offset)
 {
-	LOG("moonsound: read 0x%02x\n", 0x7e + offset);
+	if (!machine().side_effects_disabled())
+		LOG("moonsound: read 0x%02x\n", 0x7e + offset);
 	return m_ymf278b->read(4 + offset);
 }
 
 // For detecting presence of moonsound cartridge
 u8 msx_cart_moonsound_device::read_c0()
 {
-	LOG("moonsound: read 0xc0\n");
+	if (!machine().side_effects_disabled())
+		LOG("moonsound: read 0xc0\n");
 	return 0x00;
 }
 
