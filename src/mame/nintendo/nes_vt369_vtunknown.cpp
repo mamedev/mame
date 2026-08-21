@@ -1604,6 +1604,11 @@ ROM_START( gon100 )
 	ROM_LOAD( "p25d32sh.bin", 0x00000, 0x400000, CRC(6d852ab0) SHA1(4e90054d4632581f15aafff9e950f80d6bbcb1d5) )
 ROM_END
 
+ROM_START( 100burgr )
+    ROM_REGION( 0x800000, "mainrom", 0 )
+    ROM_LOAD( "p25d32sh.bin", 0x00000, 0x400000, CRC(db65f960) SHA1(60a9a716f83033cb0387124611c08e8c6975aa9a) )
+ROM_END
+
 ROM_START( d12power )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "25q128.u2", 0x00000, 0x1000000, CRC(02650ad4) SHA1(ca346409e11732d97b892c356fc5da61dc16ab01) )
@@ -1988,6 +1993,8 @@ CONS( 201?, supr200,    0,        0,  vt36x_swap_8mb, vt369, vt36x_state, empty_
 CONS( 201?, tiger108,  0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "Zebra AS / Tiger Retail", "Spillekonsol Game console - 108-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, gon100,    0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
+// very similar to gon100, but menu is at a different resolution
+CONS( 201?, 100burgr,  0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "100-in-1 Handheld Game (burger shape)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (416-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 
