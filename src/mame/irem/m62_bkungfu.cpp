@@ -123,20 +123,21 @@ several other games in m62.cpp also draw their backgrounds in 4 tile wide strips
 
 #include "machine/timer.h"
 
-// C50 replacement firmware, currently covering the data-ROM HUD script and
-// its eight semantic mailbox jobs.  It is a MAME device rather than video
-// glue so its state and VRAM bus can be carried forward to a clocked FPGA
-// implementation.
+// C50 replacement firmware, owning the external data-ROM cipher, level/object
+// commands and HUD mailbox jobs.  It is a MAME device rather than video glue
+// so its state and VRAM bus can be carried forward to a clocked FPGA model.
 class bkungfu_c50_hud_device : public device_t
 {
 public:
 	bkungfu_c50_hud_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto vram_w() { return m_vram_w.bind(); }
+	auto level_vram_w() { return m_level_vram_w.bind(); }
 	auto mailbox_out_w() { return m_mailbox_out_w.bind(); }
+	void set_data_rom(const uint8_t *data_rom, const uint8_t *key);
 	void clear();
 	void mailbox_w(offs_t offset, uint8_t data);
-	void command_w(uint8_t command, const uint8_t *rom);
+	void command_w(uint8_t command);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -146,12 +147,20 @@ private:
 	void update_slot(uint8_t slot);
 	void execute_slot(uint8_t slot);
 	void complete(uint8_t offset);
+	uint8_t decode_payload(uint16_t address) const;
+	uint16_t decode_payload_word(uint16_t address) const;
+	void draw_object(uint8_t id);
+	void draw_level_strip(int column, int row);
+	void draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr);
 	void write_number(int x, int y, uint8_t number);
 	void write_lifebar(int xbase, int ybase, uint8_t energy, bool boss);
 	void write_floor_dot(int which, bool lit);
 
 	devcb_write8 m_vram_w;
+	devcb_write8 m_level_vram_w;
 	devcb_write8 m_mailbox_out_w;
+	const uint8_t *m_data_rom = nullptr;
+	std::unique_ptr<uint8_t []> m_decrypted;
 	uint8_t m_mailbox[0x30]{};
 	uint16_t m_timer = 0;
 	uint32_t m_p1score = 0;
@@ -165,6 +174,12 @@ private:
 	uint8_t m_valid = 0;
 	bool m_initialized = false;
 	bool m_running = false;
+	uint8_t m_leveldraw_row = 0;
+	uint8_t m_leveldraw_column = 0;
+	uint8_t m_leveldraw_number = 0;
+	emu_timer *m_leveldraw_timer = nullptr;
+
+	TIMER_CALLBACK_MEMBER(leveldraw_next);
 };
 
 DECLARE_DEVICE_TYPE(BKUNG_C50_HUD, bkungfu_c50_hud_device)
@@ -193,40 +208,27 @@ private:
 	uint8_t bkungfu_blitter_r(offs_t offset);
 	void bkungfu_blitter_w(offs_t offset, uint8_t data);
 	void c50_vram_w(offs_t offset, uint8_t data);
+	void c50_level_vram_w(offs_t offset, uint8_t data);
 	void c50_mailbox_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
-	void bkungfu_blitter_draw_4_tile_column_row(int column, int row, uint8_t tile, uint8_t attr);
-	void bkungfu_blitter_draw_4_tile_column(int column, int row);
 	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram);
 	void bkungfu_blitter_draw_text();
 	void bkungfu_blitter_clear_tilemap();
-	uint8_t bkungfu_blitter_decode_payload(uint16_t address) const;
-	uint16_t bkungfu_blitter_decode_payload_word(uint16_t address) const;
-	void bkungfu_blitter_draw_object(uint8_t id);
 	void bkungfu_blitter_draw_credits_continue();
-
-	TIMER_CALLBACK_MEMBER(leveldraw_next);
 
 	// done this way so it can be viewed win the debugger with save state registration
 	uint8_t m_blittercmdram[0x800];
 
-	uint8_t m_leveldraw_row;
-	uint8_t m_leveldraw_column;
-	uint8_t m_leveldraw_number;
-
 	int m_mcu_running;
-
-	emu_timer *m_leveldraw_timer = nullptr;
 	required_device<bkungfu_c50_hud_device> m_c50_hud;
 
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
 	required_region_ptr<uint8_t> m_blitterdatarom;
-	std::unique_ptr<uint8_t []> m_blitterdecrypted;
 };
 
 } // anonymous namespace
@@ -236,6 +238,7 @@ DEFINE_DEVICE_TYPE(BKUNG_C50_HUD, bkungfu_c50_hud_device, "bkung_c50hud", "Irem 
 bkungfu_c50_hud_device::bkungfu_c50_hud_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BKUNG_C50_HUD, tag, owner, clock)
 	, m_vram_w(*this)
+	, m_level_vram_w(*this)
 	, m_mailbox_out_w(*this)
 {
 }
@@ -255,6 +258,10 @@ void bkungfu_c50_hud_device::device_start()
 	save_item(NAME(m_valid));
 	save_item(NAME(m_initialized));
 	save_item(NAME(m_running));
+	save_item(NAME(m_leveldraw_row));
+	save_item(NAME(m_leveldraw_column));
+	save_item(NAME(m_leveldraw_number));
+	m_leveldraw_timer = timer_alloc(FUNC(bkungfu_c50_hud_device::leveldraw_next), this);
 }
 
 void bkungfu_c50_hud_device::device_reset()
@@ -272,11 +279,32 @@ void bkungfu_c50_hud_device::device_reset()
 	m_valid = 0;
 	m_initialized = false;
 	m_running = false;
+	m_leveldraw_row = 0;
+	m_leveldraw_column = 0;
+	m_leveldraw_number = 0;
+	m_leveldraw_timer->adjust(attotime::never);
 }
 
 void bkungfu_c50_hud_device::clear()
 {
 	m_initialized = false;
+}
+
+void bkungfu_c50_hud_device::set_data_rom(const uint8_t *data_rom, const uint8_t *key)
+{
+	m_data_rom = data_rom;
+	m_decrypted = std::make_unique<uint8_t []>(0x8000);
+	for (int address = 0; address < 0x8000; address++)
+	{
+		uint8_t const cipher = m_data_rom[address];
+		if (address < 0x153d)
+			m_decrypted[address] = cipher;
+		else
+		{
+			uint8_t const index = uint8_t((address & 0xff) + (address >> 8));
+			m_decrypted[address] = (index & 1) ? uint8_t(key[index] - cipher) : uint8_t(cipher ^ key[index]);
+		}
+	}
 }
 
 void bkungfu_c50_hud_device::write_number(int x, int y, uint8_t number)
@@ -373,7 +401,164 @@ void bkungfu_c50_hud_device::mailbox_w(offs_t offset, uint8_t data)
 		execute_slot(offset);
 }
 
-void bkungfu_c50_hud_device::command_w(uint8_t command, const uint8_t *rom)
+uint8_t bkungfu_c50_hud_device::decode_payload(uint16_t address) const
+{
+	uint8_t const value = m_decrypted[address];
+	uint8_t const sum = uint8_t((address & 0xff) + (address >> 8));
+	if (sum & 1)
+		return uint8_t(0x60 - value);
+
+	uint8_t const base = (value & 0x20) ? 0xa0 : 0x60;
+	return uint8_t(base - value - ((value & 1) ? 0 : 2));
+}
+
+uint16_t bkungfu_c50_hud_device::decode_payload_word(uint16_t address) const
+{
+	return decode_payload(address) | (uint16_t(decode_payload(address + 1)) << 8);
+}
+
+void bkungfu_c50_hud_device::draw_object(uint8_t id)
+{
+	if (!m_decrypted || id < 0x80 || id > 0x90)
+		return;
+
+	uint16_t const recaddr = m_decrypted[0x100 + 2 * (id - 0x80)] | (uint16_t(m_decrypted[0x100 + 2 * (id - 0x80) + 1]) << 8);
+	if (recaddr == 0 || recaddr >= 0x8000 - 5)
+		return;
+
+	uint8_t const width = m_decrypted[recaddr];
+	uint16_t const pos = (m_decrypted[recaddr + 1] | (uint16_t(m_decrypted[recaddr + 2]) << 8)) & 0xfff;
+	uint16_t dataptr = m_decrypted[recaddr + 3] | (uint16_t(m_decrypted[recaddr + 4]) << 8);
+	if (width == 0 || width > 0x20 || dataptr >= 0x8000)
+		return;
+
+	uint8_t attrs[512], tiles[512];
+	int count = 0;
+	uint8_t attr = 0;
+	while (dataptr < 0x8000 && count < 512)
+	{
+		uint16_t const address = dataptr;
+		uint8_t const value = m_decrypted[dataptr++];
+		if (value == 0x5f)
+		{
+			if (dataptr >= 0x8000)
+				break;
+			attr = decode_payload(dataptr++);
+			continue;
+		}
+		if (value == 0x5e || value == 0x60)
+			break;
+		tiles[count] = decode_payload(address);
+		attrs[count] = attr;
+		count++;
+	}
+
+	for (int cell = 0; cell < count; cell++)
+	{
+		int const column = cell % width;
+		int const row = cell / width;
+		uint16_t const destination = (pos + row * 0x80 + column * 2) & 0xfff;
+		m_vram_w(destination, tiles[cell]);
+		m_vram_w(destination + 1, attrs[cell]);
+	}
+}
+
+void bkungfu_c50_hud_device::draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr)
+{
+	int const offset = ((row + 6) * 256 + column * 4) * 2;
+	for (int x = 0; x < 4; x++)
+	{
+		m_level_vram_w(offset + x * 2, tile);
+		m_level_vram_w(offset + x * 2 + 1, attr);
+	}
+}
+
+void bkungfu_c50_hud_device::draw_level_strip(int column, int row)
+{
+	if (!m_decrypted)
+		return;
+
+	draw_level_column_row(column, row, 0x05, 0x19);
+	int const source_entry = (column & ~1) + ((row >= 10) ? 1 : 0);
+	int const source_row = (row < 10)
+		? row + ((column & 1) ? 10 : 0)
+		: row - 10 + ((column & 1) ? 16 : 0);
+	uint16_t const table = 0x200 + ((m_leveldraw_number & 0x0f) << 1);
+	uint16_t const block = m_decrypted[table] | (uint16_t(m_decrypted[table + 1]) << 8);
+	uint16_t const entry = block + source_entry * 2;
+	if (block < 0x153d || entry >= 0x8000 - 1)
+		return;
+
+	uint16_t const record = decode_payload_word(entry);
+	if (record < 0x1aed || record >= 0x8000 - 8)
+		return;
+
+	uint8_t tiles[4][64];
+	uint8_t attrs[4][64];
+	int count = -1;
+	for (int stream = 0; stream < 4; stream++)
+	{
+		uint16_t dataptr = decode_payload_word(record + stream * 2);
+		if (dataptr < 0x2349 || dataptr >= 0x8000)
+			return;
+
+		uint8_t attr = 0;
+		int streamcount = 0;
+		while (dataptr < 0x8000 && streamcount < 64)
+		{
+			uint8_t const value = decode_payload(dataptr++);
+			if (value == 0x00)
+				break;
+			if (value == 0x01)
+			{
+				if (dataptr >= 0x8000)
+					return;
+				attr = decode_payload(dataptr++);
+				continue;
+			}
+			tiles[stream][streamcount] = value;
+			attrs[stream][streamcount] = attr;
+			streamcount++;
+		}
+
+		if (count < 0)
+			count = streamcount;
+		else if (count != streamcount)
+			return;
+	}
+
+	int const expected_count = (source_entry & 1) ? 32 : 20;
+	if (count != expected_count)
+		return;
+
+	int const halfheight = count / 2;
+	int const band = source_row / halfheight;
+	int const bandrow = source_row % halfheight;
+	int const offset = ((row + 6) * 256 + column * 4) * 2;
+	for (int x = 0; x < 4; x++)
+	{
+		int const stream = band * 2 + x / 2;
+		int const index = bandrow * 2 + x % 2;
+		m_level_vram_w(offset + x * 2, tiles[stream][index]);
+		m_level_vram_w(offset + x * 2 + 1, attrs[stream][index]);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(bkungfu_c50_hud_device::leveldraw_next)
+{
+	draw_level_strip(m_leveldraw_column, m_leveldraw_row);
+	if (++m_leveldraw_row == 26)
+	{
+		m_leveldraw_row = 0;
+		m_leveldraw_column++;
+	}
+	if (m_leveldraw_column != 0x38)
+		m_leveldraw_timer->adjust(attotime::from_usec(200));
+	else
+		complete(0);
+}
+
+void bkungfu_c50_hud_device::command_w(uint8_t command)
 {
 	if (command == 0xfe)
 	{
@@ -387,26 +572,48 @@ void bkungfu_c50_hud_device::command_w(uint8_t command, const uint8_t *rom)
 		clear();
 		return;
 	}
+	if (command == 0x01)
+	{
+		m_leveldraw_number = m_mailbox[1];
+		complete(0);
+		return;
+	}
+	if (command == 0x02)
+	{
+		m_leveldraw_row = 0;
+		m_leveldraw_column = 0;
+		m_leveldraw_timer->adjust(attotime::from_usec(200));
+		return;
+	}
+	if (command == 0x0f)
+	{
+		draw_object(m_mailbox[1]);
+		complete(0);
+		return;
+	}
 	if (command != 0x0a)
 		return;
 
-	uint16_t stream = rom[0x140] | (uint16_t(rom[0x141]) << 8);
+	if (!m_data_rom)
+		return;
+
+	uint16_t stream = m_data_rom[0x140] | (uint16_t(m_data_rom[0x141]) << 8);
 	uint16_t position = 0;
 	uint8_t attribute = 0;
 	for (;;)
 	{
-		uint8_t const value = rom[stream++];
+		uint8_t const value = m_data_rom[stream++];
 		if (value == 0x00)
 			break;
 		if (value == 0x01)
 		{
-			attribute = rom[stream++];
+			attribute = m_data_rom[stream++];
 			continue;
 		}
 		if (value == 0x02)
 		{
-			uint8_t const low = rom[stream++];
-			uint8_t const high = rom[stream++];
+			uint8_t const low = m_data_rom[stream++];
+			uint8_t const high = m_data_rom[stream++];
 			position = low | (uint16_t(high) << 8);
 			continue;
 		}
@@ -560,210 +767,6 @@ void m62_bkungfu_state::bkungfu_blitter_clear_tilemap()
 	}
 }
 
-uint8_t m62_bkungfu_state::bkungfu_blitter_decode_payload(uint16_t address) const
-{
-	uint8_t const value = m_blitterdecrypted[address];
-	uint8_t const sum = uint8_t((address & 0xff) + (address >> 8));
-	if (sum & 1)
-		return uint8_t(0x60 - value);
-
-	uint8_t const base = (value & 0x20) ? 0xa0 : 0x60;
-	return uint8_t(base - value - ((value & 1) ? 0 : 2));
-}
-
-uint16_t m62_bkungfu_state::bkungfu_blitter_decode_payload_word(uint16_t address) const
-{
-	return bkungfu_blitter_decode_payload(address) | (bkungfu_blitter_decode_payload(address + 1) << 8);
-}
-
-void m62_bkungfu_state::bkungfu_blitter_draw_object(uint8_t id)
-{
-	// cmd 0x0f objects (0x80-0x90): decrypted table at 0x100 + 2*(id-0x80) points to a
-	// 5-byte record [width, pos_lo, pos_hi, ptr_lo, ptr_hi]; the data stream at ptr is
-	// '5f xx' attribute tokens + one byte per cell, terminated by 0x5e/0x60.
-	//
-	// Payload bytes have one more small address-dependent transform after the data-ROM
-	// decryption.  The exact same transform is used for tile and attribute bytes; the
-	// decoded attribute is already in M62 tile-RAM format.  This reproduces both title
-	// objects and both flame frames without object-specific masks, cursors or palettes.
-	if (id < 0x80 || id > 0x90)
-		return;
-
-	uint16_t const recaddr = m_blitterdecrypted[0x100 + 2 * (id - 0x80)] | (m_blitterdecrypted[0x100 + 2 * (id - 0x80) + 1] << 8);
-	if (recaddr == 0 || recaddr >= 0x8000 - 5)
-		return;
-
-	uint8_t const width = m_blitterdecrypted[recaddr];
-	uint16_t const pos = (m_blitterdecrypted[recaddr + 1] | (m_blitterdecrypted[recaddr + 2] << 8)) & 0xfff;
-	uint16_t dataptr = m_blitterdecrypted[recaddr + 3] | (m_blitterdecrypted[recaddr + 4] << 8);
-	if (width == 0 || width > 0x20 || dataptr >= 0x8000)
-		return;
-
-	// Collect decoded tile-RAM bytes.  Control bytes are part of the stream grammar
-	// and are not payload-decoded.
-	uint8_t attrs[512], tiles[512];
-	int count = 0;
-	uint8_t attr = 0;
-	while (dataptr < 0x8000 && count < 512)
-	{
-		uint16_t const address = dataptr;
-		uint8_t const b = m_blitterdecrypted[dataptr++];
-		if (b == 0x5f)
-		{
-			if (dataptr >= 0x8000)
-				break;
-			attr = bkungfu_blitter_decode_payload(dataptr);
-			dataptr++;
-			continue;
-		}
-		if (b == 0x5e || b == 0x60)
-			break;
-		tiles[count] = bkungfu_blitter_decode_payload(address);
-		attrs[count] = attr;
-		count++;
-	}
-
-	int const height = count / width;
-	for (int k = 0; k < count; k++)
-	{
-		int const col = k % width;
-		int const y = k / width;
-		uint16_t const cell = (pos + y * 0x80 + col * 2) & 0xfff;
-		bkungfu_blitter_tilemap_w(cell, tiles[k]);
-		bkungfu_blitter_tilemap_w(cell + 1, attrs[k]);
-	}
-
-	logerror("blitter: draw object %02x rec@%04x w=%d h=%d pos=%03x count=%d\n", id, recaddr, width, height, pos, count);
-}
-
-void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column_row(int column, int row, uint8_t tile, uint8_t attr)
-{
-	// rows below 6 are the HUD
-	row += 6;
-
-	int offset = (row * 256);
-	offset += (column * 4);
-	offset <<= 1;
-
-	for (int i = 0; i < 8; i += 2)
-	{
-		m_bkungfu_tileram[offset + i] = tile;
-		m_bkungfu_tileram[offset + i + 1] = attr;
-
-		m_bg_tilemap->mark_tile_dirty((offset + i) >> 1);
-
-	}
-}
-
-void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column(int column, int row)
-{
-	// The level table is consumed in pairs.  The even record decodes to 20 rows
-	// and supplies ten upper rows to each of two adjacent destination strips.
-	// The odd record decodes to 32 rows and supplies sixteen lower rows to each:
-	//
-	//   destination even = even[0..9]  + odd[0..15]
-	//   destination odd  = even[10..19] + odd[16..31]
-	//
-	// Thus each record pair expands to two 4-tile-wide by 26-row playfield
-	// strips.  The six HUD rows are not present in this level payload.
-	int const destcolumn = column;
-	bkungfu_blitter_draw_4_tile_column_row(destcolumn, row, 0x05, 0x19);
-
-	int const source_entry = (column & ~1) + ((row >= 10) ? 1 : 0);
-	int const source_row = (row < 10)
-		? row + ((column & 1) ? 10 : 0)
-		: row - 10 + ((column & 1) ? 16 : 0);
-
-	// The Z80 advances its level value modulo eight, so gameplay order is
-	// 1,2,...,7,0 rather than 0,1,...,7.  The MCU uses that value directly as
-	// the master-table index.  Redraw values are the same indices plus eight.
-	// Consequently table slot 0 is gameplay stage 8, not stage 1.
-	uint16_t const table = 0x200 + ((m_leveldraw_number & 0x0f) << 1);
-	uint16_t const block = m_blitterdecrypted[table] | (m_blitterdecrypted[table + 1] << 8);
-	uint16_t const entry = block + source_entry * 2;
-	if (block < 0x153d || entry >= 0x8000 - 1)
-		return;
-
-	uint16_t const record = bkungfu_blitter_decode_payload_word(entry);
-	if (record < 0x1aed || record >= 0x8000 - 8)
-		return;
-
-	uint8_t tiles[4][64];
-	uint8_t attrs[4][64];
-	int count = -1;
-	for (int stream = 0; stream < 4; stream++)
-	{
-		uint16_t dataptr = bkungfu_blitter_decode_payload_word(record + stream * 2);
-		if (dataptr < 0x2349 || dataptr >= 0x8000)
-			return;
-
-		uint8_t attr = 0;
-		int streamcount = 0;
-		while (dataptr < 0x8000 && streamcount < 64)
-		{
-			uint8_t const value = bkungfu_blitter_decode_payload(dataptr++);
-			if (value == 0x00)
-				break;
-			if (value == 0x01)
-			{
-				if (dataptr >= 0x8000)
-					return;
-				attr = bkungfu_blitter_decode_payload(dataptr++);
-				continue;
-			}
-
-			tiles[stream][streamcount] = value;
-			attrs[stream][streamcount] = attr;
-			streamcount++;
-		}
-
-		if (count < 0)
-			count = streamcount;
-		else if (count != streamcount)
-			return;
-	}
-
-	int const expected_count = (source_entry & 1) ? 32 : 20;
-	if (count != expected_count)
-		return;
-
-	int const halfheight = count / 2;
-	int const band = source_row / halfheight;
-	int const bandrow = source_row % halfheight;
-	int const offset = ((row + 6) * 256 + destcolumn * 4) * 2;
-	for (int x = 0; x < 4; x++)
-	{
-		int const stream = band * 2 + x / 2;
-		int const index = bandrow * 2 + x % 2;
-		m_bkungfu_tileram[offset + x * 2] = tiles[stream][index];
-		m_bkungfu_tileram[offset + x * 2 + 1] = attrs[stream][index];
-		m_bg_tilemap->mark_tile_dirty((offset + x * 2) >> 1);
-	}
-}
-
-TIMER_CALLBACK_MEMBER(m62_bkungfu_state::leveldraw_next)
-{
-	bkungfu_blitter_draw_4_tile_column(m_leveldraw_column, m_leveldraw_row);
-
-	m_leveldraw_row++;
-
-	if (m_leveldraw_row == 26)
-	{
-		m_leveldraw_row = 0;
-		m_leveldraw_column++;
-	}
-
-	if (m_leveldraw_column != 0x38)
-	{
-		m_leveldraw_timer->adjust(attotime::from_usec(200));
-	}
-	else
-	{
-		m_blittercmdram[0x00] = 0xfe;
-	}
-}
-
-
 void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 {
 	// the tilemap needs to be 256 tiles wide for the backgrounds, which are copied in a single command
@@ -791,6 +794,15 @@ void m62_bkungfu_state::c50_vram_w(offs_t offset, uint8_t data)
 	bkungfu_blitter_tilemap_w(offset & 0x0fff, data);
 }
 
+void m62_bkungfu_state::c50_level_vram_w(offs_t offset, uint8_t data)
+{
+	if (offset < m_bkungfu_tileram.bytes())
+	{
+		m_bkungfu_tileram[offset] = data;
+		m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	}
+}
+
 void m62_bkungfu_state::c50_mailbox_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x800)
@@ -804,14 +816,8 @@ void m62_bkungfu_state::machine_start()
 	save_item(NAME(m_blittercmdram));
 	save_item(NAME(m_mcu_running));
 
-	save_item(NAME(m_leveldraw_row));
-	save_item(NAME(m_leveldraw_column));
-	save_item(NAME(m_leveldraw_number));
-
-	m_leveldraw_timer = timer_alloc(FUNC(m62_bkungfu_state::leveldraw_next), this);
-
-	// decrypt the blitter data ROM (0x153d-0x7fff): key index s = (lo+hi)&0xff of the
-	// byte address; even s: plain = cipher ^ K[s], odd s: plain = (K[s] - cipher) & 0xff
+	// Recovered C50 data-ROM key.  The C50 model applies it and owns the
+	// resulting decrypted data, rather than exposing a decoded buffer to the driver.
 	static const uint8_t blitter_key[256] = {
 	0xae, 0xf3, 0x5c, 0x5d, 0xaa, 0xf7, 0x58, 0x59, 0xa6, 0xfb, 0x54, 0x55, 0xa2, 0xff, 0x50, 0x51,
 	0xbe, 0xe3, 0x4c, 0x4d, 0xba, 0xe7, 0x48, 0x49, 0xb6, 0xeb, 0x44, 0x45, 0xb2, 0xef, 0x40, 0x41,
@@ -830,18 +836,7 @@ void m62_bkungfu_state::machine_start()
 	0x4e, 0xd3, 0xbc, 0x7d, 0x4a, 0xd7, 0xb8, 0x79, 0x46, 0xdb, 0xb4, 0x75, 0x42, 0xdf, 0xb0, 0x71,
 	0x5e, 0xc3, 0xac, 0x6d, 0x5a, 0xc7, 0xa8, 0x69, 0x56, 0xcb, 0xa4, 0x65, 0x52, 0xcf, 0xa0, 0x61,
 	};
-	m_blitterdecrypted = std::make_unique<uint8_t []>(0x8000);
-	for (int a = 0; a < 0x8000; a++)
-	{
-		uint8_t const c = m_blitterdatarom[a];
-		if (a < 0x153d)
-			m_blitterdecrypted[a] = c;
-		else
-		{
-			uint8_t const s = ((a & 0xff) + (a >> 8)) & 0xff;
-			m_blitterdecrypted[a] = (s & 1) ? uint8_t(blitter_key[s] - c) : uint8_t(c ^ blitter_key[s]);
-		}
-	}
+	m_c50_hud->set_data_rom(&m_blitterdatarom[0], blitter_key);
 }
 
 void m62_bkungfu_state::machine_reset()
@@ -853,11 +848,6 @@ void m62_bkungfu_state::machine_reset()
 
 	m_mcu_running = 0;
 
-	m_leveldraw_row = 0;
-	m_leveldraw_column = 0;
-	m_leveldraw_number = 0;
-
-	m_leveldraw_timer->adjust(attotime::never);
 }
 
 
@@ -895,7 +885,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 
 	if (offset == 0x00)
 	{
-		m_c50_hud->command_w(data, &m_blitterdatarom[0]);
+		m_c50_hud->command_w(data);
 		if (data == 0x14)
 		{
 			logerror("%s: Command %02x: blitter: draw text from ROM\n", machine().describe_context(), data);
@@ -962,13 +952,8 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint8_t param2 = m_blittercmdram[0x002];
 			logerror("%s: Command %02x: blitter: start of level cmd 2 (do draw?) %02x %02x\n", machine().describe_context(), data, param1, param2);
 
-			// note this isn't instant, you can see the draw-in on PCB footage so we're using a timer
-			// however it should complete before the character starts walking, it doesn't, is this the wrong trigger?
-			// or should this command cycle steal the maincpu instead? (there doesn't seem to be any wait for it to complete)
-			m_leveldraw_row = 0;
-			m_leveldraw_column = 0;
-			m_leveldraw_number = param1;
-			m_leveldraw_timer->adjust(attotime::from_usec(200));
+			// The C50 device owns the progressive strip draw and completes C800
+			// when its last 4-tile column has been written.
 		}
 		else if (data == 0x01)
 		{
@@ -978,11 +963,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// it happens twice at the start of each stage, once before any level animations are complete
 			// the param is different each time +8 the 2nd time, as to point to the 'with animations complete' state of the tilemap
 
-			uint16_t blitterromptr = m_blittercmdram[0x001];
-			uint16_t data_address = m_blitterdatarom[0x200 + (blitterromptr << 1)] | (m_blitterdatarom[0x200 + (blitterromptr << 1) + 1] << 8);
-			//popmessage("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x", machine().describe_context(), data, blitterromptr, data_address);
-			logerror("%s: Command %02x: blitter: draw level from ROM - param %02x source address is %04x\n", machine().describe_context(), data, blitterromptr, data_address);
-			m_blittercmdram[0x00] = 0xfe;
+			logerror("%s: Command %02x: C50 select level table entry %02x\n", machine().describe_context(), data, m_blittercmdram[0x001]);
 		}
 		else if (data == 0x0a)
 		{
@@ -1024,8 +1005,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// definitions are either coming from internal MCU ROM or the encrypted area
 
 			logerror("%s: Command %02x: blitter: draw title animation element (flames / level animations) %02x %02x\n", machine().describe_context(), data, m_blittercmdram[0x001], m_blittercmdram[0x002]);
-			bkungfu_blitter_draw_object(m_blittercmdram[0x001]);
-			m_blittercmdram[0x00] = 0xfe;
+			// The C50 device decodes the object record and writes its tilemap.
 		}
 		else if (data == 0xfe)
 		{
@@ -1185,6 +1165,7 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 
 	BKUNG_C50_HUD(config, m_c50_hud, 0);
 	m_c50_hud->vram_w().set(FUNC(m62_bkungfu_state::c50_vram_w));
+	m_c50_hud->level_vram_w().set(FUNC(m62_bkungfu_state::c50_level_vram_w));
 	m_c50_hud->mailbox_out_w().set(FUNC(m62_bkungfu_state::c50_mailbox_w));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_bkungfu_state,bkungfu)
