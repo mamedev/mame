@@ -37,7 +37,8 @@ public:
 	void bubltea(machine_config &config) ATTR_COLD;
 	void dsgnpal(machine_config &config) ATTR_COLD;
 	void bftetris(machine_config &config) ATTR_COLD;
-	
+	void pink218(machine_config &config) ATTR_COLD;
+
 	void init_fif() ATTR_COLD;
 	void init_pink218() ATTR_COLD;
 
@@ -441,6 +442,16 @@ void generalplus_gpl951xx_game_state::bftetris(machine_config &config)
 	m_screen->set_screen_update(FUNC(generalplus_gpl951xx_game_state::bftetris_screen_update));
 }
 
+void generalplus_gpl951xx_game_state::pink218(machine_config &config)
+{
+	bftetris(config);
+
+	// check!
+	m_genspi->set_jedec_manufacturer(0xc2);
+	m_genspi->set_jedec_memtype(0x20);
+	m_genspi->set_jedec_capacity(0x17);
+}
+
 
 ROM_START( fixitflx )
 	ROM_REGION16_BE(0x200000, "spi", ROMREGION_ERASE00)
@@ -731,4 +742,4 @@ CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_
 
 // this one has 2 checksums in service mode (like the generalplus_gp3x_unknown.cpp sets) but one is 00000000 and there is only a single ROM
 // BL-519-V1.2 20220822 on PCB
-CONS( 2022, pink218,      0,       0,      bftetris,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2022, pink218,      0,       0,      pink218,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
