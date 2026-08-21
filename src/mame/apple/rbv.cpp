@@ -156,10 +156,10 @@ TIMER_CALLBACK_MEMBER(rbv_device::mac_6015_tick)
 	write_6015(ASSERT_LINE);
 }
 
-template <u8 mask>
+template <u8 Mask>
 void rbv_device::slot_irq_w(int state)
 {
-	m_pseudovia->slot_irq_w<mask>(state);
+	m_pseudovia->slot_irq_w<Mask>(state);
 }
 
 template void rbv_device::slot_irq_w<0x40>(int state);

@@ -19,6 +19,10 @@ project "formats"
 		"ArchiveSplit",
 	}
 
+	defines {
+		"ZLIB_CONST",
+	}
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib",

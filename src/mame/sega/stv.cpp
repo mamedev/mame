@@ -9,6 +9,11 @@ Notes:
 - To enter into an Advanced Test Mode, hold Test Button (F2) at start-up.
 
 TODO:
+- aclub: "Error 11 call attendant", bypass by turning on maintenance mode in game test.
+\- Horrible voice pitches (SCU streaming DMA to SCSP with LV2);
+\- VDP1 Ugly time indicator (flowers), enables CCCR = 0x0067 in VDP2;
+\- will hang anyway when supposed to print report and/or dispense the oil (tries to use IOGA serial);
+
 - colmns97: has a bit of stuck envelope sound in places (i.e. coin in once at title screen);
 
 - critcrsh: 2 digits 7-seg LED stuck on hi-score during gameplay, has optional ticket dispenser;
@@ -29,6 +34,8 @@ TODO:
   set_maximum_quantum() number, might need strict SH-2 synching or it's actually a m68k comms issue.
 
 - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose if any;
+
+- tsuribor: needs input rod hookup (analog);
 
 - vfremix: https://mametesters.org/view.php?id=4445
 
@@ -1952,6 +1959,28 @@ static INPUT_PORTS_START( wwshin )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_NAME("Brake")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( aclub )
+	PORT_INCLUDE( stv )
+
+	// TODO: BSERVICE and BTEST on PDR2 (?)
+	// TODO: throws coin error in maintenance mode, only coin 2 works
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTE")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTG")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
@@ -3814,6 +3843,23 @@ ROM_START( pcpooh3 ) // set to 1p
 	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(e41d541b) SHA1(511fe00745787ee5dbd813125ddc3db921d6531e) )
 ROM_END
 
+// 837-12765-01 (c) 1996 on component side
+// 171-7410A on solder side
+// Sports an AT28C16, and an unpopulated 317-* (sticker covered).
+ROM_START( aclub )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic22",    0x0200000, 0x0200000, CRC(1d6fc99d) SHA1(0b1a85560325b0d44bd105e4b4fde5a97bf6497c) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic24",    0x0400000, 0x0200000, CRC(65502690) SHA1(00879e23c8645e67e9ce9ccddb851660478c4c18) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic26",    0x0600000, 0x0200000, CRC(ed530d76) SHA1(1cb9956e92787b7a09395310da9e4ef7320a85c6) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic28",    0x0800000, 0x0200000, CRC(1c6a7967) SHA1(5390236467077e37f962975095c7cb937f61973e) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic30",    0x0a00000, 0x0200000, CRC(4b7e36d1) SHA1(a5688976df83ce58d61b33aec36630ab6a372dcb) )
+	// empty sockets ic32, ic34 and ic36
+	// ic13 populated with a PALCE16V8H-10
+
+	// TODO: add 1p eeprom default
+ROM_END
 
 
 // Name Club / Name Club vol.2
@@ -4153,15 +4199,17 @@ GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stvpc_state, init_stv,      
 GAME( 1997, pclubyo,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V1 (J 970208 V1.000)", MACHINE_NOT_WORKING ) // Yoshimoto V1 on cart, internal string YOSHIMOTO KOGYO
 GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
 
-GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete
 GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1998, pclubsc5,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Sony Creative Ver.5 (J 980721 V1.000)", MACHINE_NOT_WORKING ) // ^
 
+GAME( 1997, aclub,     stvbios, stv,      aclub,    stv_state,   init_stv,        ROT0,   "Sega",                         "Aroma Club (J 970611 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // technically also printer and "blended oil" dispenser
+
 GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete
 GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released the same day)
 GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 GAME( 1997, nclubv4,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.4 (J 971202 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection

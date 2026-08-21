@@ -12,8 +12,8 @@ license:CC0-1.0
 		<description>Sweet as Honey</description>
 		<year>2006</year>
 		<publisher>JAKKS Pacific, Inc.</publisher>
-		<info name="alt_title" value="Dolce come il miele"/>
-		<info name="developer" value="Backbone Entertainment"/>
+		<info name="alt_title" value="Dolce come il miele" />
+		<info name="developer" value="Backbone Entertainment" />
 		<part name="cart" interface="jakks_gamekey">
 			<!--
 			Contains 3 bonus games:

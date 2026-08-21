@@ -1117,44 +1117,8 @@ u16 scsp_device::r16(u32 addr)
 			v = *((u16 *) (m_DSP.EFREG + (addr - 0xec0) / 2));
 		else
 		{
-			// TODO: kyutnkai reads from 0xee0/0xee2
-			// it's tied with EXTS register(s) also used for CD-Rom Player equalizer.
-			/*
-			This port is actually an external parallel port, directly connected from the CD Block device, hence code is a bit of an hack.
-
-			Code snippet for reference:
-			004A3A: 207C 0010 0EE0             movea.l #$100ee0, A0
-			004A40: 43EA 0090                  lea     ($90,A2), A1 ;A2=0x700
-			004A44: 6100 0254                  bsr     $4c9a
-			004A48: 207C 0010 0EE2             movea.l #$100ee2, A0
-			004A4E: 43EA 0092                  lea     ($92,A2), A1
-			004A52: 6100 0246                  bsr     $4c9a
-			004A56: 207C 0010 0ED2             movea.l #$100ed2, A0
-			004A5C: 43EA 0094                  lea     ($94,A2), A1
-			004A60: 6100 0238                  bsr     $4c9a
-			004A64: 3540 0096                  move.w  D0, ($96,A2)
-			004A68: 207C 0010 0ED4             movea.l #$100ed4, A0
-			004A6E: 43EA 0098                  lea     ($98,A2), A1
-			004A72: 6100 0226                  bsr     $4c9a
-			004A76: 3540 009A                  move.w  D0, ($9a,A2)
-			004A7A: 207C 0010 0ED6             movea.l #$100ed6, A0
-			004A80: 43EA 009C                  lea     ($9c,A2), A1
-			004A84: 6100 0214                  bsr     $4c9a
-			004A88: 3540 009E                  move.w  D0, ($9e,A2)
-			004A8C: 4E75                       rts
-
-			    004C9A: 48E7 4000                  movem.l D1, -(A7)
-			    004C9E: 3010                       move.w  (A0), D0 ;reads from 0x100ee0/ee2
-			    004CA0: 4A40                       tst.w   D0
-			    004CA2: 6A00 0004                  bpl     $4ca8
-			    004CA6: 4440                       neg.w   D0
-			    004CA8: 3211                       move.w  (A1), D1
-			    004CAA: D041                       add.w   D1, D0
-			    004CAC: E248                       lsr.w   #1, D0
-			    004CAE: 3280                       move.w  D0, (A1) ;writes to RAM buffer 0x790/0x792
-			    004CB0: 4CDF 0002                  movem.l (A7)+, D1
-			    004CB4: 4E75                       rts
-			*/
+			// saturn Multiplayer Audio CDs and kyutnkai (68k PC=004A3A) reads from 0xee0/0xee2 EXTS
+			// returns back current sample, makes the balloons in former to inflate.
 			logerror("%s: SCSP Reading from EXTS register %08x\n", machine().describe_context(), addr);
 			if (addr < 0xEE4)
 				v = *((u16 *) (m_DSP.EXTS + (addr - 0xee0) / 2));
@@ -1400,10 +1364,10 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 		for (int i = 0; i < 2; ++i)
 		{
 			SCSP_SLOT *slot = m_Slots + i + 16; // 100217, 100237 EFSDL, EFPAN for EXTS0/1
-			if (EFSDL(slot))
+			// !EFSDL case testable in saturn Multiplayer with Audio CD with default values.
+			u16 Enc = EFSDL(slot) ? ((EFPAN(slot)) << 0x8) | ((EFSDL(slot)) << 0xd) : (((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd));
 			{
 				m_DSP.EXTS[i] = s32(stream.get(i, s) * 32768.0);
-				u16 Enc = ((EFPAN(slot)) << 0x8) | ((EFSDL(slot)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
 			}
@@ -1424,6 +1388,7 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 
 // TODO: this needs to be timer-ized
 // Very likely this is burst too.
+// - darius2j uses this at startup with DGATE enabled
 void scsp_device::exec_dma()
 {
 	static u16 tmp_dma[3];
@@ -1447,7 +1412,6 @@ void scsp_device::exec_dma()
 	{
 		if (m_dma.dgate)
 		{
-			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for (i = 0; i < m_dma.dtlg; i += 2)
 			{
 				this->space().write_word(m_dma.dmea, 0);
@@ -1470,7 +1434,6 @@ void scsp_device::exec_dma()
 	{
 		if (m_dma.dgate)
 		{
-			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for (i = 0; i < m_dma.dtlg; i += 2)
 			{
 				w16(m_dma.drga, 0);

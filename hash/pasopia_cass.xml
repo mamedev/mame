@@ -15,11 +15,11 @@ license:CC0-1.0
 		<description>Pasopia Game-shuu</description>
 		<year>1982</year>
 		<publisher>東芝 (Toshiba)</publisher>
-		<info name="serial" value="PA6002"/>
-		<info name="alt_title" value="パソピア ゲーム集"/>
+		<info name="serial" value="PA6002" />
+		<info name="alt_title" value="パソピア ゲーム集" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="68596062">
-				<rom name="pa6002.wav" size="68596062" crc="f8a3ea13" sha1="01436203bb2e7a1b7f3adec812f6d2edebcb2cc7"/>
+				<rom name="pa6002.wav" size="68596062" crc="f8a3ea13" sha1="01436203bb2e7a1b7f3adec812f6d2edebcb2cc7" />
 			</dataarea>
 		</part>
 	</software>
@@ -28,18 +28,18 @@ license:CC0-1.0
 		<description>Pasopia Game Highlight</description>
 		<year>1982</year>
 		<publisher>東芝 (Toshiba)</publisher>
-		<info name="serial" value="PZA-410"/>
-		<info name="alt_title" value="パソピアゲームハイライト"/>
+		<info name="serial" value="PZA-410" />
+		<info name="alt_title" value="パソピアゲームハイライト" />
 		<part name="cass1" interface="pasopia_cass">
-			<feature name="part_id" value="A - T-BASIC用"/>
+			<feature name="part_id" value="A - T-BASIC用" />
 			<dataarea name="cass" size="80066535">
-				<rom name="pza-410.wav" size="80066535" crc="5849a0f8" sha1="7c64bb429033b0f39a703524546bc96ae706d3cf"/>
+				<rom name="pza-410.wav" size="80066535" crc="5849a0f8" sha1="7c64bb429033b0f39a703524546bc96ae706d3cf" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="pasopia_cass">
-			<feature name="part_id" value="B - OA-BASIC用"/>
+			<feature name="part_id" value="B - OA-BASIC用" />
 			<dataarea name="cass" size="80066535">
-				<rom name="pasopia game highlight oa-basic.wav" size="80066535" status="nodump"/>
+				<rom name="pasopia game highlight oa-basic.wav" size="80066535" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -48,11 +48,11 @@ license:CC0-1.0
 		<description>Sample Program PA7010-you</description>
 		<year>1982</year>
 		<publisher>東芝 (Toshiba)</publisher>
-		<info name="serial" value="PZA-383"/>
-		<info name="alt_title" value="SAMPLE PROGRAM PA7010用"/>
+		<info name="serial" value="PZA-383" />
+		<info name="alt_title" value="SAMPLE PROGRAM PA7010用" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="22310064">
-				<rom name="pza-383.wav" size="22310064" crc="98069673" sha1="7500579c6b43736fdcb17d6929af8a7077ca72e8"/>
+				<rom name="pza-383.wav" size="22310064" crc="98069673" sha1="7500579c6b43736fdcb17d6929af8a7077ca72e8" />
 			</dataarea>
 		</part>
 	</software>
@@ -65,9 +65,9 @@ license:CC0-1.0
 		<description>2001-nen Uchuu no Tabi Part II</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="2001年宇宙の旅"/>
-		<info name="serial" value="T-1102"/>
-		<info name="usage" value="Load with CLOAD&quot;PAR2&quot;"/>
+		<info name="alt_title" value="2001年宇宙の旅" />
+		<info name="serial" value="T-1102" />
+		<info name="usage" value="Load with CLOAD&quot;PAR2&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="22061100">
 				<rom name="2001nen uchu no tabi part ii.wav" size="22061100" crc="72fd2933" sha1="113043eab347992d1a00236b621d501215cb4846" />
@@ -79,9 +79,9 @@ license:CC0-1.0
 		<description>Aldebaran</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="アルデバラン"/>
-		<info name="serial" value="T-1004"/>
-		<info name="usage" value="Load with CLOAD&quot;ALD&quot;"/>
+		<info name="alt_title" value="アルデバラン" />
+		<info name="serial" value="T-1004" />
+		<info name="usage" value="Load with CLOAD&quot;ALD&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="20442156">
 				<rom name="aldebaran.wav" size="20442156" crc="1c5d321f" sha1="76956db02665951403b08d6e5cf1d4b1bcb0ddd7" />
@@ -93,9 +93,9 @@ license:CC0-1.0
 		<description>Balloon Bomber</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="バルーンボンバー"/>
-		<info name="serial" value="T-1033"/>
-		<info name="usage" value="Load with CLOAD&quot;BOMB&quot;"/>
+		<info name="alt_title" value="バルーンボンバー" />
+		<info name="serial" value="T-1033" />
+		<info name="usage" value="Load with CLOAD&quot;BOMB&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="18937900">
 				<rom name="balloon bomber.wav" size="18937900" crc="04a1281f" sha1="265b026052a2fbfa74b470178b6d75176a8ed2cc" />
@@ -110,9 +110,9 @@ license:CC0-1.0
 		<notes><![CDATA[
 shoots not registered?!
 ]]></notes>
-		<info name="alt_title" value="バルチック艦隊"/>
-		<info name="serial" value="T-1040"/>
-		<info name="usage" value="Load with CLOAD&quot;BALC&quot;"/>
+		<info name="alt_title" value="バルチック艦隊" />
+		<info name="serial" value="T-1040" />
+		<info name="usage" value="Load with CLOAD&quot;BALC&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="22058028">
 				<rom name="baltic kantai.wav" size="22058028" crc="6f0f50b9" sha1="94b1c38e7d3226954f59e7088b75d2a0448841c5" />
@@ -124,9 +124,9 @@ shoots not registered?!
 		<description>Bird Hunter</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="バードハンター"/>
-		<info name="serial" value="T-1031"/>
-		<info name="usage" value="Load with CLOAD&quot;BARD&quot;"/>
+		<info name="alt_title" value="バードハンター" />
+		<info name="serial" value="T-1031" />
+		<info name="usage" value="Load with CLOAD&quot;BARD&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="6654508">
 				<rom name="bird hunter.wav" size="6654508" crc="7c43b7cf" sha1="c7fb2535c86fc3025737e86e8a537f62fd3032fe" />
@@ -138,9 +138,9 @@ shoots not registered?!
 		<description>Block Kuzushi</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="ブロックくず氏"/>
-		<info name="serial" value="T-1012"/>
-		<info name="usage" value="Load with CLOAD&quot;BLOC&quot;"/>
+		<info name="alt_title" value="ブロックくず氏" />
+		<info name="serial" value="T-1012" />
+		<info name="usage" value="Load with CLOAD&quot;BLOC&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="4740140">
 				<rom name="block kuzushi.wav" size="4740140" crc="67616b4f" sha1="3ec4b8b4e017b12279614b7391d471049af49faa" />
@@ -155,9 +155,9 @@ shoots not registered?!
 		<notes><![CDATA[
 Missing inputs?!
 ]]></notes>
-		<info name="alt_title" value="キャッチベビー"/>
-		<info name="serial" value="T-1052"/>
-		<info name="usage" value="Load with CLOAD&quot;BABY&quot;"/>
+		<info name="alt_title" value="キャッチベビー" />
+		<info name="serial" value="T-1052" />
+		<info name="usage" value="Load with CLOAD&quot;BABY&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="31960108">
 				<rom name="catch baby.wav" size="31960108" crc="1a3f0166" sha1="c25f70e9efc1f4e7c4493640b87f6815db906853" />
@@ -169,9 +169,9 @@ Missing inputs?!
 		<description>Daisensha Toppa Sakusen</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="大戦車突破作戦"/>
-		<info name="serial" value="T-1039"/>
-		<info name="usage" value="Load with CLOAD&quot;TANK&quot;"/>
+		<info name="alt_title" value="大戦車突破作戦" />
+		<info name="serial" value="T-1039" />
+		<info name="usage" value="Load with CLOAD&quot;TANK&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="28137516">
 				<rom name="daisensha toppa sakusen.wav" size="28137516" crc="5ac4872a" sha1="a4d48815cc647bc600567f46ea7899ef03cf1297" />
@@ -186,9 +186,9 @@ Missing inputs?!
 		<notes><![CDATA[
 Map is not updating?
 ]]></notes>
-		<info name="alt_title" value="牛乳さんゲーム"/>
-		<info name="serial" value="T-1058"/>
-		<info name="usage" value="Load with CLOAD&quot;MILK&quot;"/>
+		<info name="alt_title" value="牛乳さんゲーム" />
+		<info name="serial" value="T-1058" />
+		<info name="usage" value="Load with CLOAD&quot;MILK&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="27791404">
 				<rom name="gyunyuyasan game.wav" size="27791404" crc="0a212c18" sha1="6c8f851dfab7dc16dc041f5a4fb820d49d20028f" />
@@ -200,9 +200,9 @@ Map is not updating?
 		<description>ICBM Geigeki Sakusen</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="ICMB迎撃作戦"/>
-		<info name="serial" value="T-1044"/>
-		<info name="usage" value="Load with CLOAD&quot;ICBM&quot;"/>
+		<info name="alt_title" value="ICMB迎撃作戦" />
+		<info name="serial" value="T-1044" />
+		<info name="usage" value="Load with CLOAD&quot;ICBM&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="17392684">
 				<rom name="icbm geigeki sakusen.wav" size="17392684" crc="be009e15" sha1="3c897ddb5448b6548590b3276003004b43189387" />
@@ -214,9 +214,9 @@ Map is not updating?
 		<description>Kuchikukan Gekichin Game</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="駆逐艦撃沈ゲーム"/>
-		<info name="serial" value="T-1025"/>
-		<info name="usage" value="Load with CLOAD&quot;KUCH&quot;"/>
+		<info name="alt_title" value="駆逐艦撃沈ゲーム" />
+		<info name="serial" value="T-1025" />
+		<info name="usage" value="Load with CLOAD&quot;KUCH&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="34702380">
 				<rom name="kuchikukan gekichin game.wav" size="34702380" crc="36d7048f" sha1="15115567d489d0b3b23b50e452f745a11a22feb4" />
@@ -228,9 +228,9 @@ Map is not updating?
 		<description>Kyuketsuki Bokumetsu Sakusen</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="吸血系撲滅作戦"/>
-		<info name="serial" value="T-1025"/>
-		<info name="usage" value="Load with CLOAD&quot;DORA&quot;"/>
+		<info name="alt_title" value="吸血系撲滅作戦" />
+		<info name="serial" value="T-1025" />
+		<info name="usage" value="Load with CLOAD&quot;DORA&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="32033836">
 				<rom name="kyuketsuki bokumetsu sakusen.wav" size="32033836" crc="58cde27a" sha1="9c0b09c671efb4960039d8e263b6afdc5db4623b" />
@@ -242,11 +242,11 @@ Map is not updating?
 		<description>Part-Timer no Kyuuyo Keisan</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="T-3010"/>
-		<info name="alt_title" value="パートタイマーの給与計算"/>
+		<info name="serial" value="T-3010" />
+		<info name="alt_title" value="パートタイマーの給与計算" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="14950165">
-				<rom name="t-3010.wav" size="14950165" crc="d7c6745d" sha1="fc0ae43e62128e02000bf534c156ac1c0eebb63b"/>
+				<rom name="t-3010.wav" size="14950165" crc="d7c6745d" sha1="fc0ae43e62128e02000bf534c156ac1c0eebb63b" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,11 +255,11 @@ Map is not updating?
 		<description>Pasopia Derby</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="T-1030"/>
-		<info name="alt_title" value="パソピア ダービー"/>
+		<info name="serial" value="T-1030" />
+		<info name="alt_title" value="パソピア ダービー" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="13059875">
-				<rom name="t-1030.wav" size="13059875" crc="0c2702f7" sha1="544e120e0dc5d226072371841e5e1982f015353b"/>
+				<rom name="t-1030.wav" size="13059875" crc="0c2702f7" sha1="544e120e0dc5d226072371841e5e1982f015353b" />
 			</dataarea>
 		</part>
 	</software>
@@ -268,9 +268,9 @@ Map is not updating?
 		<description>Pro Racer</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="T-1043"/>
-		<info name="alt_title" value="プロレーサー"/>
-		<info name="usage" value="Load with CLOAD&quot;PRC&quot;"/>
+		<info name="serial" value="T-1043" />
+		<info name="alt_title" value="プロレーサー" />
+		<info name="usage" value="Load with CLOAD&quot;PRC&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="21581278">
 				<rom name="pro racer.wav" size="21581278" crc="d71c10de" sha1="9e2b4dbd8ea489a8b22633c8bddcd7a931655946" />
@@ -282,9 +282,9 @@ Map is not updating?
 		<description>Scramble</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="T-1045"/>
-		<info name="alt_title" value="スクランブル"/>
-		<info name="usage" value="Load with CLOAD&quot;SCR&quot;"/>
+		<info name="serial" value="T-1045" />
+		<info name="alt_title" value="スクランブル" />
+		<info name="usage" value="Load with CLOAD&quot;SCR&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="32172076">
 				<rom name="scramble.wav" size="32172076" crc="4b7c980f" sha1="0fb3832956ef5f38b7b07621790360270af4f8a4" />
@@ -299,9 +299,9 @@ Map is not updating?
 		<notes><![CDATA[
 Uses number keys in place on numeric keypad ones!
 ]]></notes>
-		<info name="serial" value="T-1036"/>
-		<info name="alt_title" value="スキーゲーム"/>
-		<info name="usage" value="Load with CLOAD&quot;SKI&quot;"/>
+		<info name="serial" value="T-1036" />
+		<info name="alt_title" value="スキーゲーム" />
+		<info name="usage" value="Load with CLOAD&quot;SKI&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="17639468">
 				<rom name="ski game.wav" size="17639468" crc="0621a3b5" sha1="da7b0a6c34d3b1185e6458c03d45c2659731e285" />
@@ -316,9 +316,9 @@ Uses number keys in place on numeric keypad ones!
 		<notes><![CDATA[
 I could not find the proper inputs
 ]]></notes>
-		<info name="serial" value="T-1019"/>
-		<info name="alt_title" value="スーパーゴルフ"/>
-		<info name="usage" value="Load with CLOAD&quot;GOLF&quot;"/>
+		<info name="serial" value="T-1019" />
+		<info name="alt_title" value="スーパーゴルフ" />
+		<info name="usage" value="Load with CLOAD&quot;GOLF&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="15522860">
 				<rom name="super golf.wav" size="15522860" crc="75e6efd0" sha1="469229c0c7e059c48e2d0c232cf4646703672000" />
@@ -333,9 +333,9 @@ I could not find the proper inputs
 		<notes><![CDATA[
 I could not find the proper inputs
 ]]></notes>
-		<info name="serial" value="T-1019"/>
-		<info name="alt_title" value="太陽系一周レース"/>
-		<info name="usage" value="Load with CLOAD&quot;ISYU&quot;"/>
+		<info name="serial" value="T-1019" />
+		<info name="alt_title" value="太陽系一周レース" />
+		<info name="usage" value="Load with CLOAD&quot;ISYU&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="33551404">
 				<rom name="taiyokei isshu race.wav" size="33551404" crc="fecde64a" sha1="65a327b54441c54f2527a771ef1a02c508f478c5" />
@@ -350,9 +350,9 @@ I could not find the proper inputs
 		<notes><![CDATA[
 I could not find the proper inputs
 ]]></notes>
-		<info name="serial" value="T-1053"/>
-		<info name="alt_title" value="宝探し"/>
-		<info name="usage" value="Load with CLOAD&quot;TAKA&quot;"/>
+		<info name="serial" value="T-1053" />
+		<info name="alt_title" value="宝探し" />
+		<info name="usage" value="Load with CLOAD&quot;TAKA&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="27996204">
 				<rom name="takara sagashi.wav" size="27996204" crc="34b13346" sha1="36849c67e55e4b9efef26ac82a343dc813c6c866" />
@@ -364,11 +364,11 @@ I could not find the proper inputs
 		<description>The Golf</description>
 		<year>1982</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
-		<info name="serial" value="T-201"/>
-		<info name="alt_title" value="ザ・ゴルフ"/>
+		<info name="serial" value="T-201" />
+		<info name="alt_title" value="ザ・ゴルフ" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="19156507">
-				<rom name="t-201.wav" size="19156507" crc="916e814e" sha1="2e2c61129cc2359b35e1aa9d88130326b7b5ca66"/>
+				<rom name="t-201.wav" size="19156507" crc="916e814e" sha1="2e2c61129cc2359b35e1aa9d88130326b7b5ca66" />
 			</dataarea>
 		</part>
 	</software>
@@ -377,9 +377,9 @@ I could not find the proper inputs
 		<description>Uchiwa de Hoi Hoi</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="T-1038"/>
-		<info name="alt_title" value="うちわでホイホイ"/>
-		<info name="usage" value="Load with CLOAD&quot;HOI&quot;"/>
+		<info name="serial" value="T-1038" />
+		<info name="alt_title" value="うちわでホイホイ" />
+		<info name="usage" value="Load with CLOAD&quot;HOI&quot;" />
 		<part name="cass1" interface="pasopia_cass">
 			<dataarea name="cass" size="25494572">
 				<rom name="uchiwa de hoi hoi.wav" size="25494572" crc="5b36776a" sha1="4fb849a1c3dda57debec6e6c0e524c359db98c16" />

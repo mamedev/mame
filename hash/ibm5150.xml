@@ -714,7 +714,7 @@ Game doesn't boot
 	<software name="crossfire" supported="no">
 		<description>Crossfire</description>
 		<year>1984</year>
-		<publisher>Sierra On-Line</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<notes><![CDATA[
 Game doesn't boot
 ]]></notes>
@@ -8562,9 +8562,9 @@ Punts with "PLEASE USE ORIGINAL DISK ONLY.", unemulated protection
 	<software name="3dhelsim">
 		<description>3-D Helicopter Simulator</description>
 		<year>1987</year>
-		<publisher>Sierra On-Line</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Sierra On-Line" />
+		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1094495">
@@ -10610,7 +10610,7 @@ This release doesn't have copy protection.
 		<description>California Pro Golf</description>
 		<year>1989</year>
 		<publisher>Mastertronic</publisher>
-		<info name="developer" value="Andromeda Software" />
+		<info name="developer" value="Andromeda Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="California Pro Golf [Mastertronic] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="e42f8d35" sha1="34703e62bc5d808cc6839e376785faafacc7236e"/>
@@ -11450,7 +11450,7 @@ copied disks with copy utility watermark on final track
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Codewheel required" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size = "368640">
@@ -11470,7 +11470,7 @@ copied disks with copy utility watermark on final track
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Codewheel required" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Cycles, The (1989)(Accolade).dsk" size="737280" crc="7912f6ea" sha1="372e3ecb424556bd3dea4723138e66f952117cad"/>
@@ -12363,7 +12363,7 @@ Works good on EGA video mode. Choosing CGA video mode the error "Packed file is 
 		<description>Fire Power</description>
 		<year>1988</year>
 		<publisher>MicroIllusions</publisher>
-		<info name="developer" value="Silent Software" />
+		<info name="developer" value="Silent Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Fire Power [MicroIllusions] [1988] [5.25DD] [Disk 1 on 2].img" size="368640" crc="d04075f0" sha1="084905e9ec4482eeed565c78d8c3031f2f2d37fd"/>
@@ -15648,7 +15648,7 @@ Black screen after listing control scheme. Doesn't pass the protection check, th
 	<software name="polepos">
 		<description>Pole Position</description>
 		<year>1988</year>
-		<publisher>Thunder Mountain</publisher>
+		<publisher>Thunder Mountain</publisher>
 		<info name="developer" value="Namco" />
 		<info name="usage" value="only works on drive A:" />
 		<part name="flop1" interface="floppy_5_25">
@@ -17686,7 +17686,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Street Fighting Man</description>
 		<year>1989</year>
 		<publisher>Mastertronic</publisher>
-		<info name="developer" value="Sculptured Software" />
+		<info name="developer" value="Sculptured Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Street Fighting Man (1989)(Mastertronic)(Disk 1 of 2).dsk" size="368640" crc="949cdf13" sha1="89d6b45d0ec0a0ca46a90c27ad9376b827cf68a1"/>
@@ -17703,7 +17703,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Street Fighting Man (alt)</description>
 		<year>1989</year>
 		<publisher>Mastertronic</publisher>
-		<info name="developer" value="Sculptured Software" />
+		<info name="developer" value="Sculptured Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Street Fighting Man [Mastertronic] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="949cdf13" sha1="89d6b45d0ec0a0ca46a90c27ad9376b827cf68a1"/>
@@ -18247,7 +18247,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1076013">
@@ -18266,7 +18266,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1108801">
@@ -18285,7 +18285,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2172623">
@@ -18299,7 +18299,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size = "1105590">
@@ -18319,7 +18319,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2111167">
 				<rom name="Test Drive 2 [Accolade] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2111167" crc="ace3bc4b" sha1="034e77c8e585c81632310bef36ce42cb1831a13b"/>
@@ -18332,7 +18332,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1102593">
@@ -18346,7 +18346,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2111231">
@@ -18360,7 +18360,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1990</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1092883">
@@ -18374,7 +18374,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2111119">
@@ -18388,7 +18388,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1109834">
@@ -18402,7 +18402,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2111078">
@@ -18416,7 +18416,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1106294">
@@ -18430,7 +18430,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Distinctive Software" />
+		<info name="developer" value="Distinctive Software" />
 		<info name="usage" value="Add-on for Test Drive II" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2111350">
@@ -19197,8 +19197,8 @@ Includes a non-playable demo of the "Maniac Mansion" game.
 	<software name="zeliard">
 		<description>Zeliard (5.25")</description>
 		<year>1990</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="developer" value="Game Arts" />
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Game Arts" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "368640">
@@ -19222,8 +19222,8 @@ Includes a non-playable demo of the "Maniac Mansion" game.
 	<software name="zeliard_35" cloneof="zeliard">
 		<description>Zeliard (3.5")</description>
 		<year>1990</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="developer" value="Game Arts" />
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Game Arts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Zeliard [Sierra] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="aa42915e" sha1="7e90ba433d1c8d0ff13e415a64a5c59904811719"/>
@@ -19243,7 +19243,7 @@ Includes a non-playable demo of the "Maniac Mansion" game.
 		<notes><![CDATA[
 Disk 1 has a created "RESOURCE.CFG" file
 ]]></notes>
-		<info name="developer" value="Game Arts" />
+		<info name="developer" value="Game Arts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Zeliard (v2.0) [Sierra] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="1262c699" sha1="a7b70e74143a086d5c15f167ade43371782e93ef" status="baddump"/>

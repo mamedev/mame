@@ -299990,7 +299990,7 @@ license:CC0-1.0
 	<software name="planetx3_pc">
 		<description>Planet X3 (IBM PC)</description>
 		<year>2018</year>
-		<publisher>8-Bit Productions, LLC.</publisher>
+		<publisher>8-Bit Productions, LLC.</publisher>
 		<info name="cores" value="OPL2 (YM3812)"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 fight for the future.vgz" />

@@ -5667,7 +5667,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 	<software name="ppersia2">
 		<description>Prince of Persia 2 - The Shadow and the Flame (USA)</description>
 		<year>1998</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia 2 - The Shadow and the Flame
 Playable demos:
@@ -5762,7 +5762,7 @@ Prince of Persia 2 - The Shadow and the Flame (v1.0)
 	<software name="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (Europe)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)
@@ -5792,7 +5792,7 @@ Warlords III: Darklords Rising
 	<software name="ppersialea" cloneof="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (Europe, alt)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)
@@ -5822,7 +5822,7 @@ Warlords III: Darklords Rising
 	<software name="ppersiale_us" cloneof="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (USA)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)
@@ -5851,7 +5851,7 @@ The Making of Prince of Persia 3D
 	<software name="ppersiale_nl" cloneof="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (Netherlands)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)

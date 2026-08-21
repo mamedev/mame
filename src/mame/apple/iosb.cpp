@@ -315,16 +315,16 @@ void iosb_base::scc_irq_w(int state)
 	field_interrupts();
 }
 
-template <u8 mask>
+template <u8 Mask>
 void iosb_base::via2_irq_w(int state)
 {
 	if (state)
 	{
-		m_nubus_irqs &= ~mask;
+		m_nubus_irqs &= ~Mask;
 	}
 	else
 	{
-		m_nubus_irqs |= mask;
+		m_nubus_irqs |= Mask;
 	}
 
 	if ((m_nubus_irqs & 0x79) != 0x79)

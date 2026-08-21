@@ -12,10 +12,10 @@ license:CC0-1.0
 		<notes><![CDATA[
 Keeps ringing [DAC1BIT] when ball goes O.B.
 ]]></notes>
-		<info name="alt_title" value="3Dゴルフシミュレーション"/>
+		<info name="alt_title" value="3Dゴルフシミュレーション" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="31821868">
-				<rom name="3d golf simulation.wav" size="31821868" crc="1005e6a0" sha1="538562b9c80f07b8671454cc5a2e270fec7440c9"/>
+				<rom name="3d golf simulation.wav" size="31821868" crc="1005e6a0" sha1="538562b9c80f07b8671454cc5a2e270fec7440c9" />
 			</dataarea>
 		</part>
 	</software>
@@ -27,8 +27,8 @@ Keeps ringing [DAC1BIT] when ball goes O.B.
 		<notes><![CDATA[
 Fails to load
 ]]></notes>
-		<info name="alt_title" value="明るい農園"/>
-		<info name="serial" value="T-1H12"/>
+		<info name="alt_title" value="明るい農園" />
+		<info name="serial" value="T-1H12" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="7407660">
 				<rom name="akarui noen.wav" size="7407660" crc="9b48c745" sha1="ff127bc620f222ee59754cb52d518e9252e6d582" />
@@ -43,8 +43,8 @@ Fails to load
 		<notes><![CDATA[
 Fails to load
 ]]></notes>
-		<info name="alt_title" value="雨の日は大忙し"/>
-		<info name="serial" value="T-1H13"/>
+		<info name="alt_title" value="雨の日は大忙し" />
+		<info name="serial" value="T-1H13" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="6595628">
 				<rom name="ame no hi wa oisogashi.wav" size="6595628" crc="dfc43f78" sha1="482f7aa4ca1f979062026c0a6781ddc0c2ff2f59" />
@@ -59,8 +59,8 @@ Fails to load
 		<notes><![CDATA[
 Fails to load
 ]]></notes>
-		<info name="alt_title" value="バブルクンド 1999"/>
-		<info name="serial" value="T-1H11"/>
+		<info name="alt_title" value="バブルクンド 1999" />
+		<info name="serial" value="T-1H11" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="5853740">
 				<rom name="baburukundo 1999.wav" size="5853740" crc="fda205ba" sha1="faafe9135ec065b29af87ea3e6b8277d388d1418" />
@@ -72,8 +72,8 @@ Fails to load
 		<description>Cannon Ball</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="キャノンボール"/>
-		<info name="serial" value="T-1H02"/>
+		<info name="alt_title" value="キャノンボール" />
+		<info name="serial" value="T-1H02" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="3886124">
 				<rom name="cannonball.wav" size="3886124" crc="2e4d466d" sha1="04225f067e7967e002ee65717e5fdd1124195bef" />
@@ -85,8 +85,8 @@ Fails to load
 		<description>Door Door</description>
 		<year>198?</year>
 		<publisher>エニックス (Enix)</publisher>
-		<info name="alt_title" value="ドアドア"/>
-		<info name="serial" value="T-1E01"/>
+		<info name="alt_title" value="ドアドア" />
+		<info name="serial" value="T-1E01" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="18564140">
 				<rom name="door door.wav" size="18564140" crc="0fc6ddc6" sha1="c0869b74e57fcf7a4cf2acbbde7f6f54e1a16975" />
@@ -98,8 +98,8 @@ Fails to load
 		<description>Door Door (Alt)</description>
 		<year>198?</year>
 		<publisher>エニックス (Enix)</publisher>
-		<info name="alt_title" value="ドアドア"/>
-		<info name="serial" value="T-1E01"/>
+		<info name="alt_title" value="ドアドア" />
+		<info name="serial" value="T-1E01" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="18288684">
 				<rom name="door door [alt].wav" size="18288684" crc="5d33ec19" sha1="881de0a1cfabe59ffb744671422e93de2def52f1" />
@@ -114,8 +114,8 @@ Fails to load
 		<notes><![CDATA[
 Fails to load
 ]]></notes>
-		<info name="alt_title" value="フィールドウォーズ"/>
-		<info name="serial" value="T-1H08"/>
+		<info name="alt_title" value="フィールドウォーズ" />
+		<info name="serial" value="T-1H08" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="10868268">
 				<rom name="field wars.wav" size="10868268" crc="42c693c4" sha1="46717ca96293ec6b67c9c7f20bf8acde28271911" />
@@ -130,8 +130,8 @@ Fails to load
 		<notes><![CDATA[
 Fails to load
 ]]></notes>
-		<info name="serial" value="T-1611"/>
-		<info name="alt_title" value="フライボーイ"/>
+		<info name="serial" value="T-1611" />
+		<info name="alt_title" value="フライボーイ" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="23154732">
 				<rom name="fly boy.wav" size="23154732" crc="23aa20c6" sha1="03d6c172e8fd64a11da5a2b127ecb53a390e4c37" />
@@ -143,8 +143,8 @@ Fails to load
 		<description>Fruits Paradise</description>
 		<year>1983?</year>
 		<publisher>立之システムリサーチ株式会社 (Tatsuno System)</publisher>
-		<info name="alt_title" value="フルーツパラダイス"/>
-		<info name="serial" value="T-1905"/>
+		<info name="alt_title" value="フルーツパラダイス" />
+		<info name="serial" value="T-1905" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="9560330">
 				<rom name="fruits_paradise.wav" size="9560330" crc="c7adb73d" sha1="01f6c9cbc504390b3d4a11d3a00aeeab1523baa0" />
@@ -159,8 +159,8 @@ Fails to load
 		<notes><![CDATA[
 Freezes while drawing the title screen
 ]]></notes>
-		<info name="alt_title" value="ゴルフゲーム"/>
-		<info name="serial" value="T-1910"/>
+		<info name="alt_title" value="ゴルフゲーム" />
+		<info name="serial" value="T-1910" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="11171372">
 				<rom name="golf game.wav" size="11171372" crc="9d2df0e9" sha1="56ee3f3a2d8b769583f2a5469de8900c8bd51732" />
@@ -175,8 +175,8 @@ Freezes while drawing the title screen
 		<notes><![CDATA[
 Fails to load
 ]]></notes>
-		<info name="alt_title" value="ひつじや～い！"/>
-		<info name="serial" value="T-1H07"/>
+		<info name="alt_title" value="ひつじや～い！" />
+		<info name="serial" value="T-1H07" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="6942252">
 				<rom name="hitsuji ya-i.wav" size="6942252" crc="dac8d996" sha1="7eb9b2f736373db95c1580599b3e357f6dce369a" />
@@ -191,7 +191,7 @@ Fails to load
 		<notes><![CDATA[
 Freeze at title screen
 ]]></notes>
-		<info name="alt_title" value="ジャン狂"/>
+		<info name="alt_title" value="ジャン狂" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="15097900">
 				<rom name="jan-kyou.wav" size="15097900" crc="8e6a6258" sha1="e845625ef2fd224cac0942a9de64a99338723129" />
@@ -203,8 +203,8 @@ Freeze at title screen
 		<description>Justice Knight</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="ジャスティスナイト"/>
-		<info name="serial" value="T-1H09"/>
+		<info name="alt_title" value="ジャスティスナイト" />
+		<info name="serial" value="T-1H09" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="11009580">
 				<rom name="justice knight.wav" size="11009580" crc="5fa9deb5" sha1="5132d47e7fa0639823a1f83d29510b02eea2eee4" />
@@ -216,8 +216,8 @@ Freeze at title screen
 		<description>Kaeru Shooter</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="カエルシューター"/>
-		<info name="serial" value="T-1H05"/>
+		<info name="alt_title" value="カエルシューター" />
+		<info name="serial" value="T-1H05" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="3801132">
 				<rom name="kaeru shooter.wav" size="3801132" crc="92f15cc6" sha1="34318d2ea8a6b52940a9a80b148742f9cfb69dcb" />
@@ -232,8 +232,8 @@ Freeze at title screen
 		<notes><![CDATA[
 Fails to load
 ]]></notes>
-		<info name="alt_title" value="麻雀"/>
-		<info name="serial" value="T-1401"/>
+		<info name="alt_title" value="麻雀" />
+		<info name="serial" value="T-1401" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="13492268">
 				<rom name="mahjong.wav" size="13492268" crc="5c5d8cda" sha1="e116f798f3d5ed69e4c32c20b030098357def6a3" />
@@ -248,9 +248,9 @@ Fails to load
 		<notes><![CDATA[
 Needs Japanese inputs?!
 ]]></notes>
-		<info name="alt_title" value="魔女モヘカの館"/>
-		<info name="usage" value="Load with BLOAD #-1,&quot;ADVEN&quot; and then A=&amp;HAD00:CALL A"/>
-		<info name="serial" value="EB-1032"/>
+		<info name="alt_title" value="魔女モヘカの館" />
+		<info name="usage" value="Load with BLOAD #-1,&quot;ADVEN&quot; and then A=&amp;HAD00:CALL A" />
+		<info name="serial" value="EB-1032" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="9527340">
 				<rom name="majo moheka no kan.wav" size="9527340" crc="eb14d481" sha1="cf72b8964767d47c93887450c3280550540f4764" />
@@ -262,7 +262,7 @@ Needs Japanese inputs?!
 		<description>Osaka no Jin</description>
 		<year>198?</year>
 		<publisher>CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
-		<info name="alt_title" value="大坂の陣"/>
+		<info name="alt_title" value="大坂の陣" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="21613612">
 				<rom name="osaka no jin.wav" size="21613612" crc="1d43c60c" sha1="26ddd2b3998c0452c3277e94941a0de8fbf8d979" />
@@ -277,9 +277,9 @@ Needs Japanese inputs?!
 		<notes><![CDATA[
 Controls don't work?!
 ]]></notes>
-		<info name="alt_title" value="パッキングス"/>
-		<info name="usage" value="Load with BLOAD #-1,&quot;PACKINGS&quot; and then A=&amp;HC000:CALL A"/>
-		<info name="serial" value="T-1502"/>
+		<info name="alt_title" value="パッキングス" />
+		<info name="usage" value="Load with BLOAD #-1,&quot;PACKINGS&quot; and then A=&amp;HC000:CALL A" />
+		<info name="serial" value="T-1502" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="4944014">
 				<rom name="packings.wav" size="4944014" crc="0d77e047" sha1="7f6b459b975e8c03f3f0e89a55049b81f177f1db" />
@@ -294,9 +294,9 @@ Controls don't work?!
 		<notes><![CDATA[
 Hangs after completing loading process
 ]]></notes>
-		<info name="alt_title" value="パソピア７ プログラム"/>
-		<info name="serial" value="PZA-447"/>
-		<info name="usage" value="Load with CLOAD&quot;SAMPL1&quot; or CLOAD&quot;SAMPL2&quot;"/>
+		<info name="alt_title" value="パソピア７ プログラム" />
+		<info name="serial" value="PZA-447" />
+		<info name="usage" value="Load with CLOAD&quot;SAMPL1&quot; or CLOAD&quot;SAMPL2&quot;" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="136505388">
 				<rom name="pasopia7 programs (system tape).wav" size="136505388" crc="7092aefd" sha1="5a5f159f7c1102fd4f1d373b47c5c7a41990afb0" />
@@ -311,8 +311,8 @@ Hangs after completing loading process
 		<notes><![CDATA[
 Loads. Untested actual gameplay.
 ]]></notes>
-		<info name="alt_title" value="ポイボス脱出"/>
-		<info name="serial" value="TOZA16001"/>
+		<info name="alt_title" value="ポイボス脱出" />
+		<info name="serial" value="TOZA16001" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="26823724">
 				<rom name="poibosu.wav" size="26823724" crc="83cf7b1b" sha1="8da83b1533de508288119164e338332f5e41bc1c" />
@@ -327,9 +327,9 @@ Loads. Untested actual gameplay.
 		<notes><![CDATA[
 Freeze at instruction?!
 ]]></notes>
-		<info name="alt_title" value="SPY ゼロ ゼロ ワンワン"/>
-		<info name="serial" value="TOCP-16009"/>
-		<info name="usage" value="Load with CLOAD&quot;SPY&quot;"/>
+		<info name="alt_title" value="SPY-ゼロゼロワンワン" />
+		<info name="serial" value="TOCP-16009" />
+		<info name="usage" value="Load with CLOAD&quot;SPY&quot;" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="20684844">
 				<rom name="spy-0011.wav" size="20684844" crc="44c2f432" sha1="bd6a29130af17c7da2cb0bb417a46b8ab1669894" />
@@ -341,8 +341,8 @@ Freeze at instruction?!
 		<description>Super Baseball</description>
 		<year>1983</year>
 		<publisher>タイニーソフト (Tinysoft)</publisher>
-		<info name="alt_title" value="スーパーベースボール"/>
-		<info name="serial" value="P7-1002"/>
+		<info name="alt_title" value="スーパーベースボール" />
+		<info name="serial" value="P7-1002" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="9043500">
 				<rom name="super baseball.wav" size="9043500" crc="4ca6aee3" sha1="f855e19693c238fa89e571da3a0f0433b74838d9" />
@@ -357,8 +357,8 @@ Freeze at instruction?!
 		<notes><![CDATA[
 Does not draw screen?
 ]]></notes>
-		<info name="alt_title" value="詰将棋"/>
-		<info name="serial" value="T-1604"/>
+		<info name="alt_title" value="詰将棋" />
+		<info name="serial" value="T-1604" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="9388588">
 				<rom name="tsume shogi.wav" size="9388588" crc="3457cc26" sha1="9f7d4024b1177c5185529e529360a25edde68ef7" />
@@ -369,16 +369,16 @@ Does not draw screen?
 <!-- Games below come from magazine type-ins -->
 
 	<software name="c1ymath" supported="no">
-		<description>Chuu-1-You Suugaku</description>
+		<description>Chuu-1-you Suugaku</description>
 		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
 Does not clear answers for later questions... bug or limitation?
 ]]></notes>
-		<info name="alt_title" value="中１用数学"/>
+		<info name="alt_title" value="中１用数学" />
 		<info name="magazine" value="マイコンBASICマガジン ~ Mycom BASIC Magazine" />
-		<info name="release" value="198412xx"/>
-		<info name="developer" value="Hideki Oota"/>
+		<info name="release" value="198412xx" />
+		<info name="developer" value="Hideki Oota" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="1797861">
 				<rom name="7th grade math (hideki oota).wav" size="1797861" crc="9521b181" sha1="d4fd798a2e68f83fdf01b5ac997cb84099a08988" />
@@ -387,16 +387,16 @@ Does not clear answers for later questions... bug or limitation?
 	</software>
 
 	<software name="heri" supported="no">
-		<description>Fighting Heri</description>
+		<description>Fighting Heli</description>
 		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
 Freezes at title screen
 ]]></notes>
-		<info name="alt_title" value="宇宙戦艦"/>
+		<info name="alt_title" value="Fighting Heri" /> <!-- the magazine used this bad back-transliteration -->
 		<info name="magazine" value="マイコンBASICマガジン ~ Mycom BASIC Magazine" />
-		<info name="release" value="198412xx"/>
-		<info name="developer" value="Keroyon Soft"/>
+		<info name="release" value="198412xx" />
+		<info name="developer" value="Keroyon Soft" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="1408078">
 				<rom name="fighting heri (keroyon soft).wav" size="1408078" crc="9745bed6" sha1="b2c5a15a3555e7528acb369a4e0482e24152d6be" />
@@ -405,16 +405,16 @@ Freezes at title screen
 	</software>
 
 	<software name="herif" cloneof="heri" supported="no">
-		<description>Fighting Heri (Fixed?)</description>
+		<description>Fighting Heli (fixed?)</description>
 		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
 Freezes at title screen
 ]]></notes>
-		<info name="alt_title" value="宇宙戦艦"/>
+		<info name="alt_title" value="Fighting Heri" /> <!-- the magazine used this bad back-transliteration -->
 		<info name="magazine" value="マイコンBASICマガジン ~ Mycom BASIC Magazine" />
-		<info name="release" value="198412xx"/>
-		<info name="developer" value="Keroyon Soft"/>
+		<info name="release" value="198412xx" />
+		<info name="developer" value="Keroyon Soft" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="1406227">
 				<rom name="heri_fix.wav" size="1406227" crc="9b95dff7" sha1="b4fe5ccf76b2c9ef4d21af910b846f0d7e062a76" />
@@ -429,10 +429,9 @@ Freezes at title screen
 		<notes><![CDATA[
 Freezes at start
 ]]></notes>
-		<info name="alt_title" value="宇宙戦艦"/>
 		<info name="magazine" value="マイコンBASICマガジン ~ Mycom BASIC Magazine" />
-		<info name="release" value="198412xx"/>
-		<info name="developer" value="Toshihide Iwanaga"/>
+		<info name="release" value="198412xx" />
+		<info name="developer" value="Toshihide Iwanaga" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="3365211">
 				<rom name="the caterpillar in the amida (toshihide iwanaga).wav" size="3365211" crc="56d57215" sha1="8876046e974a91cf284e6f916307d89fa8070ed6" />
@@ -447,12 +446,12 @@ Freezes at start
 		<notes><![CDATA[
 Hangs once an enemy is found
 ]]></notes>
-		<info name="alt_title" value="宇宙戦艦 ~ Uchuu Senkan"/>
+		<info name="alt_title" value="宇宙戦艦" />
 		<info name="magazine" value="マイコンBASICマガジン ~ Mycom BASIC Magazine" />
 		<info name="release" value="198804xx" />
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="4865361">
-				<rom name="spacebattleship_(bm-1988-04).wav" size="4865361" crc="ec5299f6" sha1="55473cf086aacf90d124d775407b2315d303bfed"/>
+				<rom name="spacebattleship_(bm-1988-04).wav" size="4865361" crc="ec5299f6" sha1="55473cf086aacf90d124d775407b2315d303bfed" />
 			</dataarea>
 		</part>
 	</software>
@@ -469,7 +468,7 @@ Black screen, tight loops on PPI port B bit 6
 		<!-- Was with B&M label -->
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="1686928">
-				<rom name="space shooter (io_198301).wav" size="1686928" crc="35a071e5" sha1="706b1447fd8e40f2f5520c802c63271c4de952e1"/>
+				<rom name="space shooter (io_198301).wav" size="1686928" crc="35a071e5" sha1="706b1447fd8e40f2f5520c802c63271c4de952e1" />
 			</dataarea>
 		</part>
 	</software>

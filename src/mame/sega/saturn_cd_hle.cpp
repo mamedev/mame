@@ -51,6 +51,7 @@ DASM notes:
 #define LOG_SEEK           (1U << 3)
 #define LOG_XFER           (1U << 4)
 #define LOG_STATUS         (1U << 5) // log CD status changes
+#define LOG_CMDV           (1U << 6) // raw command output (verbose)
 
 #define VERBOSE (LOG_CMD | LOG_WARN | LOG_STATUS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -62,6 +63,7 @@ DASM notes:
 #define LOGSEEK(...)         LOGMASKED(LOG_SEEK, __VA_ARGS__)
 #define LOGXFER(...)         LOGMASKED(LOG_XFER, __VA_ARGS__)
 #define LOGSTATUS(...)       LOGMASKED(LOG_STATUS, __VA_ARGS__)
+#define LOGCMDV(...)         LOGMASKED(LOG_CMDV, __VA_ARGS__)
 
 #define LIVE_CD_VIEW    0
 
@@ -271,9 +273,9 @@ void saturn_cd_hle_device::amap(address_map &map)
 	map(0x80020, 0x80023).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr3_r), FUNC(saturn_cd_hle_device::cr3_w));
 	map(0x80024, 0x80027).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr4_r), FUNC(saturn_cd_hle_device::cr4_w));
 
-	// NetLink access
+	// NetLink/ Sega Saturn modem access
 	// dragndrm expects this value, most likely for status
-	// TODO: move out of here
+	// TODO: move out of here, breaks daytoncej boot
 	map(0x85029, 0x85029).lr8(NAME([] () -> u8 { return 0x11; }));
 }
 
@@ -980,8 +982,11 @@ void saturn_cd_hle_device::cmd_play_disc()
 				else
 					fadstoplay = (m_cdrom_image->get_track_start((end_pos & 0xff00) >> 8)) - cd_curfad;
 			}
-			LOGCMD("\ttrack mode %08x %08x\n", cd_curfad, fadstoplay);
-			cd_change_status(CD_STAT_PLAY);
+			LOGCMD("\ttrack mode %08x %08x -> %08x %08x\n", start_pos, end_pos, cd_curfad, fadstoplay);
+			// make sure to SEEK anyway:
+			// - Multiplayer Audio CD would otherwise override a previous track seek command
+			cd_change_status(CD_STAT_SEEK);
+			cd_seek_stat = CD_STAT_PLAY;
 		}
 		else
 		{
@@ -994,15 +999,20 @@ void saturn_cd_hle_device::cmd_play_disc()
 			// be countless possible combinations ...
 			if(fadstoplay == 0)
 			{
-				cd_curfad = m_cdrom_image->get_track_start(cur_track-1);
-				fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
-				cd_change_status(CD_STAT_PLAY);
+				// don't override FAD start, Multiplayer Audio CD needs this
+				// (testable by pausing then play again current track)
+				// TODO: need to preserve previous fadstoplay
+				// (in said case, by playing until the end of disc rather than just one track)
+				//cd_curfad = m_cdrom_image->get_track_start(cur_track);
+				fadstoplay = m_cdrom_image->get_track_start(cur_track + 1) - cd_curfad;
+				cd_change_status(CD_STAT_SEEK);
+				cd_seek_stat = CD_STAT_PLAY;
 			}
-			LOGCMD("\ttrack resume %08x %08x\n",cd_curfad,fadstoplay);
+			LOGCMD("\ttrack resume %08x %08x (%06x %06x)\n", cd_curfad, fadstoplay, start_pos, end_pos);
 		}
 	}
 
-	LOGCMD("\tPlay Disc: current %x -> start %x length %x\n", cd_curfad, cd_fad_seek, fadstoplay);
+	LOGCMD("\tPlay Disc: current %06x -> start %06x length %06x\n", cd_curfad, cd_fad_seek, fadstoplay);
 
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK);
@@ -1037,7 +1047,7 @@ void saturn_cd_hle_device::cmd_seek_disc()
 	playtype = 0;
 
 	LOGCMD("%s: Disc seek\n",   machine().describe_context());
-	LOGCMD("\t%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
+	LOGCMD("\t%04x %04x %04x %04x\n",cr1, cr2, cr3, cr4);
 	if (cr1 & 0x80)
 	{
 		temp = (cr1 & 0xff) << 16;  // get FAD to seek to
@@ -1069,7 +1079,7 @@ void saturn_cd_hle_device::cmd_seek_disc()
 		}
 		else
 		{
-			// Area 51 sets this up (TODO: re 	test me out)
+			// Area 51 sets this up (TODO: retest me out)
 			cd_fad_seek = ((cr1 & 0x7f) << 16) | cr2;
 			cd_change_status(CD_STAT_SEEK);
 			cd_seek_stat = CD_STAT_PAUSE;
@@ -1855,7 +1865,6 @@ void saturn_cd_hle_device::cmd_get_sector_data_copy_or_move_error()
 {
 	// get copy error
 	LOGCMD("%s: Get copy error\n",   machine().describe_context());
-	logerror("Get copy error\n");
 	cr1 = cd_stat;
 	cr2 = 0;
 	cr3 = 0;
@@ -2129,7 +2138,7 @@ void saturn_cd_hle_device::cd_exec_command()
 		((cr1 & 0xff00) != 0x5200) &&
 		((cr1 & 0xff00) != 0x5300) &&
 		1)
-		logerror("Command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+		LOGCMDV("Command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 	// execute the command even if CD isn't in tray
 	// - BIOS will otherwise draw VDP2 garbage if tray is closed (seen commands: 0x01, 0x75, 0x67)
@@ -2900,7 +2909,8 @@ void saturn_cd_hle_device::cd_playdata()
 			}
 			else
 			{
-				LOGSEEK("Ready\n");
+				cur_track = m_cdrom_image->get_track(cd_fad_seek);
+				LOGSEEK("Ready (track %d)\n", cur_track + 1);
 				cd_curfad = cd_fad_seek;
 				cd_change_status(cd_seek_stat);
 				if (cd_seek_stat == CD_STAT_PLAY && m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) == cdrom_file::CD_TRACK_AUDIO)
@@ -2972,11 +2982,20 @@ void saturn_cd_hle_device::cd_playdata()
 							}
 							else
 							{
+								// a cdda_maxrepeat of 0xf means keep repeating same track indefinitely
 								if(cdda_repeat_count < 0xe)
 									cdda_repeat_count++;
 
-								cd_curfad = m_cdrom_image->get_track_start(cur_track-1) + 150;
-								fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
+								// TODO: untested with cur_track == 0xaa (lead-out)
+								// - dendego (tries to) playback redbook track 3 on title screen after seek
+								// - girlpuz1 is an easy test case, on both title and Himekuri mode
+								assert(cur_track > 0 && cur_track != 0xff);
+								//cd_curfad = m_cdrom_image->get_track_start(cur_track);
+								cd_fad_seek = m_cdrom_image->get_track_start(cur_track);
+								fadstoplay = m_cdrom_image->get_track_start(cur_track + 1) - cd_fad_seek;
+								cd_change_status(CD_STAT_SEEK);
+								cd_seek_stat = CD_STAT_PLAY;
+								LOGCMD("Repeat hit track %d count %d/%d FAD %06x -> start %06x end %06x\n", cur_track, cdda_repeat_count, cdda_maxrepeat, cd_curfad, cd_fad_seek, fadstoplay);
 							}
 						}
 					}

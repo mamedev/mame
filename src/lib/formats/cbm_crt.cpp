@@ -136,7 +136,7 @@ static char const *const CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 //  cbm_crt_get_card - get slot interface card
 //-------------------------------------------------
 
-std::string cbm_crt_get_card(util::core_file &file)
+std::string cbm_crt_get_card(util::read_stream &file)
 {
 	// read the header
 	cbm_crt_header header;

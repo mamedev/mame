@@ -90,14 +90,16 @@ arbitrary_datetime arbitrary_datetime::now() noexcept
 
 
 
-// -------------------------------------------------
-// system_clock_time_point_from_ntfs_duration
-// -------------------------------------------------
-
 std::chrono::system_clock::time_point system_clock_time_point_from_ntfs_duration(ntfs_duration d)
 {
 	const std::chrono::time_point<ntfs_clock> tp(d);
 	return ntfs_clock::to_system_clock(tp);
+}
+
+
+ntfs_duration ntfs_duration_from_system_clock_time_point(std::chrono::system_clock::time_point tp)
+{
+	return ntfs_clock::from_system_clock(tp).time_since_epoch();
 }
 
 } // namespace util

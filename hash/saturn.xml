@@ -1630,7 +1630,7 @@ Disc 2 is missing from this set (there's no single CD version on Saturn)
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen, [CD-Block] regression
+Black screen, it does boot if [SMPC] pad 2 is unconnected (verify)
 ]]></notes>
 		<info name="serial" value="GS-9040"/>
 		<info name="release" value="19951110"/>
@@ -1643,7 +1643,6 @@ Black screen, [CD-Block] regression
 		</part>
 	</software>
 
-	<!-- Identifying Bakuretsu Hunter (Japan) (Disc 2) (Omake CD)... -->
 	<software name="bakhunta" cloneof="bakhunt" supported="no">
 		<description>Bakuretsu Hunter (Japan, alt Omake CD)</description>
 		<year>1996</year>
@@ -1875,11 +1874,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Burning Rangers (Japan)... -->
 	<software name="burningrj" cloneof="burningr" supported="no">
 		<description>Burning Rangers (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[VDP2] too dim in gameplay
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9174"/>
 		<info name="release" value="19980226"/>
 		<info name="alt_title" value="バーニングレンジャー"/>
@@ -2027,11 +2029,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Choro Q Park (Japan)... -->
 	<software name="choroqpk" supported="no">
 		<description>Choro Q Park (Japan)</description>
 		<year>1998</year>
 		<publisher>Takara</publisher>
+		<notes><![CDATA[
+Some transitional screens have color or GFX issues, [CD-Block] or [SCU]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-10314G"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="チョロＱパーク"/>
@@ -2267,11 +2272,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Several sprites in intro have wrong colors (cfr. first mech exiting the planet, lasers when Silver Hawk is introduced, Golden Ogre) [VDP1] -->
 	<software name="dariusgj" cloneof="dariusg" supported="no">
 		<description>Darius Gaiden (Japan, 3M)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+Several sprites in intro have wrong colors (cfr. first mech exiting the planet, lasers when Silver Hawk is introduced, Golden Ogre) [VDP1]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1102G"/>
 		<info name="release" value="19951215"/>
 		<info name="alt_title" value="ダライアス外伝"/>
@@ -2306,7 +2314,7 @@ Not extensively tested
 		<publisher>Climax</publisher>
 		<notes><![CDATA[
 CHD is missing index data from track 2
-Black screens after initial intro [CD-Block]?
+Black screens after new game initial intro [VDP1] CEF?
 Sound test is incredibly dark [VDP2]
 Some kanji drawings are dubious (verify)
 ]]></notes>
@@ -2424,11 +2432,13 @@ Hangs at now loading screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]?)
 		</part>
 	</software>
 
-	<!-- Identifying Daytona USA - Circuit Edition (Japan)... -->
 	<software name="daytoncej" cloneof="daytonce" supported="no">
 		<description>Daytona USA - Circuit Edition (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Currently hangs at [modem] not connected unskippable screen
+]]></notes>
 		<info name="serial" value="GS-9100"/>
 		<info name="release" value="19970124"/>
 		<info name="alt_title" value="デイトナUSA サーキット エディション"/>
@@ -2551,11 +2561,14 @@ https://segaretro.org/Delisoba_Deluxe
 		</part>
 	</software>
 
-	<!-- Identifying Densetsu no Ogre Battle (Japan)... -->
 	<software name="ogrebatl" supported="no">
 		<description>Densetsu no Ogre Battle (Japan)</description>
 		<year>1996</year>
 		<publisher>Riverhill Software</publisher>
+		<notes><![CDATA[
+Should use a [VDP2] color offset raster after character creation screen
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-5305G"/>
 		<info name="release" value="19961101"/>
 		<info name="alt_title" value="伝説のオウガバトル"/>
@@ -2923,13 +2936,16 @@ Serious [VDP2] Window clipping issues
 	</software>
 
 	<!-- The Dungeons and Dragons collection is a 2 disk set, but each disk is an independent game so I've left them separate -->
-	<!-- Glitchy sprites [VDP1] -->
-	<!-- No SFXs [CD-Block/SCSP] -->
-	<!-- Hangs often -->
+	<!-- TODO: bad idea, merge back -->
 	<software name="ddtod" supported="no">
 		<description>Dungeon's &amp; Dragons - Tower of Doom (Dungeons &amp; Dragons Collection Disc 1) (Japan)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Glitchy sprites [VDP1]
+No SFXs [CD-Block] or [SCSP]
+Hangs often (retest me)
+]]></notes>
 		<info name="serial" value="T-1224G"/>
 		<info name="release" value="19990304"/>
 		<info name="alt_title" value="ダンジョンズ&amp;ドラゴンズ コレクション"/>
@@ -2941,12 +2957,14 @@ Serious [VDP2] Window clipping issues
 		</part>
 	</software>
 
-	<!-- Identifying Dungeons &amp; Dragons Collection (Japan) (Disc 2) (Shadow over Mystara)... -->
-	<!-- Glitchy sprites [VDP1] -->
 	<software name="ddsom" supported="no">
 		<description>Dungeons &amp; Dragons - Shadow over Mystara (Dungeons &amp; Dragons Collection Disc 2) (Japan)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Glitchy sprites [VDP1]
+Hangs on river stage (retest me)
+]]></notes>
 		<info name="serial" value="T-1224G"/>
 		<info name="release" value="19990304"/>
 		<info name="alt_title" value="ダンジョンズ&amp;ドラゴンズ コレクション"/>
@@ -3176,7 +3194,6 @@ Dragon Slayer/Ys 1: [SCSP] sound has several hiccups
 		<year>1998</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Doesn't recognize start button on title screen, [CD-Block] related (fixed)
 Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV [CD-Block]
 Asteka II: requires [VDP1] sprite delay (cfr. main map scrolling)
 Not extensively tested
@@ -4581,11 +4598,14 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		</part>
 	</software>
 
-	<!-- Identifying Kyuutenkai (Japan)... -->
 	<software name="kyutnkai" supported="no">
 		<description>Kyuutenkai (Japan)</description>
 		<year>1995</year>
 		<publisher>Technosoft</publisher>
+		<notes><![CDATA[
+[SCUDSP] polygon glitch on Tecno Soft logo transition
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1801G"/>
 		<info name="release" value="19950825"/>
 		<info name="alt_title" value="球転界 / Fantastic Pinball 球転界 ~ Fantastic Pinball Kyuutenkai (Box)"/>
@@ -4613,11 +4633,13 @@ Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
 		</part>
 	</software>
 
-	<!-- Identifying Last Bronx (Japan) (Disc 1) (Arcade Disc)... -->
 	<software name="lastbrnxj" cloneof="lastbrnx" supported="no">
 		<description>Last Bronx (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, [CD-Block] crashes at startup (regression)
+]]></notes>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ラストブロンクス"/>
@@ -6462,12 +6484,16 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Doesn't draw the Sega Ages logo at boot [VDP2?] -->
-	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
 	<software name="columns" supported="no">
 		<description>Sega Ages: Columns Arcade Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Doesn't draw the Sega Ages logo at boot [VDP2?]
+Sets [CD-Block] HIRM with DCHG, wants the A-Bus irq if user hits the tray open
+Stack Columns: playback the wrong redbook track in gameplay [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9161"/>
 		<info name="release" value="19971030"/>
 		<info name="alt_title" value="コラムス アーケードコレクション"/>
@@ -6515,11 +6541,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages: I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)... -->
 	<software name="mickdnld" supported="no">
 		<description>Sega Ages: I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Both games: various examples of [VDP1] to [VDP2] priority bugs (intro in Castle of Illusion, sand in Quack Shot Mexico stage)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9179"/>
 		<info name="release" value="19981015"/>
 		<info name="alt_title" value="アイラブ ミッキーマウス ふしぎのお城 大冒険 / アイラブ ドナルドダック グルジア王の秘宝"/>
@@ -6665,11 +6694,13 @@ TODO: verify PS1/PS3/PS4
 		</part>
 	</software>
 
-	<!-- Identifying Sega Touring Car Championship (Japan)... -->
 	<software name="stccj" cloneof="stcc" supported="no">
 		<description>Sega Touring Car Championship (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[VDP1] no 3d in gameplay
+]]></notes>
 		<info name="serial" value="GS-9164"/>
 		<info name="release" value="19971127"/>
 		<info name="alt_title" value="セガ ツーリングカーチャンピオンシップ"/>
@@ -6878,11 +6909,13 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		</part>
 	</software>
 
-	<!-- Identifying Shin Seiki Evangelion (Japan)... -->
 	<software name="shinev" supported="no">
 		<description>Shinseiki Evangelion (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen after initial tree logo [CD-Block]
+]]></notes>
 		<info name="serial" value="GS-9051"/>
 		<info name="release" value="19960301"/>
 		<info name="alt_title" value="新世紀エヴァンゲリオン"/>
@@ -7116,11 +7149,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Silhouette Mirage (Japan)... -->
 	<software name="silhouet" supported="no">
 		<description>Silhouette Mirage (Japan)</description>
 		<year>1997</year>
 		<publisher>ESP</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-32901G"/>
 		<info name="release" value="19970911"/>
 		<info name="alt_title" value="シルエットミラージュ"/>
@@ -7992,11 +8027,14 @@ Mednafen claims 68k should address error before stage 1 boss, can't repro
 		</part>
 	</software>
 
-	<!-- Identifying Tokimeki Memorial - Forever with You (Japan) (2M)... -->
 	<software name="tokimfwy" supported="no">
 		<description>Tokimeki Memorial - Forever with You (Japan, 2M)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[VDP1] intro photo polygons have some corrupted GFXs (timing?)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-9504G (VS009-J1)"/>
 		<info name="release" value="19960719"/>
 		<info name="alt_title" value="ときめきメモリアル ～forever with you～"/>
@@ -8727,11 +8765,13 @@ Black screen at boot, [CD-Block] never completes first FMV transfer after FAD=55
 		</part>
 	</software>
 
-	<!-- Identifying World Cup France '98 - Road to Win (Japan)... -->
 	<software name="wc98" supported="no">
 		<description>World Cup France '98 - Road to Win (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[CD-Block] or [SCU] shows bad intro logos, eventually crashes (regression)
+]]></notes>
 		<info name="serial" value="GS-9196"/>
 		<info name="release" value="19980611"/>
 		<info name="alt_title" value="ワールドカップ '98フランス ～Road to Win～"/>
@@ -9248,11 +9288,13 @@ Performance is dire in gameplay [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Chaos Control (JAP) (DW0504)... -->
 	<software name="chaosconj" cloneof="chaoscon" supported="no">
 		<description>Chaos Control (Japan)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-7002G"/>
 		<info name="release" value="19951229"/>
 		<info name="alt_title" value="カオスコントロール"/>
@@ -10571,11 +10613,13 @@ Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loop
 		</part>
 	</software>
 
-	<!-- Identifying Hokuto No Ken (JAP) (DW0006)... -->
 	<software name="hokuto" supported="no">
 		<description>Hokuto no Ken (Japan)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-20601G"/>
 		<info name="release" value="19951222"/>
 		<info name="alt_title" value="北斗の拳"/>
@@ -10950,11 +10994,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Langrisser IV (JAP) (DW0374)... -->
 	<software name="langris4" supported="no">
 		<description>Langrisser IV (Japan)</description>
 		<year>1997</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Throws plenty of [CD-Block] track mode == 0
+[SCSP] awful sound scratch at very start of new game
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-2506G"/>
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ラングリッサーⅣ"/>
@@ -11064,11 +11112,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Lunar Silver Star Story Complete MPEG (JAP) (DW0559)... -->
 	<software name="lunarmpg" cloneof="lunar" supported="no">
 		<description>Lunar - Silver Star Story Complete - MPEG-ban (Japan)</description>
 		<year>1997</year>
 		<publisher>Kadokawa Shoten</publisher>
+		<notes><![CDATA[
+Requires [MPEG] Movie Card module, moans at startup
+]]></notes>
 		<info name="serial" value="T-27904G"/>
 		<info name="release" value="19970704"/>
 		<info name="alt_title" value="ルナ シルバースターストーリー ＭＰＥＧ版"/>
@@ -14078,11 +14128,14 @@ Several [VDP1] and [VDP2] glitches
 		</part>
 	</software>
 
-	<!-- Identifying Actua Soccer (T-18706G)... -->
 	<software name="actuasocj" cloneof="actuasoc" supported="no">
 		<description>Actua Soccer (Japan)</description>
 		<year>1996</year>
 		<publisher>Naxat Soft</publisher>
+		<notes><![CDATA[
+No shadows (btanb)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-18706G"/>
 		<info name="release" value="19961004"/>
 		<info name="alt_title" value="アクチャーサッカー"/>
@@ -14265,11 +14318,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Another Memories (J) (T-38001G)... -->
 	<software name="amemorie" supported="no">
 		<description>Another Memories (Japan)</description>
 		<year>1998</year>
 		<publisher>Starlight Marry</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-38001G"/>
 		<info name="release" value="19980702"/>
 		<info name="alt_title" value="アナザー・メモリーズ"/>
@@ -14299,7 +14354,7 @@ Not extensively tested
 
 	<!-- Identifying Aquazone - Desktop Life (J) (T-24001G)... -->
 	<software name="aquazonea" cloneof="aquazone" supported="no">
-		<description>Aquazone - Desktop Life (Japan, alt)</description>
+		<description>Aquazone: Desktop Life (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Open Book 9003</publisher>
 		<info name="serial" value="T-24001G"/>
@@ -14513,11 +14568,13 @@ Otherwise same as backghh
 		</part>
 	</software>
 
-	<!-- Identifying Battle Athletess Daiundoukai (T-24601G)... -->
 	<software name="btathlet" supported="no">
 		<description>Battle Athletess Daiundoukai (Japan)</description>
 		<year>1996</year>
 		<publisher>Increment P</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-24601G"/>
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="バトルアスリーテス 大運動会"/>
@@ -14545,11 +14602,15 @@ Otherwise same as backghh
 		</part>
 	</software>
 
-	<!-- Identifying Big Hurt Baseball (J) (T-8111G)... -->
 	<software name="bighurtj" cloneof="bighurt" supported="no">
 		<description>Frank Thomas Big Hurt Baseball (Japan)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<notes><![CDATA[
+[VDP1] stadium select flickers
+[VDP2] background has a layer of garbage
+[VDP1] has incorrectly colored shadows in gameplay
+]]></notes>
 		<info name="serial" value="T-8111G"/>
 		<info name="release" value="19960802"/>
 		<info name="alt_title" value="フランク・トーマス ビッグ・ハート ベースボール"/>
@@ -14688,11 +14749,14 @@ Otherwise same as backghh
 		</part>
 	</software>
 
-	<!-- Identifying Blam Machinehead (T-7015G)... -->
 	<software name="blamja" cloneof="blam" supported="no">
 		<description>Blam! Machinehead (Japan, alt)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+[VDP2] Gradiation enabled on Core FMV logo and title screen
+[VDP1] Enables outside area user cliprect mode on title screen, black screen
+]]></notes>
 		<info name="serial" value="T-7015G"/>
 		<info name="release" value="19970523"/>
 		<info name="alt_title" value="ブラム!マシーンヘッド"/>
@@ -14824,11 +14888,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Bug! Jump Shite, Fundzukechatte, Pecchanko (GS-9063)... -->
 	<software name="bugj" cloneof="bug2" supported="no">
 		<description>Bug! - Jump Shite, Fundzukechatte, Pecchanko (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen on (skippable) intro FMV with scratchy sounds [CD-Block]
+]]></notes>
 		<info name="serial" value="GS-9063"/>
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="バグ! ジャンプして、ふんづけちゃって、ぺっちゃんこ"/>
@@ -14896,11 +14962,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Casper (T-12503G)... -->
 	<software name="casperj" cloneof="casper" supported="no">
 		<description>Casper (Japan)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+[CD-Block] jumpy intro FMV sound
+[VDP2] "Window enabled for RGB555 tiles"
+Black screen on skippable FMV after starting a new game
+]]></notes>
 		<info name="serial" value="T-12503G"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="キャスパー"/>
@@ -15086,11 +15156,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Crimewave (T-7018G)... -->
 	<software name="crimewavj" cloneof="crimewav" supported="no">
 		<description>CrimeWave (Japan)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Hangs after intro FMV [CD-Block]
+]]></notes>
 		<info name="serial" value="T-7018G"/>
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="クライムウェーブ"/>
@@ -15138,11 +15210,13 @@ Known to use [SCUDSP]
 		</part>
 	</software>
 
-	<!-- Identifying Cross Romance - Ai to Maajan to Hanafuda to (T-7103G)... -->
 	<software name="xromance" supported="no">
 		<description>Cross Romance - Ai to Mahjong to Hanafuda to (Japan)</description>
 		<year>1997</year>
 		<publisher>Nihon Bussan</publisher>
+		<notes><![CDATA[
+[VDP1] [VDP2] Black screen on title screen
+]]></notes>
 		<info name="serial" value="T-7103G"/>
 		<info name="release" value="19971009"/>
 		<info name="alt_title" value="クロス・ロマンス 恋と麻雀と花札と"/>
@@ -15154,12 +15228,13 @@ Known to use [SCUDSP]
 		</part>
 	</software>
 
-	<!-- Identifying Cross Tantei Monogatari - Motsureta 7tsu no Labyrinth Disc 1 (T-36401G)... -->
-	<!-- Identifying Cross Tantei Monogatari - Motsureta 7tsu no Labyrinth Disc 2 (T-36401G)... -->
 	<software name="crtantei" supported="no">
 		<description>Cross Tantei Monogatari - Motsureta 7tsu no Labyrinth (Japan)</description>
 		<year>1998</year>
 		<publisher>WorkJam</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-36401G"/>
 		<info name="release" value="19980625"/>
 		<info name="alt_title" value="クロス探偵物語 〜もつれた7つのラビリンス〜"/>
@@ -15589,11 +15664,14 @@ TODO: how to reload with [mouse]?
 		</part>
 	</software>
 
-	<!-- Identifying Densha de Go EX (T-10317G)... -->
 	<software name="dendego" supported="no">
 		<description>Densha de Go! EX (Japan)</description>
 		<year>1998</year>
 		<publisher>Takara</publisher>
+		<notes><![CDATA[
+[CD-Block] attempts to playback a redbook on title screen, goes silent
+Heavy 3D corruption in gameplay [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-10317G"/>
 		<info name="release" value="19981001"/>
 		<info name="alt_title" value="電車でGO!EX"/>
@@ -15986,11 +16064,14 @@ Black screen after Kaze logo with [DRC] option, check also [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Earthworm Jim 2 (T-10304G)... -->
 	<software name="ejim2j" cloneof="ejim2" supported="no">
 		<description>Earthworm Jim 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
+		<notes><![CDATA[
+No [VDP1] sprites on Sega logo (uses type 3, displays with type 5)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-10304G"/>
 		<info name="release" value="19961101"/>
 		<info name="alt_title" value="アースワーム・ジム2"/>
@@ -17203,11 +17284,13 @@ Offset dots on map during gameplay
 		</part>
 	</software>
 
-	<!-- No crowd is shown, particularly noticeable in intro (where performance dips) [VDP2] -->
 	<software name="htheros" supported="no">
 		<description>HatTrick Hero S (Japan)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+No crowd is shown, particularly noticeable in intro (where performance dips) [VDP2]
+]]></notes>
 		<info name="serial" value="T-1103G"/>
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="ハットトリックヒーローS"/>
@@ -18069,11 +18152,13 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		</part>
 	</software>
 
-	<!-- Identifying Maboroshi no Black Bass (T-25303G)... -->
 	<software name="blackbas" supported="no">
 		<description>Maboroshi no Black Bass (Japan)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+No [VDP2] GFXs on main map right after starting a new game
+]]></notes>
 		<info name="serial" value="T-25303G"/>
 		<info name="release" value="19970328"/>
 		<info name="alt_title" value="幻のブラックバス"/>
@@ -18373,11 +18458,14 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		</part>
 	</software>
 
-	<!-- Identifying Nissan Presents Over Drivin GT-R (T-10613G)... -->
 	<software name="nissangt" cloneof="nfs" supported="no">
 		<description>Nissan Presents Over Drivin' GT-R (Japan)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+[CD-Block] black screen at startup, crashes
+Known to use [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-10613G"/>
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="オーバードライビング GT-R"/>
@@ -19233,11 +19321,13 @@ Has [VDP2] color calculation bugs for dialogue boxes
 		</part>
 	</software>
 
-	<!-- Identifying SD Gundam G Century S (T-13324G)... -->
 	<software name="sdgundam" supported="no">
 		<description>SD Gundam G Century S (Japan)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Black screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]?)
+]]></notes>
 		<info name="serial" value="T-13324G"/>
 		<info name="release" value="19980211"/>
 		<info name="alt_title" value="SDガンダム ジーセンチュリーS"/>
@@ -19350,11 +19440,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Seireki 1999 - Pharaoh no Fukkatsu (T-18001G)... -->
 	<software name="seireki" cloneof="exhumed" supported="no">
 		<description>Seireki 1999 - Pharaoh no Fukkatsu (Japan)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
+		<notes><![CDATA[
+[CD-Block] Hangs on initial FMV (press A button to bypass)
+Was known to draw smiles as enemy shadows, https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=101474#Post101474 (assume fixed)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-18001G"/>
 		<info name="release" value="19961129"/>
 		<info name="alt_title" value="西暦1999 ファラオの復活"/>
@@ -19623,11 +19717,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Slam'n Jam '96 featuring Magic &amp; Kareem (T-15905G)... -->
 	<software name="slamnjamj" cloneof="slamnjam" supported="no">
 		<description>Slam 'n Jam '96 featuring Magic &amp; Kareem (Japan)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
+		<notes><![CDATA[
+Heavy [VDP1] timing problems, main menu doesn't show what you select, gameplay gets stuck with first frame of animation
+]]></notes>
 		<info name="serial" value="T-15905G"/>
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="マジック・ジョンソンとカリーム・アブドュール・ジャバーのスラムジャム'96"/>
@@ -20241,11 +20337,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying The Crow - City of Angels (T-8123G)... -->
 	<software name="crowj" cloneof="crow" supported="no">
 		<description>The Crow - City of Angels (Japan)</description>
 		<year>1997</year>
 		<publisher>Acclaim Japan</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-8123G"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="ザ・クロウ"/>
@@ -20784,11 +20882,14 @@ Both games: bad [CD-Block] redbook on BGM repeats (cross borders with the succes
 		</part>
 	</software>
 
-	<!-- Identifying Ultraman (J) (T-13308G)... -->
 	<software name="ultraman" supported="no">
 		<description>Ultraman - Hikari no Kyojin Densetsu (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+[VDP2] offset window effect circle when losing
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-13308G"/>
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="ウルトラマン 光の巨人伝説"/>
@@ -21744,11 +21845,13 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		</part>
 	</software>
 
-	<!-- Identifying Zero4 Champ DooZy-J Type-R (T-21401G)... -->
 	<software name="zero4" supported="no">
 		<description>Zero4 Champ DooZy-J Type-R (Japan)</description>
 		<year>1997</year>
 		<publisher>Media Rings Corporation</publisher>
+		<notes><![CDATA[
+Black screen, Master SH-2 stalls on $60ffc13 comms ([CD-Block]? regression?)
+]]></notes>
 		<info name="serial" value="T-21401G"/>
 		<info name="release" value="19970620"/>
 		<info name="alt_title" value="ゼロヨンチャンプ ドゥーヅィージェイ タイプ−アール"/>
@@ -23735,14 +23838,17 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Masters Harukanaru Augusta 3 (J) (T-11401G)... -->
 	<software name="augusta3" supported="no">
 		<description>Masters Harukanaru Augusta 3 (Japan)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 1
+]]></notes>
 		<info name="serial" value="T-11401G"/>
 		<info name="release" value="19950922"/>
 		<info name="alt_title" value="マスターズ 遥かなるオーガスタ3"/>
+		<info name="usage" value="Requires 186 blocks of free backup RAM (otherwise moans until user frees the requested memory amount)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -26357,11 +26463,13 @@ Heavily broken [SCSP] in gameplay
 		</part>
 	</software>
 
-	<!-- Identifying Gekiretsu Pachinkers (T-29601G)... -->
 	<software name="gepachin" supported="no">
 		<description>Gekiretsu Pachinkers (Japan)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-29601G"/>
 		<info name="release" value="19960802"/>
 		<info name="alt_title" value="激烈パチンカーズ"/>
@@ -27427,7 +27535,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-1-angel-fish-jp... -->
 	<software name="aquaopt1" supported="no">
 		<description>Aquazone Option Disc 1 - Angel Fish</description>
 		<year>1996</year>
@@ -27435,6 +27542,7 @@ Not extensively tested
 		<info name="serial" value="T-24002G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ1 エンゼルフィッシュ"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27443,7 +27551,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-2-black-molly-jp... -->
 	<software name="aquaopt2" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 2 - Black Molly</description>
 		<year>1996</year>
@@ -27451,6 +27558,7 @@ Not extensively tested
 		<info name="serial" value="T-24003G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ2 ブラックモーリー"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27459,7 +27567,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-3-blue-emperor-jp... -->
 	<software name="aquaopt3" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 3 - Blue Emperor</description>
 		<year>1996</year>
@@ -27467,6 +27574,7 @@ Not extensively tested
 		<info name="serial" value="T-24004G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ3 ブルーエンペラー"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27475,7 +27583,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-4-clown-loach-jp... -->
 	<software name="aquaopt4" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 4 - Clown Loach</description>
 		<year>1996</year>
@@ -27483,6 +27590,7 @@ Not extensively tested
 		<info name="serial" value="T-24005G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ4 クラウンローチ"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27491,7 +27599,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying aquazone-option-disc-series-5-false-rummy-nose-jp... -->
 	<software name="aquaopt5" cloneof="aquazone" supported="no">
 		<description>Aquazone Option Disc 5 - False Rummy Nose</description>
 		<year>1996</year>
@@ -27499,6 +27606,7 @@ Not extensively tested
 		<info name="serial" value="T-24006G"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="アクアゾーンオプションディスクシリーズ5 ラミーノーズテトラ"/>
+		<info name="usage" value="Data disk for Aquazone"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27776,11 +27884,13 @@ Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause?
 		</part>
 	</software>
 
-	<!-- Identifying Darius II (Japan) [T-1104G] (iso-ogg sourced)... -->
 	<software name="darius2j" cloneof="darius2" supported="no">
 		<description>Darius II (Japan)</description>
 		<year>1996</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1104G"/>
 		<info name="release" value="19960607"/>
 		<info name="alt_title" value="ダライアスⅡ"/>
@@ -27864,15 +27974,17 @@ Bad reference graphics after completing a puzzle (assume fixed by 0.290 DRC chan
 	<!-- There are rumours that the Japan version should be different (containing Williams logos and such)
 	     I believe rumours to be false.  If you watch the movie linked from http://www.segagagadomain.com/saturn10/doom.htm
 	     it does not have a Williams logo ingame, and the footage is taken from a genuine Japanese CD -->
-	<!-- Black screen after GT Interactive logo, expects [VDP1] CEF to be 1 (in manual mode, without writing to the port first) -->
-	<!-- Title screen flames are white for the first few frames, [VDP2] -->
-	<!-- Hangs during gameplay expecting Work RAM H $260666b0 to be zero, cache access? -->
-	<!-- Incorrectly blends several polygons -->
-	<!-- gameplay performance is poor [VDP2?] -->
 	<software name="doomj" cloneof="doom" supported="no">
 		<description>Doom (Japan)</description>
 		<year>1997</year>
 		<publisher>Soft Bank</publisher>
+		<notes><![CDATA[
+Black screen after GT Interactive logo, expects [VDP1] CEF to be 1 (in manual mode, without writing to the port first)
+Title screen flames are white for the first few frames, [VDP2]
+Hangs during gameplay expecting Work RAM H $260666b0 to be zero, cache access?
+Incorrectly blends several polygons
+gameplay performance is poor [VDP2]?
+]]></notes>
 		<info name="serial" value="T-18610G"/>
 		<info name="release" value="19970711"/>
 		<info name="alt_title" value="ドゥーム"/>
@@ -31947,11 +32059,13 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		</part>
 	</software>
 
-	<!-- Identifying PHOTO_CD_OPERATING_SYSTEM... -->
 	<software name="photocdo" supported="no">
 		<description>Photo CD Operating System (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Often hangs on title screen [CD-Block]?
+]]></notes>
 		<info name="serial" value="MK81681-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
