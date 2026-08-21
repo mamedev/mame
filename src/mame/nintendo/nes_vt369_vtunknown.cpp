@@ -1681,6 +1681,12 @@ ROM_START( rsps300 )
 	ROM_LOAD( "s29gl128p10tfi01.u2", 0x00000, 0x1000000, CRC(77c0a7fc) SHA1(dde5f24596d34e0a1305df92ba267a868bd386d4) )
 ROM_END
 
+ROM_START( 500in1gf )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl256n10tfi01.u2", 0x00000, 0x2000000, CRC(1c7012aa) SHA1(9513b07ed1eb0f19619bd9c9199d261c6e9348bd) )
+ROM_END
+
+
 void vt369_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -1893,6 +1899,9 @@ CONS( 202?, s10_520,   0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_
 CONS( 202?, s5_520,    0,  0,  vt4ffx_16mb,          vt369, vt4ffx_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
 // fewer games, but does have the scramble
 CONS( 202?, 500in1hh,  0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
+
+// TODO: decryption, might be nes_vt42xx.cpp or nes_vt32.cpp
+CONS( 202?, 500in1gf,  0,  0,  vt4ffx_32mb, vt369, vt4ffx_state, empty_init, "<unknown>", "500-in-1 Handheld Game (with German / French languages)",  MACHINE_NOT_WORKING )
 
 // there were also 'F1' units, shaped like a car, ROM may or may not be the same
 CONS( 202?, f5_620,    0,  0,  vt4ffx_16mb,        vt369, vt4ffx_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
