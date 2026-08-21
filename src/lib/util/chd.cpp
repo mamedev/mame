@@ -903,6 +903,9 @@ std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
 				case V34_MAP_ENTRY_TYPE_COMPRESSED:
 					{
 						uint32_t const blocklen = get_u16be(&rawmap[12]) | (uint32_t(rawmap[14]) << 16);
+						if (UNEXPECTED(blocklen > m_compressed.size()))
+							return std::error_condition(error::INVALID_DATA);
+
 						std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 						if (UNEXPECTED(err))
 							return err;
@@ -933,7 +936,6 @@ std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
 
 				// compressed case
 				uint8_t const *const rawmap = &m_rawmap[m_mapentrybytes * hunknum];
-				uint32_t const blocklen = get_u24be(&rawmap[1]);
 				uint64_t const blockoffs = get_u48be(&rawmap[4]);
 				switch (rawmap[0])
 				{
@@ -941,8 +943,12 @@ std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
 				case COMPRESSION_TYPE_1:
 				case COMPRESSION_TYPE_2:
 				case COMPRESSION_TYPE_3:
-					{
-						std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
+				{
+					uint32_t const blocklen = get_u24be(&rawmap[1]);
+					if (UNEXPECTED(blocklen > m_compressed.size()))
+						return std::error_condition(error::INVALID_DATA);
+
+					std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 						if (UNEXPECTED(err))
 							return err;
 						auto &decompressor = *m_decompressor[rawmap[0]];
@@ -1029,6 +1035,9 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 				case V34_MAP_ENTRY_TYPE_COMPRESSED:
 					{
 						uint32_t const blocklen = get_u16be(&rawmap[12]) | (uint32_t(rawmap[14]) << 16);
+						if (UNEXPECTED(blocklen > m_compressed.size()))
+							return std::error_condition(error::INVALID_DATA);
+
 						std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 						if (UNEXPECTED(err))
 							return err;
@@ -1089,7 +1098,6 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 				else
 				{
 					// compressed case
-					uint32_t const blocklen = get_u24be(&rawmap[1]);
 					uint64_t const blockoffs = get_u48be(&rawmap[4]);
 					util::crc16_t const blockcrc = get_u16be(&rawmap[10]);
 					switch (rawmap[0])
@@ -1099,6 +1107,10 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 					case COMPRESSION_TYPE_2:
 					case COMPRESSION_TYPE_3:
 						{
+							uint32_t const blocklen = get_u24be(&rawmap[1]);
+							if (UNEXPECTED(blocklen > m_compressed.size()))
+								return std::error_condition(error::INVALID_DATA);
+
 							std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 							if (UNEXPECTED(err))
 								return err;
