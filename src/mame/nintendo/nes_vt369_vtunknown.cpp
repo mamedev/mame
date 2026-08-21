@@ -1904,9 +1904,8 @@ CONS( 202?, s10_520,   0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_
 CONS( 202?, s5_520,    0,  0,  vt4ffx_16mb,          vt369, vt4ffx_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
 // fewer games, but does have the scramble
 CONS( 202?, 500in1hh,  0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
-
-// TODO: decryption, might be nes_vt42xx.cpp or nes_vt32.cpp
-CONS( 202?, 500in1gf,  0,  0,  vt4ffx_32mb, vt369, vt4ffx_state, empty_init, "<unknown>", "500-in-1 Handheld Game (with German / French languages)",  MACHINE_NOT_WORKING )
+// needs banking? (32MByte ROM, but doesn't expect plain mapping)
+CONS( 202?, 500in1gf,  0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, init_s10fake, "<unknown>", "500-in-1 Handheld Game (German / French / English / Chinese menu)",  MACHINE_NOT_WORKING )
 
 // there were also 'F1' units, shaped like a car, ROM may or may not be the same
 CONS( 202?, f5_620,    0,  0,  vt4ffx_16mb,        vt369, vt4ffx_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
