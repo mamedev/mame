@@ -247,10 +247,14 @@ void cio_base_device::check_interrupt()
 		state = ASSERT_LINE;
 	}
 
-	if (m_irq != state)
+	// The under-service level gates everything further down the daisy chain, so a
+	// change there has to be published even when our own request line does not move.
+	if (m_irq != state || m_ius_level != ius_level)
 	{
-		LOG("%s CIO Interrupt: %u\n", machine().describe_context(), state);
+		if (m_irq != state)
+			LOG("%s CIO Interrupt: %u\n", machine().describe_context(), state);
 		m_irq = state;
+		m_ius_level = ius_level;
 		m_write_irq(state);
 	}
 }
@@ -971,7 +975,7 @@ cio_base_device::cio_base_device(const machine_config &mconfig, device_type type
 	m_write_pb(*this),
 	m_read_pc(*this, 0),
 	m_write_pc(*this),
-	m_irq(CLEAR_LINE)
+	m_irq(CLEAR_LINE), m_ius_level(-1)
 {
 }
 
