@@ -1408,13 +1408,18 @@ ROM_START( gbox2020 )
 	ROM_LOAD( "fgb2020.bin", 0x00000, 0x1000000, CRC(a685d943) SHA1(9b272daccd8fe244c910f031466a4fedd83d5236) ) // flash ROM
 ROM_END
 
-ROM_START( vibes240 )
+ROM_START( vibes240 ) // from a unit with translucent blue case
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u2", 0x000000, 0x1000000, CRC(2b0a26f1) SHA1(0bd6465fc7f1c9c73069245ab6fcd1bdbe3a82d8) )
+ROM_END
+
+ROM_START( vibes240a ) // might just be a bad dump of the same revision as vibes240
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
 	ROM_LOAD( "s29gl128p11tfi01.bin", 0x000000, 0x1000000, BAD_DUMP CRC(c04c5527) SHA1(58737084e1b1a2862f50f07feeab79593ca13862) )
 ROM_END
 
-ROM_START( vibes240a )
+ROM_START( vibes240e )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
 	ROM_LOAD( "vibes.u2", 0x000000, 0x1000000, BAD_DUMP CRC(a747971a) SHA1(2399d4f32d0054a06397bead069b498e634dbe37) )
@@ -1879,10 +1884,12 @@ CONS( 2020, gbox2020, gbox2019, 0, vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, em
 CONS( 2018, rsps300,  0,        0,  vt4ffx_rsps300swap_16mb, vt369, vt4ffx_state, empty_init,   "Sup", "Retro Station Pocket System GB-40 300 in 1",  MACHINE_NOT_WORKING )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
-// several games don't work (eg. Curly Monkey 2, maybe due to bad dump?)
+// several games don't work (eg. Curly Monkey 2) but the parent set should be a good dump
 CONS( 202?, vibes240, 0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// bad dump
+CONS( 202?, vibes240a,vibes240, 0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // also a bad dump, different encryption, but Curly Monkey 2 works here, only first 2 opcodes are encrypted
-CONS( 202?, vibes240a,vibes240, 0,  vt4ffx_gbox2020_16mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, vibes240e,vibes240, 0,  vt4ffx_gbox2020_16mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (alt encryption)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has TUI (holiday company) logo on packaging, no other manufacturer details
 CONS( 201?, tui240,   0,        0,  vt4ffx_gbox2020_8mb,   vt369, vt4ffx_state, init_tui240, "<unknown>",  "TUI 240-in-1", MACHINE_NOT_WORKING )
