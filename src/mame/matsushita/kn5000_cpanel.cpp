@@ -63,6 +63,7 @@ kn5000_cpanel_device::kn5000_cpanel_device(const machine_config &mconfig, const 
 	m_inta_cb(*this),
 	m_cpl_ports(*this, finder_base::DUMMY_TAG, 0U),
 	m_cpr_ports(*this, finder_base::DUMMY_TAG, 0U),
+	m_encoder_accum(0),
 	m_cpl_leds(*this, "cpl_led_%u", 0U),
 	m_cpr_leds(*this, "cpr_led_%u", 0U)
 {
@@ -100,6 +101,7 @@ void kn5000_cpanel_device::device_start()
 	save_item(NAME(m_self_clock_bytes_sent));
 	save_item(NAME(m_last_button_state));
 	save_item(NAME(m_pending_button_state));
+	save_item(NAME(m_encoder_accum));
 
 	// Initial state - line idle high
 	m_txd_cb(1);
@@ -547,6 +549,33 @@ uint8_t kn5000_cpanel_device::read_button_segment(int segment, bool is_left_pane
 	return (is_left_panel ? m_cpl_ports : m_cpr_ports)[segment].read_safe(0) & 0xff;
 }
 
+void kn5000_cpanel_device::encoder_detent(int delta)
+{
+	// Accumulate; the next scan reports the total.  The panel MCU counts detents between
+	// reports, so several detents arriving inside one scan period is a larger count, not
+	// several packets -- which is what makes the firmware's acceleration curve reachable.
+	m_encoder_accum += delta;
+}
+
+void kn5000_cpanel_device::send_encoder_packet(int8_t detents)
+{
+	// The TEMPO/PROGRAM data wheel is an input of the LEFT panel MCU: the service manual has
+	// SW101 (ENCODER SWITCH) on the CPL board, wired to that MCU's ROTA/ROTB pins.  It reports
+	// as a two-byte frame, header then a signed count of detents since the last report.
+	//
+	// Header 0xD7 = 0xC0 | 0x17: bits 7:6 = 11 select the left panel, as send_button_packet
+	// already encodes, and 0x17 is the encoder's sub-address.  The firmware turns a header into
+	// a record index with ((header & 0xC0) >> 1) | (header & 0x1F), so 0xD7 selects record 0x19,
+	// the data wheel.
+	//
+	// Deliberately not routed through send_button_packet(), which masks the sub-address to four
+	// bits -- 0x17 does not fit.
+	send_byte(0xd7);
+	send_byte(uint8_t(detents));
+
+	LOGMASKED(LOG_BUTTONS, "Encoder packet: %d detent(s)\n", detents);
+}
+
 void kn5000_cpanel_device::send_button_packet(int segment, bool is_left_panel)
 {
 	// Button packet header: bits 7:6 = panel (00=right, 11=left),
@@ -894,6 +923,26 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::button_scan_callback)
 		{
 			m_pending_button_state[idx] = state;
 		}
+	}
+
+	// Report any data-wheel movement accumulated since the last scan.
+	//
+	// The count is NEGATED: the firmware indexes an acceleration curve with it, and that curve
+	// is monotonically decreasing, so a negative count is what raises the on-screen value.
+	//
+	// It is also CLAMPED.  The firmware computes the curve index as sext8(count + 0x10) with no
+	// bounds check, so magnitudes outside -16..+15 index off the end of a 32-entry table.  A
+	// real panel cannot produce those, and neither may this one.
+	if (m_encoder_accum != 0)
+	{
+		int32_t count = -m_encoder_accum;
+		if (count > 15)
+			count = 15;
+		else if (count < -16)
+			count = -16;
+		m_encoder_accum = 0;
+		send_encoder_packet(int8_t(count));
+		changed = true;
 	}
 
 	if (changed)
