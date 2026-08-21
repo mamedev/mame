@@ -18680,6 +18680,9 @@ advision
 @source:entex/sag.cpp
 sag
 
+@source:eolith/eoforce.cpp
+burnstrk
+
 @source:eolith/eolith.cpp
 candy
 fort2b
