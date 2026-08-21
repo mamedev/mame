@@ -14,7 +14,7 @@ license:CC0-1.0
 	80-2504xx - Marvel Super Hero Squad - Sport Heroes
 	80-2505xx - Mickey Mouse - Clubhouse
 	80-2506xx - Ben 10 - Ultimate Alien Mind Mine
-	80-2507xx - ?
+	80-2507xx - Touch & Learn - Game Pack / MobiGo 2 pack-in cart (ROMless, at least for US and Germany carts, see note below)
 	80-2508xx - Nickelodeon Dora the Explorer - Twins' Day
 	80-2509xx - Disney Fairies Explore Your Talents
 	80-2510xx - >	
@@ -28,7 +28,7 @@ license:CC0-1.0
 	80-2518xx - Chuggington
 	80-2519xx - Disney/Pixar Cars 2
 	80-2520xx - DreamWorks Kung Fu Panda 2
-	80-2521xx - ?
+	80-2521xx - DreamWorks Madagascar 3 **
 	80-2522xx - ?
 	80-2523xx - Dino Train
 	80-2524xx - Hello Kitty - Hello Kitty Birthday Party!
@@ -38,10 +38,10 @@ license:CC0-1.0
 	80-2528xx - Disney Jake and the Neverland Pirates
 	80-2529xx - Disney Minnie Mouse
 	80-2530xx - Disney Planes
-	80-2531xx - ?
+	80-2531xx - Disney/Pixar Monsters University **
 	80-2532xx - Sofia the First
 	80-2533xx - Doc McStuffins
-	80-2534xx - ?
+	80-2534xx - Bubble Guppies **
 	80-2535xx - ?
 	80-2536xx - Marvel Ultimate Spider-Man
 	(any more?)
@@ -53,6 +53,8 @@ license:CC0-1.0
 	03 = UK
 	04 = Germany
 	05 = France
+	
+	** = no versions in software list
 	
 	-->
 
