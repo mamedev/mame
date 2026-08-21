@@ -104,6 +104,7 @@
 #include "multibyte.h"
 #include "opresolv.h"
 
+#include "osdcomm.h" // swapendian_int*
 #include "osdcore.h" // osd_printf_error
 
 #include <bit>
@@ -439,6 +440,25 @@ bool apple_2mg_format::supports_save() const noexcept
 	return true;
 }
 
+namespace {
+
+struct format_2mg {
+	uint32_t type;
+	uint32_t data_length;
+	uint32_t form_factor;
+	uint32_t variant;
+};
+
+const format_2mg s_formats[] = {
+	{ 0, 143360, floppy_image::FF_525, floppy_image::SSSD },
+	{ 1, 143360, floppy_image::FF_525, floppy_image::SSSD },
+	{ 1, 409600, floppy_image::FF_35, floppy_image::SSDD },
+	{ 1, 819200, floppy_image::FF_35, floppy_image::DSDD }
+	//{ 2, 232960, floppy_image::FF_525, floppy_image::SSSD }
+};
+
+} // anonymous namespace
+
 int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[32];
@@ -450,8 +470,29 @@ int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, cons
 	if(memcmp(header, "2IMG", 4) && memcmp(header, "GMI2", 4))
 		return 0;
 
+	bool found = false;
+	uint32_t data_length = get_u32le(&header[0x1c]);
+	for(auto const &format : s_formats) {
+		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != format.form_factor)
+			continue;
+		if(!variants.empty() && !has_variant(variants, format.variant))
+			continue;
+		if(format.type == header[0xc]) {
+			if(format.data_length == data_length) {
+				found = true;
+				break;
+			} else if(format.data_length == swapendian_int32(data_length)) {
+				data_length = format.data_length;
+				found = true;
+				break;
+			}
+		}
+	}
+	if(!found)
+		return 0;
+
 	uint64_t size;
-	if(!io.length(size) && (get_u32le(&header[0x1c]) + get_u32le(&header[0x18]) == size))
+	if(!io.length(size) && (data_length + get_u32le(&header[0x18]) == size))
 		return FIFID_SIGN | FIFID_STRUCT;
 
 	return FIFID_SIGN;
