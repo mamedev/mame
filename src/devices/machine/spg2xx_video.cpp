@@ -350,9 +350,10 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 	case 0x37: // IRQ pos H
 		m_video_regs[offset] = data & 0x01ff;
 		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
-		// TODO: some smartvad games set the scanline IRQ to 240 and need it to trigger to progress.
+		// Some smartvad games, stvscri, and some smartcyc games set the scanline IRQ to 240 and need it to trigger to progress.
 		// should that be treated as valid, or is it intentionally disabling it for some other reason?
-		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] < 240)
+		// documentation suggests that 0-239 is the valid range, but could be incorrect
+		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] <= 240)
 			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 		else
 			m_screenpos_timer->adjust(attotime::never);
