@@ -642,8 +642,7 @@ void generalplus_gpl951xx_game_state::init_pink218()
 	for (offs_t i = 0; i < romsize / 2; i++)
 	{
 		romdata[i] = romdata[i] ^ 0xc8a9;
-		romdata[i] = bitswap<16>(romdata[i], 11,1,3,9,8,14,0,2,6,7,13,15,4,5,12,10);
-		// something more?
+		romdata[i] = bitswap<16>(romdata[i], 3,1,11,9,  6,14,0,2,  8,7,13,15,  4,5,12,10);
 	}
 }
 
