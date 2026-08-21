@@ -103,6 +103,10 @@ protected:
 	uint32_t m_row_address_cycles;
 	uint32_t m_sequential_row_read;
 
+	// timing parameters
+	attotime m_read_time;      // tR: random read access time (cell to register)
+	attotime m_busy_until;     // time when busy period ends (attotime::never = not busy)
+
 	devcb_write_line m_write_rnb;
 };
 

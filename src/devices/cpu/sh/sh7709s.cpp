@@ -10,8 +10,8 @@
 // - Write locking of cache lines
 // - Prefix instruction fetch timing + cache handling
 // - Checks for certain area specifics : bank mode timing for sdram access, area check for sdram, area check for burst mode + burst size
-// - TLB simulation + timing and lookups
-// - Branch predicition/mispredict penalties - Needs a branch target buffer and some basic tracking, didn't make a huge difference for cv1k when I threw one together
+// - TLB simulation + timing and lookups - Unused by cv1k
+// - Branch predicition/mispredict penalties
 
 /* cv1k notes
 *
@@ -21,11 +21,8 @@
 *   to the iconic slingshotting in early titles such as Mushihimesama + Futari where you go from
 *   sections of slowdown right back to regular speed as bullets leave the screen.
 *
-* - There seems to be a bug in the ROM read code in cv1k titles that is present in all of them.
-*   This code when ROM reads are queued for whatever reason doesn't check if a read or write
-*   is done and always ends up doing an expensive cache flush + invalidate that isn't required.
-*   The processor ends up churning a bunch of cycles on uncached fetches and then also has to repopulate
-*   the cache.
+* - Graphics contents are stored compressed in the ROM and must be pulled into SDRAM, uncompressed,
+*   and flushed to SDRAM before upload to the blitter.
 *
 *   This requires looping 1024 times over every cache entry from an uncached aliased mapping in SDRAM
 *   which comes with hefty access penalties due to all the instruction fetches + some data fetches.
@@ -38,6 +35,22 @@
 *   the register value is read, IRQ2 is masked out of that value, then that masked value is written back.
 *   Documentation does mention in an addendum that this behavior can lead to lost IRQ's but luckily these
 *   games don't seem to actually use them in the release versions.
+*
+* - A quirk according to the docs for the sh7709s is that all areas must have the same bus width to use
+*   bank active mode. The cv1k board uses a 16 bit rom in area 0 which means the SDRAM is now stuck
+*   using auto precharge mode that forces a row close after every access which leads to some extra
+*   delays when cache misses collide on the same bank back to back.
+*
+* - Slowdown oddities:
+*	- In titles where rank decides bullet speed more than bullet count this leads to situations where
+*     the lower your rank the more slowdown there is as a result of bullets remaining on screen longer
+*     rather than being a deliberate result of some code
+*   - The games only check for collisions every other frame to save some time, the other optimization
+*     they do is that rather than check every bullet they have a candidate list of bullets that comprises
+*     of bullets within a certain distance of the player ship that then gets retested once they move closer.
+*     There are a handful of sections where you can manipulate slowdown by being closer (more slowdown) or
+*     farther (less slowdown) especially on patterns where bullets fly at angles around the screen rather
+*     than directly at the ship
 */
 
 #include "emu.h"
@@ -64,8 +77,10 @@ void sh7709s_device::device_reset()
 	m_last_area_accessed = 0;
 	m_last_area_accessed_was_write = false;
 	m_wb_active_cycles = 0;
-	m_last_sdram_page = 0;
+	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
+	m_burst_continuation_remaining_cycles = 0;
+	m_last_op_cycle_count = 0;
 }
 
 void sh7709s_device::device_start()
@@ -77,8 +92,10 @@ void sh7709s_device::device_start()
 	m_last_area_accessed = 0;
 	m_last_area_accessed_was_write = false;
 	m_wb_active_cycles = 0;
-	m_last_sdram_page = 0;
+	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
+	m_burst_continuation_remaining_cycles = 0;
+	m_last_op_cycle_count = 0;
 
 	for (int i = 0; i < SH7709S_CACHE_BLOCKS; i++)
 		for (int j = 0; j < SH7709S_CACHE_ASSOCIATIVITY; j++)
@@ -92,10 +109,12 @@ void sh7709s_device::device_start()
 	save_item(NAME(m_last_area_accessed));
 	save_item(NAME(m_last_area_accessed_was_write));
 	save_item(NAME(m_wb_active_cycles));
-	save_item(NAME(m_last_sdram_page));
+	save_item(NAME(m_last_sdram_bank));
 	save_item(NAME(m_precharge_remaining_cycles));
+	save_item(NAME(m_last_op_cycle_count));
 }
 
+// Top 3 region bits allow for aliasing cached/uncached pointers to the same physical address
 bool is_cacheable(uint32_t address)
 {
 	// 0x00000000 - 0x80000000 2GB cacheable virtual space
@@ -186,10 +205,8 @@ bool can_use_burst(uint32_t address)
 	return is_sdram_region(address);
 }
 
-uint32_t sh7709s_device::get_wcr1_timing(uint32_t address)
+uint32_t sh7709s_device::get_wcr1_timing(uint32_t area)
 {
-	uint32_t area = get_area(address);
-
 	if (area > 6 || area == 1)
 		return 0;
 
@@ -205,7 +222,6 @@ uint32_t sh7709s_device::get_wcr2_timing(uint32_t address)
 {
 	uint32_t area = get_area(address);
 	uint16_t wcr2 = m_wcr2;
-	bool burst_capable = can_use_burst(address);
 
 	if (area > 6 || area == 1)
 		return 0;
@@ -232,40 +248,41 @@ uint32_t sh7709s_device::get_wcr2_timing(uint32_t address)
 		area_val = wcr2 & 0x7;
 	}
 
-	if (burst_capable)
+	switch (area_val)
 	{
-		switch (area_val)
-		{
-		case 0: return 2;
-		case 1: return 2;
-		case 2: return 3;
-		case 3: return 4;
-		case 4: return 4;
-		case 5: return 6;
-		case 6: return 8;
-		case 7: return 10;
-		}
-	}
-	else
-	{
-		switch (area_val)
-		{
-		case 0: return 0;
-		case 1: return 1;
-		case 2: return 2;
-		case 3: return 3;
-		case 4: return 4;
-		case 5: return 6;
-		case 6: return 8;
-		case 7: return 10;
-		}
+	case 0: return 0;
+	case 1: return 1;
+	case 2: return 2;
+	case 3: return 3;
+	case 4: return 4;
+	case 5: return 6;
+	case 6: return 8;
+	case 7: return 10;
 	}
 
 	return 2; // Unreachable
 }
 
-// TODO : Update tpc handling to use the address multiplexer bits in mcr
-// instead of the sdram page as the precharge command holds up the whole bank
+uint32_t sh7709s_device::sdram_bank(uint32_t address)
+{
+	uint32_t amx = (m_mcr >> 3) & 0xf;
+
+	switch (amx)
+	{
+	case 0x4: // 1M x 16-bit x 4-bank : A23:A22
+		return (address >> 22) & 0x3;
+	case 0x5: // 2M x 8/16-bit x 4-bank : A24:A23
+		return (address >> 23) & 0x3;
+	case 0x7: // 512k x 32-bit x 4-bank : A22:A21
+		return (address >> 21) & 0x3;
+	case 0xd: // 4M x 16-bit x 4-bank : A25:A24
+	case 0xe: // 8M x 16-bit x 4-bank : A25:A24
+		return (address >> 24) & 0x3;
+	}
+
+	return 0;
+}
+
 uint32_t sh7709s_device::mcr_tpc()
 {
 	return ((m_mcr >> 14) & 0x3) + 1;
@@ -300,131 +317,178 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 
 	uint32_t bcr2_val = (m_bcr2 >> (area * 2)) & 0x3;
 
-	return SH7709S_CACHE_LINE_SIZE >> bcr2_val;
+	return SH7709S_CACHE_LINE_SIZE >> (bcr2_val - 1);
 }
 
-#define SDRAM_PAGE_SIZE (1024) // Hardcoded for cv1k
+// Unconfirmed behavior but the math works out based on comparison of misses in a frame to pcb footage
+// This covers a pipeline where we go from miss detect -> victim select -> address to BSC
+#define CACHE_MISS_STALL (3)
 
-// CPU cycles
-#define CACHE_MISS_STALL (1) // Miss detection in 1 cycle, the rest of the ops (wb buffer movement, etc..) happen in the background
-// Bus cycles
-// TODO : Verify the bus stall here. These Renesas docs (https://resource.renesas.com/lib/eng/e_learnig/superh_e_learning/29/contents.html)
-// refer to a 3 bus cycle penalty for a cache line fill but the other documents don't seem to mention it.
-// For now this can cover the bsc clock sync + actv + read/write command cycles
-#define BUS_ACCESS_PENALTY (3)
-// TODO : CPU does critical word first handling here, so the first access causing the fetch
-// can amortize a couple of the remaining cyles of the read. These don't amount to too much for
-// now though
-#define BURST_READ_WORD_PENALTY (3)
-#define BURST_WRITE_WORD_PENALTY (4)
+static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
+{
+	return (elapsed < cycles) ? (cycles - elapsed) : 0;
+}
 
 // cpu->bus cycle conversion hardcoded to 2x as cv1k sh3 runs the bus at 50mhz
 unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 {
-	uint32_t area = get_area(address);
 	bool is_in_cache = cache_access(address, write);
 
 	if (is_in_cache)
 		return 0;
 
-	// Penalty calculations for SDRAM access
-	unsigned int bus_penalty = BUS_ACCESS_PENALTY + BURST_READ_WORD_PENALTY + mcr_rcd() + get_wcr2_timing(address);
-	unsigned int cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
-	unsigned int page_read = address / SDRAM_PAGE_SIZE;
+	uint32_t area = get_area(address);
+	uint64_t elapsed_cycles = total_cycles() - m_last_op_cycle_count;
+	uint32_t cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
+	uint32_t bank_read = sdram_bank(address);
+	uint32_t bus_penalty = 1; // CPU -> BSC sync cost
 
-	// Penalty calculations for non-sdram access
-	if (!is_sdram_region(address))
+	// SDRAM timing based on SH7709S documentation
+	// These are copied from the timing charts. These are all in bus cycles
+	// CAS for SDRAM is stored in WCR2
+	//
+	// Burst read : CAS to critical word is from the READ command that submitted it, this
+	// works the same even if the CPU does READA+burst len or READ,READ,READ,READA
+	//
+	// Burst write : WRITA + 4 data words will clock the same as WRITE,WRITE,WRITE,WRITA
+	// overlapping data with commands
+	//
+	// Burst read  (cache fill, 4 longwords): Tr(ACTV) + Trw(RCD-1) + Tc1-Tc4 + CAS + Td2-Td4
+	// 1 + RCD + CAS + 3
+	//
+	// CPU does critical word first (with wraparound) so it should only actually stall until:
+	// 1 + RCD + CAS
+	//
+	// Single read (uncached): Tr + Tc1(READA) + Td1
+	// 1 + RCD + CAS
+	//
+	// Single write(uncached): Tr + Tc1(WRITA) + Trwl
+	// 1 + RCD + TRWL
+	//
+	// Burst write (cache eviction writeback, 4 longwords): Tr + Tc1(WRITA) + Td2-Td4 + Trwl
+	// 1 + RCD + TRWL + 4
+	//
+	// Non-SDRAM areas : T1(address) + T2(data) + WCR2 wait states
+	// 2 + WCR2
+
+	// Critical word first: the CPU stalls only until the critical word lands.
+	// The remaining burst words keep transferring on the bus after that and
+	// must block any subsequent bus access; that's tracked separately below
+	// via m_burst_continuation_remaining_cycles.
+	// Unconfirmed : precharge likely not tracked per bank on this cpu, its possible you can
+	// have multiple banks active in bank active mode but a tpc holds up some internal engine state
+	// This is only based on observation comparing gameplay footage to cache miss/eviction count
+	// in a good bit of sampled frames
+
+	if (is_sdram_region(address))
 	{
-		// If it's not cacheable we're going to just do the single access
-		if (!is_cacheable(address))
-			bus_penalty = BUS_ACCESS_PENALTY + get_wcr2_timing(address);
-		else // Cacheable access, fetch the whole cache line
-			bus_penalty = (BUS_ACCESS_PENALTY + get_wcr2_timing(address)) * cache_line_fetch_count(address);
-	}
-	else if (!is_cacheable(address)) // non-cacheable sdram access
-	{
-		if (!write)
-			bus_penalty = BUS_ACCESS_PENALTY + mcr_rcd() + get_wcr2_timing(address);
+		if (is_cacheable(address) || !write)
+			bus_penalty += 1 + mcr_rcd() + get_wcr2_timing(address);
 		else
-			bus_penalty = BUS_ACCESS_PENALTY + mcr_rcd() + mcr_trwl();
+			bus_penalty += 1 + mcr_rcd() + mcr_trwl();
+	}
+	else
+	{
+		if (is_cacheable(address))
+			bus_penalty += (2 + get_wcr2_timing(address)) * cache_line_fetch_count(address);
+		else
+			bus_penalty += 2 + get_wcr2_timing(address);
 	}
 
-	if (area != m_last_area_accessed)
-		bus_penalty += get_wcr1_timing(address);
+	// add wcr1 on area swap, because this fetch is a cache miss read wcr1 doesnt apply from write->read swap
+	// only handle the case where uncached write follows a read, writeback handles wcr1 after read fetch below
+	if (area != m_last_area_accessed || (!m_last_area_accessed_was_write && !is_cacheable(address) && write))
+	{
+		uint32_t wcr1_idle_cycles = get_wcr1_timing(area) * 2;
+		uint64_t wcr1_idle_cycles_left = remaining_cycles(elapsed_cycles, wcr1_idle_cycles);
+		cpu_penalty += wcr1_idle_cycles_left;
+		elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, wcr1_idle_cycles);
+	}
 
 	m_last_area_accessed = area;
+	// cacheable access miss will be a read, write flag set in writeback
+	// only need to handle non-cacheable + write for this check
+	m_last_area_accessed_was_write = (!is_cacheable(address) && write);
 
-	// CPU is in auto precharge mode, since we hit a bank conflict and the last precharge isn't done we stall
-	if (is_sdram_region(address) && page_read == m_last_sdram_page && m_precharge_remaining_cycles > 0)
-		cpu_penalty += m_precharge_remaining_cycles;
+	// The remaining burst words of a prior cache fill still occupy the bus, so
+	// any subsequent access must wait for them to drain
+	if (m_burst_continuation_remaining_cycles > 0)
+	{
+		uint64_t burst_cycles_left = remaining_cycles(elapsed_cycles, m_burst_continuation_remaining_cycles);
+		cpu_penalty += burst_cycles_left;
+		elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, m_burst_continuation_remaining_cycles);
+		m_burst_continuation_remaining_cycles = 0;
+	}
 
-	m_precharge_remaining_cycles = 0;
-
-	// We hit another bus operation before a writeback eviction finished, stall until that's done
-	// We already account for the precharge bank conflict above
+	// We hit another bus operation before a writeback eviction finished, calculate remaining stall time
 	if (m_wb_active_cycles > 0)
 	{
-		cpu_penalty += m_wb_active_cycles;
+		// writeback path sets last_sdram_bank so check above handles tpc wait
+		uint64_t wb_cycles_left = remaining_cycles(elapsed_cycles, m_wb_active_cycles);
+		cpu_penalty += wb_cycles_left;
+		elapsed_cycles -= std::min<uint64_t>(elapsed_cycles, m_wb_active_cycles);
 		m_wb_active_cycles = 0;
 	}
 
 	if (is_sdram_region(address))
-		m_last_sdram_page = page_read;
+		m_last_sdram_bank = bank_read;
 
 	// We had a dirty writeback eviction, total up the background cost penalty we'll pay on subsequent cycles
 	if (m_wb_address != 0)
 	{
-		if (is_sdram_region(address))
+		if (is_sdram_region(m_wb_address))
 		{
-			unsigned int page_write = m_wb_address / SDRAM_PAGE_SIZE;
-			// Bank collision in auto precharge mode, we have to wait for precharge to finish before starting
-			if (page_read == page_write)
-				m_wb_active_cycles += mcr_tpc() * 2;
-			m_wb_active_cycles += (BUS_ACCESS_PENALTY + get_wcr1_timing(address) + BURST_WRITE_WORD_PENALTY + mcr_rcd() + mcr_trwl()) * 2;
-			m_last_sdram_page = page_write;
+			// stall waiting on read precharge close
+			m_wb_active_cycles += mcr_tpc() * 2;
+			// wait on burst completion of the read
+			m_wb_active_cycles += 3 * 2;
+			// Write back folded the cost in for the burst wait
+			m_burst_continuation_remaining_cycles = 0;
+			// since this is a dirty cache line eviction we always add wcr1 as it's handled after the miss fetch read
+			// and we're switching from read->write
+			m_wb_active_cycles += (2 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(area) + mcr_tpc()) * 2;
 		}
 		else
 		{
-			m_wb_active_cycles += get_wcr1_timing(address) * 2;
-			m_wb_active_cycles += ((BUS_ACCESS_PENALTY + get_wcr2_timing(address)) * cache_line_fetch_count(address)) * 2;
+			m_wb_active_cycles += get_wcr1_timing(area) * 2;
+			m_wb_active_cycles += ((2 + get_wcr2_timing(m_wb_address)) * cache_line_fetch_count(m_wb_address)) * 2;
 		}
 
 		m_wb_address = 0;
+		m_last_area_accessed_was_write = true;
 	}
-	else if (is_sdram_region(address)) // Account for the read close after burst read if we hit the same bank, writebacks include the cost in the background cycles if there is a conflict
-		m_precharge_remaining_cycles = mcr_tpc() * 2;
+	// Account for the burst continuation and read close after the critical word lands, writebacks include the cost in the background cycles if there is a conflict
+	else if (is_sdram_region(address) && is_cacheable(address))
+		m_burst_continuation_remaining_cycles = (3 + mcr_tpc()) * 2;
 
 	return cpu_penalty + (bus_penalty * 2);
+}
+
+void sh7709s_device::update_access_cycles(uint32_t address, bool write)
+{
+#if SH7709S_ICACHE_TRACKING_HEAVY == 0
+	// For now only handle cacheable instruction fetch sampling when we do
+	// data accesses. The majority of uncached instruction fetches is
+	// handled in the cache flush timing
+	if (is_cacheable(m_sh2_state->pc)) {
+		m_sh2_state->icount -= access_penalty(m_sh2_state->pc, false);
+		m_last_op_cycle_count = total_cycles();
+	}
+#endif
+	m_sh2_state->icount -= access_penalty(address, write);
+	m_last_op_cycle_count = total_cycles();
 }
 
 void sh7709s_device::drc_memory_access_read()
 {
 	uint32_t address = m_sh2_state->arg0;
-	m_sh2_state->icount -= access_penalty(address, false);
+	update_access_cycles(address, false);
 }
 
 void sh7709s_device::drc_memory_access_write()
 {
 	uint32_t address = m_sh2_state->arg0;
-	m_sh2_state->icount -= access_penalty(address, true);
-}
-
-void sh7709s_device::drc_update_icache()
-{
-	if (m_wb_active_cycles > 0)
-	{
-		m_wb_active_cycles--;
-		// If we had an active wb complete set the remaining precharge cycles in case of bank conflict
-		if (m_wb_active_cycles == 0)
-			m_precharge_remaining_cycles = mcr_tpc() * 2;
-	}
-	else if (m_precharge_remaining_cycles > 0)
-		m_precharge_remaining_cycles--;
-	// Assume the instruction prefetch is perfect for now
-	// we'll still pay a bit of penalty for the access and
-	// handle cache writeback when the icache fetch causes
-	// a dirty line eviction
-	m_sh2_state->icount -= access_penalty(m_sh2_state->pc, false);
+	update_access_cycles(address, true);
 }
 
 static void cfunc_drc_memory_access_read(void *param)
@@ -437,42 +501,30 @@ static void cfunc_drc_memory_access_write(void* param)
 	((sh7709s_device*)param)->drc_memory_access_write();
 }
 
+#if SH7709S_ICACHE_TRACKING_HEAVY == 1
+
+void sh7709s_device::drc_update_icache()
+{
+	// instruction fetches done 2 at a time
+	if ((m_sh2_state->pc & 0x3) == 0)
+		update_access_cycles(m_sh2_state->pc, false);
+}
+
 static void cfunc_drc_update_icache(void* param)
 {
 	((sh7709s_device*)param)->drc_update_icache();
 }
 
-// Have each instruction update the icache when executed since it's a shared icache+dcache
-// TODO : Ideally this uses generate_opcode but that seems to be quite cpu heavy
-// Check if there's another way of handling it that isn't as heavy. The CPU accesses
-// for instructions aren't a huge cause of slowdown related access other than the loop on cv1k
-// that handles cache invalidation that executes 1024 times which can add up.
-// Also need to double check how the uncached instruction fetch is handled if 32 bit reads are done
-bool sh7709s_device::generate_group_0(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh7709s_device::generate_opcode(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint32_t ovrpc)
 {
 	UML_CALLC(block, cfunc_drc_update_icache, this);
-
-	return sh3_base_device::generate_group_0(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	return sh3_base_device::generate_opcode(block, compiler, desc, ovrpc);
 }
 
-bool sh7709s_device::generate_group_4(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
-{
-	UML_CALLC(block, cfunc_drc_update_icache, this);
-
-	return sh3_base_device::generate_group_4(block, compiler, desc, opcode, in_delay_slot, ovrpc);
-}
-
-bool sh7709s_device::generate_group_15(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
-{
-	UML_CALLC(block, cfunc_drc_update_icache, this);
-
-	return sh3_base_device::generate_group_15(block, compiler, desc, opcode, in_delay_slot, ovrpc);
-}
+#endif
 
 // Same as static_generate_memory_accessor from sh4.cpp but with added read/write penalty tracking
 // Address of access stored in arg0, size in arg1 (unused for now)
-// TODO : Some accesses go through read/write byte,word,etc... might need to handle those
-// via overrides and only handle the fastram accesses here
 void sh7709s_device::static_generate_memory_accessor(int size, int iswrite, const char* name, uml::code_handle*& handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1 */
@@ -630,6 +682,21 @@ void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// enforced and not handled by the hardware
 		memset(m_cache, 0, sizeof(m_cache));
 		LOG("SH7709S cache invalidate\n");
+#if SH7709S_ICACHE_TRACKING_HEAVY == 0
+		// We want to account for some of the uncached instruction
+		// fetches that happen here but instrumenting every instruction
+		// is too cpu intensive. Since this causes a decent amount of
+		// fetches in the cache flush loop just total an approximation
+		// up here
+
+		// Main loop body (2 instruction fetches per loop due to 32 bit reads):
+		// MOV.L R0, @R1
+		// DT R2
+		// BFS $AC002A66
+		// ADD #$10, R1
+		m_sh2_state->icount -= (2 /*fetches*/ * 2 /*bus cycle convert*/ * 1024 /*loop iterations*/) *
+			(2 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
+#endif
 	}
 	COMBINE_DATA(&m_ccr);
 	logerror("'%s' (%08x): CCN unmapped internal write %08x & %08x (CCR)\n", tag(), m_sh2_state->pc, data, mem_mask);
@@ -668,8 +735,7 @@ void sh7709s_device::cache_address_array_w(offs_t offset, uint32_t data, uint32_
 			uint32_t wb_address = m_cache[entry_block][way].tag * SH7709S_CACHE_LINE_SIZE;
 			m_cache[entry_block][way].dirty = 0;
 			// Always add wcr1 timing here, accesses to the cache address mappings have to be done via instruction from an uncached region
-			m_sh2_state->icount -= (BUS_ACCESS_PENALTY + BURST_WRITE_WORD_PENALTY + get_wcr1_timing(wb_address) + mcr_rcd() + mcr_trwl()) * 2;
-			// Followup access is likely to area swap as well so those will also need to pay the wait state cost in wcr1 on the instruction fetch
+			m_sh2_state->icount -= (2 + mcr_rcd() + 4 + mcr_trwl() + mcr_tpc() + get_wcr1_timing(3)) * 2;
 			m_last_area_accessed = get_area(wb_address);
 			LOG("Flushing dirty cache entry idx: %u\n", cache_entry_index);
 		}
