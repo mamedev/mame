@@ -48,7 +48,7 @@ public:
 		m_rtc(*this, "rtc")
 	{ }
 
-	void t2000(machine_config &config);
+	void t2000(machine_config &config) ATTR_COLD;
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
