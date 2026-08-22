@@ -1360,6 +1360,12 @@ maclc550
 
 @source:apple/macpdm.cpp
 pmac6100
+pmac6100_66
+pmac7100
+pmac7100_80
+pmac8100
+pmac8100_100
+pmac8100_110
 
 @source:apple/macprtb.cpp
 macpb100
