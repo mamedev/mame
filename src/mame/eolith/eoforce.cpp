@@ -25,17 +25,22 @@ ARM side, connects with a ... SATA connector? (verify)
 - 3 buttons on front panel, TEST, SERV and CLR
 - JAMMA connector
 
+BIOS is a custom PhoenixBIOS 4.0 Release 6.0, with EO Force customized splash screen.
+There's no way in setup menu to disable quiet mode, at best you can enable Phoenix FirstWare icons
+(which is a BDR Backup and Disaster Recovery tool).
+
 Game runs on a Korean Windows 98SE, with an ACCESSHW ABI, a Vault folder containing the game data +
 an exe for deploying from CD-Rom and a DivX codec installation.
 
 TODO:
 - Upgrade chipset, add remaining on-board peripherals
 - hangs while checking I/O port $8100 bp e0295,1,{eax^=1;g} bp e02b6,1,{eax^=1;g}
-- hangs with a jp $-2 (coming from SMI?) bp f49c6,1,{curpc+=2;g}
+- hangs with a jp $-2 (coming from SMI?) bp f49c6,1,{eip+=2;g}
 - CPU gets identified with a :) (just like sega/lindberg.cpp)
 - "Resource Conflict - Allocation error static node # 0E"
-- tight loops if HDD present (?)
-- in shutms11: does
+- Throws a "WARNING: this HDD cannot be read" and tight loops there (PC=7114c) if *any* HDD present
+- with shutms11 does stuff in safe mode only, throws a laconic "Burning launch error" if EWCS.EXE
+  is executed. TNGP.LOG is populated with just a TNGP.DLL loading attempt.
 
 **************************************************************************************************/
 
