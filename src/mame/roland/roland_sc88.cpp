@@ -94,10 +94,13 @@ void roland_sc88_state::sc88pro(machine_config &config)
 ROM_START(sc88)
 	ROM_REGION16_BE(0x80000, "progrom", 0)
 	ROM_DEFAULT_BIOS("102")
-	ROM_SYSTEM_BIOS(0, "102", "Control ROM 1.0.2")
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "roland_sc88-control-1.02-hn27c4096h.ic17", 0x00000, 0x80000, CRC(9e9c56f9) SHA1(9291a4e4ac0fea9fb5a39777be501ab3d34877c8) )
-	ROM_SYSTEM_BIOS(1, "101", "Control ROM 1.0.1")
-	ROM_LOAD16_WORD_BIOS(1, "roland_sc88-control-1.01.ic17", 0x00000, 0x80000, CRC(979b6c09) SHA1(3bc9a68703bd09459283b6b45d01d08feaffb744)) // dumper comment: original chip was a 27C4096
+	ROM_SYSTEM_BIOS(0, "102", "Control ROM 1.0.2")	// v1.02, 1994-06-16, 18:43 (offset 0x7cff6)
+	ROM_LOAD16_WORD_SWAP_BIOS(0, "roland_sc88-control-1.02-hn27c4096h.ic17", 0x00000, 0x80000, CRC(9e9c56f9) SHA1(9291a4e4ac0fea9fb5a39777be501ab3d34877c8))
+	ROM_SYSTEM_BIOS(1, "103", "Control ROM 1.0.3")	// v1.03, 1994-07-01, 10:48 (offset 0x7d136)
+	ROM_LOAD16_WORD_SWAP_BIOS(1, "roland_sc88-control-1.03-hn27c4096hg-85.ic17", 0x00000, 0x80000, CRC(cf953f71) SHA1(6a25d46b608b317d2604b6424fea7b50978b5d32)) // HN27C4096HG-85
+	ROM_SYSTEM_BIOS(2, "104", "Control ROM 1.0.4")	// v1.04, 1994-08-04, 12:41 (offset 0x7d1a6)
+	// This ROM dump is circulating labelled as "Roland SC88 Version 1.01", but it really is 1.04.
+	ROM_LOAD16_WORD_BIOS(2, "roland_sc88-control-1.04.ic17", 0x00000, 0x80000, CRC(979b6c09) SHA1(3bc9a68703bd09459283b6b45d01d08feaffb744)) // dumper comment: original chip was a 27C4096
 
 	ROM_REGION(0x2000, "subcpu", 0)
 	ROM_LOAD("subcpu.ic11", 0x0000, 0x2000, NO_DUMP)
