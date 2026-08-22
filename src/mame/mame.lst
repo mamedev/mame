@@ -20191,6 +20191,7 @@ retro150a
 rhhc152
 supreme
 table108
+tchib158
 throwbck
 touma560
 touma568
@@ -20235,9 +20236,9 @@ taturtf
 tamameet
 
 @source:handheld/generalplus_gpl162xx_lcdtype.cpp
+bkid218
 pcp8718
 pcp8728
-bkid218
 
 @source:handheld/generalplus_gpl951xx.cpp
 fixitflx
@@ -20250,6 +20251,7 @@ bftetris
 bubltea
 dsgnpal
 flufflav
+pink218
 pockrmsr
 pokebala
 pokeissh
@@ -26838,6 +26840,7 @@ turboex
 @source:leapfrog/leappad.cpp
 leappad
 leappadmic
+leappadw
 mfleappad
 ltleappad
 
@@ -35749,6 +35752,7 @@ zudugo
 @source:nintendo/nes_vt09.cpp
 cybar120
 dturbogt
+gampow50
 gujtv108
 joypad65
 lxplasma
@@ -35762,6 +35766,7 @@ msimm2
 msinamco
 msisinv
 msifrog
+pckarc50
 pumpactv
 rcapnp
 senario25
@@ -35808,8 +35813,10 @@ typo240
 
 @source:nintendo/nes_vt369_vtunknown.cpp
 36pcase
+100burgr
 168pcase
 240in1ar
+500in1gf
 500in1hh
 a6plus
 d12power
@@ -35837,6 +35844,7 @@ hkb502a
 jl1810gr
 jl2050
 jl2377
+jl2950
 lexi30
 lpgm240
 lxcap
@@ -35910,6 +35918,7 @@ unkra200
 urban240
 vibes240
 vibes240a
+vibes240e
 zl383
 zonefusn
 
@@ -35927,6 +35936,7 @@ gbox2022
 gprnrs1
 gprnrs16
 hhgc319
+jjfun365
 mc_7x6ss
 mc_8x6ss
 mc_9x6sa
@@ -47983,9 +47993,11 @@ lpetshop
 lxairjet
 lxspidaj
 mattelcs
+mgarage
 mpntball
 mpntbalt
 mylpony
+nvpoker
 ordentv
 pballpup
 pdcj
@@ -48000,6 +48012,7 @@ senspeed
 senwfit
 smartcyc
 spidm2
+stvscri
 swclone
 tiktokmm
 tmntbftc
