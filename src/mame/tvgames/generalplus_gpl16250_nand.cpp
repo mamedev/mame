@@ -912,13 +912,13 @@ CONS( 2009, jak_sspop, 0, 0, generalplus_gpac800_nand128mbyte, jak_hsm,  general
 CONS( 2008, jak_hmg2,  0, 0, generalplus_gpac800_nand64mbyte,  jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Hannah Montana G2 Deluxe: All in One (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Jul 9 2008 11:50:08
 CONS( 2008, jak_hsmg2, 0, 0, generalplus_gpac800_nand64mbyte,  jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "High School Musical G2 Deluxe: All in One (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Jun 25 2008 14:53:14
 CONS( 2008, jak_hmhsm, 0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe: Two in One (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
-CONS( 2008, jak_umdf,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Handheld Games", "Disney Ultimotion: Sleeping Beauty & Tinker Bell (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2008, jak_umdf,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Handheld Games", "Ultimotion: Disney Fairies - Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Ultimotion Swing Zone is SPG29xx instead
 CONS( 2008, jak_camp,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Camp Rock: Guitar Video Game (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 2 blocks fail the hidden ROM test in jak_hmpt set below, however this seems to be an error in the test mode, not the dump
 // a different set, https://www.youtube.com/watch?v=XiEMtLzcTFw showing a date of May 14 2008 10:05:22 shows exactly the same failures
-CONS( 2008, jak_hmpt,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Hannah Montana Pop Tour: Guitar Video Game (JAKKS Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // May 16 2008 10:36:59
+CONS( 2008, jak_hmpt, 0, 0, generalplus_gpac800_nand256mbyte, jak_hsm, generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Hannah Montana Pop Tour: Guitar Video Game (JAKKS Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // May 16 2008 10:36:59
 
 // There were 1-player and 2-player versions for several of the JAKKS guns. The second gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2-player versions being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from

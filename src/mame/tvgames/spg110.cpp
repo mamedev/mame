@@ -7,15 +7,15 @@
         die markings show
 
         "SunPlus PA7801" ( known as Sunplus SPG110? )
-        JAKKS Classic Arcade Pinball
-        JAKKS Spiderman 5-in-1 (original release)
+        Jakks Classic Arcade Pinball
+        Jakks Spiderman 5-in-1 (original release)
         Conny TV Virtual Tennis
         Conny Ping Pong
         Conny TV Virtual Fighter
-        JAKKS EA Sports (NHL 95 + Fifa 96) (EU)
+        Jakks EA Sports (NHL 95 + Fifa 96) (EU)
 
         assumed:
-        JAKKS EA Sports (NHL 95 + Madden 95) (US)
+        Jakks EA Sports (NHL 95 + Madden 95) (US)
 
 *******************************************************************************/
 
