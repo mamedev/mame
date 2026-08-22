@@ -128,6 +128,7 @@ protected:
 	u16 m_sprite_priority_latch;
 	u16 m_sprite_xoffset,m_sprite_yoffset;
 	u16 m_sprite_color_code;
+	u16 m_sprite_color_code_latch;
 	u8 m_layer_priority[3];
 	u16 m_background_color;
 	u16 m_screen_xoffset,m_screen_yoffset;

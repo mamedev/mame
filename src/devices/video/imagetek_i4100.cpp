@@ -380,6 +380,7 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_sprite_priority));
 	save_item(NAME(m_sprite_priority_latch));
 	save_item(NAME(m_sprite_color_code));
+	save_item(NAME(m_sprite_color_code_latch));
 	save_item(NAME(m_sprite_xoffset));
 	save_item(NAME(m_sprite_yoffset));
 	save_item(NAME(m_screen_xoffset));
@@ -429,6 +430,7 @@ void imagetek_i4100_device::device_reset()
 	m_sprite_xoffset = 0;
 	m_sprite_yoffset = 0;
 	m_sprite_color_code = 0;
+	m_sprite_color_code_latch = 0;
 	update_irq_state();
 
 	for(int i=0; i != 3; i++) {
@@ -633,8 +635,13 @@ void imagetek_i4100_device::sprite_yoffset_w(offs_t offset, uint16_t data, uint1
  * 8.w  ---- ---- ---- ----     Sprites Color Codes Start
  *
  ************************************************************/
-uint16_t imagetek_i4100_device::sprite_color_code_r() { return m_sprite_color_code; }
-void imagetek_i4100_device::sprite_color_code_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_color_code); }
+uint16_t imagetek_i4100_device::sprite_color_code_r() { return m_sprite_color_code_latch; }
+void imagetek_i4100_device::sprite_color_code_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_color_code_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_color_code = m_sprite_color_code_latch;
+}
 
 /*************************************************************
  *
@@ -1442,6 +1449,7 @@ void imagetek_i4100_device::screen_eof(int state)
 			m_spriteram->copy();
 			m_sprite_count = m_sprite_count_latch;
 			m_sprite_priority = m_sprite_priority_latch;
+			m_sprite_color_code = m_sprite_color_code_latch;
 		}
 	}
 }
