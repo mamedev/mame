@@ -943,6 +943,12 @@ ROM_START( urban240 )
 	ROM_LOAD( "urban240.u3", 0x00000, 0x8000000, CRC(73d03f0d) SHA1(a1615dba39e9114ace7a8ad68f46195da655bf35) )
 ROM_END
 
+ROM_START( jl2950 )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "jl2950.u3", 0x00000, 0x8000000, CRC(91aed900) SHA1(a2dfce489a66120237e68908319841440e5e7b60) )
+ROM_END
+
+
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "jg7800.bin", 0x00000, 0x8000000, CRC(44f50d4c) SHA1(39ad63220ddd72c5a77f125614efa77501efe59f) )
@@ -1859,6 +1865,8 @@ CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_st
 CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
 
 CONS( 201?, urban240,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Urban Outfitters", "Mini Arcade Machine 240-in-1 (translucent case)", MACHINE_NOT_WORKING )
+// same style menu as urban240, but more games (45 Sports, 112 Arcade, 75 Puzzle, 68 Shooting) 
+CONS( 201?, jl2950,    0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Lexibook", "Cyber Arcade 300-in-1 (JL2950)", MACHINE_NOT_WORKING )
 
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
