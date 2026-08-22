@@ -50,16 +50,25 @@ private:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 
+	void gdc0_drq_w(int state);
+	void gdc1_drq_w(int state);
+	void update_drq();
+
 	void upd7220_0_map(address_map &map) ATTR_COLD;
 	void upd7220_1_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<upd7220_device> m_hgdc0;
 	required_device<upd7220_device> m_hgdc1;
+	required_shared_ptr<uint16_t> m_frame_ram;
+	required_shared_ptr<uint16_t> m_font_ram;
+	required_shared_ptr<uint16_t> m_gfx_ram;
 
 	uint8_t m_option;
 	uint8_t m_attr[16];
 	uint8_t m_underline;
+	int m_gdc0_drq;
+	int m_gdc1_drq;
 	required_device<palette_device> m_palette;
 };
 
