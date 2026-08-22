@@ -609,7 +609,7 @@ uint8_t scc68070_device::iack_r(offs_t offset)
 			m_uart_tx_int = false;
 			update_ipl();
 		}
-		else if (m_i2c_int && offset == ((m_picr2 >> 4) & 7))
+		else if (m_i2c_int && offset == ((m_picr1 >> 4) & 7))
 		{
 			m_i2c_int = false;
 			update_ipl();
