@@ -1535,6 +1535,18 @@ if SOUNDS["MPEG_AUDIO"] then
 end
 
 ---------------------------------------------------
+-- Texas Instruments TMS320AV110 MPEG audio decoder
+--@src/devices/sound/tms320av110.h,SOUNDS["TMS320AV110"] = true
+---------------------------------------------------
+
+if SOUNDS["TMS320AV110"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tms320av110.cpp",
+		MAME_DIR .. "src/devices/sound/tms320av110.h",
+	}
+end
+
+---------------------------------------------------
 -- ZOOM ZSG-2
 --@src/devices/sound/zsg2.h,SOUNDS["ZSG2"] = true
 ---------------------------------------------------
