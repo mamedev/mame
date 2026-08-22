@@ -410,4 +410,4 @@ void tk3000_device::p3_w(u8 data)
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(ADB_TK3000, adb_slot_card_interface, tk3000_device, "tk3000", "Datadesk TK-3000 ADB keyboard and trackball");
+DEFINE_DEVICE_TYPE_PRIVATE(ADB_TK3000, adb_slot_card_interface, tk3000_device, "adbtk3k", "Datadesk TK-3000 ADB keyboard and trackball");
