@@ -203,6 +203,7 @@ private:
 	void internal_map(address_map &map) ATTR_COLD;
 	void cpu_space_map(address_map &map) ATTR_COLD;
 
+	void reset_peripheral_state() ATTR_COLD;
 	void reset_peripherals(int state);
 
 	void update_ipl();
