@@ -301,7 +301,7 @@ void hyprduel_state::magerror_map2(address_map &map)
 
 static INPUT_PORTS_START( hyprduel )
 	PORT_START("SERVICE")
-	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW ) // another test mode in hyprduel (specific?)
+	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW ) // another test mode in hyprduel (specific?), with bootup
 	PORT_DIPNAME( 0x4000, 0x0000, "Show Warning" )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
