@@ -123,9 +123,13 @@ protected:
 	u16 m_crtc_horz;
 	u16 m_crtc_vert;
 	u16 m_sprite_count;
+	u16 m_sprite_count_latch;
 	u16 m_sprite_priority;
+	u16 m_sprite_priority_latch;
 	u16 m_sprite_xoffset,m_sprite_yoffset;
+	u16 m_sprite_xoffset_latch,m_sprite_yoffset_latch;
 	u16 m_sprite_color_code;
+	u16 m_sprite_color_code_latch;
 	u8 m_layer_priority[3];
 	u16 m_background_color;
 	u16 m_screen_xoffset,m_screen_yoffset;
