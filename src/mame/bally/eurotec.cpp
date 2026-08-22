@@ -68,8 +68,8 @@ public:
 		m_rtc(*this, "rtc")
 	{ }
 
-	void b2(machine_config &config);
-	void b4(machine_config &config);
+	void b2(machine_config &config) ATTR_COLD;
+	void b4(machine_config &config) ATTR_COLD;
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
