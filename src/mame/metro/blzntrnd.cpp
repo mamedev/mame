@@ -850,6 +850,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, blzntrnd, 0,       blzntrnd, blzntrnd, blzntrnd_state, empty_init, ROT0, "Human Amusement", "Blazing Tornado", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, blzntrnd, 0,       blzntrnd, blzntrnd, blzntrnd_state, empty_init, ROT0, "Human Amusement", "Blazing Tornado (Export)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1996, gstrik2,  0,       gstrik2,  gstrik2,  blzntrnd_state, empty_init, ROT0, "Human Amusement", "Grand Striker 2 (Europe and Oceania)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1996, gstrik2j, gstrik2, gstrik2,  gstrik2,  blzntrnd_state, empty_init, ROT0, "Human Amusement", "Grand Striker 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
