@@ -6382,6 +6382,8 @@ if BUSES["WANGPC"] then
 		MAME_DIR .. "src/devices/bus/wangpc/wangpc.cpp",
 		MAME_DIR .. "src/devices/bus/wangpc/wangpc.h",
 		MAME_DIR .. "src/devices/bus/wangpc/emb.cpp",
+		MAME_DIR .. "src/devices/bus/wangpc/ibmc.cpp",
+		MAME_DIR .. "src/devices/bus/wangpc/ibmc.h",
 		MAME_DIR .. "src/devices/bus/wangpc/emb.h",
 		MAME_DIR .. "src/devices/bus/wangpc/lic.cpp",
 		MAME_DIR .. "src/devices/bus/wangpc/lic.h",
