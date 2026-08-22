@@ -1848,6 +1848,8 @@ static void do_verify(parameters_map &params)
 				report_error(1, "Error updating SHA1: %s", err.message());
 			util::stream_format(std::cout, "SHA1 updated to correct value in input CHD\n");
 		}
+		else
+			report_error(1, "CHD verification failed");
 	}
 	else
 	{
@@ -1872,6 +1874,8 @@ static void do_verify(parameters_map &params)
 						report_error(1, "Error updating SHA1: %s", err.message());
 					util::stream_format(std::cout, "SHA1 updated to correct value in input CHD\n");
 				}
+				else
+					report_error(1, "CHD verification failed");
 			}
 		}
 	}
