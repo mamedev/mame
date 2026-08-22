@@ -513,14 +513,30 @@ end
 
 if BUSES["ADB"] then
 	files {
-		MAME_DIR .. "src/devices/bus/adb/adb.cpp",
-		MAME_DIR .. "src/devices/bus/adb/adb.h",
-		MAME_DIR .. "src/devices/bus/adb/adbhle.cpp",
-		MAME_DIR .. "src/devices/bus/adb/adbhle.h",
+		MAME_DIR .. "src/devices/bus/adb/a9m0115.cpp",
+		MAME_DIR .. "src/devices/bus/adb/a9m0115.h",
 		MAME_DIR .. "src/devices/bus/adb/a9m0330.cpp",
 		MAME_DIR .. "src/devices/bus/adb/a9m0330.h",
 		MAME_DIR .. "src/devices/bus/adb/a9m0331.cpp",
 		MAME_DIR .. "src/devices/bus/adb/a9m0331.h",
+		MAME_DIR .. "src/devices/bus/adb/adb.cpp",
+		MAME_DIR .. "src/devices/bus/adb/adb.h",
+		MAME_DIR .. "src/devices/bus/adb/adbhle.cpp",
+		MAME_DIR .. "src/devices/bus/adb/adbhle.h",
+		MAME_DIR .. "src/devices/bus/adb/adbhlekeyboard.cpp",
+		MAME_DIR .. "src/devices/bus/adb/adbhlekeyboard.h",
+		MAME_DIR .. "src/devices/bus/adb/adbhlemouse.cpp",
+		MAME_DIR .. "src/devices/bus/adb/adbhlemouse.h",
+		MAME_DIR .. "src/devices/bus/adb/adbhlepippin.cpp",
+		MAME_DIR .. "src/devices/bus/adb/adbhlepippin.h",
+		MAME_DIR .. "src/devices/bus/adb/adbmonitor.cpp",
+		MAME_DIR .. "src/devices/bus/adb/adbmonitor.h",
+		MAME_DIR .. "src/devices/bus/adb/cards.cpp",
+		MAME_DIR .. "src/devices/bus/adb/cards.h",
+		MAME_DIR .. "src/devices/bus/adb/kb305.cpp",
+		MAME_DIR .. "src/devices/bus/adb/kb305.h",
+		MAME_DIR .. "src/devices/bus/adb/tk3000.cpp",
+		MAME_DIR .. "src/devices/bus/adb/tk3000.h",
 	}
 end
 
