@@ -40272,7 +40272,9 @@ cm300
 sc55mk2
 
 @source:roland/roland_sc88.cpp
+sc88
 sc88vl
+sc88pro
 
 @source:roland/roland_tb303.cpp
 tb303
