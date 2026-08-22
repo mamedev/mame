@@ -618,7 +618,7 @@ void imagetek_i4100_device::sprite_count_w(offs_t offset, uint16_t data, uint16_
 uint16_t imagetek_i4100_device::sprite_priority_r() { return m_sprite_priority_latch; }
 void imagetek_i4100_device::sprite_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_sprite_priority);
+	COMBINE_DATA(&m_sprite_priority_latch);
 	if (!m_spriteram_buffered)
 		m_sprite_priority = m_sprite_priority_latch;
 }
