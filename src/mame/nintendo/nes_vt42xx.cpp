@@ -88,6 +88,7 @@ public:
 	void init_g9_666();
 	void init_hhgc319();
 	void init_bl339();
+	void init_jjfun365();
 
 protected:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -576,13 +577,26 @@ void nes_vt42xx_state::init_bl339()
 		put_u16le(&romdata[i], bitswap<16>(get_u16le(&romdata[i]), 15, 7, 13, 4, 3, 10, 2, 1, 14, 6, 5, 12, 11, 9, 8, 0));
 }
 
+void nes_vt42xx_state::init_jjfun365()
+{
+	init_g9_666();
+	init_rfcp168();
+
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x800000; i += 0x20000)
+	{
+		// Swap A16 with A23
+		std::swap_ranges(&romdata[i + 0x10000], &romdata[i + 0x20000], &romdata[i + 0x800000]);
+	}
+}
+
 } // anonymous namespace
 
 
 CONS( 201?, rfcp168,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
 // 060-91011011V8.0 SUPER-FC280 on PCB
-CONS( 2022, jjfun365, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init,   "JJFun", "Retro FC Game Box 365-in-1",  MACHINE_NOT_WORKING )
+CONS( 2022, jjfun365, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_jjfun365,   "JJFun", "Retro FC Game Box 365-in-1",  MACHINE_NOT_WORKING )
 
 // these share the same bitswap, many duplicates, real game counts to be confirmed, graphical issues in some games
 CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G5 500 in 1 Handheld", MACHINE_NOT_WORKING )
