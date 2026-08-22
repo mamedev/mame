@@ -302,6 +302,46 @@ Fatal error: Incorrect layout on track 0 head 0, expected_size=50000, current_si
 		</part>
 	</software>
 
+	<software name="baddudes">
+		<description>Bad Dudes (5.25")</description>
+		<year>1988</year>
+		<publisher>Data East</publisher>
+		<notes><![CDATA[
+ibm5150: Stuck [keyboard] directional inputs in gameplay (verify)
+ibmpcjr: Doesn't boot (verify)
+]]></notes>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Data East Corporation" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk"/>
+			<dataarea name="flop" size = "1090804">
+				<rom name="Bad Dudes [Data East] [1989] [5.25DD] [Disk 1 of 2] [Program Disk].mfm" size="1090804" crc="c3d744b9" sha1="1b8ea2e32b82044c6f8f857bd0db11ad05e13dfb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size = "1088254">
+				<rom name="Bad Dudes [Data East] [1989] [5.25DD] [Disk 2 of 2] [Data Disk].mfm" size="1088254" crc="4b08733d" sha1="083a9c3ef6249bb71b47437cfd3d71e1cf98928e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baddudes35" cloneof="baddudes" supported="no">
+		<description>Bad Dudes (3.5")</description>
+		<year>1988</year>
+		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360
+]]></notes>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="656393">
+				<rom name="bad dudes.td0" size="656393" crc="dc74c1ce" sha1="e28ff95cb1793d08a1e373a7096f9024aa1f0d89"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="belowrot">
 		<description>Below the Root</description>
 		<year>1984</year>
@@ -1479,6 +1519,21 @@ Resets itself while "Loading StoryTeller"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Inca [DC] (1985)(Hayden Software) [Adventure, Interactive Fiction].img" size="368640" crc="1f9fe250" sha1="e9d213695501f9d163d402310b3f5e34f1c4ff88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: untested, no manual available -->
+	<software name="italy90">
+		<description>Italy '90 Soccer (Italy)</description>
+		<year>1989</year>
+		<publisher>Simulmondo</publisher>
+		<info name="developer" value="Dardari Bros." />
+		<info name="usage" value="PC Booter, sports manual copy protection" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2152032">
+				<!-- 80-track disk with only the first 40 formatted -->
+				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2152032" crc="f60c1a9d" sha1="302d4ed84aea32a8d78a9d83462a22f5d370058a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3103,43 +3158,7 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 		</part>
 	</software>
 
-	<software name="baddudes">
-		<description>Bad Dudes (5.25")</description>
-		<year>1988</year>
-		<publisher>Data East</publisher>
-		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Data East Corporation" />
-		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Program Disk"/>
-			<dataarea name="flop" size = "1090804">
-				<rom name="Bad Dudes [Data East] [1989] [5.25DD] [Disk 1 of 2] [Program Disk].mfm" size="1090804" crc="c3d744b9" sha1="1b8ea2e32b82044c6f8f857bd0db11ad05e13dfb"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size = "1088254">
-				<rom name="Bad Dudes [Data East] [1989] [5.25DD] [Disk 2 of 2] [Data Disk].mfm" size="1088254" crc="4b08733d" sha1="083a9c3ef6249bb71b47437cfd3d71e1cf98928e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="baddudes35" cloneof="baddudes" supported="no">
-		<description>Bad Dudes (3.5")</description>
-		<year>1988</year>
-		<publisher>Data East</publisher>
-		<notes><![CDATA[
-Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360
-]]></notes>
-		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="656393">
-				<rom name="bad dudes.td0" size="656393" crc="dc74c1ce" sha1="e28ff95cb1793d08a1e373a7096f9024aa1f0d89"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Applications -->
+<!-- !Applications -->
 
 	<software name="2630fa">
 		<description>2630 Fourier Analyzer (demo)</description>
@@ -5975,7 +5994,7 @@ Stalls or throws either "Bad command or file name", "disk read error" or "divide
 		</part>
 	</software>
 
-	<!-- Operating Systems -->
+<!-- !Operating Systems -->
 
 	<software name="condos32">
 		<description>Concurrent PC DOS Version 3.2 (Maintenance Release)</description>
@@ -8390,7 +8409,7 @@ Has optional unemulated TOS expansion boards
 		</part>
 	</software>
 
-	<!-- Driver disks -->
+<!-- !Driver disks -->
 
 	<software name="amouse7">
 		<!-- dumped via Kryoflux from original floppy, some modified sectors present -->
@@ -8530,7 +8549,7 @@ Corrupt files
 		</part>
 	</software>
 
-	<!-- DOS-based games -->
+<!-- !DOS-based non-auto bootable games -->
 
 	<software name="2400ad" supported="no">
 		<description>2400 A.D. (set 1)</description>
@@ -13221,21 +13240,6 @@ The game freezes after choosing the characters.
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 4 of 4] [Disk D].img" size="368640" crc="e5b4da48" sha1="d53fd8662d25cef392a2650732de8ab25c11d7c9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- TODO: untested, no manual available -->
-	<software name="italy90">
-		<description>Italy '90 Soccer (Italy)</description>
-		<year>1989</year>
-		<publisher>Simulmondo</publisher>
-		<info name="developer" value="Dardari Bros." />
-		<info name="usage" value="PC Booter, sports manual copy protection" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "2152032">
-				<!-- 80-track disk with only the first 40 formatted -->
-				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2152032" crc="f60c1a9d" sha1="302d4ed84aea32a8d78a9d83462a22f5d370058a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19297,7 +19301,7 @@ Disk 1 has a created "RESOURCE.CFG" file
 		</part>
 	</software>
 
-	<!-- Demoscene -->
+<!-- !Demoscene -->
 
 	<software name="8088mph" supported="no">
 		<description>8088 MPH (Final Version)</description>
