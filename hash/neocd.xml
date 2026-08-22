@@ -638,16 +638,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="karnovr">
+	<software name="karnovr" supported="no">
 		<description>Karnov's Revenge (USA) ~ Fighter's History Dynamite (Japan)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Game will play if you press 1P or 2P Start in the menu. All other menu choices
+will crash the game and load the bios.
+]]></notes>
 		<info name="alt_title" value="ファイターズヒストリー・ダイナマイト" />
-		<info name="serial" value="DECD-003 (JPN)" />
+		<info name="serial" value="DECD-003 (JPN), DECD-003E (Export)" />
 		<info name="release" value="19941222 (JPN)" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="karnov's revenge (1994)(snk)(jp-us)[fighter's history dynamite]" sha1="89acc598b304e97749f632c4883935cf1f41100e"/>
+				<disk name="fighter's history dynamite ~ karnov's revenge (japan) (en,ja)" sha1="d2577d9fd50890a5fc6b91f7fcdd21b1af87e6c1"/>
 			</diskarea>
 		</part>
 	</software>
