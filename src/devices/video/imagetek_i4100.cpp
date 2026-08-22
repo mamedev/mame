@@ -383,6 +383,8 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_sprite_color_code_latch));
 	save_item(NAME(m_sprite_xoffset));
 	save_item(NAME(m_sprite_yoffset));
+	save_item(NAME(m_sprite_xoffset_latch));
+	save_item(NAME(m_sprite_yoffset_latch));
 	save_item(NAME(m_screen_xoffset));
 	save_item(NAME(m_screen_yoffset));
 	save_item(NAME(m_layer_priority));
@@ -429,6 +431,8 @@ void imagetek_i4100_device::device_reset()
 	m_sprite_priority_latch = 0;
 	m_sprite_xoffset = 0;
 	m_sprite_yoffset = 0;
+	m_sprite_xoffset_latch = 0;
+	m_sprite_yoffset_latch = 0;
 	m_sprite_color_code = 0;
 	m_sprite_color_code_latch = 0;
 	update_irq_state();
@@ -625,10 +629,20 @@ void imagetek_i4100_device::sprite_priority_w(offs_t offset, uint16_t data, uint
  * 6.w  ---- ---- ---- ----     Sprites X Offset
  *
  ************************************************************/
-uint16_t imagetek_i4100_device::sprite_xoffset_r() { return m_sprite_xoffset; }
-void imagetek_i4100_device::sprite_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_xoffset); }
-uint16_t imagetek_i4100_device::sprite_yoffset_r() { return m_sprite_yoffset; }
-void imagetek_i4100_device::sprite_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_yoffset); }
+uint16_t imagetek_i4100_device::sprite_xoffset_r() { return m_sprite_xoffset_latch; }
+void imagetek_i4100_device::sprite_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_xoffset_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_xoffset = m_sprite_xoffset_latch;
+}
+uint16_t imagetek_i4100_device::sprite_yoffset_r() { return m_sprite_yoffset_latch; }
+void imagetek_i4100_device::sprite_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_yoffset_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_yoffset = m_sprite_yoffset_latch;
+}
 
 /*************************************************************
  *
@@ -1450,6 +1464,8 @@ void imagetek_i4100_device::screen_eof(int state)
 			m_sprite_count = m_sprite_count_latch;
 			m_sprite_priority = m_sprite_priority_latch;
 			m_sprite_color_code = m_sprite_color_code_latch;
+			m_sprite_xoffset = m_sprite_xoffset_latch;
+			m_sprite_yoffset = m_sprite_yoffset_latch;
 		}
 	}
 }
