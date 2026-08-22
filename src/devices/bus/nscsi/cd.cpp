@@ -224,7 +224,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 				m_write_path.append(PATH_SEPARATOR);
 				m_write_path.append((char *)&m_xfer_buffer[0]);
 				if (osd_file::open(m_write_path, OPEN_FLAG_CREATE | OPEN_FLAG_WRITE, file, filesize)) {
-					LOG("Open for write/creation failed for [%s]\n", m_write_path.c_str());
+					LOG("Open for write/creation failed for [%s]\n", m_write_path);
 					scsi_status_complete(SS_CHECK_CONDITION);
 					sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 					return;
@@ -238,7 +238,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 				osd_file::ptr file;
 				uint64_t filesize;
 
-				LOG("flushing [%s] to disk at %08x\n", m_write_path.c_str(), m_write_offset * 512);
+				LOG("flushing [%s] to disk at %08x\n", m_write_path, m_write_offset * 512);
 				osd_file::open(m_write_path, OPEN_FLAG_WRITE, file, filesize);
 				file->write(&m_xfer_buffer[0], m_write_offset * 512, m_write_length, actualWritten);
 
@@ -974,7 +974,7 @@ void nscsi_cdrom_device::scsi_command()
 				m_scsi_cmdbuf[pos + 38] = (m_directory[index].size >> 8) & 0xff;
 				m_scsi_cmdbuf[pos + 39] = m_directory[index].size & 0xff;
 
-				LOG("%02d: %s %08x\n", index, m_directory[index].name.c_str(), (uint32_t)m_directory[index].size);
+				LOG("%02d: %s %08x\n", index, m_directory[index].name, (uint32_t)m_directory[index].size);
 
 				index++;
 				pos += 40;
@@ -1000,7 +1000,7 @@ void nscsi_cdrom_device::scsi_command()
 
 		uint32_t offset = m_scsi_cmdbuf[2] << 24 | m_scsi_cmdbuf[3] << 16 | m_scsi_cmdbuf[4] << 8 | m_scsi_cmdbuf[5];
 		uint32_t blocks = m_scsi_cmdbuf[6];
-		LOG("TOOLBOX_GET_FILE: file # %d (%s), offset %08x, blocks %d\n", m_scsi_cmdbuf[1], m_directory[m_scsi_cmdbuf[1]].name.c_str(), offset, blocks);
+		LOG("TOOLBOX_GET_FILE: file # %d (%s), offset %08x, blocks %d\n", m_scsi_cmdbuf[1], m_directory[m_scsi_cmdbuf[1]].name, offset, blocks);
 		if (blocks == 0)
 		{
 			blocks = 1;
@@ -1020,7 +1020,7 @@ void nscsi_cdrom_device::scsi_command()
 		u64 size;
 		if (osd_file::open(tmpPath, OPEN_FLAG_READ, file, size))
 		{
-			LOG("Open failed for [%s]\n", tmpPath.c_str());
+			LOG("Open failed for [%s]\n", tmpPath);
 			scsi_status_complete(SS_CHECK_CONDITION);
 			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 			return;

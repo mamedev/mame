@@ -217,6 +217,7 @@ public:
 		m_blitter(*this, "blitter"),
 		m_nand(*this, "nand"),
 		m_eeprom(*this, "eeprom"),
+		m_ymz770(*this, "ymz770"),
 		m_ram(*this, "mainram"),
 		m_rombase(*this, "maincpu"),
 		m_eepromout(*this, "EEPROMOUT"),
@@ -243,6 +244,7 @@ private:
 	required_device<cv1k_blitter_device> m_blitter;
 	required_device<samsung_k9f1g08u0m_device> m_nand;
 	required_device<rtc9701_device> m_eeprom;
+	required_device<ymz770_device> m_ymz770;
 
 	required_shared_ptr<u64> m_ram;
 	required_region_ptr<u64> m_rombase;
@@ -256,6 +258,7 @@ private:
 	void flash_io_w(offs_t offset, u8 data);
 	u8 serial_rtc_eeprom_r(offs_t offset);
 	void serial_rtc_eeprom_w(offs_t offset, u8 data);
+	void sound_w(offs_t offset, u8 data);
 	u64 flash_port_e_r();
 
 	u64 speedup_r();
@@ -272,14 +275,28 @@ private:
 
 // FLASH interface
 
+// cv1k flash timing notes:
+// - For early titles this has less of an impact
+// - The times this is mostly visible is during midboss final patterns and certain boss patterns
+// - Latter titles lean more and more on mid stage load sequences where combined with the
+//   unneeded cache flush cause a lot of stage slowdown
+// - This behavior is exhibited in quite a bit of bosses, one big example is Pink Sweets final
+//   boss rainbow pattern where it causes the game to pause for an extended number of frames
+//   resulting in very staggered slowdown. Knowingly or unknowingly this in some cases causes
+//   or smooths some slowdown such as some patterns on the Mushi Futari Stage 5 boss
+// - Flash ready time doesn't account for a ton of time (~2500 cycles) but once the flash is ready
+//   to be read each read is done a byte at a time from an uncached area each taking ~10 cycles
+//   (2 base + 3 wait states) = 5 bus cycles -> 10 cpu cycles
 u64 cv1k_state::flash_port_e_r()
 {
 	return ((!m_nand->is_busy() ? 0x20 : 0x00)) | 0xdf;
 }
 
-
+// The cv1k_map is in physical addresses, the titles access registers from
+// uncached region 5 0xB...
 u8 cv1k_state::flash_io_r(offs_t offset)
 {
+	m_maincpu->update_access_cycles(0xB0000000 + offset, false);
 	switch (offset)
 	{
 		default:
@@ -301,6 +318,7 @@ u8 cv1k_state::flash_io_r(offs_t offset)
 
 void cv1k_state::flash_io_w(offs_t offset, u8 data)
 {
+	m_maincpu->update_access_cycles(0xB0000000 + offset, true);
 	switch (offset)
 	{
 		default:
@@ -327,6 +345,7 @@ void cv1k_state::flash_io_w(offs_t offset, u8 data)
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 {
+	m_maincpu->update_access_cycles(0xB0c00000 + offset, false);
 	switch (offset)
 	{
 		case 0x01:
@@ -339,6 +358,7 @@ u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 
 void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 {
+	m_maincpu->update_access_cycles(0xB0c00000 + offset, true);
 	switch (offset)
 	{
 		case 0x01:
@@ -355,14 +375,20 @@ void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 	}
 }
 
+// Sound writes are also done to an uncached area so they should take a penalty hit
+void cv1k_state::sound_w(offs_t offset, u8 data)
+{
+	m_maincpu->update_access_cycles(0xB0400000 + offset, true);
+	m_ymz770->write(offset, data);
+}
 
 void cv1k_state::base_map(address_map &map)
 {
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
-	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
+	map(0x10400000, 0x10400007).w(FUNC(cv1k_state::sound_w));
 	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  map(0x18000000, 0x18000057) // blitter, installed on reset
-	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
+	map(0xf0000000, 0xf0ffffff).ram(); // Memory mapped sh3 cache entry array
 }
 
 void cv1k_state::cv1k_map(address_map &map)
@@ -570,6 +596,7 @@ void cv1k_state::cv1k(machine_config &config)
 	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
 
 	CV1K_BLITTER(config, m_blitter);
+	m_blitter->set_maincpu(m_maincpu); // timing tracking of uncached blitter r/w access
 	m_blitter->set_screen("screen");
 	m_blitter->port_r_callback().set_ioport("DSW");
 	m_blitter->set_mainramsize(0x800000);

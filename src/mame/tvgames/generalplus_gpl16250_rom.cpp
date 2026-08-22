@@ -899,10 +899,10 @@ void gameu_handheld_game_state::init_gameu108()
 // ----------------------------------------------------
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS( 2008, jak_spmm, 0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / Santa Cruz Games", "The Amazing Spider-Man and the Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, jak_prr,  0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / HotGen",           "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, jak_bj,   0, 0, base, jak_bj,   gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / PopCap / HotGen",  "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2009, jak_tpir, 0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / HotGen",           "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, jak_spmm, 0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / Santa Cruz Games",     "The Amazing Spider-Man and the Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, jak_prr,  0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / HotGen Ltd.",          "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, jak_bj,   0, 0, base, jak_bj,   gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / PopCap / HotGen Ltd.", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, jak_tpir, 0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "JAKKS Pacific, Inc. / HotGen Ltd.",          "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)

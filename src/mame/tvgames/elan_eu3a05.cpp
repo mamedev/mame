@@ -967,7 +967,7 @@ CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal_4mb, airblsjs, elan_eu3a05_state, em
 
 CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
 
-CONS( 2005, pvwwcas, 0, 0, pvwwcas, sudoku, elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
+CONS( 2005, pvwwcas, 0, 0, pvwwcas, sudoku, elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-TAC", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 
 // unknown, might be EU3A05, but bad dump
 // CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?

@@ -64,9 +64,8 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
-
 #include "softlist_dev.h"
+#include "speaker.h"
 
 #include "multibyte.h"
 #include "utf8.h"

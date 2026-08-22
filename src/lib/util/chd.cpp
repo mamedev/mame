@@ -194,11 +194,7 @@ inline std::error_condition chd_file::file_write(uint64_t offset, const void *so
 	err = m_file->seek(offset, SEEK_SET);
 	if (UNEXPECTED(err))
 		return err;
-	size_t count;
-	std::tie(err, count) = write(*m_file, source, length);
-	if (UNEXPECTED(!err && (count != length)))
-		return std::error_condition(std::errc::io_error);
-	return err;
+	return write(*m_file, source, length).first;
 }
 
 
@@ -239,8 +235,6 @@ inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint3
 				std::tie(err, count) = write(*m_file, buffer, bytes_to_write);
 				if (UNEXPECTED(err))
 					throw err;
-				if (UNEXPECTED(!count))
-					throw std::error_condition(std::errc::io_error);
 				delta -= count;
 			}
 		}
@@ -251,12 +245,9 @@ inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint3
 	err = m_file->tell(offset);
 	if (UNEXPECTED(err))
 		throw err;
-	size_t count;
-	std::tie(err, count) = write(*m_file, source, length);
+	std::tie(err, std::ignore) = write(*m_file, source, length);
 	if (UNEXPECTED(err))
 		throw err;
-	if (UNEXPECTED(count != length))
-		throw std::error_condition(std::errc::io_error);
 	return offset;
 }
 

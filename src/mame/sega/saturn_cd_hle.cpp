@@ -1012,7 +1012,7 @@ void saturn_cd_hle_device::cmd_play_disc()
 		}
 	}
 
-	LOGCMD("\tPlay Disc: current %x -> start %x length %x\n", cd_curfad, cd_fad_seek, fadstoplay);
+	LOGCMD("\tPlay Disc: current %06x -> start %06x length %06x\n", cd_curfad, cd_fad_seek, fadstoplay);
 
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK);
@@ -2982,15 +2982,20 @@ void saturn_cd_hle_device::cd_playdata()
 							}
 							else
 							{
+								// a cdda_maxrepeat of 0xf means keep repeating same track indefinitely
 								if(cdda_repeat_count < 0xe)
 									cdda_repeat_count++;
 
 								// TODO: untested with cur_track == 0xaa (lead-out)
-								// TODO: needs to respect SEEK times
 								// - dendego (tries to) playback redbook track 3 on title screen after seek
+								// - girlpuz1 is an easy test case, on both title and Himekuri mode
 								assert(cur_track > 0 && cur_track != 0xff);
-								cd_curfad = m_cdrom_image->get_track_start(cur_track - 1) + 150;
-								fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
+								//cd_curfad = m_cdrom_image->get_track_start(cur_track);
+								cd_fad_seek = m_cdrom_image->get_track_start(cur_track);
+								fadstoplay = m_cdrom_image->get_track_start(cur_track + 1) - cd_fad_seek;
+								cd_change_status(CD_STAT_SEEK);
+								cd_seek_stat = CD_STAT_PLAY;
+								LOGCMD("Repeat hit track %d count %d/%d FAD %06x -> start %06x end %06x\n", cur_track, cdda_repeat_count, cdda_maxrepeat, cd_curfad, cd_fad_seek, fadstoplay);
 							}
 						}
 					}

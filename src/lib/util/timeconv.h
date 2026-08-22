@@ -329,6 +329,7 @@ inline constexpr ntfs_duration ntfs_duration_from_filetime(std::uint32_t high, s
 ***************************************************************************/
 
 std::chrono::system_clock::time_point system_clock_time_point_from_ntfs_duration(ntfs_duration d);
+ntfs_duration ntfs_duration_from_system_clock_time_point(std::chrono::system_clock::time_point tp);
 
 
 } // namespace util

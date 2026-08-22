@@ -93,7 +93,7 @@ std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_lo
 	{
 		if (!loaded_through_softlist())
 		{
-			util::core_file &file = image_core_file();
+			util::read_stream &file = image_core_file();
 			size_t const size = length();
 
 			if (is_filetype("20"))

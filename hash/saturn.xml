@@ -14608,7 +14608,7 @@ Not extensively tested
 		<notes><![CDATA[
 [VDP1] stadium select flickers
 [VDP2] background has a layer of garbage
-[VDP2] has incorrectly colored shadows
+[VDP1] has incorrectly colored shadows in gameplay
 ]]></notes>
 		<info name="serial" value="T-8111G"/>
 		<info name="release" value="19960802"/>
