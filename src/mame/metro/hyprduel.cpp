@@ -34,6 +34,9 @@ Magical Error
 different sized sound / shared region (or the mem map needs more alterations?)
 fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 
+TODO:
+- glitchy graphics in magerror in-game scene
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -298,7 +301,7 @@ void hyprduel_state::magerror_map2(address_map &map)
 
 static INPUT_PORTS_START( hyprduel )
 	PORT_START("SERVICE")
-	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW ) // another test mode in hyprduel (specific?), with bootup
 	PORT_DIPNAME( 0x4000, 0x0000, "Show Warning" )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -326,9 +329,9 @@ static INPUT_PORTS_START( hyprduel )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Start Up Mode" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Start Up Mode" ) // Devs forgot to naming status of this option? same purpose as magerror
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) ) // Game mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // Test mode
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -366,8 +369,8 @@ static INPUT_PORTS_START( hyprduel )
 	PORT_START("SYSTEM")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test")
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -531,4 +534,4 @@ void hyprduel_state::init_hyprduel()
 
 GAME( 1993, hyprduel,  0,        hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hyprduel2, hyprduel, hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magerror,  0,        magerror, magerror, hyprduel_state, empty_init,    ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase",  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magerror,  0,        magerror, magerror, hyprduel_state, empty_init,    ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
