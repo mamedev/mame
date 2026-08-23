@@ -25,15 +25,16 @@
 #include "bus/pccard/sram.h"
 #include "cpu/lc6500/lc6554.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6500_1.h"
 #include "machine/53c7xx.h"
 #include "machine/6525tpi.h"
-#include "machine/mos6526.h"
+#include "machine/cr511b.h"
 #include "machine/dmac.h"
+#include "machine/i2cmem.h"
+#include "machine/input_merger.h"
+#include "machine/mos6526.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
-#include "machine/i2cmem.h"
-#include "machine/cr511b.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "video/pwm.h"
@@ -357,6 +358,9 @@ public:
 		, m_cdrom(*this, "cdrom")
 		, m_lcdcpu(*this, "lcdcpu")
 		, m_vfd_display(*this, "vfd")
+		, m_rccpu(*this, "rccpu")
+		, m_kbclock(*this, "kbclock")
+		, m_kbdata(*this, "kbdata")
 		, m_frontpanel_power(*this, "frontpanel_power")
 		, m_frontpanel_buttons(*this, "frontpanel_kst%u", 0U)
 		, m_vfd_ampm(*this, "ampm%u", 0U)
@@ -377,7 +381,6 @@ public:
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
 	void cdtv_mem(address_map &map) ATTR_COLD;
-	void cdtv_rc_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -398,6 +401,12 @@ private:
 	void sten_w(int state);
 	void drq_w(int state);
 
+	uint8_t rccpu_porta_r();
+	void rccpu_porta_w(uint8_t data);
+	uint8_t rccpu_portb_r();
+	void rccpu_portb_w(uint8_t data);
+
+	uint8_t lcdcpu_cpcp_r();
 	uint8_t lcdcpu_frontpanel_key_r();
 	void lcdcpu_frontpanel_select_w(uint8_t data);
 	uint8_t lcdcpu_rtc_data_r();
@@ -422,6 +431,9 @@ private:
 	required_device<cr511b_device> m_cdrom;
 	required_device<lc6554_cpu_device> m_lcdcpu;
 	required_device<pwm_display_device> m_vfd_display;
+	required_device<m6500_1_device> m_rccpu;
+	required_device<input_merger_all_high_device> m_kbclock;
+	required_device<input_merger_all_high_device> m_kbdata;
 	required_ioport m_frontpanel_power;
 	required_ioport_array<4> m_frontpanel_buttons;
 	output_finder<2> m_vfd_ampm;
@@ -436,10 +448,13 @@ private:
 	bool m_sten;
 	uint8_t m_genlock_mode_select = 0; // ms0 and ms1
 
+	uint8_t m_rc_portb = 0xff;
+
 	uint8_t m_frontpanel_select = 0;
 	uint8_t m_rtc_data = 0;
 	uint8_t m_rtc_addr = 0;
 	uint8_t m_lcd_porti = 0;
+	uint8_t m_lcd_portj = 0;
 	uint8_t m_lcd_portp = 0;
 	uint8_t m_vfd_seg = 0;
 	uint8_t m_vfd_grid = 0;
@@ -1134,6 +1149,52 @@ void cdtv_state::drq_w(int state)
 		m_dmac->xdreq_w(state);
 }
 
+uint8_t cdtv_state::rccpu_porta_r()
+{
+	// 7654----  not connected?
+	// ----3---  prdt
+	// -----2--  kbclock (output)
+	// ------1-  kbdata (output)
+	// -------0  irdt
+
+	return 0xff;
+}
+
+void cdtv_state::rccpu_porta_w(uint8_t data)
+{
+	m_kbclock->in_w<1>(BIT(data, 2));
+	m_kbdata->in_w<1>(BIT(data, 1));
+}
+
+uint8_t cdtv_state::rccpu_portb_r()
+{
+	// 7654----  lcd cpu port a (output)
+	// ----3---  lcd cpu port j0
+	// -----2--  kbse (keyboard sense)
+	// ------1-  lcd cpu port j3
+	// -------0  lcd cpu port j2
+
+	uint8_t data = 0xf0;
+
+	data |= BIT(m_lcd_portj, 0) << 3;
+	data |= 1 << 2; // pull high for now
+	data |= BIT(m_lcd_portj, 3) << 1;
+	data |= BIT(m_lcd_portj, 2) << 0;
+
+	return data;
+}
+
+void cdtv_state::rccpu_portb_w(uint8_t data)
+{
+	m_rc_portb = data;
+}
+
+uint8_t cdtv_state::lcdcpu_cpcp_r()
+{
+	// pb4 to pb7 connected to pa
+	return m_rc_portb >> 4;
+}
+
 uint8_t cdtv_state::lcdcpu_frontpanel_key_r()
 {
 	uint8_t data = 0x07;
@@ -1179,7 +1240,7 @@ void cdtv_state::lcdcpu_portg_w(uint8_t data)
 
 uint8_t cdtv_state::lcdcpu_porti_r()
 {
-	// 3---  auply (cd audio play)
+	// 3---  auply (output to the lc7883m)
 	// -2--  rtc wt (output)
 	// --1-  ms1
 	// ---0  ms0
@@ -1203,11 +1264,12 @@ uint8_t cdtv_state::lcdcpu_portj_r()
 	// --1-  vcc (power sense)
 	// ---0  aus2 to 6500/1
 
-	return m_frontpanel_power->read() << 1;
+	return m_lcd_portj | (m_frontpanel_power->read() << 1);
 }
 
 void cdtv_state::lcdcpu_portj_w(uint8_t data)
 {
+	m_lcd_portj = data & 0x0d;
 }
 
 void cdtv_state::lcdcpu_portk_w(uint8_t data)
@@ -1874,11 +1936,6 @@ void cdtv_state::cdtv_mem(address_map &map)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
 
-void cdtv_state::cdtv_rc_mem(address_map &map)
-{
-	map(0x0800, 0x0fff).rom().region("rcmcu", 0);
-}
-
 void a3000_state::a3000_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -2112,22 +2169,22 @@ static INPUT_PORTS_START( cdtv )
 	PORT_BIT(0x01, 0x01, IPT_OTHER) PORT_NAME("Front Panel Power") PORT_TOGGLE
 
 	PORT_START("frontpanel_kst0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST0)")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Pause")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Reset")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("frontpanel_kst1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST1)")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Stop")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Volume Up")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("frontpanel_kst2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST2)")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Next/Forward")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Volume Down")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("frontpanel_kst3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST3)")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Previous/Backward")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel TV/CD")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
@@ -2434,22 +2491,37 @@ void cdtv_state::cdtv(machine_config &config)
 
 	amiga_base(config);
 
+	// disable floppy as default
+	subdevice<floppy_connector>("fdc:0")->set_default_option(nullptr);
+
 	// keyboard
+	INPUT_MERGER_ALL_HIGH(config, m_kbclock);
+	m_kbclock->output_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	m_kbclock->output_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
+
+	INPUT_MERGER_ALL_HIGH(config, m_kbdata);
+	m_kbdata->output_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
-	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
-	kbd.kclk_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
-	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.kclk_handler().set(m_kbclock, FUNC(input_merger_device::in_w<0>));
+	kbd.kdat_handler().set(m_kbdata, FUNC(input_merger_device::in_w<0>));
+
 	A1000_KBRESET(config, "kbrst")
 			.set_delays(attotime::from_usec(11238), attotime::from_usec(7432), attotime::from_usec(27539))
 			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
 
 	// remote control input converter
-	m6502_device &u75(M6502(config, "u75", XTAL(3'000'000)));
-	u75.set_addrmap(AS_PROGRAM, &cdtv_state::cdtv_rc_mem);
-	u75.set_disable();
+	M6500_1(config, m_rccpu, 3_MHz_XTAL);
+	m_rccpu->pa_in_cb().set(FUNC(cdtv_state::rccpu_porta_r));
+	m_rccpu->pa_out_cb().set(FUNC(cdtv_state::rccpu_porta_w));
+	m_rccpu->pb_in_cb().set(FUNC(cdtv_state::rccpu_portb_r));
+	m_rccpu->pb_out_cb().set(FUNC(cdtv_state::rccpu_portb_w));
+	// port c: joyport 1
+	// port d: joyport 2
 
 	// lcd controller
 	LC6554(config, m_lcdcpu, 4_MHz_XTAL); // U62
+	m_lcdcpu->pa_in_cb().set(FUNC(cdtv_state::lcdcpu_cpcp_r));
 	m_lcdcpu->pb_in_cb().set(FUNC(cdtv_state::lcdcpu_frontpanel_key_r));
 	m_lcdcpu->pc_out_cb().set(FUNC(cdtv_state::lcdcpu_frontpanel_select_w));
 	m_lcdcpu->pd_in_cb().set(FUNC(cdtv_state::lcdcpu_rtc_data_r));
@@ -2501,12 +2573,14 @@ void cdtv_state::cdtv(machine_config &config)
 	CR511B(config, m_cdrom);
 	m_cdrom->add_route(0, "speaker", 1.0, 0);
 	m_cdrom->add_route(1, "speaker", 1.0, 1);
-	m_cdrom->scor_cb().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
-	m_cdrom->stch_cb().set(m_tpi, FUNC(tpi6525_device::i2_w)).invert();
-	m_cdrom->sten_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));
+	m_cdrom->sbcp_cb().set(m_tpi, FUNC(tpi6525_device::pc0_w)).invert();
+	m_cdrom->scor_cb().set(m_tpi, FUNC(tpi6525_device::pc1_w)).invert();
+	m_cdrom->stch_cb().set(m_tpi, FUNC(tpi6525_device::pc2_w)).invert();
+	m_cdrom->sten_cb().set(m_tpi, FUNC(tpi6525_device::pc3_w));
 	m_cdrom->sten_cb().append(FUNC(cdtv_state::sten_w));
-	m_cdrom->drq_cb().set(m_tpi, FUNC(tpi6525_device::i4_w));
+	m_cdrom->drq_cb().set(m_tpi, FUNC(tpi6525_device::pc4_w));
 	m_cdrom->drq_cb().append(FUNC(cdtv_state::drq_w));
+	m_cdrom->subcode_data_cb().set(m_tpi, FUNC(tpi6525_device::pa_w));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 
@@ -3059,9 +3133,10 @@ ROM_START( cdtv )
 	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
 
 	// remote control input converter, mos 6500/1 mcu
-	ROM_REGION(0x1000, "rcmcu", 0)
+	ROM_REGION(0x1000, "rccpu", 0)
 	ROM_LOAD("252609-02.u75", 0x000, 0x800, NO_DUMP) // internal ROM of the final version hasn't been dumped yet
 	ROM_LOAD("v1.3-1990-10-01", 0x0000, 0x1000, CRC(3c7cb7bb) SHA1(958e799897ac044fcc0f0c74c3cb5d83f3edd0c7)) // this was dumped from a pre-production CD-1000 player which had the program in external EPROM
+	ROM_COPY("rccpu", 0x0800, 0x0000, 0x0800) // the second half contains the program code
 
 	// lcd controller, sanyo lc6554h
 	ROM_REGION(0x2000, "lcdcpu", 0)
