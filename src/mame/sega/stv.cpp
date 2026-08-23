@@ -11,7 +11,7 @@ Notes:
 TODO:
 - aclub: "Error 11 call attendant", bypass by turning on maintenance mode in game test.
 \- Horrible voice pitches (SCU streaming DMA to SCSP with LV2);
-\- VDP1 Ugly time indicator (flowers), enables CCCR = 0x0067 in VDP2;
+\- VDP1 Missing contours for time indicator (flowers), enables CCCR = 0x0067 in VDP2;
 \- will hang anyway when supposed to print report and/or dispense the oil (tries to use IOGA serial);
 
 - colmns97: has a bit of stuck envelope sound in places (i.e. coin in once at title screen);

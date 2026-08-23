@@ -1042,7 +1042,8 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY  FULLNAME                FLAGS
-COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "Epson HX-20",          MACHINE_NOT_WORKING )
-COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "Epson HX-20 (Europe)", MACHINE_NOT_WORKING )
-COMP( 1989, ecm6032, ehx20,  0,      cm6032,  cm6032, hx20_state, empty_init, "Epson", "Epson CM6032",         MACHINE_NOT_WORKING )
-COMP( 1993, ecm6127, ehx20,  0,      cm6127,  cm6127, hx20_state, empty_init, "Epson", "Epson CM6127",         MACHINE_NOT_WORKING )
+// NOTE: HX-20 is also an unrelated Toshiba MSX1, deambiguate in fullname
+COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "HX-20 (Epson portable)",          MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "HX-20 (Epson portable, Europe)", MACHINE_NOT_WORKING )
+COMP( 1989, ecm6032, ehx20,  0,      cm6032,  cm6032, hx20_state, empty_init, "Epson", "CM6032",         MACHINE_NOT_WORKING )
+COMP( 1993, ecm6127, ehx20,  0,      cm6127,  cm6127, hx20_state, empty_init, "Epson", "CM6127",         MACHINE_NOT_WORKING )
