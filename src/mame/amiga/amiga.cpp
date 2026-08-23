@@ -2492,7 +2492,10 @@ void cdtv_state::cdtv(machine_config &config)
 	amiga_base(config);
 
 	// disable floppy as default
+	// TODO: breaks software loading
+#if 0
 	subdevice<floppy_connector>("fdc:0")->set_default_option(nullptr);
+#endif
 
 	// keyboard
 	INPUT_MERGER_ALL_HIGH(config, m_kbclock);
