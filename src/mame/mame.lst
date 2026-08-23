@@ -36482,6 +36482,10 @@ drumsta
 @source:oberheim/dmx.cpp
 obdmx
 
+@source:oberheim/matrix6.cpp
+matrix6
+matrix6r
+
 @source:oberheim/ob8.cpp
 ob8
 
