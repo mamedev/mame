@@ -17474,6 +17474,12 @@ prof80
 prof180x
 prof181x
 
+@source:cosmo/cosmo_ls9310.cpp
+exfever
+
+@source:cosmo/pkscram.cpp
+pkscram
+
 @source:cromemco/c10.cpp
 c10
 
@@ -33052,9 +33058,6 @@ rndrndqs
 @source:misc/pipeline.cpp
 pipeline
 
-@source:misc/pkscram.cpp
-pkscram
-
 @source:misc/playcenter.cpp
 plycntrchtr
 plycntrchtrc
@@ -43670,9 +43673,6 @@ cortex
 
 @source:skeleton/cosmicos.cpp
 cosmicos
-
-@source:skeleton/cosmo68k.cpp
-exfever
 
 @source:skeleton/cp1.cpp
 cp1
