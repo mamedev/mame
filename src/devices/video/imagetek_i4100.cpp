@@ -78,6 +78,7 @@
 #define LOG_INT    (1U << 2)
 #define LOG_BLIT   (1U << 3)
 #define LOG_BLITOP (1U << 4)
+#define LOG_CRTC   (1U << 5)
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -88,6 +89,7 @@
 #define LOGINT(...)     LOGMASKED(LOG_INT, __VA_ARGS__)
 #define LOGBLIT(...)    LOGMASKED(LOG_BLIT, __VA_ARGS__)
 #define LOGBLITOP(...)  LOGMASKED(LOG_BLITOP, __VA_ARGS__)
+#define LOGCRTC(...)    LOGMASKED(LOG_CRTC, __VA_ARGS__)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -682,7 +684,7 @@ void imagetek_i4100_device::layer_priority_w(offs_t offset, uint16_t data, uint1
 	if ((data >> 6) != 0)
 	{
 		LOGWARN("%s warning: layer_priority_w write with %04x %04x\n"
-			, this->tag()
+			, machine().describe_context()
 			, data
 			, mem_mask
 		);
@@ -706,7 +708,7 @@ void imagetek_i4100_device::background_color_w(offs_t offset, uint16_t data, uin
 
 	m_background_color &= 0x0fff;
 	if (data & 0xf000)
-		LOGWARN("%s warning: background_color_w write with %04x %04x\n", this->tag(), data, mem_mask);
+		LOGWARN("%s warning: background_color_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 /***************************************************************************
@@ -772,7 +774,7 @@ void imagetek_i4100_device::screen_ctrl_w(offs_t offset, uint16_t data, uint16_t
 	m_screen_flip = BIT(data,0);
 
 	if (data & 0xf81c)
-		LOGWARN("%s warning: screen_ctrl_w write with %04x %04x\n", this->tag(), data, mem_mask);
+		LOGWARN("%s warning: screen_ctrl_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 
@@ -804,7 +806,7 @@ void imagetek_i4100_device::crtc_horz_w(offs_t offset, uint16_t data, uint16_t m
 	if (m_crtc_unlock == true)
 	{
 		COMBINE_DATA(&m_crtc_horz);
-		//logerror("%s CRTC horizontal %04x %04x\n",this->tag(),data,mem_mask);
+		LOGCRTC("%s CRTC horizontal %04x %04x\n",machine().describe_context(),data,mem_mask);
 	}
 }
 
@@ -813,7 +815,7 @@ void imagetek_i4100_device::crtc_vert_w(offs_t offset, uint16_t data, uint16_t m
 	if (m_crtc_unlock == true)
 	{
 		COMBINE_DATA(&m_crtc_vert);
-		//logerror("%s CRTC vertical %04x %04x\n",this->tag(),data,mem_mask);
+		LOGCRTC("%s CRTC vertical %04x %04x\n",machine().describe_context(),data,mem_mask);
 	}
 }
 
@@ -821,7 +823,7 @@ void imagetek_i4100_device::crtc_unlock_w(offs_t offset, uint16_t data, uint16_t
 {
 	m_crtc_unlock = BIT(data,0);
 	if (data & ~1)
-		LOGWARN("%s warning: unlock register write with %04x %04x\n",this->tag(),data,mem_mask);
+		LOGWARN("%s warning: unlock register write with %04x %04x\n",machine().describe_context(),data,mem_mask);
 }
 
 /***************************************************************************
