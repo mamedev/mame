@@ -47093,10 +47093,12 @@ ti95
 
 @source:ti/ti85.cpp
 ti73
+ti73v7
 ti73b
 ti81
 ti81v2
 ti82
+ti82stfr
 ti83
 ti83p
 ti83pb
@@ -47118,6 +47120,8 @@ ti84pcsev2
 ti84pce
 ti84pcev15
 ti84pcev30
+ti84pcev50
+ti84pcev61
 ti85
 ti86
 
