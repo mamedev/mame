@@ -216,9 +216,9 @@ def save_dasm(f, device, states):
         opc = tokens[0]
         mode = tokens[-1]
         extra = "0"
-        if opc in ["jsr", "bsr", "callf", "jpi", "jsb"]:
+        if opc in ["jsr", "bsr", "callf", "jpi", "jsb", "jsl"]:
             extra = "STEP_OVER"
-        elif opc in ["rts", "rti", "rtn", "retf", "tpi"]:
+        elif opc in ["rts", "rti", "rtn", "retf", "tpi", "rtl"]:
             extra = "STEP_OUT"
         elif opc in ["bcc", "bcs", "beq", "bmi", "bne", "bpl", "bvc", "bvs", "bbr", "bbs", "bbc", "bar", "bas"]:
             extra = "STEP_COND"

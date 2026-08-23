@@ -1090,15 +1090,21 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 				// the current mode is moved to the CPSR. This allows state changes which automatically restore both PC and
 				// CPSR. --> This form of instruction should not be used in User mode. <--
 
-				if (GET_MODE != eARM7_MODE_USER)
-				{
-					// Update CPSR from SPSR
-					set_cpsr(GetRegister(SPSR));
-					SwitchMode(GET_MODE);
-				}
+					if (GET_MODE != eARM7_MODE_USER)
+					{
+						// Update CPSR from SPSR
+						set_cpsr(GetRegister(SPSR));
+						SwitchMode(GET_MODE);
+					}
 
-				R15 = rd;
-
+					if (MODE32)
+					{
+						R15 = rd;
+					}
+					else
+					{
+						R15 = (R15 & ~0x03FFFFFC) | (rd & 0x03FFFFFC); // returned to a 26-bit mode: set_cpsr() has put the PSR in R15, take only the address
+					}
 				}
 				else
 				{

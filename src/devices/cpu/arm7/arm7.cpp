@@ -68,6 +68,7 @@ void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, 
 
 DEFINE_DEVICE_TYPE(ARM7,         arm7_cpu_device,         "arm7_le",      "ARM7 (little)")
 DEFINE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device,      "arm7_be",      "ARM7 (big)")
+DEFINE_DEVICE_TYPE(ARM610,       arm610_cpu_device,       "arm610",       "ARM610")
 DEFINE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device,      "arm710a",      "ARM710a")
 DEFINE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device,      "arm710t",      "ARM710T")
 DEFINE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device,      "arm7500",      "ARM7500")
@@ -137,12 +138,16 @@ arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char
 }
 
 
-arm710a_cpu_device::arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM710A, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+arm610_cpu_device::arm610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, ARM610, tag, owner, clock, 3, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
 {
-	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-			   | ARM9_COPRO_ID_ARCH_V4
-			   | ARM9_COPRO_ID_PART_ARM710;
+	m_copro_id = 0x41560610;
+}
+
+arm710a_cpu_device::arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, ARM710A, tag, owner, clock, 3, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+{
+	m_copro_id = 0x41047100;
 }
 
 
@@ -155,8 +160,9 @@ arm710t_cpu_device::arm710t_cpu_device(const machine_config &mconfig, const char
 }
 
 
+// ARM7500: ARM710-class core, ARM architecture version 3
 arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 3, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
 			   | ARM9_COPRO_ID_ARCH_V4
@@ -1098,6 +1104,7 @@ void arm7_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case ARM7_PC:
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
 			m_pc = GET_PC;
@@ -1213,7 +1220,7 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 			m_insn_prefetch_valid[index] = false;
 			break;
 		}
-		uint32_t op = m_pr32(physical_pc);
+		uint32_t op = insn_fetch_word(physical_pc);
 		LOGMASKED(LOG_PREFETCH, "Got op %08x\n", op);
 		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
 		m_insn_prefetch_buffer[index] = op;
@@ -1848,7 +1855,16 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 				m_decoded_access_control[i >> 1] = (COPRO_DOMAIN_ACCESS_CONTROL >> i) & 3;
 			}
 			break;
-		case 5:             // Fault Status
+		case 5:             // Fault Status (ARMv4 and later), TLB flush (ARMv3)
+			if (m_archRev < 4)
+			{
+				LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback ARMv3 TLB Flush, PC = %08x\n", machine().describe_context(), m_r[eR15]);
+				for (auto &entry : m_dtlb_entries)
+					entry.valid = false;
+				for (auto &entry : m_itlb_entries)
+					entry.valid = false;
+				break;
+			}
 			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Status = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			switch (op3)
 			{
@@ -1856,7 +1872,18 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 				case 1: COPRO_FAULT_STATUS_P = data; break;
 			}
 			break;
-		case 6:             // Fault Address
+		case 6:             // Fault Address (ARMv4 and later), TLB purge (ARMv3)
+			if (m_archRev < 4)
+			{
+				LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback ARMv3 TLB Purge %08x, PC = %08x\n", machine().describe_context(), data, m_r[eR15]);
+				tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_D);
+				if (entry)
+					entry->valid = false;
+				entry = tlb_probe(data, ARM7_TLB_ABORT_P);
+				if (entry)
+					entry->valid = false;
+				break;
+			}
 			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Address = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			COPRO_FAULT_ADDRESS = data;
 			break;
@@ -2158,6 +2185,17 @@ void arm946es_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 	}
 
 	m_program->write_byte(addr, data);
+}
+
+// helper so we can fetch instructions from the ITCM (important for Nintendo DS)
+uint32_t arm946es_cpu_device::insn_fetch_word(offs_t addr)
+{
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		return *reinterpret_cast<uint32_t *>(&ITCM[addr & 0x7ffc]);
+	}
+
+	return m_pr32(addr);
 }
 
 uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)

@@ -50,6 +50,8 @@ public:
 	auto drq_cb() { return m_drq_cb.bind(); }
 	auto dten_cb() { return m_dten_cb.bind(); }
 	auto scor_cb() { return m_scor_cb.bind(); }
+	auto sbcp_cb() { return m_sbcp_cb.bind(); }
+	auto subcode_data_cb() { return m_subcode_data_cb.bind(); }
 
 	uint8_t read();
 	void write(uint8_t data);
@@ -72,6 +74,9 @@ private:
 	int size_to_track_type();
 
 	TIMER_CALLBACK_MEMBER(frame_cb);
+	TIMER_CALLBACK_MEMBER(subcode_cb);
+	void start_subcode();
+	void stop_subcode();
 
 	TIMER_CALLBACK_MEMBER(stch);
 	void status_change(uint8_t status);
@@ -80,6 +85,7 @@ private:
 	void status_enable(uint8_t output_length);
 
 	void audio_end_cb(int state);
+	void play_audio(uint32_t start, uint32_t end);
 
 	// commands
 	void cmd_seek();
@@ -117,6 +123,10 @@ private:
 	static constexpr uint8_t AUDIO_STATUS_ERROR = 0x14;
 	static constexpr uint8_t AUDIO_STATUS_NO_STATUS = 0x15;
 
+	static constexpr uint8_t SUBCODE_SYNC_SYMBOLS = 2;
+	static constexpr uint8_t SUBCODE_DATA_SYMBOLS = 96;
+	static constexpr uint8_t SUBCODE_SYMBOLS_PER_FRAME = SUBCODE_SYNC_SYMBOLS + SUBCODE_DATA_SYMBOLS;
+
 	required_device<cdda_device> m_cdda;
 
 	devcb_write_line m_stch_cb;
@@ -124,8 +134,12 @@ private:
 	devcb_write_line m_drq_cb;
 	devcb_write_line m_dten_cb;
 	devcb_write_line m_scor_cb;
+	devcb_write_line m_sbcp_cb;
+	devcb_write8 m_subcode_data_cb;
 
 	emu_timer *m_frame_timer;
+	emu_timer *m_subcode_timer;
+
 	emu_timer *m_stch_timer;
 	emu_timer *m_sten_timer;
 
@@ -138,6 +152,10 @@ private:
 
 	uint8_t m_status;
 	uint16_t m_sector_size;
+
+	uint8_t m_subcode_symbol;
+	uint8_t m_subcode_buffer[SUBCODE_DATA_SYMBOLS];
+	bool m_subcode_valid;
 
 	uint32_t m_transfer_lba;
 	uint16_t m_transfer_sectors;

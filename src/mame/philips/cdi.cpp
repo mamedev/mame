@@ -105,8 +105,8 @@ void cdi_state::cdimono1_mem(address_map &map)
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("plane0");
-	map(0x200000, 0x27ffff).ram().share("plane1");
+	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
+	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
 #if ENABLE_UART_PRINTING
 	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif

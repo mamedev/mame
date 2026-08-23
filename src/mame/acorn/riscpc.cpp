@@ -205,7 +205,7 @@ void riscpc_state::rpc600(machine_config &config)
 {
 	constexpr XTAL cpuxtal(60_MHz_XTAL/2);
 
-	ARM7(config, m_maincpu, cpuxtal); // really ARM610
+	ARM610(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
 	ARM7500FE_IOMD(config, m_iomd, cpuxtal);

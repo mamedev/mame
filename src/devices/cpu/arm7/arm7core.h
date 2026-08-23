@@ -114,6 +114,9 @@ enum
 #define COPRO_CTRL_ADDRFAULT_EN             0x00000002
 #define COPRO_CTRL_DCACHE_EN                0x00000004
 #define COPRO_CTRL_WRITEBUF_EN              0x00000008
+#define COPRO_CTRL_PROG32                   0x00000010  // ARMv3: 32-bit program space (exceptions enter the 32-bit modes)
+#define COPRO_CTRL_DATA32                   0x00000020  // ARMv3: 32-bit data space (no address exceptions)
+#define COPRO_CTRL_LATE_ABORT               0x00000040  // ARMv3: late abort timing
 #define COPRO_CTRL_ENDIAN                   0x00000080
 #define COPRO_CTRL_SYSTEM                   0x00000100
 #define COPRO_CTRL_ROM                      0x00000200
@@ -131,7 +134,7 @@ enum
 #define COPRO_CTRL_BIG_ENDIAN               1
 #define COPRO_CTRL_INTVEC_0                 0
 #define COPRO_CTRL_INTVEC_F                 1
-#define COPRO_CTRL_MASK                     0x0000338f
+#define COPRO_CTRL_MASK                     0x000033ff
 
 #define COPRO_DOMAIN_ACCESS_CONTROL         m_domainAccessControl
 

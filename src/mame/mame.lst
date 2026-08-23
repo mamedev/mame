@@ -3011,6 +3011,63 @@ triviaes5
 @source:bally/cashline.cpp
 cashline
 
+@source:bally/eurotec.cpp
+action4u
+actnts7
+arcon
+atlntis6
+b18plus
+b493
+bbust
+belamis3
+bheroe
+bjagas17
+boss
+bullys11
+caipis7
+daxxs4
+daxxs8
+duo
+elevens3
+endsp9
+fgames11
+figame3
+foxxs5
+glriasl4
+glriasl5
+graffity
+hardrock
+hslots5
+hxntanz
+jjacksl
+kingcs2
+kingcs3
+limbos3
+luxxpro
+m200s5
+machmehr
+neons12
+neons13
+oxigens7
+phntoms7
+pratngs4
+pratngs5
+ptimes11
+qriscs4
+rexe
+skys6
+snfairx2
+spdruns3
+spdruns4
+texmex
+tgnias11
+trpcals3
+tscool
+ttanpro
+victoria
+winplay
+xcross
+
 @source:bally/gridlee.cpp
 gridlee
 
@@ -3098,6 +3155,12 @@ omegrace3
 @source:bally/spyhuntertec.cpp
 spyhuntsp
 spyhuntpr
+
+@source:bally/technik2000.cpp
+bmonop
+glorias
+graffiti
+roxyc
 
 @source:bally/zwackery.cpp
 zwackery
@@ -17207,6 +17270,7 @@ bg_maxa
 ccorsario
 ccorsarioa
 charles
+eltesorof
 eurbingo7
 gladiador
 mltpoints
@@ -17409,6 +17473,12 @@ prof80
 @source:conitec/prof180x.cpp
 prof180x
 prof181x
+
+@source:cosmo/cosmo_ls9310.cpp
+exfever
+
+@source:cosmo/pkscram.cpp
+pkscram
 
 @source:cromemco/c10.cpp
 c10
@@ -32988,9 +33058,6 @@ rndrndqs
 @source:misc/pipeline.cpp
 pipeline
 
-@source:misc/pkscram.cpp
-pkscram
-
 @source:misc/playcenter.cpp
 plycntrchtr
 plycntrchtrc
@@ -40208,7 +40275,9 @@ cm300
 sc55mk2
 
 @source:roland/roland_sc88.cpp
+sc88
 sc88vl
+sc88pro
 
 @source:roland/roland_tb303.cpp
 tb303
@@ -43604,9 +43673,6 @@ cortex
 
 @source:skeleton/cosmicos.cpp
 cosmicos
-
-@source:skeleton/cosmo68k.cpp
-exfever
 
 @source:skeleton/cp1.cpp
 cp1
