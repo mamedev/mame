@@ -517,6 +517,11 @@ enum arm7_cpu_device::arm_arch_flag : uint32_t
 
 enum arm7_cpu_device::arm_copro_id : uint32_t
 {
+	ARM9_COPRO_ID_STEP_SA110_J = 1,
+	ARM9_COPRO_ID_STEP_SA110_K = 2,
+	ARM9_COPRO_ID_STEP_SA110_S = 3,
+	ARM9_COPRO_ID_STEP_SA110_T = 4,
+
 	ARM9_COPRO_ID_STEP_SA1100_A = 0,
 	ARM9_COPRO_ID_STEP_SA1100_B = 1,
 	ARM9_COPRO_ID_STEP_SA1100_C = 2,
@@ -538,6 +543,7 @@ enum arm7_cpu_device::arm_copro_id : uint32_t
 	ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P7 = 7,
 
 	ARM9_COPRO_ID_PART_ARM1176JZF_S = 0xb76 << 4,
+	ARM9_COPRO_ID_PART_SA110 = 0xa10 << 4,
 	ARM9_COPRO_ID_PART_SA1100 = 0xa11 << 4,
 	ARM9_COPRO_ID_PART_SA1110 = 0xb11 << 4,
 	ARM9_COPRO_ID_PART_ARM946 = 0x946 << 4,

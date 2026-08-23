@@ -80,6 +80,7 @@ DEFINE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device, "arm1176jzf_s", "ARM11
 DEFINE_DEVICE_TYPE(PXA250,       pxa250_cpu_device,       "pxa250",       "Intel XScale PXA250")
 DEFINE_DEVICE_TYPE(PXA255,       pxa255_cpu_device,       "pxa255",       "Intel XScale PXA255")
 DEFINE_DEVICE_TYPE(PXA270,       pxa270_cpu_device,       "pxa270",       "Intel XScale PXA270")
+DEFINE_DEVICE_TYPE(SA110,        sa110_cpu_device,        "sa110",        "DEC StrongARM SA-110")
 DEFINE_DEVICE_TYPE(SA1100,       sa1100_cpu_device,       "sa1100",       "Intel StrongARM SA-1100")
 DEFINE_DEVICE_TYPE(SA1110,       sa1110_cpu_device,       "sa1110",       "Intel StrongARM SA-1110")
 DEFINE_DEVICE_TYPE(IGS036,       igs036_cpu_device,       "igs036",       "IGS036")
@@ -295,6 +296,17 @@ pxa270_cpu_device::pxa270_cpu_device(const machine_config &mconfig, const char *
 			   | ARM9_COPRO_ID_ARCH_V5TE
 			   | ARM9_COPRO_ID_PART_PXA270
 			   | ARM9_COPRO_ID_STEP_PXA255_A0;
+}
+
+// SA-110: ARM v4 with the 26-bit backwards-compatibility modes (PROG32/DATA32 in CP15 control)
+sa110_cpu_device::sa110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, SA110, tag, owner, clock, 4, ARCHFLAG_SA | ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+	// has StrongARM, no Thumb, no Enhanced DSP
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_DEC
+			   | ARM9_COPRO_ID_ARCH_V4
+			   | ARM9_COPRO_ID_PART_SA110
+			   | ARM9_COPRO_ID_STEP_SA110_T;
 }
 
 sa1100_cpu_device::sa1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1743,7 +1755,9 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, ID %02x (%02x) -> %08x (PC=%08x)\n",op2,m_archRev,data,GET_PC);
 			break;
 		case 1:             // Control
-			data = COPRO_CTRL | 0x70;   // bits 4-6 always read back as "1" (bit 3 too in XScale)
+			data = COPRO_CTRL;
+			if (!(m_archFlags & ARCHFLAG_MODE26))
+				data |= 0x70;   // PROG32/DATA32/LATE_ABORT only exist with the 26-bit modes, otherwise always read back as "1" (bit 3 too in XScale)
 			break;
 		case 2:             // Translation Table Base
 			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, TLB Base, PC = %08x\n", m_r[eR15]);
