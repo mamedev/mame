@@ -683,7 +683,7 @@ void imagetek_i4100_device::layer_priority_w(offs_t offset, uint16_t data, uint1
 	m_layer_priority[0] = (data >> 0) & 3;
 	if ((data >> 6) != 0)
 	{
-		LOGWARN("%s warning: layer_priority_w write with %04x %04x\n"
+		LOGWARN("%s: warning: layer_priority_w write with %04x %04x\n"
 			, machine().describe_context()
 			, data
 			, mem_mask
@@ -708,7 +708,7 @@ void imagetek_i4100_device::background_color_w(offs_t offset, uint16_t data, uin
 
 	m_background_color &= 0x0fff;
 	if (data & 0xf000)
-		LOGWARN("%s warning: background_color_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
+		LOGWARN("%s: warning: background_color_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 /***************************************************************************
@@ -774,7 +774,7 @@ void imagetek_i4100_device::screen_ctrl_w(offs_t offset, uint16_t data, uint16_t
 	m_screen_flip = BIT(data,0);
 
 	if (data & 0xf81c)
-		LOGWARN("%s warning: screen_ctrl_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
+		LOGWARN("%s: warning: screen_ctrl_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 
@@ -806,7 +806,7 @@ void imagetek_i4100_device::crtc_horz_w(offs_t offset, uint16_t data, uint16_t m
 	if (m_crtc_unlock == true)
 	{
 		COMBINE_DATA(&m_crtc_horz);
-		LOGCRTC("%s CRTC horizontal %04x %04x\n",machine().describe_context(),data,mem_mask);
+		LOGCRTC("%s: CRTC horizontal %04x %04x\n",machine().describe_context(),data,mem_mask);
 	}
 }
 
@@ -815,7 +815,7 @@ void imagetek_i4100_device::crtc_vert_w(offs_t offset, uint16_t data, uint16_t m
 	if (m_crtc_unlock == true)
 	{
 		COMBINE_DATA(&m_crtc_vert);
-		LOGCRTC("%s CRTC vertical %04x %04x\n",machine().describe_context(),data,mem_mask);
+		LOGCRTC("%s: CRTC vertical %04x %04x\n",machine().describe_context(),data,mem_mask);
 	}
 }
 
@@ -823,7 +823,7 @@ void imagetek_i4100_device::crtc_unlock_w(offs_t offset, uint16_t data, uint16_t
 {
 	m_crtc_unlock = BIT(data,0);
 	if (data & ~1)
-		LOGWARN("%s warning: unlock register write with %04x %04x\n",machine().describe_context(),data,mem_mask);
+		LOGWARN("%s: warning: unlock register write with %04x %04x\n",machine().describe_context(),data,mem_mask);
 }
 
 /***************************************************************************
@@ -878,7 +878,7 @@ void imagetek_i4100_device::blt_write(int const tmap, const offs_t offs, u16 con
 	{
 		vram_w(offs, data, mask, tmap - 1);
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s: Blitter [%X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
 }
 
 
@@ -908,7 +908,7 @@ void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem
 			case 3:
 				break;
 			default:
-				LOGWARN("%s Blitter unknown destination: %08X\n", machine().describe_context(), tmap);
+				LOGWARN("%s: Blitter unknown destination: %08X\n", machine().describe_context(), tmap);
 				return;
 		}
 
@@ -919,7 +919,7 @@ void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem
 			src_offs %= m_gfxrom_size;
 			b1 = m_gfxrom[src_offs];
 
-			LOGBLITOP("%s Blitter opcode %02X at %06X\n", machine().describe_context(), b1, src_offs);
+			LOGBLITOP("%s: Blitter opcode %02X at %06X\n", machine().describe_context(), b1, src_offs);
 
 			src_offs++;
 			count = ((~b1) & 0x3f) + 1;
@@ -1001,7 +1001,7 @@ void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem
 
 			// shouldn't happen
 			default:
-				//("%s Blitter unknown opcode %02X at %06X\n",machine().describe_context(),b1,src_offs-1);
+				//("%s: Blitter unknown opcode %02X at %06X\n",machine().describe_context(),b1,src_offs-1);
 				return;
 			}
 
