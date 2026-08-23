@@ -387,6 +387,8 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_sprite_yoffset_latch));
 	save_item(NAME(m_screen_xoffset));
 	save_item(NAME(m_screen_yoffset));
+	save_item(NAME(m_screen_xoffset_latch));
+	save_item(NAME(m_screen_yoffset_latch));
 	save_item(NAME(m_layer_priority));
 	save_item(NAME(m_background_color));
 	save_item(NAME(m_screen_blank));
@@ -445,6 +447,8 @@ void imagetek_i4100_device::device_reset()
 	m_background_color = 0;
 	m_screen_xoffset = 0;
 	m_screen_yoffset = 0;
+	m_screen_xoffset_latch = 0;
+	m_screen_yoffset_latch = 0;
 	m_screen_blank = false;
 	m_screen_flip = false;
 
@@ -714,10 +718,20 @@ void imagetek_i4100_device::background_color_w(offs_t offset, uint16_t data, uin
  * certain conditions
  *
  ***************************************************************************/
-uint16_t imagetek_i4100_device::screen_xoffset_r() { return m_screen_xoffset; }
-void imagetek_i4100_device::screen_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_screen_xoffset); }
-uint16_t imagetek_i4100_device::screen_yoffset_r() { return m_screen_yoffset; }
-void imagetek_i4100_device::screen_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_screen_yoffset); }
+uint16_t imagetek_i4100_device::screen_xoffset_r() { return m_screen_xoffset_latch; }
+void imagetek_i4100_device::screen_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_screen_xoffset_latch);
+	if (!m_spriteram_buffered)
+		m_screen_xoffset = m_screen_xoffset_latch;
+}
+uint16_t imagetek_i4100_device::screen_yoffset_r() { return m_screen_yoffset_latch; }
+void imagetek_i4100_device::screen_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_screen_yoffset_latch);
+	if (!m_spriteram_buffered)
+		m_screen_yoffset = m_screen_yoffset_latch;
+}
 
 uint16_t imagetek_i4100_device::window_r(offs_t offset) { return m_window[offset]; }
 void imagetek_i4100_device::window_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_window[offset]); }
@@ -1466,6 +1480,8 @@ void imagetek_i4100_device::screen_eof(int state)
 			m_sprite_color_code = m_sprite_color_code_latch;
 			m_sprite_xoffset = m_sprite_xoffset_latch;
 			m_sprite_yoffset = m_sprite_yoffset_latch;
+			m_screen_xoffset = m_screen_xoffset_latch;
+			m_screen_yoffset = m_screen_yoffset_latch;
 		}
 	}
 }

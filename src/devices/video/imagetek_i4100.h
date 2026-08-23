@@ -133,6 +133,7 @@ protected:
 	u8 m_layer_priority[3];
 	u16 m_background_color;
 	u16 m_screen_xoffset,m_screen_yoffset;
+	u16 m_screen_xoffset_latch,m_screen_yoffset_latch;
 	bool m_layer_tile_select[3];
 	bool m_screen_blank;
 	bool m_screen_flip;
