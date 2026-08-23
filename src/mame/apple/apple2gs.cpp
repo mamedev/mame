@@ -60,14 +60,15 @@
 
 #include "apple2common.h"
 // #include "machine/apple2host.h"
-#include "macadb.h"
 #include "macrtc.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/cards.h"
 #include "bus/a2gameio/gameio.h"
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
@@ -109,7 +110,7 @@ public:
 		  m_vgctimer(*this, "vgctimer"),
 		  m_acceltimer(*this, "acceltimer"),
 		  m_adbmicro(*this, "adbmicro"),
-		  m_macadb(*this, "macadb"),
+		  m_adbbus(*this, "adb"),
 		  m_ram(*this, "ram"),
 		  m_rom(*this, "maincpu"),
 		  m_docram(*this, "docram"),
@@ -168,11 +169,11 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<g65816_device> m_maincpu;
+	required_device<w65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_scantimer, m_vgctimer, m_acceltimer;
 	required_device<m5074x_device> m_adbmicro;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_docram;
@@ -598,8 +599,6 @@ void apple2gs_state::a2bus_inh_w(int state)
 	}
 }
 
-// FPI/CYA chip is connected to the VPB output of the 65816.
-// this facilitates the documented behavior from the Firmware Reference.
 u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 {
 	// when IOLC shadowing is enabled, vector fetches always go to ROM,
@@ -920,7 +919,7 @@ void apple2gs_state::raise_irq(int irq)
 			accel_temp_delay(5, BIT(m_accel_gsxsettings, 5));
 
 			m_intflag |= INTFLAG_IRQASSERTED;
-			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
+			m_maincpu->set_input_line(W65816_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 }
@@ -936,7 +935,7 @@ void apple2gs_state::lower_irq(int irq)
 		if (!m_irqmask)
 		{
 			m_intflag &= ~INTFLAG_IRQASSERTED;
-			m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE);
+			m_maincpu->set_input_line(W65816_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -3397,9 +3396,11 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	{
 		m_adb_reset_freeze = 2;
 		m_a2bus->reset_bus();
-		m_maincpu->reset();
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		if (m_accel_present)
+		{
 			accel_reset();
+		}
 		m_video->set_newvideo(0x41);
 		m_banklatch = 1 << 16;
 
@@ -3423,6 +3424,10 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		auxbank_update();
 		update_slotrom_banks();
 	}
+	else if (BIT(data, 5) && !BIT(m_adb_p2_last, 5))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 
 	if (!(data & 0x10))
 	{
@@ -3445,11 +3450,9 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 
 void apple2gs_state::adbmicro_p3_out(u8 data)
 {
-	if (((data & 0x08) == 0x08) != m_adb_line)
-	{
-		m_adb_line = (data & 0x8) ? true : false;
-		m_macadb->adb_linechange_w(!m_adb_line);
-	}
+	// m_adb_p3_last is intentionally frozen while the main CPU samples the
+	// modifier inputs across reset, but the M50740's ADB output must remain live.
+	m_adbbus->adb_host_line_w(BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (m_adb_reset_freeze == 0)
 	{
@@ -3795,9 +3798,9 @@ INPUT_PORTS_END
 void apple2gs_state::apple2gs(machine_config &config)
 {
 	/* basic machine hardware */
-	G65816(config, m_maincpu, A2GS_2_8M);
+	W65816(config, m_maincpu, A2GS_2_8M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
-	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
+	m_maincpu->set_addrmap(w65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	m_maincpu->wdm_handler().set(FUNC(apple2gs_state::wdm_trampoline));
 	TIMER(config, m_scantimer).configure_generic(FUNC(apple2gs_state::apple2_interrupt));
@@ -3817,8 +3820,10 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_adbmicro->read_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_in));
 	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 
-	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
-	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
+	ADB_BUS(config, m_adbbus);
+	m_adbbus->out_adb_callback().set(FUNC(apple2gs_state::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "iigs_kbd");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "apple_mouse");
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
 	m_rtc->cko_cb().set(FUNC(apple2gs_state::rtc_vgc));
