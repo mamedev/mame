@@ -76,27 +76,28 @@ TODO:
 #define VERBOSE         (0)
 #include "logmacro.h"
 
-#define ENABLE_UART_PRINTING (0)
-
 /*************************
 *      Memory maps       *
 *************************/
-
-void cdi_state::cdimono1_mem(address_map &map)
+void cdi_state::cdi_common_mem(address_map &map)
 {
 	map(0x000000, 0xffffff).rw(FUNC(cdi_state::bus_error_r), FUNC(cdi_state::bus_error_w));
 	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
 	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
-	map(0x300000, 0x303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
-#if ENABLE_UART_PRINTING
-	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
-#endif
-	map(0x303c00, 0x303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
-	map(0x310000, 0x317fff).rw(m_slave_hle, FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
-	map(0x318000, 0x31ffff).noprw();
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
 	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
+}
+
+void cdi_state::cdimono1_mem(address_map &map)
+{
+	cdi_common_mem(map);
+	map(0x300000, 0x303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
+
+	map(0x303c00, 0x303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
+	map(0x310000, 0x317fff).rw(m_slave_hle, FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
+	map(0x318000, 0x31ffff).noprw();
+
 	map(0x500000, 0x57ffff).ram();
 	map(0xd00000, 0xdfffff).ram(); // DVC RAM block 1
 	map(0xe00000, 0xe7ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
@@ -105,14 +106,7 @@ void cdi_state::cdimono1_mem(address_map &map)
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
-	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
-#if ENABLE_UART_PRINTING
-	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
-#endif
-	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
-	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
+	cdi_common_mem(map);
 }
 
 void cdi_state::cdi910_mem(address_map &map)
@@ -120,9 +114,7 @@ void cdi_state::cdi910_mem(address_map &map)
 	map(0x000000, 0x07ffff).ram().share("plane0");
 	map(0x180000, 0x1fffff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x200000, 0x27ffff).ram().share("plane1");
-#if ENABLE_UART_PRINTING
-	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
-#endif
+
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 	map(0x500000, 0xffffff).noprw();
