@@ -22,6 +22,7 @@ class isa8_cga_chameleon_device : public isa8_cga_device
 public:
 	// construction/destruction
 	isa8_cga_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 protected:
 	virtual void device_start() override ATTR_COLD;
 private:
@@ -29,6 +30,11 @@ private:
 	uint8_t chr_read(offs_t offset);
 	void chr_write(offs_t offset, uint8_t data);
 };
+
+const tiny_rom_entry *isa8_cga_chameleon_device::device_rom_region() const
+{
+	return nullptr;
+}
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_CHAMELEON, isa8_cga_chameleon_device, "cga_chameleon", "Seequa Chameleon CGA")
 
