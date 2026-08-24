@@ -3194,7 +3194,7 @@ Dragon Slayer/Ys 1: [SCSP] sound has several hiccups
 		<year>1998</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV [CD-Block]
+Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV, or throws a powerful corrupted BGM on title [CD-Block]
 Asteka II: requires [VDP1] sprite delay (cfr. main map scrolling)
 Not extensively tested
 ]]></notes>
@@ -6914,7 +6914,7 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen after initial tree logo [CD-Block]
+Black screen after initial tree logo [CD-Block] fnum reject
 ]]></notes>
 		<info name="serial" value="GS-9051"/>
 		<info name="release" value="19960301"/>
@@ -7308,7 +7308,7 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Sonic World: has heavy [VDP2] ROZ performance
-Sonic 1: has [VDP1] [VDP2] priority issues, runs too slow, BGM eventually dies [CD-Block]
+Sonic 1: has [VDP1] [VDP2] priority issues, runs too slow
 TODO: test Sonic 2, 3 and Knuckles
 ]]></notes>
 		<info name="serial" value="GS-9147"/>
@@ -15671,6 +15671,7 @@ TODO: how to reload with [mouse]?
 		<notes><![CDATA[
 [CD-Block] attempts to playback a redbook on title screen, goes silent
 Heavy 3D corruption in gameplay [SCUDSP]
+Optional unsupported Mascon device
 ]]></notes>
 		<info name="serial" value="T-10317G"/>
 		<info name="release" value="19981001"/>

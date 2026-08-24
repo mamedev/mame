@@ -146,11 +146,6 @@ void saturn_cd_hle_device::device_start()
 	save_item(NAME(cr2));
 	save_item(NAME(cr3));
 	save_item(NAME(cr4));
-	save_item(NAME(prev_cr1));
-	save_item(NAME(prev_cr2));
-	save_item(NAME(prev_cr3));
-	save_item(NAME(prev_cr4));
-	save_item(NAME(status_type));
 	save_item(NAME(hirqmask));
 	save_item(NAME(hirqreg));
 	save_item(NAME(cd_stat));
@@ -687,16 +682,7 @@ void saturn_cd_hle_device::cmd_get_status()
 {
 	//LOGCMD("%s: Get Status\n", machine().describe_context();
 	hirqreg |= CMOK;
-	if(status_type == 0)
-		cr_standard_return(cd_stat);
-	else
-	{
-		cr1 = (cd_stat) | (prev_cr1 & 0xff);
-		cr2 = prev_cr2;
-		cr3 = prev_cr3;
-		cr4 = prev_cr4;
-		status_type = 0; /* Road Blaster and friends needs this otherwise they won't boot. */
-	}
+	cr_standard_return(cd_stat);
 	//LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
 }
 
@@ -708,7 +694,6 @@ void saturn_cd_hle_device::cmd_get_hw_info()
 	cr2 = 0x0201;
 	cr3 = 0x0000;
 	cr4 = 0x0400;
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_toc()
@@ -724,7 +709,6 @@ void saturn_cd_hle_device::cmd_get_toc()
 	cr4 = 0;
 	xferdnum = 0;
 	hirqreg |= (CMOK|DRDY);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_session_info()
@@ -766,7 +750,6 @@ void saturn_cd_hle_device::cmd_get_session_info()
 	}
 
 	hirqreg |= (CMOK);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_init_cdsystem()
@@ -821,7 +804,6 @@ void saturn_cd_hle_device::cmd_init_cdsystem()
 	// TODO: ESEL happens at the end of the actual reset phase
 	hirqreg |= (CMOK | ESEL | EFLS | ECPY | EHST);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_end_data_transfer()
@@ -898,7 +880,6 @@ void saturn_cd_hle_device::cmd_end_data_transfer()
 	hirqreg |= CMOK;
 
 	LOGXFER("\t%04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
-	status_type = 1;
 }
 
 void saturn_cd_hle_device::cmd_play_disc()
@@ -1033,7 +1014,6 @@ void saturn_cd_hle_device::cmd_play_disc()
 		cdda_maxrepeat = 0;
 
 	cdda_repeat_count = 0;
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_seek_disc()
@@ -1111,7 +1091,6 @@ void saturn_cd_hle_device::cmd_seek_disc()
 
 	hirqreg |= CMOK;
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_ffwd_rew_disc()
@@ -1196,7 +1175,6 @@ void saturn_cd_hle_device::cmd_get_subcode_q_rw_channel()
 			break;
 	}
 	hirqreg |= CMOK|DRDY;
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_set_cddevice_connection()
@@ -1230,7 +1208,6 @@ void saturn_cd_hle_device::cmd_set_cddevice_connection()
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_cddevice_connection()
@@ -1252,7 +1229,6 @@ void saturn_cd_hle_device::cmd_last_buffer_destination()
 	cr3 = lastbuf << 8;
 	cr4 = 0;
 	hirqreg |= (CMOK);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_set_filter_range()
@@ -1270,7 +1246,6 @@ void saturn_cd_hle_device::cmd_set_filter_range()
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_filter_range()
@@ -1294,7 +1269,6 @@ void saturn_cd_hle_device::cmd_set_filter_subheader_conditions()
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 
@@ -1311,7 +1285,6 @@ void saturn_cd_hle_device::cmd_get_filter_subheader_conditions()
 	cr4 = (filters[fnum].smval << 8) | (filters[fnum].cival & 0xff);
 
 	hirqreg |= (CMOK|ESEL);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_set_filter_mode()
@@ -1333,7 +1306,6 @@ void saturn_cd_hle_device::cmd_set_filter_mode()
 	LOGCMD("%s: Set Filter Mode filt %x mode %x\n", machine().describe_context(), fnum, mode);
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_filter_mode()
@@ -1348,7 +1320,6 @@ void saturn_cd_hle_device::cmd_get_filter_mode()
 	cr4 = 0;
 
 	hirqreg |= (CMOK|ESEL);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_set_filter_connection()
@@ -1368,7 +1339,6 @@ void saturn_cd_hle_device::cmd_set_filter_connection()
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_reset_selector()
@@ -1403,7 +1373,6 @@ void saturn_cd_hle_device::cmd_reset_selector()
 
 		hirqreg |= (CMOK|ESEL);
 		cr_standard_return(cd_stat);
-		status_type = 0;
 		return;
 	}
 
@@ -1478,7 +1447,6 @@ void saturn_cd_hle_device::cmd_reset_selector()
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_buffer_size()
@@ -1490,7 +1458,6 @@ void saturn_cd_hle_device::cmd_get_buffer_size()
 	cr4 = 200;
 	LOGCMD("%s: Get Buffer Size = %d\n", machine().describe_context(), cr2);
 	hirqreg |= (CMOK);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_buffer_partition_sector_number()
@@ -1520,7 +1487,6 @@ void saturn_cd_hle_device::cmd_get_buffer_partition_sector_number()
 
 	//LOGWARN("%04x\n",cr4);
 	hirqreg |= (CMOK);
-	status_type = 1;
 }
 
 void saturn_cd_hle_device::cmd_calculate_actual_data_size()
@@ -1548,7 +1514,6 @@ void saturn_cd_hle_device::cmd_calculate_actual_data_size()
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_actual_data_size()
@@ -1560,7 +1525,6 @@ void saturn_cd_hle_device::cmd_get_actual_data_size()
 	cr4 = 0;
 	LOGCMD("%s: Get actual block size %06x\n", machine().describe_context(), calcsize);
 	hirqreg |= (CMOK);
-	status_type = 1;
 }
 
 // falcom2
@@ -1584,8 +1548,6 @@ void saturn_cd_hle_device::cmd_get_sector_information()
 		cr4 = ((partitions[bufnum].blocks[sectoffs]->subm & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->cinf & 0xff);
 		hirqreg |= (CMOK|ESEL);
 	}
-
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_set_sector_length()
@@ -1626,7 +1588,6 @@ void saturn_cd_hle_device::cmd_set_sector_length()
 	}
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_sector_data()
@@ -1669,7 +1630,6 @@ void saturn_cd_hle_device::cmd_get_sector_data()
 	cd_stat |= CD_STAT_TRANS;
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK|EHST|DRDY);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_delete_sector_data()
@@ -1728,7 +1688,6 @@ void saturn_cd_hle_device::cmd_delete_sector_data()
 	cd_stat &= ~CD_STAT_TRANS;
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK|EHST);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
@@ -1775,7 +1734,6 @@ void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
 	cd_stat |= CD_STAT_TRANS;
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK|EHST|DRDY);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_put_sector_data()
@@ -1816,7 +1774,6 @@ void saturn_cd_hle_device::cmd_put_sector_data()
 
 	hirqreg |= (CMOK|DRDY);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_move_sector_data()
@@ -1858,7 +1815,6 @@ void saturn_cd_hle_device::cmd_copy_sector_data()
 
 	hirqreg |= (CMOK|ECPY);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_sector_data_copy_or_move_error()
@@ -1870,7 +1826,6 @@ void saturn_cd_hle_device::cmd_get_sector_data_copy_or_move_error()
 	cr3 = 0;
 	cr4 = 0;
 	hirqreg |= (CMOK);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_change_directory()
@@ -1885,7 +1840,6 @@ void saturn_cd_hle_device::cmd_change_directory()
 
 	read_new_dir(temp);
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_read_directory()
@@ -1906,7 +1860,6 @@ void saturn_cd_hle_device::cmd_read_directory()
 
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK|EFLS);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_file_scope()
@@ -1919,7 +1872,6 @@ void saturn_cd_hle_device::cmd_get_file_scope()
 	cr3 = 0x0100;   // report directory held
 	cr4 = firstfile;    // first file id
 	LOGWARN("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_target_file_info()
@@ -1980,7 +1932,6 @@ void saturn_cd_hle_device::cmd_get_target_file_info()
 		xfercount = 0;
 	}
 	LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_read_file()
@@ -2009,7 +1960,6 @@ void saturn_cd_hle_device::cmd_read_file()
 	playtype = 1;
 
 	hirqreg |= (CMOK|EHST);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_abort_file()
@@ -2024,7 +1974,6 @@ void saturn_cd_hle_device::cmd_abort_file()
 		cd_change_status(CD_STAT_PAUSE); // force to pause
 
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_check_copy_protection()
@@ -2047,7 +1996,6 @@ void saturn_cd_hle_device::cmd_check_copy_protection()
 		hirqreg = 0x7c5;
 	}
 	cr_standard_return(cd_stat);
-	status_type = 0;
 }
 
 void saturn_cd_hle_device::cmd_get_disc_region()
@@ -2066,7 +2014,6 @@ void saturn_cd_hle_device::cmd_get_disc_region()
 	cr4 = 0;
 	hirqreg |= (CMOK);
 //  cr_standard_return(cd_stat);
-	status_type = 0;
 
 }
 
@@ -2216,14 +2163,6 @@ void saturn_cd_hle_device::cd_exec_command()
 
 			hirqreg |= (CMOK);
 			break;
-	}
-
-	if(status_type == 1)
-	{
-		prev_cr1 = cr1;
-		prev_cr2 = cr2;
-		prev_cr3 = cr3;
-		prev_cr4 = cr4;
 	}
 }
 
