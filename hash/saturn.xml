@@ -4721,14 +4721,14 @@ Black screen, [CD-Block] crashes at startup (regression)
 		</part>
 	</software>
 
-	<!-- Identifying Logic Puzzle - Rainbow Town (Japan)... -->
-	<software name="logicpuz" supported="no">
-		<description>Logic Puzzle - Rainbow Town (Japan)</description>
+	<software name="logicpuz" supported="partial">
+		<description>Logic Puzzle Rainbow Town (Japan)</description>
 		<year>1996</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4303G"/>
 		<info name="release" value="19960223"/>
 		<info name="alt_title" value="ロジックパズル レインボータウン"/>
+		<info name="usage" value="Mouse compatible"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -22683,6 +22683,7 @@ Has Nifty Serve option, [modem] support?
 		<info name="serial" value="T-21002G"/>
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="日灼けの想い出+姫くり"/>
+		<info name="usage" value="Mouse compatible"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27679,14 +27680,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Body Special 264 Girls in Motion Puzzle Vol. 2 (Japan) [T-21003G]... -->
-	<software name="girlpuz2" supported="no">
+	<software name="girlpuz2" supported="partial">
 		<description>Body Special 264 - Girls in Motion Puzzle Vol. 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21003G"/>
 		<info name="release" value="19960802"/>
 		<info name="alt_title" value="ボディスペシャル264"/>
+		<info name="usage" value="Mouse compatible"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

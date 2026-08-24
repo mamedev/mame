@@ -2989,13 +2989,14 @@ void saturn_cd_hle_device::cd_playdata()
 								// TODO: untested with cur_track == 0xaa (lead-out)
 								// - dendego (tries to) playback redbook track 3 on title screen after seek
 								// - girlpuz1 is an easy test case, on both title and Himekuri mode
-								assert(cur_track > 0 && cur_track != 0xff);
+								// NOTE: cur_track is -1 at this point vs. redbook spec
+								assert(cur_track >= 0 && cur_track != 0xff);
 								//cd_curfad = m_cdrom_image->get_track_start(cur_track);
 								cd_fad_seek = m_cdrom_image->get_track_start(cur_track);
 								fadstoplay = m_cdrom_image->get_track_start(cur_track + 1) - cd_fad_seek;
 								cd_change_status(CD_STAT_SEEK);
 								cd_seek_stat = CD_STAT_PLAY;
-								LOGCMD("Repeat hit track %d count %d/%d FAD %06x -> start %06x end %06x\n", cur_track, cdda_repeat_count, cdda_maxrepeat, cd_curfad, cd_fad_seek, fadstoplay);
+								LOGCMD("Repeat hit track %d count %d/%d FAD %06x -> start %06x end %06x\n", cur_track + 1, cdda_repeat_count, cdda_maxrepeat, cd_curfad, cd_fad_seek, fadstoplay);
 							}
 						}
 					}
