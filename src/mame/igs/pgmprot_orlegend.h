@@ -14,8 +14,8 @@ public:
 	{
 	}
 
-	void init_orlegend();
-	void pgm_asic3(machine_config &config);
+	void init_orlegend() ATTR_COLD;
+	void pgm_asic3(machine_config &config) ATTR_COLD;
 
 private:
 	// ASIC 3 (oriental legends protection)
@@ -25,7 +25,7 @@ private:
 	u16        m_asic3_hilo = 0;
 	u16        m_asic3_hold = 0;
 
-	void asic3_compute_hold(int,int);
+	void asic3_compute_hold(int y, int z);
 	u16 pgm_asic3_r();
 	void pgm_asic3_w(offs_t offset, u16 data);
 };

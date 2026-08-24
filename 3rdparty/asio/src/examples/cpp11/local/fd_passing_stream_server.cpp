@@ -2,7 +2,7 @@
 // fd_passing_stream_server.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2021 Heiko Hund (heiko at openvpn dot net)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying

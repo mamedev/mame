@@ -355,12 +355,12 @@ void mz5500_state::mz5500(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_user_bank).set_map(&mz5500_state::user_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x20000);
 
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(m_pic[1], FUNC(pic8259_device::acknowledge));
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
@@ -423,7 +423,7 @@ void mz5500_state::mz5500(machine_config &config)
 	RP5C01(config, m_rtc, XTAL(32'768));
 	m_rtc->out_alarm_callback().set(m_pic[1], FUNC(pic8259_device::ir0_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));

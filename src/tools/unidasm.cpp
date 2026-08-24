@@ -10,7 +10,7 @@
 #include "coretmpl.h"
 #include "disasmintf.h"
 
-using offs_t = osd::u32;
+using offs_t = util::disasm_interface::offs_t;
 using util::BIT;
 
 #include "cpu/8x300/8x300dasm.h"
@@ -52,6 +52,7 @@ using util::BIT;
 #include "cpu/dspp/dsppdasm.h"
 #include "cpu/e0c6200/e0c6200d.h"
 #include "cpu/e132xs/e1dasm.h"
+#include "cpu/edsp/edspdasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16d.h"
@@ -227,20 +228,22 @@ using util::BIT;
 #include "cpu/z8000/8000dasm.h"
 
 #include "corestr.h"
-#include "eminline.h"
-#include "endianness.h"
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "osdfile.h"
 #include "strformat.h"
 
 #include <algorithm>
+#include <bit>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <functional>
 #include <iostream>
+#include <locale>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -357,13 +360,13 @@ struct nec_unidasm_t : nec_disassembler::config
 } nec_unidasm;
 
 
-static constexpr auto le = util::endianness::little;
-static constexpr auto be = util::endianness::big;
+static constexpr auto le = std::endian::little;
+static constexpr auto be = std::endian::big;
 
 struct dasm_table_entry
 {
 	const char *            name;
-	util::endianness        endian;
+	std::endian             endian;
 	int8_t                  pcshift;
 	std::function<util::disasm_interface *()> alloc;
 };
@@ -448,6 +451,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp563xx",        le, -2, []() -> util::disasm_interface * { return new dsp563xx_disassembler; } },
 	{ "dspp",            be, -1, []() -> util::disasm_interface * { return new dspp_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
+	{ "edsp",            le, -1, []() -> util::disasm_interface * { return new edsp_disassembler; } },
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 //  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
@@ -568,6 +572,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "nios2",           le,  0, []() -> util::disasm_interface * { return new nios2_disassembler; } },
 	{ "nova",            be, -1, []() -> util::disasm_interface * { return new nova_disassembler; } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
+	{ "ns32532",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler(ns32000_disassembler::model::ns32532); } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
 	{ "nx8_500s",        le,  0, []() -> util::disasm_interface * { return new nx8_500s_disassembler; } },
@@ -632,6 +637,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sparcv9vis3",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3); } },
 	{ "sparcv9vis3b",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3b); } },
 	{ "spc700",          le,  0, []() -> util::disasm_interface * { return new spc700_disassembler; } },
+	//{ "specnextcopper",  be,  0, []() -> util::disasm_interface * { return new specnext_copper_disassembler; } },
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
 	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },
@@ -769,10 +775,10 @@ private:
 	const dasm_table_entry *entry;
 
 	template<typename T> const T *get_ptr(offs_t pc) const {
-		if(pc < base_pc)
+		if (pc < base_pc)
 			return nullptr;
 		offs_t delta = (pc - base_pc) * sizeof(T);
-		if(delta >= size)
+		if (delta >= size)
 			return nullptr;
 		return reinterpret_cast<const T *>(&data[delta]);
 	}
@@ -795,11 +801,11 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 	u32 flags = disasm->interface_flags();
 	u32 page_mask = flags & util::disasm_interface::PAGED ? (1 << disasm->page_address_bits()) - 1 : 0;
 
-	if(flags & util::disasm_interface::NONLINEAR_PC) {
-		switch(entry->pcshift) {
+	if (flags & util::disasm_interface::NONLINEAR_PC) {
+		switch (entry->pcshift) {
 		case -1:
 			lr8  = [](offs_t pc) -> u8  { throw std::logic_error("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
-			switch(entry->endian) {
+			switch (entry->endian) {
 			case le:
 				lr16 = [this](offs_t pc) -> u16 {
 					const u16 *src = get_ptr<u16>(pc);
@@ -808,8 +814,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr32 = [this, page_mask](offs_t pc) -> u32 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u32 r = 0;
-					for(int j=0; j != 2; j++) {
-						r |= little_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc))) << (j*16);
+					for (int j = 0; j != 2; j++) {
+						r |= little_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc))) << (j * 16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -817,8 +823,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr64 = [this, page_mask](offs_t pc) -> u64 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u64 r = 0;
-					for(int j=0; j != 4; j++) {
-						r |= u64(little_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc)))) << (j*16);
+					for (int j = 0; j != 4; j++) {
+						r |= u64(little_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc)))) << (j * 16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -833,8 +839,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr32 = [this, page_mask](offs_t pc) -> u32 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u32 r = 0;
-					for(int j=0; j != 2; j++) {
-						r |= big_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc))) << ((1-j)*16);
+					for (int j = 0; j != 2; j++) {
+						r |= big_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc))) << ((1 - j) * 16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -842,8 +848,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr64 = [this, page_mask](offs_t pc) -> u64 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u64 r = 0;
-					for(int j=0; j != 4; j++) {
-						r |= u64(big_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc)))) << ((3-j)*16);
+					for (int j = 0; j != 4; j++) {
+						r |= u64(big_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc)))) << ((3 - j) * 16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -858,13 +864,13 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				return src[0];
 			};
 
-			switch(entry->endian) {
+			switch (entry->endian) {
 			case le:
 				lr16 = [this, page_mask](offs_t pc) -> u16 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u16 r = 0;
-					for(int j=0; j != 2; j++) {
-						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << (j*8);
+					for (int j = 0; j != 2; j++) {
+						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << (j * 8);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -872,8 +878,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr32 = [this, page_mask](offs_t pc) -> u32 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u32 r = 0;
-					for(int j=0; j != 2; j++) {
-						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << (j*8);
+					for (int j = 0; j != 2; j++) {
+						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << (j * 8);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -881,8 +887,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr64 = [this, page_mask](offs_t pc) -> u64 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u64 r = 0;
-					for(int j=0; j != 8; j++) {
-						r |= u64(get<u8>(disasm->pc_linear_to_real(lpc))) << (j*8);
+					for (int j = 0; j != 8; j++) {
+						r |= u64(get<u8>(disasm->pc_linear_to_real(lpc))) << (j * 8);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -893,8 +899,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr16 = [this, page_mask](offs_t pc) -> u16 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u16 r = 0;
-					for(int j=0; j != 2; j++) {
-						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << ((1-j)*8);
+					for (int j = 0; j != 2; j++) {
+						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << ((1 - j) * 8);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -902,8 +908,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr32 = [this, page_mask](offs_t pc) -> u32 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u32 r = 0;
-					for(int j=0; j != 2; j++) {
-						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << ((3-j)*8);
+					for (int j = 0; j != 2; j++) {
+						r |= get<u8>(disasm->pc_linear_to_real(lpc)) << ((3 - j) * 8);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -911,8 +917,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				lr64 = [this, page_mask](offs_t pc) -> u64 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u64 r = 0;
-					for(int j=0; j != 8; j++) {
-						r |= u64(get<u8>(disasm->pc_linear_to_real(lpc))) << ((7-j)*8);
+					for (int j = 0; j != 8; j++) {
+						r |= u64(get<u8>(disasm->pc_linear_to_real(lpc))) << ((7 - j) * 8);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -922,127 +928,75 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 		}
 	} else {
-		switch(entry->pcshift) {
+		switch (entry->pcshift) {
 		case 0:
 			lr8 = [this](offs_t pc) -> u8 {
 				const u8 *p = get_ptr<u8>(pc);
-				return p ?
-				p[0]
-				: 0x00;
+				return p ? p[0] : 0x00;
 			};
-			switch(entry->endian) {
+			switch (entry->endian) {
 			case le:
 				lr16 = [this](offs_t pc) -> u16 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ?
-					p[0] |
-					(p[1] << 8)
-					: 0x0000;
+					return p ? get_u16le(p) : 0x0000;
 				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ?
-					p[0] |
-					(p[1] << 8) |
-					(p[2] << 16) |
-					(p[3] << 24)
-					: 0x00000000;
+					return p ? get_u32le(p) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ?
-					p[0] |
-					(p[1] << 8) |
-					(p[2] << 16) |
-					(p[3] << 24) |
-					(u64(p[4]) << 32) |
-					(u64(p[5]) << 40) |
-					(u64(p[6]) << 48) |
-					(u64(p[7]) << 56)
-					: 0x0000000000000000; };
+					return p ? get_u64le(p) : 0x0000000000000000;
+				};
 				break;
 			case be:
 				lr16 = [this](offs_t pc) -> u16 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ?
-					(p[0] << 8) |
-					p[1]
-					: 0x0000;
+					return p ? get_u16be(p) : 0x0000;
 				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ?
-					(p[0] << 24) |
-					(p[1] << 16) |
-					(p[2] << 8) |
-					p[3]
-					: 0x00000000;
+					return p ? get_u32be(p) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ?
-					(u64(p[0]) << 56) |
-					(u64(p[1]) << 48) |
-					(u64(p[2]) << 40) |
-					(u64(p[3]) << 32) |
-					(p[4] << 24) |
-					(p[5] << 16) |
-					(p[6] << 8) |
-					p[7]
-					: 0x0000000000000000; };
+					return p ? get_u64be(p) : 0x0000000000000000;
+				};
 				break;
 			}
 			break;
 
 		case -1:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
-			switch(entry->endian) {
+			switch (entry->endian) {
 			case le:
 				lr16 = [this](offs_t pc) -> u16 {
 					const u16 *p = get_ptr<u16>(pc);
-					return p ?
-					little_endianize_int16(p[0])
-					: 0x0000;
+					return p ? little_endianize_int16(p[0]) : 0x0000;
 				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u16 *p = get_ptr<u16>(pc);
-					return p ?
-					little_endianize_int16(p[0]) |
-					(little_endianize_int16(p[1]) << 16)
-					: 0x00000000;
+					return p ? little_endianize_int16(p[0]) | (little_endianize_int16(p[1]) << 16) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u16 *p = get_ptr<u16>(pc);
-					return p ?
-					little_endianize_int16(p[0]) |
-					(little_endianize_int16(p[1]) << 16) |
-					(u64(little_endianize_int16(p[2])) << 32) |
-					(u64(little_endianize_int16(p[3])) << 48)
-					: 0x0000000000000000;
+					return p ? little_endianize_int16(p[0]) | (little_endianize_int16(p[1]) << 16) |
+						   (u64(little_endianize_int16(p[2])) << 32) | (u64(little_endianize_int16(p[3])) << 48) : 0x0000000000000000;
 				};
 				break;
 			case be:
 				lr16 = [this](offs_t pc) -> u16 {
 					const u16 *p = get_ptr<u16>(pc);
-					return p ?
-					big_endianize_int16(p[0])
-					: 0x0000;
+					return p ? big_endianize_int16(p[0]) : 0x0000;
 				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u16 *p = get_ptr<u16>(pc);
-					return p ?
-					(big_endianize_int16(p[0]) << 16)|
-					big_endianize_int16(p[1])
-					: 0x00000000;
+					return p ? (big_endianize_int16(p[0]) << 16) | big_endianize_int16(p[1]) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u16 *p = get_ptr<u16>(pc);
-					return p ?
-					(u64(big_endianize_int16(p[0])) << 48) |
-					(u64(big_endianize_int16(p[1])) << 32) |
-					(big_endianize_int16(p[2]) << 16) |
-					big_endianize_int16(p[3])
-					: 0x0000000000000000;
+					return p ? (u64(big_endianize_int16(p[0])) << 48) | (u64(big_endianize_int16(p[1])) << 32) |
+						   (big_endianize_int16(p[2]) << 16) | big_endianize_int16(p[3]) : 0x0000000000000000;
 				};
 				break;
 			}
@@ -1051,35 +1005,25 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 		case -2:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
 			lr16 = [](offs_t pc) -> u16 { abort(); };
-			switch(entry->endian) {
+			switch (entry->endian) {
 			case le:
 				lr32 = [this](offs_t pc) -> u32 {
 					const u32 *p = get_ptr<u32>(pc);
-					return p ?
-					little_endianize_int32(p[0])
-					: 0x00000000;
+					return p ? little_endianize_int32(p[0]) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u32 *p = get_ptr<u32>(pc);
-					return p ?
-					little_endianize_int32(p[0]) |
-					(u64(little_endianize_int32(p[1])) << 32)
-					: 0x0000000000000000;
+					return p ? little_endianize_int32(p[0]) | (u64(little_endianize_int32(p[1])) << 32) : 0x0000000000000000;
 				};
 				break;
 			case be:
 				lr32 = [this](offs_t pc) -> u32 {
 					const u32 *p = get_ptr<u32>(pc);
-					return p ?
-					big_endianize_int32(p[0])
-					: 0x00000000;
+					return p ? big_endianize_int32(p[0]) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u32 *p = get_ptr<u32>(pc);
-					return p ?
-					(u64(big_endianize_int32(p[0])) << 32) |
-					big_endianize_int32(p[1])
-					: 0x0000000000000000;
+					return p ? (u64(big_endianize_int32(p[0])) << 32) | big_endianize_int32(p[1]) : 0x0000000000000000;
 				};
 				break;
 			}
@@ -1089,21 +1033,17 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			lr8 = [](offs_t pc) -> u8 { abort(); };
 			lr16 = [](offs_t pc) -> u16 { abort(); };
 			lr32 = [](offs_t pc) -> u32 { abort(); };
-			switch(entry->endian) {
+			switch (entry->endian) {
 			case le:
 				lr64 = [this](offs_t pc) -> u64 {
 					const u64 *p = get_ptr<u64>(pc);
-					return p ?
-					little_endianize_int64(p[0])
-					: 0x0000000000000000;
+					return p ? little_endianize_int64(p[0]) : 0x0000000000000000;
 				};
 				break;
 			case be:
 				lr64 = [this](offs_t pc) -> u64 {
 					const u64 *p = get_ptr<u64>(pc);
-					return p ?
-					big_endianize_int64(p[0])
-					: 0x0000000000000000;
+					return p ? big_endianize_int64(p[0]) : 0x0000000000000000;
 				};
 				break;
 			};
@@ -1111,21 +1051,21 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 
 		case 3:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
-			switch(entry->endian) {
+			switch (entry->endian) {
 			case le:
 				lr16 = [this](offs_t pc) -> u16 {
-					if(pc < base_pc)
+					if (pc < base_pc)
 						return 0x0000;
 					offs_t delta = (pc - base_pc) >> 3;
-					if(delta >= size)
+					if (delta >= size)
 						return 0x0000;
 					return little_endianize_int16(reinterpret_cast<const u16 *>(&data[delta])[0]);
 				};
 				lr32 = [this](offs_t pc) -> u32 {
-					if(pc < base_pc)
+					if (pc < base_pc)
 						return 0x00000000;
 					offs_t delta = (pc - base_pc) >> 3;
-					if(delta >= size + 2)
+					if (delta >= size + 2)
 						return 0x00000000;
 					auto p = reinterpret_cast<const u16 *>(&data[delta]);
 					return little_endianize_int16(p[0]) | (u32(little_endianize_int16(p[1])) << 16);
@@ -1133,18 +1073,18 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				break;
 			case be:
 				lr16 = [this](offs_t pc) -> u16 {
-					if(pc < base_pc)
+					if (pc < base_pc)
 						return 0x0000;
 					offs_t delta = (pc - base_pc) >> 3;
-					if(delta >= size)
+					if (delta >= size)
 						return 0x0000;
 					return big_endianize_int16(reinterpret_cast<const u16 *>(&data[delta])[0]);
 				};
 				lr32 = [this](offs_t pc) -> u32 {
-					if(pc < base_pc)
+					if (pc < base_pc)
 						return 0x00000000;
 					offs_t delta = (pc - base_pc) >> 3;
-					if(delta >= size + 2)
+					if (delta >= size + 2)
 						return 0x00000000;
 					auto p = reinterpret_cast<const u16 *>(&data[delta]);
 					return (u32(big_endianize_int16(p[0])) << 16) | big_endianize_int16(p[1]);
@@ -1165,22 +1105,31 @@ void unidasm_data_buffer::decrypt(const unidasm_data_buffer &buffer, bool opcode
 	abort();
 }
 
-static int parse_number(const char *curarg, const char *default_format, u32 *value)
+template<typename T, typename U>
+static int parse_number(const char *curarg, T &&default_format, U *value)
 {
-	int result;
-	if(curarg[0] == '0' && curarg[1] != '\0') {
-		if(tolower((uint8_t)curarg[1]) == 'x')
-			result = sscanf(&curarg[2], "%x", value);
-		else if(tolower((uint8_t)curarg[1]) == 'o')
-			result = sscanf(&curarg[2], "%o", value);
-		else
-			result = sscanf(&curarg[1], "%o", value);
+	std::istringstream str;
+	str.imbue(std::locale::classic());
+	if (curarg[0] == '0' && curarg[1] != '\0') {
+		if (tolower((uint8_t)curarg[1]) == 'x') {
+			str.str(&curarg[2]);
+			str >> std::hex;
+		} else if (tolower((uint8_t)curarg[1]) == 'o') {
+			str.str(&curarg[2]);
+			str >> std::oct;
+		} else {
+			str.str(&curarg[1]);
+			str >> std::oct;
+		}
+	} else if (curarg[0] == '$') {
+		str.str(&curarg[1]);
+		str >> std::hex;
+	} else {
+		str.str(curarg);
+		str >> default_format;
 	}
-	else if(curarg[0] == '$')
-		result = sscanf(&curarg[1], "%x", value);
-	else
-		result = sscanf(&curarg[0], default_format, value);
-	return result;
+	str >> *value;
+	return str ? 1 : 0;
 }
 
 static int parse_options(int argc, char *argv[], options *opts)
@@ -1193,44 +1142,42 @@ static int parse_options(int argc, char *argv[], options *opts)
 	memset(opts, 0, sizeof(*opts));
 
 	// loop through arguments
-	for(unsigned arg = 1; arg < argc; arg++) {
+	for (unsigned arg = 1; arg < argc; arg++) {
 		char *curarg = argv[arg];
 
 		// is it a switch?
-		if(curarg[0] == '-' && curarg[1] != '\0') {
-			if(pending_base || pending_arch || pending_skip || pending_count)
+		if (curarg[0] == '-' && curarg[1] != '\0') {
+			if (pending_base || pending_arch || pending_skip || pending_count)
 				goto usage;
 
-			if(tolower((uint8_t)curarg[1]) == 'a')
+			if (tolower((uint8_t)curarg[1]) == 'a')
 				pending_arch = true;
-			else if(tolower((uint8_t)curarg[1]) == 'b')
+			else if (tolower((uint8_t)curarg[1]) == 'b')
 				pending_base = true;
-			else if(tolower((uint8_t)curarg[1]) == 'f')
+			else if (tolower((uint8_t)curarg[1]) == 'f')
 				opts->flipped = true;
-			else if(tolower((uint8_t)curarg[1]) == 'l')
+			else if (tolower((uint8_t)curarg[1]) == 'l')
 				opts->lower = true;
-			else if(tolower((uint8_t)curarg[1]) == 's')
+			else if (tolower((uint8_t)curarg[1]) == 's')
 				pending_skip = true;
-			else if(tolower((uint8_t)curarg[1]) == 'c')
+			else if (tolower((uint8_t)curarg[1]) == 'c')
 				pending_count = true;
-			else if(tolower((uint8_t)curarg[1]) == 'n')
+			else if (tolower((uint8_t)curarg[1]) == 'n')
 				opts->norawbytes = true;
-			else if(tolower((uint8_t)curarg[1]) == 'u')
+			else if (tolower((uint8_t)curarg[1]) == 'u')
 				opts->upper = true;
-			else if(tolower((uint8_t)curarg[1]) == 'x')
+			else if (tolower((uint8_t)curarg[1]) == 'x')
 				opts->xchbytes = true;
-			else if(tolower((uint8_t)curarg[1]) == 'o')
+			else if (tolower((uint8_t)curarg[1]) == 'o')
 				opts->octal = true;
 			else
 				goto usage;
-
-		} else if(pending_base) {
-		// base PC
-			if(parse_number(curarg, "%x", &opts->basepc) != 1)
+		} else if (pending_base) {
+			// base PC
+			if (parse_number(curarg, std::hex, &opts->basepc) != 1)
 				goto usage;
 			pending_base = false;
-
-		} else if(pending_arch) {
+		} else if (pending_arch) {
 			// architecture
 			auto const arch = std::find_if(
 					std::begin(dasm_table),
@@ -1240,23 +1187,19 @@ static int parse_options(int argc, char *argv[], options *opts)
 				goto usage;
 			opts->dasm = &*arch;
 			pending_arch = false;
-
-		} else if(pending_skip) {
+		} else if (pending_skip) {
 			// skip bytes
-			if(parse_number(curarg, "%d", &opts->skip) != 1)
+			if (parse_number(curarg, std::dec, &opts->skip) != 1)
 				goto usage;
 			pending_skip = false;
-
-		} else if(pending_count) {
+		} else if (pending_count) {
 			// size
-			if(parse_number(curarg, "%d", &opts->count) != 1)
+			if (parse_number(curarg, std::dec, &opts->count) != 1)
 				goto usage;
 			pending_count = false;
-
-		} else if(opts->filename == nullptr) {
+		} else if (opts->filename == nullptr) {
 			// filename
 			opts->filename = curarg;
-
 		} else {
 			// fail
 			goto usage;
@@ -1264,41 +1207,41 @@ static int parse_options(int argc, char *argv[], options *opts)
 	}
 
 	// if we have a dangling option, error
-	if(pending_base || pending_arch || pending_skip || pending_count)
+	if (pending_base || pending_arch || pending_skip || pending_count)
 		goto usage;
 
 	// if no file or no architecture, fail
-	if(opts->filename == nullptr || opts->dasm == nullptr)
+	if (opts->filename == nullptr || opts->dasm == nullptr)
 		goto usage;
 
 	return 0;
 
 usage:
-	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
-	printf("   [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
-	printf("   [-skip <n>] [-count <n>] [-octal]\n");
-	printf("\n");
-	printf("Supported architectures:");
+	util::stream_format(std::cout, "Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
+	util::stream_format(std::cout, "   [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
+	util::stream_format(std::cout, "   [-skip <n>] [-count <n>] [-octal]\n");
+	util::stream_format(std::cout, "\n");
+	util::stream_format(std::cout, "Supported architectures:");
 	const int colwidth = 1 + std::strlen(std::max_element(std::begin(dasm_table), std::end(dasm_table), [](const dasm_table_entry &a, const dasm_table_entry &b) { return std::strlen(a.name) < std::strlen(b.name); })->name);
 	const int columns = std::max(1, 80 / colwidth);
 	const int numrows = (std::size(dasm_table) + columns - 1) / columns;
-	for(unsigned curarch = 0; curarch < numrows * columns; curarch++) {
+	for (unsigned curarch = 0; curarch < numrows * columns; curarch++) {
 		const int row = curarch / columns;
 		const int col = curarch % columns;
 		const int index = col * numrows + row;
-		if(col == 0)
-			printf("\n  ");
-		printf("%-*s", colwidth, (index < std::size(dasm_table)) ? dasm_table[index].name : "");
+		if (col == 0)
+			util::stream_format(std::cout, "\n  ");
+		util::stream_format(std::cout, "%-*s", colwidth, (index < std::size(dasm_table)) ? dasm_table[index].name : "");
 	}
-	printf("\n");
+	util::stream_format(std::cout, "\n");
 	return 1;
 };
 
 
 int disasm_file(util::random_read &file, u64 length, options &opts)
 {
-	if(opts.skip >= length) {
-		std::fprintf(stderr, "File '%s' is too short (only %llu bytes found)\n", opts.filename, (unsigned long long)length);
+	if (opts.skip >= length) {
+		util::stream_format(std::cerr, "File '%s' is too short (only %d bytes found)\n", opts.filename, length);
 		return 1;
 	}
 
@@ -1316,20 +1259,20 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	base_buffer.size = length;
 	base_buffer.base_pc = opts.basepc;
 	auto const [filerr, actual] = read_at(file, opts.skip, &base_buffer.data[0], length - opts.skip);
-	if(filerr) {
-		std::fprintf(stderr, "Error reading from file '%s' (%s)\n", opts.filename, filerr.message().c_str());
+	if (filerr) {
+		util::stream_format(std::cerr, "Error reading from file '%s' (%s)\n", opts.filename, filerr.message());
 		return 1;
 	}
-	if(opts.xchbytes) {
-		for(u64 offset = 0; offset < (length - opts.skip) - 1; offset += 2)
+	if (opts.xchbytes) {
+		for (u64 offset = 0; offset < (length - opts.skip) - 1; offset += 2)
 			std::swap(base_buffer.data[offset], base_buffer.data[offset + 1]);
 	}
 
 	// Build the decryption buffers if needed
 	unidasm_data_buffer opcodes_buffer(disasm.get(), opts.dasm), params_buffer(disasm.get(), opts.dasm);
-	if(flags & util::disasm_interface::INTERNAL_DECRYPTION) {
+	if (flags & util::disasm_interface::INTERNAL_DECRYPTION) {
 		opcodes_buffer.decrypt(base_buffer, true);
-		if((flags & util::disasm_interface::SPLIT_DECRYPTION) == util::disasm_interface::SPLIT_DECRYPTION)
+		if ((flags & util::disasm_interface::SPLIT_DECRYPTION) == util::disasm_interface::SPLIT_DECRYPTION)
 			params_buffer.decrypt(base_buffer, false);
 	}
 
@@ -1340,7 +1283,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	// Compute the pc wraparound
 	offs_t pclength = opts.dasm->pcshift < 0 ? rounded_size >> -opts.dasm->pcshift : rounded_size << opts.dasm->pcshift;
 	offs_t limit = opts.basepc + pclength;
-	offs_t pc_mask = limit ? util::make_bitmask<offs_t>(32 - count_leading_zeros_32(limit - 1)) : 0xffffffff;
+	offs_t pc_mask = limit ? util::make_bitmask<offs_t>(std::bit_width(limit - 1)) : 0xffffffff;
 
 	// Compute the page wraparound
 	offs_t page_mask = flags & util::disasm_interface::PAGED ? (1 << disasm->page_address_bits()) - 1 : 0;
@@ -1348,12 +1291,12 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	// Next pc computation lambdas
 	std::function<offs_t (offs_t, offs_t)> next_pc;
 	std::function<offs_t (offs_t, offs_t)> next_pc_wrap;
-	if(flags & util::disasm_interface::NONLINEAR_PC) {
+	if (flags & util::disasm_interface::NONLINEAR_PC) {
 		// lfsr pc is always paged
 		next_pc = [pc_mask, page_mask, dis = disasm.get()](offs_t pc, offs_t size) {
 			offs_t lpc = dis->pc_real_to_linear(pc);
 			offs_t lpce = lpc + size;
-			if((lpc ^ lpce) & ~page_mask)
+			if ((lpc ^ lpce) & ~page_mask)
 				lpce = (lpc | page_mask) + 1;
 			lpce &= pc_mask;
 			return dis->pc_linear_to_real(lpce);
@@ -1364,10 +1307,10 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			return dis->pc_linear_to_real(lpce);
 		};
 
-	} else if(flags & util::disasm_interface::PAGED) {
+	} else if (flags & util::disasm_interface::PAGED) {
 		next_pc = [pc_mask, page_mask](offs_t pc, offs_t size) {
 			offs_t pce = pc + size;
-			if((pc ^ pce) & ~page_mask)
+			if ((pc ^ pce) & ~page_mask)
 				pce = (pc | page_mask) + 1;
 			pce &= pc_mask;
 			return pce;
@@ -1387,19 +1330,19 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	}
 
 	// Compute the shift amount from pc delta to granularity-sized elements
-	u32 granularity_shift = 31 - count_leading_zeros_32(disasm->opcode_alignment());
+	u32 granularity_shift = std::bit_width(disasm->opcode_alignment()) - 1;
 
 	// Number of pc steps to disassemble
 	u32 count = pclength;
 
-	if((count > opts.count) && (opts.count != 0))
+	if ((count > opts.count) && (opts.count != 0))
 		count = opts.count;
 
 	// pc to string conversion
 	std::function<std::string (offs_t pc)> pc_to_string;
-	int aw = 32 - count_leading_zeros_32(pc_mask);
+	int aw = std::bit_width(pc_mask);
 	bool is_octal = opts.octal; // Parameter?  Per-cpu config?
-	if((flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
+	if ((flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
 		int bits1 = disasm->page_address_bits();
 		int bits2 = disasm->page2_address_bits();
 		int bits3 = aw - bits1 - bits2;
@@ -1408,79 +1351,77 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		offs_t sm2 = (1 << bits2) - 1;
 		int sh3 = bits1+bits2;
 
-		if(is_octal) {
-			int nc1 = (bits1+2)/3;
-			int nc2 = (bits2+2)/3;
-			int nc3 = (bits3+2)/3;
+		if (is_octal) {
+			int nc1 = (bits1 + 2) / 3;
+			int nc2 = (bits2 + 2) / 3;
+			int nc3 = (bits3 + 2) / 3;
 			pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
 				return util::string_format("%0*o:%0*o:%0*o",
-										   nc3, pc >> sh3,
-										   nc2, (pc >> sh2) & sm2,
-										   nc1, pc & sm1);
+						nc3, pc >> sh3,
+						nc2, (pc >> sh2) & sm2,
+						nc1, pc & sm1);
 			};
 		} else {
-			int nc1 = (bits1+3)/4;
-			int nc2 = (bits2+3)/4;
-			int nc3 = (bits3+3)/4;
+			int nc1 = (bits1 + 3) / 4;
+			int nc2 = (bits2 + 3) / 4;
+			int nc3 = (bits3 + 3) / 4;
 			pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
 				return util::string_format("%0*x:%0*x:%0*x",
-										   nc3, pc >> sh3,
-										   nc2, (pc >> sh2) & sm2,
-										   nc1, pc & sm1);
+						nc3, pc >> sh3,
+						nc2, (pc >> sh2) & sm2,
+						nc1, pc & sm1);
 			};
 		}
 
-	} else if(flags & util::disasm_interface::PAGED) {
+	} else if (flags & util::disasm_interface::PAGED) {
 		int bits1 = disasm->page_address_bits();
 		int bits2 = aw - bits1;
 		offs_t sm1 = (1 << bits1) - 1;
 		int sh2 = bits1;
 
-		if(is_octal) {
-			int nc1 = (bits1+2)/3;
-			int nc2 = (bits2+2)/3;
+		if (is_octal) {
+			int nc1 = (bits1 + 2) / 3;
+			int nc2 = (bits2 + 2) / 3;
 			pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
 				return util::string_format("%0*o:%0*o",
-										   nc2, pc >> sh2,
-										   nc1, pc & sm1);
+						nc2, pc >> sh2,
+						nc1, pc & sm1);
 			};
 		} else {
-			int nc1 = (bits1+3)/4;
-			int nc2 = (bits2+3)/4;
+			int nc1 = (bits1 + 3) / 4;
+			int nc2 = (bits2 + 3) / 4;
 			pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
 				return util::string_format("%0*x:%0*x",
-										   nc2, pc >> sh2,
-										   nc1, pc & sm1);
+						nc2, pc >> sh2,
+						nc1, pc & sm1);
 			};
 		}
 
 	} else {
 		int bits1 = aw;
 
-		if(is_octal) {
-			int nc1 = (bits1+2)/3;
+		if (is_octal) {
+			int nc1 = (bits1 + 2) / 3;
 			pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*o",
-										   nc1, pc);
+				return util::string_format("%0*o", nc1, pc);
 			};
 		} else {
-			int nc1 = (bits1+3)/4;
+			int nc1 = (bits1 + 3) / 4;
 			pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*x",
-										   nc1, pc);
+				return util::string_format("%0*x", nc1, pc);
 			};
 		}
 	}
 
 	// Lower/upper optional transform
 	std::function<std::string (const std::string &)> tf;
-	if(opts.lower)
+	if (opts.lower)
 		tf = [](const std::string &str) -> std::string {
 			std::string result = str;
 			std::transform(result.begin(), result.end(), result.begin(), [](char c) { return tolower(c); });
 			return result;
 		};
-	else if(opts.upper)
+	else if (opts.upper)
 		tf = [](const std::string &str) -> std::string {
 			std::string result = str;
 			std::transform(result.begin(), result.end(), result.begin(), [](char c) { return toupper(c); });
@@ -1495,7 +1436,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	// Do the disassembly
 	std::vector<dasm_line> dasm_lines;
 	offs_t curpc = opts.basepc;
-	for(u32 i=0; i < count;) {
+	for (u32 i = 0; i < count;) {
 		std::ostringstream stream;
 		offs_t result = disasm->disassemble(stream, curpc, *popcodes, *pparams);
 		offs_t len = result & util::disasm_interface::LENGTHMASK;
@@ -1507,11 +1448,11 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	// Compute the extrema
 	offs_t max_len = 0;
 	size_t max_text = 0;
-	for(const auto &l : dasm_lines) {
-		if(max_len < l.size)
+	for (const auto &l : dasm_lines) {
+		if (max_len < l.size)
 			max_len = l.size;
 		size_t s = l.dasm.size();
-		if(max_text < s)
+		if (max_text < s)
 			max_text = s;
 	}
 
@@ -1519,13 +1460,13 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	max_len >>= granularity_shift;
 	std::function<std::string (offs_t pc, offs_t size)> dump_raw_bytes;
 
-	if(is_octal) {
-		switch(granularity) {
+	if (is_octal) {
+		switch (granularity) {
 		case 1:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%03o", base_buffer.r8(pc));
 					pc = next_pc(pc, step);
@@ -1538,8 +1479,8 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		case 2:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%06o", base_buffer.r16(pc));
 					pc = next_pc(pc, step);
@@ -1552,8 +1493,8 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		case 4:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%011o", base_buffer.r32(pc));
 					pc = next_pc(pc, step);
@@ -1566,8 +1507,8 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		case 8:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%022o", base_buffer.r64(pc));
 					pc = next_pc(pc, step);
@@ -1578,12 +1519,12 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 		}
 	} else {
-		switch(granularity) {
+		switch (granularity) {
 		case 1:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%02x", base_buffer.r8(pc));
 					pc = next_pc(pc, step);
@@ -1596,8 +1537,8 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		case 2:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%04x", base_buffer.r16(pc));
 					pc = next_pc(pc, step);
@@ -1610,8 +1551,8 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		case 4:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%08x", base_buffer.r32(pc));
 					pc = next_pc(pc, step);
@@ -1624,8 +1565,8 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		case 8:
 			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
-				for(offs_t i=0; i != size; i++) {
-					if(i)
+				for (offs_t i = 0; i != size; i++) {
+					if (i)
 						result += ' ';
 					result += util::string_format("%016x", base_buffer.r64(pc));
 					pc = next_pc(pc, step);
@@ -1637,19 +1578,19 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 		}
 	}
 
-	if(opts.flipped) {
-		if(opts.norawbytes)
-			for(const auto &l : dasm_lines)
+	if (opts.flipped) {
+		if (opts.norawbytes)
+			for (const auto &l : dasm_lines)
 				util::stream_format(std::cout, "%-*s ; %s\n", max_text, tf(l.dasm), tf(pc_to_string(l.pc)));
 		else
-			for(const auto &l : dasm_lines)
+			for (const auto &l : dasm_lines)
 				util::stream_format(std::cout, "%-*s ; %s: %s\n", max_text, tf(l.dasm), tf(pc_to_string(l.pc)), tf(dump_raw_bytes(l.pc, l.size >> granularity_shift)));
 	} else {
-		if(opts.norawbytes)
-			for(const auto &l : dasm_lines)
+		if (opts.norawbytes)
+			for (const auto &l : dasm_lines)
 				util::stream_format(std::cout, "%s: %s\n", tf(pc_to_string(l.pc)), tf(l.dasm));
 		else
-			for(const auto &l : dasm_lines)
+			for (const auto &l : dasm_lines)
 				util::stream_format(std::cout, "%s: %-*s  %s\n", tf(pc_to_string(l.pc)), max_len, tf(dump_raw_bytes(l.pc, l.size >> granularity_shift)), tf(l.dasm));
 	}
 
@@ -1661,23 +1602,23 @@ int main(int argc, char *argv[])
 {
 	// Parse options first
 	options opts;
-	if(parse_options(argc, argv, &opts))
+	if (parse_options(argc, argv, &opts))
 		return 1;
 
 	// Load the file
 	void *data = nullptr;
 	util::random_read::ptr file;
 	u64 length = 0;
-	if(std::strcmp(opts.filename, "-") != 0) {
+	if (std::strcmp(opts.filename, "-") != 0) {
 		osd_file::ptr f;
 		std::error_condition filerr = osd_file::open(std::string(opts.filename), OPEN_FLAG_READ, f, length);
-		if(filerr) {
-			std::fprintf(stderr, "Error opening file '%s' (%s)\n", opts.filename, filerr.message().c_str());
+		if (filerr) {
+			util::stream_format(std::cerr, "Error opening file '%s' (%s)\n", opts.filename, filerr.message());
 			return 1;
 		}
 		file = util::osd_file_read(std::move(f));
-		if(!file) {
-			std::fprintf(stderr, "Error when opening file '%s'\n", opts.filename);
+		if (!file) {
+			util::stream_format(std::cerr, "Error when opening file '%s'\n", opts.filename);
 			return 1;
 		}
 	}
@@ -1688,31 +1629,31 @@ int main(int argc, char *argv[])
 #else
 		if (!std::freopen(nullptr, "rb", stdin)) {
 #endif
-			std::fprintf(stderr, "Error reopening stdin in binary mode\n");
+			util::stream_format(std::cerr, "Error reopening stdin in binary mode\n");
 			return 1;
 		}
 		std::size_t allocated = 0x1000;
 		data = std::malloc(allocated);
-		while(!std::ferror(stdin) && !std::feof(stdin)) {
-			if(length == allocated) {
+		while (!std::ferror(stdin) && !std::feof(stdin)) {
+			if (length == allocated) {
 				allocated <<= 1;
 				data = std::realloc(data, allocated);
 			}
-			if(!data) {
-				std::fprintf(stderr, "Error allocating buffer\n");
+			if (!data) {
+				util::stream_format(std::cerr, "Error allocating buffer\n");
 				return 1;
 			}
 
 			length += std::fread((u8 *)data + length, 1, allocated - length, stdin);
 		}
-		if(!length || (std::ferror(stdin) && !std::feof(stdin))) {
-			std::fprintf(stderr, "Error reading from stdin\n");
+		if (!length || (std::ferror(stdin) && !std::feof(stdin))) {
+			util::stream_format(std::cerr, "Error reading from stdin\n");
 			std::free(data);
 			return 1;
 		}
 		file = util::ram_read(data, length);
-		if(!file) {
-			std::fprintf(stderr, "Error opening stdin as file\n");
+		if (!file) {
+			util::stream_format(std::cerr, "Error opening stdin as file\n");
 			std::free(data);
 			return 1;
 		}

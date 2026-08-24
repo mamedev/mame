@@ -494,6 +494,11 @@ ROM_START( fingerd )
 	ROM_LOAD( "s29gl256n11tai02.u2", 0x00000, 0x2000000, CRC(58829d3c) SHA1(fab3b9914ec61f289509344b2d3f8a8b2f5bb5ba) )
 ROM_END
 
+ROM_START( orb300 ) // all games selectable
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "orb300arcade.u2", 0x00000, 0x1000000, CRC(25063e71) SHA1(14ee2921c24885ffeb877c0dca7842d1e3bf78fb) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -518,6 +523,9 @@ CONS( 201?, mymman,    0,  0,  nes_vt32_8mb, nes_vt32, nes_vt32_unk_state, empty
 
 // most games work, a few minor graphical issues common to the same games in other units
 CONS( 202?, typo240,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "Typo", "Vintage Gamer 240-in-1", MACHINE_IMPERFECT_GRAPHICS )
+
+// games seem to run, although sub-menus use a currently unsupported video mode
+CONS( 202?, orb300,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "Orb Gaming", "Mini Arcade Machine 300-in-1 (Orb Gaming)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // speed challenge doesn't work
 CONS( 2021, retror30,  0,  0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "Orb Gaming", "Retro Racer (30-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

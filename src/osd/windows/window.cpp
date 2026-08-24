@@ -17,13 +17,13 @@
 
 // MAME headers
 #include "emu.h"
-#include "uiinput.h"
+#include "video.h"
 #include "ui/uimain.h"
 
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
-#include "video.h"
+#include "winvideo.h"
 #include "winutf8.h"
 
 #include "winutil.h"
@@ -372,6 +372,86 @@ inline BOOL handle_mouse_wheel(windows_osd_interface &osd, int v, int h, LPARAM 
 	return handled && !osd.options().lightgun() && !osd.options().mouse();
 }
 
+inline BOOL handle_pointer_update(windows_osd_interface &osd, HWND window, WPARAM wparam, LPARAM lparam)
+{
+	PointerUpdateEventArgs args;
+	args.window = window;
+	args.id = GET_POINTERID_WPARAM(wparam);
+	args.xpos = GET_X_LPARAM(lparam);
+	args.ypos = GET_Y_LPARAM(lparam);
+	args.vdelta = args.hdelta = 0;
+	args.isnew = IS_POINTER_NEW_WPARAM(wparam);
+	args.lost = IS_POINTER_CANCELED_WPARAM(wparam);
+	args.inrange = IS_POINTER_INRANGE_WPARAM(wparam);
+	args.incontact = IS_POINTER_INCONTACT_WPARAM(wparam);
+	args.primary = IS_POINTER_PRIMARY_WPARAM(wparam);
+	args.buttons[0] = IS_POINTER_FIRSTBUTTON_WPARAM(wparam);
+	args.buttons[1] = IS_POINTER_SECONDBUTTON_WPARAM(wparam);
+	args.buttons[2] = IS_POINTER_THIRDBUTTON_WPARAM(wparam);
+	args.buttons[3] = IS_POINTER_FOURTHBUTTON_WPARAM(wparam);
+	args.buttons[4] = IS_POINTER_FIFTHBUTTON_WPARAM(wparam);
+
+	bool const handled = osd.handle_input_event(INPUT_EVENT_POINTER_UPDATE, &args);
+
+	// When in lightgun mode or mouse mode, the pointer may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd.options().lightgun() && !osd.options().mouse();
+}
+
+inline BOOL handle_pointer_leave(windows_osd_interface &osd, HWND window, WPARAM wparam, LPARAM lparam)
+{
+	PointerUpdateEventArgs args;
+	args.window = window;
+	args.id = GET_POINTERID_WPARAM(wparam);
+	args.xpos = GET_X_LPARAM(lparam);
+	args.ypos = GET_Y_LPARAM(lparam);
+	args.vdelta = args.hdelta = 0;
+	args.isnew = false;
+	args.lost = true;
+	args.inrange = IS_POINTER_INRANGE_WPARAM(wparam);
+	args.incontact = IS_POINTER_INCONTACT_WPARAM(wparam);
+	args.primary = false;
+	args.buttons[0] = false;
+	args.buttons[1] = false;
+	args.buttons[2] = false;
+	args.buttons[3] = false;
+	args.buttons[4] = false;
+
+	bool const handled = osd.handle_input_event(INPUT_EVENT_POINTER_UPDATE, &args);
+
+	// When in lightgun mode or mouse mode, the pointer may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd.options().lightgun() && !osd.options().mouse();
+}
+
+inline BOOL handle_pointer_capture_change(windows_osd_interface &osd, HWND window, WPARAM wparam, LPARAM lparam)
+{
+	PointerUpdateEventArgs args;
+	args.window = window;
+	args.id = GET_POINTERID_WPARAM(wparam);
+	args.xpos = args.ypos = 0;
+	args.vdelta = args.hdelta = 0;
+	args.isnew = false;
+	args.lost = true;
+	args.inrange = false;
+	args.incontact = false;
+	args.primary = false;
+	args.buttons[0] = false;
+	args.buttons[1] = false;
+	args.buttons[2] = false;
+	args.buttons[3] = false;
+	args.buttons[4] = false;
+
+	bool const handled = osd.handle_input_event(INPUT_EVENT_POINTER_UPDATE, &args);
+
+	// When in lightgun mode or mouse mode, the pointer may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd.options().lightgun() && !osd.options().mouse();
+}
+
 inline BOOL handle_keypress(windows_osd_interface &osd, int vkey, int down, LPARAM lparam)
 {
 	KeyPressEventArgs args;
@@ -459,6 +539,22 @@ void windows_osd_interface::process_events(bool ingame, bool nodispatch)
 
 					case WM_MOUSEHWHEEL:
 						dispatch = !handle_mouse_wheel(*this, 0, GET_WHEEL_DELTA_WPARAM(message.wParam), message.lParam);
+						break;
+
+					// forward pointer events to the input system
+					case WM_POINTERENTER:
+					case WM_POINTERDOWN:
+					case WM_POINTERUP:
+					case WM_POINTERUPDATE:
+						dispatch = !handle_pointer_update(*this, message.hwnd, message.wParam, message.lParam);
+						break;
+
+					case WM_POINTERLEAVE:
+						dispatch = !handle_pointer_leave(*this, message.hwnd, message.wParam, message.lParam);
+						break;
+
+					case WM_POINTERCAPTURECHANGED:
+						dispatch = !handle_pointer_capture_change(*this, message.hwnd, message.wParam, message.lParam);
 						break;
 
 					// forward keystrokes to the input system
@@ -1133,13 +1229,13 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				if (window->m_last_surrogate)
 				{
 					char32_t const uch = 0x10000 + ((ch & 0x03ff) | ((window->m_last_surrogate & 0x03ff) << 10));
-					window->machine().ui_input().push_char_event(window->target(), uch);
+					window->target()->push_char_event(uch);
 				}
 				window->m_last_surrogate = 0;
 			}
 			else
 			{
-				window->machine().ui_input().push_char_event(window->target(), char32_t(ch));
+				window->target()->push_char_event(char32_t(ch));
 				window->m_last_surrogate = 0;
 			}
 		}
@@ -1149,7 +1245,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		if (UNICODE_NOCHAR == wparam)
 			return TRUE;
 		else
-			window->machine().ui_input().push_char_event(window->target(), char32_t(wparam));
+			window->target()->push_char_event(char32_t(wparam));
 		break;
 
 	// legacy mouse events
@@ -1187,7 +1283,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			ScreenToClient(wnd, &where);
 			UINT ucNumLines = 3; // default
 			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
-			window->machine().ui_input().push_mouse_wheel_event(window->target(), where.x, where.y, GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
+			window->target()->push_mouse_wheel_event(where.x, where.y, GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
 		}
 		break;
 
@@ -1247,7 +1343,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	// sizing: constrain to the aspect ratio unless control key is held down
 	case WM_SIZING:
 		{
-			RECT *rect = (RECT *)lparam;
+			auto const rect = reinterpret_cast<RECT *>(lparam);
 			if (window->keepaspect() && (window->target()->scale_mode() == SCALE_FRACTIONAL) && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
 			{
 				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
@@ -1260,10 +1356,23 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		}
 		break;
 
+	// effective resolution/scaling changed
+	case WM_DPICHANGED:
+		{
+			auto const suggested = reinterpret_cast<RECT const *>(lparam);
+			SetWindowPos(
+					window->platform_window(),
+					nullptr,
+					suggested->left, suggested->top,
+					suggested->right - suggested->left, suggested->bottom - suggested->top,
+					SWP_NOZORDER | SWP_NOACTIVATE);
+		}
+		break;
+
 	// syscommands: catch win_start_maximized
 	case WM_SYSCOMMAND:
 		{
-			uint16_t cmd = wparam & 0xfff0;
+			uint16_t const cmd = wparam & 0xfff0;
 
 			// prevent screensaver or monitor power events
 			if (cmd == SC_MONITORPOWER || cmd == SC_SCREENSAVE)
@@ -1303,9 +1412,9 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			}
 
 			if ((wparam == WA_ACTIVE) || (wparam == WA_CLICKACTIVE))
-				window->machine().ui_input().push_window_focus_event(window->target());
+				window->target()->push_window_focus_event();
 			else if (wparam == WA_INACTIVE)
-				window->machine().ui_input().push_window_defocus_event(window->target());
+				window->target()->push_window_defocus_event();
 		}
 		return DefWindowProc(wnd, message, wparam, lparam);
 
@@ -1817,17 +1926,16 @@ void win_window_info::set_fullscreen(int fullscreen)
 		SetWindowPos(platform_window(), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		SetWindowPos(platform_window(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-		// if we have previous non-fullscreen bounds, use those
 		if (m_non_fullscreen_bounds.right != m_non_fullscreen_bounds.left)
 		{
+			// if we have previous non-fullscreen bounds, use those
 			SetWindowPos(platform_window(), HWND_TOP, m_non_fullscreen_bounds.left, m_non_fullscreen_bounds.top,
 						rect_width(&m_non_fullscreen_bounds), rect_height(&m_non_fullscreen_bounds),
 						SWP_NOZORDER);
 		}
-
-		// otherwise, set a small size and maximize from there
 		else
 		{
+			// otherwise, set a small size and maximize from there
 			SetWindowPos(platform_window(), HWND_TOP, 0, 0, MIN_WINDOW_DIMX, MIN_WINDOW_DIMY, SWP_NOZORDER);
 			maximize_window();
 		}
@@ -1913,8 +2021,7 @@ void win_window_info::pointer_entered(WPARAM wparam, LPARAM lparam)
 		ScreenToClient(platform_window(), &where);
 		info->x = where.x;
 		info->y = where.y;
-		machine().ui_input().push_pointer_update(
-				target(),
+		target()->push_pointer_update(
 				convert_pointer_type(info->type),
 				info->index,
 				info->device,
@@ -1958,8 +2065,7 @@ void win_window_info::pointer_capture_changed(WPARAM wparam, LPARAM lparam)
 			info->clickcnt = -info->clickcnt;
 
 		// push to UI manager and dump pointer data
-		machine().ui_input().push_pointer_abort(
-				target(),
+		target()->push_pointer_abort(
 				convert_pointer_type(info->type),
 				info->index,
 				info->device,
@@ -2088,8 +2194,7 @@ void win_window_info::expire_pointer(std::vector<win_pointer_info>::iterator inf
 	// push to UI manager and dump pointer data
 	if (!canceled)
 	{
-		machine().ui_input().push_pointer_leave(
-				target(),
+		target()->push_pointer_leave(
 				convert_pointer_type(info->type),
 				info->index,
 				info->device,
@@ -2098,8 +2203,7 @@ void win_window_info::expire_pointer(std::vector<win_pointer_info>::iterator inf
 	}
 	else
 	{
-		machine().ui_input().push_pointer_abort(
-				target(),
+		target()->push_pointer_abort(
 				convert_pointer_type(info->type),
 				info->index,
 				info->device,
@@ -2143,8 +2247,7 @@ void win_window_info::update_pointer(win_pointer_info &info, POINT const &where,
 	info.buttons = buttons;
 	if (!canceled)
 	{
-		machine().ui_input().push_pointer_update(
-				target(),
+		target()->push_pointer_update(
 				convert_pointer_type(info.type),
 				info.index,
 				info.device,
@@ -2153,8 +2256,7 @@ void win_window_info::update_pointer(win_pointer_info &info, POINT const &where,
 	}
 	else
 	{
-		machine().ui_input().push_pointer_abort(
-				target(),
+		target()->push_pointer_abort(
 				convert_pointer_type(info.type),
 				info.index,
 				info.device,

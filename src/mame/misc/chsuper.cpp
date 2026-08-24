@@ -58,7 +58,6 @@ public:
 	void init_losttrea();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -419,7 +418,7 @@ void chsuper_state::chsuper(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(chsuper_state::screen_update));
@@ -432,7 +431,7 @@ void chsuper_state::chsuper(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
 	PALETTE(config, m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // ADV476KP50
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // ADV476KP50
 	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
 
 	// sound hardware

@@ -11,7 +11,7 @@
 
 class sega_lindbergh_baseboard_device : public pci_device {
 public:
-	sega_lindbergh_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_lindbergh_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

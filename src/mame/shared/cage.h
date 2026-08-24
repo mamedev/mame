@@ -27,7 +27,7 @@ public:
 	};
 
 	// construction/destruction
-	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_speedup(offs_t speedup) { m_speedup = speedup; }
 	auto irq_handler() { return m_irqhandler.bind(); }
@@ -44,7 +44,7 @@ public:
 
 	void cage_map(address_map &map) ATTR_COLD;
 protected:
-	atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -111,7 +111,7 @@ class atari_cage_seattle_device : public atari_cage_device
 {
 public:
 	// construction/destruction
-	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void cage_map_seattle(address_map &map) ATTR_COLD;
 protected:

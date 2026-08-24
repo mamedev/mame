@@ -133,10 +133,10 @@ void segacoin_state::westdrm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segacoin_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &segacoin_state::main_portmap);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<2>(1000000); // clock frequency unknown
 
-	SEGA_315_5338A(config, "io", 0);
+	SEGA_315_5338A(config, "io");
 
 	Z80(config, m_audiocpu, 8000000); // clock frequency unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segacoin_state::sound_map);

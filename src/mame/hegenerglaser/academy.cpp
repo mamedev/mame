@@ -24,8 +24,8 @@ Academy hardware. Much unused data remains, and the TRAIN button doesn't work.
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay2.h"
+#include "mboard.h"
+#include "mdisplay2.h"
 
 #include "cpu/m6502/w65c02.h"
 #include "machine/74259.h"

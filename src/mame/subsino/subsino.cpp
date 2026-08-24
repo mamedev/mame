@@ -371,8 +371,6 @@ private:
 
 void subsino_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_tiles_offset));
 	save_item(NAME(m_out_c));
 }
@@ -2847,7 +2845,7 @@ void subsino_state::victor21(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2889,7 +2887,7 @@ void subsino_state::crsbingo(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2930,7 +2928,7 @@ void subsino_state::srider(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2969,7 +2967,7 @@ void subsino_state::dinofmly(machine_config &config)
 
 	PALETTE(config.replace(), m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 }
 
@@ -2993,7 +2991,7 @@ void subsino_state::tisub(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -3051,7 +3049,7 @@ void subsino_state::stbsub(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -3064,7 +3062,7 @@ void subsino_state::stbsub(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x100);
 	//PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)

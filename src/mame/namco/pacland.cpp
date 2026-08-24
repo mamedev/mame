@@ -677,8 +677,6 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 // machine
 void pacland_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_main_irq_mask));
@@ -906,7 +904,7 @@ void pacland_state::pacland(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(49'152'000) / 8, 384, 3*8, 39*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(pacland_state::screen_update));
 	m_screen->set_palette(m_palette);

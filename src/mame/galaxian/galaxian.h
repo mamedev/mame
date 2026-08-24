@@ -399,11 +399,6 @@ protected:
 	void turtles_map(address_map &map) ATTR_COLD;
 	void victoryc_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override
-	{
-		m_lamps.resolve();
-		m_irq_enabled = 0;
-	}
 	virtual void video_start() override ATTR_COLD;
 	virtual void sprites_clip(screen_device &screen, rectangle &cliprect);
 

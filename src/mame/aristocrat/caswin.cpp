@@ -140,7 +140,6 @@ TILE_GET_INFO_MEMBER(caswin_state::get_tile_info)
 
 void caswin_state::video_start()
 {
-	m_lamps.resolve();
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(caswin_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_transparent_pen(0);
 }
@@ -392,7 +391,7 @@ void caswin_state::vvillage(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &caswin_state::main_io);
 	m_maincpu->set_vblank_int("screen", FUNC(caswin_state::irq0_line_hold));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);

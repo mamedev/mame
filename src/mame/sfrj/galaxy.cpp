@@ -490,7 +490,7 @@ void galaxy_state::galaxy(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::irq_callback));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_palette("palette");
 	m_screen->set_size(384, 212);
@@ -527,7 +527,7 @@ void galaxy_state::galaxyp(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::irq_callback));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_palette("palette");
 	m_screen->set_size(384, 208);

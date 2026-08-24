@@ -425,8 +425,6 @@ void skykid_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 
 void skykid_state::machine_start()
 {
-	m_leds.resolve();
-
 	// configure the banks
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 
@@ -707,7 +705,7 @@ void skykid_state::skykid(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.606060);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(36*8, 28*8);

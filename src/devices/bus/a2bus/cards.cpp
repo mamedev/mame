@@ -117,7 +117,8 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("zipdrive", A2BUS_ZIPDRIVE);             // ZIP Technologies IDE card
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);           // Street Electronics Echo Plus (Echo II + Mockingboard clone)
 	device.option_add("scsi", A2BUS_SCSI);                     // Apple II SCSI Card
-	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Appli-Card
+	device.option_add("ace80", A2BUS_ACE80);                   // Franklin ACE 80 CPU Card
 	device.option_add("aesms", A2BUS_AESMS);                   // Applied Engineering Super Music Synthesizer
 	device.option_add("ultraterm", A2BUS_ULTRATERM);           // Videx UltraTerm (original)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
@@ -198,7 +199,8 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);           // Street Electronics Echo Plus (Echo II + Mockingboard clone)
 	device.option_add("scsi", A2BUS_SCSI);                     // Apple II SCSI Card
 	device.option_add("hsscsi", A2BUS_HSSCSI);                 // Apple II High-Speed SCSI Card
-	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Appli-Card
+	device.option_add("ace80", A2BUS_ACE80);                   // Franklin ACE 80 CPU Card
 	device.option_add("aesms", A2BUS_AESMS);                   // Applied Engineering Super Music Synthesizer
 	device.option_add("ultraterm", A2BUS_ULTRATERM);           // Videx UltraTerm (original)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
@@ -284,7 +286,8 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);           // Street Electronics Echo Plus (Echo II + Mockingboard clone)
 	device.option_add("scsi", A2BUS_SCSI);                     // Apple II SCSI Card
 	device.option_add("hsscsi", A2BUS_HSSCSI);                 // Apple II High-Speed SCSI Card
-	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Appli-Card
+	device.option_add("ace80", A2BUS_ACE80);                   // Franklin ACE 80 CPU Card
 	device.option_add("aesms", A2BUS_AESMS);                   // Applied Engineering Super Music Synthesizer
 	device.option_add("ultraterm", A2BUS_ULTRATERM);           // Videx UltraTerm (original)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
@@ -336,7 +339,7 @@ void apple2gs_cards(device_slot_interface &device)
 void apple3_cards(device_slot_interface &device)
 {
 	device.option_add("cffa2", A2BUS_CFFA2_6502);          // CFFA2.0 Compact Flash for Apple II (www.dreher.net), 6502 firmware
-	device.option_add("applicard", A2BUS_APPLICARD);       // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);       // PCPI Appli-Card
 	device.option_add("thclock", A2BUS_THUNDERCLOCK);      // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
 	device.option_add("mouse", A2BUS_MOUSE);               // Apple II Mouse Card
 	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);     // Focus Drive IDE card

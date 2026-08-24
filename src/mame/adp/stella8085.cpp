@@ -29,6 +29,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "emu.h"
 
 #include "cpu/i8085/i8085.h"
+#include "machine/i8255.h"
 #include "machine/i8256.h"
 #include "machine/i8279.h"
 #include "machine/mc146818.h"
@@ -61,9 +62,9 @@ public:
 		m_beep(*this, "beeper")
 	{ }
 
-	void dicemstr(machine_config &config);
-	void doppelpot(machine_config &config);
-	void excellent(machine_config &config);
+	void dicemstr(machine_config &config) ATTR_COLD;
+	void doppelpot(machine_config &config) ATTR_COLD;
+	void excellent(machine_config &config) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -83,10 +84,11 @@ private:
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
-	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
-	void small_program_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void program_4040_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
+	void io_4040_map(address_map &map) ATTR_COLD;
 
 	// I8256 ports
 	uint8_t lw_r(); //P1.0-P1.3
@@ -105,7 +107,6 @@ private:
 	void io70(uint8_t data) ATTR_COLD;
 	void io71(uint8_t data) ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
-	void io73(uint8_t data) ATTR_COLD;
 	uint8_t io9r() ATTR_COLD;
 	void io9w(uint8_t data) ATTR_COLD;
 
@@ -116,12 +117,16 @@ private:
 
 void stella8085_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	m_sound_timer = timer_alloc(FUNC(stella8085_state::sound_stop), this);
 
 	save_item(NAME(m_digit));
+}
+
+void stella8085_state::large_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // ICE6
+	map(0x8000, 0x9fff).ram(); // ICC6
+	map(0xa000, 0xffff).rom(); // ICD6
 }
 
 void stella8085_state::program_map(address_map &map)
@@ -132,14 +137,7 @@ void stella8085_state::program_map(address_map &map)
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
 
-void stella8085_state::large_program_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom(); // ICE6
-	map(0x8000, 0x9fff).ram(); // ICC6
-	map(0xa000, 0xffff).rom(); // ICD6
-}
-
-void stella8085_state::small_program_map(address_map &map)
+void stella8085_state::program_4040_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
@@ -150,14 +148,22 @@ void stella8085_state::small_program_map(address_map &map)
 void stella8085_state::io_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
-	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
 	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x73).w(FUNC(stella8085_state::io73)); // probably extra lamps
+	map(0x73, 0x73).nopw(); // programs contain vestigial code to configure the PPI used on earlier boards
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
+}
+
+void stella8085_state::io_4040_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
+	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x80, 0x81).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x90, 0x9f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 /*********************************************
@@ -358,11 +364,6 @@ void stella8085_state::sounddev(uint8_t data)
 	makesound(tone, octave, 60*(length+1)); // 60 is not correct
 }
 
-void stella8085_state::io73(uint8_t data)
-{
-	//old boards
-}
-
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 {
 	int sfrq = soundfreq(tone, octave);
@@ -429,24 +430,24 @@ int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 
 static INPUT_PORTS_START( stella8085_service )
 	PORT_START("TZ6") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Continuous run") // Dauerlauf
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Game counter") // Spielzähler
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Coin counter") // Münzspeicher
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout quote") // Auszahlquote
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Win") // Gewinn // TS0
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Reset")          // TS7
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Continuous run") //     Dauerlauf
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Game counter")   //     Spielzähler
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Coin counter")   //     Münzspeicher
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Hardware-Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Payout quote")   //     Auszahlquote
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Foul")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Win")            // TS0 Gewinn
 
 	PORT_START("TZ7") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Up 1,-") // Hoch 1,- // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Down 1,-") // Runter 1,-
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Up Series") // Hoch Serie
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Down Series") // Runter Serie
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Up 0,10") // Hoch 0,10
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Down 0,10") // Runter 0,10
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Coinage") // Münzung
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialize") // Initialisieren // TS0
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Up 1,-")         // TS7 Hoch 1,-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Down 1,-")       //     Runter 1,-
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Up Series")      //     Hoch Serie
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Down Series")    //     Runter Serie
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Up 0,10")        //     Hoch 0,10
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Down 0,10")      //     Runter 0,10
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Coinage")        //     Münzung
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Initialize")     // TS0 Initialisieren
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stella8085_dip )
@@ -565,7 +566,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
+	BEEP(config, m_beep)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -593,14 +594,21 @@ void stella8085_state::doppelpot(machine_config &config)
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
+	BEEP(config, m_beep)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void stella8085_state::excellent(machine_config &config)
 {
 	doppelpot(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
+
+	auto &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(stella8085_state::io70));
+	ppi.out_pb_callback().set(FUNC(stella8085_state::io71));
+	ppi.out_pc_callback().set(FUNC(stella8085_state::sounddev));
 }
 
 ROM_START( bahia )

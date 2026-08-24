@@ -22,11 +22,14 @@
 #include "fileio.h"
 #include "main.h"
 #include "screen.h"
+#include "sound.h"
 #include "uiinput.h"
 
 #include "corestr.h"
 #include "osdepend.h"
 #include "xmlfile.h"
+
+#include <cstdio>
 
 
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;

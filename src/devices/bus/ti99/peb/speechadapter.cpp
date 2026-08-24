@@ -138,7 +138,7 @@ void ti_speechsyn_adapter_options(device_slot_interface &device)
 
 void ti_speechsyn_adapter_device::device_add_mconfig(machine_config& config)
 {
-	TI99_IOPORT(config, m_port, 0, ti_speechsyn_adapter_options, "speechsyn");
+	TI99_IOPORT(config, m_port, ti_speechsyn_adapter_options, "speechsyn");
 	m_port->ready_cb().set(FUNC(ti_speechsyn_adapter_device::ready));
 }
 

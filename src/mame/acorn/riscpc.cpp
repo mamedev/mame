@@ -6,8 +6,7 @@
     Acorn RiscPC line of computers
 
     TODO:
-    - IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about
-      which uses what;
+    - A7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
     - PS/2 keyboard doesn't work properly;
     - Fix pendingUnd fatalerror from ARM7 core;
     - Fix pendingAbtD fatalerror for RiscOS 4.xx;
@@ -56,7 +55,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
-	required_device<arm7500fe_iomd_device> m_iomd;
+	required_device<arm_iomd_device> m_iomd;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<ps2_keyboard_controller_device> m_kbdc;
@@ -109,7 +108,7 @@ void riscpc_state::a7000_map(address_map &map)
 //  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
 	map(0x03310000, 0x03310003).portr(m_mouse);
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
@@ -185,7 +184,7 @@ void riscpc_state::base_config(machine_config &config)
 //  m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
@@ -205,10 +204,10 @@ void riscpc_state::rpc600(machine_config &config)
 {
 	constexpr XTAL cpuxtal(60_MHz_XTAL/2);
 
-	ARM7(config, m_maincpu, cpuxtal); // really ARM610
+	ARM610(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -218,7 +217,7 @@ void riscpc_state::rpc700(machine_config &config)
 	ARM710A(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -249,10 +248,10 @@ void riscpc_state::sarpc(machine_config &config)
 	// TODO: ranges from 160 to 233 MHz
 	constexpr XTAL cpuxtal(200'000'000);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -261,10 +260,10 @@ void riscpc_state::sarpc_j233(machine_config &config)
 	// TODO: 233 MHz, unsupported by xtal module
 	constexpr XTAL cpuxtal(200'000'000);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 

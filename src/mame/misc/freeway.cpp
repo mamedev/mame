@@ -39,12 +39,9 @@ public:
 	{
 	}
 
-	void freeway(machine_config &config);
+	void freeway(machine_config &config) ATTR_COLD;
 
 	void nmi_w(int state);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -67,11 +64,6 @@ private:
 
 	void palette_init(palette_device &palette) const;
 };
-
-void freeway_state::machine_start()
-{
-	m_lamps.resolve();
-}
 
 // TODO: just the minimum to show errors on screen
 MC6845_UPDATE_ROW(freeway_state::update_row)
@@ -212,7 +204,7 @@ void freeway_state::freeway(machine_config &config)
 
 	M48T58(config, "timekpr");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

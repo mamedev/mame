@@ -271,15 +271,15 @@ void dambustr_state::dambustr(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
-	TTL7474(config, "7474_9m_1", 0).output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_1_callback));
-	TTL7474(config, "7474_9m_2", 0).comp_output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_2_q_callback));
+	TTL7474(config, "7474_9m_1").output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_1_callback));
+	TTL7474(config, "7474_9m_2").comp_output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_2_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(dambustr_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(16000.0/132/2);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);

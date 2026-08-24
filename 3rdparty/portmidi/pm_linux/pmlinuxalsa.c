@@ -19,7 +19,6 @@
 #include "pmlinuxalsa.h"
 #include "string.h"
 #include "porttime.h"
-#include "pmlinux.h"
 
 #include <alsa/asoundlib.h>
 
@@ -46,8 +45,8 @@
 extern pm_fns_node pm_linuxalsa_in_dictionary;
 extern pm_fns_node pm_linuxalsa_out_dictionary;
 
-static snd_seq_t *seq = NULL; // all input comes here, 
-                              // output queue allocated on seq
+static snd_seq_t *seq = NULL; /* all input comes here, 
+                                 output queue allocated on seq */
 static int queue, queue_used; /* one for all ports, reference counted */
 
 #define PORT_IS_CLOSED -999999
@@ -154,6 +153,39 @@ static alsa_info_type alsa_info_create(int client_port, long id, int is_virtual)
 }    
 
 
+/* search system dependent extra parameters for string */
+static const char *get_sysdep_name(enum PmSysDepPropertyKey key,
+                                   PmSysDepInfo *info)
+{
+    /* the version where all current properties were introduced is 210 */
+    if (info && info->structVersion >= 210) {
+        int i;
+        for (i = 0; i < info->length; i++) {  /* search for key */
+            if (info->properties[i].key == key) {
+                return info->properties[i].value;
+            }
+        }
+    }
+    return NULL;
+}
+
+
+static void maybe_set_client_name(PmSysDepInfo *driverInfo)
+{
+    /* make sure seq is created and we have info */
+    if (!seq || !driverInfo) {
+        return;
+    }
+    
+    const char *client_name = get_sysdep_name(pmKeyAlsaClientName,
+                                              (PmSysDepInfo *) driverInfo);
+    if (client_name) {
+        snd_seq_set_client_name(seq, client_name);
+        VERBOSE printf("maybe_set_client_name set client to %s\n", client_name);
+    }
+}    
+
+
 static PmError alsa_out_open(PmInternal *midi, void *driverInfo) 
 {
     int id = midi->device_id;
@@ -162,21 +194,28 @@ static PmError alsa_out_open(PmInternal *midi, void *driverInfo)
                                             pm_descriptors[id].pub.is_virtual);
     snd_seq_port_info_t *pinfo;
     int err = 0;
-    int queue_used = 0;
+    int using_the_queue = 0;
 
     if (!ainfo) return pmInsufficientMemory;
     midi->api_info = ainfo;
-    
+
+    snd_seq_port_info_alloca(&pinfo);
     if (!ainfo->is_virtual) {
-        snd_seq_port_info_alloca(&pinfo);
         snd_seq_port_info_set_port(pinfo, id);
         snd_seq_port_info_set_capability(pinfo, SND_SEQ_PORT_CAP_WRITE |
-                                         SND_SEQ_PORT_CAP_READ);
+                SND_SEQ_PORT_CAP_READ  | SND_SEQ_PORT_CAP_SUBS_READ);
         snd_seq_port_info_set_type(pinfo, SND_SEQ_PORT_TYPE_MIDI_GENERIC | 
-                                   SND_SEQ_PORT_TYPE_APPLICATION);
+                                          SND_SEQ_PORT_TYPE_APPLICATION);
+        const char *port_name = get_sysdep_name(pmKeyAlsaPortName,
+                                                (PmSysDepInfo *) driverInfo);
+        if (port_name) {
+            snd_seq_port_info_set_name(pinfo, port_name);
+        }
         snd_seq_port_info_set_port_specified(pinfo, 1);
+
         err = snd_seq_create_port(seq, pinfo);
         if (err < 0) goto free_ainfo;
+
     }
     
     err = snd_midi_event_new(PM_DEFAULT_SYSEX_BUFFER_SIZE, &ainfo->parser);
@@ -185,7 +224,7 @@ static PmError alsa_out_open(PmInternal *midi, void *driverInfo)
     if (midi->latency > 0) { /* must delay output using a queue */
         err = alsa_use_queue();
         if (err < 0) goto free_parser;
-        queue_used++;
+        using_the_queue++;
     }
 
     if (!ainfo->is_virtual) {
@@ -193,10 +232,13 @@ static PmError alsa_out_open(PmInternal *midi, void *driverInfo)
                                  ainfo->port);
         if (err < 0) goto unuse_queue;  /* clean up and return on error */
     }
+
+    maybe_set_client_name(driverInfo);
+
     return pmNoError;
 
  unuse_queue:
-    if (queue_used > 0)  /* only for latency>0 case */
+    if (using_the_queue > 0)  /* only for latency>0 case */
         alsa_unuse_queue();
  free_parser:
     snd_midi_event_free(ainfo->parser);
@@ -316,11 +358,13 @@ static PmError alsa_create_virtual(int is_input, const char *name,
     snd_seq_port_info_set_timestamping(pinfo, 1);
     snd_seq_port_info_set_timestamp_real(pinfo, 0);
     snd_seq_port_info_set_timestamp_queue(pinfo, queue);
+
     err = snd_seq_create_port(seq, pinfo);
     if (err < 0) {
         pm_undo_add_device(id);
         return check_hosterror(err);
     }
+
     client = snd_seq_port_info_get_client(pinfo);
     port = snd_seq_port_info_get_port(pinfo);
     pm_descriptors[id].descriptor = MAKE_DESCRIPTOR(client, port);
@@ -353,18 +397,30 @@ static PmError alsa_in_open(PmInternal *midi, void *driverInfo)
     err = alsa_use_queue();
     if (err < 0) goto free_ainfo;
 
+    snd_seq_port_info_alloca(&pinfo);
     if (is_virtual) {
         ainfo->is_virtual = TRUE;
+        if (snd_seq_get_port_info(seq, ainfo->port, pinfo)) {
+            pinfo = NULL;
+            goto free_ainfo;
+        }
     } else {
         /* create a port for this alsa client (seq) where the port
            number matches the portmidi device ID of the input device */
-        snd_seq_port_info_alloca(&pinfo);
         snd_seq_port_info_set_port(pinfo, id);
         snd_seq_port_info_set_capability(pinfo, SND_SEQ_PORT_CAP_WRITE |
-                                         SND_SEQ_PORT_CAP_READ);
+                SND_SEQ_PORT_CAP_READ  | SND_SEQ_PORT_CAP_SUBS_WRITE);
+
         snd_seq_port_info_set_type(pinfo, SND_SEQ_PORT_TYPE_MIDI_GENERIC | 
-                                   SND_SEQ_PORT_TYPE_APPLICATION);
+                                          SND_SEQ_PORT_TYPE_APPLICATION);
         snd_seq_port_info_set_port_specified(pinfo, 1);
+        
+        const char *port_name = get_sysdep_name(pmKeyAlsaPortName,
+                                                (PmSysDepInfo *) driverInfo);
+        if (port_name) {
+            snd_seq_port_info_set_name(pinfo, port_name);
+        }
+        
         err = snd_seq_create_port(seq, pinfo);
         if (err < 0) goto free_queue;
 
@@ -388,6 +444,9 @@ static PmError alsa_in_open(PmInternal *midi, void *driverInfo)
         err = snd_seq_subscribe_port(seq, sub);
         if (err < 0) goto free_this_port;  /* clean up and return on error */
     }
+
+    maybe_set_client_name(driverInfo);
+
     return pmNoError;
  free_this_port:
     snd_seq_delete_port(seq, ainfo->this_port);
@@ -494,20 +553,39 @@ static PmTimestamp alsa_synchronize(PmInternal *midi)
 static void handle_event(snd_seq_event_t *ev)
 {
     int device_id = ev->dest.port;
+
+    assert(device_id >= 0 && device_id < pm_descriptor_len);
+    assert(pm_descriptors[device_id].pub.name);
+
     PmInternal *midi = pm_descriptors[device_id].pm_internal;
-    // There is a race condition when closing a device and
-    // continuing to poll other open devices. The closed device may
-    // have outstanding events from before the close operation.
+    /* There is a race condition when closing a device and
+       continuing to poll other open devices. The closed device may
+       have outstanding events from before the close operation.
+    */
     if (!midi) {
         return;
     }
     PmEvent pm_ev;
+
+    /* Copilot says: "snd_seq_event_input() will not return events for a
+     * MIDI output device." However, this does not seem to be true, e.g.,
+     * for MIDIFLEX 4 on Arch Linux, so we want to check and ignore the
+     * call if this is an output device.
+     */
+    if (!midi->is_input) {
+        return;
+    }
+
+    if (!midi->time_proc) {  /* extra sanity check */
+        return;
+    }
+
     PmTimestamp timestamp = midi->time_proc(midi->time_info);
 
     /* time stamp should be in ticks, using our queue where 1 tick = 1ms */
     /* assert((ev->flags & SND_SEQ_TIME_STAMP_MASK) == SND_SEQ_TIME_STAMP_TICK);
-     * Currently, event timestamp is ignored. See long note below. */
-
+       Currently, event timestamp is ignored. See long note below. 
+    */
     VERBOSE {
         /* translate time to time_proc basis */
         snd_seq_queue_status_t *queue_status;
@@ -692,9 +770,9 @@ static PmError alsa_poll(PmInternal *midi)
                 int i;
                 for (i = 0; i < pm_descriptor_len; i++) {
                     if (pm_descriptors[i].pub.input) {
-                        PmInternal *midi = pm_descriptors[i].pm_internal;
+                        PmInternal *midi_i = pm_descriptors[i].pm_internal;
                         /* careful, device may not be open! */
-                        if (midi) Pm_SetOverflow(midi->queue);
+                        if (midi_i) Pm_SetOverflow(midi_i->queue);
                     }
                 }
             }

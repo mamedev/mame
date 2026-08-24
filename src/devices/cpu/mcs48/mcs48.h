@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <numbers>
+
 
 /***************************************************************************
     CONSTANTS
@@ -59,7 +61,7 @@ enum
 ***************************************************************************/
 
 #define MCS48_LC_CLOCK(_L, _C) \
-	(1 / (2 * M_PI * sqrt(_L * _C)))
+	(1 / (2 * std::numbers::pi * sqrt(_L * _C)))
 
 #define MCS48_ALE_CLOCK(_clock) \
 	attotime::from_hz(_clock/(3*5))

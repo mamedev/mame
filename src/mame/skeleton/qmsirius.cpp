@@ -60,7 +60,7 @@ void qmsirius_state::qmsirius(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &qmsirius_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &qmsirius_state::ext_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

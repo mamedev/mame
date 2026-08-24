@@ -34,6 +34,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "emupal.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 
 /*
     A = Angus

@@ -804,5 +804,5 @@ void atari_fdc_device::device_start()
 void atari_fdc_device::device_add_mconfig(machine_config &config)
 {
 	for (auto &floppy : m_floppy)
-		LEGACY_FLOPPY(config, floppy, 0, &atari_floppy_interface);
+		LEGACY_FLOPPY(config, floppy, &atari_floppy_interface);
 }

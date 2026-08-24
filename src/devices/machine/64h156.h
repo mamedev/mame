@@ -109,6 +109,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(update_tick);
 
 private:
+	static constexpr unsigned WRITE_BATCH_SIZE = 32;
+
 	enum {
 		IDLE,
 		RUNNING,
@@ -136,9 +138,7 @@ private:
 
 		uint8_t yb = 0;
 		uint8_t shift_reg_write = 0;
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position = 0;
+		unsigned write_transition_count = 0;
 	};
 
 	devcb_write_line m_write_atn;

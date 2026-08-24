@@ -30,7 +30,7 @@ public:
 	nes_rob_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;

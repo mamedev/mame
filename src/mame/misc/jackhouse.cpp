@@ -53,14 +53,12 @@ public:
 
 	{ }
 
-	void jackhouse(machine_config &config);
+	void jackhouse(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); };
 	virtual void video_start() override ATTR_COLD;
 
 private:
-
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -691,7 +689,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("DSW5");
 	ppi1.in_pc_callback().set_ioport("DSW3");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(512, 256);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
@@ -700,7 +698,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x300);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &jackhouse_state::ramdac_map);
 	ramdac.set_color_base(0);
 

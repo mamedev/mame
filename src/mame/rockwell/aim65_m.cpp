@@ -109,8 +109,6 @@ void aim65_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_digits.resolve();
-
 	// Init ROM sockets
 	if (m_z24->exists())
 		space.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_z24, FUNC(generic_slot_device::read_rom)));

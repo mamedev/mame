@@ -55,7 +55,7 @@
 #include "emu.h"
 #include "h8_sci.h"
 
-#include "h8.h"
+#include "h8_cpu_base.h"
 
 #define LOG_REGS  (1 << 1U)  // Register writes
 #define LOG_RREGS (1 << 2U)  // Register reads
@@ -488,7 +488,7 @@ void h8_sci_device::clock_start(int mode)
 
 	case EXTERNAL_RATE_ASYNC:
 	case EXTERNAL_RATE_SYNC: {
-		LOGMASKED(LOG_CLOCK, "Simulating external clock\n", m_clock_mode == EXTERNAL_RATE_ASYNC ? "async" : "sync");
+		LOGMASKED(LOG_CLOCK, "Simulating external clock (%s)\n", m_clock_mode == EXTERNAL_RATE_ASYNC ? "async" : "sync");
 		u64 now = mode == CLK_TX ? m_cpu->total_cycles() : m_cpu->now_as_cycles();
 		m_clock_event = u64(u64(now * m_internal_to_external_ratio + 1) * m_external_to_internal_ratio + 1);
 		m_sync_timer->adjust(attotime::from_ticks(m_clock_event - now, m_cpu->system_clock()));

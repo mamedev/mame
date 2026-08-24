@@ -36,7 +36,7 @@ void isa16_wss_device::device_add_mconfig(machine_config &config)
 	m_opl3->add_route(2, "speaker", 1.0, 0);
 	m_opl3->add_route(3, "speaker", 1.0, 1);
 
-	AD1848(config, m_soundport, 0);
+	AD1848(config, m_soundport);
 	m_soundport->irq().set([this] (int state) { m_isa->irq7_w(state); });
 	m_soundport->drq().set([this] (int state) { m_isa->drq0_w(state); });
 }

@@ -31,9 +31,14 @@ konppc_device::konppc_device(const machine_config &mconfig, const char *tag, dev
 	, m_k033906(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_voodoo(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_texture_bank(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	//, m_cgboard_id(MAX_CG_BOARDS)
+	, m_cgboard_id(0)
 	, m_cgboard_type(0)
 	, m_num_cgboards(0)
-	//, m_cgboard_id(MAX_CG_BOARDS)
+	, m_nwk_fifo_half_full_r(0)
+	, m_nwk_fifo_half_full_w(0)
+	, m_nwk_fifo_full(0)
+	, m_nwk_fifo_mask(0)
 {
 }
 
@@ -100,7 +105,7 @@ void konppc_device::set_cgboard_id(int board_id)
 	}
 }
 
-int konppc_device::get_cgboard_id(void)
+int konppc_device::get_cgboard_id()
 {
 	if (m_cgboard_id > (m_num_cgboards - 1))
 	{

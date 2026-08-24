@@ -45,9 +45,9 @@ public:
 		, m_display(*this, "display")
 		, m_io_keyboard(*this, "X%u", 0U)
 		, m_leds(*this, "led%u", 0U)
-		{ }
+	{ }
 
-	void savia84(machine_config &config);
+	void savia84(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -168,8 +168,6 @@ uint8_t savia84_state::ppi_portc_r() // IN FA - read keyboard
 
 void savia84_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_digit));
 	save_item(NAME(m_seg));
 }

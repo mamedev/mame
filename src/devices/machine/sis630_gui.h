@@ -12,7 +12,7 @@
 class sis630_gui_device : public pci_device
 {
 public:
-	sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void legacy_memory_map(address_map &map) ATTR_COLD;
 	void legacy_io_map(address_map &map) ATTR_COLD;

@@ -251,7 +251,7 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	m_eeprom->write_time(attotime::from_usec(1));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);
@@ -381,8 +381,6 @@ void royalpk2_state::machine_start()
 	save_item(NAME(m_protection_response_byte));
 	save_item(NAME(m_protection_response_bit));
 
-	m_lamps.resolve();
-
 	for (int i = 0; i < 31; i++)
 		m_lamps[i] = 0;
 
@@ -472,7 +470,7 @@ void royalpk2_state::royalpk2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);

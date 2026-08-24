@@ -639,7 +639,7 @@ public:
 	tilemap_t &create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows)
 	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, nullptr); }
 	template <typename T, typename U, class V>
-	std::enable_if_t<std::is_base_of<device_t, V>::value, tilemap_t &> create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, V &allocated)
+	tilemap_t &create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, V &allocated) requires std::is_base_of_v<device_t, V>
 	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, &static_cast<tilemap_t &>(allocated)); }
 
 	// tilemap list information

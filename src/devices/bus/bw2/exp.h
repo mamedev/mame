@@ -79,7 +79,7 @@ public:
 	void modsel_w(offs_t offset, u8 data);
 
 	// card interface
-	required_address_space memspace() { return m_memspace; }
+	auto const &memspace() { return m_memspace; }
 
 	bool ram2() const { return m_bank == 2; }
 	bool ram3() const { return m_bank == 3; }

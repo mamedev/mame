@@ -35,7 +35,7 @@ ROM_END
 // device machine config
 void cpc_rs232_device::device_add_mconfig(machine_config &config)
 {
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->set_clk<1>(2000000);
 	m_pit->set_clk<2>(2000000);

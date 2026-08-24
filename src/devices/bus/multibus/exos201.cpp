@@ -123,8 +123,6 @@ private:
 
 void multibus_exos201_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_u21));
 	save_item(NAME(m_u83));
 	save_item(NAME(m_u111));

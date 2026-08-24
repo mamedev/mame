@@ -259,12 +259,6 @@ void xavix_state::slotreg_7810_w(uint8_t data)
 	LOG("%s: slotreg_7810_w %02x\n", machine().describe_context(), data);
 }
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::scanline_cb)
-{
-
-}
-
 INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 {
 	if (m_video_ctrl & 0x20)
@@ -1230,8 +1224,6 @@ void xavix_state::machine_reset()
 	m_sound_irqstatus = 0x00;
 
 	m_sound_regbase = 0x02; // rad_bb doesn't initialize this and expects it here.  It is possible the default is 0x00, but since 0x00 and 0x01 are special (zero page and stack) those values would also use bank 0x02
-
-	m_sprite_xhigh_ignore_hack = true;
 
 	m_cpuspace = &m_maincpu->space(AS_PROGRAM);
 

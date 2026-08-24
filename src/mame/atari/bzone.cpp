@@ -213,7 +213,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 #include "sound/ay8910.h" // for Desert Wars
 #include "sound/pokey.h"
 
@@ -232,19 +232,21 @@
 void bzone_state::machine_start()
 {
 	save_item(NAME(m_analog_data));
-	m_startled.resolve();
 }
 
 
 void redbaron_state::machine_start()
 {
 	bzone_state::machine_start();
+
 	save_item(NAME(m_rb_input_select));
 }
 
 
 void redbaron_state::machine_reset()
 {
+	bzone_state::machine_reset();
+
 	earom_control_w(0);
 }
 
@@ -613,19 +615,16 @@ void bzone_state::bzone_base(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	VECTOR(config, "vector");
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 6);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 580, 0, 400);
-	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 6);
+	m_vector->set_visarea(0, 580, 0, 400);
 
-	avg_device &avg(AVG_BZONE(config, "avg", 0));
-	avg.set_vector("vector");
+	avg_device &avg(AVG_BZONE(config, "avg"));
+	avg.set_vector(m_vector);
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	// Drivers
-	MATHBOX(config, m_mathbox, 0);
+	MATHBOX(config, m_mathbox);
 }
 
 void bzone_state::bzone(machine_config &config)
@@ -665,8 +664,8 @@ void redbaron_state::redbaron(machine_config &config)
 	ER2055(config, m_earom);
 
 	// video hardware
-	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 4);
-	m_screen->set_visarea(0, 520, 0, 400);
+	m_vector->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 4);
+	m_vector->set_visarea(0, 520, 0, 400);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -675,7 +674,7 @@ void redbaron_state::redbaron(machine_config &config)
 	pokey.allpot_r().set(FUNC(redbaron_state::redbaron_joy_r));
 	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	REDBARON(config, m_redbaronsound, 0);
+	REDBARON(config, m_redbaronsound);
 	m_redbaronsound->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

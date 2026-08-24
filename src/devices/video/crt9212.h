@@ -38,7 +38,7 @@ class crt9212_device : public device_t
 {
 public:
 	// construction/destruction
-	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_wen2(int state) { m_wen2 = state; }
 	auto dout() { return m_write_dout.bind(); }
@@ -80,7 +80,6 @@ private:
 	// internal state
 	bool m_clrcnt_edge;
 	uint8_t m_data_latch;
-	int m_ren_int;
 	int m_wen_int;
 	uint8_t m_ram[RAM_SIZE][2];
 	int m_buffer;

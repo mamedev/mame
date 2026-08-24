@@ -403,8 +403,6 @@ void jeutel_state::ppi2a_w(u8 data)
 void jeutel_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
 
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_row));

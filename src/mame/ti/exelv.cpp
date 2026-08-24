@@ -842,7 +842,7 @@ void exelv_state::exl100(machine_config &config)
 	TMS3556(config, m_tms3556, 18_MHz_XTAL);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH
@@ -860,7 +860,7 @@ void exelv_state::exl100(machine_config &config)
 
 	TIMER(config, m_timer_k).configure_generic(FUNC(exelv_state::timer_k));
 
-	//SPEECHROM(config, "vsm", 0);
+	//SPEECHROM(config, "vsm");
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
@@ -874,7 +874,7 @@ void exelv_state::exl100(machine_config &config)
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "exelvision_cart", "bin,rom");
 
-	CASSETTE(config, m_cass, 0);
+	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
@@ -907,7 +907,7 @@ void exelv_state::exeltel(machine_config &config)
 	TMS3556(config, m_tms3556, 18_MHz_XTAL);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH

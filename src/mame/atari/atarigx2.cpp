@@ -1504,7 +1504,7 @@ void atarigx2_state::atarigx2(machine_config &config)
 	m_playfield_tilemap->set_info_callback(FUNC(atarigx2_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(atarigx2_state::get_alpha_tile_info));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
@@ -1516,7 +1516,7 @@ void atarigx2_state::atarigx2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	ATARI_JSA_IIIS(config, m_jsa, 0);
+	ATARI_JSA_IIIS(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
 	m_jsa->add_route(0, "speaker", 0.7, 0);
@@ -1526,15 +1526,15 @@ void atarigx2_state::atarigx2(machine_config &config)
 void atarigx2_state::atarigx2_0x200(machine_config &config)
 {
 	atarigx2(config);
-	ATARI_136094_0072(config, m_xga, 0);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
+	ATARI_136094_0072(config, m_xga);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x200);
 }
 
 void atarigx2_state::atarigx2_0x400(machine_config &config)
 {
 	atarigx2(config);
-	ATARI_136095_0072(config, m_xga, 0);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
+	ATARI_136095_0072(config, m_xga);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x400);
 }
 
 

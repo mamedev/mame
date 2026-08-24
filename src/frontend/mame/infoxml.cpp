@@ -148,7 +148,6 @@ void output_features(std::ostream &out, device_type type, device_t::feature_type
 void output_images(std::ostream &out, device_t &device, const char *root_tag);
 void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
 void output_software_lists(std::ostream &out, device_t &root, const char *root_tag);
-void output_ramoptions(std::ostream &out, device_t &root);
 
 void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag, device_type_set *devtypes);
 void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set *filter);
@@ -169,7 +168,7 @@ constexpr char f_dtd_string[] =
 		"\t<!ATTLIST __XML_ROOT__ build CDATA #IMPLIED>\n"
 		"\t<!ATTLIST __XML_ROOT__ debug (yes|no) \"no\">\n"
 		"\t<!ATTLIST __XML_ROOT__ mameconfig CDATA #REQUIRED>\n"
-		"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>\n"
+		"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*)>\n"
 		"\t\t<!ATTLIST __XML_TOP__ name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST __XML_TOP__ sourcefile CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST __XML_TOP__ isbios (yes|no) \"no\">\n"
@@ -321,9 +320,6 @@ constexpr char f_dtd_string[] =
 		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
-		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
-		"\t\t\t<!ATTLIST ramoption name CDATA #REQUIRED>\n"
-		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 		"]>";
 
 
@@ -798,7 +794,6 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_images(out, config.root_device(), "");
 	output_slots(out, config, config.root_device(), "", devtypes);
 	output_software_lists(out, config.root_device(), "");
-	output_ramoptions(out, config.root_device());
 
 	// close the topmost tag
 	util::stream_format(out, "\t</%s>\n", XML_TOP);
@@ -1284,23 +1279,16 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag)
 {
 	// iterate over screens
-	for (const screen_device &screendev : screen_device_enumerator(device))
+	for (const device_video_output_interface &screendev : video_output_interface_enumerator(device))
 	{
-		if (strcmp(screendev.tag(), device.tag()))
+		if (strcmp(screendev.device().tag(), device.tag()))
 		{
-			std::string newtag(screendev.tag()), oldtag(":");
+			std::string newtag(screendev.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			util::stream_format(out, "\t\t<display tag=\"%s\"", util::xml::normalize_string(newtag));
 
-			switch (screendev.screen_type())
-			{
-				case SCREEN_TYPE_RASTER:    out << " type=\"raster\"";  break;
-				case SCREEN_TYPE_VECTOR:    out << " type=\"vector\"";  break;
-				case SCREEN_TYPE_LCD:       out << " type=\"lcd\"";     break;
-				case SCREEN_TYPE_SVG:       out << " type=\"svg\"";     break;
-				default:                    out << " type=\"unknown\""; break;
-			}
+			out << " type=\"" << screendev.output_type_name() << '"';
 
 			// output the orientation as a string
 			switch (screendev.orientation())
@@ -1332,7 +1320,7 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			}
 
 			// output width and height only for games that are not vector
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
+			if (!screendev.is_vector())
 			{
 				const rectangle &visarea = screendev.visible_area();
 				util::stream_format(out, " width=\"%d\"", visarea.width());
@@ -1340,21 +1328,22 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			}
 
 			// output refresh rate
-			util::stream_format(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+			util::stream_format(out, " refresh=\"%f\"", screendev.frame_period().as_hz());
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR && !screendev.oldstyle_vblank_supplied())
+			const screen_device *output_as_screen = dynamic_cast<const screen_device *>(&screendev);
+			if (output_as_screen && !output_as_screen->oldstyle_vblank_supplied())
 			{
-				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
+				int pixclock = output_as_screen->width() * output_as_screen->height() * output_as_screen->frame_period().as_hz();
 
 				util::stream_format(out, " pixclock=\"%d\"", pixclock);
-				util::stream_format(out, " htotal=\"%d\"", screendev.width());
-				util::stream_format(out, " hbend=\"%d\"", screendev.visible_area().min_x);
-				util::stream_format(out, " hbstart=\"%d\"", screendev.visible_area().max_x+1);
-				util::stream_format(out, " vtotal=\"%d\"", screendev.height());
-				util::stream_format(out, " vbend=\"%d\"", screendev.visible_area().min_y);
-				util::stream_format(out, " vbstart=\"%d\"", screendev.visible_area().max_y+1);
+				util::stream_format(out, " htotal=\"%d\"", output_as_screen->width());
+				util::stream_format(out, " hbend=\"%d\"", output_as_screen->visible_area().min_x);
+				util::stream_format(out, " hbstart=\"%d\"", output_as_screen->visible_area().max_x+1);
+				util::stream_format(out, " vtotal=\"%d\"", output_as_screen->height());
+				util::stream_format(out, " vbend=\"%d\"", output_as_screen->visible_area().min_y);
+				util::stream_format(out, " vbstart=\"%d\"", output_as_screen->visible_area().max_y+1);
 			}
 			out << " />\n";
 		}
@@ -2203,40 +2192,6 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 	}
 }
 
-
-
-//-------------------------------------------------
-//  output_ramoptions - prints m_output all RAM
-//  options for this system
-//-------------------------------------------------
-
-void output_ramoptions(std::ostream &out, device_t &root)
-{
-	for (const ram_device &ram : ram_device_enumerator(root, 1))
-	{
-		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
-		{
-			uint32_t const defsize(ram.default_size());
-			bool havedefault(false);
-			for (ram_device::extra_option const &option : ram.extra_options())
-			{
-				if (defsize == option.second)
-				{
-					assert(!havedefault);
-					havedefault = true;
-					util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
-				}
-				else
-				{
-					util::stream_format(out, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
-				}
-			}
-			if (!havedefault)
-				util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
-			break;
-		}
-	}
-}
 
 
 //-------------------------------------------------

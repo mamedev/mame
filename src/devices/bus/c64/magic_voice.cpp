@@ -221,7 +221,7 @@ void c64_magic_voice_cartridge_device::apd_w(int state)
 
 void c64_magic_voice_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	TPI6525(config, m_tpi, 0);
+	TPI6525(config, m_tpi);
 	m_tpi->out_irq_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_irq_w));
 	m_tpi->in_pa_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_pa_r));
 	m_tpi->out_pa_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_pa_w));
@@ -230,12 +230,12 @@ void c64_magic_voice_cartridge_device::device_add_mconfig(machine_config &config
 	m_tpi->out_ca_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_ca_w));
 	m_tpi->out_cb_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_cb_w));
 
-	CD40105(config, m_fifo, 0);
-	m_fifo->in_ready_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));
+	CD40105(config, m_fifo);
+	m_fifo->in_ready_cb().set(m_tpi, FUNC(tpi6525_device::pc3_w));
 
 	SPEAKER(config, "mono").front_center();
 	T6721A(config, m_vslsi, XTAL(640'000));
-	m_vslsi->eos_handler().set(m_tpi, FUNC(tpi6525_device::i2_w));
+	m_vslsi->eos_handler().set(m_tpi, FUNC(tpi6525_device::pc2_w));
 	m_vslsi->phi2_handler().set(FUNC(c64_magic_voice_cartridge_device::phi2_w));
 	m_vslsi->dtrd_handler().set(FUNC(c64_magic_voice_cartridge_device::dtrd_w));
 	m_vslsi->apd_handler().set(FUNC(c64_magic_voice_cartridge_device::apd_w));

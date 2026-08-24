@@ -5,6 +5,8 @@
 #include "filter.h"
 #include "xmlfile.h"
 
+#include <numbers>
+
 // This effect implements a couple of very standard biquad filters,
 // one lowpass and one highpass.
 
@@ -235,7 +237,7 @@ void audio_effect_filter::build_highpass()
 	float sr = m_sample_rate;
 	float fh = std::clamp(float(m_fh), 1.0f, sr/2.0f - 1.0f);
 
-	float K = tan(M_PI*fh/sr);
+	float K = tan(std::numbers::pi * fh / sr);
 	float K2 = K*K;
 	float Q = m_qh;
 
@@ -258,7 +260,7 @@ void audio_effect_filter::build_lowpass()
 	float sr = m_sample_rate;
 	float fl = std::clamp(float(m_fl), 1.0f, sr/2.0f - 1.0f);
 
-	float K = tan(M_PI*fl/sr);
+	float K = tan(std::numbers::pi * fl / sr);
 	float K2 = K*K;
 	float Q = m_ql;
 

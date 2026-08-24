@@ -553,7 +553,7 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	I80960KA(config, m_maincpu, XTAL(24'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_gameking_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(1024, 512);
@@ -578,7 +578,7 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igt_gameking);

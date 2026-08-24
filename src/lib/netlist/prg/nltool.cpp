@@ -933,7 +933,7 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 		mac_out("// auto connect: " + avs.substr(2), false);
 
 	mac_out("#define " + e->name() + "(...)");
-	mac_out("\tNET_REGISTER_DEVEXT(" + e->name() +", __VA_ARGS__)", false);
+	mac_out("\tNET_REGISTER_DEV(" + e->name() +", __VA_ARGS__)", false);
 	mac_out("", false);
 }
 

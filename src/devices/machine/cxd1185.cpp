@@ -59,7 +59,7 @@ void cxd1185_device::map(address_map &map)
 	map(0x3, 0x3).rw(FUNC(cxd1185_device::int_req_r<1>), FUNC(cxd1185_device::environ_w));
 	map(0x4, 0x4).rw(FUNC(cxd1185_device::scsi_ctrl_monitor_r), FUNC(cxd1185_device::timer_w));
 	map(0x5, 0x5).r(FUNC(cxd1185_device::fifo_status_r));
-	map(0x6, 0x6).rw(FUNC(cxd1185_device::scsi_id_r), FUNC(cxd1185_device::scsi_id_w));
+	map(0x6, 0x6).rw(FUNC(cxd1185_device::scsi_idr_r), FUNC(cxd1185_device::scsi_idr_w));
 	map(0x7, 0x7).rw(FUNC(cxd1185_device::count_r<0>), FUNC(cxd1185_device::count_w<0>));
 	map(0x8, 0x8).rw(FUNC(cxd1185_device::count_r<1>), FUNC(cxd1185_device::count_w<1>));
 	map(0x9, 0x9).rw(FUNC(cxd1185_device::count_r<2>), FUNC(cxd1185_device::count_w<2>));

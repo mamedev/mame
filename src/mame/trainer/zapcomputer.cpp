@@ -57,7 +57,6 @@ private:
 	void zapcomp_mem(address_map &map) ATTR_COLD;
 
 	uint8_t decode7seg(uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;
 };
@@ -156,11 +155,6 @@ static INPUT_PORTS_START( zapcomp )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
-
-void zapcomp_state::machine_start()
-{
-	m_digits.resolve();
-}
 
 void zapcomp_state::zapcomp(machine_config &config)
 {

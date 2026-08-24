@@ -786,7 +786,7 @@ void sapi_state::sapi1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi1_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(40*6, 24*9);
@@ -823,7 +823,7 @@ void sapi_state::sapi2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi2_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi2_io);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(sapi_state::kbd_put));
 }
 

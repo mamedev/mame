@@ -12,13 +12,15 @@
 
     TODO:
     - BRKDET: if, in Async mode, 16 low RxD bits in succession are clocked
-	  in, the SYNDET pin & status must go high. It will go low upon a
+      in, the SYNDET pin & status must go high. It will go low upon a
       status read, same as what happens with sync.
 
 *********************************************************************/
 
 #include "emu.h"
 #include "i8251.h"
+
+#include <bit>
 
 #define LOG_STAT    (1U << 1)
 #define LOG_COM     (1U << 2)
@@ -216,7 +218,7 @@ void i8251_device::sync1_rxc()
 	{
 		// bit 5: 0 = odd parity, 1 = even parity.
 		// Total 1-bits (data + received parity + parity_type) must be odd for a correct frame.
-		if (((population_count_32(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
+		if (((std::popcount(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
 			m_status |= I8251_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}
@@ -289,7 +291,7 @@ void i8251_device::sync2_rxc()
 	{
 		// bit 5: 0 = odd parity, 1 = even parity.
 		// Total 1-bits (data + received parity + parity_type) must be odd for a correct frame.
-		if (((population_count_32(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
+		if (((std::popcount(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
 			m_status |= I8251_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}
@@ -362,7 +364,7 @@ bool i8251_device::is_tx_enabled() const
 
 void i8251_device::check_for_tx_start()
 {
-	if (is_tx_enabled() && (m_status & (I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY)) == I8251_STATUS_TX_EMPTY)
+	if (is_tx_enabled() && is_transmit_register_empty() && (m_status & (I8251_STATUS_TX_READY)) == 0)
 		start_tx();
 }
 
@@ -397,7 +399,25 @@ void i8251_device::transmit_clock()
 		if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || m_delayed_tx_en))
 			start_tx();
 		else
+		{
 			m_status |= I8251_STATUS_TX_EMPTY;
+			if (m_sync_byte_count > 0 && is_tx_enabled())
+			{
+				// In synchronous mode, transmit sync character(s) during idle instead of mark state
+				if (m_sync_byte_count == 2)
+				{
+					transmit_register_setup(uint8_t(m_sync16 >> m_tx_sync_shift));
+					m_tx_sync_shift ^= 8;  // alternate between high byte (sync1) and low byte (sync2)
+				}
+				else
+					transmit_register_setup(m_sync8);
+			}
+			else
+			{
+				// return TxD to marking state (high) if not sending break character
+				m_txd_handler(!BIT(m_command, 3));
+			}
+		}
 
 		update_tx_ready();
 		update_tx_empty();
@@ -442,27 +462,6 @@ void v5x_scu_device::update_tx_ready()
 
 void i8251_device::update_tx_empty()
 {
-	if (m_status & I8251_STATUS_TX_EMPTY)
-	{
-		if (m_sync_byte_count > 0 && is_tx_enabled())
-		{
-			// In synchronous mode, transmit sync character(s) during idle instead of mark state
-			if (m_sync_byte_count == 2)
-			{
-				transmit_register_setup(uint8_t(m_sync16 >> m_tx_sync_shift));
-				m_tx_sync_shift ^= 8;  // alternate between high byte (sync1) and low byte (sync2)
-			}
-			else
-				transmit_register_setup(m_sync8);
-			m_status &= ~I8251_STATUS_TX_EMPTY;
-		}
-		else
-		{
-			// return TxD to marking state (high) if not sending break character
-			m_txd_handler(!BIT(m_command, 3));
-		}
-	}
-
 	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
 }
 

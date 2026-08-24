@@ -398,8 +398,6 @@ TILE_GET_INFO_MEMBER(gatron_state::get_bg_tile_info)
 
 void gatron_state::video_start()
 {
-	m_lamps.resolve();
-
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gatron_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 16, 48, 16);
 }
 
@@ -649,7 +647,7 @@ void gatron_state::gat(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(48*8, 16*16);

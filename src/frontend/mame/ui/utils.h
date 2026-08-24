@@ -30,7 +30,7 @@
 
 
 class mame_ui_manager;
-class render_container;
+class render_target;
 
 
 // TODO: namespace these things
@@ -141,7 +141,7 @@ public:
 
 	virtual bool apply(Entry const &info) const = 0;
 
-	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Impl &)> &&handler) = 0;
+	virtual void show_ui(mame_ui_manager &mui, render_target &target, std::function<void (Impl &)> &&handler) = 0;
 
 	virtual bool wants_adjuster() const = 0;
 	virtual char const *adjust_text() const = 0;

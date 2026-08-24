@@ -707,7 +707,7 @@ void kinst_state::kinst(machine_config &config)
 	m_ata->irq_handler().set_inputline(m_maincpu, 1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL/8, 406, 0, 320, 261, 0, 240);
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
@@ -717,7 +717,7 @@ void kinst_state::kinst(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_2K(config, m_dcs, 0);
+	DCS_AUDIO_2K(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
 }

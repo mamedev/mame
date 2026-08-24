@@ -61,7 +61,7 @@ class mikromikko2_expansion_bus_device : public device_t
 	friend class mikromikko2_expansion_bus_slot_device;
 
 public:
-	mikromikko2_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mikromikko2_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
@@ -129,13 +129,13 @@ class mikromikko2_expansion_bus_slot_device : public device_t, public device_slo
 {
 public:
 	template <typename T, typename U>
-	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&bus_tag, U &&opts, const char *dflt, bool fixed)
-		: mikromikko2_expansion_bus_slot_device(mconfig, tag, owner, clock)
+	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, U &&opts, const char *dflt, bool fixed)
+		: mikromikko2_expansion_bus_slot_device(mconfig, tag, owner)
 	{
 		set_options(std::forward<U>(opts), dflt, fixed);
 		m_bus.set_tag(std::forward<T>(bus_tag));
 	}
-	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

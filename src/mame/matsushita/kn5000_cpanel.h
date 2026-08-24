@@ -2,13 +2,13 @@
 // copyright-holders:Felipe Sanches
 /***************************************************************************
 
-	KN5000 control panel HLE
+    KN5000 control panel HLE
 
-	Emulates the two Mitsubishi M37471M2196S MCUs on the control panel.
-	Since no ROM dumps are available, this uses High Level Emulation based
-	on reverse engineering of the main CPU firmware protocol.
+    Emulates the two Mitsubishi M37471M2196S MCUs on the control panel.
+    Since no ROM dumps are available, this uses High Level Emulation based
+    on reverse engineering of the main CPU firmware protocol.
 
-	Protocol documentation: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
+    Protocol documentation: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
 
 ***************************************************************************/
 
@@ -19,28 +19,27 @@
 
 #include <queue>
 
-class kn5000_cpanel_device :
-	public device_t
+class kn5000_cpanel_device : public device_t
 {
 public:
 	kn5000_cpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// Serial interface from main CPU
-	void rxd(int state);
-	void sioclk(int state);
-	void tx_start(int state);  // Called when CPU starts a new byte transmission
+	// Button input port setters (called from main driver)
+	template <typename T> void set_cpl_port(unsigned n, T &&tag) { m_cpl_ports[n].set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpr_port(unsigned n, T &&tag) { m_cpr_ports[n].set_tag(std::forward<T>(tag)); }
+
+	// Configuration
+	void set_baudrate(uint16_t br);
 
 	// Callbacks to main CPU
 	auto txd() { return m_txd_cb.bind(); }
 	auto sclk_out() { return m_sclk_out_cb.bind(); }
 	auto inta() { return m_inta_cb.bind(); }
 
-	// Configuration
-	void set_baudrate(uint16_t br);
-
-	// Button input port setters (called from main driver)
-	void set_cpl_port(int n, ioport_port *port) { m_cpl_ports[n] = port; }
-	void set_cpr_port(int n, ioport_port *port) { m_cpr_ports[n] = port; }
+	// Serial interface from main CPU
+	void rxd(int state);
+	void sioclk(int state);
+	void tx_start(int state);  // Called when CPU starts a new byte transmission
 
 protected:
 	// device_t overrides
@@ -85,7 +84,7 @@ private:
 	// Serial TX state
 	uint8_t m_tx_clock_count;
 	uint8_t m_tx_shift_register;
-	std::queue<uint8_t> m_tx_queue;
+	std::queue<uint8_t> m_tx_queue; // FIXME: this breaks save state support
 	bool m_tx_skip_first_falling;  // Skip first falling edge after pre-outputting bit 0
 
 	// Command buffer (2-byte commands)
@@ -111,8 +110,8 @@ private:
 	devcb_write_line m_inta_cb;
 
 	// Input port pointers (set by main driver)
-	ioport_port *m_cpl_ports[11];  // Left panel segments 0-10
-	ioport_port *m_cpr_ports[11];  // Right panel segments 0-10
+	optional_ioport_array<11> m_cpl_ports;  // Left panel segments 0-10
+	optional_ioport_array<11> m_cpr_ports;  // Right panel segments 0-10
 
 	// LED outputs
 	output_finder<50> m_cpl_leds;  // Left panel LEDs (CPL_0 through CPL_49)

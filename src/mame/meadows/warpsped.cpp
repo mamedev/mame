@@ -335,7 +335,7 @@ void warpspeed_state::warpspeed(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(warpspeed_state::irq0_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size((32)*8, (32)*8);
@@ -379,7 +379,6 @@ ROM_START( warpsped )
 
 	ROM_REGION(0x0200, "gfx2", 0)
 	ROM_LOAD( "k1.k1",  0x0000, 0x0200, CRC(76b10d47) SHA1(e644a50df06535fe1fbfb8754cfc7b4a49fcb05e) )
-
 ROM_END
 
 } // anonymous namespace

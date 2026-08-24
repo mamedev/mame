@@ -14,7 +14,7 @@ class kaneko_grap2_device : public device_t, public device_rom_interface<32>, pu
 public:
 	static constexpr unsigned PALETTE_SIZE = 256 + 1; // 0x00-0xff is internal palette, 0x100 is background colour
 
-	kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// getters
 	u16 *framebuffer() { return m_framebuffer.get(); }

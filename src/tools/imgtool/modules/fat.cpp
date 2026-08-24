@@ -143,6 +143,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 
 #define FAT_DIRENT_SIZE         32

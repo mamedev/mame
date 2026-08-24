@@ -272,11 +272,11 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 
 void virge_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
 
-	S3VIRGE(config, m_vga, 0);
+	S3VIRGE(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 	m_vga->linear_config_changed().set(FUNC(virge_pci_device::linear_config_changed_w));
@@ -284,11 +284,11 @@ void virge_pci_device::device_add_mconfig(machine_config &config)
 
 void virgevx_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
 
-	S3VIRGEVX(config, m_vga, 0);
+	S3VIRGEVX(config, m_vga);
 	m_vga->set_screen("screen");
 	// 2MB, 4MB and 8MB, EDO RAM
 	m_vga->set_vram_size(0x400000);
@@ -297,11 +297,11 @@ void virgevx_pci_device::device_add_mconfig(machine_config &config)
 
 void virgedx_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
 
-	S3VIRGEDX(config, m_vga, 0);
+	S3VIRGEDX(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 	m_vga->linear_config_changed().set(FUNC(virgedx_pci_device::linear_config_changed_w));

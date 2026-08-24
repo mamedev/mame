@@ -1071,7 +1071,7 @@ void aabase_state::aabase(machine_config &config)
 
 	ARCHIMEDES_KEYBOARD(config, "keyboard").kout().set(m_ioc, FUNC(acorn_ioc_device::kin_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_VIDC1A(config, m_vidc, 24_MHz_XTAL);
@@ -1146,12 +1146,12 @@ void aa500_state::aa500(machine_config &config)
 	m_adlc->out_irq_cb().set(m_ioc, FUNC(acorn_ioc_device::fl_w));
 	//m_adlc->out_rts_cb().
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -1232,7 +1232,7 @@ void aa310_state::aa310(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -1674,7 +1674,7 @@ void aa4_state::aa4(machine_config &config)
 	m_ioc->gpio_w<1>().append(m_bmu, FUNC(acorn_bmu_device::scl_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config.replace(), "screen").set_lcd());
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_LC(config, m_lc, 24_MHz_XTAL);

@@ -63,7 +63,7 @@ public:
 		m_conf(*this, "CONF")
 	{ }
 
-	void microvision(machine_config &config);
+	void microvision(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(conf_changed) { apply_settings(); }
 
@@ -447,6 +447,8 @@ INPUT_PORTS_END
 
 void microvision_state::microvision(machine_config &config)
 {
+	// All possible CPUs are instantiated stopped, the one that's present is started when the cartridge is loaded.
+
 	// basic machine hardware
 	TMS1100(config, m_tms1100, 0);
 	m_tms1100->set_output_pla(tms1100_output_pla[0]);
@@ -470,7 +472,7 @@ void microvision_state::microvision(machine_config &config)
 	m_lcd_pwm->set_interpolation(0.25);
 	config.set_default_layout(layout_microvision);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
 	screen.set_screen_update(FUNC(microvision_state::screen_update));

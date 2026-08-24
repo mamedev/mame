@@ -917,19 +917,23 @@ static const command_description s_commands[] =
 // hard disk templates
 static const hd_template s_hd_templates[] =
 {
-	{ "Conner",     "CFA170A",    332, 16, 63, 512 }, //  163 MB
-	{ "Rodime",     "R0201",      321,  2, 16, 512 }, //    5 MB
-	{ "Rodime",     "R0202",      321,  4, 16, 512 }, //   10 MB
-	{ "Rodime",     "R0203",      321,  6, 16, 512 }, //   15 MB
-	{ "Rodime",     "R0204",      321,  8, 16, 512 }, //   20 MB
-	{ "Seagate",    "ST-213",     615,  2, 17, 512 }, //   10 MB
-	{ "Seagate",    "ST-225",     615,  4, 17, 512 }, //   20 MB
-	{ "Seagate",    "ST-251",     820,  6, 17, 512 }, //   40 MB
-	{ "Seagate",    "ST-3600N",  1877,  7, 76, 512 }, //  525 MB
-	{ "Maxtor",     "LXT-213S",  1314,  7, 53, 512 }, //  200 MB
-	{ "Maxtor",     "LXT-340S",  1574,  7, 70, 512 }, //  340 MB
-	{ "Maxtor",     "MXT-540SL", 2466,  7, 87, 512 }, //  540 MB
-	{ "Micropolis", "1528",      2094, 15, 83, 512 }, // 1342 MB
+	{ "Conner",     "CFA170A",               332, 16, 63, 512 }, //   163 MB, IDE (ATA)
+	{ "Rodime",     "R0201",                 321,  2, 16, 512 }, //     5 MB, ST-506/MFM
+	{ "Rodime",     "R0202",                 321,  4, 16, 512 }, //    10 MB, ST-506/MFM
+	{ "Rodime",     "R0203",                 321,  6, 16, 512 }, //    15 MB, ST-506/MFM
+	{ "Rodime",     "R0204",                 321,  8, 16, 512 }, //    20 MB, ST-506/MFM
+	{ "Seagate",    "ST-213",                615,  2, 17, 512 }, //    10 MB, ST-506/MFM
+	{ "Seagate",    "ST-225",                615,  4, 17, 512 }, //    20 MB, ST-506/MFM
+	{ "Seagate",    "ST-251",                820,  6, 17, 512 }, //    40 MB, ST-506/MFM
+	{ "Seagate",    "ST-3600N",             1877,  7, 76, 512 }, //   525 MB, SCSI
+	{ "Maxtor",     "LXT-213S",             1314,  7, 53, 512 }, //   200 MB, SCSI
+	{ "Maxtor",     "LXT-340S",             1574,  7, 70, 512 }, //   340 MB, SCSI
+	{ "Maxtor",     "MXT-540SL",            2466,  7, 87, 512 }, //   540 MB, SCSI
+	{ "Micropolis", "1528",                 2094, 15, 83, 512 }, //  1342 MB, SCSI-2
+	{ "Quantum",    "Fireball CR 4.3 AT",  14848,  9, 63, 512 }, //  4110 MB (4.3 GB), Ultra ATA/66 (ATA-5)
+	{ "Quantum",    "Fireball CR 6.4 AT",  13328, 15, 63, 512 }, //  6149 MB (6.4 GB), Ultra ATA/66 (ATA-5)
+	{ "Quantum",    "Fireball CR 8.4 AT",  16383, 16, 63, 512 }, //  8063 MB (8.4 GB), Ultra ATA/66 (ATA-5)
+	{ "Quantum",    "Fireball CR 13.0 AT", 25228, 16, 63, 512 }, // 12416 MB (13.0 GB), Ultra ATA/66 (ATA-5)
 };
 
 
@@ -1529,6 +1533,10 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		const int tracktype = info.trktype == cdrom_file::CD_TRACK_AUDIO ? 0 : 4;
 		const bool needquote = filename.find(' ') != std::string::npos;
 		const char *const quotestr = needquote ? "\"" : "";
+
+		if (info.pregap > 0 && info.pgdatasize == 0)
+			frameoffs += info.pregap;
+
 		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, tracktype, info.datasize, quotestr, filename, quotestr, outputoffs);
 	}
 	else if (mode == MODE_CUEBIN)
@@ -1816,12 +1824,12 @@ static void do_verify(parameters_map &params)
 
 		// determine how much to read
 		uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_chd.logical_bytes() - offset);
-		std::error_condition err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
+		std::error_condition err = input_chd.read_bytes(offset, buffer.data(), bytes_to_read);
 		if (err)
 			report_error(1, "Error reading CHD file (%s): %s", *input_chd_str->second, err.message());
 
 		// add to the checksum
-		rawsha1.append(&buffer[0], bytes_to_read);
+		rawsha1.append(buffer.data(), bytes_to_read);
 		offset += bytes_to_read;
 	}
 	util::sha1_t computed_sha1 = rawsha1.finish();
@@ -2170,6 +2178,15 @@ static void do_create_cd(parameters_map &params)
 		std::error_condition err = cdrom_file::parse_toc(*input_file_str->second, toc, track_info);
 		if (err)
 			report_error(1, "Error parsing input file (%s: %s)\n", *input_file_str->second, err.message());
+	}
+
+	bool is_gdrom = toc.flags & cdrom_file::CD_FLAG_GDROM;
+
+	if (is_gdrom)
+	{
+		std::error_condition err = cdrom_file::adjust_high_density_area(toc, track_info);
+		if (err)
+			report_error(1, "Error adjusting high density area: (%s: %s)\n", *input_file_str->second, err.message());
 	}
 
 	// process output CHD
@@ -2600,12 +2617,12 @@ static void do_extract_raw(parameters_map &params)
 
 			// determine how much to read
 			uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_end - offset);
-			std::error_condition err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
+			std::error_condition err = input_chd.read_bytes(offset, buffer.data(), bytes_to_read);
 			if (err)
 				report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
 
 			// write to the output
-			auto const [writerr, count] = write(*output_file, &buffer[0], bytes_to_read);
+			auto const [writerr, count] = write(*output_file, buffer.data(), bytes_to_read);
 			if (writerr)
 				report_error(1, "Error writing to file; check disk space (%s)", *output_file_str->second);
 
@@ -2844,78 +2861,13 @@ static void do_extract_cd(parameters_map &params)
 			else
 				output_toc_file->printf("CD_ROM\n\n\n");
 		}
-
-		if (cdrom->is_gdrom() && mode == MODE_CUEBIN)
-		{
-			// modify TOC to match Redump cue/bin format as best as possible
-			cdrom_file::toc *trackinfo = (cdrom_file::toc*)&toc;
-
-			// TOSEC GDI-based CHDs have the padframes field set to non-0 where the pregaps for the next track would be
-			const bool has_physical_pregap = trackinfo->tracks[0].padframes == 0;
-
-			for (int tracknum = 1; tracknum < toc.numtrks; tracknum++)
-			{
-				// pgdatasize should never be set in GD-ROMs currently, so if it is set then assume the TOC has proper pregap values
-				if (trackinfo->tracks[tracknum].pgdatasize != 0)
-					break;
-
-				// don't adjust the first track of the single-density and high-density areas
-				if (toc.tracks[tracknum].physframeofs == 45000)
-					continue;
-
-				if (!has_physical_pregap)
-				{
-					// NOTE: This will generate a cue with PREGAP commands instead of INDEX 00 because the pregap data isn't baked into the bins
-					trackinfo->tracks[tracknum].pregap += trackinfo->tracks[tracknum-1].padframes;
-
-					// "type 1" (only one data track in high-density area) and "type 2" (1 data and then the rest of the tracks being audio tracks in high-density area) don't require any adjustments
-					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum].trktype != cdrom_file::CD_TRACK_AUDIO)
-					{
-						if (toc.tracks[tracknum-1].trktype != cdrom_file::CD_TRACK_AUDIO)
-						{
-							// "type 3" where the high-density area is just two data tracks
-							// there shouldn't be any pregap in the padframes from the previous track in this case, and the full 3s pregap is baked into the previous track
-							// Only known to be used by Shenmue II JP's discs 2, 3, 4 and Virtua Fighter History & VF4
-							trackinfo->tracks[tracknum-1].padframes += 225;
-
-							trackinfo->tracks[tracknum].pregap += 225;
-							trackinfo->tracks[tracknum].splitframes = 225;
-							trackinfo->tracks[tracknum].pgdatasize = trackinfo->tracks[tracknum].datasize;
-							trackinfo->tracks[tracknum].pgtype = trackinfo->tracks[tracknum].trktype;
-						}
-						else
-						{
-							// "type 3 split" where the first track and last of the high-density area are data tracks and in between is audio tracks
-							// TODO: These 75 frames are actually included at the end of the previous track so should be written
-							// It's currently not possible to format it as expected without hacky code because the 150 pregap for the last track
-							// is sandwiched between these 75 frames and the actual track data.
-							// The 75 frames seems to normally be 0s so this should be ok for now until a use case is found.
-							trackinfo->tracks[tracknum-1].frames -= 75;
-							trackinfo->tracks[tracknum].pregap += 75;
-						}
-					}
-				}
-				else
-				{
-					int curextra = 150; // 00:02:00
-					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum].trktype != cdrom_file::CD_TRACK_AUDIO)
-						curextra += 75; // 00:01:00, special case when last track is data
-
-					trackinfo->tracks[tracknum-1].padframes = curextra;
-
-					trackinfo->tracks[tracknum].pregap += curextra;
-					trackinfo->tracks[tracknum].splitframes = curextra;
-					trackinfo->tracks[tracknum].pgdatasize = trackinfo->tracks[tracknum].datasize;
-					trackinfo->tracks[tracknum].pgtype = trackinfo->tracks[tracknum].trktype;
-				}
-			}
-		}
-
+		
 		// iterate over tracks and copy all data
 		uint64_t totaloutputoffs = 0;
 		uint64_t outputoffs = 0;
 		uint32_t discoffs = 0;
 		std::vector<uint8_t> buffer;
+		int sessionnum = -1;
 
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
@@ -2942,12 +2894,19 @@ static void do_extract_cd(parameters_map &params)
 			{
 				if (tracknum == 0)
 					output_toc_file->printf("REM SINGLE-DENSITY AREA\n");
-				else if (toc.tracks[tracknum].physframeofs == 45000)
+				else if (toc.tracks[tracknum].physframeofs == cdrom_file::GDI_HIGH_DENSITY_AREA)
 					output_toc_file->printf("REM HIGH-DENSITY AREA\n");
 			}
 
 			// output the metadata about the track to the TOC file
 			const cdrom_file::track_info &trackinfo = toc.tracks[tracknum];
+
+			if (mode == MODE_CUEBIN && toc.numsessions > 1 && sessionnum != trackinfo.session)
+			{
+				output_toc_file->printf("REM SESSION %02d\n", trackinfo.session+1);
+				sessionnum = trackinfo.session;
+			}
+			
 			output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
@@ -3009,7 +2968,7 @@ static void do_extract_cd(parameters_map &params)
 				if (bufferoffs == buffer.size() || frame == actualframes - 1)
 				{
 					output_bin_file->seek(outputoffs, SEEK_SET);
-					auto const [writerr, byteswritten] = write(*output_bin_file, &buffer[0], bufferoffs);
+					auto const [writerr, byteswritten] = write(*output_bin_file, buffer.data(), bufferoffs);
 					if (writerr)
 						report_error(1, "Error writing frame %d to file (%s): %s\n", frame, *output_file_str->second, "Write error");
 					outputoffs += bufferoffs;
@@ -3361,7 +3320,7 @@ static void do_dump_metadata(parameters_map &params)
 
 			// output the metadata
 			size_t count;
-			std::tie(filerr, count) = write(*output_file, &buffer[0], buffer.size());
+			std::tie(filerr, count) = write(*output_file, buffer.data(), buffer.size());
 			if (!filerr)
 				filerr = output_file->flush();
 			if (filerr)
@@ -3375,7 +3334,7 @@ static void do_dump_metadata(parameters_map &params)
 		{
 			// flush to stdout
 			// FIXME: check for errors
-			fwrite(&buffer[0], 1, buffer.size(), stdout);
+			fwrite(buffer.data(), 1, buffer.size(), stdout);
 			fflush(stdout);
 		}
 	}
@@ -3396,12 +3355,14 @@ static void do_dump_metadata(parameters_map &params)
 static void do_list_templates(parameters_map &params)
 {
 	util::stream_format(std::cout, "\n");
-	util::stream_format(std::cout, "ID  Manufacturer  Model           Cylinders  Heads  Sectors  Sector Size  Total Size\n");
-	util::stream_format(std::cout, "------------------------------------------------------------------------------------\n");
+	util::stream_format(std::cout, "ID  Manufacturer  Model               Cylinders  Heads  Sectors  Sector Size  Total Size\n");
+	util::stream_format(std::cout, "----------------------------------------------------------------------------------------\n");
 
 	for (int id = 0; id < std::size(s_hd_templates); id++)
 	{
-		util::stream_format(std::cout, "%2d  %-13s %-15s %9d  %5d  %7d  %11d  %7d MB\n",
+		uint32_t size = ((uint64_t)s_hd_templates[id].cylinders * s_hd_templates[id].heads * s_hd_templates[id].sectors * s_hd_templates[id].sector_size) / 1024 / 1024;
+
+		util::stream_format(std::cout, "%2d  %-13s %-19s %9d  %5d  %7d  %11d  %7d MB\n",
 			id,
 			s_hd_templates[id].manufacturer,
 			s_hd_templates[id].model,
@@ -3409,7 +3370,7 @@ static void do_list_templates(parameters_map &params)
 			s_hd_templates[id].heads,
 			s_hd_templates[id].sectors,
 			s_hd_templates[id].sector_size,
-			(s_hd_templates[id].cylinders * s_hd_templates[id].heads * s_hd_templates[id].sectors * s_hd_templates[id].sector_size) / 1024 / 1024
+			size
 		);
 	}
 }

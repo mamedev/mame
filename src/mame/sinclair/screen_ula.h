@@ -79,6 +79,8 @@ private:
 	u8 m_ula_scroll_x;
 	u8 m_ula_scroll_y;
 	bool m_ula_fine_scroll_x;
+	u8 m_ula_scr_latch;
+	u8 m_ula_attr_latch;
 
 	u8 screen_mode();
 	std::pair<rgb_t, rgb_t> parse_attribute(u8 attr);
@@ -87,13 +89,13 @@ private:
 class screen_ula_plus_device : public screen_ula_device
 {
 public:
-	screen_ula_plus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	screen_ula_plus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class screen_ula_next_device : public screen_ula_device
 {
 public:
-	screen_ula_next_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	screen_ula_next_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(SCREEN_ULA_PLUS, screen_ula_plus_device)

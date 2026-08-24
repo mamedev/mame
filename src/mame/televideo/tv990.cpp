@@ -380,7 +380,7 @@ void tv990_state::tv990(machine_config &config)
 	M68000(config, m_maincpu, 14967500);   // verified (59.86992/4)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tv990_state::tv990_mem);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(tv990_state::screen_update));
 	m_screen->set_size(132*16, 50*16);

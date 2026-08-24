@@ -827,7 +827,7 @@ void artmagic_state::artmagic(machine_config &config)
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256);
 	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 

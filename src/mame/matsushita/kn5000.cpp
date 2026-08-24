@@ -7,22 +7,27 @@
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "kn5000_cpanel.h"
+
 #include "bus/technics/kn5000/hdae5000.h"
 #include "cpu/tlcs900/tmp94c241.h"
-#include "cpu/tlcs900/tmp94c241_serial.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "machine/upd765.h"
 #include "video/pc_vga.h"
+
 #include "screen.h"
+
 #include "kn5000.lh"
-#include "kn5000_cpanel.h"
+
 
 class mn89304_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_reset() override ATTR_COLD;
@@ -35,8 +40,7 @@ protected:
 DEFINE_DEVICE_TYPE(MN89304_VGA, mn89304_vga_device, "mn89304_vga", "MN89304 VGA")
 
 // TODO: nothing is known about this, configured out of usage in here for now.
-mn89304_vga_device::mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, MN89304_VGA, tag, owner, clock)
+mn89304_vga_device::mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock): svga_device(mconfig, MN89304_VGA, tag, owner, clock)
 {
 	// ...
 }
@@ -110,7 +114,11 @@ public:
 		, m_cpanel_inta(0)
 	{ }
 
-	void kn5000(machine_config &config);
+	void kn5000(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<kn5000_cpanel_device> m_cpanel;
@@ -130,9 +138,6 @@ private:
 	uint8_t m_sstat;
 	uint8_t m_cpanel_inta;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	void maincpu_mem(address_map &map) ATTR_COLD;
 	void subcpu_mem(address_map &map) ATTR_COLD;
 };
@@ -147,7 +152,7 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x140000, 0x14ffff).w(m_subcpu_latch, FUNC(generic_latch_8_device::write)); // @ IC22
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1dffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
-	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
+	map(0x1e0000, 0x1fffff).ram().share("nvram"); // 1Mbit SRAM @ IC21 (CS0)
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
 	//map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
@@ -453,16 +458,6 @@ void kn5000_state::machine_start()
 	save_item(NAME(m_cpanel_inta));
 
 	m_extension->program_map(m_maincpu->space(AS_PROGRAM));
-
-	m_checking_device_led_cn11.resolve();
-	m_checking_device_led_cn12.resolve();
-
-	// Connect button input ports to control panel HLE device
-	for (int i = 0; i < 11; i++)
-	{
-		m_cpanel->set_cpl_port(i, m_CPL_SEG[i].target());
-		m_cpanel->set_cpr_port(i, m_CPR_SEG[i].target());
-	}
 }
 
 void kn5000_state::machine_reset()
@@ -499,17 +494,19 @@ void kn5000_state::kn5000(machine_config &config)
 
 	// MAINCPU PORT A:
 	//   bit 0 (output) = sub_cpu ~RESET / SRST
-	m_maincpu->porta_write().set([this] (u8 data) {
-		m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-	});
+	m_maincpu->porta_write().set(
+			[this] (u8 data) {
+				m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+			});
 
 	// MAINCPU PORT C:
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
 	m_maincpu->portc_read().set_ioport("CN11");
-	m_maincpu->portc_write().set([this] (u8 data) {
-		m_checking_device_led_cn11 = (BIT(data, 1) == 0);
-	});
+	m_maincpu->portc_write().set(
+			[this] (u8 data) {
+				m_checking_device_led_cn11 = BIT(~data, 1);
+			});
 
 
 	// MAINCPU PORT D:
@@ -524,11 +521,12 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 2 (input) = HDDRDY
 	//   bit 4 (?) = MICSNS
 	//   bit 5 (input) = INTA (control panel interrupt)
-	m_maincpu->porte_read().set([this] {
-		// Bit 0: +5v (always 1 when no HDD extension)
-		// Bit 5: INTA from control panel (active HIGH — firmware checks BIT 5,(PE); JR NZ)
-		return 0x01 | (m_cpanel_inta ? 0x20 : 0x00);
-	});
+	m_maincpu->porte_read().set(
+			[this] {
+				// Bit 0: +5v (always 1 when no HDD extension)
+				// Bit 5: INTA from control panel (active HIGH — firmware checks BIT 5,(PE); JR NZ)
+				return 0x01 | (m_cpanel_inta ? 0x20 : 0x00);
+			});
 
 
 	// MAINCPU PORT F: shared with serial interface pins
@@ -567,27 +565,37 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 5 = (input) COM.PC1
 	//   bit 6 = (input) COM.MAC
 	//   bit 7 = (input) COM.MIDI
-	m_maincpu->portz_read().set([this] {
-		return m_com_select->read() | (m_sstat << 2);
-	});
-	m_maincpu->portz_write().set([this] (u8 data) {
-		m_mstat = data & 3;
-	});
+	m_maincpu->portz_read().set(
+			[this] {
+				return m_com_select->read() | (m_sstat << 2);
+			});
+	m_maincpu->portz_write().set(
+			[this] (u8 data) {
+				m_mstat = data & 3;
+			});
 
 
 	// RX0/TX0 = MRXD/MTXD
 
 	// RX1/TX1 = CPDATA, SCLK1 = CPSCK — wired to control panel HLE
-	auto &cpanel(KN5000_CPANEL(config, "cpanel"));
-	m_maincpu->txd1().set(cpanel, FUNC(kn5000_cpanel_device::rxd));
-	m_maincpu->sclk1_out().set(cpanel, FUNC(kn5000_cpanel_device::sioclk));
-	m_maincpu->tx1_start().set(cpanel, FUNC(kn5000_cpanel_device::tx_start));
-	cpanel.txd().set(m_maincpu, FUNC(tmp94c241_device::rxd1));
-	cpanel.sclk_out().set(m_maincpu, FUNC(tmp94c241_device::sioclk1));
-	cpanel.inta().set([this] (int state) {
-		m_cpanel_inta = state;
-		m_maincpu->set_input_line(TLCS900_INTA, state ? ASSERT_LINE : CLEAR_LINE);
-	});
+	KN5000_CPANEL(config, m_cpanel);
+	m_maincpu->txd1().set(m_cpanel, FUNC(kn5000_cpanel_device::rxd));
+	m_maincpu->sclk1_out().set(m_cpanel, FUNC(kn5000_cpanel_device::sioclk));
+	m_maincpu->tx1_start().set(m_cpanel, FUNC(kn5000_cpanel_device::tx_start));
+	m_cpanel->txd().set(m_maincpu, FUNC(tmp94c241_device::rxd1));
+	m_cpanel->sclk_out().set(m_maincpu, FUNC(tmp94c241_device::sioclk1));
+	m_cpanel->inta().set(
+			[this] (int state) {
+				m_cpanel_inta = state;
+				m_maincpu->set_input_line(TLCS900_INTA, state ? ASSERT_LINE : CLEAR_LINE);
+			});
+
+	// Connect button input ports to control panel HLE device
+	for (int i = 0; i < 11; i++)
+	{
+		m_cpanel->set_cpl_port(i, m_CPL_SEG[i]);
+		m_cpanel->set_cpr_port(i, m_CPR_SEG[i]);
+	}
 
 	// AN0 = EXP (expression pedal?)
 	// AN1 = AFT
@@ -601,9 +609,10 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
 	m_subcpu->portc_read().set_ioport("CN12");
-	m_subcpu->portc_write().set([this] (u8 data) {
-		m_checking_device_led_cn12 = (BIT(data, 1) == 0);
-	});
+	m_subcpu->portc_write().set(
+			[this] (u8 data) {
+				m_checking_device_led_cn12 = (BIT(data, 1) == 0);
+			});
 
 
 	// SUBCPU PORT D:
@@ -612,12 +621,14 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 2 = (input) MSTAT0
 	//   bit 3 (not used)
 	//   bit 4 = (input) MSTAT1
-	m_subcpu->portd_read().set([this] {
-		return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
-	});
-	m_subcpu->portd_write().set([this] (u8 data) {
-		m_sstat = data & 3;
-	});
+	m_subcpu->portd_read().set(
+			[this] {
+				return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
+			});
+	m_subcpu->portd_write().set(
+			[this] (u8 data) {
+				m_sstat = data & 3;
+			});
 
 
 	GENERIC_LATCH_8(config, m_maincpu_latch); // @ IC23
@@ -646,16 +657,18 @@ void kn5000_state::kn5000(machine_config &config)
 
 	/* video hardware */
 	// LCD Controller MN89304 @ IC206 24_MHz_XTAL
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
 	screen.set_screen_update("vga", FUNC(mn89304_vga_device::screen_update));
 
-	mn89304_vga_device &vga(MN89304_VGA(config, "vga", 0));
+	mn89304_vga_device &vga(MN89304_VGA(config, "vga"));
 	vga.set_screen("screen");
 	// 4 Mbit, M5M44265CJ6S
 	vga.set_vram_size(0x80000);
 	// iochrdy tied to refresh pin and SA19, A21 and A20 to GND
 	// TODO: VGA.A18 signal, banking? From maincpu thru a T7W139F decoder
+
+	NVRAM(config, "nvram");
 
 	config.set_default_layout(layout_kn5000);
 }
@@ -717,7 +730,7 @@ ROM_START(kn5000)
 	ROMX_LOAD("kn5000_subprogram_v140_compressed.rom", 0x0e0000, 0x16bc4, CRC(5b182629) SHA1(13098dd150c5a6083a5d15a63d5d785802d8e8ae), ROM_BIOS(5)) // v5
 
 	ROM_REGION16_LE(0x400000, "rhythm_data", 0)
-	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(76d11a5e) SHA1(e4b572d318c9fe7ba00e5b44ea783e89da9c68bd))
+	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(aa4917ce) SHA1(fef7f1927935d8fdada2afbdbfac29aac56e1c3c))
 
 	ROM_REGION16_LE(0x1000000, "waveform", 0)
 	ROM_LOAD("kn5000_waveform_rom.ic304", 0x000000, 0x400000, NO_DUMP)

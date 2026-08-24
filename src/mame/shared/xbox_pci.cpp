@@ -218,12 +218,12 @@ void mcpx_isalpc_device::device_reset()
 
 void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 {
-	pic8259_device &pic8259_1(PIC8259(config, "pic8259_1", 0));
+	pic8259_device &pic8259_1(PIC8259(config, "pic8259_1"));
 	pic8259_1.out_int_callback().set(FUNC(mcpx_isalpc_device::interrupt_ouptut_changed));
 	pic8259_1.in_sp_callback().set_constant(1);
 	pic8259_1.read_slave_ack_callback().set(FUNC(mcpx_isalpc_device::get_slave_ack));
 
-	pic8259_device &pic8259_2(PIC8259(config, "pic8259_2", 0));
+	pic8259_device &pic8259_2(PIC8259(config, "pic8259_2"));
 	pic8259_2.out_int_callback().set(pic8259_1, FUNC(pic8259_device::ir2_w));
 	pic8259_2.in_sp_callback().set_constant(0);
 
@@ -260,7 +260,7 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	dma8237_1.out_dack_callback<2>().set(FUNC(mcpx_isalpc_device::dma1_dack2_w));
 	dma8237_1.out_dack_callback<3>().set(FUNC(mcpx_isalpc_device::dma1_dack3_w));
 
-	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
+	pit8254_device &pit8254(PIT8254(config, "pit8254"));
 	pit8254.set_clk<0>(1125000); /* heartbeat IRQ */
 	pit8254.out_handler<0>().set(FUNC(mcpx_isalpc_device::pit8254_out0_changed));
 	pit8254.set_clk<1>(1125000); /* originally dram refresh, now only legacy support */
@@ -268,7 +268,7 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	pit8254.set_clk<2>(1125000); /* (unused) pio port c pin 4, and speaker polling enough */
 	pit8254.out_handler<2>().set(FUNC(mcpx_isalpc_device::pit8254_out2_changed));
 
-	ds12885ext_device &ds12885(DS12885EXT(config, "rtc", 0));
+	ds12885ext_device &ds12885(DS12885EXT(config, "rtc"));
 	ds12885.irq().set(pic8259_2, FUNC(pic8259_device::ir0_w));
 
 	/*
@@ -1511,10 +1511,10 @@ void mcpx_ide_device::device_reset()
 
 void mcpx_ide_device::device_add_mconfig(machine_config &config)
 {
-	bus_master_ide_controller_device &ide1(BUS_MASTER_IDE_CONTROLLER(config, "ide1", 0));
+	bus_master_ide_controller_device &ide1(BUS_MASTER_IDE_CONTROLLER(config, "ide1"));
 	ide1.irq_handler().set(FUNC(mcpx_ide_device::ide_pri_interrupt));
 
-	bus_master_ide_controller_device &ide2(BUS_MASTER_IDE_CONTROLLER(config, "ide2", 0));
+	bus_master_ide_controller_device &ide2(BUS_MASTER_IDE_CONTROLLER(config, "ide2"));
 	ide2.irq_handler().set(FUNC(mcpx_ide_device::ide_sec_interrupt));
 }
 

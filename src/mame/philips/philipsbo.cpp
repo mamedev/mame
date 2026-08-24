@@ -246,7 +246,7 @@ void pbo_state::pbo(machine_config &config)
 	M68010(config, m_netcpu, 20_MHz_XTAL / 2); // Confirmed
 	m_netcpu->set_addrmap(AS_PROGRAM, &pbo_state::net_map);
 
-	AM7990(config, m_lance);
+	AM7990(config, m_lance, 10'000'000); // clock is a guess
 	m_lance->intr_out().set(FUNC(pbo_state::net_irq_w));
 
 	MC68681(config, "duart", 3'686'400);

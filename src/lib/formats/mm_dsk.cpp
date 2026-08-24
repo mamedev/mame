@@ -26,63 +26,29 @@ const char *mm1_format::description() const noexcept
 
 const char *mm1_format::extensions() const noexcept
 {
-	return "dsk";
+	return "img";
 }
 
-mm2_format::mm2_format() : upd765_format(formats)
-{
-}
-
-const char *mm2_format::name() const noexcept
-{
-	return "mm2";
-}
-
-const char *mm2_format::description() const noexcept
-{
-	return "Nokia MikroMikko 2 disk image";
-}
-
-const char *mm2_format::extensions() const noexcept
-{
-	return "dsk";
-}
-
-// Unverified gap sizes
 const mm1_format::format mm1_format::formats[] = {
-	{
-		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
-		2000, // 2us, 300rpm
-		8, 80, 2,
-		512, {},
-		-1, { 1,4,7,2,5,8,3,6 },
-		80, 50, 22, 80
-	},
-	{}
-};
-
-// Unverified gap sizes
-const mm2_format::format mm2_format::formats[] = {
-	{
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, // 2us, 300rpm
-		9, 40, 2,
-		512, {},
-		1, {},
-		80, 50, 22, 80
-	},
-	// 40 tracks but 18 sectors implying HD density at 300rpm, i.e. on
-	// 3.5" media?  That makes no sense
-	{
-		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
-		1000, // 1us, 300rpm, otherwise it just won't fit
-		18, 40, 2, // That line is just nonsense
-		512, {},
-		1, {},
-		80, 50, 22, 80
-	},
-	{}
+    {
+		// 320KB
+        floppy_image::FF_525, floppy_image::SSQD, floppy_image::MFM,
+        2000, // 2us, 300rpm
+        8, 80, 1,
+        512, {},
+        -1, { 1,4,7,2,5,8,3,6 },
+        80, 50, 22, 80
+    },
+    {
+		// 640KB
+        floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
+        2000, // 2us, 300rpm
+        8, 80, 2,
+        512, {},
+        -1, { 1,4,7,2,5,8,3,6 },
+        80, 50, 22, 80
+    },
+    {}
 };
 
 const mm1_format FLOPPY_MM1_FORMAT;
-const mm2_format FLOPPY_MM2_FORMAT;

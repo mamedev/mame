@@ -137,6 +137,7 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
+#include "input.h" // FIXME: use inputs properly and remove this, reading keyboard directly is bad pracice
 #include "speaker.h"
 
 //#define VERBOSE 1
@@ -155,8 +156,8 @@ public:
 		: by35_state(mconfig, type, tag, s_solenoid_features_default)
 	{ }
 
-	void init_by35_6() { m_7d = 0; }
-	void init_by35_7() { m_7d = 1; }
+	void init_by35_6() ATTR_COLD { m_7d = 0; }
+	void init_by35_7() ATTR_COLD { m_7d = 1; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -164,14 +165,14 @@ public:
 	template <int Param> int drop_target_x0();
 	template <int Param> int kickback_x3();
 
-	void by35(machine_config &config);
-	void nuovo(machine_config &config);
-	void as2888(machine_config &config);
-	void as3022(machine_config &config);
-	void sounds_plus(machine_config &config);
-	void cheap_squeak(machine_config &config);
-	void squawk_n_talk(machine_config &config);
-	void squawk_n_talk_ay(machine_config &config);
+	void by35(machine_config &config) ATTR_COLD;
+	void nuovo(machine_config &config) ATTR_COLD;
+	void as2888(machine_config &config) ATTR_COLD;
+	void as3022(machine_config &config) ATTR_COLD;
+	void sounds_plus(machine_config &config) ATTR_COLD;
+	void cheap_squeak(machine_config &config) ATTR_COLD;
+	void squawk_n_talk(machine_config &config) ATTR_COLD;
+	void squawk_n_talk_ay(machine_config &config) ATTR_COLD;
 
 protected:
 	typedef uint8_t solenoid_feature_data[20][4];
@@ -1449,10 +1450,6 @@ by35_state::solenoid_feature_data const playboy_state::s_solenoid_features_playb
 void by35_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_lamps.resolve();
-	m_digits.resolve();
-	m_solenoids.resolve();
 
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));

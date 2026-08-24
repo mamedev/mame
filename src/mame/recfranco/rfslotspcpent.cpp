@@ -232,7 +232,7 @@ void rfslotspcpent_state::rfslotspcpent(machine_config &config)
 	PENTIUM4(config, m_maincpu, 100'000'000); // Actually an Intel Celeron 575 1M cache, 2,00 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rfslotspcpent_state::rfslotspcpent_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

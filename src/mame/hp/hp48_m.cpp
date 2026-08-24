@@ -987,13 +987,6 @@ void hp48_state::base_machine_start(hp48_models model)
 	m_send_done_timer = timer_alloc(FUNC(hp48_state::rs232_byte_sent_cb), this);
 	m_send_done_timer->adjust(attotime::never);
 
-	m_lshift0.resolve();
-	m_rshift0.resolve();
-	m_alpha0.resolve();
-	m_alert0.resolve();
-	m_busy0.resolve();
-	m_transmit0.resolve();
-
 	/* save state */
 	save_item(NAME(m_out));
 	save_item(NAME(m_kdn));

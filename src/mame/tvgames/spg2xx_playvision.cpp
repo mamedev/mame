@@ -22,7 +22,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void pvmil(machine_config &config);
+	void pvmil(machine_config &config) ATTR_COLD;
 
 	int pvmil_p4buttons_r();
 
@@ -47,7 +47,6 @@ void pvmil_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
 
-	m_leds.resolve();
 	save_item(NAME(m_portcdata));
 	save_item(NAME(m_latchcount));
 	save_item(NAME(m_latchbit));
@@ -234,4 +233,4 @@ ROM_END
 
 
 // see note for the pvmil8 set in tvgames/elan_eu3a05.cpp
-CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    pvmil_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 16-bit version)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, pvmil, 0, 0, pvmil, pvmil, pvmil_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 16-bit version)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

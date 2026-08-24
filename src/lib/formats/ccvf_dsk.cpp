@@ -13,6 +13,8 @@
 #include "coretmpl.h" // BIT
 #include "ioprocs.h"
 
+#include <cstring>
+
 
 ccvf_format::ccvf_format()
 {

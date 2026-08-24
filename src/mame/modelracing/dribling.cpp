@@ -478,7 +478,7 @@ void dribling_state::dribling(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(20_MHz_XTAL / 4, 320, 0, 256, 262, 40, 256);
 	screen.set_screen_update(FUNC(dribling_state::screen_update));

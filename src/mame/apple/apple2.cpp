@@ -79,6 +79,8 @@ namespace {
 #define A2_UPPERBANK_TAG "inhbank"
 #define A2_VIDEO_TAG "a2video"
 
+static constexpr int CNXX_UNCLAIMED = -1;
+
 class apple2_state : public driver_device
 {
 public:
@@ -315,14 +317,15 @@ void apple2_state::machine_start()
 	save_item(NAME(m_reset_latch));
 
 	// setup video pointers
-	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_ram_pointers(m_ram_ptr, nullptr);
+	m_video->set_ram_masks(m_ram_size-1, 0);
 	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 }
 
 void apple2_state::machine_reset()
 {
 	// m_inh_slot is not reset here since bootable cards may want to override the monitor
-	m_cnxx_slot = -1;
+	m_cnxx_slot = CNXX_UNCLAIMED;
 	m_strobe = 0;
 	m_kbd->ack_w(0);
 }
@@ -416,10 +419,10 @@ u8 apple2_state::flags_r(offs_t offset)
 		return (m_cassette->input() > 0.0 ? 0 : 0x80) | uFloatingBus7;
 
 	case 1:  // button 0
-		return (m_gameio->sw0_r() ? 0x80 : 0) | uFloatingBus7;
+		return ((!m_gameio->has_sw0() || m_gameio->sw0_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
 
 	case 2:  // button 1
-		return (m_gameio->sw1_r() ? 0x80 : 0) | uFloatingBus7;
+		return ((!m_gameio->has_sw1() || m_gameio->sw1_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
 
 	case 3:  // button 2 (or SHIFT key, with SHIFT key mod)
 		return (((m_sysconfig->read() & 0x04) ? m_kbd->shift_r() : m_gameio->sw2_r()) ? 0x80 : 0) | uFloatingBus7;
@@ -478,17 +481,14 @@ void apple2_state::controller_strobe_w(u8 data)
 
 u8 apple2_state::c080_r(offs_t offset)
 {
-	if(!machine().side_effects_disabled())
+	int slot;
+
+	offset &= 0x7F;
+	slot = offset / 0x10;
+
+	if (m_slotdevice[slot] != nullptr)
 	{
-		int slot;
-
-		offset &= 0x7F;
-		slot = offset / 0x10;
-
-		if (m_slotdevice[slot] != nullptr)
-		{
-			return m_slotdevice[slot]->read_c0nx(offset % 0x10);
-		}
+		return m_slotdevice[slot]->read_c0nx(offset % 0x10);
 	}
 
 	return read_floatingbus();
@@ -509,12 +509,11 @@ void apple2_state::c080_w(offs_t offset, u8 data)
 
 u8 apple2_state::c100_r(offs_t offset)
 {
-	int slotnum;
-
-	slotnum = ((offset>>8) & 0xf) + 1;
+	const int slotnum = ((offset>>8) & 0xf) + 1;
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
+		// a bus fight here is resolved as "last-one-wins"
 		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
@@ -528,9 +527,7 @@ u8 apple2_state::c100_r(offs_t offset)
 
 void apple2_state::c100_w(offs_t offset, u8 data)
 {
-	int slotnum;
-
-	slotnum = ((offset>>8) & 0xf) + 1;
+	const int slotnum = ((offset>>8) & 0xf) + 1;
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
@@ -545,26 +542,16 @@ void apple2_state::c100_w(offs_t offset, u8 data)
 
 u8 apple2_state::c800_r(offs_t offset)
 {
-	if (offset == 0x7ff)
+	const int slot = m_cnxx_slot;
+
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		u8 rv = 0xff;
-
-		if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
-		{
-			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
-		}
-
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = -1;
-		}
-
-		return rv;
+		m_cnxx_slot = CNXX_UNCLAIMED;
 	}
 
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	if ((slot != CNXX_UNCLAIMED) && (m_slotdevice[slot] != nullptr))
 	{
-		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		return m_slotdevice[slot]->read_c800(offset&0xfff);
 	}
 
 	return read_floatingbus();
@@ -572,19 +559,14 @@ u8 apple2_state::c800_r(offs_t offset)
 
 void apple2_state::c800_w(offs_t offset, u8 data)
 {
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	if ((m_cnxx_slot != CNXX_UNCLAIMED) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = -1;
-		}
-
-		return;
+		m_cnxx_slot = CNXX_UNCLAIMED;
 	}
 }
 
@@ -607,129 +589,18 @@ void apple2_state::inh_w(offs_t offset, u8 data)
 	}
 }
 
-// floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
 u8 apple2_state::read_floatingbus()
 {
-	enum
-	{
-		// scanner constants
-		kHBurstClock      =    53, // clock when Color Burst starts
-		kHBurstClocks     =     4, // clocks per Color Burst duration
-		kHClock0State     =  0x18, // H[543210] = 011000
-		kHClocks          =    65, // clocks per horizontal scan (including HBL)
-		kHPEClock         =    40, // clock when HPE (horizontal preset enable) goes low
-		kHPresetClock     =    41, // clock when H state presets
-		kHSyncClock       =    49, // clock when HSync starts
-		kHSyncClocks      =     4, // clocks per HSync duration
-		kNTSCScanLines    =   262, // total scan lines including VBL (NTSC)
-		kNTSCVSyncLine    =   224, // line when VSync starts (NTSC)
-		kPALScanLines     =   312, // total scan lines including VBL (PAL)
-		kPALVSyncLine     =   264, // line when VSync starts (PAL)
-		kVLine0State      = 0x100, // V[543210CBA] = 100000000
-		kVPresetLine      =   256, // line when V state presets
-		kVSyncLines       =     4, // lines per VSync duration
-		kClocksPerVSync   = kHClocks * kNTSCScanLines // FIX: NTSC only?
-	};
+	int h_clock = m_screen->hpos() / 14 + 25; // adjust for set_raw
+	if (h_clock >= 65)
+		h_clock -= 65;
 
-	// vars
-	//
-	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
-		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
-		_hires, addend0, addend1, addend2, sum, address;
+	int v_clock = m_screen->vpos() + (h_clock < 25); // adjust for hpos wrap
+	if (v_clock >= m_screen->height())
+		v_clock -= m_screen->height();
 
-	// video scanner data
-	//
-	i = m_maincpu->total_cycles() % kClocksPerVSync; // cycles into this VSync
-
-	// machine state switches
-	//
-	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
-	Mixed    = m_video->get_mix() ? 1 : 0;
-	Page2    = m_video->get_page2() ? 1 : 0;
-	_80Store = 0;
-
-	// calculate video parameters according to display standard
-	//
-	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
-	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
-	// ScanCycles = ScanLines * kHClocks;
-
-	// calculate horizontal scanning state
-	h_clock = (i + 63) % kHClocks; // which horizontal scanning clock
-	h_state = kHClock0State + h_clock; // H state bits
-	if (h_clock >= kHPresetClock) // check for horizontal preset
-	{
-		h_state -= 1; // correct for state preset (two 0 states)
-	}
-	h_0 = (h_state >> 0) & 1; // get horizontal state bits
-	h_1 = (h_state >> 1) & 1;
-	h_2 = (h_state >> 2) & 1;
-	h_3 = (h_state >> 3) & 1;
-	h_4 = (h_state >> 4) & 1;
-	h_5 = (h_state >> 5) & 1;
-
-	// calculate vertical scanning state
-	//
-	v_line  = (i / kHClocks) + 192; // which vertical scanning line
-	v_state = kVLine0State + v_line; // V state bits
-	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
-	{
-		v_state -= ScanLines; // compensate for preset
-	}
-	v_A = (v_state >> 0) & 1; // get vertical state bits
-	v_B = (v_state >> 1) & 1;
-	v_C = (v_state >> 2) & 1;
-	v_0 = (v_state >> 3) & 1;
-	v_1 = (v_state >> 4) & 1;
-	v_2 = (v_state >> 5) & 1;
-	v_3 = (v_state >> 6) & 1;
-	v_4 = (v_state >> 7) & 1;
-	//v_5 = (v_state >> 8) & 1;
-
-	// calculate scanning memory address
-	//
-	_hires = Hires;
-	if (Hires && Mixed && (v_4 & v_2))
-	{
-		_hires = 0; // (address is in text memory)
-	}
-
-	addend0 = 0x68; // 1            1            0            1
-	addend1 =              (h_5 << 5) | (h_4 << 4) | (h_3 << 3);
-	addend2 = (v_4 << 6) | (v_3 << 5) | (v_4 << 4) | (v_3 << 3);
-	sum     = (addend0 + addend1 + addend2) & (0x0F << 3);
-
-	address = 0;
-	address |= h_0 << 0; // a0
-	address |= h_1 << 1; // a1
-	address |= h_2 << 2; // a2
-	address |= sum;      // a3 - aa6
-	address |= v_0 << 7; // a7
-	address |= v_1 << 8; // a8
-	address |= v_2 << 9; // a9
-	address |= ((_hires) ? v_A : (1 ^ (Page2 & (1 ^ _80Store)))) << 10; // a10
-	address |= ((_hires) ? v_B : (Page2 & (1 ^ _80Store))) << 11; // a11
-	if (_hires) // hires?
-	{
-		// Y: insert hires only address bits
-		//
-		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
-	}
-	else
-	{
-		// N: text, so no higher address bits unless Apple ][, not Apple //e
-		//
-		if ((kHPEClock <= h_clock) && // Y: HBL?
-			(h_clock <= (kHClocks - 1)))
-		{
-			address |= 1 << 12; // Y: a12 (add $1000 to address!)
-		}
-	}
-
-	return m_ram_ptr[address % m_ram_size];
+	const u16 address = m_video->scanner_address(h_clock, v_clock);
+	return ram_r(address);
 }
 
 /***************************************************************************
@@ -857,7 +728,7 @@ void apple2_state::apple2_common(machine_config &config)
 	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
@@ -887,12 +758,13 @@ void apple2_state::apple2_common(machine_config &config)
 	m_kbd->reset_callback().set(FUNC(apple2_state::keyb_reset_w));
 
 	/* slot devices */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_a2bus->open_bus_r().set(FUNC(apple2_state::read_floatingbus));
 	A2BUS_SLOT(config, "sl0", XTAL(14'318'181) / 2, m_a2bus, apple2_slot0_cards, "lang");
 	A2BUS_SLOT(config, "sl1", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
@@ -1114,6 +986,9 @@ ROM_START(craft2p)
 	ROM_LOAD ( "unitron_en.d0", 0x1000, 0x1000, CRC(24d73c7b) SHA1(d17a15868dc875c67061c95ec53a6b2699d3a425))
 	ROM_LOAD ( "unitron.e0"   , 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
 	ROM_LOAD ( "craftii-roms-f0-f7.bin", 0x3000, 0x1000, CRC(3f9dea08) SHA1(0e23bc884b8108675267d30b85b770066bdd94c9) )
+
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD( "keyboard.bin", 0x000, 0x800, NO_DUMP ) // unknown HW, but probably MCU-based since BASIC macros are provided
 ROM_END
 
 ROM_START(uniap2pt)
@@ -1149,7 +1024,6 @@ ROM_END
 /*
     J-Plus ROM numbers confirmed by:
     http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
-
 */
 
 ROM_START(apple2jp)
@@ -1339,8 +1213,7 @@ COMP( 1982, ace100,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init
 COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-// reverse font direction + wider character cell -\/
+COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Microcraft Microcomputadores", "Craft ][+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inverse/flashing text doesn't look OK
 COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, space84,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_SUPPORTS_SAVE )

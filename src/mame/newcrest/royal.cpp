@@ -5,7 +5,7 @@
 
 Newcrest CXG Sphinx Royal family
 
-NOTE: Turn the power switch (or button in supra's case) off before exiting MAME,
+NOTE: Turn the power switch off (or button in supra's case) before exiting MAME,
 otherwise NVRAM won't save properly. And only turn the power off when it's the
 user's turn to move, this is warned about in the manual.
 
@@ -46,6 +46,8 @@ Excluding other brands with the same product name, HD614042SJ02 MCU was used in:
 
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "cxg_granada.lh"
 #include "cxg_royal.lh"
@@ -68,9 +70,9 @@ public:
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
-	void royal(machine_config &config);
-	void granada(machine_config &config);
-	void supra(machine_config &config);
+	void royal(machine_config &config) ATTR_COLD;
+	void granada(machine_config &config) ATTR_COLD;
+	void supra(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(granada_change_cpu_freq);
 	DECLARE_INPUT_CHANGED_MEMBER(supra_on_button);
@@ -108,8 +110,6 @@ private:
 
 void royal_state::machine_start()
 {
-	m_out_digit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_com));
@@ -156,7 +156,7 @@ void royal_state::update_lcd()
 	for (int i = 0; i < 2; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u16 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 
 		// 2 digits per common

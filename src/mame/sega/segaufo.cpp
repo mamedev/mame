@@ -64,6 +64,7 @@ TODO:
 
 #include "speaker.h"
 
+#include <bit>
 #include <iomanip>
 #include <sstream>
 
@@ -107,11 +108,11 @@ public:
 	{ }
 
 	// machine configs
-	void newufo(machine_config &config);
-	void ufomini(machine_config &config);
-	void ufo21(machine_config &config);
-	void ufoalac(machine_config &config);
-	void ufo800(machine_config &config);
+	void newufo(machine_config &config) ATTR_COLD;
+	void ufomini(machine_config &config) ATTR_COLD;
+	void ufo21(machine_config &config) ATTR_COLD;
+	void ufoalac(machine_config &config) ATTR_COLD;
+	void ufo800(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -182,11 +183,6 @@ private:
 
 void ufo_state::machine_start()
 {
-	// resolve outputs
-	m_counters.resolve();
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	// register for savestates
 	save_item(NAME(m_stepper));
 	save_item(NAME(m_nmi_enable));
@@ -516,8 +512,8 @@ void ufo_state::ex_crane_xyz_w(u8 data)
 	// d5: move up
 	for (int m = 0; m < 3; m++)
 	{
-		int bits = data >> (m * 2) & 3;
-		m_player[P].motor[m].running = population_count_32(bits) & 1;
+		unsigned bits = data >> (m * 2) & 3;
+		m_player[P].motor[m].running = std::popcount(bits) & 1;
 		m_player[P].motor[m].direction = bits & 2;
 	}
 }
@@ -534,8 +530,8 @@ void ufo_state::ex_ufoalac_xz_w(u8 data)
 	// d7: p2 move arm out
 	for (int i = 0; i < 4; i++)
 	{
-		int bits = data >> (i * 2) & 3;
-		m_player[i & 1].motor[i & 2].running = population_count_32(bits) & 1;
+		unsigned bits = data >> (i * 2) & 3;
+		m_player[i & 1].motor[i & 2].running = std::popcount(bits) & 1;
 		m_player[i & 1].motor[i & 2].direction = bits & 1;
 	}
 
@@ -548,7 +544,7 @@ void ufo_state::ex_ufoalac_y_w(u8 data)
 	// d0: y normal speed
 	// d1: y slow speed
 	// d2: y direction
-	m_player[P].motor[1].running = population_count_32(data & 3) & 1;
+	m_player[P].motor[1].running = std::popcount(data & 3U) & 1;
 	m_player[P].motor[1].direction = data & 4;
 
 	m_player[P].motor[1].speed = 1.0f / CABINET_DEPTH;
@@ -1058,7 +1054,7 @@ void ufo_state::ufo21(machine_config &config)
 	m_io[1]->out_pf_callback().set(FUNC(ufo_state::ex_crane_xyz_w<1>));
 	m_io[1]->out_pg_callback().set_nop();
 
-	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3", 0));
+	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3"));
 	io3.out_pa_callback().set(FUNC(ufo_state::ex_upd_start_w));
 	io3.in_pb_callback().set(FUNC(ufo_state::ex_upd_busy_r));
 	io3.out_pe_callback().set(FUNC(ufo_state::ex_ufo21_lamps1_w));

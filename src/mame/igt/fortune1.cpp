@@ -1373,9 +1373,6 @@ void videopkr_state::machine_start()
 	m_videobank->set_entry(3);
 	m_colorbank->set_entry(3);
 
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	m_vp_sound_p2 = 0xff;   // default P2 latch value
 	m_sound_latch = 0xff;   // default sound data latch value
 	m_p24_data = 0xff;
@@ -1394,8 +1391,6 @@ void babypkr_state::machine_start()
 	videopkr_state::machine_start();
 
 	m_p24_data = 0;
-
-	m_top_lamps.resolve();
 }
 
 
@@ -1429,7 +1424,7 @@ void videopkr_state::videopkr(machine_config &config)
 	TIMER(config, "t1_timer").configure_periodic(FUNC(videopkr_state::sound_t1_callback), attotime::from_hz(50));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(5*8, 31*8-1, 3*8, 29*8-1);
 	screen.set_refresh_hz(60);

@@ -11,7 +11,7 @@ class specnext_tiles_device : public device_t, public device_gfx_interface
 {
 
 public:
-	specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	specnext_tiles_device &set_bram_bank5_ptr(const u8 *bram_bank5_ptr) { m_bram_bank5_ptr = bram_bank5_ptr; tilemap_update(); return *this; }
 	specnext_tiles_device &set_bram_bank7_ptr(const u8 *bram_bank7_ptr) { m_bram_bank7_ptr = bram_bank7_ptr; tilemap_update(); return *this; }

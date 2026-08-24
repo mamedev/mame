@@ -22,6 +22,7 @@ public:
 	void layers_w(offs_t offset, u8 data);
 	u16 priority_ram_r(offs_t offset);
 	void priority_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	int blitter_busy_r();
 
 	void prot_w(offs_t offset, u8 data);
 	u16 prot_r();
@@ -51,7 +52,6 @@ private:
 	void prot_addr_change_w(s32 data);
 	void prot_mem_range_set();
 
-	// blitter
 	struct blitter_t
 	{
 		blitter_t()

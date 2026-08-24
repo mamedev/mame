@@ -42,15 +42,14 @@ license:CC0-1.0
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=w6LsIeLsUFw -->
-	<software name="colorful" supported="no">
+	<software name="colorful">
 		<description>Colorful Animals</description>
 		<year>2018</year>
 		<publisher>Genesis Project</publisher>
-		<info name="usage" value="BYE, A" />
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="163840">
-				<rom name="colorful_animals.img" size="163840" crc="ba6ba9a1" sha1="36f9a0b814b222eb5664a87f3b52c0268dfd18c1" />
+			<dataarea name="flop" size="655360">
+				<rom name="colorful_animals_832.img" size="655360" crc="1369faea" sha1="5f6b971f29e9d931281a5ba82912c2ceea5d7d91" />
 			</dataarea>
 		</part>
 	</software>

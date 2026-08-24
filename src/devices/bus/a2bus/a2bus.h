@@ -67,7 +67,7 @@ class a2bus_device : public device_t
 	friend class a2bus_mcms2_device;
 public:
 	// construction/destruction
-	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_maincpu_space.set_tag(std::forward<T>(tag), spacenum); }
@@ -75,6 +75,7 @@ public:
 	auto nmi_w() { return m_out_nmi_cb.bind(); }
 	auto inh_w() { return m_out_inh_cb.bind(); }
 	auto dma_w() { return m_out_dma_cb.bind(); }
+	auto open_bus_r() { return m_in_open_bus_cb.bind(); }
 
 	void add_a2bus_card(int slot, device_a2bus_card_interface *card);
 	device_a2bus_card_interface *get_a2bus_card(int slot);
@@ -87,7 +88,13 @@ public:
 	void recalc_inh(int slot);
 	uint8_t dma_r(uint16_t offset);
 	void dma_w(uint16_t offset, uint8_t data);
+	void set_dma_bank(uint8_t bank) { m_dma_bank = bank; }
+	uint8_t get_dma_bank() const { return m_dma_bank; }
+
 	void reset_bus();
+	uint8_t get_open_bus() { return m_in_open_bus_cb(); }
+
+	void defer_host_access();
 
 	void irq_w(int state);
 	void nmi_w(int state);
@@ -106,11 +113,13 @@ protected:
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write8        m_out_inh_cb;
 	devcb_write_line    m_out_dma_cb;
+	devcb_read8         m_in_open_bus_cb;
 
 	device_a2bus_card_interface *m_device_list[8];
 
 	uint8_t m_slot_irq_mask;
 	uint8_t m_slot_nmi_mask;
+	uint8_t m_dma_bank;
 };
 
 
@@ -127,15 +136,15 @@ public:
 	// construction/destruction
 	virtual ~device_a2bus_card_interface();
 
-	virtual uint8_t read_c0nx(uint8_t offset) { device().logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
-	virtual void write_c0nx(uint8_t offset, uint8_t data) { device().logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
-	virtual uint8_t read_cnxx(uint8_t offset) { return 0; }       // CnXX - /IOSEL
-	virtual void write_cnxx(uint8_t offset, uint8_t data) { device().logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
-	virtual uint8_t read_c800(uint16_t offset) { return 0; }      // C800 - /IOSTB
-	virtual void write_c800(uint16_t offset, uint8_t data) {device().logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
-	virtual bool take_c800() const { return false; }   // override and return true if your card can take over the /IOSTB space
-	virtual uint8_t read_inh_rom(uint16_t offset) { return 0; }
-	virtual void write_inh_rom(uint16_t offset, uint8_t data) { }
+	virtual uint8_t read_c0nx(uint8_t offset);          // C0nX - /DEVSEL
+	virtual void write_c0nx(uint8_t offset, uint8_t data);
+	virtual uint8_t read_cnxx(uint8_t offset);          // CnXX - /IOSEL
+	virtual void write_cnxx(uint8_t offset, uint8_t data);
+	virtual uint8_t read_c800(uint16_t offset);         // C800 - /IOSTB
+	virtual void write_c800(uint16_t offset, uint8_t data);
+	virtual bool take_c800() const { return false; }    // override and return true if your card can take over the /IOSTB space
+	virtual uint8_t read_inh_rom(uint16_t offset);
+	virtual void write_inh_rom(uint16_t offset, uint8_t data);
 	virtual uint16_t inh_start() { return INH_START_INVALID; }
 	virtual uint16_t inh_end() { return INH_END_INVALID; }
 	virtual bool inh_check(uint16_t offset, bool bIsWrite) { return false; }
@@ -150,6 +159,7 @@ public:
 
 	uint8_t slot_dma_read(uint16_t offset) { return m_a2bus->dma_r(offset); }
 	void slot_dma_write(uint16_t offset, uint8_t data) { m_a2bus->dma_w(offset, data); }
+	void defer_host_access() { m_a2bus->defer_host_access(); }
 
 protected:
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
@@ -162,6 +172,7 @@ protected:
 	void recalc_slot_inh() { m_a2bus->recalc_inh(m_slot); }
 	void raise_slot_dma() { m_a2bus->set_dma_line(ASSERT_LINE); }
 	void lower_slot_dma() { m_a2bus->set_dma_line(CLEAR_LINE); }
+	uint8_t get_open_bus() { return m_a2bus->get_open_bus(); }
 
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 

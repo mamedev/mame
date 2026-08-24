@@ -96,6 +96,7 @@ DEFINE_DEVICE_TYPE(AMD_29F080,               amd_29f080_device,               "a
 DEFINE_DEVICE_TYPE(AMD_29F400T,              amd_29f400t_device,              "amd_29f400t",              "AMD 29F400T Flash")
 DEFINE_DEVICE_TYPE(AMD_29F800T,              amd_29f800t_device,              "amd_29f800t",              "AMD 29F800T Flash")
 DEFINE_DEVICE_TYPE(AMD_29F800B_16BIT,        amd_29f800b_16bit_device,        "amd_29f800b_16bit",        "AMD 29F800B Flash (16-bit)")
+DEFINE_DEVICE_TYPE(AMD_29LV160DT,            amd_29lv160dt_device,            "amd_29lv160dt",            "AMD 29LV160DT Flash")
 DEFINE_DEVICE_TYPE(AMD_29LV200T,             amd_29lv200t_device,             "amd_29lv200t",             "AMD 29LV200T Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE,         fujitsu_29f160te_device,         "mbm29f160te",              "Fujitsu MBM29F160TE Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,   fujitsu_29f160te_16bit_device,   "mbm29f160te_16bit",        "Fujitsu MBM29F160TE Flash (16-bit)")
@@ -109,6 +110,7 @@ DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC,       macronix_29f1610mc_device,       "m
 DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC_16BIT, macronix_29f1610mc_16bit_device, "macronix_29f1610mc_16bit", "Macronix 29F1610MC Flash (16-bit)")
 DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,        macronix_29l001mc_device,        "macronix_29l001mc",        "Macronix 29L001MC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,      macronix_29lv160tmc_device,      "macronix_29lv160tmc",      "Macronix 29LV160TMC Flash")
+DEFINE_DEVICE_TYPE(MACRONIX_29LV320ETTI,     macronix_29lv320etti_device,     "macronix_29lv320etti",     "Macronix 29LV320ETTI Flash")
 DEFINE_DEVICE_TYPE(ST_M29W640GB,             st_m29w640gb_device,             "st_m29w640gb",             "ST M29W640GB Flash")
 DEFINE_DEVICE_TYPE(ST_M29W640FT,             st_m29w640ft_device,             "st_m29w640ft",             "ST M29W640FT Flash")
 DEFINE_DEVICE_TYPE(TMS_29F040,               tms_29f040_device,               "tms_29f040",               "Texas Instruments 29F040 Flash")
@@ -240,6 +242,9 @@ amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char
 amd_29f800b_16bit_device::amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_top_boot_sector = false; }
 
+amd_29lv160dt_device::amd_29lv160dt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, AMD_29LV160DT, tag, owner, clock, 0x200000, MFG_AMD, 0xc4) {}
+
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, tag, owner, clock, 0x40000, MFG_AMD, 0x3b) { }
 
@@ -263,6 +268,9 @@ macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig
 
 macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, MACRONIX_29LV160TMC, tag, owner, clock, 0x20000, MFG_MACRONIX, 0x49) { m_sector_is_16k = true; }
+
+macronix_29lv320etti_device::macronix_29lv320etti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, MACRONIX_29LV320ETTI, tag, owner, clock, 0x400000, MFG_MACRONIX, 0x22A7) { m_top_boot_sector = true; }
 
 st_m29w640gb_device::st_m29w640gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, ST_M29W640GB, tag, owner, clock, 0x800000, MFG_ST, 0x227e) { m_bot_boot_sector = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; }

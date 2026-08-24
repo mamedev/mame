@@ -500,7 +500,7 @@ void pgram_device::device_add_mconfig(machine_config& config)
 	LS259(config, m_crulatch); // u14
 
 	// Bank switch
-	TTL7474(config, m_bankff, 0);
+	TTL7474(config, m_bankff);
 
 	// We allocate the space for PGRAM+
 	BUFF_RAM(config, GRAM4567_TAG, 0).set_size(128*1024);

@@ -50,7 +50,7 @@ void apple3_state::apple3(machine_config &config)
 	mainirq.output_handler().append(m_via[1], FUNC(via6522_device::write_pa7)).invert(); // this is active low
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple3_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -61,7 +61,7 @@ void apple3_state::apple3(machine_config &config)
 	PALETTE(config, m_palette, FUNC(apple3_state::palette_init), 32);
 
 	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -80,7 +80,7 @@ void apple3_state::apple3(machine_config &config)
 	TIMER(config, m_repttimer).configure_generic(FUNC(apple3_state::ay3600_repeat));
 
 	/* slot bus */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
@@ -102,7 +102,7 @@ void apple3_state::apple3(machine_config &config)
 	SOFTWARE_LIST(config, "flop525_list").set_original("apple3");
 
 	/* acia */
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(XTAL(1'843'200)); // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

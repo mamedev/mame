@@ -2,7 +2,7 @@
 // detail/impl/epoll_reactor.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <sys/epoll.h>
+#include "asio/config.hpp"
 #include "asio/detail/epoll_reactor.hpp"
 #include "asio/detail/scheduler.hpp"
 #include "asio/detail/throw_error.hpp"
@@ -33,18 +34,26 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 epoll_reactor::epoll_reactor(asio::execution_context& ctx)
   : execution_context_service_base<epoll_reactor>(ctx),
     scheduler_(use_service<scheduler>(ctx)),
-    mutex_(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          REACTOR_REGISTRATION, scheduler_.concurrency_hint())),
-    interrupter_(),
+    mutex_(config(ctx).get("reactor", "registration_locking", true),
+        config(ctx).get("reactor", "registration_locking_spin_count", 0)),
+    interrupter_(config(ctx).get("reactor", "use_eventfd", true)),
     epoll_fd_(do_epoll_create()),
-    timer_fd_(do_timerfd_create()),
+    timer_fd_(config(ctx).get("reactor", "use_timerfd", true)
+        ? do_timerfd_create() : -1),
     shutdown_(false),
-    registered_descriptors_mutex_(mutex_.enabled())
+    io_locking_(config(ctx).get("reactor", "io_locking", true)),
+    io_locking_spin_count_(
+        config(ctx).get("reactor", "io_locking_spin_count", 0)),
+    registered_descriptors_mutex_(mutex_.enabled(), mutex_.spin_count()),
+    registered_descriptors_(execution_context::allocator<void>(ctx),
+        config(ctx).get("reactor", "preallocated_io_objects", 0U),
+        io_locking_, io_locking_spin_count_)
 {
   // Add the interrupter's descriptor to epoll.
   epoll_event ev = { 0, { 0 } };
@@ -102,9 +111,11 @@ void epoll_reactor::notify_fork(
     epoll_fd_ = do_epoll_create();
 
     if (timer_fd_ != -1)
+    {
       ::close(timer_fd_);
-    timer_fd_ = -1;
-    timer_fd_ = do_timerfd_create();
+      timer_fd_ = -1;
+      timer_fd_ = do_timerfd_create();
+    }
 
     interrupter_.recreate();
 
@@ -130,14 +141,18 @@ void epoll_reactor::notify_fork(
     for (descriptor_state* state = registered_descriptors_.first();
         state != 0; state = state->next_)
     {
-      ev.events = state->registered_events_;
-      ev.data.ptr = state;
-      int result = epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, state->descriptor_, &ev);
-      if (result != 0)
+      if (state->registered_events_ != 0)
       {
-        asio::error_code ec(errno,
-            asio::error::get_system_category());
-        asio::detail::throw_error(ec, "epoll re-registration");
+        ev.events = state->registered_events_;
+        ev.data.ptr = state;
+        int result = epoll_ctl(epoll_fd_,
+            EPOLL_CTL_ADD, state->descriptor_, &ev);
+        if (result != 0)
+        {
+          asio::error_code ec(errno,
+              asio::error::get_system_category());
+          asio::detail::throw_error(ec, "epoll re-registration");
+        }
       }
     }
   }
@@ -216,7 +231,11 @@ int epoll_reactor::register_internal_descriptor(
   ev.data.ptr = descriptor_data;
   int result = epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, descriptor, &ev);
   if (result != 0)
+  {
+    // Don't try to re-register internal descriptor after fork().
+    descriptor_data->registered_events_ = 0;
     return errno;
+  }
 
   return 0;
 }
@@ -663,8 +682,7 @@ int epoll_reactor::do_timerfd_create()
 epoll_reactor::descriptor_state* epoll_reactor::allocate_descriptor_state()
 {
   mutex::scoped_lock descriptors_lock(registered_descriptors_mutex_);
-  return registered_descriptors_.alloc(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-        REACTOR_IO, scheduler_.concurrency_hint()));
+  return registered_descriptors_.alloc(io_locking_, io_locking_spin_count_);
 }
 
 void epoll_reactor::free_descriptor_state(epoll_reactor::descriptor_state* s)
@@ -756,9 +774,9 @@ struct epoll_reactor::perform_io_cleanup_on_block_exit
   operation* first_op_;
 };
 
-epoll_reactor::descriptor_state::descriptor_state(bool locking)
+epoll_reactor::descriptor_state::descriptor_state(bool locking, int spin_count)
   : operation(&epoll_reactor::descriptor_state::do_complete),
-    mutex_(locking)
+    mutex_(locking, spin_count)
 {
 }
 
@@ -817,6 +835,7 @@ void epoll_reactor::descriptor_state::do_complete(
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

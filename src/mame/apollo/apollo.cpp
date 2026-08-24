@@ -1057,7 +1057,7 @@ void apollo_state::dn3500(machine_config &config)
 	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 #ifdef APOLLO_XXL
-	apollo_stdio_device &stdio(APOLLO_STDIO(config, APOLLO_STDIO_TAG, 0));
+	apollo_stdio_device &stdio(APOLLO_STDIO(config, APOLLO_STDIO_TAG));
 	stdio.tx_cb().set(m_sio, FUNC(apollo_sio::rx_b_w));
 #endif
 }
@@ -1084,7 +1084,7 @@ void apollo_state::dn3500_19i(machine_config &config)
 	dn3500(config);
 	/* video hardware 19" monochrome */
 	APOLLO_MONO19I(config, m_graphics, 0);
-	APOLLO_KBD(config, m_keyboard, 0);
+	APOLLO_KBD(config, m_keyboard);
 	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
 	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 }
@@ -1093,8 +1093,8 @@ void apollo_state::dn3500_15i(machine_config &config)
 {
 	dn3500(config);
 	/* video hardware is 15" monochrome or color */
-	APOLLO_GRAPHICS(config, m_graphics, 0);
-	APOLLO_KBD(config, m_keyboard, 0);
+	APOLLO_GRAPHICS(config, m_graphics);
+	APOLLO_KBD(config, m_keyboard);
 	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
 	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 }
@@ -1137,7 +1137,7 @@ void apollo_state::dn3000_19i(machine_config &config)
 	dn3000(config);
 	/* video hardware 19" monochrome */
 	APOLLO_MONO19I(config, m_graphics, 0);
-	APOLLO_KBD(config, m_keyboard, 0);
+	APOLLO_KBD(config, m_keyboard);
 	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
 	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 }
@@ -1146,8 +1146,8 @@ void apollo_state::dn3000_15i(machine_config &config)
 {
 	dn3000(config);
 	/* video hardware 15" monochrome */
-	APOLLO_GRAPHICS(config, m_graphics, 0);
-	APOLLO_KBD(config, m_keyboard, 0);
+	APOLLO_GRAPHICS(config, m_graphics);
+	APOLLO_KBD(config, m_keyboard);
 	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
 	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 }
@@ -1183,7 +1183,7 @@ void apollo_state::dn5500_19i(machine_config &config)
 	dn5500(config);
 	/* video hardware 19" monochrome */
 	APOLLO_MONO19I(config, m_graphics, 0);
-	APOLLO_KBD(config, m_keyboard, 0);
+	APOLLO_KBD(config, m_keyboard);
 	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
 	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 }
@@ -1192,8 +1192,8 @@ void apollo_state::dn5500_15i(machine_config &config)
 {
 	dn5500(config);
 	/* video hardware 15" monochrome */
-	APOLLO_GRAPHICS(config, m_graphics, 0);
-	APOLLO_KBD(config, m_keyboard, 0);
+	APOLLO_GRAPHICS(config, m_graphics);
+	APOLLO_KBD(config, m_keyboard);
 	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
 	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 }

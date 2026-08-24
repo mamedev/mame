@@ -8,7 +8,6 @@ authors:Sandro Ronco, hap
 <!-- define elements -->
 
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="greenb"><rect><color red="0.1" green="0.8" blue="0.35" /></rect></element>
 	<element name="blackbd"><disk><color red="0" green="0" blue="0" /></disk></element>
 	<element name="whited"><disk><color red="0.99" green="0.99" blue="0.99" /></disk></element>
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
@@ -490,6 +489,17 @@ authors:Sandro Ronco, hap
 		</rect>
 	</element>
 
+	<element name="outline3">
+		<rect>
+			<bounds xc="0" yc="0" width="6" height="4.5" />
+			<color red="0.1" green="0.8" blue="0.35" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="5.6" height="4.1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+
 	<element name="text_u1"><text string="VERIFY"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_u2"><text string="OPTION"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_u3"><text string="LEVEL"><color red="0.01" green="0.01" blue="0.01" /></text></element>
@@ -533,9 +543,9 @@ authors:Sandro Ronco, hap
 	<group name="panel">
 		<bounds x="-3" y="0" width="125" height="17" />
 
-		<element ref="greenb"><bounds x="51" y="4" width="6" height="4.5" /></element>
-		<element ref="blackb"><bounds x="51.5" y="4.5" width="5" height="3.5" /></element>
+		<element ref="outline3"><bounds x="51" y="4" width="6" height="4.5" /></element>
 		<element name="0.8" ref="led"><bounds x="53.2" y="5.5" width="1.5" height="1.5" /></element>
+
 		<element ref="cwhite"><bounds x="51" y="9.5" width="6" height="4.5" /></element>
 		<element ref="text_shift"><bounds x="51" y="10.9" width="6" height="1.5" /></element>
 		<element ref="hlr" inputtag="IN.0" inputmask="0x100"><bounds x="51" y="9.5" width="6" height="4.5" /><color alpha="0.3" /></element>

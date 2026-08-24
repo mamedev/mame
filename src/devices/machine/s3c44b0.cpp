@@ -807,7 +807,7 @@ void s3c44b0_device::lcd_configure()
 	height = lineval + 1;
 	m_lcd.framerate = framerate;
 	LOGMASKED(LOG_LCD_CONFIG, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
-	screen().configure(screen().width(), screen().height(), screen().visible_area(), HZ_TO_ATTOSECONDS(m_lcd.framerate));
+	screen().configure(screen().width(), screen().height(), screen().visible_area(), attotime::from_hz(m_lcd.framerate));
 	m_lcd.hpos_min = 25;
 	m_lcd.hpos_max = 25 + width - 1;
 	m_lcd.hpos_end = 25 + width - 1 + 25;

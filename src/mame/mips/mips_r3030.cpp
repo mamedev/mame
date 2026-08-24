@@ -120,6 +120,8 @@
 
 #include "imagedev/floppy.h"
 
+#include "endianness.h"
+
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)
 
@@ -372,7 +374,7 @@ void mips_r3030_state::r3030(machine_config &config)
 	m_scsi->drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
 
 	// ethernet
-	AM7990(config, m_net);
+	AM7990(config, m_net, 10'000'000); // clock is a guess
 	m_net->intr_out().set(FUNC(mips_r3030_state::irq_w<INT_NET>));
 	m_net->dma_in().set(FUNC(mips_r3030_state::lance_r));
 	m_net->dma_out().set(FUNC(mips_r3030_state::lance_w));
@@ -423,7 +425,7 @@ void mips_r3030_state::r3030(machine_config &config)
 	// motherboard monochrome video (1152x900 @ 72Hz)
 	u32 const pixclock = 74'649'600;
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(pixclock, 1152, 0, 1152, 900, 0, 900);
 	m_screen->set_screen_update(m_rambo.finder_tag(), FUNC(mips_rambo_device::screen_update));
 

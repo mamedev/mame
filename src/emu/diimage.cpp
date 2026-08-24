@@ -1102,7 +1102,7 @@ void device_image_interface::clear() noexcept
 
 void device_image_interface::unload()
 {
-	if (is_loaded() || loaded_through_softlist())
+	if (is_loaded() || loaded_through_softlist() || exists())
 	{
 		call_unload();
 		clear();

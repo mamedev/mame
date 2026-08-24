@@ -868,7 +868,7 @@ void bml3_state::bml3(machine_config &config)
 	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set(FUNC(bml3_state::piaA_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	m_acia->rts_handler().set(FUNC(bml3_state::acia_rts_w));
 	m_acia->irq_handler().set(FUNC(bml3_state::acia_irq_w));
@@ -882,7 +882,7 @@ void bml3_state::bml3(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("bml3_cass");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Service manual specifies "Raster return period" as 2.4 ms (p.64),
 	// although the total vertical non-displaying time seems to be 4 ms.
 	// NOTE: D80_CLOCK x 2 as per MAME interlace limitation
@@ -901,7 +901,7 @@ void bml3_state::bml3(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	BML3BUS(config, m_bml3bus, 0);
+	BML3BUS(config, m_bml3bus);
 	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_bml3bus->firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);

@@ -1,19 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Mathis Rosenhauer
 
-#include <cmath>
 #include "emu.h"
 #include "vectrex.h"
 #include "cpu/m6809/m6809.h"
+
+#include <cmath>
+#include <numbers>
 
 
 #define ANALOG_DELAY 8500
 
 #define INT_PER_CLOCK 550
-
-#ifndef M_SQRT1_2
-#define M_SQRT1_2 0.70710678118654752440
-#endif
 
 /*********************************************************************
 
@@ -113,13 +111,13 @@ void vectrex_base_state::via_w(offs_t offset, uint8_t data)
 TIMER_CALLBACK_MEMBER(vectrex_base_state::refresh)
 {
 	/* Refresh only marks the range of vectors which will be drawn
-	 * during the next screen_update. */
+	 * during the next vector_update. */
 	m_display_start = m_display_end;
 	m_display_end = m_point_index;
 }
 
 
-uint32_t vectrex_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void vectrex_base_state::vector_update(vector_device &vector)
 {
 	screen_configuration();
 
@@ -136,10 +134,6 @@ uint32_t vectrex_base_state::screen_update(screen_device &screen, bitmap_rgb32 &
 							m_points[i].col,
 							m_points[i].intensity);
 	}
-
-	m_vector->screen_update(screen, bitmap, cliprect);
-	m_vector->clear_list();
-	return 0;
 }
 
 
@@ -165,10 +159,12 @@ void vectrex_base_state::add_point(int x, int y, rgb_t color, int intensity)
 
 void vectrex_base_state::add_point_stereo(int x, int y, rgb_t color, int intensity)
 {
+	constexpr double SQRT1_2 = std::numbers::sqrt2 / 2.0;
+
 	if (m_imager_status == 2) /* left = 1, right = 2 */
-		add_point((int)(y * M_SQRT1_2)+ m_x_center, (int)(((m_x_max - x) * M_SQRT1_2)), color, intensity);
+		add_point((int)(y * SQRT1_2)+ m_x_center, (int)(((m_x_max - x) * SQRT1_2)), color, intensity);
 	else
-		add_point((int)(y * M_SQRT1_2), (int)((m_x_max - x) * M_SQRT1_2), color, intensity);
+		add_point((int)(y * SQRT1_2), (int)((m_x_max - x) * SQRT1_2), color, intensity);
 }
 
 
@@ -222,7 +218,7 @@ void vectrex_base_state::update_vector()
 
 void vectrex_base_state::video_start()
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_x_center=(visarea.width() / 2) << 16;
 	m_y_center=(visarea.height() / 2) << 16;

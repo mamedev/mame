@@ -141,7 +141,7 @@ void aim65_40_state::aim65_40(machine_config &config)
 	MOS6522(config, M6522_1_TAG, 1000000);
 	MOS6522(config, M6522_2_TAG, 1000000);
 
-	mos6551_device &acia(MOS6551(config, M6551_TAG, 0));
+	mos6551_device &acia(MOS6551(config, M6551_TAG));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

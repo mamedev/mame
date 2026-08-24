@@ -36,14 +36,17 @@
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
-#include "machine/k054321.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "video/k053936.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+#include "endianness.h"
 
 #include "rungun_dual.lh"
 
@@ -657,7 +660,7 @@ void rungun_state::rng(machine_config &config)
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -667,10 +670,10 @@ void rungun_state::rng(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(34, 9);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -8, 15);
 	m_k055673->set_palette(m_palette);
@@ -712,7 +715,7 @@ void rungun_state::rng_dual(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update_dual_left));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
 	screen2.set_screen_update(FUNC(rungun_state::screen_update_dual_right));
 	screen2.set_palette(m_palette2);

@@ -61,7 +61,7 @@ namespace {
 
 class taito_state : public genpin_class
 {
-public:
+protected:
 	taito_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_audiocpu(*this, "audiocpu")
@@ -70,15 +70,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void taito_common(machine_config &config);
+	void taito_common(machine_config &config) ATTR_COLD;
 
-protected:
-	void mr_common();
-	void ms_common();
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	void taito_ay_audio(machine_config &config);
 	void audio_map(address_map &map) ATTR_COLD;
 	void audio_map2(address_map &map) ATTR_COLD;
 	u8 pia_pb_r();
+
 	u8 m_sndcmd = 0x3eU;
 	required_device<m6802_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pia;
@@ -93,18 +94,20 @@ public:
 		: taito_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_votrax(*this, "votrax")
-		{ }
+	{ }
 
-	void taito(machine_config &config);
-	void taito1(machine_config &config);
-	void taito2(machine_config &config);
-	void taito4(machine_config &config);
-	void taito6(machine_config &config);
-	void shock(machine_config &config);
+	void taito(machine_config &config) ATTR_COLD;
+	void taito1(machine_config &config) ATTR_COLD;
+	void taito2(machine_config &config) ATTR_COLD;
+	void taito4(machine_config &config) ATTR_COLD;
+	void taito6(machine_config &config) ATTR_COLD;
+	void shock(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void pia_pb_w(u8 data);
@@ -127,13 +130,14 @@ public:
 		: taito_state(mconfig, type, tag)
 		, m_z80cpu(*this, "maincpu")
 		, m_io_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
-	void taitoz(machine_config &config);
+	void taitoz(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	void mrblkz80_mem_map(address_map &map) ATTR_COLD;
 	void mrblkz80_io_map(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z);
@@ -143,6 +147,7 @@ private:
 	void z80_lamp_w(u8);
 	void z80_sol_w(u8);
 	u8 z80_key_r();
+
 	u8 m_row = 0U;
 	u8 m_t_c = 0U;
 	required_device<z80_device> m_z80cpu;
@@ -410,23 +415,22 @@ void taito_8080::votrax_request(int state)
 	m_pia->ca1_w(state);
 }
 
-void taito_state::ms_common()
+void taito_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
+	save_item(NAME(m_sndcmd));
 }
 
 void taito_8080::machine_start()
 {
-	ms_common();
+	taito_state::machine_start();
+
 	save_item(NAME(m_io));
-	save_item(NAME(m_sndcmd));
 	save_item(NAME(m_votrax_cmd));
 }
 
-void taito_state::mr_common()
+void taito_state::machine_reset()
 {
 	genpin_class::machine_reset();
 
@@ -438,7 +442,8 @@ void taito_state::mr_common()
 
 void taito_8080::machine_reset()
 {
-	mr_common();
+	taito_state::machine_reset();
+
 	m_votrax_cmd = 0x3e;
 	std::fill(std::begin(m_io), std::end(m_io), 0);
 }
@@ -446,14 +451,10 @@ void taito_8080::machine_reset()
 // **** MRBLKZ80 ****
 void mrblkz80_state::machine_start()
 {
-	ms_common();
+	taito_state::machine_start();
+
 	save_item(NAME(m_row));
 	save_item(NAME(m_t_c));
-}
-
-void mrblkz80_state::machine_reset()
-{
-	mr_common();
 }
 
 void mrblkz80_state::z80_col_w(u8 data)

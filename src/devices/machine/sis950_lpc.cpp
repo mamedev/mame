@@ -126,7 +126,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	constexpr XTAL lpc_pit_clock = XTAL(14'318'181);
 
 	// confirmed 82C54
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	// heartbeat IRQ
 	m_pit->set_clk<0>(lpc_pit_clock / 12);
 	m_pit->out_handler<0>().set(FUNC(sis950_lpc_device::pit_out0));
@@ -172,7 +172,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_dmac_slave->out_dack_callback<3>().set(FUNC(sis950_lpc_device::pc_dack7_w));
 
 	// Confirmed 82C59s
-	PIC8259(config, m_pic_master, 0);
+	PIC8259(config, m_pic_master);
 	m_pic_master->out_int_callback().set_inputline(m_host_cpu, 0);
 	m_pic_master->in_sp_callback().set_constant(1);
 	m_pic_master->read_slave_ack_callback().set(
@@ -184,7 +184,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 			return 0;
 		});
 
-	PIC8259(config, m_pic_slave, 0);
+	PIC8259(config, m_pic_slave);
 	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir2_w));
 	m_pic_slave->in_sp_callback().set_constant(0);
 
@@ -221,7 +221,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set(FUNC(sis950_lpc_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(sis950_lpc_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(sis950_lpc_device::pc_irq5_w));

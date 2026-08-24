@@ -15,6 +15,7 @@
 #include "video/mc6845.h"
 #include "machine/mm58167.h"
 #include "machine/wd_fdc.h"
+#include "machine/wd1010.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
@@ -125,8 +126,6 @@ public:
 
 	void kaypronew2(machine_config &config);
 	void kaypro484(machine_config &config);
-	void kaypro10(machine_config &config);
-	void kaypro1084(machine_config &config);
 	void kaypro284(machine_config &config);
 	void kaypro4x(machine_config &config);
 	void kaypro1(machine_config &config);
@@ -134,10 +133,10 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
-private:
 	void kaypro10_io(address_map &map) ATTR_COLD;
 	void kaypro484_io(address_map &map) ATTR_COLD;
 
+private:
 	u8 kaypro484_87_r();
 	u8 kaypro484_system_port_r();
 	u8 kaypro484_status_r();
@@ -162,6 +161,40 @@ private:
 	u8 m_mc6845_ind = 0U;
 	u16 m_mc6845_video_address = 0U;
 	u8 m_rtc_address = 0U;
+};
+
+class kaypro10_state : public kaypro84_state
+{
+public:
+	kaypro10_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaypro84_state(mconfig, type, tag)
+		, m_hdc(*this, "hdc")
+		, m_hdd(*this, "hdc:0")
+	{}
+
+	void kaypro10(machine_config &config);
+	void kaypro1084(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void kaypro10hd_io(address_map &map) ATTR_COLD;
+	void kaypro1084_io(address_map &map) ATTR_COLD;
+
+	void add_hdc(machine_config &config);          // shared WD1002-HD0 wiring (kaypro10 + kaypro1084)
+	u8 hdc_r(offs_t offset);
+	void hdc_w(offs_t offset, u8 data);
+	u8 hdc_data_r();
+	void hdc_data_w(u8 data);
+	u8 hdc_buf_in();
+	void hdc_buf_out(u8 data);
+	void hdc_bcr_w(int state);
+
+	required_device<wd1010_device> m_hdc;          // WD1002-HD0 Winchester controller
+	required_device<harddisk_image_device> m_hdd;
+	std::unique_ptr<u8[]> m_hdc_buf;               // WD1002 board sector buffer
+	u16 m_hdc_ptr = 0U;
 };
 
 #endif // MAME_KAYPRO_KAYPRO_H

@@ -67,7 +67,7 @@ const char* fd5_format::extensions() const noexcept
 const fd5_format::format fd5_format::formats[] = {
 	// SINGLE-SIDED (SS) – 160 kB
 	{
-		floppy_image::FF_3,		 // 3" floppy
+		floppy_image::FF_3,      // 3" floppy
 		floppy_image::SSDD,      // single side, double density
 		floppy_image::MFM,
 		2000,                    // 2 µs (cca 250 kbps in 300 rpm)

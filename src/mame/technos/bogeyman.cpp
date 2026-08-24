@@ -445,7 +445,7 @@ void bogeyman_state::bogeyman(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(bogeyman_state::interrupt), "screen", 8, 16);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // DECO video CRTC, unverified
 	m_screen->set_screen_update(FUNC(bogeyman_state::screen_update));
 	m_screen->set_palette(m_palette);

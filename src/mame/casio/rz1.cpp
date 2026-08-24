@@ -382,12 +382,6 @@ void rz1_state::port_c_w(uint8_t data)
 
 void rz1_state::machine_start()
 {
-	// resolve output finders
-	m_led_sampling.resolve();
-	m_led_song.resolve();
-	m_led_pattern.resolve();
-	m_led_startstop.resolve();
-
 	// register for save states
 	save_item(NAME(m_port_a));
 	save_item(NAME(m_port_b));
@@ -429,7 +423,7 @@ void rz1_state::rz1(machine_config &config)
 	NVRAM(config, "sample2", nvram_device::DEFAULT_NONE);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*16+1, 10);

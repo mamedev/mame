@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="s1000_flop" description="Akai S1000 and S1100 floppies">
+
+    <software name="sl012d">
+		<description>Akai Professional Sound Library SL012D: Dance Kit #1</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="8535385">
+				<rom name="akai sl012d.mfi" size="8535385" crc="56af5b92" sha1="01496aa04888873bcc12c950bced7fe241f1ffc5"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl095a">
+		<description>Akai Professional Sound Library SL095A: Orchestra #1</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="7833362">
+				<rom name="akai sl095a.mfi" size="7833362" crc="0e1f551e" sha1="af5159913e5a0694191c98292c68de7f741eaa72"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl097w">
+		<description>Akai Professional Sound Library SL097W: Wind #5</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="6726102">
+				<rom name="akai sl097w.mfi" size="6726102" crc="bc7f581e" sha1="41b11a8a228bcd08f7fbf192d488b62de3a2ee91"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl120w">
+		<description>Akai Professional Sound Library SL120W: Orchestral Wind</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="7701419">
+				<rom name="akai sl120w.mfi" size="7701419" crc="b27d3d71" sha1="3f998ceecda49222a9c4f09e910959d389f23368"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl212e">
+		<description>Akai Professional Sound Library SL212E: Analogue Reed</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="8495166">
+				<rom name="akai sl212e.mfi" size="8495166" crc="9402774e" sha1="860acdc6d279dba3398008b8d35d9056b2751d2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl217d">
+		<description>Akai Professional Sound Library SL217D: Wind Chime</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="8082867">
+				<rom name="akai sl217d.mfi" size="8082867" crc="146aa6d6" sha1="0ce99465229ec2a02db170a2a81b325633c1ecab"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl234e">
+		<description>Akai Professional Sound Library SL234E: Analogue Reed #2</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="7414398">
+				<rom name="akai sl234e.mfi" size="7414398" crc="0d5ef6f6" sha1="1fe82326c7c53b122382ab150c0c745f01478dc9"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl1016">
+		<description>Akai Professional Sound Library: DSP Effect Programs SL1016: Grand Piano #2</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9537021">
+				<rom name="akai professional dsp effect programs sl1016.mfi" size="9537021" crc="d2a4ce02" sha1="cf2766eae45bef98f46dd2366a57cbadcf977204"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl1036">
+		<description>Akai Professional Sound Library SL1036: Wind &amp; Glocken</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="10511460">
+				<rom name="akai sl1036.mfi" size="10511460" crc="51f8fdbb" sha1="6433abb306d28199434f239cbb6f2483b94e5b85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sl1070">
+		<description>Akai Professional Sound Library: DSP Effect Programs SL1070: Orchestral #1</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="10682731">
+				<rom name="akai professional dsp effect programs sl1070.mfi" size="10682731" crc="4a29a46b" sha1="8986e8285c242a7b537638e7ae70260de98ee2a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl1133">
+		<description>Akai Professional Sound Library: DSP Effect Programs SL1133: Breathy Perc</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9822666">
+				<rom name="akai professional dsp effect programs sl1133.mfi" size="9822666" crc="861037ad" sha1="b71fd6583f97f48ded7676455332d012b0098403"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl1150">
+		<description>Akai Professional Natural Sound Library SL1150: Caxixi, Surdo, Brazil</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9565023">
+				<rom name="akai sl1150.mfi" size="9565023" crc="f8eff060" sha1="19331cafa4fbaae23af2e3c489904873d2ae51af"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl1152">
+		<description>Akai Professional Natural Sound Library SL1152: Ganza, Ago-go, Brazil</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9491893">
+				<rom name="akai sl1152.mfi" size="9491893" crc="7a94a331" sha1="578c7ddfa204290d292978af86281dfd7c96a491"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="sl1156">
+		<description>Akai Professional Natural Sound Library SL1156: Congas, Cuba</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9878152">
+				<rom name="akai sl1156.mfi" size="9878152" crc="45b7327d" sha1="8323f2c19a68c7100c8dd59869175571d699501e"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="swm8">
+		<description>Akai Professional Sound Library SWM #8: Sample Wave Mixing</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9475854">
+				<rom name="akai professional sound library swm #8.mfi" size="9475854" crc="5c9fc8e8" sha1="a46809d1c13039fb4ec852ca259bceb25152d0fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="swm8dsp" cloneof="swm8">
+		<description>Akai Professional Sound Library: DSP Effect Programs SWM #8: Sample Wave Mixing</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="10310945">
+				<rom name="akai professional dsp effect programs swm #8.mfi" size="10310945" crc="d04fd596" sha1="1f3de71e6242bfa59f33bf6ae0f5f019c71aac70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="workstation5">
+		<description>Akai Professional Sound Library Work Station #5: Dance</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9835918">
+				<rom name="akai professional sound library work station #5.mfi" size="9835918" crc="945e9afa" sha1="17581f02cc4a412476598e1e4c053759fc3d9e8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="workstation5dsp" cloneof="workstation5">
+		<description>Akai Professional Sound Library: DSP Effect Programs Work Station #5: Dance</description>
+		<year>19??</year>
+		<publisher>Akai Electric</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="9520990">
+				<rom name="akai professional dsp effect programs work station #5.mfi" size="9520990" crc="51a0acdb" sha1="34f8eebd3a92eb70d87e4ed0cb5db9b201510ffa"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

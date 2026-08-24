@@ -74,7 +74,7 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void instruct(machine_config &config);
+	void instruct(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -341,8 +341,6 @@ void instruct_state::machine_reset()
 
 void instruct_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_lar));
 	save_item(NAME(m_digit));
 	save_item(NAME(m_seg));

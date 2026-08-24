@@ -190,7 +190,7 @@ void gaelco2_state::maniacsq(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -515,7 +515,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1042,7 +1042,7 @@ ROM_START( luckyclrs )
 	ROM_LOAD16_BYTE( "1_m27c1001.u40",  0x000001, 0x020000, CRC(f49787e9) SHA1(3be6e865e071066b3f53e7f46da3cf7e117913c6) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	ROM_LOAD( "ds5002fp_50i.mcu", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "ds5002fp_lucky_1.1i.mcu", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
@@ -1180,7 +1180,7 @@ void gaelco2_state::play2000(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1216,7 +1216,7 @@ void gaelco2_state::srollnd(machine_config& config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1316,7 +1316,7 @@ void bang_state::bang(machine_config &config)
 	// Video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1678,7 +1678,7 @@ void gaelco2_state::alighunt(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -2086,7 +2086,7 @@ void gaelco2_dual_state::touchgo(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(59.1);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	lscreen.set_size(64*16, 32*16);
@@ -2094,7 +2094,7 @@ void gaelco2_dual_state::touchgo(machine_config &config)
 	lscreen.set_screen_update(FUNC(gaelco2_dual_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(59.1);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	rscreen.set_size(64*16, 32*16);
@@ -2566,7 +2566,7 @@ void snowboar_state::snowboar(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -2607,7 +2607,7 @@ void snowboar_state::maniacsqs(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -2904,7 +2904,7 @@ void wrally2_state::wrally2(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(59.1);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	lscreen.set_size(384, 32*16);
@@ -2912,7 +2912,7 @@ void wrally2_state::wrally2(machine_config &config)
 	lscreen.set_screen_update(FUNC(wrally2_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(59.1);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	rscreen.set_size(384, 32*16);
@@ -3370,7 +3370,7 @@ GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state,  
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)", MACHINE_NOT_WORKING ) // bad dump
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)", 0 )
 
-GAME( 1999, luckyclrs,   0,         play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Lucky Colors (v1.1i) (Italy)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
+GAME( 1999, luckyclrs,   0,         play2000,         play2000, gaelco2_state,      init_luckyclrs, ROT0, "Nova Desitec", "Lucky Colors (v1.1i) (Italy)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
 GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 

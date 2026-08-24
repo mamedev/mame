@@ -53,8 +53,8 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void usg32(machine_config &config);
-	void usg185(machine_config &config);
+	void usg32(machine_config &config) ATTR_COLD;
+	void usg185(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,8 +136,6 @@ MC6845_UPDATE_ROW(usgames_state::update_row)
 
 void usgames_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_rombank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
@@ -311,7 +309,7 @@ void usgames_state::usg32(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 32*8);

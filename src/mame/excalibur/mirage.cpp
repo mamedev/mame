@@ -47,7 +47,7 @@ BTANB:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -105,8 +105,6 @@ private:
 
 void mirage_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_segs));
@@ -303,10 +301,9 @@ void mirage_state::mirage(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(2, 24);
 	m_lcd_pwm->output_x().set(FUNC(mirage_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 697/5);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_excal_mirage);
 

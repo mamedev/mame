@@ -144,8 +144,6 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 
 void amiga_state::machine_start()
 {
-	m_power_led.resolve();
-
 	// set up chip RAM access
 	memory_share *share = memshare("chip_ram");
 	if (share == nullptr)
@@ -1200,8 +1198,9 @@ void amiga_state::ocs_map(address_map &map)
 			return CUSTOM_REG(REG_COLOR00 + offset);
 		}),
 		NAME([this] (offs_t offset, u16 data) {
-			CUSTOM_REG(REG_COLOR00 + offset) = data;
+			// TODO: a2000 kick31 Prefs/Overscan sets bit 15 here for COLOR01, genlock select?
 			data &= 0xfff;
+			CUSTOM_REG(REG_COLOR00 + offset) = data;
 			// Extra Half-Brite
 			CUSTOM_REG(REG_COLOR00 + offset + 32) = (data >> 1) & 0x777;
 		})

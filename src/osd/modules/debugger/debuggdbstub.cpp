@@ -359,7 +359,7 @@ static const gdb_register_map gdb_register_map_z80 =
 	"z80",
 	{
 		{
-			"mame.z80",
+			"org.gnu.gdb.z80.cpu",
 			{
 				{ "AF",  "af",  false, TYPE_INT },
 				{ "BC",  "bc",  false, TYPE_INT },
@@ -373,6 +373,7 @@ static const gdb_register_map gdb_register_map_z80 =
 				{ "IY",  "iy",  false, TYPE_INT },
 				{ "SP",  "sp",  true,  TYPE_DATA_POINTER },
 				{ "PC",  "pc",  true,  TYPE_CODE_POINTER },
+				{ "IR",  "ir",  false, TYPE_INT },
 			}
 		}
 	}
@@ -666,6 +667,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m6510",      gdb_register_map_m6502 },
 	{ "m65ce02",    gdb_register_map_m6502 },
 	{ "rp2a03",     gdb_register_map_m6502 },
+	{ "rp2a03g",    gdb_register_map_m6502 },
 	{ "w65c02",     gdb_register_map_m6502 },
 	{ "w65c02s",    gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
@@ -848,6 +850,21 @@ void debug_gdbstub::exit()
 void debug_gdbstub::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
+
+	// the fatal error is deferred to a reset notifier: throwing from
+	// here or from an instruction hook crashes on exit
+	std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
+	std::error_condition const filerr = m_socket.open(socket_name);
+	if ( filerr )
+	{
+		osd_printf_error("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+		machine.add_notifier(MACHINE_NOTIFY_RESET,
+			machine_notify_delegate([this]() {
+				fatalerror("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+			}));
+		return;
+	}
+	osd_printf_info("gdbstub: listening on address %s port %d\n", m_debugger_host, m_debugger_port);
 }
 
 //-------------------------------------------------------------------------
@@ -995,12 +1012,6 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
 #endif
 
-		std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
-		std::error_condition const filerr = m_socket.open(socket_name);
-		if ( filerr )
-			fatalerror("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
-		osd_printf_info("gdbstub: listening on address %s port %d\n", m_debugger_host, m_debugger_port);
-
 		m_initialized = true;
 	}
 	else
@@ -1040,6 +1051,9 @@ void debug_gdbstub::debugger_update()
 			break;
 		handle_character((char) ch);
 	}
+
+	if ( m_dettached && m_socket.is_open() )
+		m_socket.close();
 }
 
 //-------------------------------------------------------------------------
@@ -1328,8 +1342,13 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	if ( name == "Supported" )
 	{
 		std::string reply = string_format("PacketSize=%x", MAX_PACKET_SIZE);
-		reply += ";qXfer:features:read+";
+		reply += ";qXfer:features:read+;qOffsets+";
 		send_reply(reply);
+		return REPLY_NONE;
+	}
+	else if ( name == "Offsets" )
+	{
+		send_reply("Text=0;Data=0;Bss=0");
 		return REPLY_NONE;
 	}
 	else if ( name == "Xfer" )

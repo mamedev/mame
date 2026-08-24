@@ -47,7 +47,7 @@ Year + Game               License       PCB         Tilemaps        Sprites     
 01 Thunder Heroes         Primetek      ?           038 9838WX003   013 9918EX008
 -----------------------------------------------------------------------------------------
 
-To Do:
+TODO:
 
 - Modernize state objects for each PCB sub-variant, rename to something more
   apt than "cave_state";
@@ -124,29 +124,18 @@ NOTE: Easter egg in Fereron SOS / Dangun Feveron:
 ***************************************************************************/
 
 
-/* Update the IRQ state based on all possible causes */
-void cave_state::update_irq_state()
-{
-	if (m_vblank_irq || m_sound_irq || m_unknown_irq)
-		m_maincpu->set_input_line(m_irq_level, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(m_irq_level, CLEAR_LINE);
-}
-
 TIMER_CALLBACK_MEMBER(cave_state::vblank_end)
 {
 	if (m_kludge == 3) // mazinger metmqstr
 	{
-		m_unknown_irq = 1;
-		update_irq_state();
+		m_irqs->in_set<UNKNOWN_IRQ>();
 	}
 	m_agallet_vblank_irq = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cave_state::vblank_start)
 {
-	m_vblank_irq = 1;
-	update_irq_state();
+	m_irqs->in_set<VBLANK_IRQ>();
 	m_spritegen[0]->get_sprite_info(m_screen[0]->visible_area());
 	m_agallet_vblank_irq = 1;
 	m_vblank_end_timer->adjust(attotime::from_usec(2000)); // 2000us : vblank time
@@ -173,14 +162,6 @@ INTERRUPT_GEN_MEMBER(ppsatan_state::interrupt_ppsatan)
 	m_int_timer_right->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
 
-/* Called by the YMZ280B to set the IRQ state */
-void cave_state::sound_irq_gen(int state)
-{
-	m_sound_irq = (state != 0);
-	update_irq_state();
-}
-
-
 /*  Level 1 irq routines:
 
     Game        |first read | bit==0->routine + |
@@ -201,19 +182,17 @@ u16 cave_state::irq_cause_r(offs_t offset)
 {
 	u16 result = 0x0003;
 
-	if (m_vblank_irq)
+	if (m_irqs->in_r<VBLANK_IRQ>())
 		result ^= 0x01;
-	if (m_unknown_irq)
+	if (m_irqs->in_r<UNKNOWN_IRQ>())
 		result ^= 0x02;
 
 	if (!machine().side_effects_disabled())
 	{
 		if (offset == 4/2)
-			m_vblank_irq = 0;
+			m_irqs->in_clear<VBLANK_IRQ>();
 		if (offset == 6/2)
-			m_unknown_irq = 0;
-
-		update_irq_state();
+			m_irqs->in_clear<UNKNOWN_IRQ>();
 	}
 
 /*
@@ -2127,12 +2106,8 @@ GFXDECODE_END
 
 void cave_state::machine_start()
 {
-	m_led_outputs.resolve();
 	m_vblank_end_timer = timer_alloc(FUNC(cave_state::vblank_end), this);
 
-	save_item(NAME(m_vblank_irq));
-	save_item(NAME(m_sound_irq));
-	save_item(NAME(m_unknown_irq));
 	save_item(NAME(m_agallet_vblank_irq));
 }
 
@@ -2156,9 +2131,9 @@ void ppsatan_state::machine_start()
 
 void cave_state::machine_reset()
 {
-	m_vblank_irq = 0;
-	m_sound_irq = 0;
-	m_unknown_irq = 0;
+	m_irqs->in_clear<VBLANK_IRQ>();
+	m_irqs->in_clear<SOUND_IRQ>();
+	m_irqs->in_clear<UNKNOWN_IRQ>();
 	m_agallet_vblank_irq = 0;
 }
 
@@ -2177,9 +2152,11 @@ void cave_state::add_base_config(machine_config &config, int layer)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_vblank_int("screen.0", FUNC(cave_state::interrupt));
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, 1);
+
 	TIMER(config, m_int_timer).configure_generic(FUNC(cave_state::vblank_start));
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_refresh_hz(15625/271.5);
 	m_screen[0]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[0]->set_size(320, 240);
@@ -2188,7 +2165,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 	PALETTE(config, m_palette[0], palette_device::BLACK).set_format(palette_device::xGRB_555, 0x8000);
 
-	SPRITE013(config, m_spritegen[0], 0, m_palette[0], gfx_common_spr);
+	SPRITE013(config, m_spritegen[0], m_palette[0], gfx_common_spr);
 	m_spritegen[0]->set_screen(m_screen[0]);
 	m_spritegen[0]->set_spriteram_tag(m_spriteram[0]);
 	m_spritegen[0]->set_colpri_callback(FUNC(cave_state::colpri_cb));
@@ -2212,7 +2189,7 @@ void cave_state::add_ymz(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
-	ymz.irq_handler().set(FUNC(cave_state::sound_irq_gen));
+	ymz.irq_handler().set(m_irqs, FUNC(input_merger_any_high_device::in_w<SOUND_IRQ>));
 	ymz.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -2286,7 +2263,7 @@ void cave_state::donpachi(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
@@ -2419,6 +2396,8 @@ void cave_state::korokoro(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::korokoro_map);
+
+	m_irqs->output_handler().set_inputline(m_maincpu, 2);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2570,7 +2549,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_top));
 	subdevice<timer_device>("int_timer")->configure_generic(FUNC(ppsatan_state::vblank_start));
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_refresh_hz(15625/271.5);
 	m_screen[1]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[1]->set_size(320, 240);
@@ -2578,7 +2557,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[1]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_left));
 	TIMER(config, "int_timer_left").configure_generic(FUNC(ppsatan_state::vblank_start_left));
 
-	SCREEN(config, m_screen[2], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[2]);
 	m_screen[2]->set_refresh_hz(15625/271.5);
 	m_screen[2]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[2]->set_size(320, 240);
@@ -2588,7 +2567,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 
 	m_spritegen[0]->set_info(gfx_korokoro_spr);
 
-	SPRITE013(config, m_spritegen[1], 0, m_palette[1], gfx_ppsatan_spr_1);
+	SPRITE013(config, m_spritegen[1], m_palette[1], gfx_ppsatan_spr_1);
 	m_spritegen[1]->set_screen(m_screen[1]);
 	m_spritegen[1]->set_spriteram_tag(m_spriteram[1]);
 	m_spritegen[1]->set_colpri_callback(FUNC(ppsatan_state::colpri_cb));
@@ -2598,7 +2577,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_spritegen[1]->set_transpen(0);
 	m_spritegen[1]->set_granularity(16);
 
-	SPRITE013(config, m_spritegen[2], 0, m_palette[2], gfx_ppsatan_spr_2);
+	SPRITE013(config, m_spritegen[2], m_palette[2], gfx_ppsatan_spr_2);
 	m_spritegen[2]->set_screen(m_screen[2]);
 	m_spritegen[2]->set_spriteram_tag(m_spriteram[2]);
 	m_spritegen[2]->set_colpri_callback(FUNC(ppsatan_state::colpri_cb));
@@ -2683,7 +2662,7 @@ void cave_z80_state::pwrinst2(machine_config &config)
 	ym2203.add_route(2, "mono", 0.40);
 	ym2203.add_route(3, "mono", 0.80);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -4368,10 +4347,10 @@ ROM_START( paccarn )
 	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )
 	// empty ROM socket
 
-	ROM_REGION( 0x117 * 3, "plds", 0 ) // all protected
-	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, CRC(5ceb0101) SHA1(ad5d221eb87c52ee558d60e5e44a9933c669dcf2) )
+	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, CRC(4cd79750) SHA1(cfb3331cd8bb2eaaf5d2a80ae76a5a15ae92d379) )
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )
 ROM_END
 
 /***************************************************************************
@@ -4921,8 +4900,16 @@ BPSM.U77    23C16000    GFX
 	ROM_RELOAD(           0x080000, 0x080000             ) \
 	ROM_RELOAD(           0x100000, 0x080000             ) \
 	ROM_RELOAD(           0x180000, 0x080000             )
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( sailormn )
+	ROMS_SAILORMN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
+ROM_END
+
+ROM_START( sailormne )
 	ROMS_SAILORMN
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -4934,13 +4921,6 @@ ROM_START( sailormnu )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "sailormn_usa.nv", 0x0000, 0x0080, CRC(3915abe3) SHA1(1b8d3b8c65cf2298939c27607ec52630c017c7ea) )
-ROM_END
-
-ROM_START( sailormnj )
-	ROMS_SAILORMN
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
 ROM_END
 
 ROM_START( sailormnk )
@@ -5004,8 +4984,16 @@ ROM_END
 	ROM_RELOAD(           0x080000, 0x080000             ) \
 	ROM_RELOAD(           0x100000, 0x080000             ) \
 	ROM_RELOAD(           0x180000, 0x080000             )
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
-ROM_START( sailormnn )
+ROM_START( sailormnnj )
+	ROMS_SAILORMNN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
+ROM_END
+
+ROM_START( sailormnne )
 	ROMS_SAILORMNN
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -5017,13 +5005,6 @@ ROM_START( sailormnnu )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "sailormn_usa.nv", 0x0000, 0x0080, CRC(3915abe3) SHA1(1b8d3b8c65cf2298939c27607ec52630c017c7ea) )
-ROM_END
-
-ROM_START( sailormnnj )
-	ROMS_SAILORMNN
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
 ROM_END
 
 ROM_START( sailormnnk )
@@ -5087,8 +5068,16 @@ ROM_END
 	ROM_RELOAD(           0x080000, 0x080000             ) \
 	ROM_RELOAD(           0x100000, 0x080000             ) \
 	ROM_RELOAD(           0x180000, 0x080000             )
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
-ROM_START( sailormno )
+ROM_START( sailormnoj )
+	ROMS_SAILORMNO
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
+ROM_END
+
+ROM_START( sailormnoe )
 	ROMS_SAILORMNO
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -5100,13 +5089,6 @@ ROM_START( sailormnou )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "sailormn_usa.nv", 0x0000, 0x0080, CRC(3915abe3) SHA1(1b8d3b8c65cf2298939c27607ec52630c017c7ea) )
-ROM_END
-
-ROM_START( sailormnoj )
-	ROMS_SAILORMNO
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
 ROM_END
 
 ROM_START( sailormnok )
@@ -5413,8 +5395,6 @@ void cave_state::init_cave()
 {
 	m_kludge = 0;
 	m_time_vblank_irq = 100;
-
-	m_irq_level = 1;
 }
 
 void cave_z80_state::init_z80_bank()
@@ -5573,8 +5553,6 @@ void cave_state::init_korokoro()
 {
 	init_guwange();
 
-	m_irq_level = 2;
-
 	m_leds[0] = 0;
 	m_leds[1] = 0;
 	save_item(NAME(m_leds));
@@ -5614,21 +5592,21 @@ GAME( 1995, plegends,   0,        pwrinst2, metmqstr, cave_z80_state, init_pwrin
 GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, cave_z80_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95.06.20)", MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1995, sailormn,   0,        sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, Europe)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormn,   0,        sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormne,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, Europe)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnu,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, USA)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnj,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnk,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, Korea)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnt,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnh,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnn,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, Europe)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnu, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, USA)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnnj, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnne, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, Europe)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnu, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, USA)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnnk, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, Korea)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnnt, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnnh, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormno,  sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, Europe)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnou, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, USA)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnoj, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/21, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoe, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, Europe)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnou, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, USA)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnok, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, Korea)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnot, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/21, Taiwan)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnoh, sailormn, sailormn, cave,     cave_z80_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/21, Hong Kong)",  MACHINE_SUPPORTS_SAVE )

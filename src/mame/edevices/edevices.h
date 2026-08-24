@@ -12,10 +12,16 @@
 class edevices_device : public device_t, public device_gfx_interface
 {
 public:
-	edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: edevices_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: edevices_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));
@@ -84,9 +90,15 @@ private:
 class edevices_sforce_device : public edevices_device
 {
 public:
-	edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: edevices_sforce_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: edevices_sforce_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));

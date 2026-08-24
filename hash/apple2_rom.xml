@@ -8,9 +8,11 @@ license:CC0-1.0
 
 	<software name="aid1">
 		<description>Programmer's Aid #1</description>
-		<year>1978</year>
+		<year>1979</year>
 		<publisher>Apple Computer</publisher>
 		<info name="partno" value="A2M0019" />
+		<info name="programmer" value="Steve Wozniak" />
+		<info name="programmer" value="Gary J. Shannon" />
 		<!-- This collection of utilities for Integer BASIC programmers was the only software Apple released for the original Apple II's empty ROM sockets. It was included as standard on some later-produced Apple IIs and the Integer BASIC firmware card. -->
 		<part name="d0" interface="apple2_d0_rom">
 			<dataarea name="rom" size="2048">

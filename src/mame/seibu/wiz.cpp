@@ -1156,7 +1156,7 @@ void wiz_state::kungfut(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(wiz_state::sound_interrupt), attotime::from_hz(4*60)); // ???
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -1224,7 +1224,7 @@ void stinger_state::scion(machine_config &config)
 {
 	stinger(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	// video hardware
 	subdevice<screen_device>("screen")->set_visarea(2*8, 32*8-1, 2*8, 30*8-1);

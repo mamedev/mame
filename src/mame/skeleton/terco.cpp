@@ -307,7 +307,7 @@ void t4490_state::t4490(machine_config &config)
 	/* devices */
 	PIA6821(config, m_pia1);
 	PIA6821(config, m_pia2);
-	ACIA6850(config, "acia", 0);
+	ACIA6850(config, "acia");
 }
 
 ROM_START( t4490 )

@@ -49,7 +49,9 @@ TODO:
 - Interrupt controller at 838000 or a38000 (there's a preliminary
   implementation for lhb)
 
-- vbowl, vbowlj: trackball support
+- vbowl, vbowlj: trackball glitches occasionally with "direct"
+  orientation, jumping by exactly 181 in the direction orthogonal to
+  the movement
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
 
@@ -58,12 +60,22 @@ TODO:
 
 Notes:
 
-- In most games, keep test button pressed during boot to access the
+- In most games, keep the Test button pressed during boot to access the
   input test and sound test.
 
+Original game bugs that are emulated faithfully:
+
 - dbc: The title screen background palette is wrong since the fade
-  routine is called with incorrect argument values, but the PCB does the
-  same thing.
+  routine is called with incorrect argument values.
+
+- drgnwrld: The copyright text on the title screen was updated to show
+  "1997" (rather than "1995") by drawing the "7" over the top using the
+  CPU rather than the blitter.  The font and background of the "7"
+  appears mismatched.
+
+- drgnwrld: If you change the Background DIP switch setting (SW2 2) to
+  "Scene", you'll still see the "Girl" animation, albeit with incorrect
+  colours, after completing some stages.
 
 ***************************************************************************/
 
@@ -86,11 +98,6 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#define LOG_BLITTER (1U << 1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_BLITTER)
-#include "logmacro.h"
 
 
 namespace {
@@ -277,6 +284,8 @@ public:
 		, m_ics(*this, "ics")
 		, m_vbowl_trackball(*this, "vbowl_trackball")
 		, m_io_an(*this, "AN%u", 0U)
+		, m_io_conf(*this, "CONF")
+		, m_trackball_count{ 0, 0 }
 	{
 	}
 
@@ -287,10 +296,16 @@ public:
 	void vbowl(machine_config &config) ATTR_COLD;
 	void vbowlhk(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_device<ics2115_device> m_ics;
 	required_shared_ptr<u16> m_vbowl_trackball;
 	required_ioport_array<2> m_io_an;
+	required_ioport m_io_conf;
+
+	u16 m_trackball_count[2];
 
 	void vbowl_prot_swap_w(u8 data);
 	u16 vbowl_prot_r();
@@ -344,6 +359,13 @@ void igs011_oki_state::machine_start()
 	save_item(NAME(m_lhb_irq_enable));
 }
 
+void vbowl_state::machine_start()
+{
+	igs011_state_base::machine_start();
+
+	save_item(NAME(m_trackball_count));
+}
+
 // Inputs
 
 u16 igs011_oki_state::key_matrix_r()
@@ -371,11 +393,12 @@ u16 igs011_state_base::dips_r()
 
 	u16 ret = 0xff;
 	for (int i = 0; i < Num; i++)
+	{
 		if (BIT(~m_dips_sel, i))
 			ret &= m_io_dsw[i]->read();
+	}
 
-	// 0x0100 is blitter busy
-	return  (ret & 0xff) | 0x0000;
+	return  (ret & 0xff) | (m_igs011->blitter_busy_r() ? 0x0100 : 0x0000);
 }
 
 /***************************************************************************
@@ -2420,7 +2443,25 @@ void vbowl_state::screen_vblank(int state)
 	if (state)
 	{
 		m_vbowl_trackball[0] = m_vbowl_trackball[1];
-		m_vbowl_trackball[1] = (m_io_an[1]->read() << 8) | m_io_an[0]->read();
+
+		// trackball is rotated 45 degrees
+		u8 const x = m_io_an[0]->read();
+		u8 const y = m_io_an[1]->read();
+		if (BIT(m_io_conf->read(), 0))
+		{
+			u8 const dx = x - m_trackball_count[0];
+			u8 const dy = y - m_trackball_count[1];
+			u8 const ax = (m_vbowl_trackball[1] & 0xff) + dx + dy;
+			u8 const ay = (m_vbowl_trackball[1] >> 8) + dy - dx;
+			m_vbowl_trackball[1] = (u16(ay) << 8) | u16(ax);
+		}
+		else
+		{
+			m_vbowl_trackball[1] = (u16(y) << 8) | u16(x);
+		}
+
+		m_trackball_count[0] = x;
+		m_trackball_count[1] = y;
 	}
 }
 
@@ -2432,10 +2473,10 @@ void vbowl_state::vbowl_pen_hi_w(u8 data)
 		logerror("%s: warning, unknown bits written to pen_hi = %02x\n", machine().describe_context(), data);
 }
 
-void vbowl_state::vbowl_link_0_w(u16 data){ }
-void vbowl_state::vbowl_link_1_w(u16 data){ }
-void vbowl_state::vbowl_link_2_w(u16 data){ }
-void vbowl_state::vbowl_link_3_w(u16 data){ }
+void vbowl_state::vbowl_link_0_w(u16 data) { }
+void vbowl_state::vbowl_link_1_w(u16 data) { }
+void vbowl_state::vbowl_link_2_w(u16 data) { }
+void vbowl_state::vbowl_link_3_w(u16 data) { }
 
 void vbowl_state::vbowl_mem(address_map &map)
 {
@@ -3486,6 +3527,8 @@ static INPUT_PORTS_START( vbowlhk )
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0xff, IPT_UNKNOWN )
+
+	PORT_START("CONF")
 INPUT_PORTS_END
 
 
@@ -3513,6 +3556,11 @@ static INPUT_PORTS_START( vbowl )
 
 	PORT_MODIFY("AN1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+
+	PORT_MODIFY("CONF")
+	PORT_CONFNAME( 0x01, 0x01, "Trackball Orientation" )
+	PORT_CONFSETTING(    0x00, "Direct" )
+	PORT_CONFSETTING(    0x01, "Natural" )
 INPUT_PORTS_END
 
 
@@ -3524,6 +3572,9 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Trackball ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3570,7 +3621,7 @@ void igs011_state_base::igs011_base(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1282));
 	m_screen->set_size(512, 260);
@@ -3637,7 +3688,7 @@ void igs011_oki_state::drgnwrld_igs012(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::drgnwrld_igs012_mem);
 
-	IGS012(config, m_igs012, 0);
+	IGS012(config, m_igs012);
 }
 
 
@@ -3772,14 +3823,14 @@ void vbowl_state::vbowl(machine_config &config)
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 
-	IGS012(config, m_igs012, 0);
+	IGS012(config, m_igs012);
 
 	m_screen->screen_vblank().set(FUNC(vbowl_state::screen_vblank));
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set(FUNC(vbowl_state::sound_irq));
-	m_ics->add_route(ALL_OUTPUTS, "mono", 3.75);
+	m_ics->add_route(ALL_OUTPUTS, "mono", 0.375);
 }
 
 void vbowl_state::vbowlhk(machine_config &config)
@@ -4621,7 +4672,7 @@ GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_oki_stat
 GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_oki_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_oki_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_oki_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_oki_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_oki_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_oki_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_oki_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2cpgs,      lhb2,     lhb2cpgs,        lhb2cpgs,  igs011_oki_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches

@@ -9,7 +9,7 @@ class specnext_sprites_device : public device_t, public device_gfx_interface
 {
 
 public:
-	specnext_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	specnext_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	specnext_sprites_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 

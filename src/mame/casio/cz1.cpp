@@ -781,11 +781,6 @@ int cz1_state::sync49_r()
 /**************************************************************************/
 void cz1_state::machine_start()
 {
-	m_leds.resolve();
-	m_led_env.resolve();
-	m_led_bank.resolve();
-	m_led_tone.resolve();
-
 	// aftertouch amp levels (TODO: are these correct?)
 	for (int i = 0; i < 0x40; i++)
 		m_volume[i] = pow(2, (float)i / 0x3f) - 1.0;
@@ -859,7 +854,7 @@ void cz1_state::mz1(machine_config &config)
 	mdin.rxd_handler().append("mdthru", FUNC(midi_port_device::write_txd));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16 + 1, 19);

@@ -10,11 +10,18 @@
 class gaelco_wrally_sprites_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
-	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
 	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: gaelco_wrally_sprites_device(mconfig, tag, owner, clock)
+	{
+		set_palette(std::forward<T>(palette_tag));
+		set_info(gfxinfo);
+	}
+	template <typename T>
+	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: gaelco_wrally_sprites_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_palette(std::forward<T>(palette_tag));
 		set_info(gfxinfo);
@@ -38,11 +45,18 @@ private:
 class blmbycar_sprites_device : public gaelco_wrally_sprites_device
 {
 public:
-	blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
 	blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: blmbycar_sprites_device(mconfig, tag, owner, clock)
+	{
+		set_palette(std::forward<T>(palette_tag));
+		set_info(gfxinfo);
+	}
+	template <typename T>
+	blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: blmbycar_sprites_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_palette(std::forward<T>(palette_tag));
 		set_info(gfxinfo);

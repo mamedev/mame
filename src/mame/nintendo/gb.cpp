@@ -1048,7 +1048,7 @@ void gb_state::gameboy(machine_config &config)
 	m_maincpu->set_halt_bug(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(MASTER_CLOCK, 456, 0, 20 * 8, 154, 0, 18 * 8);
 	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
@@ -1082,7 +1082,7 @@ void sgb_state::supergb(machine_config &config)
 	m_maincpu->set_halt_bug(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_physical_aspect(4, 3); // runs on a TV, not an LCD
 	screen.set_refresh_hz(SGB_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
@@ -1148,7 +1148,7 @@ void gbc_state::gbcolor(machine_config &config)
 	m_maincpu->timer_cb().set(FUNC(gbc_state::gb_timer_callback));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(GBC_CLOCK / 2, 456, 0, 20 * 8, 154, 0, 18 * 8);
 	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
@@ -1182,7 +1182,7 @@ void megaduck_state::megaduck(machine_config &config)
 	m_maincpu->set_halt_bug(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
 	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));

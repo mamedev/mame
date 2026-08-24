@@ -69,7 +69,7 @@ bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			std::vector<uint32_t> raw_track_data;
 			int data_count = 0;
 			int splice_pos = -1;
-			bool header = false;
+			bool is_idam = false, is_dam = false;
 
 			// Read track
 			/*auto const [err, actual] =*/ read_at(io, (heads * track + head) * track_size, &track_data[0], track_size);
@@ -80,16 +80,12 @@ bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				if (track_data[offset + 1] == 1 && splice_pos < 0)
 				{
-					splice_pos = offset - (20 * 2);
+					splice_pos = std::max(0, offset - (20 * 2));
 				}
 				if (track_data[offset + 1] == 3)
 				{
 					splice_pos = offset;
 				}
-			}
-			if (splice_pos < 0)
-			{
-				splice_pos = 0;
 			}
 
 			for (int offset = splice_pos; offset < track_size + splice_pos; offset += 2)
@@ -98,21 +94,30 @@ bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				{
 				case 0: // regular data
 					if (data_count == 0)
-						header = (track_data[offset % track_size] == 0x95) ? true : false;
+					{
+						is_idam = (track_data[offset % track_size] == 0x95);
+						is_dam = (track_data[offset % track_size] == 0x6a);
+					}
 					data_count++;
-					mfm_w(raw_track_data, 8, track_data[offset % track_size]);
+					// stored GAP3 may be too long (standard size is 22)
+					if (!(is_dam && data_count > 256 + 2 + 2 + 22))
+					{
+						mfm_w(raw_track_data, 8, track_data[offset % track_size]);
+					}
 					break;
 
-				case 1: // sync mark
-					if (header && data_count < 11) // XXX hack
+				case 1: case 0x80: // sync mark
+					// stored GAP2 may be too short (standard formatter writes 5, sprite os uses 8)
+					if (is_idam && data_count < 6 + 5)
 					{
-						for (; data_count < 12; data_count++)
+						for (; data_count < 6 + 5; data_count++)
 						{
 							mfm_w(raw_track_data, 8, 0xaa);
 						}
 					}
-					raw_w(raw_track_data, 16, 0x8924);
-					raw_w(raw_track_data, 16, 0x5555);
+					mfm_w(raw_track_data, 8, 0xa4);
+					raw_w(raw_track_data, 1, 0);
+					mfm_w(raw_track_data, 8, 0xff);
 					data_count = 0;
 					break;
 
@@ -125,6 +130,14 @@ bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				}
 			}
 
+			for (int i = raw_track_data.size(); i < 102144; i += 16)
+			{
+				mfm_w(raw_track_data, 8, 0xaa);
+			}
+			if (raw_track_data.size() < 102144)
+			{
+				mfm_w(raw_track_data, 102144 - raw_track_data.size(), 0xaa);
+			}
 			generate_track_from_levels(track, head, raw_track_data, 0, image);
 		}
 	}

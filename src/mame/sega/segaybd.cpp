@@ -214,6 +214,7 @@ EPR-12028 - 27C256 EPROM
 #include "sound/ymopm.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "pdrift.lh"
@@ -284,7 +285,6 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -448,31 +448,6 @@ void segaybd_state::output2_w(uint8_t data)
 }
 
 
-
-//**************************************************************************
-//  DRIVER OVERRIDES
-//**************************************************************************
-
-void segaybd_state::device_resolve_objects()
-{
-	m_start_lamp.resolve();
-	m_right_motor_position.resolve();
-	m_right_motor_position_nor.resolve();
-	m_right_motor_speed.resolve();
-	m_left_motor_position.resolve();
-	m_left_motor_position_nor.resolve();
-	m_left_motor_speed.resolve();
-	m_danger_lamp.resolve();
-	m_crash_lamp.resolve();
-	m_emergency_stop_lamp.resolve();
-	m_bank_data_raw.resolve();
-	m_vibration_motor.resolve();
-	m_bank_motor_position.resolve();
-	m_upright_wheel_motor.resolve();
-	m_left_start_lamp.resolve();
-	m_right_start_lamp.resolve();
-	m_gun_recoil.resolve();
-}
 
 //**************************************************************************
 //  VIDEO STARTUP
@@ -1037,7 +1012,7 @@ void segaybd_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
+	map(0xf000, 0xf0ff).mirror(0x0700).m("pcm", FUNC(sega_315_5218_device::map));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1700,21 +1675,21 @@ void segaybd_state::yboard(machine_config &config)
 	io.out_ph_callback().set(FUNC(segaybd_state::output2_w));
 	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_tag<0>("ADC.0");
 	adc.set_input_tag<1>("ADC.1");
 	adc.set_input_tag<2>("ADC.2");
 	adc.set_input_cb<3>(FUNC(segaybd_state::analog_mux));
 
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_suby", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main");
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx");
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby");
+	SEGA_315_5249_DIVIDER(config, "divider_main");
+	SEGA_315_5249_DIVIDER(config, "divider_subx");
+	SEGA_315_5249_DIVIDER(config, "divider_suby");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(342,262);   // to be verified
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
@@ -1723,9 +1698,9 @@ void segaybd_state::yboard(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 
-	SEGA_SYS16B_SPRITES(config, m_bsprites, 0);
-	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
+	SEGA_SYS16B_SPRITES(config, m_bsprites);
+	SEGA_YBOARD_SPRITES(config, m_ysprites);
+	SEGAIC16VID(config, m_segaic16vid, "gfxdecode");
 
 	PALETTE(config, m_palette).set_entries(8192*2);
 
@@ -1739,8 +1714,8 @@ void segaybd_state::yboard(machine_config &config)
 	ymsnd.add_route(0, "speaker", 0.30, 0);
 	ymsnd.add_route(1, "speaker", 0.30, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/8));
-	pcm.set_bank(segapcm_device::BANK_12M | segapcm_device::BANK_MASKF8);
+	sega_315_5218_device &pcm(SEGA_315_5218(config, "pcm", SOUND_CLOCK/8));
+	pcm.set_bank(sega_315_5218_device::BANK_12M | sega_315_5218_device::BANK_MASKF8);
 	pcm.add_route(0, "speaker", 0.70, 0);
 	pcm.add_route(1, "speaker", 0.70, 1);
 }

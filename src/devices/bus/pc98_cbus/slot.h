@@ -75,7 +75,7 @@ class pc98_cbus_root_device : public device_t,
 							  public device_memory_interface
 {
 public:
-	pc98_cbus_root_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc98_cbus_root_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u16 mem_r(offs_t offset, u16 mem_mask = ~0);
 	void mem_w(offs_t offset, u16 data, u16 mem_mask = ~0);

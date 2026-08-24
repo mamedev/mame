@@ -311,7 +311,7 @@ void blktiger_ms_state::blktigerm(machine_config &config)
 	audiocpu.set_periodic_int(FUNC(blktiger_ms_state::irq0_line_hold), attotime::from_hz(60));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
+	SCREEN(config, m_screen); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

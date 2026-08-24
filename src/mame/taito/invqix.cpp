@@ -315,7 +315,7 @@ void invqix_state::invqix(machine_config &config)
 	m_maincpu->write_portg().set_nop();
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(invqix_state::screen_update));
 	screen.set_size(640, 480);

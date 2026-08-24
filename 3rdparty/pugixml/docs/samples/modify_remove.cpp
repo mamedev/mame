@@ -12,7 +12,7 @@ int main()
     pugi::xml_node node = doc.child("node");
     node.remove_child("description");
 
-    // remove id attribute
+    // remove value attribute
     pugi::xml_node param = node.child("param");
     param.remove_attribute("value");
 

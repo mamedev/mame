@@ -1407,13 +1407,13 @@ void a7800_state::a7800_common(machine_config &config, uint32_t clock)
 	TIMER(config, "scantimer").configure_scanline(FUNC(a7800_state::interrupt), "screen", 0, 1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(m_maria, FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), std::size(a7800_colors));
 
-	ATARI_MARIA(config, m_maria, 0);
+	ATARI_MARIA(config, m_maria);
 	m_maria->set_screen(m_screen);
 	m_maria->set_dmaspace_tag(m_maincpu, AS_PROGRAM);
 	m_maria->dma_wait_callback().set(FUNC(a7800_state::dma_wait_cb));

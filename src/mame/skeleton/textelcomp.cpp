@@ -67,8 +67,6 @@ void textelcomp_state::machine_start()
 	m_rtc->cs1_w(1);
 	subdevice<mos6551_device>("acia")->write_cts(0);
 
-	m_leds.resolve();
-
 	save_item(NAME(m_keyscan));
 	save_item(NAME(m_shift_register));
 	save_item(NAME(m_shift_data));
@@ -352,7 +350,7 @@ void textelcomp_state::textelcomp(machine_config &config)
 	acia.set_xtal(3.6864_MHz_XTAL / 2);
 	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_color(rgb_t(0x00, 0xff, 0x80));
 	screen.set_refresh_hz(50);
 	screen.set_size(640, 201);

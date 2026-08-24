@@ -337,8 +337,6 @@ protected:
 
 void disk_type1_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
 }
@@ -610,8 +608,6 @@ protected:
 
 void disk_type2_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_control));
 }
 
@@ -913,8 +909,6 @@ void fd03_device::device_add_mconfig(machine_config &config)
 
 void fd03_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_control));
 }
 

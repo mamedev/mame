@@ -46,7 +46,9 @@ const options_entry ui_options::s_option_entries[] =
 	{ nullptr,                              nullptr,            option_type::HEADER,     "UI MISC OPTIONS" },
 	{ OPTION_SYSTEM_NAMES,                  "",                 option_type::MULTIPATH,  "translated system names file" },
 	{ OPTION_SKIP_WARNINGS,                 "0",                option_type::BOOLEAN,    "display fewer repeated warnings about imperfect emulation" },
-	{ OPTION_UNTHROTTLE_MUTE ";utm",        "0",                option_type::BOOLEAN,    "mute audio when running unthrottled or when fast-forwarding" },
+	{ OPTION_UNTHROTTLE_MUTE,               "0",                option_type::BOOLEAN,    "mute audio when running unthrottled or when fast-forwarding" },
+	{ OPTION_MENU_PAUSE,                    "0",                option_type::BOOLEAN,    "automatically pause when showing menus" },
+	{ OPTION_UI_FOLLOW_FOCUS,               "0",                option_type::BOOLEAN,    "open menus in active window" },
 
 	// UI options
 	{ nullptr,                              nullptr,            option_type::HEADER,     "UI OPTIONS" },

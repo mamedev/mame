@@ -204,8 +204,6 @@ ioport_constructor hp9122c_device::device_input_ports() const
 
 void hp9122c_device::device_start()
 {
-	m_leds.resolve();
-
 	for (auto &floppy : m_floppy)
 		floppy->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&hp9122c_device::index_pulse_cb, this));
 

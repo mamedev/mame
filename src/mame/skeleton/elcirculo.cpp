@@ -161,9 +161,6 @@ void elcirculo_state::machine_start()
 {
 	save_item(NAME(m_led_row));
 	save_item(NAME(m_led_data));
-
-	m_leds.resolve();
-	m_lamps.resolve();
 }
 
 void elcirculo_state::elcirculo(machine_config &config)

@@ -77,7 +77,7 @@ public:
 		set_nubus_slot(std::forward<T>(nbtag), tag);
 	}
 
-	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// inline configuration
 	template <typename T>
@@ -113,7 +113,7 @@ class nubus_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	~nubus_device();
 
 	// inline configuration
@@ -239,7 +239,7 @@ DECLARE_DEVICE_TYPE(MACSE30_PDS_BUS, se30_pds_bus_device);
 class se30_pds_bus_device: public nubus_device
 {
 public:
-	se30_pds_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	se30_pds_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
 		: nubus_device(mconfig, MACSE30_PDS_BUS, tag, owner, clock),
 		m_internal_screen(*this, finder_base::DUMMY_TAG)
 	{

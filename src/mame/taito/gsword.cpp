@@ -1000,7 +1000,7 @@ void gsword_state::gsword(machine_config &config)
 	config.set_perfect_quantum("mcu1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -1064,7 +1064,7 @@ void josvolly_state::josvolly(machine_config &config)
 	config.set_perfect_quantum("mcu2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -1230,6 +1230,6 @@ ROM_START( josvolly )
 ROM_END
 
 
-GAME( 1983, josvolly, 0,      josvolly, josvolly, josvolly_state, empty_init,   ROT90, "Allumer / Taito Corporation", "Joshi Volleyball",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   init_gsword,  ROT0,  "Allumer / Taito Corporation", "Great Swordsman (World?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   init_gsword2, ROT0,  "Allumer / Taito Corporation", "Great Swordsman (Japan?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, josvolly, 0,      josvolly, josvolly, josvolly_state, empty_init,   ROT90, "Allumer / Taito", "Joshi Volleyball",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   init_gsword,  ROT0,  "Allumer / Taito", "Great Swordsman (World?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   init_gsword2, ROT0,  "Allumer / Taito", "Great Swordsman (Japan?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

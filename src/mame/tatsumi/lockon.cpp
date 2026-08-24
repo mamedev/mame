@@ -422,8 +422,6 @@ void lockon_state::ym2203_out_b(uint8_t data)
 
 void lockon_state::machine_start()
 {
-	m_lamp.resolve();
-
 	save_item(NAME(m_ground_ctrl));
 	save_item(NAME(m_scroll_h));
 	save_item(NAME(m_scroll_v));
@@ -486,7 +484,7 @@ void lockon_state::lockon(machine_config &config)
 	adc.in_callback<2>().set_ioport("ADC_MISSILE");
 	adc.in_callback<3>().set_ioport("ADC_HOVER");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(lockon_state::screen_update));

@@ -1788,7 +1788,7 @@ void dkong_state::dkong_base(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60000)); // for I8257
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_dkong));
 	m_screen->set_palette(m_palette);
@@ -1901,7 +1901,7 @@ void dkong_state::dkong3(machine_config &config)
 	m_z80dma->out_mreq_callback().set(FUNC(dkong_state::memory_write_byte));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_dkong));
 	m_screen->set_palette(m_palette);
@@ -3959,4 +3959,4 @@ GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, init_strtheat
 GAME( 1985, strtheata, strtheat, strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat (set 2, older?)", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
 
 /* Atari */
-GAME( 1985, jammin,  0,    jammin, jammin,  jammin_state, empty_init, ROT270, "Atari Games", "Jammin' (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, jammin,    0,        jammin,    jammin,   jammin_state,empty_init,    ROT270, "Atari Games", "Jammin' (prototype)", MACHINE_SUPPORTS_SAVE )

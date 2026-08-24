@@ -74,7 +74,7 @@ void sshuffle_state::sshuffle(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sshuffle_state::sshuffle_map);
 	m_maincpu->set_addrmap(AS_IO, &sshuffle_state::sshuffle_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

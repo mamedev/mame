@@ -4,9 +4,9 @@
 #include "emu.h"
 #include "rompdasm.h"
 
-#define R2 ((op >> 4) & 15)
-#define R3 (op & 15)
-#define R3_0(i, r3) (r3 ? util::string_format("0x%x(%s)", i, gpr[r3]) : util::string_format("0x%x", i))
+#define R2 BIT(op, 4, 4)
+#define R3 BIT(op, 0, 4)
+#define R3_0(i) (R3 ? util::string_format("0x%x(%s)", i, gpr[R3]) : util::string_format("0x%x", i))
 
 // repurpose reserved bit for invalid condition
 #define N (BIT(op, 7) ? R2 : 13)
@@ -50,18 +50,18 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 		break;
 
 		// DS format
-	case 0x1: util::stream_format(stream, "stcs   %s,%s", gpr[R2], R3_0((op >> 8) & 15, R3)); break; // store character short
-	case 0x2: util::stream_format(stream, "sths   %s,%s", gpr[R2], R3_0((op >> 7) & 30, R3)); break; // store half short
-	case 0x3: util::stream_format(stream, "sts    %s,%s", gpr[R2], R3_0((op >> 6) & 60, R3)); break; // store short
-	case 0x4: util::stream_format(stream, "lcs    %s,%s", gpr[R2], R3_0((op >> 8) & 15, R3)); break; // load character short
-	case 0x5: util::stream_format(stream, "lhas   %s,%s", gpr[R2], R3_0((op >> 7) & 30, R3)); break; // load half algebraic short
+	case 0x1: util::stream_format(stream, "stcs   %s,%s", gpr[R2], R3_0((op >> 8) & 15)); break; // store character short
+	case 0x2: util::stream_format(stream, "sths   %s,%s", gpr[R2], R3_0((op >> 7) & 30)); break; // store half short
+	case 0x3: util::stream_format(stream, "sts    %s,%s", gpr[R2], R3_0((op >> 6) & 60)); break; // store short
+	case 0x4: util::stream_format(stream, "lcs    %s,%s", gpr[R2], R3_0((op >> 8) & 15)); break; // load character short
+	case 0x5: util::stream_format(stream, "lhas   %s,%s", gpr[R2], R3_0((op >> 7) & 30)); break; // load half algebraic short
 	case 0x6: // compute address short (X format)
 		if (R3)
 			util::stream_format(stream, "cas    %s,%s,%s", gpr[(op >> 8) & 15], gpr[R2], gpr[R3]);
 		else
 			util::stream_format(stream, "cas    %s,%s", gpr[(op >> 8) & 15], gpr[R2]);
 		break;
-	case 0x7: util::stream_format(stream, "ls     %s,%s", gpr[R2], R3_0((op >> 6) & 60, R3)); break; // load short
+	case 0x7: util::stream_format(stream, "ls     %s,%s", gpr[R2], R3_0((op >> 6) & 60)); break; // load short
 
 	case 0x8:
 		// BI, BA format
@@ -101,28 +101,28 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 
 			switch (op >> 8)
 			{
-			case 0xc0: util::stream_format(stream, "svc    %s", R3_0(i, R3)); flags |= STEP_OVER; break; // supervisor call
+			case 0xc0: util::stream_format(stream, "svc    %s", R3_0(i)); flags |= STEP_OVER; break; // supervisor call
 			case 0xc1: util::stream_format(stream, "ai     %s,%s,0x%x", gpr[R2], gpr[R3], s16(i)); break; // add immediate
-			case 0xc2: util::stream_format(stream, "cal16  %s,%s", gpr[R2], R3_0(i, R3)); break; // compute address lower half 16-bit
+			case 0xc2: util::stream_format(stream, "cal16  %s,%s", gpr[R2], R3_0(i)); break; // compute address lower half 16-bit
 			case 0xc3: util::stream_format(stream, "oiu    %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // or immediate upper half
 			case 0xc4: util::stream_format(stream, "oil    %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // or immediate lower half
 			case 0xc5: util::stream_format(stream, "nilz   %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // and immediate lower half extended zeroes
 			case 0xc6: util::stream_format(stream, "nilo   %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // and immediate lower half extended ones
 			case 0xc7: util::stream_format(stream, "xil    %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // exclusive or immediate lower half
-			case 0xc8: util::stream_format(stream, "cal    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // compute address lower half
-			case 0xc9: util::stream_format(stream, "lm     %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load multiple
-			case 0xca: util::stream_format(stream, "lha    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load half algebraic
-			case 0xcb: util::stream_format(stream, "ior    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // input/output read
+			case 0xc8: util::stream_format(stream, "cal    %s,%s", gpr[R2], R3_0(s16(i))); break; // compute address lower half
+			case 0xc9: util::stream_format(stream, "lm     %s,%s", gpr[R2], R3_0(s16(i))); break; // load multiple
+			case 0xca: util::stream_format(stream, "lha    %s,%s", gpr[R2], R3_0(s16(i))); break; // load half algebraic
+			case 0xcb: util::stream_format(stream, "ior    %s,%s", gpr[R2], R3_0(s16(i))); break; // input/output read
 			case 0xcc: // trap on condition immediate
 				util::stream_format(stream, "t%-4s  %s,0x%x", tc[R2 & 7], gpr[R3], s16(i));
 				if ((R2 & 7) != 0)
 					flags |= STEP_OVER | STEP_COND;
 				break;
-			case 0xcd: util::stream_format(stream, "l      %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load
-			case 0xce: util::stream_format(stream, "lc     %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load character
-			case 0xcf: util::stream_format(stream, "tsh    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // test and set half
+			case 0xcd: util::stream_format(stream, "l      %s,%s", gpr[R2], R3_0(s16(i))); break; // load
+			case 0xce: util::stream_format(stream, "lc     %s,%s", gpr[R2], R3_0(s16(i))); break; // load character
+			case 0xcf: util::stream_format(stream, "tsh    %s,%s", gpr[R2], R3_0(s16(i))); break; // test and set half
 
-			case 0xd0: util::stream_format(stream, "lps    %d,%s", R2, R3_0(s16(i), R3)); flags |= STEP_OUT; break; // load program status
+			case 0xd0: util::stream_format(stream, "lps    %d,%s", R2, R3_0(s16(i))); flags |= STEP_OUT; break; // load program status
 			case 0xd1: util::stream_format(stream, "aei    %s,%s,0x%x", gpr[R2], gpr[R3], s16(i)); break; // add extended immediate
 			case 0xd2: util::stream_format(stream, "sfi    %s,%s,0x%x", gpr[R2], gpr[R3], s16(i)); break; // subtract from immediate
 			case 0xd3: util::stream_format(stream, "cli    %s,0x%x", gpr[R3], s16(i)); break; // compare logical immediate
@@ -130,13 +130,13 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 			case 0xd5: util::stream_format(stream, "niuz   %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // and immediate upper half extended zeroes
 			case 0xd6: util::stream_format(stream, "niuo   %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // and immediate upper half extended ones
 			case 0xd7: util::stream_format(stream, "xiu    %s,%s,0x%x", gpr[R2], gpr[R3], i); break; // exclusive or immediate upper half
-			case 0xd8: util::stream_format(stream, "cau    %s,%s", gpr[R2], R3_0(i, R3)); break; // compute address upper half
-			case 0xd9: util::stream_format(stream, "stm    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // store multiple
-			case 0xda: util::stream_format(stream, "lh     %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load half
-			case 0xdb: util::stream_format(stream, "iow    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // input/output write
-			case 0xdc: util::stream_format(stream, "sth    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // store half
-			case 0xdd: util::stream_format(stream, "st     %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // store
-			case 0xde: util::stream_format(stream, "stc    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // store character
+			case 0xd8: util::stream_format(stream, "cau    %s,%s", gpr[R2], R3_0(i)); break; // compute address upper half
+			case 0xd9: util::stream_format(stream, "stm    %s,%s", gpr[R2], R3_0(s16(i))); break; // store multiple
+			case 0xda: util::stream_format(stream, "lh     %s,%s", gpr[R2], R3_0(s16(i))); break; // load half
+			case 0xdb: util::stream_format(stream, "iow    %s,%s", gpr[R2], R3_0(s16(i))); break; // input/output write
+			case 0xdc: util::stream_format(stream, "sth    %s,%s", gpr[R2], R3_0(s16(i))); break; // store half
+			case 0xdd: util::stream_format(stream, "st     %s,%s", gpr[R2], R3_0(s16(i))); break; // store
+			case 0xde: util::stream_format(stream, "stc    %s,%s", gpr[R2], R3_0(s16(i))); break; // store character
 			// df
 			}
 		}

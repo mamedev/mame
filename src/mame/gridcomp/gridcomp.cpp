@@ -43,10 +43,9 @@
     - EAROM (X2210D)
     - modem (incl. DTMF generator)
     - proper serial port connection (incl. PAL 16R4 300135-02)
-    - keyboard MCU emulation
     - proper custom DMA logic timing
     - loading ROMs for Compass II
-	- proper 2101 and 2102 emulation
+    - proper 2101 and 2102 emulation
 
     missing dumps:
 
@@ -67,9 +66,9 @@
 #include "gridrom.h"
 
 #include "bus/ieee488/ieee488.h"
-#include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/printer.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/i7220.h"
 #include "machine/i80130.h"
@@ -113,6 +112,7 @@ public:
 		, m_dac(*this, "dac0832")
 		, m_ram(*this, RAM_TAG)
 		, m_tms9914(*this, "hpib")
+		, m_keyboard(*this, "keyboard")
 		, m_test_rom(*this, "test_rom")
 		, m_app_roms(*this, "app_rom%u", 0U)
 	{ }
@@ -128,7 +128,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8086_cpu_device> m_maincpu;
@@ -139,20 +138,18 @@ private:
 	required_device<dac0832_device> m_dac;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
+	required_device<grid_keyboard_device> m_keyboard;
 	required_device<gridrom_socket_device> m_test_rom;
 	optional_device_array<gridrom_socket_device, 4> m_app_roms;
 
-	bool m_kbd_ready = false;
-	uint16_t m_kbd_data = 0;
-
 	uint16_t *m_videoram = nullptr;
+
+	bool m_video_chip_activated = false;
+	bool m_widescreen_activated = false;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	uint16_t grid_9ff0_r(offs_t offset);
-	uint16_t grid_keyb_r(offs_t offset);
 	uint8_t grid_modem_r(offs_t offset);
-	void grid_keyb_w(offs_t offset, uint16_t data);
 	void grid_modem_w(offs_t offset, uint8_t data);
 
 	void grid_sound_w(offs_t offset, uint8_t data);
@@ -160,10 +157,11 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
+	void split_board_w(offs_t offset, uint8_t data);
+
 	template <int Width>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void kbd_put(u16 data);
+	uint32_t screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void grid1101_io(address_map &map) ATTR_COLD;
 	void grid1101_map(address_map &map) ATTR_COLD;
@@ -176,68 +174,15 @@ static void rs232_devices(device_slot_interface &device)
 	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
 	/*
-		FIXME:
-		The GRiDPaint documentation states that this mouse should work.
-		But for some reason, the laptop does not recognize it.
+	    FIXME:
+	    The GRiDPaint documentation states that this mouse should work.
+	    But for some reason, the laptop does not recognize it.
 
-		device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	    device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 	*/
 
 	device.option_add("printer", SERIAL_PRINTER);
 }
-
-
-[[maybe_unused]] uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
-{
-	uint16_t data = 0;
-
-	switch (offset)
-	{
-	case 0:
-		data = 0xbb66;
-		break;
-	}
-
-	LOGDBG("9FF0: %02x == %02x\n", 0x9ff00 + (offset << 1), data);
-
-	return data;
-}
-
-uint16_t gridcomp_state::grid_keyb_r(offs_t offset)
-{
-	uint16_t data = 0;
-
-	switch (offset)
-	{
-	case 0:
-		data = m_kbd_data;
-		m_kbd_data = 0xff;
-		m_kbd_ready = false;
-		m_osp->ir4_w(CLEAR_LINE);
-		break;
-
-	case 1:
-		data = m_kbd_ready ? 2 : 0;
-		break;
-	}
-
-	LOGKBD("%02x == %02x\n", 0xdffc0 + (offset << 1), data);
-
-	return data;
-}
-
-void gridcomp_state::grid_keyb_w(offs_t offset, uint16_t data)
-{
-	LOGKBD("%02x <- %02x\n", 0xdffc0 + (offset << 1), data);
-}
-
-void gridcomp_state::kbd_put(u16 data)
-{
-	m_kbd_data = data;
-	m_kbd_ready = true;
-	m_osp->ir4_w(ASSERT_LINE);
-}
-
 
 // reject all commands
 uint8_t gridcomp_state::grid_modem_r(offs_t offset)
@@ -282,6 +227,23 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
+void gridcomp_state::split_board_w(offs_t offset, uint8_t data)
+{
+	// LOG("SPLIT BOARD %02x <- %02x\n", offset, data);
+
+	switch (offset)
+	{
+	case 0:
+		m_video_chip_activated = data == 1;
+		break;
+
+	case 4:
+		if (m_video_chip_activated)
+			m_widescreen_activated = data == 0x0B;
+		break;
+	}
+}
+
 template <int Width>
 uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -305,6 +267,47 @@ uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_widescreen_activated)
+	{
+		// In widescreen mode just copy the framebuffer to a bitmap.
+		// The image in the framebuffer is stored exactly as specified in set_raw.
+		screen_update<512>(screen, bitmap, cliprect);
+		return 0;
+	}
+
+	// In compatibility mode, only 320 by 240 pixels is stored in the framebuffer,
+	// and the image is centered on the screen, which requires adding padding
+	// and clear a region around the image.
+	bitmap.fill(0);
+
+	int const width = 320;
+	int const height = 240;
+
+	int const x_padding = (cliprect.width() - width) / 2;
+	int const y_padding = (cliprect.height() - height) / 2;
+
+	for (int y = 0; y < height; y++)
+	{
+		uint16_t *p = &bitmap.pix(cliprect.top() + y + y_padding, cliprect.left() + x_padding);
+
+		int const offset = y * (width / 16);
+
+		for (int x = offset; x < offset + width / 16; x++)
+		{
+			uint16_t const gfx = m_videoram[x];
+
+			for (int i = 15; i >= 0; i--)
+			{
+				*p++ = BIT(gfx, i);
+			}
+		}
+	}
+
+	return 0;
+}
+
 void gridcomp_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -312,11 +315,7 @@ void gridcomp_state::machine_start()
 	program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	m_videoram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x400);
-}
 
-void gridcomp_state::machine_reset()
-{
-	m_kbd_ready = false;
 }
 
 IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
@@ -336,7 +335,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
-	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xdffc0, 0xdffcf).rw(m_keyboard, FUNC(grid_keyboard_device::read), FUNC(grid_keyboard_device::write)).umask16(0x00ff); // Intel 8741 MCU
 	map(0xe0000, 0xeffff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
@@ -344,11 +343,12 @@ void gridcomp_state::grid1101_map(address_map &map)
 void gridcomp_state::grid1121_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
-	map(0x9ff00, 0x9ff0f).unmaprw(); // .r(FUNC(gridcomp_state::grid_9ff0_r)); // ?? ROM?
+	map(0x80000, 0x9ffff).unmapr(); // Application ROM
 	map(0xc0000, 0xcffff).r(m_test_rom, FUNC(gridrom_socket_device::read));
 	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
-	map(0xdfe00, 0xdfe1f).unmaprw(); // ??
+	map(0xdfe00, 0xdfe07).w(FUNC(gridcomp_state::split_board_w));
+	map(0xdfe08, 0xdfe0f).unmaprw();  // Application ROM
+	map(0xdfe10, 0xdfe1f).unmapw(); // .rw(FUNC(gridcomp_state::uart_pal_r), FUNC(gridcomp_state::uart_pal_w));
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
@@ -356,7 +356,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
-	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xdffc0, 0xdffcf).rw(m_keyboard, FUNC(grid_keyboard_device::read), FUNC(grid_keyboard_device::write)).umask16(0x00ff); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
 
@@ -401,7 +401,7 @@ void gridcomp_state::grid1101(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC0832(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
+	screen_device &screen(SCREEN(config, "screen").set_lcd()); // actually a kind of EL display
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(gridcomp_state::screen_update<320>));
 	screen.set_raw(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240); // XXX 66 Hz refresh
@@ -410,8 +410,10 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	grid_keyboard_device &keyboard(GRID_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(gridcomp_state::kbd_put));
+	grid_keyboard_device &keyboard(GRID_KEYBOARD(config, "keyboard"));
+	keyboard.irq_callback().set(I80130_TAG, FUNC(i80130_device::ir4_w));
+	keyboard.dma_callback().set_nop();
+	keyboard.nmi_callback().set_nop();
 
 	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
 	i7220.set_data_size(3); // 3 1-Mbit MBM's
@@ -458,7 +460,7 @@ void gridcomp_state::grid1101(machine_config &config)
 	rs232_port.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
 	rs232_port.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
 
-	I8255(config, "modem", 0);
+	I8255(config, "modem");
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
 
@@ -499,7 +501,7 @@ void gridcomp_state::grid1129(machine_config &config)
 void gridcomp_state::grid1131(machine_config &config)
 {
 	grid1121(config);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update<512>));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
 	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 

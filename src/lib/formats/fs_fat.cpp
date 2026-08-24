@@ -148,6 +148,7 @@
 
 #include "strformat.h"
 
+#include <cstring>
 #include <optional>
 #include <regex>
 #include <string_view>

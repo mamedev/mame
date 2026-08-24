@@ -54,7 +54,6 @@
 #include "save.h"
 
 // I/O
-#include "input.h"
 #include "ioport.h"
 #include "output.h"
 
@@ -62,6 +61,7 @@
 #include "device.h"
 #include "devfind.h"
 #include "addrmap.h" // Needs optional_device<> and required_device<>
+#include "divo.h"
 #include "distate.h"
 #include "dimemory.h"
 #include "dipalette.h"
@@ -88,10 +88,6 @@
 
 // video-related
 #include "drawgfx.h"
-#include "video.h"
-
-// sound-related
-#include "sound.h"
 
 // generic helpers
 #include "devcb.h"
@@ -99,6 +95,8 @@
 #include "video/generic.h"
 
 // member templates that don't like incomplete types
+#include "devdelegate.ipp"
 #include "device.ipp"
+#include "output.ipp"
 
 #endif // __EMU_H__

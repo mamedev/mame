@@ -123,7 +123,7 @@ void mgt_multigame_state::mgtmg9(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &mgt_multigame_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

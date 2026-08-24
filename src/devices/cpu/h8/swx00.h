@@ -117,6 +117,7 @@ protected:
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(u64 current_time) override;
+	using h8_device::internal_update;
 	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;

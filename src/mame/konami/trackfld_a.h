@@ -18,8 +18,15 @@ public:
 		m_audiocpu.set_tag(std::forward<T>(cpu_tag));
 		m_vlm.set_tag(std::forward<U>(vlm_tag));
 	}
+	template <typename T, typename U>
+	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&vlm_tag)
+		: trackfld_audio_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag), std::forward<U>(vlm_tag))
+	{
+		m_audiocpu.set_tag(std::forward<T>(cpu_tag));
+		m_vlm.set_tag(std::forward<U>(vlm_tag));
+	}
 
-	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void sh_irqtrigger_w(int state);
 	uint8_t trackfld_sh_timer_r();

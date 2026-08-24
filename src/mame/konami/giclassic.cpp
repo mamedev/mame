@@ -317,7 +317,7 @@ void giclassic_state::giclassic(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(giclassic_state::interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.62);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(600, 384);
@@ -342,7 +342,7 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(giclassicsvr_state::interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.62);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_visarea_full();
@@ -357,7 +357,7 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette(m_palette);

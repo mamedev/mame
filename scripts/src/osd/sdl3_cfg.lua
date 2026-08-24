@@ -4,7 +4,7 @@
 dofile('modules.lua')
 
 forcedincludes {
-	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
+	MAME_DIR .. "src/osd/sdl3/sdlprefix.h"
 }
 
 if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" then
@@ -119,23 +119,13 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"UNICODE",
 			"_UNICODE",
-			"_WIN32_WINNT=0x0600",
+			"_WIN32_WINNT=0x0A00",
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX",
 		}
 
 	configuration { }
 
-elseif _OPTIONS["targetos"]=="linux" then
-	if _OPTIONS["QT_HOME"]~=nil then
-		buildoptions {
-			"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
-		}
-	else
-		buildoptions {
-			"-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
-		}
-	end
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",

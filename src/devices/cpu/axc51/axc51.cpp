@@ -88,7 +88,6 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 	, m_dac_out_cb(*this)
 	, m_spi_in_cb(*this, 0xff)
 	, m_spi_out_cb(*this)
-	, m_spi_out_dir_cb(*this)
 	, m_rtemp(0)
 {
 	for (int i = 0; i < 0x80; i++)
@@ -1402,7 +1401,6 @@ void axc51base_cpu_device::spicon_w(uint8_t data)
 {
 //  LOGMASKED(LOG_UNSORTED,"%s: sfr_write SFR_SPICON %02x\n", machine().describe_context(), data);
 	m_sfr_regs[SFR_SPICON] = data;
-	m_spi_out_dir_cb((data & 0x20) ? true : false);
 }
 
 

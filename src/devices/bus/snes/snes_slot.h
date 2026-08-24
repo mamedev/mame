@@ -258,7 +258,13 @@ public:
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}
-	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sns_cart_slot_device(mconfig, tag, owner)
+	{
+		set_options(std::forward<T>(opts), dflt, false);
+	}
+	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual const char *image_interface() const noexcept override { return "snes_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "sfc"; }
 };
@@ -271,11 +277,11 @@ public:
 	// construction/destruction
 	template <typename T>
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sns_sufami_cart_slot_device(mconfig, tag, owner, 0)
+		: sns_sufami_cart_slot_device(mconfig, tag, owner)
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}
-	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual const char *image_interface() const noexcept override { return "st_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "st"; }
 };
@@ -288,11 +294,11 @@ public:
 	// construction/destruction
 	template <typename T>
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sns_bsx_cart_slot_device(mconfig, tag, owner, 0)
+		: sns_bsx_cart_slot_device(mconfig, tag, owner)
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}
-	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual const char *image_interface() const noexcept override { return "bspack"; }
 	virtual const char *file_extensions() const noexcept override { return "bs"; }
 };

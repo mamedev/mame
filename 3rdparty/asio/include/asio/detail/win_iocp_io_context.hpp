@@ -2,7 +2,7 @@
 // detail/win_iocp_io_context.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,7 +22,6 @@
 #include "asio/detail/limits.hpp"
 #include "asio/detail/mutex.hpp"
 #include "asio/detail/op_queue.hpp"
-#include "asio/detail/scoped_ptr.hpp"
 #include "asio/detail/socket_types.hpp"
 #include "asio/detail/thread.hpp"
 #include "asio/detail/thread_context.hpp"
@@ -36,6 +35,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class wait_op;
@@ -45,10 +45,16 @@ class win_iocp_io_context
     public thread_context
 {
 public:
-  // Constructor. Specifies a concurrency hint that is passed through to the
-  // underlying I/O completion port.
-  ASIO_DECL win_iocp_io_context(asio::execution_context& ctx,
-      int concurrency_hint = -1, bool own_thread = true);
+  // Tag type used for constructing as an internal scheduler.
+  struct internal {};
+
+  // Constructor.
+  ASIO_DECL win_iocp_io_context(
+      asio::execution_context& ctx, bool own_thread = true);
+
+  // Construct as an internal scheduler.
+  ASIO_DECL win_iocp_io_context(internal,
+      asio::execution_context& ctx);
 
   // Destructor.
   ASIO_DECL ~win_iocp_io_context();
@@ -176,44 +182,39 @@ public:
       const asio::error_code& ec, DWORD bytes_transferred = 0);
 
   // Add a new timer queue to the service.
-  template <typename Time_Traits>
-  void add_timer_queue(timer_queue<Time_Traits>& timer_queue);
+  template <typename TimeTraits, typename Allocator>
+  void add_timer_queue(timer_queue<TimeTraits, Allocator>& timer_queue);
 
   // Remove a timer queue from the service.
-  template <typename Time_Traits>
-  void remove_timer_queue(timer_queue<Time_Traits>& timer_queue);
+  template <typename TimeTraits, typename Allocator>
+  void remove_timer_queue(timer_queue<TimeTraits, Allocator>& timer_queue);
 
   // Schedule a new operation in the given timer queue to expire at the
   // specified absolute time.
-  template <typename Time_Traits>
-  void schedule_timer(timer_queue<Time_Traits>& queue,
-      const typename Time_Traits::time_type& time,
-      typename timer_queue<Time_Traits>::per_timer_data& timer, wait_op* op);
+  template <typename TimeTraits, typename Allocator>
+  void schedule_timer(timer_queue<TimeTraits, Allocator>& queue,
+      const typename TimeTraits::time_type& time,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& timer,
+      wait_op* op);
 
   // Cancel the timer associated with the given token. Returns the number of
   // handlers that have been posted or dispatched.
-  template <typename Time_Traits>
-  std::size_t cancel_timer(timer_queue<Time_Traits>& queue,
-      typename timer_queue<Time_Traits>::per_timer_data& timer,
+  template <typename TimeTraits, typename Allocator>
+  std::size_t cancel_timer(timer_queue<TimeTraits, Allocator>& queue,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& timer,
       std::size_t max_cancelled = (std::numeric_limits<std::size_t>::max)());
 
   // Cancel the timer operations associated with the given key.
-  template <typename Time_Traits>
-  void cancel_timer_by_key(timer_queue<Time_Traits>& queue,
-      typename timer_queue<Time_Traits>::per_timer_data* timer,
+  template <typename TimeTraits, typename Allocator>
+  void cancel_timer_by_key(timer_queue<TimeTraits, Allocator>& queue,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data* timer,
       void* cancellation_key);
 
   // Move the timer operations associated with the given timer.
-  template <typename Time_Traits>
-  void move_timer(timer_queue<Time_Traits>& queue,
-      typename timer_queue<Time_Traits>::per_timer_data& to,
-      typename timer_queue<Time_Traits>::per_timer_data& from);
-
-  // Get the concurrency hint that was used to initialise the io_context.
-  int concurrency_hint() const
-  {
-    return concurrency_hint_;
-  }
+  template <typename TimeTraits, typename Allocator>
+  void move_timer(timer_queue<TimeTraits, Allocator>& queue,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& to,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& from);
 
 private:
 #if defined(WINVER) && (WINVER < 0x0500)
@@ -257,18 +258,18 @@ private:
   auto_handle iocp_;
 
   // The count of unfinished work.
-  long outstanding_work_;
+  LONG outstanding_work_;
 
   // Flag to indicate whether the event loop has been stopped.
-  mutable long stopped_;
+  mutable LONG stopped_;
 
   // Flag to indicate whether there is an in-flight stop event. Every event
   // posted using PostQueuedCompletionStatus consumes non-paged pool, so to
-  // avoid exhausting this resouce we limit the number of outstanding events.
-  long stop_event_posted_;
+  // avoid exhausting this resource we limit the number of outstanding events.
+  LONG stop_event_posted_;
 
   // Flag to indicate whether the service has been shut down.
-  long shutdown_;
+  LONG shutdown_;
 
   enum
   {
@@ -308,13 +309,13 @@ private:
   friend struct timer_thread_function;
 
   // Background thread used for processing timeouts.
-  scoped_ptr<thread> timer_thread_;
+  asio::detail::thread timer_thread_;
 
   // A waitable timer object used for waiting for timeouts.
   auto_handle waitable_timer_;
 
   // Non-zero if timers or completed operations need to be dispatched.
-  long dispatch_required_;
+  LONG dispatch_required_;
 
   // Mutex for protecting access to the timer queues and completed operations.
   mutex dispatch_mutex_;
@@ -329,10 +330,11 @@ private:
   const int concurrency_hint_;
 
   // The thread that is running the io_context.
-  scoped_ptr<thread> thread_;
+  asio::detail::thread thread_;
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -9,7 +9,7 @@
 class news_020_mmu_device : public device_t, public device_memory_interface
 {
 public:
-	news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
+	news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	template <typename... T>
 	void set_bus_error_callback(T &&...args) { m_bus_error.set(std::forward<T>(args)...); }

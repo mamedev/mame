@@ -8,14 +8,14 @@ license:CC0-1.0
     *Guitar Favorites (K7357)
 
     *Barbie Guitar Party (K9901)
-    *Hot Wheels Road Tunes (K9902)
-    *SpongeBob SquarePants Surf's Up (K9903)
+    *Hot Wheels: Road Tunes (K9902)
+    *SpongeBob SquarePants: Surf's Up (K9903)
 
      (is there a K9904?)
 
     *Nashville Hits (K9905)
     *Rock 101 (K9906)
-    *American Idol Guitar Greats (K9907)
+    *American Idol: Guitar Greats (K9907)
 
 
     cartridge pinout (not identical to I Can Play Piano)
@@ -47,11 +47,11 @@ license:CC0-1.0
 
 -->
 
-<softwarelist name="icanguit" description="Fisher-Price / Mattel I Can Play Guitar cartridges">
+<softwarelist name="icanguit" description="Mattel I Can Play Guitar cartridges">
 	<software name="guitfav" supported="no">
 		<description>Guitar Favorites (K7357)</description>
 		<year>2007</year>
-		<publisher>Fisher-Price / Mattel</publisher>
+		<publisher>Mattel</publisher>
 		<part name="cart" interface="icanguit_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="icanplayguitar_guitarfavorites.bin" size="0x800000" crc="c804822e" sha1="81e10a033355f4ba4be23a6741bd9d81c5627544"/>
@@ -62,7 +62,7 @@ license:CC0-1.0
 	<software name="barbie" supported="no">
 		<description>Barbie Guitar Party (K9901)</description>
 		<year>2007</year>
-		<publisher>Fisher-Price / Mattel</publisher>
+		<publisher>Mattel</publisher>
 		<part name="cart" interface="icanguit_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="icpgbarbieguitarparty.bin" size="0x800000" crc="0355a72a" sha1="ca39f3a4c5c10e6435c6fa5f006c7878cf74f74e"/>
@@ -71,9 +71,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="roadtune" supported="no">
-		<description>Hot Wheels - Road Tunes (K9902)</description>
+		<description>Hot Wheels: Road Tunes (K9902)</description>
 		<year>2007</year>
-		<publisher>Fisher-Price / Mattel</publisher>
+		<publisher>Mattel</publisher>
 		<part name="cart" interface="icanguit_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="icpgroadtunes.bin" size="0x800000" crc="d2c4da6b" sha1="28cb2ea079e4a4885523ef94999342365316ef12"/>
@@ -82,9 +82,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="surfsup" supported="no">
-		<description>SpongeBob SquarePants - Surf's Up (K9903)</description>
+		<description>SpongeBob SquarePants: Surf's Up (K9903)</description>
 		<year>2007</year>
-		<publisher>Fisher-Price / Mattel</publisher>
+		<publisher>Mattel</publisher>
 		<part name="cart" interface="icanguit_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="icpgsurfsup.bin" size="0x800000" crc="c6ead0fd" sha1="f49ec1cf28e960dd5a253482e74978b67d92f652"/>
@@ -95,7 +95,7 @@ license:CC0-1.0
 	<software name="nashhits" supported="no">
 		<description>Nashville Hits (K9905)</description>
 		<year>2007</year>
-		<publisher>Fisher-Price / Mattel</publisher>
+		<publisher>Mattel</publisher>
 		<part name="cart" interface="icanguit_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="icpgnashvillehits.bin" size="0x800000" crc="b3615978" sha1="9c8d5c085feb55ed18d118d4dd7b9ff72872f3bc"/>
@@ -106,7 +106,7 @@ license:CC0-1.0
 	<software name="rock101" supported="no">
 		<description>Rock 101 (K9906)</description>
 		<year>2007</year>
-		<publisher>Fisher-Price / Mattel</publisher>
+		<publisher>Mattel</publisher>
 		<part name="cart" interface="icanguit_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="icpgrock101.bin" size="0x800000" crc="74b81353" sha1="d2cc03d043242e7fc6595dacfb2cde36612bb44a"/>
@@ -115,9 +115,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="ggreats" supported="no">
-		<description>American Idol - Guitar Greats (K9907)</description>
+		<description>American Idol: Guitar Greats (K9907)</description>
 		<year>2007</year>
-		<publisher>Fisher-Price / Mattel</publisher>
+		<publisher>Mattel</publisher>
 		<part name="cart" interface="icanguit_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="icpgguitargreats.bin" size="0x800000" crc="5a4daf19" sha1="4f673c39fe95399ebfd02257c7b6b80ec44ed14f"/>

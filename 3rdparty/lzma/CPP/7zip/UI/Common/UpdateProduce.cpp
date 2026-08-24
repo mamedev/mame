@@ -19,12 +19,13 @@ void UpdateProduce(
     const CUpdatePair &pair = updatePairs[i];
 
     CUpdatePair2 up2;
+    up2.Construct();
     up2.DirIndex = pair.DirIndex;
     up2.ArcIndex = pair.ArcIndex;
     up2.NewData = up2.NewProps = true;
     up2.UseArcProps = false;
     
-    switch (actionSet.StateActions[(unsigned)pair.State])
+    switch ((int)actionSet.StateActions[(unsigned)pair.State])
     {
       case NPairAction::kIgnore:
         if (pair.ArcIndex >= 0 && callback)
@@ -61,6 +62,8 @@ void UpdateProduce(
         up2.IsAnti = true;
         up2.UseArcProps = (pair.ArcIndex >= 0);
         break;
+      
+      default: throw 123; // break; // is unexpected case
     }
 
     up2.IsSameTime = ((unsigned)pair.State == NUpdateArchive::NPairState::kSameFiles);

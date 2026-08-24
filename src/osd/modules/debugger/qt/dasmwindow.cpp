@@ -130,6 +130,15 @@ DasmWindow::~DasmWindow()
 }
 
 
+void DasmWindow::debugActOpenDasm()
+{
+	DasmWindow *foo = new DasmWindow(m_debugger, this);
+	foo->m_cpuComboBox->setCurrentIndex(m_dasmView->sourceIndex());
+	foo->m_inputEdit->setText(QString::fromUtf8(m_dasmView->view<debug_view_disasm>()->expression()));
+	foo->expressionSubmitted();
+}
+
+
 void DasmWindow::restoreConfiguration(util::xml::data_node const &node)
 {
 	WindowQt::restoreConfiguration(node);

@@ -24,13 +24,15 @@
 
     In addition, there are several optimizations enabled which make
     assumptions about the code which may not be valid for other
-    applications. Check dsp32ops.inc for details.
+    applications. Check dsp32ops.hxx for details.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "dsp32.h"
 #include "dsp32dis.h"
+
+#include "endianness.h"
 
 
 //**************************************************************************

@@ -680,7 +680,7 @@ void liberate_state::liberate_base(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */);
 	screen.set_size(32*8, 32*8);
@@ -773,7 +773,7 @@ void liberate_state::prosport(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */);
 	screen.set_size(32*8, 32*8);

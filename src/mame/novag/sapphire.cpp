@@ -80,8 +80,10 @@ which hardware it runs on, see diamond.cpp for Diamond II.
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
+
+#include <bit>
 
 // internal artwork
 #include "novag_chesstea.lh"
@@ -108,11 +110,11 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void init_chesstea();
+	void init_chesstea() ATTR_COLD;
 
-	void sapphire(machine_config &config);
-	void sapphire2(machine_config &config);
-	void chesstea(machine_config &config);
+	void sapphire(machine_config &config) ATTR_COLD;
+	void sapphire2(machine_config &config) ATTR_COLD;
+	void chesstea(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -162,8 +164,6 @@ private:
 
 void sapphire_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	if (m_rombank)
 		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 
@@ -183,7 +183,7 @@ void sapphire_state::machine_start()
 
 void sapphire_state::init_chesstea()
 {
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+	u16 *rom = (u16*)memregion("maincpu")->base();
 
 	// There's a bug in the serial routine, where it clears SSR TDRE, and then
 	// writes to TDR. The H8 documentation warns not to do this, since the next
@@ -252,7 +252,7 @@ void sapphire_state::update_lcd()
 		const u8 shift = m_lcd_pwm->width() & 0x18;
 
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_data >> (shift + (i * 2)) & 3);
+		const u8 com = std::popcount(m_lcd_data >> (shift + (i * 2)) & 3U);
 		u16 segs = m_lcd_data & ((1 << shift) - 1);
 		segs |= m_lcd_segs2 << shift; // sapphire
 
@@ -475,10 +475,9 @@ void sapphire_state::sapphire(machine_config &config)
 	m_lcd_pwm->output_x().set(FUNC(sapphire_state::lcd_pwm_w));
 	m_lcd_pwm->set_bri_levels(0.05);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/3, 606/3);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_sapphire);
 
@@ -506,9 +505,8 @@ void sapphire_state::sapphire2(machine_config &config)
 	// video hardware
 	m_lcd_pwm->set_width(16);
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen_svg_device &screen(*subdevice<screen_svg_device>("screen"));
 	screen.set_size(1920/3, 671/3);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_sapphire2);
 }

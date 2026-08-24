@@ -37,68 +37,74 @@
     68681 uses custom vector 0x40 (address 0x100) level 3
 
     VFX / VFX-SD / SD-1 / SD-1 32 panel button codes:
-    2 = PROGRAM CONTROL
-    3 = WRITE
-    4 = WAVE
-    5 = SELECT VOICE
-    6 = MIXER/SHAPER
-    7 = EFFECT
-    8 = COMPARE
-    9 = COPY EFFECTS PARAMETERS
+    0 = FS2, Foot Switch Right Pedal
+    1 = FS1, Foot Switch Left Pedal
+        These come not from the panel as such, but from the 3.5mm jack for
+        connecting a SW-1 basic footswitch, to FS2 only, or a SW-5 dual
+        footswitch to both FS2 (right pedal) and FS1 (left pedal).
+        They can be assigned to different functions on the 'Master' page.
+    2 = Program Control
+    3 = Write
+    4 = Wave
+    5 = Select Voice
+    6 = Mod Mixer
+    7 = Effects        (in Programming section)
+    8 = Compare
+    9 = Copy
     10 = LFO
-    11 = PITCH
-    12 = ENV1
-    13 = PITCH MOD
-    14 = ENV2
-    15 = FILTER
-    16 = ENV3
-    17 = OUTPUT
-    18 = ERROR 20 (VFX) / SEQ. CONTROL
-    19 = RECORD
-    20 = MASTER
-    21 = STORAGE
-    22 = STOP/CONT
-    23 = PLAY
-    24 = MIDI
-    25 = BUTTON 9
-    26 = PSEL
-    27 = STAT
-    28 = EFFECT
-    29 = SEQ?  (toggles INT0 / TRAX display)
-    30 = TRACKS 1-6
-    31 = TRACKS 7-12
-    32 = ERROR 20 (VFX) / CLICK-REC
-    33 = ERROR 20 (VFX) / LOCATE
-    34 = BUTTON 8
-    35 = BUTTON 7
-    36 = VOLUME
-    37 = PAN
-    38 = TIMBRE
-    39 = KEY ZONE
-    40 = TRANSPOSE
-    41 = RELEASE
-    42 = SOFT TOP CENTER
-    43 = SOFT TOP RIGHT
-    44 = SOFT BOTTOM CENTER
-    45 = SOFT BOTTOM RIGHT
-    46 = BUTTON 3
-    47 = BUTTON 4
-    48 = BUTTON 5
-    49 = BUTTON 6
-    50 = SOFT BOTTOM LEFT
-    51 = ERROR 202 (VFX) / SEQ.
-    52 = CART
-    53 = SOUNDS
-    54 = PRESETS
-    55 = BUTTON 0
-    56 = BUTTON 1
-    57 = BUTTON 2
-    58 = SOFT TOP LEFT
-    59 = ERROR 20 (VFX) / EDIT SEQUENCE
-    60 = ERROR 20 (VFX) / EDIT SONG
-    61 = ERROR 20 (VFX) / EDIT TRACK
-    62 = DATA INCREMENT
-    63 = DATA DECREMENT
+    11 = Pitch
+    12 = Env1
+    13 = Pitch Mod
+    14 = Env2
+    15 = Filters
+    16 = Env3
+    17 = Output
+    18 = Seq Control   (gives ERROR 20 On VFX)
+    19 = Rec
+    20 = Master
+    21 = Storage
+    22 = Stop/Cont
+    23 = Play
+    24 = MIDI Control
+    25 = 9
+    26 = Patch Select
+    27 = MIDI
+    28 = Effects       (in Performance section)
+    29 = Replace Program
+    30 = Tracks 1-6    ('Multi A' On VFX)
+    31 = Tracks 7-12   ('Multi B' On VFX)
+    32 = Click         (gives ERROR 20 On VFX)
+    33 = Locate        (gives ERROR 20 On VFX)
+    34 = 8
+    35 = 7
+    36 = Volume
+    37 = Pan
+    38 = Timbre
+    39 = Key Zone
+    40 = Trans-pose
+    41 = Release
+    42 = Soft Top Center
+    43 = Soft Top Right
+    44 = Soft Bottom Center
+    45 = Soft Bottom Right
+    46 = 3
+    47 = 4
+    48 = 5
+    49 = 6
+    50 = Soft Bottom Left
+    51 = Seq           (below display; gives ERROR 20 On VFX)
+    52 = Cart          ('BankSet' On SD-1 And SD-1/32)
+    53 = Sounds
+    54 = Presets
+    55 = 0
+    56 = 1
+    57 = 2
+    58 = Soft Top Left
+    59 = Edit Seq      (gives ERROR 20 On VFX)
+    60 = Edit Song     (gives ERROR 20 On VFX)
+    61 = Edit Track    (gives ERROR 20 On VFX)
+    62 = Data Increment
+    63 = Data Decrement
 
     VFX / VFX-SD / SD-1 analog values: all values are 10 bits, left-justified within 16 bits.
     0 = Pitch Bend
@@ -188,6 +194,11 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include "sd1.lh"
+#include "sd132.lh"
+#include "vfx.lh"
+#include "vfxsd.lh"
+
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -240,10 +251,10 @@ public:
 		, m_seqram_nvram(*this, "seqram")
 	{ }
 
-	void vfx(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX) ATTR_COLD;
-	void vfxsd(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX_SD) ATTR_COLD;
-	void sd1(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1) ATTR_COLD;
-	void sd132(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1_32) ATTR_COLD;
+	void vfx(machine_config &config) ATTR_COLD;
+	void vfxsd(machine_config &config) ATTR_COLD;
+	void sd1(machine_config &config) ATTR_COLD;
+	void sd132(machine_config &config) ATTR_COLD;
 	void eps(machine_config &config) ATTR_COLD;
 	void sq1(machine_config &config) ATTR_COLD;
 	void ks32(machine_config &config) ATTR_COLD;
@@ -803,17 +814,19 @@ void esq5505_state::common(machine_config &config)
 	m_otis->add_route(7, "pump", 1.0, 7);
 }
 
-void esq5505_state::vfx(machine_config &config, int panel_type)
+void esq5505_state::vfx(machine_config &config)
 {
 	common(config);
 
 	ENSONIQ_VFX_CARTRIDGE(config, m_cart);
 
-	ESQPANEL2X40_VFX(config, m_panel, panel_type);
+	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
 	NVRAM(config, m_osram_nvram, nvram_device::DEFAULT_NONE);
+
+	config.set_default_layout(layout_vfx);
 }
 
 void esq5505_state::eps(machine_config &config)
@@ -839,9 +852,9 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->dma8_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
 
-void esq5505_state::vfxsd(machine_config &config, int panel_type)
+void esq5505_state::vfxsd(machine_config &config)
 {
-	vfx(config, panel_type);
+	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 	// and nvram for the sequencer RAM as well
 	NVRAM(config, m_seqram_nvram, nvram_device::DEFAULT_NONE);
@@ -855,24 +868,28 @@ void esq5505_state::vfxsd(machine_config &config, int panel_type)
 
 	// software list
 	SOFTWARE_LIST(config, "vfxsd_flop").set_original("vfxsd_flop");
+
+	config.set_default_layout(layout_vfxsd);
 }
 
-void esq5505_state::sd1(machine_config &config, int panel_type)
+void esq5505_state::sd1(machine_config &config)
 {
-	// Like the VFX-SD but with its own panel type
-	vfxsd(config, panel_type);
+	// Like the VFX-SD but with its own software list and layout
+	vfxsd(config);
 
 	// software list
 	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop");
+
+	config.set_default_layout(layout_sd1);
 }
 
 // Like the sd1, but with some clock speeds faster.
-void esq5505_state::sd132(machine_config &config, int panel_type)
+void esq5505_state::sd132(machine_config &config)
 {
 	auto clock = 30.47618_MHz_XTAL / 2;
 
-	// Like the SD-1 but with its own panel type
-	sd1(config, panel_type);
+	// Like the SD-1 but with different clocks, software and layout
+	sd1(config);
 	m_duart->set_clock(4'000'000);
 
 	m_maincpu->set_clock(clock);
@@ -881,6 +898,8 @@ void esq5505_state::sd132(machine_config &config, int panel_type)
 
 	// software list
 	SOFTWARE_LIST(config, "sd132_flop").set_original("sd132_flop");
+
+	config.set_default_layout(layout_sd132);
 }
 
 // 32-voice machines with the VFX-SD type config

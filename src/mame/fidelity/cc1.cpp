@@ -64,6 +64,8 @@ with CCX and CC7.
 #include "machine/i8255.h"
 #include "video/pwm.h"
 
+#include <bit>
+
 // internal artwork
 #include "fidel_cc1.lh"
 #include "fidel_cc3.lh"
@@ -143,7 +145,7 @@ u8 cc1_state::ppi_porta_r()
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
-	u8 data = count_leading_zeros_32(m_inputs[0]->read()) - 24;
+	u8 data = std::countl_zero(u8(m_inputs[0]->read()));
 	if (data == 8) data = 0xf;
 
 	// d5-d7: more inputs (direct)

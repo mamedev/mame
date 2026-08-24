@@ -12,6 +12,8 @@
 files {
 	MAME_DIR .. "src/devices/sound/bbd.cpp",
 	MAME_DIR .. "src/devices/sound/bbd.h",
+	MAME_DIR .. "src/devices/sound/drivesound.cpp",
+	MAME_DIR .. "src/devices/sound/drivesound.h",
 	MAME_DIR .. "src/devices/sound/flt_biquad.cpp",
 	MAME_DIR .. "src/devices/sound/flt_biquad.h",
 	MAME_DIR .. "src/devices/sound/flt_vol.cpp",
@@ -256,6 +258,18 @@ if SOUNDS["CEM3394"] then
 end
 
 
+
+---------------------------------------------------
+-- Creative Labs CT1741 SB16 DSP
+--@src/devices/sound/ct1741.h,SOUNDS["CT1741"] = true
+---------------------------------------------------
+
+if SOUNDS["CT1741"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ct1741.cpp",
+		MAME_DIR .. "src/devices/sound/ct1741.h",
+	}
+end
 
 ---------------------------------------------------
 -- Creative Labs CT1745 SB16 Mixer
@@ -522,6 +536,7 @@ end
 --@src/devices/sound/k007232.h,SOUNDS["K007232"] = true
 --@src/devices/sound/k051649.h,SOUNDS["K051649"] = true
 --@src/devices/sound/k053260.h,SOUNDS["K053260"] = true
+--@src/devices/sound/k054321.h,SOUNDS["K054321"] = true
 --@src/devices/sound/k054539.h,SOUNDS["K054539"] = true
 --@src/devices/sound/k056800.h,SOUNDS["K056800"] = true
 ---------------------------------------------------
@@ -551,6 +566,13 @@ if SOUNDS["K053260"] then
 	files {
 		MAME_DIR .. "src/devices/sound/k053260.cpp",
 		MAME_DIR .. "src/devices/sound/k053260.h",
+	}
+end
+
+if SOUNDS["K054321"] then
+	files {
+		MAME_DIR .. "src/devices/sound/k054321.cpp",
+		MAME_DIR .. "src/devices/sound/k054321.h",
 	}
 end
 
@@ -616,6 +638,20 @@ if SOUNDS["MAS3507D"] then
 	files {
 		MAME_DIR .. "src/devices/sound/mas3507d.cpp",
 		MAME_DIR .. "src/devices/sound/mas3507d.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Fujitsu MB87077 volume controller
+--@src/devices/sound/mb87077.h,SOUNDS["MB87077"] = true
+---------------------------------------------------
+
+if SOUNDS["MB87077"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb87077.cpp",
+		MAME_DIR .. "src/devices/sound/mb87077.h",
 	}
 end
 
@@ -1286,6 +1322,18 @@ if SOUNDS["VA_VCA"] then
 end
 
 --------------------------------------------------
+-- Virtual analog voltage-controlled oscillator (VCO)
+--@src/devices/sound/va_vco.h,SOUNDS["VA_VCO"] = true
+--------------------------------------------------
+
+if SOUNDS["VA_VCO"] then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vco.cpp",
+		MAME_DIR .. "src/devices/sound/va_vco.h",
+	}
+end
+
+--------------------------------------------------
 -- Virtual analog voltage-controlled filters (VCFs)
 --@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
 --------------------------------------------------
@@ -1926,5 +1974,29 @@ if SOUNDS["FZ_PCM"] then
 	files {
 		MAME_DIR .. "src/devices/sound/fz_pcm.cpp",
 		MAME_DIR .. "src/devices/sound/fz_pcm.h",
+	}
+end
+
+---------------------------------------------------
+-- Akai L6009
+--@src/devices/sound/l6009.h,SOUNDS["L6009"] = true
+---------------------------------------------------
+
+if SOUNDS["L6009"] then
+	files {
+		MAME_DIR .. "src/devices/sound/l6009.cpp",
+		MAME_DIR .. "src/devices/sound/l6009.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/gt913.h,SOUNDS["GT913"] = true
+---------------------------------------------------
+
+if SOUNDS["GT913"] then
+	files {
+		MAME_DIR .. "src/devices/sound/gt913.cpp",
+		MAME_DIR .. "src/devices/sound/gt913.h",
 	}
 end

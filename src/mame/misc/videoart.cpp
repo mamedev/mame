@@ -62,7 +62,7 @@ public:
 		m_led(*this, "led")
 	{ }
 
-	void videoart(machine_config &config);
+	void videoart(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -112,8 +112,6 @@ private:
 
 void videoart_state::machine_start()
 {
-	m_led.resolve();
-
 	// register for savestates
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
@@ -379,7 +377,7 @@ void videoart_state::videoart(machine_config &config)
 
 	TIMER(config, "scanline").configure_scanline(FUNC(videoart_state::scanline), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(m_ef9367->clock() / (262.0 * 96.0));
 	m_screen->set_screen_update(FUNC(videoart_state::screen_update));
 	m_screen->set_size(512, 256);

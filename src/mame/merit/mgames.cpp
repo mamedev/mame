@@ -281,8 +281,6 @@ TILE_GET_INFO_MEMBER( mgames_state::tile_info )
 void mgames_state::machine_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mgames_state::tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-
-	m_lamps.resolve();
 }
 
 uint32_t mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -654,7 +652,7 @@ void mgames_state::mgames(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

@@ -80,7 +80,7 @@ BTANB (ssystem3):
 #include "video/md4330b.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -111,10 +111,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cu_plug);
 
 	// machine configs
-	void ssystem3(machine_config &config);
-	void ssystem4(machine_config &config);
+	void ssystem3(machine_config &config) ATTR_COLD;
+	void ssystem4(machine_config &config) ATTR_COLD;
 
-	void init_ssystem3() { m_xor_kludge = true; }
+	void init_ssystem3() ATTR_COLD { m_xor_kludge = true; }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -168,8 +168,6 @@ private:
 
 void ssystem3_state::machine_start()
 {
-	m_out_lcd2.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_control));
@@ -472,10 +470,9 @@ void ssystem3_state::ssystem4(machine_config &config)
 	MD4332B(config, m_lcd1);
 	m_lcd1->write_q().set(FUNC(ssystem3_state::lcd1_output_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/2, 729/2);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display[0]).set_size(5, 9);
 	m_display[0]->set_bri_levels(0.25);
@@ -511,17 +508,16 @@ void ssystem3_state::ssystem3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	HLCD0438(config, m_lcd2[0], 0);
+	HLCD0438(config, m_lcd2[0]);
 	m_lcd2[0]->write_segs().set(FUNC(ssystem3_state::lcd2_output_w<0>));
 	m_lcd2[0]->write_data().set(m_lcd2[1], FUNC(hlcd0438_device::data_w));
 
-	HLCD0438(config, m_lcd2[1], 0);
+	HLCD0438(config, m_lcd2[1]);
 	m_lcd2[1]->write_segs().set(FUNC(ssystem3_state::lcd2_output_w<1>));
 
-	screen_device &screen(SCREEN(config, "chessunit", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "chessunit"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1060/1.5, 1080/1.5);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display[1]).set_size(8, 48);
 	m_display[1]->output_x().set(FUNC(ssystem3_state::lcd2_pwm_w));

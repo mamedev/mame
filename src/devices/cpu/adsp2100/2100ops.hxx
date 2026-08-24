@@ -2097,12 +2097,12 @@ void adsp21xx_device::shift_op(uint32_t op)
 			if (xop < 0)
 			{
 				SET_SS;
-				res = count_leading_ones_32(xop) - 16 - 1;
+				res = std::countl_one(u32(xop)) - 16 - 1;
 			}
 			else
 			{
 				CLR_SS;
-				res = count_leading_zeros_32(xop) - 16 - 1;
+				res = std::countl_zero(u32(xop)) - 16 - 1;
 			}
 			m_core.se.s = -res;
 			break;
@@ -2120,12 +2120,12 @@ void adsp21xx_device::shift_op(uint32_t op)
 				if (xop < 0)
 				{
 					SET_SS;
-					res = count_leading_ones_32(xop) - 16 - 1;
+					res = std::countl_one(u32(xop)) - 16 - 1;
 				}
 				else
 				{
 					CLR_SS;
-					res = count_leading_zeros_32(xop) - 16 - 1;
+					res = std::countl_zero(u32(xop)) - 16 - 1;
 				}
 				m_core.se.s = -res;
 			}
@@ -2135,14 +2135,14 @@ void adsp21xx_device::shift_op(uint32_t op)
 			if (m_core.se.s == -15)
 			{
 				xop = SHIFT_GETXREG_SIGNED(xop);
-				res = count_leading_zeros_32((GET_SS ? ~xop : xop) & 0xffff) - 1;
+				res = std::countl_zero(u32((GET_SS ? ~xop : xop) & 0xffff)) - 1;
 				m_core.se.s = -res;
 			}
 			break;
 		case 0x0f:
 			// EXPADJ
 			xop = SHIFT_GETXREG_SIGNED(xop);
-			res = count_leading_zeros_32((xop < 0) ? ~xop : xop) - 16 - 1;
+			res = std::countl_zero(u32((xop < 0) ? ~xop : xop)) - 16 - 1;
 			if (res < -m_core.sb.s)
 				m_core.sb.s = -res;
 			break;

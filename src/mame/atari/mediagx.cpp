@@ -319,7 +319,7 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 		m_frame_height = height;
 
 		visarea.set(0, width - 1, 0, height - 1);
-		m_screen->configure(width, height * 262 / 240, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(width, height * 262 / 240, visarea, m_screen->frame_period());
 	}
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
@@ -897,11 +897,11 @@ void mediagx_state::mediagx(machine_config &config)
 
 	TIMER(config, "sound_timer").configure_generic(FUNC(mediagx_state::sound_timer_callback));
 
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &mediagx_state::ramdac_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 639, 0, 239);

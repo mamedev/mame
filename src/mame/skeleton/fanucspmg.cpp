@@ -955,17 +955,17 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	I8085A(config, m_subcpu, XTAL(16'000'000)/2/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &fanucspmg_state::subcpu_mem);
 
-	I8251(config, m_usart[0], 0);
-	I8251(config, m_usart[1], 0);
-	I8251(config, m_usart[2], 0);
-	I8251(config, m_usart[3], 0);
+	I8251(config, m_usart[0]);
+	I8251(config, m_usart[1]);
+	I8251(config, m_usart[2]);
+	I8251(config, m_usart[3]);
 
-	PIT8253(config, m_pit[0], 0);
+	PIT8253(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(XTAL(15'000'000)/12);
 	m_pit[0]->set_clk<1>(XTAL(15'000'000)/12);
 	m_pit[0]->set_clk<2>(XTAL(15'000'000)/12);
 
-	PIT8253(config, m_pit[1], 0);
+	PIT8253(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(XTAL(15'000'000)/12);
 	m_pit[1]->set_clk<1>(XTAL(15'000'000)/12);
 	m_pit[1]->set_clk<2>(XTAL(15'000'000)/12);
@@ -978,12 +978,12 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	m_dmac->in_ior_cb<0>().set(FUNC(fanucspmg_state::fdcdma_r));
 	m_dmac->out_iow_cb<0>().set(FUNC(fanucspmg_state::fdcdma_w));
 
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(FUNC(fanucspmg_state::get_slave_ack));
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir7_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
@@ -993,7 +993,7 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);
 	screen.set_screen_update(CRTC_TAG, FUNC(mc6845_device::screen_update));
 

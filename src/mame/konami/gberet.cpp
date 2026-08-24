@@ -738,7 +738,7 @@ void gberet_state::gberet(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	K005849(config, m_k005849, 0);
+	K005849(config, m_k005849);
 	m_k005849->set_irq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_k005849->set_firq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -747,7 +747,7 @@ void gberet_state::gberet(machine_config &config)
 	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
 	mainirq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(gberet_state::screen_update));
 	screen.set_palette(m_palette);
@@ -770,7 +770,7 @@ void gberetb_state::gberetb(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(gberetb_state::nmi_line_assert), attotime::from_hz(20_MHz_XTAL / 0x8000)); // divider guessed
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58.7090);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

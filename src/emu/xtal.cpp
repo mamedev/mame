@@ -230,6 +230,7 @@ const double XTAL::known_xtals[] = {
 	 12'672'000, // 12.672_MHz_XTAL        TRS-80 Model 4 80*24 video
 	 12'800'000, // 12.8_MHz_XTAL          Cave CV1000
 	 12'854'400, // 12.8544_MHz_XTAL       Alphatronic P3
+	 12'875'000, // 12.875_MHz_XTAL        EACA Genie III video board
 	 12'936'000, // 12.936_MHz_XTAL        CDC 721
 	 12'979'200, // 12.9792_MHz_XTAL       Exidy 440
 	 13'000'000, // 13_MHz_XTAL            STM Pied Piper dot clock
@@ -462,7 +463,8 @@ const double XTAL::known_xtals[] = {
 	 36'000'000, // 36_MHz_XTAL            Sega Model 1 video board
 	 36'864'000, // 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll
 	 37'980'000, // 37.98_MHz_XTAL         Falco 5220
-	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board
+	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board (C67 / Driver's Eyes)
+	 38'808'000, // 38.808_MHz_XTAL        Namco System 21 video board (Winning Run)
 	 38'863'630, // 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video
 	 39'321'600, // 39.3216_MHz_XTAL       Sun 2/120
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock
@@ -476,6 +478,7 @@ const double XTAL::known_xtals[] = {
 	 44'000'000, // 44_MHz_XTAL            VGame slots
 	 44'100'000, // 44.1_MHz_XTAL          Subsino's Bishou Jan
 	 44'236'800, // 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16
+	 44'444'000, // 44.444_MHz_XTAL        Zilog System 8000 CPU boards
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965
 	 44'900'000, // 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics
 	 45'000'000, // 45_MHz_XTAL            Eolith with Hyperstone CPUs

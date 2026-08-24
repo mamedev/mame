@@ -69,7 +69,7 @@ PmTimestamp get_time(void *info)
 }
 
 
-void fast_test()
+void fast_test(void)
 {
     PmStream *midi;
     char line[STRING_MAX];
@@ -170,7 +170,7 @@ void fast_test()
 }
 
 
-void show_usage()
+void show_usage(void)
 {
     printf("Usage: fast [-h] [-l latency] [-r rate] [-d device] [-s dur] "
            "[-n] [-p] [-m]\n"

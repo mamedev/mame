@@ -16,14 +16,15 @@ public:
 	auto &set_base_program(u8 base) { m_base_program = base; return *this; }
 
 	auto int_cb() { return m_int_cb.bind(); }
+	int int_r() { return m_int; }
+	void ack_w(int state);
 
 	u8 data_r();
 	void data_w(u8 data) { m_in_data = data; }
 
-	int ack_r() { return m_in_strobe; }
-	void ack_w(int state);
-
 	void strobe_w(int state);
+	auto ack_cb() { return m_ack_cb.bind(); }
+	int ack_r() { return m_in_strobe; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -64,6 +65,7 @@ private:
 
 	required_ioport m_channel;
 	devcb_write_line m_int_cb;
+	devcb_write_line m_ack_cb;
 
 	u8 m_base_program;
 

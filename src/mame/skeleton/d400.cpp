@@ -90,7 +90,7 @@ void d400_state::d461(machine_config &config)
 	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
 	duart.irq_cb().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(59.292_MHz_XTAL / 3, 1080, 0, 810, 305, 0, 300); // yes, 81 columns
 	//screen.set_raw(59.292_MHz_XTAL / 2, 1620, 0, 1215, 305, 0, 300); // for 135-column mode
 	screen.set_screen_update(FUNC(d400_state::screen_update));

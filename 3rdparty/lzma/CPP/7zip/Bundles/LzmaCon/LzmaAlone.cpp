@@ -59,13 +59,13 @@ static const char * const kHelpString =
     "  b : Benchmark\n"
     "<switches>\n"
     "  -a{N}  : set compression mode : [0, 1] : default = 1 (max)\n"
-    "  -d{N}  : set dictionary size : [12, 30] : default = 24 (16 MiB)\n"
+    "  -d{N}  : set dictionary size : [12, 31] : default = 24 (16 MiB)\n"
     "  -fb{N} : set number of fast bytes : [5, 273] : default = 128\n"
     "  -mc{N} : set number of cycles for match finder\n"
     "  -lc{N} : set number of literal context bits : [0, 8] : default = 3\n"
     "  -lp{N} : set number of literal pos bits : [0, 4] : default = 0\n"
     "  -pb{N} : set number of pos bits : [0, 4] : default = 2\n"
-    "  -mf{M} : set match finder: [hc4, bt2, bt3, bt4] : default = bt4\n"
+    "  -mf{M} : set match finder: [hc4, hc5, bt2, bt3, bt4, bt5] : default = bt4\n"
     "  -mt{N} : set number of CPU threads\n"
     "  -eos   : write end of stream marker\n"
     "  -si    : read data from stdin\n"
@@ -372,8 +372,8 @@ static int main2(int numArgs, const char *args[])
     return 0;
   }
 
-  bool stdInMode = parser[NKey::kStdIn].ThereIs;
-  bool stdOutMode = parser[NKey::kStdOut].ThereIs;
+  const bool stdInMode = parser[NKey::kStdIn].ThereIs;
+  const bool stdOutMode = parser[NKey::kStdOut].ThereIs;
 
   if (!stdOutMode)
     PrintTitle();
@@ -394,7 +394,16 @@ static int main2(int numArgs, const char *args[])
     UInt32 dictLog;
     const UString &s = parser[NKey::kDict].PostStrings[0];
     dictLog = GetNumber(s);
-    dict = 1 << dictLog;
+    if (dictLog >= 32)
+      throw "unsupported dictionary size";
+    // we only want to use dictionary sizes that are powers of 2,
+    // because 7-zip only recognizes such dictionary sizes in the lzma header.#if 0
+#if 0
+    if (dictLog == 32)
+      dict = (UInt32)3840 << 20;
+    else
+#endif
+    dict = (UInt32)1 << dictLog;
     dictDefined = true;
     AddProp(props2, "d", s);
   }
@@ -501,7 +510,7 @@ static int main2(int numArgs, const char *args[])
     const UString &outputName = params[paramIndex++];
     outStreamSpec = new COutFileStream;
     outStream = outStreamSpec;
-    if (!outStreamSpec->Create(us2fs(outputName), true))
+    if (!outStreamSpec->Create_ALWAYS(us2fs(outputName)))
     {
       PrintError2("Cannot open output file", outputName);
       return 1;
@@ -522,7 +531,7 @@ static int main2(int numArgs, const char *args[])
 
   if (encodeMode && !dictDefined)
   {
-    dict = 1 << kDictSizeLog;
+    dict = (UInt32)1 << kDictSizeLog;
     if (fileSizeDefined)
     {
       unsigned i;

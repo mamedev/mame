@@ -905,7 +905,7 @@ void samcoupe_state::samcoupe(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("256K");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 2, SAM_TOTAL_WIDTH,  0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT,
 									   SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
 	m_screen->set_screen_update(FUNC(samcoupe_state::screen_update));

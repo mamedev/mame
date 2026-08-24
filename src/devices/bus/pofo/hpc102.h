@@ -42,11 +42,10 @@ protected:
 
 	virtual uint8_t eack_r() override;
 
-	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-
 private:
 	required_device<ins8250_device> m_uart;
+	memory_passthrough_handler m_uart_tap;
+	memory_passthrough_handler m_vector_tap;
 
 	uint8_t m_vector;
 };

@@ -658,7 +658,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::sound_portmap);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(44*8, 30*8);
@@ -672,7 +672,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, 14.318181_MHz_XTAL / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(pipedrm_state::fromance_gga_data_w));
 
-	VSYSTEM_SPR2(config, m_spr_old, 0, m_palette, gfx_pipedrm_spr);
+	VSYSTEM_SPR2(config, m_spr_old, m_palette, gfx_pipedrm_spr);
 	m_spr_old->set_offsets(-13, -6);
 	m_spr_old->set_pritype(3);
 
@@ -703,7 +703,7 @@ void hatris_state::hatris(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &hatris_state::sound_portmap);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(44*8, 30*8);

@@ -214,7 +214,7 @@ void rm380z_state::base_configure(machine_config &config)
 
 	/* video hardware */
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
 	m_screen->set_palette(m_palette);
 
@@ -229,7 +229,7 @@ void rm380z_state::base_configure(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 
@@ -254,7 +254,7 @@ void rm380z_state_cos34::rm380z34e(machine_config &config)
 
 	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
 
-	SN74S262(config, m_rocg, 0);
+	SN74S262(config, m_rocg);
 	m_rocg->set_palette(m_palette);
 }
 

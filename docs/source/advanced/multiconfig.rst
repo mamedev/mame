@@ -1,12 +1,15 @@
 Multiple Configuration Files
 ============================
 
-MAME has a very powerful configuration file system that can allow you to tweak settings on a per-game, per-system, or even per-monitor type basis, but requires careful thought about how you arrange your configs.
+MAME has a very powerful configuration file system that can allow you to tweak
+settings on a per-game, per-system, or even per-monitor type basis, but requires
+careful thought about how you arrange your configuration files.
 
-.. _advanced-multi-CFG:
 
-Order of Config Loading
------------------------
+.. _advanced-multicfg-order:
+
+Order of Configurattion File Loading
+------------------------------------
 
 1. The command line is parsed first, and any settings passed that way *will take
    precedence over anything in an INI file*.
@@ -100,7 +103,7 @@ Examples of Config Loading Order
   8. ``smleague.ini`` (parent system)
   9. ``finlarch.ini`` (system)
 
-*Remember command line parameters take precedence over all else!*
+*Remember command line argument take precedence over all else!*
 
 
 Tricks to Make Life Easier
@@ -110,3 +113,14 @@ Some users may have a wall-mounted or otherwise rotatable monitor, and may wish
 to actually play vertical games with the rotated display.  The easiest way to
 accomplish this is to put your rotation modifiers into ``vertical.ini``, where
 they will only affect vertical games.
+
+
+Multiple Search Folders
+-----------------------
+
+If you include paths to multiple folders in your :ref:`inipath setting
+<mame-commandline-inipath>`, MAME will search for each INI file in each of the
+specified folders in the order they are listed.  If a file with the same name is
+found in multiple folders, settings from files found earlier have precedence
+over settings in files found later.  MAME always saves INI files to the first
+folder specified in your inipath setting.

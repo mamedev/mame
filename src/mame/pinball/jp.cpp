@@ -72,9 +72,10 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void init_6d() { m_game = 1; }
-	void jp(machine_config &config);
-	void jps(machine_config &config);
+	void init_6d() ATTR_COLD { m_game = 1; }
+
+	void jp(machine_config &config) ATTR_COLD;
+	void jps(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -373,9 +374,6 @@ void jp_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	if (m_adpcm_bank.found())
 		m_adpcm_bank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
 
@@ -485,7 +483,7 @@ void jp_state::jps(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jp_state::audio_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(jp_state::sound_int_cb));
 
-	LS157(config, m_adpcm_select, 0); // not labeled in manual; might even be a CD4019
+	LS157(config, m_adpcm_select); // not labeled in manual; might even be a CD4019
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	SPEAKER(config, "msmvol").front_center();

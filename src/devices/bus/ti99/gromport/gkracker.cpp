@@ -419,7 +419,7 @@ const tiny_rom_entry *ti99_gkracker_device::device_rom_region() const
 
 void ti99_gkracker_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, m_cartridge, 0);
+	TI99_CART(config, m_cartridge);
 }
 
 INPUT_PORTS_START(gkracker)

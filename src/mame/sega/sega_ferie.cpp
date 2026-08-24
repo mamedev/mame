@@ -88,7 +88,7 @@ public:
 
 	void sega_ferie(machine_config &config);
 
-	DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
+	float pen_y_mapper(float linear_value);
 	ioport_value pen_y_rescale_r();
 	ioport_value pen_target_r();
 
@@ -321,11 +321,11 @@ void sega_ferie_state::machine_reset()
 	m_pen_target = PEN_TARGET_LCD;
 }
 
-CROSSHAIR_MAPPER_MEMBER(sega_ferie_state::pen_y_mapper)
+float sega_ferie_state::pen_y_mapper(float linear_value)
 {
 	// Parameter `linear_value` is ignored, since we will read the input port directly
 	// for adjustments, just need to return that value in the expected range [0.0f..1.0f].
-	return (float) pen_y_rescale_r() / 0xff;
+	return float(pen_y_rescale_r()) / 0xff;
 }
 
 ioport_value sega_ferie_state::pen_y_rescale_r()
@@ -662,7 +662,7 @@ void sega_ferie_state::sega_ferie(machine_config &config)
 	// FIXME: Guessed timings
 	TIMER(config, "irq").configure_periodic(FUNC(sega_ferie_state::irq), attotime::from_hz(200));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(LCD_W, LCD_H);

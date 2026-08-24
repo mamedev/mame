@@ -10,12 +10,9 @@
 #ifndef MAME_OSD_INTERFACE_UIEVENTS_H
 #define MAME_OSD_INTERFACE_UIEVENTS_H
 
+#pragma once
 
-//**************************************************************************
-//  FORWARD DECLARATIONS
-//**************************************************************************
-
-class render_target;
+#include <cstdint>
 
 
 namespace osd {
@@ -41,19 +38,28 @@ public:
 	};
 
 	// window events
-	virtual void push_window_focus_event(render_target *target) = 0;
-	virtual void push_window_defocus_event(render_target *target) = 0;
+	virtual void push_window_focus_event() = 0;
+	virtual void push_window_defocus_event() = 0;
 
 	// legacy mouse events
-	virtual void push_mouse_wheel_event(render_target *target, s32 x, s32 y, short delta, int lines) = 0;
+	virtual void push_mouse_wheel_event(std::int32_t x, std::int32_t y, short delta, int lines) = 0;
 
 	// pointer events
-	virtual void push_pointer_update(render_target *target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks) = 0;
-	virtual void push_pointer_leave(render_target *target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) = 0;
-	virtual void push_pointer_abort(render_target *target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) = 0;
+	virtual void push_pointer_update(
+			pointer type, std::uint16_t ptrid, std::uint16_t device,
+			std::int32_t x, std::int32_t y, std::uint32_t buttons,
+			std::uint32_t pressed, std::uint32_t released, std::int16_t clicks) = 0;
+	virtual void push_pointer_leave(
+			pointer type, std::uint16_t ptrid, std::uint16_t device,
+			std::int32_t x, std::int32_t y,
+			std::uint32_t released, std::int16_t clicks) = 0;
+	virtual void push_pointer_abort(
+			pointer type, std::uint16_t ptrid, std::uint16_t device,
+			std::int32_t x, std::int32_t y,
+			std::uint32_t released, std::int16_t clicks) = 0;
 
 	// text input events
-	virtual void push_char_event(render_target *target, char32_t ch) = 0;
+	virtual void push_char_event(char32_t ch) = 0;
 };
 
 } // namespace osd

@@ -93,7 +93,7 @@ void magiceyes_vr3520f_game_state::leapfrog_didj(machine_config &config)
 	ARM9(config, m_maincpu, 533000000); // 533 MHz ARM926TEJ (clocked at @ 393 MHz for the Didj?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &magiceyes_vr3520f_game_state::didj_arm9_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
@@ -120,4 +120,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2008, didj,      0,       0,      leapfrog_didj, leapfrog_didj, magiceyes_vr3520f_game_state, empty_init, "LeapFrog", "Didj", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2008, didj, 0, 0, leapfrog_didj, leapfrog_didj, magiceyes_vr3520f_game_state, empty_init, "LeapFrog", "Didj", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

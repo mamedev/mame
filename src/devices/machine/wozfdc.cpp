@@ -58,7 +58,8 @@ void wozfdc_device::device_add_mconfig(machine_config &config)
 
 wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-		m_phaselatch(*this, "phaselatch")
+	m_rom_p6(*this, DISKII_P6_REGION),
+	m_phaselatch(*this, "phaselatch")
 {
 }
 
@@ -78,8 +79,6 @@ appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const ch
 
 void wozfdc_device::device_start()
 {
-	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION).c_str())->base();
-
 	timer = timer_alloc(FUNC(wozfdc_device::generic_tick), this);
 	delay_timer = timer_alloc(FUNC(wozfdc_device::delayed_tick), this);
 
@@ -91,8 +90,6 @@ void wozfdc_device::device_start()
 	save_item(NAME(cycles));
 	save_item(NAME(data_reg));
 	save_item(NAME(address));
-	save_item(NAME(write_start_time));
-	save_item(NAME(write_position));
 	save_item(NAME(write_line_active));
 	save_item(NAME(drvsel));
 	save_item(NAME(enable1));
@@ -108,8 +105,6 @@ void wozfdc_device::device_reset()
 	cycles = time_to_cycles(machine().time());
 	data_reg = 0x00;
 	address = 0x00;
-	write_start_time = attotime::never;
-	write_position = 0;
 	write_line_active = false;
 	external_io_select = false;
 
@@ -203,6 +198,9 @@ TIMER_CALLBACK_MEMBER(wozfdc_device::delayed_tick)
 
 uint8_t wozfdc_device::read(offs_t offset)
 {
+	if (machine().side_effects_disabled())
+		return (offset & 1) ? 0xff : data_reg;
+
 	lss_sync();
 	control(offset);
 
@@ -308,19 +306,18 @@ void wozfdc_device::control(int offset)
 				if(active)
 					address &= ~0x08;
 				mode_write = false;
-				attotime now = machine().time();
 				if(floppy)
-					floppy->write_flux(write_start_time, now, write_position, write_buffer);
+					floppy->write_end(machine().time());
 			}
 			break;
 		case 0xf:
 			if(!mode_write) {
 				if(active) {
 					address |= 0x08;
-					write_start_time = machine().time();
-					write_position = 0;
-					if(floppy)
-						floppy->set_write_splice(write_start_time);
+					if(floppy) {
+						floppy->write_start(machine().time());
+						floppy->set_write_splice(machine().time());
+					}
 				}
 				mode_write = true;
 			}
@@ -348,11 +345,11 @@ void wozfdc_device::lss_start()
 	cycles = time_to_cycles(machine().time());
 	data_reg = 0x00;
 	address &= ~0x0e;
-	write_position = 0;
-	write_start_time = mode_write ? machine().time() : attotime::never;
 	write_line_active = false;
-	if(mode_write && floppy)
-		floppy->set_write_splice(write_start_time);
+	if(mode_write && floppy) {
+		floppy->write_start(machine().time());
+		floppy->set_write_splice(machine().time());
+	}
 }
 
 void wozfdc_device::lss_sync(uint64_t extra_cycles)
@@ -387,14 +384,8 @@ void wozfdc_device::lss_sync(uint64_t extra_cycles)
 				if((write_line_active && !(address & 0x80)) ||
 					(!write_line_active && (address & 0x80))) {
 					write_line_active = !write_line_active;
-					assert(write_position != 32);
-					write_buffer[write_position++] = cycles_to_time(cycles);
-				} else if(write_position >= 30) {
-					attotime now = cycles_to_time(cycles);
 					if(floppy)
-						floppy->write_flux(write_start_time, now, write_position, write_buffer);
-					write_start_time = now;
-					write_position = 0;
+						floppy->write_flux_change(cycles_to_time(cycles));
 				}
 			}
 

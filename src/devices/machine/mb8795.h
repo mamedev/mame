@@ -9,7 +9,7 @@ class mb8795_device :   public device_t,
 						public device_network_interface
 {
 public:
-	mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto tx_irq() { return m_irq_tx_cb.bind(); }
 	auto rx_irq() { return m_irq_rx_cb.bind(); }

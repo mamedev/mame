@@ -50,7 +50,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void meyc8088(machine_config &config);
+	void meyc8088(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -294,8 +294,6 @@ void meyc8088_state::common_w(uint8_t data)
 
 void meyc8088_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_status));
 	save_item(NAME(m_common));
 }
@@ -390,7 +388,7 @@ void meyc8088_state::meyc8088(machine_config &config)
 	TIMER(config, m_heartbeat).configure_generic(FUNC(meyc8088_state::heartbeat_callback));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224);
 	screen.set_screen_update(FUNC(meyc8088_state::screen_update));
 	screen.screen_vblank().set(FUNC(meyc8088_state::screen_vblank));

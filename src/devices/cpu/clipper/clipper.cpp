@@ -36,16 +36,6 @@
 #define FLAGS(C,V,Z,N) \
 	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0))
 
-#define FLAGS_ADD(op2, op1, result) FLAGS(                                        \
-	(BIT31(op2) && BIT31(op1)) || (!BIT31(result) && (BIT31(op2) || BIT31(op1))), \
-	(BIT31(op2) == BIT31(op1)) && (BIT31(result) != BIT31(op2)),                  \
-	result == 0, BIT31(result))
-
-#define FLAGS_SUB(op2, op1, result) FLAGS(                                         \
-	(!BIT31(op2) && BIT31(op1)) || (BIT31(result) && (!BIT31(op2) || BIT31(op1))), \
-	(BIT31(op2) != BIT31(op1)) && (BIT31(result) != BIT31(op2)),                   \
-	result == 0, BIT31(result))
-
 DEFINE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device, "clipper_c100", "C100 CLIPPER")
 DEFINE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device, "clipper_c300", "C300 CLIPPER")
 DEFINE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device, "clipper_c400", "C400 CLIPPER")
@@ -667,19 +657,13 @@ void clipper_device::execute_instruction()
 		break;
 	case 0x34:
 		// rotw: rotate word
-		if (!BIT31(m_r[R1]))
-			m_r[R2] = rotl_32(m_r[R2], m_r[R1]);
-		else
-			m_r[R2] = rotr_32(m_r[R2], -m_r[R1]);
+		m_r[R2] = std::rotl<u32>(m_r[R2], m_r[R1]);
 		// FLAGS: 00ZN
 		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		break;
 	case 0x35:
 		// rotl: rotate longword
-		if (!BIT31(m_r[R1]))
-			set_64(R2, rotl_64(get_64(R2), m_r[R1]));
-		else
-			set_64(R2, rotr_64(get_64(R2), -m_r[R1]));
+		set_64(R2, std::rotl(get_64(R2), m_r[R1]));
 		// FLAGS: 00ZN
 		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		break;
@@ -746,20 +730,14 @@ void clipper_device::execute_instruction()
 		break;
 	case 0x3c:
 		// roti: rotate immediate
-		if (!BIT31(m_info.imm))
-			m_r[R2] = rotl_32(m_r[R2], m_info.imm);
-		else
-			m_r[R2] = rotr_32(m_r[R2], -m_info.imm);
+		m_r[R2] = std::rotl<u32>(m_r[R2], m_info.imm);
 		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x3d:
 		// rotli: rotate longword immediate
-		if (!BIT31(m_info.imm))
-			set_64(R2, rotl_64(get_64(R2), m_info.imm));
-		else
-			set_64(R2, rotr_64(get_64(R2), -m_info.imm));
+		set_64(R2, std::rotl(get_64(R2), m_info.imm));
 		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		// FLAGS: 00ZN
 		// TRAPS: I
@@ -900,36 +878,81 @@ void clipper_device::execute_instruction()
 	case 0x80:
 		// addw: add word
 		{
-			const u32 result = m_r[R2] + m_r[R1];
+			u32 const result = m_r[R2] + m_r[R1];
 
-			FLAGS_ADD(m_r[R2], m_r[R1], result);
+			m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+
+			// carry
+			if (result < m_r[R2])
+				m_psw |= PSW_C;
+
+			// overflow
+			if (BIT(~(m_r[R2] ^ m_r[R1]) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// zero
+			if (result == 0)
+				m_psw |= PSW_Z;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
 		break;
 
 	case 0x82:
 		// addq: add quick
 		{
-			const u32 result = m_r[R2] + m_info.r1;
+			u32 const result = m_r[R2] + m_info.r1;
 
-			FLAGS_ADD(m_r[R2], m_info.r1, result);
+			m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+
+			// carry
+			if (result < m_r[R2])
+				m_psw |= PSW_C;
+
+			// overflow
+			if (BIT(~m_r[R2] & result, 31))
+				m_psw |= PSW_V;
+
+			// zero
+			if (result == 0)
+				m_psw |= PSW_Z;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
 		break;
 	case 0x83:
 		// addi: add immediate
 		{
-			const u32 result = m_r[R2] + m_info.imm;
+			u32 const result = m_r[R2] + m_info.imm;
 
-			FLAGS_ADD(m_r[R2], m_info.imm, result);
+			m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+
+			// carry
+			if (result < m_r[R2])
+				m_psw |= PSW_C;
+
+			// overflow
+			if (BIT(~(m_r[R2] ^ m_info.imm) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// zero
+			if (result == 0)
+				m_psw |= PSW_Z;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
 		// TRAPS: I
 		break;
 	case 0x84:
@@ -983,24 +1006,55 @@ void clipper_device::execute_instruction()
 	case 0x90:
 		// addwc: add word with carry
 		{
-			const u32 result = m_r[R2] + m_r[R1] + (PSW(C) ? 1 : 0);
+			u32 const sum1 = m_r[R2] + m_r[R1];
+			u32 const result = sum1 + bool(PSW(C));
 
-			FLAGS_ADD(m_r[R2], m_r[R1], result);
+			m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+
+			// carry
+			if (sum1 < m_r[R2] || result < sum1)
+				m_psw |= PSW_C;
+
+			// overflow
+			if (BIT(~(m_r[R2] ^ m_r[R1]) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// zero
+			if (result == 0)
+				m_psw |= PSW_Z;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
 		break;
 	case 0x91:
 		// subwc: subtract word with carry
 		{
-			const u32 result = m_r[R2] - m_r[R1] - (PSW(C) ? 1 : 0);
+			u32 const result = m_r[R2] - m_r[R1] - bool(PSW(C));
 
-			FLAGS_SUB(m_r[R2], m_r[R1], result);
+			m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+
+			// carry
+			if (m_r[R2] < m_r[R1] || (m_r[R2] == m_r[R1] && result))
+				m_psw |= PSW_C;
+
+			// overflow
+			if (BIT((m_r[R2] ^ m_r[R1]) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// zero
+			if (result == 0)
+				m_psw |= PSW_Z;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
 		break;
 
 	case 0x93:
@@ -1105,66 +1159,150 @@ void clipper_device::execute_instruction()
 		break;
 	case 0xa0:
 		// subw: subtract word
+		m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+		if (u32 const result = m_r[R2] - m_r[R1])
 		{
-			const u32 result = m_r[R2] - m_r[R1];
+			// carry
+			if (m_r[R2] < m_r[R1])
+				m_psw |= PSW_C;
 
-			FLAGS_SUB(m_r[R2], m_r[R1], result);
+			// overflow
+			if (BIT((m_r[R2] ^ m_r[R1]) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
+		else
+		{
+			// zero
+			m_psw |= PSW_Z;
+
+			m_r[R2] = 0;
+		}
 		break;
 
 	case 0xa2:
 		// subq: subtract quick
+		m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+		if (u32 const result = m_r[R2] - m_info.r1)
 		{
-			const u32 result = m_r[R2] - m_info.r1;
+			// carry
+			if (m_r[R2] < m_info.r1)
+				m_psw |= PSW_C;
 
-			FLAGS_SUB(m_r[R2], m_info.r1, result);
+			// overflow
+			if (BIT(m_r[R2] & ~result, 31))
+				m_psw |= PSW_V;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
+		else
+		{
+			// zero
+			m_psw |= PSW_Z;
+
+			m_r[R2] = 0;
+		}
 		break;
 	case 0xa3:
 		// subi: subtract immediate
+		m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+		if (u32 const result = m_r[R2] - m_info.imm)
 		{
-			const u32 result = m_r[R2] - m_info.imm;
+			// carry
+			if (m_r[R2] < m_info.imm)
+				m_psw |= PSW_C;
 
-			FLAGS_SUB(m_r[R2], m_info.imm, result);
+			// overflow
+			if (BIT((m_r[R2] ^ m_info.imm) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 
 			m_r[R2] = result;
 		}
-		// FLAGS: CVZN
+		else
+		{
+			// zero
+			m_psw |= PSW_Z;
+
+			m_r[R2] = 0;
+		}
 		// TRAPS: I
 		break;
 	case 0xa4:
 		// cmpw: compare word
+		m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+		if (u32 const result = m_r[R2] - m_r[R1])
 		{
-			const u32 result = m_r[R2] - m_r[R1];
+			// carry
+			if (m_r[R2] < m_r[R1])
+				m_psw |= PSW_C;
 
-			FLAGS_SUB(m_r[R2], m_r[R1], result);
+			// overflow
+			if (BIT((m_r[R2] ^ m_r[R1]) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 		}
-		// FLAGS: CVZN
+		else
+			// zero
+			m_psw |= PSW_Z;
 		break;
 
 	case 0xa6:
 		// cmpq: compare quick
+		m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+		if (u32 const result = m_r[R2] - m_info.r1)
 		{
-			const u32 result = m_r[R2] - m_info.r1;
+			// carry
+			if (m_r[R2] < m_info.r1)
+				m_psw |= PSW_C;
 
-			FLAGS_SUB(m_r[R2], m_info.r1, result);
+			// overflow
+			if (BIT(m_r[R2] & ~result, 31))
+				m_psw |= PSW_V;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 		}
-		// FLAGS: CVZN
+		else
+			// zero
+			m_psw |= PSW_Z;
 		break;
 	case 0xa7:
 		// cmpi: compare immediate
+		m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
+		if (u32 const result = m_r[R2] - m_info.imm)
 		{
-			const u32 result = m_r[R2] - m_info.imm;
+			// carry
+			if (m_r[R2] < m_info.imm)
+				m_psw |= PSW_C;
 
-			FLAGS_SUB(m_r[R2], m_info.imm, result);
+			// overflow
+			if (BIT((m_r[R2] ^ m_info.imm) & (m_r[R2] ^ result), 31))
+				m_psw |= PSW_V;
+
+			// negative
+			if (BIT(result, 31))
+				m_psw |= PSW_N;
 		}
-		// FLAGS: CVZN
+		else
+			// zero
+			m_psw |= PSW_Z;
 		// TRAPS: I
 		break;
 	case 0xa8:
@@ -1243,7 +1381,7 @@ void clipper_device::execute_instruction()
 
 				m_r[0]--;
 				m_r[1]++;
-				m_r[2] = rotr_32(m_r[2], 8);
+				m_r[2] = std::rotr(m_r[2], 8);
 			}
 			// TRAPS: P,W
 			break;
@@ -1260,9 +1398,22 @@ void clipper_device::execute_instruction()
 				{
 					get_dcammu().load<s8>(m_ssw, m_r[2], [this, byte1](s32 byte2)
 					{
-						const s32 result = byte2 - byte1;
+						if (s32 const result = byte2 - byte1)
+						{
+							m_psw &= ~(PSW_C | PSW_V | PSW_Z | PSW_N);
 
-						FLAGS_SUB(byte2, byte1, result);
+							// carry
+							if (byte2 < byte1)
+								m_psw |= PSW_C;
+
+							// overflow
+							if (BIT((byte2 ^ byte1) & (byte2 ^ result), 31))
+								m_psw |= PSW_V;
+
+							// negative
+							if (BIT(result, 31))
+								m_psw |= PSW_N;
+						}
 					});
 				});
 

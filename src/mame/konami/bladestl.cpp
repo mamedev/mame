@@ -392,7 +392,6 @@ GFXDECODE_END
 void bladestl_state::machine_start()
 {
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
-	m_lamps.resolve();
 
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_last_track));
@@ -425,7 +424,7 @@ void bladestl_state::bladestl(machine_config &config)
 	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(bladestl_state::screen_update));
 	screen.set_palette("palette");

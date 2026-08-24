@@ -206,11 +206,11 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SKIP_GAMEINFO,                              "0",         core_options::option_type::BOOLEAN,    "skip displaying the system information screen at startup" },
 	{ OPTION_UI_FONT,                                    "default",   core_options::option_type::STRING,     "specify a font to use for UI text" },
 	{ OPTION_UI,                                         "cabinet",   core_options::option_type::STRING,     "type of UI (simple|cabinet)" },
-	{ OPTION_RAMSIZE ";ram",                             nullptr,     core_options::option_type::STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         core_options::option_type::BOOLEAN,    "ask for confirmation before exiting" },
 	{ OPTION_UI_MOUSE,                                   "1",         core_options::option_type::BOOLEAN,    "display UI mouse cursor" },
 	{ OPTION_LANGUAGE ";lang",                           "",          core_options::option_type::STRING,     "set UI display language" },
 	{ OPTION_NVRAM_SAVE ";nvwrite",                      "1",         core_options::option_type::BOOLEAN,    "save NVRAM data on exit" },
+	{ OPTION_RTC_TIME,                                   nullptr,     core_options::option_type::STRING,     "start emulation with time" },
 
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "SCRIPTING OPTIONS" },
 	{ OPTION_AUTOBOOT_COMMAND ";ab",                     nullptr,     core_options::option_type::STRING,     "command to execute after machine boot" },
@@ -766,7 +766,7 @@ void emu_options::reevaluate_default_card_software()
 				// values representing cartridge types and such
 				if (default_card_software.empty())
 				{
-					auto *opt = slot.option(slot_opt.default_card_software().c_str());
+					auto *opt = slot.option(slot_opt.default_card_software());
 					if (opt && opt->selectable())
 						continue;
 				}
@@ -985,11 +985,11 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 								std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
 
 								// only add defaults if they exist in this configuration
-								device_t *device = config.root_device().subdevice(slot_name.c_str());
+								device_t *device = config.root_device().subdevice(slot_name);
 								if (device)
 								{
 									device_slot_interface *intf;
-									if (device->interface(intf) && intf->option(fi.value().c_str()))
+									if (device->interface(intf) && intf->option(fi.value()))
 										results.slot_defaults[slot_name] = fi.value();
 								}
 							}

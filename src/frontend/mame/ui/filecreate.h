@@ -17,6 +17,11 @@
 
 #include "imagedev/floppy.h"
 
+#include <functional>
+#include <string>
+#include <string_view>
+#include <vector>
+
 
 class floppy_image_format_t;
 
@@ -27,14 +32,16 @@ namespace ui {
 class menu_confirm_save_as : public menu
 {
 public:
-	menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes);
+	using handler_function = std::function<void ()>;
+
+	menu_confirm_save_as(mame_ui_manager &mui, render_target &target, handler_function &&handler);
 	virtual ~menu_confirm_save_as() override;
 
 private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	bool &m_yes;
+	handler_function m_handler;
 };
 
 
@@ -43,7 +50,15 @@ private:
 class menu_file_create : public menu
 {
 public:
-	menu_file_create(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok);
+	using handler_function = std::function<void (std::string const &)>;
+
+	menu_file_create(
+			mame_ui_manager &mui,
+			render_target &target,
+			device_image_interface &image,
+			std::string_view current_directory,
+			std::string &&starting_name,
+			handler_function &&handler);
 	virtual ~menu_file_create() override;
 
 protected:
@@ -55,11 +70,10 @@ private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	bool &                          m_ok;
-	device_image_interface *        m_image;
-	std::string &                   m_current_directory;
-	std::string &                   m_current_file;
-	const image_device_format *     m_current_format;
+	handler_function                m_handler;
+	device_image_interface &        m_image;
+	std::string_view const          m_current_directory;
+	image_device_format const *     m_current_format;
 	std::string                     m_filename;
 };
 
@@ -68,8 +82,15 @@ private:
 class menu_select_format : public menu
 {
 public:
-	menu_select_format(mame_ui_manager &mui, render_container &container,
-					   const std::vector<const floppy_image_format_t *> &formats, int ext_match, const floppy_image_format_t **result);
+	using handler_function = std::function<void (floppy_image_format_t const &)>;
+
+	menu_select_format(
+			mame_ui_manager &mui,
+			render_target &target,
+			floppy_image_device &fd,
+			std::string_view name,
+			handler_function &&handler);
+
 	virtual ~menu_select_format() override;
 
 private:
@@ -77,9 +98,9 @@ private:
 	virtual bool handle(event const *ev) override;
 
 	// internal state
-	std::vector<const floppy_image_format_t *> m_formats;
-	int                                        m_ext_match;
-	const floppy_image_format_t *             *m_result;
+	handler_function const                      m_handler;
+	std::vector<floppy_image_format_t const *>  m_formats;
+	size_t                                      m_ext_match;
 };
 
 // ======================> menu_select_floppy_init
@@ -87,8 +108,13 @@ private:
 class menu_select_floppy_init : public menu
 {
 public:
-	menu_select_floppy_init(mame_ui_manager &mui, render_container &container,
-		std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result);
+	using handler_function = std::function<void (floppy_image_device::fs_info const &)>;
+
+	menu_select_floppy_init(
+			mame_ui_manager &mui,
+			render_target &target,
+			std::vector<std::reference_wrapper<floppy_image_device::fs_info const> > &&fs,
+			handler_function &&handler);
 	virtual ~menu_select_floppy_init() override;
 
 private:
@@ -96,8 +122,8 @@ private:
 	virtual bool handle(event const *ev) override;
 
 	// internal state
-	std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> m_fs;
-	int *                                                                   m_result;
+	handler_function const                                                      m_handler;
+	std::vector<std::reference_wrapper<floppy_image_device::fs_info const > >   m_fs;
 };
 
 

@@ -230,7 +230,7 @@ void pk32_state::pk32(machine_config &config)
 	RAM(config, m_ram).set_default_size("16M").set_extra_options("8M,4M");
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(pk32_state::kbd_put));
 }
 

@@ -135,7 +135,6 @@ public:
 	void bbusters(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -179,11 +178,6 @@ private:
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_portmap(address_map &map) ATTR_COLD;
 };
-
-void bbusters_state::machine_start()
-{
-	m_gun_recoil.resolve();
-}
 
 void bbusters_state::sound_cpu_w(uint8_t data)
 {
@@ -519,7 +513,7 @@ void bbusters_state::bbusters(machine_config &config)
 	adc.in_callback<5>().set_ioport("GUNX3");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
@@ -531,12 +525,12 @@ void bbusters_state::bbusters(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bbusters);
 	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
-	SNK_BBUSTERS_SPR(config, m_sprites[0], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[0]);
 	m_sprites[0]->set_scaletable_tag("sprites1:scale_table");
 	m_sprites[0]->set_palette("palette");
 	m_sprites[0]->set_spriteram_tag("spriteram1");
 
-	SNK_BBUSTERS_SPR(config, m_sprites[1], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[1]);
 	m_sprites[1]->set_scaletable_tag("sprites2:scale_table");
 	m_sprites[1]->set_palette("palette");
 	m_sprites[1]->set_spriteram_tag("spriteram2");

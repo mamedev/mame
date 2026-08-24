@@ -799,7 +799,7 @@ void tubep_state::tubep(machine_config &config)
 	m_soundlatch->set_separate_acknowledge(true);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(19.968_MHz_XTAL / 4, 320, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tubep_state::screen_update));
 	m_screen->set_palette("palette");
@@ -864,7 +864,7 @@ void rjammer_state::rjammer(machine_config &config)
 	mainlatch.q_out_cb<5>().set(FUNC(rjammer_state::screen_flip_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(19.968_MHz_XTAL / 4, 320, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(rjammer_state::screen_update));
 	m_screen->set_palette("palette");

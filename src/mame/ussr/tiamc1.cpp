@@ -341,7 +341,7 @@ void tiamc1_state::tiamc1(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256);       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
 	screen.set_screen_update(FUNC(tiamc1_state::screen_update_tiamc1));
 	screen.set_palette(m_palette);
@@ -370,7 +370,7 @@ void tiamc1_state::kot(machine_config &config)
 	config.device_remove("2x8253");
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(PIXEL_CLOCK / 4);
 	pit8253.set_clk<2>(SND_CLOCK);                // guess
 	pit8253.out_handler<2>().set(FUNC(tiamc1_state::pit8253_2_w));

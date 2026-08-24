@@ -57,7 +57,7 @@ void skopro_state::skopro(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &skopro_state::skopro_map);
 	m_maincpu->set_disable();
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

@@ -19,9 +19,14 @@
 DEFINE_DEVICE_TYPE(DECO_RMC3, deco_rmc3_device, "deco_rmc3", "DECO RM-C3 PALETTE")
 
 deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: deco_rmc3_device(mconfig, tag, owner, clock, 0)
+{
+}
+
+deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 entries)
 	: device_t(mconfig, DECO_RMC3, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
-	, m_entries(0)
+	, m_entries(entries)
 	, m_indirect_entries(0)
 	, m_prom_region(*this, finder_base::DUMMY_TAG)
 	, m_init(*this)

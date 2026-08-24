@@ -20,6 +20,8 @@
 #include "emu.h"
 #include "flt_biquad.h"
 
+#include <numbers>
+
 // enable this to display debug info about the filters being set up
 #define LOG_SETUP       (1U << 1)
 // enable this to display the filter parameters upon being recalculated
@@ -31,11 +33,6 @@
 
 //#define VERBOSE         (LOG_SETUP)
 #include "logmacro.h"
-
-// we need the M_SQRT2 constant
-#ifndef M_SQRT2
-#define M_SQRT2 1.41421356237309504880
-#endif
 
 // device type definition
 DEFINE_DEVICE_TYPE(FILTER_BIQUAD, filter_biquad_device, "filter_biquad", "Biquad Filter")
@@ -59,7 +56,7 @@ filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const 
 		m_type(biquad_type::HIGHPASS),
 		m_last_sample_rate(0),
 		m_fc(16.0),
-		m_q(M_SQRT2/2.0),
+		m_q(std::numbers::sqrt2 / 2.0),
 		m_gain(1.0),
 		m_input(0.0),
 		m_w0(0.0),
@@ -162,13 +159,13 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lphp_calc(biq
 	}
 	r.type = type;
 	r.gain = 1.0 + (r4 / r3); // == (r3 + r4) / r3
-	r.fc = 1.0 / (2 * M_PI * sqrt(r1 * r2 * c1 * c2));
+	r.fc = 1.0 / (2 * std::numbers::pi * sqrt(r1 * r2 * c1 * c2));
 	if (type == biquad_type::LOWPASS)
 		r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r2 * c2) + ((r1 * c1) * (1.0 - r.gain)));
 	else if (type == biquad_type::HIGHPASS)
 		r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r1 * c1) + ((r2 * c2) * (1.0 - r.gain)));
 	else
-		r.q = M_SQRT2/2.0; // we shouldn't get here but fail gracefully if we do.
+		r.q = std::numbers::sqrt2 / 2.0; // we shouldn't get here but fail gracefully if we do.
 	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_sk_lphp_calc(%f, %f, %f, %f, %f, %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, r3, r4, c1*1000000, c2*1000000, r.fc, r.q, r.gain);
 	return r;
 }
@@ -308,15 +305,15 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_mfb_lowpass_calc
 		fatalerror("filter_biquad_device::opamp_mfb_lowpass_calc() - only c1 can be 0 (and if c1 is 0, r2 can also be 0); parameters were: r1: %f, r2: %f, r3: %f, c1: %f, c2: %f", r1, r2, r3, c1, c2); /* Filter can not be setup.  Undefined results. */
 	}
 	r.gain = -r3 / r1;
-	r.q = (M_SQRT2 / 2.0);
+	r.q = (std::numbers::sqrt2 / 2.0);
 	if (c1 == 0) // if both R2 and C1 are 0, it is the 'proper' first order case. If C1 is 0 (Williams...) the filter is 1st order. There do exist some unusual filters where R2 is not 0, though. In both cases this yields a single-pole filter with limited configurable gain, and a Q of ~0.707. R2 being zero makes the (r1 * r3) numerator term cancel out to 1.0.
 	{
-		r.fc = (r1 * r3) / (2 * M_PI * ((r1 * r2) + (r1 * r3) + (r2 * r3)) * r3 * c2);
+		r.fc = (r1 * r3) / (2 * std::numbers::pi * ((r1 * r2) + (r1 * r3) + (r2 * r3)) * r3 * c2);
 		r.type = biquad_type::LOWPASS1P;
 	}
 	else // common case, (r2 != 0) && (c1 != 0)
 	{
-		r.fc = 1.0 / (2 * M_PI * sqrt(r2 * r3 * c1 * c2));
+		r.fc = 1.0 / (2 * std::numbers::pi * sqrt(r2 * r3 * c1 * c2));
 		r.q = sqrt(r2 * r3 * c1 * c2) / ((r3 * c2) + (r2 * c2) + ((r2 * c2) * -r.gain));
 		r.type = biquad_type::LOWPASS;
 	}
@@ -354,7 +351,7 @@ filter_biquad_device &filter_biquad_device::opamp_mfb_bandpass_setup(double r1, 
 	double const r_in = 1.0 / ((1.0 / r1) + (1.0 / r2));
 	double const gain = (r3 / r1) * (-c2 / (c1 + c2));
 	double const q = sqrt((r3 / r_in) * c1 * c2) / (c1 + c2);
-	double const fc = 1.0 / (2 * M_PI * sqrt(r_in * r3 * c1 * c2)); // technically this is the center frequency of the bandpass
+	double const fc = 1.0 / (2 * std::numbers::pi * sqrt(r_in * r3 * c1 * c2)); // technically this is the center frequency of the bandpass
 	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_mfb_bandpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 	return setup(biquad_type::BANDPASS, fc, q, gain);
 }
@@ -383,7 +380,7 @@ filter_biquad_device &filter_biquad_device::opamp_mfb_highpass_setup(double r1, 
 	}
 
 	double const gain = -c1 / c3;
-	double const fc = 1.0 / (2 * M_PI * sqrt(c2 * c3 * r1 * r2));
+	double const fc = 1.0 / (2 * std::numbers::pi * sqrt(c2 * c3 * r1 * r2));
 	double const q = sqrt(c2 * c3 * r1 * r2) / ((c2 * r1) + (c3 * r1) + ((c3 * r1) * -gain));
 	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_mfb_highpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 	return setup(biquad_type::HIGHPASS, fc, q, gain);
@@ -431,8 +428,8 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_ca
 		fatalerror("filter_biquad_device::opamp_diff_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2); /* Filter can not be setup.  Undefined results. */
 	}
 	r.gain = -r2 / r1;
-	double const f1 = 1.0 / (2 * M_PI * r1 * c1);
-	double const f2 = 1.0 / (2 * M_PI * r2 * c2);
+	double const f1 = 1.0 / (2 * std::numbers::pi * r1 * c1);
+	double const f2 = 1.0 / (2 * std::numbers::pi * r2 * c2);
 	double const fct = (log10(f1) + log10(f2)) / 2.0;
 	r.fc = pow(10.0, fct);
 	r.q = r.fc / (f2 - f1);
@@ -501,7 +498,7 @@ filter_biquad_device::biquad_params filter_biquad_device::rc_rr_bandpass_calc(do
 	const double z = r2 * c1;
 	biquad_params p;
 	p.type = biquad_type::BANDPASS;
-	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.fc = 1.0 / (2.0 * std::numbers::pi * x);
 	p.q = x / y;
 	p.gain = z / y;
 	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_rr_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
@@ -529,7 +526,7 @@ filter_biquad_device::biquad_params filter_biquad_device::rc_cc_bandpass_calc(do
 	const double z = r2 * c2;
 	biquad_params p;
 	p.type = biquad_type::BANDPASS;
-	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.fc = 1.0 / (2.0 * std::numbers::pi * x);
 	p.q = x / y;
 	p.gain = z / y;
 	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_cc_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
@@ -637,7 +634,7 @@ void filter_biquad_device::recalc()
 		double const MGain = fabs(m_gain); // absolute multiplicative gain
 		double const DBGain = log10(MGain) * 20.0; // gain in dB
 		double const AMGain = pow(10, fabs(DBGain) / 20.0); // multiplicative gain of absolute DB
-		double const K = tan(M_PI * m_fc / m_stream->sample_rate());
+		double const K = tan(std::numbers::pi * m_fc / m_stream->sample_rate());
 		double const Ksquared = K * K;
 		double const KoverQ = K / m_q;
 		double normal = 1.0 / (1.0 + KoverQ + Ksquared);
@@ -645,13 +642,13 @@ void filter_biquad_device::recalc()
 		switch (m_type)
 		{
 			case biquad_type::LOWPASS1P:
-				m_a1 = exp(-2.0 * M_PI * (m_fc / m_stream->sample_rate()));
+				m_a1 = exp(-2.0 * std::numbers::pi * (m_fc / m_stream->sample_rate()));
 				m_b0 = 1.0 - m_a1;
 				m_a1 = -m_a1;
 				m_b1 = m_b2 = m_a2 = 0.0;
 				break;
 			case biquad_type::HIGHPASS1P:
-				m_a1 = -exp(-2.0 * M_PI * (0.5 - m_fc / m_stream->sample_rate()));
+				m_a1 = -exp(-2.0 * std::numbers::pi * (0.5 - m_fc / m_stream->sample_rate()));
 				m_b0 = 1.0 + m_a1;
 				m_a1 = -m_a1;
 				m_b1 = m_b2 = m_a2 = 0.0;
@@ -713,19 +710,19 @@ void filter_biquad_device::recalc()
 			case biquad_type::LOWSHELF:
 				if (DBGain >= 0.0)
 				{
-					normal = 1.0 / (1.0 + M_SQRT2 * K + Ksquared);
+					normal = 1.0 / (1.0 + std::numbers::sqrt2 * K + Ksquared);
 					m_b0 = (1.0 + sqrt(2.0 * AMGain) * K + AMGain * Ksquared) * normal;
 					m_b1 = 2.0 * (AMGain * Ksquared - 1.0) * normal;
 					m_b2 = (1.0 - sqrt(2.0 * AMGain) * K + AMGain * Ksquared) * normal;
 					m_a1 = 2.0 * (Ksquared - 1.0) * normal;
-					m_a2 = (1.0 - M_SQRT2 * K + Ksquared) * normal;
+					m_a2 = (1.0 - std::numbers::sqrt2 * K + Ksquared) * normal;
 				}
 				else
 				{
 					normal = 1.0 / (1.0 + sqrt(2.0 * AMGain) * K + AMGain * Ksquared);
-					m_b0 = (1.0 + M_SQRT2 * K + Ksquared) * normal;
+					m_b0 = (1.0 + std::numbers::sqrt2 * K + Ksquared) * normal;
 					m_b1 = 2.0 * (Ksquared - 1.0) * normal;
-					m_b2 = (1.0 - M_SQRT2 * K + Ksquared) * normal;
+					m_b2 = (1.0 - std::numbers::sqrt2 * K + Ksquared) * normal;
 					m_a1 = 2.0 * (AMGain * Ksquared - 1.0) * normal;
 					m_a2 = (1.0 - sqrt(2.0 * AMGain) * K + AMGain * Ksquared) * normal;
 				}
@@ -733,19 +730,19 @@ void filter_biquad_device::recalc()
 			case biquad_type::HIGHSHELF:
 				if (DBGain >= 0.0)
 				{
-					normal = 1.0 / (1.0 + M_SQRT2 * K + Ksquared);
+					normal = 1.0 / (1.0 + std::numbers::sqrt2 * K + Ksquared);
 					m_b0 = (AMGain + sqrt(2.0 * AMGain) * K + Ksquared) * normal;
 					m_b1 = 2.0 * (Ksquared - AMGain) * normal;
 					m_b2 = (AMGain - sqrt(2.0 * AMGain) * K + Ksquared) * normal;
 					m_a1 = 2.0 * (Ksquared - 1.0) * normal;
-					m_a2 = (1.0 - M_SQRT2 * K + Ksquared) * normal;
+					m_a2 = (1.0 - std::numbers::sqrt2 * K + Ksquared) * normal;
 				}
 				else
 				{
 					normal = 1.0 / (AMGain + sqrt(2.0 * AMGain) * K + Ksquared);
-					m_b0 = (1.0 + M_SQRT2 * K + Ksquared) * normal;
+					m_b0 = (1.0 + std::numbers::sqrt2 * K + Ksquared) * normal;
 					m_b1 = 2.0 * (Ksquared - 1.0) * normal;
-					m_b2 = (1.0 - M_SQRT2 * K + Ksquared) * normal;
+					m_b2 = (1.0 - std::numbers::sqrt2 * K + Ksquared) * normal;
 					m_a1 = 2.0 * (Ksquared - AMGain) * normal;
 					m_a2 = (AMGain - sqrt(2.0 * AMGain) * K + Ksquared) * normal;
 				}

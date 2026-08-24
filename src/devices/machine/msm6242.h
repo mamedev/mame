@@ -46,7 +46,7 @@ class msm6242_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto out_int_handler() { return m_out_int_handler.bind(); }
 
@@ -57,11 +57,11 @@ public:
 protected:
 	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_pre_save() override;
-	virtual void device_post_load() override;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	// rtc overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
@@ -114,7 +114,7 @@ class rtc62423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> rtc72421_device
@@ -136,12 +136,11 @@ public:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(MSM6242,  msm6242_device)
 DECLARE_DEVICE_TYPE(RTC62421, rtc62421_device)
 DECLARE_DEVICE_TYPE(RTC62423, rtc62423_device)
 DECLARE_DEVICE_TYPE(RTC72421, rtc72421_device)
 DECLARE_DEVICE_TYPE(RTC72423, rtc72423_device)
-
 
 #endif // MAME_MACHINE_MSM6242_H

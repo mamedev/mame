@@ -124,7 +124,7 @@ static INPUT_PORTS_START( ertictac )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPNAME( 0x02, 0x02, "Demo Sound" )    PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("DSW1:3") // "Demo Sound"
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "Test Mode" )     PORT_DIPLOCATION("DSW1:1")
@@ -243,7 +243,7 @@ void ertictac_state::ertictac(machine_config &config)
 
 	PCF8583(config, "i2cmem", 32.768_kHz_XTAL); // TODO: Are we sure that this HW have I2C device?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 	screen.screen_vblank().append(m_memc, FUNC(acorn_memc_device::vidrq_w));
 

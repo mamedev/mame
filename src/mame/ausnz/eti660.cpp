@@ -306,8 +306,6 @@ void eti660_state::machine_reset()
 
 void eti660_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_color_ram));
 	save_item(NAME(m_color));
 	save_item(NAME(m_keylatch));
@@ -356,7 +354,7 @@ void eti660_state::eti660(machine_config &config)
 	m_maincpu->dma_wr_cb().set(FUNC(eti660_state::dma_w));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

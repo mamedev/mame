@@ -92,6 +92,8 @@
 #include "model2.h"
 #include "model2rd.ipp"
 
+#include "corefloat.h"
+
 #include <cmath>
 #include <limits>
 

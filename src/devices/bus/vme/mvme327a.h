@@ -37,7 +37,7 @@ private:
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;
 
-	required_device<wd37c65c_device> m_fdc;
+	required_device<wd37c65_device> m_fdc;
 	required_device<wd33c93a_device> m_scsi;
 
 	memory_view m_boot;

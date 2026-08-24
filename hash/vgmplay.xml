@@ -435,7 +435,7 @@ license:CC0-1.0
 	<software name="ffant_msxfm">
 		<description>Final Fantasy 1 (MSX FM)</description>
 		<year>1989</year>
-		<publisher>Micro Cabin Corp.</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="cores" value="MSX PSG (AY-3-8910A), MSX-Music (YM2413)"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01_prelude.vgm" />
@@ -91881,7 +91881,7 @@ license:CC0-1.0
 	<software name="flstory_msx">
 		<description>The FairyLand Story (MSX)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="cores" value="AY-3-8910A"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 round start.vgz" />
@@ -129291,7 +129291,7 @@ license:CC0-1.0
 	<software name="overhorz_nes">
 		<description>Over Horizon (NES)</description>
 		<year>1991</year>
-		<publisher>Hot-B (J) / Takara (E)</publisher>
+		<publisher>Hot-B Co. (J) / Takara (E)</publisher>
 		<info name="cores" value="NES APU (RP2A03)"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 title.vgz" />
@@ -129946,7 +129946,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="poolrad_nes">
-		<description>Pool of Radiance (NES)</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (NES)</description>
 		<year>1992</year>
 		<publisher>FCI (U) / Pony Canyon (J)</publisher>
 		<info name="cores" value="NES APU (RP2A03)"/>
@@ -139838,7 +139838,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="yiear_nes">
-		<description>Yie Ar Kung Fu (NES)</description>
+		<description>Yie Ar Kung-Fu (NES)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="cores" value="NES APU (RP2A03)"/>
@@ -160586,7 +160586,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="poolrad_98">
-		<description>Pool of Radiance (NEC PC-9801)</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (NEC PC-9801)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="cores" value="YM2203"/>
@@ -181436,7 +181436,7 @@ license:CC0-1.0
 	<software name="xak3_98">
 		<description>Xak III - The Eternal Recurrence (NEC PC-9801)</description>
 		<year>1993</year>
-		<publisher>Microcabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="cores" value="YM2203"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 main theme from xak iii (title).vgz" />
@@ -248167,7 +248167,7 @@ license:CC0-1.0
 	<software name="ffant_msx2">
 		<description>Final Fantasy (MSX2, PSG)</description>
 		<year>1989</year>
-		<publisher>Micro Cabin Corp.</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="cores" value="PSG (AY8910)"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 prelude.vgz" />
@@ -262402,7 +262402,7 @@ license:CC0-1.0
 	<software name="draghalf_98">
 		<description>Dragon Half (NEC PC-9801)</description>
 		<year>1993</year>
-		<publisher>Microcabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="cores" value="YM2203"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 come on! come on! come and see!!.vgz" />
@@ -268234,7 +268234,7 @@ license:CC0-1.0
 	<software name="kax3_98">
 		<description>Kax III (NEC PC-9801)</description>
 		<year>1993</year>
-		<publisher>Microcabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="cores" value="YM2203"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 startup.vgz" />
@@ -280769,7 +280769,7 @@ license:CC0-1.0
 	<software name="schmeisr">
 		<description>Schmeiser Robo (Arcade)</description>
 		<year>1993</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="cores" value="YM2151, OKIM6295"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 credit.vgz" />
@@ -299990,7 +299990,7 @@ license:CC0-1.0
 	<software name="planetx3_pc">
 		<description>Planet X3 (IBM PC)</description>
 		<year>2018</year>
-		<publisher>8-Bit Productions, LLC.</publisher>
+		<publisher>8-Bit Productions, LLC.</publisher>
 		<info name="cores" value="OPL2 (YM3812)"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 fight for the future.vgz" />
@@ -305638,7 +305638,7 @@ license:CC0-1.0
 	<software name="draghalf_fmt">
 		<description>Dragon Half (FM Towns)</description>
 		<year>1994</year>
-		<publisher>Microcabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="cores" value="YM3438"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 come on! come on! come and see!!.vgz" />
@@ -317547,7 +317547,7 @@ license:CC0-1.0
 	<software name="bluealma_md">
 		<description>Blue Almanac (GEN/MD)</description>
 		<year>1991</year>
-		<publisher>Kodansha / Hot-B</publisher>
+		<publisher>Kodansha / Hot-B Co.</publisher>
 		<info name="cores" value="YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - prologue.vgz" />
@@ -336518,7 +336518,7 @@ license:CC0-1.0
 	<software name="insectx_md">
 		<description>Insector X (GEN/MD)</description>
 		<year>1990</year>
-		<publisher>Taito / Hot-B</publisher>
+		<publisher>Taito / Hot-B Co.</publisher>
 		<info name="cores" value="YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - jack'n (title theme).vgz" />
@@ -338034,7 +338034,7 @@ license:CC0-1.0
 	<software name="kageki_md">
 		<description>Ka-Ge-Ki - Fists of Steel (GEN/MD)</description>
 		<year>1991</year>
-		<publisher>Kaneko / Hot-B</publisher>
+		<publisher>Kaneko / Hot-B Co.</publisher>
 		<info name="cores" value="YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - title theme.vgz" />
@@ -338730,7 +338730,7 @@ license:CC0-1.0
 	<software name="kingsal_md">
 		<description>King Salmon (GEN/MD)</description>
 		<year>1993</year>
-		<publisher>Hot-B / Vic Tokai</publisher>
+		<publisher>Hot-B Co. / Vic Tokai</publisher>
 		<info name="cores" value="SN76496, YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - title theme.vgz" />
@@ -366289,7 +366289,7 @@ license:CC0-1.0
 	<software name="steelemp_md">
 		<description>Steel Empire (Koutetsu Teikoku - Steel Empire, Empire of Steel) (GEN/MD)</description>
 		<year>1992</year>
-		<publisher>Hot-B / Flying Edge</publisher>
+		<publisher>Hot-B Co. / Flying Edge</publisher>
 		<info name="cores" value="SN76496, YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - title theme.vgz" />
@@ -383366,7 +383366,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wwfsup_md">
-		<description>WWF Super Wrestlemania (GEN/MD)</description>
+		<description>WWF Super WrestleMania (GEN/MD)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="cores" value="SN76496, YM2612"/>

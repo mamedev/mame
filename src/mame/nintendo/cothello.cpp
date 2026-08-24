@@ -96,8 +96,6 @@ private:
 
 void cothello_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_counter_timer = timer_alloc(FUNC(cothello_state::counter_tick), this);
 	m_beeper_off = timer_alloc(FUNC(cothello_state::beeper_off), this);
 
@@ -276,7 +274,7 @@ void cothello_state::cothello(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cothello_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64, 192);
 	m_screen->set_visarea(0, 64-1, 0, 192-1);
@@ -285,7 +283,7 @@ void cothello_state::cothello(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

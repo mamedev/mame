@@ -47,6 +47,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bravegf" cloneof="brave" supported="no">
+		<description>Disney/Pixar Rebelle (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252605"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252605 - Rebelle (France).bin" size="0x1000000" crc="1952cdcc" sha1="658f48d75f141f7937e3ff55b376238588f8ffa3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- offset 0x12 is '0x02' is this a version number? cartridge was still only marked as 80-251900(US) -->
 	<software name="cars2" supported="no">
 		<description>Disney/Pixar Cars 2 (USA, rev 2?)</description>
@@ -72,6 +84,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cars2f" cloneof="cars2" supported="no">
+		<description>Disney/Pixar Cars 2 (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251905"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251905 - Cars 2 (France).bin" size="0x1000000" crc="e600f5c8" sha1="7104bb402d3506818e7db90226b94b28419b4aa0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carstoong" supported="no">
 		<description>Disney/Pixar Cars Toon - Hooks unglaubliche Geschichten (Germany)</description>
 		<year>2011</year>
@@ -80,6 +104,18 @@ license:CC0-1.0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-251204 - cars toon - hooks unglaubliche geschichten (ger).bin" size="0x1000000" crc="d36ea48d" sha1="aaa90b3b44a77ea0dd013b38c7d789e23e4a6f55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carstoonf" cloneof="carstoong" supported="no">
+		<description>Disney/Pixar Cars Toon - Martin se la raconte (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251205"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251205 - Disney Pixar - Cars Toon - Martin se la raconte (France).bin" size="0x1000000" crc="0748406a" sha1="d6cb451b870abfc2d8496abb20b2a13ef8e58ad2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,6 +144,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="docmcf" cloneof="docmcg" supported="no">
+		<description>Docteur La Peluche (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-253305"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253305 - Docteur La Peluche (France).bin" size="0x1000000" crc="f7e1ace2" sha1="f080630d33a708cd0fa03e99180209aa47e4cfd5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elmoabby" supported="no">
 		<description>Sesame Street - Elmo and Abby - Nature Explorers (USA)</description>
 		<year>2011</year>
@@ -120,7 +168,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dzuggerg" supported="no">
+	<software name="dinotrg" supported="no">
 		<description>Dino-Zug - Erforsche die Welt (Germany)</description>
 		<year>2014</year>
 		<publisher>VTech</publisher>
@@ -128,6 +176,18 @@ license:CC0-1.0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-252304 - dino-zug - erforsche die welt (ger).bin" size="0x1000000" crc="7019a906" sha1="a9b0caa59cd7119d8fac305729b75b4da0702dc1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinotrf" cloneof="dinotrg" supported="no">
+		<description>Le Dino Train - A la decouverte du monde! (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252305"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252305 - Le Dino Train - A la decouverte du monde (France).bin" size="0x1000000" crc="65002a9a" sha1="77c936de055459385bc0c2bd95242f44e8365433"/>
 			</dataarea>
 		</part>
 	</software>
@@ -152,6 +212,18 @@ license:CC0-1.0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-251104 - disney princess (ger).bin" size="0x1000000" crc="3919d5c1" sha1="1ee7bed2ed36dca4bcedfef382fdfb75f47f19fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dprincesf" cloneof="dprinces" supported="no">
+		<description>Disney Princess (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251105"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251105 - Disney Princess (France).bin" size="0x1000000" crc="cb73c525" sha1="bc65143c114fa070a4bc55205384c4af9318728f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -200,6 +272,18 @@ license:CC0-1.0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-252804 - Jake und die Nimmerland Piraten (GER).bin" size="0x1000000" crc="4b7999b8" sha1="388c30d403183aafa7f2844fcb99c0a95936569b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jakenevf" cloneof="jakenev" supported="no">
+		<description>Jake et les Pirates du pays imaginaire (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252805"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252805 - Jake et les Pirates du pays imaginaire (France).bin" size="0x1000000" crc="3bae692b" sha1="d67289662df7939130fa1f14df4e58a41f684d04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -287,6 +371,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="penmadf" cloneof="penmad" supported="no">
+		<description>DreamWorks/Nickelodeon Les Pingouins de Madagascar - Mission Aventure (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250305"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250305 - Les Pingouins de Madagascar - Mission Aventure (France).bin" size="0x1000000" crc="ee56c618" sha1="11b6c083b4e6b30d896455457662aa6b3bb5fbf6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="planesg" supported="no">
 		<description>Disney Planes (Germany)</description>
 		<year>2013</year>
@@ -295,6 +391,18 @@ license:CC0-1.0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-253004 - planes (ger).bin" size="0x1000000" crc="f945b3cd" sha1="4b7f17f3d7b7edc1626b4e84e26e01ae67bb4f5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planesf" cloneof="planesg" supported="no">
+		<description>Disney Planes (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-253005"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253005 - Disney Planes (France).bin" size="0x1000000" crc="e370c31c" sha1="51b66ad8230d376d6ae3f23055216245c7f27826"/>
 			</dataarea>
 		</part>
 	</software>
@@ -319,6 +427,18 @@ license:CC0-1.0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-251603 - Scooby-Doo - Mystery Town (UK).bin" size="0x1000000" crc="dcc4a1ee" sha1="678e4c83bb120db028ffdd170f4bcfb3aa9d5229"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobymtf" cloneof="scoobymt" supported="no">
+		<description>Scooby-Doo! - Dans la cite clandestine (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251605"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251605 - Scooby-Doo - Dans la cite clandestine (France).bin" size="0x1000000" crc="3607335b" sha1="200ed6254a1abdebf24db8b7e4600801d1f6721f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -430,6 +550,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="tangledf" cloneof="tangled" supported="no">
+		<description>Raiponce (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251705"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251705 - Raiponce (France).bin" size="0x1000000" crc="b9512130" sha1="b65e7e0013ad142af63845af36982059c50c2f37"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="teamumizg" supported="no">
 		<description>Nickelodeon Team Umizoomi - Die große Umiauto Rettung (Germany)</description>
 		<year>2012</year>
@@ -504,6 +636,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="tbellf" cloneof="tbell" supported="no">
+		<description>Disney les Fees - Talents de fees (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250905"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250905 - Disney les Fees - Talents de fees (France).bin" size="0x1000000" crc="d7a2b207" sha1="486b3a7ad99b47ad66535ede17bcb531b2f99a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tstory3" supported="no">
 		<description>Disney/Pixar Toy Story 3 (USA)</description>
 		<year>2010</year>
@@ -536,6 +680,30 @@ license:CC0-1.0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-253604 - ultimate spider-man (ger).bin" size="0x1000000" crc="953d470c" sha1="e74fb15fcb92aadd0d36ec1f5bf6799c46ca5425"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrmenf" supported="no">
+		<description>Les Monsieur Madame - Aventures a Jolieville (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250205"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250205 - Les Monsieur Madame - Aventures a Jolieville (France).bin" size="0x1000000" crc="e1410eed" sha1="1acff360ebf323e5e5a8f974f49ac8e773eb64b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmclubf" supported="no">
+		<description>La Maison de Mickey - La Balle de Pluto (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250505"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250505 - La Maison de Mickey - La Balle de Pluto (France).bin" size="0x1000000" crc="c5f50181" sha1="31afd42bb436a7deced2366c739aef2b6d3896f8"/>
 			</dataarea>
 		</part>
 	</software>

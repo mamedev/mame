@@ -223,7 +223,6 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 void videopin_state::machine_start()
 {
-	m_leds.resolve();
 	m_interrupt_timer = timer_alloc(FUNC(videopin_state::interrupt_callback), this);
 
 	save_item(NAME(m_time_pushed));
@@ -494,7 +493,7 @@ void videopin_state::videopin(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(304, 263);
 	m_screen->set_visarea(0, 303, 0, 255);

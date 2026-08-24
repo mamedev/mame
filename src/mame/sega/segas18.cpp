@@ -160,7 +160,6 @@ TIMER_CALLBACK_MEMBER(segas18_state::initial_boost)
 
 void segas18_state::machine_start()
 {
-	m_gun_recoil.resolve(); // lghost
 	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x2000);
 	m_init_boost_timer = timer_alloc(FUNC(segas18_state::initial_boost), this);
 }
@@ -1403,7 +1402,7 @@ void segas18_state::system18(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.23); // verified on pcb
 	m_screen->set_size(342,262);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
@@ -1413,8 +1412,8 @@ void segas18_state::system18(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas18);
 	PALETTE(config, m_palette).set_entries(2048*2 + 64*3);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1449,7 +1448,7 @@ void segas18_state::lghost_fd1094(machine_config &config)
 	// basic machine hardware
 	m_io->out_pc_callback().set(FUNC(segas18_state::lghost_gun_recoil_w));
 
-	MSM6253(config, m_lghost_adc, 0);
+	MSM6253(config, m_lghost_adc);
 	m_lghost_adc->set_input_cb<0>(FUNC(segas18_state::lghost_y1_r));
 	m_lghost_adc->set_input_cb<1>(FUNC(segas18_state::lghost_x1_r));
 	m_lghost_adc->set_input_cb<2>(FUNC(segas18_state::lghost_y2_r));
@@ -1463,7 +1462,7 @@ void segas18_state::lghost(machine_config &config)
 	// basic machine hardware
 	m_io->out_pc_callback().set(FUNC(segas18_state::lghost_gun_recoil_w));
 
-	MSM6253(config, m_lghost_adc, 0);
+	MSM6253(config, m_lghost_adc);
 	m_lghost_adc->set_input_cb<0>(FUNC(segas18_state::lghost_y1_r));
 	m_lghost_adc->set_input_cb<1>(FUNC(segas18_state::lghost_x1_r));
 	m_lghost_adc->set_input_cb<2>(FUNC(segas18_state::lghost_y2_r));

@@ -12,7 +12,7 @@ TODO:
 	<software name="aliengya" supported="no">
 		<description>Alien no Gyakushū</description>
 		<year>1983?</year>
-		<publisher>Compac</publisher>
+		<publisher>株式会社コムパック (Compac)</publisher>
 		<!-- TODO: Denoting wrong snippet -->
 		<notes><![CDATA[
 LOAD"CAS0:(F)
@@ -32,7 +32,7 @@ RUN
 	<software name="atkseam" supported="no">
 		<description>Attack Sea Monster</description>
 		<year>1983</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<notes><![CDATA[
 WIDTH 40
 LOADM "CAS0:",R
@@ -49,7 +49,7 @@ LOADM "CAS0:",R
 	<software name="backgamn" supported="no">
 		<description>Backgammon</description>
 		<year>1983?</year>
-		<publisher>Compac</publisher>
+		<publisher>株式会社コムパック (Compac)</publisher>
 		<notes><![CDATA[
 RUN "CAS0:(F)"
 ]]></notes>
@@ -65,7 +65,7 @@ RUN "CAS0:(F)"
 	<software name="golf" supported="no">
 		<description>Golf Game</description>
 		<year>1983?</year>
-		<publisher>Compac</publisher>
+		<publisher>株式会社コムパック (Compac)</publisher>
 		<!-- TODO: Denoting wrong snippet -->
 		<notes><![CDATA[
 LAD"CAS0:(F)"
@@ -83,7 +83,7 @@ RAN
 	<software name="kalah" supported="no">
 		<description>Kalah Game</description>
 		<year>1983?</year>
-		<publisher>Compac</publisher>
+		<publisher>株式会社コムパック (Compac)</publisher>
 		<notes><![CDATA[
 LOAD"CAS0:(F)"
 RUN
@@ -100,7 +100,7 @@ RUN
 	<software name="moo" supported="no">
 		<description>Moo Game</description>
 		<year>1983?</year>
-		<publisher>Compac</publisher>
+		<publisher>株式会社コムパック (Compac)</publisher>
 		<notes><![CDATA[
 LOAD "CAS0:(F)"
 RUN
@@ -117,7 +117,7 @@ RUN
 	<software name="renkuzu" supported="no">
 		<description>Renga Kuzushi</description>
 		<year>1983?</year>
-		<publisher>Compac</publisher>
+		<publisher>株式会社コムパック (Compac)</publisher>
 		<notes><![CDATA[
 LOADM "CAS0:(F)",R
 ]]></notes>
@@ -134,7 +134,7 @@ LOADM "CAS0:(F)",R
 	<software name="vegcrush" supported="no">
 		<description>Vegetable Crush</description>
 		<year>1983</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<notes><![CDATA[
 WIDTH 40
 LOADM"CAS0:(S)"

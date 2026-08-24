@@ -42,10 +42,6 @@ public:
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	// configuration
-	void set_sw_pullups(bool enabled) { m_sw_pullups = enabled; }
-	bool has_sw_pullups() const { return m_sw_pullups; }
-
 	// standard options
 	static void default_options(device_slot_interface &slot);
 	static void iiandplus_options(device_slot_interface &slot);
@@ -62,6 +58,8 @@ public:
 	int sw1_r();
 	int sw2_r();
 	int sw3_r();
+	bool has_sw0() const;
+	bool has_sw1() const;
 
 	// annunciator outputs
 	void an0_w(int state);
@@ -87,8 +85,6 @@ protected:
 private:
 	// selected device
 	device_a2gameio_interface *m_intf;
-
-	bool m_sw_pullups;
 };
 
 // ======================> device_a2gameio_interface
@@ -109,10 +105,12 @@ protected:
 	virtual u8 pdl1_r() { return 0; }
 	virtual u8 pdl2_r() { return 0; }
 	virtual u8 pdl3_r() { return 0; }
-	virtual int sw0_r() { return m_connector->has_sw_pullups() ? 1 : 0; }
-	virtual int sw1_r() { return m_connector->has_sw_pullups() ? 1 : 0; }
-	virtual int sw2_r() { return m_connector->has_sw_pullups() ? 1 : 0; }
-	virtual int sw3_r() { return m_connector->has_sw_pullups() ? 1 : 0; }
+	virtual int sw0_r() { return 1; }
+	virtual int sw1_r() { return 1; }
+	virtual int sw2_r() { return 1; }
+	virtual int sw3_r() { return 1; }
+	virtual bool has_sw0() const { return false; }
+	virtual bool has_sw1() const { return false; }
 
 	// optional output overrides
 	virtual void an0_w(int state) { }

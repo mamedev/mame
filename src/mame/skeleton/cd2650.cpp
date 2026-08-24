@@ -315,7 +315,7 @@ void cd2650_state::cd2650(machine_config &config)
 	// "Morse Code" program by Mike Durham.
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(14'192'640), 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES);
 	screen.set_screen_update(FUNC(cd2650_state::screen_update));
 	screen.set_palette("palette");
@@ -331,7 +331,7 @@ void cd2650_state::cd2650(machine_config &config)
 	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(cd2650_state::kbd_put));
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);

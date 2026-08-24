@@ -392,7 +392,7 @@ void xorworld_ms_state::xorworld_ms(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &xorworld_ms_state::xorworld_ms_map);
 	m_maincpu->set_vblank_int("screen", FUNC(xorworld_ms_state::irq4_line_hold));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

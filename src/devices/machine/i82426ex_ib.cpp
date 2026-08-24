@@ -63,7 +63,7 @@ void i82426ex_ib_device::device_add_mconfig(machine_config &config)
 	m_dma[1]->out_dack_callback<2>().set([this] (int state) { set_dma_channel(6, state); });
 	m_dma[1]->out_dack_callback<3>().set([this] (int state) { set_dma_channel(7, state); });
 
-	PIC8259(config, m_intc[0], 0);
+	PIC8259(config, m_intc[0]);
 	m_intc[0]->out_int_callback().set([this] (int state) { m_write_intr(state); });
 	m_intc[0]->in_sp_callback().set_constant(1);
 	m_intc[0]->read_slave_ack_callback().set([this] (offs_t offset) -> u8 {
@@ -72,12 +72,12 @@ void i82426ex_ib_device::device_add_mconfig(machine_config &config)
 		return 0;
 	});
 
-	PIC8259(config, m_intc[1], 0);
+	PIC8259(config, m_intc[1]);
 	m_intc[1]->out_int_callback().set(m_intc[0], FUNC(pic8259_device::ir2_w));
 	m_intc[1]->in_sp_callback().set_constant(0);
 
 	// 82C54
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(this->clock() / 12);
 	m_pit->out_handler<0>().set(m_intc[0], FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(this->clock() / 12);
@@ -91,7 +91,7 @@ void i82426ex_ib_device::device_add_mconfig(machine_config &config)
 		m_portb = (m_portb & 0xdf) | (state << 5);
 	});
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set( m_intc[0], FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set( m_intc[0], FUNC(pic8259_device::ir4_w));
 	m_isabus->irq5_callback().set( m_intc[0], FUNC(pic8259_device::ir5_w));

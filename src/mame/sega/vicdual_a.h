@@ -32,14 +32,14 @@ private:
 class borderline_audio_device : public vicdual_audio_device_base
 {
 public:
-	borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class frogs_audio_device : public vicdual_audio_device_base
 {
 public:
-	frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

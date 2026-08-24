@@ -820,7 +820,6 @@ void digdug_state::earom_control_w(uint8_t data)
 
 void galaga_state::machine_start()
 {
-	m_leds.resolve();
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = timer_alloc(FUNC(galaga_state::cpu3_interrupt_callback), this);
 	save_item(NAME(m_main_irq_mask));
@@ -1626,7 +1625,7 @@ void bosco_state::bosco(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(bosco_state::screen_update_bosco));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
@@ -1638,7 +1637,7 @@ void bosco_state::bosco(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bosco);
 	PALETTE(config, m_palette, FUNC(bosco_state::bosco_palette), 64*4 + 64*4 + 4 + 64, 32+64);
 
-	STARFIELD_05XX(config, m_starfield, 0);
+	STARFIELD_05XX(config, m_starfield);
 	m_starfield->set_starfield_config(0, STARFIELD_Y_OFFSET_BOSCO, STARFIELD_X_LIMIT_BOSCO);
 
 	/* sound hardware */
@@ -1702,7 +1701,7 @@ void galaga_state::galaga(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(galaga_state::screen_update_galaga));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
@@ -1714,7 +1713,7 @@ void galaga_state::galaga(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaga);
 	PALETTE(config, m_palette, FUNC(galaga_state::galaga_palette), 64*4 + 64*4 + 4 + 64, 32+64);
 
-	STARFIELD_05XX(config, m_starfield, 0);
+	STARFIELD_05XX(config, m_starfield);
 	m_starfield->set_starfield_config(STARFIELD_X_OFFSET_GALAGA, 0, STARFIELD_X_LIMIT_GALAGA);
 
 	/* sound hardware */
@@ -1818,7 +1817,7 @@ void xevious_state::xevious(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(xevious_state::screen_update_xevious));
 	m_screen->set_palette(m_palette);
@@ -1935,7 +1934,7 @@ void digdug_state::digdug(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(digdug_state::screen_update_digdug));
 	m_screen->set_palette(m_palette);

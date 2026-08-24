@@ -10,7 +10,7 @@
 class igs023_video_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
-	igs023_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs023_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto read_spriteram_callback() { return m_readspriteram_cb.bind(); }
 

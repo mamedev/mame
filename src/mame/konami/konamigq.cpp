@@ -98,6 +98,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_gpu(*this, "gpu"),
+		m_ram(*this, "ram"),
+		m_gpu_ram(*this, "gpu_ram"),
 		m_dasp(*this, "dasp"),
 		m_ncr53cf96(*this, "ncr53cf96"),
 		m_k056800(*this, "k056800"),
@@ -113,8 +116,11 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
 	required_device<tms57002_device> m_dasp;
 	required_device<ncr53cf96_device> m_ncr53cf96;
 	required_device<k056800_device> m_k056800;
@@ -349,11 +355,13 @@ void konamigq_state::machine_reset()
 void konamigq_state::konamigq(machine_config &config)
 {
 	/* basic machine hardware */
-	CXD8530BQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530BQ(config, m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigq_state::konamigq_map);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, this));
 	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, this));
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	M68000(config, m_soundcpu, XTAL(32'000'000)/4); /* 8MHz - measured */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &konamigq_state::konamigq_sound_map);
@@ -376,9 +384,15 @@ void konamigq_state::konamigq(machine_config &config)
 	m_ncr53cf96->drq_handler_cb().set(DEVICE_SELF, FUNC(konamigq_state::scsi_drq));
 
 	/* video hardware */
-	CXD8538Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8538Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0);
+
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

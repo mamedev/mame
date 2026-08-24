@@ -1,0 +1,632 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- Check RAM requirements for each SW;
+- Check if p2000m can really run everything here or it warrants a sharedfeat;
+
+-->
+<softwarelist name="p2000_cart" description="Philips P2000T/P2000M cartridges">
+
+<!-- !Basic -->
+
+	<software name="basicnl">
+		<description>Cassette Basic (v1.1, Netherlands)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<!-- "BASICNL1.1.bin" floating around same as this -->
+				<rom name="basic.rom" size="0x4000" crc="9d9d38f9" sha1="fb5100436c99634a2592a10dff867f85bcff7aec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicnl2" cloneof="basicnl" supported="partial">
+		<description>Cassette Basic (v1.0 Netherlands)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+[SAA5050] No cursor
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="BASICNL1.0.bin" size="0x4000" crc="99975042" sha1="7735126003ad7e2835f1d3d689b3e116fc5bf51e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicnlh" cloneof="basicnl" supported="partial">
+		<description>Cassette Basic (1A2 PDOS hack)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+PDOS implications untested
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="BASICNL1.1A2.bin" size="0x4000" crc="0d5239ff" sha1="a6313ab7cc2d052427ba852f3035377bbf76bf63" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jwsbasic" cloneof="basicnl" supported="no">
+		<description>JWSBasic</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Disk Basic
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="JWSBasic.bin" size="0x4000" crc="7b7aedab" sha1="f5a0c98c2794b1288ab39ce2f25623fa425bbf6d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicen" supported="partial">
+		<description>Extended Basic (Release 1.0 DA)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+[SAA5050] No cursor
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="BASICEN1.0.bin" size="0x4000" crc="0c8ecec4" sha1="fe34d22c9096a8572b1c431c1c77ec351e8557d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic24" supported="no">
+		<!-- Disk Basic -->
+		<description>Basic-24</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"DISK BASIC LOAD ERROR"
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="Basic-24.bin" size="0x4000" crc="6cb8e392" sha1="a2a0956c409ed1143604941f601d32372c0e04fb" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Operating Systems -->
+
+	<software name="cpmnater" supported="no">
+		<description>CP/M Nater</description>
+		<year>1987?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"No CP/M printer present"
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="CPM Nater.bin" size="0x4000" crc="3b1f4d1e" sha1="73de7c2d9b9144e48a1171c233b3b84bb849cc30" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Applications -->
+
+	<software name="bis" supported="no">
+		<description>BIS Terminal Program (English)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+Requires [SLOT2] I/O module (dual RS-232)
+Requires [FDC]
+https://retroordenadoresorty.blogspot.com/2024/09/interface-bildschirmtext-io-modul-p2171.html
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="BIS.bin" size="0x4000" crc="b9e6b089" sha1="415ebe69e953feb56a7132e0e66478ed82797902" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bildtext" cloneof="bis" supported="no">
+		<description>Bildschirmtext (German)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="BILDSCHIRMTEXT_DE.bin" size="0x4000" crc="14f11de8" sha1="eed014a31edb0d59d50098b78681d97284b5ff06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecol" supported="no">
+		<description>FTU/OC ECOL 3.0</description>
+		<year>1984?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Untested, wants a tape?
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ECOL3.0.bin" size="0x4000" crc="d2e357a7" sha1="00d073afc0ddf929dd8b7e57b9e553197481532c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eprom" supported="no">
+		<description>P2000 EPROM Programmer</description>
+		<year>198?</year>
+		<!-- auteurs: Ron E. & ZERO -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Likely requires a [SLOT2] cart
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="EPROM-programmer.bin" size="0x3000" crc="64112dbe" sha1="8ecdf7fd65d06c6e1931720e141315c2c17e44fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="familie4" supported="no">
+		<description>Familiegeheugen (v4.L)</description>
+		<year>1987</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+Seems to require a [cassette]
+Pressing '?' on [keyboard] doesn't bring information screen
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="familiegeheugen 4.bin" size="0x4000" crc="ae114624" sha1="3aebcd396a1870ff21e574b46a8e67fabc67624d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="familie3" cloneof="familie4" supported="no">
+		<description>Familiegeheugen (v3.L)</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="familiegeheugen 3.bin" size="0x4000" crc="a4c5d1c1" sha1="8fb8eb7a34662c7888878b6e05aed64559e37a79" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="familie2" cloneof="familie4" supported="no">
+		<description>Familiegeheugen (v2.0)</description>
+		<year>1984</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="familiegeheugen 2.bin" size="0x4000" crc="7b1d922a" sha1="cf8501c679952fce06accafd6ece2591f68cd70d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- "Electronische Kaartenbak" subtitle a.k.a. Electronic Card Index, a Teletext writer? -->
+	<software name="flexbase" supported="no">
+		<description>Flexbase (Release 2.1)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="flexbase.bin" size="0x4000" crc="6c7b788b" sha1="2f82a760a64b551a82fd2f7264bed3762f21c510" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flexbasea" cloneof="flexbase" supported="no">
+		<description>Flexbase (Release 1.6)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="flexbase1_6.bin" size="0x4000" crc="e4ce6d3a" sha1="0245374271948d115b70cd955e9ee871fd140c7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nebocalc" supported="no">
+		<description>NeboCalc</description>
+		<year>1980?</year>
+		<publisher>Regents of the University of California</publisher>
+		<notes><![CDATA[
+"LOAD ERROR"
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="NeboCalc.bin" size="0x4000" crc="1359824a" sha1="85ff8f90c7dcdbe8c5fc0af1f31324c1196d8683" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="text2de" supported="no">
+		<description>TEXT (v2, German)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="TEXT2_DE.bin" size="0x4000" crc="67a0c91a" sha1="19c73838fa008cbe4895ae40bcc1f6de604ee635" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: all clones looks same layout -->
+	<software name="text1de" cloneof="text2de" supported="no">
+		<description>TEXT (v1, German)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="TEXT1_DE.bin" size="0x4000" crc="008a41d3" sha1="9b4eaf424e91e5511c46fa4e9070f4f6a4bd609b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekst1" cloneof="text2de" supported="no">
+		<description>Tekst (1.0d, Dutch?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="tekst 1.bin" size="0x4000" crc="66b2bc1e" sha1="aa1a231dec43b187225d735d0ff9c031ad0a0abb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordpr1" cloneof="text2de" supported="no">
+		<description>WordProcessor (v1.2, Dutch?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="WordProcessor 1.bin" size="0x4000" crc="563bafc9" sha1="93a13ca028966583b960dafa758b9ff5e2980e17" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordpr2" cloneof="text2de" supported="no">
+		<description>WordProcessor (v2.0, Dutch?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="WordProcessor 2.bin" size="0x4000" crc="3b89ee86" sha1="da8ec1a9b78660139ebd5c405a350210f0529644" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="text2k" supported="no">
+		<description>Text-2000 (v3.0)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="Text2000 3.bin" size="0x4000" crc="c05e0473" sha1="5919b18b7daf830377c84d1ffff553d821a7960f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="text2ka" cloneof="text2k" supported="no">
+		<description>Text-2000 (v2.0)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="Text2000 2.bin" size="0x3000" crc="2b6b56d8" sha1="d2626e88aedd1651e25791498a72cd31cf47fdf6" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Programming Languages -->
+
+	<software name="asm59" supported="no">
+		<description>P2000 Assembler (v5.9)</description>
+		<year>198?</year>
+		<!-- Ron Eijnthoven -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="assembler 5.9.bin" size="0x4000" crc="a50e0e68" sha1="89ae3bafacf8e7109e7b8acd0bc9d346161d0d15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asm56" cloneof="asm59" supported="no">
+		<description>P2000 Assembler (v5.6)</description>
+		<year>198?</year>
+		<!-- Ron Eijnthoven -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="assembler 5.6.bin" size="0x4000" crc="1ab4f488" sha1="4606c775b333d394a304986fffca82fe6cfa0c98" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth" supported="no">
+		<description>P2000 Forth</description>
+		<year>1986</year>
+		<!-- F.L. van der Markt -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="Forth.bin" size="0x2900" crc="345df79c" sha1="73ef669e06522673102488a92ddfd2d0f3239b39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ucsdpas" supported="no">
+		<description>UCSD Pascal</description>
+		<year>1980?</year>
+		<publisher>Regents of the University of California</publisher>
+		<notes><![CDATA[
+"Pascal Load Error"
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="UCSD Pascal.bin" size="0x4000" crc="58a11897" sha1="50c405f39c084bc7346206907b3f8bcec2a2b8a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zemon" supported="no">
+		<description>Zemon Z80 Assembler (v1.4)</description>
+		<year>1985</year>
+		<!-- F. Jalvingh & L. Hilgersom -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="Zemon 1.4.bin" size="0x4000" crc="912c7455" sha1="53bf77ff64a113c289fcba0529195e1cfc3e383e" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Diagnostics -->
+
+	<software name="main2" supported="no">
+		<description>Maintenance (Release 2.2)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+Crashes in RAM test if less than 64kb
+[display] Various screens expects 80 char width
+Various unsupported features
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="Maintenance 2.bin" size="0x4000" crc="3eaba205" sha1="022a4c8c5e18f2566cc12a6304f5800ca95d613e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="main1" cloneof="main2" supported="no">
+		<description>Maintenance (Release 1)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="MAINT1.bin" size="0x4000" crc="6e3bc292" sha1="f8ffe80de237241b197f46e97df513eb61c2ad6f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="main1a" cloneof="main2" supported="no">
+		<description>Maintenance (Release 1, alt)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<!-- odd size, bad? -->
+				<rom name="Maintenance 1.bin" size="0x3000" crc="711e96d4" sha1="fd8d9eda5941179d3f4dad831f636e5036afc958" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games -->
+
+	<software name="brkwall" supported="partial">
+		<description>Brick-Wall</description>
+		<!-- original is '82, this conversion may be later -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Optional [joystick] support
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x3b67">
+				<rom name="Brick-Wall.bin" size="0x3b67" crc="002713a8" sha1="9ae4ba67c8e9bec1ad444f8c9364eb8ab5baf0c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doolhof">
+		<description>Doolhof</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x23c1">
+				<rom name="Doolhof.bin" size="0x23c1" crc="ac493cd9" sha1="a4922027d2a4f06fe7aefcbf0d38e7ca29037f53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fraxxon" supported="partial">
+		<description>Fraxxon: Space Fight II (joystick)</description>
+		<year>19??</year>
+		<publisher>LBK Production</publisher>
+		<notes><![CDATA[
+Optional [joystick] support
+]]></notes>
+		<info name="required_ram" value="32KB" />
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x3fbe">
+				<rom name="Fraxxon (joystick).bin" size="0x3fbe" crc="80e38fa5" sha1="732cb508208ff8af157fe1bdfe75f18918f90103" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghosthnt" supported="no">
+		<description>Ghosthunt</description>
+		<year>19??</year>
+		<!-- Loek & Ralph -->
+		<publisher>Error Soft</publisher>
+		<notes><![CDATA[
+Black screen, [CTC]?
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x3711">
+				<rom name="Ghosthunt.bin" size="0x3711" crc="6d1ad444" sha1="4829e38ffd8d72865e1e70f30199104a92a67e69" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lazybug">
+		<description>Lazy Bug</description>
+		<year>1984</year>
+		<publisher>Double Brain!</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x2dd7">
+				<rom name="Lazy Bug.bin" size="0x2dd7" crc="dabce382" sha1="c5262af5bd3e9c99e73a7ee04fa2f5f07f2cd5b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkong">
+		<description>Monkey Kong</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x29c3">
+				<rom name="Monkey Kong.bin" size="0x29c3" crc="dbc6839a" sha1="1e06f8d8bb18f81f0a327b9b7f0403666d2f1e42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulpede">
+		<description>Multipede</description>
+		<year>19??</year>
+		<publisher>Double Brain!</publisher>
+		<!-- PvH, WB Produktions -->
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x2485">
+				<rom name="Multipede.bin" size="0x2485" crc="e6d8d5f9" sha1="d670c730d034c31a6503d39169e1625356ee9d2e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcfight">
+		<description>Space Fight</description>
+		<year>19??</year>
+		<!-- Lucas Benjamin Kruijswijk -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires zero fill on unused part otherwise no enemy appear (verify)
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom value="0x00" size="0x4000" loadflag="fill" />
+				<rom name="Space Fight.bin" size="0x2b65" crc="8f9a815f" sha1="8d4439e0f9ff6fc8bdedfa1a2809ea65387f2e0f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>19??</year>
+		<publisher>B.&amp; E. Soft</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x24d6">
+				<rom name="Tetris.bin" size="0x24d6" crc="ed58aece" sha1="43f31d9aeac842d7a93f886cd0814b2d44e9cdbb" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Unsorted -->
+
+	<software name="mcpm" supported="no">
+		<description>MCPM</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Crashes at startup
+Reload unconfirmed (doesn't have $1000 bit 3 low)
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="MCPM.bin" size="0x2000" crc="7e42295f" sha1="8c81089d70c579c2a2ac558896d216254b32837c" />
+				<rom size="0x2000" offset="0x2000" loadflag="reload"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

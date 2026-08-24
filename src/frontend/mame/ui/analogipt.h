@@ -26,7 +26,7 @@ namespace ui {
 class menu_analog : public menu
 {
 public:
-	menu_analog(mame_ui_manager &mui, render_container &container);
+	menu_analog(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_analog() override;
 
 protected:

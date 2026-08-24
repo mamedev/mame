@@ -4,6 +4,8 @@
 #include "se3208.h"
 #include "se3208dis.h"
 
+#include "endianness.h"
+
 #define LOG_ALIGN (1 << 1)
 
 #define VERBOSE (0)

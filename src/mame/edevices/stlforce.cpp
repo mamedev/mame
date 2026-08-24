@@ -255,7 +255,7 @@ void stlforce_state::stlforce(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 32*8);
@@ -265,7 +265,7 @@ void stlforce_state::stlforce(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	edevices_sforce_device &video(EDEVICES_SFORCE_VID(config, "video", 0, m_palette, gfx_stlforce));
+	edevices_sforce_device &video(EDEVICES_SFORCE_VID(config, "video", m_palette, gfx_stlforce));
 	video.set_bg_videoram_tag("bg_videoram");
 	video.set_mlow_videoram_tag("mlow_videoram");
 	video.set_mhigh_videoram_tag("mhigh_videoram");

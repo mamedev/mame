@@ -221,7 +221,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void jubileep(machine_config &config);
+	void jubileep(machine_config &config) ATTR_COLD;
 
 private:
 	void jubileep_videoram_w(offs_t offset, uint8_t data);
@@ -234,7 +234,6 @@ private:
 	void jubileep_cru_map(address_map &map) ATTR_COLD;
 	void jubileep_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	uint8_t mux_sel = 0;
@@ -685,7 +684,7 @@ void jubilee_state::jubileep(machine_config &config)
 	NVRAM(config, "videoworkram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);                         /* (47+1*8, 38+1*8) from CRTC settings */

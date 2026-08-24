@@ -16,7 +16,7 @@ class att6300p_mmu_device :  public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	att6300p_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	att6300p_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto trapio_callback() { return m_trapio.bind(); }
 

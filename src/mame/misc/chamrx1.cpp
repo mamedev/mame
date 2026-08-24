@@ -57,7 +57,7 @@ void chamrx1_state::chamrx1(machine_config &config)
 	PENTIUM4(config, m_maincpu, 100'000'000); // actually 2.66 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &chamrx1_state::chamrx1_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

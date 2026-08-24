@@ -25,6 +25,7 @@
 #include "strconv.h"
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
 // only for oslog callback
 #include <functional>
@@ -86,7 +87,7 @@ int main(int argc, char** argv)
 
 #if defined(SDLMAME_MACOSX) && SDL_VERSION_ATLEAST(3, 4, 0)
 	// disable the popup accents menu on macOS
-	SDL_SetHint(SDL_HINT_MAC_PRESS_AND_HOLD, 0);
+	SDL_SetHint(SDL_HINT_MAC_PRESS_AND_HOLD, "false");
 #endif
 
 	// FIXME: this should be done differently

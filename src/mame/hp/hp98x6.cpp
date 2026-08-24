@@ -263,7 +263,7 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp98x6_rom");
 
-	DIO16(config, m_dio_bus, 0);
+	DIO16(config, m_dio_bus);
 	m_dio_bus->set_program_space(m_cpu, AS_PROGRAM);
 	m_cpu->reset_cb().append(m_dio_bus, FUNC(bus::hp_dio::dio16_device::reset_in));
 	// IRQ mergers
@@ -285,8 +285,8 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 
 	m_upi->irq1_write_cb().set(m_irq1_merger, FUNC(input_merger_any_high_device::in_w<1>));
 
-	DIO16_SLOT(config, "slot0", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
-	DIO16_SLOT(config, "slot1", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
+	DIO16_SLOT(config, "slot0", "diobus", dio16_hp98x6_cards, nullptr, false);
+	DIO16_SLOT(config, "slot1", "diobus", dio16_hp98x6_cards, nullptr, false);
 }
 
 void hp98x6_base_state::cpu_mem_map(address_map &map)
@@ -401,7 +401,7 @@ void hp9816_state::hp9816(machine_config &config)
 {
 	hp98x6_base_state::hp98x6_base(config, DOT_CLOCK_9816, 10);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
+	SCREEN(config, m_screen).set_color(rgb_t::white());
 	// Parameters for 50 Hz frame rate
 	m_screen->set_raw(DOT_CLOCK_9816, 1040, 0, 800, 384, 0, 300);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
@@ -972,6 +972,7 @@ void hp9826_36_state::machine_start()
 void hp9826_36_state::machine_reset()
 {
 	hp98x6_base_state::machine_reset();
+	m_fdc->dden_w(0);
 	m_curr_floppy = nullptr;
 	floppy_reset();
 }
@@ -996,7 +997,6 @@ void hp9826_36_state::hp9826_36(machine_config &mconfig, unsigned dot_clock, int
 
 	FD1793(mconfig, m_fdc, HPIB_CLOCK / 5);
 	m_fdc->set_force_ready(true);
-	m_fdc->dden_w(0);
 	m_fdc->intrq_wr_callback().set(FUNC(hp9826_36_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(hp9826_36_state::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(hp9826_36_state::fdc_hld_w));
@@ -1335,7 +1335,7 @@ void hp9826_state::hp9826(machine_config &mconfig)
 {
 	hp9826_36(mconfig, DOT_CLOCK_9826.value(), 8);
 
-	SCREEN(mconfig, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
+	SCREEN(mconfig, m_screen).set_color(rgb_t::white());
 	m_screen->set_raw(DOT_CLOCK_9826, 520, 0, 400, 321, 0, 300);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
@@ -1539,7 +1539,7 @@ void hp9836_state::hp9836(machine_config &mconfig)
 	// In the horizontal direction everything is doubled to account for half pixels
 	hp9826_36(mconfig, DOT_CLOCK_9836 * 2, 18);
 
-	SCREEN(mconfig, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
+	SCREEN(mconfig, m_screen).set_color(rgb_t::white());
 	// Parameters for 50 Hz frame rate
 	m_screen->set_raw(DOT_CLOCK_9836 * 2, 2070, 0, 1536, 498, 0, 390);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
@@ -1872,7 +1872,7 @@ void hp9836c_state::hp9836c(machine_config &mconfig)
 	// In the horizontal direction everything is doubled to account for half pixels
 	hp9826_36(mconfig, DOT_CLOCK_9836 * 2, 18);
 
-	SCREEN(mconfig, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(mconfig, m_screen);
 	// Parameters for 50 Hz frame rate
 	m_screen->set_raw(DOT_CLOCK_9836 * 2, 2070, 0, 1536, 498, 0, 390);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));

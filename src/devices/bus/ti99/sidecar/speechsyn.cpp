@@ -253,14 +253,14 @@ void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
 	m_vsp->ready_cb().set(FUNC(ti_speech_synthesizer_device::speech_ready));
 	m_vsp->add_route(ALL_OUTPUTS, "speech_out", 0.50);
 
-	TMS6100(config, "vsm", 0);
+	TMS6100(config, "vsm");
 	m_vsp->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
 	m_vsp->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
 	m_vsp->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
 	m_vsp->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
 	m_vsp->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
 
-	TI99_IOPORT(config, m_port, 0, ti99_ioport_options_evpc1, nullptr);
+	TI99_IOPORT(config, m_port, ti99_ioport_options_evpc1, nullptr);
 	m_port->extint_cb().set(FUNC(ti_speech_synthesizer_device::extint));
 	m_port->ready_cb().set(FUNC(ti_speech_synthesizer_device::extready));
 }

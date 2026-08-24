@@ -2,77 +2,77 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    PC-9801 MEMSW interface
+PC-9801 MEMSW interface
 
-    A CMOS-like interface that maps in the TVRAM area
+A CMOS-like interface that maps in the TVRAM area
 
-    Reference URL:
-    http://ohta.music.coocan.jp/packen/board/memsw.htm
-    Running the MON command under BASIC allows the user to change these
-    settings.
-    ssw -> for displaying current settings on screen;
-    ssw#<cr> -> to change the given # (new hex number after striking enter)
+Reference URL:
+http://ohta.music.coocan.jp/packen/board/memsw.htm
+Running the MON command under BASIC allows the user to change these
+settings.
+ssw -> for displaying current settings on screen;
+ssw#<cr> -> to change the given # (new hex number after striking enter)
 
-    List of settings, parenthesis for default if not zero
-    SW1 $A3FE2
-    xx-- ---- stop bit length (01)
-    --x- ---- parity specification
-    ---x ---- parity check
-    ---- xx-- data bit length (10)
-    ---- --x- communication method
-    ---- ---x X parameter
+List of settings, parenthesis for default if not zero
+SW1 $A3FE2
+xx-- ---- stop bit length (01)
+--x- ---- parity specification
+---x ---- parity check
+---- xx-- data bit length (10)
+---- --x- communication method
+---- ---x X parameter
 
-    SW2 $A3FE6
-    x--- ---- S parameter
-    -x-- ---- line feed code when sending
-    --x- ---- line feed code when receiving
-    ---x ---- Japanese shift code
-    ---- xxxx transfer speed (0101)
+SW2 $A3FE6
+x--- ---- S parameter
+-x-- ---- line feed code when sending
+--x- ---- line feed code when receiving
+---x ---- Japanese shift code
+---- xxxx transfer speed (0101)
 
-    SW3 $A3FEA
-    x--- ---- Operation when DEL code is received (input / output mode)
-    x--- ---- Operation when DEL code is received (terminal mode)
-    -x-- ---- Text screen color
-    --x- ---- Maximum operating frequency for V30 coprocessor
-    ---x ---- With or without V30 coprocessor
-    ---- x--- Coprocessor for 80286,386
-    ---- -xxx Conventional memory size (100)
+SW3 $A3FEA
+x--- ---- Operation when DEL code is received (input / output mode)
+x--- ---- Operation when DEL code is received (terminal mode)
+-x-- ---- Text screen color
+--x- ---- Maximum operating frequency for V30 coprocessor
+---x ---- With or without V30 coprocessor
+---- x--- Coprocessor for 80286,386
+---- -xxx Conventional memory size (100)
 
-    SW4 $A3FEE
-    x--- ---- Expansion ROM CE000-CFFFF
-    -x-- ---- Expansion ROM CA000-CBFFF
-    --x- ---- Expansion ROM D4000-D5FFF
-    ---x ---- Expansion ROM D0000-D3FFF
-    ---- x--- Expansion ROM CC000-CFFFF
-    ---- -x-- Expansion ROM C8000-C9FFF
-    ---- --xx (Unused)
+SW4 $A3FEE
+x--- ---- Expansion ROM CE000-CFFFF
+-x-- ---- Expansion ROM CA000-CBFFF
+--x- ---- Expansion ROM D4000-D5FFF
+---x ---- Expansion ROM D0000-D3FFF
+---- x--- Expansion ROM CC000-CFFFF
+---- -x-- Expansion ROM C8000-C9FFF
+---- --xx (Unused)
 
-    SW5 $A3FF2
-    xxxx ---- Select boot device (0000)
-    1100 ---- SCSI HDD #1
-    1011 ---- HDD #2
-    1010 ---- HDD #1
-    1000 ---- ROM BASIC
-    0110 ---- MO disk
-    0100 ---- 1MB FDD
-    0010 ---- 640K FDD
-    0000 ---- standard
-    ???? ---- ROM BASIC
-    ---- x--- Screen Hard copy color
-    ---- -x-- Use HDD user ID
-    ---- --x- Prioritize HDD with device name
-    ---- ---x PC-PR201 series used (1)
+SW5 $A3FF2
+xxxx ---- Select boot device (0000)
+1100 ---- SCSI HDD #1
+1011 ---- HDD #2
+1010 ---- HDD #1
+1000 ---- ROM BASIC
+0110 ---- MO disk
+0100 ---- 1MB FDD
+0010 ---- 640K FDD
+0000 ---- standard
+???? ---- ROM BASIC
+---- x--- Screen Hard copy color
+---- -x-- Use HDD user ID
+---- --x- Prioritize HDD with device name
+---- ---x PC-PR201 series used (1)
 
-    SW5 $A3FF6
-    --x- ---- Use modem-NCU control function
-    ---x ---- Extended screen hard copy function
-    ---- x--- Use monitor mode (Use extended monitor mode)
-    xx-- -xxx (Unused)
+SW5 $A3FF6
+--x- ---- Use modem-NCU control function
+---x ---- Extended screen hard copy function
+---- x--- Use monitor mode (Use extended monitor mode)
+xx-- -xxx (Unused)
 
 
-    TODO:
-    - Is the mapping truly aligned to 2 bytes? Looks more like 4, needs real
-      HW verification.
+TODO:
+- Is the mapping truly aligned to 2 bytes? Looks more like 4, needs real
+  HW verification.
 
 **************************************************************************************************/
 
@@ -91,7 +91,7 @@ pc98_memsw_device::pc98_memsw_device(const machine_config &mconfig, const char *
 
 void pc98_memsw_device::device_start()
 {
-	save_pointer(NAME(m_bram), m_bram_size);
+	save_item(NAME(m_bram));
 }
 
 
@@ -136,7 +136,7 @@ uint8_t pc98_memsw_device::read(offs_t offset)
 	return m_bram[offset];
 }
 
-void pc98_memsw_device::write(offs_t offset, uint8_t data )
+void pc98_memsw_device::write(offs_t offset, uint8_t data)
 {
 	m_bram[offset] = data;
 }

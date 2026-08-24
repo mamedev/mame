@@ -416,16 +416,11 @@ Notes:
       CN5 - Gun connection for player 1 pump switch
 
 
-Other games not dumped
-----------------------
-Miracle Stadium
-
 Cancelled, prototypes known to exists
 ----------------------
 Chase 1929
 Force Five
 Kenju
-Premier Eleven
 
 **************************************************************************************************/
 
@@ -805,7 +800,7 @@ void atomiswave_state::aw_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atomiswave_state::aw_map);
 	m_maincpu->set_addrmap(AS_IO, &atomiswave_state::aw_port);
 	MACRONIX_29L001MC(config, "awflash");
-	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0));
+	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
@@ -815,28 +810,28 @@ void atomiswave_state::aw_base(machine_config &config)
 void atomiswave_state::aw1c(machine_config &config)
 {
 	aw_base(config);
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", m_maple, 0));
 	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
 	// TODO: isn't it supposed to be just one controller?
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", m_maple, 1));
 	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 void atomiswave_state::aw2c(machine_config &config)
 {
 	aw_base(config);
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", m_maple, 0));
 	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", m_maple, 1));
 	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 void atomiswave_state::aw4c(machine_config &config)
 {
 	aw2c(config);
-	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", m_maple, 2));
 	dcctrl2.set_port_tags("P3.0", "P3.1", "P3.A0", "P3.A1", "P3.A2", "P3.A3", "P3.A4", "P3.A5");
-	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", m_maple, 3));
 	dcctrl3.set_port_tags("P4.0", "P4.1", "P4.A0", "P4.A1", "P4.A2", "P4.A3", "P4.A4", "P4.A5");
 }
 
@@ -1456,6 +1451,24 @@ ROM_START( waidrive )
 	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
 ROM_END
 
+// Sammy AM3AHC-01 type board
+// Miracle Stadium dump: AM3AHC-01 / WA01-7009-0, eight 29DL64DF-70PFTN flash devices
+ROM_START( mirstad )
+	AW_BIOS
+
+	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "u3",  0x0000000, 0x0800000, CRC(c42d3ad7) SHA1(11b6801400cc9b64db4f5098c70f98051dadea08) )
+	// U1 populated, empty
+	ROM_LOAD( "u4",  0x1000000, 0x0800000, CRC(a158e741) SHA1(3f052f5ae5e3454fddd44e380caa747837806173) )
+	ROM_LOAD( "u2",  0x1800000, 0x0800000, CRC(861dd84e) SHA1(c8cdef4f8edb48b4ad5792d3fb838a6ccbef6833) )
+	ROM_LOAD( "u15", 0x2000000, 0x0800000, CRC(c8305ab3) SHA1(96a9651bf71b65c7c2d8ba9af3ba239ad8466dfb) )
+	// U17 populated, empty
+	// U14 populated, empty
+	// U16 populated, empty
+
+	ROM_PARAMETER(":rom_board:key", "45")
+ROM_END
+
 // Prototype ROM board
 // Build:May 23 2003 14:40:15
 ROM_START( sushibar )
@@ -1474,6 +1487,32 @@ ROM_START( sushibar )
 	ROM_PARAMETER(":rom_board:key", "25") // Julie
 ROM_END
 
+// Prototype ROM board
+ROM_START( prem11 )
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "ic12", 0x00000000, 0x00800000, CRC(537f7c61) SHA1(2af2717eb13cddace0aaf0e47f50d31348a33b8f) )
+	// IC13 populated, empty
+	ROM_LOAD( "ic14", 0x01000000, 0x00800000, CRC(40c3df38) SHA1(f1ae7673f146b6a3f3d1480863a4ef276ea4465f) )
+	ROM_LOAD( "ic15", 0x01800000, 0x00800000, CRC(789cfc1d) SHA1(d15570efe6fe57cb6d0adc5982e47cfe8f69203e) )
+	ROM_LOAD( "ic16", 0x02000000, 0x00800000, CRC(c72f0497) SHA1(34a8f83a8d5f369ac1b03e090bb740497ee95ba4) )
+	ROM_LOAD( "ic17", 0x02800000, 0x00800000, CRC(1c7a01ca) SHA1(a645311b92ebea3f11384cf41b8cf0d4a8f48c13) )
+	ROM_LOAD( "ic18", 0x03000000, 0x00800000, CRC(2a74e5da) SHA1(b402a8cc903a1d5165931a5906bc18647ade95fe) )
+	ROM_LOAD( "ic19", 0x03800000, 0x00800000, CRC(24a59e7d) SHA1(41bc8df3dd67d87dde0d1989c931e0dc338b0b5e) )
+	ROM_LOAD( "ic20", 0x04000000, 0x00800000, CRC(3baae0e0) SHA1(32c9559b16d45d497fbb06e89cf2ce67741323b3) )
+	ROM_LOAD( "ic21", 0x04800000, 0x00800000, CRC(824b16fe) SHA1(e0353e20d12d91d669a211d8a29f22a63bff9dd8) )
+	//ROM_LOAD( "ic22", 0x05000000, 0x00800000, CRC(b04384ff) SHA1(ab9b830260489a33949144e80fe4fcf679b891c9) ) // garbage unused data
+	// IC23 populated, empty
+	// IC24 populated, empty
+	// IC25 populated, empty
+	// IC26 populated, empty
+	// IC27 populated, empty
+
+	ROM_PARAMETER(":rom_board:key", "25") // Julie
+ROM_END
+
+
 #define GAME_FLAGS (MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING)
 
 // Released in April 2003, boot ROM has (c) 2001 $be0
@@ -1482,6 +1521,7 @@ GAME( 2001, awbios,    0,        aw2c, aw2c, atomiswave_state, init_atomiswave, 
 // game "exe" build timestamps, shown in SYSTEM MENU -> TEST MODE
 GAME( 2003, ggx15,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", GAME_FLAGS ) // none
 GAME( 2003, sprtshot,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS ) // May 02 2003 09:40:31
+GAME( 2003, prem11,    awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "Premier Eleven (prototype)", GAME_FLAGS ) // May 15 2003
 GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Sushi Bar / Toretore! Sushi", GAME_FLAGS ) // May 23 2003 14:40:15
 GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS ) // Jun 02 2003 16:45:35
 GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS ) // Jun 09 2003 10:20:37
@@ -1502,6 +1542,7 @@ GAME( 2005, anmlbskta, anmlbskt, aw2c, aw2c, atomiswave_state, init_atomiswave, 
 GAME( 2005, anmlbskt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket / Hustle Tamaire Kyousou (24 Jan 2005)", GAME_FLAGS ) // Jan 24 2005 14:12:29
 GAME( 2005, waidrive,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT270, "MOSS / Sammy",             "WaiWai Drive", GAME_FLAGS ) // Jan 27 2005 16:21:21
 GAME( 2005, vfurlong,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Progress / Sammy",         "Net@Select: Horse Racing - Victory Furlong", GAME_FLAGS ) // Mar 02 2005 22:10:33
+GAME( 2004, mirstad,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "MOSS / Sammy",             "Miracle Stadium", GAME_FLAGS ) // dumped from AM3AHC-01 / WA01-7009-0 board
 GAME( 2005, rumblef2,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2", GAME_FLAGS ) // Mar 04 2005 19:26:32
 GAME( 2005, ngbc,      awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum", GAME_FLAGS ) // Jun 25 2005 17:00:38
 GAME( 2005, ngbcj,     ngbc,     aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum (Japan)", GAME_FLAGS ) // Jun 25 2005 17:00:38

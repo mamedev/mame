@@ -103,7 +103,7 @@ void tanbus_tanex_device::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set(FUNC(tanbus_tanex_device::bus_irq_w));
 
 	/* acia */
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));

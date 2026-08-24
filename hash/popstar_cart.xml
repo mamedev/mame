@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="popstar_cart" description="Cartridges compatible with Popstar Karaoke">
+
+	<software name="5songs" supported="no"> <!-- this was the pack-in cart -->
+		<description>Popstar Karaoke - 5 Songs</description>
+		<year>2002</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="popstar_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="popstar_karaoke_5songs.u5" size="0x80000" crc="d0010434" sha1="967a0bea0a940757ff1c397c580a23c0055b3fca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popstar1" supported="no">
+		<description>Popstar Karaoke Vol. 1</description>
+		<year>2002</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="popstar_cart">
+			<dataarea name="rom" size="0x80000">
+				<!-- checksum on label doesn't seem to match bytesum? -->
+				<rom name="popstar_karaoke_vol1.u5" size="0x80000" crc="ae1e0550" sha1="6b874630a3925f55b3d9755e331232eee8edd6f0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popstar2" supported="no">
+		<description>Popstar Karaoke Vol. 2</description>
+		<year>2002</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="popstar_cart">
+			<dataarea name="rom" size="0x80000">
+				<!-- checksum on label doesn't seem to match bytesum? -->
+				<rom name="popstar_karaoke_vol2.u5" size="0x80000" crc="38eeac5b" sha1="6cd4f7b7f34fecd68564f9d14e773dba61607db8" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

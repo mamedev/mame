@@ -11,7 +11,7 @@
 class sis950_acpi_device : public lpc_device
 {
 public:
-	sis950_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis950_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;

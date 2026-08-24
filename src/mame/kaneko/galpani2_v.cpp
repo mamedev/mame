@@ -11,6 +11,8 @@
 
 #include "emu.h"
 #include "galpani2.h"
+
+#include "input.h" // for video debug keys
 #include "screen.h"
 
 /*

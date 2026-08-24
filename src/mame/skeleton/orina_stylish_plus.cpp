@@ -6,7 +6,7 @@
     Software List for the cartridges can exist.
 
     There's no external code on either the main board or in the cartridges
-	meaning everything is driven by an MCU in the glob
+    meaning everything is driven by an MCU in the glob
 */
 
 #include "emu.h"

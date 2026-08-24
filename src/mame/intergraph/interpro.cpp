@@ -609,8 +609,6 @@ protected:
 
 void interpro_state::machine_start()
 {
-	m_diag_led.resolve();
-
 	save_item(NAME(m_error));
 	save_item(NAME(m_status));
 	save_item(NAME(m_led));

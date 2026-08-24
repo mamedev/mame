@@ -501,11 +501,7 @@ static const uint8_t cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 
 void aristmk4_state::video_start()
 {
-	int tile;
-	for (tile = 0; tile < m_gfxdecode->gfx(0)->elements(); tile++)
-	{
-		m_gfxdecode->gfx(0)->get_data(tile);
-	}
+	m_gfxdecode->gfx(0)->decode_all();
 }
 
 void aristmk4_state::uBackgroundColour()
@@ -1810,11 +1806,8 @@ void aristmk4_state::init_aristmk4()
 
 void aristmk4_state::machine_start()
 {
-	save_pointer(NAME(m_nvram), 0x1000); // m_nvram
-	m_credit_spend_meter.resolve();
-	m_credit_out_meter.resolve();
-	m_hopper_motor_out.resolve();
-	m_lamps.resolve();
+	save_pointer(NAME(m_nvram), 0x1000);
+
 	m_power_timer = timer_alloc(FUNC(aristmk4_state::power_fail), this);
 	m_note_reset_timer = timer_alloc(FUNC(aristmk4_state::note_input_reset), this);
 	m_coin_reset_timer = timer_alloc(FUNC(aristmk4_state::coin_input_reset), this);
@@ -1870,7 +1863,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 256);

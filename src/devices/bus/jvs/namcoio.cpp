@@ -297,6 +297,8 @@ Note both games use a CCD camera for the gun sensor.
 #include "jvshle.h"
 #include "cpu/f2mc16/mb90570.h"
 
+#include "endianness.h"
+
 #define LOG_OUTPUT (1U << 1)
 
 //#define VERBOSE (LOG_OUTPUT)

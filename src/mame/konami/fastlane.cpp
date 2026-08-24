@@ -352,14 +352,14 @@ void fastlane_state::fastlane(machine_config &config)
 	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(fastlane_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(fastlane_state::palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
-	K007121(config, m_k007121, 0, gfx_fastlane, m_palette, m_screen);
+	K007121(config, m_k007121, gfx_fastlane, m_palette, m_screen);
 	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);

@@ -11,6 +11,8 @@
 
 #include "3dom2.h"
 
+#include "endianness.h"
+
 #include <cmath>
 #include <sstream>
 

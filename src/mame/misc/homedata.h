@@ -15,7 +15,7 @@
 
 class homedata_state : public driver_device
 {
-public:
+protected:
 	homedata_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_vreg(*this, "vreg"),
@@ -33,7 +33,6 @@ public:
 	{
 	}
 
-protected:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -64,7 +63,7 @@ protected:
 	optional_device<generic_latch_8_device> m_mainlatch; // pteacher
 	optional_device<sn76489a_device> m_sn; // mrokumei and pteacher
 
-	optional_ioport_array<12> m_keys;
+	optional_ioport_array<10> m_keys;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;

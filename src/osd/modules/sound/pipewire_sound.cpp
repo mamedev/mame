@@ -710,7 +710,7 @@ uint32_t sound_pipewire::stream_sink_open(uint32_t node, std::string name, uint3
 	pw_stream_connect(stream.m_stream,
 					  PW_DIRECTION_OUTPUT,
 					  PW_ID_ANY,
-					  pw_stream_flags(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS),
+					  pw_stream_flags(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS),
 					  &params, 1);
 
 	while(stream.m_wait_stream)
@@ -763,7 +763,7 @@ uint32_t sound_pipewire::stream_source_open(uint32_t node, std::string name, uin
 	pw_stream_connect(stream.m_stream,
 					  PW_DIRECTION_INPUT,
 					  PW_ID_ANY,
-					  pw_stream_flags(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS),
+					  pw_stream_flags(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS),
 					  &params, 1);
 
 	while(stream.m_wait_stream)

@@ -43,11 +43,11 @@
 
 #pragma once
 
-#include "coretmpl.h"
-
+#include <array>
 #include <cstdlib>
 #include <span>
 #include <string>
+#include <utility>
 #include <vector>
 
 
@@ -126,7 +126,7 @@ public:
 	const std::span<const entry> &entries() const { return m_entries; }
 
 protected:
-	option_guide(const entry *begin, size_t count)
+	option_guide(const entry *begin, std::size_t count)
 		: m_entries(begin, count)
 	{
 	}

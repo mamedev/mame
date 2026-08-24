@@ -13,7 +13,7 @@
 class mach8_device : public ibm8514a_device
 {
 public:
-	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t mach8_ec0_r();
 	void mach8_ec0_w(uint16_t data);

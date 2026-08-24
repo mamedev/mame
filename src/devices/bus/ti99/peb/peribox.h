@@ -122,7 +122,7 @@ protected:
 class peribox_sg_device : public peribox_device
 {
 public:
-	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -159,10 +159,10 @@ protected:
 class peribox_gen_device : public peribox_device
 {
 public:
-	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
@@ -172,7 +172,7 @@ protected:
 class peribox_genmod_device : public peribox_gen_device
 {
 public:
-	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

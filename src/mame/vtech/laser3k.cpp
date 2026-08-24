@@ -1209,7 +1209,7 @@ void laser3k_state::laser3k(machine_config &config)
 	M6502(config, m_maincpu, 14_MHz_XTAL / 14); // 1 or 2 MHz depending on soft switch
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser3k_state::laser3k_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(300*2, 192);
@@ -1231,12 +1231,12 @@ void laser3k_state::laser3k(machine_config &config)
 		FLOPPY_CONNECTOR(config, floppy, applefdintf_device::floppies_525, "525", applefdintf_device::formats_525).enable_sound(true);
 
 	APPLE2_GAMEIO(config, m_gamepad, apple2_gameio_device::joystick_options, nullptr);
-	m_gamepad->set_sw_pullups(true); // 3K9 pullups to +5V
+	// 3K9 pullups to +5V on switches
 
 	I8048(config, "kbdmcu", 14_MHz_XTAL * 2 / 7).set_disable();
 
 	/* the 8048 isn't dumped, so substitute modified real Apple II h/w */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");

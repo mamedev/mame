@@ -74,9 +74,6 @@ private:
 
 void nixieclock_state::machine_start()
 {
-	m_nixie_out.resolve();
-	m_neon_out.resolve();
-
 	std::fill(std::begin(m_nixie), std::end(m_nixie), 0);
 	save_item(NAME(m_nixie));
 }

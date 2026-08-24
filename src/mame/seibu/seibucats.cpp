@@ -308,18 +308,18 @@ void seibucats_state::seibucats(machine_config &config)
 
 	//JRC6355E(config, m_rtc, XTAL(32'768));
 
-	I8251(config, "usart1", 0);
-	I8251(config, "usart2", 0);
+	I8251(config, "usart1");
+	I8251(config, "usart2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	//screen.set_screen_update(FUNC(seibucats_state::screen_update));
 	screen.set_screen_update(FUNC(seibucats_state::screen_update_sys386f));
 	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
 
 	PALETTE(config, m_palette, palette_device::BLACK, 8192);
 
-	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_seibucats);
+	SEI25X_RISE1X(config, m_spritegen, m_palette, gfx_seibucats);
 	m_spritegen->set_screen("screen");
 	// see above
 	m_spritegen->set_pix_raw_shift(6);

@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "pgm2.h"
 
+#include <bit>
+
+
 inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, u32 palette_offset, s16 realx, s16 realy, u16 pal)
 {
 	if (cliprect.contains(realx, realy))
@@ -89,7 +92,7 @@ inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, u32 &palett
 
 inline void pgm2_state::skip_sprite_chunk(u32 &palette_offset, u32 maskdata, bool reverse)
 {
-	s32 bits = population_count_32(maskdata);
+	s32 bits = std::popcount(maskdata);
 
 	if (!reverse)
 	{
@@ -110,7 +113,7 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, u32 &mask_of
 	s16 realxdraw = 0;
 
 	if (flipx ^ reverse)
-		realxdraw = (population_count_32(zoomx_bits) * sizex) - 1;
+		realxdraw = (std::popcount(zoomx_bits) * sizex) - 1;
 
 	for (int xdraw = 0; xdraw < sizex; xdraw++)
 	{

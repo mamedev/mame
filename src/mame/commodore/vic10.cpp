@@ -659,7 +659,7 @@ void vic10_state::vic10(machine_config &config)
 	mos8566.set_addrmap(0, &vic10_state::vic_videoram_map);
 	mos8566.set_addrmap(1, &vic10_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6566_VRETRACERATE);
 	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
 	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);

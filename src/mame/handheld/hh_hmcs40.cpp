@@ -137,7 +137,7 @@ TODO:
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -488,10 +488,9 @@ void bambball_state::bambball(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bambball_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 478);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_bambball);
@@ -638,10 +637,9 @@ void bmboxing_state::bmboxing(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.4");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 529);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 12);
 	config.set_default_layout(layout_bmboxing);
@@ -770,10 +768,9 @@ void bfriskyt_state::bfriskyt(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bfriskyt_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 675);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 22);
 
@@ -893,10 +890,9 @@ void packmon_state::packmon(machine_config &config)
 	m_maincpu->read_d().set(FUNC(packmon_state::input_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 680);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 20);
 	config.set_default_layout(layout_packmon);
@@ -1023,10 +1019,9 @@ void bzaxxon_state::bzaxxon(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.5");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(613, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(11, 19);
 
@@ -1155,10 +1150,9 @@ void zackman_state::zackman(machine_config &config)
 	m_maincpu->write_d().set(FUNC(zackman_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(487, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 30);
 
@@ -1290,10 +1284,9 @@ void bpengo_state::bpengo(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.5");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 759);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 28);
 
@@ -1421,10 +1414,9 @@ void bbtime_state::bbtime(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bbtime_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(379, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(6, 28);
 
@@ -1628,10 +1620,9 @@ void bdoramon_state::bdoramon(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 668);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 20);
 
@@ -1846,10 +1837,9 @@ void bultrman_state::bultrman(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 673);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
@@ -2075,10 +2065,9 @@ void machiman_state::machiman(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1534, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(5, 19);
 
@@ -2382,10 +2371,9 @@ void alnattck_state::alnattck(machine_config &config)
 	m_maincpu->read_d().set(FUNC(alnattck_state::input_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 700);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 20);
 
@@ -2527,10 +2515,9 @@ void cdkong_state::cdkong(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(605, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(11, 28);
 
@@ -2671,10 +2658,9 @@ void cgalaxn_state::cgalaxn(machine_config &config)
 	m_maincpu->write_d().set(FUNC(cgalaxn_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(526, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 15);
 
@@ -2806,10 +2792,9 @@ void cpacman_state::cpacman(machine_config &config)
 	m_maincpu->write_d().set(FUNC(cpacman_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(484, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(11, 26);
 
@@ -2945,10 +2930,9 @@ void cmspacmn_state::cmspacmn(machine_config &config)
 	m_maincpu->write_d().set(FUNC(cmspacmn_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(11, 26);
 
@@ -3083,10 +3067,9 @@ void egalaxn2_state::egalaxn2(machine_config &config)
 	m_maincpu->write_d().set(FUNC(egalaxn2_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(505, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(15, 24);
 
@@ -3172,9 +3155,8 @@ void epacman2_state::epacman2(machine_config &config)
 	egalaxn2(config);
 
 	// video hardware
-	screen_device *screen = subdevice<screen_device>("screen");
+	screen_svg_device *screen = subdevice<screen_svg_device>("screen");
 	screen->set_size(505, 1080);
-	screen->set_visarea_full();
 }
 
 // roms
@@ -3303,10 +3285,9 @@ void einvader2_state::einvader2(machine_config &config)
 	m_maincpu->read_d().set(FUNC(einvader2_state::input_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(469, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 14);
 
@@ -3514,10 +3495,9 @@ void eturtles_state::eturtles(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(484, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(15, 28);
 
@@ -3655,10 +3635,9 @@ void estargte_state::estargte(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 854);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(14, 28);
 
@@ -3787,10 +3766,9 @@ void ghalien_state::ghalien(machine_config &config)
 	m_maincpu->read_d().set(FUNC(ghalien_state::input_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 699);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 20);
 
@@ -3921,10 +3899,9 @@ void gckong_state::gckong(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.5");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(479, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(11, 18);
 	config.set_default_layout(layout_gckong);
@@ -4060,10 +4037,9 @@ void gscobra_state::gscobra(machine_config &config)
 	m_maincpu->write_d().set(FUNC(gscobra_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 852);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 31);
 
@@ -4324,10 +4300,9 @@ void gdigdug_state::gdigdug(machine_config &config)
 	m_maincpu->write_d().set(FUNC(gdigdug_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(476, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 32);
 
@@ -4497,10 +4472,9 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	m_maincpu->write_d().set(FUNC(mwcbaseb_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 478);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_bri_levels(0.001); // cyan elements strobed very briefly?
@@ -4641,10 +4615,9 @@ void msthawk_state::msthawk(machine_config &config)
 	m_maincpu->write_d().set(FUNC(msthawk_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 696);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 21);
 	config.set_default_layout(layout_msthawk);
@@ -4744,10 +4717,9 @@ void pbqbert_state::pbqbert(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.0");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(603, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 29);
 
@@ -4971,10 +4943,9 @@ void tmtron_state::tmtron(machine_config &config)
 	m_maincpu->write_d().set(FUNC(tmtron_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 662);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 22);
 
@@ -5103,10 +5074,9 @@ void kingman_state::kingman(machine_config &config)
 	m_maincpu->write_d().set(FUNC(kingman_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(374, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 21);
 
@@ -5335,10 +5305,9 @@ void vinvader_state::vinvader(machine_config &config)
 	m_maincpu->read_d().set_ioport("IN.1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(233, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 15);
 

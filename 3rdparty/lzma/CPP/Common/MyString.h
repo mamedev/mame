@@ -281,6 +281,8 @@ class AString
   void ReAlloc(unsigned newLimit);
   void ReAlloc2(unsigned newLimit);
   void SetStartLen(unsigned len);
+  
+  Z7_NO_INLINE
   void Grow_1();
   void Grow(unsigned n);
 
@@ -373,6 +375,8 @@ public:
   void SetFromWStr_if_Ascii(const wchar_t *s);
   // void SetFromBstr_if_Ascii(BSTR s);
 
+// private:
+  Z7_FORCE_INLINE
   AString &operator+=(char c)
   {
     if (_limit == _len)
@@ -384,14 +388,16 @@ public:
     _len = len;
     return *this;
   }
-  
+public:
   void Add_Space();
   void Add_Space_if_NotEmpty();
   void Add_OptSpaced(const char *s);
+  void Add_Char(char c);
   void Add_LF();
   void Add_Slash();
   void Add_Dot();
   void Add_Minus();
+  void Add_Colon();
   void Add_PathSepar() { operator+=(CHAR_PATH_SEPARATOR); }
 
   AString &operator+=(const char *s);
@@ -402,6 +408,7 @@ public:
 
   void AddFrom(const char *s, unsigned len); // no check
   void SetFrom(const char *s, unsigned len); // no check
+  void SetFrom_Chars_SizeT(const char* s, size_t len); // no check
   void SetFrom(const char* s, int len) // no check
   {
     SetFrom(s, (unsigned)len); // no check
@@ -422,11 +429,11 @@ public:
   // int CompareNoCase(const char *s) const { return MyStringCompareNoCase(_chars, s); }
   // int CompareNoCase(const AString &s) const { return MyStringCompareNoCase(_chars, s._chars); }
   bool IsPrefixedBy(const char *s) const { return IsString1PrefixedByString2(_chars, s); }
-  bool IsPrefixedBy_Ascii_NoCase(const char *s) const throw();
+  bool IsPrefixedBy_Ascii_NoCase(const char *s) const { return IsString1PrefixedByString2_NoCase_Ascii(_chars, s); }
  
   bool IsAscii() const
   {
-    unsigned len = Len();
+    const unsigned len = Len();
     const char *s = _chars;
     for (unsigned i = 0; i < len; i++)
       if ((unsigned char)s[i] >= 0x80)
@@ -668,6 +675,8 @@ public:
   UString &operator=(const char *s);
   UString &operator=(const AString &s) { return operator=(s.Ptr()); }
 
+// private:
+  Z7_FORCE_INLINE
   UString &operator+=(wchar_t c)
   {
     if (_limit == _len)
@@ -680,12 +689,17 @@ public:
     return *this;
   }
 
-  UString &operator+=(char c) { return (*this)+=((wchar_t)(unsigned char)c); }
-
+private:
+  UString &operator+=(char c); //  { return (*this)+=((wchar_t)(unsigned char)c); }
+public:
+  void Add_Char(char c);
+  // void Add_WChar(wchar_t c);
   void Add_Space();
   void Add_Space_if_NotEmpty();
   void Add_LF();
   void Add_Dot();
+  void Add_Minus();
+  void Add_Colon();
   void Add_PathSepar() { operator+=(WCHAR_PATH_SEPARATOR); }
 
   UString &operator+=(const wchar_t *s);
@@ -713,22 +727,23 @@ public:
   // int CompareNoCase(const wchar_t *s) const { return MyStringCompareNoCase(_chars, s); }
   // int CompareNoCase(const UString &s) const { return MyStringCompareNoCase(_chars, s._chars); }
   bool IsPrefixedBy(const wchar_t *s) const { return IsString1PrefixedByString2(_chars, s); }
+  bool IsPrefixedBy(const char *s) const { return IsString1PrefixedByString2(_chars, s); }
   bool IsPrefixedBy_NoCase(const wchar_t *s) const { return IsString1PrefixedByString2_NoCase(_chars, s); }
-  bool IsPrefixedBy_Ascii_NoCase(const char *s) const throw();
+  bool IsPrefixedBy_Ascii_NoCase(const char *s) const { return IsString1PrefixedByString2_NoCase_Ascii(_chars, s); }
 
   bool IsAscii() const
   {
-    unsigned len = Len();
+    const unsigned len = Len();
     const wchar_t *s = _chars;
     for (unsigned i = 0; i < len; i++)
-      if (s[i] >= 0x80)
+      if ((unsigned)(int)s[i] >= 0x80)
         return false;
     return true;
   }
   int Find(wchar_t c) const { return FindCharPosInString(_chars, c); }
   int Find(wchar_t c, unsigned startIndex) const
   {
-    int pos = FindCharPosInString(_chars + startIndex, c);
+    const int pos = FindCharPosInString(_chars + startIndex, c);
     return pos < 0 ? -1 : (int)startIndex + pos;
   }
 

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="jr100_cass" description="National JR-100 cassettes">
+
+<!-- Supposed to contain 4 programs
+1. Demonstration
+2. Calendar
+3. Mole Game
+4. UFO
+-->
+	<software name="demotape" supported="no">
+		<description>JR100 Demonstration Program</description>
+		<year>1982</year>
+		<publisher>ナショナル (National)</publisher>
+		<info name="alt_title" value="JR-100 デモンストレーションプログラム"/>
+		<part name="cass1" interface="jr100_cass">
+			<dataarea name="cass" size="50019372">
+				<rom name="demonstration program.wav" size="50019372" crc="79266f6b" sha1="ea34d4b910529ef3c5591bb663ed0124cf88703c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invader" supported="no">
+		<description>Invader</description>
+		<year>1982</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="インベーダー"/>
+		<info name="serial" value="J-1007"/>
+		<part name="cass1" interface="jr100_cass">
+			<dataarea name="cass" size="6396460">
+				<rom name="invader.wav" size="6396460" crc="06a1867d" sha1="9bcccbc7618edd51abe8870c7c989dfbd813cc69" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

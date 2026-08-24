@@ -974,7 +974,7 @@ void zaxxon_state::root(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaxxon);
 	PALETTE(config, m_palette, FUNC(zaxxon_state::zaxxon_palette), 256);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(zaxxon_state::screen_update_zaxxon));
 	screen.set_palette(m_palette);
@@ -1046,7 +1046,7 @@ void razmataz_state::razmataze(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SEGAUSBROM(config, "usbsnd", m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -1069,7 +1069,7 @@ void razmataz_state::ixion(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SEGAUSBROM(config, "usbsnd", m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 

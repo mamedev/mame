@@ -91,11 +91,11 @@ const tiny_rom_entry *sis630_gui_device::device_rom_region() const
 
 void sis630_gui_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(sis630_vga_device::screen_update));
 
-	SIS630_VGA(config, m_vga, 0);
+	SIS630_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 64MB according to POST
 	// documentation claims 128MB, assume being wrong

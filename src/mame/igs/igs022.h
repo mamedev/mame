@@ -8,7 +8,7 @@
 class igs022_device : public device_t
 {
 public:
-	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void handle_command();
 
@@ -23,7 +23,7 @@ private:
 	u8 m_stack_ptr;
 
 	optional_shared_ptr<u16> m_sharedprotram;
-	required_memory_region m_rom;
+	required_region_ptr<u8> m_rom;
 
 	u32 read_reg(u16 offset);
 	void write_reg(u16 offset, u32 data);

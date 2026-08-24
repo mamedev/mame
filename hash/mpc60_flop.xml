@@ -1,0 +1,370 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="mpc60_flop" description="Akai MPC60 floppies">
+	<software name="disk1ss" supported="yes">
+		<description>MPC60 Disk 1 - Studio Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="mpc60_disk1_studio_set.hfe" size="2008064" crc="c197e8b6" sha1="aee42d018660344e62bd0a42f4daf6324c891ff1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disk2rs" supported="yes">
+		<description>MPC60 Disk 2 - Rock Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="mpc60_disk2_rock_set.hfe" size="2008064" crc="a01eb230" sha1="79ec727fb8f956b9c693534beb949c8b0354ac5e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disk3ds" supported="yes">
+		<description>MPC60 Disk 3 - Dry Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="mpc60_disk3_dry_set.hfe" size="2008064" crc="5d5c007c" sha1="b915cfe114be7c85516fc40342297366f8fee0ec"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disk4ss" supported="yes">
+		<description>MPC60 Disk 4 - Synth Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="mpc60_disk4_synth_set.hfe" size="2008064" crc="9539afea" sha1="035595f5fc77ec9988cc93ec0b00f1f29cd4183d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl601" supported="yes">
+		<description>MPC60 Sound Library SL601 - Samba Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl601.hfe" size="2008064" crc="2eb88e58" sha1="b544ce1049da5c3da5d36f2cbd5a3b15bb8c6ff6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl602" supported="yes">
+		<description>MPC60 Sound Library SL602 - Ambience Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl602.hfe" size="2008064" crc="2db2005f" sha1="935dbe79e69b05addea9ee89eb4eb1f031a89b5b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl604" supported="yes">
+		<description>MPC60 Sound Library SL604 - Loft Drum</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl604.hfe" size="2008064" crc="464bfa94" sha1="7129221aa2153e2de3543c3e4d48ed5c16ff7ee0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl605" supported="yes">
+		<description>MPC60 Sound Library SL605 - Real Drum</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl605.hfe" size="2008064" crc="76f6ba4f" sha1="61cd4384d14e17e284be59e6017c0f7195019b8b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl606" supported="yes">
+		<description>MPC60 Sound Library SL606 - Solid Drum</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl606.hfe" size="2008064" crc="d227fe12" sha1="ad82623694c8fbe66213d6008eb566ba111ca0ce"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl607" supported="yes">
+		<description>MPC60 Sound Library SL607 - Native Drum</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl607.hfe" size="2008064" crc="45eb987c" sha1="5f391c3de8561f8626683a364eb0710add419ae9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl608" supported="yes">
+		<description>MPC60 Sound Library SL608 - Live Drum</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl608.hfe" size="2008064" crc="8282a126" sha1="19e25c7dc15ff1852c2b36aa6b6429cdc674b362"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl609" supported="yes">
+		<description>MPC60 Sound Library SL609 - LA-1 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl609.hfe" size="2008064" crc="5faa4078" sha1="a1d0bd886cf8b6f5551f2e416a797a8e0f0e0805"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl610" supported="yes">
+		<description>MPC60 Sound Library SL610 - UK-1 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl610.hfe" size="2008064" crc="600696a4" sha1="38f12f41613ca35b5151a68a9602a30406e8b262"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl612" supported="yes">
+		<description>MPC60 Sound Library SL612 - Power Drum</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl612.hfe" size="2008064" crc="b0761ecd" sha1="d13272856fc88406e30238886b86e9c33bf979c9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl613" supported="yes">
+		<description>MPC60 Sound Library SL613 - Metal Drum</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl613.hfe" size="2008064" crc="6a27ac34" sha1="802791a48e4ef063bb1516c70aace654c9278262"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl614" supported="yes">
+		<description>MPC60 Sound Library SL614 - UK-2 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl614.hfe" size="2008064" crc="fb72b0f4" sha1="5fb12522ad06ef46b0acf3639e39151508fd7feb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl615" supported="yes">
+		<description>MPC60 Sound Library SL615 - UK-3 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl615.hfe" size="2008064" crc="77328b9c" sha1="baebecb4f6511155c41a6f5e3459a76aed62d6ea"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl616" supported="yes">
+		<description>MPC60 Sound Library SL616 - UK-4 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl616.hfe" size="2008064" crc="4e4dc7bd" sha1="34f302be0f7d2875b26ac58fd00a81c238297337"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl617" supported="yes">
+		<description>MPC60 Sound Library SL617 - UK-5 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl617.hfe" size="2008064" crc="9317118e" sha1="21a596fc989a857d04e8f33065745d97de52df8c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl618" supported="yes">
+		<description>MPC60 Sound Library SL618 - UK-6 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl618.hfe" size="2008064" crc="2e80d20b" sha1="a6216eeebbc5d1ef59a78820c4aee976a464852a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl619" supported="yes">
+		<description>MPC60 Sound Library SL619 - UK-7 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl619.hfe" size="2008064" crc="5ebe44ab" sha1="a287feb6a587e58b33453f7917d83c33e7921f90"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl620" supported="yes">
+		<description>MPC60 Sound Library SL620 - UK-8 Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl620.hfe" size="2008064" crc="e6e09c02" sha1="69307c4ea0a4843032ec3139493c03f3ea17a20b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl101" supported="yes">
+		<description>MPC60 Sound Library SL101 - Percussion 1</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl101 percussion 1.hfe" size="2008064" crc="f3b86993" sha1="b2cd8319369d5616b19fce19f500dae031ac563c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl102" supported="yes">
+		<description>MPC60 Sound Library SL102 - Live Kit 1</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl102 live kit 1.hfe" size="2008064" crc="d1e2ea2c" sha1="b8908aebfdb4f4b371577e0292a9af1fa63aa8b3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl103" supported="yes">
+		<description>MPC60 Sound Library SL103 - Live Kit 2</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl103 live kit 2.hfe" size="2008064" crc="cd92d49b" sha1="a102d7a7e1b8d67e35b3bc09fb64da4e9bd02aa0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl104" supported="yes">
+		<description>MPC60 Sound Library SL104 - Gated Kit</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl104 gated kit.hfe" size="2008064" crc="47072e48" sha1="50e418a83053ac93a0b4a38cb85bf6d90f521fd3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl105" supported="yes">
+		<description>MPC60 Sound Library SL105 - Electronic Drums 1</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl105 electronic drums 1.hfe" size="2008064" crc="bbed0aea" sha1="c825015151fd7bdfe23218c049f8ce0c2268707d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl106" supported="yes">
+		<description>MPC60 Sound Library SL106 - Percussion 2</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl106 percussion 2.hfe" size="2008064" crc="fb80bc59" sha1="ed547477c71e36eeec15654945515bcb8d4ce8aa"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl107" supported="yes">
+		<description>MPC60 Sound Library SL107 - Tuned Percussion</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl107 tuned percussion.hfe" size="2008064" crc="92339b7e" sha1="93d9bc21b287576587b353e6717f30373a499923"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl108" supported="yes">
+		<description>MPC60 Sound Library SL108 - 808 &amp; 909 Kits</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl108 808 &amp; 9000 kits.hfe" size="2008064" crc="1b854311" sha1="c70582c6de2a954ee6a19b06a60e30cb6ca0b7b2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl109" supported="yes">
+		<description>MPC60 Sound Library SL109 - Live Kit 3</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl109 live kit 3.hfe" size="2008064" crc="4cb9e9fb" sha1="87c0081241e376afc64eab744cfee3fcd67958de"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl110" supported="yes">
+		<description>MPC60 Sound Library SL110 - Live Kit 4</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl110 live kit 4.hfe" size="2008064" crc="19bbad6f" sha1="fa8a8c3923ba28b79a249b6763f8735d8ae06369"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sl111" supported="yes">
+		<description>MPC60 Sound Library SL111 - Live Kit 5</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC60 or MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="2008064">
+				<rom name="sl111 live kit 5.hfe" size="2008064" crc="1df23087" sha1="0f92e121f7aa00b5e55560681a47180dba9439f4"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

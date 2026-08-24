@@ -41,7 +41,7 @@ protected:
 		abuffer(uint32_t channels, uint32_t rate) noexcept;
 		void set_latency(float latency);
 		void clear();
-		void get(int16_t *data, uint32_t samples, bool internal = false) noexcept;
+		void get(int16_t *data, uint32_t samples) noexcept;
 		void push(const int16_t *data, uint32_t samples);
 		uint32_t channels() const noexcept { return m_channels; }
 		uint32_t available() const noexcept;

@@ -148,6 +148,8 @@
 
 #include "formats/flopimg.h"
 
+#include "util/endianness.h"
+
 
 namespace {
 
@@ -603,7 +605,7 @@ void sun3x_state::sun3_80(machine_config &config)
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3x_state::sun3_80_mem);
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	M48T02(config, TIMEKEEPER_TAG);
 
 	SCC8530(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
@@ -644,7 +646,7 @@ void sun3x_state::sun3_80(machine_config &config)
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit
 	TIMER(config, "timer").configure_periodic(FUNC(sun3x_state::sun380_timer), attotime::from_hz(100));
 
-	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	screen_device &bwtwo(SCREEN(config, "bwtwo"));
 	bwtwo.set_screen_update(FUNC(sun3x_state::bw2_update));
 	bwtwo.set_size(1152,900);
 	bwtwo.set_visarea(0, 1152-1, 0, 900-1);

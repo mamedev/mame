@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "gsc.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(GSC, gsc_device, "applegsc", "Apple Gray Scale Controller video")
 
 static constexpr u8 GSC_GRAYSCALE               = 0x04;
@@ -60,7 +62,7 @@ void gsc_device::device_reset()
 
 void gsc_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// these parameters are not real; we know the refresh rate is ~60.15 Hz and that's it
 	m_screen->set_raw(21604953, 800, 0, 640, 449, 0, 400);
 

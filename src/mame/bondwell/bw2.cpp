@@ -521,7 +521,7 @@ void bw2_state::bw2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &bw2_state::bw2_io);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(MSM6255_TAG, FUNC(msm6255_device::screen_update));
 	screen.set_size(640, 200);
@@ -531,7 +531,7 @@ void bw2_state::bw2(machine_config &config)
 	PALETTE(config, "palette", FUNC(bw2_state::bw2_palette), 2);
 
 	// devices
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(16_MHz_XTAL / 4); // 8251 USART TXC, RXC
 	m_pit->out_handler<0>().set(m_uart, FUNC(i8251_device::write_txc));
 	m_pit->out_handler<0>().append(m_uart, FUNC(i8251_device::write_rxc));
@@ -556,7 +556,7 @@ void bw2_state::bw2(machine_config &config)
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(latch);
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));

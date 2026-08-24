@@ -153,6 +153,8 @@
 #include "speaker.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include "beena.lh"
 #include "tvochken.lh"
 
@@ -1712,7 +1714,7 @@ void sega_9h0_0008_state::sega_9h0_0008(machine_config &config)
 	AP2010CPU(config, m_maincpu, 81'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_9h0_0008_state::beena_arm7_map);
 
-	SCREEN(config, m_screen_main, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen_main);
 	m_screen_main->set_refresh_hz(60);
 	m_screen_main->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen_main->set_size(SCREEN_W, SCREEN_H);
@@ -1789,7 +1791,7 @@ public:
 
 	void sega_beena(machine_config &config);
 
-	virtual DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
+	virtual float pen_y_mapper(float linear_value);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -2019,7 +2021,7 @@ void sega_beena_state::update_sensors(offs_t offset)
 	}
 }
 
-CROSSHAIR_MAPPER_MEMBER(sega_beena_state::pen_y_mapper)
+float sega_beena_state::pen_y_mapper(float linear_value)
 {
 	// TODO: Either remove or adapt for Storyware layout
 	return linear_value;

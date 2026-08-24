@@ -33,6 +33,7 @@ bool debugwin_info::s_window_class_registered = false;
 
 debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
 	debugbase_info(debugger),
+	m_metrics(debugger.preferences()),
 	m_is_main_console(is_main_console),
 	m_wnd(nullptr),
 	m_handler(handler),
@@ -44,9 +45,24 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 {
 	register_window_class();
 
+	// try to find the monitor that MAME started on
+	RECT work_bounds;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &work_bounds, 0);
+	HMONITOR const nearest_monitor = MonitorFromWindow(
+			dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window(),
+			MONITOR_DEFAULTTONEAREST);
+	if (nearest_monitor)
+	{
+		MONITORINFO info;
+		std::memset(&info, 0, sizeof(info));
+		info.cbSize = sizeof(info);
+		if (GetMonitorInfo(nearest_monitor, &info))
+			work_bounds = info.rcWork;
+	}
+
 	m_wnd = win_create_window_ex_utf8(
 			DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
-			0, 0, 100, 100,
+			work_bounds.left, work_bounds.top, 100, 100,
 			debugger.get_group_windows()
 				? dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window()
 				: nullptr,
@@ -56,8 +72,16 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 	if (!m_wnd)
 		return;
 
-	RECT work_bounds;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &work_bounds, 0);
+	m_metrics.set_dpi(GetDpiForWindow(m_wnd));
+
+	RECT bounds;
+	bounds.top = bounds.left = 0;
+	bounds.right = (metrics().debug_font_width() * 32) + metrics().vscroll_width();
+	bounds.bottom = (metrics().debug_font_ascent() * 16) + metrics().hscroll_height();
+	AdjustWindowRectExForDpi(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX, metrics().dpi());
+	set_minwidth(bounds.right - bounds.left);
+	set_minheight(bounds.bottom - bounds.top);
+
 	m_maxwidth = work_bounds.right - work_bounds.left;
 	m_maxheight = work_bounds.bottom - work_bounds.top;
 }
@@ -303,7 +327,7 @@ void debugwin_info::restore_configuration_from_node(util::xml::data_node const &
 	desired.right = desired.left + node.get_attribute_int(ATTR_WINDOW_WIDTH, bounds.right);
 	desired.bottom = desired.top + node.get_attribute_int(ATTR_WINDOW_HEIGHT, bounds.bottom);
 	// TODO: sanity checks...
-	if (!AdjustWindowRectEx(&desired, DEBUG_WINDOW_STYLE, GetMenu(window()) ? TRUE : FALSE, DEBUG_WINDOW_STYLE_EX))
+	if (!AdjustWindowRectExForDpi(&desired, DEBUG_WINDOW_STYLE, GetMenu(window()) ? TRUE : FALSE, DEBUG_WINDOW_STYLE_EX, metrics().dpi()))
 		return;
 
 	// actually move the window
@@ -361,6 +385,11 @@ void debugwin_info::restore_configuration_from_node(util::xml::data_node const &
 }
 
 
+void debugwin_info::update_dpi()
+{
+}
+
+
 // Set the bounds for the corresponding debug_viewinfo.  This implementation
 // is only intended for use with win_infos that appear solely as an
 // independent free-floating window.  win_infos that can appear as a frame
@@ -373,8 +402,8 @@ void debugwin_info::recompute_children()
 		RECT bounds;
 		bounds.top = bounds.left = 0;
 		bounds.right = m_views[0]->prefwidth() + (2 * EDGE_WIDTH);
-		bounds.bottom = 200;
-		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
+		bounds.bottom = (metrics().debug_font_ascent() * 16) + metrics().hscroll_height();
+		AdjustWindowRectExForDpi(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX, metrics().dpi());
 
 		// clamp the min/max size
 		set_maxwidth(bounds.right - bounds.left);
@@ -569,12 +598,12 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	// get min/max info: set the minimum window size
 	case WM_GETMINMAXINFO:
 		{
-			auto *minmax = (MINMAXINFO *)lparam;
+			auto const minmax = reinterpret_cast<MINMAXINFO *>(lparam);
 			minmax->ptMinTrackSize.x = m_minwidth;
 			minmax->ptMinTrackSize.y = m_minheight;
 			// Leave default ptMaxSize and ptMaxTrackSize so maximum size is not restricted
-			break;
 		}
+		break;
 
 	// sizing: recompute child window locations
 	case WM_SIZE:
@@ -583,9 +612,34 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 		InvalidateRect(m_wnd, nullptr, FALSE);
 		break;
 
+	// effective resolution change: resize and recompute child window locations
+	case WM_DPICHANGED:
+		{
+			auto const suggested = reinterpret_cast<RECT const *>(lparam);
+			m_metrics.set_dpi(GetDpiForWindow(m_wnd));
+			RECT bounds;
+			bounds.top = bounds.left = 0;
+			bounds.right = (metrics().debug_font_width() * 32) + metrics().vscroll_width();
+			bounds.bottom = (metrics().debug_font_ascent() * 16) + metrics().hscroll_height();
+			AdjustWindowRectExForDpi(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX, metrics().dpi());
+			set_minwidth(bounds.right - bounds.left);
+			set_minheight(bounds.bottom - bounds.top);
+			update_dpi();
+			SetWindowPos(
+					window(),
+					nullptr,
+					suggested->left, suggested->top,
+					suggested->right - suggested->left, suggested->bottom - suggested->top,
+					SWP_NOZORDER | SWP_NOACTIVATE);
+			recompute_children();
+			InvalidateRect(m_wnd, nullptr, FALSE);
+		}
+		break;
+
 	// mouse wheel: forward to the first view
 	case WM_MOUSEWHEEL:
 		{
+			// FIXME: this is a liability
 			static int units_carryover = 0;
 
 			UINT lines_per_click;
@@ -618,9 +672,8 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			// send the appropriate message to this view's scrollbar
 			if (m_views[viewnum] != nullptr)
 				m_views[viewnum]->send_vscroll(delta);
-
-			break;
 		}
+		break;
 
 	// activate: set the focus
 	case WM_INITMENU:

@@ -34,7 +34,7 @@ class ti99_cartridge_device : public device_t, public device_cartrom_image_inter
 	friend class ti99_gromemu_cartridge;
 
 public:
-	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void readz(offs_t offset, uint8_t *value);
 	void write(offs_t offset, uint8_t data);

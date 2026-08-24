@@ -10,12 +10,14 @@
 
 #pragma once
 
-#include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class lordgun_base_state : public driver_device
 {

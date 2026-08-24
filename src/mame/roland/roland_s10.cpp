@@ -18,7 +18,7 @@
 #include "machine/i8251.h"
 #include "mb62h195.h"
 #include "mb63h149.h"
-#include "mb87013.h"
+#include "machine/mb87013.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/upd7001.h"
@@ -228,7 +228,7 @@ void roland_s10_state::s10(machine_config &config)
 	keyscan.int_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
 
 	// LCD unit: LM16155C
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

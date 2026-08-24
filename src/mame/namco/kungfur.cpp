@@ -123,9 +123,6 @@ private:
 
 void kungfur_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	// register for savestates
 	save_item(NAME(m_control));
 	save_item(NAME(m_digit_data));

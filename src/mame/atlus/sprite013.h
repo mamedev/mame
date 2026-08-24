@@ -13,9 +13,15 @@ public:
 	using sprite013_colpri_delegate = device_delegate<bool (u8 &dstpri, u32 &colpri)>;
 	using sprite013_decrypt_delegate = device_delegate<void ()>;
 
-	sprite013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sprite013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> sprite013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: sprite013_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> sprite013_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: sprite013_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));

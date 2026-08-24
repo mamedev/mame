@@ -64,6 +64,9 @@ using is_device_implementation = std::bool_constant<std::is_base_of_v<device_t, 
 template <typename T>
 using is_device_interface = std::bool_constant<std::is_base_of_v<device_interface, T> && !is_device_implementation<T>::value>;
 
+template <typename T> concept device_implementation_class = is_device_implementation<T>::value;
+template <typename T> concept device_interface_class = is_device_interface<T>::value;
+
 
 struct device_flags
 {

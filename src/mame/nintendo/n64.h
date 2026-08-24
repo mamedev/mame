@@ -87,7 +87,7 @@ private:
 
 public:
 	// construction/destruction
-	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_sram(T &&tag) { m_sram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_rdram(T &&tag) { m_rdram.set_tag(std::forward<T>(tag)); }

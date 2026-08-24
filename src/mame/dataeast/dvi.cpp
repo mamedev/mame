@@ -26,8 +26,8 @@ struct DVI_Header
 struct AVSS_Header
 {
 	uint32_t av1;       // header ID (AVSS)
-	uint16_t av2;     // header size
-	uint16_t av3;     // header version
+	uint16_t av2;       // header size
+	uint16_t av3;       // header version
 	uint16_t av4;       // number of stream groups
 	uint16_t av5;       // size of each stream group
 	uint32_t av6;       // offset to first stream group
@@ -82,7 +82,7 @@ struct AUDI_Header
 	uint16_t au3;      // header format
 	uint8_t  au4[80];  // original media filename
 	uint32_t au5;      // original media frame ID
-	uint16_t au6;    // original media frame ID
+	uint16_t au6;      // original media frame ID
 	uint16_t au7;      // unused (Pad)
 	uint32_t au8;      // number of frames
 	uint32_t au9;      // offset of next header
@@ -348,7 +348,6 @@ void process_dvi_data(device_t *device,uint8_t* dvi_data, int baseoffset, int re
 
 			subptr = dvi_data+CIMG.ci9+baseoffset;
 		}
-
 	}
 
 	/* Frame Dictionaries etc. */
@@ -377,12 +376,7 @@ void process_dvi_data(device_t *device,uint8_t* dvi_data, int baseoffset, int re
 		dviprintf("     Frame Num         %08x\n", FHEAD.fh1);
 		dviprintf("     Previous Offset   %08x\n", FHEAD.fh2);
 		dviprintf("     Frame Checksum    %08x\n", FHEAD.fh3);
-
-
 	}
 
 	dviprintf("\n");
-
-
-
 }

@@ -618,6 +618,7 @@ void x1_020_dx_101_device::draw_sprites_line(bitmap_ind16 &bitmap, const rectang
 	const uint16_t *s1 = m_private_spriteram.get();
 
 	int sprite_debug_count = 0;
+	(void)sprite_debug_count;
 
 	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4, sprite_debug_count++)
 	{

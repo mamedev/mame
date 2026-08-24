@@ -8,7 +8,7 @@
 class specnext_multiface_device : public device_t
 {
 public:
-	specnext_multiface_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	specnext_multiface_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void cpu_a_0066_w(bool data) { m_cpu_a_0066 = data; }
 

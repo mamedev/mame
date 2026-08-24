@@ -563,7 +563,7 @@ void scv_state::scv(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// Video chip is EPOCH TV-1
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181)/2, 456, 24, 24+192, 262, 23, 23+222);  // Clock verified. TODO: Verify rest of the parameters
 	m_screen->set_screen_update(FUNC(scv_state::screen_update_scv));
 	m_screen->set_palette("palette");

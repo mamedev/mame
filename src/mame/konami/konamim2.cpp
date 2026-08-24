@@ -1160,7 +1160,7 @@ void konamim2_state::konamim2(machine_config &config)
 	// Common devices
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(konamim2_state::ata_int));
 
 	m_ata->slot(0).option_add("cr589", CR589);
@@ -1168,7 +1168,7 @@ void konamim2_state::konamim2(machine_config &config)
 	m_ata->slot(0).set_default_option("cr589");
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("bda:vdu", FUNC(m2_vdu_device::screen_update));
 
 	// Sound hardware

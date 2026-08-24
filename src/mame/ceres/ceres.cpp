@@ -387,7 +387,7 @@ void ceres1_state::ceres1(machine_config &config)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
 	FLOPPY_CONNECTOR(config, "fdc:0", "fdd", FLOPPY_35_DD, true, floppy_image_device::default_mfm_floppy_formats);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(70'000'000, 1344, 0, 1024, 838, 0, 800);
 	m_screen->set_screen_update(FUNC(ceres1_state::screen_update));
 }

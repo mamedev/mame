@@ -147,14 +147,6 @@ tandberg_tdv2100_keyboard_device::tandberg_tdv2100_keyboard_device(const machine
 void tandberg_tdv2100_keyboard_device::device_start()
 {
 	m_key_repeat_trigger = timer_alloc(FUNC(tandberg_tdv2100_keyboard_device::key_repeat), this);
-	m_online_led.resolve();
-	m_carrier_led.resolve();
-	m_error_led.resolve();
-	m_enquiry_led.resolve();
-	m_ack_led.resolve();
-	m_nak_led.resolve();
-	m_wait_led.resolve();
-	m_shiftlock_led.resolve();
 
 	save_item(NAME(m_shift_lock));
 	save_item(NAME(m_column_counter));

@@ -403,7 +403,7 @@ void alien_state::alien(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(medalusion_devices, "cfcard", nullptr, true);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// configured by main GPU
 	m_screen->set_raw(MASTER_CLOCK / 20, 608, 0, 480, 262, 0, 234);
 	m_screen->set_screen_update(FUNC(alien_state::screen_update));

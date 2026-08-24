@@ -161,7 +161,9 @@ public:
 
 	// input and interrupt management
 	void set_input_line(int linenum, int state) { assert(device().started()); m_input[linenum].set_state_synced(state); }
+	[[deprecated("set_input_line_vector is deprecated; use set_irq_acknowledge_callback instead")]]
 	void set_input_line_vector(int linenum, int vector) { assert(device().started()); m_input[linenum].set_vector(vector); }
+	[[deprecated("set_input_line_and_vector is deprecated; use set_irq_acknowledge_callback instead")]]
 	void set_input_line_and_vector(int linenum, int state, int vector) { assert(device().started()); m_input[linenum].set_state_synced(state, vector); }
 	int input_line_state(int linenum) const { assert(device().started()); return m_input[linenum].m_curstate; }
 	void pulse_input_line(int irqline, const attotime &duration);

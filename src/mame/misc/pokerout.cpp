@@ -371,7 +371,7 @@ void pokerout_state::pokerout(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(VDP_MEM);
 //  int line no connected, so no callback.
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -647,7 +647,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -659,7 +659,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_hvyunit_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_hvyunit_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

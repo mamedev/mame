@@ -6,6 +6,8 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
+#include <cstring>
+
 static constexpr unsigned HEADER_LENGTH = 66;
 static constexpr uint8_t MAGIC_XOR = 0xb3;
 
@@ -26,7 +28,7 @@ const char *sap_dsk_format::name() const noexcept
 
 const char *sap_dsk_format::description() const noexcept
 {
-	return "Thomson SAP disk image (Systeme d'Archivage Pukall)";
+	return "SAP disk image (Systeme d'Archivage Pukall)";
 }
 
 const char *sap_dsk_format::extensions() const noexcept
@@ -148,6 +150,7 @@ bool sap_dsk_format::load(util::random_read &io, uint32_t form_factor, const std
 				sectors[sector_count].deleted = bool(sector_header[0] & 0x04);
 				sectors[sector_count].bad_data_crc = crc != get_u16be(sector_crc);
 				sectors[sector_count].bad_addr_crc = false;
+				sectors[sector_count].weak = false;
 
 				read_offset += sector_octets + 6;
 				bufptr += sector_octets;

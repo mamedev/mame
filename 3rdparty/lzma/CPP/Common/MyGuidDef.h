@@ -13,7 +13,7 @@ typedef struct {
   UInt32 Data1;
   UInt16 Data2;
   UInt16 Data3;
-  unsigned char Data4[8];
+  Byte Data4[8];
 } GUID;
 
 #ifdef __cplusplus
@@ -32,7 +32,7 @@ typedef GUID CLSID;
 inline int operator==(REFGUID g1, REFGUID g2)
 {
   for (unsigned i = 0; i < sizeof(g1); i++)
-    if (((const unsigned char *)&g1)[i] != ((const unsigned char *)&g2)[i])
+    if (((const Byte *)&g1)[i] != ((const Byte *)&g2)[i])
       return 0;
   return 1;
 }

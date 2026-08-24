@@ -1613,7 +1613,6 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	int vblank_period, hblank_period;
-	attoseconds_t refresh;
 	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
 	uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
 	int pixel_clock;
@@ -1633,7 +1632,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	// TODO: improve/complete clocking modes
 	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
-	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
@@ -1917,6 +1916,10 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	const uint16_t mask_comp = line_compare_mask();
 	int curr_addr = 0;
+
+	// clear the backbuffer for 320x240 linear modes, avoid transitional artifacts
+	bitmap.fill(0, cliprect);
+
 //  uint16_t line_length;
 //  if(vga.crtc.dw)
 //      line_length = vga.crtc.offset << 3;  // doubleword mode
@@ -1967,7 +1970,10 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	/* line compare is screen sensitive */
 //  uint16_t mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
+	(void)curr_addr;
 	int yi = 0;
+
+	bitmap.fill(0, cliprect);
 
 	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
@@ -2007,7 +2013,10 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	/* line compare is screen sensitive */
 //  uint16_t mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
+	(void)curr_addr;
 	int yi = 0;
+
+	bitmap.fill(0, cliprect);
 
 	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line += height, addr += offset(), curr_addr += offset())
 	{
@@ -2047,7 +2056,10 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	/* line compare is screen sensitive */
 //  uint16_t mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
+	(void)curr_addr;
 	int yi = 0;
+
+	bitmap.fill(0, cliprect);
 
 	for (int addr = vga.crtc.start_addr << 3, line=0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{
@@ -2087,7 +2099,10 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	/* line compare is screen sensitive */
 //  mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
+	(void)curr_addr;
 	int yi = 0;
+
+	bitmap.fill(0, cliprect);
 
 	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{

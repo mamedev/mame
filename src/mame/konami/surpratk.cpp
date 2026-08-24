@@ -330,7 +330,7 @@ void surpratk_state::surpratk(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(surpratk_state::screen_update));
 	screen.set_palette(m_palette);
@@ -349,7 +349,7 @@ void surpratk_state::surpratk(machine_config &config)
 	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback));
 	m_k053244->set_priority_shadows(true);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

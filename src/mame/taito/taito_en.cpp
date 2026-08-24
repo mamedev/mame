@@ -236,7 +236,7 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	MB87078(config, m_mb87078);
 	m_mb87078->gain_changed().set(FUNC(taito_en_device::mb87078_gain_changed));
 
-	MB8421(config, "dpram", 0); // host accesses this from the other side
+	MB8421(config, "dpram"); // host accesses this from the other side
 
 	// sound hardware
 	ESQ_5505_5510_PUMP(config, m_pump, 30.47618_MHz_XTAL / (2 * 16 * 32));

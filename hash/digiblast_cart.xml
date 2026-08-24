@@ -6,11 +6,46 @@ license:CC0-1.0
 
 <!--
     These dumps seem to have blank ECC data, it might need to be reconstructed as done in eolith/ghosteo.cpp
+
+    The following are known to exist but not dumped
+
+    Crazy Mix 1
+    Gold Miner Joe
+    Gormiti 3 episodi
+    Gormiti: Agguato nella Valle
+    MP3 Player
+    Power Rangers SPD
+    Teenage Mutant Ninja Turtles + 5 Atari Games
+    Teenage Mutant Ninja Turtles 1
+    Winx Club 2
+
+    The following were cancelled, prototypes may exist
+
+    Activision Anthology
+    Freddi Fish and the Case of the Missing Kelp Seeds
+    SparkBlast
+    The Fast and the Furious & 2 Fast 2 Furious
+    Tony Hawk's Pro Skater 4
+    Truckz
+    X2: Wolverine's Revenge
+    Das Magische Labyrinth (maybe released)
+
 -->
 <softwarelist name="digiblast_cart" description="Nikko Entertainment B.V. / Grey Innovation digiBLAST cartridges">
 
 	<software name="sonicx1" supported="no">
-		<description>Sonic X 1 (Italy / Spain)</description>
+		<description>Sonic X 1 (Italy / Spain, set 1)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="sonic x 1 [v] (it es).bin" size="0x4200000" crc="c24cb643" sha1="62d73be42aa4e104ec980a467bae01b233194579" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicx1a" cloneof="sonicx1" supported="no">
+		<description>Sonic X 1 (Italy / Spain, set 2)</description>
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
@@ -32,6 +67,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="totsp1" supported="no">
+		<description>Totally Spies! 1</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="totally spies 1 [v] (nl en fr tr).bin" size="0x4200000" crc="93e46afb" sha1="0495f2b468cbd9cfd2ef74a306a639c4fc9d3c57" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="totsp1i" cloneof="totsp1" supported="no">
 		<description>Totally Spies! 1 (Italy)</description>
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
@@ -54,12 +100,34 @@ license:CC0-1.0
 	</software>
 
 	<software name="wxatari" supported="no">
-		<description>Winx Club + 5 Atari Games (Italy / Spain)</description>
+		<description>Winx Club + 5 Atari Games (Italy / Spain, set 1)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x2100000">
+				<rom name="winx club + 5 atari games [v g] (it es).bin" size="0x2100000" crc="6b5ca82e" sha1="e934ace84ba44defb4e4c0967236ad8803837409" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wxataria" cloneof="wxatari" supported="no">
+		<description>Winx Club + 5 Atari Games (Italy / Spain, set 2)</description>
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="winx club + 5 atari games (ita esp).bin" size="0x4200000" crc="09897866" sha1="df1b42368ae776d9028a27796874d5830bfd38c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wxatarib" cloneof="wxatari" supported="no">
+		<description>Winx Club + 5 Atari Games (4 language version)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x2100000">
+				<rom name="winx club + 5 atari games [v g] (nl fr de tr).bin" size="0x2100000" crc="eb1d8fda" sha1="f192ffe38eadcc8e3b9b59db76379806e400892f" />
 			</dataarea>
 		</part>
 	</software>
@@ -71,6 +139,138 @@ license:CC0-1.0
 		<part name="cart" interface="digiblast_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="winx club 1 (ita esp).bin" size="0x4200000" crc="a870766e" sha1="ade470b1e574761bf35254064b2437dccf1a3c2c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crzyjack" supported="no">
+		<description>Crazy Jack</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="crazy jack [g] (en).bin" size="0x1080000" crc="9bce041a" sha1="221d68d590bf8b716a69e330da83e9fab2b48c04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cuccioli" supported="no">
+		<description>Cuccioli Cerca Amici (Italy)</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="cuccioli cerca amici [g] (it).bin" size="0x4200000" crc="40a18574" sha1="7d5d2201a0f93b083ea32e116da8d2fe530f36f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digiquad" supported="no">
+		<description>DigiQUAD</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="digiquad [g] (en).bin" size="0x1080000" crc="c57e4b7c" sha1="17aff879b64ebba5574a787cb78b763b04d7efea" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gormiti2" supported="no">
+		<description>Gormiti 2 episodi (Italy)</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x2100000">
+				<rom name="gormiti 2 episodi [v] (it).bin" size="0x2100000" crc="b0b98ad1" sha1="78cdd5a11af87a762ef689ede4afe1f1852f124b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gormitil" supported="no">
+		<description>Gormiti Lotta Oscura (Italy)</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x2100000">
+				<rom name="gormiti lotta oscura [g] (it).bin" size="0x2100000" crc="d11135f5" sha1="9538995c2fd9344be1e3b64c754488fac7ad3985" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gormitim" supported="no">
+		<description>Gormiti Masters of the Gorm Island (Italy)</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="gormiti masters of the gorm island [g] (it).bin" size="0x1080000" crc="f890f74c" sha1="26431663f87e3549eab3c36e5d89ef0dbbadd489" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall" supported="no">
+		<description>Pitfall The Lost Expedition</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="pitfall the lost expedition [g] (en).bin" size="0x1080000" crc="d1d6118f" sha1="8f7027041c5a02ac8128a4fa2cb3a5dc6e45c357" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rayman3" supported="no">
+		<description>Rayman 3</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="rayman 3 [g] (m10).bin" size="0x1080000" crc="e3e1953e" sha1="015df5c3b9c7a6f1be4d58bedb49b6d0f5674bf9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidmm" supported="no">
+		<description>Spider-Man Mysterio's Menace</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="spider-man mysterios menace [g] (en).bin" size="0x1080000" crc="142577ee" sha1="ddf13723b44ab1cdbb80d73a8b55601a98f7e1b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbatari" supported="no">
+		<description>Sponge Bob + 5 Atari Games (Italy / Spain)</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x2100000">
+				<rom name="sponge bob 5 atari games [v g] (it es).bin" size="0x2100000" crc="69ab74c0" sha1="f454bc13b5b2cde1dcee1cc6a5861ee0e9bc032c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sschefs" supported="no">
+		<description>Superstar Chefs</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="superstar chefs [g] (en).bin" size="0x1080000" crc="93209877" sha1="026494753c9c35feee362342ff96bd4f05f241b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wadehix" supported="no">
+		<description>Wade Hixton's Counter Punch</description>
+		<year>200?</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x1080000">
+				<rom name="wade hixtons counter punch [g] (en).bin" size="0x1080000" crc="eba2a2c3" sha1="10e52e59d0be41db6f1e9ba4d895237569890c22" />
 			</dataarea>
 		</part>
 	</software>

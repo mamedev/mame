@@ -353,7 +353,7 @@ void esh_state::esh(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->command_strobe_callback().set(FUNC(esh_state::ld_command_strobe_cb));
 	m_laserdisc->set_overlay(256, 256, FUNC(esh_state::screen_update_esh));
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);

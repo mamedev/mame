@@ -112,7 +112,7 @@ public:
 class dp8390d_device : public dp8390_device
 {
 public:
-	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition

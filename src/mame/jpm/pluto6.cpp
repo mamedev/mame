@@ -234,7 +234,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void pluto6(machine_config &config) ATTR_COLD;    // Private to prevent use
@@ -392,14 +391,7 @@ INPUT_PORTS_END
 
 void pluto6_state::machine_start()
 {
-	m_open_drain.resolve();
-	m_lamp.resolve();
-	m_led.resolve();
-	m_aux.resolve();
-}
-
-void pluto6_state::machine_reset(){
-
+	// TODO: savestates
 }
 
 void pluto6_state::duart_irq_handler(int state)
@@ -503,9 +495,9 @@ void pluto6_state::pluto6(machine_config &config){
 	m_maincpu->sda_w_cb().set(FUNC(pluto6_state::pluto_sda));
 	m_maincpu->scl_w_cb().set(FUNC(pluto6_state::pluto_scl));
 
-	PLUTO6_EXPANSION_SLOT(config, m_exp0, 0);
+	PLUTO6_EXPANSION_SLOT(config, m_exp0);
 	m_exp0->set_default_option(nullptr);
-	PLUTO6_EXPANSION_SLOT(config, m_exp1, 0);
+	PLUTO6_EXPANSION_SLOT(config, m_exp1);
 	m_exp1->set_default_option(nullptr);
 
 	SPEAKER(config, "speaker", 2).front();

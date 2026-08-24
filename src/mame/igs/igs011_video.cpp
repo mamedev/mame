@@ -7,7 +7,9 @@ IGS011 blitter with protection
 implementation based from igs/igs011.cpp, by Luca Elia/Olivier Galibert.
 
 TODO:
-- transparent pixel is wrong in dbc title screen
+- realistic blitter timings
+- blitter busy flag
+
 */
 
 #include "emu.h"
@@ -121,33 +123,19 @@ void igs011_device::priority_ram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_priority_ram[offset]);
 }
 
+int igs011_device::blitter_busy_r()
+{
+	return 0; // TODO
+}
+
 u32 igs011_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef MAME_DEBUG
-	int layer_enable = -1;
-#endif
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 0x01;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 0x02;
-		if (machine().input().code_pressed(KEYCODE_E))  mask |= 0x04;
-		if (machine().input().code_pressed(KEYCODE_R))  mask |= 0x08;
-		if (machine().input().code_pressed(KEYCODE_A))  mask |= 0x10;
-		if (machine().input().code_pressed(KEYCODE_S))  mask |= 0x20;
-		if (machine().input().code_pressed(KEYCODE_D))  mask |= 0x40;
-		if (machine().input().code_pressed(KEYCODE_F))  mask |= 0x80;
-		if (mask)   layer_enable &= mask;
-	}
-#endif
-
 	u16 const *const pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
 	u32 const hibpp_layers = std::min<u32>(4 - (m_blitter.depth & 0x07), std::size(m_layer_ram));
 
 	if (BIT(m_blitter.depth, 4))
 	{
+		// video output disabled
 		u16 const pri = pri_ram[0xff] & 7;
 		bitmap.fill((pri << 8) | 0xff, cliprect);
 		return 0;
@@ -167,10 +155,7 @@ u32 igs011_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			{
 				layerpix[l] = m_layer_ram[i++][scr_addr];
 				if (layerpix[l] != 0xff)
-#ifdef MAME_DEBUG
-					if (layer_enable & (1 << l))
-#endif
-						pri_addr &= ~(1 << l);
+					pri_addr &= ~(1 << l);
 				++l;
 			}
 			while (std::size(m_layer_ram) > i)
@@ -178,27 +163,16 @@ u32 igs011_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				u8 const pixdata = m_layer_ram[i++][scr_addr];
 				layerpix[l] = pixdata & 0x0f;
 				if (layerpix[l] != 0x0f)
-#ifdef MAME_DEBUG
-					if (layer_enable & (1 << l))
-#endif
-						pri_addr &= ~(1 << l);
+					pri_addr &= ~(1 << l);
 				++l;
 				layerpix[l] = (pixdata >> 4) & 0x0f;
 				if (layerpix[l] != 0x0f)
-#ifdef MAME_DEBUG
-					if (layer_enable & (1 << l))
-#endif
-						pri_addr &= ~(1 << l);
+					pri_addr &= ~(1 << l);
 				++l;
 			}
 
 			u16 const pri = pri_ram[pri_addr] & 7;
-#ifdef MAME_DEBUG
-			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix(y, x) = palette().black_pen();
-			else
-#endif
-				bitmap.pix(y, x) = layerpix[pri] | (pri << 8);
+			bitmap.pix(y, x) = layerpix[pri] | (pri << 8);
 		}
 	}
 	return 0;
@@ -277,6 +251,8 @@ void igs011_device::blit_h_w(offs_t offset, u16 data, u16 mem_mask)
 
 void igs011_device::blit_depth_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	// ---X ---- disable video output
+	// ---- -XXX layer depth configuration expressed as number of buffers used as dual 4bpp layers
 	COMBINE_DATA(&m_blitter.depth);
 }
 

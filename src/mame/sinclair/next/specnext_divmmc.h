@@ -8,7 +8,7 @@
 class specnext_divmmc_device : public device_t
 {
 public:
-	specnext_divmmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	specnext_divmmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void cpu_a_15_13_w(u8 data) { m_cpu_a_15_13 = data & 0x07; };
 	void cpu_mreq_n_w(bool data) { m_cpu_mreq_n = data; }

@@ -217,8 +217,6 @@ void multibus_dsd5217_device::device_start()
 
 	save_item(NAME(m_hdd_cyl));
 
-	m_led.resolve();
-
 	// populate 32-bit crc lookup table
 	u32 const polynomial = 0x0010'5187U;
 	for (unsigned i = 0; i < 256; i++)
@@ -273,7 +271,7 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &multibus_dsd5217_device::cpu_pio);
 	m_cpu->in_sid_func().set([this]() -> int { return !BIT(m_wua, 15); });
 
-	AM2910(config, m_rwc, 0); // TODO: clocked at disk data rate
+	AM2910(config, m_rwc); // TODO: clocked at disk data rate
 	// TODO: 1K words of prom
 
 	I8155(config, m_rio, 10_MHz_XTAL / 4);

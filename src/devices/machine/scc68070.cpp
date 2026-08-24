@@ -355,10 +355,9 @@ void scc68070_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void scc68070_device::device_reset()
-{
-	scc68070_base_device::device_reset();
 
+void scc68070_device::reset_peripheral_state()
+{
 	m_lir = 0;
 
 	m_picr1 = 0;
@@ -420,11 +419,19 @@ void scc68070_device::device_reset()
 		m_mmu.desc[index].base = 0;
 	}
 
-	update_ipl();
-
 	m_uart.rx_timer->adjust(attotime::never);
 	m_uart.tx_timer->adjust(attotime::never);
+	m_i2c.timer->adjust(attotime::never);
+
 	set_timer_callback(0);
+	update_ipl();
+}
+
+void scc68070_device::device_reset()
+{
+	scc68070_base_device::device_reset();
+
+	reset_peripheral_state();
 }
 
 
@@ -439,43 +446,7 @@ void scc68070_device::device_config_complete()
 void scc68070_device::reset_peripherals(int state)
 {
 	if (state)
-	{
-		m_lir = 0;
-
-		m_picr1 = 0;
-		m_picr2 = 0;
-		m_timer_int = false;
-		m_i2c_int = false;
-		m_uart_rx_int = false;
-		m_uart_tx_int = false;
-
-		m_i2c.status_register = ISR_PIN;
-		m_i2c.control_register = 0;
-		m_i2c.clock_control_register = 0;
-		m_i2c.scl_out_state = true;
-		m_i2c.scl_in_state = true;
-		m_i2c.sda_out_state = true;
-		m_i2c.state = I2C_IDLE;
-		m_i2c.clock_change_state = I2C_SCL_IDLE;
-		m_i2c.clocks = 0;
-		m_uart.command_register = 0;
-		m_uart.receive_pointer = -1;
-		m_uart.transmit_pointer = -1;
-
-		m_uart.mode_register = 0;
-		m_uart.status_register = USR_TXRDY;
-		m_uart.clock_select = 0;
-
-		m_timers.timer_status_register = 0;
-		m_timers.timer_control_register = 0;
-
-		m_uart.rx_timer->adjust(attotime::never);
-		m_uart.tx_timer->adjust(attotime::never);
-		m_timers.timer0_timer->adjust(attotime::never);
-		m_i2c.timer->adjust(attotime::never);
-
-		update_ipl();
-	}
+		reset_peripheral_state();
 }
 
 void scc68070_device::update_ipl()
@@ -609,7 +580,7 @@ uint8_t scc68070_device::iack_r(offs_t offset)
 			m_uart_tx_int = false;
 			update_ipl();
 		}
-		else if (m_i2c_int && offset == ((m_picr2 >> 4) & 7))
+		else if (m_i2c_int && offset == ((m_picr1 >> 4) & 7))
 		{
 			m_i2c_int = false;
 			update_ipl();
@@ -658,12 +629,23 @@ void scc68070_device::uart_ctsn(int state)
 
 void scc68070_device::uart_rx(uint8_t data)
 {
+	if (m_uart.receive_pointer >= int16_t(std::size(m_uart.receive_buffer) - 1))
+	{
+		LOGMASKED(LOG_UART, "%s: uart_rx: receiver overrun, discarding %02x\n", machine().describe_context(), data);
+		m_uart.status_register |= USR_OE;
+		return;
+	}
 	m_uart.receive_pointer++;
 	m_uart.receive_buffer[m_uart.receive_pointer] = data;
 }
 
 void scc68070_device::uart_tx(uint8_t data)
 {
+	if (m_uart.transmit_pointer >= int16_t(std::size(m_uart.transmit_buffer) - 1))
+	{
+		LOGMASKED(LOG_UART, "%s: uart_tx: transmit buffer full, discarding %02x\n", machine().describe_context(), data);
+		return;
+	}
 	m_uart.transmit_pointer++;
 	m_uart.transmit_buffer[m_uart.transmit_pointer] = data;
 	m_uart.status_register &= ~USR_TXEMT;
@@ -706,35 +688,36 @@ TIMER_CALLBACK_MEMBER(scc68070_device::rx_callback)
 
 TIMER_CALLBACK_MEMBER(scc68070_device::tx_callback)
 {
-	if (((m_uart.command_register >> 2) & 3) == 1)
+	if (((m_uart.command_register >> 2) & 3) != 1)
 	{
-		m_uart.status_register |= USR_TXRDY;
+		return;
+	}
 
+	if (m_uart.transmit_pointer > -1)
+	{
+		if (m_uart.transmit_ctsn && BIT(m_uart.mode_register, 4))
+		{
+			return;
+		}
+
+		m_uart.transmit_holding_register = m_uart.transmit_buffer[0];
+		m_uart_tx_callback(m_uart.transmit_holding_register);
+
+		LOGMASKED(LOG_MORE_UART, "tx_callback: Transmitting %02x\n", m_uart.transmit_holding_register);
+		for(int index = 0; index < m_uart.transmit_pointer; index++)
+		{
+			m_uart.transmit_buffer[index] = m_uart.transmit_buffer[index+1];
+		}
+		m_uart.transmit_pointer--;
+
+		m_uart.status_register |= USR_TXRDY;
 		m_uart_tx_int = true;
 		update_ipl();
+	}
 
-		if (m_uart.transmit_pointer > -1)
-		{
-			if (m_uart.transmit_ctsn && BIT(m_uart.mode_register, 4))
-			{
-				return;
-			}
-
-			m_uart.transmit_holding_register = m_uart.transmit_buffer[0];
-			m_uart_tx_callback(m_uart.transmit_holding_register);
-
-			LOGMASKED(LOG_MORE_UART, "tx_callback: Transmitting %02x\n", m_uart.transmit_holding_register);
-			for(int index = 0; index < m_uart.transmit_pointer; index++)
-			{
-				m_uart.transmit_buffer[index] = m_uart.transmit_buffer[index+1];
-			}
-			m_uart.transmit_pointer--;
-		}
-
-		if (m_uart.transmit_pointer < 0)
-		{
-			m_uart.status_register |= USR_TXEMT;
-		}
+	if (m_uart.transmit_pointer < 0)
+	{
+		m_uart.status_register |= USR_TXEMT | USR_TXRDY;
 	}
 }
 
@@ -1387,13 +1370,13 @@ void scc68070_device::ucr_w(uint8_t data)
 	case 0x3: // Reset transmitter
 		LOGMASKED(LOG_MORE_UART, "%s: Reset transmitter\n", machine().describe_context());
 		m_uart.transmit_pointer = -1;
-		m_uart.status_register |= USR_TXEMT;
+		m_uart.status_register |= USR_TXEMT | USR_TXRDY;
 		m_uart.command_register &= 0xf0;
 		m_uart.transmit_holding_register = 0x00;
 		break;
 	case 0x4: // Reset error status
 		LOGMASKED(LOG_MORE_UART, "%s: Reset error status\n", machine().describe_context());
-		m_uart.status_register &= 0x87; // Clear error bits in USR
+		m_uart.status_register &= ~(USR_RB | USR_FE | USR_PE | USR_OE); // Clear error bits in USR
 		m_uart.command_register &= 0xf0;
 		break;
 	case 0x6: // Start break
@@ -1418,6 +1401,7 @@ void scc68070_device::uth_w(uint8_t data)
 	LOGMASKED(LOG_MORE_UART, "%s: UART Transmit Holding Register Write: %02x ('%c')\n", machine().describe_context(), data, (data >= 0x20 && data < 0x7f) ? data : ' ');
 	uart_tx(data);
 	m_uart.transmit_holding_register = data;
+	m_uart.status_register &= ~USR_TXRDY;
 }
 
 uint8_t scc68070_device::urh_r()

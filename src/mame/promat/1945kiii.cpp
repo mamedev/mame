@@ -663,7 +663,7 @@ void k3_state::flagrall(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1945kiii);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(27'000'000)/4, 432, 0, 320, 315, 0, 240); // ~49.61Hz, reference : https://www.youtube.com/watch?v=CuGrTiQs4ww
 	m_screen->set_screen_update(FUNC(k3_state::screen_update));
 	m_screen->set_palette(m_palette);

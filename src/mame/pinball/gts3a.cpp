@@ -80,10 +80,10 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void p0(machine_config &config);
-	void p7(machine_config &config);
+	void p0(machine_config &config) ATTR_COLD;
+	void p7(machine_config &config) ATTR_COLD;
 
-	void init_gts3a();
+	void init_gts3a() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
@@ -406,8 +406,6 @@ void gts3a_state::crtc_vs(int state)
 
 void gts3a_state::machine_start()
 {
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_row));
 	save_item(NAME(m_u4b));
@@ -432,7 +430,7 @@ void gts3a_state::p0(machine_config &config)
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &gts3a_state::dmd_map);
 
 	// Video
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));

@@ -424,6 +424,7 @@ void pecom_state::pecom64(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pecom_state::io_map);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(pecom_state::clear_r));
+	m_maincpu->ef1_cb().set(m_cdp1869, FUNC(cdp1869_device::predisplay_r));
 	m_maincpu->ef2_cb().set(FUNC(pecom_state::ef2_r));
 	m_maincpu->q_cb().set(FUNC(pecom_state::q_w));
 	m_maincpu->sc_cb().set(FUNC(pecom_state::sc_w));

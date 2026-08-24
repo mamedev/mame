@@ -273,6 +273,7 @@ public:
 	{ }
 
 	ioport_value arm_sensors_r();
+
 	void dnbanban(machine_config &config) ATTR_COLD;
 
 protected:
@@ -280,16 +281,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device_array<i8255_device, 2> m_ppi;
-	required_device<pwm_display_device> m_digits_pwm;
-	output_finder<8> m_ledsp2;
-	output_finder<8> m_ledsp3;
-	output_finder<8> m_ledsp5;
-	output_finder<8> m_ledsp6;
-	output_finder<8> m_ledsp8;
-	output_finder<4> m_pos;
-
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -299,6 +290,16 @@ private:
 	void ppi0_c_w(uint8_t data);
 	void ppi1_b_w(uint8_t data);
 	void ppi1_c_w(uint8_t data);
+
+	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 2> m_ppi;
+	required_device<pwm_display_device> m_digits_pwm;
+	output_finder<8> m_ledsp2;
+	output_finder<8> m_ledsp3;
+	output_finder<8> m_ledsp5;
+	output_finder<8> m_ledsp6;
+	output_finder<8> m_ledsp8;
+	output_finder<4> m_pos;
 
 	u16 m_var[4] = { };
 	u8 m_pre[4] = { };
@@ -312,14 +313,6 @@ private:
 
 void katosmedz80_state::machine_start()
 {
-	// resolve outputs
-	m_ledsp2.resolve();
-	m_ledsp3.resolve();
-	m_ledsp5.resolve();
-	m_ledsp6.resolve();
-	m_ledsp8.resolve();
-	m_pos.resolve();
-
 	// register for savestates
 	save_item(NAME(m_var));
 	save_item(NAME(m_pre));

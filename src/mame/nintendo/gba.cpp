@@ -1453,7 +1453,7 @@ void gba_state::gbadv(machine_config &config)
 	ARM7(config, m_maincpu, 4.194304_MHz_XTAL * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gba_state::gba_map);
 
-	gba_lcd_device &lcd(GBA_LCD(config, "lcd", 0));
+	gba_lcd_device &lcd(GBA_LCD(config, "lcd"));
 	lcd.int_hblank_callback().set(FUNC(gba_state::int_hblank_callback));
 	lcd.int_vblank_callback().set(FUNC(gba_state::int_vblank_callback));
 	lcd.int_vcount_callback().set(FUNC(gba_state::int_vcount_callback));

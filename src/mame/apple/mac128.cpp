@@ -93,6 +93,7 @@ Scanline 0 is the start of vblank.
 #include "bus/macpds/pds_tpdfpd.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/iwm.h"
@@ -1152,7 +1153,7 @@ void mac128_state::mac512ke(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, MAC_V_FIRST, MAC_V_TOTAL);
 	m_screen->set_native_aspect();
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
@@ -1172,7 +1173,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_volfilter->add_route(ALL_OUTPUTS, m_outfilter, 0.195);                                                                             // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
 	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
 	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
-	SPEAKER_SOUND(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.839); // speaker_filtered_1bit_pwm has an effective gain of 0.54375 so invert that
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, m_filter, 1.839); // speaker_filtered_1bit_pwm has an effective gain of 0.54375 so invert that
 	TIMER(config, m_dac_timer).configure_generic(FUNC(mac128_state::mac_dac));
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -1188,6 +1189,18 @@ void mac128_state::mac512ke(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	MOS6522(config, m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));

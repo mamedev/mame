@@ -65,6 +65,7 @@
 #include "a2kbd.h"
 
 #include "am100kbd.h"
+#include "autokbd.h"
 #include "ivelultrkb.h"
 #include "kb200.h"
 #include "nkbd.h"
@@ -99,6 +100,7 @@ void a2kbd_connector_device::default_options(device_slot_interface &slot)
 	slot.option_add("tk10", A2KBD_TK10);
 	slot.option_add("videnh2", A2KBD_VIDENH2);
 	slot.option_add("uniap2ti", A2KBD_UNIAP2TI);
+	slot.option_add("autokbd", A2KBD_AUTOKBD);
 }
 
 void a2kbd_connector_device::device_config_complete()

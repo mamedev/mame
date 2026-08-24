@@ -294,8 +294,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_88_state::key_nmi)
 
 void mpf1_88_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->pointer());
 
 	// register for state saving
@@ -328,7 +326,7 @@ void mpf1_88_state::mpf1_88(machine_config &config)
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(mpf1_88_state::key_nmi), attotime::from_msec(15));
 
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	auto &screen = SCREEN(config, "screen").set_lcd();
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(132, 28);
@@ -368,6 +366,7 @@ void mpf1_88_state::mpf1_88(machine_config &config)
 	isa8_device &isa8(ISA8(config, "isa", 3.579545_MHz_XTAL/2));
 	isa8.set_memspace(m_maincpu, AS_PROGRAM);
 	isa8.set_iospace(m_maincpu, AS_IO);
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "isa", mpf1_88_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa2", 0, "isa", mpf1_88_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, "isa", mpf1_88_isa8_cards, nullptr, false);

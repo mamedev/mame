@@ -65,7 +65,13 @@ public:
 	{
 		set_options(std::forward<T>(slot_options), default_option, false);
 	}
-	bk_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	bk_parallel_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: bk_parallel_slot_device(mconfig, tag, owner)
+	{
+		set_options(std::forward<T>(slot_options), default_option, false);
+	}
+	bk_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~bk_parallel_slot_device();
 
 	// callbacks

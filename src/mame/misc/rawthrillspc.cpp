@@ -62,7 +62,7 @@ void rawthrillspc_state::rawthrillspc(machine_config &config)
 	PENTIUM4(config, m_maincpu, 120'000'000); // Actually an Athlon 64 X2
 	m_maincpu->set_addrmap(AS_PROGRAM, &rawthrillspc_state::rawthrillspc_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

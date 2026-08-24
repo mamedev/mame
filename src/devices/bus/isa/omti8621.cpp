@@ -50,7 +50,7 @@ class omti_disk_image_device : public harddisk_image_base_device
 {
 public:
 	// construction/destruction
-	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
@@ -240,8 +240,8 @@ INPUT_PORTS_END
 
 void omti8621_device::device_add_mconfig(machine_config &config)
 {
-	OMTI_DISK(config, OMTI_DISK0_TAG, 0);
-	OMTI_DISK(config, OMTI_DISK1_TAG, 0);
+	OMTI_DISK(config, OMTI_DISK0_TAG);
+	OMTI_DISK(config, OMTI_DISK1_TAG);
 
 	UPD765A(config, m_fdc, 48_MHz_XTAL / 6, false, false); // clocked through FDC9239BT
 	m_fdc->intrq_wr_callback().set(FUNC(omti8621_device::fdc_irq_w));

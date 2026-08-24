@@ -1207,7 +1207,7 @@ void m107_state::firebarr(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m107_state::sound_map);
 	m_soundcpu->set_decryption_table(rtypeleo_decryption_table);
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(m107_state::scanline_interrupt), "screen", 0, 1);
@@ -1215,7 +1215,7 @@ void m107_state::firebarr(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(512, 256);

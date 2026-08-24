@@ -11,8 +11,12 @@
 #include "emu.h"
 #include "voodoo.h"
 
-namespace voodoo
-{
+#include "endianness.h"
+
+#include <bit>
+
+
+namespace voodoo {
 
 static constexpr bool LOG_RASTERIZERS = false;
 
@@ -61,7 +65,7 @@ static const rectangle global_cliprect(-4096, 4095, -4096, 4095);
 
 inline s32 ATTR_FORCE_INLINE compute_wfloat(s64 iterw)
 {
-	int exp = count_leading_zeros_64(iterw) - 16;
+	int exp = std::countl_zero(u64(iterw)) - 16;
 	if (exp < 0)
 		return 0x0000;
 	if (exp >= 16)
@@ -337,13 +341,14 @@ void rasterizer_params::compute_equations()
 
 u32 rasterizer_params::hash() const
 {
+	using std::rotl;
 	return m_generic ^
-			rotl_32(m_alphamode, 0) ^
-			rotl_32(m_fbzmode, 6) ^
-			rotl_32(m_fbzcp, 12) ^
-			rotl_32(m_fogmode, 18) ^
-			rotl_32(m_texmode0, 24) ^
-			rotl_32(m_texmode1, 30);
+			rotl<u32>(m_alphamode, 0) ^
+			rotl<u32>(m_fbzmode, 6) ^
+			rotl<u32>(m_fbzcp, 12) ^
+			rotl<u32>(m_fogmode, 18) ^
+			rotl<u32>(m_texmode0, 24) ^
+			rotl<u32>(m_texmode1, 30);
 }
 
 
@@ -1376,7 +1381,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::stipple_test(thread_stats_block &
 	// rotate mode
 	if (fbzmode.stipple_pattern() == 0)
 	{
-		stipple = rotr_32(stipple, 1);
+		stipple = std::rotr(stipple, 1);
 		if (s32(stipple) >= 0)
 		{
 			threadstats.stipple_count++;
@@ -1416,7 +1421,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_renderer::compute_depthval(poly_data const &
 			result = 0xffff;
 		else
 		{
-			int exp = count_leading_zeros_32(iterz) - 4;
+			int const exp = std::countl_zero(u32(iterz)) - 4;
 			return ((exp << 12) | ((iterz >> (15 - exp)) ^ 0x1fff)) + 1;
 		}
 	}
@@ -2894,4 +2899,4 @@ static_rasterizer_info s_predef_raster_table[] =
 	{ nullptr, rasterizer_params(0xffffffff) }
 };
 
-}
+} // namespace voodoo

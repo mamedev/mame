@@ -125,7 +125,7 @@ void fstgfish_state::fstgfish(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fstgfish_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &fstgfish_state::main_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

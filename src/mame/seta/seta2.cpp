@@ -83,7 +83,6 @@ blnctry:
 
 #include "mahjong.h"
 
-#include "cpu/m68000/mcf5206e.h"
 #include "cpu/m68000/tmp68301.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
@@ -328,9 +327,6 @@ void seta2_state::machine_start()
 			}
 		}
 	}
-
-	m_leds.resolve();
-	m_lamps.resolve();
 }
 
 void seta2_state::sound_bank_w(offs_t offset, uint8_t data)
@@ -2013,7 +2009,7 @@ void seta2_state::seta2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(0x200, 0x100);
@@ -2218,7 +2214,7 @@ void seta2_state::namcostr(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(0x200, 0x200);

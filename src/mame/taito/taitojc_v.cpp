@@ -13,6 +13,8 @@
 
 #include "video/poly.h"
 
+#include "endianness.h"
+
 
 static const gfx_layout char_layout =
 {

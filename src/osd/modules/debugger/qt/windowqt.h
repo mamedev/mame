@@ -52,8 +52,8 @@ public:
 	virtual void restoreConfiguration(util::xml::data_node const &node);
 
 protected slots:
-	void debugActOpenMemory();
-	void debugActOpenDasm();
+	virtual void debugActOpenMemory();
+	virtual void debugActOpenDasm();
 	void debugActOpenLog();
 	void debugActOpenPoints();
 	void debugActOpenDevices();

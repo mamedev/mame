@@ -446,13 +446,11 @@ void lle_device_base::device_add_mconfig(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_ext).set_map(&lle_device_base::ext_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x100);
 
 	SPEAKER(config, "keyboard").front_center();
-	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "keyboard", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "keyboard", 0.25);
 }
 
 void lle_device_base::device_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_txd));
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));

@@ -13,9 +13,11 @@
 
 #pragma once
 
-class h8_device;
+#include "h8_intc_base.h"
 
-class h8_intc_device : public device_t {
+class h8_cpu_base;
+
+class h8_intc_device : public h8_intc_base {
 public:
 	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	template<typename T> h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu) :
@@ -25,7 +27,7 @@ public:
 	}
 
 	int interrupt_taken(int vector);
-	void internal_interrupt(int vector);
+	void internal_interrupt(int vector) override;
 	void set_input(int inputnum, int state);
 	void set_filter(int icr_filter, int ipr_filter);
 	void set_nmi_edge(int state) { m_nmi_type = state ? EDGE_RISE : EDGE_FALL; }
@@ -49,7 +51,7 @@ protected:
 	int m_irq_vector_nmi;
 	bool m_has_isr;
 
-	required_device<h8_device> m_cpu;
+	required_device<h8_cpu_base> m_cpu;
 
 	u32 m_pending_irqs[MAX_VECTORS/32];
 	u8 m_irq_type[8];

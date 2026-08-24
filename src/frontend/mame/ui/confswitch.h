@@ -54,7 +54,7 @@ protected:
 	using field_vector = std::vector<field_descriptor>;
 	using switch_group_vector = std::vector<switch_group_descriptor>;
 
-	menu_confswitch(mame_ui_manager &mui, render_container &container, uint32_t type);
+	menu_confswitch(mame_ui_manager &mui, render_target &target, uint32_t type);
 
 	virtual void menu_activated() override;
 	virtual void populate() override;
@@ -79,7 +79,7 @@ private:
 class menu_settings_dip_switches : public menu_confswitch
 {
 public:
-	menu_settings_dip_switches(mame_ui_manager &mui, render_container &container);
+	menu_settings_dip_switches(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_settings_dip_switches() override;
 
 protected:
@@ -102,7 +102,7 @@ private:
 class menu_settings_machine_config : public menu_confswitch
 {
 public:
-	menu_settings_machine_config(mame_ui_manager &mui, render_container &container);
+	menu_settings_machine_config(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_settings_machine_config();
 };
 

@@ -141,21 +141,21 @@ void fruitpc_state::fruitpc(machine_config &config)
 
 	/* video hardware */
 	// TODO: custom 1998 Elpin Systems/STMicroeletronics BIOS internal to the SoC, likely PCI
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	vga_device &vga(VGA(config, "vga", 0));
+	vga_device &vga(VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
-	PCI_ROOT(config, m_pciroot, 0);
+	PCI_ROOT(config, m_pciroot);
 	// TODO: STPCD0166BTC3 host PCI
 
 	// TODO: should really be ISA16
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir1_w));

@@ -16,7 +16,7 @@
 class sega_315_5296_device : public device_t
 {
 public:
-	sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	auto in_pa_callback() { return m_in_port_cb[0].bind(); }

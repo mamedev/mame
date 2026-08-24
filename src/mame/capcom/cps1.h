@@ -195,10 +195,8 @@ protected:
 	virtual void device_post_load() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_START(cps1);
 	DECLARE_MACHINE_START(qsound);
-	DECLARE_MACHINE_START(ganbare);
 	DECLARE_MACHINE_RESET(cps);
 
 	uint16_t cps1_dsw_r(offs_t offset);

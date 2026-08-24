@@ -417,13 +417,13 @@ void pt68k4_state::pt68k2(machine_config &config)
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	M48T02(config, TIMEKEEPER_TAG);
 
 	WD1772(config, m_wdfdc, 16_MHz_XTAL / 2);
 	FLOPPY_CONNECTOR(config, m_floppy_connector[0], pt68k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy_connector[1], pt68k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
-	ISA8(config, m_isa, 0);
+	ISA8(config, m_isa);
 	m_isa->set_custom_spaces();
 	m_isa->irq5_callback().set(FUNC(pt68k4_state::irq5_w));
 
@@ -457,9 +457,9 @@ void pt68k4_state::pt68k4(machine_config &config)
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	M48T02(config, TIMEKEEPER_TAG);
 
-	ISA8(config, m_isa, 0);
+	ISA8(config, m_isa);
 	m_isa->set_custom_spaces();
 
 	ISA8_SLOT(config, "isa1", 0, m_isa, pt68k4_isa8_cards, "fdc_at", false); // FIXME: determine ISA bus clock

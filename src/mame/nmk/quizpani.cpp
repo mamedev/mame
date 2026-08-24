@@ -430,7 +430,7 @@ void quizpani_state::quizpani(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_quizpani);
 	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -440,7 +440,7 @@ void quizpani_state::quizpani(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki");
 
 	okim6295_device &oki(OKIM6295(config, "oki", 16'000'000 / 4, okim6295_device::PIN7_LOW));

@@ -69,11 +69,11 @@ const tiny_rom_entry *promotion3210_device::device_rom_region() const
 
 void promotion3210_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
 
-	PROMOTION_VGA(config, m_vga, 0);
+	PROMOTION_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// TODO: configurable between 1 and 4 MB (2x EDO slots on board)
 	// Only known OEM Board (Miro) has 1MB

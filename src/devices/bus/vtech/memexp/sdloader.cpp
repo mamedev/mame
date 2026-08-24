@@ -138,7 +138,7 @@ void vtech_sdloader_device::device_add_mconfig(machine_config &config)
 {
 	vtech_memexp_device::device_add_mconfig(config);
 
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(vtech_sdloader_device::spi_miso_w));
 }

@@ -42,12 +42,6 @@ dim68k_keyboard_device::dim68k_keyboard_device(const machine_config &mconfig, co
 {
 }
 
-void dim68k_keyboard_device::device_resolve_objects()
-{
-	m_capslock_led.resolve();
-	m_numlock_led.resolve();
-}
-
 void dim68k_keyboard_device::device_start()
 {
 	save_item(NAME(m_p1_in));

@@ -54,7 +54,7 @@ void psr2000_state::psr2000(machine_config &config)
 
 	auto &palette = PALETTE(config, "palette", FUNC(psr2000_state::palette_init), 2);
 
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	auto &screen = SCREEN(config, "screen").set_lcd();
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(m_lcdc, FUNC(sed1330_device::screen_update));
 	screen.set_size(320, 240);

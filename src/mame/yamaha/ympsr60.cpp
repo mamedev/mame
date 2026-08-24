@@ -324,7 +324,6 @@ void psr60_state::machine_start()
 {
 	m_bbd_timer = timer_alloc(FUNC(psr60_state::bbd_tick), this);
 
-	m_drvif_out.resolve();
 	m_rom2bank->configure_entries(0, 2, memregion("rom2")->base(), 0x4000);
 	m_rom2bank->set_entry(0);
 	m_acia_irq = 0;

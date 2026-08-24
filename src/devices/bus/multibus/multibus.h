@@ -132,7 +132,7 @@ public:
 		set_options(std::forward<U>(slot_options), default_option, false);
 	}
 
-	auto bus() const { return m_bus; }
+	auto const &bus() const { return m_bus; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

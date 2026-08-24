@@ -700,12 +700,6 @@ void gl3000s_state::machine_start()
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank2->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
-
-	m_lev_out.resolve();
-	m_try_out.resolve();
-	m_tick_out.resolve();
-	m_time_out.resolve();
-	m_points_out.resolve();
 }
 
 void gl4004_state::machine_start()
@@ -771,7 +765,7 @@ void pc2000_state::pc2000gen(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(pc2000_state::irq0_line_hold), attotime::from_hz(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));

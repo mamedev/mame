@@ -49,7 +49,7 @@ private:
 
 class msm6222b_01_device : public msm6222b_device {
 public:
-	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;

@@ -36,21 +36,11 @@
 --
 -- Escape quoted string so it can be passed as define via command line.
 --
-
+-- FIXME: this simplistic function doesn't work properly with embedded escapes
+-- and quoted strings, nor with Windows Command Prompt quoting and escaping
+-- rules. It causes build problems on both Windows and Linux and has been disabled.
 	function _MAKE.escquote(value)
-		local result
-		if (type(value) == "table") then
-			result = { }
-			for _,v in ipairs(value) do
-				table.insert(result, _MAKE.escquote(v))
-			end
-			return result
-		else
-			-- handle simple replacements
-			result = value:gsub(" ", "\\ ")
-			result = result:gsub("\"", "\\\"")
-			return result
-		end
+		return value
 	end
 
 

@@ -88,7 +88,7 @@ void newbrain_eim_device::device_add_mconfig(machine_config &config)
 	adc.in_callback<6>().set_constant(0);
 	adc.in_callback<7>().set_constant(0);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set(FUNC(newbrain_eim_device::acia_interrupt));
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);

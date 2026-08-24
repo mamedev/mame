@@ -214,7 +214,7 @@ class scn2651_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2651_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2651_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2661a_device
@@ -223,7 +223,7 @@ class scn2661a_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2661a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2661a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2661b_device
@@ -232,7 +232,7 @@ class scn2661b_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2661b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2661b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2661c_device
@@ -241,7 +241,7 @@ class scn2661c_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2661c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2661c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2641_device
@@ -250,7 +250,7 @@ class scn2641_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2641_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2641_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// callback configuration
 	auto intr_handler() { return m_intr_callback.bind(); }

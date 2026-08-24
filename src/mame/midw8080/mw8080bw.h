@@ -167,9 +167,6 @@ public:
 
 	ioport_value erase_input_r();
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	void explosion_lamp_w(u8 data);
 	void periscope_lamp_w(u8 data);
@@ -436,9 +433,6 @@ public:
 	}
 
 	void bowler(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_200_left_light;

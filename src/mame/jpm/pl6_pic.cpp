@@ -38,7 +38,6 @@ void pl6pic_device::device_start()
 	m_timer = timer_alloc(FUNC(pl6pic_device::heartbeat_callback), this);
 	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	save_item(NAME(m_heartbeat));
-	m_hb_led.resolve();
 }
 
 TIMER_CALLBACK_MEMBER(pl6pic_device::heartbeat_callback)

@@ -81,9 +81,6 @@ void sda5708_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 
-	// look up outputs
-	m_dots.resolve();
-
 	// register for state saving
 	save_item(NAME(m_serial));
 	save_item(NAME(m_load));

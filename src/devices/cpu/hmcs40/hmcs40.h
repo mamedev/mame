@@ -319,25 +319,25 @@ protected:
 class hd38750_device : public hmcs43_cpu_device
 {
 public:
-	hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd38755_device : public hmcs43_cpu_device
 {
 public:
-	hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44750_device : public hmcs43_cpu_device
 {
 public:
-	hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44758_device : public hmcs43_cpu_device
 {
 public:
-	hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
@@ -354,25 +354,25 @@ protected:
 class hd38800_device : public hmcs44_cpu_device
 {
 public:
-	hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd38805_device : public hmcs44_cpu_device
 {
 public:
-	hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44801_device : public hmcs44_cpu_device
 {
 public:
-	hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44808_device : public hmcs44_cpu_device
 {
 public:
-	hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
@@ -389,25 +389,25 @@ protected:
 class hd38820_device : public hmcs45_cpu_device
 {
 public:
-	hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd38825_device : public hmcs45_cpu_device
 {
 public:
-	hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44820_device : public hmcs45_cpu_device
 {
 public:
-	hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44828_device : public hmcs45_cpu_device
 {
 public:
-	hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
@@ -424,13 +424,13 @@ protected:
 class hd44840_device : public hmcs46_cpu_device
 {
 public:
-	hd44840_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44840_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44848_device : public hmcs46_cpu_device
 {
 public:
-	hd44848_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44848_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
@@ -446,19 +446,19 @@ protected:
 class hd38870_device : public hmcs47_cpu_device
 {
 public:
-	hd38870_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd38870_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44860_device : public hmcs47_cpu_device
 {
 public:
-	hd44860_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44860_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class hd44868_device : public hmcs47_cpu_device
 {
 public:
-	hd44868_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd44868_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

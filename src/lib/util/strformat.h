@@ -599,53 +599,67 @@ private:
 	using unsigned_integer_semantics = std::bool_constant<std::is_integral_v<U> && !std::is_signed_v<U> >;
 
 	template <typename U>
-	static std::enable_if_t<std::is_same_v<typename Stream::char_type, typename U::value_type>, U const &> launder_string(U const &value)
+	static U const &launder_string(U const &value) requires std::is_same_v<typename Stream::char_type, typename U::value_type>
 	{
 		return value;
 	}
 #if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
 	template <typename U>
-	static std::enable_if_t<std::is_same_v<typename Stream::char_type, char> && std::is_same_v<typename U::value_type, char8_t>, std::basic_string_view<typename Stream::char_type> > launder_string(U const &value)
+	static std::basic_string_view<typename Stream::char_type> launder_string(U const &value) requires (std::is_same_v<typename Stream::char_type, char> && std::is_same_v<typename U::value_type, char8_t>)
 	{
 		return std::basic_string_view<typename Stream::char_type>(reinterpret_cast<typename Stream::char_type const *>(value.data()), value.length());
 	}
 #endif
 
-	template <typename U>
-	static std::enable_if_t<std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> > || std::is_integral_v<U> > apply_signed(Stream &str, U const &value)
+	static void apply_signed(Stream &str, T const &value) requires (std::is_same_v<std::make_signed_t<std::remove_cv_t<T> >, std::make_signed_t<char> > || std::is_integral_v<T>)
 	{
-		if constexpr (std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> >)
-			str << int(std::make_signed_t<U>(value));
-		else if constexpr (!std::is_signed_v<U> || std::is_same_v<typename Stream::char_type, U>)
-			str << std::make_signed_t<U>(value);
-#if __cplusplus > 201703L
-		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
-			str << std::make_signed_t<U>(value);
-#endif
+		if constexpr (std::is_same_v<std::make_signed_t<std::remove_cv_t<T> >, std::make_signed_t<char> >)
+			str << int(std::make_signed_t<T>(value));
+		else if constexpr (!std::is_signed_v<T> || std::is_same_v<typename Stream::char_type, std::remove_cv_t<T> >)
+			str << std::make_signed_t<T>(value);
+		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, T const &>)
+			str << std::make_signed_t<T>(value);
 		else
 			str << value;
 	}
 
-	template <typename U>
-	static std::enable_if_t<std::is_same_v<std::make_unsigned_t<U>, std::make_unsigned_t<char> > || std::is_integral_v<U> > apply_unsigned(Stream &str, U const &value)
+	static void apply_unsigned(Stream &str, T const &value) requires (std::is_same_v<std::make_unsigned_t<std::remove_cv_t<T> >, std::make_unsigned_t<char> > || std::is_integral_v<T>)
 	{
-		if constexpr (std::is_same_v<std::make_unsigned_t<U>, std::make_unsigned_t<char> >)
-			str << unsigned(std::make_unsigned_t<U>(value));
-		else if constexpr (!std::is_unsigned_v<U> || std::is_same_v<typename Stream::char_type, U>)
-			str << std::make_unsigned_t<U>(value);
-#if __cplusplus > 201703L
-		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
-			str << std::make_unsigned_t<U>(value);
-#endif
+		if constexpr (std::is_same_v<std::make_unsigned_t<std::remove_cv_t<T> >, std::make_unsigned_t<char> >)
+			str << unsigned(std::make_unsigned_t<T>(value));
+		else if constexpr (!std::is_unsigned_v<T> || std::is_same_v<typename Stream::char_type, std::remove_cv_t<T> >)
+			str << std::make_unsigned_t<T>(value);
+		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, T const &>)
+			str << std::make_unsigned_t<T>(value);
 		else
 			str << value;
 	}
 
 public:
-	template <typename U>
-	static void apply(Stream &str, format_flags const &flags, U const &value)
+	static void apply(Stream &str, format_flags const &flags, T const &value)
 	{
-		if constexpr (string_semantics<U>::value)
+		if constexpr (std::is_same_v<std::remove_cv_t<T>, bool>)
+		{
+			switch (flags.get_conversion())
+			{
+			case format_flags::conversion::signed_decimal:
+			case format_flags::conversion::unsigned_decimal:
+			case format_flags::conversion::octal:
+			case format_flags::conversion::hexadecimal:
+			case format_flags::conversion::scientific_decimal:
+			case format_flags::conversion::fixed_decimal:
+			case format_flags::conversion::floating_decimal:
+			case format_flags::conversion::scientific_hexadecimal:
+			case format_flags::conversion::character:
+			case format_flags::conversion::pointer:
+				format_output<Stream, unsigned>().apply(str, flags, unsigned(value));
+				break;
+			default:
+				if (flags.get_alternate_format()) str.setf(Stream::boolalpha);
+				str << value;
+			}
+		}
+		else if constexpr (string_semantics<std::remove_cv_t<T> >::value)
 		{
 			auto const &laundered(launder_string(value));
 			int const precision(flags.get_precision());
@@ -674,7 +688,7 @@ public:
 				str << laundered;
 			}
 		}
-		else if constexpr (signed_integer_semantics<U>::value)
+		else if constexpr (signed_integer_semantics<std::remove_cv_t<T> >::value)
 		{
 			switch (flags.get_conversion())
 			{
@@ -761,7 +775,7 @@ public:
 				str << value;
 			}
 		}
-		else if constexpr (unsigned_integer_semantics<U>::value)
+		else if constexpr (unsigned_integer_semantics<std::remove_cv_t<T> >::value)
 		{
 			switch (flags.get_conversion())
 			{
@@ -845,14 +859,12 @@ public:
 				str << reinterpret_cast<void const *>(std::uintptr_t(value));
 				break;
 			default:
-#if __cplusplus > 201703L
-				if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
+				if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, T const &>)
 				{
 					assert(false); // stream out operator not declared or declared deleted
 					str << '?';
 				}
 				else
-#endif
 				{
 					str << value;
 				}
@@ -863,27 +875,6 @@ public:
 			str << value;
 		}
 	}
-	static void apply(Stream &str, format_flags const &flags, bool value)
-	{
-		switch (flags.get_conversion())
-		{
-		case format_flags::conversion::signed_decimal:
-		case format_flags::conversion::unsigned_decimal:
-		case format_flags::conversion::octal:
-		case format_flags::conversion::hexadecimal:
-		case format_flags::conversion::scientific_decimal:
-		case format_flags::conversion::fixed_decimal:
-		case format_flags::conversion::floating_decimal:
-		case format_flags::conversion::scientific_hexadecimal:
-		case format_flags::conversion::character:
-		case format_flags::conversion::pointer:
-			apply(str, flags, unsigned(value));
-			break;
-		default:
-			if (flags.get_alternate_format()) str.setf(Stream::boolalpha);
-			str << value;
-		}
-	}
 };
 
 template <typename Stream, typename T>
@@ -891,30 +882,27 @@ class format_output<Stream, T *>
 {
 protected:
 	template <typename CharT, typename U>
-	struct string_semantics : public std::bool_constant<std::is_same_v<std::remove_const_t<U>, CharT> > { };
+	struct string_semantics : public std::bool_constant<std::is_same_v<std::remove_cv_t<U>, CharT> > { };
 #if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
 	template <typename U>
-	struct string_semantics<char, U> : public std::bool_constant<std::is_same_v<std::remove_const_t<U>, char> || std::is_same_v<std::remove_const_t<U>, char8_t> > { };
+	struct string_semantics<char, U> : public std::bool_constant<std::is_same_v<std::remove_cv_t<U>, char> || std::is_same_v<std::remove_cv_t<U>, char8_t> > { };
 #endif
 
-	template <typename U>
-	static std::enable_if_t<std::is_same_v<typename Stream::char_type, std::remove_const_t<U> >, T const *> launder_string(U *value)
+	static T const *launder_string(T const *value) requires (std::is_same_v<typename Stream::char_type, std::remove_cv_t<T> >)
 	{
 		return value;
 	}
 #if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
-	template <typename U>
-	static std::enable_if_t<std::is_same_v<typename Stream::char_type, char> && std::is_same_v<std::remove_const_t<U>, char8_t>, char const *> launder_string(U *value)
+	static char const *launder_string(T const *value) requires(std::is_same_v<typename Stream::char_type, char> && std::is_same_v<std::remove_cv_t<T>, char8_t>)
 	{
 		return reinterpret_cast<char const *>(value);
 	}
 #endif
 
 public:
-	template <typename U>
-	static void apply(Stream &str, format_flags const &flags, U const *value)
+	static void apply(Stream &str, format_flags const &flags, T const *value)
 	{
-		if constexpr (string_semantics<typename Stream::char_type, U>::value)
+		if constexpr (string_semantics<typename Stream::char_type, T>::value)
 		{
 			switch (flags.get_conversion())
 			{
@@ -924,7 +912,7 @@ public:
 					if (0 <= flags.get_precision())
 					{
 						std::streamsize cnt(0);
-						for ( ; (0 < precision) && (U(format_chars<U>::nul) != value[cnt]); --precision, ++cnt) { }
+						for ( ; (0 < precision) && (format_chars<std::remove_cv_t<T> >::nul != value[cnt]); --precision, ++cnt) { }
 						unsigned width(flags.get_field_width());
 						bool const pad(std::make_unsigned_t<std::streamsize>(cnt) < width);
 						typename Stream::fmtflags const adjust(str.flags() & Stream::adjustfield);
@@ -943,7 +931,7 @@ public:
 				}
 				break;
 			case format_flags::conversion::pointer:
-				str << reinterpret_cast<void const *>(const_cast<std::remove_volatile_t<U> *>(value));
+				str << reinterpret_cast<void const *>(const_cast<std::remove_volatile_t<T> *>(value));
 				break;
 			default:
 				str << launder_string(value);
@@ -951,7 +939,7 @@ public:
 		}
 		else
 		{
-			str << reinterpret_cast<void const *>(const_cast<std::remove_volatile_t<U> *>(value));
+			str << reinterpret_cast<void const *>(const_cast<std::remove_volatile_t<T> *>(value));
 		}
 	}
 };
@@ -960,14 +948,13 @@ template <typename Stream, typename T, std::size_t N>
 class format_output<Stream, T[N]> : protected format_output<Stream, T *>
 {
 public:
-	template <typename U>
-	static void apply(Stream &str, format_flags const &flags, U const *value)
+	static void apply(Stream &str, format_flags const &flags, T const *value)
 	{
 		static_assert(
-				!format_output::template string_semantics<typename Stream::char_type, U>::value || (N <= size_t(unsigned((std::numeric_limits<int>::max)()))),
+				!format_output::template string_semantics<typename Stream::char_type, T>::value || (N <= size_t(unsigned((std::numeric_limits<int>::max)()))),
 				"C string array length must not exceed maximum integer value");
 		format_flags f(flags);
-		if (format_output::template string_semantics<typename Stream::char_type, U>::value && ((0 > f.get_precision()) || (N < unsigned(f.get_precision()))))
+		if (format_output::template string_semantics<typename Stream::char_type, T>::value && ((0 > f.get_precision()) || (N < unsigned(f.get_precision()))))
 			f.set_precision(int(unsigned(N)));
 		format_output<Stream, T *>::apply(str, f, value);
 	}
@@ -988,14 +975,14 @@ private:
 	using use_signed_cast = std::bool_constant<!use_unsigned_cast<U>::value && std::is_convertible_v<U const, int> >;
 
 public:
-	template <typename U> static bool apply(U const &value, int &result)
+	static bool apply(T const &value, int &result)
 	{
-		if constexpr (use_unsigned_cast<U>::value)
+		if constexpr (use_unsigned_cast<std::remove_cv_t<T> >::value)
 		{
 			result = int(unsigned(value));
 			return true;
 		}
-		else if constexpr (use_signed_cast<U>::value)
+		else if constexpr (use_signed_cast<std::remove_cv_t<T> >::value)
 		{
 			result = int(value);
 			return true;
@@ -1026,16 +1013,16 @@ private:
 	using use_signed_cast = std::bool_constant<is_non_const_ptr<U>::value && !use_unsigned_cast<U>::value && std::is_convertible_v<std::streamoff, std::remove_pointer_t<U> > >;
 
 public:
-	template <typename U> static bool apply(U const &value, std::streamoff data)
+	static bool apply(T const &value, std::streamoff data)
 	{
-		if constexpr (use_unsigned_cast<U>::value)
+		if constexpr (use_unsigned_cast<T>::value)
 		{
-			*value = std::remove_pointer_t<U>(std::make_unsigned_t<std::streamoff>(data));
+			*value = std::remove_pointer_t<T>(std::make_unsigned_t<std::streamoff>(data));
 			return true;
 		}
-		else if constexpr (use_signed_cast<U>::value)
+		else if constexpr (use_signed_cast<T>::value)
 		{
-			*value = std::remove_pointer_t<U>(std::make_signed_t<std::streamoff>(data));
+			*value = std::remove_pointer_t<T>(std::make_signed_t<std::streamoff>(data));
 			return true;
 		}
 		else
@@ -1141,7 +1128,7 @@ protected:
 		static Character const *launder(Character const *ptr) { return ptr; }
 #if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
 		template <typename T>
-		static std::enable_if_t<std::is_same_v<Character, char> && std::is_same_v<T, char8_t>, Character const *> launder(T const *ptr) { return reinterpret_cast<Character const *>(ptr); }
+		static Character const *launder(T const *ptr) requires (std::is_same_v<Character, char> && std::is_same_v<T, char8_t>) { return reinterpret_cast<Character const *>(ptr); }
 #endif
 	};
 	template <typename Format>

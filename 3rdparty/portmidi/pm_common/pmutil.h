@@ -9,6 +9,9 @@
     available for other uses.
  */
 
+#ifndef PORTMIDI_PMUTIL_H
+#define PORTMIDI_PMUTIL_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -24,10 +27,10 @@ typedef void PmQueue;
 
     @param num_msgs the number of messages the queue can hold
 
-    @param the fixed message size
+    @param bytes_per_msg the fixed message size
 
     @return the allocated and initialized queue, or NULL if memory
-    cannot be allocated. Allocation uses #pm_malloc().
+    cannot be allocated. Allocation uses pm_alloc().
 
     The queue only accepts fixed sized messages. 
 
@@ -66,7 +69,7 @@ PMEXPORT PmQueue *Pm_QueueCreate(long num_msgs, int32_t bytes_per_msg);
 
     @return pmNoError or an error code.
 
-    Uses #pm_free(). 
+    Uses pm_free(). 
 
  */
 PMEXPORT PmError Pm_QueueDestroy(PmQueue *queue);
@@ -102,7 +105,7 @@ PMEXPORT PmError Pm_Enqueue(PmQueue *queue, void *msg);
 
     @param queue a queue created by #Pm_QueueCreate().
 
-    @return non-zero iff the queue is empty, and @pmBadPtr if \p queue
+    @return non-zero iff the queue is empty, and #pmBadPtr if \p queue
     is NULL.
 
     The full condition may change immediately because a parallel
@@ -177,3 +180,5 @@ PMEXPORT PmError Pm_SetOverflow(PmQueue *queue);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif /* PORTMIDI_PMUTIL_H */

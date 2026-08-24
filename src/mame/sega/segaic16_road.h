@@ -41,7 +41,7 @@ public:
 	};
 
 
-	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void segaic16_road_hangon_decode(struct road_info *info);
 	void segaic16_road_outrun_decode(struct road_info *info);

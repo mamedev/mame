@@ -129,7 +129,7 @@ void hy268a_state::xycs(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify everything once emulation works
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify everything once emulation works
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -141,7 +141,7 @@ void hy268a_state::xycs(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100); // TODO
 
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &hy268a_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &hy268a_state::ramdac_map);
 
 	HD63484(config, "acrtc", 22_MHz_XTAL / 4).set_addrmap(0, &hy268a_state::hd63484_map); // divider not verified
 

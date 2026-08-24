@@ -40,9 +40,6 @@ mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, devic
 void mulcd_device::device_start()
 {
 	hd44780_base_device::device_start();
-	m_outputs.resolve();
-	m_contrast.resolve();
-	m_led_outputs.resolve();
 }
 
 void mulcd_device::device_reset()
@@ -64,7 +61,7 @@ void mulcd_device::set_leds(u16 leds)
 		m_led_outputs[x] = (leds >> x) & 1;
 }
 
-u32 mulcd_device::mu_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void mulcd_device::mu_screen_update(screen_svg_device &screen)
 {
 	const u8 *image = render();
 	for(int x=0; x != 64; x++) {
@@ -75,17 +72,14 @@ u32 mulcd_device::mu_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 		image += 8;
 	}
-
-	return 0;
 }
 
 void mulcd_device::device_add_mconfig(machine_config &config)
 {
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto &screen = SCREEN_SVG(config, "screen");
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/1.5, 580/1.5);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(mulcd_device::mu_screen_update));
+	screen.set_size(1280, 386);
+	screen.set_screen_svg_update(FUNC(mulcd_device::mu_screen_update));
 
 	config.set_default_layout(layout_mulcd);
 }

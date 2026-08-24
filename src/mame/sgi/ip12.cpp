@@ -217,10 +217,10 @@ static void scsi_devices(device_slot_interface &device)
 
 void ip12_state::ip12(machine_config &config)
 {
-	SGI_PIC1(config, m_pic, 0);
+	SGI_PIC1(config, m_pic);
 	m_pic->set_bus(m_cpu, AS_PROGRAM);
 
-	SGI_HPC1(config, m_hpc, 0);
+	SGI_HPC1(config, m_hpc);
 	m_hpc->set_addrmap(0, &ip12_state::pbus_map);
 	m_hpc->set_gio(m_cpu, AS_PROGRAM);
 	m_hpc->set_enet(m_eth);
@@ -270,7 +270,7 @@ void ip12_state::ip12(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
 
-	SEEQ8003(config, m_eth, 0);
+	SEEQ8003(config, m_eth);
 	m_eth->out_int_cb().set(m_hpc, FUNC(hpc1_device::write_int));
 	m_eth->out_rxrdy_cb().set(m_hpc, FUNC(hpc1_device::write_drq<1>));
 	m_hpc->dma_r_cb<1>().set(m_eth, FUNC(seeq8003_device::fifo_r));
@@ -289,7 +289,7 @@ void ip12_state::ip12(machine_config &config)
 
 	sgi_kbd_port_device &kbd_port(SGI_KBD_PORT(config, "keyboard_port"));
 	kbd_port.option_set("keyboard", SGI_KBD);
-	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port", 0));
+	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port"));
 	mouse_port.option_set("mouse", SGI_HLE_SERIAL_MOUSE);
 	m_scc[0]->out_txda_callback().set(kbd_port, FUNC(sgi_kbd_port_device::write_txd));
 	kbd_port.rxd_handler().set(m_scc[0], FUNC(scc85c30_device::rxa_w));

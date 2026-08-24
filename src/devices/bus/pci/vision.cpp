@@ -67,11 +67,11 @@ const tiny_rom_entry *vision864_pci_device::device_rom_region() const
 
 void vision864_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision864_vga_device::screen_update));
 
-	S3_VISION864_VGA(config, m_vga, 0);
+	S3_VISION864_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 1MB, option for 2MB
 	m_vga->set_vram_size(2*1024*1024);
@@ -167,11 +167,11 @@ const tiny_rom_entry *vision964_pci_device::device_rom_region() const
 
 void vision964_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision964_vga_device::screen_update));
 
-	S3_VISION964_VGA(config, m_vga, 0);
+	S3_VISION964_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 2MB/4MB/8MB
 	m_vga->set_vram_size(4*1024*1024);
@@ -217,11 +217,11 @@ const tiny_rom_entry *vision968_pci_device::device_rom_region() const
 
 void vision968_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision968_vga_device::screen_update));
 
-	S3_VISION968_VGA(config, m_vga, 0);
+	S3_VISION968_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 2MB/4MB/8MB
 	m_vga->set_vram_size(4*1024*1024);

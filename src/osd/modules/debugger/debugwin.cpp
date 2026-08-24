@@ -14,12 +14,12 @@
 #include "win/debugwin.h"
 
 #include "win/consolewininfo.h"
+#include "win/debuggerprefs.h"
 #include "win/debugwininfo.h"
 #include "win/disasmwininfo.h"
 #include "win/logwininfo.h"
 #include "win/memorywininfo.h"
 #include "win/pointswininfo.h"
-#include "win/uimetrics.h"
 
 // emu
 #include "config.h"
@@ -33,6 +33,8 @@
 #include "winmain.h"
 
 #include "../input/input_windows.h" // for the keyboard translation table
+
+#include <shellscalingapi.h>
 
 
 namespace osd {
@@ -50,7 +52,7 @@ public:
 		debug_module(),
 		m_osd(nullptr),
 		m_machine(nullptr),
-		m_metrics(),
+		m_prefs(),
 		m_waiting_for_debugger(false),
 		m_window_list(),
 		m_main_console(nullptr),
@@ -74,7 +76,7 @@ public:
 protected:
 	virtual running_machine &machine() const override { return *m_machine; }
 
-	virtual debugger::win::ui_metrics &metrics() const override { return *m_metrics; }
+	virtual debugger::win::debugger_preferences const &preferences() const override { return *m_prefs; }
 	virtual void set_color_theme(int index) override;
 	virtual bool get_save_window_arrangement() const override { return m_save_windows; }
 	virtual void set_save_window_arrangement(bool save) override { m_save_windows = save; }
@@ -106,7 +108,7 @@ private:
 
 	windows_osd_interface *m_osd;
 	running_machine *m_machine;
-	std::unique_ptr<debugger::win::ui_metrics> m_metrics;
+	std::unique_ptr<debugger::win::debugger_preferences> m_prefs;
 	bool m_waiting_for_debugger;
 	std::vector<std::unique_ptr<debugger::win::debugwin_info> > m_window_list;
 	debugger::win::consolewin_info *m_main_console;
@@ -138,7 +140,7 @@ void debugger_windows::exit()
 		m_window_list.front()->destroy();
 
 	m_main_console = nullptr;
-	m_metrics.reset();
+	m_prefs.reset();
 	m_machine = nullptr;
 }
 
@@ -146,7 +148,7 @@ void debugger_windows::exit()
 void debugger_windows::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
-	m_metrics = std::make_unique<debugger::win::ui_metrics>(downcast<osd_options &>(m_machine->options()));
+	m_prefs = std::make_unique<debugger::win::debugger_preferences>(downcast<osd_options &>(m_machine->options()));
 	machine.configuration().config_register(
 			"debugger",
 			configuration_manager::load_delegate(&debugger_windows::config_load, this),
@@ -172,8 +174,10 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 			info.cbSize = sizeof(info);
 			if (GetMonitorInfo(nearest_monitor, &info))
 			{
-				m_next_window_pos.x = info.rcWork.left + 100;
-				m_next_window_pos.y = info.rcWork.top + 100;
+				UINT xdpi = 96, ydpi = 96;
+				GetDpiForMonitor(nearest_monitor, MDT_EFFECTIVE_DPI, &xdpi, &ydpi);
+				m_next_window_pos.x = info.rcWork.left + MulDiv(100, xdpi, 96);
+				m_next_window_pos.y = info.rcWork.top + MulDiv(100, xdpi, 96);
 				m_window_start_x = m_next_window_pos.x;
 			}
 		}
@@ -255,7 +259,7 @@ void debugger_windows::debugger_update()
 
 void debugger_windows::set_color_theme(int index)
 {
-	m_metrics->set_color_theme(index);
+	m_prefs->set_color_theme(index);
 	for (auto const &window : m_window_list)
 		window->redraw();
 }
@@ -345,7 +349,7 @@ void debugger_windows::stagger_window(HWND window, int width, int height)
 	target.top = 0;
 	target.right = width;
 	target.bottom = height;
-	if (!AdjustWindowRectEx(&target, GetWindowLong(window, GWL_STYLE), GetMenu(window) ? TRUE : FALSE,GetWindowLong(window, GWL_EXSTYLE)))
+	if (!AdjustWindowRectExForDpi(&target, GetWindowLong(window, GWL_STYLE), GetMenu(window) ? TRUE : FALSE, GetWindowLong(window, GWL_EXSTYLE), GetDpiForWindow(window)))
 	{
 		// really shouldn't end up here, but have to do something
 		SetWindowPos(window, HWND_TOP, m_next_window_pos.x, m_next_window_pos.y, width, height, SWP_SHOWWINDOW);
@@ -357,6 +361,9 @@ void debugger_windows::stagger_window(HWND window, int width, int height)
 
 	// get the work area for the nearest monitor to the target position
 	HMONITOR const mon = MonitorFromPoint(m_next_window_pos, MONITOR_DEFAULTTONEAREST);
+	UINT xdpi = 96, ydpi = 96;
+	if (mon)
+		GetDpiForMonitor(mon, MDT_EFFECTIVE_DPI, &xdpi, &ydpi);
 	if (mon)
 	{
 		MONITORINFO info;
@@ -367,10 +374,10 @@ void debugger_windows::stagger_window(HWND window, int width, int height)
 			// restart cascade if necessary
 			if (((m_next_window_pos.x + target.right) > info.rcWork.right) || ((m_next_window_pos.y + target.bottom) > info.rcWork.bottom))
 			{
-				m_next_window_pos.x = m_window_start_x += 16;
-				m_next_window_pos.y = info.rcWork.top + 100;
+				m_next_window_pos.x = m_window_start_x += MulDiv(16, xdpi, 96);
+				m_next_window_pos.y = info.rcWork.top + MulDiv(100, ydpi, 96);
 				if ((m_next_window_pos.x + target.right) > info.rcWork.right)
-					m_next_window_pos.x = m_window_start_x = info.rcWork.left + 100;
+					m_next_window_pos.x = m_window_start_x = info.rcWork.left + MulDiv(100, xdpi, 96);
 			}
 		}
 	}
@@ -378,8 +385,8 @@ void debugger_windows::stagger_window(HWND window, int width, int height)
 	// move the window and adjust the next position
 	MoveWindow(window, m_next_window_pos.x, m_next_window_pos.y, target.right, target.bottom, FALSE);
 	SetWindowPos(window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW);
-	m_next_window_pos.x += 16;
-	m_next_window_pos.y += 16;
+	m_next_window_pos.x += MulDiv(16, xdpi, 96);
+	m_next_window_pos.y += MulDiv(16, ydpi, 96);
 }
 
 
@@ -408,7 +415,7 @@ void debugger_windows::config_load(config_type cfgtype, config_level cfglevel, u
 			m_group_windows = m_group_windows_setting = 0 != parentnode->get_attribute_int(debugger::ATTR_DEBUGGER_GROUP_WINDOWS, m_group_windows ? 1 : 0);
 			util::xml::data_node const *const colors = parentnode->get_child(debugger::NODE_COLORS);
 			if (colors)
-				m_metrics->set_color_theme(colors->get_attribute_int(debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme()));
+				m_prefs->set_color_theme(colors->get_attribute_int(debugger::ATTR_COLORS_THEME, m_prefs->get_color_theme()));
 		}
 		else if (config_type::SYSTEM == cfgtype)
 		{
@@ -435,7 +442,7 @@ void debugger_windows::config_save(config_type cfgtype, util::xml::data_node *pa
 		parentnode->set_attribute_int(debugger::ATTR_DEBUGGER_GROUP_WINDOWS, m_group_windows_setting ? 1 : 0);
 		util::xml::data_node *const colors = parentnode->add_child(debugger::NODE_COLORS, nullptr);
 		if (colors)
-			colors->set_attribute_int(debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme());
+			colors->set_attribute_int(debugger::ATTR_COLORS_THEME, m_prefs->get_color_theme());
 	}
 	else if (m_save_windows && (config_type::SYSTEM == cfgtype))
 	{

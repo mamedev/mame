@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+license:BSD-3-Clause
+copyright-holders:MAMEdev Team
+
+RC702 display layout — TRUE RC752 (NEC JB-1201M(A)) geometry.
+
+The RC752 monitor's active display area is 230 x 165 mm (RCSL 44-RT1981) for the
+8275's 560 x 275 visible raster (80 cols x 7 dots, 25 rows x 11 lines).  That is
+a physical aspect of 230:165 = 46:33 = 1.3939, i.e. pixel aspect ratio 0.685
+(pixels ~1.46x taller than wide).
+
+The background-colour margin around the active raster is baked into the screen
+bitmap by screen_update_with_border (rc702.cpp) via bitmap.fill(palette[0]) and
+a CRTC_BORDER coordinate offset in display_pixels.  No separate artwork element
+is needed; the margin is renderer-independent (SDL and BGFX both correct).
+
+View 776x568 with screen filling the full bounds.  The 8-pixel bitmap margin
+(CRTC_BORDER) scales proportionally with the content.
+-->
+<mamelayout version="2">
+
+	<view name="Standard">
+		<bounds x="0" y="0" width="776" height="568" />
+		<screen index="0">
+			<bounds x="0" y="0" width="776" height="568" />
+		</screen>
+	</view>
+
+</mamelayout>

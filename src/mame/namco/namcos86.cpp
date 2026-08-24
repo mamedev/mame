@@ -319,8 +319,6 @@ void namcos86_state::machine_start()
 	if (m_subbank)
 		m_subbank->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
 
-	m_leds.resolve();
-
 	save_item(NAME(m_wdog));
 }
 
@@ -1053,7 +1051,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(49.152_MHz_XTAL/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8);
 	screen.set_screen_update(FUNC(namcos86_state::screen_update));
 	screen.screen_vblank().set(FUNC(namcos86_state::screen_vblank));
@@ -1064,11 +1062,11 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(namcos86_state::sprite_bank_cb));
 	m_spritegen->flip_callback().set(FUNC(namcos86_state::flip_screen_set));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[0], 0, m_palette, gfx_namcos86_tile_0);
+	NAMCO_CUS4XTMAP(config, m_tilegen[0], m_palette, gfx_namcos86_tile_0);
 	m_tilegen[0]->set_offset(47, 422, -9, 9);
 	m_tilegen[0]->set_tile_callback(FUNC(namcos86_state::tile_cb_0));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[1], 0, m_palette, gfx_namcos86_tile_1);
+	NAMCO_CUS4XTMAP(config, m_tilegen[1], m_palette, gfx_namcos86_tile_1);
 	m_tilegen[1]->set_offset(46, 422, -9, 9);
 	m_tilegen[1]->set_tile_callback(FUNC(namcos86_state::tile_cb_1));
 

@@ -4,7 +4,7 @@
 // these are similar to the devices in generalplus_gpl162xx_lcdtype.cpp
 // including the other HD 360 Degrees Rocker Palm Eyecare Console
 // which has an identical case
-// 
+//
 // they've been rebuilt for a different (unknown) tech level
 // (but still unSP2.0 based, even if they have GP3x in the header)
 // register use (in the tiny bit of code) looks similar to generalplus_gpce4.cpp
@@ -74,7 +74,7 @@ void generalplus_gp3x_state::generalplus_gp3x(machine_config &config)
 	UNSP_20(config, m_maincpu, 96000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gp3x_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(320, 240);

@@ -76,7 +76,6 @@ protected:
 
 	// setting cart values
 	void set_cart_value(int value);
-	void set_cart_value(bool value) { set_cart_value(value ? 1 : 0); }
 
 private:
 	distomeb_slot_device *const m_owning_slot;

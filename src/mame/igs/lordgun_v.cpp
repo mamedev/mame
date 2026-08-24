@@ -40,6 +40,8 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "lordgun.h"
 
+#include "input.h" // for video debug keys
+
 
 /***************************************************************************
 

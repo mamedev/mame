@@ -727,7 +727,7 @@ void macportable_state::macprtb(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.15);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -785,7 +785,7 @@ void macportable_state::macprtb(machine_config &config)
 	m_via1->irq_handler().set(FUNC(macportable_state::via_irq_w));
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::ASC);
+	ASC(config, m_asc, 15.6672_MHz_XTAL);
 	m_asc->irqf_callback().set(FUNC(macportable_state::asc_irq_w));
 	m_asc->add_route(0, "speaker", 1.0, 0);
 	m_asc->add_route(1, "speaker", 1.0, 1);

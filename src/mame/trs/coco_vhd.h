@@ -25,12 +25,12 @@ class coco_vhd_image_device :   public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: coco_vhd_image_device(mconfig, tag, owner, clock)
+	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: coco_vhd_image_device(mconfig, tag, owner, 0U)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 	}
-	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~coco_vhd_image_device();
 
 	// device_image_interface implementation

@@ -98,6 +98,8 @@ TODO (socrates):
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "corefloat.h"
+
 
 namespace {
 
@@ -742,20 +744,17 @@ rgb_t socrates_state::create_color(uint8_t color)
 	int const chromaindex = color&0x0F;
 	int const swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
 	double finalY = (1/LUMAMAX) * lumatable[swappedcolor];
-	double const finalI = (M_I * (cos((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-	double const finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalI = (M_I * cos(DEGREE_TO_RADIAN(phaseangle[chromaindex]))) * ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalQ = (M_Q * sin(DEGREE_TO_RADIAN(phaseangle[chromaindex]))) * ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
 	if (finalY > 1) finalY = 1; // clamp luma
 	// calculate the R, G and B values here, neato matrix math
 	double finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
 	double finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
 	double finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
 	// scale/clamp to 0-255 range
-	if (finalR<0) finalR = 0;
-	if (finalR>1) finalR = 1;
-	if (finalG<0) finalG = 0;
-	if (finalG>1) finalG = 1;
-	if (finalB<0) finalB = 0;
-	if (finalB>1) finalB = 1;
+	finalR = std::clamp(finalR, 0.0, 1.0);
+	finalG = std::clamp(finalG, 0.0, 1.0);
+	finalB = std::clamp(finalB, 0.0, 1.0);
 	// gamma correction: 1.0 to GAMMA:
 	finalR = pow(finalR, 1/GAMMA)*255;
 	finalG = pow(finalG, 1/GAMMA)*255;
@@ -927,7 +926,7 @@ void iqunlimz_state::video_regs_w(offs_t offset, uint8_t data)
 	{
 		rectangle visarea = m_screen->visible_area();
 		visarea.set(0, (data & 0x02 ? 496 : 256) - 1, 0, 224 - 1);
-		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period());
 	}
 
 	m_video_regs[offset] = data;
@@ -1463,7 +1462,7 @@ void socrates_state::socrates(machine_config &config)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
@@ -1522,7 +1521,7 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(iqunlimz_state::screen_update));

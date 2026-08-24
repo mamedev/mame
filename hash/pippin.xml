@@ -273,7 +273,7 @@ license:CC0-1.0
 
 	<software name="comptonp" cloneof="compton" supported="no">
 		<!--
-		http://redump.org/disc/128570/
+		https://redump.info/disc/128570/
 		<rom name="Compton's Interactive Encyclopedia - @World Edition (USA) (Beta) (1996-10-28).cue" size="143" crc="3de7dc4f" sha1="92ba912add9f284a02a9c0a758a5b5b89eff01d0"/>
 		<rom name="Compton's Interactive Encyclopedia - @World Edition (USA) (Beta) (1996-10-28).bin" size="783086640" crc="393265f1" sha1="2d753c87c832a6878bce3818d42060f4f644e8f8"/>
 		-->
@@ -550,7 +550,7 @@ license:CC0-1.0
 
 	<software name="mrpotatop" supported="no">
 		<!--
-		http://redump.org/disc/128568/
+		https://redump.info/disc/128568/
 		<rom name="Mr. Potato Head Saves Veggie Valley (USA) (Beta) (1996-10-30).cue" size="127" crc="014a399f" sha1="e1706fed2c4d06ea60df9765d61aca17793c0013"/>
 		<rom name="Mr. Potato Head Saves Veggie Valley (USA) (Beta) (1996-10-30).bin" size="783086640" crc="a538ab3a" sha1="609e586f4ef51f40122a6eb8fbc02f50d3468d36"/>
 		-->
@@ -801,7 +801,7 @@ license:CC0-1.0
 
 	<software name="powerranp" cloneof="powerran" supported="no">
 		<!--
-		http://redump.org/disc/128570/
+		https://redump.info/disc/128570/
 		<rom name="Saban's Power Rangers Zeo Versus the Machine Empire (USA) (Beta) (1996-10-23).cue" size="143" crc="a059ce57" sha1="0a47c695bef66a508d73aa2d41979edb834b9ac6"/>
 		<rom name="Saban's Power Rangers Zeo Versus the Machine Empire (USA) (Beta) (1996-10-23).bin" size="783086640" crc="fdad6a9f" sha1="cacd6d6afff3fbc26193f464cf1a529f0d0345ef"/>
 		-->

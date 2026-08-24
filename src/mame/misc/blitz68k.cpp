@@ -64,6 +64,8 @@ To Do:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 // configurable logging
 #define LOG_MCU     (1U << 1)
 #define LOG_BLITTER (1U << 2)
@@ -133,9 +135,6 @@ public:
 	void ramdac_config(machine_config &config) ATTR_COLD;
 	void steaser(machine_config &config) ATTR_COLD;
 	void texasrls(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
 
 private:
 	void blit_copy_w(uint16_t data);
@@ -1796,7 +1795,7 @@ void blitz68k_state::ramdac_map(address_map &map)
 void blitz68k_state::ramdac_config(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 
@@ -1806,7 +1805,7 @@ void blitz68k_state::ilpag(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::ilpag_map);
 	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq4_line_hold)); //3 & 6 used, mcu comms?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1876,7 +1875,7 @@ void blitz68k_state::cjffruit(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1916,7 +1915,7 @@ void blitz68k_state::bankrob(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1947,7 +1946,7 @@ void blitz68k_state::bankroba(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1977,7 +1976,7 @@ void blitz68k_state::deucesw2(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2009,7 +2008,7 @@ void blitz68k_state::dualgame(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2039,7 +2038,7 @@ void blitz68k_state::hermit(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2073,7 +2072,7 @@ void blitz68k_state::maxidbl(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

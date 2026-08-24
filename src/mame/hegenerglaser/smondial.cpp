@@ -61,9 +61,9 @@ public:
 	{ }
 
 	// machine configs
-	void smondial2(machine_config &config);
-	void mega4(machine_config &config);
-	void smondialb(machine_config &config);
+	void smondial2(machine_config &config) ATTR_COLD;
+	void mega4(machine_config &config) ATTR_COLD;
+	void smondialb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -96,8 +96,6 @@ protected:
 
 void smondialb_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_board_mux));
 }
@@ -405,7 +403,7 @@ SYST( 1986, smondial,   0,        0,      smondiala, smondial,  smondiala_state,
 SYST( 1986, smondialab, smondial, 0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE )
 SYST( 1986, smondialb,  smondial, 0,      smondialb, smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)",  MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1988, mega4,      0,        0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE )
 SYST( 1988, mega4a,     mega4,    0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE )

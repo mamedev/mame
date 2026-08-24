@@ -54,6 +54,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include <numbers>
+
 
 namespace {
 
@@ -374,10 +376,11 @@ uint32_t cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_in
 		     0
 		*/
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
-		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
-		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
+		constexpr double PI = std::numbers::pi;
+		p1 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
+		p2 = -65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p3 = 65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p4 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
 
 		x = -256 - (m_scrollx | m_scrollx_hi);
 		y = 256 + (m_scrolly | m_scrolly_hi);
@@ -421,10 +424,11 @@ uint32_t cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_in
 		     0
 		*/
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
-		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
-		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
+		constexpr double PI = std::numbers::pi;
+		p1 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
+		p2 = -65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p3 = 65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p4 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
 
 		x = 256 + (m_scrollx | m_scrollx_hi);
 		y = 256 - (m_scrolly | m_scrolly_hi);
@@ -996,7 +1000,7 @@ void cntsteer_state::cntsteer(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(256, 256);
@@ -1047,7 +1051,7 @@ void cntsteer_state::zerotrgt(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(256, 256);

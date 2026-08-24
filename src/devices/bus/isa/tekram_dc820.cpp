@@ -220,7 +220,7 @@ void tekram_dc320b_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);
@@ -240,7 +240,7 @@ void tekram_dc320e_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);
@@ -260,7 +260,7 @@ void tekram_dc820_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);
@@ -280,7 +280,7 @@ void tekram_dc820b_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);

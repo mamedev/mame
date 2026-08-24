@@ -38,7 +38,6 @@ protected:
 	virtual u8 *get_vram_ptr() override;
 	virtual u8 *get_auxbank_ptr() override;
 	virtual u16 get_auxbank_mask() override;
-	virtual bool allow_dhr() override { return true; }
 
 private:
 	u8 m_ram[64*1024];

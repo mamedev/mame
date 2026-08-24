@@ -349,15 +349,15 @@ void maciivx_state::maciiv_base(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(m_vasp, FUNC(vasp_device::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -377,7 +377,7 @@ void maciivx_state::maciiv_base(machine_config &config)
 
 	MACADB(config, m_macadb, C15M);
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irqc_callback().set(m_vasp, FUNC(vasp_device::slot0_irq_w));
 	nubus.out_irqd_callback().set(m_vasp, FUNC(vasp_device::slot1_irq_w));

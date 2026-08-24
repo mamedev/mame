@@ -52,15 +52,15 @@ class dc_controller_device : public dc_common_device
 {
 public:
 	// construction/destruction
+
 	template <typename T>
-	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
-		: dc_controller_device(mconfig, tag, owner, clock)
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&host_tag, int host_port)
+		: dc_controller_device(mconfig, tag, owner)
 	{
 		host.set_tag(std::forward<T>(host_tag));
 		set_host_port(host_port);
 	}
-
-	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 private:
 	void fixed_status(uint32_t *dest) override;
@@ -74,14 +74,14 @@ class dc_keyboard_device : public dc_common_device
 public:
 	// construction/destruction
 	template <typename T>
-	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
-		: dc_keyboard_device(mconfig, tag, owner, clock)
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&host_tag, int host_port)
+		: dc_keyboard_device(mconfig, tag, owner)
 	{
 		host.set_tag(std::forward<T>(host_tag));
 		set_host_port(host_port);
 	}
 
-	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 //protected:
 

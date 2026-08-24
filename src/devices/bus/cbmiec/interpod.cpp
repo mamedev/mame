@@ -132,7 +132,7 @@ void cbm_interpod_device::device_add_mconfig(machine_config &config)
 
 	MOS6532(config, m_riot, 1000000);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	ieee488_device::add_cbm_devices(config, nullptr);
 

@@ -244,7 +244,7 @@ void cham24_state::cham24(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cham24_state::cham24_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(32*8, 262);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);

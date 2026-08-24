@@ -462,7 +462,7 @@ ROM_END
  */
 void mpcb828_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
 	//m_screen->set_raw(83'020'800, 1184, 0, 1184, 884, 0, 884);
 	m_screen->set_screen_update(FUNC(mpcb828_device::screen_update));
@@ -495,7 +495,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
  */
 void mpcb849_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
 	m_screen->set_screen_update(FUNC(mpcb849_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
@@ -507,7 +507,7 @@ void mpcb849_device::device_add_mconfig(machine_config &config)
 	m_dsp->holda().set(FUNC(mpcb828_device::holda));
 	m_dsp->set_disable();
 
-	BT458(config, "ramdac", 0); // unconfirmed clock
+	BT458(config, "ramdac"); // unconfirmed clock
 
 	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb849_device::scc_irq));
@@ -530,14 +530,14 @@ void mpcb030_device::device_add_mconfig(machine_config &config)
 
 void mpcba63_device::device_add_mconfig(machine_config &config)
 {
-	//SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//SCREEN(config, m_screen);
 	// screen params copied from GT
 	//m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
 	//m_screen->set_screen_update().set(FUNC(mpcba63_device::screen_update));
 	//m_screen->screen_vblank().set(FUNC(?, vblank));
-	//BT457(config, "ramdac0", 0); // PS045701-165
-	//BT457(config, "ramdac1", 0);
-	//BT457(config, "ramdac2", 0);
+	//BT457(config, "ramdac0"); // PS045701-165
+	//BT457(config, "ramdac1");
+	//BT457(config, "ramdac2");
 }
 
 /*
@@ -570,7 +570,7 @@ void msmt094_device::device_add_mconfig(machine_config &config)
 
 void mpcb896_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
 	m_screen->set_screen_update(FUNC(mpcb896_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));

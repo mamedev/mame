@@ -50,6 +50,7 @@ void pofo_hpc102_device::device_add_mconfig(machine_config &config)
 }
 
 
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -72,6 +73,13 @@ pofo_hpc102_device::pofo_hpc102_device(const machine_config &mconfig, const char
 
 void pofo_hpc102_device::device_start()
 {
+	m_uart_tap = m_slot->iospace().install_readwrite_tap(0x8070, 0x8077, "hpc102_uart",
+		[this] (offs_t offset, u8 &data, u8) { data = m_uart->ins8250_r(offset & 0x07); },
+		[this] (offs_t offset, u8 &data, u8) { m_uart->ins8250_w(offset & 0x07, data); }, &m_uart_tap);
+
+	m_vector_tap = m_slot->iospace().install_readwrite_tap(0x807f, 0x807f, "hpc102_vector",
+		[] (offs_t offset, u8 &data, u8) { data = 0x01; },
+		[this] (offs_t offset, u8 &data, u8) { m_vector = data; }, &m_vector_tap);
 }
 
 
@@ -92,48 +100,4 @@ void pofo_hpc102_device::device_reset()
 uint8_t pofo_hpc102_device::eack_r()
 {
 	return m_vector;
-}
-
-
-//-------------------------------------------------
-//  nrdi_r - read
-//-------------------------------------------------
-
-uint8_t pofo_hpc102_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
-{
-	if (!bcom)
-	{
-		if ((offset & 0x0f) == 0x0f)
-		{
-			data = 0x01;
-		}
-
-		if (!(offset & 0x08))
-		{
-			data = m_uart->ins8250_r(offset & 0x07);
-		}
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  nwri_w - write
-//-------------------------------------------------
-
-void pofo_hpc102_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
-{
-	if (!bcom)
-	{
-		if ((offset & 0x0f) == 0x0f)
-		{
-			m_vector = data;
-		}
-
-		if (!(offset & 0x08))
-		{
-			m_uart->ins8250_w(offset & 0x07, data);
-		}
-	}
 }

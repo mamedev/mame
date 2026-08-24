@@ -2,7 +2,7 @@
 // execution/bad_executor.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +20,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace execution {
 
 /// Exception thrown when trying to access an empty polymorphic executor.
@@ -28,19 +29,26 @@ class bad_executor
 {
 public:
   /// Constructor.
-  ASIO_DECL bad_executor() noexcept;
+  bad_executor() noexcept
+  {
+  }
+
+  /// Destructor.
+  virtual ~bad_executor() noexcept
+  {
+  }
 
   /// Obtain message associated with exception.
-  ASIO_DECL virtual const char* what() const noexcept;
+  virtual const char* what() const noexcept
+  {
+    return "bad executor";
+  }
 };
 
 } // namespace execution
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
-
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/execution/impl/bad_executor.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
 
 #endif // ASIO_EXECUTION_BAD_EXECUTOR_HPP

@@ -25,6 +25,7 @@
 #include "ymf271.h"
 
 #include <algorithm>
+#include <numbers>
 
 #define STD_CLOCK       (16934400)
 
@@ -1540,8 +1541,8 @@ void ymf271_device::init_tables()
 
 	for (int i = 0; i < SIN_LEN; i++)
 	{
-		double m = sin( ((i*2)+1) * M_PI / SIN_LEN );
-		double m2 = sin( ((i*4)+1) * M_PI / SIN_LEN );
+		double m = sin( ((i*2)+1) * std::numbers::pi / SIN_LEN );
+		double m2 = sin( ((i*4)+1) * std::numbers::pi / SIN_LEN );
 
 		// Waveform 0: sin(wt)    (0 <= wt <= 2PI)
 		m_lut_waves[0][i] = (int16_t)(m * MAXOUT);

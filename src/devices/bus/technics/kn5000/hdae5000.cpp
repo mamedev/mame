@@ -83,7 +83,7 @@ void hdae5000_device::ata_w(offs_t offset, uint8_t data)
 
 void hdae5000_device::device_add_mconfig(machine_config &config)
 {
-	IDE_HARDDISK(config, m_hdd, 0);
+	IDE_HARDDISK(config, m_hdd);
 
 	/* Optional Parallel Port */
 	I8255(config, m_ppi); // actual chip is a NEC uPD71055 @ IC9

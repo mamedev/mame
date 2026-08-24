@@ -205,10 +205,10 @@ Below is an incomplete list of Commodore part numbers:
 			</dataarea>
 		</part>
 		<part name="extras" interface="floppy_3_5">
-			<!-- or 317451-01? should contain ABasiC and Tutor -->
+			<!-- or 317451-01? contains ABasiC but is missing Tutor, so might be modified -->
 			<feature name="part_id" value="Extras 1.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="327246-01_extras.adf" size="901120" status="nodump" />
+				<rom name="327246-01_extras.adf" size="901120" crc="c9ca0811" sha1="2ddbd016dbdf581a948d8882a45987eb81afee06" />
 			</dataarea>
 		</part>
 	</software>
@@ -565,7 +565,27 @@ Below is an incomplete list of Commodore part numbers:
 
 	<!-- 317794-01 Workbench 1.3 (Es) -->
 	<!-- 317795-01 Workbench 1.3 (Ch) -->
-	<!-- 317796-01 Workbench 1.3 (Se/Fi) [label found] -->
+
+	<software name="wb13_se" cloneof="wb13">
+		<description>Workbench 1.3 Rev. 34.20 (Se/Fi)</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3 (Se/Fi)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317796-01_workbench.adf" size="901120" crc="084995a7" sha1="2380ee391588bc7059a41aadbb7d64a8c297a75a" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- 317797-01 Workbench 1.3 (It) [label found] -->
 
 	<software name="wb13_dk" cloneof="wb13">
@@ -665,6 +685,7 @@ Below is an incomplete list of Commodore part numbers:
 		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
 			<feature name="part_id" value="Workbench 1.3.2 (Es)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317794-03_workbench.adf" size="901120" crc="e84cd11c" sha1="c5127904ecf864e1a8be770405a02f583ef11ccc" status="baddump" />
@@ -690,7 +711,7 @@ Below is an incomplete list of Commodore part numbers:
 			<!-- original label found -->
 			<feature name="part_id" value="Workbench 1.3.2 (It)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317797-03_workbench.adf" size="901120" status="nodump" />
+				<rom name="317797-03_workbench.adf" size="901120" crc="121f7525" sha1="beb9147c5c042fcb22a12824506f59e73200e791" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="extras" interface="floppy_3_5">
@@ -834,7 +855,7 @@ Below is an incomplete list of Commodore part numbers:
 	</software>
 
 	<!-- 317793-04 Workbench 1.3.3 (No) -->
-	<!-- 317794-04 Workbench 1.3.3 (Es) -->
+	<!-- 317794-04 Workbench 1.3.3 (Es) [label found] -->
 	<!-- 317795-04 Workbench 1.3.3 (Ch) -->
 	<!-- 317796-04 Workbench 1.3.3 (Se/Fi) [label found] -->
 	<!-- 317797-04 Workbench 1.3.3 (It) -->
@@ -1117,21 +1138,21 @@ Below is an incomplete list of Commodore part numbers:
 			<!-- original label found -->
 			<feature name="part_id" value="Workbench Version 2.05" />
 			<dataarea name="flop" size="901120">
-				<rom name="367959-01_workbench.adf" size="901120" status="nodump" />
+				<rom name="367959-01_workbench.adf" size="901120" crc="200d9ac0" sha1="280b637f63dff53506445c462a355e4fbc011f2c" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="extras" interface="floppy_3_5">
-			<!-- original label found, crc should be 2ec25826 -->
+			<!-- original label found, crc should be 2ec25826 instead? but disk appears unmodified -->
 			<feature name="part_id" value="Extras Version 2.05" />
 			<dataarea name="flop" size="901120">
-				<rom name="367960-01_extras.adf" size="901120" status="nodump" />
+				<rom name="367960-01_extras.adf" size="901120" crc="b8093b06" sha1="a3bde4025b06248df065b532ccdade83aa26ef85" />
 			</dataarea>
 		</part>
 		<part name="fonts" interface="floppy_3_5">
 			<!-- original label found, crc should be 0f4d1bbd -->
 			<feature name="part_id" value="Fonts Version 2.05" />
 			<dataarea name="flop" size="901120">
-				<rom name="367968-01_fonts.adf" size="901120" status="nodump" />
+				<rom name="367968-01_fonts.adf" size="901120" crc="6743418a" sha1="58082ebaed6be73bcbb5972fa7352a933e3a747e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1286,24 +1307,23 @@ Below is an incomplete list of Commodore part numbers:
 
 	<!-- Version 3.1 -->
 
-	<!-- Missing: There is also a release on HD disks -->
-
+	<!-- Village Tronic release? -->
 	<software name="wb31">
 		<description>Workbench 3.1 Rev. 40.42</description>
 		<year>1994</year>
 		<publisher>Commodore</publisher>
 		<part name="install" interface="floppy_3_5">
-			<!-- original label found, crc should be 5a039e90 -->
+			<!-- original label found, crc should be 5a039e90? -->
 			<feature name="part_id" value="Install Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370299-98_install.adf" size="901120" crc="2bd9d105" sha1="27c8d7042da3a8c7a21742129970bd7e56b7e828" status="baddump" />
+				<rom name="370299-98_install.adf" size="901120" crc="b631f796" sha1="336b24b8d8c1cda4604fe980607c1c8c874781f8" />
 			</dataarea>
 		</part>
 		<part name="storage" interface="floppy_3_5">
-			<!-- original label found, crc should be 4bd38ef4 -->
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Storage Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370299-99_storage.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" status="baddump" />
+				<rom name="370299-99_storage.adf" size="901120" crc="4bd38ef4" sha1="0ff271946f3071a84572dd8e3b9651f8fce783e8" />
 			</dataarea>
 		</part>
 		<part name="workbench" interface="floppy_3_5">
@@ -1314,29 +1334,104 @@ Below is an incomplete list of Commodore part numbers:
 			</dataarea>
 		</part>
 		<part name="locale" interface="floppy_3_5">
-			<!-- original label found, crc should be e0e5de81 -->
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Locale Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370300-99_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" status="baddump" />
+				<rom name="370300-99_locale.adf" size="901120" crc="e0e5de81" sha1="51c754634343eacb69f9f2c114acbfa2f14ca6f6" />
 			</dataarea>
 		</part>
 		<part name="extras" interface="floppy_3_5">
-			<!-- original label found, crc should be 32f55078 -->
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370301-98_extras.adf" size="901120" crc="786a7c59" sha1="0a887f5e1f3b2f2af5b5d4c689cc00ea83414137" status="baddump" />
+				<rom name="370301-98_extras.adf" size="901120" crc="32f55078" sha1="bb1ab9acfc90b8911c78cba3b07a305306391a6c" />
 			</dataarea>
 		</part>
 		<part name="fonts" interface="floppy_3_5">
-			<!-- original label found, crc should be 63470de4 -->
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Fonts Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370301-99_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" status="baddump" />
+				<rom name="370301-99_fonts.adf" size="901120" crc="63470de4" sha1="df890f6d92002a332f26f35004c9446651d4f5fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wb31a" cloneof="wb31">
+		<description>Workbench 3.1 Rev. 40.42 (Alt)</description>
+		<year>1994</year>
+		<publisher>Commodore</publisher>
+		<part name="install" interface="floppy_3_5">
+			<!-- original label found, crc should be 5a039e90? this is a slighty cleaned up version of wb31:install - offical? -->
+			<feature name="part_id" value="Install Version 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370299-98_install.adf" size="901120" crc="2bd9d105" sha1="27c8d7042da3a8c7a21742129970bd7e56b7e828" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="storage" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Storage Version 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370299-99_storage.adf" size="901120" crc="4bd38ef4" sha1="0ff271946f3071a84572dd8e3b9651f8fce783e8" />
+			</dataarea>
+		</part>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Workbench Version 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370300-98_workbench.adf" size="901120" crc="d233484c" sha1="ca5b96eaac70558273d3158f476a4e39ca8c7f75" />
+			</dataarea>
+		</part>
+		<part name="locale" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Locale Version 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370300-99_locale.adf" size="901120" crc="e0e5de81" sha1="51c754634343eacb69f9f2c114acbfa2f14ca6f6" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras Version 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370301-98_extras.adf" size="901120" crc="32f55078" sha1="bb1ab9acfc90b8911c78cba3b07a305306391a6c" />
+			</dataarea>
+		</part>
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Fonts Version 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370301-99_fonts.adf" size="901120" crc="63470de4" sha1="df890f6d92002a332f26f35004c9446651d4f5fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Included with the (limited) Commodore A4000T release? Part numbers missing -->
+	<!-- Part numbers might be the ones listed on the ESCOM release A4000T labels since they re-used them -->
+	<software name="wb31_a4000t" supported="no">
+		<description>Workbench 3.1 Rev. 40.42 A4000T</description>
+		<year>1994</year>
+		<publisher>Commodore</publisher>
+		<part name="install" interface="floppy_3_5">
+			<feature name="part_id" value="Install Version 3.1" />
+			<dataarea name="flop" size="1802240">
+				<rom name="install31_a4000t.adf" size="1802240" crc="50b46be3" sha1="34ddd5f0618e57e96c82cc48a519c629189d458d" />
+			</dataarea>
+		</part>
+		<part name="storage" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench Version 3.1" />
+			<dataarea name="flop" size="1802240">
+				<rom name="workbench31_a4000t.adf" size="1802240" crc="cd474084" sha1="362aa210e4cce323c90aaaf2845899cbbcb27019" />
+			</dataarea>
+		</part>
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Extras Version 3.1" />
+			<dataarea name="flop" size="1802240">
+				<rom name="extras31_a4000t.adf" size="1802240" crc="b0c5efc7" sha1="0a5b3c25bab292b6a34a5c23d5095b4a039fbd8a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- ESCOM releases below -->
+
 	<!-- Some disk labels show the same PN as the Commodore release, however the content seems different -->
 
 	<software name="wb31_escom" cloneof="wb31">
@@ -1347,47 +1442,47 @@ Below is an incomplete list of Commodore part numbers:
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Install 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_install.adf" size="901120" crc="27b3c15a" sha1="96d1fa31a61a29f4c1fe7d4659e0e32a3fa6b5f8" />
+				<rom name="install31_escom.adf" size="901120" crc="27b3c15a" sha1="96d1fa31a61a29f4c1fe7d4659e0e32a3fa6b5f8" />
 			</dataarea>
 		</part>
 		<part name="workbench" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Workbench 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_workbench.adf" size="901120" crc="576b08f9" sha1="486ea9520e60051c20ec01329d5a0fe3bb10b4fc" />
+				<rom name="workbench31_escom.adf" size="901120" crc="576b08f9" sha1="486ea9520e60051c20ec01329d5a0fe3bb10b4fc" />
 			</dataarea>
 		</part>
 		<part name="locale" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Locale 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
+				<rom name="locale31_escom.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
 			</dataarea>
 		</part>
 		<part name="extras" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_extras.adf" size="901120" crc="786a7c59" sha1="0a887f5e1f3b2f2af5b5d4c689cc00ea83414137" />
+				<rom name="extras31_escom.adf" size="901120" crc="786a7c59" sha1="0a887f5e1f3b2f2af5b5d4c689cc00ea83414137" />
 			</dataarea>
 		</part>
 		<part name="fonts" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Fonts 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
+				<rom name="fonts31_escom.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
 			</dataarea>
 		</part>
 		<part name="storage" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Storage 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_storage.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" />
+				<rom name="storage31_escom.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wb31_a4000t" cloneof="wb31">
+	<software name="wb31_a4000t_e" cloneof="wb31_a4000t">
 		<description>Workbench 3.1 Rev. 40.42 A4000T (ESCOM)</description>
 		<year>1995</year>
 		<publisher>ESCOM</publisher>
@@ -1395,42 +1490,42 @@ Below is an incomplete list of Commodore part numbers:
 			<!-- pn 370299-97? original label found -->
 			<feature name="part_id" value="Install 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_install_a4000t.adf" size="901120" status="nodump" />
+				<rom name="install31_a4000t_escom.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
 		<part name="workbench" interface="floppy_3_5">
 			<!-- pn 370300-97? original label found, crc should be 92847a4c -->
 			<feature name="part_id" value="Workbench 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_workbench_a4000t.adf" size="901120" status="nodump" />
+				<rom name="workbench31_a4000t_escom.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
 		<part name="locale" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Locale 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
+				<rom name="locale31_escom.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
 			</dataarea>
 		</part>
 		<part name="extras" interface="floppy_3_5">
 			<!-- pn 370301-97? original label found, crc should be 4f4f2e7d -->
 			<feature name="part_id" value="Extras 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_extras_a4000t.adf" size="901120" status="nodump" />
+				<rom name="extras31_a4000t_escom.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
 		<part name="fonts" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Fonts 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="escom_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
+				<rom name="fonts31_escom.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
 			</dataarea>
 		</part>
 		<part name="storage" interface="floppy_3_5">
 			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Storage 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370299-99_storage.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" />
+				<rom name="storage31_escom.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" />
 			</dataarea>
 		</part>
 	</software>

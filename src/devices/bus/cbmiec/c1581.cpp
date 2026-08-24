@@ -360,8 +360,6 @@ c1563_device::c1563_device(const machine_config &mconfig, const char *tag, devic
 
 void c1581_device::device_start()
 {
-	m_leds.resolve();
-
 	// state saving
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_atn_ack));

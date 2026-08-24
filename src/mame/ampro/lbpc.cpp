@@ -86,7 +86,7 @@ private:
 
 	required_device<v40_device> m_maincpu;
 	required_device<isa8_device> m_expbus;
-	required_device<wd37c65c_device> m_fdc;
+	required_device<wd37c65b_device> m_fdc;
 	required_device<ncr53c80_device> m_scsic;
 	required_device<pc_kbdc_device> m_kbd;
 	required_device<speaker_sound_device> m_speaker;
@@ -291,9 +291,9 @@ void lbpc_state::io_map(address_map &map)
 	map(0x0330, 0x0337).rw(m_scsic, FUNC(ncr53c80_device::read), FUNC(ncr53c80_device::write));
 	map(0x0338, 0x0338).portr("JUMPERS");
 	map(0x0378, 0x037f).unmaprw(); // parallel printer port (ASIC1)
-	map(0x03f2, 0x03f2).w(m_fdc, FUNC(wd37c65c_device::dor_w));
-	map(0x03f4, 0x03f5).m(m_fdc, FUNC(wd37c65c_device::map));
-	map(0x03f7, 0x03f7).w(m_fdc, FUNC(wd37c65c_device::ccr_w));
+	map(0x03f2, 0x03f2).w(m_fdc, FUNC(wd37c65b_device::dor_w));
+	map(0x03f4, 0x03f5).m(m_fdc, FUNC(wd37c65b_device::map));
+	map(0x03f7, 0x03f7).w(m_fdc, FUNC(wd37c65b_device::ccr_w));
 	map(0x03f8, 0x03ff).rw("com", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
 
@@ -347,8 +347,8 @@ void lbpc_state::lbpc(machine_config &config)
 	m_maincpu->in_ior_cb<0>().set(FUNC(lbpc_state::exp_dack1_r));
 	m_maincpu->out_iow_cb<0>().set(FUNC(lbpc_state::exp_dack1_w));
 	m_maincpu->out_dack_cb<1>().set(FUNC(lbpc_state::dmaak_w<1>));
-	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(wd37c65c_device::dma_r));
-	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(wd37c65c_device::dma_w));
+	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(wd37c65b_device::dma_r));
+	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(wd37c65b_device::dma_w));
 	m_maincpu->out_dack_cb<2>().set(FUNC(lbpc_state::dmaak_w<2>));
 	m_maincpu->in_ior_cb<2>().set(m_scsic, FUNC(ncr53c80_device::dma_r));
 	m_maincpu->out_iow_cb<2>().set(m_scsic, FUNC(ncr53c80_device::dma_w));
@@ -366,7 +366,7 @@ void lbpc_state::lbpc(machine_config &config)
 	com.out_tx_callback().set("serial", FUNC(rs232_port_device::write_txd)); // J3 pin 5
 	com.out_dtr_callback().set("serial", FUNC(rs232_port_device::write_dtr)); // J3 pin 7
 
-	wd37c65c_device &fdc(WD37C65C(config, m_fdc, 16_MHz_XTAL, 9.6_MHz_XTAL)); // WD37C65BJM
+	wd37c65b_device &fdc(WD37C65B(config, m_fdc, 16_MHz_XTAL, 9.6_MHz_XTAL)); // WD37C65BJM
 	// 9.6 MHz XTAL is optional and not supported by the BIOS, but can still be installed
 	fdc.intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 	fdc.drq_wr_callback().set(m_maincpu, FUNC(v40_device::dreq_w<1>));
@@ -404,6 +404,7 @@ void lbpc_state::lbpc(machine_config &config)
 	m_expbus->irq3_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_expbus->iochck_callback().set(FUNC(lbpc_state::iochck_w));
 
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "exp", 0, m_expbus, pc_isa8_cards, "ega", false);
 }
 

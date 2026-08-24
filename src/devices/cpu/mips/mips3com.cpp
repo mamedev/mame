@@ -147,7 +147,7 @@ void mips3_device::mips3com_tlbp()
 	for (tlbindex = 0; tlbindex < m_tlbentries; tlbindex++)
 	{
 		const mips3_tlb_entry &entry = m_tlb[tlbindex];
-		const uint64_t mask = ~((entry.page_mask >> 13) & 0xfff) << 13;
+		const uint64_t mask = ~((entry.page_mask >> 13) & 0x3ffff) << 13;
 
 		/* if the relevant bits of EntryHi match the relevant bits of the TLB */
 		if ((entry.entry_hi & mask) == (m_core->cpr[0][COP0_EntryHi] & mask))
@@ -216,20 +216,27 @@ uint32_t mips3_device::compute_config_register()
 	else if (m_flavor == MIPS3_TYPE_VR5500)
 	{
 		/*
-		    For VR55xx, Config is as follows:
+		    For VR55xx, Config is as follows (VR5500 User's Manual U16044EJ1V0UM, figure 5-19):
 		    bit 31 = always 0
-		    bits 28-30 = EC
-		    bits 24-27 = EP
-		    bits 23-22 = EM
+		    bits 30-28 = EC system clock / PClock ratio
+		    bits 27-24 = EP block write transfer rate; undefined coming out of reset
+		    bits 23-22 = EM SysAD bus timing mode; undefined coming out of reset
 		    bits 21-20 = always b11
-		    bits 19-18 = EW
+		    bits 19-18 = EW (SysAD bus width: b00 = 64-bit, b01 = 32-bit)
 		    bits 17-16 = always b10
 		    bit 15 = endian indicator as standard MIPS III
-		    bits 3-14 = always b110011011110
-		    bits 0-2 = K0 ("Coherency algorithm of kseg0")
+		    bits 3-14 = always b110011011110 (fixed 16 KB caches with 32-byte lines)
+		    bits 0-2 = K0 ("Coherency algorithm of kseg0"; undefined out of reset)
 		*/
 
-		configreg = 0x6460;
+		configreg = 0x003266f0;
+
+		// EC on VR5500 is in 1/2 units and can't be lower than 1, so
+		// 0 = 1, 1 = 1.5, etc.
+		uint32_t ratio2 = 4;
+		if (c_system_clock != 0)
+			ratio2 = uint32_t((2ULL * m_cpu_clock + c_system_clock / 2) / c_system_clock);
+		configreg |= ((ratio2 < 4) ? 0 : (ratio2 > 11) ? 7 : (ratio2 - 4)) << 28;
 	}
 	else
 	{
@@ -374,7 +381,7 @@ void mips3_device::tlb_map_entry(int tlbindex)
 	if ((entry.entry_lo[0] & 0x80000000) && m_flavor == MIPS3_TYPE_R5900)
 		count = 4;
 	else
-		count = ((entry.page_mask >> 13) & 0x00fff) + 1;
+		count = ((entry.page_mask >> 13) & 0x3ffff) + 1;
 
 	/* loop over both the even and odd pages */
 	for (which = 0; which < 2; which++)
@@ -401,8 +408,10 @@ void mips3_device::tlb_map_entry(int tlbindex)
 				flags |= (flags << 4) & (USER_READ_ALLOWED | USER_WRITE_ALLOWED | USER_FETCH_ALLOWED);
 		}
 
-		/* load the virtual TLB with the corresponding entries */
-		if ((effvpn + count) <= (0x80000000 >> MIPS3_MIN_PAGE_SHIFT) || effvpn >= (0xc0000000 >> MIPS3_MIN_PAGE_SHIFT))
+		/* load the virtual TLB with the corresponding entries, provided the mapping fits within
+		   the virtual TLB's table - a large page near the top of memory may run off the end */
+		if ((effvpn + count) <= (1U << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)) &&
+			((effvpn + count) <= (0x80000000 >> MIPS3_MIN_PAGE_SHIFT) || effvpn >= (0xc0000000 >> MIPS3_MIN_PAGE_SHIFT)))
 			vtlb_load(2 * tlbindex + which, count, effvpn << MIPS3_MIN_PAGE_SHIFT, (pfn << MIPS3_MIN_PAGE_SHIFT) | flags);
 		else
 			vtlb_load(2 * tlbindex + which, 0, 0, 0);
@@ -424,7 +433,7 @@ void mips3_device::tlb_write_common(int tlbindex)
 
 		/* fill in the new TLB entry from the COP0 registers */
 		entry.page_mask = m_core->cpr[0][COP0_PageMask];
-		entry.entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry.page_mask & u64(0x0000000001ffe000U));
+		entry.entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry.page_mask & u64(0x000000007fffe000U));
 		entry.entry_lo[0] = m_core->cpr[0][COP0_EntryLo0];
 		entry.entry_lo[1] = m_core->cpr[0][COP0_EntryLo1];
 
@@ -453,7 +462,7 @@ void mips3_device::mips3_tlb_entry::log_half(int tlbindex, int which) const
 		const uint32_t r = (hi >> 62) & 3;
 		const uint32_t pfn = (lo >> 6) & 0x00ffffff;
 		const uint32_t c = (lo >> 3) & 7;
-		const uint32_t pagesize = (((page_mask >> 13) & 0xfff) + 1) << MIPS3_MIN_PAGE_SHIFT;
+		const uint32_t pagesize = (((page_mask >> 13) & 0x3ffff) + 1) << MIPS3_MIN_PAGE_SHIFT;
 		const uint64_t vaddr = ((uint64_t)vpn * MIPS3_MIN_PAGE_SIZE) + (pagesize * which);
 		const uint64_t paddr = (uint64_t)pfn * MIPS3_MIN_PAGE_SIZE;
 

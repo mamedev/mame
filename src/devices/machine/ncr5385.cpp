@@ -177,7 +177,15 @@ void ncr5385_device::scsi_ctrl_changed()
 			m_state_timer->adjust(attotime::zero);
 	}
 	else if (ctrl & S_BSY)
+	{
 		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x arbitration/selection\n", ctrl);
+
+		// the target asserts BSY in response to selection while the initiator is still
+		// asserting SEL; complete the selection as soon as the target responds instead
+		// of waiting out the full selection timeout that SEL_WAIT_BSY was armed with.
+		if (m_state == SEL_WAIT_BSY)
+			m_state_timer->adjust(attotime::zero);
+	}
 	else
 	{
 		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x BUS FREE\n", ctrl);
@@ -567,6 +575,8 @@ int ncr5385_device::state_step()
 	case SEL_DELAY:
 		LOGMASKED(LOG_STATE, "selection: BSY cleared\n");
 		m_state = SEL_WAIT_BSY;
+		// this is the upper-bound selection timeout; a responding target completes
+		// the selection early via scsi_ctrl_changed() asserting BSY
 		delay = SCSI_SEL_TIMEOUT;
 
 		// clear BSY, optionally assert ATN

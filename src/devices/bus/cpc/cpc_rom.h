@@ -22,7 +22,7 @@ class cpc_rom_image_device : public device_t, public device_rom_image_interface
 {
 public:
 	// construction/destruction
-	cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~cpc_rom_image_device();
 
 	// device_image_interface implementation

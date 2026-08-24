@@ -64,6 +64,8 @@
 #include "video/bt47x.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define VERBOSE (0)
 #include "logmacro.h"
 
@@ -148,9 +150,9 @@ void ncd88k_state::ncd19c(machine_config &config)
 
 	SCN2681(config, "duart", 3'686'400);
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(125'000'000, 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
 	m_screen->set_screen_update(FUNC(ncd88k_state::screen_update));
 }
@@ -267,7 +269,7 @@ void ncdmcx_state::ncdmcx(machine_config &config)
 
 	BT477(config, m_ramdac, 125'000'000); // ATT20C497-11
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(125'000'000, 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
 	m_screen->set_screen_update(FUNC(ncdmcx_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(ncdmcx_state::irq_w<4>));

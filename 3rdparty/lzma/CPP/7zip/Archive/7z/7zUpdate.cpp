@@ -33,15 +33,8 @@ struct CFilterMode
   UInt32 Id;
   UInt32 Delta;  // required File Size alignment, if Id is not k_Delta.
                  // (Delta == 0) means unknown alignment
-  UInt32 Offset; // for k_ARM64
+  UInt32 Offset; // for k_ARM64 / k_RISCV
   // UInt32 AlignSizeOpt; // for k_ARM64
-
-  CFilterMode():
-    Id(0),
-    Delta(0),
-    Offset(0)
-    // , AlignSizeOpt(0)
-    {}
 
   void ClearFilterMode()
   {
@@ -59,7 +52,7 @@ struct CFilterMode
       Delta = 16;
     else if (Id == k_ARM64 || Id == k_ARM || Id == k_PPC || Id == k_SPARC)
       Delta = 4;
-    else if (Id == k_ARMT)
+    else if (Id == k_ARMT || Id == k_RISCV)
       Delta = 2;
     else if (Id == k_BCJ || Id == k_BCJ2)
       Delta = 1; // do we need it?
@@ -95,7 +88,9 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
     return 0;
   p += 4;
   
-  switch (GetUi16(p))
+  const unsigned machine = GetUi16(p);
+
+  switch (machine)
   {
     case 0x014C:
     case 0x8664:  filterId = k_X86; break;
@@ -112,11 +107,16 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
     case 0x01C2:  filterId = k_ARM; break;  // WinCE new
     case 0x01C4:  filterId = k_ARMT; break; // WinRT
 
+    case 0x5032:  // RISCV32
+    case 0x5064:  // RISCV64
+    // case 0x5128:  // RISCV128
+                  filterId = k_RISCV; break;
+
     case 0x0200:  filterId = k_IA64; break;
     default:  return 0;
   }
 
-  // const UInt32 numSections = GetUi16(p + 2);
+  const UInt32 numSections = GetUi16(p + 2);
   optHeaderSize = GetUi16(p + 16);
   if (optHeaderSize > (1 << 10))
     return 0;
@@ -132,34 +132,49 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
       return 0;
   }
 
-  /*
     // Windows exe file sizes are not aligned for 4 KiB.
     // So we can't use (CFilterMode::Offset != 0) in solid archives.
     // So we just don't set Offset here.
 #define NUM_SCAN_SECTIONS_MAX (1 << 6)
-#define EXE_SECTION_OFFSET_MAX (1 << 27)
-#define EXE_SECTION_SIZE_MIN (1 << 8)
-#define EXE_SECTION_SIZE_MAX (1 << 27)
+// #define EXE_SECTION_OFFSET_MAX (1 << 27)
+// #define EXE_SECTION_SIZE_MIN (1 << 8)
+// #define EXE_SECTION_SIZE_MAX (1 << 27)
 #define PE_SectHeaderSize 40
-#define PE_SECT_EXECUTE 0x20000000
+// #define PE_SECT_EXECUTE 0x20000000
 
+/*
   if (numSections > NUM_SCAN_SECTIONS_MAX)
     return 0;
+*/
 
+  if ((size_t)(p - buf) + optHeaderSize <= size)
+  {
   p += optHeaderSize;
+/*
   // UInt32 numExeSections = 0;
   // bool execute_finded = false;
   // UInt32 sect_va = 0;
   // UInt32 sect_size = 0;
   // UInt32 sect_offset = 0;
-
+*/
+  if (numSections <= NUM_SCAN_SECTIONS_MAX)
+  if (machine == 0x8664)
   for (UInt32 i = 0; i < numSections
-        // && numExeSections < numSectionsMax
         ; i++, p += PE_SectHeaderSize)
   {
-    UInt32 characts, rawSize, offset;
+    // UInt32 characts, rawSize, offset;
     if ((UInt32)(p - buf) + PE_SectHeaderSize > size)
-      return 0;
+    {
+      // return 0;
+      break;
+    }
+    if (memcmp(p, ".a64xrm", 8) == 0)
+    {
+      // ARM64EC
+      filterId = k_ARM64;
+      break;
+    }
+/*
     rawSize = GetUi32(p + 16);
     offset = GetUi32(p + 20);
     characts = GetUi32(p + 36);
@@ -178,8 +193,11 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
         break;
       }
     }
+*/
+  }
   }
 
+  /*
   filterMode->Offset = 0;
   if (filterId == k_ARM64)
   {
@@ -193,6 +211,14 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
   return 1;
 }
 
+
+/*
+  Filters don't improve the compression ratio for relocatable object files (".o").
+  But we can get compression ratio gain, if we compress object
+  files and executables in same solid block.
+  So we use filters for relocatable object files (".o"):
+*/
+// #define Z7_7Z_CREATE_ARC_DISABLE_FILTER_FOR_OBJ
 
 /* ---------- ELF ---------- */
 
@@ -233,6 +259,12 @@ static int Parse_ELF(const Byte *buf, size_t size, CFilterMode *filterMode)
     default: return 0;
   }
 
+#ifdef Z7_7Z_CREATE_ARC_DISABLE_FILTER_FOR_OBJ
+#define ELF_ET_REL  1
+  if (Get16(buf + 0x10, be) == ELF_ET_REL)
+    return 0;
+#endif
+
   switch (Get16(buf + 0x12, be))
   {
     case 3:
@@ -243,8 +275,9 @@ static int Parse_ELF(const Byte *buf, size_t size, CFilterMode *filterMode)
     case 43: filterId = k_SPARC; break;
     case 20:
     case 21: if (!be) return 0; filterId = k_PPC; break;
-    case 40: if ( be) return 0; filterId = k_ARM; break;
+    case 40:  if (be) return 0; filterId = k_ARM; break;
     case 183: if (be) return 0; filterId = k_ARM64; break;
+    case 243: if (be) return 0; filterId = k_RISCV; break;
 
     /* Some IA-64 ELF executables have size that is not aligned for 16 bytes.
        So we don't use IA-64 filter for IA-64 ELF */
@@ -291,6 +324,12 @@ static unsigned Parse_MACH(const Byte *buf, size_t size, CFilterMode *filterMode
     case MACH_SIG_LE_64: /* mode64 = True;  */ be = False; break;
     default: return 0;
   }
+
+#ifdef Z7_7Z_CREATE_ARC_DISABLE_FILTER_FOR_OBJ
+#define MACH_TYPE_OBJECT 1
+  if (Get32(buf + 0xC, be) == MACH_TYPE_OBJECT)
+      return 0;
+#endif
 
   switch (Get32(buf + 4, be))
   {
@@ -391,7 +430,11 @@ struct CFilterMode2: public CFilterMode
   bool Encrypted;
   unsigned GroupIndex;
   
-  CFilterMode2(): Encrypted(false) {}
+  void Construct()
+  {
+    ClearFilterMode();
+    Encrypted = false;
+  }
 
   int Compare(const CFilterMode2 &m) const
   {
@@ -482,6 +525,7 @@ static inline bool IsExeFilter(CMethodId m)
   switch (m)
   {
     case k_ARM64:
+    case k_RISCV:
     case k_BCJ:
     case k_BCJ2:
     case k_ARM:
@@ -490,6 +534,7 @@ static inline bool IsExeFilter(CMethodId m)
     case k_SPARC:
     case k_IA64:
       return true;
+    default: break;
   }
   return false;
 }
@@ -498,6 +543,7 @@ static unsigned Get_FilterGroup_for_Folder(
     CRecordVector<CFilterMode2> &filters, const CFolderEx &f, bool extractFilter)
 {
   CFilterMode2 m;
+  m.Construct();
   // m.Id = 0;
   // m.Delta = 0;
   // m.Offset = 0;
@@ -521,7 +567,8 @@ static unsigned Get_FilterGroup_for_Folder(
       if (m.Id == k_BCJ2)
         m.Id = k_BCJ;
       m.SetDelta();
-      if (m.Id == k_ARM64)
+      if (m.Id == k_ARM64 ||
+          m.Id == k_RISCV)
         if (coder.Props.Size() == 4)
           m.Offset = GetUi32(coder.Props);
     }
@@ -537,15 +584,12 @@ static HRESULT WriteRange(IInStream *inStream, ISequentialOutStream *outStream,
     UInt64 position, UInt64 size, ICompressProgressInfo *progress)
 {
   RINOK(InStream_SeekSet(inStream, position))
-  CLimitedSequentialInStream *streamSpec = new CLimitedSequentialInStream;
-  CMyComPtr<ISequentialInStream> inStreamLimited(streamSpec);
+  CMyComPtr2_Create<ISequentialInStream, CLimitedSequentialInStream> streamSpec;
   streamSpec->SetStream(inStream);
   streamSpec->Init(size);
-
-  NCompress::CCopyCoder *copyCoderSpec = new NCompress::CCopyCoder;
-  CMyComPtr<ICompressCoder> copyCoder = copyCoderSpec;
-  RINOK(copyCoder->Code(inStreamLimited, outStream, NULL, NULL, progress))
-  return (copyCoderSpec->TotalSize == size ? S_OK : E_FAIL);
+  CMyComPtr2_Create<ICompressCoder, NCompress::CCopyCoder> copyCoder;
+  RINOK(copyCoder.Interface()->Code(streamSpec, outStream, NULL, NULL, progress))
+  return (copyCoder->TotalSize == size ? S_OK : E_FAIL);
 }
 
 /*
@@ -675,7 +719,7 @@ static int CompareEmptyItems(const unsigned *p1, const unsigned *p2, void *param
   return (u1.IsDir && u1.IsAnti) ? -n : n;
 }
 
-static const char *g_Exts =
+static const char * const g_Exts =
   " 7z xz lzma ace arc arj bz tbz bz2 tbz2 cab deb gz tgz ha lha lzh lzo lzx pak rar rpm sit zoo"
   " zip jar ear war msi"
   " 3gp avi mov mpeg mpg mpe wmv"
@@ -749,19 +793,19 @@ struct CRefItem
   unsigned NamePos;
   unsigned ExtensionIndex;
   
-  CRefItem() {}
-  CRefItem(UInt32 index, const CUpdateItem &ui, bool sortByType):
-    UpdateItem(&ui),
-    Index(index),
-    ExtensionPos(0),
-    NamePos(0),
-    ExtensionIndex(0)
+  void Construct(UInt32 index, const CUpdateItem &ui, bool sortByType)
   {
+    UpdateItem = &ui;
+    Index = index;
+    ExtensionPos = 0;
+    NamePos = 0;
+    ExtensionIndex = 0;
+
     if (sortByType)
     {
-      int slashPos = ui.Name.ReverseFind_PathSepar();
+      const int slashPos = ui.Name.ReverseFind_PathSepar();
       NamePos = (unsigned)(slashPos + 1);
-      int dotPos = ui.Name.ReverseFind_Dot();
+      const int dotPos = ui.Name.ReverseFind_Dot();
       if (dotPos <= slashPos)
         ExtensionPos = ui.Name.Len();
       else
@@ -772,7 +816,7 @@ struct CRefItem
           AString s;
           for (unsigned pos = ExtensionPos;; pos++)
           {
-            wchar_t c = ui.Name[pos];
+            const wchar_t c = ui.Name[pos];
             if (c >= 0x80)
               break;
             if (c == 0)
@@ -780,7 +824,7 @@ struct CRefItem
               ExtensionIndex = GetExtIndex(s);
               break;
             }
-            s += (char)MyCharLower_Ascii((char)c);
+            s.Add_Char((char)MyCharLower_Ascii((char)c));
           }
         }
       }
@@ -1123,6 +1167,12 @@ HRESULT CAnalysis::GetFilterGroup(UInt32 index, const CUpdateItem &ui, CFilterMo
         #ifdef MY_CPU_ARM64
           filterModeTemp.Id = k_ARM64;
         #endif
+        #ifdef MY_CPU_RISCV
+          filterModeTemp.Id = k_RISCV;
+        #endif
+        #ifdef MY_CPU_SPARC
+          filterModeTemp.Id = k_SPARC;
+        #endif
         parseRes = true;
       }
 
@@ -1172,6 +1222,8 @@ static inline void GetMethodFull(UInt64 methodID, UInt32 numStreams, CMethodFull
   m.NumStreams = numStreams;
 }
 
+
+// we add bond for mode.Methods[0] that is filter
 static HRESULT AddBondForFilter(CCompressionMethodMode &mode)
 {
   for (unsigned c = 1; c < mode.Methods.Size(); c++)
@@ -1189,16 +1241,19 @@ static HRESULT AddBondForFilter(CCompressionMethodMode &mode)
   return E_INVALIDARG;
 }
 
-static HRESULT AddFilterBond(CCompressionMethodMode &mode)
+/*
+static HRESULT AddBondForFilter_if_ThereAreBonds(CCompressionMethodMode &mode)
 {
   if (!mode.Bonds.IsEmpty())
     return AddBondForFilter(mode);
   return S_OK;
 }
+*/
 
 static HRESULT AddBcj2Methods(CCompressionMethodMode &mode)
 {
   // mode.Methods[0] must be k_BCJ2 method !
+  // mode.Methods[1] : we expect that there is at least one method after BCJ2
 
   CMethodFull m;
   GetMethodFull(k_LZMA, 1, m);
@@ -1210,7 +1265,7 @@ static HRESULT AddBcj2Methods(CCompressionMethodMode &mode)
   m.AddProp32(NCoderPropID::kLitContextBits, 0);
   // m.AddProp_Ascii(NCoderPropID::kMatchFinder, "BT2");
 
-  unsigned methodIndex = mode.Methods.Size();
+  const unsigned methodIndex = mode.Methods.Size();
 
   if (mode.Bonds.IsEmpty())
   {
@@ -1229,109 +1284,140 @@ static HRESULT AddBcj2Methods(CCompressionMethodMode &mode)
   
   RINOK(AddBondForFilter(mode))
   CBond2 bond;
-  bond.OutCoder = 0;
+  bond.OutCoder = 0; // index of BCJ2 coder
   bond.InCoder = methodIndex;      bond.OutStream = 1;  mode.Bonds.Add(bond);
   bond.InCoder = methodIndex + 1;  bond.OutStream = 2;  mode.Bonds.Add(bond);
   return S_OK;
 }
 
+
 static HRESULT MakeExeMethod(CCompressionMethodMode &mode,
-    const CFilterMode &filterMode, /* bool addFilter, */ bool bcj2Filter)
+    const CFilterMode &filterMode,
+    const bool bcj2_IsAllowed,
+    const CUIntVector &disabledFilterIDs)
 {
   if (mode.Filter_was_Inserted)
   {
+    // filter was inserted, but bond for that filter was not added still.
     const CMethodFull &m = mode.Methods[0];
-    const CMethodId id = m.Id;
-    if (id == k_BCJ2)
+    if (m.Id == k_BCJ2)
       return AddBcj2Methods(mode);
     if (!m.IsSimpleCoder())
       return E_NOTIMPL;
-    // if (Bonds.IsEmpty()) we can create bonds later
-    return AddFilterBond(mode);
+    if (mode.Bonds.IsEmpty())
+      return S_OK;
+    return AddBondForFilter(mode);
   }
 
   if (filterMode.Id == 0)
     return S_OK;
 
-  CMethodFull &m = mode.Methods.InsertNew(0);
+  unsigned nextCoder;
 
-  {
-    FOR_VECTOR (k, mode.Bonds)
-    {
-      CBond2 &bond = mode.Bonds[k];
-      bond.InCoder++;
-      bond.OutCoder++;
-    }
-  }
+  const bool useBcj2 = bcj2_IsAllowed
+      && Is86Filter(filterMode.Id)
+      && disabledFilterIDs.FindInSorted(k_BCJ2) < 0;
 
-  HRESULT res;
-  
-  if (bcj2Filter && Is86Filter(filterMode.Id))
+  if (!useBcj2 && disabledFilterIDs.FindInSorted(filterMode.Id) >= 0)
   {
-    GetMethodFull(k_BCJ2, 4, m);
-    res = AddBcj2Methods(mode);
+    // required filter is disabled,
+    // but we still can use information about data alignment.
+#if 0 // 1 for debug
+    // we can return here, if we want default lzma properties
+    return S_OK;
+#else
+    // we will try to change lzma/lzma2 properties
+    nextCoder = 0;
+    if (!mode.Bonds.IsEmpty())
+      for (unsigned c = 0;; c++)
+      {
+        if (c == mode.Methods.Size())
+          return S_OK;
+        if (!mode.IsThereBond_to_Coder(c))
+        {
+          nextCoder = c;
+          break;
+        }
+      }
+#endif
   }
   else
   {
+    // we insert new filter method:
+    CMethodFull &m = mode.Methods.InsertNew(0); // 0 == index of new inserted item
+    {
+      // we move all coder indexes in bonds up for 1 position:
+      FOR_VECTOR (k, mode.Bonds)
+      {
+        CBond2 &bond = mode.Bonds[k];
+        bond.InCoder++;
+        bond.OutCoder++;
+      }
+    }
+    if (useBcj2)
+    {
+      GetMethodFull(k_BCJ2, 4, m);
+      return AddBcj2Methods(mode);
+    }
+    
     GetMethodFull(filterMode.Id, 1, m);
+    
     if (filterMode.Id == k_Delta)
       m.AddProp32(NCoderPropID::kDefaultProp, filterMode.Delta);
-    else if (filterMode.Id == k_ARM64)
+    else if (filterMode.Id == k_ARM64
+          || filterMode.Id == k_RISCV)
     {
       // if (filterMode.Offset != 0)
-        m.AddProp32(
-          NCoderPropID::kDefaultProp,
-          // NCoderPropID::kBranchOffset,
-          filterMode.Offset);
+      m.AddProp32(
+        NCoderPropID::kDefaultProp,
+        // NCoderPropID::kBranchOffset,
+        filterMode.Offset);
     }
-    res = AddFilterBond(mode);
-
-    int alignBits = -1;
+    
+    nextCoder = 1;
+    if (!mode.Bonds.IsEmpty())
     {
-      const UInt32 delta = filterMode.Delta;
-      if (delta == 0 || delta > 16)
-      {
-        // if (delta == 0) alignBits = GetAlignForFilterMethod(filterMode.Id);
-      }
-      else if ((delta & ((1 << 4) - 1)) == 0) alignBits = 4;
-      else if ((delta & ((1 << 3) - 1)) == 0) alignBits = 3;
-      else if ((delta & ((1 << 2) - 1)) == 0) alignBits = 2;
-      else if ((delta & ((1 << 1) - 1)) == 0) alignBits = 1;
-      // else alignBits = 0;
-      /* alignBits=0 is default mode for lzma/lzma2.
-         So we don't set alignBits=0 here. */
-    }
-    if (res == S_OK && alignBits > 0)
-    {
-      unsigned nextCoder = 1;
-      if (!mode.Bonds.IsEmpty())
-      {
-        nextCoder = mode.Bonds.Back().InCoder;
-      }
-      if (nextCoder < mode.Methods.Size())
-      {
-        CMethodFull &nextMethod = mode.Methods[nextCoder];
-        if (nextMethod.Id == k_LZMA || nextMethod.Id == k_LZMA2)
-        {
-          if (!nextMethod.Are_Lzma_Model_Props_Defined())
-          {
-            if (alignBits != 0)
-            {
-              if (alignBits > 2 || filterMode.Id == k_Delta)
-                nextMethod.AddProp32(NCoderPropID::kPosStateBits, (unsigned)alignBits);
-              unsigned lc = 0;
-              if (alignBits < 3)
-                lc = (unsigned)(3 - alignBits);
-              nextMethod.AddProp32(NCoderPropID::kLitContextBits, lc);
-              nextMethod.AddProp32(NCoderPropID::kLitPosBits, (unsigned)alignBits);
-            }
-          }
-        }
-      }
+      RINOK(AddBondForFilter(mode))
+      nextCoder = mode.Bonds.Back().InCoder;
     }
   }
 
-  return res;
+  if (nextCoder >= mode.Methods.Size())
+  {
+    // we don't expect that case, if there was non-filter method.
+    // but we return S_OK to support filter-only case.
+    return S_OK;
+  }
+
+  int alignBits = -1;
+  {
+    const UInt32 delta = filterMode.Delta;
+    if (delta == 0 || delta > 16)
+    {
+      // if (delta == 0) alignBits = GetAlignForFilterMethod(filterMode.Id);
+    }
+    else if ((delta & ((1 << 4) - 1)) == 0) alignBits = 4;
+    else if ((delta & ((1 << 3) - 1)) == 0) alignBits = 3;
+    else if ((delta & ((1 << 2) - 1)) == 0) alignBits = 2;
+    else if ((delta & ((1 << 1) - 1)) == 0) alignBits = 1;
+    // else alignBits = 0;
+    /* alignBits=0 is default mode for lzma/lzma2.
+    So we don't set alignBits=0 here. */
+  }
+  if (alignBits <= 0)
+    return S_OK;
+  // (alignBits > 0)
+  CMethodFull &nextMethod = mode.Methods[nextCoder];
+  if (nextMethod.Id == k_LZMA || nextMethod.Id == k_LZMA2)
+  if (!nextMethod.Are_Lzma_Model_Props_Defined())
+  {
+    if (alignBits > 2 || filterMode.Id == k_Delta)
+      nextMethod.AddProp32(NCoderPropID::kPosStateBits, (unsigned)alignBits);
+    const unsigned lc = (alignBits < 3) ? (unsigned)(3 - alignBits) : 0u;
+    nextMethod.AddProp32(NCoderPropID::kLitContextBits, lc);
+    nextMethod.AddProp32(NCoderPropID::kLitPosBits, (unsigned)alignBits);
+  }
+  return S_OK;
 }
 
 
@@ -1859,6 +1945,7 @@ HRESULT Update(
 
   CIntArr fileIndexToUpdateIndexMap;
   UInt64 complexity = 0;
+  bool isThere_UnknownSize = false;
   UInt64 inSizeForReduce2 = 0;
 
  #ifndef Z7_NO_CRYPTO
@@ -1971,28 +2058,36 @@ HRESULT Update(
 
   UInt64 inSizeForReduce = 0;
   {
-    bool isSolid = (numSolidFiles > 1 && options.NumSolidBytes != 0);
+    const bool isSolid = (numSolidFiles > 1 && options.NumSolidBytes != 0);
     FOR_VECTOR (i, updateItems)
     {
       const CUpdateItem &ui = updateItems[i];
       if (ui.NewData)
       {
-        complexity += ui.Size;
-        if (isSolid)
-          inSizeForReduce += ui.Size;
-        else if (inSizeForReduce < ui.Size)
-          inSizeForReduce = ui.Size;
+        if (ui.Size == (UInt64)(Int64)-1)
+          isThere_UnknownSize = true;
+        else
+        {
+          complexity += ui.Size;
+          if (isSolid)
+            inSizeForReduce += ui.Size;
+          else if (inSizeForReduce < ui.Size)
+            inSizeForReduce = ui.Size;
+        }
       }
     }
   }
 
+  if (isThere_UnknownSize)
+    inSizeForReduce = (UInt64)(Int64)-1;
+  else
+    RINOK(updateCallback->SetTotal(complexity))
+
   if (inSizeForReduce < inSizeForReduce2)
-    inSizeForReduce = inSizeForReduce2;
+      inSizeForReduce = inSizeForReduce2;
 
-  RINOK(updateCallback->SetTotal(complexity))
 
-  CLocalProgress *lps = new CLocalProgress;
-  CMyComPtr<ICompressProgressInfo> progress = lps;
+  CMyComPtr2_Create<ICompressProgressInfo, CLocalProgress> lps;
   lps->Init(updateCallback, true);
 
   #ifndef Z7_ST
@@ -2057,6 +2152,7 @@ HRESULT Update(
         continue;
 
       CFilterMode2 fm;
+      fm.Construct();
       if (useFilters)
       {
         // analysis.ATime_Defined = false;
@@ -2232,12 +2328,13 @@ HRESULT Update(
     CCompressionMethodMode method = *options.Method;
     {
       const HRESULT res = MakeExeMethod(method, filterMode,
+        // bcj2_IsAllowed:
         #ifdef Z7_ST
           false
         #else
           options.MaxFilter && options.MultiThreadMixer
         #endif
-        );
+        , options.DisabledFilterIDs);
 
       RINOK(res)
     }
@@ -2299,7 +2396,7 @@ HRESULT Update(
 
         const UInt64 packSize = db->GetFolderFullPackSize(folderIndex);
         RINOK(WriteRange(inStream, archive.SeqStream,
-            db->GetFolderStreamPos(folderIndex, 0), packSize, progress))
+            db->GetFolderStreamPos(folderIndex, 0), packSize, lps))
         lps->ProgressOffset += packSize;
 
         const unsigned folderIndex_New = newDatabase.Folders.Size();
@@ -2321,7 +2418,7 @@ HRESULT Update(
         size_t indexStart = db->FoToCoderUnpackSizes[folderIndex];
         const size_t indexEnd = db->FoToCoderUnpackSizes[folderIndex + 1];
         for (; indexStart < indexEnd; indexStart++)
-          newDatabase.CoderUnpackSizes.Add(db->CoderUnpackSizes[indexStart]);
+          newDatabase.CoderUnpackSizes.Add(db->CoderUnpackSizes.ConstData()[indexStart]);
       }
       else
       {
@@ -2481,7 +2578,7 @@ HRESULT Update(
               sizeToEncode, // expectedDataSize
               newDatabase.Folders.AddNew(),
               // newDatabase.CoderUnpackSizes, curUnpackSize,
-              archive.SeqStream, newDatabase.PackSizes, progress);
+              archive.SeqStream, newDatabase.PackSizes, lps);
 
           if (encodeRes == k_My_HRESULT_CRC_ERROR)
             return E_FAIL;
@@ -2612,7 +2709,7 @@ HRESULT Update(
     unsigned i;
 
     for (i = 0; i < numFiles; i++)
-      refItems[i] = CRefItem(group.Indices[i], updateItems[group.Indices[i]], sortByType);
+      refItems[i].Construct(group.Indices[i], updateItems[group.Indices[i]], sortByType);
 
     CSortParam sortParam;
     // sortParam.TreeFolders = &treeFolders;
@@ -2680,8 +2777,7 @@ HRESULT Update(
       */
 
 
-      CFolderInStream *inStreamSpec = new CFolderInStream;
-      CMyComPtr<ISequentialInStream> solidInStream(inStreamSpec);
+      CMyComPtr2_Create<ISequentialInStream, CFolderInStream> inStreamSpec; // solidInStream;
 
       // inStreamSpec->_reportArcProp = reportArcProp;
       
@@ -2702,13 +2798,13 @@ HRESULT Update(
       
       RINOK(encoder.Encode1(
           EXTERNAL_CODECS_LOC_VARS
-          solidInStream,
+          inStreamSpec,
           // NULL,
           &inSizeForReduce,
           expectedDataSize, // expected size
           newDatabase.Folders.AddNew(),
           // newDatabase.CoderUnpackSizes, curFolderUnpackSize,
-          archive.SeqStream, newDatabase.PackSizes, progress))
+          archive.SeqStream, newDatabase.PackSizes, lps))
 
       if (!inStreamSpec->WasFinished())
         return E_FAIL;
@@ -2970,7 +3066,7 @@ HRESULT Update(
     if (newDatabase.NumUnpackStreamsVector.Size() != numFolders
         || newDatabase.FolderUnpackCRCs.Defs.Size() > numFolders)
       return E_FAIL;
-    newDatabase.FolderUnpackCRCs.if_NonEmpty_FillResedue_with_false(numFolders);
+    newDatabase.FolderUnpackCRCs.if_NonEmpty_FillResidue_with_false(numFolders);
   }
   
   updateItems.ClearAndFree();

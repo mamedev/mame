@@ -303,6 +303,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_gpu(*this, "gpu"),
+		m_spu(*this, "spu"),
+		m_ram(*this, "ram"),
+		m_gpu_ram(*this, "gpu_ram"),
+		m_spu_ram(*this, "spu_ram"),
 		m_ncr53cf96(*this, "ncr53cf96"),
 		m_ata(*this, "ata"),
 		m_dpram(*this, "dpram"),
@@ -361,8 +366,13 @@ private:
 
 	TIMER_CALLBACK_MEMBER(scsi_dma_transfer);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	required_device<ncr53cf96_device> m_ncr53cf96;
 	required_device<ata_interface_device> m_ata;
 	required_device<cy7c131_device> m_dpram;
@@ -576,18 +586,6 @@ static const uint16_t asciicharset[]=
 void twinkle_state::machine_start()
 {
 	m_dma_timer = timer_alloc(FUNC(twinkle_state::scsi_dma_transfer), this);
-
-	m_led_displays.resolve();
-	m_spotlights.resolve();
-	m_main_leds.resolve();
-	m_key_leds.resolve();
-	m_spu_leds.resolve();
-	m_player_lamps.resolve();
-	m_vefx_lamp.resolve();
-	m_effect_lamp.resolve();
-	m_credit_lamp.resolve();
-	m_neon_lamp.resolve();
-	m_unknown_outputs.resolve();
 
 	save_item(NAME(m_spu_ctrl));
 	save_item(NAME(m_spu_ata_dma));
@@ -1135,11 +1133,13 @@ void twinkle_state::scsi_drq(int state)
 void twinkle_state::twinkle(machine_config &config)
 {
 	/* basic machine hardware */
-	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530CQ(config, m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &twinkle_state::main_map);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this));
 	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this));
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	M68000(config, m_audiocpu, 32000000/2);    /* 16.000 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &twinkle_state::sound_map);
@@ -1164,23 +1164,33 @@ void twinkle_state::twinkle(machine_config &config)
 	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
 	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
-	RTC65271(config, "rtc", 0);
+	RTC65271(config, "rtc");
 
 	FDC37C665GT(config, "fdc37c665gt", XTAL(24'000'000));
 
 	/* video hardware */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0);
+
+	screen_device &screen(SCREEN(config, "screen"));
 	//all twinkle cabinets use anamorphic widescreen displays
 	screen.set_physical_aspect(16, 9);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "speaker", 0.75, 0);
-	spu.add_route(1, "speaker", 0.75, 1);
+	SPU(config, m_spu, 67.7376_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->add_route(0, "speaker", 0.75, 0);
+	m_spu->add_route(1, "speaker", 0.75, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K,1M,2M,4M").set_default_value(0);
 
 	rf5c400_device &rf5c400(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
 	rf5c400.set_addrmap(0, &twinkle_state::rf5c400_map);
@@ -1193,7 +1203,7 @@ void twinkle_state::twinkle_dvd_type1(machine_config &config)
 	// All versions before beatmania IIDX 2nd style
 	//   - maincpu:sio1 (PSX SIO1) is used for the DVD player
 	//   - fdc37c665gt:uart2 is used for network/session play
-	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd"));
 	rs232.option_add("xvd701", JVC_XVD701);
 	rs232.set_default_option("xvd701");
 
@@ -1223,7 +1233,7 @@ void twinkle_state::twinkle_dvd_type2(machine_config &config)
 	// All versions starting from beatmania IIDX 2nd style
 	//   - fdc37c665gt:uart2 is used for the DVD player
 	//   - maincpu:sio1 (PSX SIO1) is used for network/session play
-	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd"));
 	rs232.option_add("xvd701", JVC_XVD701);
 	// rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
 	rs232.set_default_option("xvd701");
@@ -1264,7 +1274,7 @@ void twinkle_state::twinklei(machine_config &config)
 {
 	twinkle(config);
 	twinkle_dvd_type2(config);
-	I2C_M24C02(config, "security", 0); // M24C02-W
+	I2C_M24C02(config, "security"); // M24C02-W
 }
 
 static INPUT_PORTS_START( twinkle )

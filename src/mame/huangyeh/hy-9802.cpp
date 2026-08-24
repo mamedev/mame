@@ -230,7 +230,7 @@ void hy9802_state::wlzb(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &hy9802_state::audio_program_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify everything once emulation works
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify everything once emulation works
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -242,7 +242,7 @@ void hy9802_state::wlzb(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100); // TODO
 
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &hy9802_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &hy9802_state::ramdac_map);
 
 	HD63484(config, m_acrtc, 22_MHz_XTAL / 4).set_addrmap(0, &hy9802_state::hd63484_map);
 

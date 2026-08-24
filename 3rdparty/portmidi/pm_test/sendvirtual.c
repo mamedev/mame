@@ -11,13 +11,38 @@
 #include "assert.h"
 
 #define OUTPUT_BUFFER_SIZE 0
-#define DEVICE_INFO NULL
-#define DRIVER_INFO NULL
 #define TIME_PROC ((PmTimeProcPtr) Pt_Time)
 #define TIME_INFO NULL
 #define TIME_START Pt_Start(1, 0, 0) /* timer started w/millisecond accuracy */
 
 int latency = 0;
+PmSysDepInfo *sysdepinfo = NULL;
+char *port_name = "portmidi";
+
+static void set_sysdepinfo(char m_or_p, const char *name)
+{
+    if (!sysdepinfo) {
+        // allocate some space we will alias with open-ended PmDriverInfo:
+        // there is space for 4 parameters:
+        static char dimem[sizeof(PmSysDepInfo) + sizeof(void *) * 8];
+        sysdepinfo = (PmSysDepInfo *) dimem;
+        // build the driver info structure:
+        sysdepinfo->structVersion = PM_SYSDEPINFO_VERS;
+        sysdepinfo->length = 0;
+    }
+    if (sysdepinfo->length > 1) {
+        printf("Error: sysdepinfo was allocated to hold 2 parameters\n");
+        exit(1);
+    }
+    int i = sysdepinfo->length++;
+    enum PmSysDepPropertyKey k = pmKeyNone;
+    if (m_or_p == 'm') k = pmKeyCoreMidiManufacturer;
+    else if (m_or_p == 'p') k = pmKeyAlsaPortName;
+    else if (m_or_p == 'c') k = pmKeyAlsaClientName;
+    sysdepinfo->properties[i].key = k;
+    sysdepinfo->properties[i].value = name;
+}
+
 
 static void prompt_and_exit(void)
 {
@@ -70,11 +95,11 @@ void main_test_output(int num)
     TIME_START;
 
     /* create a virtual output device */
-    id = checkerror(Pm_CreateVirtualOutput("portmidi", NULL, DEVICE_INFO));
-    checkerror(Pm_OpenOutput(&midi, id, DRIVER_INFO, OUTPUT_BUFFER_SIZE,
+    id = checkerror(Pm_CreateVirtualOutput(port_name, NULL, sysdepinfo));
+    checkerror(Pm_OpenOutput(&midi, id, sysdepinfo, OUTPUT_BUFFER_SIZE,
                              TIME_PROC, TIME_INFO, latency));
 
-    printf("Midi Output Virtual Device \"portmidi\" created.\n");
+    printf("Midi Output Virtual Device \"%s\" created.\n", port_name);
     printf("Type ENTER to send messages: ");
     while (getchar() != '\n') ;
 
@@ -107,11 +132,15 @@ void main_test_output(int num)
 }
 
 
-void show_usage()
+void show_usage(void)
 {
-    printf("Usage: sendvirtual [-h] [-l latency-in-ms] [n]\n"
+    printf("Usage: sendvirtual [-h] [-l latency-in-ms] [-m manufacturer] "
+           "[-c clientname] [-p portname] [n]\n"
            "    -h for this message,\n"
            "    -l ms designates latency for precise timing (default 0),\n"
+           "    -m name designates a manufacturer name (macOS only),\n"
+           "    -c name designates a client name (linux only),\n"
+           "    -p name designates a port name (linux only),\n"
            "    n is number of message to send.\n"
            "sends change program to 1, then one note per second with 0.5s on,\n"
            "0.5s off, for n/2 seconds. Latency >0 uses the device driver for \n"
@@ -124,6 +153,9 @@ int main(int argc, char *argv[])
 {
     int num = 10;
     int i;
+    if (argc <= 1) {
+        show_usage();
+    }
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-h") == 0) {
             show_usage();
@@ -131,9 +163,23 @@ int main(int argc, char *argv[])
             i = i + 1;
             latency = atoi(argv[i]);
             printf("Latency will be %d\n", latency);
+        } else if (strcmp(argv[i], "-m") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            set_sysdepinfo('m', argv[i]);
+            printf("Manufacturer name will be %s\n", argv[i]);
+        } else if (strcmp(argv[i], "-p") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            port_name = argv[i];
+            set_sysdepinfo('p', port_name);
+            printf("Port name will be %s\n", port_name);
+        } else if (strcmp(argv[i], "-c") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            set_sysdepinfo('c', argv[i]);
+            printf("Client name will be %s\n", argv[i]);
         } else {
-            num = atoi(argv[1]);
+            num = atoi(argv[i]);
             if (num <= 0) {
+                printf("Zero value or non-number for n\n");
                 show_usage();
             }
             printf("Sending %d messages.\n", num);

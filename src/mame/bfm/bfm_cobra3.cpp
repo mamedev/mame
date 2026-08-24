@@ -82,7 +82,6 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void dma1_drq(int state);
 	void scc66470_irq(int state);
 
 	void bfm_cobra3_map(address_map &map) ATTR_COLD;
@@ -145,8 +144,7 @@ uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
 
 					case 0x400:
 						{
-							//input reads, haven't got far enough to trigger any
-							return m_strobein[m_active_strobe]->read();
+							return m_strobein[m_active_strobe]->read() << 8;
 						}
 					case 0x500: //SCSI DMA
 						if (ACCESSING_BITS_8_15)
@@ -377,20 +375,14 @@ INPUT_PORTS_END
 void bfm_cobra3_state::machine_start()
 {
 	m_active_strobe = 0;
-	m_lamps.resolve();
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
 }
 
 
-void bfm_cobra3_state::dma1_drq(int state)
-{
-//  m_maincpu->dma_dreq1_w(state);
-}
-
 void bfm_cobra3_state::scc66470_irq(int state)
 {
-	m_maincpu->set_input_line(5, !state);
+	m_maincpu->set_input_line(5, state);
 }
 
 uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -462,14 +454,14 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15000000, 960, 0, 768, 312, 32, 312);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(FUNC(bfm_cobra3_state::screen_update));
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	RAMDAC(config, m_ramdac, 0, m_palette); // MUSIC Semiconductor TR9C1710 RAMDAC
+	RAMDAC(config, m_ramdac, m_palette); // MUSIC Semiconductor TR9C1710 RAMDAC
 	m_ramdac->set_addrmap(0, &bfm_cobra3_state::ramdac_map);
 	m_ramdac->set_split_read(1);
 
@@ -491,10 +483,10 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 
 	NCR5380(config, m_scsic);
 	scsi.set_external_device(6, m_scsic);
-	m_scsic->drq_handler().set(DEVICE_SELF, FUNC(bfm_cobra3_state::dma1_drq));
+	m_scsic->drq_handler().set(m_maincpu, FUNC(m68340_cpu_device::dma_dreq1_w)).invert();
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9)); //TODO: Check timings
-	METERS(config, m_meters, 0).set_number(4);
+	METERS(config, m_meters).set_number(4);
 }
 
 ROM_START( c3_rtime )

@@ -302,7 +302,7 @@ void paso1600_state::paso1600(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -319,7 +319,7 @@ void paso1600_state::paso1600(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	AM9517A(config, m_dma, 16000000/4);

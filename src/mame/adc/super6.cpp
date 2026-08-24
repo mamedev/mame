@@ -5,15 +5,6 @@
 TODO:
 - peripheral interfaces
 
-- Fix floppy. It needs to WAIT the cpu whenever port 0x14 is read, wait
-  for either DRQ or INTRQ to assert, then release the cpu and then do the
-  actual port read. But it doesn't work properly at the moment. It gets stuck
-  if you load up the cpm disk (from software list). The other disks are useless.
-
-  The schematic isn't clear, but it seems the 2 halves of U16 (as shown) have
-  a common element, so that activity on one side can affect what happens on
-  the other side.
-
 */
 
 #include "emu.h"
@@ -198,15 +189,12 @@ uint8_t super6_state::fdc_r()
 
 	*/
 
-	if (!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && !m_fdc->drq_r() && !m_fdc->intrq_r())
 	{
-		if (!m_z80_wait)
-		{
-			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-			m_maincpu->retry_access();
-		}
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->retry_access();
 
-		m_z80_wait = !m_z80_wait;
+		return 0xff;
 	}
 
 	return m_fdc->intrq_r() ? 0x7f : 0xff;
@@ -382,7 +370,7 @@ void super6_state::io_write_byte(offs_t offset, uint8_t data)
 
 static void super6_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_QD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
 void super6_state::fdc_intrq_w(int state)
@@ -404,14 +392,13 @@ void super6_state::fdc_drq_w(int state)
 //  z80_daisy_config super6_daisy_chain
 //-------------------------------------------------
 
-// no evidence of daisy chain in use - removed for now
-//static const z80_daisy_config super6_daisy_chain[] =
-//{
-//  { Z80CTC_TAG },
-//  { Z80DART_TAG },
-//  { Z80PIO_TAG },
-//  { nullptr }
-//};
+static const z80_daisy_config super6_daisy_chain[] =
+{
+	{ Z80CTC_TAG },
+	{ Z80DART_TAG },
+	{ Z80PIO_TAG },
+	{ nullptr }
+};
 
 
 //**************************************************************************
@@ -425,7 +412,6 @@ void super6_state::fdc_drq_w(int state)
 void super6_state::machine_start()
 {
 	// state saving
-	save_item(NAME(m_z80_wait));
 	save_item(NAME(m_s100));
 	save_item(NAME(m_bank0));
 	save_item(NAME(m_bank1));
@@ -434,7 +420,6 @@ void super6_state::machine_start()
 
 void super6_state::machine_reset()
 {
-	m_z80_wait = false;
 	m_bank0 = m_bank1 = 0;
 
 	bankswitch();
@@ -456,7 +441,7 @@ void super6_state::super6(machine_config &config)
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &super6_state::super6_mem);
 	m_maincpu->set_addrmap(AS_IO, &super6_state::super6_io);
-	//m_maincpu->set_daisy_config(super6_daisy_chain);
+	m_maincpu->set_daisy_config(super6_daisy_chain);
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	// devices
@@ -481,7 +466,7 @@ void super6_state::super6(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(super6_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(super6_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], super6_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], super6_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], super6_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	Z80DART(config, m_dart, 24_MHz_XTAL / 4);
@@ -542,4 +527,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                         FULLNAME     FLAGS
-COMP( 1983, super6, 0,      0,      super6,  super6, super6_state, empty_init, "Advanced Digital Corporation", "Super Six", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, super6, 0,      0,      super6,  super6, super6_state, empty_init, "Advanced Digital Corporation", "Super Six", MACHINE_NO_SOUND_HW )

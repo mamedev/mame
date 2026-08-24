@@ -930,7 +930,7 @@ void spacecom_state::spacecom(machine_config &config)
 	maincpu.out_inte_func().set(FUNC(spacecom_state::int_enable_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(18'000'000) / 3, 384, 0, 256, 260, 0, 224); // parameters guessed
 	m_screen->set_screen_update(FUNC(spacecom_state::screen_update_spacecom));
 
@@ -1302,7 +1302,7 @@ void _8080bw_state::escmars(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_mw8080bw));
 
@@ -3087,7 +3087,7 @@ void shuttlei_state::shuttlei(machine_config &config)
 	maincpu.out_inte_func().set(FUNC(shuttlei_state::int_enable_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(32*8, 32*8);
@@ -6136,11 +6136,11 @@ GAMEL(1978, invaderl,    invaders, invnomb,   sicv,      sisv_state,     empty_i
 GAMEL(1978, invadernc,   invaders, invaders,  sicv,      sisv_state,     empty_init,    ROT270, "bootleg (Nas Corp)",                 "Space Invaders (Nas Corp bootleg)",                               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Runs on original Logitec PCB, PROM dump might be bad, needs correct decoding anyway
 GAMEL(1978, spcewars,    invaders, spcewars,  spcewars,  _8080bw_state,  empty_init,    ROT270, "Taito / Sanritsu",                   "Space War (Sanritsu)",                                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
 GAME( 1979, spcewarla,   invaders, spcewarla, spcewars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure and Allied)",       "Space War (Leisure and Allied)",                                  MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unclassified, licensed or bootleg?
-GAMEL(1978, spceking,    invaders, invaders,  sicv,      sisv_state,     empty_init,    ROT270, "Taito / Leijac Corporation",         "Space King",                                                      MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
+GAMEL(1978, spceking,    invaders, invaders,  sicv,      sisv_state,     empty_init,    ROT270, "Taito / Leijac",                     "Space King",                                                      MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
 GAME( 1978, spcebttl,    invaders, invaders,  sitv,      sisv_state,     empty_init,    ROT270, "bootleg",                            "Space Battle (Space Invaders bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters (version II)",                                    MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // Taito sued, and as settlement they were allowed to sell Universal's Galaxy Wars
 GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters 2",                                               MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // "
-GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   invaders_state, empty_init,    ROT270, "Taito / Zenitone-Microsec Ltd.",     "Super Invaders (Zenitone-Microsec)",                              MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
+GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   invaders_state, empty_init,    ROT270, "Taito / Zenitone-Microsec",          "Super Invaders (Zenitone-Microsec)",                              MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
 GAMEL(1980, spaceat2,    invaders, invaders,  spaceat2,  invaders_state, empty_init,    ROT270, "bootleg (Video Games UK)",           "Space Attack II (bootleg of Super Invaders)",                     MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Zenitone-Microsec Super Invaders
 GAMEL(1980, invader4,    invaders, invaders,  spaceat2,  invaders_state, empty_init,    ROT270, "bootleg",                            "Space Invaders Part Four (bootleg of Space Attack II)",           MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Space Attack II
 GAMEL(1980, ultrainv,    invaders, invaders,  sicv,      sisv_state,     empty_init,    ROT270, "Taito / Konami",                     "Ultra Invaders",                                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?

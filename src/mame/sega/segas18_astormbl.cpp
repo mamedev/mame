@@ -486,14 +486,14 @@ void segas18_astormbl_state::astormbl_video(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
 	PALETTE(config, m_palette).set_entries(2048*2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(25'174'800)/4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segas18_astormbl_state::screen_update));
 	m_screen->set_palette(m_palette);
 	// see note in segas16a.cpp, also used here for consistency
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 }
 

@@ -96,12 +96,13 @@
 
 ***************************************************************************/
 
-#include <cstdlib>
-#include <cassert>
-
-#include "coretmpl.h"
 #include "huffman.h"
+
 #include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <vector>
 
 
 //**************************************************************************

@@ -1,5 +1,5 @@
 /* DllSecur.c -- DLL loading security
-2023-04-02 : Igor Pavlov : Public domain */
+: Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -11,19 +11,7 @@
 
 #ifndef UNDER_CE
 
-#if (defined(__GNUC__) && (__GNUC__ >= 8)) || defined(__clang__)
-  // #pragma GCC diagnostic ignored "-Wcast-function-type"
-#endif
-
-#if defined(__clang__) || defined(__GNUC__)
-typedef void (*Z7_voidFunction)(void);
-#define MY_CAST_FUNC (Z7_voidFunction)
-#elif defined(_MSC_VER) && _MSC_VER > 1920
-#define MY_CAST_FUNC  (void *)
-// #pragma warning(disable : 4191) // 'type cast': unsafe conversion from 'FARPROC' to 'void (__cdecl *)()'
-#else
-#define MY_CAST_FUNC
-#endif
+Z7_DIAGNOSTIC_IGNORE_CAST_FUNCTION
 
 typedef BOOL (WINAPI *Func_SetDefaultDllDirectories)(DWORD DirectoryFlags);
 
@@ -61,7 +49,7 @@ static const char * const g_Dlls =
     if ((UInt16)GetVersion() != 6) { \
       const \
        Func_SetDefaultDllDirectories setDllDirs = \
-      (Func_SetDefaultDllDirectories) MY_CAST_FUNC GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), \
+      (Func_SetDefaultDllDirectories) Z7_CAST_FUNC_C GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), \
            "SetDefaultDllDirectories"); \
       if (setDllDirs) if (setDllDirs(MY_LOAD_LIBRARY_SEARCH_SYSTEM32 | MY_LOAD_LIBRARY_SEARCH_USER_DIRS)) return; }
 
@@ -79,7 +67,7 @@ void LoadSecurityDlls(void)
   // at Vista (ver 6.0) : CoCreateInstance(CLSID_ShellLink, ...) doesn't work after SetDefaultDllDirectories() : Check it ???
   IF_NON_VISTA_SET_DLL_DIRS_AND_RETURN
   {
-    wchar_t buf[MAX_PATH + 100];
+    WCHAR buf[MAX_PATH + 100];
     const char *dll;
     unsigned pos = GetSystemDirectoryW(buf, MAX_PATH + 2);
     if (pos == 0 || pos > MAX_PATH)
@@ -88,7 +76,7 @@ void LoadSecurityDlls(void)
       buf[pos++] = '\\';
     for (dll = g_Dlls; *dll != 0;)
     {
-      wchar_t *dest = &buf[pos];
+      WCHAR *dest = &buf[pos];
       for (;;)
       {
         const char c = *dll++;

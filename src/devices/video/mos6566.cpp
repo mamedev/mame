@@ -2291,13 +2291,15 @@ void mos6566_device::draw_sprites()
 						}
 						else
 						{
-							if (m_fore_coll_buf[p + i])
-							{
-								gfx_coll |= sbit;
-							}
-
 							if (plane0 & 0x80000000)
+							{
+								if (m_fore_coll_buf[p + i])
+								{
+									gfx_coll |= sbit;
+								}
+
 								col = m_spritemulti[1];
+							}
 							else
 								continue;
 						}

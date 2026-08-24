@@ -51,7 +51,7 @@ ioport_constructor nes_bandaihs_device::device_input_ports() const
 
 void nes_bandaihs_device::device_add_mconfig(machine_config &config)
 {
-	NES_ZAPPER_SENSOR(config, m_sensor, 0);
+	NES_ZAPPER_SENSOR(config, m_sensor);
 	if (m_port != nullptr)
 		m_sensor->set_screen_tag(m_port->m_screen);
 }

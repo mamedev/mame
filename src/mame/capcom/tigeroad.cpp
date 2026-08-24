@@ -661,14 +661,14 @@ void tigeroad_state::tigeroad(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 260, 16, 240);
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
-	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	TIGEROAD_SPRITE(config, m_spritegen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_color_base(0x200);
 
@@ -740,14 +740,14 @@ void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 260, 16, 240); // assume same as tigeroad
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
-	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	TIGEROAD_SPRITE(config, m_spritegen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_color_base(0x200);
 

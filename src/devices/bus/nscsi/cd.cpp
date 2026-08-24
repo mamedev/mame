@@ -13,6 +13,7 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_2X, nscsi_cdrom_2x_device, "scsi_cdrom2x", "SCSI CD-ROM (2X speed)")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device, "scsi_cdrom_sgi", "SCSI CD-ROM SGI")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_NEWS, nscsi_cdrom_news_device, "scsi_cdrom_news", "SCSI CD-ROM NEWS")
 DEFINE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device, "nrrd45", "RRD45 CD-ROM (New)")
@@ -45,13 +46,18 @@ nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char
 {
 }
 
+nscsi_cdrom_2x_device::nscsi_cdrom_2x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_2X, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+{
+}
+
 nscsi_cdrom_sgi_device::nscsi_cdrom_sgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_CDROM_SGI, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
 {
 }
 
 nscsi_cdrom_news_device::nscsi_cdrom_news_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_cdrom_device(mconfig, NSCSI_CDROM_NEWS, tag, owner, "Sony", "CD-ROM CDU-541", "1.0A", 0x00, 0x05)
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_NEWS, tag, owner, "SONY", "CD-ROM CDU-541", "1.0A", 0x00, 0x05)
 {
 }
 
@@ -218,7 +224,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 				m_write_path.append(PATH_SEPARATOR);
 				m_write_path.append((char *)&m_xfer_buffer[0]);
 				if (osd_file::open(m_write_path, OPEN_FLAG_CREATE | OPEN_FLAG_WRITE, file, filesize)) {
-					LOG("Open for write/creation failed for [%s]\n", m_write_path.c_str());
+					LOG("Open for write/creation failed for [%s]\n", m_write_path);
 					scsi_status_complete(SS_CHECK_CONDITION);
 					sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 					return;
@@ -232,7 +238,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 				osd_file::ptr file;
 				uint64_t filesize;
 
-				LOG("flushing [%s] to disk at %08x\n", m_write_path.c_str(), m_write_offset * 512);
+				LOG("flushing [%s] to disk at %08x\n", m_write_path, m_write_offset * 512);
 				osd_file::open(m_write_path, OPEN_FLAG_WRITE, file, filesize);
 				file->write(&m_xfer_buffer[0], m_write_offset * 512, m_write_length, actualWritten);
 
@@ -291,9 +297,7 @@ void nscsi_cdrom_device::update_directory()
 
 		while ((ourEntry = directory->read()) != nullptr)
 		{
-			// FIXME: use-after-free
-			// the directory entry's name is not valid after a subsequent call to read()
-			m_directory.push_back(*ourEntry);
+			m_directory.push_back({ ourEntry->name, ourEntry->type, ourEntry->size });
 
 			// API version 0 has a hard cap of 100 files
 			if (m_directory.size() >= 99)
@@ -964,7 +968,7 @@ void nscsi_cdrom_device::scsi_command()
 				m_scsi_cmdbuf[pos] = index;
 				m_scsi_cmdbuf[pos + 1] = m_directory[index].type != osd::directory::entry::entry_type::DIR;
 				// There's a guaranteed null terminator one byte after the name field
-				strncpy(reinterpret_cast<char *>(&m_scsi_cmdbuf[pos + 2]), m_directory[index].name, 31);
+				strncpy(reinterpret_cast<char *>(&m_scsi_cmdbuf[pos + 2]), m_directory[index].name.c_str(), 31);
 				m_scsi_cmdbuf[pos + 36] = (m_directory[index].size >> 24) & 0xff;
 				m_scsi_cmdbuf[pos + 37] = (m_directory[index].size >> 16) & 0xff;
 				m_scsi_cmdbuf[pos + 38] = (m_directory[index].size >> 8) & 0xff;
@@ -1016,7 +1020,7 @@ void nscsi_cdrom_device::scsi_command()
 		u64 size;
 		if (osd_file::open(tmpPath, OPEN_FLAG_READ, file, size))
 		{
-			LOG("Open failed for [%s]\n", tmpPath.c_str());
+			LOG("Open failed for [%s]\n", tmpPath);
 			scsi_status_complete(SS_CHECK_CONDITION);
 			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 			return;
@@ -1101,6 +1105,27 @@ void nscsi_cdrom_device::scsi_command()
 	default:
 		nscsi_full_device::scsi_command();
 		break;
+	}
+}
+
+attotime nscsi_cdrom_2x_device::scsi_data_byte_period()
+{
+	// 150 sectors/second * 2048 bytes/sector = 307,200 bytes/second
+	return attotime::from_ticks(1, 307'200);
+}
+
+attotime nscsi_cdrom_2x_device::scsi_data_command_delay()
+{
+	switch (m_scsi_cmdbuf[0])
+	{
+	case SC_READ_6:
+	case SC_READ_10:
+	case SC_READ_12:
+	case SC_READ_TOC_PMA_ATIP:
+		return attotime::from_usec(100);
+
+	default:
+		return attotime::zero;
 	}
 }
 
@@ -1581,8 +1606,20 @@ void nscsi_cdrom_apple_device::scsi_command()
 			// 1 = address is the stop address, start address was set by a TRACK SEARCH command
 			if (m_scsi_cmdbuf[1] & 0x10)
 			{
-				const auto start = cdda->get_audio_lba();
-				cdda->start_audio(start, address - start);
+				// several games' audio playback track searches the same track and assume it means "just play this track"
+				if (m_stop_position == address)
+				{
+					if (start_track >= image->get_last_track())
+					{
+						m_stop_position = image->get_track_start(0xaa);
+					}
+					else
+					{
+						m_stop_position = image->get_track_start(start_track + 1);
+					}
+				}
+
+				cdda->start_audio(address, m_stop_position - address);
 			}
 			else
 			{

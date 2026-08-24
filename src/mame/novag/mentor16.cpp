@@ -99,9 +99,6 @@ void mentor16_state::machine_start()
 {
 	m_piezo_delay = timer_alloc(FUNC(mentor16_state::update_piezo), this);
 
-	m_out_lcd.resolve();
-	m_out_digit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));

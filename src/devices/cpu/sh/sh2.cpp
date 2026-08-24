@@ -21,6 +21,10 @@
 
 #include "cpu/drcumlsh.h"
 
+#include "endianness.h"
+
+#include <bit>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -28,12 +32,12 @@ constexpr int SH2_INT_15 = 15;
 
 sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines, uint32_t address_mask)
 	: sh_common_execution(mconfig, type, tag, owner, clock, ENDIANNESS_BIG, internal_map)
-	, m_am(address_mask)
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_drcfe(nullptr)
 {
 	m_cpu_type = cpu_type;
+	m_am = address_mask;
 	m_isdrc = allow_drc();
 }
 
@@ -122,7 +126,7 @@ std::unique_ptr<util::disasm_interface> sh2_device::create_disassembler()
 
 uint8_t sh2_device::read_byte(offs_t offset)
 {
-	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+	if (offset < 0x40000000)
 		return m_program->read_byte(offset & m_am);
 
 	return m_program->read_byte(offset);
@@ -130,7 +134,7 @@ uint8_t sh2_device::read_byte(offs_t offset)
 
 uint16_t sh2_device::read_word(offs_t offset)
 {
-	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+	if (offset < 0x40000000)
 		return m_program->read_word(offset & m_am);
 
 	return m_program->read_word(offset);
@@ -138,11 +142,12 @@ uint16_t sh2_device::read_word(offs_t offset)
 
 uint32_t sh2_device::read_long(offs_t offset)
 {
-	/* 0x20000000 no Cache */
-	/* 0x00000000 read thru Cache if CE bit is 1 */
-	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+	// The cached (0x00000000) and cache-through (0x20000000) windows
+	// end up mirroring each other
+	if (offset < 0x40000000)
+	{
 		return m_program->read_dword(offset & m_am);
-
+	}
 	return m_program->read_dword(offset);
 }
 
@@ -153,7 +158,7 @@ uint16_t sh2_device::decrypted_read_word(offs_t offset)
 
 void sh2_device::write_byte(offs_t offset, uint8_t data)
 {
-	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+	if (offset < 0x40000000)
 	{
 		m_program->write_byte(offset & m_am, data);
 		return;
@@ -164,7 +169,7 @@ void sh2_device::write_byte(offs_t offset, uint8_t data)
 
 void sh2_device::write_word(offs_t offset, uint16_t data)
 {
-	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+	if (offset < 0x40000000)
 	{
 		m_program->write_word(offset & m_am, data);
 		return;
@@ -175,14 +180,12 @@ void sh2_device::write_word(offs_t offset, uint16_t data)
 
 void sh2_device::write_long(offs_t offset, uint32_t data)
 {
-	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+	if (offset < 0x40000000)
 	{
 		m_program->write_dword(offset & m_am, data);
 		return;
 	}
 
-	/* 0x20000000 no Cache */
-	/* 0x00000000 read thru Cache if CE bit is 1 */
 	m_program->write_dword(offset, data);
 }
 
@@ -198,7 +201,7 @@ void sh2_device::check_pending_irq(const char *message)
 		int irq = m_sh2_state->internal_irq_level;
 		if (m_sh2_state->pending_irq)
 		{
-			int external_irq = 15 - (count_leading_zeros_32(m_sh2_state->pending_irq) - 16);
+			int external_irq = std::bit_width(m_sh2_state->pending_irq) - 1;
 			if (external_irq >= irq)
 			{
 				irq = external_irq;
@@ -273,7 +276,7 @@ inline void sh2_device::ILLEGAL()
 	write_long(m_sh2_state->r[15], m_sh2_state->pc - 2); /* push PC onto stack */
 
 	/* fetch PC */
-	m_sh2_state->pc = read_long(m_sh2_state->vbr + 4 * 4);
+	m_sh2_state->pc = read_long(m_sh2_state->vbr + 4 * 4) & m_am;
 
 	/* TODO: timing is a guess */
 	m_sh2_state->icount -= 5;
@@ -489,7 +492,7 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 			m_sh2_state->sr = (m_sh2_state->sr & ~SH_I) | (irqline << 4);
 
 		/* fetch PC */
-		m_sh2_state->pc = read_long(m_sh2_state->vbr + vector * 4);
+		m_sh2_state->pc = read_long(m_sh2_state->vbr + vector * 4) & m_am;
 	}
 
 	if (m_sh2_state->sleep_mode == 1)

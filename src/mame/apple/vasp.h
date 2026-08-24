@@ -66,7 +66,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<via6522_device> m_via1;
 	required_device<pseudovia_device> m_pseudovia;
-	required_device<asc_device> m_asc;
+	required_device<asc_base_device> m_asc;
 	required_region_ptr<u32> m_rom;
 
 	std::unique_ptr<u32[]> m_vram;

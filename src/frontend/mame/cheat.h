@@ -319,7 +319,7 @@ public:
 	// actions
 	void reload();
 	bool save_all(std::string const &filename);
-	void render_text(mame_ui_manager &mui, render_container &container);
+	void render_text(mame_ui_manager &mui, render_target &target);
 
 	// output helpers
 	std::string &get_output_string(int row, ui::text_layout::text_justify justify);

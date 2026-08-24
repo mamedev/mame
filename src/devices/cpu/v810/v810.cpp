@@ -43,6 +43,8 @@
 #include "v810.h"
 #include "v810dasm.h"
 
+#include "corefloat.h"
+
 #define clkIF 3
 #define clkMEM 3
 #define clkIRQ 14

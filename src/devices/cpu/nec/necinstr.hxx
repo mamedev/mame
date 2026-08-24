@@ -747,8 +747,28 @@ OP( 0xf6, i_f6pre ) { uint32_t tmp; uint32_t uresult,uresult2; int32_t result,re
 		case 0x18: m_CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Byte(tmp); PutbackRMByte(ModRM,tmp&0xff); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NEG */
 		case 0x20: uresult = Breg(AL)*tmp; Wreg(AW)=(WORD)uresult; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLKM(30,30,8,36,36,12); break; /* MULU */
 		case 0x28: result = (int16_t)((int8_t)Breg(AL))*(int16_t)((int8_t)tmp); Wreg(AW)=(WORD)result; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLKM(47,47,8,57,53,12); break; /* MUL */
-		case 0x30: if (tmp) DIVUB else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(25,25,11,35,31,15); break;
-		case 0x38: if (tmp) DIVB else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(43,43,17,53,49,20); break;
+		case 0x30:
+			if (tmp)
+				DIVUB
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+
+			CLKM(25,25,11,35,31,15);
+			break;
+		case 0x38:
+			if (tmp)
+				DIVB
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+
+			CLKM(43,43,17,53,49,20);
+			break;
 	}
 }
 
@@ -761,8 +781,27 @@ OP( 0xf7, i_f7pre   ) { uint32_t tmp,tmp2; uint32_t uresult,uresult2; int32_t re
 		case 0x18: m_CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NEG */
 		case 0x20: uresult = Wreg(AW)*tmp; Wreg(AW)=uresult&0xffff; Wreg(DW)=((uint32_t)uresult)>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLKM(30,30,12,36,36,16); break; /* MULU */
 		case 0x28: result = (int32_t)((int16_t)Wreg(AW))*(int32_t)((int16_t)tmp); Wreg(AW)=result&0xffff; Wreg(DW)=result>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLKM(47,47,12,57,53,16); break; /* MUL */
-		case 0x30: if (tmp) DIVUW else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(25,25,19,35,31,23); break;
-		case 0x38: if (tmp) DIVW else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(43,43,24,53,49,28); break;
+		case 0x30:
+			if (tmp)
+				DIVUW
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+
+			CLKM(25,25,19,35,31,23);
+			break;
+		case 0x38:
+			if (tmp)
+				DIVW
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+			CLKM(43,43,24,53,49,28);
+			break;
 	}
 }
 

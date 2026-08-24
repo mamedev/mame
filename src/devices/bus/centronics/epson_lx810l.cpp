@@ -147,7 +147,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* gate array */
-	e05a30_device &e05a30(E05A30(config, m_e05a30, 0));
+	e05a30_device &e05a30(E05A30(config, m_e05a30));
 	e05a30.printhead().set(FUNC(epson_lx810l_device::printhead));
 	e05a30.pf_stepper().set(FUNC(epson_lx810l_device::pf_stepper));
 	e05a30.cr_stepper().set(FUNC(epson_lx810l_device::cr_stepper));
@@ -326,9 +326,6 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 
 void epson_lx810l_device::device_start()
 {
-	m_online_led.resolve();
-	m_ready_led.resolve();
-
 	m_cr_timer = timer_alloc(FUNC(epson_lx810l_device::cr_tick), this);
 }
 

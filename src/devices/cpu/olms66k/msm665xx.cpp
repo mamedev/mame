@@ -10,6 +10,8 @@
 #include "msm665xx.h"
 #include "nx8dasm.h"
 
+#include "endianness.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(MSM66573, msm66573_device, "msm66573", "Oki MSM66573")
 
@@ -1587,6 +1589,7 @@ void msm665xx_device::execute_run()
 		case inst_state::prefix_PRn_ERn:
 			m_adr = BIT(m_inst, 2) ? addr_er(m_inst) : addr_pr(m_inst);
 			m_seg = 0;
+			m_tmp[0] = m_data_cache.read_word(m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 2;
 			m_state = s_prefixed_inst_decode[1][m_inst];
@@ -1595,6 +1598,7 @@ void msm665xx_device::execute_run()
 		case inst_state::prefix_Rn:
 			m_adr = addr_lr(m_inst);
 			m_seg = 0;
+			m_tmp[0] = m_data_cache.read_byte(m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 2;
 			m_state = s_prefixed_inst_decode[0][m_inst];
@@ -1692,6 +1696,7 @@ void msm665xx_device::execute_run()
 
 		case inst_state::prefix_PSW:
 			set_adr_sfr8(0x04 + BIT(m_inst, 4));
+			m_tmp[0] = BIT(m_inst, 4) ? m_psw >> 8 : m_psw & 0x00ff;
 			m_inst = m_fetch_byte;
 			m_icount -= 2;
 			m_state = s_prefixed_inst_decode[0][m_inst];
@@ -1825,6 +1830,7 @@ void msm665xx_device::execute_run()
 		case inst_state::prefix_ind8_PRn:
 			m_adr = m_data_cache.read_word(addr_pr(m_inst));
 			m_seg = get_seg(m_adr);
+			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 4;
 			m_state = s_prefixed_inst_decode[0][m_inst];
@@ -1833,6 +1839,7 @@ void msm665xx_device::execute_run()
 		case inst_state::prefix_ind16_PRn:
 			m_adr = m_data_cache.read_word(addr_pr(m_inst));
 			m_seg = get_seg(m_adr);
+			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 4;
 			m_state = s_prefixed_inst_decode[1][m_inst];
@@ -1897,12 +1904,14 @@ void msm665xx_device::execute_run()
 
 		case inst_state::prefix_obj8:
 			m_inst = m_fetch_byte;
+			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_icount -= 2;
 			m_state = s_prefixed_inst_decode[0][m_inst];
 			break;
 
 		case inst_state::prefix_obj16:
 			m_inst = m_fetch_byte;
+			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_icount -= 2;
 			m_state = s_prefixed_inst_decode[1][m_inst];
 			break;
@@ -1911,6 +1920,7 @@ void msm665xx_device::execute_run()
 			m_tmp[0] = m_data_cache.read_word(addr_pr(0));
 			m_adr = m_tmp[0] + (m_acc & 0x00ff);
 			m_seg = get_seg(m_adr);
+			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 6;
 			m_state = s_prefixed_inst_decode[0][m_inst];
@@ -1920,6 +1930,7 @@ void msm665xx_device::execute_run()
 			m_tmp[0] = m_data_cache.read_word(addr_pr(0));
 			m_adr = m_tmp[0] + (m_acc & 0x00ff);
 			m_seg = get_seg(m_adr);
+			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 6;
 			m_state = s_prefixed_inst_decode[1][m_inst];
@@ -1929,6 +1940,7 @@ void msm665xx_device::execute_run()
 			m_tmp[0] = m_data_cache.read_word(addr_pr(0));
 			m_adr = m_tmp[0] + m_data_cache.read_byte(addr_lr(0));
 			m_seg = get_seg(m_adr);
+			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 6;
 			m_state = s_prefixed_inst_decode[0][m_inst];
@@ -1938,6 +1950,7 @@ void msm665xx_device::execute_run()
 			m_tmp[0] = m_data_cache.read_word(addr_pr(0));
 			m_adr = m_tmp[0] + m_data_cache.read_byte(addr_lr(0));
 			m_seg = get_seg(m_adr);
+			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_inst = m_fetch_byte;
 			m_icount -= 6;
 			m_state = s_prefixed_inst_decode[1][m_inst];
@@ -1957,6 +1970,7 @@ void msm665xx_device::execute_run()
 
 		case inst_state::prefix_A16:
 			set_adr_sfr8(0x06);
+			m_tmp[0] = m_acc;
 			m_inst = m_fetch_byte;
 			m_icount -= 2;
 			m_state = s_prefixed_inst_decode[m_inst >= 0x70][m_inst];
@@ -1964,6 +1978,7 @@ void msm665xx_device::execute_run()
 
 		case inst_state::prefix_A8:
 			set_adr_sfr8(0x06);
+			m_tmp[0] = m_acc & 0x00ff;
 			m_inst = m_fetch_byte;
 			m_icount -= 2;
 			m_state = s_prefixed_inst_decode[0][m_inst];
@@ -2303,7 +2318,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::RB_SB_obj_bit:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
+			// Dummy read is documented but not performed here
 			if (BIT(m_tmp[0], m_inst & 0x07))
 				m_psw &= 0xbfff;
 			else
@@ -2317,7 +2332,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MB_C_obj_bit:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_inst & 0x07))
 				m_psw |= 0x8000;
 			else
@@ -2327,7 +2341,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MB_obj_bit_C:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
+			// Dummy read is documented but not performed here
 			if (BIT(m_psw, 15))
 				m_tmp[0] |= 1 << (m_inst & 0x07);
 			else
@@ -2337,7 +2351,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::JBR_JBS_obj_bit:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_inst & 0x07) == BIT(m_inst, 3))
 			{
 				m_pc += s8(m_fetch_byte);
@@ -2349,7 +2362,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::JBRS_JBSR_obj_bit:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_inst & 0x07) == BIT(m_inst, 3))
 			{
 				m_tmp[0] ^= 1 << (m_inst & 0x07);
@@ -2365,7 +2377,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::BAND_C_obj_bit:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_inst & 0x07) == BIT(m_inst, 3))
 				m_psw &= 0x7fff;
 			m_icount -= 3;
@@ -2373,7 +2384,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::BOR_C_obj_bit:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_inst & 0x07) != BIT(m_inst, 3))
 				m_psw |= 0x8000;
 			m_icount -= 3;
@@ -2381,7 +2391,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::BXOR_C_obj_bit:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_inst & 0x07))
 				m_psw ^= 0x8000;
 			m_icount -= 3;
@@ -2389,14 +2398,12 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOV_ERn_PRn_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_data_cache.write_word(BIT(m_inst, 2) ? addr_pr(m_inst) : addr_er(m_inst), m_tmp[0]);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::MOVB_Rn_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_data_cache.write_byte(addr_lr(m_inst), m_tmp[0]);
 			m_icount -= 2;
 			next_inst();
@@ -2439,21 +2446,18 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::op16_obj1_obj2:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[0] = do_aluop_word(m_tmp[0], m_tmp[1]);
 			m_icount -= 3;
 			next_inst_and_store_word(m_tmp[0]);
 			break;
 
 		case inst_state::op8_obj1_obj2:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_tmp[0] = do_aluop_byte(m_tmp[0], m_tmp[1]);
 			m_icount -= 3;
 			next_inst_and_store_byte(m_tmp[0]);
 			break;
 
 		case inst_state::op16_obj_N16:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::op16_obj_N16_2;
@@ -2472,7 +2476,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::op8_obj_N8:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::op8_obj_N8_2;
@@ -2485,61 +2488,54 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::op16_obj_A:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[0] = do_aluop_word(m_tmp[0], m_acc);
 			m_icount -= 2;
 			next_inst_and_store_word(m_tmp[0]);
 			break;
 
 		case inst_state::op8_obj_A:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_tmp[0] = do_aluop_byte(m_tmp[0], m_acc & 0x00ff);
 			m_icount -= 2;
 			next_inst_and_store_byte(m_tmp[0]);
 			break;
 
 		case inst_state::op16_A_obj:
-			m_acc = do_aluop_word(m_acc, data_read_word(m_seg, m_adr));
+			m_acc = do_aluop_word(m_acc, m_tmp[0]);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::op8_A_obj:
-			m_acc = (m_acc & 0xff00) | do_aluop_byte(m_acc & 0x00ff, data_read_byte(m_seg, m_adr));
+			m_acc = (m_acc & 0xff00) | do_aluop_byte(m_acc & 0x00ff, m_tmp[0]);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::MOV_fix8_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			set_adr_fix8(m_fetch_byte);
 			m_icount -= 2;
 			m_state = inst_state::store_word;
 			break;
 
 		case inst_state::MOV_off8_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			set_adr_off8(m_fetch_byte);
 			m_icount -= 2;
 			m_state = inst_state::store_word;
 			break;
 
 		case inst_state::MOVB_fix8_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			set_adr_fix8(m_fetch_byte);
 			m_icount -= 2;
 			m_state = inst_state::store_byte;
 			break;
 
 		case inst_state::MOVB_off8_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			set_adr_off8(m_fetch_byte);
 			m_icount -= 2;
 			m_state = inst_state::store_byte;
 			break;
 
 		case inst_state::MOV_ind_PRn_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_adr = m_data_cache.read_word(addr_pr(m_inst));
 			m_seg = get_seg(m_adr);
 			m_icount -= 4;
@@ -2547,7 +2543,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOV_ind_DP_post_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = addr_pr(2);
 			m_adr = m_data_cache.read_word(m_tmp[1]);
 			m_seg = get_seg(m_adr);
@@ -2557,7 +2552,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_ind_PRn_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_adr = m_data_cache.read_word(addr_pr(m_inst));
 			m_seg = get_seg(m_adr);
 			m_icount -= 4;
@@ -2565,7 +2559,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_ind_DP_post_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = addr_pr(2);
 			m_adr = m_data_cache.read_word(m_tmp[1]);
 			m_seg = get_seg(m_adr);
@@ -2575,7 +2568,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::SLL_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_psw &= 0x7fff;
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
@@ -2589,7 +2581,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::SLLB_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_psw &= 0x7fff;
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
@@ -2603,21 +2594,18 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CMP_obj1_obj2:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			(void)do_sub(m_tmp[0], m_tmp[1]);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::CMPB_obj1_obj2:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			(void)do_subb(m_tmp[0], m_tmp[1]);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::CMP_obj_N16:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::CMP_obj_N16_2;
@@ -2636,7 +2624,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CMPB_obj_N8:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::CMPB_obj_N8_2;
@@ -2649,47 +2636,42 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CMP_obj_A:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			(void)do_sub(m_tmp[0], m_acc);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::CMPB_obj_A:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			(void)do_subb(m_tmp[0], m_acc & 0x00ff);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::MOV_sfr8_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			set_adr_sfr8(m_fetch_byte);
 			m_icount -= 2;
 			m_state = inst_state::store_word;
 			break;
 
 		case inst_state::MOV_A_obj:
-			m_acc = data_read_word(m_seg, m_adr);
+			m_acc = m_tmp[0];
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::MOVB_sfr8_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			set_adr_sfr8(m_fetch_byte);
 			m_icount -= 2;
 			m_state = inst_state::store_byte;
 			break;
 
 		case inst_state::MOVB_A_obj:
-			m_acc = (m_acc & 0xff00) | data_read_byte(m_seg, m_adr);
+			m_acc = (m_acc & 0xff00) | (m_tmp[0] & 0x00ff);
 			m_icount -= 2;
 			next_inst();
 			break;
 
 		case inst_state::MOV_D16_PRn_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::MOV_dir_obj_2;
@@ -2703,7 +2685,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_D16_PRn_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::MOV_dir_obj_2;
@@ -2717,7 +2698,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOV_n7_ind_PR_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_adr = m_data_cache.read_word(addr_pr(2 + BIT(m_fetch_byte, 7))) + util::sext(m_fetch_byte, 7);
 			m_seg = get_seg(m_adr);
 			m_icount -= 4;
@@ -2725,7 +2705,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_n7_ind_PR_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_adr = m_data_cache.read_word(addr_pr(2 + BIT(m_fetch_byte, 7))) + util::sext(m_fetch_byte, 7);
 			m_seg = get_seg(m_adr);
 			m_icount -= 4;
@@ -2733,7 +2712,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOV_dir_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::MOV_dir_obj_2;
@@ -2747,7 +2725,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_dir_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::MOVB_dir_obj_2;
@@ -2761,7 +2738,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::SRL_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
 				if (BIT(m_tmp[0], 0))
@@ -2776,7 +2752,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::SRLB_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
 				if (BIT(m_tmp[0], 0))
@@ -2791,7 +2766,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::TJNZ_TJZ:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			if (BIT(m_inst, 0) ? m_tmp[0] == 0 : m_tmp[0] != 0)
 			{
 				m_pc += s8(m_fetch_byte);
@@ -2803,7 +2777,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::TJNZB_TJZB:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_inst, 0) ? m_tmp[0] == 0 : m_tmp[0] != 0)
 			{
 				m_pc += s8(m_fetch_byte);
@@ -2815,28 +2788,24 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::DIV_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			do_div(m_tmp[0]);
 			m_icount -= 42;
 			next_inst();
 			break;
 
 		case inst_state::DIVB_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			do_divb(m_tmp[0]);
 			m_icount -= 22;
 			next_inst();
 			break;
 
 		case inst_state::MUL_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			do_mul(m_tmp[0]);
 			m_icount -= 21; // TODO: 3 if high-speed multiplier provided
 			next_inst();
 			break;
 
 		case inst_state::MULB_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			m_acc = (m_acc & 0x00ff) * m_tmp[0];
 			if (m_acc == 0)
 				m_psw |= 0x4000;
@@ -2847,11 +2816,13 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOV_obj_A:
+			// Dummy read is discarded
 			m_icount -= 2;
 			next_inst_and_store_word(m_acc);
 			break;
 
 		case inst_state::MOV_obj_N16:
+			// Dummy read is discarded
 			m_tmp[0] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::MOV_obj_N16_2;
@@ -2864,18 +2835,19 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_obj_A:
+			// Dummy read is discarded
 			m_icount -= 2;
 			next_inst_and_store_byte(m_acc & 0x00ff);
 			break;
 
 		case inst_state::MOVB_obj_N8:
+			// Dummy read is discarded
 			m_tmp[0] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::store_byte;
 			break;
 
 		case inst_state::ROL_ROR_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
 				m_tmp[0] = BIT(m_inst, 4) ? do_ror(m_tmp[0]) : do_rol(m_tmp[0]);
@@ -2886,7 +2858,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::ROLB_RORB_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
 				m_tmp[0] = BIT(m_inst, 4) ? do_rorb(m_tmp[0]) : do_rolb(m_tmp[0]);
@@ -2921,6 +2892,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::SBR_RBR_obj:
+			// Dummy read is discarded
 			m_adr += (m_acc & 0x00f8) >> 3;
 			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_acc & 0x0007))
@@ -2936,6 +2908,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MBR_C_obj:
+			// Dummy read is discarded
 			m_adr += (m_acc & 0x00f8) >> 3;
 			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_acc & 0x0007))
@@ -2947,6 +2920,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MBR_obj_C:
+			// Dummy read is discarded
 			m_adr += (m_acc & 0x00f8) >> 3;
 			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_psw, 15))
@@ -2958,7 +2932,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::INC_DEC_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			if (BIT(m_inst, 4))
 				m_tmp[0] = do_dec(m_tmp[0]);
 			else
@@ -2968,20 +2941,20 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CLR_FILL_obj:
+			// Dummy read is discarded
 			m_tmp[0] = BIT(m_inst, 4) ? 0xffff : 0;
 			m_icount -= 2;
 			next_inst_and_store_word(m_tmp[0]);
 			break;
 
 		case inst_state::XCHG_A_obj:
-			m_tmp[1] = data_read_word(m_seg, m_adr);
-			m_tmp[0] = m_acc;
-			m_acc = m_tmp[1];
+			std::swap(m_acc, m_tmp[0]);
 			m_icount -= 3;
 			next_inst_and_store_word(m_tmp[0]);
 			break;
 
 		case inst_state::TBR_obj:
+			// Dummy read is discarded
 			m_adr += (m_acc & 0x00f8) >> 3;
 			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_tmp[0], m_acc & 0x0007))
@@ -2993,13 +2966,12 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::J_ind_obj:
-			m_pc = data_read_word(m_seg, m_adr);
+			m_pc = m_tmp[0];
 			m_icount -= 2;
 			m_state = inst_state::NOP;
 			break;
 
 		case inst_state::CMPC_LC_A_ind_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = data_read_word(0x8000 | m_tsr, m_tmp[0]);
 			if (BIT(m_inst, 1))
 			{
@@ -3016,7 +2988,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CMPCB_LCB_A_ind_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = data_read_byte(0x8000 | m_tsr, m_tmp[0]);
 			m_acc = (m_acc & 0xff00) | m_tmp[1];
 			if (BIT(m_inst, 1))
@@ -3033,7 +3004,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CMPC_LC_A_T16_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			m_tmp[1] = m_fetch_byte;
 			m_icount -= 2;
 			m_state = inst_state::CMPC_LC_A_T16_obj_2;
@@ -3085,7 +3055,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::INCB_DECB_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			if (BIT(m_inst, 4))
 				m_tmp[0] = do_decb(m_tmp[0]);
 			else
@@ -3095,21 +3064,19 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CLRB_FILLB_obj:
+			// Dummy read is discarded
 			m_tmp[0] = BIT(m_inst, 4) ? 0xff : 0;
 			m_icount -= 2;
 			next_inst_and_store_byte(m_tmp[0]);
 			break;
 
 		case inst_state::XCHGB_A_obj:
-			m_tmp[1] = data_read_byte(m_seg, m_adr);
-			m_tmp[0] = m_acc & 0x00ff;
-			m_acc = (m_acc & 0xff00) | m_tmp[1];
+			m_tmp[0] = std::exchange(m_acc, (m_acc & 0xff00) | (m_tmp[0] & 0x00ff)) & 0x00ff;
 			m_icount -= 3;
 			next_inst_and_store_byte(m_tmp[0]);
 			break;
 
 		case inst_state::DJNZ_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			--m_tmp[0];
 			if (m_tmp[0] != 0)
 			{
@@ -3122,8 +3089,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::CAL_ind_obj:
-			m_tmp[0] = m_pc - 1;
-			m_pc = data_read_word(m_seg, m_adr);
+			m_tmp[0] = std::exchange(m_pc, m_tmp[0]) - 1;
 			m_adr = m_ssp;
 			m_seg = 0;
 			m_ssp -= 2;
@@ -3132,7 +3098,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::SRA_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
 				if (BIT(m_tmp[0], 0))
@@ -3147,7 +3112,6 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::SRAB_obj:
-			m_tmp[0] = data_read_byte(m_seg, m_adr);
 			for (int n = m_inst & 0x03; n >= 0; n--)
 			{
 				if (BIT(m_tmp[0], 0))
@@ -3162,6 +3126,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOV_obj_ind_X1_A:
+			// Dummy read is discarded (not documented but plausible)
 			m_tmp[1] = m_data_cache.read_word(addr_pr(0));
 			m_tmp[1] += m_acc & 0x00ff;
 			m_tmp[0] = data_read_word(get_seg(m_tmp[1]), m_tmp[1]);
@@ -3170,6 +3135,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOV_obj_ind_X1_R0:
+			// Dummy read is discarded (not documented but plausible)
 			m_tmp[1] = m_data_cache.read_word(addr_pr(0));
 			m_tmp[1] += m_data_cache.read_byte(addr_lr(0));
 			m_tmp[0] = data_read_word(get_seg(m_tmp[1]), m_tmp[1]);
@@ -3178,6 +3144,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_obj_ind_X1_A:
+			// Dummy read is discarded (not documented but plausible)
 			m_tmp[1] = m_data_cache.read_word(addr_pr(0));
 			m_tmp[1] += m_acc & 0x00ff;
 			m_tmp[0] = data_read_word(get_seg(m_tmp[1]), m_tmp[1]);
@@ -3186,6 +3153,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::MOVB_obj_ind_X1_R0:
+			// Dummy read is discarded (not documented but plausible)
 			m_tmp[1] = m_data_cache.read_word(addr_pr(0));
 			m_tmp[1] += m_data_cache.read_byte(addr_lr(0));
 			m_tmp[0] = data_read_byte(get_seg(m_tmp[1]), m_tmp[1]);
@@ -3194,6 +3162,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::FJ:
+			// Dummy read is discarded (not documented but plausible; prefix usually specifies PR0)
 			if (!BIT(m_memscon, 1))
 			{
 				m_state = inst_state::illegal;
@@ -3218,13 +3187,13 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::DIVQ_obj:
-			m_tmp[0] = data_read_word(m_seg, m_adr);
 			do_divq(m_tmp[0]);
 			m_icount -= 42;
 			next_inst();
 			break;
 
 		case inst_state::JLTS_JGES:
+			// Dummy read is discarded (not documented but plausible; prefix usually specifies PSWL)
 			if ((BIT(m_psw, 9) != BIT(m_psw, 11)) != BIT(m_inst, 1))
 			{
 				m_pc += s8(m_fetch_byte);
@@ -3236,6 +3205,7 @@ void msm665xx_device::execute_run()
 			break;
 
 		case inst_state::JLES_JGTS:
+			// Dummy read is discarded (not documented but plausible; prefix usually specifies PSWL)
 			if (((BIT(m_psw, 9) != BIT(m_psw, 11)) || BIT(m_psw, 14)) != BIT(m_inst, 1))
 			{
 				m_pc += s8(m_fetch_byte);

@@ -896,7 +896,7 @@ class ti990_tape_image_device : public magtape_image_device
 {
 public:
 	// construction/destruction
-	ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
@@ -986,8 +986,8 @@ void tap_990_device::device_start()
 
 void tap_990_device::device_add_mconfig(machine_config &config)
 {
-	TI990_TAPE(config, "tape0", 0);
-	TI990_TAPE(config, "tape1", 0);
-	TI990_TAPE(config, "tape2", 0);
-	TI990_TAPE(config, "tape3", 0);
+	TI990_TAPE(config, "tape0");
+	TI990_TAPE(config, "tape1");
+	TI990_TAPE(config, "tape2");
+	TI990_TAPE(config, "tape3");
 }

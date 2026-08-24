@@ -38,7 +38,7 @@ static void* Pt_Thread(void *p)
     CFRunLoopTimerContext timerContext;
     CFRunLoopTimerRef timer;
     PtThreadParams *params = (PtThreadParams*)p;
-    //CFTimeInterval timeout;
+    /* CFTimeInterval timeout; */
 
     /* raise the thread's priority */
     kern_return_t error;
@@ -93,7 +93,7 @@ PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
 
     printf("Pt_Start() called\n");
 
-    // /* make sure we're not already playing */
+    /* make sure we're not already playing */
     if (time_started_flag) return ptAlreadyStarted;
     startTime = CFAbsoluteTimeGetCurrent();
 

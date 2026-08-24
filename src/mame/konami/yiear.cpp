@@ -495,7 +495,7 @@ void yiear_state::yiear(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(yiear_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -507,7 +507,7 @@ void yiear_state::yiear(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	TRACKFLD_AUDIO(config, m_audio, 0, finder_base::DUMMY_TAG, m_vlm);
+	TRACKFLD_AUDIO(config, m_audio, finder_base::DUMMY_TAG, m_vlm);
 
 	SN76489A(config, m_sn, 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // clock verified on PCB
 

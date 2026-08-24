@@ -777,7 +777,7 @@ void pastelg_state::pastelg(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -829,13 +829,13 @@ void threeds_state::threeds(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &threeds_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(threeds_state::irq0_line_assert));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("blitter");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);

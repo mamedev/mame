@@ -3,11 +3,30 @@
 <!--
 license:CC0-1.0
 
-Note: a Chinese pirate mahjong game is rumored to exist
-Kof95 and Ultraman require additional ROM cartridges to work!
+https://segaretro.org/Pro_Action_Replay_(Saturn)
+
+
+Undumped list:
+- Pro Action Replay / プロアクションリプレイ (Datel, Tommo, Karat versions)
+- Pro Action Replay 2 / プロアクションリプレイ2 (Karat)
+- Pro Action Replay 2 Clear / プロアクションリプレイ2 (Karat)
+- Game Shark (InterAct)
+- Action Replay (Bigben)
+- Game Buster (Dataflash)
+- Replay Pro. (Super UFO)
+- X-Terminator (Super UFO)
+- X-Terminator Ver. 2 / エックスターミネーター Ver.2 (Gametech)
+- USB dev cart (needs saturn:usbcartf extraction)
+- Saturn Gamer's Cartridge (SD dev cart, needs saturn:pskaisatf extraction)
+- Chinese/Taiwanese pirate mahjong game is rumored to exist (unconfirmed)
+- a number of Chinese/Taiwanese CD protection bypass (TODO: fill me in)
+
 -->
 
 <softwarelist name="sat_cart" description="Sega Saturn cartridges">
+
+<!-- !Game ROM compendiums -->
+<!-- Needs to be tied with the correlated CD-ROM entries -->
 
 	<!-- The header would indicate this is the same for both regions -->
 	<software name="kof95" supported="no">
@@ -39,10 +58,20 @@ Kof95 and Ultraman require additional ROM cartridges to work!
 		</part>
 	</software>
 
-	<software name="test1f">
-		<description>Test Menu v1.0f</description>
-		<year>1994</year>
+<!-- !Debugging carts -->
+
+	<software name="test1f" supported="partial">
+		<!-- title from cart header -->
+		<description>Test Menu Daisekkei (V1.0f)</description>
+		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Reads [CD-Block] at $5888018
+Diagnostics fails on [SH-2] cache test
+CD tests requires test/key CDs (doesn't seem to work from retail, specific diag discs?)
+]]></notes>
+		<info name="release" value="19950112" />
+
 		<part name="cart" interface="sat_cart">
 			<feature name="slot" value="rom" />
 			<dataarea name="rom" size="0x80000">
@@ -51,20 +80,52 @@ Kof95 and Ultraman require additional ROM cartridges to work!
 		</part>
 	</software>
 
+<!-- !Action Replay -->
+
 	<!-- Flash ROM actually -->
-	<software name="ar">
+	<software name="ar" supported="no">
 		<description>Action Replay</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Likely a Flash ROM
+Loops back to Sega bootloader
+Tests cart ID = 0x57 at $2600001, loops between that and $2500001 if provided
+]]></notes>
 		<part name="cart" interface="sat_cart">
 			<feature name="slot" value="rom" />
-			<dataarea name="rom" size="84069">
-				<rom name="action replay rom.bin" size="84069" crc="cc518d69" sha1="8c091285a2fc863c8b3e6e9e5849a8a3469e02ff"/>
+			<dataarea name="rom" size="0x40000">
+				<rom value="0xFF" offset="0" size="0x40000"  loadflag="fill" />
+				<rom name="action replay rom.bin" size="0x14865" crc="cc518d69" sha1="8c091285a2fc863c8b3e6e9e5849a8a3469e02ff"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- RAM cartridges -->
+<!-- !Homebrew -->
+
+	<software name="pssat" supported="no">
+		<description>Pseudo Saturn (v0.832 FINAL)</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://github.com/cyberwarriorx/pseudosaturn
+Flash ROM
+"Couldn't init [CD-Block]"
+]]></notes>
+		<info name="developer" value="Pseudo Saturn Team" />
+		<info name="developer" value="CyberWarriorX" />
+
+		<part name="cart" interface="sat_cart">
+			<feature name="slot" value="rom" />
+			<dataarea name="rom" size="0x40000">
+				<rom value="0xFF" offset="0" size="0x40000"  loadflag="fill" />
+				<rom name="pseudosaturn.bin" size="0x17b0c" crc="45fc94d8" sha1="9a90165ac39dd3d88100a9a72c0773b3e74c21b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !RAM cartridges -->
+<!-- TODO: should be entirely cart options not SW items -->
 
 	<software name="ram8">
 		<description>Extended RAM 8Mbit cartridge</description>

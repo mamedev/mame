@@ -672,7 +672,7 @@ void djboy_state::djboy(machine_config &config)
 	m_beastlatch->data_pending_callback().set_inputline(m_beast, INPUT_LINE_IRQ0);
 	m_beastlatch->set_separate_acknowledge(true);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.5);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -685,7 +685,7 @@ void djboy_state::djboy(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x200);
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_djboy_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_djboy_spr);
 
 	SPEAKER(config, "speaker", 2).front();
 

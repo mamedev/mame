@@ -20,9 +20,10 @@ struct h8_dtc_state;
 
 class h8_device;
 
+#include "h8_cpu_base.h"
 #include "h8_sci.h"
 
-class h8_device : public cpu_device, public device_nvram_interface {
+class h8_device : public h8_cpu_base, public device_nvram_interface {
 public:
 	enum {
 		H8_PC = 1,
@@ -70,26 +71,26 @@ public:
 	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
 	void nvram_set_default_value(u16 val) { m_nvram_defval = val; } // default is 0
 	auto standby_cb() { return m_standby_cb.bind(); } // notifier (not an output pin)
-	int standby() { return suspended(SUSPEND_REASON_CLOCK) ? 1 : 0; }
-	u64 standby_time() { return m_standby_time; }
+	int standby() override { return suspended(SUSPEND_REASON_CLOCK) ? 1 : 0; }
+	u64 standby_time() override { return m_standby_time; }
 
-	void internal_update();
-	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
-	bool trigger_dma(int vector);
-	void set_dma_channel(h8_dma_state *state);
-	void update_active_dma_channel();
-	void set_current_dtc(h8_dtc_state *state);
-	void request_state(int state);
-	bool access_is_dma() const { return m_inst_state == STATE_DMA || m_inst_state == STATE_DTC; }
+	void internal_update() override;
+	void set_irq(int irq_vector, int irq_level, bool irq_nmi) override;
+	bool trigger_dma(int vector) override;
+	void set_dma_channel(h8_dma_state *state) override;
+	void update_active_dma_channel() override;
+	void set_current_dtc(h8_dtc_state *state) override;
+	void request_state(int state) override;
+	bool access_is_dma() const override { return m_inst_state == STATE_DMA || m_inst_state == STATE_DTC; }
 
-	u16 do_read_adc(int port) { return m_read_adc[port](); }
-	u8 do_read_port(int port) { return m_read_port[port](); }
-	void do_write_port(int port, u8 data, u8 ddr) { m_write_port[port](0, data, ddr); }
-	void do_sci_tx(int sci, int state) { m_sci_tx[sci](state); }
-	void do_sci_clk(int sci, int state) { m_sci_clk[sci](state); }
+	u16 do_read_adc(int port) override { return m_read_adc[port](); }
+	u8 do_read_port(int port) override { return m_read_port[port](); }
+	void do_write_port(int port, u8 data, u8 ddr) override { m_write_port[port](0, data, ddr); }
+	void do_sci_tx(int sci, int state) override { m_sci_tx[sci](state); }
+	void do_sci_clk(int sci, int state) override { m_sci_clk[sci](state); }
 
-	u64 system_clock() const { return execute_clocks_to_cycles(clock()); }
-	u64 now_as_cycles() const { return machine().time().as_ticks(system_clock()) - m_cycles_base; }
+	u64 system_clock() const override { return execute_clocks_to_cycles(clock()); }
+	u64 now_as_cycles() const override { return machine().time().as_ticks(system_clock()) - m_cycles_base; }
 
 protected:
 	enum {

@@ -21,9 +21,10 @@
 #include "dfac2.h"
 #include "djmemc.h"
 #include "iosb.h"
-#include "macadb.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -52,7 +53,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_memcjr(*this, "memcjr"),
 		m_primetime(*this, "primetime"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_cuda(*this, "cuda"),
 		m_dfac2(*this, "dfac2"),
 		m_scc(*this, "scc"),
@@ -73,10 +74,10 @@ public:
 	void init_macqd605();
 
 private:
-	required_device<m68040_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<memcjr_device> m_memcjr;
 	required_device<primetime_device> m_primetime;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<cuda_device> m_cuda;
 	required_device<dfac2_device> m_dfac2;
 	required_device<z80scc_device> m_scc;
@@ -171,15 +172,15 @@ void quadra605_state::macqd605(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(m_primetime, FUNC(primetime_device::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -205,17 +206,19 @@ void quadra605_state::macqd605(machine_config &config)
 	m_ncr1->irq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_irq_w));
 	m_ncr1->drq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_drq_w));
 
-	MACADB(config, m_macadb, C15M);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0788");
 	m_cuda->reset_callback().set(FUNC(quadra605_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_primetime, FUNC(primetime_device::cb1_w));
 	m_cuda->via_data_callback().set(m_primetime, FUNC(primetime_device::cb2_w));
 	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	APPLE_DFAC2(config, m_dfac2, 22257);
@@ -228,7 +231,7 @@ void quadra605_state::macqd605(machine_config &config)
 	m_primetime->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_primetime->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
 
-	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus_device &nubus(NUBUS(config, "pds"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 	nubus.out_irqe_callback().set(m_primetime, FUNC(primetime_device::via2_irq_w<0x20>));
@@ -247,18 +250,20 @@ void quadra605_state::maclc475(machine_config &config)
 {
 	macqd605(config);
 
+	M68LC040(config.replace(), m_maincpu, 25_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadra605_state::lc475_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	// TODO: This machine really had 5MiB of RAM base, we need actual memory controller support for that to work
 }
 
 void quadra605_state::maclc575(machine_config &config)
 {
 	macqd605(config);
 
-	M68040(config.replace(), m_maincpu, 33_MHz_XTAL);
+	M68LC040(config.replace(), m_maincpu, 33_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadra605_state::lc575_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
-
-	m_ram->set_default_size("5M");
 }
 
 ROM_START( macqd605 )

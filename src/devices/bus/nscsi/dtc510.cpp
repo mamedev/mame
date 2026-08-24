@@ -44,11 +44,6 @@ nscsi_dtc510_device::nscsi_dtc510_device(const machine_config &mconfig, const ch
 	std::fill(std::begin(m_param), std::end(m_param), 0);
 }
 
-void nscsi_dtc510_device::device_reset()
-{
-	nscsi_harddisk_device::device_reset();
-}
-
 bool nscsi_dtc510_device::scsi_command_done(uint8_t command, uint8_t length)
 {
 	switch(command >> 5) {
@@ -93,7 +88,7 @@ void nscsi_dtc510_device::scsi_command()
 			scsi_status_complete(SS_NOT_READY);
 			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
-			// lba = 0;
+			m_last_cylinder = 0;   // recalibrate returns the heads to track 0
 			scsi_status_complete(SS_GOOD);
 		}
 		break;
@@ -262,8 +257,12 @@ attotime nscsi_dtc510_device::scsi_data_command_delay()
 	case SC_SEEK:
 	case SC_ASSIGN_ALT_TRACK:
 	case SC_RETENTION:
-		// average seek time of NEC D5126A hard disk
-		return attotime::from_msec(85);
+		// Legacy default (unchanged unless a driver calls set_seek_timing()): the
+		// flat average-seek time of the NEC D5126A.  With a model configured,
+		// defer to the base's cylinder-aware timing.
+		if (!m_seek_model)
+			return attotime::from_msec(85);
+		return seek_time(get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff);
 
 	default:
 		return attotime::zero;

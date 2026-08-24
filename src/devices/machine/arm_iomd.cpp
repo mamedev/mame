@@ -2,17 +2,20 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    ARM IOMD device emulation
+ARM IOMD device emulation
 
-    ARM7 SoC or stand-alone device, upgraded version(s) of the IOC found in Acorn Archimedes.
+ARM7 SoC or stand-alone device, upgraded version(s) of the IOC found in Acorn Archimedes.
 
-    TODO:
-    - IOCR / IOLINES hookups can be further improved, also DDR bits needs verifying;
-    - word-boundary accesses for 8-bit ports;
-    - split into different types, add quick notes about where they diverges do in this header;
-    - keyboard/mouse interface hookup is wrong for PS/2 and unimplemented for quadrature.
-      I guess we can use connectors over a custom handling, with a terminal mock for testing it
-      without the overhead of everything else.
+TODO:
+- IOCR / IOLINES hookups can be further improved, also DDR bits needs verifying;
+- word-boundary accesses for 8-bit ports;
+- split into different types, add quick notes about where they diverges do in this header;
+- keyboard/mouse interface hookup is wrong for PS/2 and unimplemented for quadrature.
+  I guess we can use connectors over a custom handling, with a terminal mock for testing it
+  without the overhead of everything else.
+- Make interrupts falling or rising edge (depending on type);
+- tetfight: sets the two timers only as irq sources (no flyback), T0 controls gameplay, T1 to QS1000
+  sound engine. IRQs are unevenly accepted, if latter is disabled makes framerate stable ...
 
 **************************************************************************************************/
 
@@ -426,6 +429,7 @@ inline u8 arm_iomd_device::update_irqa_type(u8 data)
 
 inline void arm_iomd_device::flush_irq(unsigned Which)
 {
+	// TODO: use external setters, don't use pulse_input_line
 	if (m_irq_status[Which] & m_irq_mask[Which])
 		m_host_cpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_host_cpu->minimum_quantum_time());
 }
