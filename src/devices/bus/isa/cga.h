@@ -317,4 +317,22 @@ protected:
 
 DECLARE_DEVICE_TYPE(ISA8_CGA_CPORTIII, isa8_cga_cportiii_device)
 
+
+class isa8_cga_chameleon_device : public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
+protected:
+	virtual void device_start() override ATTR_COLD;
+private:
+	std::vector<uint8_t> m_charram;
+	uint8_t chr_read(offs_t offset);
+	void chr_write(offs_t offset, uint8_t data);
+};
+
+DECLARE_DEVICE_TYPE(ISA8_CGA_CHAMELEON, isa8_cga_chameleon_device)
+
 #endif  // MAME_BUS_ISA_CGA_H
