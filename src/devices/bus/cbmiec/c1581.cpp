@@ -6,14 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - drive not ready if ready_r() is connected to CIA
-
-*/
-
 #include "emu.h"
 #include "c1581.h"
 
@@ -139,7 +131,7 @@ uint8_t c1581_device::cia_pa_r()
 	uint8_t data = 0;
 
 	// ready
-	//data |= !m_floppy->ready_r() << 1;
+	data |= m_floppy->ready_r() << 1;
 
 	// device number
 	data |= ((m_slot->get_address() - 8) & 0x03) << 3;
@@ -273,10 +265,10 @@ void c1581_device::floppy_formats(format_registration &fr)
 
 void c1581_device::device_add_mconfig(machine_config &config)
 {
-	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
+	M6502(config, m_maincpu, XTAL(16'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1581_device::c1581_mem);
 
-	MOS8520(config, m_cia, 16_MHz_XTAL / 8);
+	MOS8520(config, m_cia, XTAL(16'000'000)/8);
 	m_cia->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_cia->cnt_wr_callback().set(FUNC(c1581_device::cnt_w));
 	m_cia->sp_wr_callback().set(FUNC(c1581_device::sp_w));
@@ -285,7 +277,9 @@ void c1581_device::device_add_mconfig(machine_config &config)
 	m_cia->pb_rd_callback().set(FUNC(c1581_device::cia_pb_r));
 	m_cia->pb_wr_callback().set(FUNC(c1581_device::cia_pb_w));
 
-	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	WD1772(config, m_fdc, XTAL(16'000'000)/2);
+	m_fdc->set_disable_motor_control(true);
+	
 	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true).enable_sound(true);
 }
 
@@ -375,11 +369,6 @@ void c1581_device::device_start()
 
 void c1581_device::device_reset()
 {
-	m_maincpu->reset();
-
-	m_cia->reset();
-	m_fdc->reset();
-
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(0);
 

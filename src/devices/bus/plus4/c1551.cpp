@@ -460,12 +460,6 @@ void c1551_device::device_start()
 
 void c1551_device::device_reset()
 {
-	m_maincpu->reset();
-
-	m_tpi0->reset();
-
-	m_exp->reset();
-
 	// initialize gate array
 	m_ga->test_w(1);
 	m_ga->soe_w(1);

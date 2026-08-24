@@ -17,6 +17,7 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
 #include "machine/output_latch.h"
 
 

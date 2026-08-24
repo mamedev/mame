@@ -712,13 +712,6 @@ void c1541_prologic_dos_classic_device::c1541pdc_mem(address_map &map)
 }
 
 
-void c1541_device_base::via0_irq_w(int state)
-{
-	m_via0_irq = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
-}
-
 uint8_t c1541_device_base::via0_pa_r()
 {
 	// dummy read to acknowledge ATN IN interrupt
@@ -822,13 +815,6 @@ uint8_t c1541c_device::via0_pa_r()
 	return !m_floppy->trk00_r();
 }
 
-
-void c1541_device_base::via1_irq_w(int state)
-{
-	m_via1_irq = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
-}
 
 uint8_t c1541_device_base::via1_pb_r()
 {
@@ -971,13 +957,15 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_device_base::c1541_mem);
 
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	MOS6522(config, m_via0, XTAL(16'000'000)/16);
 	m_via0->readpa_handler().set(FUNC(c1541_device_base::via0_pa_r));
 	m_via0->readpb_handler().set(FUNC(c1541_device_base::via0_pb_r));
 	m_via0->writepa_handler().set(FUNC(c1541_device_base::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c1541_device_base::via0_pb_w));
 	m_via0->cb2_handler().set(FUNC(c1541_device_base::via0_ca2_w));
-	m_via0->irq_handler().set(FUNC(c1541_device_base::via0_irq_w));
+	m_via0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MOS6522(config, m_via1, XTAL(16'000'000)/16);
 	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
@@ -986,7 +974,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(c1541_device_base::via1_pb_w));
 	m_via1->ca2_handler().set(C64H156_TAG, FUNC(c64h156_device::soe_w));
 	m_via1->cb2_handler().set(C64H156_TAG, FUNC(c64h156_device::oe_w));
-	m_via1->irq_handler().set(FUNC(c1541_device_base::via1_irq_w));
+	m_via1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	C64H156(config, m_ga, XTAL(16'000'000));
 	m_ga->atn_callback().set(FUNC(c1541_device_base::atn_w));
@@ -1102,9 +1090,7 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 	m_ga(*this, C64H156_TAG),
 	m_address(*this, "ADDRESS"),
 	m_leds(*this, "led%u", 0U),
-	m_data_out(1),
-	m_via0_irq(CLEAR_LINE),
-	m_via1_irq(CLEAR_LINE)
+	m_data_out(1)
 {
 }
 
@@ -1277,8 +1263,6 @@ void c1541_device_base::device_start()
 
 	// register for state saving
 	save_item(NAME(m_data_out));
-	save_item(NAME(m_via0_irq));
-	save_item(NAME(m_via1_irq));
 }
 
 void fsd2_device::device_start()
@@ -1303,11 +1287,6 @@ void fsd2_device::device_start()
 
 void c1541_device_base::device_reset()
 {
-	m_maincpu->reset();
-
-	m_via0->reset();
-	m_via1->reset();
-
 	// initialize gate array
 	m_ga->accl_w(0);
 	m_ga->ted_w(1);

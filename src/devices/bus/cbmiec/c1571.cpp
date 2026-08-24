@@ -10,7 +10,7 @@
 
     TODO:
 
-    - WD1770 set_floppy
+	- MFM
     - 1571CR
         - MOS5710
     - ICT Mini Chief MC-20
@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "c1571.h"
 
+#include "formats/c1571_dsk.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 #include "formats/d71_dsk.h"
@@ -174,13 +175,6 @@ void mini_chief_device::mini_chief_mem(address_map &map)
 	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
 }
 
-
-void c1571_device::via0_irq_w(int state)
-{
-	m_via0_irq = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
-}
 
 uint8_t c1571_device::via0_pa_r()
 {
@@ -403,13 +397,6 @@ void c1571_device::via1_w(offs_t offset, uint8_t data)
 	m_ga->ted_w(1);
 }
 
-void c1571_device::via1_irq_w(int state)
-{
-	m_via1_irq = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
-}
-
 uint8_t c1571_device::via1_pb_r()
 {
 	/*
@@ -472,13 +459,6 @@ void c1571_device::via1_pb_w(uint8_t data)
 //-------------------------------------------------
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
-
-void c1571_device::cia_irq_w(int state)
-{
-	m_cia_irq = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void c1571_device::cia_pc_w(int state)
 {
@@ -582,6 +562,7 @@ void c1571_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_D64_FORMAT);
 	fr.add(FLOPPY_G64_FORMAT);
 	fr.add(FLOPPY_D71_FORMAT);
+	fr.add(FLOPPY_C1571_FORMAT);
 }
 
 
@@ -600,26 +581,30 @@ static void mini_chief_isa8_cards(device_slot_interface &device)
 
 void c1571_device::add_base_mconfig(machine_config &config)
 {
-	M6502(config, m_maincpu, 16_MHz_XTAL / 16);
+	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1571_device::c1571_mem);
 
-	MOS6522(config, m_via0, 16_MHz_XTAL / 16);
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	MOS6522(config, m_via0, XTAL(16'000'000)/16);
 	m_via0->readpa_handler().set(FUNC(c1571_device::via0_pa_r));
 	m_via0->readpb_handler().set(FUNC(c1571_device::via0_pb_r));
 	m_via0->writepa_handler().set(FUNC(c1571_device::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c1571_device::via0_pb_w));
-	m_via0->irq_handler().set(FUNC(c1571_device::via0_irq_w));
+	m_via0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MOS6522(config, m_via1, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via1, XTAL(16'000'000)/16);
 	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
 	m_via1->readpb_handler().set(FUNC(c1571_device::via1_pb_r));
 	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
 	m_via1->writepb_handler().set(FUNC(c1571_device::via1_pb_w));
 	m_via1->ca2_handler().set(C64H156_TAG, FUNC(c64h156_device::soe_w));
 	m_via1->cb2_handler().set(C64H156_TAG, FUNC(c64h156_device::oe_w));
-	m_via1->irq_handler().set(FUNC(c1571_device::via1_irq_w));
+	m_via1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	m_fdc->set_disable_motor_control(true);
+	m_fdc->mon_wr_callback().set(C64H156_TAG, FUNC(c64h156_device::disable));
 
 	C64H156(config, m_ga, 16_MHz_XTAL);
 	m_ga->byte_callback().set(FUNC(c1571_device::byte_w));
@@ -634,8 +619,8 @@ void c1571_device::add_base_mconfig(machine_config &config)
 
 void c1571_device::add_cia_mconfig(machine_config &config)
 {
-	MOS6526(config, m_cia, 16_MHz_XTAL / 16);
-	m_cia->irq_wr_callback().set(FUNC(c1571_device::cia_irq_w));
+	MOS6526(config, m_cia, XTAL(16'000'000)/16);
+	m_cia->irq_wr_callback().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_cia->cnt_wr_callback().set(FUNC(c1571_device::cia_cnt_w));
 	m_cia->sp_wr_callback().set(FUNC(c1571_device::cia_sp_w));
 	m_cia->pb_rd_callback().set(FUNC(c1571_device::cia_pb_r));
@@ -664,7 +649,7 @@ void c1571cr_device::device_add_mconfig(machine_config &config)
 	m_via0->writepa_handler().set(FUNC(c1571cr_device::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c1571cr_device::via0_pb_w));
 
-	//MOS5710(config, M5710_TAG, 16_MHz_XTAL / 16);
+	MOS5710(config, M5710_TAG, XTAL(16'000'000)/16);
 }
 
 
@@ -716,27 +701,24 @@ ioport_constructor c1571_device::device_input_ports() const
 //  c1571_device - constructor
 //-------------------------------------------------
 
-c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_cbm_iec_interface(mconfig, *this),
-		device_c64_floppy_parallel_interface(mconfig, *this),
-		m_maincpu(*this, M6502_TAG),
-		m_via0(*this, M6522_0_TAG),
-		m_via1(*this, M6522_1_TAG),
-		m_cia(*this, M6526_TAG),
-		m_fdc(*this, WD1770_TAG),
-		m_ga(*this, C64H156_TAG),
-		m_floppy(*this, C64H156_TAG":0:525qd"),
-		m_address(*this, "ADDRESS"),
-		m_leds(*this, "led%u", 0U),
-		m_1_2mhz(0),
-		m_data_out(1),
-		m_ser_dir(0),
-		m_sp_out(1),
-		m_cnt_out(1),
-		m_via0_irq(CLEAR_LINE),
-		m_via1_irq(CLEAR_LINE),
-		m_cia_irq(CLEAR_LINE)
+c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_cbm_iec_interface(mconfig, *this),
+	device_c64_floppy_parallel_interface(mconfig, *this),
+	m_maincpu(*this, M6502_TAG),
+	m_via0(*this, M6522_0_TAG),
+	m_via1(*this, M6522_1_TAG),
+	m_cia(*this, M6526_TAG),
+	m_fdc(*this, WD1770_TAG),
+	m_ga(*this, C64H156_TAG),
+	m_floppy(*this, C64H156_TAG":0:525qd"),
+	m_address(*this, "ADDRESS"),
+	m_leds(*this, "led%u", 0U),
+	m_1_2mhz(0),
+	m_data_out(1),
+	m_ser_dir(0),
+	m_sp_out(1),
+	m_cnt_out(1)
 {
 }
 
@@ -784,7 +766,6 @@ void c1571_device::device_start()
 {
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
-	//m_fdc->set_floppy(m_floppy);
 	m_floppy->setup_wpt_cb(floppy_image_device::wpt_cb(&c1571_device::wpt_callback, this));
 
 	// register for state saving
@@ -793,9 +774,6 @@ void c1571_device::device_start()
 	save_item(NAME(m_ser_dir));
 	save_item(NAME(m_sp_out));
 	save_item(NAME(m_cnt_out));
-	save_item(NAME(m_via0_irq));
-	save_item(NAME(m_via1_irq));
-	save_item(NAME(m_cia_irq));
 }
 
 
@@ -805,13 +783,7 @@ void c1571_device::device_start()
 
 void c1571_device::device_reset()
 {
-	m_maincpu->reset();
-
-	m_via0->reset();
-	m_via1->reset();
-	m_cia->reset();
-	m_fdc->reset();
-
+	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(0);
 
 	m_sp_out = 1;
