@@ -64,6 +64,7 @@ protected:
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override ATTR_COLD;
 
+	void cdi_common_mem(address_map &map) ATTR_COLD;
 	void cdimono1_mem(address_map &map) ATTR_COLD;
 
 	void cdi910_mem(address_map &map) ATTR_COLD;

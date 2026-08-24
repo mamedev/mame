@@ -641,6 +641,24 @@ void scc68070_device::uart_rx(uint8_t data)
 
 void scc68070_device::uart_tx(uint8_t data)
 {
+	if(ENABLE_UART_PRINTING)
+	{
+		// Static variable does not survive load state.
+		static std::string s_line;
+		if (data == '\r' || data == '\n')
+		{
+			if (!s_line.empty())
+			{
+				logerror("UART: %s\n", s_line);
+				s_line.clear();
+			}
+		}
+		else
+		{
+			s_line += char(data);
+		}
+	}
+
 	if (m_uart.transmit_pointer >= int16_t(std::size(m_uart.transmit_buffer) - 1))
 	{
 		LOGMASKED(LOG_UART, "%s: uart_tx: transmit buffer full, discarding %02x\n", machine().describe_context(), data);
@@ -1809,10 +1827,3 @@ void scc68070_device::mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 	}
 }
-
-#if ENABLE_UART_PRINTING
-uint16_t scc68070_device::uart_loopback_enable()
-{
-	return 0x1234;
-}
-#endif
