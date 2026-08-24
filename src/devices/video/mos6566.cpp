@@ -14,7 +14,7 @@
     TODO:
 
     - cleanup
-    - http://hitmen.c02.at/temp/palstuff/
+    - https://hitmen.c02.at/temp/palstuff/
 
 */
 
@@ -126,7 +126,7 @@ static const rgb_t PALETTE_MOS[] =
 		} \
 	} while (0)
 
-#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8569))
+#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 #define IS_VICIIE               ((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 
 #define ROW25_YSTART      0x33
@@ -2737,7 +2737,7 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 		{
 			if (BIT(m_reg[offset], 0) != BIT(data, 0))
 			{
-				m_cpu->set_unscaled_clock(clock() << BIT(data, 0));
+				m_cpu->set_unscaled_clock((clock() / 8) << BIT(data, 0));
 			}
 
 			m_reg[offset] = data | 0xfc;
