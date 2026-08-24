@@ -8,9 +8,8 @@ Irem M62-based unreleased Kung-Fu Master sequel
 video reference: https://www.youtube.com/watch?v=Efr9EQkbCSQ
 
 TODO:
-- level backgrounds (encrypted tilemap data in MCU data ROM) (needs decryption)
-- other background elements (title screen animation, moving elements in levels) (either encrypted data in MCU data ROM, or internal to MCU)
-- remaining HUD elements (floor counter, continue screen, credit counter, high score table) again all handled by the MCU
+- validate/refine reconstructed level data, especially later-stage animated layouts
+- model C50 execution timing rather than using high-level synchronous command handlers
 - test mode doesn't work (there are strings for it in the MCU data ROM, is the MCU involved?)
 
 NOTES ON MCU DATA ROM FORMAT
@@ -126,15 +125,15 @@ several other games in m62.cpp also draw their backgrounds in 4 tile wide strips
 // C50 replacement firmware, owning the external data-ROM cipher, level/object
 // commands and HUD mailbox jobs.  It is a MAME device rather than video glue
 // so its state and VRAM bus can be carried forward to a clocked FPGA model.
-class bkungfu_c50_hud_device : public device_t
+class bkungfu_c50_device : public device_t
 {
 public:
-	bkungfu_c50_hud_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	bkungfu_c50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto vram_w() { return m_vram_w.bind(); }
 	auto level_vram_w() { return m_level_vram_w.bind(); }
 	auto mailbox_out_w() { return m_mailbox_out_w.bind(); }
-	void set_data_rom(const uint8_t *data_rom, const uint8_t *key);
+	void set_data_rom(const uint8_t *data_rom);
 	void clear();
 	void mailbox_w(offs_t offset, uint8_t data);
 	void command_w(uint8_t command);
@@ -146,12 +145,16 @@ protected:
 private:
 	void update_slot(uint8_t slot);
 	void execute_slot(uint8_t slot);
-	void complete(uint8_t offset);
+	void complete(uint16_t offset);
+	void mailbox_out(uint16_t offset, uint8_t data);
 	uint8_t decode_payload(uint16_t address) const;
 	uint16_t decode_payload_word(uint16_t address) const;
 	void draw_object(uint8_t id);
 	void draw_level_strip(int column, int row);
 	void draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr);
+	void draw_text(uint16_t table_offset, bool use_mailbox);
+	void draw_credits_continue();
+	void clear_tilemap();
 	void write_number(int x, int y, uint8_t number);
 	void write_lifebar(int xbase, int ybase, uint8_t energy, bool boss);
 	void write_floor_dot(int which, bool lit);
@@ -161,7 +164,7 @@ private:
 	devcb_write8 m_mailbox_out_w;
 	const uint8_t *m_data_rom = nullptr;
 	std::unique_ptr<uint8_t []> m_decrypted;
-	uint8_t m_mailbox[0x30]{};
+	uint8_t m_mailbox[0x800]{};
 	uint16_t m_timer = 0;
 	uint32_t m_p1score = 0;
 	uint32_t m_topscore = 0;
@@ -182,7 +185,7 @@ private:
 	TIMER_CALLBACK_MEMBER(leveldraw_next);
 };
 
-DECLARE_DEVICE_TYPE(BKUNG_C50_HUD, bkungfu_c50_hud_device)
+DECLARE_DEVICE_TYPE(BKUNG_C50, bkungfu_c50_device)
 
 namespace {
 
@@ -191,7 +194,7 @@ class m62_bkungfu_state : public m62_state
 public:
 	m62_bkungfu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: m62_state(mconfig, type, tag)
-		, m_c50_hud(*this, "c50hud")
+		, m_c50(*this, "c50")
 		, m_bkungfu_tileram(*this, "tileram", 256*32*2, ENDIANNESS_LITTLE)
 		, m_blitterdatarom(*this, "blitterdat")
 	{ }
@@ -215,16 +218,11 @@ private:
 	DECLARE_VIDEO_START(bkungfu);
 
 	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
-	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram);
-	void bkungfu_blitter_draw_text();
-	void bkungfu_blitter_clear_tilemap();
-	void bkungfu_blitter_draw_credits_continue();
 
 	// done this way so it can be viewed win the debugger with save state registration
 	uint8_t m_blittercmdram[0x800];
 
-	int m_mcu_running;
-	required_device<bkungfu_c50_hud_device> m_c50_hud;
+	required_device<bkungfu_c50_device> m_c50;
 
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
@@ -233,17 +231,17 @@ private:
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE(BKUNG_C50_HUD, bkungfu_c50_hud_device, "bkung_c50hud", "Irem Beyond Kung-Fu C50 HUD")
+DEFINE_DEVICE_TYPE(BKUNG_C50, bkungfu_c50_device, "bkung_c50", "Irem Beyond Kung-Fu C50")
 
-bkungfu_c50_hud_device::bkungfu_c50_hud_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BKUNG_C50_HUD, tag, owner, clock)
+bkungfu_c50_device::bkungfu_c50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BKUNG_C50, tag, owner, clock)
 	, m_vram_w(*this)
 	, m_level_vram_w(*this)
 	, m_mailbox_out_w(*this)
 {
 }
 
-void bkungfu_c50_hud_device::device_start()
+void bkungfu_c50_device::device_start()
 {
 	save_item(NAME(m_mailbox));
 	save_item(NAME(m_timer));
@@ -261,10 +259,10 @@ void bkungfu_c50_hud_device::device_start()
 	save_item(NAME(m_leveldraw_row));
 	save_item(NAME(m_leveldraw_column));
 	save_item(NAME(m_leveldraw_number));
-	m_leveldraw_timer = timer_alloc(FUNC(bkungfu_c50_hud_device::leveldraw_next), this);
+	m_leveldraw_timer = timer_alloc(FUNC(bkungfu_c50_device::leveldraw_next), this);
 }
 
-void bkungfu_c50_hud_device::device_reset()
+void bkungfu_c50_device::device_reset()
 {
 	std::fill(std::begin(m_mailbox), std::end(m_mailbox), 0);
 	m_timer = 0;
@@ -285,13 +283,34 @@ void bkungfu_c50_hud_device::device_reset()
 	m_leveldraw_timer->adjust(attotime::never);
 }
 
-void bkungfu_c50_hud_device::clear()
+void bkungfu_c50_device::clear()
 {
 	m_initialized = false;
 }
 
-void bkungfu_c50_hud_device::set_data_rom(const uint8_t *data_rom, const uint8_t *key)
+void bkungfu_c50_device::set_data_rom(const uint8_t *data_rom)
 {
+	// Recovered C50 data-ROM key.  It belongs to the coprocessor rather than
+	// the Z80-facing driver: the host can only see the command mailbox.
+	static constexpr uint8_t key[256] = {
+	0xae, 0xf3, 0x5c, 0x5d, 0xaa, 0xf7, 0x58, 0x59, 0xa6, 0xfb, 0x54, 0x55, 0xa2, 0xff, 0x50, 0x51,
+	0xbe, 0xe3, 0x4c, 0x4d, 0xba, 0xe7, 0x48, 0x49, 0xb6, 0xeb, 0x44, 0x45, 0xb2, 0xef, 0x40, 0x41,
+	0x8e, 0x13, 0x7c, 0x3d, 0x8a, 0x17, 0x78, 0x39, 0x86, 0x1b, 0x74, 0x35, 0x82, 0x1f, 0x70, 0x31,
+	0x9e, 0x03, 0x6c, 0x2d, 0x9a, 0x07, 0x68, 0x29, 0x96, 0x0b, 0x64, 0x25, 0x92, 0x0f, 0x60, 0x21,
+	0xee, 0x33, 0x1c, 0x1d, 0xea, 0x37, 0x18, 0x19, 0xe6, 0x3b, 0x14, 0x15, 0xe2, 0x3f, 0x10, 0x11,
+	0xfe, 0x23, 0x0c, 0x0d, 0xfa, 0x27, 0x08, 0x09, 0xf6, 0x2b, 0x04, 0x05, 0xf2, 0x2f, 0x00, 0x01,
+	0xce, 0x53, 0x3c, 0xfd, 0xca, 0x57, 0x38, 0xf9, 0xc6, 0x5b, 0x34, 0xf5, 0xc2, 0x5f, 0x30, 0xf1,
+	0xde, 0x43, 0x2c, 0xed, 0xda, 0x47, 0x28, 0xe9, 0xd6, 0x4b, 0x24, 0xe5, 0xd2, 0x4f, 0x20, 0xe1,
+	0x2e, 0x73, 0xdc, 0xdd, 0x2a, 0x77, 0xd8, 0xd9, 0x26, 0x7b, 0xd4, 0xd5, 0x22, 0x7f, 0xd0, 0xd1,
+	0x3e, 0x63, 0xcc, 0xcd, 0x3a, 0x67, 0xc8, 0xc9, 0x36, 0x6b, 0xc4, 0xc5, 0x32, 0x6f, 0xc0, 0xc1,
+	0x0e, 0x93, 0xfc, 0xbd, 0x0a, 0x97, 0xf8, 0xb9, 0x06, 0x9b, 0xf4, 0xb5, 0x02, 0x9f, 0xf0, 0xb1,
+	0x1e, 0x83, 0xec, 0xad, 0x1a, 0x87, 0xe8, 0xa9, 0x16, 0x8b, 0xe4, 0xa5, 0x12, 0x8f, 0xe0, 0xa1,
+	0x6e, 0xb3, 0x9c, 0x9d, 0x6a, 0xb7, 0x98, 0x99, 0x66, 0xbb, 0x94, 0x95, 0x62, 0xbf, 0x90, 0x91,
+	0x7e, 0xa3, 0x8c, 0x8d, 0x7a, 0xa7, 0x88, 0x89, 0x76, 0xab, 0x84, 0x85, 0x72, 0xaf, 0x80, 0x81,
+	0x4e, 0xd3, 0xbc, 0x7d, 0x4a, 0xd7, 0xb8, 0x79, 0x46, 0xdb, 0xb4, 0x75, 0x42, 0xdf, 0xb0, 0x71,
+	0x5e, 0xc3, 0xac, 0x6d, 0x5a, 0xc7, 0xa8, 0x69, 0x56, 0xcb, 0xa4, 0x65, 0x52, 0xcf, 0xa0, 0x61,
+	};
+
 	m_data_rom = data_rom;
 	m_decrypted = std::make_unique<uint8_t []>(0x8000);
 	for (int address = 0; address < 0x8000; address++)
@@ -307,17 +326,17 @@ void bkungfu_c50_hud_device::set_data_rom(const uint8_t *data_rom, const uint8_t
 	}
 }
 
-void bkungfu_c50_hud_device::write_number(int x, int y, uint8_t number)
+void bkungfu_c50_device::write_number(int x, int y, uint8_t number)
 {
 	m_vram_w(((y * 0x40 + x) << 1) & 0x0fff, (number & 0x0f) + 0x30);
 }
 
-void bkungfu_c50_hud_device::write_floor_dot(int which, bool lit)
+void bkungfu_c50_device::write_floor_dot(int which, bool lit)
 {
 	m_vram_w(((3 * 0x40 + 0x20 + which * 2) << 1) & 0x0fff, lit ? 0xd5 : 0xd6);
 }
 
-void bkungfu_c50_hud_device::write_lifebar(int xbase, int ybase, uint8_t energy, bool boss)
+void bkungfu_c50_device::write_lifebar(int xbase, int ybase, uint8_t energy, bool boss)
 {
 	int const full_segments = (energy & 0x78) >> 3;
 	for (int segment = 0; segment < 8; segment++)
@@ -328,7 +347,7 @@ void bkungfu_c50_hud_device::write_lifebar(int xbase, int ybase, uint8_t energy,
 	}
 }
 
-void bkungfu_c50_hud_device::update_slot(uint8_t slot)
+void bkungfu_c50_device::update_slot(uint8_t slot)
 {
 	if (!m_initialized)
 		return;
@@ -362,13 +381,93 @@ void bkungfu_c50_hud_device::update_slot(uint8_t slot)
 	}
 }
 
-void bkungfu_c50_hud_device::complete(uint8_t offset)
+void bkungfu_c50_device::complete(uint16_t offset)
 {
-	m_mailbox[offset] = 0xfe;
-	m_mailbox_out_w(offset, 0xfe);
+	mailbox_out(offset, 0xfe);
 }
 
-void bkungfu_c50_hud_device::execute_slot(uint8_t slot)
+void bkungfu_c50_device::mailbox_out(uint16_t offset, uint8_t data)
+{
+	m_mailbox[offset] = data;
+	m_mailbox_out_w(offset, data);
+}
+
+void bkungfu_c50_device::draw_text(uint16_t table_offset, bool use_mailbox)
+{
+	if (!m_running || !m_data_rom)
+		return;
+
+	uint16_t data_address;
+	const uint8_t *data;
+	uint8_t position_low;
+	uint8_t position_high;
+	uint8_t attribute;
+	if (use_mailbox)
+	{
+		data_address = 0x100;
+		data = m_mailbox;
+		position_low = 3;
+		position_high = 4;
+		attribute = 5;
+	}
+	else
+	{
+		data_address = m_data_rom[table_offset] | (uint16_t(m_data_rom[table_offset + 1]) << 8);
+		data = m_data_rom;
+		position_low = 2;
+		position_high = 3;
+		attribute = 4;
+	}
+
+	for (uint8_t value = data[data_address++]; value != 0; value = data[data_address++])
+	{
+		if (value == 0x01)
+		{
+			mailbox_out(attribute, data[data_address++]);
+		}
+		else if (value == 0x02)
+		{
+			mailbox_out(position_low, data[data_address++]);
+			mailbox_out(position_high, data[data_address++]);
+		}
+		else
+		{
+			uint16_t position = (uint16_t(m_mailbox[position_high]) << 8) | m_mailbox[position_low];
+			m_vram_w(position & 0x0fff, value);
+			m_vram_w((position + 1) & 0x0fff, m_mailbox[attribute]);
+			position = (position & ~0x007f) | ((position + 2) & 0x007f);
+			mailbox_out(position_low, position & 0xff);
+			mailbox_out(position_high, position >> 8);
+		}
+	}
+}
+
+void bkungfu_c50_device::draw_credits_continue()
+{
+	if (!m_running)
+		return;
+
+	uint16_t const position = (uint16_t(m_mailbox[3]) << 8) | m_mailbox[2];
+	uint8_t const attribute = m_mailbox[4];
+	m_vram_w(position & 0x0fff, (m_mailbox[1] >> 4) + 0x30);
+	m_vram_w((position + 1) & 0x0fff, attribute);
+	m_vram_w((position + 2) & 0x0fff, (m_mailbox[1] & 0x0f) + 0x30);
+	m_vram_w((position + 3) & 0x0fff, attribute);
+}
+
+void bkungfu_c50_device::clear_tilemap()
+{
+	if (!m_running)
+		return;
+
+	for (uint16_t position = 0; position < 0x1000; position += 2)
+	{
+		m_vram_w(position, m_mailbox[2]);
+		m_vram_w(position + 1, m_mailbox[1]);
+	}
+}
+
+void bkungfu_c50_device::execute_slot(uint8_t slot)
 {
 	uint8_t const trigger = m_mailbox[slot];
 	uint8_t const p1 = m_mailbox[slot + 1];
@@ -391,7 +490,7 @@ void bkungfu_c50_hud_device::execute_slot(uint8_t slot)
 	complete(slot);
 }
 
-void bkungfu_c50_hud_device::mailbox_w(offs_t offset, uint8_t data)
+void bkungfu_c50_device::mailbox_w(offs_t offset, uint8_t data)
 {
 	if (offset >= std::size(m_mailbox))
 		return;
@@ -401,7 +500,7 @@ void bkungfu_c50_hud_device::mailbox_w(offs_t offset, uint8_t data)
 		execute_slot(offset);
 }
 
-uint8_t bkungfu_c50_hud_device::decode_payload(uint16_t address) const
+uint8_t bkungfu_c50_device::decode_payload(uint16_t address) const
 {
 	uint8_t const value = m_decrypted[address];
 	uint8_t const sum = uint8_t((address & 0xff) + (address >> 8));
@@ -412,12 +511,12 @@ uint8_t bkungfu_c50_hud_device::decode_payload(uint16_t address) const
 	return uint8_t(base - value - ((value & 1) ? 0 : 2));
 }
 
-uint16_t bkungfu_c50_hud_device::decode_payload_word(uint16_t address) const
+uint16_t bkungfu_c50_device::decode_payload_word(uint16_t address) const
 {
 	return decode_payload(address) | (uint16_t(decode_payload(address + 1)) << 8);
 }
 
-void bkungfu_c50_hud_device::draw_object(uint8_t id)
+void bkungfu_c50_device::draw_object(uint8_t id)
 {
 	if (!m_decrypted || id < 0x80 || id > 0x90)
 		return;
@@ -463,7 +562,7 @@ void bkungfu_c50_hud_device::draw_object(uint8_t id)
 	}
 }
 
-void bkungfu_c50_hud_device::draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr)
+void bkungfu_c50_device::draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr)
 {
 	int const offset = ((row + 6) * 256 + column * 4) * 2;
 	for (int x = 0; x < 4; x++)
@@ -473,7 +572,7 @@ void bkungfu_c50_hud_device::draw_level_column_row(int column, int row, uint8_t 
 	}
 }
 
-void bkungfu_c50_hud_device::draw_level_strip(int column, int row)
+void bkungfu_c50_device::draw_level_strip(int column, int row)
 {
 	if (!m_decrypted)
 		return;
@@ -544,7 +643,7 @@ void bkungfu_c50_hud_device::draw_level_strip(int column, int row)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(bkungfu_c50_hud_device::leveldraw_next)
+TIMER_CALLBACK_MEMBER(bkungfu_c50_device::leveldraw_next)
 {
 	draw_level_strip(m_leveldraw_column, m_leveldraw_row);
 	if (++m_leveldraw_row == 26)
@@ -558,18 +657,50 @@ TIMER_CALLBACK_MEMBER(bkungfu_c50_hud_device::leveldraw_next)
 		complete(0);
 }
 
-void bkungfu_c50_hud_device::command_w(uint8_t command)
+void bkungfu_c50_device::command_w(uint8_t command)
 {
 	if (command == 0xfe)
 	{
 		m_running = true;
 		for (uint8_t slot = 0x10; slot <= 0x2c; slot += 4)
 			complete(slot);
+		complete(0x102);
+		complete(0x106);
+		complete(0x118);
+		complete(0x11c);
+		complete(0);
 		return;
 	}
 	if (command == 0x08)
 	{
+		clear_tilemap();
 		clear();
+		complete(0);
+		return;
+	}
+	if (command == 0x14 || command == 0x0d)
+	{
+		draw_text(uint16_t(m_mailbox[1]) << 1, false);
+		complete(0);
+		return;
+	}
+	if (command == 0x0c)
+	{
+		draw_text(0, true);
+		complete(0);
+		return;
+	}
+	if (command == 0x10)
+	{
+		draw_credits_continue();
+		complete(0);
+		return;
+	}
+	if (command == 0x05)
+	{
+		// Observed after command 0x0f for later-stage animation objects.
+		// Its additional effect, if any, is not known yet.
+		complete(0);
 		return;
 	}
 	if (command == 0x01)
@@ -594,6 +725,8 @@ void bkungfu_c50_hud_device::command_w(uint8_t command)
 	if (command != 0x0a)
 		return;
 
+	// Pre-level setup: decode the ROM-described base HUD.  This is an
+	// explicit C50 command, not a completion synthesized by the Z80 driver.
 	if (!m_data_rom)
 		return;
 
@@ -626,6 +759,7 @@ void bkungfu_c50_hud_device::command_w(uint8_t command)
 	for (uint8_t slot = 0x10; slot <= 0x2c; slot += 4)
 		if (m_valid & (1U << ((slot - 0x10) >> 2)))
 			update_slot(slot);
+	complete(0);
 }
 
 namespace {
@@ -680,93 +814,6 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	return m_blittercmdram[offset];
 }
 
-void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram)
-{
-	const int tilemap_width = 64;
-	const int widthmask = (tilemap_width * 2) - 1;
-	//int tilemap_height = 32;
-
-	if (!m_mcu_running)
-		return;
-
-	uint16_t data_address;
-	const uint8_t *dataptr;
-
-	uint8_t poslow_attr;
-	uint8_t poshigh_attr;
-	uint8_t col_attr;
-
-	if (use_ram) // high score table is drawn from RAM
-	{
-		data_address = 0x100;
-		dataptr = m_blittercmdram;
-		// attribute 2 is always set to 0xe1, and the rest are shifted in this mode, why?
-		poslow_attr = 3;
-		poshigh_attr = 4;
-		col_attr = 5;
-	}
-	else
-	{
-		data_address = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
-		dataptr = m_blitterdatarom;
-		poslow_attr = 2;
-		poshigh_attr = 3;
-		col_attr = 4;
-	}
-
-	uint8_t blitdat = dataptr[data_address++];
-	while (blitdat != 0x00)
-	{
-		if (blitdat == 0x01)
-		{
-			// change color value during blit
-			m_blittercmdram[col_attr] = dataptr[data_address++];
-		}
-		else if (blitdat == 0x02)
-		{
-			// change position params during blit
-			m_blittercmdram[poslow_attr] = dataptr[data_address++];
-			m_blittercmdram[poshigh_attr] = dataptr[data_address++];
-		}
-		else
-		{
-			uint16_t position = (m_blittercmdram[poshigh_attr] << 8) | m_blittercmdram[poslow_attr];
-
-			bkungfu_blitter_tilemap_w((position) & 0xfff, blitdat);
-			bkungfu_blitter_tilemap_w((position + 1) & 0xfff, m_blittercmdram[col_attr]);
-
-			// move along to the next character, wrapping at the end of a line
-			// otherwise Game Over text will sometimes get split across lines due to crossing the right edge
-			int vposition = (position & ~widthmask);
-			position += 2;
-			position = vposition | (position & widthmask);
-
-			m_blittercmdram[poslow_attr] = position & 0xff;
-			m_blittercmdram[poshigh_attr] = (position & 0xff00) >> 8;
-		}
-
-		blitdat = dataptr[data_address++];
-	}
-}
-
-void m62_bkungfu_state::bkungfu_blitter_draw_text()
-{
-	uint16_t blitterromptr = m_blittercmdram[0x001] * 2;
-	bkungfu_blitter_draw_text_inner(blitterromptr, false);
-}
-
-void m62_bkungfu_state::bkungfu_blitter_clear_tilemap()
-{
-	if (!m_mcu_running)
-		return;
-
-	for (int position = 0; position < 0x1000; position += 2)
-	{
-		bkungfu_blitter_tilemap_w((position) & 0xfff, m_blittercmdram[0x002]);
-		bkungfu_blitter_tilemap_w((position + 1) & 0xfff, m_blittercmdram[0x001]);
-	}
-}
-
 void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 {
 	// the tilemap needs to be 256 tiles wide for the backgrounds, which are copied in a single command
@@ -814,29 +861,8 @@ void m62_bkungfu_state::machine_start()
 	m62_state::machine_start();
 
 	save_item(NAME(m_blittercmdram));
-	save_item(NAME(m_mcu_running));
 
-	// Recovered C50 data-ROM key.  The C50 model applies it and owns the
-	// resulting decrypted data, rather than exposing a decoded buffer to the driver.
-	static const uint8_t blitter_key[256] = {
-	0xae, 0xf3, 0x5c, 0x5d, 0xaa, 0xf7, 0x58, 0x59, 0xa6, 0xfb, 0x54, 0x55, 0xa2, 0xff, 0x50, 0x51,
-	0xbe, 0xe3, 0x4c, 0x4d, 0xba, 0xe7, 0x48, 0x49, 0xb6, 0xeb, 0x44, 0x45, 0xb2, 0xef, 0x40, 0x41,
-	0x8e, 0x13, 0x7c, 0x3d, 0x8a, 0x17, 0x78, 0x39, 0x86, 0x1b, 0x74, 0x35, 0x82, 0x1f, 0x70, 0x31,
-	0x9e, 0x03, 0x6c, 0x2d, 0x9a, 0x07, 0x68, 0x29, 0x96, 0x0b, 0x64, 0x25, 0x92, 0x0f, 0x60, 0x21,
-	0xee, 0x33, 0x1c, 0x1d, 0xea, 0x37, 0x18, 0x19, 0xe6, 0x3b, 0x14, 0x15, 0xe2, 0x3f, 0x10, 0x11,
-	0xfe, 0x23, 0x0c, 0x0d, 0xfa, 0x27, 0x08, 0x09, 0xf6, 0x2b, 0x04, 0x05, 0xf2, 0x2f, 0x00, 0x01,
-	0xce, 0x53, 0x3c, 0xfd, 0xca, 0x57, 0x38, 0xf9, 0xc6, 0x5b, 0x34, 0xf5, 0xc2, 0x5f, 0x30, 0xf1,
-	0xde, 0x43, 0x2c, 0xed, 0xda, 0x47, 0x28, 0xe9, 0xd6, 0x4b, 0x24, 0xe5, 0xd2, 0x4f, 0x20, 0xe1,
-	0x2e, 0x73, 0xdc, 0xdd, 0x2a, 0x77, 0xd8, 0xd9, 0x26, 0x7b, 0xd4, 0xd5, 0x22, 0x7f, 0xd0, 0xd1,
-	0x3e, 0x63, 0xcc, 0xcd, 0x3a, 0x67, 0xc8, 0xc9, 0x36, 0x6b, 0xc4, 0xc5, 0x32, 0x6f, 0xc0, 0xc1,
-	0x0e, 0x93, 0xfc, 0xbd, 0x0a, 0x97, 0xf8, 0xb9, 0x06, 0x9b, 0xf4, 0xb5, 0x02, 0x9f, 0xf0, 0xb1,
-	0x1e, 0x83, 0xec, 0xad, 0x1a, 0x87, 0xe8, 0xa9, 0x16, 0x8b, 0xe4, 0xa5, 0x12, 0x8f, 0xe0, 0xa1,
-	0x6e, 0xb3, 0x9c, 0x9d, 0x6a, 0xb7, 0x98, 0x99, 0x66, 0xbb, 0x94, 0x95, 0x62, 0xbf, 0x90, 0x91,
-	0x7e, 0xa3, 0x8c, 0x8d, 0x7a, 0xa7, 0x88, 0x89, 0x76, 0xab, 0x84, 0x85, 0x72, 0xaf, 0x80, 0x81,
-	0x4e, 0xd3, 0xbc, 0x7d, 0x4a, 0xd7, 0xb8, 0x79, 0x46, 0xdb, 0xb4, 0x75, 0x42, 0xdf, 0xb0, 0x71,
-	0x5e, 0xc3, 0xac, 0x6d, 0x5a, 0xc7, 0xa8, 0x69, 0x56, 0xcb, 0xa4, 0x65, 0x52, 0xcf, 0xa0, 0x61,
-	};
-	m_c50_hud->set_data_rom(&m_blitterdatarom[0], blitter_key);
+	m_c50->set_data_rom(&m_blitterdatarom[0]);
 }
 
 void m62_bkungfu_state::machine_reset()
@@ -846,33 +872,6 @@ void m62_bkungfu_state::machine_reset()
 	for (int i = 0; i < 0x800; i++)
 		m_blittercmdram[i] = 0x00;
 
-	m_mcu_running = 0;
-
-}
-
-
-void m62_bkungfu_state::bkungfu_blitter_draw_credits_continue()
-{
-	// draws a 2 digit number from a byte to a given location with given attribute
-	if (!m_mcu_running)
-		return;
-
-	uint16_t position = (m_blittercmdram[0x003] << 8) | m_blittercmdram[0x002];
-	uint8_t attr = m_blittercmdram[0x004];
-
-	int value = (m_blittercmdram[0x001] & 0xf0) >> 4;
-	value += 0x30;
-
-	bkungfu_blitter_tilemap_w((position) & 0xfff, value);
-	bkungfu_blitter_tilemap_w((position + 1) & 0xfff, attr);
-
-	position += 2;
-
-	value = m_blittercmdram[0x001] & 0x0f;
-	value += 0x30;
-
-	bkungfu_blitter_tilemap_w((position) & 0xfff, value);
-	bkungfu_blitter_tilemap_w((position + 1) & 0xfff, attr);
 }
 
 void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
@@ -880,25 +879,21 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 	int pc = m_maincpu->pc();
 
 	m_blittercmdram[offset] = data;
-	if (offset < 0x30)
-		m_c50_hud->mailbox_w(offset, data);
+	if (offset < 0x800)
+		m_c50->mailbox_w(offset, data);
 
 	if (offset == 0x00)
 	{
-		m_c50_hud->command_w(data);
+		m_c50->command_w(data);
 		if (data == 0x14)
 		{
 			logerror("%s: Command %02x: blitter: draw text from ROM\n", machine().describe_context(), data);
-			bkungfu_blitter_draw_text();
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x0d)
 		{
 			// this is used on the ending, and to draw the headers for the high score table
 			// should it differ from the above somehow, or is it just a mirrored command?
 			logerror("%s: Command %02x: blitter: draw text from ROM (alt)\n", machine().describe_context(), data);
-			bkungfu_blitter_draw_text();
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x0c)
 		{
@@ -917,15 +912,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint8_t param5 = m_blittercmdram[0x005];
 
 			logerror("%s: Command %02x: blitter: draw highscores %02x %02x %02x %02x %02x\n", machine().describe_context(), data, param1, param2, param3, param4, param5);
-			bkungfu_blitter_draw_text_inner(-1, true);
-
-			// override the RAM data with 0xfe (task done flag) so this works for the next call
-			// (seems logical based on checks above) but works without it, and breaks if you do this?)
-			//  m_blittercmdram[0x102] = 0xfe;
-			//  m_blittercmdram[0x106] = 0xfe;
-			//  m_blittercmdram[0x118] = 0xfe;
-			//  m_blittercmdram[0x11c] = 0xfe;
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x10)
 		{
@@ -934,14 +920,10 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// write number of credits to param 0x01 and 0x1d (attribute?) to 0x04
 			uint8_t param = m_blittercmdram[0x001];
 			logerror("%s: Command %02x: blitter: draw number of coins %02x\n", machine().describe_context(), data, param);
-			bkungfu_blitter_draw_credits_continue();
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x08) // clear layer to fixed value
 		{
 			logerror("%s: Command %02x: blitter: clear layer\n", machine().describe_context(), data);
-			bkungfu_blitter_clear_tilemap();
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x02)
 		{
@@ -972,7 +954,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// (unlikely, it gets called without updating the other elements after you die etc.)
 			uint16_t levelnum = m_blittercmdram[0x001];
 			logerror("%s: Command %02x: blitter: pre-draw level (draw HUD?) %02x\n", machine().describe_context(), data, levelnum);
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x05)
 		{
@@ -984,7 +965,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// no additional params are sent after calling 0xf and before calling this?
 			// which could suggest command 0xf is used to draw instead, but then why this call after it?
 			logerror("%s: Command %02x: blitter: after level animation command on level 3+\n", machine().describe_context(), data);
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x0f)
 		{
@@ -1009,21 +989,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		}
 		else if (data == 0xfe)
 		{
-			// probably tells the MCU to start running
-			m_mcu_running = 1;
 			logerror("%s: Command %02x: blitter: start up\n", machine().describe_context(), data);
-
-			// set the command response addresses to ready / done
-			// (the high score table commands check their status before executing anything)
-
-			// High Score Table
-			m_blittercmdram[0x102] = 0xfe;
-			m_blittercmdram[0x106] = 0xfe;
-			m_blittercmdram[0x118] = 0xfe;
-			m_blittercmdram[0x11c] = 0xfe;
-
-			// trigger
-			m_blittercmdram[0x00] = 0xfe;
 		}
 		else
 		{
@@ -1040,9 +1006,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 
 		if (part == 0x00)
 		{
-			if (!m_mcu_running)
-				return;
-
 			// all these commands draw the HUD in various states
 			//
 			// a pointer to this basic HUD layout is at 0x140, although it could be a leftover
@@ -1163,10 +1126,10 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_bkungfu_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_bkungfu_state::io_map);
 
-	BKUNG_C50_HUD(config, m_c50_hud, 0);
-	m_c50_hud->vram_w().set(FUNC(m62_bkungfu_state::c50_vram_w));
-	m_c50_hud->level_vram_w().set(FUNC(m62_bkungfu_state::c50_level_vram_w));
-	m_c50_hud->mailbox_out_w().set(FUNC(m62_bkungfu_state::c50_mailbox_w));
+	BKUNG_C50(config, m_c50, 0);
+	m_c50->vram_w().set(FUNC(m62_bkungfu_state::c50_vram_w));
+	m_c50->level_vram_w().set(FUNC(m62_bkungfu_state::c50_level_vram_w));
+	m_c50->mailbox_out_w().set(FUNC(m62_bkungfu_state::c50_mailbox_w));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_bkungfu_state,bkungfu)
 }
