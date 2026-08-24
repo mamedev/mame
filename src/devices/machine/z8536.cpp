@@ -1021,6 +1021,7 @@ void cio_base_device::device_start()
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
 
 	save_item(NAME(m_irq));
+	save_item(NAME(m_ius_level));
 	save_item(NAME(m_register));
 	save_item(NAME(m_input));
 	save_item(NAME(m_output));
