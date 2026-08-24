@@ -26999,6 +26999,9 @@ jb3000
 myb3k
 stepone
 
+@source:matsushita/wsa1.cpp
+wsa1r
+
 @source:mattel/aquarius.cpp
 aquarius
 aquariusp
