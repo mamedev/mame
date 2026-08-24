@@ -278,4 +278,4 @@ ROM_START(chameleon)
 ROM_END
 }
 
-COMP(1983, chameleon, 0, 0, chameleon, 0, chameleon_state, empty_init, "Seequa", "Chameleon", MACHINE_NOT_WORKING)
+COMP(1983, chameleon, 0, 0, chameleon, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC)", MACHINE_NOT_WORKING)
