@@ -14,8 +14,6 @@
 #include "cbmiec.h"
 #include "mos5710.h"
 #include "bus/c64/bn1541.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/wd1002a_wx1.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
@@ -156,32 +154,9 @@ private:
 };
 
 
-// ======================> mini_chief_device
-
-class mini_chief_device :  public c1571_device
-{
-public:
-	// construction/destruction
-	mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
-private:
-	uint8_t cia_pa_r();
-	void cia_pa_w(uint8_t data);
-	void cia_pb_w(uint8_t data);
-
-	void mini_chief_mem(address_map &map) ATTR_COLD;
-};
-
-
 // device type definition
 DECLARE_DEVICE_TYPE(C1570,      c1570_device)
 DECLARE_DEVICE_TYPE(C1571,      c1571_device)
 DECLARE_DEVICE_TYPE(C1571CR,    c1571cr_device)
-DECLARE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device)
 
 #endif // MAME_BUS_CBMIEC_C1571_H

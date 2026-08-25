@@ -484,6 +484,7 @@ int cbm_iec_device::get_signal(int signal)
 #include "diag264_lb_iec.h"
 #include "fd2000.h"
 #include "interpod.h"
+#include "minichief.h"
 #include "serialbox.h"
 #include "vic1515.h"
 #include "vic1520.h"
