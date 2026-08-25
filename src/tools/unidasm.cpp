@@ -104,6 +104,7 @@ using util::BIT;
 #include "cpu/m6502/m740d.h"
 #include "cpu/m6502/r65c02d.h"
 #include "cpu/m6502/r65c19d.h"
+#include "cpu/m6502/w65816d.h"
 #include "cpu/m6502/w65c02d.h"
 #include "cpu/m6502/xavixd.h"
 #include "cpu/m6502/xavix2000d.h"
@@ -291,6 +292,16 @@ struct m740_unidasm_t : m740_disassembler::config
 	virtual ~m740_unidasm_t() override = default;
 	virtual u32 get_state_base() const override { return inst_state_base; }
 } m740_unidasm;
+
+// The 65816 decodes out of one of five banks depending on E, M and X; with no
+// machine to ask, default to emulation mode and let -flags pick another.
+struct w65816_unidasm_t : w65816_disassembler::config
+{
+	u32 inst_state_base;
+	w65816_unidasm_t() { inst_state_base = 0; }
+	virtual ~w65816_unidasm_t() override = default;
+	virtual u32 get_state_base() const override { return inst_state_base; }
+} w65816_unidasm;
 
 // Configuration missing
 struct m7700_unidasm_t : m7700_disassembler::config
@@ -731,6 +742,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "vt50",            le,  0, []() -> util::disasm_interface * { return new vt50_disassembler; } },
 	{ "vt52",            le,  0, []() -> util::disasm_interface * { return new vt52_disassembler; } },
 	{ "vt61",            le, -1, []() -> util::disasm_interface * { return new vt61_disassembler; } },
+	{ "w65816",          le,  0, []() -> util::disasm_interface * { return new w65816_disassembler(&w65816_unidasm); } },
 	{ "w65c02",          le,  0, []() -> util::disasm_interface * { return new w65c02_disassembler; } },
 	{ "we32100",         be,  0, []() -> util::disasm_interface * { return new we32100_disassembler; } },
 	{ "x86_16",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 16; return new i386_disassembler(&i386_unidasm); } },

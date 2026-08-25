@@ -214,6 +214,9 @@ void pippin_state::pippin(machine_config &config)
 	m_scsibus->set_external_device(7, m_mesh);
 	m_mesh->drq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_drq));
 	m_mesh->irq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_irq));
+	m_mesh->cmd_done_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(5, !state); });
+	m_mesh->exception_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(6, !state); });
+	m_mesh->error_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(7, !state); });
 	m_grandcentral->scsi1_r_callback().set(m_mesh, FUNC(mesh_device::read));
 	m_grandcentral->scsi1_w_callback().set(m_mesh, FUNC(mesh_device::write));
 	m_grandcentral->scsi1_dma_r_callback().set(m_mesh, FUNC(mesh_device::dma16_r));

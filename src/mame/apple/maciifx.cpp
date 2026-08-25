@@ -17,11 +17,12 @@
 
 #include "emu.h"
 
-#include "macadb.h"
 #include "macrtc.h"
 #include "mactoolbox.h"
 #include "scsidma.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
@@ -56,7 +57,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via1"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_rtc(*this, "rtc"),
 		m_scsidma(*this, "scsidma"),
@@ -69,8 +70,7 @@ public:
 		m_last_taken_interrupt(-1),
 		m_overlay(true),
 		m_rom_ptr(nullptr),
-		m_rom_size(0),
-		m_adb_in(0)
+		m_rom_size(0)
 	{
 	}
 
@@ -84,7 +84,7 @@ protected:
 private:
 	required_device<m68030_device> m_maincpu;
 	required_device<via6522_device> m_via1;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<rtc3430042_device> m_rtc;
 	required_device<scsidma_device> m_scsidma;
@@ -103,8 +103,6 @@ private:
 	bool m_overlay;
 	u32 *m_rom_ptr;
 	u32 m_rom_size;
-
-	int m_adb_in;
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
@@ -129,15 +127,16 @@ private:
 
 	uint32_t rom_switch_r(offs_t offset);
 
-	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE) ? true : false; }
-	int adbin_r() { return m_adb_in; }
+	int adbin_r()
+	{
+		return m_adbbus->adb_line_r();
+	}
 };
 
 void maciifx_state::machine_start()
 {
 	save_item(NAME(m_hdsel));
 	save_item(NAME(m_last_taken_interrupt));
-	save_item(NAME(m_adb_in));
 
 	m_scsidma->set_ram_base(m_ram->pointer());
 
@@ -148,7 +147,6 @@ void maciifx_state::machine_start()
 	m_rom_size = memregion("bootrom")->bytes();
 
 	m_last_taken_interrupt = -1;
-	m_adb_in = 0;
 }
 
 void maciifx_state::machine_reset()
@@ -464,8 +462,9 @@ void maciifx_state::maciifx(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(maciifx_state::via_out_b));
 	m_via1->irq_handler().set(FUNC(maciifx_state::oss_interrupt<11>));
 
-	MACADB(config, m_macadb, C15M);
-	m_macadb->adb_data_callback().set(FUNC(maciifx_state::set_adb_line));
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	applepic_device &sccpic(APPLEPIC(config, "sccpic", C15M));
 	sccpic.prd_callback().set(m_scc, FUNC(z80scc_device::dc_ab_r));
@@ -480,7 +479,7 @@ void maciifx_state::maciifx(machine_config &config)
 	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));
 	swimpic.pwr_callback().set(m_fdc, FUNC(applefdintf_device::write));
 	swimpic.hint_callback().set(FUNC(maciifx_state::oss_interrupt<6>));
-	swimpic.gpout0_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w)).invert();
+	swimpic.gpout0_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w)).invert();
 	swimpic.gpin_callback().set(FUNC(maciifx_state::adbin_r));
 
 	m_fdc->dat1byte_cb().set("swimpic", FUNC(applepic_device::reqa_w));

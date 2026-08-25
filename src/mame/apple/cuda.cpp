@@ -204,33 +204,31 @@ void cuda_device::pc_w(u8 data)
 	if (BIT(data, 3) != m_reset_line)
 	{
 		LOGMASKED(LOG_HOSTCOMM, "680x0 reset: %d -> %d (PC=%x)\n", m_reset_line, BIT(data, 3), m_maincpu->pc());
-		// falling edge, should reset the machine too
-		if (!m_reset_line && BIT(data, 3))
+		m_reset_line = BIT(data, 3);
+
+		// The firmware pulses this line high to reset the system, both at power-on and for the
+		// RESET_SYSTEM command, so track the level rather than latching the first rising edge.
+		write_reset(m_reset_line ? ASSERT_LINE : CLEAR_LINE);
+
+		// if PRAM's waiting to be loaded, transfer it now
+		if (m_reset_line && !m_pram_loaded)
 		{
-			write_reset(ASSERT_LINE);
-			write_reset(CLEAR_LINE);
-			m_reset_line = BIT(data, 3);
-
-			// if PRAM's waiting to be loaded, transfer it now
-			if (!m_pram_loaded)
+			for (int byte = 0; byte < 256; byte++)
 			{
-				for (int byte = 0; byte < 256; byte++)
-				{
-					m_maincpu->write_internal_ram(0x70 + byte, m_disk_pram[byte]);
-				}
-
-				system_time systime;
-				machine().current_datetime(systime);
-				u32 seconds = get_local_seconds(systime);
-
-				m_maincpu->write_internal_ram(0xae - 0x90, seconds & 0xff);
-				m_maincpu->write_internal_ram(0xad - 0x90, (seconds >> 8) & 0xff);
-				m_maincpu->write_internal_ram(0xac - 0x90, (seconds >> 16) & 0xff);
-				m_maincpu->write_internal_ram(0xab - 0x90, (seconds >> 24) & 0xff);
-
-				LOGMASKED(LOG_PRAM, "Syncing PRAM to saved/default and RTC to current date/time %08x\n", seconds);
-				m_pram_loaded = true;
+				m_maincpu->write_internal_ram(0x70 + byte, m_disk_pram[byte]);
 			}
+
+			system_time systime;
+			machine().current_datetime(systime);
+			u32 seconds = get_local_seconds(systime);
+
+			m_maincpu->write_internal_ram(0xae - 0x90, seconds & 0xff);
+			m_maincpu->write_internal_ram(0xad - 0x90, (seconds >> 8) & 0xff);
+			m_maincpu->write_internal_ram(0xac - 0x90, (seconds >> 16) & 0xff);
+			m_maincpu->write_internal_ram(0xab - 0x90, (seconds >> 24) & 0xff);
+
+			LOGMASKED(LOG_PRAM, "Syncing PRAM to saved/default and RTC to current date/time %08x\n", seconds);
+			m_pram_loaded = true;
 		}
 	}
 
