@@ -27,32 +27,6 @@
                    TOD  19 |             | 22  R/W
                    Vcc  20 |_____________| 21  _IRQ
 
-                            _____   _____
-                  FCO*   1 |*    \_/     | 48  FDO*
-                   TED   2 |             | 47  FCI*
-                  phi0   3 |             | 46  FDI*
-                 CLKIN   4 |             | 45  IRQ
-                 CTRLO   5 |             | 44  RSET
-                 CTRLI   6 |             | 43
-                  phi2   7 |             | 42
-                    D7   8 |             | 41  INDEX*
-                    D6   9 |             | 40  WG2*
-                    D5  10 |             | 39  WPRT*
-                    D4  11 |             | 38  RPULSE
-                   GND  12 |   MOS5710   | 37  Q
-                   Vcc  13 |             | 36  Vcc
-                    D3  14 |             | 35  GND
-                    D2  15 |             | 34  CS3*
-                    D1  16 |             | 33  CS2*
-                    D0  17 |             | 32  CS1*
-                   A15  18 |             | 31  R/W*
-                   A14  19 |             | 30  OSC
-                   A13  20 |             | 29  XTL1
-                   A12  21 |             | 28  XTL2
-                   A10  22 |             | 27  A0
-                    A4  23 |             | 26  A1
-                    A3  24 |_____________| 25  A2
-
 **********************************************************************/
 
 #ifndef MAME_MACHINE_MOS6526_H
@@ -237,22 +211,9 @@ protected:
 };
 
 
-// ======================> mos5710_device
-
-class mos5710_device : public mos6526_device
-{
-public:
-	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	//uint8_t read(offs_t offset);
-	//void write(offs_t offset, uint8_t data);
-};
-
-
 // device type definition
 DECLARE_DEVICE_TYPE(MOS6526,  mos6526_device)
 DECLARE_DEVICE_TYPE(MOS6526A, mos6526a_device)
 DECLARE_DEVICE_TYPE(MOS8520,  mos8520_device)
-DECLARE_DEVICE_TYPE(MOS5710,  mos5710_device)
 
 #endif // MAME_MACHINE_MOS6526_H
