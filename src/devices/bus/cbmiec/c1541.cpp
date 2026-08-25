@@ -308,35 +308,6 @@ void c1541_device_base::c1541_mem(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( c1541dd_mem )
-//-------------------------------------------------
-
-void c1541_device_base::c1541dd_mem(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
-	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
-	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xffff).rom().region(M6502_TAG, 0x2000);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( c1541pd_mem )
-//-------------------------------------------------
-
-void c1541_device_base::c1541pd_mem(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
-	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
-	map(0x8000, 0x9fff).rom().region(M6502_TAG, 0x4000);
-	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xffff).rom().region(M6502_TAG, 0x0000);
-}
-
-
 uint8_t c1541_device_base::via0_pa_r()
 {
 	// dummy read to acknowledge ATN IN interrupt

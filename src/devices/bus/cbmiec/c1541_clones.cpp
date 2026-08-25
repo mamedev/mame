@@ -463,12 +463,42 @@ void c1541_prologic_dos_classic_device::pia_pb_w(uint8_t data)
 
 
 //-------------------------------------------------
+//  ADDRESS_MAP( c1541dd_mem )
+//-------------------------------------------------
+
+void c1541_dolphin_dos_device::c1541dd_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x6000).ram();
+	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
+	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xffff).rom().region(M6502_TAG, 0x2000);
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( c1541pd_mem )
+//-------------------------------------------------
+
+void c1541_professional_dos_v1_device::c1541pd_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x6000).ram();
+	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
+	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
+	map(0x8000, 0x9fff).rom().region(M6502_TAG, 0x4000);
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xffff).rom().region(M6502_TAG, 0x0000);
+}
+
+
+//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void c1541_dolphin_dos_device::device_add_mconfig(machine_config &config)
 {
 	c1541_device_base::device_add_mconfig(config);
+	
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_dolphin_dos_device::c1541dd_mem);
 }
 
@@ -476,6 +506,7 @@ void c1541_dolphin_dos_device::device_add_mconfig(machine_config &config)
 void c1541_professional_dos_v1_device::device_add_mconfig(machine_config &config)
 {
 	c1541_device_base::device_add_mconfig(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_professional_dos_v1_device::c1541pd_mem);
 }
 

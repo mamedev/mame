@@ -78,6 +78,9 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	void c1541dd_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -93,6 +96,9 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	void c1541pd_mem(address_map &map) ATTR_COLD;
 };
 
 

@@ -53,8 +53,6 @@ protected:
 	required_device<floppy_image_device> m_floppy;
 
 	void c1541_mem(address_map &map) ATTR_COLD;
-	void c1541dd_mem(address_map &map) ATTR_COLD;
-	void c1541pd_mem(address_map &map) ATTR_COLD;
 
 	required_device<m6502_device> m_maincpu;
 
