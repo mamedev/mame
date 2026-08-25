@@ -22,7 +22,19 @@ TODO:
 #include "emu.h"
 #include "arm_iomd.h"
 
+#include "bus/pc_kbd/keyboards.h"
 
+enum keyboard_status_register : u8
+{
+	KSR_KCI = 0x01, // keyboard clock in
+	KSR_KDI = 0x02, // keyboard data in
+	KSR_RXP = 0x04, // parity bit in
+	KSR_ENA = 0x08, // enable
+	KSR_RXB = 0x10, // receiver busy
+	KSR_RXF = 0x20, // receiver full
+	KSR_TXB = 0x40, // transmitter busy
+	KSR_TXE = 0x80, // transmitter empty
+};
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -143,7 +155,8 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
-	, m_kbdc(*this, finder_base::DUMMY_TAG)
+	, m_ssrt(*this, "ssrt")
+	, m_kbdc(*this, "kbdc")
 	, m_iocr_read_od_cb(*this, 1)
 	, m_iocr_write_od_cb(*this)
 	, m_iocr_read_id_cb(*this, 1)
@@ -226,12 +239,24 @@ arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, cons
 
 void arm_iomd_device::device_add_mconfig(machine_config &config)
 {
-	//DEVICE(config, ...);
-	//TODO: keyboard and mouse interfaces at very least, also they differs by device type
+	//TODO: mouse interface, also they differs by device type
+
+	AT_SSRT(config, m_ssrt);
+	m_ssrt->clk().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_ssrt->txd().set(m_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_ssrt->pe().set(FUNC(arm_iomd_device::kbd_rxp_w));
+	m_ssrt->rx().set(FUNC(arm_iomd_device::kbd_rxf_w));
+	m_ssrt->tx().set(FUNC(arm_iomd_device::kbd_txe_w));
+
+	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_kbdc->out_clock_cb().set(m_ssrt, FUNC(at_ssrt_device::clk_w));
+	m_kbdc->out_data_cb().set(m_ssrt, FUNC(at_ssrt_device::rxd_w));
 }
 
 void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 {
+	arm_iomd_device::device_add_mconfig(config);
+
 	//DEVICE(config, ...);
 	//TODO: above plus new sub-devices
 }
@@ -243,6 +268,7 @@ void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 void arm_iomd_device::device_start()
 {
 	save_item(NAME(m_iocr_ddr));
+	save_item(NAME(m_kbdsr));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vidinita));
 	save_item(NAME(m_vidend));
@@ -305,6 +331,8 @@ void arm_iomd_device::device_reset()
 	for (int i = 0; i < std::size(m_timer); i++)
 		m_timer[i]->adjust(attotime::never);
 
+	m_kbdsr = 0;
+
 	m_sndcur = 0;
 	m_sndend = 0;
 	std::fill_n(m_sndcur_reg, std::size(m_sndcur_reg), 0);
@@ -357,44 +385,81 @@ void arm_iomd_device::iocr_w(u32 data)
 	m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
 }
 
-u32 arm_iomd_device::kbddat_r()
-{
-	if (m_kbdc.found())
-		return m_kbdc->data_r();
-
-	logerror("%s attempted to read kbddat with no controller\n", this->tag());
-	return 0xff;
-}
-
 u32 arm_iomd_device::kbdcr_r()
 {
-	if (m_kbdc.found())
-		return m_kbdc->status_r();
+	u32 data = m_kbdsr;
 
-	logerror("%s attempted to read kbdcr with no controller\n", this->tag());
-	return 0xff;
+	if (m_kbdc->clock_signal())
+		data |= KSR_KCI;
+	if (m_kbdc->data_signal())
+		data |= KSR_KDI;
+	if (m_ssrt->rx_busy())
+		data |= KSR_RXB;
+	if (m_ssrt->tx_busy())
+		data |= KSR_TXB;
+
+	return data;
+}
+
+u32 arm_iomd_device::kbddat_r()
+{
+	return u32(m_ssrt->data_r());
 }
 
 void arm_iomd_device::kbddat_w(u32 data)
 {
-	if (m_kbdc.found())
-	{
-		m_kbdc->data_w(data & 0xff);
-		return;
-	}
-
-	logerror("%s attempted to write %02x on kbddat with no controller\n", this->tag(),data & 0xff);
+	m_ssrt->data_w(u8(data));
 }
 
 void arm_iomd_device::kbdcr_w(u32 data)
 {
-	if (m_kbdc.found())
+	if (m_kbdsr & KSR_ENA)
 	{
-		m_kbdc->command_w(data & 0xff);
-		return;
+		m_kbdc->data_write_from_mb(!BIT(data, 1));
+		m_kbdc->clock_write_from_mb(!BIT(data, 0));
 	}
+	else if (data & KSR_ENA)
+	{
+		m_kbdsr |= KSR_TXE | KSR_ENA;
+		trigger_irq<IRQB>(0x40);
+	}
+}
 
-	logerror("%s attempted to write %02x on kbdcr with no controller\n", this->tag(),data & 0xff);
+void arm_iomd_device::kbd_rxp_w(int state)
+{
+	// parity bit is inverse of ssrt parity error
+	if (!state)
+		m_kbdsr |= KSR_RXP;
+	else
+		m_kbdsr &= ~KSR_RXP;
+}
+
+void arm_iomd_device::kbd_rxf_w(int state)
+{
+	if (state)
+	{
+		m_kbdsr |= KSR_RXF;
+		trigger_irq<IRQB>(0x80);
+	}
+	else
+	{
+		m_kbdsr &= ~KSR_RXF;
+		irqrq_w<IRQB>(0x80);
+	}
+}
+
+void arm_iomd_device::kbd_txe_w(int state)
+{
+	if (state)
+	{
+		m_kbdsr |= KSR_TXE;
+		trigger_irq<IRQB>(0x40);
+	}
+	else
+	{
+		m_kbdsr &= ~KSR_TXE;
+		irqrq_w<IRQB>(0x40);
+	}
 }
 
 u32 arm7500fe_iomd_device::msecr_r()
@@ -747,19 +812,3 @@ void arm_iomd_device::sound_drq(int state)
 		// ...
 	}
 }
-
-void arm_iomd_device::keyboard_irq(int state)
-{
-	printf("IRQ %d\n",state);
-	if (!state)
-		return;
-
-	trigger_irq<IRQB>(0x80);
-}
-
-void arm_iomd_device::keyboard_reset(int state)
-{
-	printf("RST %d\n",state);
-}
-
-

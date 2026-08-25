@@ -18,9 +18,6 @@
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
 #include "machine/i2cmem.h"
-#include "machine/at_keybc.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -39,7 +36,6 @@ public:
 		, m_iomd(*this, "iomd")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
-		, m_kbdc(*this, "kbdc")
 		, m_mouse(*this, "MOUSE")
 	{ }
 
@@ -58,7 +54,6 @@ private:
 	required_device<arm_iomd_device> m_iomd;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
-	required_device<ps2_keyboard_controller_device> m_kbdc;
 	required_ioport m_mouse;
 
 	virtual void machine_reset() override ATTR_COLD;
@@ -164,21 +159,11 @@ void riscpc_state::base_config(machine_config &config)
 {
 	I2C_24C02(config, m_i2cmem);
 
-	// TODO: verify type
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101));
-	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
-
 	// auxiliary connector
 //  pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 //  aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 //  aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
-	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	m_kbdc->hot_res().set(m_iomd, FUNC(arm_iomd_device::keyboard_reset));
-	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(m_iomd, FUNC(arm_iomd_device::keyboard_irq));
 //  m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 //  m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 //  m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
@@ -193,7 +178,6 @@ void riscpc_state::base_config(machine_config &config)
 
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
-	m_iomd->set_kbdc_tag(m_kbdc);
 	m_iomd->iocr_read_od<0>().set(FUNC(riscpc_state::iocr_od0_r));
 	m_iomd->iocr_read_od<1>().set(FUNC(riscpc_state::iocr_od1_r));
 	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));

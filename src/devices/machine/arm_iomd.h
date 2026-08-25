@@ -13,9 +13,8 @@
 
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
-#include "machine/at_keybc.h"
+#include "machine/at_ssrt.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -43,17 +42,13 @@ public:
 	// IRQA
 	void vblank_irq(int state);
 	// IRQB
-	void keyboard_irq(int state);
 	// DRQs
 	void sound_drq(int state);
-	// Reset
-	void keyboard_reset(int state);
 
 	// I/O operations
 	virtual void map(address_map &map) ATTR_COLD;
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template<class T> void set_vidc_tag(T &&tag) { m_vidc.set_tag(std::forward<T>(tag)); }
-	template<class T> void set_kbdc_tag(T &&tag) { m_kbdc.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// device-level overrides
@@ -85,7 +80,8 @@ protected:
 	// TODO: convert to ARM7 device instead, enums shouldn't be public
 	required_device<cpu_device> m_host_cpu;
 	required_device<arm_vidc20_device> m_vidc;
-	optional_device<ps2_keyboard_controller_device> m_kbdc;
+	required_device<at_ssrt_device> m_ssrt;
+	required_device<pc_kbdc_device> m_kbdc;
 	address_space *m_host_space; /**< reference to the host cpu space for DMA ops */
 private:
 	u8 m_iocr_ddr;
@@ -102,6 +98,10 @@ private:
 	void kbddat_w(u32 data);
 	u32 kbdcr_r();
 	void kbdcr_w(u32 data);
+	void kbd_rxp_w(int state);
+	void kbd_rxf_w(int state);
+	void kbd_txe_w(int state);
+	u8 m_kbdsr;
 
 	u32 m_vidinita, m_vidend;
 	bool m_vidlast, m_videqual;
