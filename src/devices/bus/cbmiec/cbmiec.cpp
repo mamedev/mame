@@ -477,6 +477,7 @@ int cbm_iec_device::get_signal(int signal)
 
 // slot devices
 #include "c1541.h"
+#include "c1541_clones.h"
 #include "c1571.h"
 #include "c1581.h"
 #include "c64_nl10.h"
@@ -502,6 +503,7 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("fsd2", FSD2);
 	device.option_add("csd1", CSD1);
 	device.option_add("c1541dd", C1541_DOLPHIN_DOS);
+	device.option_add("c1541tt", C1541_TURBOTRANS);
 	device.option_add("c1541pd", C1541_PROFESSIONAL_DOS_V1);
 	device.option_add("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC);
 	device.option_add("c1570", C1570);
