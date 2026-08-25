@@ -9,8 +9,8 @@
     TODO:
     - Unimplemented instructions
     - External interrupts
-    - Serial port
-    - Pseudo-port functions
+    - Serial port is only implemented as far as the CDTV uses it
+    - Pseudo-port functions (if there are others)
     - Control register flags other than CTL_TIMER_INT_ENABLE
     - Mask options (prescaler, port defaults, etc.)
 
@@ -80,7 +80,9 @@ lc6554_cpu_device::lc6554_cpu_device(const machine_config &mconfig, const char *
 	m_program_config("program", ENDIANNESS_BIG, 8, 12, 0, address_map_constructor(FUNC(lc6554_cpu_device::lc6554_program_map), this)),
 	m_data_config("data", ENDIANNESS_BIG, 8, 7, 0, address_map_constructor(FUNC(lc6554_cpu_device::lc6554_data_map), this)),
 	m_port_in_cb(*this, 0xff),
-	m_port_out_cb(*this)
+	m_port_out_cb(*this),
+	m_so_cb(*this),
+	m_sck_cb(*this)
 {
 }
 
@@ -118,10 +120,13 @@ void lc6554_cpu_device::device_start()
 	m_tm = 0;
 	m_sp = 0;
 	m_gp_access = false;
+	m_serial_mode = 0;
+	m_serial_shift = 0;
+	m_si = false;
+	m_sck = false;
 
 	std::fill(std::begin(m_opcode), std::end(m_opcode), 0);
 	std::fill(std::begin(m_stack), std::end(m_stack), 0);
-	std::fill(std::begin(m_gp), std::end(m_gp), 0);
 
 	// allocate timer
 	m_timer = timer_alloc(FUNC(lc6554_cpu_device::timer_update), this);
@@ -140,8 +145,11 @@ void lc6554_cpu_device::device_start()
 	save_item(NAME(m_tm));
 	save_item(NAME(m_stack));
 	save_item(NAME(m_sp));
-	save_item(NAME(m_gp));
 	save_item(NAME(m_gp_access));
+	save_item(NAME(m_serial_mode));
+	save_item(NAME(m_serial_shift));
+	save_item(NAME(m_si));
+	save_item(NAME(m_sck));
 
 	state_add(STATE_GENPC,     "GENPC",    m_pc).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",    m_pc).callexport().noshow();
@@ -152,6 +160,8 @@ void lc6554_cpu_device::device_start()
 	state_add(LC6554_DP,       "DP",       m_dp).callimport();
 	state_add(LC6554_CTL,      "CTL",      m_ctl).callimport().formatstr("%01X");
 	state_add(LC6554_TM,       "TM",       m_tm).callimport().formatstr("%02X");
+	state_add(LC6554_SM,       "SM",       m_serial_mode).callimport().formatstr("%02X");
+	state_add(LC6554_SS,       "SS",       m_serial_shift).callimport().formatstr("%02X");
 
 	set_icountptr(m_icount);
 }
@@ -163,6 +173,7 @@ void lc6554_cpu_device::device_reset()
 	m_ctl = 0;
 	m_status &= ~(FLAG_TMF | FLAG_EXTF);
 	m_sp = 0; // not reset according to datasheet?
+	m_serial_mode = 0;
 }
 
 uint64_t lc6554_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
@@ -336,6 +347,49 @@ void lc6554_cpu_device::set_cf_and_zf(uint8_t data)
 {
 	set_cf(data);
 	set_zf(data);
+}
+
+
+//**************************************************************************
+//  SERIAL PORT
+//**************************************************************************
+
+void lc6554_cpu_device::si_w(int state)
+{
+	m_si = bool(state);
+}
+
+void lc6554_cpu_device::sck_w(int state)
+{
+	serial_clock(state);
+}
+
+void lc6554_cpu_device::serial_clock(int state)
+{
+	if (serial_port_enabled())
+	{
+		// falling edge, latch serial out
+		if (m_sck && state == 0 && serial_transmit())
+			m_so_cb(m_serial_shift & 1);
+
+		// rising edge, sample serial in and shift
+		if (!m_sck && state == 1)
+			m_serial_shift = (m_si ? 0x80 : 0x00) | (m_serial_shift >> 1);
+	}
+
+	m_sck = bool(state);
+}
+
+void lc6554_cpu_device::set_serial_mode(uint8_t data, uint8_t mem_mask)
+{
+	m_serial_mode &= ~mem_mask;
+	m_serial_mode |= data;
+}
+
+void lc6554_cpu_device::set_serial_data(uint8_t data, uint8_t mem_mask)
+{
+	m_serial_shift &= ~mem_mask;
+	m_serial_shift |= data;
 }
 
 
@@ -737,7 +791,16 @@ void lc6554_cpu_device::op_ip()
 	if (m_gp_access)
 	{
 		LOGMASKED(LOG_GP, "R GP port %x\n", m_dp & 0x0f);
-		m_ac = 0;
+
+		switch (m_dp & 0x0f)
+		{
+			case 0x0e: m_ac = (m_serial_shift >> 0) & 0x0f; break;
+			case 0x0f: m_ac = (m_serial_shift >> 4) & 0x0f; break;
+
+			default:
+				logerror("Read from invalid pseudo-port: %01x\n", m_dp & 0x0f);
+				m_ac = 0;
+		}
 	}
 	else
 		m_ac = m_port_in_cb[m_dp & 0x0f](0);
@@ -750,11 +813,33 @@ void lc6554_cpu_device::op_op()
 {
 	if (m_gp_access)
 	{
-		LOGMASKED(LOG_GP, "W GP port %x = %01x\n", m_ac, m_dp & 0x0f);
-		m_gp[m_dp & 0x0f] = m_ac;
+		LOGMASKED(LOG_GP, "W GP port %x = %01x\n", m_dp & 0x0f, m_ac);
+
+		switch (m_dp & 0x0f)
+		{
+			case 0x0c: set_serial_mode(m_ac << 0, 0x0f); break;
+			case 0x0d: set_serial_mode(m_ac << 4, 0xf0); break;
+			case 0x0e: set_serial_data(m_ac << 0, 0x0f); break;
+			case 0x0f: set_serial_data(m_ac << 4, 0xf0); break;
+
+			default:
+				logerror("Write to invalid pseudo-port: %01x\n", m_dp & 0x0f);
+		}
 	}
 	else
+	{
+		// we model SCK as an extra pin, so forward it in case we need to take action
+		if (((m_dp & 0x0f) == 5))
+		{
+			// external serial clock line
+			m_sck_cb(BIT(m_ac, 2));
+
+			// update internal state
+			serial_clock(BIT(m_ac, 2));
+		}
+
 		m_port_out_cb[m_dp & 0x0f](0, m_ac);
+	}
 
 	m_gp_access = false;
 }

@@ -2541,6 +2541,8 @@ void cdtv_state::cdtv(machine_config &config)
 	m_lcdcpu->pn_out_cb().set(FUNC(cdtv_state::lcdcpu_portn_w));
 	m_lcdcpu->po_out_cb().set(FUNC(cdtv_state::lcdcpu_porto_w));
 	m_lcdcpu->pp_out_cb().set(FUNC(cdtv_state::lcdcpu_portp_w));
+	m_lcdcpu->so_out_cb().set(m_cdrom, FUNC(cr511b_device::sdata_w));
+	m_lcdcpu->sck_out_cb().set(m_cdrom, FUNC(cr511b_device::sck_w));
 
 	PWM_DISPLAY(config, m_vfd_display);
 	m_vfd_display->set_size(8, 8);
@@ -2584,6 +2586,7 @@ void cdtv_state::cdtv(machine_config &config)
 	m_cdrom->drq_cb().set(m_tpi, FUNC(tpi6525_device::pc4_w));
 	m_cdrom->drq_cb().append(FUNC(cdtv_state::drq_w));
 	m_cdrom->subcode_data_cb().set(m_tpi, FUNC(tpi6525_device::pa_w));
+	m_cdrom->sdata_cb().set(m_lcdcpu, FUNC(lc6554_cpu_device::si_w));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 

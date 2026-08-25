@@ -28,6 +28,7 @@
 #define LOG_SUBQ    (1 << 4)
 #define LOG_SUBQ2   (1 << 5) // log subq data to popmessage
 #define LOG_SUBCODE (1 << 6)
+#define LOG_SERIAL  (1 << 7)
 
 #define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_PARAM)
 
@@ -55,6 +56,7 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 	m_scor_cb(*this),
 	m_sbcp_cb(*this),
 	m_subcode_data_cb(*this),
+	m_sdata_cb(*this),
 	m_input_fifo_pos(0),
 	m_output_fifo_pos(0),
 	m_output_fifo_length(0),
@@ -92,6 +94,8 @@ void cr511b_device::device_start()
 
 	m_frame_timer = timer_alloc(FUNC(cr511b_device::frame_cb), this);
 	m_subcode_timer = timer_alloc(FUNC(cr511b_device::subcode_cb), this);
+	m_scan_timer = timer_alloc(FUNC(cr511b_device::scan_cb), this);
+
 	m_stch_timer = timer_alloc(FUNC(cr511b_device::stch), this);
 	m_sten_timer = timer_alloc(FUNC(cr511b_device::sten), this);
 
@@ -114,10 +118,16 @@ void cr511b_device::device_start()
 	save_item(NAME(m_transfer_length));
 	save_item(NAME(m_transfer_buffer));
 	save_item(NAME(m_transfer_buffer_pos));
+	save_item(NAME(m_serial_shift));
+	save_item(NAME(m_serial_count));
+	save_item(NAME(m_serial_transmit));
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_cmd));
+	save_item(NAME(m_sdata));
+	save_item(NAME(m_sck));
 	save_item(NAME(m_status_ready));
 	save_item(NAME(m_data_ready));
+	save_item(NAME(m_front_panel_enabled));
 }
 
 void cr511b_device::device_reset()
@@ -130,11 +140,19 @@ void cr511b_device::device_reset()
 
 	m_status_ready = false;
 	m_data_ready = false;
+	m_front_panel_enabled = false;
 
 	m_subcode_symbol = 0;
 	m_subcode_valid = false;
 
 	m_status = STATUS_READY;
+	m_sector_size = 0;
+
+	m_serial_shift = 0;
+	m_serial_count = 0;
+	m_serial_transmit = false;
+	m_sdata = true;
+	m_sck = true;
 
 	if (exists())
 		m_status |= STATUS_MEDIA;
@@ -146,6 +164,9 @@ void cr511b_device::device_reset()
 
 	// used when playing audio cds
 	m_subcode_timer->adjust(attotime::never);
+
+	m_scan_timer->adjust(attotime::never);
+	m_cdda->cancel_scan();
 }
 
 std::pair<std::error_condition, std::string> cr511b_device::call_load()
@@ -329,6 +350,7 @@ void cr511b_device::status_change(uint8_t status)
 		else
 			m_frame_timer->adjust(attotime::never);
 
+		// stop the subcode timer if we no longer play
 		if (!(m_status & STATUS_PLAYING))
 			stop_subcode();
 
@@ -388,6 +410,7 @@ void cr511b_device::play_audio(uint32_t start, uint32_t end)
 		if (m_cdda->audio_active())
 			status |= STATUS_SUCCESS;
 
+		m_cdda->cancel_scan();
 		m_cdda->stop_audio();
 
 		status &= ~STATUS_PLAYING;
@@ -401,7 +424,10 @@ void cr511b_device::play_audio(uint32_t start, uint32_t end)
 			m_input_fifo[1], m_input_fifo[2], m_input_fifo[3],
 			m_input_fifo[4], m_input_fifo[5], m_input_fifo[6], start, end);
 
-		m_cdda->start_audio(start, end - start);
+		bool const already_running = m_cdda->audio_active();
+
+		m_cdda->cancel_scan();
+		m_cdda->start_audio(start, end - start );
 
 		uint8_t status = m_status;
 
@@ -409,7 +435,8 @@ void cr511b_device::play_audio(uint32_t start, uint32_t end)
 		status |= STATUS_MOTOR;
 
 		status_change(status);
-		start_subcode();
+		if (!already_running)
+			start_subcode();
 	}
 	else
 	{
@@ -531,6 +558,150 @@ void cr511b_device::enable_w(int state)
 	m_enabled = !bool(state); // active low
 }
 
+void cr511b_device::sdata_w(int state)
+{
+	m_sdata = bool(state);
+}
+
+void cr511b_device::sck_w(int state)
+{
+	// falling edge in transmit mode
+	if (m_sck && (state == 0) && m_serial_transmit && m_serial_count < 8)
+	{
+		if (m_serial_count == 0)
+			LOGMASKED(LOG_SERIAL, "Sending serial data: %02x\n", m_serial_shift);
+
+		m_sdata_cb(m_serial_shift & 1);
+		m_serial_shift >>= 1;
+		m_serial_count++;
+	}
+	// rising edge after all bits are sent, exit transmit mode
+	else if (!m_sck && (state == 1) && m_serial_transmit && m_serial_count == 8)
+	{
+		m_serial_count = 0;
+		m_serial_transmit = false;
+	}
+	// rising edge in receive mode
+	else if (!m_sck && (state == 1) && !m_serial_transmit)
+	{
+		m_serial_shift = (m_sdata ? 0x80 : 0x00) | (m_serial_shift >> 1);
+		m_serial_count++;
+
+		if (m_serial_count == 8)
+		{
+			LOGMASKED(LOG_SERIAL, "Received serial command: %02x\n", m_serial_shift);
+			m_serial_count = 0;
+			serial_cmd();
+		}
+	}
+
+	m_sck = bool(state);
+}
+
+void cr511b_device::serial_cmd()
+{
+	if (!m_front_panel_enabled)
+		return;
+
+	switch (m_serial_shift)
+	{
+		// Play/Pause
+		case 0x01:
+			if (m_cdda->audio_active())
+			{
+				m_cdda->cancel_scan();
+				m_cdda->pause_audio(!m_cdda->audio_paused());
+			}
+			else
+			{
+				play_audio(0, get_track_start(0xaa));
+			}
+			break;
+
+		// Next Track
+		case 0x02:
+			if (m_cdda->audio_active())
+			{
+				uint8_t current_track = get_track(m_cdda->get_audio_lba());
+				if (current_track != (get_last_track() - 1))
+				{
+					uint32_t start_lba = get_track_start(current_track + 1);
+					uint32_t end_lba = get_track_start(0xaa);
+
+					// start 2 second early - without this essential cd+g commands can be missed
+					// TODO: verify with hardware
+					start_lba = (start_lba >= 150) ? start_lba - 150 : 0;
+
+					LOGMASKED(LOG_SERIAL, "Next track, now playing lba %d to %d\n", start_lba, end_lba);
+
+					m_cdda->cancel_scan();
+					play_audio(start_lba, end_lba);
+				}
+			}
+			break;
+
+		// Fast Forward
+		case 0x03:
+			if (m_cdda->audio_active())
+			{
+				m_cdda->scan_forward();
+				m_scan_timer->adjust(attotime::from_msec(250));
+			}
+			break;
+
+		// Previous Track
+		case 0x04:
+			if (m_cdda->audio_active())
+			{
+				uint8_t current_track = get_track(m_cdda->get_audio_lba());
+				if (current_track != 0)
+				{
+					uint32_t start_lba = get_track_start(current_track - 1);
+					uint32_t end_lba = get_track_start(0xaa);
+
+					// start 2 second early - without this essential cd+g commands can be missed
+					// TODO: verify with hardware
+					start_lba = (start_lba >= 150) ? start_lba - 150 : 0;
+
+					LOGMASKED(LOG_SERIAL, "Previous track, now playing lba %d to %d\n", start_lba, end_lba);
+
+					m_cdda->cancel_scan();
+					play_audio(start_lba, end_lba);
+				}
+			}
+			break;
+
+		// Rewind
+		case 0x05:
+			if (m_cdda->audio_active())
+			{
+				m_cdda->scan_reverse();
+				m_scan_timer->adjust(attotime::from_msec(250));
+			}
+			break;
+
+		// Stop
+		case 0x06:
+			if (m_cdda->audio_active())
+			{
+				m_cdda->cancel_scan();
+				play_audio(0, 0);
+			}
+			break;
+
+		// Send Track
+		case 0x10:
+			m_serial_shift = m_cdda->audio_active() ? get_track(m_cdda->get_audio_lba()) + 1 : 0;
+			m_serial_transmit = true;
+			break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(cr511b_device::scan_cb)
+{
+	m_cdda->cancel_scan();
+}
+
 void cr511b_device::cmd_seek()
 {
 	LOGMASKED(LOG_CMD, "Command: Seek\n");
@@ -596,7 +767,7 @@ void cr511b_device::cmd_play_lba()
 
 	// play to the end of the disc?
 	if (end == 0x7fffff)
-		end = get_track_start(0xaa) - 1;
+		end = get_track_start(0xaa);
 
 	play_audio(start, end);
 	status_enable(0);
@@ -615,7 +786,7 @@ void cr511b_device::cmd_play_msf()
 
 	// play to the end of the disc?
 	if (end_msf == 0xffffff)
-		end = get_track_start(0xaa) - 1;
+		end = get_track_start(0xaa);
 
 	play_audio(start, end);
 	status_enable(0);
@@ -631,22 +802,16 @@ void cr511b_device::cmd_play_track()
 	uint8_t end_track = m_input_fifo[3];
 	uint8_t end_index = m_input_fifo[4]; // TODO
 
-	// the cdtv cd+g player sends command 0x0b with all zeroes parameters
-	// this is wrong, but for the controls to work in this mode we need to emulate the direct link to the lc6554 first
-	const bool whole_disc = std::all_of(&m_input_fifo[1], &m_input_fifo[7], [](uint8_t value) { return value == 0x00; });
-
-	uint32_t start_lba = 0;
-	uint32_t end_lba = get_track_start(0xaa) - 1;
-
-	if (!whole_disc)
+	if (start_track > 0 && end_track > 0)
 	{
-		start_lba = get_track_start(start_track - 1);
-		end_lba = get_track_start(end_track - 1) - 1;
+		uint32_t start_lba = get_track_start(start_track - 1);
+		uint32_t end_lba = get_track_start(end_track - 1);
+
+		LOGMASKED(LOG_CMD, "Playing audio track %d-%d to %d-%d (LBA %d to %d)\n", start_track, start_index, end_track, end_index, start_lba, end_lba);
+
+		play_audio(start_lba, end_lba);
 	}
 
-	LOGMASKED(LOG_CMD, "Playing audio track %d-%d to %d-%d (LBA %d to %d)\n", start_track, start_index, end_track, end_index, start_lba, end_lba);
-
-	play_audio(start_lba, end_lba);
 	status_enable(0);
 }
 
@@ -890,6 +1055,8 @@ void cr511b_device::cmd_front_panel()
 	// 04: unused?
 	// 05: unused?
 	// 06: unused?
+
+	m_front_panel_enabled = (m_input_fifo[1] == 0x20);
 
 	status_enable(0);
 }
