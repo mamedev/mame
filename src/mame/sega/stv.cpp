@@ -3537,6 +3537,21 @@ ROM_START( prc2ksu ) // set to 1p
 	ROM_LOAD( "prc2ksu.nv", 0x0000, 0x0080, CRC(ee7ffdc5) SHA1(4008e37cae306c0202146c5dd79ca925b8d8edd5) )
 ROM_END
 
+// Sports an AT28C16. Empty 317-* protection socket
+ROM_START( pclub2mb ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, CRC(d16683a9) SHA1(11869edff6b63d33eeca06589bd64b70e2306896) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, CRC(67eba65e) SHA1(9d78d667ebf32264fedcf4e502c8a919223fea37) ) // 0xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, CRC(05f5e4ff) SHA1(bfb2c54514caa135cc382a09af36d8206a9d1486) )
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, CRC(b7fcaa7c) SHA1(e91b4a8a7892ec7cdc3b3c75ea5b926cb2c3d5df) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, CRC(7de3ee3c) SHA1(0e16fb27280b717c1e74e23e09985dbc2143edc8) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
+
+	// TODO: add 1p eeprom default
+ROM_END
+
 
 ROM_START( pclub2pe ) // set to 1p
 	STV_BIOS
@@ -3624,6 +3639,22 @@ ROM_START( pclubsc5 )
 	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
 	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
+ROM_END
+
+// Print Club ソニークリエイティブ Ver.6
+// 837-12765-09 PCB with populated 317-0231 protection device. Sports an AT28C16.
+ROM_START( pclubsc6 )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP("ic22.bin", 0x0200000, 0x200000, CRC(754890c3) SHA1(37378e9abb93ce4f8568f8e34aff40ac5fbae75d) )
+	ROM_LOAD16_WORD_SWAP("ic24.bin", 0x0400000, 0x200000, CRC(9830393b) SHA1(3a0e75b034aacf3231da42d07a64f22cfc16723d) )
+	ROM_LOAD16_WORD_SWAP("ic26.bin", 0x0600000, 0x200000, CRC(6bec2559) SHA1(8d481a8f77ae9945b5bcd82831ebf09bc26666c7) )
+	ROM_LOAD16_WORD_SWAP("ic28.bin", 0x0800000, 0x200000, CRC(79a159e6) SHA1(f5be546a88d7418cd353d45297ee30c50bbd8fc0) )
+	ROM_LOAD16_WORD_SWAP("ic30.bin", 0x0a00000, 0x200000, CRC(6533f7fc) SHA1(7ca107191bdf1e54718bb609e0cff7387d16d794) )
+	ROM_LOAD16_WORD_SWAP("ic32.bin", 0x0c00000, 0x200000, CRC(048876e3) SHA1(13cc97bc13dcd77df9088ea80151202bbeb08465) )
+
+	// TODO: add 1p eeprom default
 ROM_END
 
 
@@ -4175,6 +4206,7 @@ GAME( 1999, pclubpok,  stvbios, stv,      stv,      stvpc_state, init_stv,      
 // Japan sets
 GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (J V1.100)", MACHINE_NOT_WORKING ) // version info is blank
+GAME( 1998, pclub2mb,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Mr. Bean (J 980325 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
@@ -4204,6 +4236,7 @@ GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_n
 GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1998, pclubsc5,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Sony Creative Ver.5 (J 980721 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pclubsc6,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Sony Creative Ver.6 (J 971006 V1.000)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ^, earlier than pclubsc5? IC2 bad, black screen on boot (hops on illegal opcode)
 
 GAME( 1997, aclub,     stvbios, stv,      aclub,    stv_state,   init_stv,        ROT0,   "Sega",                         "Aroma Club (J 970611 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // technically also printer and "blended oil" dispenser
 

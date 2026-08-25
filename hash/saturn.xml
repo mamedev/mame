@@ -4725,6 +4725,9 @@ Black screen, [CD-Block] crashes at startup (regression)
 		<description>Logic Puzzle Rainbow Town (Japan)</description>
 		<year>1996</year>
 		<publisher>Human</publisher>
+		<notes><![CDATA[
+[VDP2] Color Calculation bug in stage select when text is at bottom
+]]></notes>
 		<info name="serial" value="T-4303G"/>
 		<info name="release" value="19960223"/>
 		<info name="alt_title" value="ロジックパズル レインボータウン"/>
