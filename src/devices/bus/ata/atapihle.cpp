@@ -149,11 +149,13 @@ void atapi_hle_device::fill_buffer()
 		break;
 
 	case IDE_COMMAND_IDENTIFY_PACKET_DEVICE:
+		// IDENTIFY PACKET DEVICE is an ATA command, not an ATAPI packet
+		// command.  INTRQ is asserted once when the data is available.  Asserting
+		// it here also is wrong per the spec and screws up the Mac OS ATA driver.
 		m_cylinder_low = 0;
 		m_cylinder_high = 0;
 
 		m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
-		set_irq(ASSERT_LINE);
 		break;
 	}
 }

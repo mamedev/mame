@@ -150,8 +150,16 @@ public:
 
 	void scsi1_irq(int state) { set_irq_line<13>(state); }
 	void scsi1_drq(int state) { m_dma_scsi1->drq_w(state); }
+	void scsi1_status_bit_w(int bit, int state) { m_dma_scsi1->status_bit_w(bit, state); }
 	auto scsi1_dma_r_callback() { return read_scsi1_dma.bind(); }
 	auto scsi1_dma_w_callback() { return write_scsi1_dma.bind(); }
+
+	// In the tradition of the Quadras stashing CPU-visible DRQ status anywhere they had a spare bit, the
+	// 53C94's DRQ shows up in ChannelStatus.s5 for the SCSI channel's DBDMA controller.  99% of the time it
+	// doesn't matter but there's one old-style SCSI Manager transaction that occurs at Finder startup even on
+	// Mac OS 9 that requires this bit be active or else the system hangs and the drive icon never appears.
+	void set_scsi0_drq_status_bit(int bit) { subdevice<dbdma_device>("dma_scsi0")->set_drq_status_bit(bit); }
+	void set_scsi1_drq_status_bit(int bit) { subdevice<dbdma_device>("dma_scsi1")->set_drq_status_bit(bit); }
 
 protected:
 	// device-level overrides
@@ -199,6 +207,16 @@ public:
 
 	virtual void map(address_map &map) ATTR_COLD;
 
+	// The on-chip ATA buses.  As with the MESH SCSI bus, what (if anything) is
+	// attached to them is the driver's decision; populate them after instantiating
+	// the ASIC, e.g.
+	//   macio.ata(0).slot(0).set_default_option("hdd");
+	//   macio.ata(1).slot(0).set_default_option("cdrom");
+	// Leave a bus alone for an unpopulated header, or use
+	//   macio.ata(1).options(ata_devices, nullptr, nullptr, true);
+	// to hide a bus whose signals aren't brought out on the board.
+	ata_interface_device &ata(int bus) { return *subdevice<ata_interface_device>(m_ata[bus].finder_tag()); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -227,6 +245,7 @@ protected:
 
 	u8 m_nvram[0x8000];
 	u32 m_ata_config[2];
+	u8 m_ata_selected[2];
 };
 
 class heathrow_device : public ohare_device

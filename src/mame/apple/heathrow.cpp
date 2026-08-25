@@ -230,6 +230,25 @@ void ohare_device::device_add_mconfig(machine_config &config)
 	m_dma_scsi0->dma_r().set(m_mesh, FUNC(mesh_device::dma8_r));
 	m_dma_scsi0->dma_w().set(m_mesh, FUNC(mesh_device::dma8_w));
 
+	// The MESH's command done, exception, and error outputs show up in the SCSI
+	// channel's ChannelStatus so a channel program can wait for a command to
+	// finish and branch on how it went.  The lines are active low, so a bit reads
+	// 1 while its condition is clear.
+	//
+	// The O'Hare/Heathrow ERS tables give s7 = MESHCmdDone_L, s6 = MESHException_L,
+	// and s5 = MESHError_L, but that ordering is wrong: Apple's own driver source
+	// (apple-oss-distributions/AppleMESH, mesh.cpp) sets up the channel with
+	//     waitSelect   = 0x20002000;  /* Wait until command done      */
+	//     branchSelect = 0xC000C000;  /* Br if Exc or Err             */
+	// i.e. it waits on s5 for completion and branches on s6|s7 for trouble.
+	// (Apple only ever tests exception and error together, so which of s6/s7 is
+	// which is not determined; we keep the ERS's relative order for those two.)
+	m_mesh->cmd_done_handler_cb().set([this](int state) { m_dma_scsi0->status_bit_w(5, !state); });
+	m_mesh->exception_handler_cb().set([this](int state) { m_dma_scsi0->status_bit_w(6, !state); });
+	m_mesh->error_handler_cb().set([this](int state) { m_dma_scsi0->status_bit_w(7, !state); });
+
+	// O'Hare and later also have two ATA buses on-chip, and we also leave
+	// device population to the driver.
 	ATA_INTERFACE(config, m_ata[0]).options(ata_devices, nullptr, nullptr, false);
 	m_ata[0]->irq_handler().set(FUNC(macio_device::set_irq_line<13>));
 	m_ata[0]->dmarq_handler().set(FUNC(ohare_device::ata_dmarq<0>));
@@ -386,6 +405,8 @@ void ohare_device::ohare_start()
 
 	m_ata_config[0] = m_ata_config[1] = 0;
 	save_item(NAME(m_ata_config));
+	m_ata_selected[0] = m_ata_selected[1] = 0;
+	save_item(NAME(m_ata_selected));
 
 	m_dma_ata0->set_address_space(get_pci_busmaster_space());
 	m_dma_ata1->set_address_space(get_pci_busmaster_space());
@@ -825,10 +846,18 @@ template <int Ch> u32 ohare_device::ata_r(offs_t offset, u32 mem_mask)
 
 		case 0x01: case 0x02: case 0x03: case 0x04:
 		case 0x05: case 0x06: case 0x07:    // command block, byte-wide
-			return ata.cs0_r((offset >> 2) & 7, 0xff);
+		{
+			const u8 value = ata.cs0_r((offset >> 2) & 7, 0xff);
+			// Apple has a weak pull-down on DB7 so devices that aren't present
+			// read as 0x7f
+			return ata.slot(m_ata_selected[Ch]).dev() ? value : 0x7f;
+		}
 
 		case 0x16:  // control block: alternate status
-			return ata.cs1_r(6, 0xff);
+		{
+			const u8 value = ata.cs1_r(6, 0xff);
+			return ata.slot(m_ata_selected[Ch]).dev() ? value : 0x7f;
+		}
 
 		case 0x20:  // Apple timing configuration register
 			return m_ata_config[Ch];
@@ -857,6 +886,10 @@ template <int Ch> void ohare_device::ata_w(offs_t offset, u32 data, u32 mem_mask
 
 		case 0x01: case 0x02: case 0x03: case 0x04:
 		case 0x05: case 0x06: case 0x07:    // command block, byte-wide
+			if (((offset >> 2) & 7) == 6)
+			{
+				m_ata_selected[Ch] = BIT(data, 4);
+			}
 			ata.cs0_w((offset >> 2) & 7, data & 0xff, 0xff);
 			break;
 
