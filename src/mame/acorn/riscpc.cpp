@@ -182,6 +182,7 @@ void riscpc_state::base_config(machine_config &config)
 	m_iomd->iocr_read_od<1>().set(FUNC(riscpc_state::iocr_od1_r));
 	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));
 	m_iomd->iocr_write_od<1>().set(FUNC(riscpc_state::iocr_od1_w));
+	m_iomd->irq_cb().set([this] (int state) { m_maincpu->set_input_line( arm7_cpu_device::ARM7_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE); });
 }
 
 void riscpc_state::rpc600(machine_config &config)

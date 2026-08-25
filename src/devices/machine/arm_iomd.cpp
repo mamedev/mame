@@ -161,6 +161,8 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 	, m_iocr_write_od_cb(*this)
 	, m_iocr_read_id_cb(*this, 1)
 	, m_iocr_write_id_cb(*this)
+	, m_irq_cb(*this)
+//	, m_fiq_cb(*this)
 	, m_sndcur(0)
 	, m_sndend(0)
 	, m_sndcur_reg{ 0, 0 }
@@ -199,7 +201,7 @@ void arm7500fe_iomd_device::map(address_map &map)
 	map(0x078, 0x07b).rw(FUNC(arm7500fe_iomd_device::irqmsk_r<IRQD>), FUNC(arm7500fe_iomd_device::irqmsk_w<IRQD>));
 
 	// PS/2 mouse
-//  map(0x0a8, 0x0ab).rw(FUNC(arm7500fe_iomd_device::msedat_r), FUNC(arm7500fe_iomd_device::msedat_w));
+	map(0x0a8, 0x0ab).rw(FUNC(arm7500fe_iomd_device::msedat_r), FUNC(arm7500fe_iomd_device::msedat_w));
 	map(0x0ac, 0x0af).rw(FUNC(arm7500fe_iomd_device::msecr_r), FUNC(arm7500fe_iomd_device::msecr_w));
 	// I/O control
 //  map(0x0cc, 0x0cf).rw(FUNC(arm7500fe_iomd_device::astcr_r), FUNC(arm7500fe_iomd_device::astcr_w));
@@ -239,7 +241,7 @@ arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, cons
 
 void arm_iomd_device::device_add_mconfig(machine_config &config)
 {
-	//TODO: mouse interface, also they differs by device type
+	//TODO: hookup mouse quadrature interface here ...
 
 	AT_SSRT(config, m_ssrt);
 	m_ssrt->clk().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
@@ -257,8 +259,7 @@ void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 {
 	arm_iomd_device::device_add_mconfig(config);
 
-	//DEVICE(config, ...);
-	//TODO: above plus new sub-devices
+	//TODO: ... replace quadrature mouse with AUX PS/2
 }
 
 //-------------------------------------------------
@@ -462,6 +463,17 @@ void arm_iomd_device::kbd_txe_w(int state)
 	}
 }
 
+u32 arm7500fe_iomd_device::msedat_r()
+{
+	// a7000p -bios 2 wants at least pulling high at startup
+	return u32(0xff);
+}
+
+void arm7500fe_iomd_device::msedat_w(u32 data)
+{
+	// ...
+}
+
 u32 arm7500fe_iomd_device::msecr_r()
 {
 	// a7000p wants a TX empty otherwise it outright refuses to boot.
@@ -492,17 +504,20 @@ inline u8 arm_iomd_device::update_irqa_type(u8 data)
 
 // interrupts
 
-inline void arm_iomd_device::flush_irq(unsigned Which)
+inline void arm_iomd_device::flush_irq()
 {
-	// TODO: use external setters, don't use pulse_input_line
-	if (m_irq_status[Which] & m_irq_mask[Which])
-		m_host_cpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_host_cpu->minimum_quantum_time());
+	// collect irq from all sources, not necessarily the caller
+	int irq_output = 0;
+	for (unsigned i = IRQA; i < IRQ_SOURCES_SIZE; i++)
+		irq_output |= !!(m_irq_status[i] & m_irq_mask[i]);
+
+	m_irq_cb(irq_output);
 }
 
 template <unsigned Which> inline void arm_iomd_device::trigger_irq(u8 irq_type)
 {
 	m_irq_status[Which] |= irq_type;
-	flush_irq(Which);
+	flush_irq();
 }
 
 template <unsigned Which> u32 arm_iomd_device::irqst_r()
@@ -526,13 +541,13 @@ template <unsigned Which> void arm_iomd_device::irqrq_w(u32 data)
 	if (Which == IRQA)
 		res = update_irqa_type(res);
 	m_irq_status[Which] = res;
-	flush_irq(Which);
+	flush_irq();
 }
 
 template <unsigned Which> void arm_iomd_device::irqmsk_w(u32 data)
 {
 	m_irq_mask[Which] = data & 0xff;
-	flush_irq(Which);
+	flush_irq();
 }
 
 // master clock control
@@ -557,25 +572,30 @@ void arm7500fe_iomd_device::clkctl_w(u32 data)
 // timers
 inline void arm_iomd_device::trigger_timer(unsigned Which)
 {
-	int timer_count = m_timer_counter[Which];
-	// TODO: it's actually a 2 MHz timer
-	int val = timer_count / 2;
+	int count = m_timer_counter[Which];
 
-	if(val==0)
+	if(count == 0)
 		m_timer[Which]->adjust(attotime::never);
 	else
-		m_timer[Which]->adjust(attotime::from_usec(val), Which ? 0x40 : 0x20, attotime::from_usec(val));
+	{
+		attotime sample_period = attotime::from_ticks(count, XTAL(2'000'000));
+
+		m_timer[Which]->adjust(sample_period, Which ? 0x40 : 0x20, sample_period);
+	}
 }
 
-// TODO: live updates aren't really supported here
+// TODO: not extensively tested
+// just enough to make a7000p -bios 2 to not hang at startup with timer 1
 template <unsigned Which> u32 arm_iomd_device::tNlow_r()
 {
-	return m_timer_out[Which] & 0xff;
+	return m_timer[Which]->elapsed().as_ticks(XTAL(2'000'000)) & 0xff;
+	//	return m_timer_out[Which] & 0xff;
 }
 
 template <unsigned Which> u32 arm_iomd_device::tNhigh_r()
 {
-	return (m_timer_out[Which] >> 8) & 0xff;
+	return (m_timer[Which]->elapsed().as_ticks(XTAL(2'000'000)) >> 8) & 0xff;
+	// 	return (m_timer_out[Which] >> 8) & 0xff;
 }
 
 template <unsigned Which> void arm_iomd_device::tNlow_w(u32 data)
