@@ -25,13 +25,13 @@ class get_default_card_software_hook
 {
 	// goofy "hook" to pass to device_slot_interface::get_default_card_software
 public:
-	using get_hashfile_extrainfo_func = std::function<bool (util::core_file &, std::string &)>;
+	using get_hashfile_extrainfo_func = std::function<bool (util::random_read &, std::string &)>;
 
 	get_default_card_software_hook(std::string const &path, get_hashfile_extrainfo_func &&get_hashfile_extrainfo);
 
 	// accesses the image file to be scrutinized by get_default_card_software(); is
 	// nullptr in the case of images loaded by software list
-	util::core_file::ptr &image_file() { return m_image_file;  }
+	util::random_read::ptr const &image_file() { return m_image_file;  }
 
 	// checks to see if image is of the specified "file type" (in practice, file extension)
 	bool is_filetype(std::string_view candidate_filetype) const;
@@ -40,7 +40,7 @@ public:
 	bool hashfile_extrainfo(std::string &extrainfo);
 
 private:
-	util::core_file::ptr        m_image_file;
+	util::random_read::ptr      m_image_file;
 	std::string                 m_file_type;
 	get_hashfile_extrainfo_func m_get_hashfile_extrainfo;
 	bool                        m_called_get_hashfile_extrainfo;

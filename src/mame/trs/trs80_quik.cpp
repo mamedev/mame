@@ -55,7 +55,7 @@ trs80_quickload_device::trs80_quickload_device(const machine_config &mconfig, co
 // TODO: If you get "Attempting to write outside of RAM" enough times in succession, MAME will exit unexpectedly (no error).
 QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 {
-	util::core_file &file = image_core_file();
+	util::random_read &file = image_core_file();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	uint8_t type, length;

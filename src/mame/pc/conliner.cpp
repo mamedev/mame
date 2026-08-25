@@ -55,7 +55,7 @@ public:
 	{
 	}
 
-	void conliner(machine_config &config);
+	void conliner(machine_config &config) ATTR_COLD;
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
@@ -100,7 +100,7 @@ ROM_START(onlinertp)
 	ROM_LOAD("ht27c512.u5",   0x00000, 0x10000, CRC(6b0e2837) SHA1(fca2609c12b595df7c4f8e2b38b3cb089983e523)) // ATI RAGE 128 PRO AGP
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 //   YEAR  NAME       PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                    FULLNAME               FLAGS
 GAME(200?, onlinertp, 0,      conliner, conliner, conliner_state, empty_init, ROT0, "Comatel / Atata Systems", "Onliner Touch Party", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // v4.222.493, with v4.44.450 update

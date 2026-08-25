@@ -324,12 +324,15 @@ public:
 
 	// file create
 	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
+	std::error_condition create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
 	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
 	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
+	std::error_condition create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
 	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
 
 	// file open
 	std::error_condition open(std::string_view filename, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
+	std::error_condition open(util::random_read_write &file, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
 	std::error_condition open(util::random_read_write::ptr &&file, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
 
 	// file close
@@ -398,7 +401,8 @@ private:
 	void metadata_update_hash();
 
 	// file characteristics
-	util::random_read_write::ptr m_file;        // handle to the open core file
+	util::random_read_write::ptr m_owned_file;  // open file if we own it
+	util::random_read_write *m_file;            // handle to the open file
 	bool                    m_allow_reads;      // permit reads from this CHD?
 	bool                    m_allow_writes;     // permit writes to this CHD?
 
@@ -412,7 +416,7 @@ private:
 	uint32_t                m_unitbytes;        // size of each unit in bytes
 	uint64_t                m_unitcount;        // number of units represented
 	chd_codec_type          m_compression[4];   // array of compression types used
-	std::shared_ptr<chd_file> m_parent;           // pointer to parent file, or nullptr if none
+	std::shared_ptr<chd_file> m_parent;         // pointer to parent file, or nullptr if none
 	bool                    m_parent_missing;   // are we missing our parent?
 
 	// key offsets within the header

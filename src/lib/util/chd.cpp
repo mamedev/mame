@@ -624,7 +624,8 @@ std::error_condition chd_file::create(
 	m_parent.reset();
 
 	// take ownership of the file
-	m_file = std::move(file);
+	m_owned_file = std::move(file);
+	m_file = m_owned_file.get();
 	return create_common();
 }
 
@@ -665,7 +666,8 @@ std::error_condition chd_file::create(
 	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), &parent);
 
 	// take ownership of the file
-	m_file = std::move(file);
+	m_owned_file = std::move(file);
+	m_file = m_owned_file.get();
 	return create_common();
 }
 
@@ -795,6 +797,39 @@ std::error_condition chd_file::open(
 }
 
 /**
+ * @fn  std::error_condition chd_file::open(util::random_read_write &file, bool writeable, chd_file *parent)
+ *
+ * @brief   -------------------------------------------------
+ *            open - open an existing file for read or read/write
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  file    The file.
+ * @param   writeable       true if writeable.
+ * @param [in,out]  parent  If non-null, the parent.
+ *
+ * @return  A std::error_condition.
+ */
+
+std::error_condition chd_file::open(
+		util::random_read_write &file,
+		bool writeable,
+		chd_file *parent,
+		const open_parent_func &open_parent)
+{
+	// make sure we don't already have a file open
+	if (UNEXPECTED(m_file))
+		return error::ALREADY_OPEN;
+
+	assert(!m_owned_file);
+
+	// open the file
+	m_file = &file;
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), parent); // don't take ownership of parent
+	m_cachehunk = ~0;
+	return open_common(writeable, open_parent);
+}
+
+/**
  * @fn  std::error_condition chd_file::open(util::random_read_write::ptr &&file, bool writeable, chd_file *parent)
  *
  * @brief   -------------------------------------------------
@@ -821,8 +856,9 @@ std::error_condition chd_file::open(
 		return std::errc::invalid_argument;
 
 	// open the file
-	m_file = std::move(file);
-	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), parent);
+	m_owned_file = std::move(file);
+	m_file = m_owned_file.get();
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), parent); // don't take ownership of parent
 	m_cachehunk = ~0;
 	return open_common(writeable, open_parent);
 }
@@ -838,7 +874,8 @@ std::error_condition chd_file::open(
 void chd_file::close()
 {
 	// reset file characteristics
-	m_file.reset();
+	m_owned_file.reset();
+	m_file = nullptr;
 	m_allow_reads = false;
 	m_allow_writes = false;
 
@@ -3304,7 +3341,11 @@ void chd_file_compressor::async_read()
 			{
 				std::error_condition err = m_parent->read_hunk(curhunk, curdest);
 				if (err && (error::HUNK_OUT_OF_RANGE != err)) // FIXME: fix the code so it doesn't depend on trying to read past the end of the parent CHD
+				{
+					osd_printf_error("error reading parent offs=%u hunk=%u: %s:%d %s\n", curoffs, curhunk, err.category().name(), err.value(), err.message());
+					osd_break_into_debugger("Help!\n");
 					throw err;
+				}
 				curoffs += hunk_bytes();
 				curdest += hunk_bytes();
 				++curhunk;
