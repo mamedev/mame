@@ -44,16 +44,16 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m6805/m68705.h"
 
-class mos5710cr_device : public device_t
+class mos5710_device : public device_t
 {
 public:
-	mos5710cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(MOS5710CR, mos5710cr_device)
+DECLARE_DEVICE_TYPE(MOS5710, mos5710_device)
 
 #endif // MAME_BUS_CBMIEC_MOS5710_H

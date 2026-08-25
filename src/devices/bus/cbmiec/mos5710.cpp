@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    MOS5710CR Custom Floppy Controller and Gate Array
+    MOS5710 Custom Floppy Controller and Gate Array
 
 **********************************************************************/
 
@@ -47,13 +47,13 @@ Registers
 #include "emu.h"
 #include "mos5710.h"
 
-DEFINE_DEVICE_TYPE(MOS5710CR, mos5710cr_device, "mos5710cr", "MOS5710CR Custom Floppy Controller and Gate Array")
+DEFINE_DEVICE_TYPE(MOS5710, mos5710_device, "mos5710", "MOS5710 Custom Floppy Controller and Gate Array")
 
-mos5710cr_device::mos5710cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-    device_t(mconfig, MOS5710CR, tag, owner, clock)
+mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+    device_t(mconfig, MOS5710, tag, owner, clock)
 {
 }
 
-void mos5710cr_device::device_start()
+void mos5710_device::device_start()
 {
 }
