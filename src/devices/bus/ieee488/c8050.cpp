@@ -8,17 +8,14 @@
 
 /*
 
-    TODO:
+    Set 8250/SFD-1001 to 8050 mode
+	------------------------------
 
-    - Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
-
-    - BASIC program to set 8250/SFD-1001 to 8050 mode:
-
-        10 OPEN 15,8,15
-        20 PRINT#15,"M-W"CHR$(172)CHR$(16)CHR$(1)CHR$(1)
-        30 PRINT#15,"M-W"CHR$(195)CHR$(16)CHR$(1)CHR$(0)
-        40 PRINT#15,"U9"
-        50 CLOSE 15
+	10 OPEN 15,8,15
+	20 PRINT#15,"M-W"CHR$(172)CHR$(16)CHR$(1)CHR$(1)
+	30 PRINT#15,"M-W"CHR$(195)CHR$(16)CHR$(1)CHR$(0)
+	40 PRINT#15,"U9"
+	50 CLOSE 15
 
 */
 
