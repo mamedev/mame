@@ -48,6 +48,8 @@ if BUSES["A2BUS"] then
 		MAME_DIR .. "src/devices/bus/a2bus/a2arcadebd.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2cffa.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2cffa.h",
+		MAME_DIR .. "src/devices/bus/a2bus/a2clock.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/a2clock.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskiing.cpp",
