@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    MOS5710 Custom Floppy Controller and Gate Array
+    MOS5710CR Custom Floppy Controller and Gate Array
 
     Used in 1571CR
 
@@ -19,7 +19,7 @@
                     D6   9 |             | 40  WG
                     D5  10 |             | 39  *WPRT
                     D4  11 |             | 38  *RD
-                   Vss  12 |   MOS5710   | 37  WD
+                   Vss  12 |   MOS5710CR   | 37  WD
                    Vcc  13 |             | 36  Vcc
                     D3  14 |             | 35  Vss
                     D2  15 |             | 34  *VIA1
@@ -35,8 +35,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_CBMIEC_MOS5710_H
-#define MAME_BUS_CBMIEC_MOS5710_H
+#ifndef MAME_BUS_CBMIEC_MOS5710CR_H
+#define MAME_BUS_CBMIEC_MOS5710CR_H
 
 #pragma once
 
@@ -44,16 +44,16 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m6805/m68705.h"
 
-class mos5710_device : public device_t
+class mos5710cr_device : public device_t
 {
 public:
-	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos5710cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(MOS5710, mos5710_device)
+DECLARE_DEVICE_TYPE(MOS5710CR, mos5710cr_device)
 
-#endif // MAME_BUS_CBMIEC_MOS5710_H
+#endif // MAME_BUS_CBMIEC_MOS5710CR_H
