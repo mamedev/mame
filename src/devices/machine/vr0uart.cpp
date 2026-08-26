@@ -79,9 +79,15 @@ inline void vr0uart_device::tx_send_byte(u8 val)
 
 inline u32 vr0uart_device::calculate_baud_rate()
 {
+	// Baud Rate = Clock Source / ((Divisor Value + 1) * 16), the clock source
+	// being the internal one - system clock over two - or the UCLK pin,
+	// selected by UCON bit 4.  Note the baud rate divisor register section of
+	// the manual gives the formula without the plus one, but its own worked
+	// examples use this form.
 	const u32 div_rate = ((m_ubdr & 0xffff) + 1) * 16;
-	// TODO: external / internal serial clock config
-	return (this->clock() / 2) / div_rate;
+	const u32 source = BIT(m_ucon, 4) ? m_uclk : (this->clock() / 2);
+
+	return source / div_rate;
 }
 
 void vr0uart_device::update_serial_config()
@@ -105,6 +111,12 @@ void vr0uart_device::update_serial_config()
 		set_rcv_rate(0);
 		set_tra_rate(0);
 	}
+
+	// set_tra_rate() calls transmit_register_reset(), so a byte still going out
+	// when the configuration changes is dropped and tra_complete() never runs.
+	// Say so in the status: otherwise USTAT bit 5 stays set forever and a host
+	// polling it for buffer space waits on a transmission that will never end.
+	m_ustat &= ~0x60;
 }
 
 void vr0uart_device::tra_callback()
