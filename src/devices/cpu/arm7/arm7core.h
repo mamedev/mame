@@ -71,6 +71,7 @@ enum
 #define COPRO_DOMAIN_MANAGER                3
 
 #define COPRO_FAULT_NONE                    0
+#define COPRO_FAULT_DEBUG                   2
 #define COPRO_FAULT_TRANSLATE_SECTION       5
 #define COPRO_FAULT_TRANSLATE_PAGE          7
 #define COPRO_FAULT_DOMAIN_SECTION          9
@@ -238,7 +239,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
 		eR8, eR9, eR10, eR11, eR12,
 		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
+		eR15, eCPSR, eCPSR  // No SPSR in this mode
 	},
 	{ /* FIQ */
 		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
@@ -277,7 +278,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
 		eR8, eR9, eR10, eR11, eR12,
 		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
+		eR15, eCPSR, eCPSR  // No SPSR in this mode
 	}
 };
 

@@ -56,6 +56,8 @@ public:
 
 	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
+	uint32_t vector_base() const;
+
 protected:
 	enum arm_arch_flag : uint32_t;
 	enum arm_copro_id : uint32_t;
@@ -135,7 +137,7 @@ protected:
 	{
 		bool valid;
 		uint8_t domain;
-		uint8_t access;
+		uint8_t access;         // all four subpage AP fields (AP3..AP0, 2 bits each) for pages, AP in bits 1:0 otherwise
 		uint32_t table_bits;
 		uint32_t base_addr;
 		uint8_t type;
@@ -205,6 +207,8 @@ protected:
 	void HandleMemBlock(uint32_t insn);
 
 	void arm7ops_0123(uint32_t insn);
+	void arm7ops_0123_v4(uint32_t insn);
+	void arm7ops_undef_conditional(uint32_t insn);
 	void arm7ops_4567(uint32_t insn);
 	void arm7ops_89(uint32_t insn);
 	void arm7ops_ab(uint32_t insn);
@@ -227,7 +231,7 @@ protected:
 	tlb_entry *tlb_map_entry(const offs_t vaddr, const int flags);
 	tlb_entry *tlb_probe(const offs_t vaddr, const int flags);
 	uint32_t get_fault_from_permissions(const uint8_t access, const uint8_t domain, const uint8_t type, const int flags);
-	uint32_t tlb_check_permissions(tlb_entry *entry, const int flags);
+	uint32_t tlb_check_permissions(tlb_entry *entry, const offs_t vaddr, const int flags);
 	offs_t tlb_translate(tlb_entry *entry, const offs_t vaddr);
 	uint32_t get_lvl2_desc_from_page_table(uint32_t granularity, uint32_t first_desc, uint32_t vaddr);
 	int detect_fault(int desc_lvl1, int ap, int flags);
@@ -344,6 +348,8 @@ protected:
 	void tg0d_c(uint32_t pc, uint32_t insn);
 	void tg0d_d(uint32_t pc, uint32_t insn);
 	void tg0d_e(uint32_t pc, uint32_t insn);
+	void thumb_undefined(uint32_t pc, uint32_t insn);
+	void thumb_empty_rlist(uint32_t rb, bool load, bool ascending);
 	void tg0d_f(uint32_t pc, uint32_t insn);
 	void tg0e_0(uint32_t pc, uint32_t insn);
 	void tg0e_1(uint32_t pc, uint32_t insn);
@@ -381,6 +387,17 @@ class arm710a_cpu_device : public arm7_cpu_device
 public:
 	// construction/destruction
 	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	arm710a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+};
+
+// ARM710a with the BIGEND pin tied high
+class arm710a_be_cpu_device : public arm710a_cpu_device
+{
+public:
+	// construction/destruction
+	arm710a_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class arm610_cpu_device : public arm7_cpu_device
@@ -388,6 +405,17 @@ class arm610_cpu_device : public arm7_cpu_device
 public:
 	// construction/destruction
 	arm610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	arm610_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+};
+
+// ARM610 with the BIGEND pin tied high (Apple Newton)
+class arm610_be_cpu_device : public arm610_cpu_device
+{
+public:
+	// construction/destruction
+	arm610_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class arm710t_cpu_device : public arm7_cpu_device
@@ -505,6 +533,17 @@ class sa110_cpu_device : public arm7_cpu_device
 public:
 	// construction/destruction
 	sa110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	sa110_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+};
+
+// SA-110 with the CP15 control register B bit set at reset (Apple Newton MessagePad 2x00)
+class sa110_be_cpu_device : public sa110_cpu_device
+{
+public:
+	// construction/destruction
+	sa110_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sa1100_cpu_device : public arm7_cpu_device
@@ -524,7 +563,9 @@ public:
 DECLARE_DEVICE_TYPE(ARM7,         arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM610,       arm610_cpu_device)
+DECLARE_DEVICE_TYPE(ARM610_BE,    arm610_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device)
+DECLARE_DEVICE_TYPE(ARM710A_BE,   arm710a_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device)
 DECLARE_DEVICE_TYPE(ARM9,         arm9_cpu_device)
@@ -536,6 +577,7 @@ DECLARE_DEVICE_TYPE(PXA250,       pxa250_cpu_device)
 DECLARE_DEVICE_TYPE(PXA255,       pxa255_cpu_device)
 DECLARE_DEVICE_TYPE(PXA270,       pxa270_cpu_device)
 DECLARE_DEVICE_TYPE(SA110,        sa110_cpu_device)
+DECLARE_DEVICE_TYPE(SA110_BE,     sa110_be_cpu_device)
 DECLARE_DEVICE_TYPE(SA1100,       sa1100_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,       sa1110_cpu_device)
 DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)

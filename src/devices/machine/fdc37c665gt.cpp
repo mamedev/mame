@@ -11,16 +11,20 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 #include "emu.h"
 #include "fdc37c665gt.h"
 
+//#include <iostream>
+
 #define LOG_CONFIG (1U << 1) // Show global configuration changes
+#define LOG_ACCESS (1U << 2) // Show read/write access (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_CONFIG)
-// #define LOG_OUTPUT_STREAM std::cout
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
 #define LOGCONFIG(...) LOGMASKED(LOG_CONFIG, __VA_ARGS__)
+#define LOGACCESS(...) LOGMASKED(LOG_ACCESS, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "FDC37C665GT")
+DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "SMSC FDC37C665GT Super I/O")
 
 fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, upd765_family_device::mode_t floppy_mode)
 	: device_t(mconfig, FDC37C665GT, tag, owner, clock)
@@ -42,6 +46,7 @@ fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char
 	, m_fdc(*this, "fdc")
 	, m_serial(*this, "uart%u", 1)
 	, m_lpt(*this, "lpt")
+	, m_ide(*this, "ide%u", 1)
 {
 }
 
@@ -79,6 +84,7 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	// floppy disc controller
 	N82077AA(config, m_fdc, 24_MHz_XTAL, m_floppy_mode);
 	m_fdc->intrq_wr_callback().set(FUNC(fdc37c665gt_device::irq_floppy_w));
+	m_fdc->drq_wr_callback().set(FUNC(fdc37c665gt_device::drq_floppy_w));
 
 	// parallel port
 	PC_LPT(config, m_lpt);
@@ -96,11 +102,43 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	m_serial[1]->out_tx_callback().set(FUNC(fdc37c665gt_device::txd_serial2_w));
 	m_serial[1]->out_dtr_callback().set(FUNC(fdc37c665gt_device::dtr_serial2_w));
 	m_serial[1]->out_rts_callback().set(FUNC(fdc37c665gt_device::rts_serial2_w));
+
+	// NOTE: irq(s) is client responsibility (no pins on Super I/O)
+	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, nullptr, nullptr, false);
+
+	ATA_INTERFACE(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
 }
 
 uint8_t fdc37c665gt_device::read(offs_t offset)
 {
-	// TODO: IDE not implemented
+	LOGACCESS("[%04x]\n", offset);
+
+	if (offset == 0x3f1 && mode == OperatingMode::Configuration) {
+		u8 res = 0;
+		switch(config_index)
+		{
+			case 0x0d:
+				// read identifier (most if not all riscpc targets)
+				// '666GT reads 0x66 here
+				res = 0x65;
+				break;
+			case 0x0e:
+				// chip revision level
+				res = 0x02;
+				break;
+			default:
+				if (config_index & 0xf0)
+					LOG("Warning: read of register %02x with upper address bits set\n", config_index);
+				res = configuration_registers[config_index & 0xf];
+				break;
+		}
+
+		//printf("[%02x] -> %02x\n", config_index, res);
+
+		return res;
+	}
+
+	// TODO: a7000p access at $70~$73, does it belong here or it's an external (ISA) GPIO?
 
 	// Parallel port
 	if (offset >= device_addresses[LogicalDevice::Parallel] && offset <= device_addresses[LogicalDevice::Parallel] + 2) {
@@ -147,12 +185,31 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 		}
 	}
 
+	// IDE
+	if ((offset & 0x178) == 0x170 && enabled_logical[LogicalDevice::IDE]) {
+		// HACK: range $xx6~$xx7 looks sensitive on riscpc (and returns 0xff with current core)
+		// Will hang even if no ATA device mounted
+		if ((offset & 0x6) == 6)
+			return machine().rand();
+
+		// $1f0 IDE1 cs0
+		// $3f0 IDE1 cs1
+		// $170 IDE2 cs0
+		// $370 IDE2 cs1
+		const u8 cs_select = BIT(offset, 9);
+		const u8 ide_target = !BIT(offset, 7);
+
+		auto &ide_dev = m_ide[ide_target];
+
+		return cs_select ? ide_dev->cs1_r(offset & 7, 0xff) : ide_dev->cs0_r(offset & 7, 0xff);
+	}
+
 	return 0;
 }
 
 void fdc37c665gt_device::write(offs_t offset, uint8_t data)
 {
-	// TODO: IDE not implemented
+	LOGACCESS("[%04x] %02x\n", offset, data);
 
 	// Parallel port
 	if (offset >= device_addresses[LogicalDevice::Parallel] && offset <= device_addresses[LogicalDevice::Parallel] + 2) {
@@ -232,6 +289,19 @@ void fdc37c665gt_device::write(offs_t offset, uint8_t data)
 			case 7: m_fdc->ccr_w(data); return;
 		}
 	}
+
+	// IDE
+	if ((offset & 0x178) == 0x170 && enabled_logical[LogicalDevice::IDE]) {
+		const u8 cs_select = BIT(offset, 9);
+		const u8 ide_target = !BIT(offset, 7);
+
+		auto &ide_dev = m_ide[ide_target];
+
+		if(cs_select)
+			ide_dev->cs1_w(offset & 7, data, 0xff);
+		else
+			ide_dev->cs0_w(offset & 7, data, 0xff);
+	}
 }
 
 void fdc37c665gt_device::write_configuration_register(int index, int data)
@@ -247,7 +317,8 @@ void fdc37c665gt_device::write_configuration_register(int index, int data)
 	LOGCONFIG("Modified configuration register cr[%02x] = %02x\n", index, data);
 
 	if (index == 0) {
-		enabled_logical[LogicalDevice::IDE] = BIT(configuration_registers[index], 1);
+		enabled_logical[LogicalDevice::IDE] = BIT(configuration_registers[index], 0);
+		// TODO: bit 1 IDE AT/XT mode
 		enabled_logical[LogicalDevice::FDC] = BIT(configuration_registers[index], 3) && BIT(configuration_registers[index], 4);
 	} else if (index == 1) {
 		enabled_logical[LogicalDevice::Parallel] = BIT(configuration_registers[index], 2) && BIT(configuration_registers[index], 3);
@@ -262,6 +333,8 @@ void fdc37c665gt_device::write_configuration_register(int index, int data)
 		} else if (lpt_port == 3) {
 			device_addresses[LogicalDevice::Parallel] = 0x278; // Default
 		}
+
+		// TODO: bit 4 irq polarity
 
 		auto com34 = BIT(configuration_registers[index], 5, 2);
 		if (com34 == 0) {
@@ -284,6 +357,7 @@ void fdc37c665gt_device::write_configuration_register(int index, int data)
 		enabled_logical[LogicalDevice::Serial2] = BIT(configuration_registers[index], 6) && BIT(configuration_registers[index], 7);
 		device_addresses[LogicalDevice::Serial2] = BIT(configuration_registers[index], 4, 2);
 	} else if (index == 3) {
+		// TODO: enhanced floppy mode 2 (bit 1), Drive Options (bits 3~4), PINTR (bit 2), ADRx/DRV2 EN/PINTR (bit 7)
 		auto floppy_mode = BIT(configuration_registers[index], 5, 2);
 
 		// 2 is reserved/unused
@@ -299,7 +373,8 @@ void fdc37c665gt_device::write_configuration_register(int index, int data)
 	} else if (index == 4) {
 		// Set clock speeds for MIDI modes (clock divisor becomes 12 instead of 13)
 		m_serial[0]->set_unscaled_clock(clock() / (13 - BIT(configuration_registers[4], 4)));
-		m_serial[1]->set_unscaled_clock(clock() / (13 - BIT(configuration_registers[5], 5)));
+		m_serial[1]->set_unscaled_clock(clock() / (13 - BIT(configuration_registers[4], 5)));
+		// TODO: PP EXT modes (bits 1~0), EPP Type (bit 6), Parallel Port FDC (bits 3~2)
 	} else if (index == 5) {
 		auto fdc_port = BIT(configuration_registers[index], 0);
 		if (fdc_port == 0) {
@@ -307,7 +382,14 @@ void fdc37c665gt_device::write_configuration_register(int index, int data)
 		} else if (fdc_port == 1) {
 			device_addresses[LogicalDevice::FDC] = 0x370;
 		}
+		// TODO: IDE Secondary (bit 1), FDC DMA Mode (bit 2), DenSel (bits 4~3), Swap drv 0,1 (bit 5), EXTx4 (bit 6), DS3 (bit 7)
 	}
+
+	// TODO: CR6 floppy disk type, reflected in FDC $3f3 bits 5~4
+	// TODO: CR7 Media ID Polarity (bits 3~2) and Floppy Boot Drive (bits 1~0)
+	// TODO: CR8~CR9 ADRx
+	// TODO: CRA ECP FIFO Threshold (bits 3~0)
+	// TODO: CRF Test Modes
 }
 
 void fdc37c665gt_device::irq_floppy_w(int state)
@@ -317,6 +399,15 @@ void fdc37c665gt_device::irq_floppy_w(int state)
 	}
 
 	m_fintr_callback(state);
+}
+
+void fdc37c665gt_device::drq_floppy_w(int state)
+{
+	if (!enabled_logical[LogicalDevice::FDC]) {
+		return;
+	}
+
+	m_fdrq_callback(state);
 }
 
 void fdc37c665gt_device::irq_parallel_w(int state)

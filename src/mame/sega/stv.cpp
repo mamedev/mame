@@ -34,7 +34,7 @@ TODO:
   set_maximum_quantum() number, might need strict SH-2 synching or it's actually a m68k comms issue.
 
 - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose if any;
-\- Hangs with a "please call staff member"
+\- Hangs with an ERROR 2 "please call staff member"
 
 - tsuribor: needs input rod hookup (analog);
 
@@ -44,7 +44,10 @@ TODO:
   Enables VDP2 RBG0 layer but doesn't draw at all (lack of a linescroll effect when scrolling
   sideways looks dubious)
 
-- wwshin: has plenty of VDP2 window glitches for being a simple game
+- wwshin: has plenty of VDP2 window glitches for being a simple game;
+
+- yattrmnp: throws "S ERR=305 SATELLITE CHACKER JAM" (sic), alternates with "DOOR OPEN"
+\- illegal opcode when running in test mode (reads in IC13 cart space at $4000x)
 
 ***************************************************************************************************/
 
@@ -67,6 +70,7 @@ TODO:
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 
+#define DUMP_CART_HEADER (0)
 
 /*
 Sega 315-5649 IO IC, functional same as 315-5338A, also used in Model 2/3, integrated into 315-6146 'MIE' MCU, etc
@@ -402,6 +406,35 @@ void stv_state::init_stv()
 	m_slave->sh2drc_add_fastram(0x00000000, 0x0007ffff, 1, &m_rom[0]);
 	m_slave->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
 	m_slave->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
+
+	// crude dump of header from cart space
+	// (BIOS defaults to no cart mapped, have to enter in game test mode to make it appear in debugger)
+#if DUMP_CART_HEADER
+	memory_region *const cart_region = memregion("cart");
+
+	// avoid crashing in stvbios
+	if (cart_region)
+	{
+		u8 *ROM = reinterpret_cast<u8 *>(cart_region->base());
+		// Check the 'S' of "SEGA ST-V(TITAN)" mandatory header,
+		// for the few games that doesn't have a regular layout (dfeverg)
+		const u32 rom_base = ROM[0x200000 ^ 3] == 'S' ? 0x200000 : 0;
+		// Check the successive 'E' letter for IC13 byte setup
+		const u8 ic13_shift = rom_base == 0 && ROM[0 ^ 0] == 'E';
+		const u8 ic13_endian = ic13_shift ? 1 : 3;
+
+		printf("Header found at $%08x%s\n", rom_base, ic13_shift ? " (IC13 setup)" : "");
+
+		// actual header is 0x100 in size, we omit non-printable chars
+		for (int i = 0; i < 0xc0; i+=0x10)
+		{
+			for (int j = 0; j < 0x10; j++)
+				printf("%c", ROM[((rom_base + (i + j)) ^ ic13_endian) << ic13_shift]);
+
+			printf("\n");
+		}
+	}
+#endif
 }
 
 // reference patches for magzun, we rather need to emulate microphone properly.
@@ -4092,7 +4125,7 @@ ROM_END
 ROM_START( yattrmnp ) // ROM board stickered 837-13598
 	STV_BIOS
 
-	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21122.ic13",    0x0000000, 0x0080000, CRC(49f56e32) SHA1(7d8bdaaf3a4edd9df90becc3ec5e94a69bb29ffc) ) // ST M27C4002-12F1
 	ROM_LOAD16_WORD_SWAP( "mpr-21125.ic02",    0x0400000, 0x0400000, CRC(40f5f119) SHA1(68fc634734ab05b54ff93256259969f16e26807d) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21130.ic03",    0x0800000, 0x0400000, CRC(84cb4e9c) SHA1(675464b0fdf80a3d6e39292e56528e906d388d3c) )
