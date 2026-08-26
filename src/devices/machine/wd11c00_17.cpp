@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "wd11c00_17.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -160,6 +160,10 @@ inline void wd11c00_17_device::software_reset()
 
 inline void wd11c00_17_device::select()
 {
+	// force the busy notification below to fire even if the host never
+	// read back the previous command's completion byte (leaving BUSY set)
+	m_busy = 1;
+
 	m_status = STATUS_BUSY | STATUS_C_D | STATUS_REQ;
 
 	check_interrupt();
