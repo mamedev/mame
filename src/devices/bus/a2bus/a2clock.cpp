@@ -283,6 +283,19 @@ void a2clock_device::rtc_clock_updated(int year, int month, int day, int day_of_
 		day += gregorian_days_in_month(i, year);
 
 	m_seconds = ((u32(day - 1) * 24 + hour) * 60 + minute) * 60 + second;
+
+	// Set the LY switch so that the correct date will be returned for the given year
+	for (ioport_field &field : m_switches->fields())
+	{
+		if (field.mask() == 0x40)
+		{
+			ioport_field::user_settings settings;
+			field.get_user_settings(settings);
+			settings.value = gregorian_is_leap_year(year) ? 0x40 : 0x00;
+			field.set_user_settings(settings);
+			break;
+		}
+	}
 }
 
 static INPUT_PORTS_START(a2clock)
