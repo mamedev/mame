@@ -245,7 +245,8 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<!-- also found as UBL 500-10916 - Monsters, Inc with identical ROM -->
 	<software name="monsters" supported="no">
 		<description>Leap 2 - Reading - Disney/Pixar Monsters, Inc. (UK)</description>
 		<year>2001</year>
@@ -480,6 +481,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- also found as UBL 500-10904-B - Finding Nemo with identical ROM -->
 	<software name="findnemoa" supported="no">
 		<description>Leap 1 - Reading - Disney/Pixar Finding Nemo (UK)</description>
 		<year>2003</year>
@@ -617,13 +619,13 @@ license:CC0-1.0
 		<description>Disney/Pixar Toy Story 2 (UK)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-10497 UBL"/>
+		<info name="serial" value="UBL 500-10497-C"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-2911"/>
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10497 UBL - Toy Story 2.bin" size="0x400000" crc="a5e841e2" sha1="7dbb0f053cbf8e9459a964bec43a5013d84ae87b" />
+				<rom name="UBL 500-10497-C - Toy Story 2.bin" size="0x400000" crc="a5e841e2" sha1="7dbb0f053cbf8e9459a964bec43a5013d84ae87b" />
 			</dataarea>
 		</part>
 	</software>
