@@ -256,19 +256,19 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 	{
 		util::stream_format(stream, "SMLA%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
-		util::stream_format(stream, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, (opcode>>12)&0xf, opcode&0xf, (opcode>>8)&0xf);
+		util::stream_format(stream, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf, (opcode>>12)&0xf);   // Rd, Rm, Rs, Rn
 	}
 	else if ((opcode & 0x0ff00090) == 0x01400080)   // SMLALxy - v5TE
 	{
 		util::stream_format(stream, "SMLAL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
-		util::stream_format(stream, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, (opcode>>12)&0xf, opcode&0xf, (opcode>>8)&0xf);
+		util::stream_format(stream, "R%d, R%d, R%d, R%d", (opcode>>12)&0xf, (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf);   // RdLo, RdHi, Rm, Rs
 	}
 	else if ((opcode & 0x0ff00090) == 0x01600080)   // SMULxy - v5TE
 	{
 		util::stream_format(stream, "SMUL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
-		util::stream_format(stream, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>12)&0xf);
+		util::stream_format(stream, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf);   // Rd, Rm, Rs
 	}
 	else if ((opcode & 0x0ff000b0) == 0x012000a0)   // SMULWy - v5TE
 	{

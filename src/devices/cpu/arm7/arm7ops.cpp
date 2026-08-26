@@ -319,7 +319,15 @@ void arm7_cpu_device::HandleCoProcRT(uint32_t insn)
 		uint32_t res = arm7_rt_r_callback(insn);   // RT Read handler must parse opcode & return appropriate result
 		if (!m_pendingUnd)
 		{
-			SetRegister((insn >> 12) & 0xf, res);
+			uint32_t const rd = (insn >> 12) & 0xf;
+			if (rd == eR15)
+			{
+				set_cpsr((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK | V_MASK)) | (res & (N_MASK | Z_MASK | C_MASK | V_MASK)));
+			}
+			else
+			{
+				SetRegister(rd, res);
+			}
 		}
 	}
 	// Store (MCR) data from ARM7 to Co-Proc register
@@ -471,7 +479,8 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 
 	/* Do the transfer */
 	rd = (insn & INSN_RD) >> INSN_RD_SHIFT;
-	if (insn & INSN_SDT_L)
+	bool const is_load = (insn & INSN_SDT_L) != 0;
+	if (is_load)
 	{
 		/* Load */
 		if (insn & INSN_SDT_B)
@@ -536,7 +545,16 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 
 	if (m_pendingAbtD)
 	{
-		if ((insn & INSN_SDT_P) && (insn & INSN_SDT_W))
+		if ((m_archRev < 4) && (COPRO_CTRL & COPRO_CTRL_LATE_ABORT))
+		{
+			// ARMv3 late abort: the base register write-back still takes place and the abort
+			// handler has to undo it.
+			if (!(insn & INSN_SDT_P))
+			{
+				SetRegister(rn, (insn & INSN_SDT_U) ? (rnv + off) : (rnv - off));
+			}
+		}
+		else if ((insn & INSN_SDT_P) && (insn & INSN_SDT_W))
 		{
 			SetRegister(rn, rnv_old);
 		}
@@ -548,9 +566,7 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 	{
 		if (insn & INSN_SDT_U)
 		{
-			/* Writeback is applied in pipeline, before value is read from mem,
-			    so writeback is effectively ignored */
-			if (rd == rn) {
+			if (rd == rn && is_load) {
 				SetRegister(rn, GetRegister(rd));
 				// todo: check for offs... ?
 			}
@@ -563,9 +579,7 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 		}
 		else
 		{
-			/* Writeback is applied in pipeline, before value is read from mem,
-			    so writeback is effectively ignored */
-			if (rd == rn) {
+			if (rd == rn && is_load) {
 				SetRegister(rn, GetRegister(rd));
 			}
 			else {
@@ -638,6 +652,7 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 
 	/* Do the transfer */
 	rd = (insn & INSN_RD) >> INSN_RD_SHIFT;
+	bool const is_load = (insn & INSN_SDT_L) || ((insn & 0x60) == 0x40);   // L bit or LDRD
 
 	/* Load */
 	if (insn & INSN_SDT_L)
@@ -665,20 +680,17 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 
 			if (!m_pendingAbtD)
 			{
-			// PC?
-			if (rd == eR15)
-			{
-				R15 = newval + 8;
-				// LDR(H,SH,SB) PC takes 2S + 2N + 1I (5 total cycles)
-				ARM7_ICOUNT -= 2;
-
-			}
-			else
-			{
-				SetRegister(rd, newval);
-				R15 += 4;
-			}
-
+				// PC? (officially unpredictable on ARMv4 and later - the halfword path does not add 4 afterwards, so R15 takes the value as-is)
+				if (rd == eR15)
+				{
+					R15 = newval;
+					ARM7_ICOUNT -= 2;
+				}
+				else
+				{
+					SetRegister(rd, newval);
+					R15 += 4;
+				}
 			}
 			else
 			{
@@ -695,7 +707,7 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 			{
 				if (rd == eR15)
 				{
-					R15 = newval + 8;
+					R15 = newval;
 					// extra cycles for LDR(H,SH,SB) PC (5 total cycles)
 					ARM7_ICOUNT -= 2;
 				}
@@ -717,16 +729,64 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 	/* Store or ARMv5+ dword insns */
 	else
 	{
-		if ((insn & 0x60) == 0x40)  // LDRD
+		if (((insn & 0x60) == 0x40 || (insn & 0x60) == 0x60) && !(m_archFlags & ARCHFLAG_E))
 		{
-			SetRegister(rd, READ32(rnv));
-			SetRegister(rd+1, READ32(rnv+4));
-				R15 += 4;
+			// LDRD/STRD need the E variant; earlier cores have no instruction here
+			LOGMASKED(LOG_OPS, "%08x: LDRD/STRD on a core without the DSP extensions\n", R15);
+			if ((insn & INSN_SDT_P) && (insn & INSN_SDT_W))
+			{
+				SetRegister(rn, rnv_old);
+			}
+			R15 += 4;
+			m_pendingUnd = true;
+			update_irq_state();
+			return;
 		}
-		else if ((insn & 0x60) == 0x60) // STRD
+		else if ((insn & 0x60) == 0x40)  // LDRD - v5TE
 		{
-			WRITE32(rnv, GetRegister(rd));
-			WRITE32(rnv+4, GetRegister(rd+1));
+			if ((rd & 1) || (rd == eR14))
+			{
+				// odd Rd (including R15) and Rd = R14 is unpredictable: take an undefined instruction trap
+				LOGMASKED(LOG_OPS, "%08x: LDRD with UNPREDICTABLE Rd = R%d\n", R15, rd);
+				if ((insn & INSN_SDT_P) && (insn & INSN_SDT_W))
+				{
+					SetRegister(rn, rnv_old);
+				}
+				R15 += 4;
+				m_pendingUnd = true;
+				update_irq_state();
+				return;
+			}
+
+			uint32_t const lo = READ32(rnv & ~3);
+			uint32_t const hi = m_pendingAbtD ? 0 : READ32((rnv & ~3) + 4);
+			if (!m_pendingAbtD)
+			{
+				SetRegister(rd, lo);
+				SetRegister(rd+1, hi);
+			}
+			R15 += 4;
+		}
+		else if ((insn & 0x60) == 0x60) // STRD - v5TE
+		{
+			if ((rd & 1) || (rd == eR14))
+			{
+				LOGMASKED(LOG_OPS, "%08x: STRD with UNPREDICTABLE Rd = R%d\n", R15, rd);
+				if ((insn & INSN_SDT_P) && (insn & INSN_SDT_W))
+				{
+					SetRegister(rn, rnv_old);
+				}
+				R15 += 4;
+				m_pendingUnd = true;
+				update_irq_state();
+				return;
+			}
+
+			WRITE32(rnv & ~3, GetRegister(rd));
+			if (!m_pendingAbtD)
+			{
+				WRITE32((rnv & ~3) + 4, GetRegister(rd+1));
+			}
 			R15 += 4;
 		}
 		else
@@ -734,10 +794,7 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 			// WRITE16(rnv, rd == eR15 ? R15 + 8 : GetRegister(rd));
 			WRITE16(rnv, rd == eR15 ? R15 + 8 + 4 : GetRegister(rd)); // manual says STR RD=PC, +12 of address
 
-// if R15 is not increased then e.g. "STRH R10, [R15,#$10]" will be executed over and over again
-#if 0
-			if (rn != eR15)
-#endif
+			// if R15 is not increased then e.g. "STRH R10, [R15,#$10]" will be executed over and over again
 			R15 += 4;
 
 			// STRH takes 2 cycles, so we add + 1
@@ -754,16 +811,12 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 	}
 	else
 	{
-	// SJE: No idea if this writeback code works or makes sense here..
-
 	/* Do post-indexing writeback */
 	if (!(insn & INSN_SDT_P)/* && (insn & INSN_SDT_W)*/)
 	{
 		if (insn & INSN_SDT_U)
 		{
-			/* Writeback is applied in pipeline, before value is read from mem,
-			    so writeback is effectively ignored */
-			if (rd == rn) {
+			if (rd == rn && is_load) {
 				SetRegister(rn, GetRegister(rd));
 				// todo: check for offs... ?
 			}
@@ -776,9 +829,7 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 		}
 		else
 		{
-			/* Writeback is applied in pipeline, before value is read from mem,
-			    so writeback is effectively ignored */
-			if (rd == rn) {
+			if (rd == rn && is_load) {
 				SetRegister(rn, GetRegister(rd));
 			}
 			else {
@@ -930,6 +981,10 @@ void arm7_cpu_device::HandlePSRTransfer(uint32_t insn)
 	// MRS (bit 21 clear) - Copy CPSR or SPSR to specified Register
 	else
 	{
+		if ((reg == SPSR) && (oldmode == eARM7_MODE_USER || oldmode == eARM7_MODE_SYS))
+		{
+			LOGMASKED(LOG_OPS, "%08x: MRS from SPSR in a mode without an SPSR (UNPREDICTABLE, returns CPSR)\n", R15);
+		}
 		SetRegister((insn >> 12)& 0x0f, GetRegister(reg));
 	}
 }
@@ -1090,11 +1145,15 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 				// the current mode is moved to the CPSR. This allows state changes which automatically restore both PC and
 				// CPSR. --> This form of instruction should not be used in User mode. <--
 
-					if (GET_MODE != eARM7_MODE_USER)
+					if (GET_MODE != eARM7_MODE_USER && GET_MODE != eARM7_MODE_SYS)
 					{
 						// Update CPSR from SPSR
 						set_cpsr(GetRegister(SPSR));
 						SwitchMode(GET_MODE);
+					}
+					else
+					{
+						LOGMASKED(LOG_OPS, "%08x: S-bit write to R15 in a mode without an SPSR (UNPREDICTABLE)\n", R15);
 					}
 
 					if (MODE32)
@@ -1135,7 +1194,11 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 			LOGMASKED(LOG_OPS, "%08x: TST class on R15 s bit set\n", R15);
 #endif
 			if (MODE32)
-				R15 = rd;
+			{
+				// Rd is SBZ for the compare instructions in the 32-bit architectures (UNPREDICTABLE): the flags
+				// have been set normally above, R15 is left alone
+				LOGMASKED(LOG_OPS, "%08x: TST/TEQ/CMP/CMN with Rd = R15 in a 32-bit mode\n", R15);
+			}
 			else
 			{
 				uint32_t temp;
@@ -1310,7 +1373,32 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 {
 	uint32_t rb = (insn & INSN_RN) >> INSN_RN_SHIFT;
 	uint32_t rbp = GetRegister(rb);
+	uint32_t const rb_orig = rbp;
 	int result;
+
+	if ((insn & 0xffff) == 0)
+	{
+		// Empty register list is unpredictable. Real cores write the base back by 0x40 as if all 16 registers
+		// had been transferred, and ARMv4 cores (ARM7TDMI) also transfer R15 through the first slot.
+		uint32_t const addr = (insn & INSN_BDT_U) ? (rbp + ((insn & INSN_BDT_P) ? 4 : 0)) : (rbp - ((insn & INSN_BDT_P) ? 0x40 : 0x3c));
+		LOGMASKED(LOG_OPS, "%08x: %s with an empty register list\n", R15, (insn & INSN_BDT_L) ? "LDM" : "STM");
+		if (m_archRev < 5)
+		{
+			if (insn & INSN_BDT_L)
+			{
+				uint32_t const data = READ32(addr & ~3);
+				if (!m_pendingAbtD && MODE32)
+					R15 = data - 4;     // arm7ops_89 adds 4
+			}
+			else
+			{
+				WRITE32(addr & ~3, R15 + 12);
+			}
+		}
+		if ((insn & INSN_BDT_W) && !m_pendingAbtD)
+			SetRegister(rb, (insn & INSN_BDT_U) ? (rbp + 0x40) : (rbp - 0x40));
+		return;
+	}
 
 #if ARM7_DEBUG_CORE
 	if (rbp & 3)
@@ -1371,8 +1459,15 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 				{
 					if (MODE32)
 					{
-						set_cpsr(GetRegister(SPSR));
-						SwitchMode(GET_MODE);
+						if (GET_MODE != eARM7_MODE_USER && GET_MODE != eARM7_MODE_SYS)
+						{
+							set_cpsr(GetRegister(SPSR));
+							SwitchMode(GET_MODE);
+						}
+						else
+						{
+							LOGMASKED(LOG_OPS, "%08x: LDM with PC and S bit in a mode without an SPSR (UNPREDICTABLE)\n", R15);
+						}
 					}
 					else
 					{
@@ -1434,8 +1529,15 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 				{
 					if (MODE32)
 					{
-						set_cpsr(GetRegister(SPSR));
-						SwitchMode(GET_MODE);
+						if (GET_MODE != eARM7_MODE_USER && GET_MODE != eARM7_MODE_SYS)
+						{
+							set_cpsr(GetRegister(SPSR));
+							SwitchMode(GET_MODE);
+						}
+						else
+						{
+							LOGMASKED(LOG_OPS, "%08x: LDM with PC and S bit in a mode without an SPSR (UNPREDICTABLE)\n", R15);
+						}
 					}
 					else
 					{
@@ -1533,6 +1635,17 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 		ARM7_ICOUNT -= (result - 1) + 2;
 	}
 
+	// On ARMv3 an aborted LDM/STM still writes back its base register as if the whole transfer had
+	// completed, in both the early and late abort models, and the abort handler is expected
+	// to undo that (Newton OS does so to work out the stack extension it needs). Loading the base
+	// from the list is suppressed by the abort, so the written-back value is what remains.
+	// ARMv4 and later restore the base instead.
+	if (m_pendingAbtD && (insn & INSN_BDT_W) && (m_archRev < 4))
+	{
+		uint32_t const count = std::popcount(insn & 0xffffu);
+		SetRegister(rb, (insn & INSN_BDT_U) ? (rb_orig + (count << 2)) : (rb_orig - (count << 2)));
+	}
+
 	// We will specify the cycle count for each case, so remove the -3 that occurs at the end
 	ARM7_ICOUNT += 3;
 
@@ -1553,8 +1666,12 @@ const arm7_cpu_device::arm7ops_ophandler arm7_cpu_device::ops_handler[0x20] =
 
 void arm7_cpu_device::arm9ops_undef(uint32_t insn)
 {
-	// unsupported instruction
-	LOGMASKED(LOG_OPS, "ARM7: Instruction %08X unsupported\n", insn);
+	// Undefined or unsupported instruction in the unconditional (cond = 1111) space.
+	// Advance past it and take the undefined instruction exception (R14_und = next instruction).
+	LOGMASKED(LOG_OPS, "%08x: ARM7: Instruction %08X unsupported\n", R15, insn);
+	R15 += 4;
+	m_pendingUnd = true;
+	update_irq_state();
 }
 
 void arm7_cpu_device::arm9ops_1(uint32_t insn)
@@ -1564,39 +1681,37 @@ void arm7_cpu_device::arm9ops_1(uint32_t insn)
 	{
 		// unsupported (armv6 onwards only)
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 	else if ((insn & 0x00ff00f0) == 0x00010000) /* set endianness (SETEND) */
 	{
-		// unsupported (armv6 onwards only)
-		if (m_archRev < 6) arm9ops_undef(insn);
+		// Only for ARMv6 and later
+		if (m_archRev < 6)
+		{
+			arm9ops_undef(insn);
+		}
 		else
 		{
 			uint32_t new_cpsr = GET_CPSR & ~(1 << 9);
 			set_cpsr(new_cpsr | (insn & (1 << 9)));
+			R15 += 4;
 		}
-		R15 += 4;
 	}
 	else
 	{
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 }
 
 void arm7_cpu_device::arm9ops_57(uint32_t insn)
 {
-	/* Cache Preload (PLD) */
+	// Cache Preload (PLD) for ARMv5TE+.  We don't (yet?) emulate the cache.
 	if ((insn & 0x0070f000) == 0x0050f000)
 	{
-		// unsupported (armv6 onwards only)
-		if(m_archRev < 6) arm9ops_undef(insn);
 		R15 += 4;
 	}
 	else
 	{
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 }
 
@@ -1607,18 +1722,15 @@ void arm7_cpu_device::arm9ops_89(uint32_t insn)
 	{
 		// unsupported (armv6 onwards only)
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 	else if ((insn & 0x00500f00) == 0x00100a00) /* Return From Exception (RFE) */
 	{
 		// unsupported (armv6 onwards only)
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 	else
 	{
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 }
 
@@ -1631,26 +1743,23 @@ void arm7_cpu_device::arm9ops_ab(uint32_t insn)
 
 void arm7_cpu_device::arm9ops_c(uint32_t insn)
 {
-	/* Additional coprocessor double register transfer */
+	/* Additional coprocessor double register transfer (MCRR2/MRRC2) */
 	if ((insn & 0x00e00000) == 0x00400000)
 	{
 		// unsupported
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 	else
 	{
 		arm9ops_undef(insn);
-		R15 += 4;
 	}
 }
 
 void arm7_cpu_device::arm9ops_e(uint32_t insn)
 {
-	/* Additional coprocessor register transfer */
+	/* Additional coprocessor register transfer (CDP2/MCR2/MRC2) */
 	// unsupported
 	arm9ops_undef(insn);
-	R15 += 4;
 }
 
 
@@ -1670,17 +1779,32 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 			set_cpsr(GET_CPSR|T_MASK);
 		}
 	}
+	else if (m_archRev < 5)
+	{
+		arm7ops_0123_v4(insn);
+		return;
+	}
 	else if ((insn & 0x0ff000f0) == 0x01200030) // BLX Rn - v5
 	{
+		// read the target before writing LR, because BLX LR is legal
+		uint32_t const target = GetRegister(insn & 0x0f);
+
 		// save link address
 		SetRegister(14, R15 + 4);
 
-		R15 = GetRegister(insn & 0x0f);
+		R15 = target;
 		// If new PC address has A0 set, switch to Thumb mode
 		if (R15 & 1) {
 			R15--;
 			set_cpsr(GET_CPSR|T_MASK);
 		}
+	}
+	else if ((insn & 0x0ff000f0) == 0x01200070) // BKPT - v5
+	{
+		LOGMASKED(LOG_OPS, "%08x: BKPT #%d\n", R15, ((insn >> 4) & 0xfff0) | (insn & 0xf));
+		COPRO_FAULT_STATUS_D = COPRO_FAULT_DEBUG;
+		m_pendingAbtP = true;
+		update_irq_state();
 	}
 	else if ((insn & 0x0ff000f0) == 0x01600010) // CLZ - v5
 	{
@@ -1690,6 +1814,14 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		SetRegister(rd, std::countl_zero(GetRegister(rm)));
 
 		R15 += 4;
+	}
+	else if (!(m_archFlags & ARCHFLAG_E) && (insn & 0x0f900090) == 0x01000080)
+	{
+		arm7ops_undef_conditional(insn);
+	}
+	else if (!(m_archFlags & ARCHFLAG_E) && (insn & 0x0f9000f0) == 0x01000050)
+	{
+		arm7ops_undef_conditional(insn);
 	}
 	else if ((insn & 0x0ff000f0) == 0x01000050) // QADD - v5
 	{
@@ -1706,12 +1838,9 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>16)&0xf);
 
-		// check if doubling operation will overflow
-		int64_t res = (int64_t)src2 * 2;
-		saturate_qbit_overflow(res);
-
-		src2 *= 2;
-		res = saturate_qbit_overflow((int64_t)src1 + (int64_t)src2);
+		// Rd = SignedSat(Rm + SignedSat(Rn * 2, 32), 32) - both saturations can set Q
+		src2 = (int32_t)saturate_qbit_overflow((int64_t)src2 * 2);
+		int64_t res = saturate_qbit_overflow((int64_t)src1 + (int64_t)src2);
 
 		SetRegister((insn>>12)&0xf, (int32_t)res);
 		R15 += 4;
@@ -1731,12 +1860,9 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>16)&0xf);
 
-		// check if doubling operation will overflow
-		int64_t res = (int64_t)src2 * 2;
-		saturate_qbit_overflow(res);
-
-		src2 *= 2;
-		res = saturate_qbit_overflow((int64_t)src1 - (int64_t)src2);
+		// Rd = SignedSat(Rm - SignedSat(Rn * 2, 32), 32) - both saturations can set Q
+		src2 = (int32_t)saturate_qbit_overflow((int64_t)src2 * 2);
+		int64_t res = saturate_qbit_overflow((int64_t)src1 - (int64_t)src2);
 
 		SetRegister((insn>>12)&0xf, (int32_t)res);
 		R15 += 4;
@@ -1771,11 +1897,30 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>8)&0xf);
 
+		// select top and bottom halves of src1/src2 and sign extend if necessary
+		if (insn & 0x20)
+		{
+			src1 >>= 16;
+		}
+		else
+		{
+			src1 = util::sext(src1, 16);
+		}
+
+		if (insn & 0x40)
+		{
+			src2 >>= 16;
+		}
+		else
+		{
+			src2 = util::sext(src2, 16);
+		}
+
 		int64_t dst = (int64_t)GetRegister((insn>>12)&0xf);
 		dst |= (int64_t)GetRegister((insn>>16)&0xf)<<32;
 
-		// do the multiply and accumulate
-		dst += mul_32x32(src1, src2);
+		// do the 16x16 multiply and the 64-bit accumulate (no saturation, no Q flag)
+		dst += (int64_t)src1 * (int64_t)src2;
 
 		// write back the result
 		SetRegister((insn>>12)&0xf, (uint32_t)dst);
@@ -1829,17 +1974,30 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 
 		int32_t res = mul_32x32_shift(src1, src2, 16);
 
-		// check for overflow and set the Q bit
+		// check for overflow and set the Q bit (the result itself is not saturated)
 		saturate_qbit_overflow((int64_t)src3 + res);
 
-		// do the real accumulate
-		src3 += res;
-
-		// write the result back
-		SetRegister((insn>>16)&0xf, (uint32_t)res);
+		// do the real accumulate and write the result back
+		SetRegister((insn>>16)&0xf, (uint32_t)src3 + (uint32_t)res);
 		R15 += 4;
 	}
 	else
+	{
+		arm7ops_0123_v4(insn);
+	}
+}
+
+void arm7_cpu_device::arm7ops_undef_conditional(uint32_t insn)
+{
+	// undefined instruction in the conditional space: advance past it and take the UND trap
+	LOGMASKED(LOG_OPS, "%08x: undefined instruction %08X\n", R15, insn);
+	R15 += 4;
+	m_pendingUnd = true;
+	update_irq_state();
+}
+
+void arm7_cpu_device::arm7ops_0123_v4(uint32_t insn)
+{
 	/* Multiply OR Swap OR Half Word Data Transfer */
 	if ((insn & 0x0e000000) == 0 && (insn & 0x80) && (insn & 0x10))  // bits 27-25=000 bit 7=1 bit 4=1
 	{
@@ -1880,9 +2038,18 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		/* PSR Transfer (MRS & MSR) */
 		if (((insn & 0x00100000) == 0) && ((insn & 0x01800000) == 0x01000000)) // S bit must be clear, and bit 24,23 = 10
 		{
-			HandlePSRTransfer(insn);
-			ARM7_ICOUNT += 2;       // PSR only takes 1 - S Cycle, so we add + 2, since at end, we -3..
-			R15 += 4;
+			if (!(insn & INSN_I) && (insn & 0xf0) != 0)
+			{
+				// cond 00010 xx0 .... with bits 7:4 != 0000 is the rest of the miscellaneous space: the ARMv5 additions
+				// (already decoded above on v5 cores) and the remaining holes. Not MSR/MRS - trap it.
+				arm7ops_undef_conditional(insn);
+			}
+			else
+			{
+				HandlePSRTransfer(insn);
+				ARM7_ICOUNT += 2;       // PSR only takes 1 - S Cycle, so we add + 2, since at end, we -3..
+				R15 += 4;
+			}
 		}
 		/* Data Processing */
 		else
@@ -1895,50 +2062,62 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 
 void arm7_cpu_device::arm7ops_4567(uint32_t insn) /* Data Transfer - Single Data Access */
 {
-//case 4:
-//case 5:
-//case 6:
-//case 7:
+	if ((insn & INSN_I) && (insn & 0x10))
+	{
+		// the ARMv6 media instructions don't exist on ARMv5 and earlier
+		LOGMASKED(LOG_OPS, "%08x: undefined instruction %08X in the single data transfer space\n", R15, insn);
+		R15 += 4;
+		m_pendingUnd = true;
+		update_irq_state();
+		return;
+	}
+
 	HandleMemSingle(insn);
 	R15 += 4;
-//  break;
 }
 
 void arm7_cpu_device::arm7ops_89(uint32_t insn) /* Block Data Transfer/Access */
 {
-//case 8:
-//case 9:
 	HandleMemBlock(insn);
 	R15 += 4;
-//  break;
 }
 
 void arm7_cpu_device::arm7ops_ab(uint32_t insn) /* Branch or Branch & Link */
 {
-//case 0xa:
-//case 0xb:
 	HandleBranch(insn, false);
-//  break;
 }
 
 void arm7_cpu_device::arm7ops_cd(uint32_t insn) /* Co-Processor Data Transfer */
 {
-//case 0xc:
-//case 0xd:
+	if ((insn & 0x0fe00000) == 0x0c400000)  // MCRR/MRRC - v5TE: cond 1100 010L Rn Rd cp_num opcode CRm
+	{
+		// The only coprocessor in the tree with a double-register transfer is the XScale DSP (CP0: MAR/MRA),
+		// which is not emulated yet - ignore those like the rest of its CP0 accesses; everything else traps.
+		if ((m_archFlags & ARCHFLAG_XSCALE) && ((insn >> 8) & 0xf) == 0)
+		{
+			LOGMASKED(LOG_OPS, "%08x: XScale %s (DSP Coprocessor 0 not yet emulated)\n", R15, (insn & 0x00100000) ? "MRA" : "MAR");
+			R15 += 4;
+		}
+		else
+		{
+			R15 += 4;
+			m_pendingUnd = true;
+			update_irq_state();
+		}
+		return;
+	}
+
 	HandleCoProcDT(insn);
 	R15 += 4;
-//  break;
 }
 
 void arm7_cpu_device::arm7ops_e(uint32_t insn) /* Co-Processor Data Operation or Register Transfer */
 {
-//case 0xe:
 	if (insn & 0x10)
 		HandleCoProcRT(insn);
 	else
 		HandleCoProcDO(insn);
 	R15 += 4;
-//  break;
 }
 
 void arm7_cpu_device::arm7ops_f(uint32_t insn) /* Software Interrupt */
@@ -1947,5 +2126,4 @@ void arm7_cpu_device::arm7ops_f(uint32_t insn) /* Software Interrupt */
 	update_irq_state();
 	arm7_check_irq_state();
 	//couldn't find any cycle counts for SWI
-//  break;
 }
