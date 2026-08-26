@@ -5,12 +5,20 @@
     Mountain Hardware Apple Clock
 
     This early real time clock card for the Apple II was released
-    in 1979. It uses a chain of battery-backed CMOS 4518 decade
-    counters counting microseconds and 4040 ripple counters (extended
-    by a flip-flop) counting a little more than a year's worth of
-    seconds.
+    in 1979 by Mountain Hardware, Inc. (which became Mountain
+    Computer, Inc. the following year); it was later sold as
+    The Clock. It uses a chain of battery-backed CMOS 4518 decade
+    counters counting microseconds (readable to the millisecond)
+    and 4040 ripple counters (extended by a 4013 flip-flop stage)
+    counting seconds with a period of about 388 days. A 1 second
+    interrupt is also provided.
 
-    The manual recommends that this card be placed in slot #4.
+    The manual recommends that this card be placed in slot #4,
+    though software that supports it will usually recognize it in
+    other slots as well.
+
+    The write-protect switch serves to prevent the clock from
+    glitching when system power is switched off.
 
 *********************************************************************/
 
@@ -114,7 +122,7 @@ void a2clock_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(a2clock_device::advance_seconds)
 {
-	++m_seconds;
+	m_seconds = (m_seconds + 1) & 0x1ffffff;
 	m_useconds = 0;
 
 	set_irq(m_int_enable);
@@ -155,7 +163,7 @@ void a2clock_device::set_irq(bool irq)
 void a2clock_device::do_adv1()
 {
 	if (!m_run_clock)
-		++m_seconds;
+		m_seconds = (m_seconds + 1) & 0x1ffffff;
 
 	if (m_int_active)
 		logerror("%s: IRQ cleared\n", machine().describe_context());
@@ -165,7 +173,7 @@ void a2clock_device::do_adv1()
 void a2clock_device::do_adv2()
 {
 	if (!m_run_clock)
-		m_seconds += 0x1000;
+		m_seconds = (m_seconds + 0x1000) & 0x1ffffff;
 }
 
 u8 a2clock_device::read_c0nx(u8 offset)
@@ -274,7 +282,7 @@ void a2clock_device::rtc_clock_updated(int year, int month, int day, int day_of_
 	for (int i = 1; i < month; i++)
 		day += gregorian_days_in_month(i, year);
 
-	m_seconds = (((day - 1) * 24 + hour) * 60 + minute) * 60 + second;
+	m_seconds = ((u32(day - 1) * 24 + hour) * 60 + minute) * 60 + second;
 }
 
 static INPUT_PORTS_START(a2clock)
