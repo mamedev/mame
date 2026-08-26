@@ -16,10 +16,25 @@
 #include "emu.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
+#include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
+
+#include "formats/acorn_dsk.h"
+#include "formats/apd_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/jfd_dsk.h"
+#include "formats/st_dsk.h"
+
+#include "imagedev/floppy.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -36,6 +51,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
+		, m_superio(*this, "superio")
 		, m_kbdc(*this, "kbdc")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
@@ -55,6 +71,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
 	required_device<arm_iomd_device> m_iomd;
+	required_device<fdc37c665gt_device> m_superio;
 	required_device<pc_kbdc_device> m_kbdc;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
@@ -102,16 +119,19 @@ void riscpc_state::a7000_map(address_map &map)
 	//
 //  map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
 //  I/O 03000000 - 033fffff
-//  AM_RANGE(0x03010000, 0x03011fff) //Super IO
-//  AM_RANGE(0x03012000, 0x03029fff) //FDC
-//  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
-//  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
-//  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
+	// TODO: mirrored? was 0x03011fff
+	// mirrored? 0x1fff >> 2 = 0x7ff (out of canonical ISA mask 0x3ff)
+	// cfr. 0x30119e8 accesses with a7000p -bios 2
+	map(0x03010000, 0x03010fff).mirror(0x1000).rw(m_superio, FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0x000000ff);
+//  map(0x03012000, 0x03029fff) //FDC (option?)
+//  map(0x0302b000, 0x0302bfff) //Network podule
+//  map(0x03040000, 0x0304ffff) //podule space 0,1,2,3
+//  map(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
 	map(0x03310000, 0x03310003).portr(m_mouse);
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
-//  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
+//  map(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
 
 	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
@@ -128,8 +148,6 @@ void riscpc_state::riscpc_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( a7000 )
-//  PORT_INCLUDE( at_keyboard )
-
 	PORT_START("MOUSE")
 	// for debugging we leave video and sound HWs as options, eventually slotify them
 	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
@@ -157,6 +175,45 @@ void riscpc_state::machine_start()
 void riscpc_state::machine_reset()
 {
 
+}
+
+// assume same formats as Acorn Archimedes
+static void riscpc_floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_HFE_FORMAT);
+	//fr.add(FLOPPY_HFE3_FORMAT);
+	// Archimedes formats
+	fr.add(FLOPPY_ACORN_ADFS_NEW_FORMAT);
+	fr.add(FLOPPY_APD_FORMAT);
+	fr.add(FLOPPY_JFD_FORMAT);
+	// BBC Micro formats
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	// Atari ST formats
+	fr.add(FLOPPY_ST_FORMAT);
+	fr.add(FLOPPY_MSA_FORMAT);
+}
+
+static void riscpc_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525sd", FLOPPY_525_SD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse",  LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse",     WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse",  MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal",        SERIAL_TERMINAL);
+	device.option_add("null_modem",      NULL_MODEM);
+	device.option_add("sun_kbd",         SUN_KBD_ADAPTOR);
 }
 
 void riscpc_state::base_config(machine_config &config)
@@ -193,6 +250,28 @@ void riscpc_state::base_config(machine_config &config)
 	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbdc->out_clock_cb().set(m_iomd, FUNC(arm_iomd_device::kclk_w));
 	m_kbdc->out_data_cb().set(m_iomd, FUNC(arm_iomd_device::kdata_w));
+
+	// https://arcwiki.org.uk/index.php/FDC37C665GT
+	// sarpc_j233 also uses a 'GT, as per the identifier check it does at startup (65h in CRD)
+	FDC37C665GT(config, m_superio, XTAL(24'000'000), upd765_family_device::mode_t::AT);
+//	m_fdc->fintr().set(m_iomd, FUNC...);
+
+	FLOPPY_CONNECTOR(config, "superio:fdc:0", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "superio:fdc:1", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
+	serport0.rxd_handler().set("superio", FUNC(fdc37c665gt_device::rxd1_w));
+	serport0.dcd_handler().set("superio", FUNC(fdc37c665gt_device::ndcd1_w));
+	serport0.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr1_w));
+	serport0.ri_handler().set("superio", FUNC(fdc37c665gt_device::nri1_w));
+	serport0.cts_handler().set("superio", FUNC(fdc37c665gt_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("superio", FUNC(fdc37c665gt_device::rxd2_w));
+	serport1.dcd_handler().set("superio", FUNC(fdc37c665gt_device::ndcd2_w));
+	serport1.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr2_w));
+	serport1.ri_handler().set("superio", FUNC(fdc37c665gt_device::nri2_w));
+	serport1.cts_handler().set("superio", FUNC(fdc37c665gt_device::ncts2_w));
 }
 
 void riscpc_state::rpc600(machine_config &config)
