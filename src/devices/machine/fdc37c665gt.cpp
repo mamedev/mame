@@ -84,6 +84,7 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	// floppy disc controller
 	N82077AA(config, m_fdc, 24_MHz_XTAL, m_floppy_mode);
 	m_fdc->intrq_wr_callback().set(FUNC(fdc37c665gt_device::irq_floppy_w));
+	m_fdc->drq_wr_callback().set(FUNC(fdc37c665gt_device::drq_floppy_w));
 
 	// parallel port
 	PC_LPT(config, m_lpt);
@@ -102,11 +103,10 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	m_serial[1]->out_dtr_callback().set(FUNC(fdc37c665gt_device::dtr_serial2_w));
 	m_serial[1]->out_rts_callback().set(FUNC(fdc37c665gt_device::rts_serial2_w));
 
-	IDE_CONTROLLER(config, m_ide[0]).options(ata_devices, nullptr, nullptr, false);
-//	m_ide[0]->irq_handler().set([this] (int state) { m_ide1_irq(state); });
+	// NOTE: irq(s) is client responsibility (no pins on Super I/O)
+	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, nullptr, nullptr, false);
 
-	IDE_CONTROLLER(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
-//	m_ide[1]->irq_handler().set([this] (int state) { m_ide2_irq(state); });
+	ATA_INTERFACE(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
 }
 
 uint8_t fdc37c665gt_device::read(offs_t offset)
@@ -399,6 +399,15 @@ void fdc37c665gt_device::irq_floppy_w(int state)
 	}
 
 	m_fintr_callback(state);
+}
+
+void fdc37c665gt_device::drq_floppy_w(int state)
+{
+	if (!enabled_logical[LogicalDevice::FDC]) {
+		return;
+	}
+
+	m_fdrq_callback(state);
 }
 
 void fdc37c665gt_device::irq_parallel_w(int state)

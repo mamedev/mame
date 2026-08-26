@@ -1,17 +1,29 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 // thanks-to: Tomasz Slanina, Sarah Walker
-/***************************************************************************
+/**************************************************************************************************
 
-    Acorn RiscPC line of computers
+Acorn RiscPC line of computers
 
-    TODO:
-    - A7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
-    - PS/2 keyboard doesn't work properly;
-    - Fix pendingUnd fatalerror from ARM7 core;
-    - Fix pendingAbtD fatalerror for RiscOS 4.xx;
+TODO:
+- a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
 
-****************************************************************************/
+TODO (a7000p -bios 2):
+- Hangs at boot with no harddisk (strike ESC key several times until Boot menu appears,
+  then disable it in Configure machine item);
+- In turn above seems too slow to catch up (verify);
+- Floppy throws "Disc not formatted" when mounted, or numerical disk boot errors.
+  Won't format properly either;
+- CD throws "CD drive not ready or disc not present" when mounted
+  (NOTE: needs filesystem changed to CDFS in Configure machine)
+- Serial mouse doesn't work even if selected;
+
+Notes:
+- List of compatible RiscPC SWs at:
+https://arcwiki.org.uk/index.php?title=Category:Software_compatible_with_the_RiscPC&pageuntil=Minus+4#mw-pages
+
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "bus/pc_kbd/pc_kbdc.h"
@@ -26,6 +38,7 @@
 #include "machine/arm_iomd.h"
 #include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
+#include "machine/input_merger.h"
 
 #include "formats/acorn_dsk.h"
 #include "formats/apd_dsk.h"
@@ -119,11 +132,22 @@ void riscpc_state::a7000_map(address_map &map)
 	//
 //  map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
 //  I/O 03000000 - 033fffff
-	// TODO: mirrored? was 0x03011fff
-	// mirrored? 0x1fff >> 2 = 0x7ff (out of canonical ISA mask 0x3ff)
-	// cfr. 0x30119e8 accesses with a7000p -bios 2
-	map(0x03010000, 0x03010fff).mirror(0x1000).rw(m_superio, FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0x000000ff);
-//  map(0x03012000, 0x03029fff) //FDC (option?)
+	// NOTE: 0x1fff >> 2 = 0x7ff, the upper $400 used for LPTx ECP regs
+	map(0x03010000, 0x03011fff).rw(m_superio, FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0x000000ff);
+//  map(0x03012000, 0x0302afff) //FDC DMA space
+	map(0x03012000, 0x03029fff).rw(m_superio, FUNC(fdc37c665gt_device::fdc_dma_r), FUNC(fdc37c665gt_device::fdc_dma_w)).umask32(0x000000ff);
+	map(0x0302a000, 0x0302afff).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = m_superio->fdc_dma_r(0);
+			if (!machine().side_effects_disabled())
+				m_superio->fdc_tc_w(1);
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_superio->fdc_dma_w(0, data);
+			m_superio->fdc_tc_w(1);
+		})
+	).umask32(0x000000ff);
 //  map(0x0302b000, 0x0302bfff) //Network podule
 //  map(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  map(0x03070000, 0x0307ffff) //podule space 4,5,6,7
@@ -154,6 +178,7 @@ static INPUT_PORTS_START( a7000 )
 	PORT_CONFSETTING(    0x00, "VGA" )
 	PORT_CONFSETTING(    0x01, "TV Screen" )
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	// TODO: unmap for non-quadrature mouse variants
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)
@@ -244,6 +269,7 @@ void riscpc_state::base_config(machine_config &config)
 	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));
 	m_iomd->iocr_write_od<1>().set(FUNC(riscpc_state::iocr_od1_w));
 	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+	m_iomd->fiq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
 	m_iomd->kclk_cb().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_iomd->kdata_cb().set(m_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
@@ -253,8 +279,26 @@ void riscpc_state::base_config(machine_config &config)
 
 	// https://arcwiki.org.uk/index.php/FDC37C665GT
 	// sarpc_j233 also uses a 'GT, as per the identifier check it does at startup (65h in CRD)
+	// some systems may use a '672 instead (TBD, which ones?)
 	FDC37C665GT(config, m_superio, XTAL(24'000'000), upd765_family_device::mode_t::AT);
-//	m_fdc->fintr().set(m_iomd, FUNC...);
+	m_superio->fintr().set(m_iomd, FUNC(arm_iomd_device::int4_w));
+	m_superio->fdrq().set(m_iomd, FUNC(arm_iomd_device::int9_w));
+	subdevice<upd765_family_device>("superio:fdc")->idx_wr_callback().set(m_iomd, FUNC(arm_iomd_device::int1_w));
+	m_superio->pintr1().set(m_iomd, FUNC(arm_iomd_device::int2_w));
+	m_superio->irq4().set(m_iomd, FUNC(arm_iomd_device::int6_w));
+	// TODO: connection with COM2 irq3 (FIRQ?)
+	m_superio->txd1().set("serport0", FUNC(rs232_port_device::write_txd));
+	m_superio->ndtr1().set("serport0", FUNC(rs232_port_device::write_dtr));
+	m_superio->nrts1().set("serport0", FUNC(rs232_port_device::write_rts));
+	m_superio->txd2().set("serport1", FUNC(rs232_port_device::write_txd));
+	m_superio->ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
+	m_superio->nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
+
+
+	INPUT_MERGER_ANY_HIGH(config, "ide_irq").output_handler().set(m_iomd, FUNC(arm_iomd_device::int7_w));
+
+	subdevice<ata_interface_device>("superio:ide1")->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<0>));
+	subdevice<ata_interface_device>("superio:ide2")->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<1>));
 
 	FLOPPY_CONNECTOR(config, "superio:fdc:0", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "superio:fdc:1", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);

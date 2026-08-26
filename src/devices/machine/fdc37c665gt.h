@@ -41,6 +41,9 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 	auto fintr() { return m_fintr_callback.bind(); }
+	auto pintr1() { return m_pintr1_callback.bind(); }
+	auto irq3() { return m_irq3_callback.bind(); }
+	auto irq4() { return m_irq4_callback.bind(); }
 	auto fdrq() { return m_fdrq_callback.bind(); }
 	auto txd1() { return m_txd1_callback.bind(); }
 	auto ndtr1() { return m_ndtr1_callback.bind(); }
@@ -61,12 +64,18 @@ public:
 	void nri2_w(int state);
 	void ncts2_w(int state);
 
+	uint8_t fdc_dma_r(offs_t offset) { return m_fdc->dma_r(); }
+	void fdc_dma_w(offs_t offset, u8 data) { m_fdc->dma_w(data); }
+
+	void fdc_tc_w(int state) { m_fdc->tc_w(state); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
 	// for the internal floppy controller
 	void irq_floppy_w(int state);
+	void drq_floppy_w(int state);
 
 	// for the internal parallel port
 	void irq_parallel_w(int state);
@@ -126,7 +135,7 @@ private:
 	required_device<n82077aa_device> m_fdc;
 	required_device_array<ns16550_device, 2> m_serial;
 	required_device<pc_lpt_device> m_lpt;
-	required_device_array<ide_controller_device, 2> m_ide;
+	required_device_array<ata_interface_device, 2> m_ide;
 
 	void write_configuration_register(int index, int data);
 };
