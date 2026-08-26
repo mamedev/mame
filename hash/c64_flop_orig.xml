@@ -452,6 +452,61 @@ All games fails loading
 		</part>
 	</software>
 
+	<software name="geos20de" supported="no">
+		<description>GEOS 2.0 (Germany)</description>
+		<year>1988</year>
+		<publisher>Berkeley Softworks</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="278234">
+				<rom name="geos20de_1a.g64" size="278234" crc="9110479e" sha1="b36f95c2fa7686c7fc412d4b06e8fbca69521af4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="278234">
+				<rom name="geos20de_1b.g64" size="278234" crc="5b7bcfb3" sha1="5529ddac58606b77ec139c37f264daa2bcab9302"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="255154">
+				<rom name="geos20de_2a.g64" size="255154" crc="84451bb3" sha1="d35a261d57f39a389914eef9b55809b88c7a98d0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="278234">
+				<rom name="geos20de_2b.g64" size="278234" crc="67c016ed" sha1="df2f2b0d94d841f605b200e9a05f19d54a58b114"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_3a.d64" size="174848" crc="1893d010" sha1="dae3f3c0f18a4ad99b6cb60fbf61aecfe4fcb0a4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_3b.d64" size="174848" crc="d4ad471f" sha1="8424d81bb0eb0c6d0778ffac33f5421a8928dcd6"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_4a.d64" size="174848" crc="1ce3419d" sha1="5c9c5b720fe62bbcb8a4bae203d2dee328f8317c"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_4b.d64" size="174848" crc="53ae19b1" sha1="bd3739c266aca675589ddf3783b558aad83370c6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sprbas64">
 		<description>SuperBase 64 (Finland)</description>
 		<year>1983</year>
