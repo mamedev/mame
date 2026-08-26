@@ -35750,10 +35750,11 @@ tvkunio3
 typo240
 
 @source:nintendo/nes_vt369_vtunknown.cpp
-36pcase
 100burgr
 168pcase
+200in1fn
 240in1ar
+36pcase
 500in1gf
 500in1hh
 a6plus

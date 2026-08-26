@@ -1702,6 +1702,10 @@ ROM_START( 500in1gf )
 	ROM_LOAD( "s29gl256n10tfi01.u2", 0x00000, 0x2000000, CRC(1c7012aa) SHA1(9513b07ed1eb0f19619bd9c9199d261c6e9348bd) )
 ROM_END
 
+ROM_START( 200in1fn )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "200in1.u3", 0x000000, 0x1000000, CRC(9db30eac) SHA1(32cf7db7fc6a3facf59739b3fbe66c8bf1615ea3) )
+ROM_END
 
 void vt369_state::init_lxcmcypp()
 {
@@ -1908,6 +1912,9 @@ CONS( 202?, t3_630,   0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, 
 CONS( 202?, zl383,    0,        0,  vt4ffx_vibesswap_8mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 202?, retro620, 0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// BL-901-V2.0, 20190611 on PCB  TODO: encryption
+CONS( 2019, 200in1fn, 0,  0,  vt4ffx_rsps300swap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "200 in 1 Handheld Console (with bad menu font)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // all games after the first 180 listed on the menu are duplicates. BTANB: games 501-520 are mislabeled duplicates: e.g., "511. Exerion" actually loads Pac-Man.
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
