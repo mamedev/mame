@@ -724,9 +724,14 @@ void cr511b_device::cmd_read()
 	LOGMASKED(LOG_CMD, "Command: Read\n");
 	LOGPARAM;
 
+	// cancel any pending data that hasn't been transfered yet
+	m_data_ready = false;
+	m_drq_cb(0);
+
 	m_transfer_lba = (m_input_fifo[1] << 16) | (m_input_fifo[2] << 8) | (m_input_fifo[3] << 0);
 	m_transfer_sectors = (m_input_fifo[4] << 8) | (m_input_fifo[5] << 0);
 	m_transfer_length = m_transfer_sectors * m_sector_size;
+	m_transfer_buffer_pos = 0;
 
 	LOGMASKED(LOG_CMD, "-> LBA %d, sectors %d\n", m_transfer_lba, m_transfer_sectors);
 
