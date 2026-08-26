@@ -1585,6 +1585,7 @@ boot OK
 
 	<software name="ggianas" supported="no">
 		<description>The Great Giana Sisters</description>
+		<!-- 2001 according to Dir :0 / Ex filestamps (?)-->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
@@ -3936,7 +3937,8 @@ boot OK
 
 	<software name="timezone" supported="no">
 		<description>Time Zone</description>
-		<year>19??</year>
+		<!-- Dir :0 Ex filestamps -->
+		<year>1992?</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
 Jumps to lalaland
