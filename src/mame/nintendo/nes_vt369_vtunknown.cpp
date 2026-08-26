@@ -173,6 +173,7 @@ public:
 	void vt4ffx_32mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_h12p1000(machine_config &config) ATTR_COLD;
 
+	void vt4ffx_vibesswap_1mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_vibesswap_8mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_vibesswap_16mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_gbox2020_8mb(machine_config &config) ATTR_COLD;
@@ -665,6 +666,12 @@ void vt4ffx_state::vt4ffx_vibesswap_8mb(machine_config &config)
 {
 	vt4ffx_vibesswap_16mb(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_8mbyte);
+}
+
+void vt4ffx_state::vt4ffx_vibesswap_1mb(machine_config &config)
+{
+	vt4ffx_vibesswap_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_1mbyte);
 }
 
 void vt4ffx_state::vt4ffx_gbox2020_8mb(machine_config &config)
@@ -1431,6 +1438,11 @@ ROM_START( vibes240e )
 	ROM_LOAD( "vibes.u2", 0x000000, 0x1000000, BAD_DUMP CRC(a747971a) SHA1(2399d4f32d0054a06397bead069b498e634dbe37) )
 ROM_END
 
+ROM_START( asthh )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "29dl800ba.u2", 0x000000, 0x100000, CRC(1fbad073) SHA1(e358d24e2e383a71b41fc4e0cbf9d8a7d09c4d9d) )
+ROM_END
+
 ROM_START( retro620 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "620in1_retrofc.bin", 0x00000, 0x1000000, CRC(2698f4e5) SHA1(8b9551c22071c48a7ebc1635ca37ebe7a3b33c4b) ) // BGA on subboard
@@ -1902,6 +1914,9 @@ CONS( 202?, vibes240, 0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, 
 CONS( 202?, vibes240a,vibes240, 0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // also a bad dump, different encryption, but Curly Monkey 2 works here, only first 2 opcodes are encrypted
 CONS( 202?, vibes240e,vibes240, 0,  vt4ffx_gbox2020_16mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (alt encryption)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// uses unsupported screen mode
+CONS( 202?, asthh,    0,        0,  vt4ffx_vibesswap_1mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Asteroids: Classic Arcade Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has TUI (holiday company) logo on packaging, no other manufacturer details
 CONS( 201?, tui240,   0,        0,  vt4ffx_gbox2020_8mb,   vt369, vt4ffx_state, init_tui240, "<unknown>",  "TUI 240-in-1", MACHINE_NOT_WORKING )
