@@ -81,9 +81,6 @@ enum
 	EG_OFF
 };
 
-// Wave 6: the MUL-scaled modulation input wraps at 2^W6_BITS (0 = continuous).
-constexpr int W6_BITS = 9;
-
 // EG increment patterns (ymfm/OPM): nibble k of entry r = increment for
 // EG sub-step k at rate r.
 const uint32_t eg_inc[64] =
@@ -1125,22 +1122,16 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 			}
 			else if (s.wave == 6)
 			{
-				// "linear waveform table": assumed that output does not depend on the
-				// phase; it is (1 + modulation input) * envelope, i.e. a DC level
-				// when unmodulated (drum pitch sweeps use it as a modulator) and
-				// the modulation input passed through when modulated (hi-hat
-				// carriers emit their modulator directly).  The modulation input
-				// is scaled by MUL (0 = 1/2) like a phase increment and wraps at
-				// 2^W6_BITS; full scale = one wrap.  The wrap size sets the
-				// passed-through modulator's noise floor and the level of the
-				// PG-rate line in it.  The manual only states "1" (D.C.) for
-				// this waveform; the phase does not enter.
+				// "linear waveform table": the output does not depend on the
+				// phase.  It is a DC level of half scale (drum pitch sweeps use it
+				// as a modulator) plus the modulation input passed through as a
+				// ramp: the input is scaled by MUL (0 = 1/2) like a phase
+				// increment, wraps at 9 bits and is stretched to 15 bits (a
+				// hi-hat carrier emits its modulator directly, at up to 2.5x
+				// the range of the other waveforms).  The manual only states "1"
+				// (D.C.) for this waveform.
 				int32_t mm = s.mul ? mod * int32_t(s.mul) : (mod >> 1);
-				int32_t lin;
-				if (W6_BITS)
-					lin = 8192 + ((1 + (mm & ((1 << W6_BITS) - 1))) << (13 - W6_BITS));
-				else
-					lin = 8168 + (mm << 4);
+				int32_t lin = 8192 + ((mm << 6) & 32767);
 				out = env_mul(lin, env);
 				s.phase += phase_inc(s, pm);   // the PG keeps running
 			}
