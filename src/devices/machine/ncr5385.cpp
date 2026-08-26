@@ -575,7 +575,7 @@ int ncr5385_device::state_step()
 	case SEL_DELAY:
 		LOGMASKED(LOG_STATE, "selection: BSY cleared\n");
 		m_state = SEL_WAIT_BSY;
-		delay = m_cnt ? int(u64(m_cnt) * 1024 * 1'000'000'000 / clock()) : -1;
+		delay = m_cnt ? attotime::from_ticks(u64(m_cnt) * 1024, clock()).as_ticks(1'000'000'000) : -1;
 
 		// clear BSY, optionally assert ATN
 		if (!BIT(m_cmd, 0))
