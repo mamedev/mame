@@ -15,6 +15,7 @@ public:
 	auto txd() { return m_txd_cb.bind(); } // data output
 
 	auto pe() { return m_pe_cb.bind(); } // rx parity error
+	auto rp() { return m_rp_cb.bind(); } // rx parity bit
 	auto rx() { return m_rx_cb.bind(); } // rx complete
 	auto tx() { return m_tx_cb.bind(); } // tx complete
 
@@ -34,18 +35,19 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	void timer(s32 param);
+	void rts(s32 param);
 
 private:
 	devcb_write_line m_clk_cb;
 	devcb_write_line m_txd_cb;
 
 	devcb_write_line m_pe_cb;
+	devcb_write_line m_rp_cb;
 	devcb_write_line m_rx_cb;
 	devcb_write_line m_tx_cb;
 
 	// state machine
-	emu_timer *m_timer;
+	emu_timer *m_rts;
 	u8 m_state;
 
 	// rx/tx data

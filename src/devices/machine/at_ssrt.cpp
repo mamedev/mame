@@ -57,6 +57,7 @@ at_ssrt_device::at_ssrt_device(machine_config const &mconfig, char const *tag, d
 	, m_clk_cb(*this)
 	, m_txd_cb(*this)
 	, m_pe_cb(*this)
+	, m_rp_cb(*this)
 	, m_rx_cb(*this)
 	, m_tx_cb(*this)
 	, m_clk(false)
@@ -75,7 +76,7 @@ void at_ssrt_device::device_start()
 	save_item(NAME(m_clk));
 	save_item(NAME(m_rxd));
 
-	m_timer = timer_alloc(FUNC(at_ssrt_device::timer), this);
+	m_rts = timer_alloc(FUNC(at_ssrt_device::rts), this);
 }
 
 void at_ssrt_device::device_reset()
@@ -86,13 +87,21 @@ void at_ssrt_device::device_reset()
 	m_shift = 0;
 	m_parity = false;
 
-	m_timer->reset();
+	m_rts->reset();
+	m_txd_cb(1);
+	m_clk_cb(1);
+
+	m_pe_cb(0);
+	m_rx_cb(0);
+	m_tx_cb(0);
 }
 
 void at_ssrt_device::clk_w(int state)
 {
-	// falling edge?
-	if (m_clk && state == 0)
+	bool const falling_edge = m_clk && !state;
+	m_clk = bool(state);
+
+	if (falling_edge)
 	{
 		LOGMASKED(LOG_RXTX, "clk\n");
 
@@ -124,6 +133,8 @@ void at_ssrt_device::clk_w(int state)
 			if (m_rxd)
 				m_parity = !m_parity;
 
+			m_rp_cb(m_rxd);
+
 			m_state++;
 			break;
 		case RX_STOP:
@@ -135,19 +146,22 @@ void at_ssrt_device::clk_w(int state)
 				m_latch = m_shift;
 
 				if (!m_parity)
-				{
 					LOG("rx parity error\n");
-					m_pe_cb(1);
-				}
+
+				m_pe_cb(!m_parity);
+
+				// inhibit keyboard
+				m_state = RX_START;
+				m_clk_cb(0);
+
+				// signal rx done
+				m_rx_cb(1);
 			}
 			else
+			{
 				LOG("rx framing error\n");
-
-			m_state = RX_START;
-
-			// signal rx done
-			if (m_rxd)
-				m_rx_cb(1);
+				m_state = RX_START;
+			}
 			break;
 
 		case TX_START:
@@ -194,8 +208,6 @@ void at_ssrt_device::clk_w(int state)
 			break;
 		}
 	}
-
-	m_clk = bool(state);
 }
 
 void at_ssrt_device::rxd_w(int state)
@@ -213,7 +225,10 @@ u8 at_ssrt_device::data_r()
 	{
 		LOG("%s: data_r 0x%02x\n", machine().describe_context(), m_latch);
 
-		m_pe_cb(0);
+		m_state = RX_START;
+
+		// release keyboard
+		m_clk_cb(1);
 		m_rx_cb(0);
 	}
 
@@ -224,26 +239,25 @@ void at_ssrt_device::data_w(u8 data)
 {
 	LOG("%s: data_w 0x%02x\n", machine().describe_context(), data);
 
-	// load data latch
-	m_latch = data;
+	// load shift register
+	m_shift = data;
 	m_parity = false;
 
 	m_state = TX_START;
 	m_tx_cb(0);
 
-	// inhibit keyboard for 60µs
+	// request to send: inhibit keyboard for >60µs
+	// NOTE: transmitting data releases the keyboard clock, meaning that any
+	// previously received data is lost if not read before new data is received
 	// TODO: test receiver active
 	m_clk_cb(0);
-	m_timer->adjust(attotime::from_usec(60));
+	m_rts->adjust(attotime::from_usec(65));
 }
 
-void at_ssrt_device::timer(s32 param)
+void at_ssrt_device::rts(s32 param)
 {
 	if (m_state == TX_START)
 	{
-		// load shift register
-		m_shift = m_latch;
-
 		// tx start bit
 		LOGMASKED(LOG_RXTX, "txd 0 start\n");
 		m_txd_cb(0);
