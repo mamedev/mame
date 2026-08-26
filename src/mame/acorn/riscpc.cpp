@@ -14,6 +14,8 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
@@ -34,6 +36,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
+		, m_kbdc(*this, "kbdc")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
 		, m_mouse(*this, "MOUSE")
@@ -52,6 +55,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
 	required_device<arm_iomd_device> m_iomd;
+	required_device<pc_kbdc_device> m_kbdc;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
 	required_ioport m_mouse;
@@ -182,7 +186,13 @@ void riscpc_state::base_config(machine_config &config)
 	m_iomd->iocr_read_od<1>().set(FUNC(riscpc_state::iocr_od1_r));
 	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));
 	m_iomd->iocr_write_od<1>().set(FUNC(riscpc_state::iocr_od1_w));
-	m_iomd->irq_cb().set([this] (int state) { m_maincpu->set_input_line( arm7_cpu_device::ARM7_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE); });
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+	m_iomd->kclk_cb().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_iomd->kdata_cb().set(m_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+
+	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_kbdc->out_clock_cb().set(m_iomd, FUNC(arm_iomd_device::kclk_w));
+	m_kbdc->out_data_cb().set(m_iomd, FUNC(arm_iomd_device::kdata_w));
 }
 
 void riscpc_state::rpc600(machine_config &config)

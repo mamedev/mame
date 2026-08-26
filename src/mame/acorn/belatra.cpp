@@ -149,8 +149,8 @@ void belatra_state::belatra(machine_config &config)
 	m_iomd->iocr_write_id().set([this] (int state) { logerror("%s: IOCR write ID %d\n", machine().describe_context(), state); });
 	m_iomd->iolines_read().set([this] () { logerror("%s: IO lines read\n", machine().describe_context()); return uint8_t(0); });
 	m_iomd->iolines_write().set([this] (uint8_t data) { logerror("%s: IO lines write %02x\n", machine().describe_context(), data); });
-	m_iomd->irq_cb().set([this] (int state) { m_maincpu->set_input_line( arm7_cpu_device::ARM7_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE); });
-	m_iomd->subdevice<pc_kbdc_device>("kbdc")->set_default_option(nullptr);
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+
 	// TODO: actual connection to AUX port, mouse or otherwise
 
 	// AT90S2313(config, "mcu", xxxx); // TODO: AVR 8-bit core, only the fairyl2 set has a dump

@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
 #include "machine/at_ssrt.h"
@@ -34,7 +33,6 @@ class arm_iomd_device : public device_t
 public:
 	// construction/destruction
 	arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	template <unsigned N> auto iocr_read_od() { return m_iocr_read_od_cb[N].bind(); }
 	template <unsigned N> auto iocr_write_od() { return m_iocr_write_od_cb[N].bind(); }
@@ -42,7 +40,9 @@ public:
 	auto iocr_write_id() { return m_iocr_write_id_cb.bind(); }
 
 	auto irq_cb() { return m_irq_cb.bind(); }
-//	auto fiq_cb() { return m_fiq_cb.bind(); }
+//  auto fiq_cb() { return m_fiq_cb.bind(); }
+	auto kclk_cb() { return m_ssrt.lookup()->clk(); }
+	auto kdata_cb() { return m_ssrt.lookup()->txd(); }
 
 	// IRQA
 	void vblank_irq(int state);
@@ -55,8 +55,13 @@ public:
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template<class T> void set_vidc_tag(T &&tag) { m_vidc.set_tag(std::forward<T>(tag)); }
 
+	void kclk_w(int state);
+	void kdata_w(int state);
+
 protected:
-	// device-level overrides
+	arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -86,7 +91,6 @@ protected:
 	required_device<cpu_device> m_host_cpu;
 	required_device<arm_vidc20_device> m_vidc;
 	required_device<at_ssrt_device> m_ssrt;
-	required_device<pc_kbdc_device> m_kbdc;
 	address_space *m_host_space; /**< reference to the host cpu space for DMA ops */
 private:
 	u8 m_iocr_ddr;

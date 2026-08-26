@@ -156,13 +156,12 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
 	, m_ssrt(*this, "ssrt")
-	, m_kbdc(*this, "kbdc")
 	, m_iocr_read_od_cb(*this, 1)
 	, m_iocr_write_od_cb(*this)
 	, m_iocr_read_id_cb(*this, 1)
 	, m_iocr_write_id_cb(*this)
 	, m_irq_cb(*this)
-//	, m_fiq_cb(*this)
+//  , m_fiq_cb(*this)
 	, m_sndcur(0)
 	, m_sndend(0)
 	, m_sndcur_reg{ 0, 0 }
@@ -244,15 +243,9 @@ void arm_iomd_device::device_add_mconfig(machine_config &config)
 	//TODO: hookup mouse quadrature interface here ...
 
 	AT_SSRT(config, m_ssrt);
-	m_ssrt->clk().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_ssrt->txd().set(m_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_ssrt->pe().set(FUNC(arm_iomd_device::kbd_rxp_w));
+	m_ssrt->rp().set(FUNC(arm_iomd_device::kbd_rxp_w));
 	m_ssrt->rx().set(FUNC(arm_iomd_device::kbd_rxf_w));
 	m_ssrt->tx().set(FUNC(arm_iomd_device::kbd_txe_w));
-
-	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
-	m_kbdc->out_clock_cb().set(m_ssrt, FUNC(at_ssrt_device::clk_w));
-	m_kbdc->out_data_cb().set(m_ssrt, FUNC(at_ssrt_device::rxd_w));
 }
 
 void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
@@ -390,10 +383,6 @@ u32 arm_iomd_device::kbdcr_r()
 {
 	u32 data = m_kbdsr;
 
-	if (m_kbdc->clock_signal())
-		data |= KSR_KCI;
-	if (m_kbdc->data_signal())
-		data |= KSR_KDI;
 	if (m_ssrt->rx_busy())
 		data |= KSR_RXB;
 	if (m_ssrt->tx_busy())
@@ -414,22 +403,38 @@ void arm_iomd_device::kbddat_w(u32 data)
 
 void arm_iomd_device::kbdcr_w(u32 data)
 {
-	if (m_kbdsr & KSR_ENA)
-	{
-		m_kbdc->data_write_from_mb(!BIT(data, 1));
-		m_kbdc->clock_write_from_mb(!BIT(data, 0));
-	}
-	else if (data & KSR_ENA)
+	if (!(m_kbdsr & KSR_ENA) && (data & KSR_ENA))
 	{
 		m_kbdsr |= KSR_TXE | KSR_ENA;
 		trigger_irq<IRQB>(0x40);
 	}
+
+	m_kbdsr = (m_kbdsr & ~KSR_ENA) | (data & KSR_ENA);
+}
+
+void arm_iomd_device::kclk_w(int state)
+{
+	if (state)
+		m_kbdsr |= KSR_KCI;
+	else
+		m_kbdsr &= ~KSR_KCI;
+
+	m_ssrt->clk_w(state);
+}
+
+void arm_iomd_device::kdata_w(int state)
+{
+	if (state)
+		m_kbdsr |= KSR_KDI;
+	else
+		m_kbdsr &= ~KSR_KDI;
+
+	m_ssrt->rxd_w(state);
 }
 
 void arm_iomd_device::kbd_rxp_w(int state)
 {
-	// parity bit is inverse of ssrt parity error
-	if (!state)
+	if (state)
 		m_kbdsr |= KSR_RXP;
 	else
 		m_kbdsr &= ~KSR_RXP;
@@ -589,13 +594,13 @@ inline void arm_iomd_device::trigger_timer(unsigned Which)
 template <unsigned Which> u32 arm_iomd_device::tNlow_r()
 {
 	return m_timer[Which]->elapsed().as_ticks(XTAL(2'000'000)) & 0xff;
-	//	return m_timer_out[Which] & 0xff;
+	//  return m_timer_out[Which] & 0xff;
 }
 
 template <unsigned Which> u32 arm_iomd_device::tNhigh_r()
 {
 	return (m_timer[Which]->elapsed().as_ticks(XTAL(2'000'000)) >> 8) & 0xff;
-	// 	return (m_timer_out[Which] >> 8) & 0xff;
+	//  return (m_timer_out[Which] >> 8) & 0xff;
 }
 
 template <unsigned Which> void arm_iomd_device::tNlow_w(u32 data)

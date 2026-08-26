@@ -630,8 +630,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
-	m_iomd->irq_cb().set([this] (int state) { m_maincpu->set_input_line( arm7_cpu_device::ARM7_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE); });
-	m_iomd->subdevice<pc_kbdc_device>("kbdc")->set_default_option(nullptr);
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 
 	SPEAKER(config, "speaker", 2).front();
 
