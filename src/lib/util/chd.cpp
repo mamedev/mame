@@ -107,6 +107,7 @@ enum
 // description of where a metadata entry lives within the file
 struct chd_file::metadata_entry
 {
+	uint32_t                index;			// index of the metadata
 	uint64_t                offset;         // offset within the file of the header
 	uint64_t                next;           // offset within the file of the next header
 	uint64_t                prev;           // offset within the file of the previous header
@@ -1521,11 +1522,36 @@ std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, 
 
 std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
 {
+	uint32_t index = 0;
+	return read_metadata(searchtag,searchindex, output, index);
+}
+
+/**
+ * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index)
+ *
+ * @brief   -------------------------------------------------
+ *            read_metadata - read the indexed metadata of the given type
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_METADATA_NOT_FOUND   Thrown when a chderr metadata not found error
+ *                                          condition occurs.
+ *
+ * @param   searchtag       The searchtag.
+ * @param   searchindex     The searchindex.
+ * @param [in,out]  output  The output.
+ * @param [in,out]  index   The index of the metadata.
+ *
+ * @return  An error condition.
+ */
+
+std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index)
+{
 	// if we didn't find it, just return
 	metadata_entry metaentry;
 	if (std::error_condition err = metadata_find(searchtag, searchindex, metaentry))
 		return err;
 
+	index = metaentry.index;
 	// read the metadata
 	try { output.assign(metaentry.length, '\0'); }
 	catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
@@ -2923,6 +2949,7 @@ std::error_condition chd_file::metadata_find(chd_metadata_tag metatag, int32_t m
 	{
 		metaentry.offset = m_metaoffset;
 		metaentry.prev = 0;
+		metaentry.index = 0;
 	}
 	else
 	{
@@ -2951,6 +2978,7 @@ std::error_condition chd_file::metadata_find(chd_metadata_tag metatag, int32_t m
 				return std::error_condition();
 
 		// no match, fetch the next link
+		metaentry.index++;
 		metaentry.prev = metaentry.offset;
 		metaentry.offset = metaentry.next;
 	}

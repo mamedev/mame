@@ -349,6 +349,7 @@ public:
 
 	// metadata management
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output);
+	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags);
