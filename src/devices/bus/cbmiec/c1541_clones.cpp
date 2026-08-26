@@ -6,22 +6,8 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - hardware extensions
-        - Dolphin-DOS 2.0
-        - Dolphin-DOS 3.0
-        - Professional-DOS
-        - Prologic-DOS
-
-*/
-
 #include "emu.h"
 #include "c1541_clones.h"
-
-#include "bus/centronics/ctronics.h"
 
 
 
@@ -30,11 +16,6 @@
 //**************************************************************************
 
 #define M6502_TAG       "ucd5"
-#define M6522_0_TAG     "uab1"
-#define M6522_1_TAG     "ucd4"
-
-#define MC6821_TAG      "pia"
-#define CENTRONICS_TAG  "centronics"
 
 
 
@@ -45,10 +26,6 @@
 DEFINE_DEVICE_TYPE(FSD1,                       fsd1_device,                       "fsd1",     "FSD-1 Disk Drive")
 DEFINE_DEVICE_TYPE(FSD2,                       fsd2_device,                       "fsd2",     "FSD-2 Disk Drive")
 DEFINE_DEVICE_TYPE(CSD1,                       csd1_device,                       "csd1",     "CSD-1 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_device,          "c1541dd",  "Commodore 1541 Dolphin-DOS 2.0 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541_TURBOTRANS,           c1541_turbotrans_device,           "c1541tt",  "Commodore 1541 TurboTrans v3.4 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_device,  "c1541pd",  "Commodore 1541 Professional-DOS v1 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_device, "c1541pdc", "Commodore 1541 ProLogic-DOS Classic Disk Drive")
 DEFINE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device,                   "indusgt",  "Indus GT Disk Drive")
 DEFINE_DEVICE_TYPE(TECHNICA,                   technica_device,                   "technica", "Westfalia Technica Disk Drive")
 DEFINE_DEVICE_TYPE(BLUE_CHIP,                  blue_chip_device,                  "bluechip", "Amtech Blue Chip Disk Drive")
@@ -125,92 +102,6 @@ ROM_END
 const tiny_rom_entry *csd1_device::device_rom_region() const
 {
 	return ROM_NAME( csd1 );
-}
-
-
-//-------------------------------------------------
-//  ROM( c1541dd )
-//-------------------------------------------------
-
-ROM_START( c1541dd )
-	ROM_REGION( 0x8000, M6502_TAG, 0 )
-	ROM_LOAD( "dd20.bin", 0x0000, 0x8000, CRC(94c7fe19) SHA1(e4d5b9ad6b719dd988276214aa4536d3525d313c) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *c1541_dolphin_dos_device::device_rom_region() const
-{
-	return ROM_NAME( c1541dd );
-}
-
-
-//-------------------------------------------------
-//  ROM( c1541tt )
-//-------------------------------------------------
-
-ROM_START( c1541tt )
-	ROM_REGION( 0x8000, M6502_TAG, 0 )
-	ROM_LOAD( "ttd34.uab5", 0x0000, 0x8000, CRC(518d34a1) SHA1(4d6ffdce6ab122e9627b0a839861687bcd4e03ec) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *c1541_turbotrans_device::device_rom_region() const
-{
-	return ROM_NAME( c1541tt );
-}
-
-
-//-------------------------------------------------
-//  ROM( c1541pd )
-//-------------------------------------------------
-
-ROM_START( c1541pd )
-	ROM_REGION( 0x6000, M6502_TAG, 0 )
-	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD( "professionaldos-v1-floppy-expansion-eprom-27128.bin", 0x2000, 0x4000, CRC(c9abf072) SHA1(2b26adc1f4192b6ca1514754f73c929087b24426) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *c1541_professional_dos_v1_device::device_rom_region() const
-{
-	return ROM_NAME( c1541pd );
-}
-
-
-//-------------------------------------------------
-//  ROM( c1541pdc )
-//-------------------------------------------------
-
-ROM_START( c1541pdc )
-	ROM_REGION( 0x8000, M6502_TAG, 0 )
-	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
-	ROM_LOAD( "kernal.bin", 0x4000, 0x4000, CRC(79032ed5) SHA1(0ca4d5ef41c7e3d18d8945476d1481573af3e27c) )
-
-	ROM_REGION( 0x2000, "mmu", 0 )
-	ROM_LOAD( "mmu.bin", 0x0000, 0x2000, CRC(4c41392c) SHA1(78846af2ee6a56fceee44f9246659685ab2cbb7e) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *c1541_prologic_dos_classic_device::device_rom_region() const
-{
-	return ROM_NAME( c1541pdc );
 }
 
 
@@ -384,154 +275,6 @@ const tiny_rom_entry *msd_sd2_device::device_rom_region() const
 }
 
 
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t c1541_prologic_dos_classic_device::read()
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void c1541_prologic_dos_classic_device::write(uint8_t data)
-{
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( c1541pdc_mem )
-//-------------------------------------------------
-
-void c1541_prologic_dos_classic_device::c1541pdc_mem(address_map &map)
-{
-	map(0x0000, 0xffff).rw(FUNC(c1541_prologic_dos_classic_device::read), FUNC(c1541_prologic_dos_classic_device::write));
-/*  map(0x0000, 0x07ff).mirror(0x6000).ram().share("share1");
-    map(0x1800, 0x180f).mirror(0x63f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
-    map(0x1c00, 0x1c0f).mirror(0x63f0).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
-    map(0x8000, 0x87ff).ram().share("share1");
-    map(0x8800, 0x9fff).ram();
-    map(0xa000, 0xb7ff).rom().region(M6502_TAG, 0x0000);
-    map(0xb800, 0xb80f).rw(FUNC(c1541_prologic_dos_classic_device::pia_r), FUNC(c1541_prologic_dos_classic_device::pia_w));
-    map(0xf000, 0xffff).rom().region(M6502_TAG, 0x2000);*/
-}
-
-
-uint8_t c1541_prologic_dos_classic_device::pia_r(offs_t offset)
-{
-	return m_pia->read((offset >> 2) & 0x03);
-}
-
-void c1541_prologic_dos_classic_device::pia_w(offs_t offset, uint8_t data)
-{
-	m_pia->write((offset >> 2) & 0x03, data);
-}
-
-void c1541_prologic_dos_classic_device::pia_pa_w(uint8_t data)
-{
-	/*
-
-	    bit     description
-
-	    0       1/2 MHz
-	    1
-	    2
-	    3       35/40 tracks
-	    4
-	    5
-	    6
-	    7       Hi
-
-	*/
-}
-
-uint8_t c1541_prologic_dos_classic_device::pia_pb_r()
-{
-	return m_parallel_data;
-}
-
-void c1541_prologic_dos_classic_device::pia_pb_w(uint8_t data)
-{
-	m_parallel_data = data;
-
-	m_cent_data_out->write(data);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( c1541dd_mem )
-//-------------------------------------------------
-
-void c1541_dolphin_dos_device::c1541dd_mem(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
-	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
-	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xffff).rom().region(M6502_TAG, 0x2000);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( c1541pd_mem )
-//-------------------------------------------------
-
-void c1541_professional_dos_v1_device::c1541pd_mem(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
-	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
-	map(0x8000, 0x9fff).rom().region(M6502_TAG, 0x4000);
-	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xffff).rom().region(M6502_TAG, 0x0000);
-}
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void c1541_dolphin_dos_device::device_add_mconfig(machine_config &config)
-{
-	c1541_device_base::device_add_mconfig(config);
-	
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_dolphin_dos_device::c1541dd_mem);
-}
-
-
-void c1541_professional_dos_v1_device::device_add_mconfig(machine_config &config)
-{
-	c1541_device_base::device_add_mconfig(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_professional_dos_v1_device::c1541pd_mem);
-}
-
-
-void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &config)
-{
-	c1541_device_base::device_add_mconfig(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_prologic_dos_classic_device::c1541pdc_mem);
-
-	PIA6821(config, m_pia);
-	m_pia->readpb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_r));
-	m_pia->writepa_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pa_w));
-	m_pia->writepb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_w));
-	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
-
-	centronics_device &centronics(CENTRONICS(config, CENTRONICS_TAG, centronics_devices, "printer"));
-	centronics.ack_handler().set(MC6821_TAG, FUNC(pia6821_device::ca1_w));
-
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	centronics.set_output_latch(cent_data_out);
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -558,43 +301,6 @@ fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_
 
 csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: c1541_device_base(mconfig, CSD1, tag, owner, clock) { }
-
-
-//-------------------------------------------------
-//  c1541_dolphin_dos_device - constructor
-//-------------------------------------------------
-
-c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, C1541_DOLPHIN_DOS, tag, owner, clock) {  }
-
-
-//-------------------------------------------------
-//  c1541_turbotrans_device - constructor
-//-------------------------------------------------
-
-c1541_turbotrans_device::c1541_turbotrans_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, C1541_TURBOTRANS, tag, owner, clock) { }
-
-
-//-------------------------------------------------
-//  c1541_professional_dos_v1_device - constructor
-//-------------------------------------------------
-
-c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, C1541_PROFESSIONAL_DOS_V1, tag, owner, clock) {  }
-
-
-//-------------------------------------------------
-//  c1541_prologic_dos_classic_device - constructor
-//-------------------------------------------------
-
-c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, C1541_PROLOGIC_DOS_CLASSIC, tag, owner, clock),
-		m_pia(*this, MC6821_TAG),
-		m_cent_data_out(*this, "cent_data_out"),
-		m_mmu_rom(*this, "mmu")
-{
-}
 
 
 //-------------------------------------------------
