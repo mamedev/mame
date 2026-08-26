@@ -21,9 +21,10 @@
 #include "dfac2.h"
 #include "djmemc.h"
 #include "iosb.h"
-#include "macadb.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -52,7 +53,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_memcjr(*this, "memcjr"),
 		m_primetime(*this, "primetime"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_cuda(*this, "cuda"),
 		m_dfac2(*this, "dfac2"),
 		m_scc(*this, "scc"),
@@ -76,7 +77,7 @@ private:
 	required_device<m68000_musashi_device> m_maincpu;
 	required_device<memcjr_device> m_memcjr;
 	required_device<primetime_device> m_primetime;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<cuda_device> m_cuda;
 	required_device<dfac2_device> m_dfac2;
 	required_device<z80scc_device> m_scc;
@@ -205,17 +206,19 @@ void quadra605_state::macqd605(machine_config &config)
 	m_ncr1->irq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_irq_w));
 	m_ncr1->drq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_drq_w));
 
-	MACADB(config, m_macadb, C15M);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0788");
 	m_cuda->reset_callback().set(FUNC(quadra605_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_primetime, FUNC(primetime_device::cb1_w));
 	m_cuda->via_data_callback().set(m_primetime, FUNC(primetime_device::cb2_w));
 	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	APPLE_DFAC2(config, m_dfac2, 22257);

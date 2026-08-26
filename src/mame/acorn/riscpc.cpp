@@ -6,8 +6,7 @@
     Acorn RiscPC line of computers
 
     TODO:
-    - IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about
-      which uses what;
+    - A7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
     - PS/2 keyboard doesn't work properly;
     - Fix pendingUnd fatalerror from ARM7 core;
     - Fix pendingAbtD fatalerror for RiscOS 4.xx;
@@ -15,13 +14,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
 #include "machine/i2cmem.h"
-#include "machine/at_keybc.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -38,9 +36,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
+		, m_kbdc(*this, "kbdc")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
-		, m_kbdc(*this, "kbdc")
 		, m_mouse(*this, "MOUSE")
 	{ }
 
@@ -56,10 +54,10 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
-	required_device<arm7500fe_iomd_device> m_iomd;
+	required_device<arm_iomd_device> m_iomd;
+	required_device<pc_kbdc_device> m_kbdc;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
-	required_device<ps2_keyboard_controller_device> m_kbdc;
 	required_ioport m_mouse;
 
 	virtual void machine_reset() override ATTR_COLD;
@@ -109,7 +107,7 @@ void riscpc_state::a7000_map(address_map &map)
 //  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
 	map(0x03310000, 0x03310003).portr(m_mouse);
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
@@ -165,21 +163,11 @@ void riscpc_state::base_config(machine_config &config)
 {
 	I2C_24C02(config, m_i2cmem);
 
-	// TODO: verify type
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101));
-	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
-
 	// auxiliary connector
 //  pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 //  aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 //  aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
-	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	m_kbdc->hot_res().set(m_iomd, FUNC(arm_iomd_device::keyboard_reset));
-	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(m_iomd, FUNC(arm_iomd_device::keyboard_irq));
 //  m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 //  m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 //  m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
@@ -194,21 +182,27 @@ void riscpc_state::base_config(machine_config &config)
 
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
-	m_iomd->set_kbdc_tag(m_kbdc);
 	m_iomd->iocr_read_od<0>().set(FUNC(riscpc_state::iocr_od0_r));
 	m_iomd->iocr_read_od<1>().set(FUNC(riscpc_state::iocr_od1_r));
 	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));
 	m_iomd->iocr_write_od<1>().set(FUNC(riscpc_state::iocr_od1_w));
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+	m_iomd->kclk_cb().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_iomd->kdata_cb().set(m_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+
+	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_kbdc->out_clock_cb().set(m_iomd, FUNC(arm_iomd_device::kclk_w));
+	m_kbdc->out_data_cb().set(m_iomd, FUNC(arm_iomd_device::kdata_w));
 }
 
 void riscpc_state::rpc600(machine_config &config)
 {
 	constexpr XTAL cpuxtal(60_MHz_XTAL/2);
 
-	ARM7(config, m_maincpu, cpuxtal); // really ARM610
+	ARM610(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -218,7 +212,7 @@ void riscpc_state::rpc700(machine_config &config)
 	ARM710A(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -249,10 +243,10 @@ void riscpc_state::sarpc(machine_config &config)
 	// TODO: ranges from 160 to 233 MHz
 	constexpr XTAL cpuxtal(200'000'000);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -261,10 +255,10 @@ void riscpc_state::sarpc_j233(machine_config &config)
 	// TODO: 233 MHz, unsupported by xtal module
 	constexpr XTAL cpuxtal(200'000'000);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 

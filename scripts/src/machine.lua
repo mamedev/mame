@@ -5716,3 +5716,15 @@ if MACHINES["QUADMOUSE"] then
 		MAME_DIR .. "src/devices/machine/quadmouse.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/at_ssrt.h,MACHINES["AT_SSRT"] = true
+---------------------------------------------------
+
+if MACHINES["AT_SSRT"] then
+	files {
+		MAME_DIR .. "src/devices/machine/at_ssrt.cpp",
+		MAME_DIR .. "src/devices/machine/at_ssrt.h",
+	}
+end

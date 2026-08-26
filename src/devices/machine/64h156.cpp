@@ -10,13 +10,9 @@
 
     TODO:
 
-    http://personalpages.tds.net/~rcarlsen/cbm/1541/1541%20EARLY/1540-2.GIF
-
-    - write protect
-    - separate read/write methods
     - cycle exact VIA
     - get these running and we're golden
-        - Bounty Bob Strikes Back (aligned halftracks)
+        + Bounty Bob Strikes Back (aligned halftracks)
         - Quiwi (speed change within track)
         - Defender of the Crown (V-MAX! v2, density checks)
         - Test Drive / Cabal (HLS, sub-cycle jitter)
@@ -62,6 +58,7 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_write_byte(*this),
 	m_floppy(nullptr),
 	m_mtr(1),
+	m_disabled(false),
 	m_accl(0),
 	m_stp(0),
 	m_ds(0),
@@ -89,6 +86,7 @@ void c64h156_device::device_start()
 
 	// register for state saving
 	save_item(NAME(m_mtr));
+	save_item(NAME(m_disabled));
 	save_item(NAME(m_accl));
 	save_item(NAME(m_stp));
 	save_item(NAME(m_ds));
@@ -157,14 +155,18 @@ void c64h156_device::live_start()
 
 void c64h156_device::checkpoint()
 {
-	get_next_edge(machine().time());
+	if (cur_live.oe) {
+		get_next_edge(machine().time());
+	}
 	checkpoint_live = cur_live;
 }
 
 void c64h156_device::rollback()
 {
 	cur_live = checkpoint_live;
-	get_next_edge(cur_live.tm);
+	if (cur_live.oe) {
+		get_next_edge(cur_live.tm);
+	}
 }
 
 void c64h156_device::start_writing(const attotime &tm)
@@ -187,7 +189,7 @@ bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 	if(etime > limit)
 		return true;
 
-	if(bit && m_floppy) {
+	if(bit && m_floppy && !m_floppy->wpt_r()) {
 		m_floppy->write_flux_change(cur_live.tm - m_period);
 		cur_live.write_transition_count++;
 	}
@@ -268,6 +270,9 @@ void c64h156_device::live_run(const attotime &limit)
 			if (cur_live.tm > limit)
 				return;
 
+			if ((cur_live.tm + m_period) > limit)
+				return;
+
 			int bit = get_next_bit(cur_live.tm, limit);
 			if(bit < 0)
 				return;
@@ -299,7 +304,7 @@ void c64h156_device::live_run(const attotime &limit)
 					syncpoint = true;
 				}
 
-				if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) { // TODO WPS
+				if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) {
 					write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
 				}
 
@@ -349,8 +354,6 @@ void c64h156_device::live_run(const attotime &limit)
 			}
 
 			if (syncpoint) {
-				commit(cur_live.tm);
-
 				cur_live.tm += m_period;
 				live_delay(RUNNING_SYNCPOINT);
 				return;
@@ -374,11 +377,15 @@ void c64h156_device::live_run(const attotime &limit)
 
 void c64h156_device::get_next_edge(const attotime &when)
 {
+	if (m_disabled) return;
 	cur_live.edge = m_floppy->get_next_transition(when);
 }
 
 int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 {
+	if (!cur_live.oe)
+		return 0;
+
 	int bit = 0;
 	if (!cur_live.edge.is_never())
 	{
@@ -499,7 +506,7 @@ void c64h156_device::mtr_w(int state)
 		checkpoint();
 
 		if (m_mtr) {
-			if(cur_live.state == IDLE) {
+			if (!m_disabled && cur_live.state == IDLE) {
 				live_start();
 			}
 		} else {
@@ -507,6 +514,32 @@ void c64h156_device::mtr_w(int state)
 		}
 
 		live_run();
+	}
+}
+
+
+//-------------------------------------------------
+//  disable - enable/disable access to the floppy
+//  image (used when an external FDC has taken
+//  control of the drive, e.g. WD1770 in the 1571)
+//-------------------------------------------------
+
+void c64h156_device::disable(int state)
+{
+	bool disabled = !state;
+
+	if (m_disabled != disabled)
+	{
+		live_sync();
+		LOG("%s DISABLE %u\n", machine().time().as_string(), disabled);
+
+		if (disabled) {
+			live_abort();
+			m_disabled = disabled;
+		} else if (m_mtr && cur_live.state == IDLE) {
+			m_disabled = disabled;
+			live_start();
+		}
 	}
 }
 

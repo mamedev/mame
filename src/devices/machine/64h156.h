@@ -99,6 +99,7 @@ public:
 	void ds_w(int ds);
 
 	void set_floppy(floppy_image_device *floppy);
+	void disable(int state);
 
 protected:
 	// device-level overrides
@@ -148,6 +149,7 @@ private:
 	floppy_image_device *m_floppy;
 
 	int m_mtr;
+	bool m_disabled;
 	int m_accl;
 	int m_stp;
 	int m_ds;

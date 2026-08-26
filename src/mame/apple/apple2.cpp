@@ -913,12 +913,16 @@ ROM_START(apple2pe)
 	ROM_LOAD ( "videx lower case chip rom.bin", 0x0000, 0x0800, CRC(00f68076) SHA1(447874fe0850c8add3fd5b13fa98f6648fe6f999))
 
 	ROM_REGION(0x4000, "maincpu", ROMREGION_LE)
+	ROM_SYSTEM_BIOS(0, "autostart", "Autostart Monitor (original)") // some software refuses to run on modified versions
+	ROM_SYSTEM_BIOS(1, "videx", "Autostart Monitor (modified for lowercase input)")
+	ROM_DEFAULT_BIOS("videx")
 	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
 	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
 	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
-	ROM_LOAD ( "monitor.bin", 0x3800, 0x0800, CRC(65d726d3) SHA1(2186b371b96fc279338fe67c5e351438d86f4f7f)) // Autostart ROM patched as described on p. A-4 of Enhancer ][ manual
+	ROMX_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098), ROM_BIOS(0))
+	ROMX_LOAD ( "monitor.bin", 0x3800, 0x0800, CRC(65d726d3) SHA1(2186b371b96fc279338fe67c5e351438d86f4f7f), ROM_BIOS(1)) // Autostart ROM patched as described on p. A-4 of Enhancer ][ manual
 ROM_END
 
 ROM_START(ace1000)

@@ -221,14 +221,14 @@ Commodore CDTV Front Panel
 				<bounds left="748" top="615" right="773" bottom="627" />
 			</element>
 
-			<element ref="button" inputtag="frontpanel_kst2" inputmask="0x01">
+			<element ref="button" inputtag="frontpanel_kst3" inputmask="0x01">
 				<bounds left="612" top="668" right="647" bottom="690" />
 			</element>
 			<element ref="text_bw">
 				<bounds left="617" top="673" right="642" bottom="685" />
 			</element>
 
-			<element ref="button" inputtag="frontpanel_kst3" inputmask="0x01">
+			<element ref="button" inputtag="frontpanel_kst2" inputmask="0x01">
 				<bounds left="655" top="668" right="690" bottom="690" />
 			</element>
 			<element ref="text_fw">

@@ -943,7 +943,7 @@ void ppc_device::static_generate_tlb_mismatch()
 	if (!(m_cap & PPCCAP_603_MMU))
 	{
 		// an ISI reports its fault reason in SRR1 (passed as the exception parameter)
-		UML_MOV(block, mem(&m_core->param1), 0);                            // always a read here
+		UML_MOV(block, mem(&m_core->param1), TR_FETCH);                     // this was an instruction fetch
 		UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                     // get reason to param1
 		UML_MOV(block, I0, mem(&m_core->param1));                           // mov i0, [param1]
 		UML_AND(block, I0, I0, DSISR_NOT_FOUND | DSISR_PROTECTED);          // keep the SRR1 ISI reason bits
@@ -2591,10 +2591,13 @@ void ppc_device::generate_branch(drcuml_block &block, compiler_state *compiler, 
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, uml::mem(srcptr), true);    // <subtract cycles>
-
-		// clear two LSBs of the target address to prevent branching to an invalid address
-		UML_AND(block, I0, mem(srcptr), 0xFFFFFFFC);      // and i0, 0xFFFFFFFC
+		// The low two bits of LR/CTR are ignored when they are used as a branch target.  Clear
+		// them before the target is used as the next PC anywhere: an interrupt delivered here
+		// (SRR0) or an out-of-cycles exit would otherwise resume at the unmasked address and
+		// execute from an odd PC.  Mac OS X 10.1 and later lean heavily on this. (possibly stashing
+		// data in those low bits?)
+		UML_AND(block, I0, mem(srcptr), 0xFFFFFFFC);      // and     i0,[src],0xFFFFFFFC
+		generate_update_cycles(block, &compiler_temp, uml::I0, true);                  // <subtract cycles>
 		UML_HASHJMP(block, m_core->mode, I0, *m_nocode);  // hashjmp <mode>,i0,nocode
 	}
 
@@ -3152,18 +3155,20 @@ bool ppc_device::generate_instruction_13(drcuml_block &block, compiler_state *co
 				UML_MOV(block, MSR32, SPR32(SPR4XX_SRR1));                                  // mov     [msr],[srr1]
 			generate_update_mode(block);                                               // <update mode>
 			compiler->checkints = true;
-			generate_update_cycles(block, compiler, SPR32(SPROEA_SRR0), true);         // <subtract cycles>
-			UML_HASHJMP(block, mem(&m_core->mode), SPR32(SPROEA_SRR0), *m_nocode);
+			UML_AND(block, I0, SPR32(SPROEA_SRR0), 0xFFFFFFFC);                         // and     i0,[srr0],0xFFFFFFFC ; rfi ignores SRR0[30:31]
+			generate_update_cycles(block, compiler, uml::I0, true);                         // <subtract cycles>
+			UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);
 																							// hashjmp mode,[srr0],nocode
 			return true;
 
 		case 0x033:  // RFCI
 			assert(m_cap & PPCCAP_4XX);
 			UML_MOV(block, MSR32, SPR32(SPR4XX_SRR3));                                      // mov     [msr],[srr3]
-			generate_update_mode(block);                                               // <update mode>
+			generate_update_mode(block);                                                    // <update mode>
 			compiler->checkints = true;
-			generate_update_cycles(block, compiler, SPR32(SPR4XX_SRR2), true);         // <subtract cycles>
-			UML_HASHJMP(block, mem(&m_core->mode), SPR32(SPR4XX_SRR2), *m_nocode);
+			UML_AND(block, I0, SPR32(SPR4XX_SRR2), 0xFFFFFFFC);                             // and     i0,[srr2],0xFFFFFFFC ; rfci ignores SRR2[30:31]
+			generate_update_cycles(block, compiler, uml::I0, true);                         // <subtract cycles>
+			UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);
 																							// hashjmp mode,[srr2],nocode
 			return true;
 
@@ -4296,6 +4301,21 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			}
 			generate_update_mode(block);                                        // <update mode>
 			compiler->checkints = true;                                         // mtmsr can enable MSR[EE] so recheck pending interrupts
+			if (m_cap & PPCCAP_OEA)
+			{
+				// Setting MSR[POW] enters nap/doze/sleep: instruction fetch stops until an
+				// exception is taken (which clears POW again).  Used by the OS X idle task.
+				uml::code_label const nosleep = compiler->labelnum++;
+				UML_TEST(block, MSR32, MSROEA_POW);                             // test    msr,POW
+				UML_JMPc(block, COND_Z, nosleep);                               // jmp     nosleep,z
+				UML_TEST(block, mem(&m_core->irq_pending), ~uint32_t(0));       // test    [irq_pending],~0
+				UML_JMPc(block, COND_NZ, nosleep);                              // jmp     nosleep,nz
+				UML_MOV(block, mem(&m_core->pc), desc->pc);                     // mov     [pc],desc->pc
+				save_fast_iregs(block);                                         // <save fastregs>
+				UML_MOV(block, mem(&m_core->icount), 0);                        // mov     [icount],0
+				UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                         // exit    EXECUTE_OUT_OF_CYCLES
+				UML_LABEL(block, nosleep);                                      // nosleep:
+			}
 			return true;
 
 		case 0x1d3:  // MTSPR

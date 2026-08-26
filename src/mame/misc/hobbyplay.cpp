@@ -28,10 +28,11 @@ various TTL chips
 */
 
 #include "emu.h"
-#include "emupal.h"
-#include "speaker.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+
+#include "speaker.h"
 
 
 namespace {
@@ -39,13 +40,13 @@ namespace {
 class hobbyplay_state : public driver_device
 {
 public:
-	hobbyplay_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hobbyplay_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{
 	}
 
-	void hobbyplay(machine_config &config);
+	void hobbyplay(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

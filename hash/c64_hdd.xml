@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="c64_hdd" description="Commodore 64 hard disks">
+
+	<software name="minichief">
+		<description>ICT Mini Chief MC-20</description>
+		<year>1987</year>
+		<publisher>InConTrol</publisher>
+
+		<!-- Seagate ST225 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="minichief" sha1="c5146009a240841f816e65c218e8d43b68931c28" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

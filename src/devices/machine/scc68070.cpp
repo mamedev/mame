@@ -355,10 +355,9 @@ void scc68070_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void scc68070_device::device_reset()
-{
-	scc68070_base_device::device_reset();
 
+void scc68070_device::reset_peripheral_state()
+{
 	m_lir = 0;
 
 	m_picr1 = 0;
@@ -420,11 +419,19 @@ void scc68070_device::device_reset()
 		m_mmu.desc[index].base = 0;
 	}
 
-	update_ipl();
-
 	m_uart.rx_timer->adjust(attotime::never);
 	m_uart.tx_timer->adjust(attotime::never);
+	m_i2c.timer->adjust(attotime::never);
+
 	set_timer_callback(0);
+	update_ipl();
+}
+
+void scc68070_device::device_reset()
+{
+	scc68070_base_device::device_reset();
+
+	reset_peripheral_state();
 }
 
 
@@ -439,43 +446,7 @@ void scc68070_device::device_config_complete()
 void scc68070_device::reset_peripherals(int state)
 {
 	if (state)
-	{
-		m_lir = 0;
-
-		m_picr1 = 0;
-		m_picr2 = 0;
-		m_timer_int = false;
-		m_i2c_int = false;
-		m_uart_rx_int = false;
-		m_uart_tx_int = false;
-
-		m_i2c.status_register = ISR_PIN;
-		m_i2c.control_register = 0;
-		m_i2c.clock_control_register = 0;
-		m_i2c.scl_out_state = true;
-		m_i2c.scl_in_state = true;
-		m_i2c.sda_out_state = true;
-		m_i2c.state = I2C_IDLE;
-		m_i2c.clock_change_state = I2C_SCL_IDLE;
-		m_i2c.clocks = 0;
-		m_uart.command_register = 0;
-		m_uart.receive_pointer = -1;
-		m_uart.transmit_pointer = -1;
-
-		m_uart.mode_register = 0;
-		m_uart.status_register = USR_TXRDY;
-		m_uart.clock_select = 0;
-
-		m_timers.timer_status_register = 0;
-		m_timers.timer_control_register = 0;
-
-		m_uart.rx_timer->adjust(attotime::never);
-		m_uart.tx_timer->adjust(attotime::never);
-		m_timers.timer0_timer->adjust(attotime::never);
-		m_i2c.timer->adjust(attotime::never);
-
-		update_ipl();
-	}
+		reset_peripheral_state();
 }
 
 void scc68070_device::update_ipl()
@@ -609,7 +580,7 @@ uint8_t scc68070_device::iack_r(offs_t offset)
 			m_uart_tx_int = false;
 			update_ipl();
 		}
-		else if (m_i2c_int && offset == ((m_picr2 >> 4) & 7))
+		else if (m_i2c_int && offset == ((m_picr1 >> 4) & 7))
 		{
 			m_i2c_int = false;
 			update_ipl();

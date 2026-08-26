@@ -790,7 +790,8 @@ void lua_engine::on_machine_presave()
 void lua_engine::on_machine_postload()
 {
 	// clear waiting tasks
-	m_timer->reset();
+	if (m_timer)
+		m_timer->reset();
 	std::vector<int> expired;
 	expired.reserve(m_waiting_tasks.size());
 	for (auto const &waiting : m_waiting_tasks)
@@ -938,6 +939,9 @@ void lua_engine::initialize()
 						luaL_error(s, "waiting duration must be attotime or number");
 					delay = attotime::from_double(*seconds);
 				}
+				if (!m_timer)
+					luaL_error(s, "cannot wait outside a running machine");
+
 				attotime const expiry = machine().time() + delay;
 
 				int const ret = lua_pushthread(s);

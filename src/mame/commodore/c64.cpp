@@ -1599,6 +1599,7 @@ void c64_state::ntsc(machine_config &config)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("NTSC");
 	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("NTSC");
 	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter("NTSC");
+	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1773,6 +1774,7 @@ void c64_state::pal(machine_config &config)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("PAL");
 	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("PAL");
 	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter("PAL");
+	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -2012,6 +2014,8 @@ ROM_START( c64 )
 	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(28) )
 	ROM_SYSTEM_BIOS(29, "mercury31s", "Mercury-ROM v3.1s" )
 	ROMX_LOAD( "mercury31s.u4", 0x0000, 0x2000, CRC(97aa5d2f) SHA1(9fc653e61c34225245036f266db14e05feeadb21), ROM_BIOS(29) )
+	ROM_SYSTEM_BIOS(30, "rapidos", "RapiDOS Professional 2.0" )
+	ROMX_LOAD( "rapidos_pro_20_kernal.u4", 0x0000, 0x2000, CRC(bb2bdf0e) SHA1(f47456ef5f9336ac6529131d546a5ce873cb780f), ROM_BIOS(30) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )

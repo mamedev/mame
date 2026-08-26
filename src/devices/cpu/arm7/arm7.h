@@ -240,6 +240,8 @@ protected:
 	virtual uint32_t arm7_cpu_read16(offs_t addr);
 	virtual uint8_t arm7_cpu_read8(offs_t addr);
 
+	virtual uint32_t insn_fetch_word(offs_t addr) { return m_pr32(addr); }
+
 	// Coprocessor support
 	void arm7_do_callback(uint32_t data);
 	virtual uint32_t arm7_rt_r_callback(offs_t offset);
@@ -381,6 +383,13 @@ public:
 	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class arm610_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	arm610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class arm710t_cpu_device : public arm7_cpu_device
 {
 public:
@@ -423,6 +432,8 @@ public:
 	virtual uint32_t arm7_cpu_read32(offs_t addr) override;
 	virtual uint32_t arm7_cpu_read16(offs_t addr) override;
 	virtual uint8_t arm7_cpu_read8(offs_t addr) override;
+
+	virtual uint32_t insn_fetch_word(offs_t addr) override;
 
 protected:
 	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -489,6 +500,13 @@ public:
 	pxa270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class sa110_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	sa110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class sa1100_cpu_device : public arm7_cpu_device
 {
 public:
@@ -505,6 +523,7 @@ public:
 
 DECLARE_DEVICE_TYPE(ARM7,         arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device)
+DECLARE_DEVICE_TYPE(ARM610,       arm610_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device)
@@ -516,6 +535,7 @@ DECLARE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device)
 DECLARE_DEVICE_TYPE(PXA250,       pxa250_cpu_device)
 DECLARE_DEVICE_TYPE(PXA255,       pxa255_cpu_device)
 DECLARE_DEVICE_TYPE(PXA270,       pxa270_cpu_device)
+DECLARE_DEVICE_TYPE(SA110,        sa110_cpu_device)
 DECLARE_DEVICE_TYPE(SA1100,       sa1100_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,       sa1110_cpu_device)
 DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)

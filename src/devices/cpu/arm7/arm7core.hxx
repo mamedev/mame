@@ -96,8 +96,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 	if (!m_pending_interrupt)
 		return;
 
-	uint32_t cpsr = m_r[eCPSR];   /* save current CPSR */
-	uint32_t pc = m_r[eR15] + 4;      /* save old pc (already incremented in pipeline) */;
+	uint32_t const cpsr = m_r[eCPSR];
+	uint32_t const pc = m_r[eR15] + 4;
 
 	/* Exception priorities:
 
@@ -110,17 +110,39 @@ void arm7_cpu_device::arm7_check_irq_state()
 	    Software Interrupt
 	*/
 
+	bool const prog32 = !(m_archFlags & ARCHFLAG_MODE26) || (COPRO_CTRL & COPRO_CTRL_PROG32);
+
+	auto const enter_exception = [this, cpsr, prog32] (uint32_t mode32, uint32_t mode26, uint32_t link, uint32_t vector, bool mask_fiq)
+	{
+		if (prog32)
+		{
+			// switch banks; leaving a 26-bit mode strips the PSR bits from R15
+			set_cpsr((cpsr & ~uint32_t(0x1f)) | SR_MODE32 | mode32);
+			if (!(cpsr & SR_MODE32))
+				link &= 0x03FFFFFC;         // R14 is a plain address in the 32-bit modes
+			SetRegister(14, link);
+			SetRegister(SPSR, cpsr);
+			set_cpsr((GET_CPSR | I_MASK | (mask_fiq ? F_MASK : 0)) & ~T_MASK);
+			R15 = vector | m_vectorbase;
+			if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST))
+				R15 |= 0xFFFF0000;
+		}
+		else
+		{
+			// switch to 26-bit mode
+			set_cpsr((cpsr & ~uint32_t(0x1f)) | mode26);
+			// R14 gets the return address with the interrupted code's PSR in bits 31:26 and 1:0
+			SetRegister(14, (link & 0x03FFFFFC) | (cpsr & 0xF0000000) | ((cpsr & (I_MASK | F_MASK)) << 20) | (cpsr & 3));
+			// fetch the vector in the new mode
+			R15 = (cpsr & 0xF0000000) | ((cpsr & F_MASK) << 20) | (mask_fiq ? 0x0C000000 : 0x08000000) | vector | mode26;
+			set_cpsr((GET_CPSR & 0x0FFFFF3F) | (R15 & 0xF0000000) | ((R15 & 0x0C000000) >> 20));
+		}
+	};
+
 	// Data Abort
 	if (m_pendingAbtD)
 	{
-		if (MODE26) fatalerror("ARM7: pendingAbtD (todo)\n");
-		SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
-		SetRegister(14, pc - 8 + 8);                   /* save PC to R14 */
-		SetRegister(SPSR, cpsr);               /* Save current CPSR */
-		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
-		set_cpsr(GET_CPSR & ~T_MASK);
-		R15 = 0x10;                             /* IRQ Vector address */
-		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
+		enter_exception(eARM7_MODE_ABT, eARM7_MODE_SVC, pc, 0x10, false);   // R14 = aborted instruction + 8
 		m_pendingAbtD = false;
 		update_irq_state();
 		return;
@@ -130,15 +152,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 	if (m_pendingFiq && (cpsr & F_MASK) == 0)
 	{
 		standard_irq_callback(ARM7_FIRQ_LINE, pc);
-		if (MODE26) fatalerror("pendingFiq (todo)\n");
-		SwitchMode(eARM7_MODE_FIQ);             /* Set FIQ mode so PC is saved to correct R14 bank */
-		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
-		SetRegister(SPSR, cpsr);               /* Save current CPSR */
-		set_cpsr(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
-		set_cpsr(GET_CPSR & ~T_MASK);
-		R15 = 0x1c;                             /* IRQ Vector address */
-		R15 |= m_vectorbase;
-		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
+		enter_exception(eARM7_MODE_FIQ, eARM7_MODE_FIQ, pc, 0x1c, true);    // R14 = next instruction + 4
 		return;
 	}
 
@@ -146,38 +160,14 @@ void arm7_cpu_device::arm7_check_irq_state()
 	if (m_pendingIrq && (cpsr & I_MASK) == 0)
 	{
 		standard_irq_callback(ARM7_IRQ_LINE, pc);
-		SwitchMode(eARM7_MODE_IRQ);             /* Set IRQ mode so PC is saved to correct R14 bank */
-		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
-		if (MODE32)
-		{
-			SetRegister(SPSR, cpsr);               /* Save current CPSR */
-			set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
-			set_cpsr(GET_CPSR & ~T_MASK);
-			R15 = 0x18;                             /* IRQ Vector address */
-		}
-		else
-		{
-			uint32_t temp;
-			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x18 | 0x00000002 /* IRQ */ | 0x08000000 /* I */;
-			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
-			set_cpsr(temp);            /* Mask IRQ */
-		}
-		R15 |= m_vectorbase;
-		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
+		enter_exception(eARM7_MODE_IRQ, eARM7_MODE_IRQ, pc, 0x18, false);   // R14 = next instruction + 4
 		return;
 	}
 
 	// Prefetch Abort
 	if (m_pendingAbtP)
 	{
-		if (MODE26) fatalerror("pendingAbtP (todo)\n");
-		SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
-		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
-		SetRegister(SPSR, cpsr);               /* Save current CPSR */
-		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
-		set_cpsr(GET_CPSR & ~T_MASK);
-		R15 = 0x0c | m_vectorbase;                             /* IRQ Vector address */
-		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
+		enter_exception(eARM7_MODE_ABT, eARM7_MODE_SVC, pc, 0x0c, false);   // R14 = aborted instruction + 4
 		m_pendingAbtP = false;
 		update_irq_state();
 		return;
@@ -186,22 +176,9 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// Undefined instruction
 	if (m_pendingUnd)
 	{
-		if (MODE26) printf("ARM7: pendingUnd (todo)\n");
-		SwitchMode(eARM7_MODE_UND);             /* Set UND mode so PC is saved to correct R14 bank */
 		// compensate for prefetch (should this also be done for normal IRQ?)
-		if (T_IS_SET(GET_CPSR))
-		{
-			SetRegister(14, pc - 4 + 2);         /* save PC to R14 */
-		}
-		else
-		{
-			SetRegister(14, pc - 4 + 4 - 4);           /* save PC to R14 */
-		}
-		SetRegister(SPSR, cpsr);               /* Save current CPSR */
-		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
-		set_cpsr(GET_CPSR & ~T_MASK);
-		R15 = 0x04 | m_vectorbase;                             /* IRQ Vector address */
-		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
+		uint32_t const link = T_IS_SET(cpsr) ? (pc - 4 + 2) : (pc - 4 + 4 - 4);
+		enter_exception(eARM7_MODE_UND, eARM7_MODE_SVC, link, 0x04, false);
 		m_pendingUnd = false;
 		update_irq_state();
 		return;
@@ -210,32 +187,9 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// Software Interrupt
 	if (m_pendingSwi)
 	{
-		SwitchMode(eARM7_MODE_SVC);             /* Set SVC mode so PC is saved to correct R14 bank */
 		// compensate for prefetch (should this also be done for normal IRQ?)
-		if (T_IS_SET(GET_CPSR))
-		{
-			SetRegister(14, pc - 4 + 2);         /* save PC to R14 */
-		}
-		else
-		{
-			SetRegister(14, pc - 4 + 4);           /* save PC to R14 */
-		}
-		if (MODE32)
-		{
-			SetRegister(SPSR, cpsr);               /* Save current CPSR */
-			set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
-			set_cpsr(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
-			R15 = 0x08;                             /* Jump to the SWI vector */
-		}
-		else
-		{
-			uint32_t temp;
-			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x08 | 0x00000003 /* SVC */ | 0x08000000 /* I */;
-			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
-			set_cpsr(temp);            /* Mask IRQ */
-		}
-		R15 |= m_vectorbase;
-		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
+		uint32_t const link = T_IS_SET(cpsr) ? (pc - 4 + 2) : (pc - 4 + 4);
+		enter_exception(eARM7_MODE_SVC, eARM7_MODE_SVC, link, 0x08, false);
 		m_pendingSwi = false;
 		update_irq_state();
 		return;

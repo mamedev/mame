@@ -507,6 +507,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/c1571_dsk.h,FORMATS["C1571_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "C1571_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/c1571_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/c1571_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/c4040_dsk.h,FORMATS["C4040_DSK"] = true
 --------------------------------------------------
 

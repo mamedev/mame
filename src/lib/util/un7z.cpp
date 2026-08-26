@@ -55,7 +55,7 @@ struct CFileInStream : public ISeekInStream
 		Seek = &CFileInStream::seek_static;
 	}
 
-	random_read::ptr    file;
+	random_read *       file = nullptr;
 	std::uint64_t       currfpos = 0;
 	std::uint64_t       length = 0;
 
@@ -124,14 +124,21 @@ private:
 class m7z_file_impl
 {
 public:
-	typedef std::unique_ptr<m7z_file_impl> ptr;
+	using ptr = std::unique_ptr<m7z_file_impl>;
 
 	m7z_file_impl(std::string &&filename) noexcept;
+
+	m7z_file_impl(random_read &file) noexcept
+		: m7z_file_impl(std::string())
+	{
+		m_archive_stream.file = &file;
+	}
 
 	m7z_file_impl(random_read::ptr &&file) noexcept
 		: m7z_file_impl(std::string())
 	{
-		m_archive_stream.file = std::move(file);
+		m_owned_file = std::move(file);
+		m_archive_stream.file = m_owned_file.get();
 	}
 
 	virtual ~m7z_file_impl()
@@ -238,6 +245,7 @@ private:
 	std::vector<char32_t>                   m_uchar_buf;
 	std::vector<char>                       m_utf8_buf;
 
+	util::random_read::ptr                  m_owned_file;
 	CFileInStream                           m_archive_stream;
 	CLookToRead2                            m_look_stream;
 	CSzArEx                                 m_db;
@@ -353,7 +361,10 @@ std::error_condition m7z_file_impl::initialize() noexcept
 		std::error_condition const err = osd_file::open(m_filename, OPEN_FLAG_READ, file, m_archive_stream.length);
 		if (err)
 			return err;
-		m_archive_stream.file = osd_file_read(std::move(file));
+		m_owned_file = osd_file_read(std::move(file));
+		if (!m_owned_file)
+			return std::errc::not_enough_memory;
+		m_archive_stream.file = m_owned_file.get();
 		osd_printf_verbose("un7z: opened archive file %s\n", m_filename);
 	}
 	else if (!m_archive_stream.length)
@@ -403,7 +414,8 @@ void m7z_file_impl::close(ptr &&archive) noexcept
 	{
 		// close the open files
 		osd_printf_verbose("un7z: closing archive file %s and sending to cache\n", archive->m_filename);
-		archive->m_archive_stream.file.reset();
+		archive->m_owned_file.reset();
+		archive->m_archive_stream.file = nullptr;
 
 		// find the first nullptr entry in the cache
 		std::lock_guard<std::mutex> guard(s_cache_mutex);
@@ -463,7 +475,8 @@ std::error_condition m7z_file_impl::decompress(void *buffer, std::size_t length)
 					m_filename, err.category().name(), err.value(), err.message());
 			return err;
 		}
-		m_archive_stream.file = osd_file_read(std::move(file));
+		m_owned_file = osd_file_read(std::move(file));
+		m_archive_stream.file = m_owned_file.get();
 		osd_printf_verbose("un7z: reopened archive file %s\n", m_filename);
 	}
 
@@ -633,6 +646,32 @@ std::error_condition archive_file::open_7z(std::string_view filename, ptr &resul
 		if (err)
 			return err;
 	}
+
+	// allocate the archive API wrapper
+	result.reset(new (std::nothrow) m7z_file_wrapper(std::move(newimpl)));
+	if (result)
+	{
+		return std::error_condition();
+	}
+	else
+	{
+		m7z_file_impl::close(std::move(newimpl));
+		return std::errc::not_enough_memory;
+	}
+}
+
+std::error_condition archive_file::open_7z(random_read &file, ptr &result) noexcept
+{
+	// ensure we start with a nullptr result
+	result.reset();
+
+	// allocate memory for the zip_file structure
+	m7z_file_impl::ptr newimpl(new (std::nothrow) m7z_file_impl(file));
+	if (!newimpl)
+		return std::errc::not_enough_memory;
+	auto const err = newimpl->initialize();
+	if (err)
+		return err;
 
 	// allocate the archive API wrapper
 	result.reset(new (std::nothrow) m7z_file_wrapper(std::move(newimpl)));

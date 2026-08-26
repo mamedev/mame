@@ -630,6 +630,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 
 	SPEAKER(config, "speaker", 2).front();
 

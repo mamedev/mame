@@ -3194,7 +3194,7 @@ Dragon Slayer/Ys 1: [SCSP] sound has several hiccups
 		<year>1998</year>
 		<publisher>JVC</publisher>
 		<notes><![CDATA[
-Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV [CD-Block]
+Sometimes corrupts sounds if left idle in attract, or fails loading the intro FMV, or throws a powerful corrupted BGM on title [CD-Block]
 Asteka II: requires [VDP1] sprite delay (cfr. main map scrolling)
 Not extensively tested
 ]]></notes>
@@ -4721,14 +4721,17 @@ Black screen, [CD-Block] crashes at startup (regression)
 		</part>
 	</software>
 
-	<!-- Identifying Logic Puzzle - Rainbow Town (Japan)... -->
-	<software name="logicpuz" supported="no">
-		<description>Logic Puzzle - Rainbow Town (Japan)</description>
+	<software name="logicpuz" supported="partial">
+		<description>Logic Puzzle Rainbow Town (Japan)</description>
 		<year>1996</year>
 		<publisher>Human</publisher>
+		<notes><![CDATA[
+[VDP2] Color Calculation bug in stage select when text is at bottom
+]]></notes>
 		<info name="serial" value="T-4303G"/>
 		<info name="release" value="19960223"/>
 		<info name="alt_title" value="ロジックパズル レインボータウン"/>
+		<info name="usage" value="Mouse compatible"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6914,7 +6917,7 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen after initial tree logo [CD-Block]
+Black screen after initial tree logo [CD-Block] fnum reject
 ]]></notes>
 		<info name="serial" value="GS-9051"/>
 		<info name="release" value="19960301"/>
@@ -7308,7 +7311,7 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Sonic World: has heavy [VDP2] ROZ performance
-Sonic 1: has [VDP1] [VDP2] priority issues, runs too slow, BGM eventually dies [CD-Block]
+Sonic 1: has [VDP1] [VDP2] priority issues, runs too slow
 TODO: test Sonic 2, 3 and Knuckles
 ]]></notes>
 		<info name="serial" value="GS-9147"/>
@@ -15671,6 +15674,7 @@ TODO: how to reload with [mouse]?
 		<notes><![CDATA[
 [CD-Block] attempts to playback a redbook on title screen, goes silent
 Heavy 3D corruption in gameplay [SCUDSP]
+Optional unsupported Mascon device
 ]]></notes>
 		<info name="serial" value="T-10317G"/>
 		<info name="release" value="19981001"/>
@@ -22683,6 +22687,7 @@ Has Nifty Serve option, [modem] support?
 		<info name="serial" value="T-21002G"/>
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="日灼けの想い出+姫くり"/>
+		<info name="usage" value="Mouse compatible"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -27679,14 +27684,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Body Special 264 Girls in Motion Puzzle Vol. 2 (Japan) [T-21003G]... -->
-	<software name="girlpuz2" supported="no">
+	<software name="girlpuz2" supported="partial">
 		<description>Body Special 264 - Girls in Motion Puzzle Vol. 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21003G"/>
 		<info name="release" value="19960802"/>
 		<info name="alt_title" value="ボディスペシャル264"/>
+		<info name="usage" value="Mouse compatible"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

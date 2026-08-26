@@ -34,6 +34,15 @@ public:
 
 	void set_address_space(address_space *space) { m_pci_memory = space; }
 	void set_width(int width) { m_width = width; }
+	// Mirror the device's DMA request line into one of the general-purpose
+	// ChannelStatus bits s7..s0 (Grand Central SCSI channels with a 53C9x
+	// attached show DReq in s5 for the classic SCSI Manager's use).
+	void set_drq_status_bit(int bit) { m_drq_status_bit = bit; }
+	// Drive one of the general-purpose ChannelStatus bits s7..s0 from a device
+	// output (the MESH's command done/exception/error lines on the O'Hare family's
+	// SCSI channel).  Channel programs can wait on and branch on these bits, and
+	// software can't change them.
+	void status_bit_w(int bit, int state);
 
 	void map(address_map &map) ATTR_COLD;
 
@@ -58,6 +67,11 @@ private:
 	int m_width;
 	int m_drq_state;
 	bool m_in_pump;
+	int m_drq_status_bit;
+	u8 m_hw_status_mask;
+	u8 m_hw_status;
+	bool m_waiting;
+	emu_timer *m_wake_timer;
 
 	devcb_read32 m_read_dma;
 	devcb_write32 m_write_dma;
@@ -78,6 +92,10 @@ private:
 	void fetch_command();
 	void process_commands();
 	void finish_command();
+	void complete_command();
+	bool wait_condition();
+	void check_wait();
+	TIMER_CALLBACK_MEMBER(wake_tick);
 	void pump();
 	int quad_size();
 	bool test_condition(u32 field, u32 select);

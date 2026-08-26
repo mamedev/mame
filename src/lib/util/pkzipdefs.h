@@ -60,6 +60,15 @@ struct pkzip_defs
 
 	static constexpr std::uint16_t EXTRA_NTFS_TAG_TIMES = 0x0001;
 
+	static constexpr std::uint16_t INT_ATTR_TEXT = 0x0001;
+
+	static constexpr std::uint32_t EXT_ATTR_FAT_READ_ONLY = 0x00000001;
+	static constexpr std::uint32_t EXT_ATTR_FAT_HIDDEN    = 0x00000002;
+	static constexpr std::uint32_t EXT_ATTR_FAT_SYSTEM    = 0x00000004;
+	static constexpr std::uint32_t EXT_ATTR_FAT_VOL_LABEL = 0x00000008;
+	static constexpr std::uint32_t EXT_ATTR_FAT_SUBDIR    = 0x00000010;
+	static constexpr std::uint32_t EXT_ATTR_FAT_ARCHIVE   = 0x00000020;
+
 	enum : unsigned
 	{
 		OFFS_LCL_HDR_SIG          = 0,
@@ -96,13 +105,30 @@ struct pkzip_defs
 
 		OFFS_ECD_SIG              = 0,
 		OFFS_ECD_THIS_DISK        = 4,
-		OFFS_ECD_CD_START         = 6,
+		OFFS_ECD_CD_START_DISK    = 6,
 		OFFS_ECD_THIS_ENTRIES     = 8,
 		OFFS_ECD_CD_ENTRIES       = 10,
 		OFFS_ECD_CD_SIZE          = 12,
 		OFFS_ECD_CD_OFFS          = 16,
 		OFFS_ECD_CMT_LEN          = 20,
 		OFFS_ECD_CMT              = 22,
+
+		OFFS_ECD64_SIG            = 0,
+		OFFS_ECD64_SIZE           = 4,
+		OFFS_ECD64_VER_CREATE     = 12,
+		OFFS_ECD64_VER_REQ        = 14,
+		OFFS_ECD64_THIS_DISK      = 16,
+		OFFS_ECD64_CD_START_DISK  = 20,
+		OFFS_ECD64_THIS_ENTRIES   = 24,
+		OFFS_ECD64_CD_ENTRIES     = 32,
+		OFFS_ECD64_CD_SIZE        = 40,
+		OFFS_ECD64_CD_OFFS        = 48,
+		OFFS_ECD64_EXT_DATA       = 56,
+
+		OFFS_ECD64_LOC_SIG        = 0,
+		OFFS_ECD64_LOC_ECD64_DISK = 4,
+		OFFS_ECD64_LOC_ECD64_OFFS = 8,
+		OFFS_ECD64_LOC_DISKS      = 16,
 
 		OFFS_DATA_DESC_SIG        = 0,
 		OFFS_DATA_DESC_CRC32      = 4,

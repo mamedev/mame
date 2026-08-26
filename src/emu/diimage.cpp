@@ -636,10 +636,8 @@ std::error_condition device_image_interface::load_image_by_path(u32 open_flags, 
 		osd_printf_verbose("%s: error opening image file %s with flags=%08X (%s:%d %s)\n", device().tag(), path, open_flags, filerr.category().name(), filerr.value(), filerr.message());
 		return filerr;
 	}
-	else
-	{
-		osd_printf_verbose("%s: opened image file %s with flags=%08X\n", device().tag(), path, open_flags);
-	}
+
+	osd_printf_verbose("%s: opened image file %s with flags=%08X\n", device().tag(), path, open_flags);
 
 	m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
 	m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;

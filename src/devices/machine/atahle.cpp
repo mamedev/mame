@@ -12,8 +12,8 @@
 #define LOG_WRITEDATA (1U << 7)
 #define LOG_WRITECOMPLETED (1U << 8)
 
-//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_READ | /* LOG_READDATA | LOG_READSTATUS | */ LOG_READCOMPLETED | LOG_WRITE | /* LOG_WRITEDATA | */ LOG_WRITECOMPLETED)
-//#define LOG_OUTPUT_FUNC osd_printf_info
+#define VERBOSE (0)
+#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGCOMMAND(...)        LOGMASKED(LOG_COMMAND, __VA_ARGS__)
@@ -208,6 +208,10 @@ void ata_hle_device_base::process_command()
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
 
+	case IDE_COMMAND_DEVICE_RESET:
+		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
+		break;
+
 	default:
 		LOG("%s device %d process_command() unknown command (0x%02x)\n", machine().describe_context(), m_csel, m_command);
 		m_status |= IDE_STATUS_ERR;
@@ -241,6 +245,11 @@ void ata_hle_device_base::finished_command()
 		break;
 
 	case IDE_COMMAND_CACHE_FLUSH:
+		m_status |= IDE_STATUS_DRDY;
+		set_irq(ASSERT_LINE);
+		break;
+
+	case IDE_COMMAND_DEVICE_RESET:
 		m_status |= IDE_STATUS_DRDY;
 		break;
 

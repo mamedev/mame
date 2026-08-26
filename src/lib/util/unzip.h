@@ -52,10 +52,12 @@ public:
 
 	// open a ZIP file and parse its central directory
 	static std::error_condition open_zip(std::string_view filename, ptr &result) noexcept;
+	static std::error_condition open_zip(random_read &file, ptr &result) noexcept;
 	static std::error_condition open_zip(std::unique_ptr<random_read> &&file, ptr &result) noexcept;
 
 	// open a 7Z file and parse its central directory
 	static std::error_condition open_7z(std::string_view filename, ptr &result) noexcept;
+	static std::error_condition open_7z(random_read &file, ptr &result) noexcept;
 	static std::error_condition open_7z(std::unique_ptr<random_read> &&file, ptr &result) noexcept;
 
 	// close an archive file (may actually be left open due to caching)

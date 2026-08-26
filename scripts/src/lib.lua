@@ -39,6 +39,8 @@ end
 		MAME_DIR .. "src/lib/util/abi.h",
 		MAME_DIR .. "src/lib/util/aes256cbc.cpp",
 		MAME_DIR .. "src/lib/util/aes256cbc.h",
+		MAME_DIR .. "src/lib/util/archiver.cpp",
+		MAME_DIR .. "src/lib/util/archiver.h",
 		MAME_DIR .. "src/lib/util/avhuff.cpp",
 		MAME_DIR .. "src/lib/util/avhuff.h",
 		MAME_DIR .. "src/lib/util/aviio.cpp",

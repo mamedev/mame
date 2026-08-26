@@ -13,9 +13,8 @@
 
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
-#include "machine/at_keybc.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
+#include "machine/at_ssrt.h"
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -34,29 +33,35 @@ class arm_iomd_device : public device_t
 public:
 	// construction/destruction
 	arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	template <unsigned N> auto iocr_read_od() { return m_iocr_read_od_cb[N].bind(); }
 	template <unsigned N> auto iocr_write_od() { return m_iocr_write_od_cb[N].bind(); }
 	auto iocr_read_id() { return m_iocr_read_id_cb.bind(); }
 	auto iocr_write_id() { return m_iocr_write_id_cb.bind(); }
+
+	auto irq_cb() { return m_irq_cb.bind(); }
+//  auto fiq_cb() { return m_fiq_cb.bind(); }
+	auto kclk_cb() { return m_ssrt.lookup()->clk(); }
+	auto kdata_cb() { return m_ssrt.lookup()->txd(); }
+
 	// IRQA
 	void vblank_irq(int state);
 	// IRQB
-	void keyboard_irq(int state);
 	// DRQs
 	void sound_drq(int state);
-	// Reset
-	void keyboard_reset(int state);
 
 	// I/O operations
 	virtual void map(address_map &map) ATTR_COLD;
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template<class T> void set_vidc_tag(T &&tag) { m_vidc.set_tag(std::forward<T>(tag)); }
-	template<class T> void set_kbdc_tag(T &&tag) { m_kbdc.set_tag(std::forward<T>(tag)); }
+
+	void kclk_w(int state);
+	void kdata_w(int state);
 
 protected:
-	// device-level overrides
+	arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -85,15 +90,16 @@ protected:
 	// TODO: convert to ARM7 device instead, enums shouldn't be public
 	required_device<cpu_device> m_host_cpu;
 	required_device<arm_vidc20_device> m_vidc;
-	optional_device<ps2_keyboard_controller_device> m_kbdc;
+	required_device<at_ssrt_device> m_ssrt;
 	address_space *m_host_space; /**< reference to the host cpu space for DMA ops */
 private:
 	u8 m_iocr_ddr;
 
-	devcb_read_line::array<2> m_iocr_read_od_cb;
+	devcb_read_line::array<2>  m_iocr_read_od_cb;
 	devcb_write_line::array<2> m_iocr_write_od_cb;
-	devcb_read_line m_iocr_read_id_cb;
+	devcb_read_line  m_iocr_read_id_cb;
 	devcb_write_line m_iocr_write_id_cb;
+	devcb_write_line m_irq_cb;
 
 	u32 iocr_r();
 	void iocr_w(u32 data);
@@ -102,6 +108,10 @@ private:
 	void kbddat_w(u32 data);
 	u32 kbdcr_r();
 	void kbdcr_w(u32 data);
+	void kbd_rxp_w(int state);
+	void kbd_rxf_w(int state);
+	void kbd_txe_w(int state);
+	u8 m_kbdsr;
 
 	u32 m_vidinita, m_vidend;
 	bool m_vidlast, m_videqual;
@@ -137,7 +147,7 @@ private:
 
 	u8 m_irq_status[IRQ_SOURCES_SIZE], m_irq_mask[IRQ_SOURCES_SIZE];
 	inline u8 update_irqa_type(u8 data);
-	inline void flush_irq(unsigned Which);
+	inline void flush_irq();
 	template <unsigned Which> inline void trigger_irq(u8 irq_type);
 
 	inline void trigger_timer(unsigned Which);
@@ -189,6 +199,8 @@ private:
 	u32 iolines_r();
 	void iolines_w(u32 data);
 
+	u32 msedat_r();
+	void msedat_w(u32 data);
 	u32 msecr_r();
 	void msecr_w(u32 data);
 };

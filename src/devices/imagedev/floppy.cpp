@@ -1281,6 +1281,13 @@ void floppy_image_device::write_flush(const attotime &when)
 
 void floppy_image_device::write_do_flush(const attotime &when)
 {
+	// A rollback replay can call us with `when` earlier than a prior
+	// speculative flush already advanced m_write_start_time to; treating
+	// that as a forward span would wrap around and wipe the track. Skip
+	// it -- the replay's next forward flush will overwrite correctly.
+	if(when < m_write_start_time)
+		return;
+
 	int committed = 0;
 	for(int i = 0; i != int(m_write_transition_times.size()); i++)
 		if(m_write_transition_times[i] < when)

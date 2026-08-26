@@ -232,6 +232,7 @@ public:
 
 	void set_serial_clock(uint32_t serial_clock) { c_serial_clock = serial_clock; }
 	void set_serial_clock(const XTAL &xtal) { set_serial_clock(xtal.value()); }
+	void set_tb_divisor(uint32_t divisor) { m_tb_divisor = divisor; }
 
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 

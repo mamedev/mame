@@ -571,6 +571,9 @@ ROM_START( pgm )
 
 	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", ROMREGION_ERASEFF ) /* Sprite Colour Data */
 	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
+
+	ROM_REGION( 0x117, "pld", 0 )
+	ROM_LOAD( "pal.u7", 0x000, 0x117, CRC(bfa23d78) SHA1(32078fec6f3747a081b8dc735452dc1dae4b3d51) )
 ROM_END
 
 ROM_START( orlegend )

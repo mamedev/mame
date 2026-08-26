@@ -234,7 +234,7 @@ uint8_t a2bus_timemasterho_device::read_cnxx(uint8_t offset)
 	{
 		if (!(m_dsw1->read() & 2))  // TimeMaster native
 		{
-			return m_rom[offset+0xc00];
+			return m_rom[offset|0xc00];
 		}
 	}
 
@@ -248,7 +248,7 @@ uint8_t a2bus_timemasterho_device::read_cnxx(uint8_t offset)
 
 uint8_t a2bus_timemasterho_device::read_c800(uint16_t offset)
 {
-	return m_rom[offset+0xc00];
+	return m_rom[offset|0xc00];
 }
 
 void a2bus_timemasterho_device::pia_out_a(uint8_t data)

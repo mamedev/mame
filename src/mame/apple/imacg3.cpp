@@ -20,6 +20,9 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/pci/opti82c861.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/dimm_spd.h"
@@ -28,11 +31,14 @@
 #include "machine/mpc106.h"
 #include "machine/pci.h"
 #include "machine/ram.h"
+#include "sound/cdda.h"
 #include "video/atirage.h"
+
 #include "burgundy.h"
 #include "cuda.h"
 #include "heathrow.h"
-#include "macadb.h"
+#include "softlist.h"
+#include "softlist_dev.h"
 
 class imac_state : public driver_device
 {
@@ -44,7 +50,7 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<mpc106_host_device> m_mpc106;
 	required_device<cuda_device> m_cuda;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<dimm_spd_device> m_dimm0, m_dimm1;
 	required_device<i2c_24c01_device> m_edid;
 	required_device<ram_device> m_ram;
@@ -77,7 +83,7 @@ imac_state::imac_state(const machine_config &mconfig, device_type type, const ch
 	m_maincpu(*this, "maincpu"),
 	m_mpc106(*this, "pci:00.0"),
 	m_cuda(*this, "cuda"),
-	m_macadb(*this, "macadb"),
+	m_adbbus(*this, "adb"),
 	m_dimm0(*this, "dimm0"),
 	m_dimm1(*this, "dimm1"),
 	m_edid(*this, "edid"),
@@ -97,18 +103,21 @@ void imac_state::machine_start()
 	m_dimm0->set_dimm_size(dimm_spd_device::SIZE_SLOT_EMPTY);
 	m_dimm1->set_dimm_size(dimm_spd_device::SIZE_SLOT_EMPTY);
 
+	// The iMac probes DIMM0 through two Grackle bank numbers.  Report half the
+	// selected aggregate size so the duplicated probe does not create two full-
+	// sized banks that alias the same RAM backing store.
 	switch (m_ram->size())
 	{
 		case 32 * 1024 * 1024:
-			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_32_MIB);
+			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_16_MIB);
 			break;
 
 		case 64 * 1024 * 1024:
-			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_64_MIB);
+			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_32_MIB);
 			break;
 
 		case 128 * 1024 * 1024:
-			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_128_MIB);
+			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_64_MIB);
 			break;
 	}
 
@@ -148,7 +157,9 @@ void imac_state::write_sense(u16 data)
 void imac_state::imac(machine_config &config)
 {
 	PPC750(config, m_maincpu, 233'000'000);
-	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_MACOS_CACHE_HACK);
+	m_maincpu->set_bus_frequency(66'820'000);
+	m_maincpu->set_tb_divisor(14);
 	m_maincpu->set_addrmap(AS_PROGRAM, &imac_state::imac_map);
 
 	PCI_ROOT(config, "pci");
@@ -158,24 +169,37 @@ void imac_state::imac(machine_config &config)
 	paddington.set_maincpu_tag("maincpu");
 	paddington.irq_callback().set(FUNC(imac_state::irq_w));
 
+	// ATA HDD on bus 0, ATAPI CD-ROM on bus 1
+	paddington.ata(0).slot(0).set_default_option("hdd");
+	paddington.ata(1).slot(0).set_default_option("cdrom");
+	paddington.ata(1).slot(0).set_option_machine_config("cdrom", [](device_t *device)
+	{
+		device->subdevice<cdda_device>("cdda")->add_route(0, "^^^^speaker", 1.0, 0);
+		device->subdevice<cdda_device>("cdda")->add_route(1, "^^^^speaker", 1.0, 1);
+	});
+
 	atirage_device &ati(ATI_RAGEIIC(config, "pci:12.0", 14.318181_MHz_XTAL));
 	ati.gpio_get_cb().set(FUNC(imac_state::read_sense));
 	ati.gpio_set_cb().set(FUNC(imac_state::write_sense));
+	ati.irq_cb().set(paddington, FUNC(heathrow_device::set_irq_line<22>));
 	ati.set_gpio_pullups(0x3000);   // bits 8 & 9 are the I2C bus
 
 	I2C_24C01(config, m_edid);
 
 	OPTI_82C861(config, "pci:14.0", 0);
 
-	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(imac_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(paddington, FUNC(heathrow_device::cb1_w));
 	m_cuda->via_data_callback().set(paddington, FUNC(heathrow_device::cb2_w));
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	paddington.pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
@@ -205,6 +229,7 @@ void imac_state::imac(machine_config &config)
 
 	burgundy_device &burgundy(BURGUNDY(config, "codec", 45.1584_MHz_XTAL / 2));
 	burgundy.dma_output().set(paddington, FUNC(heathrow_device::codec_dma_read));
+	burgundy.dma_input().set(paddington, FUNC(heathrow_device::codec_dma_write));
 
 	paddington.codec_r_callback().set(burgundy, FUNC(burgundy_device::read_macrisc));
 	paddington.codec_w_callback().set(burgundy, FUNC(burgundy_device::write_macrisc));
@@ -212,6 +237,9 @@ void imac_state::imac(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 	burgundy.add_route(0, "speaker", 1.0, 0);
 	burgundy.add_route(1, "speaker", 1.0, 1);
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom");
 }
 
 ROM_START(imac)

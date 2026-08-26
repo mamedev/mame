@@ -146,7 +146,19 @@ license:CC0-1.0
 	</software>
 
 	<software name="bbr128">
-		<description>Big Blue Reader 128</description>
+		<description>Big Blue Reader 128 v4.10</description>
+		<year>1993</year>
+		<publisher>SOGWAP</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="big.blue.reader.128.v4.10.d64" size="174848" crc="148f793e" sha1="169b91f8733cce68e3fc0e2e5739a303a5221a73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbr128a" cloneof="bbr128">
+		<description>Big Blue Reader 128 v3.12</description>
 		<year>1991</year>
 		<publisher>SOGWAP</publisher>
 		<info name="protection" value="none" />

@@ -1991,3 +1991,121 @@ void isa8_cga_cportiii_device::port_23c6_w(uint8_t data)
 		m_isa->install_bank(0xb8000, 0xb8000 + 0x8000 - 1, &m_vram[0]);
 }
 
+DEFINE_DEVICE_TYPE(ISA8_CGA_CHAMELEON, isa8_cga_chameleon_device, "cga_chameleon", "Seequa Chameleon CGA")
+
+const tiny_rom_entry *isa8_cga_chameleon_device::device_rom_region() const
+{
+	return nullptr;
+}
+
+MC6845_UPDATE_ROW( isa8_cga_chameleon_device::crtc_update_row )
+{
+	if (m_update_row_type == -1)
+		return;
+
+	y = m_y;
+	if(m_y >= bitmap.height())
+		return;
+
+	switch (m_update_row_type)
+	{
+		case CGA_TEXT_INTEN:
+			cga_text<false, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_ALT:
+			cga_text<false, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_CG:
+			cga_text<false, false, true, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK:
+			cga_text<true, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_ALT:
+			cga_text<true, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_SI:
+			cga_text<true, true, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_1BPP:
+			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_2BPP:
+			cga_gfx_2bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPL:
+			cga_gfx_4bppl_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPH:
+			cga_gfx_4bpph_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+	}
+}
+
+uint8_t isa8_cga_chameleon_device::chr_read(offs_t offset)
+{
+	return bitswap<8>(m_charram[offset], 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
+void isa8_cga_chameleon_device::chr_write(offs_t offset, uint8_t data)
+{
+	m_charram[offset] = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
+void isa8_cga_chameleon_device::device_start()
+{
+	if (m_palette != nullptr && !m_palette->started())
+		throw device_missing_dependencies();
+
+	set_isa_device();
+	m_vram.resize(m_vram_size);
+	m_isa->install_device(0x3d0, 0x3dc, read8sm_delegate(*this, FUNC(isa8_cga_device::io_read)), write8sm_delegate(*this, FUNC(isa8_cga_device::io_write)));
+	m_isa->install_bank(0xb0000, 0xb3fff, &m_vram[0]);
+	m_isa->install_bank(0xb4000, 0xb7fff, &m_vram[0]);
+	m_isa->install_bank(0xb8000, 0xb9fff, &m_vram[0]);
+	m_isa->install_bank(0xbc000, 0xbffff, &m_vram[0]);
+	m_isa->install_memory(0xaf000, 0xaffff, read8sm_delegate(*this, FUNC(isa8_cga_chameleon_device::chr_read)), write8sm_delegate(*this, FUNC(isa8_cga_chameleon_device::chr_write)));
+
+	m_chr_gen_base = &m_charram[0];
+	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
+	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x0000;
+	m_chr_gen = m_chr_gen_base;
+
+	/* Initialise the cga palette */
+	int i;
+
+	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
+	{
+		m_palette->set_pen_color( i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+	}
+
+	i = 0x8000;
+	for ( int r = 0; r < 32; r++ )
+	{
+		for ( int g = 0; g < 32; g++ )
+		{
+			for ( int b = 0; b < 32; b++ )
+			{
+				m_palette->set_pen_color( i, r << 3, g << 3, b << 3 );
+				i++;
+			}
+		}
+	}
+
+	save_item(NAME(m_framecnt));
+	save_item(NAME(m_mode_control));
+	save_item(NAME(m_color_select));
+	//save_item(NAME(m_status)); uncomment when used
+	save_item(NAME(m_update_row_type));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_hsync));
+	save_item(NAME(m_vram));
+	save_item(NAME(m_plantronics));
+	save_item(NAME(m_y));
+}
+
+isa8_cga_chameleon_device::isa8_cga_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_device(mconfig, ISA8_CGA_CHAMELEON, tag, owner, clock),
+	m_charram(0x1000)
+{
+}

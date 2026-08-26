@@ -22,6 +22,7 @@
 
 
 #define G64_FORMAT_HEADER   "GCR-1541"
+#define G71_FORMAT_HEADER   "GCR-1571"
 
 g64_format::g64_format()
 {
@@ -42,7 +43,7 @@ int g64_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	if (err || (8 != actual))
 		return 0;
 
-	if (!memcmp(h, G64_FORMAT_HEADER, 8))
+	if (!memcmp(h, G64_FORMAT_HEADER, 8) || !memcmp(h, G71_FORMAT_HEADER, 8))
 		return FIFID_SIGN;
 
 	return 0;
@@ -57,6 +58,12 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	auto const [err, img, actual] = read_at(io, 0, size);
 	if (err || (actual != size))
 		return false;
+
+	if (size < POS_TRACK_OFFSET)
+	{
+		osd_printf_error("g64_format: File too small for header\n");
+		return false;
+	}
 
 	if (img[POS_VERSION])
 	{
@@ -76,12 +83,19 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 		uint32_t tpos = POS_TRACK_OFFSET + (track * 4);
 		uint32_t spos = tpos + (track_count * 4);
+
+		if ((uint64_t(spos) + 4) > size)
+		{
+			osd_printf_error("g64_format: Track %u offset table entry out of bounds\n", track);
+			return false;
+		}
+
 		uint32_t dpos = get_u32le(&img[tpos]);
 
 		if (!dpos)
 			continue;
 
-		if (dpos > size)
+		if ((uint64_t(dpos) + 2) > size)
 		{
 			osd_printf_error("g64_format: Track %u offset %06x out of bounds\n", track, dpos);
 			return false;
@@ -97,6 +111,12 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 		uint16_t track_bytes = get_u16le(&img[dpos]);
 		int track_size = track_bytes * 8;
+
+		if ((uint64_t(dpos) + 2 + track_bytes) > size)
+		{
+			osd_printf_error("g64_format: Track %u data (%u bytes) out of bounds\n", track, track_bytes);
+			return false;
+		}
 
 		LOG_FORMATS("head %u track %u offs %u size %u cell %ld\n", head, cylinder, dpos, track_bytes, 200000000L/track_size);
 
@@ -128,27 +148,46 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	uint8_t const zerofill[] = { 0x00, 0x00, 0x00, 0x00 };
 	std::vector<uint8_t> const prefill(TRACK_LENGTH, 0xff);
 
+	auto write = [&io](uint32_t pos, void const *buf, std::size_t len) -> bool
+	{
+		auto const [err, actual] = write_at(io, pos, buf, len);
+		if (err || (actual != len))
+		{
+			osd_printf_error("g64_format: Write error at offset %06x\n", pos);
+			return false;
+		}
+		return true;
+	};
+
 	int tracks, heads;
 	image.get_actual_geometry(tracks, heads);
 	tracks = TRACK_COUNT * heads;
 
 	// write header
-	uint8_t header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, static_cast<uint8_t>(tracks), TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
-	write_at(io, POS_SIGNATURE, header, sizeof(header)); // FIXME: check for errors
+	uint8_t header[12];
+	std::memcpy(header, (heads == 2) ? G71_FORMAT_HEADER : G64_FORMAT_HEADER, 8);
+	header[8] = 0x00;
+	header[9] = static_cast<uint8_t>(tracks);
+	header[10] = TRACK_LENGTH & 0xff;
+	header[11] = TRACK_LENGTH >> 8;
+	if (!write(POS_SIGNATURE, header, sizeof(header)))
+		return false;
 
 	// write tracks
-	for (int head = 0; head < heads; head++) {
-		int tracks_written = 0;
+	int tracks_written = 0;
 
+	for (int head = 0; head < heads; head++) {
 		std::vector<bool> trackbuf;
 
 		for (int track = 0; track < TRACK_COUNT; track++) {
-			uint32_t const tpos = POS_TRACK_OFFSET + (track * 4);
+			uint32_t const tpos = POS_TRACK_OFFSET + ((head * TRACK_COUNT + track) * 4);
 			uint32_t const spos = tpos + (tracks * 4);
 			uint32_t const dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * TRACK_LENGTH);
 
-			write_at(io, tpos, zerofill, 4); // FIXME: check for errors
-			write_at(io, spos, zerofill, 4); // FIXME: check for errors
+			if (!write(tpos, zerofill, 4))
+				return false;
+			if (!write(spos, zerofill, 4))
+				return false;
 
 			if (image.get_buffer(track, head).size() <= 1)
 				continue;
@@ -180,11 +219,16 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			put_u32le(speed_offset, speed_zone);
 			put_u16le(track_length, packed.size());
 
-			write_at(io, tpos, track_offset, 4); // FIXME: check for errors
-			write_at(io, spos, speed_offset, 4); // FIXME: check for errors
-			write_at(io, dpos, prefill.data(), TRACK_LENGTH); // FIXME: check for errors
-			write_at(io, dpos, track_length, 2); // FIXME: check for errors
-			write_at(io, dpos + 2, packed.data(), packed.size()); // FIXME: check for errors
+			if (!write(tpos, track_offset, 4))
+				return false;
+			if (!write(spos, speed_offset, 4))
+				return false;
+			if (!write(dpos, prefill.data(), TRACK_LENGTH))
+				return false;
+			if (!write(dpos, track_length, 2))
+				return false;
+			if (!write(dpos + 2, packed.data(), packed.size()))
+				return false;
 
 			tracks_written++;
 		}
