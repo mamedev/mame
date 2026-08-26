@@ -13,6 +13,9 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 
 #pragma once
 
+// IDE
+#include "bus/ata/ataintf.h"
+#include "machine/idectrl.h"
 // floppy disk controller
 #include "machine/upd765.h"
 #include "imagedev/floppy.h"
@@ -123,6 +126,7 @@ private:
 	required_device<n82077aa_device> m_fdc;
 	required_device_array<ns16550_device, 2> m_serial;
 	required_device<pc_lpt_device> m_lpt;
+	required_device_array<ide_controller_device, 2> m_ide;
 
 	void write_configuration_register(int index, int data);
 };
