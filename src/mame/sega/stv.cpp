@@ -34,6 +34,7 @@ TODO:
   set_maximum_quantum() number, might need strict SH-2 synching or it's actually a m68k comms issue.
 
 - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose if any;
+\- Hangs with a "please call staff member"
 
 - tsuribor: needs input rod hookup (analog);
 
@@ -3213,6 +3214,7 @@ ROM_START( nclubv4 ) // 837-12765-11 sticker
 	ROM_LOAD( "nclubv4.nv", 0x0000, 0x0080, CRC(7efc9c6a) SHA1(3d44940b7497b07151908a0a6bc2809c7e15f4a8) )
 ROM_END
 
+// TODO: has extra connection to a i486BD according to test mode
 ROM_START( nclubdis ) // 837-12765-11 sticker
 	STV_BIOS
 
@@ -4136,9 +4138,10 @@ ROM_START( tsuribor ) // 837-12765-01 ROM BD
 	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
 ROM_END
 
-GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V BIOS", MACHINE_IS_BIOS_ROOT )
+// NOTE: need to use stv6b input def for gaxeduel and suikoenb in multicart mode
+// (making a new def for the base 4th button is a YAGNI until we find a game that needs it)
+GAME( 1996, stvbios,   0,       stv_slot, stv6b,    stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V BIOS", MACHINE_IS_BIOS_ROOT )
 
-//GAME YEAR, NAME,     PARENT,  MACH,     INP,      STATE,       INIT,            MONITOR
 /* Playable */
 GAME( 1998, astrass,   stvbios, stv_5881, stv6b,    stv_state,   init_astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, bakubaku,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
