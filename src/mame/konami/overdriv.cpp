@@ -24,6 +24,7 @@
 
     TODO:
     - Incorrect timing in attract sequence
+      ex: Title logo animation is faster than it's should be.
 
 ***************************************************************************/
 
