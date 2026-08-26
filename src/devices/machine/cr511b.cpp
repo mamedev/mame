@@ -162,7 +162,9 @@ void cr511b_device::device_reset()
 	m_scor_cb(0);
 	m_sbcp_cb(0);
 
-	// used when playing audio cds
+	m_drq_cb(0);
+
+	// active while the motor/decoder is running
 	m_subcode_timer->adjust(attotime::never);
 
 	m_scan_timer->adjust(attotime::never);
@@ -248,8 +250,8 @@ TIMER_CALLBACK_MEMBER(cr511b_device::frame_cb)
 
 TIMER_CALLBACK_MEMBER(cr511b_device::subcode_cb)
 {
-	// if we're paused return early
-	if (m_cdda->audio_paused())
+	// if we're playing audio and are paused return early
+	if ((m_status & STATUS_PLAYING) && m_cdda->audio_paused())
 	{
 		m_scor_cb(0);
 		m_sbcp_cb(0);
@@ -262,20 +264,24 @@ TIMER_CALLBACK_MEMBER(cr511b_device::subcode_cb)
 	{
 		// the byte-ready line is inactive throughout the two sync symbols
 		m_sbcp_cb(0);
+		m_subcode_valid = false;
 
-		uint32_t const audio_lba = m_cdda->get_audio_lba();
+		if (m_status & STATUS_PLAYING)
+		{
+			uint32_t const audio_lba = m_cdda->get_audio_lba();
 
-		// get_audio_lba() can potentially change our status, so check that we still play
-		if (!(m_status & STATUS_PLAYING))
-			return;
+			// get_audio_lba() can potentially change our status, so check that we still play
+			if (!(m_status & STATUS_PLAYING))
+				return;
 
-		LOGMASKED(LOG_SUBCODE, "Fetching new subchannel data for sector %u\n", audio_lba);
+			LOGMASKED(LOG_SUBCODE, "Fetching new subchannel data for sector %u\n", audio_lba);
 
-		uint32_t const subsize = get_toc().tracks[get_track(audio_lba)].subsize;
-		m_subcode_valid = read_subcode(audio_lba, m_subcode_buffer) && (subsize == SUBCODE_DATA_SYMBOLS);
+			uint32_t const subsize = get_toc().tracks[get_track(audio_lba)].subsize;
+			m_subcode_valid = read_subcode(audio_lba, m_subcode_buffer) && (subsize == SUBCODE_DATA_SYMBOLS);
 
-		if (!m_subcode_valid)
-			LOGMASKED(LOG_SUBCODE, "No raw P-W subcode for sector %u (subsize %u)\n", audio_lba, subsize);
+			if (!m_subcode_valid)
+				LOGMASKED(LOG_SUBCODE, "No raw P-W subcode for sector %u (subsize %u)\n", audio_lba, subsize);
+		}
 	}
 	else if (m_subcode_symbol == 1)
 	{
@@ -343,16 +349,20 @@ void cr511b_device::status_change(uint8_t status)
 {
 	if (m_status != status)
 	{
+		bool const motor_was_running = bool(m_status & STATUS_MOTOR);
 		m_status = status;
 
 		if (m_status & STATUS_MOTOR)
+		{
 			m_frame_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));
+			if (!motor_was_running)
+				start_subcode();
+		}
 		else
+		{
 			m_frame_timer->adjust(attotime::never);
-
-		// stop the subcode timer if we no longer play
-		if (!(m_status & STATUS_PLAYING))
 			stop_subcode();
+		}
 
 		m_stch_timer->adjust(attotime::from_usec(64 * 3), 1); // TODO: Timing
 	}
@@ -424,8 +434,6 @@ void cr511b_device::play_audio(uint32_t start, uint32_t end)
 			m_input_fifo[1], m_input_fifo[2], m_input_fifo[3],
 			m_input_fifo[4], m_input_fifo[5], m_input_fifo[6], start, end);
 
-		bool const already_running = m_cdda->audio_active();
-
 		m_cdda->cancel_scan();
 		m_cdda->start_audio(start, end - start );
 
@@ -435,8 +443,6 @@ void cr511b_device::play_audio(uint32_t start, uint32_t end)
 		status |= STATUS_MOTOR;
 
 		status_change(status);
-		if (!already_running)
-			start_subcode();
 	}
 	else
 	{
