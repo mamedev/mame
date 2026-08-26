@@ -633,6 +633,10 @@ ROM_START( pink218 )
 	ROM_LOAD( "p25q64h.u2", 0x000000, 0x800000, CRC(7209e7bf) SHA1(1cc0a0b74d3f373dae18b52b3f7014d56f0d9b51) )
 ROM_END
 
+ROM_START( smkfrnd )
+	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gpr25l6403.u3", 0x0000, 0x800000, CRC(1a865cc2) SHA1(c7abee0b625c713f22c0ffbc923e0938e503ce55) )
+ROM_END
 
 void generalplus_gpl951xx_game_state::init_fif()
 {
@@ -743,3 +747,5 @@ CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_
 // this one has 2 checksums in service mode (like the generalplus_gp3x_unknown.cpp sets) but one is 00000000 and there is only a single ROM
 // BL-519-V1.2 20220822 on PCB
 CONS( 2022, pink218,      0,       0,      pink218,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+CONS( 2022, smkfrnd,      0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
