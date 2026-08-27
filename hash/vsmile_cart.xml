@@ -1100,6 +1100,19 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="batmanit" cloneof="batmanuk">
+		<description>The Batman - Il Salvataggio di Gotham City (Italy)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="The Batman - Il Salvataggio di Gotham City (Italy).bin" size="0x800000" crc="d6835b03" sha1="40e849b04fcb9d232fd5d512ba8a321fe25bafa1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmannl" cloneof="batmanuk">
 		<description>The Batman - De redding van Gotham City (Netherlands)</description>
 		<year>2006</year> <!-- (s06) -->
@@ -1594,6 +1607,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x800000">
 				<rom name="C92674-1.u1" size="0x800000" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- this fails to boot with 'vsmile' but runs with 'vsmilem' despite not being a motion cart, is it failing a checksum that 'vsmilem' doesn't perform?
+	     reads were consistent but ROM may be bad -->
+	<software name="carsit" cloneof="carsr201" supported="no">
+		<description>Disney-Pixar Cars - Motori Ruggenti a Radiator Springs (Italy)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092671(IT)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="translucent blue" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Disney-Pixar Cars - Motori Ruggenti (Italy).bin" size="0x800000" crc="74a7fb79" sha1="7003d465a59a4627fb5307719d59e4bb3206087d" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3012,6 +3041,19 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="mypuppyfr" cloneof="mypuppyge">
+		<description>Mon Toutou tout fou! (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-090145(FR)" />		
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-090145 - Mon Toutou tout fou (France).bin" size="0x800000" crc="124b11c1" sha1="7b8b612b3f610e22ca4c7054fc612fd30695cc7c" />
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="mypuppysp" cloneof="mypuppyge">
 		<description>Dakota y su mascota (Spain)</description>
