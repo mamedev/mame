@@ -176,6 +176,7 @@ public:
 	void vt4ffx_vibesswap_1mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_vibesswap_8mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_vibesswap_16mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_gbox2020_4mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_gbox2020_8mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_gbox2020_16mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_s10swap_8mb(machine_config &config) ATTR_COLD;
@@ -687,6 +688,12 @@ void vt4ffx_state::vt4ffx_gbox2020_16mb(machine_config &config)
 {
 	vt4ffx_gbox2020_8mb(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_16mbyte);
+}
+
+void vt4ffx_state::vt4ffx_gbox2020_4mb(machine_config &config)
+{
+	vt4ffx_gbox2020_8mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_4mbyte);
 }
 
 void vt4ffx_state::vt4ffx_s10swap_8mb(machine_config &config)
@@ -1421,6 +1428,11 @@ ROM_START( gbox2020 )
 	ROM_LOAD( "fgb2020.bin", 0x00000, 0x1000000, CRC(a685d943) SHA1(9b272daccd8fe244c910f031466a4fedd83d5236) ) // flash ROM
 ROM_END
 
+ROM_START( fined200 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "29lv320.u1", 0x00000, 0x400000, CRC(45cefe71) SHA1(0dd5a5eed1fbdd109e831fa52eb5826ffef030d5) )
+ROM_END
+
 ROM_START( vibes240 ) // from a unit with translucent blue case
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128n10tfi01.u2", 0x000000, 0x1000000, CRC(2b0a26f1) SHA1(0bd6465fc7f1c9c73069245ab6fcd1bdbe3a82d8) )
@@ -1906,6 +1918,9 @@ CONS( 2020, gbox2020, gbox2019, 0, vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, em
 
 // GB-40-36V1.2 and 20180825 on PCB, assuming to be from Sup although unit wasn't branded
 CONS( 2018, rsps300,  0,        0,  vt4ffx_rsps300swap_16mb, vt369, vt4ffx_state, empty_init,   "Sup", "Retro Station Pocket System GB-40 300 in 1",  MACHINE_NOT_WORKING )
+
+// HKDSUP Ver.2.0 2024.09.05 on PCB
+CONS( 2024, fined200, 0,        0, vt4ffx_gbox2020_4mb, vt369, vt4ffx_state, empty_init, "Sup", "Fine & Dandy 200 in 1", MACHINE_NOT_WORKING )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
 // several games don't work (eg. Curly Monkey 2) but the parent set should be a good dump
