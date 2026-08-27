@@ -221,6 +221,7 @@ void acorn_vidc10_device::device_start()
 void acorn_vidc10_device::device_reset()
 {
 	m_cursor_enable = false;
+	m_sound_mode = false;
 	memset(m_stereo_image, 4, m_sound_max_channels);
 	for (int ch = 0; ch < m_sound_max_channels; ch++)
 		refresh_stereo_image(ch);
@@ -454,15 +455,19 @@ void acorn_vidc10_device::write_dac(u8 channel, u8 data)
 	m_dac[channel & 7]->write(res);
 }
 
+u32 acorn_vidc10_device::get_sound_clock()
+{
+	return clock() / 24 / 8;
+}
+
 void acorn_vidc10_device::refresh_sound_frequency()
 {
 	// TODO: check against test bit (reloads sound frequency if 0)
-	if (m_sound_mode == true)
+	// assume a value of zero is invalid (ppcar POST setup)
+	if (m_sound_mode == true && m_sound_frequency_latch)
 	{
 		// TODO: Range is between 3 and 256 usecs
-		// TODO: clock select in VIDC20
-		double sndhz = 1e6 / ((m_sound_frequency_latch & 0xff) + 2);
-		sndhz /= get_dac_mode() == true ? 2.0 : 8.0;
+		double sndhz = get_sound_clock() / ((m_sound_frequency_latch & 0xff) + 2);
 		m_sound_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 		LOGMASKED(LOG_AUDIODMA, "VIDC: audio DMA start %02x + 2 -> sndhz = %f\n", m_sound_frequency_latch, sndhz);
 	}
@@ -584,6 +589,7 @@ arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *
 	, m_pixel_source(0)
 	, m_pixel_rate(0)
 	, m_dac32(*this, "serial_dac_%u", 0)
+	, m_ext_sclk(24'000'000)
 {
 	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
 	m_pal_4bpp_base = 0x000;
@@ -639,6 +645,8 @@ void arm_vidc20_device::device_reset()
 	// TODO: sensible defaults
 	m_vco_r_modulo = 1;
 	m_vco_v_modulo = 1;
+
+	m_clksel = 1;
 
 	// make sure DACs don't output any undefined behaviour for now
 	// (will cause wild DC offset in ssfindo.cpp games)
@@ -702,7 +710,7 @@ u32 arm_vidc20_device::get_pixel_clock()
 void arm_vidc20_device::vidc20_crtc_w(offs_t offset, u32 data)
 {
 	if (offset & 0x8)
-		throw emu_fatalerror("%s accessing CRTC test register %02x, please call the ambulance",this->tag(),offset+0x80);
+		popmessage("%s accessing CRTC test register [%02x] %02x", this->tag(), offset + 0x80, data);
 
 	const u8 crtc_offset = (offset & 0x7) | ((offset & 0x10) >> 1);
 
@@ -763,6 +771,21 @@ void arm_vidc20_device::vidc20_control_w(u32 data)
 	screen_dynamic_res_change();
 }
 
+u32 arm_vidc20_device::get_sound_clock()
+{
+	// ppcar
+	if (!m_clksel)
+	{
+		return m_ext_sclk;
+	}
+
+	// 32-bit mode doubles clock rate
+	const u32 divider = 8 >> get_dac_mode();
+
+	return clock() / 24 / divider;
+}
+
+
 /*
  * ---- x--- sclr <should never be programmed high>
  * ---- -x-- sdac (1) VIDC10 compatible sound
@@ -771,12 +794,12 @@ void arm_vidc20_device::vidc20_control_w(u32 data)
  */
 void arm_vidc20_device::vidc20_sound_control_w(u32 data)
 {
-	// TODO: ext clock bit 0
-	m_dac_serial_mode = BIT(data, 1);
 	m_sdac = BIT(data, 2);
+	m_dac_serial_mode = BIT(data, 1);
+	m_clksel = BIT(data, 0);
 
 	LOGMASKED(LOG_STEREO, "vidc20_sound_control_w %02x: sclr %d sdac %d serial mode %d clksel %d\n",
-		data, BIT(data, 3), m_sdac, m_dac_serial_mode, BIT(data, 0)
+		data, BIT(data, 3), m_sdac, m_dac_serial_mode, m_clksel
 	);
 
 	m_dac32[0]->set_output_gain(0, m_dac_serial_mode ? 1.0 : 0.0);
@@ -795,6 +818,9 @@ void arm_vidc20_device::vidc20_sound_control_w(u32 data)
 		for (int ch = 0; ch < m_sound_max_channels; ch++)
 			m_dac[ch]->set_output_gain(0, 0.0);
 	}
+
+	if (m_sound_mode == true)
+		refresh_sound_frequency();
 }
 
 void arm_vidc20_device::vidc20_sound_frequency_w(u32 data)

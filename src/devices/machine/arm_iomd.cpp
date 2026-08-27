@@ -689,8 +689,17 @@ u32 arm_iomd_device::version_r()
 
 // sound DMA
 
+// TODO: shouldn't be read-backable
 template <unsigned Which> u32 arm_iomd_device::sdcur_r() { return m_sndcur_reg[Which]; }
-template <unsigned Which> void arm_iomd_device::sdcur_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_sndcur_reg[Which]); }
+
+template <unsigned Which> void arm_iomd_device::sdcur_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_sndcur_reg[Which]);
+	m_sndbuffer_ok[Which] = true;
+	irqrq_w<IRQDMA>(0x10);
+}
+
+// TODO: shouldn't be read-backable
 template <unsigned Which> u32 arm_iomd_device::sdend_r()
 {
 	return (m_sndstop_reg[Which] << 31) | (m_sndlast_reg[Which] << 30) | (m_sndend_reg[Which] & 0x00fffff0);
@@ -703,6 +712,7 @@ template <unsigned Which> void arm_iomd_device::sdend_w(offs_t offset, u32 data,
 	m_sndstop_reg[Which] = BIT(data, 31);
 	m_sndlast_reg[Which] = BIT(data, 30);
 	m_sndbuffer_ok[Which] = true;
+	irqrq_w<IRQDMA>(0x10);
 }
 
 u32 arm_iomd_device::sdcr_r()
@@ -858,12 +868,14 @@ void arm_iomd_device::sound_drq(int state)
 			return;
 
 		for (int ch = 0; ch < 2; ch++)
-			m_vidc->write_dac32(ch, (m_host_space->read_word(m_sndcur + ch*2)));
+			m_vidc->write_dac32(ch, (m_host_space->read_word(m_sndcur + ch * 2)));
 
 		m_sndcur += 4;
 
 		if (m_sndcur >= m_sndend)
 		{
+			trigger_irq<IRQDMA>(0x10);
+
 			m_vidc->update_sound_mode(m_sound_dma_on);
 			if (m_sound_dma_on)
 			{
@@ -873,13 +885,13 @@ void arm_iomd_device::sound_drq(int state)
 			}
 			else
 			{
-				// ...
+				// TODO: disable sound
 			}
 		}
 	}
 	else
 	{
-		// ...
+		// TODO: VIDC10 compatible mode
 	}
 }
 
