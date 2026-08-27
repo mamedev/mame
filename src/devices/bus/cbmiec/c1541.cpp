@@ -356,6 +356,13 @@ uint8_t c1541_device_base::via0_pb_r()
 	return data;
 }
 
+TIMER_CALLBACK_MEMBER(c1541_device_base::iec_sync_tick)
+{
+    m_data_out = BIT(m_iec_pb, 1);
+    m_ga->atna_w(BIT(m_iec_pb, 4));
+    m_bus->clk_w(this, !BIT(m_iec_pb, 3));
+}
+
 void c1541_device_base::via0_pb_w(uint8_t data)
 {
 	/*
@@ -373,14 +380,8 @@ void c1541_device_base::via0_pb_w(uint8_t data)
 
 	*/
 
-	// data out
-	m_data_out = BIT(data, 1);
-
-	// attention acknowledge
-	m_ga->atna_w(BIT(data, 4));
-
-	// clock out
-	m_bus->clk_w(this, !BIT(data, 3));
+	m_iec_pb = data;
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void c1541_device_base::via0_ca2_w(int state)
@@ -662,6 +663,8 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 
 void c1541_device_base::device_start()
 {
+	m_iec_sync_timer = timer_alloc(FUNC(c1541_device_base::iec_sync_tick), this);
+
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 

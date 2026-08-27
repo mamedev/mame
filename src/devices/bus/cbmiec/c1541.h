@@ -91,6 +91,10 @@ private:
 	// interrupts
 	int m_via0_irq;                         // VIA #0 interrupt request
 	int m_via1_irq;                         // VIA #1 interrupt request
+
+	u8 m_iec_pb;
+	emu_timer *m_iec_sync_timer;
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 };
 
 

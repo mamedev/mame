@@ -172,6 +172,12 @@ public:
 	int m_user_pa2;
 	int m_user_pb;
 
+	bool m_iec_atn;
+	bool m_iec_clk;
+	bool m_iec_data;
+	emu_timer *m_iec_sync_timer;
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void pet64(machine_config &config);
@@ -1196,6 +1202,13 @@ uint8_t c64_state::cia2_pa_r()
 	return data;
 }
 
+TIMER_CALLBACK_MEMBER(c64_state::iec_sync_tick)
+{
+	m_iec->host_atn_w(m_iec_atn);
+	m_iec->host_clk_w(m_iec_clk);
+	m_iec->host_data_w(m_iec_data);
+}
+
 void c64_state::cia2_pa_w(uint8_t data)
 {
 	/*
@@ -1221,9 +1234,10 @@ void c64_state::cia2_pa_w(uint8_t data)
 	m_user->write_m(BIT(data, 2));
 
 	// IEC bus
-	m_iec->host_atn_w(!BIT(data, 3));
-	m_iec->host_clk_w(!BIT(data, 4));
-	m_iec->host_data_w(!BIT(data, 5));
+	m_iec_atn = !BIT(data, 3);
+	m_iec_clk = !BIT(data, 4);
+	m_iec_data = !BIT(data, 5);
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 uint8_t c64_state::cia2_pb_r()
@@ -1429,6 +1443,8 @@ void sx1541_iec_devices(device_slot_interface &device)
 
 void c64_state::machine_start()
 {
+	m_iec_sync_timer = timer_alloc(FUNC(c64_state::iec_sync_tick), this);
+
 	// get pointers to ROMs
 	if (memregion("basic") != nullptr)
 	{

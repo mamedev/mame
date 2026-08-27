@@ -78,7 +78,7 @@ Fails loading
 		</part>
 	</software>
 
-	<software name="bbsb" supported="yes">
+	<software name="bbsb">
 		<description>Bounty Bob Strikes Back! (v1.2)</description>
 		<year>1985</year>
 		<publisher>Big Five</publisher>
