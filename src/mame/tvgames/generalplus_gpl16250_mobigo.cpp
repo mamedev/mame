@@ -90,16 +90,19 @@ void mobigo_state::init_mobigo()
 
 ROM_START( mobigo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
+	// MobiOURS0.1  2010-01-02
 	ROM_LOAD16_WORD_SWAP("mobigo.bin", 0x0000, 0x800000, CRC(49479bad) SHA1(4ee82c7ba13072cf25a34893cf6272f2da5d8928) )
 ROM_END
 
 ROM_START( mobigos )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
+	// MobiOURS1.0  2010-07-21
 	ROM_LOAD16_WORD_SWAP("mobigospanish.bin", 0x0000, 0x200000, CRC(462b4f9d) SHA1(1541152f1a359bc18de4d4f3d5038a954c9a3ad4))
 ROM_END
 
 ROM_START( mobigouk )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
+	// MobiOURS1.0  2010-07-21
 	ROM_LOAD16_WORD_SWAP("mobigo_uk.u5", 0x0000, 0x200000, CRC(efd27779) SHA1(b8f99a5c05d0fc8bbaf22996f9e699e0ea9ab4da) )
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00) // for built-in games and/or downloads? (not a boot ROM)
@@ -108,6 +111,7 @@ ROM_END
 
 ROM_START( mobigof )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
+	// MobiOURS1.0  2010-07-21
 	ROM_LOAD16_WORD_SWAP("mobigo_fr.u5", 0x0000, 0x200000, CRC(61d739aa) SHA1(d23d4c806f1b60058c57ea9b339a7c5e3124bafa))
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00) // for built-in games and/or downloads? (not a boot ROM)
