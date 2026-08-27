@@ -290,9 +290,9 @@ CONS( 2004, leappadw,   0,      0,      leapfrog_leappad,   leapfrog_leappad, le
 CONS( 2004, leappadmic, 0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Microphone", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Compatible with regular LeapPad carts
 // "LeapPad Read Aloud" (alt name for LeapPad Plus Microphone?)
 // "LeapPad Plus Writing & Microphone"
-// "QuantumPad"
+// "QuantumPad" (has unique carts)
 
-// a 'Microphone Upgrade Kit' cartridge exists (gives regular units Micorphone support?)
+// a 'Microphone Upgrade Kit' cartridge exists (gives regular units Microphone support?)
 
 CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, ltleappad,  0,      0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
