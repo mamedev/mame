@@ -99,7 +99,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wiggles" supported="no">
 		<description>The Wiggles - Learn, Dance and Sing with The Wiggles! (UK)</description>
 		<year>2004</year>
@@ -113,7 +113,7 @@ license:CC0-1.0
 				<rom name="500-12288 - The Wiggles - Learn, Dance and Sing with The Wiggles.bin" size="0x400000" crc="febe7467" sha1="e35c7e3a1093e6e5b90f836acde4c39ad00addf0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="cars" supported="no">
 		<description>Disney/Pixar Cars (UK)</description>

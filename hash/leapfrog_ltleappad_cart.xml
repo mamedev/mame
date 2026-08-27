@@ -18,7 +18,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="animalda" supported="no">
 		<description>Animal Dance (UK)</description>
 		<year>2003</year>
@@ -31,7 +31,7 @@ license:CC0-1.0
 				<rom name="500-10244 - Animal Dance (UK).bin" size="0x400000" crc="65ed100c" sha1="20287a62d88f7d4da9342e016e09fb202e93335a" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Will be clone of "Baby Animals" once found and dumped -->
 	<software name="babyanimlsg" supported="no">

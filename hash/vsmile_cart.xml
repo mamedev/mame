@@ -1610,7 +1610,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- this fails to boot with 'vsmile' but runs with 'vsmilem' despite not being a motion cart, is it failing a checksum that 'vsmilem' doesn't perform?
 	     reads were consistent but ROM may be bad -->
 	<software name="carsit" cloneof="carsr201" supported="no">
@@ -3041,19 +3041,19 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mypuppyfr" cloneof="mypuppyge">
 		<description>Mon Toutou tout fou! (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="52-090145(FR)" />		
+		<info name="serial" value="52-090145(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="0x800000">
 				<rom name="52-090145 - Mon Toutou tout fou (France).bin" size="0x800000" crc="124b11c1" sha1="7b8b612b3f610e22ca4c7054fc612fd30695cc7c" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mypuppysp" cloneof="mypuppyge">
 		<description>Dakota y su mascota (Spain)</description>
