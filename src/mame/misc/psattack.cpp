@@ -239,6 +239,9 @@ void psattack_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( psattack )
 	PORT_START("IN0")
+	// gun triggers
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably guns are here
 
 	PORT_START("IN1")
