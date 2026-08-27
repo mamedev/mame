@@ -177,17 +177,17 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(FSD1,                       fsd1_device)
-DECLARE_DEVICE_TYPE(FSD2,                       fsd2_device)
-DECLARE_DEVICE_TYPE(CSD1,                       csd1_device)
-DECLARE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device)
-DECLARE_DEVICE_TYPE(TECHNICA,                   technica_device)
-DECLARE_DEVICE_TYPE(BLUE_CHIP,                  blue_chip_device)
-DECLARE_DEVICE_TYPE(COMMANDER_C2,               commander_c2_device)
-DECLARE_DEVICE_TYPE(ENHANCER_2000,              enhancer_2000_device)
-DECLARE_DEVICE_TYPE(FD148,                      fd148_device)
-DECLARE_DEVICE_TYPE(MSD_SD1,                    msd_sd1_device)
-DECLARE_DEVICE_TYPE(MSD_SD2,                    msd_sd2_device)
+DECLARE_DEVICE_TYPE(FSD1, fsd1_device)
+DECLARE_DEVICE_TYPE(FSD2, fsd2_device)
+DECLARE_DEVICE_TYPE(CSD1, csd1_device)
+DECLARE_DEVICE_TYPE(INDUS_GT, indus_gt_device)
+DECLARE_DEVICE_TYPE(TECHNICA, technica_device)
+DECLARE_DEVICE_TYPE(BLUE_CHIP, blue_chip_device)
+DECLARE_DEVICE_TYPE(COMMANDER_C2, commander_c2_device)
+DECLARE_DEVICE_TYPE(ENHANCER_2000, enhancer_2000_device)
+DECLARE_DEVICE_TYPE(FD148, fd148_device)
+DECLARE_DEVICE_TYPE(MSD_SD1, msd_sd1_device)
+DECLARE_DEVICE_TYPE(MSD_SD2, msd_sd2_device)
 
 
 #endif // MAME_BUS_CBMIEC_C1541_CLONES_H

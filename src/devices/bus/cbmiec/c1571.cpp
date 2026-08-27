@@ -44,9 +44,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "Commodore 1570 Disk Drive")
-DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "Commodore 1571 Disk Drive")
-DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "Commodore 1571CR Disk Drive")
+DEFINE_DEVICE_TYPE(C1570, c1570_device, "c1570", "Commodore 1570 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571, c1571_device, "c1571", "Commodore 1571 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571CR, c1571cr_device, "c1571cr", "Commodore 1571CR Disk Drive")
 
 
 //-------------------------------------------------
@@ -126,10 +126,10 @@ const tiny_rom_entry *c1571cr_device::device_rom_region() const
 void c1571_device::c1571_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1800, 0x180f).mirror(0x03f0).m(M6522_0_TAG, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x03f0).m(m_via0, FUNC(via6522_device::map));
 	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(c1571_device::via1_r), FUNC(c1571_device::via1_w));
-	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(0x4000, 0x400f).mirror(0x3ff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	map(0x2000, 0x2003).mirror(0x1ffc).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x4000, 0x400f).mirror(0x3ff0).rw(m_cia, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
 }
 
@@ -202,9 +202,9 @@ void c1571_device::via0_pa_w(uint8_t data)
 	}
 
 	// attention out
-	m_bus->atn_w(this, !BIT(data, 6));
+	m_iec_atn = !BIT(data, 6);
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void c1571cr_device::via0_pa_w(uint8_t data)
@@ -299,12 +299,12 @@ void c1571_device::via0_pb_w(uint8_t data)
 	m_data_out = BIT(data, 1);
 
 	// clock out
-	m_bus->clk_w(this, !BIT(data, 3));
+	m_iec_clk = !BIT(data, 3);
 
 	// attention acknowledge
 	m_ga->atna_w(BIT(data, 4));
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void c1571cr_device::via0_pb_w(uint8_t data)
@@ -328,12 +328,12 @@ void c1571cr_device::via0_pb_w(uint8_t data)
 	m_data_out = BIT(data, 1);
 
 	// clock out
-	m_bus->clk_w(this, !BIT(data, 3));
+	m_iec_clk = !BIT(data, 3);
 
 	// attention in
 	m_ga->atni_w(BIT(data, 4));
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -430,14 +430,14 @@ void c1571_device::cia_cnt_w(int state)
 {
 	m_cnt_out = state;
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void c1571_device::cia_sp_w(int state)
 {
 	m_sp_out = state;
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 uint8_t c1571_device::cia_pb_r()
@@ -617,14 +617,13 @@ c1571_device::c1571_device(const machine_config &mconfig, device_type type, cons
 	m_data_out(1),
 	m_ser_dir(0),
 	m_sp_out(1),
-	m_cnt_out(1)
+	m_cnt_out(1),
+	m_iec_atn(1)
 {
 }
 
 c1571_device::c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: c1571_device(mconfig, C1571, tag, owner, clock)
-{
-}
+	: c1571_device(mconfig, C1571, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -632,9 +631,7 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1570_device::c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: c1571_device(mconfig, C1570, tag, owner, clock)
-{
-}
+	: c1571_device(mconfig, C1570, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -642,9 +639,7 @@ c1570_device::c1570_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: c1571_device(mconfig, C1571CR, tag, owner, clock)
-{
-}
+	: c1571_device(mconfig, C1571CR, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -653,6 +648,8 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 
 void c1571_device::device_start()
 {
+	m_iec_sync_timer = timer_alloc(FUNC(c1571_device::iec_sync_tick), this);
+
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 	m_floppy->setup_wpt_cb(floppy_image_device::wpt_cb(&c1571_device::wpt_callback, this));
@@ -663,6 +660,8 @@ void c1571_device::device_start()
 	save_item(NAME(m_ser_dir));
 	save_item(NAME(m_sp_out));
 	save_item(NAME(m_cnt_out));
+	save_item(NAME(m_iec_atn));
+	save_item(NAME(m_iec_clk));
 }
 
 
@@ -676,9 +675,12 @@ void c1571_device::device_reset()
 	m_fdc->dden_w(0);
 
 	m_sp_out = 1;
+	m_data_out = 1;
 	m_cnt_out = 1;
+	m_iec_atn = 1;
+	m_iec_clk = 1;
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -688,7 +690,7 @@ void c1571_device::device_reset()
 
 void c1571_device::cbm_iec_srq(int state)
 {
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -698,7 +700,7 @@ void c1571_device::cbm_iec_srq(int state)
 
 void c1571_device::cbm_iec_atn(int state)
 {
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -708,7 +710,7 @@ void c1571_device::cbm_iec_atn(int state)
 
 void c1571_device::cbm_iec_data(int state)
 {
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -749,22 +751,27 @@ void c1571_device::parallel_strobe_w(int state)
 //  update_iec -
 //-------------------------------------------------
 
-void c1571_device::update_iec()
+TIMER_CALLBACK_MEMBER(c1571_device::iec_sync_tick)
 {
 	m_cia->cnt_w(m_ser_dir || m_bus->srq_r());
 	m_cia->sp_w(m_ser_dir || m_bus->data_r());
 
-	int atn = m_bus->atn_r();
+	// serial attention
+	bool atn = m_bus->atn_r();
 	m_via0->write_ca1(!atn);
 	m_ga->atni_w(!atn);
+	m_bus->atn_w(this, m_iec_atn);
+
+	// serial clock
+	m_bus->clk_w(this, m_iec_clk);
 
 	// serial data
-	int data = !m_data_out && !m_ga->atn_r();
+	bool data = !m_data_out && !m_ga->atn_r();
 	if (m_ser_dir) data &= m_sp_out;
 	m_bus->data_w(this, data);
 
 	// fast clock
-	int srq = 1;
+	bool srq = 1;
 	if (m_ser_dir) srq &= m_cnt_out;
 	m_bus->srq_w(this, srq);
 }
