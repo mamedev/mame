@@ -49,7 +49,7 @@ private:
 	required_ioport m_sic;
 	required_ioport m_s1;
 
-	uint8_t input_r() { return !m_rs232a->dsr_r() | (!m_rs232b->dsr_r() << 1); }
+	uint8_t input_r() { return (!m_rs232a->dsr_r()) | (!m_rs232b->dsr_r() << 1); }
 	void page_w(uint8_t data) { m_page = data & 0x0f; }
 
 	uint8_t dmac_mem_r(offs_t offset) { return m_bus->memspace().read_byte((m_page << 16) | offset); }

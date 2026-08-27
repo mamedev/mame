@@ -12,8 +12,7 @@ TODO (a7000p -bios 2):
 - Hangs at boot with no harddisk (strike ESC key several times until Boot menu appears,
   then disable it in Configure machine item);
 - In turn above seems too slow to catch up (verify);
-- Floppy throws "Disc not formatted" when mounted, or numerical disk boot errors.
-  Won't format properly either;
+- Verify floppy hookup (seems working but perhaps one too many OS failures along the way);
 - CD throws "CD drive not ready or disc not present" when mounted
   (NOTE: needs filesystem changed to CDFS in Configure machine)
 - Serial mouse doesn't work even if selected;
@@ -21,7 +20,8 @@ TODO (a7000p -bios 2):
 Notes:
 - List of compatible RiscPC SWs at:
 https://arcwiki.org.uk/index.php?title=Category:Software_compatible_with_the_RiscPC&pageuntil=Minus+4#mw-pages
-
+- CTRL + F12 brings a Task window in RISCOS 4 in Desktop
+- https://www.riscosopen.org/wiki/documentation/show/CLI%20Basics%20part%201#TOC1
 
 **************************************************************************************************/
 
@@ -50,8 +50,8 @@ https://arcwiki.org.uk/index.php?title=Category:Software_compatible_with_the_Ris
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-#include "debugger.h"
 
 
 namespace {
@@ -101,6 +101,10 @@ private:
 	int iocr_od1_r();
 	void iocr_od0_w(int state);
 	void iocr_od1_w(int state);
+
+	TIMER_CALLBACK_MEMBER(tc_zero_tick);
+
+	emu_timer *m_tc_zero_timer = nullptr;
 };
 
 int riscpc_state::iocr_od1_r()
@@ -125,6 +129,11 @@ void riscpc_state::iocr_od1_w(int state)
 	m_i2cmem->write_scl(state == true ? 1 : 0);
 }
 
+TIMER_CALLBACK_MEMBER(riscpc_state::tc_zero_tick)
+{
+	m_superio->fdc_tc_w(0);
+}
+
 void riscpc_state::a7000_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
@@ -140,12 +149,19 @@ void riscpc_state::a7000_map(address_map &map)
 		NAME([this] (offs_t offset) {
 			u8 res = m_superio->fdc_dma_r(0);
 			if (!machine().side_effects_disabled())
+			{
 				m_superio->fdc_tc_w(1);
+				// TODO: accurate timing, same as below
+				m_tc_zero_timer->reset();
+				m_tc_zero_timer->adjust(attotime::from_usec(50));
+			}
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_superio->fdc_dma_w(0, data);
 			m_superio->fdc_tc_w(1);
+			m_tc_zero_timer->reset();
+			m_tc_zero_timer->adjust(attotime::from_usec(50));
 		})
 	).umask32(0x000000ff);
 //  map(0x0302b000, 0x0302bfff) //Network podule
@@ -153,6 +169,7 @@ void riscpc_state::a7000_map(address_map &map)
 //  map(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
 	map(0x03310000, 0x03310003).portr(m_mouse);
+//  map(0x033a0004, 0x033a0004) // topbanan, joystick?
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 //  map(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
@@ -194,12 +211,12 @@ INPUT_PORTS_END
 
 void riscpc_state::machine_start()
 {
-	// ...
+	m_tc_zero_timer = timer_alloc(FUNC(riscpc_state::tc_zero_tick), this);
 }
 
 void riscpc_state::machine_reset()
 {
-
+	m_tc_zero_timer->adjust(attotime::never);
 }
 
 // assume same formats as Acorn Archimedes
@@ -316,6 +333,8 @@ void riscpc_state::base_config(machine_config &config)
 	serport1.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr2_w));
 	serport1.ri_handler().set("superio", FUNC(fdc37c665gt_device::nri2_w));
 	serport1.cts_handler().set("superio", FUNC(fdc37c665gt_device::ncts2_w));
+
+	SOFTWARE_LIST(config, "flop_list").set_compatible("archimedes");
 }
 
 void riscpc_state::rpc600(machine_config &config)

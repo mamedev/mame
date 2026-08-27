@@ -1138,7 +1138,8 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 		else
 		{
 			// Rd = 15 and S Flag IS set, Result is placed in R15, and current mode SPSR moved to CPSR
-			if (rdn == eR15) {
+			if (rdn == eR15)
+			{
 				if (MODE32)
 				{
 				// When Rd is R15 and the S flag is set the result of the operation is placed in R15 and the SPSR corresponding to
@@ -1158,7 +1159,9 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 
 					if (MODE32)
 					{
-						R15 = rd;
+						// On exception return, the instruction set state comes from the restored CPSR and the address is
+						// aligned for it.  Fixes Nintendo DS boot.
+						R15 = rd & (T_IS_SET(GET_CPSR) ? ~1 : ~3);
 					}
 					else
 					{
@@ -1468,6 +1471,7 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						{
 							LOGMASKED(LOG_OPS, "%08x: LDM with PC and S bit in a mode without an SPSR (UNPREDICTABLE)\n", R15);
 						}
+						R15 &= T_IS_SET(GET_CPSR) ? ~1 : ~3; // exception return: align the address for the restored state
 					}
 					else
 					{
@@ -1538,6 +1542,7 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						{
 							LOGMASKED(LOG_OPS, "%08x: LDM with PC and S bit in a mode without an SPSR (UNPREDICTABLE)\n", R15);
 						}
+						R15 &= T_IS_SET(GET_CPSR) ? ~1 : ~3; // exception return: align the address for the restored state
 					}
 					else
 					{
