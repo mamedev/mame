@@ -148,7 +148,7 @@ void ncr5385_device::device_reset()
 	m_dst_id = 0;
 	m_aux_status = AUX_STATUS_TC_ZERO;
 	m_int_status = 0;
-	m_src_id = 0;
+	m_src_id = 0x07;
 	m_dia_status &= (DIAG_DONE | DIAG_SELF);
 	m_cnt = 0;
 
@@ -575,9 +575,7 @@ int ncr5385_device::state_step()
 	case SEL_DELAY:
 		LOGMASKED(LOG_STATE, "selection: BSY cleared\n");
 		m_state = SEL_WAIT_BSY;
-		// this is the upper-bound selection timeout; a responding target completes
-		// the selection early via scsi_ctrl_changed() asserting BSY
-		delay = SCSI_SEL_TIMEOUT;
+		delay = m_cnt ? attotime::from_ticks(u64(m_cnt) * 1024, clock()).as_ticks(1'000'000'000) : -1;
 
 		// clear BSY, optionally assert ATN
 		if (!BIT(m_cmd, 0))
@@ -597,6 +595,9 @@ int ncr5385_device::state_step()
 			LOGMASKED(LOG_STATE, "selection: timed out\n");
 			m_int_status |= INT_DISCONNECTED;
 			m_state = IDLE;
+
+			m_cnt = 0;
+			m_aux_status |= AUX_STATUS_TC_ZERO;
 
 			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN | S_SEL);
 
