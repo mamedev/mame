@@ -724,7 +724,10 @@ void cr511b_device::cmd_read()
 	LOGMASKED(LOG_CMD, "Command: Read\n");
 	LOGPARAM;
 
-	// cancel any pending data that hasn't been transfered yet
+	if (m_data_ready || m_transfer_sectors > 0)
+		LOGMASKED(LOG_CMD, "-> Canceling remaining data transfer\n");
+
+	// cancel any remaining data that hasn't been transferred yet
 	m_data_ready = false;
 	m_drq_cb(0);
 
@@ -813,14 +816,34 @@ void cr511b_device::cmd_play_track()
 	uint8_t end_track = m_input_fifo[3];
 	uint8_t end_index = m_input_fifo[4]; // TODO
 
-	if (start_track > 0 && end_track > 0)
+	// the cd+g player sends a play track command with all 0 parameters - we treat it as no-op
+	if (!(start_track == 0 && start_index == 0 && end_track == 0 && end_index == 0))
 	{
-		uint32_t start_lba = get_track_start(start_track - 1);
-		uint32_t end_lba = get_track_start(end_track - 1);
+		uint8_t const last_track = get_last_track();
 
-		LOGMASKED(LOG_CMD, "Playing audio track %d-%d to %d-%d (LBA %d to %d)\n", start_track, start_index, end_track, end_index, start_lba, end_lba);
+		if (start_track == 0 || start_track > last_track || (end_track > 0 && (end_track > last_track || start_track >= end_track)))
+		{
+			LOGMASKED(LOG_CMD, "-> Invalid track setting: start=%d, end=%d\n", start_track, end_track);
 
-		play_audio(start_lba, end_lba);
+			uint8_t status = m_status;
+
+			m_cdda->cancel_scan();
+			m_cdda->stop_audio();
+
+			status &= ~(STATUS_PLAYING | STATUS_MOTOR);
+			status |= STATUS_ERROR;
+
+			status_change(status);
+		}
+		else
+		{
+			uint32_t start_lba = get_track_start(start_track - 1);
+			uint32_t end_lba = end_track > 0 ? get_track_start(end_track - 1) : get_track_start(0xaa);
+
+			LOGMASKED(LOG_CMD, "Playing audio track %d-%d to %d-%d (LBA %d to %d)\n", start_track, start_index, end_track, end_index, start_lba, end_lba);
+
+			play_audio(start_lba, end_lba);
+		}
 	}
 
 	status_enable(0);
