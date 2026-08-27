@@ -2855,7 +2855,7 @@ ATK test: failed
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-new68k: throws "Invalid Memory Pointer" after selecting language
+Not extensively tested
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -5569,7 +5569,7 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-boots in a500p only, [FDC]? Update: doesn't with new68k
+a500: doesn't boot, [FDC]?
 Has transparent stripes all over the place during intro [Copper]
 ATK test: C:0 H:U Bad
 ]]></notes>
@@ -7837,7 +7837,6 @@ Fatal errors in ipf_decode::generate_timings type 4
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
-new68k: white screen
 Title screen background glitches out [Copper]
 Map screen mosaic effect is off [Copper]
 Gameplay missing [Denise] lives counter, missing background [Copper]
@@ -9338,8 +9337,8 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
-black screen after loading arcade mode [FDC] copy protection (enables 68k trace mode)
-new68k: Guru Meditation right after Kickstart
+Untested [FDC] floppy saving
+Not extensively tested
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -26403,8 +26402,7 @@ ATK test: C:79 Bad
 		<year>1989</year>
 		<publisher>Mirrorsoft</publisher>
 		<notes><![CDATA[
-Locks up on AmigaDOS with DSKDAT R, side effect of [FDC] with adkcon=$1100
-new68k: cyan screen (with garbage) after loading
+[FDC] randomly crashes
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -29208,9 +29206,8 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Elite</publisher>
 		<notes><![CDATA[
-Hangs at a rainbow colored screen [FDC] dsksync (fixed)
-new68k: black screen with music on, hangs with reading [FDC] DSKBYTR bit 4 (data?)
-(TODO: recheck gameplay differences compared to MD, cfr. Kenshiro doesn't strip off after reaching power level threshold, subtle copy protection?)
+[Paula] SFXs on map screens are weird (verify)
+TODO: recheck gameplay differences compared to MD, cfr. Kenshiro doesn't strip off after reaching power level threshold, subtle copy protection?
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31702,7 +31699,7 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-new68k: throws [FDC] DSKDATR, black screen
+Not extensively tested
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31795,6 +31792,8 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Thalion</publisher>
 		<notes><![CDATA[
+Throws a Guru Meditation after intro [FDC]
+https://github.com/mamedev/mame/issues/15908
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -43237,6 +43236,7 @@ ATK test: OK
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
 black screen, [FDC] dsksync
+Does an inflight [Blitter] setup
 new68k: Guru Meditation
 [FDC] accesses DSKDATR
 a500: Does not boot aftewards, accesses autoconfig RAM banks at $300000 and $c00000
@@ -45945,7 +45945,6 @@ ATK test: OK
 		<publisher>Kaiko</publisher>
 		<notes><![CDATA[
 Hangs on Lade Spiel (Game loading) after disk swap, [FDC]
-new68k: black screen [FDC]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -47633,8 +47632,9 @@ ATK test: OK
 		<publisher>Bloodhouse</publisher>
 		<notes><![CDATA[
 Punts after disk swap with "FATAL DISK ERROR! CHECK YOUR MANUAL." [FDC]
-new68k: above happens on first disk
+new68k: above happens on first disk (truly random?)
 No GFX stars during intro [Copper]
+Does a [Blitter] inflight setup during intro
 https://codetapper.com/amiga/sprite-tricks/stardust/ (coverdisc only?)
 ATK test: failed
 ]]></notes>
@@ -51869,7 +51869,8 @@ ATK test: C:79 H:L 1 Sector Bad
 		<year>1992</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
-new68k: Hangs at initial pink screen
+Doesn't draw intro properly, [Copper] or [Denise]
+Hangs at title screen [FDC]?
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -51894,9 +51895,8 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
-new68k: Hangs at initial cyan screen
-[Denise] Has slight garbage GFX stripe on bottom of screen
-Accesses [FDC] DSKDATR during initial loading
+Doesn't draw intro properly, [Copper] or [Denise]
+Hangs at title screen [FDC]?
 Requires data disk [FDC] format
 ATK test: OK
 ]]></notes>
@@ -52350,8 +52350,7 @@ ATK test: OK
 		<year>1996</year>
 		<publisher>Domark</publisher>
 		<notes><![CDATA[
-Transparency sprite issue when ball goes near the goal lines (i.e. top or bottom of field)
-new68k: Guru Meditation after AmigaDOS
+Transparency sprite issue when ball goes near the goal lines (i.e. top or bottom of field) (fixed?)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">

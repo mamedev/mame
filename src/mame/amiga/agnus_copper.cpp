@@ -240,6 +240,7 @@ void agnus_copper_device::vblank_sync(bool state)
 	if (state)
 	{
 		// If copper DMA is disabled at vblank time the restart is deferred
+		// - maglines intro would otherwise squash drawing to a very small portion at screen center
 		if (m_dma_master_enable && m_dma_copen)
 			set_pc(0, true);
 		else
