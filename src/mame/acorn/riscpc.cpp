@@ -16,12 +16,14 @@ TODO (a7000p -bios 2):
 - CD throws "CD drive not ready or disc not present" when mounted
   (NOTE: needs filesystem changed to CDFS in Configure machine)
 - Serial mouse doesn't work even if selected;
+- No VIDC10 sound even if configured in games;
 
 Notes:
 - List of compatible RiscPC SWs at:
 https://arcwiki.org.uk/index.php?title=Category:Software_compatible_with_the_RiscPC&pageuntil=Minus+4#mw-pages
 - CTRL + F12 brings a Task window in RISCOS 4 in Desktop
 - https://www.riscosopen.org/wiki/documentation/show/CLI%20Basics%20part%201#TOC1
+- "Configure SoundSystem 8bit" to attempt using older VIDC10 sound system;
 
 **************************************************************************************************/
 
@@ -320,7 +322,7 @@ void riscpc_state::base_config(machine_config &config)
 	FLOPPY_CONNECTOR(config, "superio:fdc:0", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "superio:fdc:1", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
 
-	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("superio", FUNC(fdc37c665gt_device::rxd1_w));
 	serport0.dcd_handler().set("superio", FUNC(fdc37c665gt_device::ndcd1_w));
 	serport0.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr1_w));
