@@ -72,6 +72,7 @@ private:
 	u16 m_pending_offset;
 	u16 m_pending_data;
 	u16 m_xpos_state;
+	bool m_resync_pending;
 	bool m_vertical_blank;
 };
 
