@@ -18829,6 +18829,9 @@ esp250c
 @source:esprit/executive10.cpp
 exe10102
 
+@source:excalibur/grandmaster.cpp
+egrandmas
+
 @source:excalibur/ivant.cpp
 igor
 ivant
