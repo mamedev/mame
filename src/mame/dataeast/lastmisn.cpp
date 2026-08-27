@@ -316,7 +316,7 @@ TILE_GET_INFO_MEMBER(lastmisn_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(lastmisn_state::get_fix_tile_info)
 {
 	const u32 offs = tile_index << 1;
-	const u16 tile = get_u16be(&m_bg_ram[offs]);
+	const u16 tile = get_u16be(&m_videoram[offs]);
 	const u8 color = (tile & 0xc000) >> 14;
 
 	tileinfo.set(0, tile & 0xfff, color, 0);
