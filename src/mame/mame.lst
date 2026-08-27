@@ -20285,6 +20285,9 @@ smkguras
 smkgurasa
 wiwcs
 
+@source:handheld/gc71_nes_bootleg.cpp
+gc71hh
+
 @source:handheld/gmaster.cpp
 gmaster
 
