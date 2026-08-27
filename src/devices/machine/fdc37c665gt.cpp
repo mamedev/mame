@@ -191,11 +191,6 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 	if ((offset & 0x178) == 0x170 && enabled_logical[LogicalDevice::IDE]) {
 		// $1f0 IDE1 cs0
 		// $3f0 IDE1 cs1
-		if ((offset & 0x6) == 6)
-			return machine().rand();
-
-		// $170 IDE2 cs0
-		// $370 IDE2 cs1
 		// $170 IDE2 cs0
 		// $370 IDE2 cs1
 		const u8 cs_select = BIT(offset, 9);

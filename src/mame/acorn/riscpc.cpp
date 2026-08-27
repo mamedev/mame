@@ -9,14 +9,13 @@ TODO:
 - a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
 
 TODO (a7000p -bios 2):
-- Hangs at boot with no harddisk (strike ESC key several times until Boot menu appears,
+- Hangs at boot with nullptr ide1:0 option (strike ESC key several times until Boot menu appears,
   then disable it in Configure machine item);
-- In turn above seems too slow to catch up (verify);
-- Verify floppy hookup (seems working but perhaps one too many OS failures along the way);
+- In turn the ESC key Cancel looks too slow to catch up (verify);
 - CD throws "CD drive not ready or disc not present" when mounted
   (NOTE: needs filesystem changed to CDFS in Configure machine)
 - Serial mouse doesn't work even if selected;
-- No VIDC10 sound even if configured in games;
+- No VIDC10 sound even if configured in games, needs support in IOMD sound DMA;
 
 Notes:
 - List of compatible RiscPC SWs at:
@@ -313,9 +312,11 @@ void riscpc_state::base_config(machine_config &config)
 	m_superio->ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
 	m_superio->nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
 
-
 	INPUT_MERGER_ANY_HIGH(config, "ide_irq").output_handler().set(m_iomd, FUNC(arm_iomd_device::int7_w));
 
+	// cfr. note on top, we need to reserve first option for an HDD connector
+	// (even if user don't mount one)
+	subdevice<ata_slot_device>("superio:ide1:0")->set_default_option("hdd");
 	subdevice<ata_interface_device>("superio:ide1")->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<0>));
 	subdevice<ata_interface_device>("superio:ide2")->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<1>));
 
