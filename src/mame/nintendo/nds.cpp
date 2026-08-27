@@ -834,10 +834,9 @@ void nds_state::dma_exec(int ch)
 {
 	address_space &space = (ch < 4) ? m_arm9->space(AS_PROGRAM) : m_arm7->space(AS_PROGRAM);
 	const uint32_t ctrl = m_dma_ctrl[ch];
-	const int dstadd = (ctrl >> 21) & 3;
 	const int srcadd = (ctrl >> 23) & 3;
-	const bool wide = BIT(ctrl, 26);
-	const int step = wide ? 4 : 2;
+	int dstadd = (ctrl >> 21) & 3;
+	bool wide = BIT(ctrl, 26);
 
 	uint32_t src = m_dma_src[ch];
 	uint32_t dst = m_dma_dst[ch];
@@ -849,10 +848,14 @@ void nds_state::dma_exec(int ch)
 	}
 
 	// a GBA-mode direct sound DMA always transfers four 32-bit words
-	if (m_gba_mode && (ch >= 4) && (((ctrl >> 28) & 3) == 3))
+	if (m_gba_mode && ((ch == 5) || (ch == 6)) && (((ctrl >> 28) & 3) == 3))
 	{
 		cnt = 4;
+		wide = true;
+		dstadd = 2;
 	}
+
+	const int step = wide ? 4 : 2;
 
 	LOGMASKED(LOG_DMA, "DMA%d: %08x -> %08x, %x %d-bit units\n", ch, src, dst, cnt, wide ? 32 : 16);
 
@@ -2723,7 +2726,7 @@ uint32_t nds_state::gba_io_r(offs_t offset, uint32_t mem_mask)
 	}
 
 	bool handled = false;
-	if (offset < ENGINE_A_END_OFFSET)
+	if (offset < GBA_LCD_END_OFFSET)
 	{
 		if (offset == DISPSTAT_OFFSET)
 		{
@@ -2764,7 +2767,7 @@ void nds_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 
 	bool handled = false;
-	if (offset < ENGINE_A_END_OFFSET)
+	if (offset < GBA_LCD_END_OFFSET)
 	{
 		if (offset == DISPSTAT_OFFSET)
 		{
