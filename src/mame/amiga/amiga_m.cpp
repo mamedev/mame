@@ -344,17 +344,27 @@ void amiga_state::update_irqs()
 	}
 
 	// int 2 and 6 are level triggered
+	uint16_t level_interrupts = 0;
+
 	if (int2_pending())
-		CUSTOM_REG(REG_INTREQ) |= INTENA_PORTS;
+		level_interrupts |= INTENA_PORTS;
 
 	if (int6_pending())
-		CUSTOM_REG(REG_INTREQ) |= INTENA_EXTER;
+		level_interrupts |= INTENA_EXTER;
+
+	uint16_t const newly_asserted = level_interrupts & ~CUSTOM_REG(REG_INTREQ);
+
+	CUSTOM_REG(REG_INTREQ) |= level_interrupts;
+
+	// schedule another call to us if new interrupts arrived
+	if (newly_asserted)
+		m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
 }
 
 TIMER_CALLBACK_MEMBER( amiga_state::irq_process_callback )
 {
-	update_irqs();
 	m_irq_timer->reset();
+	update_irqs();
 }
 
 void amiga_state::paula_int_w (offs_t channel, u8 state)

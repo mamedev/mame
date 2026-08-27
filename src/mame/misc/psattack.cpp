@@ -173,12 +173,12 @@ private:
 
 u8 psattack_state::cfcard_regs_r(offs_t offset)
 {
-	return m_ata->cs0_r(offset & 7, 0x000000ff);
+	return m_ata->cs0_r(offset & 7);
 }
 
 void psattack_state::cfcard_regs_w(offs_t offset, u8 data)
 {
-	m_ata->cs0_w(offset & 7, data, 0x000000ff);
+	m_ata->cs0_w(offset & 7, data);
 }
 
 // The startup path at 0x0205c0e2 (RAM) programs the peripheral chip select at
@@ -194,7 +194,7 @@ u8 psattack_state::pic_status_r()
 
 u16 psattack_state::cfcard_data_r()
 {
-	return m_ata->cs0_r(0, 0x0000ffff);
+	return m_ata->cs0_r(0);
 }
 
 void psattack_state::output_w(offs_t offset, u32 data, u32 mem_mask)

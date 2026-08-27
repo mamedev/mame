@@ -71,7 +71,7 @@ license:CC0-1.0
 	    Dream Fighter                   Perfume                     Dream Fighter                   Perfume
 	    ポリリズム                      Perfume                     Polyrhythm                      Perfume -->
 	<software name="user5" supported="no">
-		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs, set 1) (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -126,6 +126,24 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- this one has some songs programmed into it:
+	    言葉より大切なもの              嵐                              Kotoba Yori Taisetsu na Mono    ARASHI
+	    時代（ジダイ）                  嵐                              Jidai                           ARASHI
+	    PIKA☆☆NCHI DOUBLE               嵐                              PIKA☆☆NCHI DOUBLE               ARASHI
+	    Believe                         嵐                              Believe                         ARASHI
+	    Love so sweet                   嵐                              Love so sweet                   ARASHI -->
+	<software name="user5d" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_5_3.bin" size="0x100000" crc="c4d75e61" sha1="225d5be516ca54393ad5ce7e46b6a445d51d0c35"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 	<!-- this one has some songs programmed into it:
 	    雫                              スキマスイッチ                  Shizuku                         Sukima Switch

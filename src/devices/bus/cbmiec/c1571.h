@@ -97,7 +97,7 @@ protected:
 		LED_ACT
 	};
 
-	void update_iec();
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
@@ -110,13 +110,17 @@ protected:
 	output_finder<2> m_leds;
 
 	// signals
-	int m_1_2mhz;                           // clock speed
+	bool m_1_2mhz;                           // clock speed
 
 	// IEC bus
-	int m_data_out;                         // serial data out
-	int m_ser_dir;                          // fast serial direction
-	int m_sp_out;                           // fast serial data out
-	int m_cnt_out;                          // fast serial clock out
+	bool m_data_out;                         // serial data out
+	bool m_ser_dir;                          // fast serial direction
+	bool m_sp_out;                           // fast serial data out
+	bool m_cnt_out;                          // fast serial clock out
+	bool m_iec_atn;
+	bool m_iec_clk;
+
+	emu_timer *m_iec_sync_timer;
 };
 
 
@@ -155,8 +159,8 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(C1570,      c1570_device)
-DECLARE_DEVICE_TYPE(C1571,      c1571_device)
-DECLARE_DEVICE_TYPE(C1571CR,    c1571cr_device)
+DECLARE_DEVICE_TYPE(C1570, c1570_device)
+DECLARE_DEVICE_TYPE(C1571, c1571_device)
+DECLARE_DEVICE_TYPE(C1571CR, c1571cr_device)
 
 #endif // MAME_BUS_CBMIEC_C1571_H

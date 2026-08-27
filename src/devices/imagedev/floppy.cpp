@@ -2532,7 +2532,7 @@ void teac_fd_55g::setup_characteristics()
 //-------------------------------------------------
 //  ALPS 32551901 (black) / 32551902 (brown)
 //
-//  used in the Commodoere 1541 disk drive
+//  used in the Commodore 1541 disk drive
 //-------------------------------------------------
 
 alps_3255190x::alps_3255190x(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

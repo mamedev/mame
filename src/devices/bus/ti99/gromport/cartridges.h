@@ -171,6 +171,8 @@ public:
 	ti99_cartridge_pcb();
 	virtual ~ti99_cartridge_pcb() { }
 
+	device_t &device() { return *m_cart; }
+
 protected:
 	virtual void readz(offs_t offset, uint8_t *value);
 	virtual void write(offs_t offset, uint8_t data);
@@ -199,7 +201,6 @@ protected:
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
 	bool                is_grom_idle() { return m_cart->m_grom_idle; }
-	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const { m_cart->logerror(fmt, args...); }
 
 	ti99_cartridge_device*  m_cart;
 

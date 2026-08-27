@@ -2378,6 +2378,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/nds/ndsslot.h,BUSES["NDS"] = true
+---------------------------------------------------
+
+if BUSES["NDS"] then
+	files {
+		MAME_DIR .. "src/devices/bus/nds/ndsslot.cpp",
+		MAME_DIR .. "src/devices/bus/nds/ndsslot.h",
+		MAME_DIR .. "src/devices/bus/nds/rom.cpp",
+		MAME_DIR .. "src/devices/bus/nds/rom.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/generic/slot.h,BUSES["GENERIC"] = true
 ---------------------------------------------------
 

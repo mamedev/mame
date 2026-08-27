@@ -323,7 +323,7 @@ public:
 	{
 	}
 
-	virtual uint32_t lba_address() override
+	virtual uint64_t lba_address() override
 	{
 		if (m_device_head & IDE_DEVICE_HEAD_L)
 			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;

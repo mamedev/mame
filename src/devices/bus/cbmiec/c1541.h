@@ -27,8 +27,8 @@
 // ======================> c1541_device_base
 
 class c1541_device_base :  public device_t,
-					  public device_cbm_iec_interface,
-					  public device_c64_floppy_parallel_interface
+					       public device_cbm_iec_interface,
+					       public device_c64_floppy_parallel_interface
 {
 protected:
 	// construction/destruction
@@ -63,8 +63,6 @@ private:
 		LED_ACT
 	};
 
-	inline void set_iec_data();
-
 	void via0_irq_w(int state);
 	virtual uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
@@ -85,12 +83,11 @@ private:
 	required_ioport m_address;
 	output_finder<2> m_leds;
 
-	// IEC bus
-	int m_data_out;                         // serial data out
+	bool m_iec_clk;
+	bool m_iec_data;
 
-	// interrupts
-	int m_via0_irq;                         // VIA #0 interrupt request
-	int m_via1_irq;                         // VIA #1 interrupt request
+	emu_timer *m_iec_sync_timer;
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 };
 
 
@@ -169,11 +166,11 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(C1540,                      c1540_device)
-DECLARE_DEVICE_TYPE(C1541,                      c1541_device)
-DECLARE_DEVICE_TYPE(C1541C,                     c1541c_device)
-DECLARE_DEVICE_TYPE(C1541II,                    c1541ii_device)
-DECLARE_DEVICE_TYPE(SX1541,                     sx1541_device)
+DECLARE_DEVICE_TYPE(C1540, c1540_device)
+DECLARE_DEVICE_TYPE(C1541, c1541_device)
+DECLARE_DEVICE_TYPE(C1541C, c1541c_device)
+DECLARE_DEVICE_TYPE(C1541II, c1541ii_device)
+DECLARE_DEVICE_TYPE(SX1541, sx1541_device)
 
 
 #endif // MAME_BUS_CBMIEC_C1541_H

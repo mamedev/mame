@@ -3376,6 +3376,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/s35180.h,MACHINES["S35180"] = true
+---------------------------------------------------
+
+if MACHINES["S35180"] then
+	files {
+		MAME_DIR .. "src/devices/machine/s35180.cpp",
+		MAME_DIR .. "src/devices/machine/s35180.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/s3520cf.h,MACHINES["S3520CF"] = true
 ---------------------------------------------------
 

@@ -218,7 +218,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->cs0_r(offset - 8, 0xff);
+			return m_ata->cs0_r(offset - 8);
 	}
 
 	return get_open_bus();
@@ -264,7 +264,7 @@ void a2bus_cffa2000_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->cs0_w(offset-8, data, 0xff);
+			m_ata->cs0_w(offset-8, data);
 			break;
 	}
 }

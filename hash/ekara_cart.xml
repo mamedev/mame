@@ -3211,15 +3211,56 @@ license:CC0-1.0
 	     アンパンマンたいそう                                              ドリーミング                        Anpanman Taisō                      Dreaming
 	     アンパンマンのマーチ                                              ドリーミング                        Anpanman no March                   Dreaming
 	     キューティーハニー                                                倖田來未                            Cutie Honey                         Kōda Kumi
-	     勇気１００％（２００２）                                          Ya-Ya-yah                           Yūki 100% (2002)                    Ya-Ya-yah -->
+	     勇気１００％（2002）                                              Ya-Ya-yah                           Yūki 100% (2002)                    Ya-Ya-yah -->
 	<software name="ekaraweb28b" cloneof="ekaraweb28">
-		<description>e-kara Web cartridge 28M (used, with 28 songs) (Japan)</description>
+		<description>e-kara Web cartridge 28M (used, with 28 songs, set 1) (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekara_user_red.bin" size="0x200000" crc="2acf2b95" sha1="100106cf9da486fcc5dae328721feb2ffba74b3b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     さくらんぼ                        大塚愛                                                                      Sakuranbo                           Ōtsuka Ai
+	     Yeah！めっちゃホリデイ            松浦亜弥                                                                    Yeah! Meccha Holiday                Matsuura Aya
+	     ね〜え？                          松浦亜弥                                                                    Nee?                                Matsuura Aya
+	     ♡桃色片想い♡                      松浦亜弥                                                                    ♡Momoiro Kataomoi♡                  Matsuura Aya
+	     愛のために。                      上戸彩                                                                      Ai no Tame ni.                      Ueto Aya
+	     世界に一つだけの花                SMAP                                                                        Sekai ni Hitotsu Dake no Hana       SMAP
+	     さんぽ                            井上あずみ                                                                  Sanpo                               Inoue Azumi
+	     タッチ                            岩崎良美                                                                    TOUCH                               Iwasaki Yoshimi
+	     マツケンサンバⅡ                   松平健                                                                      Matsuken Samba II                   Matsudairi Ken
+	     気がつけば あなた                 松浦亜弥                                                                    Ki ga Tsukeba Anata                 Matsuura Aya
+	     勇気１００％（2002）              Ya-Ya-yah                                                                   Yūki 100% (2002)                    Ya-Ya-yah
+	     チェリー                          スピッツ                                                                    Cherry                              Spitz
+	     キューティーハニー                前川陽子                                                                    Cutie Honey                         Maekawa Yōko
+	     花                                ORANGE RANGE                                                                Hana                                Orange Range
+	     I can’t stop my love for you♡     愛内里菜                                                                    I can’t stop my love for you♡       Aiuchi Rina
+	     START                             愛内里菜                                                                    START                               Aiuchi Rina
+	     世界はそれを愛と呼ぶんだぜ        サンボマスター                                                              Sekai wa Sore o Ai to Yobun Daze    Sambomaster
+	     生きてこそ                        Kiroro                                                                      Ikite Koso                          Kiroro
+	     Sign                              Mr.Children                                                                 Sign                                Mr.Children
+	     PECORI♥NIGHT                      Gorie with Jasmine&Joann                                                    PECORI♥NIGHT                        Gorie with Jasmine & Joann
+	     NO MORE CRY                       D-51                                                                        No More Cry                         D-51
+	     プラネタリウム                    大塚愛                                                                      Planetarium                         Ōtsuka Ai
+	     青春アミーゴ                      修二と彰                                                                    Seishun Amigo                       Shūji to Akira
+	     POP STAR                          平井堅                                                                      Pop Star                            Hirai Ken
+	     あじゃぱー                        かいけつゾロリ（山寺宏一）・イシシ（愛河里花子）・ノシシ（くまいもとこ）    Ajapa                               Kaiketsu Zorori (Yamadera Kōichi)/Ishishi (Aikawa Rikako)/Noshishi (Kumai Motoko)
+	     ココロのちず                      BOYSTYLE                                                                    Kokoro no Chizu                     BOYSTYLE
+	     SMILY                             大塚愛                                                                      Smily                               Ōtsuka Ai
+	     ファンタスティポ                  トラジ・ハイジ                                                              Fantastipo                          Toraji Haiji -->
+	<software name="ekaraweb28c" cloneof="ekaraweb28">
+		<description>e-kara Web cartridge 28M (used, with 28 songs, set 2) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart28_28.bin" size="0x200000" crc="a45bc1aa" sha1="b962b78f4eb26a0524cc72523f1d7fbbea0aa1b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3381,7 +3422,7 @@ license:CC0-1.0
 	     Reach for the sky                               倉木麻衣                        Reach for the sky                        Kuraki Mai
 	     さくらんぼ                                      大塚愛                          Sakuranbo                                Ōtsuka Ai
 	     Dream×Dream                                     愛内里菜                        Dream×Dream                              Aiuchi Rina
-	     I can’t stop my love for you♥                   愛内里菜                        I can’t stop my love for you♥            Aiuchi Rina
+	     I can’t stop my love for you♡                   愛内里菜                        I can’t stop my love for you♡            Aiuchi Rina
 	     MESSAGE                                         上戸彩                          Message                                  Ueto Aya
 	     愛のために。                                    上戸彩                          Ai no Tame ni.                           Ueto Aya
 	     無色                                            上原あずみ                      Mushoku                                  Uehara Azumi
@@ -3545,6 +3586,73 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekara_user_orange.bin" size="0x100000" crc="5614327d" sha1="5c415fe2529f0ee084914fe0ddb35d2ef161c939"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     Triangle                      SMAP                            Triangle                               SMAP
+	     夢物語                        タッキー & 翼                   Yumemonogatari                         Tackey & Tsubasa
+	     恋しさと せつなさと 心強さと  篠原涼子 with t.komuro          Itoshisato Setsunasato Kokorozuyosato  Shinohara Ryōko with t.komuro
+	     桜援歌(Oh!ENKA)               関ジャニ∞                       Oh! Enka                               Kanajani Eight
+	     兄弟船                        鳥羽一郎                        Kyōdai Bune                            Toba Ichirō
+	     昔の名前で出ています          小林旭                          Mukashi no Namae de Deimasu            Kobayashi Akira
+	     長崎は今日も雨だった          内山田洋とクール・ファイブ      Nagasaki wa Kyō mo Amedatta            Uchiyamada Hiroshi to Cool Five
+	     釧路湿原                      水森かおり                      Kushiro Shitsugen                      Mizumori Kaori
+	     浮雲ふたり                    神野美伽                        Ukigumo Futari                         Shinno Mika
+	     雪椿                          小林幸子                        Yukitsubaki                            Kobayashi Sachiko
+	     川の流れのように              美空ひばり                      Kawa no Nagare no Yō ni                Misora Hibari
+	     ありがとう                    SMAP                            Arigatō                                SMAP -->
+	<software name="ekaraweb12n" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 11) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart12_12_1.bin" size="0x100000" crc="fe54acf0" sha1="c583b66a9b9d84fc5653a07ca70132ce6b86aaa1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     Dear WOMAN                    SMAP                            Dear WOMAN              SMAP
+	     フレンジャー                  大塚愛                          Frienger                Ōtsuka Ai
+	     宙船（そらふね）              ΤΟΚΙΟ                           Sorafune                Tokio
+	     粉雪                          レミオロメン                    Konayuki                Remioromen
+	     どんなときも。                槇原敬之                        Donna Toki mo.          Makihara Noriyuki
+	     僕のキモチ                    Wat                             Boku no Kimochi         WaT
+	     Ready Go!                     WaT                             Ready Go!               WaT
+	     恋におちたら                  Crystal Kay                     Koi ni Ochitara         Crystal Kay
+	     何度でも                      DREAMS COME TRUE                Nando Demo              DREAMS COME TRUE
+	     恋のバカンス                  ザ・ピーナッツ                  Koi no Vacance          The Peanuts
+	     地上の星                      中島みゆき                      Chijō no Hoshi          Nakajima Miyuki
+	     恋のつぼみ                    倖田來未                        Koi no Tsubomi          Kōda Kumi -->
+	<software name="ekaraweb12o" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 12) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart12_12_2.bin" size="0x100000" crc="9e5e3a95" sha1="e961e0b6a0d047fc67f47c26bb187c2a0e6dbdec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     おどるポンポコリン            B.B.クィーンズ                  Odoru Pompokolin        B.B.QUEENS
+	     チャンピオーネ                ORANGE RANGE                    Champione               ORANGE RANGE
+	     全力少年                      スキマスイッチ                  Zenryoku Shōnen         Sukima Switch
+	     ボクノート                    スキマスイッチ                  Bokunote                Sukima Switch -->
+	<software name="ekaraweb12p" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 4 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart12_4.bin" size="0x100000" crc="9ed939b1" sha1="69fd57d2b58f0606339b603ca8a9662203e3e152"/>
 			</dataarea>
 		</part>
 	</software>

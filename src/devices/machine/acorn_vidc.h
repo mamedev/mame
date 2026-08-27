@@ -13,6 +13,7 @@
 
 #include "speaker.h"
 #include "sound/dac.h"
+#include "sound/mixer.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -78,20 +79,23 @@ protected:
 	inline void screen_vblank_line_update();
 	inline void screen_dynamic_res_change();
 	void refresh_sound_frequency();
+	virtual u32 get_sound_clock();
 
 	u16 m_pal_4bpp_base;
 	u16 m_pal_cursor_base;
 	u16 m_pal_border_base;
 
 	u8 m_bpp_mode, m_crtc_interlace;
-	u8       m_sound_frequency_latch;
-	bool     m_sound_mode;
+	u16 m_sound_frequency_latch;
+	bool m_sound_mode;
 
 	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
+	required_device_array<mixer_device, 2> m_mixer;
 	int m_dac_type;
 
 	required_device<speaker_device> m_speaker;
 
+	void stereo_image_w(offs_t offset, u32 data);
 	virtual void refresh_stereo_image(u8 channel);
 	const int m_sound_max_channels = 8;
 private:
@@ -100,7 +104,6 @@ private:
 
 	void pal_data_display_w(offs_t offset, u32 data);
 	void pal_data_cursor_w(offs_t offset, u32 data);
-	void stereo_image_w(offs_t offset, u32 data);
 	void crtc_w(offs_t offset, u32 data);
 	void sound_frequency_w(u32 data);
 	void control_w(u32 data);
@@ -125,7 +128,7 @@ private:
 
 	bool m_sound_frequency_test_bit;
 	u8       m_stereo_image[8];
-	const float m_sound_input_gain = 0.05f;
+	const float m_sound_input_gain = 0.125f;
 	int16_t  m_ulaw_lookup[256];
 };
 
@@ -153,6 +156,8 @@ public:
 	// construction/destruction
 	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	void set_ext_sclk(u32 clock) { m_ext_sclk = clock; }
+
 	void write_dac32(u8 channel, u16 data);
 	virtual bool get_dac_mode() override;
 
@@ -166,6 +171,8 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock() override;
 
+	virtual u32 get_sound_clock() override;
+
 private:
 	void vidc20_pal_data_display_w(offs_t offset, u32 data);
 	void vidc20_pal_data_index_w(u32 data);
@@ -178,7 +185,7 @@ private:
 
 	u8 m_pal_data_index;
 	inline void update_8bpp_palette(u16 index, u32 paldata);
-	bool m_dac_serial_mode;
+	bool m_dac_serial_mode, m_sdac, m_clksel;
 	u8 m_pixel_source;
 	u8 m_pixel_rate;
 	u8 m_vco_r_modulo;
@@ -186,7 +193,9 @@ private:
 
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac32;
 
-	virtual void refresh_stereo_image(u8 channel) override;
+	u32 m_ext_sclk;
+
+//	virtual void refresh_stereo_image(u8 channel) override;
 };
 
 DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)

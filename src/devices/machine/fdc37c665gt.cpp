@@ -201,7 +201,7 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 
 		auto &ide_dev = m_ide[ide_target];
 
-		return cs_select ? ide_dev->cs1_r(offset & 7, 0xff) : ide_dev->cs0_r(offset & 7, 0xff);
+		return cs_select ? ide_dev->cs1_r(offset & 7) : ide_dev->cs0_r(offset & 7);
 	}
 
 	return 0;
@@ -298,9 +298,9 @@ void fdc37c665gt_device::write(offs_t offset, uint8_t data)
 		auto &ide_dev = m_ide[ide_target];
 
 		if(cs_select)
-			ide_dev->cs1_w(offset & 7, data, 0xff);
+			ide_dev->cs1_w(offset & 7, data);
 		else
-			ide_dev->cs0_w(offset & 7, data, 0xff);
+			ide_dev->cs0_w(offset & 7, data);
 	}
 }
 

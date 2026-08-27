@@ -78,13 +78,10 @@ Fails loading
 		</part>
 	</software>
 
-	<software name="bbsb" supported="yes">
+	<software name="bbsb">
 		<description>Bounty Bob Strikes Back! (v1.2)</description>
 		<year>1985</year>
 		<publisher>Big Five</publisher>
-		<notes><![CDATA[
-LOAD "*",8 then LOAD "BBSB",8,1
-]]></notes>
 		<info name="usage" value="Needs a joystick in port 1 once it loads"/>
 		<info name="protection" value="halftrack" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
@@ -237,6 +234,7 @@ Punts to BASIC, or just fails loading
 		<year>1985</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
+DOES NOT WORK IN VICE EITHER
 LOAD "0:*",8,1
 Locks up during boot
 ]]></notes>
@@ -452,7 +450,7 @@ All games fails loading
 		</part>
 	</software>
 
-	<software name="geos20de" supported="no">
+	<software name="geos20de">
 		<description>GEOS 2.0 (Germany)</description>
 		<year>1988</year>
 		<publisher>Berkeley Softworks</publisher>
@@ -503,6 +501,26 @@ All games fails loading
 			<feature name="part_id" value="Disk 4 Side 2"/>
 			<dataarea name="flop" size="174848">
 				<rom name="geos20de_4b.d64" size="174848" crc="53ae19b1" sha1="bd3739c266aca675589ddf3783b558aad83370c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos15">
+		<description>GEOS deskTop 1.5</description>
+		<year>1988</year>
+		<publisher>Berkeley Softworks</publisher>
+		<info name="serial" value="317749-01" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1: GEOS deskTop 1.5 for the Commodore 64C"/>
+			<dataarea name="flop" size="279582">
+				<rom name="geos15_1a.g64" size="279582" crc="572ca967" sha1="b23b40dd0ac00c4a97a9aa0f00e84c6b9debb947"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2: GEOS Additional for the Commodore 64C"/>
+			<dataarea name="flop" size="287512">
+				<rom name="geos15_1b.g64" size="287512" crc="b6b5004d" sha1="1267ca44e408e5939919d12783adda6ec7f41412"/>
 			</dataarea>
 		</part>
 	</software>

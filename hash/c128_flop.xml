@@ -722,7 +722,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm1581" supported="no">
+	<software name="cpm1581" cloneof="cpm">
 		<description>CP/M Version 3.0 (1581)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>

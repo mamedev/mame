@@ -123,42 +123,42 @@ void ripple_ide_device::banked_flash_w(offs_t offset, uint8_t data)
 
 uint16_t ripple_ide_device::ide0_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_0->cs0_swap_r(offset >> 8, mem_mask);
+	return m_ata_0->cs0_swap_r(offset >> 8);
 }
 
 void ripple_ide_device::ide0_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_0->cs0_swap_w(offset >> 8, data, mem_mask);
+	m_ata_0->cs0_swap_w(offset >> 8, data);
 }
 
 uint16_t ripple_ide_device::ide0_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_0->cs1_swap_r(offset >> 8, mem_mask);
+	return m_ata_0->cs1_swap_r(offset >> 8);
 }
 
 void ripple_ide_device::ide0_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_0->cs1_swap_w(offset >> 8, data, mem_mask);
+	m_ata_0->cs1_swap_w(offset >> 8, data);
 }
 
 uint16_t ripple_ide_device::ide1_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_1->cs0_swap_r(offset >> 8, mem_mask);
+	return m_ata_1->cs0_swap_r(offset >> 8);
 }
 
 void ripple_ide_device::ide1_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_1->cs0_swap_w(offset >> 8, data, mem_mask);
+	m_ata_1->cs0_swap_w(offset >> 8, data);
 }
 
 uint16_t ripple_ide_device::ide1_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_1->cs1_swap_r(offset >> 8, mem_mask);
+	return m_ata_1->cs1_swap_r(offset >> 8);
 }
 
 void ripple_ide_device::ide1_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_1->cs1_swap_w(offset >> 8, data, mem_mask);
+	m_ata_1->cs1_swap_w(offset >> 8, data);
 }
 
 

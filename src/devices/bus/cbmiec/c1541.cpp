@@ -302,8 +302,8 @@ const tiny_rom_entry *sx1541_device::device_rom_region() const
 void c1541_device_base::c1541_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
-	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x63f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x1c00, 0x1c0f).mirror(0x63f0).m(m_via1, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region(M6502_TAG, 0);
 }
 
@@ -356,6 +356,16 @@ uint8_t c1541_device_base::via0_pb_r()
 	return data;
 }
 
+TIMER_CALLBACK_MEMBER(c1541_device_base::iec_sync_tick)
+{
+	m_via0->write_ca1(!m_bus->atn_r());
+
+	m_bus->clk_w(this, m_iec_clk);
+
+	bool data = m_iec_data && !m_ga->atn_r();
+	m_bus->data_w(this, data);
+}
+
 void c1541_device_base::via0_pb_w(uint8_t data)
 {
 	/*
@@ -373,14 +383,10 @@ void c1541_device_base::via0_pb_w(uint8_t data)
 
 	*/
 
-	// data out
-	m_data_out = BIT(data, 1);
+	m_iec_clk = !BIT(data, 3);
+	m_iec_data = !BIT(data, 1);
 
-	// attention acknowledge
-	m_ga->atna_w(BIT(data, 4));
-
-	// clock out
-	m_bus->clk_w(this, !BIT(data, 3));
+	m_ga->atna_w(BIT(data, 4)); // triggers IEC sync
 }
 
 void c1541_device_base::via0_ca2_w(int state)
@@ -480,7 +486,7 @@ void c1541_device_base::via1_pb_w(uint8_t data)
 
 void c1541_device_base::atn_w(int state)
 {
-	set_iec_data();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void c1541_device_base::byte_w(int state)
@@ -576,23 +582,6 @@ ioport_constructor c1541_device_base::device_input_ports() const
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  set_iec_data -
-//-------------------------------------------------
-
-inline void c1541_device_base::set_iec_data()
-{
-	int data = !m_data_out && !m_ga->atn_r();
-
-	m_bus->data_w(this, data);
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -610,8 +599,7 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 	m_via1(*this, M6522_1_TAG),
 	m_ga(*this, C64H156_TAG),
 	m_address(*this, "ADDRESS"),
-	m_leds(*this, "led%u", 0U),
-	m_data_out(1)
+	m_leds(*this, "led%u", 0U)
 {
 }
 
@@ -662,11 +650,14 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 
 void c1541_device_base::device_start()
 {
+	m_iec_sync_timer = timer_alloc(FUNC(c1541_device_base::iec_sync_tick), this);
+
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 
 	// register for state saving
-	save_item(NAME(m_data_out));
+	save_item(NAME(m_iec_clk));
+	save_item(NAME(m_iec_data));
 }
 
 
@@ -688,10 +679,7 @@ void c1541_device_base::device_reset()
 
 void c1541_device_base::cbm_iec_atn(int state)
 {
-	m_via0->write_ca1(!state);
-	m_ga->atni_w(!state);
-
-	set_iec_data();
+	m_ga->atni_w(!state); // triggers IEC sync
 }
 
 
