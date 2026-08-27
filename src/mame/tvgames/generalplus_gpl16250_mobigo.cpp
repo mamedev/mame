@@ -98,6 +98,14 @@ ROM_START( mobigos )
 	ROM_LOAD16_WORD_SWAP("mobigospanish.bin", 0x0000, 0x200000, CRC(462b4f9d) SHA1(1541152f1a359bc18de4d4f3d5038a954c9a3ad4))
 ROM_END
 
+ROM_START( mobigouk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("mobigo_uk.u5", 0x0000, 0x200000, CRC(efd27779) SHA1(b8f99a5c05d0fc8bbaf22996f9e699e0ea9ab4da) )
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00) // for built-in games and/or downloads? (not a boot ROM)
+	ROM_LOAD16_WORD_SWAP("mx25l1606e.u3", 0x0000, 0x200000, CRC(94a1b745) SHA1(a99ef67a6cbf93dd33ee2756627fe96abfe8690e) )
+ROM_END
+
 ROM_START( mobigof )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("mobigo_fr.u5", 0x0000, 0x200000, CRC(61d739aa) SHA1(d23d4c806f1b60058c57ea9b339a7c5e3124bafa))
@@ -115,5 +123,6 @@ ROM_END
 // ----------------------------------------------------
 
 CONS( 2010, mobigo,  0,      0, mobigo, mobigo, mobigo_state, init_mobigo, "VTech", "MobiGo (USA)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, mobigouk,mobigo, 0, mobigo, mobigo, mobigo_state, init_mobigo, "VTech", "MobiGo (UK)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2011, mobigos, mobigo, 0, mobigo, mobigo, mobigo_state, init_mobigo, "VTech", "MobiGo (Spain)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2011, mobigof, mobigo, 0, mobigo, mobigo, mobigo_state, init_mobigo, "VTech", "MobiGo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
