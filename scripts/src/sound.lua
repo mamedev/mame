@@ -1954,6 +1954,18 @@ if SOUNDS["GT155"] then
 end
 
 ---------------------------------------------------
+-- Nintendo DS Sound
+--@src/devices/sound/nds_sound.h,SOUNDS["NDS_SOUND"] = true
+---------------------------------------------------
+
+if SOUNDS["NDS_SOUND"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nds_sound.cpp",
+		MAME_DIR .. "src/devices/sound/nds_sound.h",
+	}
+end
+
+---------------------------------------------------
 -- Nintendo MMC5 Sound
 --@src/devices/sound/mmc5.h,SOUNDS["MMC5"] = true
 ---------------------------------------------------
