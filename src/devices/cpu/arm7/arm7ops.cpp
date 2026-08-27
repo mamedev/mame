@@ -1471,7 +1471,12 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						{
 							LOGMASKED(LOG_OPS, "%08x: LDM with PC and S bit in a mode without an SPSR (UNPREDICTABLE)\n", R15);
 						}
-						R15 &= T_IS_SET(GET_CPSR) ? ~1 : ~3; // exception return: align the address for the restored state
+
+						// if the new mode we just SwitchMode'd to is 32-bit, mask R15 correctly for ARM vs Thumb
+						if (MODE32)
+						{
+							R15 &= T_IS_SET(GET_CPSR) ? ~1 : ~3;
+						}
 					}
 					else
 					{
@@ -1542,7 +1547,12 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						{
 							LOGMASKED(LOG_OPS, "%08x: LDM with PC and S bit in a mode without an SPSR (UNPREDICTABLE)\n", R15);
 						}
-						R15 &= T_IS_SET(GET_CPSR) ? ~1 : ~3; // exception return: align the address for the restored state
+
+						// if the new mode we just SwitchMode'd to is 32-bit, mask R15 correctly for ARM vs Thumb
+						if (MODE32)
+						{
+							R15 &= T_IS_SET(GET_CPSR) ? ~1 : ~3;
+						}
 					}
 					else
 					{
