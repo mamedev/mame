@@ -49,12 +49,15 @@ license:CC0-1.0
 	x is region
 	00 = USA
 	01 = ? (not seen)
-	22 = Spain
+	02 = ? (not seen)
 	03 = UK
 	04 = Germany
 	05 = France
 	06 = ? (not seen)
 	07 = Italy
+	..
+	22 = Spain
+	23 = Netherlands
 
 	** = no versions in software list
 

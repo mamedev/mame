@@ -97,7 +97,7 @@ Regular game cartridges
 |        | 80-090140(US)     | <Unknown> (Should be My Pet Puppy)                                                             |
 |        | 80-090142(NL)     | Mijn Puppy!                                                                                    |
 |   XX   | 80-090144(GE)     | Mein erster Hund                                                                               |
-|        | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
+|   XX   | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
 |   XX   | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475, 52-090147(SP) on back label)                           |
 |        |          (DK)     | Min hundehvalp                                                                                 |
 |   XX   | 80-090154(SE)     | Min hundvalp                                                                                   |
@@ -418,7 +418,7 @@ Regular game cartridges
 |   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label)
 +========+===================+================================================================================================+
 |        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                |
-|        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                             |
+|   XX   |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                             |
 |   XX   | 80-092482(NL)     | The Batman - De Redding van Gotham City (52-92482(NL) on back label)                           |
 |   XX   | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                |
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                           |
@@ -482,7 +482,7 @@ Regular game cartridges
 +========+===================+================================================================================================+
 |   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (rev. 201)                                                |
-|        |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                              |
+|   XX?  |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                              |
 |        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                                           |
 |   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs (alt)                                                     |
