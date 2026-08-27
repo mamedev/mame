@@ -390,25 +390,25 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 uint32_t kinst_state::ide_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_ata->cs0_r(offset / 2, mem_mask);
+	return m_ata->cs0_r(offset / 2);
 }
 
 
 void kinst_state::ide_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	m_ata->cs0_w(offset / 2, data, mem_mask);
+	m_ata->cs0_w(offset / 2, data);
 }
 
 
 uint32_t kinst_state::ide_extra_r()
 {
-	return m_ata->cs1_r(6, 0xff);
+	return m_ata->cs1_r(6);
 }
 
 
 void kinst_state::ide_extra_w(uint32_t data)
 {
-	m_ata->cs1_w(6, data, 0xff);
+	m_ata->cs1_w(6, data);
 }
 
 

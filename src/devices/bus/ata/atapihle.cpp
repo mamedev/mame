@@ -4,7 +4,8 @@
 #include "atapihle.h"
 
 atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	ata_hle_device_base(mconfig, type, tag, owner, clock),
+	device_t(mconfig, type, tag, owner, clock),
+	device_ata_hle_interface(mconfig, *this),
 	m_packet(0),
 	m_data_size(0),
 	m_is_ready(false)
@@ -14,13 +15,11 @@ atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type ty
 void atapi_hle_device::device_start()
 {
 	t10_start(*this);
-	ata_hle_device_base::device_start();
 }
 
 void atapi_hle_device::device_reset()
 {
 	t10_reset();
-	ata_hle_device_base::device_reset();
 }
 
 void atapi_hle_device::set_is_ready(bool state)
@@ -35,7 +34,8 @@ void atapi_hle_device::process_buffer()
 {
 	if (m_packet)
 	{
-		//printf( "atapi command %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+		//osd_printf_info( "%s atapi command %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+		//    device().tag(),
 		//    m_buffer[0],m_buffer[1],m_buffer[2],m_buffer[3],
 		//    m_buffer[4],m_buffer[5],m_buffer[6],m_buffer[7],
 		//    m_buffer[8],m_buffer[9],m_buffer[10],m_buffer[11]);
@@ -198,6 +198,7 @@ void atapi_hle_device::wait_buffer()
 void atapi_hle_device::signature()
 {
 	// TODO: IDENTIFY DEVICE & READ SECTORS writes signature too.
+	m_status |= IDE_STATUS_SERV;
 	m_sector_count = 1;
 	m_sector_number = 1;
 	m_cylinder_low = 0x14;
@@ -216,25 +217,20 @@ void atapi_hle_device::process_command()
 		soft_reset();
 		break;
 
+	case IDE_COMMAND_RECALIBRATE:
+		set_irq(ASSERT_LINE);
+		break;
+
 	case IDE_COMMAND_PACKET:
-		m_packet = 1;
-
-		if (packet_command_length() == PACKET_COMMAND_LENGTH_16)
-		{
-			m_buffer_size = 16;
-		}
-		else
-		{
-			m_buffer_size = 12;
-		}
-
 		m_status |= IDE_STATUS_DRQ;
 		m_sector_count = ATAPI_INTERRUPT_REASON_CD;
 
+		m_packet = 1;
+
+		m_buffer_size = (packet_command_length() == PACKET_COMMAND_LENGTH_16) ? 16 : 12;
+
 		if (packet_command_response() == PACKET_COMMAND_RESPONSE_INTRQ)
-		{
 			set_irq(ASSERT_LINE);
-		}
 		break;
 
 	case IDE_COMMAND_IDENTIFY_PACKET_DEVICE:
@@ -265,14 +261,17 @@ void atapi_hle_device::process_command()
 		set_irq(ASSERT_LINE);
 		break;
 
+	case IDE_COMMAND_IDLE_IMMEDIATE:
+		set_irq(ASSERT_LINE);
+		break;
+
 	case IDE_COMMAND_CHECK_POWER_MODE:
-		m_status = IDE_STATUS_DRDY;
 		m_sector_count = 0xff;      // Power mode: 0x00 = Standby, 0x80 = Idle mode, 0xff = Active mode or Idle mode
 		set_irq(ASSERT_LINE);
 		break;
 
 	default:
-		ata_hle_device_base::process_command();
+		device_ata_hle_interface::process_command();
 		break;
 	}
 }
@@ -282,7 +281,7 @@ void atapi_hle_device::finished_command()
 	switch (m_command)
 	{
 	default:
-		ata_hle_device_base::finished_command();
+		device_ata_hle_interface::finished_command();
 		break;
 	}
 }

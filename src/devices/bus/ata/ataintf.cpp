@@ -129,39 +129,39 @@ void abstract_ata_interface_device::pdiag1_write_line(int state)
 
 uint16_t abstract_ata_interface_device::read_dma()
 {
-	uint16_t result = 0xffff;
+	PAIR16 data; data.w = m_default_data;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read_dma();
+			elem->dev()->read_dma(data);
 
-//  logerror( "%s: read_dma %04x\n", machine().describe_context(), result );
-	return result;
+//  logerror( "%s: read_dma %04x\n", machine().describe_context(), data.w );
+	return data.w;
 }
 
-uint16_t abstract_ata_interface_device::internal_read_cs0(offs_t offset, uint16_t mem_mask)
+uint16_t abstract_ata_interface_device::internal_read_cs0(offs_t offset)
 {
-	uint16_t result = mem_mask;
+	PAIR16 data; data.w = m_default_data;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read_cs0(offset, mem_mask);
+			elem->dev()->read_cs0(offset, data);
 
-//  { static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
+//  { static int last_status = -1; if (offset == 7 ) { if( data.b.l == last_status ) return last_status; last_status = data.b.l; } else last_status = -1; }
 
-//  logerror( "%s: read cs0 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
+//  logerror( "%s: read cs0 %04x %04x\n", machine().describe_context(), offset, data.w );
 
-	return result;
+	return data.w;
 }
 
-uint16_t abstract_ata_interface_device::internal_read_cs1(offs_t offset, uint16_t mem_mask)
+uint16_t abstract_ata_interface_device::internal_read_cs1(offs_t offset)
 {
-	uint16_t result = mem_mask;
+	PAIR16 data; data.w = m_default_data;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read_cs1(offset, mem_mask);
+			elem->dev()->read_cs1(offset, data);
 
-//  logerror( "%s: read cs1 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
+//  logerror( "%s: read cs1 %04x %04x\n", machine().describe_context(), offset, data.w );
 
-	return result;
+	return data.w;
 }
 
 /*************************************
@@ -179,22 +179,22 @@ void abstract_ata_interface_device::write_dma( uint16_t data )
 			elem->dev()->write_dma(data);
 }
 
-void abstract_ata_interface_device::internal_write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
+void abstract_ata_interface_device::internal_write_cs0(offs_t offset, uint16_t data)
 {
-//  logerror( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
+//  logerror( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write_cs0(offset, data, mem_mask);
+			elem->dev()->write_cs0(offset, data);
 }
 
-void abstract_ata_interface_device::internal_write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask)
+void abstract_ata_interface_device::internal_write_cs1(offs_t offset, uint16_t data)
 {
-//  logerror( "%s: write cs1 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
+//  logerror( "%s: write cs1 %04x %04x\n", machine().describe_context(), offset, data );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write_cs1(offset, data, mem_mask);
+			elem->dev()->write_cs1(offset, data);
 }
 
 void abstract_ata_interface_device::write_dmack(int state)
@@ -209,6 +209,7 @@ void abstract_ata_interface_device::write_dmack(int state)
 abstract_ata_interface_device::abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_slot(*this, "%u", 0U),
+	m_default_data(0xffff),
 	m_irq_handler(*this),
 	m_dmarq_handler(*this),
 	m_dasp_handler(*this)

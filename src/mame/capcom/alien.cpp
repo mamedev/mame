@@ -230,23 +230,23 @@ void alien_state::alien_map(address_map &map)
 			offset *= 2;
 			u16 data = 0;
 			if (ACCESSING_BITS_0_7)
-				data |= m_ata->cs0_r(offset, 0xff) & 0xff;
+				data |= m_ata->cs0_r(offset) & 0xff;
 			if (ACCESSING_BITS_8_15)
-				data |= (m_ata->cs0_r(offset + 1, 0xff) << 8);
+				data |= (m_ata->cs0_r(offset + 1) << 8);
 			return data;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			offset *= 2;
 			if (ACCESSING_BITS_0_7)
-				m_ata->cs0_w(offset, data & 0xff, 0xff);
+				m_ata->cs0_w(offset, data & 0xff);
 			if (ACCESSING_BITS_8_15)
-				m_ata->cs0_w(offset + 1, data >> 8, 0xff);
+				m_ata->cs0_w(offset + 1, data >> 8);
 		})
 	);
 	map(0x18800400, 0x18800403).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) { return m_ata->cs0_r(0, mem_mask); }),
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_ata->cs0_r(0); }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			m_ata->cs0_w(0, data, mem_mask);
+			m_ata->cs0_w(0, data);
 		})
 	);
 	map(0x1b000000, 0x1b7fffff).rw(m_ymz_flash[0], FUNC(spansion_s29gl064s_device::read), FUNC(spansion_s29gl064s_device::write));

@@ -221,10 +221,10 @@ uint8_t a2bus_zipdrivebase_device::read_c0nx(uint8_t offset)
 		case 5:
 		case 6:
 		case 7:
-			return m_ata->cs0_r(offset, 0xff);
+			return m_ata->cs0_r(offset);
 
 		case 8: // data port
-			m_lastdata = m_ata->cs0_r(0, 0xffff);
+			m_lastdata = m_ata->cs0_r(0);
 //          printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -251,10 +251,10 @@ uint8_t a2bus_focusdrive_device::read_c0nx(uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->cs0_r(offset&7, 0xff);
+			return m_ata->cs0_r(offset&7);
 
 		case 0: // data port
-			m_lastdata = m_ata->cs0_r(0, 0xffff);
+			m_lastdata = m_ata->cs0_r(0);
 			//printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -286,7 +286,7 @@ void a2bus_zipdrivebase_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 6:
 		case 7:
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->cs0_w(offset, data, 0xff);
+			m_ata->cs0_w(offset, data);
 			break;
 
 		case 8:
@@ -298,7 +298,7 @@ void a2bus_zipdrivebase_device::write_c0nx(uint8_t offset, uint8_t data)
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ata->cs0_w(0, m_lastdata, 0xffff);
+			m_ata->cs0_w(0, m_lastdata);
 			break;
 
 		default:
@@ -328,7 +328,7 @@ void a2bus_focusdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 			}
 			#endif
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->cs0_w(offset & 7, data, 0xff);
+			m_ata->cs0_w(offset & 7, data);
 			break;
 
 		case 0:
@@ -340,7 +340,7 @@ void a2bus_focusdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ata->cs0_w(0, m_lastdata, 0xffff);
+			m_ata->cs0_w(0, m_lastdata);
 			break;
 
 		default:

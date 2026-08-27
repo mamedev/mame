@@ -16,7 +16,6 @@
 #define LOG_RX     (1U << 3)
 #define VERBOSE    (0)
 
-#define LOG_OUTPUT_FUNC device().logerror
 #include "logmacro.h"
 
 device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device) :

@@ -158,17 +158,17 @@ void msx_cart_sunrise_ataide_device::device_start()
 	m_view[1].install_write_handler(0x7e00, 0x7e0f, write8sm_delegate(*this, [this] (offs_t offset, u8 data)
 		{
 			if (BIT(offset, 3))
-				m_ata->cs1_w(offset & 0x07, data, 0xff);
+				m_ata->cs1_w(offset & 0x07, data);
 			else
-				m_ata->cs0_w(offset & 0x07, data, 0xff);
+				m_ata->cs0_w(offset & 0x07, data);
 		}, "write_ide")
 	);
 	m_view[1].install_read_handler(0x7e00, 0x7e0f, read8sm_delegate(*this, [this] (offs_t offset)
 		{
 			if (BIT(offset, 3))
-				return m_ata->cs1_r(offset & 0x07, 0xff);
+				return m_ata->cs1_r(offset & 0x07);
 			else
-				return m_ata->cs0_r(offset & 0x07, 0xff);
+				return m_ata->cs0_r(offset & 0x07);
 		}, "read_ide")
 	);
 

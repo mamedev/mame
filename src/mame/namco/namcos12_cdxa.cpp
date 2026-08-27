@@ -267,12 +267,12 @@ uint16_t namcos12_cdxa_device::cdrom_status_flag_r(offs_t offset, uint16_t mem_m
 
 uint16_t namcos12_cdxa_device::sh2_cdrom_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata->cs0_r(offset >> 13, mem_mask);
+	return m_ata->cs0_r(offset >> 13);
 }
 
 void namcos12_cdxa_device::sh2_cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata->cs0_w(offset >> 13, data, mem_mask);
+	m_ata->cs0_w(offset >> 13, data);
 }
 
 void namcos12_cdxa_device::volume_w(offs_t offset, uint16_t data)
@@ -284,12 +284,12 @@ void namcos12_cdxa_device::volume_w(offs_t offset, uint16_t data)
 
 uint16_t namcos12_cdxa_device::cdrom_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata->cs0_r(offset, mem_mask);
+	return m_ata->cs0_r(offset);
 }
 
 void namcos12_cdxa_device::cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata->cs0_w(offset, data, mem_mask);
+	m_ata->cs0_w(offset, data);
 }
 
 void namcos12_cdxa_device::mb87078_gain_changed(offs_t offset, uint8_t data)

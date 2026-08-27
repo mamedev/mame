@@ -842,12 +842,12 @@ template <int Ch> u32 ohare_device::ata_r(offs_t offset, u32 mem_mask)
 				const u16 w1 = ata.cs0_r(0);
 				return w0 | (u32(w1) << 16);
 			}
-			return ata.cs0_r(0, mem_mask & 0xffff);
+			return ata.cs0_r(0);
 
 		case 0x01: case 0x02: case 0x03: case 0x04:
 		case 0x05: case 0x06: case 0x07:    // command block, byte-wide
 		{
-			const u8 value = ata.cs0_r((offset >> 2) & 7, 0xff);
+			const u8 value = ata.cs0_r((offset >> 2) & 7);
 			// Apple has a weak pull-down on DB7 so devices that aren't present
 			// read as 0x7f
 			return ata.slot(m_ata_selected[Ch]).dev() ? value : 0x7f;
@@ -855,7 +855,7 @@ template <int Ch> u32 ohare_device::ata_r(offs_t offset, u32 mem_mask)
 
 		case 0x16:  // control block: alternate status
 		{
-			const u8 value = ata.cs1_r(6, 0xff);
+			const u8 value = ata.cs1_r(6);
 			return ata.slot(m_ata_selected[Ch]).dev() ? value : 0x7f;
 		}
 
@@ -880,7 +880,7 @@ template <int Ch> void ohare_device::ata_w(offs_t offset, u32 data, u32 mem_mask
 			}
 			else
 			{
-				ata.cs0_w(0, data & 0xffff, mem_mask & 0xffff);
+				ata.cs0_w(0, data & 0xffff);
 			}
 			break;
 
@@ -890,11 +890,11 @@ template <int Ch> void ohare_device::ata_w(offs_t offset, u32 data, u32 mem_mask
 			{
 				m_ata_selected[Ch] = BIT(data, 4);
 			}
-			ata.cs0_w((offset >> 2) & 7, data & 0xff, 0xff);
+			ata.cs0_w((offset >> 2) & 7, data & 0xff);
 			break;
 
 		case 0x16:  // control block: device control
-			ata.cs1_w(6, data & 0xff, 0xff);
+			ata.cs1_w(6, data & 0xff);
 			break;
 
 		case 0x20:  // Apple timing configuration register

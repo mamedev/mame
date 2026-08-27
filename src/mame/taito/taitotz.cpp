@@ -2171,7 +2171,7 @@ void taitotz_state::tlcs_rtc_w(offs_t offset, u8 data)
 
 u16 taitotz_state::tlcs_ide0_r(offs_t offset, u16 mem_mask)
 {
-	u16 d = m_ata->cs0_r(offset, mem_mask);
+	u16 d = m_ata->cs0_r(offset);
 	if (offset == 7)
 	{
 		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up.
@@ -2183,7 +2183,7 @@ u16 taitotz_state::tlcs_ide0_r(offs_t offset, u16 mem_mask)
 
 u16 taitotz_state::tlcs_ide1_r(offs_t offset, u16 mem_mask)
 {
-	u16 d = m_ata->cs1_r(offset, mem_mask);
+	u16 d = m_ata->cs1_r(offset);
 	if (offset == 6)
 	{
 		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up.

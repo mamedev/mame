@@ -167,22 +167,22 @@ void pc9801vm_state::ide_ctrl_w(u8 data)
 
 uint16_t pc9801vm_state::ide_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ide[m_ide_sel]->cs0_r(offset, mem_mask);
+	return m_ide[m_ide_sel]->cs0_r(offset);
 }
 
 void pc9801vm_state::ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ide[m_ide_sel]->cs0_w(offset, data, mem_mask);
+	m_ide[m_ide_sel]->cs0_w(offset, data);
 }
 
 uint16_t pc9801vm_state::ide_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ide[m_ide_sel]->cs1_r(offset, mem_mask);
+	return m_ide[m_ide_sel]->cs1_r(offset);
 }
 
 void pc9801vm_state::ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ide[m_ide_sel]->cs1_w(offset, data, mem_mask);
+	m_ide[m_ide_sel]->cs1_w(offset, data);
 }
 
 void pc9801_state::pc9801_map(address_map &map)

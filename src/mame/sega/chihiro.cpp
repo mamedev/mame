@@ -1506,7 +1506,7 @@ void ohci_hlean2131sc_device::device_start()
 
 // ======================> ide_baseboard_device
 
-class ide_baseboard_device : public ata_mass_storage_device_base, public device_ata_interface
+class ide_baseboard_device : public device_t, public device_ata_mass_storage_device_interface, public device_ata_interface
 {
 public:
 	using ide_event_delegate = device_delegate<void (int, uint8_t *, uint8_t *)>;
@@ -1519,22 +1519,22 @@ public:
 	template <typename... T> void set_ide_dimmboard(T &&... args) { ide_dimmboard_cb.set(std::forward<T>(args)...); }
 
 	// device_ata_interface implementation
-	virtual uint16_t read_dma() override { return dma_r(); }
-	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask) override { return command_r(offset); }
-	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask) override { return control_r(offset); }
+	virtual void read_dma(PAIR16 &data) override { dma_r(data); }
+	virtual void read_cs0(offs_t offset, PAIR16 &data) override { command_r(offset, data); }
+	virtual void read_cs1(offs_t offset, PAIR16 &data) override { control_r(offset, data); }
 
 	virtual void write_dma(uint16_t data) override { dma_w(data); }
-	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask) override { command_w(offset, data); }
-	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask) override { control_w(offset, data); }
+	virtual void write_cs0(offs_t offset, uint16_t data) override { command_w(offset, data); }
+	virtual void write_cs1(offs_t offset, uint16_t data) override { control_w(offset, data); }
 
 	virtual void write_dmack(int state) override { set_dmack_in(state); }
 	virtual void write_csel(int state) override { set_csel_in(state); }
 	virtual void write_dasp(int state) override { set_dasp_in(state); }
 	virtual void write_pdiag(int state) override { set_pdiag_in(state); }
 
-	// ata_mass_storage_device_base implementation
-	virtual int  read_sector(uint32_t lba, void *buffer) override;
-	virtual int  write_sector(uint32_t lba, const void *buffer) override;
+	// device_ata_mass_storage_device_interface implementation
+	virtual int read_sector(uint64_t lba, void *buffer) override;
+	virtual int write_sector(uint64_t lba, const void *buffer) override;
 
 protected:
 	// device_t implementation
@@ -1548,7 +1548,7 @@ protected:
 	static const int size_factor = 2;
 
 private:
-	// ata_hle_device_base implementation
+	// device_ata_hle_interface implementation
 	virtual void set_irq_out(int state) override { device_ata_interface::set_irq(state); }
 	virtual void set_dmarq_out(int state) override { device_ata_interface::set_dmarq(state); }
 	virtual void set_dasp_out(int state) override { device_ata_interface::set_dasp(state); }
@@ -1567,7 +1567,8 @@ DEFINE_DEVICE_TYPE(IDE_BASEBOARD, ide_baseboard_device, "ide_baseboard", "IDE Ba
 //-------------------------------------------------
 
 ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ata_mass_storage_device_base(mconfig, IDE_BASEBOARD, tag, owner, clock)
+	: device_t(mconfig, IDE_BASEBOARD, tag, owner, clock)
+	, device_ata_mass_storage_device_interface(mconfig, *this)
 	, device_ata_interface(mconfig, *this)
 	, ide_event_cb(*this)
 	, ide_dimmboard_cb(*this)
@@ -1580,8 +1581,6 @@ ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const 
 
 void ide_baseboard_device::device_start()
 {
-	ata_mass_storage_device_base::device_start();
-
 	ide_event_cb.resolve();
 	ide_dimmboard_cb.resolve();
 
@@ -1604,11 +1603,9 @@ void ide_baseboard_device::device_reset()
 		ide_build_identify_device();
 		m_can_identify_device = 1;
 	}
-
-	ata_mass_storage_device_base::device_reset();
 }
 
-int ide_baseboard_device::read_sector(uint32_t lba, void *buffer)
+int ide_baseboard_device::read_sector(uint64_t lba, void *buffer)
 {
 	int off;
 	uint8_t *data;
@@ -1658,7 +1655,7 @@ int ide_baseboard_device::read_sector(uint32_t lba, void *buffer)
 	return 1;
 }
 
-int ide_baseboard_device::write_sector(uint32_t lba, const void *buffer)
+int ide_baseboard_device::write_sector(uint64_t lba, const void *buffer)
 {
 	logerror("baseboard: write sector lba %08x\n", lba);
 	if (lba >= ((0x40000 << size_factor) - 0x8000)) {
