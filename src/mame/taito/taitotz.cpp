@@ -2188,7 +2188,7 @@ u16 taitotz_state::tlcs_ide1_r(offs_t offset)
 	{
 		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up.
 		// The status check explicitly checks for 0x50 (drive ready, seek complete).
-		printf("tlcs_ide1_r(6)=%d\n", d & 2);
+		d &= ~0x2;
 	}
 	return d;
 }
