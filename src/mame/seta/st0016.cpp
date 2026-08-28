@@ -643,7 +643,9 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 	{
 		if (m_vregs[j + 1] && ((priority && (m_vregs[j + 3] == 0xff)) || ((!priority) && (m_vregs[j + 3] != 0xff))))
 		{
-			int i = m_vregs[j + 1] * 0x1000;
+			//u16 xscroll = (m_vregs[j + 0] | (m_vregs[j + 1] << 8)) & 0x1ff;
+			//u8 yscroll = (0xff - m_vregs[j + 2]);
+			int i = m_vregs[j + 1] * 0x1000; //(m_vregs[j + 1] >> 1) * 0x2000;
 
 			for (int x = 0; x < 32 * 2; x++)
 			{
@@ -655,18 +657,18 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 					const bool flipx = BIT(m_spriteram[i + 3], 7); // crownpkr test mode doesn't seem to agree with this
 					const bool flipy = BIT(m_spriteram[i + 3], 6); // "
 
+					int xpos = (x * 8) + m_spr_dx; // + xscroll;
+					int ypos = (y * 8) + m_spr_dy; // + yscroll;
 					if (priority)
 					{
 						gfx->transpen(bitmap, cliprect,
 							code,
 							color,
 							flipx, flipy,
-							x * 8 + m_spr_dx, y * 8 + m_spr_dy, 0);
+							xpos, ypos, 0);
 					}
 					else
 					{
-						int ypos = y * 8 + m_spr_dy;// + ((m_vregs[j + 2] == 0xaf) ? 0x50 : 0); //hack for mayjinsen title screen
-						int xpos = x * 8 + m_spr_dx;
 						int gfxoffs = 0;
 						const u8 *const srcgfx = gfx->get_data(code);
 
