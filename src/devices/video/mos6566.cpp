@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "mos6566.h"
 
+#include "cpu/m6502/m6502.h"
 #include "screen.h"
 
 
@@ -312,7 +313,6 @@ inline void mos6566_device::spr_ba(int num)
 	if (BIT(m_spr_dma_on, num))
 	{
 		set_ba(CLEAR_LINE);
-		m_rdy_cycles += 2;
 	}
 	else if (num > 1 && !BIT(m_spr_dma_on, num - 1))
 	{
@@ -368,7 +368,6 @@ inline void mos6566_device::bad_line_ba()
 		if (m_ba)
 		{
 			set_ba(CLEAR_LINE);
-			m_rdy_cycles += 55 - m_cycle;
 		}
 	}
 	else
@@ -828,7 +827,7 @@ void mos6566_device::device_reset()
 	m_ba = CLEAR_LINE;
 	m_aec = CLEAR_LINE;
 	m_aec_delay = 0xff;
-	m_rdy_cycles = 0;
+	m_cpu_halted = 0;
 
 	set_ba(ASSERT_LINE);
 	set_aec(ASSERT_LINE);
@@ -843,9 +842,6 @@ void mos6566_device::execute_run()
 {
 	do
 	{
-		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
-		uint8_t vic_cycles = total_cycles() & 0xff;
-
 		m_phi0 = 0;
 
 		m_aec_delay <<= 1;
@@ -894,6 +890,8 @@ void mos6566_device::execute_run()
 				m_rasterline = m_vc_base = 0;
 				m_ref_cnt = 0xff;
 				m_vblanking = 0;
+
+				m_bad_lines_enabled = 0;
 
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
@@ -1414,10 +1412,12 @@ void mos6566_device::execute_run()
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
 
-		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
+		int const halt = !m_ba;
+
+		if (halt != m_cpu_halted)
 		{
-			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
-			m_rdy_cycles = 0;
+			m_cpu_halted = halt;
+			m_cpu->set_input_line(M6502_RDY_LINE, halt ? CLEAR_LINE : ASSERT_LINE);
 		}
 
 		m_icount--;
@@ -1433,9 +1433,6 @@ void mos6569_device::execute_run()
 {
 	do
 	{
-		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
-		uint8_t vic_cycles = total_cycles() & 0xff;
-
 		m_phi0 = 0;
 
 		m_aec_delay <<= 1;
@@ -1486,6 +1483,8 @@ void mos6569_device::execute_run()
 				m_rasterline = m_vc_base = 0;
 				m_ref_cnt = 0xff;
 				m_vblanking = 0;
+
+				m_bad_lines_enabled = 0;
 
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
@@ -1985,10 +1984,12 @@ void mos6569_device::execute_run()
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
 
-		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
+		int const halt = !m_ba;
+
+		if (halt != m_cpu_halted)
 		{
-			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
-			m_rdy_cycles = 0;
+			m_cpu_halted = halt;
+			m_cpu->set_input_line(M6502_RDY_LINE, halt ? CLEAR_LINE : ASSERT_LINE);
 		}
 
 		m_icount--;
