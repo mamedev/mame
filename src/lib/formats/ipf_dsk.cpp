@@ -461,9 +461,8 @@ bool ipf_format::ipf_decode::generate_track(track_info &t, floppy_image &image)
 		return true;
 
 	if(t.type == 1) {
-		// Noise/unformatted track
-		std::vector<uint32_t> track(t.size_cells, floppy_image::MG_N);
-		timing_set(track, 0, t.size_cells, 2000);
+		// Noise/unformatted track: a single MG_N cell - the surface has no cell structure
+		std::vector<uint32_t> track(1, floppy_image::MG_N | (t.size_cells*2000));
 		generate_track_from_levels(t.cylinder, t.head, track, 0, image);
 		return true;
 	}
