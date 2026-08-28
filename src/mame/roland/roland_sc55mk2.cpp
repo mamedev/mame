@@ -37,7 +37,6 @@
     TODO:
     - remote control receiver, battery test (analog inputs)
     - RS-422/RS-232 computer port (sub CPU UART 1)
-    - custom LCD glass layout
 */
 
 #include "emu.h"
@@ -53,6 +52,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "roland_sc55mk2.lh"
 
 
 namespace {
@@ -81,6 +82,7 @@ public:
 	void init_sc55mk2();
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -301,12 +303,111 @@ void sc55mk2_state::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0xff, 0xa0, 0x20)); // orange backlight
 	palette.set_pen_color(1, rgb_t(0x20, 0x10, 0x00));
+	palette.set_pen_color(2, rgb_t::black()); // LCD power off
+}
+
+// the LCD unit and its backlight are powered through a regulator the CPU switches off in standby
+u32 sc55mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (BIT(m_lcd_control, 0))
+	{
+		bitmap.fill(2, cliprect);
+		return 0;
+	}
+	return m_lcd->screen_update(screen, bitmap, cliprect);
+}
+
+// The RCM2024T display unit is a custom glass driven by an HD44780-compatible
+// controller in 2x40 mode.  Only part of the DDRAM maps onto visible
+// character cells; the rest of the glass is a 16 x 16 bar graph (part level
+// meters) and a stereo "L R" mark, both lit from character generator RAM.
+//
+//   line 0, pos  0- 2  part number          line 1, pos  0- 2  level
+//   line 0, pos  3-18  instrument name      line 1, pos  3- 5  pan
+//   line 0/1, pos 20-23 bar graph            line 1, pos  6- 8  chorus
+//     (5 columns per cell = 5 parts,        line 1, pos  9-11  reverb
+//      cell 23 column 0 = part 16,          line 1, pos 12-14  key shift
+//      line 0 = upper 8 segments)           line 1, pos 15-17  MIDI channel
+//                                           line 1, pos 18     L/R mark (row 0, bit 0)
+
+static constexpr int LCD_CHAR_PITCH = 35;
+static constexpr int LCD_DOT_PITCH = 6;
+static constexpr int LCD_DOT_SIZE = 5;
+static constexpr int LCD_COL0_X = 24;      // part number, level, reverb, key shift
+static constexpr int LCD_COL1_X = 143;     // instrument, pan, chorus, MIDI channel
+static constexpr int LCD_ROW_Y[4] = { 14, 78, 142, 206 };
+static constexpr int LCD_BAR_X = 283;
+static constexpr int LCD_BAR_Y = 74;
+static constexpr int LCD_BAR_PITCH_X = 26;
+static constexpr int LCD_BAR_PITCH_Y = 11;
+static constexpr int LCD_BAR_W = 24;
+static constexpr int LCD_BAR_H = 9;
+static constexpr int LCD_LR_X = 254;
+static constexpr int LCD_LR_Y[2] = { 74, 234 };
+
+static void lcd_fill(bitmap_ind16 &bitmap, int x, int y, int w, int h, int state)
+{
+	for (int yy = y; yy < y + h; yy++)
+		for (int xx = x; xx < x + w; xx++)
+			bitmap.pix(yy, xx) = state;
 }
 
 HD44780_PIXEL_UPDATE(sc55mk2_state::lcd_pixel_update)
 {
-	if (x < 5 && y < 8 && line < 2 && pos < 40)
-		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
+	if (pos >= 20 && pos < 24 && line < 2)
+	{
+		// bar graph: one CG column per part, one CG row per segment
+		int const bar = (pos - 20) * 5 + x;
+		if (bar < 16)
+			lcd_fill(bitmap, LCD_BAR_X + bar * LCD_BAR_PITCH_X, LCD_BAR_Y + (line * 8 + y) * LCD_BAR_PITCH_Y, LCD_BAR_W, LCD_BAR_H, state);
+		return;
+	}
+
+	if (line == 1 && pos == 18)
+	{
+		// L/R mark: single segment lit by bit 0 of the glyph's first row
+		if (y == 0 && x == 4)
+		{
+			static constexpr u16 L_SHAPE[12] = { 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x7ff, 0x7ff };
+			static constexpr u16 R_SHAPE[12] = { 0x7fc, 0x7fe, 0x606, 0x606, 0x606, 0x7fe, 0x7fc, 0x630, 0x618, 0x60c, 0x606, 0x603 };
+			for (int i = 0; i < 12; i++)
+				for (int j = 0; j < 11; j++)
+				{
+					if (BIT(L_SHAPE[i], 10 - j))
+						bitmap.pix(LCD_LR_Y[0] + i, LCD_LR_X + j) = state;
+					if (BIT(R_SHAPE[i], 10 - j))
+						bitmap.pix(LCD_LR_Y[1] + i, LCD_LR_X + j) = state;
+				}
+		}
+		return;
+	}
+
+	if (y >= 7)
+		return;
+
+	int cx, cy;
+	if (line == 0)
+	{
+		if (pos < 3)
+			cx = LCD_COL0_X + pos * LCD_CHAR_PITCH;
+		else if (pos < 19)
+			cx = LCD_COL1_X + (pos - 3) * LCD_CHAR_PITCH;
+		else
+			return;
+		cy = LCD_ROW_Y[0];
+	}
+	else if (line == 1 && pos < 18)
+	{
+		int const field = pos / 3;
+		static constexpr int FIELD_COL[6] = { 0, 1, 1, 0, 0, 1 };
+		static constexpr int FIELD_ROW[6] = { 1, 1, 2, 2, 3, 3 };
+		cx = (FIELD_COL[field] ? LCD_COL1_X : LCD_COL0_X) + (pos % 3) * LCD_CHAR_PITCH;
+		cy = LCD_ROW_Y[FIELD_ROW[field]];
+	}
+	else
+		return;
+
+	lcd_fill(bitmap, cx + x * LCD_DOT_PITCH, cy + y * LCD_DOT_PITCH, LCD_DOT_SIZE, LCD_DOT_SIZE, state);
 }
 
 
@@ -387,15 +488,17 @@ void sc55mk2_state::sc55mk2(machine_config &config)
 	m_screen->set_refresh_hz(80);
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(sc55mk2_state::lcd_palette), 2);
+	PALETTE(config, "palette", FUNC(sc55mk2_state::lcd_palette), 3);
 
 	HD44780(config, m_lcd, 270'000);
 	m_lcd->set_lcd_size(2, 40);
 	m_lcd->set_pixel_update_cb(FUNC(sc55mk2_state::lcd_pixel_update));
 
-	m_screen->set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));
-	m_screen->set_size(6 * 40, 8 * 2);
+	m_screen->set_screen_update(FUNC(sc55mk2_state::screen_update));
+	m_screen->set_size(720, 272);
 	m_screen->set_visarea_full();
+
+	config.set_default_layout(layout_roland_sc55mk2);
 }
 
 ROM_START( sc55mk2 )
