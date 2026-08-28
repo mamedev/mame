@@ -1165,6 +1165,7 @@ void z80scc_channel::device_reset()
 	{
 		m_uart->reset_interrupts();
 	}
+	m_extint_latch = 0;
 	m_extint_states = m_rr0;
 	m_baudtimer->adjust(attotime::never);
 	m_brg_counter = 0;
