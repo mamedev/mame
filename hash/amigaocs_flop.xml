@@ -3184,16 +3184,13 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="armagman" supported="no">
+	<software name="armagman" supported="yes">
 		<!-- SPS (CAPS) release 629 -->
 		<description>The Armageddon Man (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Martech</publisher>
-		<notes><![CDATA[
-ATK test: OK
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1050092">
 				<rom name="(sps629)armageddonman,the.ipf" size="1050092" crc="cb04a6bc" sha1="37c66c9cee589308a3da9151c21a184cb9a8cad9"/>
@@ -4637,10 +4634,6 @@ ATK test: failed
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Palace</publisher>
-		<notes><![CDATA[
-Guru Meditation during "The game is loading" phase [FDC] with adkcon=$1100 (fixed)
-ATK test: OK
-]]></notes>
 		<info name="alt_title" value="Barbarian - The Ultimate Warrior" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1050092">
@@ -7414,16 +7407,13 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="bombjack" supported="no">
+	<software name="bombjack" supported="yes">
 		<!-- SPS (CAPS) release 2797 -->
 		<description>Bomb Jack (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Elite</publisher>
-		<notes><![CDATA[
-ATK test: C:even H:L 1 Sector Bad
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2797)bombjack.ipf" size="1049612" crc="08372886" sha1="02c7d6ed985cad2217f70a89b3e0def36323940d"/>
@@ -13916,17 +13906,13 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="demolitn" supported="no">
+	<software name="demolitn" supported="yes">
 		<!-- SPS (CAPS) release 2712 -->
 		<description>Demolition (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
 		<publisher>Anco</publisher>
-		<notes><![CDATA[
-Black screen after title screen, [FDC] dsksync (fixed)
-ATK test: OK
-]]></notes>
 		<info name="usage" value="Insert ABUSS when prompted for secret code"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049304">
@@ -16513,17 +16499,13 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="eco" supported="no">
+	<software name="eco" supported="yes">
 		<!-- SPS (CAPS) release 1139 -->
 		<description>ECO (Europe)</description>
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-Guru Meditation during initial boot, [FDC] with adkcon=$1100
-ATK test: OK
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1050092">
 				<rom name="(sps1139)eco.ipf" size="1050092" crc="baede9bf" sha1="53fb3d2bfd87e64b2244180d080b3bec405220bd"/>
@@ -19959,7 +19941,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="fbmang2" supported="no">
+	<software name="fbmang2" supported="yes">
 		<!-- SPS (CAPS) release 246 -->
 		<description>Football Manager 2 (Europe)</description>
 		<!-- retail, standalone -->
@@ -19967,10 +19949,6 @@ ATK test: OK
 		<year>1988</year>
 		<!-- Publisher: Prism Leisure -->
 		<publisher>Addictive</publisher>
-		<notes><![CDATA[
-Guru Meditation during Workbench load after pressing left mouse button on Hot Shot advertisement
-ATK test: OK
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049660">
 				<rom name="(sps246)footballmanager2.ipf" size="1049660" crc="93e18d3a" sha1="8346be9f4db729f70477b5b847ab2b2c61cef3f5"/>
@@ -19978,16 +19956,13 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="fbmang2ek" cloneof="fbmang2" supported="no">
+	<software name="fbmang2ek" cloneof="fbmang2" supported="yes">
 		<!-- SPS (CAPS) release 793 -->
 		<description>Football Manager 2 Expansion Kit (Europe, FM2 &amp; FM2 Expansion Kit)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Addictive</publisher>
-		<notes><![CDATA[
-ATK test: C:0 H:U Bad
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps793)footballmanager2expansionkit.ipf" size="1049304" crc="0ed424fd" sha1="3f5f4502b137a1599beecbe217fe5f5326629b86"/>
@@ -19995,16 +19970,13 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="fbmang2eka" cloneof="fbmang2" supported="no">
+	<software name="fbmang2eka" cloneof="fbmang2" supported="yes">
 		<!-- SPS (CAPS) release 2226 -->
 		<description>Football Manager 2 Expansion Kit (Europe, Amiga Sports Pack)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Addictive</publisher>
-		<notes><![CDATA[
-ATK test: OK
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1050140">
 				<rom name="(sps2226)footballmanager2expansionkit.ipf" size="1050140" crc="5e0e0ad6" sha1="6c8e8988ac498e540b125c341e02865dbcfc05e3"/>
@@ -24978,17 +24950,13 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="ikplus" supported="no">
+	<software name="ikplus" supported="yes">
 		<!-- SPS (CAPS) release 339 -->
 		<description>IK+ (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>System 3</publisher>
-		<notes><![CDATA[
-Doesn't boot with debugger on, otherwise hangs anytime during the boot phase (spurious irqs or unsafe video code)
-ATK test: failed
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="396338">
 				<rom name="(sps339)ik+.ipf" size="396338" crc="e185a90b" sha1="a1e2270ac5133e3565ece889de8bf8c5d4480077"/>
@@ -24996,16 +24964,13 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="ikplusa" cloneof="ikplus" supported="no">
+	<software name="ikplusa" cloneof="ikplus" supported="yes">
 		<!-- SPS (CAPS) release 2063 -->
 		<description>IK+ (Europe, Budget)</description>
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>The Hit Squad</publisher>
-		<notes><![CDATA[
-ATK test: OK
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2063)ik+.ipf" size="1049180" crc="eefd220d" sha1="702c31441a3d9ff0c7c0d9959bd49e814b7c55c8"/>
@@ -39243,16 +39208,13 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="prison" supported="no">
+	<software name="prison" supported="yes">
 		<!-- SPS (CAPS) release 416 -->
 		<description>Prison (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Krisalis</publisher>
-		<notes><![CDATA[
-ATK test: failed
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1043236">
 				<rom name="(sps416)prison.ipf" size="1043236" crc="bdc1439d" sha1="1c2a4836662f8da75ec3dd8adee58cf57ee28ca4"/>
@@ -52633,16 +52595,13 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="dizzy2" supported="no">
+	<software name="dizzy2" supported="yes">
 		<!-- SPS (CAPS) release 594 -->
 		<description>Treasure Island Dizzy (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
-		<notes><![CDATA[
-ATK test: OK
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049946">
 				<rom name="(sps594)treasureislanddizzy.ipf" size="1049946" crc="2647b5b2" sha1="4d47c03307eba1540d2c117566b286ff41440b30"/>
@@ -56007,16 +55966,13 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="wizball" supported="no">
+	<software name="wizball" supported="yes">
 		<!-- SPS (CAPS) release 176 -->
 		<description>Wizball (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-ATK test: failed
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1050092">
 				<rom name="(sps176)wizball.ipf" size="1050092" crc="6c16e59f" sha1="b7fc1b931c94370b6e8a05765352ac4d742ead28"/>
@@ -56024,16 +55980,13 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="wizballa" cloneof="wizball" supported="no">
+	<software name="wizballa" cloneof="wizball" supported="yes">
 		<!-- SPS (CAPS) release 1380 -->
 		<description>Wizball (Europe, Tenstar Pack)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-ATK test: C:0 H:U Bad
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049214">
 				<rom name="(sps1380)wizball.ipf" size="1049214" crc="f72d8106" sha1="8b65155a7238d0c0f0a2d60bbb8d6173756de45f"/>
@@ -56041,16 +55994,13 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="wizballb" cloneof="wizball" supported="no">
+	<software name="wizballb" cloneof="wizball" supported="yes">
 		<!-- SPS (CAPS) release 1544 -->
 		<description>Wizball (Europe, Budget)</description>
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>The Hit Squad</publisher>
-		<notes><![CDATA[
-ATK test: OK
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1544)wizball.ipf" size="1049180" crc="047608f5" sha1="d36c7cb70340dc5bea09078e6c385450771cb69c"/>

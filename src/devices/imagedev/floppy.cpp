@@ -291,6 +291,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	m_cyl(0),
 	m_subcyl(0),
 	m_amplifier_freakout_time(attotime::from_usec(16)),
+	m_glitch_threshold(attotime::zero),
 	m_image_dirty(false),
 	m_track_dirty(false),
 	m_writing(false),
@@ -1130,7 +1131,6 @@ void floppy_image_device::cache_clear()
 	m_cache_entry = 0;
 	m_cache_weak = false;
 }
-
 void floppy_image_device::cache_fill(const attotime &when)
 {
 	if(m_writing)
@@ -1142,7 +1142,7 @@ void floppy_image_device::cache_fill(const attotime &when)
 		m_cache_end_time = attotime::never;
 		m_cache_index = 0;
 		m_cache_entry = (cells == 1) ? buf[0] : floppy_image::MG_N;
-		cache_weakness_setup();
+		cache_weakness_setup(buf, attotime::zero);
 		return;
 	}
 
@@ -1164,18 +1164,44 @@ void floppy_image_device::cache_fill(const attotime &when)
 	for(;;) {
 		cache_fill_index(buf, index, base);
 		if(m_cache_end_time > when) {
-			cache_weakness_setup();
+			// base now belongs to the entry after the current one;
+			// cache_fill_index wrapped it if index reached zero
+			attotime const base_cur = index ? base : base - m_rev_time;
+			cache_weakness_setup(buf, base_cur);
 			break;
 		}
 	}
 }
 
-void floppy_image_device::cache_weakness_setup()
+void floppy_image_device::cache_weakness_setup(const std::vector<uint32_t> &buf, attotime base)
 {
-	u32 type = m_cache_entry & floppy_image::MG_MASK;
-	if(type == floppy_image::MG_N || type == floppy_image::MG_D) {
+	auto const weak_kind = [] (u32 e) {
+		u32 const t = e & floppy_image::MG_MASK;
+		return t == floppy_image::MG_N || t == floppy_image::MG_D;
+	};
+
+	if(weak_kind(m_cache_entry)) {
+		// Anchor the noise on the start of the weak run, not on the
+		// entry the cache sits on, so a zone serves the same stream
+		// however the decoder chopped it up
 		m_cache_weak = true;
-		m_cache_weak_start = m_cache_start_time;
+		if(buf.size() <= 1) {
+			// Whole track unformatted
+			m_cache_weak_start = m_cache_start_time;
+			return;
+		}
+		int s = m_cache_index;
+		int c = 0;
+		while(c < 1024 && s > 0 && weak_kind(buf[s-1])) {
+			s--;
+			c++;
+		}
+		if(c == 1024 || (s == 0 && weak_kind(buf[buf.size()-1]))) {
+			// Run start not reachable: no anchor, no blip
+			m_cache_weak_start = attotime::never;
+			return;
+		}
+		m_cache_weak_start = position_to_time(base, buf[s] & floppy_image::TIME_MASK);
 		return;
 	}
 
@@ -1184,6 +1210,7 @@ void floppy_image_device::cache_weakness_setup()
 		m_cache_weak_start = attotime::never;
 		return;
 	}
+	// The comparator reference needs time to decay before it follows the noise
 	m_cache_weak_start = m_cache_start_time + attotime::from_usec(16);
 }
 
@@ -1192,25 +1219,35 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!m_image || m_mon)
 		return attotime::never;
 
-	if(from_when < m_cache_start_time || m_cache_start_time.is_zero() || (!m_cache_end_time.is_never() && from_when >= m_cache_end_time))
-		cache_fill(from_when);
-
-	if(!m_cache_weak)
-		return m_cache_end_time;
-
-	// Put a flux transition in the middle of a 4us interval with a 50% probability
-	uint64_t interval_index = (from_when < m_cache_weak_start) ? 0 : (from_when - m_cache_weak_start).as_ticks(250000);
-	attotime weak_time = m_cache_weak_start + attotime::from_ticks(interval_index*2+1, 500000);
+	attotime from = from_when;
 	for(;;) {
-		if(weak_time >= m_cache_end_time)
-			return m_cache_end_time;
-		if(weak_time > from_when) {
-			u32 test = hash32(hash32(hash32(hash32(m_revolution_count) ^ 0x4242) + m_cache_index) + interval_index);
-			if(test & 1)
-				return weak_time;
+		if(from < m_cache_start_time || m_cache_start_time.is_zero() || (!m_cache_end_time.is_never() && from >= m_cache_end_time))
+			cache_fill(from);
+
+		if(m_cache_weak) {
+			// Weak surface: noise at an unknown rate.  One hash-drawn
+			// blip per zone per revolution, silence for the rest -
+			// entries are skipped like the bounce filter skips ring,
+			// so no entry boundaries leak out as flux.
+			if(m_cache_weak_start.is_never())
+				return attotime::never;
+			attotime const blip = m_cache_weak_start
+				+ attotime::from_nsec(hash32(hash32(m_revolution_count) ^ 0x4242
+						^ u32(m_cache_weak_start.as_ticks(7000000))) % 50000);
+			if(blip > from && blip < m_cache_end_time)
+				return blip;
+			if(m_cache_end_time.is_never())
+				return attotime::never;
+			from = m_cache_end_time;
+			continue;
 		}
-		weak_time += attotime::from_usec(4);
-		interval_index ++;
+		// A change too close after the previous one is read-chain ring,
+		// not signal - drop it
+		if(!m_cache_end_time.is_never() && m_cache_end_time - m_cache_start_time < m_glitch_threshold) {
+			from = m_cache_end_time;
+			continue;
+		}
+		return m_cache_end_time;
 	}
 }
 
@@ -1657,8 +1694,9 @@ void floppy_35_dd::setup_characteristics()
 	m_tracks = 84;
 	m_sides = 2;
 	set_rpm(300);
+	// Changes closer than ~2.1us are read-chain ring; legal DD flux never comes closer than 4us
+	m_glitch_threshold = attotime::from_nsec(2100);
 
-	add_variant(floppy_image::SSSD);
 	add_variant(floppy_image::SSDD);
 	add_variant(floppy_image::DSDD);
 }
