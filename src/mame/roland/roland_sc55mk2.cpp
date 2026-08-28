@@ -29,19 +29,23 @@
     LCD unit RCM2024T (HD44780 command set)
 
     MIDI IN 1/2 and the RS-422/RS-232 computer port go to the sub CPU's three UARTs;
+    the sub CPU merges them and sends the stream to the main CPU's SCI from UART 2's TxD;
+    UART 3's CTS pin doubles as an attention line to the main CPU.
     MIDI OUT comes from the main CPU's SCI. The front panel switch matrix hangs off
     the sub CPU's ports; the two CPUs talk through the sub CPU's shared RAM.
 
     TODO:
-    - M37409M2 sub CPU: MIDI in, panel switches, IPC (currently a stub)
     - remote control receiver, battery test (analog inputs)
+    - RS-422/RS-232 computer port (sub CPU UART 1)
     - custom LCD glass layout
 */
 
 #include "emu.h"
 
+#include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8500/h8532.h"
+#include "cpu/m6502/m37409.h"
 #include "machine/nvram.h"
 #include "sound/roland_gp.h"
 #include "video/hd44780.h"
@@ -59,10 +63,16 @@ public:
 	sc55mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_keys(*this, "KEY%u", 0U)
+		, m_computer_sw(*this, "COMPUTER")
 		, m_screen(*this, "screen")
 		, m_lcd(*this, "lcd")
 		, m_pcm(*this, "pcm")
 		, m_nvram(*this, "nvram", 0x8000, ENDIANNESS_BIG)
+		, m_led_all(*this, "led_all")
+		, m_led_mute(*this, "led_mute")
+		, m_led_standby(*this, "led_standby")
 	{
 	}
 
@@ -85,45 +95,48 @@ private:
 
 	u8 ga_r(offs_t offset);
 	void ga_w(offs_t offset, u8 data);
-	void ga_int_w(int source, int state);
-	void pcm_int_w(int state);
+	void sub_cts_w(int state);
 
-	u8 ipc_r(offs_t offset);
-	void ipc_w(offs_t offset, u8 data);
+	u8 keys_r();
+	void key_scan_w(offs_t offset, u8 data, u8 mem_mask);
+	u16 analog_r();
 
 	required_device<h8532_device> m_maincpu;
+	required_device<m37409_device> m_subcpu;
+	required_ioport_array<3> m_keys;
+	required_ioport m_computer_sw;
 	required_device<screen_device> m_screen;
 	required_device<hd44780_device> m_lcd;
 	required_device<roland_gp4_device> m_pcm;
 	memory_share_creator<u8> m_nvram;
+	output_finder<> m_led_all;
+	output_finder<> m_led_mute;
+	output_finder<> m_led_standby;
 
-	// gate array interrupt aggregator (source 5 = PCM and sub CPU UART 3)
+	// gate array interrupt aggregator on IRQ1 (source 5 = sub CPU attention line)
 	u8 m_ga_int_enable = 0;
 	u8 m_ga_int_trigger = 0;
-	u8 m_ga_int_state = 0;
+	u8 m_ga_int5_state = 0;
 	u8 m_lcd_control = 0;
-
-	// sub CPU shared RAM and mailbox, stubbed until the M37409 is emulated
-	u8 m_ipc_ram[0xc0] = { };
-	u8 m_ipc_semaphore = 0;
+	u8 m_key_scan = 0xff;
 };
 
 
 void sc55mk2_state::machine_start()
 {
+
 	save_item(NAME(m_ga_int_enable));
 	save_item(NAME(m_ga_int_trigger));
-	save_item(NAME(m_ga_int_state));
+	save_item(NAME(m_ga_int5_state));
 	save_item(NAME(m_lcd_control));
-	save_item(NAME(m_ipc_ram));
-	save_item(NAME(m_ipc_semaphore));
+	save_item(NAME(m_key_scan));
 }
 
 void sc55mk2_state::machine_reset()
 {
 	m_ga_int_enable = 0;
 	m_ga_int_trigger = 0;
-	m_ga_int_state = 0;
+	m_ga_int5_state = 0;
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
@@ -187,7 +200,7 @@ void sc55mk2_state::ga_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 	case 1:
-		// bit 0 low enables the LCD
+		// bit 0 low enables the LCD, bits 2-3 select the analog multiplexer input
 		m_lcd_control = data;
 		break;
 	case 2:
@@ -206,49 +219,57 @@ void sc55mk2_state::ga_w(offs_t offset, u8 data)
 	}
 }
 
-void sc55mk2_state::ga_int_w(int source, int state)
+// the sub CPU pulses its CTS3 pin low as an output to signal the main CPU;
+// source 5 triggers on the falling edge when enabled
+void sc55mk2_state::sub_cts_w(int state)
 {
-	const u8 mask = 1 << source;
-	if (state && !(m_ga_int_state & mask) && BIT(m_ga_int_enable, source - 1) && m_ga_int_trigger == 0)
+	const u8 active = !state;
+	if (active && !m_ga_int5_state && BIT(m_ga_int_enable, 4) && m_ga_int_trigger == 0)
 	{
-		m_ga_int_trigger = source;
+		m_ga_int_trigger = 5;
 		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
-	if (state)
-		m_ga_int_state |= mask;
-	else
-		m_ga_int_state &= ~mask;
-}
-
-void sc55mk2_state::pcm_int_w(int state)
-{
-	ga_int_w(5, state);
+	m_ga_int5_state = active;
 }
 
 
-//-------------------------------------------------
-//  sub CPU interface (stub)
-//-------------------------------------------------
-
-u8 sc55mk2_state::ipc_r(offs_t offset)
+// AN7 reads the BU4051 multiplexer: battery voltage, n/c, the rear COMPUTER
+// selector (a resistor ladder) or the remote control receiver
+u16 sc55mk2_state::analog_r()
 {
-	if (offset < 0xc0)
-		return m_ipc_ram[offset];
-	switch (offset)
+	switch ((m_lcd_control >> 2) & 3)
 	{
-	case 0xff:
-		return m_ipc_semaphore;
+	case 0:
+		return 0x2a0;
+	case 2:
+		return m_computer_sw->read() * 0x155;
 	default:
 		return 0;
 	}
 }
 
-void sc55mk2_state::ipc_w(offs_t offset, u8 data)
+
+//-------------------------------------------------
+//  front panel: switch matrix on the sub CPU's ports, scanned by the main
+//  CPU through the port passthrough (P0 walking zero, P1 columns); the
+//  ALL, MUTE and STANDBY LEDs hang off P0 bits 6, 5 and 4 (active low)
+//-------------------------------------------------
+
+void sc55mk2_state::key_scan_w(offs_t offset, u8 data, u8 mem_mask)
 {
-	if (offset < 0xc0)
-		m_ipc_ram[offset] = data;
-	else if (offset == 0xff)
-		m_ipc_semaphore = (m_ipc_semaphore & ~0x1f) | (data & 0x1f);
+	m_key_scan = data;
+	m_led_all = BIT(~data, 6);
+	m_led_mute = BIT(~data, 5);
+	m_led_standby = BIT(~data, 4);
+}
+
+u8 sc55mk2_state::keys_r()
+{
+	u8 data = 0xff;
+	for (int row = 0; row < 3; row++)
+		if (!BIT(m_key_scan, row))
+			data &= m_keys[row]->read();
+	return data;
 }
 
 
@@ -262,7 +283,7 @@ void sc55mk2_state::sc55mk2_map(address_map &map)
 	map(0x08000, 0x0dfff).rw(FUNC(sc55mk2_state::nvram_r), FUNC(sc55mk2_state::nvram_w));
 	map(0x0e000, 0x0e03f).mirror(0x3c0).rw(m_pcm, FUNC(roland_gp4_device::read), FUNC(roland_gp4_device::write));
 	map(0x0e400, 0x0e407).rw(FUNC(sc55mk2_state::ga_r), FUNC(sc55mk2_state::ga_w));
-	map(0x0ec00, 0x0ecff).rw(FUNC(sc55mk2_state::ipc_r), FUNC(sc55mk2_state::ipc_w));
+	map(0x0ec00, 0x0ecff).rw(m_subcpu, FUNC(m37409_device::system_r), FUNC(m37409_device::system_w));
 	// the program ROM's A18 is driven by CPU A19; pages 1-4 see its lower half, 8-9 and 14-15 the upper
 	map(0x10000, 0x3ffff).rom().region("progrom", 0x10000);
 	map(0x40000, 0x4ffff).rom().region("progrom", 0x00000);
@@ -294,6 +315,42 @@ HD44780_PIXEL_UPDATE(sc55mk2_state::lcd_pixel_update)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( sc55mk2 )
+	PORT_START("KEY0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Power")
+	PORT_BIT(0x06, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Instrument <")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Instrument >")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Mute")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("All")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MIDI Ch <")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MIDI Ch >")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Chorus <")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Chorus >")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Pan <")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Pan >")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Part >")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Key Shift <")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Key Shift >")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Reverb <")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Reverb >")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Level <")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Level >")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Part <")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	// rear panel selector, read through the analog multiplexer as a resistor ladder
+	PORT_START("COMPUTER")
+	PORT_CONFNAME(0x03, 0x03, "Computer Switch")
+	PORT_CONFSETTING(0x03, "MIDI")
+	PORT_CONFSETTING(0x02, "RS-232C-2")
+	PORT_CONFSETTING(0x01, "RS-232C-1")
+	PORT_CONFSETTING(0x00, "RS-422")
 INPUT_PORTS_END
 
 void sc55mk2_state::sc55mk2(machine_config &config)
@@ -301,15 +358,26 @@ void sc55mk2_state::sc55mk2(machine_config &config)
 	HD6435328(config, m_maincpu, 24_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc55mk2_state::sc55mk2_map);
 	m_maincpu->read_port9().set_constant(0x02); // bit 1: 1 = SC-55mkII, 0 = SC-155mkII
+	m_maincpu->read_adc<7>().set(FUNC(sc55mk2_state::analog_r));
 	m_maincpu->write_sci_tx<0>().set("mdout", FUNC(midi_port_device::write_txd));
+
+	M37409(config, m_subcpu, 10_MHz_XTAL);
+	m_subcpu->write_p<0>().set(FUNC(sc55mk2_state::key_scan_w));
+	m_subcpu->read_p<1>().set(FUNC(sc55mk2_state::keys_r));
+	m_subcpu->cts_handler<2>().set(FUNC(sc55mk2_state::sub_cts_w));
+	m_subcpu->txd_handler<1>().set(m_maincpu, FUNC(h8532_device::sci_rx_w<0>)); // merged MIDI stream to the main CPU
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // SRM20256 (IC28) + CR2032 battery
 
+	midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
+	mdin.rxd_handler().set(m_subcpu, FUNC(m37409_device::rxd_w<1>));
+	midi_port_device &mdin2(MIDI_PORT(config, "mdin2", midiin_slot, "midiin"));
+	mdin2.rxd_handler().set(m_subcpu, FUNC(m37409_device::rxd_w<2>));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
 	ROLAND_GP4(config, m_pcm, 24_MHz_XTAL);
 	m_pcm->set_device_rom_tag("waverom");
-	m_pcm->int_callback().set(FUNC(sc55mk2_state::pcm_int_w));
+	m_pcm->int_callback().set_inputline(m_maincpu, 0); // IRQ0
 
 	SPEAKER(config, "speaker", 2).front();
 	m_pcm->add_route(0, "speaker", 1.0, 0);
