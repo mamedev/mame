@@ -1889,6 +1889,9 @@ void fm7_state::fm7(machine_config &config)
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::sub_irq_ack));
 	config.set_perfect_quantum(m_sub);
 
+	// FM-7 keyboard MCU (MB88401 at IC125)
+	MB88401(config, m_kbmcu, 4_MHz_XTAL);
+
 	SPEAKER(config, "mono").front_center();
 	AY8913(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
