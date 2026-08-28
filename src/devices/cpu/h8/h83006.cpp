@@ -155,7 +155,7 @@ void h83006_device::device_add_mconfig(machine_config &config)
 	H8H_INTC(config, m_intc, *this);
 	H8_ADC_3006(config, m_adc, *this, m_intc, 23);
 	H8_PORT(config, m_port4, *this, h8_device::PORT_4, 0x00, 0x00);
-	H8_PORT(config, m_port6, *this, h8_device::PORT_6, 0x80, 0x80);
+	H8_PORT(config, m_port6, *this, h8_device::PORT_6, 0x80, 0x00, 0x80);
 	H8_PORT(config, m_port7, *this, h8_device::PORT_7, 0x00, 0x00);
 	H8_PORT(config, m_port8, *this, h8_device::PORT_8, 0xf0, 0xe0);
 	H8_PORT(config, m_port9, *this, h8_device::PORT_9, 0xc0, 0xc0);
