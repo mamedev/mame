@@ -3692,6 +3692,85 @@ ROM_START( pclubsc6 )
 	// TODO: add 1p eeprom default
 ROM_END
 
+// 昭和レトロプリント倶楽部2
+ROM_START( pclub2sr ) // 837-12765-01 ROM BD, protection device not present
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic22",    0x0200000, 0x0200000, CRC(6662b00e) SHA1(8e972bf14f3a4415d0a5108764600a16ed0a17f1) BAD_DUMP )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic24",    0x0400000, 0x0200000, CRC(35721f04) SHA1(9658c9526a3d1dde89e1b6fd986b3469011813ca) ) // same as pclubol
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic26",    0x0600000, 0x0200000, CRC(1b621078) SHA1(f0f0a03739420f838ea27a78b2aa39e0b35bc9c2) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic28",    0x0800000, 0x0200000, CRC(295970fc) SHA1(f4dd5b24749469bd60f27442fd491349cb08c7f6) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic30",    0x0a00000, 0x0200000, CRC(2cc5a926) SHA1(f80b26cf2a7e7c5a1011b0eb18d7e79d8ec3c574) )
+
+	// TODO: add 1p eeprom default
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
+ROM_END
+
+// PRINT CLUB 2 BANPRESTO ぼのぼの
+ROM_START( pclub2bb ) // 837-12765-01 ROM BD, protection device not present
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic22",    0x0200000, 0x0200000, CRC(4550ccf5) SHA1(fccdb52dd0b0e3c167fedf4200b042a0adef4b88) BAD_DUMP )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic24",    0x0400000, 0x0200000, CRC(b1577a65) SHA1(4a64ecd6e3bf2c5c5d11413b17a4bedd09622a52) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic26",    0x0600000, 0x0200000, CRC(5655091e) SHA1(590ef446d4db57cd5bff0a8e10f08549d8df5c91) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic28",    0x0800000, 0x0200000, CRC(fb98a97c) SHA1(3411411580505e6d223912ca9e1e1746c4060a2f) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic30",    0x0a00000, 0x0200000, CRC(b5220345) SHA1(e9fce1a8c7c298d2f571ca70c16023808a95dd24) )
+
+	// TODO: add 1p eeprom default
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
+ROM_END
+
+// プリント倶楽部 ナイトメアビフォアクリスマス
+ROM_START( pclubnbc ) // 837-12765-04 (stickered) ROM BD, protection device (317-0230) present
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic22",    0x0200000, 0x0200000, CRC(b0207086) SHA1(4f6db1799759e87c6b7b86313ea2f2bae6301450) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic24",    0x0400000, 0x0200000, CRC(1241ae77) SHA1(e2b8b769b04e25fa9365f1971289a66c24cd9ea0) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic26",    0x0600000, 0x0200000, CRC(d7ff1134) SHA1(a4c8bec3d03f63fd1e881943b15819fd49d00d19) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic28",    0x0800000, 0x0200000, CRC(de38b841) SHA1(8604bc6459fb167490e9a4ef8a6227da4a6ff052) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic30",    0x0a00000, 0x0200000, CRC(499edabf) SHA1(cad2bd0e8f579c406fdbae9d63397e636191c3d6) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic32",    0x0c00000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // present but empty
+
+	// TODO: add 1p eeprom default
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
+ROM_END
+
+// PRINT CLUB 2 ツブヤキシロー
+ROM_START( pclub2ts ) // 837-12765-02 (stickered) ROM BD, protection device not present
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic22",    0x0200000, 0x0200000, CRC(a8fef41b) SHA1(940a17888614771df7a997c0f474160033427f7f) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic24",    0x0400000, 0x0200000, CRC(5f550c41) SHA1(9a6e8eca437fb5da7a53363021f1acb03b95b75b) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic26",    0x0600000, 0x0200000, CRC(b26d9dba) SHA1(5aad355eebce4d3e0f437d3fd87b401082d275ad) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic28",    0x0800000, 0x0200000, CRC(4b9df566) SHA1(ac339b204d99db49861721a86f4549ab7e855dd5) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic32",    0x0c00000, 0x0200000, CRC(3438c564) SHA1(8da287c22290bd82d7d7a1a2b55ed82711934d3c) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic32",    0x0e00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // present but empty
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic32",    0x1000000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // present but empty
+
+	// TODO: add 1p eeprom default
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
+ROM_END
 
 ROM_START( prc298au ) // set to 1p
 	STV_BIOS
@@ -4249,6 +4328,8 @@ GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stvpc_state, init_stv,      
 GAME( 1997, pclb2elk,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pckobe99,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
 
+GAME( 1997, pclub2bb,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Banpresto Bono Bono", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2ts,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Tsubuyaki Shiro (J 970708 V1.100)", MACHINE_NOT_WORKING ) // internal string TUBUYAKI SHIRO (sic)
 GAME( 1997, pclub26w,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
 GAME( 1997, pclub26wa, pclub26w,stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
 GAME( 1997, pclub27s,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
@@ -4259,6 +4340,7 @@ GAME( 1997, prc297wia, prc297wi,stv,      stv,      stvpc_state, init_stv,      
 GAME( 1998, prc298sp,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have been updated, this should be early 98
 GAME( 1998, prc298su,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
 GAME( 1998, prc298au,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1998, pclub2sr,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Showa Retro Print Club 2", MACHINE_NOT_WORKING ) // bad dump
 GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
 
 GAME( 1999, pclubor,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
@@ -4273,6 +4355,7 @@ GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_n
 GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1998, pclubsc5,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Sony Creative Ver.5 (J 980721 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1997, pclubsc6,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Sony Creative Ver.6 (J 971006 V1.000)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ^, earlier than pclubsc5? IC2 bad, black screen on boot (hops on illegal opcode)
+GAME( 1998, pclubnbc,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Nightmare Before Christmas (J 980717 V1.000)", MACHINE_NOT_WORKING ) // internal string P.CL NIGHTMARE
 
 GAME( 1997, aclub,     stvbios, stv,      aclub,    stv_state,   init_stv,        ROT0,   "Sega",                         "Aroma Club (J 970611 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // technically also printer and "blended oil" dispenser
 
