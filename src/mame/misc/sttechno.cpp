@@ -178,8 +178,8 @@ private:
 
 	void uart_config_w(uint16_t data);
 
-	void ata_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ata_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ata_cs0_w(offs_t offset, uint16_t data);
+	uint16_t ata_cs0_r(offs_t offset);
 
 	void ata_control_w(uint16_t data);
 
@@ -412,7 +412,7 @@ void sttechno_state::uart_config_w(uint16_t data)
 	LOGMASKED(LOG_UART, "uart_config_w %04x\n", data);
 }
 
-void sttechno_state::ata_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sttechno_state::ata_cs0_w(offs_t offset, uint16_t data)
 {
 	if (!m_ata_enabled)
 		return;
@@ -420,7 +420,7 @@ void sttechno_state::ata_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_ata->cs0_w(offset, data);
 }
 
-uint16_t sttechno_state::ata_cs0_r(offs_t offset, uint16_t mem_mask)
+uint16_t sttechno_state::ata_cs0_r(offs_t offset)
 {
 	if (!m_ata_enabled)
 		return 0;

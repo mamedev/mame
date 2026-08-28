@@ -244,8 +244,8 @@ void alien_state::alien_map(address_map &map)
 		})
 	);
 	map(0x18800400, 0x18800403).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) { return m_ata->cs0_r(0); }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		NAME([this] (offs_t offset) { return m_ata->cs0_r(0); }),
+		NAME([this] (offs_t offset, u16 data) {
 			m_ata->cs0_w(0, data);
 		})
 	);

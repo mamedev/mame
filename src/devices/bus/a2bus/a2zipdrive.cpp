@@ -321,9 +321,9 @@ void a2bus_focusdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0xf:
 			// due to a bug in the 6502 firmware, eat data if DRQ is set
 			#if 0
-			while (m_ata->cs0_r(7, 0xff) & 0x08)
+			while (m_ata->cs0_r(7) & 0x08)
 			{
-				m_ata->cs0_r(0, 0xffff);
+				m_ata->cs0_r(0);
 				printf("eating 2 bytes to clear DRQ\n");
 			}
 			#endif

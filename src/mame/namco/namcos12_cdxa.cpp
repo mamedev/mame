@@ -148,7 +148,7 @@ void namcos12_cdxa_device::amap(address_map &map)
 	}));
 
 	map(0x7e0000, 0x7e000f).rw(FUNC(namcos12_cdxa_device::cdrom_cs0_r), FUNC(namcos12_cdxa_device::cdrom_cs0_w));
-	// map(0x1f7e8000, 0x1f7e800f).rw(FUNC(namcos12_cdxa_device::cdrom_cs1_r), FUNC(namcos12_cdxa_device::cdrom_cs1_w));
+	map(0x7e8000, 0x7e800f).rw(FUNC(namcos12_cdxa_device::cdrom_cs1_r), FUNC(namcos12_cdxa_device::cdrom_cs1_w));
 	// 1f7d7000 volume enabled/set? gets set to 6 between the "SH2 Volume Set" and "SH2 Trf Program" steps, after setting 4 volumes registers to 0x7e
 	map(0x7f8000, 0x7f80ff).w(FUNC(namcos12_cdxa_device::volume_w));
 }
@@ -197,14 +197,7 @@ void namcos12_cdxa_device::sh7014_map(address_map &map)
 	// 417000 ?
 	map(0x0041c000, 0x0041c003).nopw().r(FUNC(namcos12_cdxa_device::cdrom_status_flag_r));
 	map(0x00c00000, 0x00c1ffff).rw(FUNC(namcos12_cdxa_device::sh2_cdrom_cs0_r), FUNC(namcos12_cdxa_device::sh2_cdrom_cs0_w));
-
-	// Definitely is cs1 but hooking it up breaks the CD drive state seemingly due to timing issues.
-	// The code sets cs1 control reg to 0xe, causing it go into the software reset routine immediately.
-	// The game's code wants to immediately send a command for IDE_COMMAND_CHECK_POWER_MODE after setting cs1, but MAME rejects
-	// all commands immediately after SRST is set so it gets stuck in an infinite loop waiting for the status register to become
-	// 8 (IDE_STATUS_DRDY) so it can finish sending the rest of the check power mode command.
-	// Things seem to work fine without it being hooked up so this is for documentation purposes.
-	// map(0x00c20000, 0x00c3ffff).rw(FUNC(namcos12_cdxa_device::sh2_cdrom_cs1_r), FUNC(namcos12_cdxa_device::sh2_cdrom_cs1_w));
+	map(0x00c20000, 0x00c3ffff).rw(FUNC(namcos12_cdxa_device::sh2_cdrom_cs1_r), FUNC(namcos12_cdxa_device::sh2_cdrom_cs1_w));
 }
 
 void namcos12_cdxa_device::reset_sh2_w(uint16_t data)
@@ -252,27 +245,44 @@ void namcos12_cdxa_device::ps1_int10_finished_w(uint16_t data)
 	m_psx_int10_busy = false;
 }
 
-void namcos12_cdxa_device::trigger_psx_int10_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namcos12_cdxa_device::trigger_psx_int10_w(uint16_t data)
 {
 	m_psx_int10_cb(1);
 	m_psx_int10_busy = true;
 }
 
-uint16_t namcos12_cdxa_device::cdrom_status_flag_r(offs_t offset, uint16_t mem_mask)
+uint16_t namcos12_cdxa_device::cdrom_status_flag_r()
 {
 	// Needs to return 0x800 for it to signal the interrupt for the PS1
 	// Guessed
 	return m_psx_int10_busy ? 0 : 0x800;
 }
 
-uint16_t namcos12_cdxa_device::sh2_cdrom_cs0_r(offs_t offset, uint16_t mem_mask)
+uint16_t namcos12_cdxa_device::sh2_cdrom_cs0_r(offs_t offset)
 {
 	return m_ata->cs0_r(offset >> 13);
 }
 
-void namcos12_cdxa_device::sh2_cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namcos12_cdxa_device::sh2_cdrom_cs0_w(offs_t offset, uint16_t data)
 {
 	m_ata->cs0_w(offset >> 13, data);
+}
+
+uint16_t namcos12_cdxa_device::sh2_cdrom_cs1_r(offs_t offset)
+{
+	return m_ata->cs1_r(offset >> 13);
+}
+
+void namcos12_cdxa_device::sh2_cdrom_cs1_w(offs_t offset, uint16_t data)
+{
+	// Definitely is cs1 but hooking it up breaks the CD drive state seemingly due to timing issues.
+	// The code sets cs1 control reg to 0xe, causing it go into the software reset routine immediately.
+	// The game's code wants to immediately send a command for IDE_COMMAND_CHECK_POWER_MODE after setting cs1, but MAME rejects
+	// all commands immediately after SRST is set so it gets stuck in an infinite loop waiting for the status register to become
+	// 8 (IDE_STATUS_DRDY) so it can finish sending the rest of the check power mode command.
+	// Things seem to work fine without it being hooked up so this is for documentation purposes.
+
+	//m_ata->cs1_w(offset >> 13, data);
 }
 
 void namcos12_cdxa_device::volume_w(offs_t offset, uint16_t data)
@@ -282,14 +292,24 @@ void namcos12_cdxa_device::volume_w(offs_t offset, uint16_t data)
 	m_mb87078->data_w(m_volume_write_counter, offset & 0xff);
 }
 
-uint16_t namcos12_cdxa_device::cdrom_cs0_r(offs_t offset, uint16_t mem_mask)
+uint16_t namcos12_cdxa_device::cdrom_cs0_r(offs_t offset)
 {
 	return m_ata->cs0_r(offset);
 }
 
-void namcos12_cdxa_device::cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namcos12_cdxa_device::cdrom_cs0_w(offs_t offset, uint16_t data)
 {
 	m_ata->cs0_w(offset, data);
+}
+
+uint16_t namcos12_cdxa_device::cdrom_cs1_r(offs_t offset)
+{
+	return m_ata->cs1_r(offset);
+}
+
+void namcos12_cdxa_device::cdrom_cs1_w(offs_t offset, uint16_t data)
+{
+	m_ata->cs1_w(offset, data);
 }
 
 void namcos12_cdxa_device::mb87078_gain_changed(offs_t offset, uint8_t data)
