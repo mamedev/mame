@@ -71,13 +71,16 @@ def emit(f, text):
 
 def identify_line_type(ins):
     if "eat-all-cycles" in ins: return "EAT"
-    for s in ["read", "write"]:
-        if s in ins:
-            return "MEMORY"
+    if "read" in ins: return "MEMORY_READ"
+    if "write" in ins: return "MEMORY_WRITE"
     return "NONE"
 
 
+RDY_GATED_DEVICES = {"m6502", "m6510"}
+
+
 def save_opcodes(f, device, opcodes):
+    rdy_gated = device in RDY_GATED_DEVICES
     for name, instructions in opcodes:
         emit(f, "void %s_device::%s_full()" % (device, name))
         emit(f, "{")
@@ -90,7 +93,15 @@ def save_opcodes(f, device, opcodes):
                 emit(f, "\tm_inst_substate = %d;" % substate)
                 emit(f, "\treturn;")
                 substate += 1
-            elif line_type == "MEMORY":
+            elif line_type in ("MEMORY_READ", "MEMORY_WRITE"):
+                if rdy_gated and line_type == "MEMORY_READ":
+                    emit(f, "\twhile(!m_rdy_state) {")
+                    emit(f, "\t\tm_icount--;")
+                    emit(f, "\t\tif(m_icount <= 0) {")
+                    emit(f, "\t\t\tm_inst_substate = %d;" % substate)
+                    emit(f, "\t\t\treturn;")
+                    emit(f, "\t\t}")
+                    emit(f, "\t}")
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
                 emit(f, "\tif(m_icount <= 0) {")
@@ -121,9 +132,17 @@ def save_opcodes(f, device, opcodes):
                 emit(f, "\treturn;")
                 emit(f, "\tcase %d:;" % substate)
                 substate += 1
-            elif line_type == "MEMORY":
+            elif line_type in ("MEMORY_READ", "MEMORY_WRITE"):
                 emit(f, "\t[[fallthrough]];")
                 emit(f, "case %d:" % substate)
+                if rdy_gated and line_type == "MEMORY_READ":
+                    emit(f, "\twhile(!m_rdy_state) {")
+                    emit(f, "\t\tm_icount--;")
+                    emit(f, "\t\tif(m_icount <= 0) {")
+                    emit(f, "\t\t\tm_inst_substate = %d;" % substate)
+                    emit(f, "\t\t\treturn;")
+                    emit(f, "\t\t}")
+                    emit(f, "\t}")
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
                 emit(f, "\tif(m_icount <= 0) {")

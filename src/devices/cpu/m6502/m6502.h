@@ -20,7 +20,8 @@ public:
 		IRQ_LINE = INPUT_LINE_IRQ0,
 		APU_IRQ_LINE = INPUT_LINE_IRQ1,
 		NMI_LINE = INPUT_LINE_NMI,
-		V_LINE   = INPUT_LINE_IRQ0 + 16
+		V_LINE = INPUT_LINE_IRQ0 + 16,
+		RDY_LINE = INPUT_LINE_IRQ0 + 17
 	};
 
 	class memory_interface {
@@ -135,7 +136,7 @@ protected:
 	std::unique_ptr<memory_interface> m_mintf;
 	int m_inst_state, m_inst_substate;
 	int m_icount, m_bcount, m_count_before_instruction_step;
-	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state;
+	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state, m_rdy_state;
 	bool m_nmi_pending, m_irq_taken, m_sync, m_inhibit_interrupts;
 	bool m_uses_custom_memory_interface;
 
@@ -299,7 +300,8 @@ enum {
 enum {
 	M6502_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6502_NMI_LINE = m6502_device::NMI_LINE,
-	M6502_SET_OVERFLOW = m6502_device::V_LINE
+	M6502_SET_OVERFLOW = m6502_device::V_LINE,
+	M6502_RDY_LINE = m6502_device::RDY_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6502, m6502_device)
