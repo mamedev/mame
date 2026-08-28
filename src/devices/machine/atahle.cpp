@@ -538,14 +538,14 @@ void device_ata_hle_interface::command_r(offs_t offset, PAIR16 &data, uint16_t m
 		if (m_dmack)
 		{
 			if (!device().machine().side_effects_disabled())
-				LOG("%s device %d cs0_r(0x%x) 0x%04x (ignored DMACK)\n", device().machine().describe_context(), dev(), offset, data.w & mem_mask);
+				LOG("%s device %d cs0_r(0x%x) 0x%04x (ignored DMACK)\n", device().machine().describe_context(), dev(), offset, data.w);
 		}
 		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_DATA_RW && !is_packet_device())
 		{
 			data.b.l = device_selected() ? calculate_status() : 0;
 
 			if (!device().machine().side_effects_disabled())
-				LOGREADSTATUS("%s device %d cs0_r(0x%x) 0x%04x (status BSY)\n", device().machine().describe_context(), dev(), offset, data.w & mem_mask);
+				LOGREADSTATUS("%s device %d cs0_r(0x%x) 0x%04x (status BSY)\n", device().machine().describe_context(), dev(), offset, data.w);
 		}
 		else
 		{
@@ -557,65 +557,65 @@ void device_ata_hle_interface::command_r(offs_t offset, PAIR16 &data, uint16_t m
 					if (m_status & IDE_STATUS_BSY)
 					{
 						if (!device().machine().side_effects_disabled())
-							LOG("%s device %d cs0_r data 0x%04x (ignored BSY)\n", device().machine().describe_context(), m_csel, data.w & mem_mask);
+							LOG("%s device %d cs0_r data 0x%04x (ignored BSY)\n", device().machine().describe_context(), m_csel, data.w);
 					}
 					else if (!(m_status & IDE_STATUS_DRQ))
 					{
 						if (!device().machine().side_effects_disabled())
-							LOG("%s device %d cs0_r data 0x%04x (ignored !DRQ)\n", device().machine().describe_context(), m_csel, data.w & mem_mask);
+							LOG("%s device %d cs0_r data 0x%04x (ignored !DRQ)\n", device().machine().describe_context(), m_csel, data.w);
 					}
 					else
 					{
 						read_data(data, mem_mask);
 
 						if (!device().machine().side_effects_disabled())
-							LOGREADDATA("%s device %d cs0_r data 0x%04x\n", device().machine().describe_context(), m_csel, data.w & mem_mask);
+							LOGREADDATA("%s device %d cs0_r data 0x%04x\n", device().machine().describe_context(), m_csel, data.w);
 					}
 				}
 				else if (!device().machine().side_effects_disabled())
-					LOG("%s device %d cs0_r data 0x%04x (ignored !selected)\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOG("%s device %d cs0_r data 0x%04x (ignored !selected)\n", device().machine().describe_context(), dev(), data.w);
 				break;
 
 			case IDE_CS0_ERROR_R:
 				data.b.l = m_error;
 
 				if (!device().machine().side_effects_disabled())
-					LOGREAD("%s device %d cs0_r error register 0x%04x\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOGREAD("%s device %d cs0_r error register 0x%04x\n", device().machine().describe_context(), dev(), data.w);
 				break;
 
 			case IDE_CS0_SECTOR_COUNT_RW:
 				data.b.l = is_hob() ? m_sector_count_hob : m_sector_count;
 
 				if (!device().machine().side_effects_disabled())
-					LOGREAD("%s device %d cs0_r sector count 0x%04x\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOGREAD("%s device %d cs0_r sector count 0x%04x\n", device().machine().describe_context(), dev(), data.w);
 				break;
 
 			case IDE_CS0_SECTOR_NUMBER_RW:
 				data.b.l = is_hob() ? m_sector_number_hob : m_sector_number;
 
 				if (!device().machine().side_effects_disabled())
-					LOGREAD("%s device %d cs0_r sector number 0x%04x\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOGREAD("%s device %d cs0_r sector number 0x%04x\n", device().machine().describe_context(), dev(), data.w);
 				break;
 
 			case IDE_CS0_CYLINDER_LOW_RW:
 				data.b.l = is_hob() ? m_cylinder_low_hob : m_cylinder_low;
 
 				if (!device().machine().side_effects_disabled())
-					LOGREAD("%s device %d cs0_r cylinder low 0x%04x\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOGREAD("%s device %d cs0_r cylinder low 0x%04x\n", device().machine().describe_context(), dev(), data.w);
 				break;
 
 			case IDE_CS0_CYLINDER_HIGH_RW:
 				data.b.l = is_hob() ? m_cylinder_high_hob : m_cylinder_high;
 
 				if (!device().machine().side_effects_disabled())
-					LOGREAD("%s device %d cs0_r cylinder high 0x%04x\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOGREAD("%s device %d cs0_r cylinder high 0x%04x\n", device().machine().describe_context(), dev(), data.w);
 				break;
 
 			case IDE_CS0_DEVICE_HEAD_RW:
 				data.b.l = m_device_head;
 
 				if (!device().machine().side_effects_disabled())
-					LOGREAD("%s device %d cs0_r device/head 0x%04x\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOGREAD("%s device %d cs0_r device/head 0x%04x\n", device().machine().describe_context(), dev(), data.w);
 				break;
 
 			case IDE_CS0_STATUS_R:
@@ -626,13 +626,13 @@ void device_ata_hle_interface::command_r(offs_t offset, PAIR16 &data, uint16_t m
 					if (device_selected())
 						set_irq(CLEAR_LINE);
 
-					LOGREADSTATUS("%s device %d cs0_r status 0x%04x\n", device().machine().describe_context(), dev(), data.w & mem_mask);
+					LOGREADSTATUS("%s device %d cs0_r status 0x%04x\n", device().machine().describe_context(), dev(), data.w);
 				}
 				break;
 
 			default:
 				if (!device().machine().side_effects_disabled())
-					LOG("%s device %d cs0_r unknown offset 0x%x 0x%04x\n", device().machine().describe_context(), dev(), offset, data.w & mem_mask);
+					LOG("%s device %d cs0_r unknown offset 0x%x 0x%04x\n", device().machine().describe_context(), dev(), offset, data.w);
 				break;
 			}
 		}

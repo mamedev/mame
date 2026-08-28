@@ -31,6 +31,8 @@ public:
 		: fdc37c665gt_device(mconfig, tag, owner, clock, upd765_family_device::mode_t::AT)
 	{ }
 
+	template<unsigned N, typename T> void set_ide(T&& tag) { m_ide[N].set_tag(std::forward<T>(tag)); }
+
 	fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, upd765_family_device::mode_t floppy_mode);
 
 	// optional information overrides
@@ -135,7 +137,7 @@ private:
 	required_device<n82077aa_device> m_fdc;
 	required_device_array<ns16550_device, 2> m_serial;
 	required_device<pc_lpt_device> m_lpt;
-	required_device_array<ata_interface_device, 2> m_ide;
+	optional_device_array<ata_interface_device, 2> m_ide;
 
 	void write_configuration_register(int index, int data);
 };

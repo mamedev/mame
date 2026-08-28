@@ -9,13 +9,14 @@ TODO:
 - a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
 
 TODO (a7000p -bios 2):
-- Hangs at boot with nullptr ide1:0 option (strike ESC key several times until Boot menu appears,
+- Hangs at boot with no harddisk (strike ESC key several times until Boot menu appears,
   then disable it in Configure machine item);
-- In turn the ESC key Cancel looks too slow to catch up (verify);
+- In turn above seems too slow to catch up (verify);
+- Verify floppy hookup (seems working but perhaps one too many OS failures along the way);
 - CD throws "CD drive not ready or disc not present" when mounted
   (NOTE: needs filesystem changed to CDFS in Configure machine)
 - Serial mouse doesn't work even if selected;
-- No VIDC10 sound even if configured in games, needs support in IOMD sound DMA;
+- No VIDC10 sound even if configured in games;
 
 Notes:
 - List of compatible RiscPC SWs at:
@@ -25,7 +26,6 @@ https://arcwiki.org.uk/index.php?title=Category:Software_compatible_with_the_Ris
 - "Configure SoundSystem 8bit" to attempt using older VIDC10 sound system;
 
 **************************************************************************************************/
-
 #include "emu.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -66,6 +66,7 @@ public:
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
 		, m_superio(*this, "superio")
+		, m_ide(*this, "ide%u", 1U)
 		, m_kbdc(*this, "kbdc")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
@@ -86,6 +87,7 @@ private:
 	required_device<arm_vidc20_device> m_vidc;
 	required_device<arm_iomd_device> m_iomd;
 	required_device<fdc37c665gt_device> m_superio;
+	required_device_array<ata_interface_device, 2> m_ide;
 	required_device<pc_kbdc_device> m_kbdc;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
@@ -299,6 +301,8 @@ void riscpc_state::base_config(machine_config &config)
 	// sarpc_j233 also uses a 'GT, as per the identifier check it does at startup (65h in CRD)
 	// some systems may use a '672 instead (TBD, which ones?)
 	FDC37C665GT(config, m_superio, XTAL(24'000'000), upd765_family_device::mode_t::AT);
+	m_superio->set_ide<0>(m_ide[0]);
+	m_superio->set_ide<1>(m_ide[1]);
 	m_superio->fintr().set(m_iomd, FUNC(arm_iomd_device::int4_w));
 	m_superio->fdrq().set(m_iomd, FUNC(arm_iomd_device::int9_w));
 	subdevice<upd765_family_device>("superio:fdc")->idx_wr_callback().set(m_iomd, FUNC(arm_iomd_device::int1_w));
@@ -316,9 +320,11 @@ void riscpc_state::base_config(machine_config &config)
 
 	// cfr. note on top, we need to reserve first option for an HDD connector
 	// (even if user don't mount one)
-	subdevice<ata_slot_device>("superio:ide1:0")->set_default_option("hdd");
-	subdevice<ata_interface_device>("superio:ide1")->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<0>));
-	subdevice<ata_interface_device>("superio:ide2")->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<1>));
+	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr);
+	m_ide[0]->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<0>));
+
+	ATA_INTERFACE(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
+	m_ide[1]->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<1>));
 
 	FLOPPY_CONNECTOR(config, "superio:fdc:0", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "superio:fdc:1", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);

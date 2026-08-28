@@ -242,6 +242,12 @@ void abstract_ata_interface_device::device_start()
 		if (dev)
 			dev->write_csel(i);
 	}
+
+	save_item(NAME(m_irq));
+	save_item(NAME(m_dmarq));
+	save_item(NAME(m_dasp));
+	save_item(NAME(m_pdiag));
+	save_item(NAME(m_default_data));
 }
 
 

@@ -46,7 +46,7 @@ fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char
 	, m_fdc(*this, "fdc")
 	, m_serial(*this, "uart%u", 1)
 	, m_lpt(*this, "lpt")
-	, m_ide(*this, "ide%u", 1)
+	, m_ide(*this, finder_base::DUMMY_TAG, -1)
 {
 }
 
@@ -77,6 +77,9 @@ void fdc37c665gt_device::device_start()
 	for (int i = 0; i < std::size(configuration_registers_defaults); i++) {
 		write_configuration_register(i, configuration_registers_defaults[i]);
 	}
+
+	if (m_ide[0]) m_ide[0]->default_data(0x0000);
+	if (m_ide[1]) m_ide[1]->default_data(0x0000);
 }
 
 void fdc37c665gt_device::device_add_mconfig(machine_config &config)
@@ -102,13 +105,6 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	m_serial[1]->out_tx_callback().set(FUNC(fdc37c665gt_device::txd_serial2_w));
 	m_serial[1]->out_dtr_callback().set(FUNC(fdc37c665gt_device::dtr_serial2_w));
 	m_serial[1]->out_rts_callback().set(FUNC(fdc37c665gt_device::rts_serial2_w));
-
-	// NOTE: irq(s) is client responsibility (no pins on Super I/O)
-	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, nullptr, nullptr, false);
-	m_ide[0]->default_data(0x0000);
-
-	ATA_INTERFACE(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
-	m_ide[1]->default_data(0x0000);
 }
 
 uint8_t fdc37c665gt_device::read(offs_t offset)
@@ -198,7 +194,8 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 
 		auto &ide_dev = m_ide[ide_target];
 
-		return cs_select ? ide_dev->cs1_r(offset & 7) : ide_dev->cs0_r(offset & 7);
+		if (ide_dev)
+			return cs_select ? ide_dev->cs1_r(offset & 7) : ide_dev->cs0_r(offset & 7);
 	}
 
 	return 0;
@@ -294,10 +291,13 @@ void fdc37c665gt_device::write(offs_t offset, uint8_t data)
 
 		auto &ide_dev = m_ide[ide_target];
 
-		if(cs_select)
-			ide_dev->cs1_w(offset & 7, data);
-		else
-			ide_dev->cs0_w(offset & 7, data);
+		if (ide_dev)
+		{
+			if (cs_select)
+				ide_dev->cs1_w(offset & 7, data);
+			else
+				ide_dev->cs0_w(offset & 7, data);
+		}
 	}
 }
 
