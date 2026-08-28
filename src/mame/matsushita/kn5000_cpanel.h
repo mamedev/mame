@@ -28,8 +28,7 @@ public:
 	template <typename T> void set_cpl_port(unsigned n, T &&tag) { m_cpl_ports[n].set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_cpr_port(unsigned n, T &&tag) { m_cpr_ports[n].set_tag(std::forward<T>(tag)); }
 
-	// One detent of the TEMPO/PROGRAM data wheel, +1 clockwise.  Called from the driver's
-	// input-changed handler; the detents are accumulated and reported on the next panel scan.
+	// one detent of the TEMPO/PROGRAM data wheel, +1 clockwise; reported on the next panel scan
 	void encoder_detent(int delta);
 
 	// Configuration

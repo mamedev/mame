@@ -551,25 +551,17 @@ uint8_t kn5000_cpanel_device::read_button_segment(int segment, bool is_left_pane
 
 void kn5000_cpanel_device::encoder_detent(int delta)
 {
-	// Accumulate; the next scan reports the total.  The panel MCU counts detents between
-	// reports, so several detents arriving inside one scan period is a larger count, not
-	// several packets -- which is what makes the firmware's acceleration curve reachable.
+	// the panel MCU counts detents between reports, so the next scan reports the total
 	m_encoder_accum += delta;
 }
 
 void kn5000_cpanel_device::send_encoder_packet(int8_t detents)
 {
-	// The TEMPO/PROGRAM data wheel is an input of the LEFT panel MCU: the service manual has
-	// SW101 (ENCODER SWITCH) on the CPL board, wired to that MCU's ROTA/ROTB pins.  It reports
-	// as a two-byte frame, header then a signed count of detents since the last report.
-	//
-	// Header 0xD7 = 0xC0 | 0x17: bits 7:6 = 11 select the left panel, as send_button_packet
-	// already encodes, and 0x17 is the encoder's sub-address.  The firmware turns a header into
-	// a record index with ((header & 0xC0) >> 1) | (header & 0x1F), so 0xD7 selects record 0x19,
-	// the data wheel.
-	//
-	// Deliberately not routed through send_button_packet(), which masks the sub-address to four
-	// bits -- 0x17 does not fit.
+	// SW101 (ENCODER SWITCH) is on the CPL board, wired to the left panel MCU's ROTA/ROTB pins.
+	// Header 0xD7 = 0xC0 (left panel) | 0x17 (encoder sub-address); the firmware maps it to
+	// record index ((header & 0xc0) >> 1) | (header & 0x1f) = 0x19.  Then a signed count of
+	// detents since the last report.  send_button_packet() cannot carry this: it masks the
+	// sub-address to four bits.
 	send_byte(0xd7);
 	send_byte(uint8_t(detents));
 
@@ -925,14 +917,9 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::button_scan_callback)
 		}
 	}
 
-	// Report any data-wheel movement accumulated since the last scan.
-	//
-	// The count is NEGATED: the firmware indexes an acceleration curve with it, and that curve
-	// is monotonically decreasing, so a negative count is what raises the on-screen value.
-	//
-	// It is also CLAMPED.  The firmware computes the curve index as sext8(count + 0x10) with no
-	// bounds check, so magnitudes outside -16..+15 index off the end of a 32-entry table.  A
-	// real panel cannot produce those, and neither may this one.
+	// Report any data-wheel movement accumulated since the last scan.  The count is negated
+	// because the firmware's acceleration curve is monotonically decreasing, and clamped to
+	// -16..+15 because the curve index is sext8(count + 0x10) into a 32-entry table, unchecked.
 	if (m_encoder_accum != 0)
 	{
 		int32_t count = -m_encoder_accum;

@@ -92,10 +92,8 @@ uint16_t mn89304_vga_device::offset()
 
 namespace {
 
-// Detents per full turn of the data wheel.  The exact number does not reach the firmware --
-// only the count of detents does -- so this is a UI granularity choice, not a hardware fact.
+// data wheel: detents per full turn, and the drag adjuster's 0..100 range plus one
 static constexpr int ENCODER_POSITIONS = 24;
-// The drag control is a plain 0..100 adjuster; its full turn is one more than its range.
 static constexpr int ENCODER_DRAG_POSITIONS = 101;
 
 class kn5000_state : public driver_device
@@ -120,7 +118,6 @@ public:
 		, m_cpanel_inta(0)
 	{ }
 
-	// One detent of the TEMPO/PROGRAM data wheel.  Public: reached by PORT_CHANGED_MEMBER.
 	DECLARE_INPUT_CHANGED_MEMBER(encoder_moved);
 
 	void kn5000(machine_config &config) ATTR_COLD;
@@ -456,13 +453,8 @@ static INPUT_PORTS_START(kn5000)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DOWN 2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 2")
-	// The TEMPO/PROGRAM data wheel below the LCD.  It is an ENDLESS rotary encoder, so it is
-	// modelled as a wrapping positional control rather than an adjuster: there is no absolute
-	// position to represent, only motion.  Following src/mame/oberheim/xpander.cpp, which has
-	// the same kind of control on a synthesiser front panel.
-	//
-	// The panel MCU reports detents, so every step of this control becomes one detent handed to
-	// the control-panel device; it is that device that puts them on the serial link.
+	// TEMPO/PROGRAM data wheel below the LCD: an endless rotary encoder, so a wrapping
+	// positional control.  Each step becomes one detent for the control panel device.
 	PORT_START("ENCODER")
 	PORT_BIT(0x1f, 0x00, IPT_POSITIONAL) PORT_NAME("Tempo / Program Data Wheel")
 		PORT_POSITIONS(ENCODER_POSITIONS) PORT_WRAPS PORT_SENSITIVITY(20) PORT_KEYDELTA(1)
@@ -470,13 +462,7 @@ static INPUT_PORTS_START(kn5000)
 		PORT_FULL_TURN_COUNT(ENCODER_POSITIONS)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_POSITIONS)
 
-	// The layout script drags this one in a circle. It needs to be a separate field from the
-	// control above, and specifically an IPT_ADJUSTER, because the two Lua write paths are
-	// mutually exclusive: set_value() is the only route into an analog field and it sets
-	// m_use_adjoverride permanently (ioport.cpp:3822), so the field stops reading its accumulator
-	// and the KEY BINDINGS above would go dead for the rest of the session after one drag; while
-	// user_value, which has no such side effect, is ignored on anything that is not an adjuster
-	// (ioport.cpp:1048). Detents from both are summed by the panel device.
+	// The same wheel, as an adjuster for the layout script to drag; detents from both are summed.
 	PORT_START("ENCODER_DRAG")
 	PORT_ADJUSTER(50, "Tempo / Program Data Wheel (mouse drag)")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_DRAG_POSITIONS)
@@ -500,13 +486,10 @@ void kn5000_state::machine_reset()
 	m_checking_device_led_cn12 = 0;
 }
 
-// A step of the data wheel.  PORT_WRAPS means a full turn wraps the position, so a step across
-// the wrap point looks like a huge jump; recognise it and treat it as one detent, the way
-// src/mame/oberheim/xpander.cpp does for its encoders.
+// A step of the data wheel.  Both wheel controls arrive here; param is the control's full
+// turn, so that a wrap reads as one detent rather than a full-scale move backwards.
 INPUT_CHANGED_MEMBER(kn5000_state::encoder_moved)
 {
-	// Both wheel controls arrive here; the parameter is the control's full turn, so that a jump
-	// of more than half of it reads as a wrap rather than a full-scale move backwards.
 	int const modulus = int(param);
 	int delta = int(newval) - int(oldval);
 	if (delta > modulus / 2)
@@ -514,8 +497,7 @@ INPUT_CHANGED_MEMBER(kn5000_state::encoder_moved)
 	else if (delta < -modulus / 2)
 		delta += modulus;
 
-	// The magnitude is kept, not reduced to a direction: the firmware reads the reported count
-	// as an index into an acceleration curve, so a fast turn is meant to move further per detent.
+	// magnitude is kept, not reduced to a direction: the firmware uses it as an acceleration index
 	if (delta != 0)
 		m_cpanel->encoder_detent(delta);
 }

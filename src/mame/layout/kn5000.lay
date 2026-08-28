@@ -1338,11 +1338,8 @@ license:CC0-1.0
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
 		-----------------------------------------------------------------------
-		-- Widgets are stored PER VIEW. A single shared list is WRONG when the same control is registered in
-		-- more than one view (e.g. a Compact view plus a single-block view): each view has its own coordinate
-		-- normalisation, so a pointer hit-test in view A against a widget's bounds registered for view B gives
-		-- false matches (symptom: clicking near one control in one view drags a slider that "lives" in another
-		-- view whose normalised bounds happen to overlap). Keying the widget list by view fixes that.
+		-- Widgets are stored per view: bounds are normalised per view, so a hit test is only
+		-- meaningful against widgets registered for the same view.
 		local view_widgets = {}   -- view (userdata) -> list of its widgets
 		local active_wl = nil     -- widget list of the view whose pointer last moved (for the frame wheel poll)
 		local pointers = {}       -- Tracks pointer state (keyed by pointer id).
@@ -1375,19 +1372,13 @@ license:CC0-1.0
 				scale     = scale })
 		end
 
-		-- An INFINITE rotary knob (e.g. the TEMPO/PROGRAM wheel). A circular drag rotates the `finger_id`
-		-- element around the knob centre and steps the attached relative encoder (an IPT_ADJUSTER the driver
-		-- diffs wrap-aware). `finger_id` is repositioned every frame via set_bounds_callback; the running
-		-- angle accumulates without limit, so the finger just keeps going round and round.
-		-- Every rotary knob, for the per-frame finger update. MUST be declared before
+		-- Every rotary knob, for the per-frame finger update.  Must be declared before
 		-- add_rotary_knob(): a Lua local is not visible to code written above it.
 		local rotary_widgets = {}
 
-		-- `drag_port_name` is written by this script; `key_port_name` is the control the KEYS and the
-		-- mouse axis drive, which the script only ever READS. They cannot be the same field: an
-		-- analog field's only Lua write path, set_value(), latches m_use_adjoverride permanently and
-		-- detaches the field from the input system, so one drag would kill the keys for the rest of
-		-- the session. An adjuster's user_value has no such side effect, and the driver sums both.
+		-- An infinite rotary knob.  A circular drag rotates `finger_id` around the knob centre and
+		-- steps the encoder.  `drag_port_name` is the adjuster this script writes; `key_port_name`
+		-- is the control the keys and mouse axis drive, which it only reads.
 		function add_rotary_knob(view, clickarea_id, finger_id, drag_port_name, key_port_name)
 			local w = {
 				clickarea = get_layout_item(view, clickarea_id),
@@ -1400,12 +1391,9 @@ license:CC0-1.0
 				notch     = 0 }    -- last encoder notch emitted
 			table.insert(widget_list(view), w)
 			table.insert(rotary_widgets, w)
-			-- The finger orbits the knob centre at the current angle (0 = 12 o'clock, clockwise positive).
-			-- item.bounds is normalised PER-AXIS (x by view width, y by view height), so a screen-circular
-			-- orbit needs the x offset scaled by the click area's normalised WIDTH and the y offset by its
-			-- normalised HEIGHT (the click area is square in view units, so these encode the pixel aspect).
-			-- Orbit radius 0.24 keeps the finger (half-size 0.148) fully inside the wheel (r 0.48) with an
-			-- internal margin; the wheel is square in view units so scale x by width, y by height.
+			-- The finger orbits the knob centre (0 = 12 o'clock, clockwise positive).  item.bounds is
+			-- normalised per axis, so the x offset scales by the click area's width and y by its height.
+			-- Orbit radius 0.24 keeps the finger (half-size 0.148) inside the wheel (r 0.48).
 			w.finger:set_bounds_callback(function()
 				local b = w.clickarea.bounds
 				local cx = (b.x0 + b.x1) / 2
@@ -1447,14 +1435,12 @@ license:CC0-1.0
 			return field
 		end
 
-		-- Step the rotary encoder: map the accumulated angle to notches and nudge the adjuster by the
-		-- notch delta (wrapping 0..100). The driver diffs the adjuster wrap-aware into [0x17] encoder steps.
+		-- Step the rotary encoder: map the accumulated angle to notches and nudge the adjuster by
+		-- the notch delta, wrapping at 101, which the driver diffs wrap-aware.
 		local ROTARY_STEPS_PER_REV = 24
 		local function rotary_emit(w)
 			local target = math.floor(w.angle * ROTARY_STEPS_PER_REV / (2 * math.pi) + 0.5)
 			if target ~= w.notch then
-				-- Writes the DRAG adjuster via user_value: the one route that does not latch the
-				-- field away from MAME's input system. The driver diffs it wrap-aware at 101.
 				local v = (w.field.user_value + (target - w.notch)) % 101
 				if v < 0 then v = v + 101 end
 				w.field.user_value = v
@@ -1462,9 +1448,8 @@ license:CC0-1.0
 			end
 		end
 
-		-- Pointer angle around a widget's knob centre (0 = 12 o'clock, clockwise positive). Per-axis
-		-- normalisation (÷ width, ÷ height) matches the finger's aspect-corrected orbit, so the finger
-		-- tracks the cursor faithfully all the way round instead of leading/lagging near the sides.
+		-- Pointer angle around a widget's knob centre (0 = 12 o'clock, clockwise positive), with the
+		-- same per-axis normalisation as the finger's orbit so the two track each other.
 		local function knob_angle(w, x, y)
 			local b = w.clickarea.bounds
 			local cx = (b.x0 + b.x1) / 2
@@ -1472,11 +1457,9 @@ license:CC0-1.0
 			return math.atan((x - cx) / (b.x1 - b.x0), (cy - y) / (b.y1 - b.y0))
 		end
 
-		-- Mouse-WHEEL editing for rotary knobs. MAME's layout pointer API does NOT deliver wheel events,
-		-- so we read the mouse device's relative Z axis directly each frame (the sandbox exposes `machine`,
-		-- hence machine.input). One detent = 120 * RELATIVE_PER_PIXEL(512) = 61440 accumulator units
-		-- (SDL osd: m_v += wheel.y * 120 * RELATIVE_PER_PIXEL). Each notch nudges the finger and the encoder
-		-- exactly like a click of a drag, but only while the cursor hovers over the wheel.
+		-- Mouse-wheel editing for rotary knobs.  The pointer API delivers no wheel event, so the
+		-- mouse device's relative Z axis is read each frame.  One detent is
+		-- 120 * RELATIVE_PER_PIXEL(512) accumulator units (SDL osd: m_v += wheel.y * 120 * RPP).
 		local WHEEL_PER_NOTCH = 120 * 512
 		local wheel_item, wheel_probed, wheel_accum = nil, false, 0
 		local function find_wheel_item()
@@ -1493,10 +1476,8 @@ license:CC0-1.0
 			end
 			return nil
 		end
-		-- The knob graphic must turn for whatever moved the wheel -- keys, mouse axis, pointer drag or
-		-- scroll wheel -- so it is driven by the summed wrap-aware DELTA of both controls rather than
-		-- by the drag gesture. Driving it from either control's absolute value would make it jump
-		-- whenever the other one moved.
+		-- The knob graphic follows the summed wrap-aware delta of both controls, so that it turns
+		-- for whatever moved the wheel: keys, mouse axis, pointer drag or scroll wheel.
 		local function wrapped_delta(cur, prev, modulus)
 			local d = cur - prev
 			if d > modulus / 2 then d = d - modulus
@@ -1550,8 +1531,8 @@ license:CC0-1.0
 			end
 		end
 
-		-- `wl` is the widget list of the view this callback was installed on (see install_slider_callbacks).
-		-- Only widgets belonging to THIS view are hit-tested, so a click never matches another view's control.
+		-- `wl` is the widget list of the view this callback was installed on, so only that view's
+		-- widgets are hit-tested.
 		local function pointer_updated(wl, type, id, dev, x, y, btn, dn, up, cnt)
 			hover_x, hover_y = x, y   -- remember where the cursor is, so the wheel poll can hit-test it
 			active_wl = wl            -- this is the view the user is interacting with
@@ -1599,8 +1580,8 @@ license:CC0-1.0
 			local pointer = pointers[id]
 			local widget = pointer.selected_wl[pointer.selected_widget]
 
-			-- Rotary knob: rotate the finger by the pointer's angular motion and step the encoder. The angle
-			-- accumulates without limit, so it can be spun round and round (24 encoder steps per revolution).
+			-- Rotary knob: rotate the finger by the pointer's angular motion and step the encoder.
+			-- The angle accumulates without limit, so the wheel can be spun round and round.
 			if widget.is_rotary then
 				local pa = knob_angle(widget, x, y)
 				local d = pa - pointer.last_pa
@@ -1665,11 +1646,8 @@ license:CC0-1.0
 		-----------------------------------------------------------------------
 		-- Slider and knob library ends.
 
-		-- KN5000 TEMPO/PROGRAM data wheel: an INFINITE rotary encoder, made draggable with the same
-		-- shared widget library, inlined because MAME layouts cannot include external files.
-		-- A circular drag (or the mouse wheel while hovering) spins the finger and steps the
-		-- ENCODER control, 24 notches per revolution. The driver turns each step into one detent
-		-- and the control-panel device puts it on the serial link as [0xD7, signed count].
+		-- KN5000 TEMPO/PROGRAM data wheel: a circular drag, or the mouse wheel while hovering,
+		-- spins the finger and steps the encoder 24 notches per revolution.
 		file:set_resolve_tags_callback(function()
 			for vname, view in pairs(file.views) do
 				if view.items["tempo_program_encoder"] ~= nil and view.items["tempo_program_encoder_finger"] ~= nil then
@@ -1679,8 +1657,7 @@ license:CC0-1.0
 				end
 			end
 		end)
-		-- The layout plugin invokes the returned table's frame() every video frame; use it to poll
-		-- the mouse wheel for the rotary wheel (the pointer API delivers no wheel event).
+		-- The layout plugin invokes the returned table's frame() every video frame.
 		return { frame = function() poll_rotary_wheels(); follow_rotary_values() end }
 	]]></script>
 </mamelayout>
