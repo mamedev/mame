@@ -32,6 +32,7 @@ public:
 	void fixitflx(machine_config &config) ATTR_COLD;
 	void wiwcs(machine_config &config) ATTR_COLD;
 	void poke(machine_config &config) ATTR_COLD;
+	void pixlstar(machine_config &config) ATTR_COLD;
 	void flufflav(machine_config &config) ATTR_COLD;
 	void puni(machine_config &config) ATTR_COLD;
 	void bubltea(machine_config &config) ATTR_COLD;
@@ -397,6 +398,14 @@ void generalplus_gpl951xx_game_state::poke(machine_config &config)
 	m_genspi->set_jedec_capacity(0x19);
 }
 
+void generalplus_gpl951xx_game_state::pixlstar(machine_config &config)
+{
+	gpl951xx(config);
+	m_genspi->set_jedec_manufacturer(0xc2);
+	m_genspi->set_jedec_memtype(0x20);
+	m_genspi->set_jedec_capacity(0x18);
+}
+
 void generalplus_gpl951xx_game_state::flufflav(machine_config &config)
 {
 	gpl951xx(config);
@@ -531,6 +540,11 @@ ROM_END
 ROM_START( punistar )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "xm25qh64c.ic3", 0x0000, 0x800000, CRC(72f54f23) SHA1(902955764d0b61decc057eb3afaf2960cf2134c6) )
+ROM_END
+
+ROM_START( pixlstar )
+	ROM_REGION16_BE(0x1000000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "pixel_stars.bin", 0x0000, 0x1000000, CRC(24787fa9) SHA1(104791a1e5783e6d657c6c3b37c2120db8e6f4eb) )
 ROM_END
 
 ROM_START( flufflav )
@@ -693,6 +707,8 @@ CONS(2021, punij2pk, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, e
 CONS(2021, punifrnd, 0,        0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2021, punistar, 0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2020, pixlstar, 0,        0, pixlstar, base, generalplus_gpl951xx_game_state, empty_init, "Skyrocket Toys", "Pixel Stars Dreamhouse", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // 'Poo' emoji shaped item, comes in multiple colours, has a solder pad which might change between units
 // this was dumped from the 'Lavender' unit
