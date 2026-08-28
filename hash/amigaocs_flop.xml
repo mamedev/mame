@@ -7248,6 +7248,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+[FDC] hangs after title screen, keeps repeating data read with BGM playing
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1028720">
 				<rom name="(sps3081)bluesbrothers,the.ipf" size="1028720" crc="5dd15801" sha1="5071b71f7d76fd7fe16a5dffe04498df1ccc1104"/>
@@ -7262,6 +7265,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+(same as bluesb)
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1028720">
 				<rom name="(sps3082)bluesbrothers,the.ipf" size="1028720" crc="99b57dfd" sha1="06cc9e6dd233c41b57f938b78cc51142345f62a7"/>
@@ -14185,13 +14191,16 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="dicktr" supported="yes">
+	<software name="dicktr" supported="no">
 		<!-- SPS (CAPS) release 3083 -->
 		<description>Dick Tracy (Europe, Titus)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+[FDC] hangs on pre-new game newspaper with loading burps
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="853776">
 				<rom name="(sps3083)dicktracy.ipf" size="853776" crc="4bf9beba" sha1="02589a4204c294c91a54514cd9d6289c45f785fe"/>
@@ -14487,13 +14496,14 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="dogsowar" supported="no">
+	<software name="dogsowar" supported="yes">
 		<!-- SPS (CAPS) release 3008 -->
 		<description>Dogs Of War</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Elite</publisher>
+		<!-- TODO: why baddump? -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1016901">
 				<rom name="dogsofwar.ipf" size="1016901" crc="e738511f" sha1="5581ab144292d0e1283beaa6188addd111bb4099" status="baddump"/>
@@ -20077,25 +20087,6 @@ ATK test: OK
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2759)foundationswaste.ipf" size="1049180" crc="8382b600" sha1="836b66230b9e360106c7e1eeb8d60672317e3a46"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="foundwstc" cloneof="foundwst" supported="no">
-		<!-- SPS (CAPS) release 3155? -->
-		<description>Foundation's Waste (Europe, Coverdisk)</description>
-		<!-- coverdisk, standalone -->
-		<!-- (Amiga, OCS, PAL) -->
-		<year>1990</year>
-		<publisher>&lt;coverdisk&gt;</publisher>
-		<notes><![CDATA[
-ATK test: failed
-]]></notes>
-		<info name="magazine" value="The One 22" />
-		<info name="release" value="199007xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1034145">
-				<rom name="foundation's waste (europe) (coverdisk - the one - issue 22) (amiga + st).ipf" size="1034145" crc="8cc8484f" sha1="c51cc0cf5005fa6f422383e7f84a00f6bac5915c" />
 			</dataarea>
 		</part>
 	</software>
@@ -30328,27 +30319,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="lxcess" supported="no">
-		<!-- SPS (CAPS) release 3058 -->
-		<description>Lethal Xcess (Europe)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, OCS, NTSC) -->
-		<year>1991</year>
-		<publisher>Eclipse</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1004597">
-				<rom name="lethal xcess - wings of death ii (europe) (amiga + st) (disk a).ipf" size="1004597" crc="33cc029d" sha1="54a268710716f3510918cd8767d9d248798c4ed0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1008380">
-				<rom name="lethal xcess - wings of death ii (europe) (amiga + st) (disk b).ipf" size="1008380" crc="7c53b994" sha1="8b8cefdb0dbd7e4a515c95235526ed909fe499c7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lweapon" supported="no">
 		<!-- SPS (CAPS) release 814 -->
 		<description>Lethal Weapon (Europe)</description>
@@ -33885,20 +33855,6 @@ ATK test: C:0 H:U Bad
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049214">
 				<rom name="(sps1124)deluxemonopoly.ipf" size="1049214" crc="15afa481" sha1="c8fd086477fe7ca5b8f988976180bc3fd42086a9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="monstbus" supported="yes">
-		<!-- SPS (CAPS) release 3032 -->
-		<description>Monster Business (Europe)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, OCS, PAL / Atari ST, PAL) -->
-		<year>1991</year>
-		<publisher>Eclipse</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1009109">
-				<rom name="monster business (europe) (amiga + st).ipf" size="1009109" crc="be6095a0" sha1="c6d0706c363f3fd7f5e40864b49568ac9e157c8b" />
 			</dataarea>
 		</part>
 	</software>
@@ -38473,7 +38429,7 @@ ATK test: OK
 		<!-- SPS (CAPS) release 70 -->
 		<description>Populous (USA, v2.7 19890330)</description>
 		<!-- retail, standalone -->
-		<!-- (Amiga, OCS, PAL) -->
+		<!-- (Amiga, OCS, NTSC) -->
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
@@ -38486,24 +38442,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="populouspl" cloneof="populous" supported="no">
-		<!-- SPS (CAPS) release 3024 -->
-		<description>Populous - The Promised Lands (Europe)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, OCS, PAL / Atari ST, PAL) -->
-		<year>1989</year>
-		<publisher>Electronic Arts</publisher>
-		<notes><![CDATA[
-ATK test: failed
-]]></notes>
-		<info name="usage" value="Requires &quot;Populous&quot; to work" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1037012">
-				<rom name="populous - the promised lands (europe) (addon) (amiga + st).ipf" size="1037012" crc="de09f0a3" sha1="21301177eb04122183aa716c081e8a4fda35cff8" />
-			</dataarea>
-		</part>
-	</software>
-
+	<!-- budget stand-alone version, for the multiplatform disk cfr. generic_flop_35:populouspl -->
 	<software name="populouspla" cloneof="populous" supported="no">
 		<!-- SPS (CAPS) release 1217 -->
 		<description>Populous - The Promised Lands (Europe, Budget)</description>
@@ -47689,23 +47628,6 @@ ATK test: OK
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps174)starglider.ipf" size="1049612" crc="aac8ce6d" sha1="77386f85ec2c8b1564d9d71bac98a19964ed9560"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="stargld2">
-		<!-- SPS (CAPS) release 3000 -->
-		<description>Starglider 2 (Europe)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, OCS, PAL / Atari ST, PAL) -->
-		<year>1988</year>
-		<publisher>Rainbird</publisher>
-		<notes><![CDATA[
-ATK test: failed
-]]></notes>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1019021">
-				<rom name="starglider 2 (europe) (en,fr,de) (amiga + st).ipf" size="1019021" crc="ed38c67f" sha1="c2cb4b2f517e2f20205577b8ba16331920660160" />
 			</dataarea>
 		</part>
 	</software>
