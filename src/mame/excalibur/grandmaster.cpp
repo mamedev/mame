@@ -29,7 +29,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "excal_grandmaster.lh"
+#include "excal_grandmas.lh"
 
 
 namespace {
@@ -218,7 +218,7 @@ void grandmas_state::grandmas(machine_config &config)
 	//m_board->set_nvram_enable(true);
 
 	// video hardware
-	//config.set_default_layout(layout_excal_grandmaster);
+	config.set_default_layout(layout_excal_grandmas);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
