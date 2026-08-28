@@ -29,6 +29,7 @@ public:
 	void data_write(uint8_t data);
 	uint8_t data_read();
 
+    void set_screen(screen_device &screen);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -44,22 +45,24 @@ private:
     uint32_t m_datalatch;
     uint16_t m_currcol, m_currrow, m_height, m_width;
 
-    void writeReg(uint16_t val);
-    bool updateCursorReg(uint16_t *cursor, uint16_t start, uint16_t end, uint8_t flag);
-    void resetCursorRegs(uint16_t mode, bool resetX, bool resetY);
+    screen_device *m_screen = nullptr;
 
-    uint32_t getGRAMData(uint32_t addr);
-    uint32_t getPixel(uint16_t x, uint16_t y);
+    void write_reg(uint16_t val);
+    bool update_cursor_reg(uint16_t *cursor, uint16_t start, uint16_t end, uint8_t flag);
+    void reset_cursor_regs(uint16_t mode, bool reset_x, bool reset_y);
+
+    uint32_t get_gram_data(uint32_t addr);
+    uint32_t get_pixel(uint16_t x, uint16_t y);
     uint16_t rgb666_to_rgb565(uint32_t pixel);
-    uint32_t rgb666_swapBGR(uint32_t pixel);
+    uint32_t rgb666_swap_bgr(uint32_t pixel);
 
-    void writePixel_565(uint16_t pixel);
-    void writePixel_666(uint32_t pixel);
-    void writePixel_666_unpacked(uint32_t pixel);
+    void write_pixel_565(uint16_t pixel);
+    void write_pixel_666(uint32_t pixel);
+    void write_pixel_666_unpacked(uint32_t pixel);
 
-    void drawInterlacedFrame(bitmap_rgb32 &bitmap);
-    void drawPartialImage(bitmap_rgb32 &bitmap, uint16_t disp_pos, uint16_t start_line, uint16_t end_line);
-    void plotPixel(bitmap_rgb32 &bitmap, uint32_t pixel18, uint8_t x, uint16_t y);
+    void draw_interlaced_frame(bitmap_rgb32 &bitmap);
+    void draw_partial_image(bitmap_rgb32 &bitmap, uint16_t disp_pos, uint16_t start_line, uint16_t end_line);
+    void plot_pixel(bitmap_rgb32 &bitmap, uint32_t pixel18, uint8_t x, uint16_t y);
 };
 
 // device type definition
