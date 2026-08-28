@@ -763,8 +763,14 @@ macro take_exception %vector
 # CMP.W EA, #imm16
 05    ff    cmp_ea_16      e        -      -
 	m_tmp1 = read_imm16();
-	m_tmp2 = read_ea_16();
-	do_sub16(m_tmp2, m_tmp1);
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp2 = read_ea_16();
+		do_sub16(m_tmp2, m_tmp1);
+	} else {
+		m_tmp1 &= 0xff;
+		m_tmp2 = read_ea_8();
+		do_sub8(m_tmp2, m_tmp1);
+	}
 	cycles 2
 	prefetch
 
