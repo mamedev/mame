@@ -321,9 +321,11 @@ void riscpc_state::base_config(machine_config &config)
 	// cfr. note on top, we need to reserve first option for an HDD connector
 	// (even if user don't mount one)
 	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr);
+	m_ide[0]->default_data(0x0000);
 	m_ide[0]->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<0>));
 
 	ATA_INTERFACE(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
+	m_ide[1]->default_data(0x0000);
 	m_ide[1]->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<1>));
 
 	FLOPPY_CONNECTOR(config, "superio:fdc:0", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);

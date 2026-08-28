@@ -77,9 +77,6 @@ void fdc37c665gt_device::device_start()
 	for (int i = 0; i < std::size(configuration_registers_defaults); i++) {
 		write_configuration_register(i, configuration_registers_defaults[i]);
 	}
-
-	if (m_ide[0]) m_ide[0]->default_data(0x0000);
-	if (m_ide[1]) m_ide[1]->default_data(0x0000);
 }
 
 void fdc37c665gt_device::device_add_mconfig(machine_config &config)
