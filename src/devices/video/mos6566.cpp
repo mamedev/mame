@@ -827,7 +827,6 @@ void mos6566_device::device_reset()
 	m_ba = CLEAR_LINE;
 	m_aec = CLEAR_LINE;
 	m_aec_delay = 0xff;
-	m_cpu_halted = 0;
 
 	set_ba(ASSERT_LINE);
 	set_aec(ASSERT_LINE);
@@ -1412,14 +1411,6 @@ void mos6566_device::execute_run()
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
 
-		int const halt = !m_ba;
-
-		if (halt != m_cpu_halted)
-		{
-			m_cpu_halted = halt;
-			m_cpu->set_input_line(M6502_RDY_LINE, halt ? CLEAR_LINE : ASSERT_LINE);
-		}
-
 		m_icount--;
 	} while (m_icount > 0);
 }
@@ -1983,14 +1974,6 @@ void mos6569_device::execute_run()
 
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
-
-		int const halt = !m_ba;
-
-		if (halt != m_cpu_halted)
-		{
-			m_cpu_halted = halt;
-			m_cpu->set_input_line(M6502_RDY_LINE, halt ? CLEAR_LINE : ASSERT_LINE);
-		}
 
 		m_icount--;
 	} while (m_icount > 0);

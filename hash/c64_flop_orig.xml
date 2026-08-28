@@ -89,8 +89,6 @@ Fails loading
 		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_5_25">
-			<!-- will not load if disk is not write protected -->
-			<feature name="read_only" value="true"/>
 			<dataarea name="flop" size="208212">
 				<rom name="bbsb.g64" size="208212" crc="69456d8c" sha1="26801eda258f748aa6f6c45df8af7f7cbb2857d4"/>
 			</dataarea>
@@ -101,9 +99,6 @@ Fails loading
 		<description>Commando</description>
 		<year>1985</year>
 		<publisher>Elite</publisher>
-		<notes><![CDATA[
-LOAD "COMMANDO",8,1
-]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -304,14 +299,10 @@ Punts to BASIC
 		</part>
 	</software>
 
-	<software name="sthassle" supported="no">
+	<software name="sthassle">
 		<description>Street Hassle</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Part of player sprite draws transparent (collisions still works)
-]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -320,7 +311,7 @@ Part of player sprite draws transparent (collisions still works)
 		</part>
 	</software>
 
-	<software name="spoker" supported="yes">
+	<software name="spoker">
 		<description>Strip Poker</description>
 		<year>1984</year>
 		<publisher>Artworx</publisher>
@@ -950,9 +941,7 @@ All games fails loading
 		<description>1541/1571 Drive Alignment</description>
 		<year>1987</year>
 		<publisher>Free Spirit Software</publisher>
-		<notes><![CDATA[
-LOAD "*",8
-]]></notes>
+		<info name="usage" value='LOAD "*",8' />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">

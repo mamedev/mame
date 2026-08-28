@@ -1528,6 +1528,7 @@ void c64_state::ntsc(machine_config &config)
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
 	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos6567.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
@@ -1703,6 +1704,7 @@ void c64_state::pal(machine_config &config)
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
 	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos6569.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
@@ -1854,6 +1856,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
 	mos8565.set_cpu(m_maincpu);
 	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos8565.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
 	mos8565.set_screen(SCREEN_TAG);
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);

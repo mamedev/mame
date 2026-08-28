@@ -98,7 +98,8 @@ protected:
 
 enum {
 	M6510_IRQ_LINE = m6502_device::IRQ_LINE,
-	M6510_NMI_LINE = m6502_device::NMI_LINE
+	M6510_NMI_LINE = m6502_device::NMI_LINE,
+	M6510_RDY_LINE = m6502_device::RDY_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6510, m6510_device)
