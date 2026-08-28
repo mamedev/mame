@@ -462,7 +462,7 @@ void c1571_device::byte_w(int state)
 {
 	m_via1->write_ca1(state);
 
-	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, !state);
 }
 
 
