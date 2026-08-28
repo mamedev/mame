@@ -19,11 +19,12 @@
 
 #include "bus/gba/rom.h"
 #include "bus/nds/rom.h"
-#include "crsshair.h"
-#include "softlist_dev.h"
-
 #include "layout/generic.h"
+
+#include "crsshair.h"
+#include "multibyte.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 #define LOG_UNK_RD      (1U << 1)
 #define LOG_UNK_WR      (1U << 2)
@@ -157,7 +158,7 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_rtc_io(0),
 	m_gba_mode(false),
 	m_total_lines(TOTAL_LINES), m_visible_lines(VISIBLE_LINES),
-	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_fifo{},
+	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_bios_prefetch(0), m_gba_fifo{},
 	m_auxspicnt(0),	m_auxspidata(0),
 	m_romctrl(0),
 	m_card_command{}, m_cartdata_len(0), m_card_cpu(1),
@@ -2377,7 +2378,10 @@ void nds_state::install_gba_map()
 	address_space &space = m_arm7->space(AS_PROGRAM);
 	space.unmap_readwrite(0x00000000, 0xffffffff);
 
-	space.install_rom(0x00000000, 0x00003fff, m_gbabios.target());
+	space.install_read_handler(0x00000000, 0x00003fff, read32s_delegate(*this, FUNC(nds_state::gba_bios_r)));
+	space.nop_write(0x00000000, 0x00003fff);
+	space.install_read_handler(0x00004000, 0x01ffffff, read32s_delegate(*this, FUNC(nds_state::gba_open_bus_r)));
+	space.install_read_handler(0x10000000, 0xffffffff, read32s_delegate(*this, FUNC(nds_state::gba_open_bus_r)));
 	space.install_ram(0x02000000, 0x0203ffff, 0x00fc0000, memshare("mainram")->ptr());                  // EWRAM: 256K of main RAM
 	space.install_ram(0x03000000, 0x03007fff, 0x00ff8000, m_arm7ram.target());                          // IWRAM: 32K of the ARM7's WRAM
 	space.install_readwrite_handler(0x04000000, 0x04ffffff,
@@ -2433,6 +2437,74 @@ void nds_state::install_gba_map()
 uint32_t nds_state::gba_pak_r(offs_t offset)
 {
 	return m_gbacart->read_rom(offset);
+}
+
+uint32_t nds_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
+{
+	const uint32_t pc = m_arm7->pc();
+	if (pc >= 0x4000)
+	{
+		// The BIOS can only be read while executing from it; other reads return the most recently
+		// fetched BIOS opcode as per GBATEK.
+		return m_gba_bios_prefetch;
+	}
+
+	const uint32_t data = get_u32le(&m_gbabios[offset << 2]);
+
+	// The core prefetches 2 words ahead of the PC like the real pipeline, so PC+8
+	if (((offset << 2) == ((pc & ~3) + 8)) && !machine().side_effects_disabled())
+	{
+		m_gba_bios_prefetch = data;
+	}
+
+	return data;
+}
+
+// Reads from unused address space return the most recently prefetched opcode.
+// Justice League Chronicles and The Pinball of the Dead both do null pointer
+// reads and work by accident.
+uint32_t nds_state::gba_open_bus_r(offs_t offset, uint32_t mem_mask)
+{
+	address_space &mspace = m_arm7->space(AS_PROGRAM);
+	const uint32_t pc = m_arm7->pc();
+
+	// don't recurse if we're somehow executing from unused space
+	if ((pc >= 0x10000000) || ((pc >= 0x4000) && (pc < 0x02000000)))
+	{
+		return 0;
+	}
+
+	uint32_t data;
+	if (BIT(m_arm7->state_int(arm7_cpu_device::ARM7_CPSR), 5))    // Thumb
+	{
+		// Thumb: the two halves depend on where the code is and how it's aligned
+		switch (pc >> 24)
+		{
+			case 0x00: // BIOS
+			case 0x03: // IWRAM
+			case 0x07: // OAM
+				if (pc & 2)
+				{
+					data = mspace.read_word(pc + 2) | (mspace.read_word(pc + 4) << 16);
+				}
+				else
+				{
+					data = mspace.read_word(pc + 4) | (mspace.read_word(pc + 6) << 16);
+				}
+				break;
+
+			default: // EWRAM, palette, VRAM, cartridge ROM
+				data = mspace.read_word(pc + 4);
+				data |= data << 16;
+				break;
+		}
+	}
+	else
+	{
+		data = mspace.read_dword(pc + 8);
+	}
+	logerror("%s: unmapped program memory read = %08X & %08X\n", machine().describe_context(), data, mem_mask);
+	return data;
 }
 
 // The GBA I/O map: LCD registers are engine A's, DMA/timers/keys/serial are
@@ -2848,6 +2920,7 @@ void nds_state::machine_start()
 	save_item(STRUCT_MEMBER(m_gba_fifo, sample));
 	save_item(STRUCT_MEMBER(m_gba_fifo, word));
 	save_item(NAME(m_gba_waitcnt));
+	save_item(NAME(m_gba_bios_prefetch));
 
 	// the card decrypts KEY1 commands with the same Blowfish tables the BIOS encrypts them with
 	m_ndscart->set_key1_table(memregion("arm7")->base() + 0x30);

@@ -261,6 +261,7 @@ private:
 	int m_visible_lines;
 	uint32_t m_gba_soundregs[0x50/4];
 	uint16_t m_gba_waitcnt;
+	uint32_t m_gba_bios_prefetch;
 
 	// GBA mode DirectSound: two FIFOs fed by DMA, drained to the DACs on timer overflow
 	struct gba_fifo_t
@@ -281,6 +282,8 @@ private:
 	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);
 	void gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gba_pak_r(offs_t offset);
+	uint32_t gba_bios_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t gba_open_bus_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	// gamecard
 	uint16_t m_auxspicnt;
