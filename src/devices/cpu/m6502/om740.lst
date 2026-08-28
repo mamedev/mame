@@ -237,8 +237,10 @@ brk_m_imp
 	// BRK uses the vector of the interrupt with the highest priority if any are enabled and pending
 	if(m_irq_taken)
 		standard_irq_callback(IRQ_LINE, m_PC);
-	m_PC = read_arg(m_irq_vector);
-	m_PC = set_h(m_PC, read_arg(m_irq_vector+1));
+	// latch the vector: a request arriving between the two reads must not split the fetch
+	m_TMP = m_irq_vector;
+	m_PC = read_arg(m_TMP);
+	m_PC = set_h(m_PC, read_arg(m_TMP+1));
 	m_irq_taken = false;
 	m_P |= F_I; // Do *not* move after the prefetch
 	prefetch();
