@@ -1754,6 +1754,20 @@ static INPUT_PORTS_START( prail )
 	PORT_BIT( 0x0003, 0x0000, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_REMAP_TABLE(handle_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dvlaptop )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_DIPNAME( 0x0040, 0x0000, "Show Display 1" ) // might be a button
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+
+	PORT_MODIFY("P3")
+	PORT_DIPNAME( 0x0020, 0x0000, "Show Display 2" ) // might be a button
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+INPUT_PORTS_END
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -3150,6 +3164,14 @@ ROM_START( dinothun )
 	ROM_LOAD16_WORD_SWAP( "dinothunder.bin", 0x000000, 0x400000, CRC(03e82604) SHA1(c39d72aa8a0750ee38ab01b317e77a46e1d6004e) )
 ROM_END
 
+ROM_START( dvlaptop )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "u3-main.u3-1", 0x000000, 0x800000, CRC(0457c902) SHA1(a0f49627e1e099262b92c2655d42090f32fb1d21) )
+	// 2nd bank? (or to drive the LCD?)  It's a SunPlus SPG2xx program like above
+	ROM_LOAD16_WORD_SWAP( "u8-slave.u8-1", 0x800000, 0x800000, CRC(d0627571) SHA1(029cb3b5d8b9e565c822c0705782770715b4fb53) )
+ROM_END
+
+
 ROM_START( nvpoker )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "poker.bin", 0x000000, 0x400000, CRC(0efbe6a7) SHA1(f266fac7a35535d37557604c782091222830d3d7) )
@@ -3418,3 +3440,6 @@ CONS( 2004, mgarage,    0,        0, spg2xx,     mgarage,    spg2xx_game_state, 
 
 // this Japan version uses different banking to spg2xx_pdc.cpp so is in here instead
 CONS( 2006, pdcj,       0,        0, pdcj,       pdcj,       spg2xx_game_pdcj_state,          empty_init,    "Conny / Takara", "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// has an monochrome LCD display (that part might not be dumped if it's done entirely by one of the globs) but can also connect to the TV
+CONS( 200?, dvlaptop,   0,        0, spg2xx,     dvlaptop,   spg2xx_game_state,               empty_init,    "VTech", "Double Vision Laptop (Germany)", MACHINE_NOT_WORKING )

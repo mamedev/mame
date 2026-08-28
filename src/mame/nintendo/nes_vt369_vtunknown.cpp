@@ -1798,6 +1798,8 @@ void vt369_state::init_tui240()
 // First half of games don't work, probably bad dump
 CONS( 201?, dvnimbus,   0,        0,  vt369_unk_16mb, vt369, vt36x_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 
+// BL-901-V2.0, 20190611 on PCB
+CONS( 2019, 200in1fn, 0,  0,  vt36x_altswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "200 in 1 Handheld Console (with bad menu font)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /****************************************************************************************************************
 
@@ -1942,9 +1944,6 @@ CONS( 202?, t3_630,   0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, 
 CONS( 202?, zl383,    0,        0,  vt4ffx_vibesswap_8mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 202?, retro620, 0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// BL-901-V2.0, 20190611 on PCB  TODO: encryption
-CONS( 2019, 200in1fn, 0,  0,  vt4ffx_rsps300swap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "200 in 1 Handheld Console (with bad menu font)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // all games after the first 180 listed on the menu are duplicates. BTANB: games 501-520 are mislabeled duplicates: e.g., "511. Exerion" actually loads Pac-Man.
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
