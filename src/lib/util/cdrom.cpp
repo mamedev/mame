@@ -420,15 +420,14 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 			osd_printf_verbose("Reading %u bytes from sector %d from track %d at offset %lu\n", (unsigned)length, chdsector, tracknum + 1, (unsigned long)sourcefileoffset);
 
 		result = srcfile.seek(sourcefileoffset, SEEK_SET);
-		size_t actual;
+		size_t actual = 0;
 		if (!result)
-		{
 			std::tie(result, actual) = read(srcfile, dest, length);
-			if (!result && (actual != length))
-				result = std::errc::io_error;
-		}
+		if (!result && (actual != length))
+			result = chd_file::error::INVALID_DATA;
 
-		needswap = cdtrack_info.track[tracknum].swap;
+		if (!result)
+			needswap = cdtrack_info.track[tracknum].swap;
 	}
 
 	if (!result && needswap)
