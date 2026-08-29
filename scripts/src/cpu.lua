@@ -1496,6 +1496,23 @@ if opt_tool(CPUS, "MB88XX") then
 end
 
 --------------------------------------------------
+-- Fujitsu MB88xxx
+--@src/devices/cpu/mb88xxx/mb88xxx.h,CPUS["MB88XXX"] = true
+--------------------------------------------------
+
+if CPUS["MB88XXX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxx.cpp",
+		MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxx.h",
+	}
+end
+
+if opt_tool(CPUS, "MB88XXX") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxxdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxxdasm.h")
+end
+
+--------------------------------------------------
 -- Fujitsu MB86233
 --@src/devices/cpu/mb86233/mb86233.h,CPUS["MB86233"] = true
 --------------------------------------------------

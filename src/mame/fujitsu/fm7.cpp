@@ -1889,6 +1889,9 @@ void fm7_state::fm7(machine_config &config)
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::sub_irq_ack));
 	config.set_perfect_quantum(m_sub);
 
+	// FM-7 keyboard MCU (MB88401 at IC125)
+	MB88401(config, m_kbmcu, 4_MHz_XTAL).set_disable(); // No ROM dump available
+
 	SPEAKER(config, "mono").front_center();
 	AY8913(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -2177,6 +2180,9 @@ ROM_START( fmnew7 )
 	ROM_REGION( 0x800, "boot", 0 )
 	ROM_LOAD( "boot_bas.rom", 0x0200,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) BAD_DUMP ) // actually 0.5K banks of the same ROM
 	ROM_LOAD( "boot_dos.rom", 0x0600,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) BAD_DUMP )
+
+	ROM_REGION( 0x1000, "kbmcu", 0 )
+	ROM_LOAD( "mb88401.ic125", 0x0000, 0x1000, NO_DUMP )
 
 	// optional Kanji ROM
 	ROM_REGION( 0x20000, "kanji1", 0 )
