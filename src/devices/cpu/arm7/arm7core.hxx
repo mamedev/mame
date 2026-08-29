@@ -137,11 +137,16 @@ void arm7_cpu_device::arm7_check_irq_state()
 		}
 	};
 
-	// Data Abort
+	// Data Abort, or the 26-bit data space address exception (same priority and completion rules, but vector 0x14 and
+	// always SVC mode - there is no ABT mode in the 26-bit world)
 	if (m_pendingAbtD)
 	{
-		enter_exception(eARM7_MODE_ABT, eARM7_MODE_SVC, T_IS_SET(cpsr) ? (pc + 2) : pc, 0x10, false);
+		if (m_pendingAddrExc)
+			enter_exception(eARM7_MODE_SVC, eARM7_MODE_SVC, T_IS_SET(cpsr) ? (pc + 2) : pc, 0x14, false);
+		else
+			enter_exception(eARM7_MODE_ABT, eARM7_MODE_SVC, T_IS_SET(cpsr) ? (pc + 2) : pc, 0x10, false);
 		m_pendingAbtD = false;
+		m_pendingAddrExc = false;
 		update_irq_state();
 		return;
 	}

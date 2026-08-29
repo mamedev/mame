@@ -292,7 +292,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "deco156.h"
 #include "decocrpt.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
@@ -365,7 +365,7 @@ void fghthist_common_state::sound_bankswitch_w(u8 data)
 
 void fghthist_common_state::vblank_ack_w(u32 data)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 template<int Chip>
@@ -935,7 +935,7 @@ void tattass_state::machine_start()
 // DE-0380-2
 void fghthist_state::fghthisto(machine_config &config)
 {
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE156(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fghthist_state::fghthisto_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fghthist_common_state::irq0_line_assert));
 
@@ -1044,7 +1044,7 @@ void fghthist_state::fghthistu(machine_config &config)
 void nslasher_state::nslasher(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE156(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nslasher_state::nslasher_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fghthist_common_state::irq0_line_assert));
 
@@ -1142,7 +1142,7 @@ void nslasher_state::nslasheru(machine_config &config)
 void tattass_state::tattass(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE156(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tattass_state::tattass_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fghthist_common_state::irq0_line_assert));
 

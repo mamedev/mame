@@ -44,7 +44,7 @@ TODO:
 
 #include "emu.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/sensorboard.h"
@@ -96,7 +96,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	memory_view m_boot_view;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
@@ -250,7 +250,7 @@ u32 risc2500_state::input_r()
 	}
 
 	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 
 	return data;
 }
@@ -397,9 +397,8 @@ INPUT_PORTS_END
 void risc2500_state::risc2500(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28.322_MHz_XTAL / 2);
+	ARM2(config, m_maincpu, 28.322_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc2500_state::risc2500_mem);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_assert), irq_period);

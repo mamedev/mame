@@ -25,6 +25,7 @@ public:
 	public:
 		virtual ~config() = default;
 		virtual bool get_t_flag() const = 0;
+		virtual u8 get_arch_rev() const = 0;    // ARM architecture version: < 3 selects the ARM2/ARM3 view (TEQP etc., no v3+ encodings)
 	};
 
 	arm7_disassembler(config *conf);

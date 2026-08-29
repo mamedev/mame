@@ -55,7 +55,7 @@ BTANB:
 
 #include "emu.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/smartboard.h"
@@ -97,7 +97,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm60_cpu_device> m_maincpu;
 	memory_view m_boot_view;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
@@ -173,7 +173,7 @@ u32 tasc_state::input_r()
 		if (m_boot_timer->remaining().is_never())
 			m_boot_timer->adjust(m_maincpu->cycles_to_attotime(10));
 
-		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 
 	// read chessboard
@@ -295,9 +295,8 @@ INPUT_PORTS_END
 void tasc_state::tasc(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 30_MHz_XTAL);
+	ARM60(config, m_maincpu, 30_MHz_XTAL); // PROG32/DATA32 low: the 26-bit configuration
 	m_maincpu->set_addrmap(AS_PROGRAM, &tasc_state::main_map);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(tasc_state::irq1_line_assert), irq_period);

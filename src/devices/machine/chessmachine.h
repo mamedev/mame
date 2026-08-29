@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 
 
 class chessmachine_device : public device_t
@@ -37,7 +37,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	memory_view m_boot_view;
 
 	devcb_write_line m_data_out;

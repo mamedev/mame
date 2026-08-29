@@ -658,7 +658,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/acorn_ioc.h"
 #include "machine/acorn_memc.h"
 #include "machine/acorn_vidc.h"
@@ -890,7 +890,7 @@ private:
 	void aristmk5_map(address_map &map) ATTR_COLD;
 	void aristmk5_usa_map(address_map &map) ATTR_COLD;
 
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm250_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
 	required_device<acorn_memc_device> m_memc;
 	required_device<acorn_vidc10_device> m_vidc;
@@ -2494,7 +2494,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void aristmk5_state::aristmk5(machine_config &config)
 {
-	ARM(config, m_maincpu, MASTER_CLOCK/6); // 12000000
+	ARM250(config, m_maincpu, MASTER_CLOCK/6); // 12000000
 	m_maincpu->set_addrmap(AS_PROGRAM, &aristmk5_state::aristmk5_arm_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2));  /* 1.6 - 2 seconds */
@@ -2504,8 +2504,8 @@ void aristmk5_state::aristmk5(machine_config &config)
 	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
 
 	ACORN_IOC(config, m_ioc, MASTER_CLOCK / 9);
-	m_ioc->fiq_w().set_inputline(m_maincpu, ARM_FIRQ_LINE);
-	m_ioc->irq_w().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ioc->fiq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_ioc->irq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_ioc->peripheral_r<2>().set(FUNC(aristmk5_state::sram_r));
 	m_ioc->peripheral_w<2>().set(FUNC(aristmk5_state::sram_w));
 	m_ioc->kout_w().set("kart", FUNC(rs232_port_device::write_txd));

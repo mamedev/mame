@@ -165,21 +165,8 @@ end
 --------------------------------------------------
 -- Acorn ARM series
 --
---@src/devices/cpu/arm/arm.h,CPUS["ARM"] = true
 --@src/devices/cpu/arm7/arm7.h,CPUS["ARM7"] = true
 --------------------------------------------------
-
-if CPUS["ARM"] then
-	files {
-		MAME_DIR .. "src/devices/cpu/arm/arm.cpp",
-		MAME_DIR .. "src/devices/cpu/arm/arm.h",
-	}
-end
-
-if opt_tool(CPUS, "ARM") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arm/armdasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arm/armdasm.h")
-end
 
 if CPUS["ARM7"] then
 	files {
@@ -1493,23 +1480,6 @@ end
 if opt_tool(CPUS, "MB88XX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb88xx/mb88dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb88xx/mb88dasm.h")
-end
-
---------------------------------------------------
--- Fujitsu MB88xxx
---@src/devices/cpu/mb88xxx/mb88xxx.h,CPUS["MB88XXX"] = true
---------------------------------------------------
-
-if CPUS["MB88XXX"] then
-	files {
-		MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxx.cpp",
-		MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxx.h",
-	}
-end
-
-if opt_tool(CPUS, "MB88XXX") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxxdasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb88xxx/mb88xxxdasm.h")
 end
 
 --------------------------------------------------

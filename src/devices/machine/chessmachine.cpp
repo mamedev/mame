@@ -91,7 +91,7 @@ void chessmachine_device::data1_w_sync(s32 param)
 		m_latch[0] = (m_latch[0] & 1) | param;
 
 		// cause interrupt?
-		m_maincpu->set_input_line(ARM_FIRQ_LINE, param ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, param ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -144,9 +144,8 @@ void chessmachine_device::main_map(address_map &map)
 
 void chessmachine_device::device_add_mconfig(machine_config &config)
 {
-	ARM(config, m_maincpu, DERIVED_CLOCK(1,1));
+	ARM2(config, m_maincpu, DERIVED_CLOCK(1,1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmachine_device::main_map);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 }
 
 

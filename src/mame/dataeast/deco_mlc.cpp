@@ -112,7 +112,7 @@
 
 #include "deco156.h"
 #include "machine/eepromser.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "cpu/sh/sh7604.h"
 #include "speaker.h"
 
@@ -570,7 +570,7 @@ void deco_mlc_state::avengrgs(machine_config &config)
 void deco_mlc_state::mlc(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 42000000/6); // 42 MHz -> 7MHz clock confirmed on real board
+	DE156(config, m_maincpu, 42000000/6); // 42 MHz -> 7MHz clock confirmed on real board
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_no146_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
@@ -1056,7 +1056,7 @@ void deco_mlc_state::init_mlc()
 	    effective clock rate here to compensate otherwise we have slowdowns in
 	    Skull Fang where there probably shouldn't be. */
 	m_maincpu->set_clock_scale(2.0);
-	m_irqLevel = ARM_IRQ_LINE;
+	m_irqLevel = arm7_cpu_device::ARM7_IRQ_LINE;
 	deco156_decrypt(machine());
 	descramble_sound();
 }
@@ -1064,7 +1064,7 @@ void deco_mlc_state::init_mlc()
 void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
 {
 	m_maincpu->set_clock_scale(2.0); // avoids hangs in attract mode / end of round, see init_mlc()
-	m_irqLevel = ARM_IRQ_LINE;
+	m_irqLevel = arm7_cpu_device::ARM7_IRQ_LINE;
 	deco156_decrypt(machine());
 }
 

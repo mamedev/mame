@@ -206,8 +206,9 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 	const char *pConditionCode = pConditionCodeTable[opcode>>28];
 	uint32_t dasmflags = 0;
 	std::streampos start_position = stream.tellp();
+	const u8 arch = m_config->get_arch_rev();
 
-	if( (opcode&0xfe000000)==0xfa000000 ) //bits 31-25 == 1111 101 (BLX - v5)
+	if( arch >= 3 && (opcode&0xfe000000)==0xfa000000 ) //bits 31-25 == 1111 101 (BLX - v5)
 	{
 		/* BLX(1) */
 		util::stream_format( stream, "BLX" );
@@ -217,7 +218,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 
 		WriteBranchAddress( stream, pc, opcode, true );
 	}
-	else if( (opcode&0x0ff000f0)==0x01200030 )  // (BLX - v5)
+	else if( arch >= 3 && (opcode&0x0ff000f0)==0x01200030 )  // (BLX - v5)
 	{
 		/* BLX(2) */
 		stream << "BLX";
@@ -227,7 +228,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		WritePadding(stream, start_position);
 		util::stream_format( stream, "R%d",(opcode&0xf));
 	}
-	else if( (opcode&0x0ffffff0)==0x012fff10 ) //bits 27-4 == 000100101111111111110001
+	else if( arch >= 3 && (opcode&0x0ffffff0)==0x012fff10 ) //bits 27-4 == 000100101111111111110001
 	{
 		/* Branch and Exchange (BX) */
 		util::stream_format( stream, "B%sX", pConditionCode );
@@ -238,13 +239,13 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		if (opcode < 0xe0000000)
 			dasmflags |= STEP_COND;
 	}
-	else if ((opcode & 0x0ff000f0) == 0x01600010)   // CLZ - v5
+	else if (arch >= 3 && (opcode & 0x0ff000f0) == 0x01600010)   // CLZ - v5
 	{
 		stream << "CLZ";
 		WritePadding(stream, start_position);
 		util::stream_format(stream, "R%d, R%d", (opcode>>12)&0xf, opcode&0xf);
 	}
-	else if ((opcode & 0x0f9000f0) == 0x01000050)   // Q(D)ADD, Q(D)SUB - v5TE
+	else if (arch >= 3 && (opcode & 0x0f9000f0) == 0x01000050)   // Q(D)ADD, Q(D)SUB - v5TE
 	{
 		util::stream_format(stream, "Q%s%s", (opcode & 0x00400000) != 0 ? "D" : "", (opcode & 0x00200000) != 0 ? "SUB" : "ADD");
 		WritePadding(stream, start_position);
@@ -252,35 +253,41 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 			util::stream_format(stream, "R%d, ", (opcode>>12)&0xf);
 		util::stream_format(stream, "R%d, R%d", opcode&0xf, (opcode>>16)&0xf);
 	}
-	else if ((opcode & 0x0ff00090) == 0x01000080)   // SMLAxy - v5TE
+	else if (arch >= 3 && (opcode & 0x0ff00090) == 0x01000080)   // SMLAxy - v5TE
 	{
 		util::stream_format(stream, "SMLA%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
 		util::stream_format(stream, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf, (opcode>>12)&0xf);   // Rd, Rm, Rs, Rn
 	}
-	else if ((opcode & 0x0ff00090) == 0x01400080)   // SMLALxy - v5TE
+	else if (arch >= 3 && (opcode & 0x0ff00090) == 0x01400080)   // SMLALxy - v5TE
 	{
 		util::stream_format(stream, "SMLAL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
 		util::stream_format(stream, "R%d, R%d, R%d, R%d", (opcode>>12)&0xf, (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf);   // RdLo, RdHi, Rm, Rs
 	}
-	else if ((opcode & 0x0ff00090) == 0x01600080)   // SMULxy - v5TE
+	else if (arch >= 3 && (opcode & 0x0ff00090) == 0x01600080)   // SMULxy - v5TE
 	{
 		util::stream_format(stream, "SMUL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
 		util::stream_format(stream, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf);   // Rd, Rm, Rs
 	}
-	else if ((opcode & 0x0ff000b0) == 0x012000a0)   // SMULWy - v5TE
+	else if (arch >= 3 && (opcode & 0x0ff000b0) == 0x012000a0)   // SMULWy - v5TE
 	{
 		util::stream_format(stream, "SMULW%c", (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
 		util::stream_format(stream, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf);
 	}
-	else if ((opcode & 0x0ff000b0) == 0x01200080)   // SMLAWy - v5TE
+	else if (arch >= 3 && (opcode & 0x0ff000b0) == 0x01200080)   // SMLAWy - v5TE
 	{
 		util::stream_format(stream, "SMLAW%c", (opcode&0x40) ? 'T' : 'B');
 		WritePadding(stream, start_position);
 		util::stream_format(stream, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf, (opcode>>12)&0xf);
+	}
+	else if( arch < 3 && (opcode&0x0e000000)==0 && (opcode&0x90)==0x90 && (arch < 2 || (opcode&0x60) || (opcode&0x01800000)==0x00800000) )
+	{
+		// ARM1 has no multiply or swap; ARM2/ARM3 have only MUL/MLA (and SWP) in this space - the halfword transfers (v4)
+		// and the long multiplies (v3M) are undefined
+		stream << "Undefined";
 	}
 	else if( (opcode&0x0e000000)==0 && (opcode&0x80) && (opcode&0x10) ) //bits 27-25 == 000, bit 7=1, bit 4=1
 	{
@@ -439,7 +446,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		/* Data Processing OR PSR Transfer */
 
 		//SJE: check for MRS & MSR ( S bit must be clear, and bit 24,23 = 10 )
-		if( ((opcode&0x00100000)==0) && ((opcode&0x01800000)==0x01000000) )
+		if( arch >= 3 && ((opcode&0x00100000)==0) && ((opcode&0x01800000)==0x01000000) )
 		{
 			if ((opcode & 0xf26000f0) == 0xe0200070)
 			{
@@ -521,6 +528,10 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 			if( (opcode&0x0100000) && (op & 0x0c) != 0x08 )
 			{
 				stream << 'S';
+			}
+			else if( arch < 3 && (opcode&0x0100000) && ((opcode>>12)&0xf) == 15 )
+			{
+				stream << 'P';      // ARM2/ARM3: TSTP/TEQP/CMPP/CMNP write the result to the PSR in R15
 			}
 
 			WritePadding(stream, start_position);

@@ -23,7 +23,7 @@ PCB has a single OSC at 24MHz
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/acorn_ioc.h"
 #include "machine/acorn_memc.h"
 #include "machine/acorn_vidc.h"
@@ -56,7 +56,7 @@ private:
 	void ertictac_arm_map(address_map &map) ATTR_COLD;
 	void ertictac_map(address_map &map) ATTR_COLD;
 
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
 	required_device<acorn_memc_device> m_memc;
 	required_device<acorn_vidc10_device> m_vidc10;
@@ -237,7 +237,7 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 
 void ertictac_state::ertictac(machine_config &config)
 {
-	ARM(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	ARM2(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_arm_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
@@ -252,8 +252,8 @@ void ertictac_state::ertictac(machine_config &config)
 	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
 
 	ACORN_IOC(config, m_ioc, 24_MHz_XTAL/3);
-	m_ioc->fiq_w().set_inputline(m_maincpu, ARM_FIRQ_LINE);
-	m_ioc->irq_w().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ioc->fiq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_ioc->irq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_ioc->peripheral_r<4>().set(FUNC(ertictac_state::ertictac_podule_r));
 	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
 	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
