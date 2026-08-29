@@ -7,19 +7,18 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Incomplete XBus/CD drive semantics
-\- 3do disks fail to be recognized, reads Avatar structure, decides they aren't worth and moves on;
-\- Photo CD bails out at startup with error -8021 (unless A is held on 3do_fz10e & Sanyo based
-   romsets, where first picture is loaded then bails out anyway)
-\- Audio CD black screen (needs DSPP irq), has plenty of Cel, VDLP and sport issues later
+- Incomplete XBus/CD drive semantics (resolved?)
+\- Photo CD appears to work - toilhana shows its images no problem and you can advance through
+   the album.
+\- Audio CD has plenty of Cel, VDLP and sport issues
    (reads random port, asks for audio tracks *with* subcode);
-- Incomplete DSPP mapping
-\- Most notably it should restart on counter reloads (bp 38,1,{pc=0;g} to bypass hang in 3do_fz1)
-- Replace ARM7 with ARM60;
-- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, wrong ARM type?);
+- Incomplete DSPP mapping (semaphores, audio input, output FIFO flush, FIFO status flags,
+  RAM to DSPP N stack DMA);
+- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, possible mirroring?)
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
-- MMU (user programs will need it);
-- 3do_fz1: black screen after insert disk screen (needs DSPP irq);
+- MMU?  Games seem to run fine with stock ARM60 semantics.
+
+Probably obsolete (all of these variants boot cpquazar fine in my testing):
 - 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs;
 - 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
 - 3do_try, 3do_hc21 (bios 1): throws "QueueSport error on cmd 4: xfer across 1M boundary",
@@ -208,6 +207,23 @@ void _3do_state::machine_reset()
 	m_bankdev->set_bank(0);
 }
 
+void _3do_state::soft_reset_w(int state)
+{
+	if (state)
+	{
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(_3do_state::soft_reset_cb), this));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(_3do_state::soft_reset_cb)
+{
+	m_maincpu->reset();
+
+	// reset vector is fetched from the primary ROM
+	m_overlay_view.select(0);
+	m_bankdev->set_bank(0);
+}
+
 
 // TODO: clocks (doubled vs. ARM?)
 void _3do_state::green_config(machine_config &config)
@@ -247,6 +263,8 @@ void _3do_state::green_config(machine_config &config)
 		return res;
 	});
 	m_madam->arm_ctl_cb().set(m_clio, FUNC(clio_device::arm_ctl_w));
+	m_madam->dspp_dma_read_cb().set(m_clio, FUNC(clio_device::dspp_dma_r));
+	m_madam->dspp_dma_write_cb().set(m_clio, FUNC(clio_device::dspp_dma_w));
 	m_madam->irq_dexp_cb().set(m_clio, FUNC(clio_device::dexp_w));
 	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
 		if (offset == 0)
@@ -264,6 +282,23 @@ void _3do_state::green_config(machine_config &config)
 		//  m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	});
 	m_clio->set_screen_tag("screen");
+	m_clio->dma_read_cb().set([this] (offs_t offset) -> u8 {
+		address_space &space = m_maincpu->space();
+		return space.read_byte(offset);
+	});
+	m_clio->dma_write_cb().set([this] (offs_t offset, u8 data) {
+		address_space &space = m_maincpu->space();
+		space.write_byte(offset, data);
+	});
+	m_clio->softreset_cb().set(FUNC(_3do_state::soft_reset_w));
+	m_clio->abort_cb().set([this] (int state) {
+		if (state)
+		{
+			m_madam->abort_w(madam_device::ABT_CLIOT);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_ABORT_EXCEPTION, ASSERT_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_ABORT_EXCEPTION, CLEAR_LINE);
+		}
+	});
 	m_clio->xbus_sel_cb().set([this] (u8 data) {
 		m_cdrom->enable_w(data != 0);
 	});
@@ -284,6 +319,22 @@ void _3do_state::green_config(machine_config &config)
 		}
 		m_cdrom->cmd_w(1);
 	});
+	// PIO path to the drive data FIFO (dipir uses it, the OS driver goes through Madam DMA)
+	m_clio->xbus_data_read_cb().set([this] (offs_t offset) -> u8 {
+		if (offset != 0)
+			return 0xff;
+		m_cdrom->cmd_w(1);
+		u8 res = m_cdrom->read();
+		m_cdrom->cmd_w(0);
+		return res;
+	});
+	m_clio->xbus_data_write_cb().set([this] (offs_t offset, u8 data) {
+		if (offset != 0)
+			return;
+		m_cdrom->cmd_w(1);
+		m_cdrom->write(data);
+		m_cdrom->cmd_w(0);
+	});
 	m_clio->exp_dma_enable_cb().set(m_madam, FUNC(madam_device::exp_dma_req_w));
 	m_clio->vsync_cb().set(m_madam, FUNC(madam_device::vdlp_start_w));
 	m_clio->hsync_cb().set(m_madam, FUNC(madam_device::vdlp_continue_w));
@@ -302,6 +353,7 @@ void _3do_state::green_config(machine_config &config)
 //  m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
 //  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
 	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_int_w)).invert();
+	m_cdrom->media_cb().set(m_clio, FUNC(clio_device::xbus_media_w));
 	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus_wr_w));
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);

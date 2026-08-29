@@ -29,13 +29,19 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_dspp(*this, "dspp")
 	, m_firq_cb(*this)
+	, m_softreset_cb(*this)
+	, m_abort_cb(*this)
 	, m_vsync_cb(*this)
 	, m_hsync_cb(*this)
 	, m_xbus_sel_cb(*this)
 	, m_xbus_read_cb(*this, 0xff)
 	, m_xbus_write_cb(*this)
+	, m_xbus_data_read_cb(*this, 0xff)
+	, m_xbus_data_write_cb(*this)
 	, m_exp_dma_enable_cb(*this)
 	, m_dac_l(*this)
+	, m_dma_read_cb(*this, 0)
+	, m_dma_write_cb(*this)
 	, m_dac_r(*this)
 //  , m_adb_in_cb(*this)
 	, m_adb_out_cb(*this)
@@ -44,13 +50,35 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 
 void clio_device::device_add_mconfig(machine_config &config)
 {
-	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
+	// 25 MHz, frames of 568 cycles at 44.1 kHz
+	DSPP(config, m_dspp, DERIVED_CLOCK(2, 1));
 	m_dspp->int_handler().set([this] (int state) {
 		if (state)
 			request_fiq<0>(1 << IRQ_DSPPINT);
 	});
-//  m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
-//  m_dspp->dma_write_handler().set(FUNC(m2_bda_device::write_bus8));
+	m_dspp->dma_read_handler().set([this] (offs_t offset) { return m_dma_read_cb(offset); });
+	m_dspp->dma_write_handler().set([this] (offs_t offset, u8 data) { m_dma_write_cb(offset, data); });
+	// Mode bits 16-28 select an irq when an input channel rolls over to its next buffer,
+	// output channels always irq
+	m_dspp->dma_rollover_handler().set([this] (offs_t channel, u32 data) {
+		if (channel < 13)
+		{
+			if (BIT(m_mode, 16 + channel))
+				request_fiq<0>(1 << (IRQ_DRDINT0 + channel));
+		}
+		else if (channel >= 16 && channel < 20)
+			request_fiq<0>(1 << (IRQ_DDRINT0 + channel - 16));
+	});
+}
+
+void clio_device::dspp_dma_w(offs_t offset, u32 data)
+{
+	m_dspp->host_dma_w(offset >> 2, offset & 3, data);
+}
+
+u32 clio_device::dspp_dma_r(offs_t offset)
+{
+	return m_dspp->host_dma_r(offset >> 2, offset & 3);
 }
 
 void clio_device::device_start()
@@ -117,7 +145,10 @@ void clio_device::device_reset()
 	m_adbio = 0x00;
 	std::fill(std::begin(m_xbus_dev), std::end(m_xbus_dev), 0x00);
 	m_xfrcnt = 0;
-	m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
+	m_sel = 0;
+	m_poll = 0;
+	m_dipir1 = m_dipir2 = 0;
+	m_system_timer->adjust(attotime::from_ticks(m_slack + 64, this->clock() * 2));
 	m_scan_timer->adjust(m_screen->time_until_pos(0), 0);
 }
 
@@ -141,7 +172,6 @@ void clio_device::xbus_int_w(int state)
 
 void clio_device::xbus_wr_w(int state)
 {
-//  printf("%d WR %02x\n", state, m_xbus_dev[0]);
 	if (state)
 	{
 		m_xbus_dev[0] |= 0x20;
@@ -150,6 +180,41 @@ void clio_device::xbus_wr_w(int state)
 	}
 	else
 		m_xbus_dev[0] &= ~0x20;
+}
+void clio_device::xbus_media_w(int state)
+{
+	if (!state)
+	{
+		return;
+	}
+
+	m_xbus_dev[0] |= 0x80;
+	if (!BIT(m_dipir1, 15))
+	{
+		m_dipir1 = 0x8000 | 0; // XB_DipirCurrent | unit 0
+	}
+	else
+	{
+		m_dipir2 = 0x8000 | 0;
+	}
+	request_fiq<1>(1 << IRQ_DIPIR);
+}
+
+// Only the internal CD-ROM (unit 0) and the "new device" pseudo-unit (15|external) answer.
+bool clio_device::xbus_unit_present() const
+{
+	return (m_sel == 0x00) || (m_sel == 0x8f);
+}
+
+void clio_device::xbus_timeout()
+{
+	if (machine().side_effects_disabled())
+	{
+		return;
+	}
+	LOGXBUS("xbus timeout on unit %02x (%s)\n", m_sel, machine().describe_context());
+	m_abort_cb(1);
+	m_abort_cb(0);
 }
 
 void clio_device::dexp_w(int state)
@@ -217,12 +282,39 @@ void clio_device::map(address_map &map)
 			COMBINE_DATA(&m_audout);
 		})
 	);
+	/*
+	 * ---- ---- -x-- ---- DIPIR reset (r/o, set by a soft reset)
+	 * ---- ---- --x- ---- clear DIPIR request (w/o)
+	 * ---- ---- ---x ---- soft reset (w/o)
+	 * ---- ---- ---- x--- watchdog counter reset
+	 * ---- ---- ---- -x-- watchdog pin reset
+	 * ---- ---- ---- --x- reset rollover
+	 * ---- ---- ---- ---x power on reset
+	 * Boot ROM dispatches on bits 0, 1 and 6 (anything else hangs).
+	 */
 	map(0x0028, 0x002b).lrw32(
 		NAME([this] () { return m_cstatbits; }),
-		// bits 0,1, and 6 are tested (reset source)
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("cstatbits: %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_cstatbits);
+			if (BIT(data, 4))
+			{
+				m_cstatbits = 0x40;
+				m_dipir1 = BIT(m_dipir1, 15) ? ((m_dipir1 & 0xff) | 0x4000) : 0;
+				m_dipir2 = BIT(m_dipir2, 15) ? ((m_dipir2 & 0xff) | 0x4000) : 0;
+				m_irq[1] &= ~(1 << IRQ_DIPIR);
+				request_fiq<1>(0);
+				m_softreset_cb(1);
+				m_softreset_cb(0);
+			}
+			else if (BIT(data, 5))
+			{
+				m_dipir1 &= ~0x8000;
+				m_dipir2 &= ~0x8000;
+				m_irq[1] &= ~(1 << IRQ_DIPIR);
+				request_fiq<1>(0);
+			}
+			else
+				COMBINE_DATA(&m_cstatbits);
 		})
 	);
 	map(0x002c, 0x002f).lw32(
@@ -280,10 +372,7 @@ void clio_device::map(address_map &map)
 		})
 	);
 	map(0x0048, 0x004f).lrw32(
-		// TODO: second priority bit 31 should always read 1
-		// this however causes continous irq loop cycles during POST as soon as IRQ_PLYINT is requested
-		// (never actually enabled in irq1, just IRQ_BADBITS is)
-		NAME([this] () { return m_irq_enable[0]; }),
+		NAME([this] () { return m_irq_enable[0] | (1 << IRQ_SCNDPINT); }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (offset)
 				m_irq_enable[0] &= ~data;
@@ -402,12 +491,13 @@ void clio_device::map(address_map &map)
 	);
 	map(0x0200, 0x020f).lrw32(
 		NAME([this] (offs_t offset) {
-			const u8 shift = (offset & 2) * 32;
+			const u8 shift = BIT(offset, 1) ? 32 : 0;
 			// TODO: reading clears timer?
-			return m_timer_ctrl >> shift;
+			return u32(m_timer_ctrl >> shift);
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			const u8 shift = (offset & 2) * 32;
+			// $200/$204: set/clear timers 0-7, $208/$20c: set/clear timers 8-15
+			const u8 shift = BIT(offset, 1) ? 32 : 0;
 			const u64 mask = ((u64)data << shift);
 			if (offset & 1)
 				m_timer_ctrl &= ~mask;
@@ -423,14 +513,19 @@ void clio_device::map(address_map &map)
 			LOG("slack: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_slack);
 			m_slack &= 0x7ff;
-			// NOTE: Kernel forbids slack times less than 64 anyway
-			// TODO: is it really +64?
-			m_slack = std::max<unsigned>(m_slack, 64);
-			m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
+			// Timer tick = (slack + 64) cycles of the 25 MHz system clock; Portfolio programs
+			// 400 - 64 for the 16 usec tick the kernel timers and dipir WaitMills() assume
+			m_system_timer->adjust(attotime::from_ticks(m_slack + 64, this->clock() * 2));
 		})
 	);
 
-//  map(0x0300, 0x0303) FIFO init
+	// FIFO init: bits 0-12 DMA->DSPP, 13-14 audio in, 16-19 DSPP->DMA
+	map(0x0300, 0x0303).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGDSPP("FIFO init %08x & %08x\n", data, mem_mask);
+			m_dspp->host_fifo_init_w(data);
+		})
+	);
 //  map(0x0304, 0x0307) DMA request enable
 //  map(0x0308, 0x030b) DMA request disable
 	// NOTE: not readable on Red revision apparently
@@ -443,9 +538,14 @@ void clio_device::map(address_map &map)
 				m_dma_enable |= data;
 			LOG("DMA request %s: %08x & %08x\n", offset ? "clear" : "set", data, mem_mask);
 			m_exp_dma_enable_cb(BIT(m_dma_enable, 20) && BIT(m_expctl, 11));
+			// DSPP channels 0-12 (RAM -> DSPP) and 16-19 (DSPP -> RAM)
+			if (data & 0x000f1fff)
+				m_dspp->host_channel_enable_w(offset ? 0 : (data & 0x000f1fff), offset ? (data & 0x000f1fff) : 0);
 		})
 	);
-//  map(0x0380, 0x0383) FIFO status
+	// FIFO status, DMA->DSPP then DSPP->DMA
+	map(0x0380, 0x03bf).lr32(NAME([this] (offs_t offset) { return m_dspp->host_fifo_status_r(offset); }));
+	map(0x03c0, 0x03ff).lr32(NAME([this] (offs_t offset) { return m_dspp->host_fifo_status_r(16 + offset); }));
 
 	// XBus
 	map(0x0400, 0x0407).lrw32(
@@ -503,16 +603,6 @@ void clio_device::map(address_map &map)
 
 			m_xbus_sel_cb(data);
 			LOGXBUSV("xbus sel: %02x & %08x\n", data, mem_mask);
-			/* Detection of too many devices on the bus */
-			switch ( data & 0xff )
-			{
-			case 0x8f:
-				/* Everything is fine, there are not too many devices in the system */
-				m_poll = ( m_poll & 0x0f );
-				break;
-			default:
-				m_poll = ( m_poll & 0x0f ) | 0x90;
-			}
 		})
 	);
 	/*
@@ -527,10 +617,13 @@ void clio_device::map(address_map &map)
 	 */
 	map(0x0540, 0x057f).lrw32(
 		NAME([this] () -> u8 {
-			u8 res = m_poll;
-			//m_poll &= ~0x80;
-			if (m_sel == 0)
-				return m_xbus_dev[0]; //(res & 0xcf) | (m_xbus_dev[0] & 0x30);
+			if (!xbus_unit_present())
+			{
+				xbus_timeout();
+				return 0xff;
+			}
+			// unit 15|external is the "new device" detector: no overflow, nothing plugged in
+			u8 res = (m_sel == 0) ? m_xbus_dev[0] : m_poll;
 			return (res);
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -539,22 +632,59 @@ void clio_device::map(address_map &map)
 			//m_poll &= 0xf8;
 			if (ACCESSING_BITS_0_7)
 			{
-				if (m_sel == 0)
+				if (!xbus_unit_present())
+					xbus_timeout();
+				else if (m_sel == 0)
 				{
 					m_xbus_dev[0] = (data & 0xf) | (m_xbus_dev[0] & 0xf0);
+					// media access is read/clear
+					if (BIT(data, 7))
+						m_xbus_dev[0] &= ~0x80;
 				}
 				else
-					m_poll = data & 0xff;
+					m_poll = data & 0x0f;
 			}
 		})
 	);
 	// 1--- 1111 external device
 	// 0--- xxxx internal device
 	map(0x0580, 0x05bf).lrw32(
-		NAME([this] () { return m_xbus_read_cb(m_sel & 0x8f); }),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_xbus_write_cb(m_sel & 0x8f, data & 0xff); })
+		NAME([this] () -> u32 {
+			if (!xbus_unit_present())
+			{
+				xbus_timeout();
+				return 0xff;
+			}
+			return m_xbus_read_cb(m_sel & 0x8f);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (!xbus_unit_present())
+			{
+				xbus_timeout();
+				return;
+			}
+			m_xbus_write_cb(m_sel & 0x8f, data & 0xff);
+		})
 	);
-//  map(0x05c0, 0x05ff) Data
+	// Data FIFO, one byte per access in bits 7-0 (ReadNBytes does a 8 words LDM over the mirrors)
+	map(0x05c0, 0x05ff).lrw32(
+		NAME([this] () -> u32 {
+			if (!xbus_unit_present())
+			{
+				xbus_timeout();
+				return 0xff;
+			}
+			return m_xbus_data_read_cb(m_sel & 0x8f);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (!xbus_unit_present())
+			{
+				xbus_timeout();
+				return;
+			}
+			m_xbus_data_write_cb(m_sel & 0x8f, data & 0xff);
+		})
+	);
 
 	// TODO: should really map these directly in DSPP core
 //  map(0x17d0, 0x17d3) Semaphore
@@ -562,15 +692,18 @@ void clio_device::map(address_map &map)
 	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
 //  map(0x17d4, 0x17d7) Semaphore ACK
 //  map(0x17e0, 0x17e3) DSPP DMA
-//  map(0x17e4, 0x17e7) DSPPRST0 (use current reload)
+	// DSPPRST0 (use current reload)
+	map(0x17e4, 0x17e7).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGDSPP("DSPP $17e4 %08x & %08x\n", data, mem_mask);
+			m_dspp->host_tick_reset(false);
+		})
+	);
 	// DSPPRST1 (set 568 tick cycle)
 	map(0x17e8, 0x17eb).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			//m_dspp->write(0x6074 >> 2, 1);
-			//m_dspp->write(0x6074 >> 2, 0);
-			//m_dspp->write((0x1300 + 8) >> 2, 568);
-			//m_dspp->write((0x1340 + 8) >> 2, 568);
 			LOGDSPP("DSPP $17e8 %08x & %08x\n", data, mem_mask);
+			m_dspp->host_tick_reset(true);
 		})
 	);
 //  map(0x17f0, 0x17f3) Read noise value (Red only?)
@@ -648,12 +781,15 @@ template <unsigned N> void clio_device::request_fiq(uint32_t irq_req)
 	else
 		m_irq[0] |= irq_req;
 
-	if(m_irq[1])
-		m_irq[0] |= 1 << IRQ_SCNDPINT; // Second Priority
+	// Second priority summary bit.  Any pending *and enabled* source in the second word.
+	// Its enable bit always reads as set, the kernel FIRQ dispatcher relies on both
+	// (it never enables bit 31 itself and only scans irq1 when irq0 shows it).
+	if (m_irq[1] & m_irq_enable[1])
+		m_irq[0] |= 1 << IRQ_SCNDPINT;
 	else
 		m_irq[0] &= ~(1 << IRQ_SCNDPINT);
 
-	m_firq_cb((m_irq[0] & m_irq_enable[0]) || (m_irq[1] & m_irq_enable[1]));
+	m_firq_cb((m_irq[0] & (m_irq_enable[0] | (1 << IRQ_SCNDPINT))) != 0);
 }
 
 // TODO: this actually generates from Amy not from Clio
@@ -741,13 +877,9 @@ TIMER_CALLBACK_MEMBER( clio_device::system_timer_cb )
 		}
 	}
 
-	// Opera specification goes this lengthy explaination about "64" being the unit of time
-	// but 3do_fc2 and 3do_gdo101 won't boot with a timer tick this small ...
-	// TODO: causes "PAL system detected" in most BIOSes
-	// - slack may just be the start time
-	// - in an ideal world we would split this implementation in separate timers,
-	//   however that will give more scheduler roundtrips, in an already crowded scenario ...
-	m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
+	// TODO: in an ideal world we would split this implementation in separate timers,
+	// however that will give more scheduler roundtrips, in an already crowded scenario ...
+	m_system_timer->adjust(attotime::from_ticks(m_slack + 64, this->clock() * 2));
 }
 
 TIMER_CALLBACK_MEMBER(clio_device::dac_update_cb)

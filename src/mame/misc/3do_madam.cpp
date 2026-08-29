@@ -41,6 +41,8 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_irq_dexp_cb(*this)
 	, m_playerbus_read_cb(*this, 0)
 	, m_irq_dply_cb(*this)
+	, m_dspp_dma_read_cb(*this, 0)
+	, m_dspp_dma_write_cb(*this)
 	, m_is_pal(false)
 {
 }
@@ -352,12 +354,19 @@ void madam_device::map(address_map &map)
 		NAME([this] (offs_t offset) {
 			const u16 channel = (offset >> 2) & 0x1f;
 			const u8 reg = offset & 3;
+			if (channel <= DMA_RAM_TO_DSPP12 || (channel >= DMA_DSPP_TO_RAM0 && channel <= DMA_DSPP_TO_RAM3))
+				return m_dspp_dma_read_cb(offset & 0x7f) & 0x3f'fffc;
 			return m_dma[channel][reg] & 0x3f'fffc;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			const u16 channel = (offset >> 2) & 0x1f;
 			const u8 reg = offset & 3;
 			LOGDMA("DMA [%d] reg [%02x]: %08x & %08x\n", channel, reg, data, mem_mask);
+			if (channel <= DMA_RAM_TO_DSPP12 || (channel >= DMA_DSPP_TO_RAM0 && channel <= DMA_DSPP_TO_RAM3))
+			{
+				m_dspp_dma_write_cb(offset & 0x7f, data & 0x3f'fffc);
+				return;
+			}
 			COMBINE_DATA(&m_dma[channel][reg]);
 			// TODO: despite documentation mask really depends on what channel is
 			// (video DMA definitely sets it with 0x20'0000 high)
@@ -570,8 +579,17 @@ void madam_device::vdlp_continue_w(int state)
 	if (!state || !BIT(m_mctl, 14) || !m_vdlp.fetch)
 		return;
 
-	if (m_vdlp.scanlines == 0)
+	// zero length entries (the OS "pre-display" stuff point is one) apply their settings and
+	// chain straight to the next VDL without consuming a scanline
+	for (int hops = 0; m_vdlp.scanlines == 0; hops++)
 	{
+		if (hops >= 16)
+		{
+			m_vdlp.fetch = false;
+			LOGVDLP("line=%d too many zero length VDL entries\n", m_vdlp.y_dest);
+			return;
+		}
+
 		// abort if we are out of VRAM space
 		if (!(m_vdlp.address & 0x20'0000))
 		{
@@ -583,12 +601,6 @@ void madam_device::vdlp_continue_w(int state)
 		const u32 control_word = m_dma32_read_cb(m_vdlp.address);
 
 		m_vdlp.scanlines = (control_word & 0x1ff);
-
-		if (m_vdlp.scanlines == 0)
-		{
-			m_vdlp.fetch = false;
-			return;
-		}
 
 		// upper limit of 34 due of hblank
 		const u16 clut_words = std::min<u16>((control_word >> 9) & 0x3f, 34) << 2;
@@ -633,6 +645,9 @@ void madam_device::vdlp_continue_w(int state)
 
 		m_vdlp.link = m_dma32_read_cb(m_vdlp.address + 0x0c);
 		m_vdlp.y_src = 0;
+
+		if (m_vdlp.scanlines == 0)
+			m_vdlp.address = m_vdlp.link;
 	}
 
 	if (m_vdlp.video_dma)
