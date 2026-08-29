@@ -12380,8 +12380,8 @@ Optional [redbook] audio CD on PC-8801MC
 		<year>1991</year>
 		<publisher>テクノグラード (Techno Gurado)</publisher>
 		<notes><![CDATA[
-Crashes with any key press on title screen
-Sound gets stuck on PC8801mkIISR (verify)
+[FDC] Crashes at end of title screen BGM
+pc8801mk2sr: Sound gets stuck after title (verify)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199112xx"/>
@@ -12409,13 +12409,13 @@ Sound gets stuck on PC8801mkIISR (verify)
 		</part>
 	</software>
 
-	<!-- No inputs on PC8801MA -->
-	<!-- Sound gets stuck on PC8801mkIISR [i8214 sound irq] -->
-	<!-- "syntax error" and resets during boot (regression after hooking i8214 irqs) -->
 	<software name="finalcria" cloneof="finalcri" supported="no">
 		<description>Final Crisis (alt)</description>
 		<year>1991</year>
 		<publisher>テクノグラード (Techno Gurado)</publisher>
+		<notes><![CDATA[
+(same as finalcri)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199112xx"/>
 		<info name="alt_title" value="ファイナルクライシス"/>
