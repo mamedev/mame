@@ -33577,8 +33577,8 @@ license:CC0-1.0
 		<publisher>Apple Computer</publisher>
 		<info name="required_ram" value="64K" />
 		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or Apple //e or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<info name="version" value="800K" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2026-01-21 -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296138">
