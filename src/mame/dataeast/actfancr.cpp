@@ -33,6 +33,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "multibyte.h"
 
 namespace {
 
@@ -47,7 +48,7 @@ public:
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_BIG)
+		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_LITTLE)
 	{ }
 
 	void actfancr(machine_config &config);
@@ -147,7 +148,7 @@ void actfancr_state::buffer_spriteram_w(uint8_t data)
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i = 0; i < 0x800 / 2; i++)
 	{
-		m_spriteram16[i] = m_spriteram[i * 2] | (m_spriteram[(i * 2) + 1] << 8);
+		m_spriteram16[i] = get_u16le(&m_spriteram[i * 2]);
 	}
 }
 
