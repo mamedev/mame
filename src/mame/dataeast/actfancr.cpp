@@ -33,6 +33,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "multibyte.h"
 
 namespace {
 
@@ -47,7 +48,7 @@ public:
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_BIG)
+		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_LITTLE)
 	{ }
 
 	void actfancr(machine_config &config);
@@ -147,7 +148,7 @@ void actfancr_state::buffer_spriteram_w(uint8_t data)
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i = 0; i < 0x800 / 2; i++)
 	{
-		m_spriteram16[i] = m_spriteram[i * 2] | (m_spriteram[(i * 2) + 1] << 8);
+		m_spriteram16[i] = get_u16le(&m_spriteram[i * 2]);
 	}
 }
 
@@ -440,7 +441,7 @@ void triothep_state::triothep(machine_config &config)
 /******************************************************************************/
 
 ROM_START( actfancr )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "fe08-3.bin", 0x00000, 0x10000, CRC(35f1999d) SHA1(03b61b6544a21350dbb7a31591db163a00cf7a64) )
 	ROM_LOAD( "fe09-3.bin", 0x10000, 0x10000, CRC(d21416ca) SHA1(2c863042fe7cf5e4d8cf8a1138089b539406bec3) )
 	ROM_LOAD( "fe10-3.bin", 0x20000, 0x10000, CRC(85535fcc) SHA1(c764032463a40c9110ab35c38642de070d528a60) )
@@ -473,7 +474,7 @@ ROM_START( actfancr )
 ROM_END
 
 ROM_START( actfancr2 )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "fe08-2.bin", 0x00000, 0x10000, CRC(0d36fbfa) SHA1(cef5cfd053beac5ca2ac52421024c316bdbfba42) )
 	ROM_LOAD( "fe09-2.bin", 0x10000, 0x10000, CRC(27ce2bb1) SHA1(52a423dfc2bba7b3330d1a10f4149ae6eeb9198c) )
 	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
@@ -506,7 +507,7 @@ ROM_START( actfancr2 )
 ROM_END
 
 ROM_START( actfancr1 )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "08-1", 0x00000, 0x10000, CRC(3bf214a4) SHA1(f7513672b2292d3acb4332b392695888bf6560a5) )
 	ROM_LOAD( "09-1", 0x10000, 0x10000, CRC(13ae78d5) SHA1(eba77d3dbfe273e18c7fa9c0ca305ac2468f9381) )
 	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
@@ -539,7 +540,7 @@ ROM_START( actfancr1 )
 ROM_END
 
 ROM_START( actfancrj )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "fd08-1.bin", 0x00000, 0x10000, CRC(69004b60) SHA1(7c6b876ca04377d2aa2d3c3f19d8e6cc7345363d) )
 	ROM_LOAD( "fd09-1.bin", 0x10000, 0x10000, CRC(a455ae3e) SHA1(960798271c8370c1c4ffce2a453f59d7a301c9f9) )
 	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
@@ -572,7 +573,7 @@ ROM_START( actfancrj )
 ROM_END
 
 ROM_START( triothep )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "fg-16.bin", 0x00000, 0x20000, CRC(7238355a) SHA1(4ac6c3fd808e7c94025972fdb45956bd707ec89f) )
 	ROM_LOAD( "fg-15.bin", 0x20000, 0x10000, CRC(1c0551ab) SHA1(1f90f80db44d92af4b233bc16cb1023db2797e8a) )
 	ROM_LOAD( "fg-14.bin", 0x30000, 0x10000, CRC(4ba7de4a) SHA1(bf552fa33746f3d27f9b193424a38fef58fe0765) )
@@ -606,7 +607,7 @@ ROM_END
 
 // All ROMSs are FF even the ones matching the parent FG ROMs
 ROM_START( triothepj )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ff-16.bin", 0x00000, 0x20000, CRC(84d7e1b6) SHA1(28381d2e1f6d22a959383eb2e8d73f2e03f4d39f) )
 	ROM_LOAD( "ff-15.bin", 0x20000, 0x10000, CRC(6eada47c) SHA1(98fc4e93c47bc42ea7c20e8ac994b117cd7cb5a5) )
 	ROM_LOAD( "ff-14.bin", 0x30000, 0x10000, CRC(4ba7de4a) SHA1(bf552fa33746f3d27f9b193424a38fef58fe0765) )
