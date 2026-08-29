@@ -943,7 +943,7 @@ std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
 				case COMPRESSION_TYPE_1:
 				case COMPRESSION_TYPE_2:
 				case COMPRESSION_TYPE_3:
-				{
+					{
 					uint32_t const blocklen = get_u24be(&rawmap[1]);
 					if (UNEXPECTED(blocklen > m_compressed.size()))
 						return std::error_condition(error::INVALID_DATA);
