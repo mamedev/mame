@@ -50,7 +50,7 @@ void roland_mt80s_state::mt80s(machine_config &config)
 
 	// HD63266(config, m_hdfdc, 16_MHz_XTAL); // HD63266F
 
-	// TC6116(config, "pcm", 16_MHz_XTAL); // TC6116AF
+	// ROLAND_GP4(config, "pcm", 16_MHz_XTAL); // TC6116AF
 }
 
 ROM_START(mt80s)

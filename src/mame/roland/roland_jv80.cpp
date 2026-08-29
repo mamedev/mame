@@ -49,7 +49,7 @@ private:
 	required_device<h8532_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<hd44780_device> m_lcd;
-	required_device<tc6116_device> m_pcm;
+	required_device<roland_gp4_device> m_pcm;
 
 	// gate array interrupt aggregator (sources: 3/4 = encoder, 5 = PCM)
 	u8 m_ga_int_enable = 0;
@@ -125,7 +125,7 @@ void roland_jv80_state::jv880_mem_map(address_map &map)
 {
 	map(0x0'0000, 0x0'7fff).rom().region("maincpu", 0);
 	map(0x0'8000, 0x0'dfff).ram().mirror(0xa0000);
-	map(0x0'f000, 0x0'f3ff).rw(m_pcm, FUNC(tc6116_device::read), FUNC(tc6116_device::write));
+	map(0x0'f000, 0x0'f3ff).rw(m_pcm, FUNC(roland_gp4_device::read), FUNC(roland_gp4_device::write));
 	map(0x0'f400, 0x0'f403).rw(FUNC(roland_jv80_state::ga_r), FUNC(roland_jv80_state::ga_w));
 	map(0x0'f404, 0x0'f405).rw(m_lcd, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x0'f406, 0x0'f407).nopw(); // unknown gate array registers
@@ -160,7 +160,7 @@ void roland_jv80_state::jv880(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // LC36256AML-10 (IC18) + CR2032 battery
 
-	TC6116(config, m_pcm, 23.2_MHz_XTAL);
+	ROLAND_GP4(config, m_pcm, 23.2_MHz_XTAL);
 	m_pcm->set_device_rom_tag("waverom");
 	m_pcm->int_callback().set(FUNC(roland_jv80_state::pcm_int_w));
 
@@ -198,14 +198,14 @@ private:
 	void keyscan_w(offs_t offset, u8 data);
 
 	required_device<h8510_device> m_maincpu;
-	required_device<tc6116_device> m_pcm;
+	required_device<roland_gp4_device> m_pcm;
 };
 
 void roland_rd500_state::rd500_mem_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("progrom", 0);
 	map(0x900000, 0x90ffff).ram();
-	map(0xa00000, 0xa0ffff).rw(m_pcm, FUNC(tc6116_device::read), FUNC(tc6116_device::write));
+	map(0xa00000, 0xa0ffff).rw(m_pcm, FUNC(roland_gp4_device::read), FUNC(roland_gp4_device::write));
 	map(0xc00000, 0xc0ffff).rw(FUNC(roland_rd500_state::keyscan_r), FUNC(roland_rd500_state::keyscan_w));
 }
 
@@ -226,7 +226,7 @@ void roland_rd500_state::rd500(machine_config &config)
 	HD6415108(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_rd500_state::rd500_mem_map);
 
-	TC6116(config, m_pcm, 23.2_MHz_XTAL);
+	ROLAND_GP4(config, m_pcm, 23.2_MHz_XTAL);
 	m_pcm->set_device_rom_tag("waverom");
 }
 
