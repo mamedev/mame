@@ -18413,6 +18413,7 @@ kotbinsp
 kotbinyo
 kotbinyosu
 mjchuuka
+mjchuukac
 mjdchuka
 mjflove
 mjgnight
@@ -26927,15 +26928,15 @@ jr200u
 kn5000
 
 @source:matsushita/kn7000.cpp
-kn6000
 kn2400
-kn2600                          // SX-KN2600, same firmware as SX-KN2400
+kn2600
+kn6000
 kn6500
 kn7000
 
 @source:matsushita/myb3k.cpp
-myb3k
 jb3000
+myb3k
 stepone
 
 @source:mattel/aquarius.cpp
@@ -32058,6 +32059,7 @@ h01jce
 
 @source:misc/haiwei.cpp
 hqdf
+unkhaiwei
 
 @source:misc/hapyfish.cpp
 hapyfsh2
@@ -39042,6 +39044,8 @@ whtforce
 @source:pinball/supstarf.cpp
 supstarf
 supstarfa
+supstarfb
+supstarfc
 
 @source:pinball/taito.cpp
 cavnegro
