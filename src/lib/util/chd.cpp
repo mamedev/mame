@@ -949,11 +949,11 @@ std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
 						return std::error_condition(error::INVALID_DATA);
 
 					std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
-						if (UNEXPECTED(err))
-							return err;
-						auto &decompressor = *m_decompressor[rawmap[0]];
-						decompressor.process(m_compressed.data(), blocklen);
-						return std::error_condition();
+					if (UNEXPECTED(err))
+						return err;
+					auto &decompressor = *m_decompressor[rawmap[0]];
+					decompressor.process(m_compressed.data(), blocklen);
+					return std::error_condition();
 					}
 
 				case COMPRESSION_NONE:
