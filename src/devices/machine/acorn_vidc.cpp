@@ -2,21 +2,22 @@
 // copyright-holders:Angelo Salese, R. Belmont, Juergen Buchmueller
 /**********************************************************************************************
 
-    Acorn VIDC10 (VIDeo Controller) device chip
+Acorn VIDC10 (VIDeo Controller) device chip
 
-    based off legacy AA VIDC implementation by Angelo Salese, R. Belmont, Juergen Buchmueller
+based off legacy AA VIDC implementation by Angelo Salese, R. Belmont, Juergen Buchmueller
 
-    TODO:
-    - subclass screen_device, derive h/vsync signals out there;
-    - improve timings for raster effects:
-      * nebulus: 20 lines off with aa310;
-      * lotustc2: abuses color flipping;
-      * quazer: needs in-flight DMA;
-    - move DAC handling into a separate sub-device(s),
-      particularly needed for proper VIDC20 mixing and likely for fixing aliasing
-      issues in VIDC10;
-    - complete VIDC20 emulation (RiscPC/ssfindo.cpp);
-    - Are CRTC values correct? VGA modes have a +1 in display line;
+TODO:
+- subclass screen_device, derive h/vsync signals out there;
+- improve timings for raster effects:
+  * caverns: has no main sprite;
+  * nebulus: 20 lines off with aa310;
+  * lotustc2: abuses color flipping;
+  * quazer: needs in-flight DMA;
+- move DAC handling into a separate sub-device(s),
+  particularly needed for proper VIDC20 mixing and likely for fixing aliasing
+  issues in VIDC10;
+- complete VIDC20 emulation (RiscPC/ssfindo.cpp);
+- Are CRTC values correct? VGA modes have a +1 in display line;
 
 **********************************************************************************************/
 
@@ -488,17 +489,19 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 	const u8 pen_byte_sizes[4] = { 1, 2, 4, 1 };
 	const u16 pen_byte_size = pen_byte_sizes[bpp];
 	const int raster_ystart = std::max(0, cliprect.min_y-ystart);
-	xsize >>= 3-bpp;
+	const int line_size = m_crtc_interlace + 1;
+
+	xsize >>= 3 - bpp;
 
 	//printf("%d %d %d %d\n",ystart, ysize, cliprect.min_y, cliprect.max_y);
 
 	for (int srcy = raster_ystart; srcy < ysize; srcy++)
 	{
-		int dsty = (srcy + ystart) * (m_crtc_interlace+1);
+		int dsty = (srcy + ystart) << m_crtc_interlace;
 		for (int srcx = 0; srcx < xsize; srcx++)
 		{
-			u8 pen = vram[srcx + srcy * xsize];
-			int dstx = (srcx*xchar_size) + xstart;
+			u8 pen = vram[(srcx + srcy * xsize) & m_data_vram_mask];
+			int dstx = (srcx * xchar_size) + xstart;
 
 			for (int xi = 0; xi < xchar_size; xi++)
 			{
@@ -506,9 +509,16 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 				if (is_cursor == true && dot == 0)
 					continue;
 				dot += pen_base;
-				bitmap.pix(dsty, dstx+xi) = this->pen(dot);
-				if (m_crtc_interlace)
-					bitmap.pix(dsty+1, dstx+xi) = this->pen(dot);
+
+				for (int line_i = 0; line_i < line_size; line_i++)
+				{
+					// guard against out of bounds clip rectangle
+					// - chuckrck sets (transitional) xstart = -16 & (in actual gameplay) ystart = -16
+					if (!cliprect.contains(dstx + xi, dsty + line_i))
+						continue;
+
+					bitmap.pix(dsty + line_i, dstx + xi) = this->pen(dot);
+				}
 			}
 		}
 	}
