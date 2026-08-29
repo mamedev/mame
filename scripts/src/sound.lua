@@ -1630,6 +1630,18 @@ if SOUNDS["TA7630"] then
 end
 
 ---------------------------------------------------
+-- STmicroelectronics TDA7433
+--@src/devices/sound/tda7433.h,SOUNDS["TDA7433"] = true
+---------------------------------------------------
+
+if SOUNDS["TDA7433"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tda7433.cpp",
+		MAME_DIR .. "src/devices/sound/tda7433.h",
+	}
+end
+
+---------------------------------------------------
 -- Sanyo LC7535
 --@src/devices/sound/lc7535.h,SOUNDS["LC7535"] = true
 ---------------------------------------------------
@@ -1938,6 +1950,18 @@ if SOUNDS["GT155"] then
 	files {
 		MAME_DIR .. "src/devices/sound/gt155.cpp",
 		MAME_DIR .. "src/devices/sound/gt155.h",
+	}
+end
+
+---------------------------------------------------
+-- Nintendo DS Sound
+--@src/devices/sound/nds_sound.h,SOUNDS["NDS_SOUND"] = true
+---------------------------------------------------
+
+if SOUNDS["NDS_SOUND"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nds_sound.cpp",
+		MAME_DIR .. "src/devices/sound/nds_sound.h",
 	}
 end
 

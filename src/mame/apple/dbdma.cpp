@@ -67,6 +67,11 @@ dbdma_device::dbdma_device(const machine_config &mconfig, const char *tag, devic
 	m_width(4),
 	m_drq_state(0),
 	m_in_pump(false),
+	m_drq_status_bit(-1),
+	m_hw_status_mask(0),
+	m_hw_status(0),
+	m_waiting(false),
+	m_wake_timer(nullptr),
 	m_read_dma(*this, 0),
 	m_write_dma(*this)
 {
@@ -92,6 +97,11 @@ void dbdma_device::device_start()
 	save_item(NAME(m_xferLimit));
 	save_item(NAME(m_bytesLeft));
 	save_item(NAME(m_drq_state));
+	save_item(NAME(m_hw_status_mask));
+	save_item(NAME(m_hw_status));
+	save_item(NAME(m_waiting));
+
+	m_wake_timer = timer_alloc(FUNC(dbdma_device::wake_tick), this);
 }
 
 //-------------------------------------------------
@@ -100,10 +110,13 @@ void dbdma_device::device_start()
 
 void dbdma_device::device_reset()
 {
-	m_status = 0;
+	// the hardware-driven status bits keep whatever level the device is presenting
+	m_status = m_hw_status;
 	m_command_pointer = 0;
 	m_intselect = m_branchselect = m_waitselect = 0;
 	m_in_pump = false;
+	m_waiting = false;
+	m_wake_timer->reset();
 }
 
 // 00 = control (write only)
@@ -126,8 +139,9 @@ void dbdma_device::map(address_map &map)
 void dbdma_device::control_w(u32 data)
 {
 	// the top 16 bits of data are a mask selecting which bits of
-	// the status are changed by the write.
-	const u16 mask = (data >> 16);
+	// the status are changed by the write.  Status bits driven by the
+	// device can't be changed by software.
+	const u16 mask = (data >> 16) & ~m_hw_status_mask;
 	const u16 old_status = m_status;
 
 	m_status &= (mask ^ 0xffff);
@@ -151,16 +165,29 @@ void dbdma_device::control_w(u32 data)
 
 	if (m_status & STATUS_FLUSH)
 	{
-		// TODO: write back the in-progress command's status.  FLUSH is
-		// self-clearing; software polls for it to drop.
+		// INPUT commands must return a partial transfer status
+		const u32 op = m_opcode >> 28;
+		if ((m_status & STATUS_ACTIVE) && ((op == OP_INPUT_MORE) || (op == OP_INPUT_LAST)))
+		{
+			m_pci_memory->write_word(m_command_pointer + 12, m_bytesLeft);
+			m_pci_memory->write_word(m_command_pointer + 14, m_status);
+		}
 		m_status &= ~STATUS_FLUSH;
 	}
 
 	if (m_status & STATUS_WAKE)
 	{
-		// TODO: wait conditions aren't modeled.  WAKE is also self-clearing.
+		// WAKE releases a waiting channel and is self-clearing
 		m_status &= ~STATUS_WAKE;
+		if (m_waiting)
+		{
+			m_waiting = false;
+			m_wake_timer->adjust(attotime::zero);
+		}
 	}
+
+	// a program waiting on a software-controlled status bit may be able to continue
+	check_wait();
 
 	// on a RUN rising edge, fetch the channel program from the command pointer
 	if ((m_status & STATUS_RUN) && !(old_status & STATUS_RUN))
@@ -173,8 +200,7 @@ void dbdma_device::control_w(u32 data)
 }
 
 u32 dbdma_device::status_r()
-{
-	return m_status;
+{	return m_status;
 }
 
 u32 dbdma_device::cmdpointer_r()
@@ -188,7 +214,6 @@ void dbdma_device::cmdpointer_w(u32 data)
 	{
 		LOG("%s: %08x to command pointer\n", tag(), swapendian_int32(data));
 		m_command_pointer = data;
-
 		new_command();
 	}
 }
@@ -230,10 +255,11 @@ u32 dbdma_device::dma_read(offs_t offset)
 	// silence rather than the stale last word, which would hold a DC level and
 	// click when playback resumes.  SCSI never gets here while inactive because
 	// pump() only runs the callbacks while a transfer command is active.
-	if ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) != STATUS_ACTIVE)
+	if (((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) != STATUS_ACTIVE) || m_waiting)
 	{
 		return 0;
 	}
+	m_xfer_word = 0;
 	step_program();
 	return m_xfer_word;
 }
@@ -269,10 +295,42 @@ bool dbdma_device::is_to_memory()
 void dbdma_device::drq_w(int state)
 {
 	m_drq_state = state;
+
+	// optionally mirror the request line into a general-purpose status bit
+	if (m_drq_status_bit >= 0)
+	{
+		if (state)
+		{
+			m_status |= (1 << m_drq_status_bit);
+		}
+		else
+		{
+			m_status &= ~(1 << m_drq_status_bit);
+		}
+	}
+
 	if (state)
 	{
 		pump();
 	}
+}
+
+void dbdma_device::status_bit_w(int bit, int state)
+{	const u8 mask = 1 << bit;
+
+	m_hw_status_mask |= mask;
+	if (state)
+	{
+		m_hw_status |= mask;
+		m_status |= mask;
+	}
+	else
+	{
+		m_hw_status &= ~mask;
+		m_status &= ~mask;
+	}
+
+	check_wait();
 }
 
 // Move data between the device (via the dma_r/dma_w callbacks) and memory
@@ -287,7 +345,7 @@ void dbdma_device::pump()
 	}
 
 	m_in_pump = true;
-	while (m_drq_state && ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) == STATUS_ACTIVE))
+	while (m_drq_state && !m_waiting && ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) == STATUS_ACTIVE))
 	{
 		switch (m_opcode >> 28)
 		{
@@ -311,66 +369,109 @@ void dbdma_device::pump()
 
 void dbdma_device::step_program()
 {
-	if ((m_status & STATUS_PAUSE) || !(m_status & STATUS_ACTIVE))
+	if (((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) != STATUS_ACTIVE) || m_waiting)
 	{
 		return;
 	}
 
-	switch (m_opcode >> 28)
+	const u32 initial_op = m_opcode >> 28;
+	const bool input = (initial_op == OP_INPUT_MORE) || (initial_op == OP_INPUT_LAST);
+	if (!input && (initial_op != OP_OUTPUT_MORE) && (initial_op != OP_OUTPUT_LAST))
 	{
-		case OP_OUTPUT_MORE:
-		case OP_OUTPUT_LAST:
-			switch (m_width)
-			{
-				case 1:
-					m_xfer_word = m_pci_memory->read_byte(m_address);
-					break;
-
-				case 2:
-					m_xfer_word = m_pci_memory->read_word_unaligned(m_address);
-					break;
-
-				case 4:
-					m_xfer_word = m_pci_memory->read_dword_unaligned(m_address);
-					break;
-			}
-			m_address += m_width;
-			m_currentXfer += m_width;
-			m_bytesLeft -= m_width;
-			break;
-
-		case OP_INPUT_MORE:
-		case OP_INPUT_LAST:
-			switch (m_width)
-			{
-				case 1:
-					m_pci_memory->write_byte(m_address, m_xfer_word);
-					break;
-
-				case 2:
-					m_pci_memory->write_word_unaligned(m_address, m_xfer_word);
-					break;
-
-				case 4:
-					m_pci_memory->write_dword_unaligned(m_address, m_xfer_word);
-					break;
-			}
-			m_address += m_width;
-			m_currentXfer += m_width;
-			m_bytesLeft -= m_width;
-			break;
-
-		default:
-			// non-transfer commands are executed by process_commands() as
-			// soon as they're fetched, so a step should never land on one
-			logerror("%s: transfer step on non-transfer opcode %d\n", tag(), m_opcode >> 28);
-			return;
+		logerror("%s: transfer step on non-transfer opcode %d\n", tag(), initial_op);
+		return;
 	}
 
-	if (m_bytesLeft == 0)
+	// a descriptor can end with residual bytes, so we need to do some special handling so the transfer
+	// makes it through intact.
+	u32 byte_offset = 0;
+	while ((byte_offset < m_width) && ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) == STATUS_ACTIVE))
 	{
-		finish_command();
-		process_commands();
+		const u32 op = m_opcode >> 28;
+		const bool current_input = (op == OP_INPUT_MORE) || (op == OP_INPUT_LAST);
+		const bool current_output = (op == OP_OUTPUT_MORE) || (op == OP_OUTPUT_LAST);
+		const bool more = (op == OP_INPUT_MORE) || (op == OP_OUTPUT_MORE);
+		if ((input && !current_input) || (!input && !current_output))
+		{
+			return;
+		}
+
+		const u32 transfer_size = std::min<u32>(m_width - byte_offset, m_bytesLeft);
+		if (transfer_size == 0)
+		{
+			finish_command();
+			process_commands();
+			if (!more || m_waiting)
+			{
+				return;
+			}
+			continue;
+		}
+
+		u32 transfer_word = 0;
+		if (!input)
+		{
+			switch (transfer_size)
+			{
+				case 1:
+					transfer_word = m_pci_memory->read_byte(m_address);
+					break;
+
+				case 2:
+					transfer_word = m_pci_memory->read_word_unaligned(m_address);
+					break;
+
+				case 3:
+					transfer_word = m_pci_memory->read_byte(m_address)
+						| (m_pci_memory->read_byte(m_address + 1) << 8)
+						| (m_pci_memory->read_byte(m_address + 2) << 16);
+					break;
+
+				case 4:
+					transfer_word = m_pci_memory->read_dword_unaligned(m_address);
+					break;
+			}
+			m_xfer_word |= transfer_word << (byte_offset * 8);
+		}
+		else
+		{
+			transfer_word = m_xfer_word >> (byte_offset * 8);
+			switch (transfer_size)
+			{
+				case 1:
+					m_pci_memory->write_byte(m_address, transfer_word);
+					break;
+
+				case 2:
+					m_pci_memory->write_word_unaligned(m_address, transfer_word);
+					break;
+
+				case 3:
+					m_pci_memory->write_byte(m_address, transfer_word);
+					m_pci_memory->write_byte(m_address + 1, transfer_word >> 8);
+					m_pci_memory->write_byte(m_address + 2, transfer_word >> 16);
+					break;
+
+				case 4:
+					m_pci_memory->write_dword_unaligned(m_address, transfer_word);
+					break;
+			}
+		}
+
+		m_address += transfer_size;
+		m_currentXfer += transfer_size;
+		m_bytesLeft -= transfer_size;
+		byte_offset += transfer_size;
+
+		if (m_bytesLeft == 0)
+		{
+			finish_command();
+			process_commands();
+			if (!more || m_waiting)
+			{
+				return;
+			}
+		}
 	}
 }
 
@@ -378,7 +479,7 @@ void dbdma_device::step_program()
 // we land on a transfer command or the channel stops.
 void dbdma_device::process_commands()
 {
-	while ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) == STATUS_ACTIVE)
+	while (!m_waiting && ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) == STATUS_ACTIVE))
 	{
 		switch (m_opcode >> 28)
 		{
@@ -478,14 +579,56 @@ bool dbdma_device::test_condition(u32 field, u32 select)
 	return false;   // never
 }
 
+// The "w" field stalls the channel after the command's transfer (if any) until
+// the wait condition is no longer met.  The condition is re-checked whenever a
+// ChannelStatus bit changes.
+bool dbdma_device::wait_condition()
+{	return (m_opcode & WAIT_MASK) && test_condition((m_opcode >> 16) & 3, m_waitselect);
+}
+
+void dbdma_device::check_wait()
+{
+	if (m_waiting && !wait_condition())
+	{
+		m_waiting = false;
+		// Continue from a timer so a device that changed the bit from inside one
+		// of its own register handlers isn't re-entered by the next command.
+		m_wake_timer->adjust(attotime::zero);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(dbdma_device::wake_tick)
+{
+	if (m_waiting || ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) != STATUS_ACTIVE))
+	{
+		return;
+	}
+
+	complete_command();
+	process_commands();
+	if (m_drq_state)
+	{
+		pump();
+	}
+}
+
 void dbdma_device::finish_command()
 {
-	const u32 op = m_opcode >> 28;
-
-	if (m_opcode & WAIT_MASK)
+	if (wait_condition())
 	{
-		LOG("%s: command has wait bits %d, not implemented\n", tag(), (m_opcode >> 16) & 3);
+		LOG("%s: waiting on %08x (status %04x)\n", tag(), m_waitselect, m_status);
+		m_waiting = true;
+		return;
 	}
+
+	complete_command();
+}
+
+// Everything that happens once a command (and any wait) is over: the status
+// write-back, the branch, the interrupt, and moving on to the next command.
+void dbdma_device::complete_command()
+{
+	const u32 op = m_opcode >> 28;
 
 	// evaluate the branch condition ("b" bits)
 	const bool branch_taken = test_condition((m_opcode >> 18) & 3, m_branchselect);
@@ -515,8 +658,7 @@ void dbdma_device::finish_command()
 
 	if (test_condition((m_opcode >> 20) & 3, m_intselect))
 	{
-		LOG("%s: raising completion interrupt\n", tag());
-		// Latch the completion event and hold it.  The macio IRQ controller
+		LOG("%s: raising completion interrupt\n", tag());		// Latch the completion event and hold it.  The macio IRQ controller
 		// keeps the event pending until Mac OS acknowledges it, at which point
 		// it also drops this channel's held level so the next completion is
 		// seen as a fresh edge.

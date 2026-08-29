@@ -17,6 +17,7 @@
 #include "a2applicard.h"
 #include "a2arcadebd.h"
 #include "a2cffa.h"
+#include "a2clock.h"
 #include "a2corvus.h"
 #include "a2diskiing.h"
 #include "a2dx1.h"
@@ -166,6 +167,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
 	device.option_add("sic", A2BUS_SIC);                       // Apple II Serial Interface Card
 	device.option_add("sweetalk", A2BUS_SWEETALK);             // Micromint Sweet Talker Phonetic Speech Synthesizer Interface
+	device.option_add("clock", APPLE_CLOCK);                   // Mountain Hardware Apple Clock
 }
 
 void apple2e_cards(device_slot_interface &device)
@@ -256,6 +258,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
 	device.option_add("sic", A2BUS_SIC);                       // Apple II Serial Interface Card
 	device.option_add("sweetalk", A2BUS_SWEETALK);             // Micromint Sweet Talker Phonetic Speech Synthesizer Interface
+	device.option_add("clock", APPLE_CLOCK);                   // Mountain Hardware Apple Clock
 }
 
 void apple2gs_cards(device_slot_interface &device)

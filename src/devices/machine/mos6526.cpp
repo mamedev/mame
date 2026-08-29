@@ -17,7 +17,6 @@
         - CIA2TA/TB
     - pass VICE cia tests
     - 8520 read/write
-    - 5710 read/write
     - optimize
     - off by one errors in vAmigaTS/showcia1 TODLO (reproducible particularly with -nothrottle)
     - flag_w & amigafdc both auto-inverts index pulses, it also fails ICR vAmigaTS/showcia1 test
@@ -118,7 +117,6 @@ enum
 DEFINE_DEVICE_TYPE(MOS6526,  mos6526_device,  "mos6526",  "MOS 6526 CIA")
 DEFINE_DEVICE_TYPE(MOS6526A, mos6526a_device, "mos6526a", "MOS 6526A CIA")
 DEFINE_DEVICE_TYPE(MOS8520,  mos8520_device,  "mos8520",  "MOS 8520 CIA")
-DEFINE_DEVICE_TYPE(MOS5710,  mos5710_device,  "mos5710",  "MOS 5710 CIA")
 
 
 
@@ -617,9 +615,6 @@ mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag,
 
 mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6526_device(mconfig, MOS8520, tag, owner, clock, TYPE_8520) { }
-
-mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS5710, tag, owner, clock, TYPE_5710) { }
 
 
 //-------------------------------------------------

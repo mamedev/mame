@@ -791,7 +791,7 @@ void emu_options::reevaluate_default_card_software()
 std::string emu_options::get_default_card_software(device_slot_interface &slot)
 {
 	std::string image_path;
-	std::function<bool(util::core_file &, std::string&)> get_hashfile_extrainfo;
+	std::function<bool (util::random_read &, std::string&)> get_hashfile_extrainfo;
 
 	// figure out if an image option has been specified, and if so, get the image path out of the options
 	device_image_interface *image = dynamic_cast<device_image_interface *>(&slot);
@@ -799,16 +799,17 @@ std::string emu_options::get_default_card_software(device_slot_interface &slot)
 	{
 		image_path = image_option(image->instance_name()).value();
 
-		get_hashfile_extrainfo = [image, this](util::core_file &file, std::string &extrainfo)
-		{
-			util::hash_collection hashes = image->calculate_hash_on_file(file);
+		get_hashfile_extrainfo =
+				[image, this] (util::random_read &file, std::string &extrainfo)
+				{
+					util::hash_collection hashes = image->calculate_hash_on_file(file);
 
-			return hashfile_extrainfo(
-					hash_path(),
-					image->device().mconfig().gamedrv(),
-					hashes,
-					extrainfo);
-		};
+					return hashfile_extrainfo(
+							hash_path(),
+							image->device().mconfig().gamedrv(),
+							hashes,
+							extrainfo);
+				};
 	}
 
 	// create the hook

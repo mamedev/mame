@@ -284,7 +284,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sente6vb_device::clock_counter_0_ff)
 void sente6vb_device::update_counter_0_timer()
 {
 	double maxfreq = 0.0;
-	int i;
 
 	// if there's already a timer, remove it
 	if (m_counter_0_timer_active)
@@ -293,7 +292,7 @@ void sente6vb_device::update_counter_0_timer()
 
 	// find the counter with the maximum frequency
 	// this is used to calibrate the timers at startup
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		if (m_cem_device[i]->final_gain() > 0.1)
 		{
 			double tempfreq;

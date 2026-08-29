@@ -630,6 +630,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -646,6 +647,8 @@ void ssfindo_state::ppcar(machine_config &config)
 	ssfindo(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ppcar_map);
+	// sets external sclk, unverified value
+	m_vidc->set_ext_sclk(24'000'000 / (24 * 2));
 
 	subdevice<qs1000_device>("qs1000")->set_external_rom(false); // ppcar has no external ROM
 	subdevice<i8052_device>("qs1000:cpu")->set_disable(); // internal ROM hasn't been dumped yet

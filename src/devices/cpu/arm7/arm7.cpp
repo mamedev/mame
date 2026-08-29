@@ -3,14 +3,16 @@
 /*****************************************************************************
  *
  *   arm7.cpp
- *   Portable CPU Emulator for 32-bit ARM v3/4/5/6
+ *   Portable CPU Emulator for 26/32-bit ARM v1/v2/v3/v4/v5 (including v5TE and v5TDMI)
+ *   There is stub v6 support, which will be expanded in the future.
  *
- *   Copyright Steve Ellenoff
- *   Thumb, DSP, and MMU support and many bugfixes by R. Belmont and Ryan Holtz.
+ *   Emulation by R. Belmont, Ryan Holtz, and Steve Ellenoff
+ *   Thumb, DSP, 26-bit, and MMU support and many bugfixes by R. Belmont and Ryan Holtz.
  *
  *  This work is based on:
  *  #1) 'Atmel Corporation ARM7TDMI (Thumb) Datasheet - January 1999'
  *  #2) Arm 2/3/6 emulator By Bryan McPhail (bmcphail@tendril.co.uk) and Phil Stroffolino (MAME CORE 0.76)
+ *  #3) The ARM Architecture Reference Manual v3, v4, and v5
  *
  *****************************************************************************/
 
@@ -26,7 +28,7 @@
 
 TODO:
 - Cleanups
-- Fix and finish the DRC code, or remove it entirely
+- Write a DRC
 
 *****************************************************************************/
 
@@ -50,6 +52,7 @@ TODO:
 #define LOG_TLB             (1U << 7)
 #define LOG_TLB_MISS        (1U << 8)
 #define LOG_PREFETCH        (1U << 9)
+#define LOG_MODE            (1U << 10)
 
 #define VERBOSE             (0) // (LOG_COPRO_READS | LOG_COPRO_WRITES | LOG_COPRO_UNKNOWN | LOG_COPRO_RESERVED)
 #include "logmacro.h"
@@ -66,9 +69,17 @@ void (*arm7_coproc_dt_r_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, 
 void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
 
 
+DEFINE_DEVICE_TYPE(ARM1,         arm1_cpu_device,         "arm1",         "ARM1")
+DEFINE_DEVICE_TYPE(ARM2,         arm2_cpu_device,         "arm2",         "ARM2")
+DEFINE_DEVICE_TYPE(ARM250,       arm250_cpu_device,       "arm250",       "ARM250")
+DEFINE_DEVICE_TYPE(ARM3,         arm3_cpu_device,         "arm3",         "ARM3")
+DEFINE_DEVICE_TYPE(ARM60,        arm60_cpu_device,        "arm60",        "ARM60")
+DEFINE_DEVICE_TYPE(ARM610,       arm610_cpu_device,       "arm610",       "ARM610")
+DEFINE_DEVICE_TYPE(ARM610_BE,    arm610_be_cpu_device,    "arm610_be",    "ARM610 (big)")
 DEFINE_DEVICE_TYPE(ARM7,         arm7_cpu_device,         "arm7_le",      "ARM7 (little)")
 DEFINE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device,      "arm7_be",      "ARM7 (big)")
 DEFINE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device,      "arm710a",      "ARM710a")
+DEFINE_DEVICE_TYPE(ARM710A_BE,   arm710a_be_cpu_device,   "arm710a_be",   "ARM710a (big)")
 DEFINE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device,      "arm710t",      "ARM710T")
 DEFINE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device,      "arm7500",      "ARM7500")
 DEFINE_DEVICE_TYPE(ARM9,         arm9_cpu_device,         "arm9",         "ARM9")
@@ -79,8 +90,12 @@ DEFINE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device, "arm1176jzf_s", "ARM11
 DEFINE_DEVICE_TYPE(PXA250,       pxa250_cpu_device,       "pxa250",       "Intel XScale PXA250")
 DEFINE_DEVICE_TYPE(PXA255,       pxa255_cpu_device,       "pxa255",       "Intel XScale PXA255")
 DEFINE_DEVICE_TYPE(PXA270,       pxa270_cpu_device,       "pxa270",       "Intel XScale PXA270")
+DEFINE_DEVICE_TYPE(SA110,        sa110_cpu_device,        "sa110",        "DEC StrongARM SA-110")
+DEFINE_DEVICE_TYPE(SA110_BE,     sa110_be_cpu_device,     "sa110_be",     "DEC StrongARM SA-110 (big)")
 DEFINE_DEVICE_TYPE(SA1100,       sa1100_cpu_device,       "sa1100",       "Intel StrongARM SA-1100")
 DEFINE_DEVICE_TYPE(SA1110,       sa1110_cpu_device,       "sa1110",       "Intel StrongARM SA-1110")
+DEFINE_DEVICE_TYPE(DE156,        de156_cpu_device,        "de156",        "Data East 156")
+DEFINE_DEVICE_TYPE(DE101,        de101_cpu_device,        "de101",        "Data East 101")
 DEFINE_DEVICE_TYPE(IGS036,       igs036_cpu_device,       "igs036",       "IGS036")
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -98,7 +113,7 @@ arm7_cpu_device::arm7_cpu_device(
 		endianness_t endianness,
 		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", endianness, 32, 32, 0, internal_map)
+	, m_program_config("program", endianness, 32, (archFlags & ARCHFLAG_ONLY26) ? 26 : 32, 0, internal_map)
 	, m_prefetch_word0_shift(endianness == ENDIANNESS_LITTLE ? 0 : 16)
 	, m_prefetch_word1_shift(endianness == ENDIANNESS_LITTLE ? 16 : 0)
 	, m_endian(endianness)
@@ -137,12 +152,36 @@ arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char
 }
 
 
-arm710a_cpu_device::arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM710A, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+arm610_cpu_device::arm610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm610_cpu_device(mconfig, ARM610, tag, owner, clock, ENDIANNESS_LITTLE)
 {
-	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-			   | ARM9_COPRO_ID_ARCH_V4
-			   | ARM9_COPRO_ID_PART_ARM710;
+}
+
+arm610_cpu_device::arm610_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: arm7_cpu_device(mconfig, type, tag, owner, clock, 3, ARCHFLAG_MODE26, endianness)
+{
+	m_copro_id = 0x41560610;
+}
+
+arm610_be_cpu_device::arm610_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm610_cpu_device(mconfig, ARM610_BE, tag, owner, clock, ENDIANNESS_BIG)
+{
+}
+
+arm710a_cpu_device::arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm710a_cpu_device(mconfig, ARM710A, tag, owner, clock, ENDIANNESS_LITTLE)
+{
+}
+
+arm710a_cpu_device::arm710a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: arm7_cpu_device(mconfig, type, tag, owner, clock, 3, ARCHFLAG_MODE26, endianness)
+{
+	m_copro_id = 0x41047100;
+}
+
+arm710a_be_cpu_device::arm710a_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm710a_cpu_device(mconfig, ARM710A_BE, tag, owner, clock, ENDIANNESS_BIG)
+{
 }
 
 
@@ -155,8 +194,9 @@ arm710t_cpu_device::arm710t_cpu_device(const machine_config &mconfig, const char
 }
 
 
+// ARM7500: ARM710-class core, ARM architecture version 3
 arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 3, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
 			   | ARM9_COPRO_ID_ARCH_V4
@@ -291,6 +331,27 @@ pxa270_cpu_device::pxa270_cpu_device(const machine_config &mconfig, const char *
 			   | ARM9_COPRO_ID_STEP_PXA255_A0;
 }
 
+// SA-110: ARM v4 with the 26-bit backwards-compatibility modes (PROG32/DATA32 in CP15 control)
+sa110_cpu_device::sa110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sa110_cpu_device(mconfig, SA110, tag, owner, clock, ENDIANNESS_LITTLE)
+{
+}
+
+sa110_cpu_device::sa110_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: arm7_cpu_device(mconfig, type, tag, owner, clock, 4, ARCHFLAG_SA | ARCHFLAG_MODE26, endianness)
+	// has StrongARM, no Thumb, no Enhanced DSP
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_DEC
+			   | ARM9_COPRO_ID_ARCH_V4
+			   | ARM9_COPRO_ID_PART_SA110
+			   | ARM9_COPRO_ID_STEP_SA110_T;
+}
+
+sa110_be_cpu_device::sa110_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sa110_cpu_device(mconfig, SA110_BE, tag, owner, clock, ENDIANNESS_BIG)
+{
+}
+
 sa1100_cpu_device::sa1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, SA1100, tag, owner, clock, 4, ARCHFLAG_SA, ENDIANNESS_LITTLE)
 	// has StrongARM, no Thumb, no Enhanced DSP
@@ -311,6 +372,164 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 			   | ARM9_COPRO_ID_STEP_SA1110_B4;
 }
 
+arm2_cpu_device::arm2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm2_cpu_device(mconfig, ARM2, tag, owner, clock, 2, ARCHFLAG_MODE26 | ARCHFLAG_ONLY26)
+{
+}
+
+arm2_cpu_device::arm2_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags)
+	: arm7_cpu_device(mconfig, type, tag, owner, clock, archRev, archFlags, ENDIANNESS_LITTLE)
+{
+}
+
+uint32_t arm2_cpu_device::arm7_rt_r_callback(offs_t offset)
+{
+	LOGMASKED(LOG_COPRO_UNKNOWN, "%08x: MRC p%d on a part without coprocessors\n", R15, (offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT);
+	m_pendingUnd = true;
+	update_irq_state();
+	return 0;
+}
+
+void arm2_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
+{
+	LOGMASKED(LOG_COPRO_UNKNOWN, "%08x: MCR p%d on a part without coprocessors\n", R15, (offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT);
+	m_pendingUnd = true;
+	update_irq_state();
+}
+
+arm1_cpu_device::arm1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm2_cpu_device(mconfig, ARM1, tag, owner, clock, 1, ARCHFLAG_MODE26 | ARCHFLAG_ONLY26)
+{
+}
+
+arm250_cpu_device::arm250_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm2_cpu_device(mconfig, ARM250, tag, owner, clock, 2, ARCHFLAG_MODE26 | ARCHFLAG_ONLY26 | ARCHFLAG_V2A)
+{
+}
+
+arm3_cpu_device::arm3_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm2_cpu_device(mconfig, ARM3, tag, owner, clock, 2, ARCHFLAG_MODE26 | ARCHFLAG_ONLY26 | ARCHFLAG_V2A)
+	, m_cache_control(0)
+	, m_cacheable(0)
+	, m_updateable(0)
+	, m_disruptive(0)
+{
+}
+
+void arm3_cpu_device::device_start()
+{
+	arm2_cpu_device::device_start();
+	save_item(NAME(m_cache_control));
+	save_item(NAME(m_cacheable));
+	save_item(NAME(m_updateable));
+	save_item(NAME(m_disruptive));
+}
+
+void arm3_cpu_device::device_reset()
+{
+	arm2_cpu_device::device_reset();
+	m_cache_control = 0;
+	m_cacheable = 0;
+	m_updateable = 0;
+	m_disruptive = 0;
+}
+
+uint32_t arm3_cpu_device::arm7_rt_r_callback(offs_t offset)
+{
+	uint8_t const cpnum = (offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint8_t const creg = (offset & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+
+	if (cpnum != 15 || GET_MODE == eARM7_MODE_USER)
+		return arm2_cpu_device::arm7_rt_r_callback(offset);   // undefined instruction
+
+	switch (creg)
+	{
+	case 0: return 0x41560300;   // ID: ARM / VLSI / ARM3 / revision 0
+	case 2: return m_cache_control;
+	case 3: return m_cacheable;
+	case 4: return m_updateable;
+	case 5: return m_disruptive;
+	default:
+		LOGMASKED(LOG_COPRO_READS, "%08x: ARM3 MRC p15, c%d\n", R15, creg);
+		return 0;
+	}
+}
+
+void arm3_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
+{
+	uint8_t const cpnum = (offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint8_t const creg = (offset & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+
+	if (cpnum != 15 || GET_MODE == eARM7_MODE_USER)
+	{
+		arm2_cpu_device::arm7_rt_w_callback(offset, data);   // undefined instruction
+		return;
+	}
+
+	switch (creg)
+	{
+	case 1: break;   // flush the cache: nothing to do
+	case 2: m_cache_control = data; break;
+	case 3: m_cacheable = data; break;
+	case 4: m_updateable = data; break;
+	case 5: m_disruptive = data; break;
+	default:
+		LOGMASKED(LOG_COPRO_WRITES, "%08x: ARM3 MCR p15, c%d = %08x\n", R15, creg, data);
+		break;
+	}
+}
+
+arm60_cpu_device::arm60_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, ARM60, tag, owner, clock, 3, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+{
+	m_copro_id = 0x41560600;   // ARM / VLSI / ARM6
+}
+
+void arm60_cpu_device::set_config_pins(bool prog32, bool data32)
+{
+	m_reset_control = (prog32 ? COPRO_CTRL_PROG32 : 0) | (data32 ? COPRO_CTRL_DATA32 : 0);
+}
+
+uint32_t arm60_cpu_device::arm7_rt_r_callback(offs_t offset)
+{
+	uint8_t const cpnum = (offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint8_t const creg = (offset & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+
+	if (cpnum != 15)
+	{
+		LOGMASKED(LOG_COPRO_UNKNOWN, "%08x: MRC p%d, no such coprocessor\n", R15, cpnum);
+		m_pendingUnd = true;
+		update_irq_state();
+		return 0;
+	}
+
+	switch (creg)
+	{
+	case 0: return m_copro_id;
+	case 1: return COPRO_CTRL;
+	default:
+		LOGMASKED(LOG_COPRO_READS, "%08x: ARM60 MRC p15, c%d\n", R15, creg);
+		return 0;
+	}
+}
+
+void arm60_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
+{
+	uint8_t const cpnum = (offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint8_t const creg = (offset & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+
+	if (cpnum != 15)
+	{
+		LOGMASKED(LOG_COPRO_UNKNOWN, "%08x: MCR p%d, no such coprocessor\n", R15, cpnum);
+		m_pendingUnd = true;
+		update_irq_state();
+		return;
+	}
+
+	// the control register is set by the configuration pins
+	LOGMASKED(LOG_COPRO_WRITES, "%08x: ARM60 MCR p15, c%d = %08x ignored\n", R15, creg, data);
+}
+
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -323,10 +542,29 @@ void arm7_cpu_device::update_reg_ptr()
 	m_reg_group = sRegisterTable[GET_MODE];
 }
 
+uint32_t arm7_cpu_device::vector_base() const
+{
+	return m_vectorbase | ((COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST) ? 0xffff0000 : 0);
+}
+
 void arm7_cpu_device::set_cpsr(uint32_t val)
 {
 	uint8_t old_mode = GET_CPSR & MODE_FLAG;
 	bool call_hook = false;
+
+	if (m_archFlags & ARCHFLAG_ONLY26)
+	{
+		val &= ~(uint32_t(0x10) | T_MASK);   // the 32-bit modes and Thumb do not exist
+	}
+
+	static constexpr uint16_t VALID_MODES =
+			(1 << eARM7_MODE_USER) | (1 << eARM7_MODE_FIQ) | (1 << eARM7_MODE_IRQ) | (1 << eARM7_MODE_SVC) |
+			(1 << eARM7_MODE_ABT) | (1 << eARM7_MODE_UND) | (1 << eARM7_MODE_SYS);
+	if (!BIT(VALID_MODES, val & MODE_FLAG))
+	{
+		LOGMASKED(LOG_MODE, "%08x: attempt to set invalid CPSR mode %02x (CPSR %08x), ignored\n", m_r[eR15], val & 0x1f, m_r[eCPSR]);
+		val = (val & ~uint32_t(0x1f)) | (m_r[eCPSR] & 0x1f);
+	}
 	if (m_archFlags & ARCHFLAG_MODE26)
 	{
 		if ((val & 0x10) != (m_r[eCPSR] & 0x10))
@@ -638,9 +876,21 @@ uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const
 	}
 }
 
-uint32_t arm7_cpu_device::tlb_check_permissions(tlb_entry *entry, const int flags)
+uint32_t arm7_cpu_device::tlb_check_permissions(tlb_entry *entry, const offs_t vaddr, const int flags)
 {
-	return get_fault_from_permissions(entry->access, entry->domain, entry->type, flags);
+	uint8_t access = entry->access;
+	switch (entry->type)
+	{
+		case COPRO_TLB_TYPE_LARGE:
+			access >>= (vaddr >> 13) & 6;
+			break;
+		case COPRO_TLB_TYPE_SMALL:
+			access >>= (vaddr >> 9) & 6;
+			break;
+		default:
+			break;
+	}
+	return get_fault_from_permissions(access & 3, entry->domain, entry->type, flags);
 }
 
 offs_t arm7_cpu_device::tlb_translate(tlb_entry *entry, const offs_t vaddr)
@@ -663,18 +913,21 @@ offs_t arm7_cpu_device::tlb_translate(tlb_entry *entry, const offs_t vaddr)
 bool arm7_cpu_device::page_table_finish_translation(offs_t &vaddr, const uint8_t type, const uint32_t lvl1, const uint32_t lvl2, const int flags, const uint32_t lvl1a, const uint32_t lvl2a)
 {
 	const uint8_t domain = (uint8_t)(lvl1 >> 5) & 0xF;
-	uint8_t access = 0;
+	uint8_t access = 0;         // AP bits for the subpage being accessed
+	uint8_t access_all = 0;     // every AP field in the descriptor, cached in the TLB entry
 	uint32_t table_bits = 0;
 	switch (type)
 	{
 		case COPRO_TLB_TYPE_SECTION:
 			access = (uint8_t)((lvl2 >> 10) & 3);
+			access_all = access;
 			table_bits = vaddr & COPRO_TLB_STABLE_MASK;
 			break;
 		case COPRO_TLB_TYPE_LARGE:
 		{
 			const uint8_t subpage_shift = 4 + (uint8_t)((vaddr >> 13) & 6);
 			access = (uint8_t)((lvl2 >> subpage_shift) & 3);
+			access_all = (uint8_t)((lvl2 >> 4) & 0xff);
 			table_bits = vaddr & COPRO_TLB_LSTABLE_MASK;
 			break;
 		}
@@ -683,12 +936,14 @@ bool arm7_cpu_device::page_table_finish_translation(offs_t &vaddr, const uint8_t
 		{
 			const uint8_t subpage_shift = 4 + (uint8_t)((vaddr >> 9) & 6);
 			access = (uint8_t)((lvl2 >> subpage_shift) & 3);
+			access_all = (uint8_t)((lvl2 >> 4) & 0xff);
 			table_bits = vaddr & COPRO_TLB_LSTABLE_MASK;
 			break;
 		}
 
 		case COPRO_TLB_TYPE_TINY:
 			access = (uint8_t)((lvl2 >> 4) & 3);
+			access_all = access;
 			table_bits = vaddr & COPRO_TLB_TTABLE_MASK;
 			break;
 	}
@@ -722,7 +977,7 @@ bool arm7_cpu_device::page_table_finish_translation(offs_t &vaddr, const uint8_t
 
 		entry->valid = true;
 		entry->domain = domain;
-		entry->access = access;
+		entry->access = access_all;
 		entry->table_bits = table_bits;
 		entry->base_addr = base_addr;
 		entry->type = type;
@@ -860,7 +1115,7 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 				machine().describe_context(), entry->domain, entry->access, entry->table_bits, entry->base_addr, entry->type);
 		}
 
-		const uint32_t access_result = tlb_check_permissions(entry, flags);
+		const uint32_t access_result = tlb_check_permissions(entry, vaddr, flags);
 		if (access_result == 0)
 		{
 			vaddr = tlb_translate(entry, vaddr);
@@ -929,7 +1184,7 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
 
 		if (entry)
 		{
-			const uint32_t access_result = tlb_check_permissions(entry, flags);
+			const uint32_t access_result = tlb_check_permissions(entry, address, flags);
 			if (access_result == 0)
 			{
 				address = tlb_translate(entry, address);
@@ -986,6 +1241,7 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_pendingIrq));
 	save_item(NAME(m_pendingFiq));
 	save_item(NAME(m_pendingAbtD));
+	save_item(NAME(m_pendingAddrExc));
 	save_item(NAME(m_pendingAbtP));
 	save_item(NAME(m_pendingUnd));
 	save_item(NAME(m_pendingSwi));
@@ -1098,6 +1354,7 @@ void arm7_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case ARM7_PC:
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
 			m_pc = GET_PC;
@@ -1131,11 +1388,12 @@ void arm7_cpu_device::device_reset()
 	m_pendingIrq = false;
 	m_pendingFiq = false;
 	m_pendingAbtD = false;
+	m_pendingAddrExc = false;
 	m_pendingAbtP = false;
 	m_pendingUnd = false;
 	m_pendingSwi = false;
 	m_pending_interrupt = false;
-	m_control = 0;
+	m_control = m_reset_control;
 	m_tlbBase = 0;
 	m_tlb_base_mask = 0;
 	m_faultStatus[0] = 0;
@@ -1146,10 +1404,21 @@ void arm7_cpu_device::device_reset()
 	m_domainAccessControl = 0;
 	std::fill_n(&m_decoded_access_control[0], 16, 0);
 
-	/* start up in SVC mode with interrupts disabled. */
-	m_r[eCPSR] = I_MASK | F_MASK | 0x10;
-	SwitchMode(eARM7_MODE_SVC);
-	m_r[eR15] = 0 | m_vectorbase;
+	// start up in SVC mode with interrupts disabled.
+	if ((m_archFlags & ARCHFLAG_MODE26) && !(m_control & COPRO_CTRL_PROG32))
+	{
+		// PROG32 low is the 26-bit configuration: SVC26, with the PSR in R15.  That is the only state of the 26-bit-only
+		// parts and the reset state of every ARM6/ARM7/StrongARM that supports 26-bit mode.
+		m_r[eCPSR] = I_MASK | F_MASK | eARM7_MODE_SVC;
+		update_reg_ptr();
+		m_r[eR15] = (vector_base() & 0x03FFFFFC) | 0x0C000000 /* I F */ | eARM7_MODE_SVC;
+	}
+	else
+	{
+		m_r[eCPSR] = I_MASK | F_MASK | 0x10;
+		SwitchMode(eARM7_MODE_SVC);
+		m_r[eR15] = vector_base();
+	}
 
 	for (auto &entry : m_dtlb_entries)
 	{
@@ -1213,7 +1482,7 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 			m_insn_prefetch_valid[index] = false;
 			break;
 		}
-		uint32_t op = m_pr32(physical_pc);
+		uint32_t op = insn_fetch_word(physical_pc);
 		LOGMASKED(LOG_PREFETCH, "Got op %08x\n", op);
 		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
 		m_insn_prefetch_buffer[index] = op;
@@ -1647,13 +1916,138 @@ bool arm7_cpu_device::get_t_flag() const
 	return T_IS_SET(m_r[eCPSR]);
 }
 
+u8 arm7_cpu_device::get_arch_rev() const
+{
+	return m_archRev;
+}
+
 
 /* ARM system coprocessor support */
 
-void arm7_cpu_device::arm7_do_callback(uint32_t data)
+void arm7_cpu_device::arm7_do_callback(uint32_t insn)
 {
 	m_pendingUnd = true;
 	update_irq_state();
+}
+
+static uint32_t bcd_to_decimal(uint32_t value)
+{
+	uint32_t accumulator = 0;
+	uint32_t multiplier = 1;
+	for (int i = 0; i < 8; i++)
+	{
+		accumulator += (value & 0xF) * multiplier;
+		multiplier *= 10;
+		value >>= 4;
+	}
+	return accumulator;
+}
+
+static uint32_t decimal_to_bcd(uint32_t value)
+{
+	uint32_t accumulator = 0;
+	uint32_t divisor = 10;
+	for (int i = 0; i < 8; i++)
+	{
+		uint32_t temp = value % divisor;
+		value -= temp;
+		temp /= divisor / 10;
+		accumulator += temp << (i * 4);
+		divisor *= 10;
+	}
+	return accumulator;
+}
+
+de156_cpu_device::de156_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: de156_cpu_device(mconfig, DE156, tag, owner, clock)
+{
+}
+
+de156_cpu_device::de156_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: arm2_cpu_device(mconfig, type, tag, owner, clock, 2, ARCHFLAG_MODE26 | ARCHFLAG_ONLY26)
+{
+	m_ldr_pc_round_up = true;
+	// Exact behavior of the actual DE156 is unknown, but this is what we've always done to make the games run
+	m_address_exception = false;
+	std::fill(std::begin(m_copro), std::end(m_copro), 0);
+}
+
+de101_cpu_device::de101_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: de156_cpu_device(mconfig, DE101, tag, owner, clock)
+{
+}
+
+void de156_cpu_device::device_start()
+{
+	arm2_cpu_device::device_start();
+	save_item(NAME(m_copro));
+}
+
+void de156_cpu_device::device_reset()
+{
+	arm2_cpu_device::device_reset();
+	std::fill(std::begin(m_copro), std::end(m_copro), 0);
+}
+
+uint32_t de156_cpu_device::arm7_rt_r_callback(offs_t offset)
+{
+	if (((offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT) != 0)
+		return arm2_cpu_device::arm7_rt_r_callback(offset);   // undefined instruction
+
+	uint8_t const crn = (offset & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+	LOGMASKED(LOG_COPRO_READS, "%08x: DE156 MRC p0, c%d -> %08x\n", R15, crn, m_copro[crn]);
+	return m_copro[crn];
+}
+
+void de156_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
+{
+	if (((offset & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT) != 0)
+	{
+		arm2_cpu_device::arm7_rt_w_callback(offset, data);
+		return;
+	}
+
+	uint8_t const crn = (offset & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+	LOGMASKED(LOG_COPRO_WRITES, "%08x: DE156 MCR p0, c%d = %08x\n", R15, crn, data);
+	m_copro[crn] = data;
+
+	if (crn == 2)
+	{
+		// c2 = command: BCD arithmetic on c0 and c1, result in c5
+		uint32_t const v0 = bcd_to_decimal(m_copro[0]);
+		uint32_t const v1 = bcd_to_decimal(m_copro[1]);
+		switch (data)
+		{
+		case 0: m_copro[5] = decimal_to_bcd(v0 + v1); break;
+		case 1: m_copro[5] = decimal_to_bcd(v0 * v1); break;
+		case 3: m_copro[5] = decimal_to_bcd(v0 - v1); break;
+		default:
+			LOGMASKED(LOG_COPRO_UNKNOWN, "%08x: DE156 unknown BCD command %08x\n", R15, data);
+			break;
+		}
+	}
+}
+
+void de156_cpu_device::arm7_do_callback(uint32_t insn)
+{
+	if (((insn & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT) != 0)
+	{
+		arm2_cpu_device::arm7_do_callback(insn);   // undefined instruction
+		return;
+	}
+
+	// CDP: c3 = c0 / c1, c4 = c0 % c1
+	if (m_copro[1] != 0)
+	{
+		m_copro[3] = m_copro[0] / m_copro[1];
+		m_copro[4] = m_copro[0] % m_copro[1];
+	}
+	else
+	{
+		m_copro[3] = 0xffffffff;   // unverified
+		m_copro[4] = 0xffffffff;
+	}
+	LOGMASKED(LOG_COPRO_WRITES, "%08x: DE156 CDP %08x / %08x -> %08x rem %08x\n", R15, m_copro[0], m_copro[1], m_copro[3], m_copro[4]);
 }
 
 uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
@@ -1661,11 +2055,8 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 	uint32_t opcode = offset;
 	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
 	uint8_t op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
-	uint8_t op3 =    opcode & INSN_COPRO_OP3;
 	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 	uint32_t data = 0;
-
-//    printf("cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, GET_REGISTER(arm, 15));
 
 	// we only handle system copro here
 	if (cpnum != 15)
@@ -1736,7 +2127,9 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, ID %02x (%02x) -> %08x (PC=%08x)\n",op2,m_archRev,data,GET_PC);
 			break;
 		case 1:             // Control
-			data = COPRO_CTRL | 0x70;   // bits 4-6 always read back as "1" (bit 3 too in XScale)
+			data = COPRO_CTRL;
+			if (!(m_archFlags & ARCHFLAG_MODE26))
+				data |= 0x70;   // PROG32/DATA32/LATE_ABORT only exist with the 26-bit modes, otherwise always read back as "1" (bit 3 too in XScale)
 			break;
 		case 2:             // Translation Table Base
 			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, TLB Base, PC = %08x\n", m_r[eR15]);
@@ -1747,11 +2140,15 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 			data = COPRO_DOMAIN_ACCESS_CONTROL;
 			break;
 		case 5:             // Fault Status
-			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Status, PC = %08x, op3 %d, FSR0 = %08x, FSR1 = %08x\n", m_r[eR15], op3, COPRO_FAULT_STATUS_D, COPRO_FAULT_STATUS_P);
-			switch (op3)
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Status, PC = %08x, op2 %d, FSR0 = %08x, FSR1 = %08x\n", m_r[eR15], op2, COPRO_FAULT_STATUS_D, COPRO_FAULT_STATUS_P);
+			// ARMv3 has a single FSR and ignores CRm/opcode2 (Newton OS reads it as c5, c5);
+			if ((m_archRev >= 4) && (op2 == 1))
 			{
-				case 0: data = COPRO_FAULT_STATUS_D; break;
-				case 1: data = COPRO_FAULT_STATUS_P; break;
+				data = COPRO_FAULT_STATUS_P;
+			}
+			else
+			{
+				data = COPRO_FAULT_STATUS_D;
 			}
 			break;
 		case 6:             // Fault Address
@@ -1848,15 +2245,38 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 				m_decoded_access_control[i >> 1] = (COPRO_DOMAIN_ACCESS_CONTROL >> i) & 3;
 			}
 			break;
-		case 5:             // Fault Status
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Status = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
-			switch (op3)
+		case 5:             // Fault Status (ARMv4 and later), TLB flush (ARMv3)
+			if (m_archRev < 4)
 			{
-				case 0: COPRO_FAULT_STATUS_D = data; break;
-				case 1: COPRO_FAULT_STATUS_P = data; break;
+				LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback ARMv3 TLB Flush, PC = %08x\n", machine().describe_context(), m_r[eR15]);
+				for (auto &entry : m_dtlb_entries)
+					entry.valid = false;
+				for (auto &entry : m_itlb_entries)
+					entry.valid = false;
+				break;
+			}
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Status = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
+			if ((m_archRev >= 4) && (op2 == 1))
+			{
+				COPRO_FAULT_STATUS_P = data;
+			}
+			else
+			{
+				COPRO_FAULT_STATUS_D = data;
 			}
 			break;
-		case 6:             // Fault Address
+		case 6:             // Fault Address (ARMv4 and later), TLB purge (ARMv3)
+			if (m_archRev < 4)
+			{
+				LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback ARMv3 TLB Purge %08x, PC = %08x\n", machine().describe_context(), data, m_r[eR15]);
+				tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_D);
+				if (entry)
+					entry->valid = false;
+				entry = tlb_probe(data, ARM7_TLB_ABORT_P);
+				if (entry)
+					entry->valid = false;
+				break;
+			}
 			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Address = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			COPRO_FAULT_ADDRESS = data;
 			break;
@@ -2160,6 +2580,17 @@ void arm946es_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 	m_program->write_byte(addr, data);
 }
 
+// helper so we can fetch instructions from the ITCM (important for Nintendo DS)
+uint32_t arm946es_cpu_device::insn_fetch_word(offs_t addr)
+{
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		return *reinterpret_cast<uint32_t *>(&ITCM[addr & 0x7ffc]);
+	}
+
+	return m_pr32(addr);
+}
+
 uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)
 {
 	uint32_t result;
@@ -2308,8 +2739,37 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 /***************************************************************************
  * Default Memory Handlers
  ***************************************************************************/
+
+// 26-bit data space.  With CP15 DATA32 clear - the reset state of the ARMv3/v4 parts that have the 26-bit modes - data
+// addresses are 26 bits wide and an address with bits 31:26 set takes the address exception: vector 0x14, SVC mode,
+// R14 = aborted instruction + 8, the instruction completes as for a data abort (ARM2/ARM3 datasheets, ARM610 datasheet
+// "Address exception").  26-bit code routinely leaves PSR bits in a register it then uses as an address, so this is
+// what such code sees on the real parts; the old cpu/arm core silently masked the address instead, which
+// set_address_exception(false) restores for anything found to depend on it.
+bool arm7_cpu_device::check_data_address(offs_t &addr)
+{
+	if ((m_archFlags & ARCHFLAG_MODE26) && !(COPRO_CTRL & COPRO_CTRL_DATA32) && (addr & 0xFC000000))
+	{
+		if (m_address_exception)
+		{
+			LOGMASKED(LOG_MMU, "%08x: address exception, data address %08x\n", R15, addr);
+			m_pendingAbtD = true;
+			m_pendingAddrExc = true;
+			update_irq_state();
+			return false;
+		}
+		addr &= 0x03FFFFFF;
+	}
+	return true;
+}
+
 void arm7_cpu_device::arm7_cpu_write32(offs_t addr, uint32_t data)
 {
+	if (!check_data_address(addr))
+	{
+		return;
+	}
+
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
 		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
@@ -2325,6 +2785,11 @@ void arm7_cpu_device::arm7_cpu_write32(offs_t addr, uint32_t data)
 
 void arm7_cpu_device::arm7_cpu_write16(offs_t addr, uint16_t data)
 {
+	if (!check_data_address(addr))
+	{
+		return;
+	}
+
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
 		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
@@ -2339,6 +2804,11 @@ void arm7_cpu_device::arm7_cpu_write16(offs_t addr, uint16_t data)
 
 void arm7_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 {
+	if (!check_data_address(addr))
+	{
+		return;
+	}
+
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
 		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
@@ -2352,6 +2822,11 @@ void arm7_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 
 uint32_t arm7_cpu_device::arm7_cpu_read32(offs_t addr)
 {
+	if (!check_data_address(addr))
+	{
+		return 0;
+	}
+
 	uint32_t result;
 
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
@@ -2376,6 +2851,11 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(offs_t addr)
 
 uint32_t arm7_cpu_device::arm7_cpu_read16(offs_t addr)
 {
+	if (!check_data_address(addr))
+	{
+		return 0;
+	}
+
 	uint32_t result;
 
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
@@ -2398,6 +2878,11 @@ uint32_t arm7_cpu_device::arm7_cpu_read16(offs_t addr)
 
 uint8_t arm7_cpu_device::arm7_cpu_read8(offs_t addr)
 {
+	if (!check_data_address(addr))
+	{
+		return 0;
+	}
+
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
 		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))

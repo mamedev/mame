@@ -78,13 +78,10 @@ Fails loading
 		</part>
 	</software>
 
-	<software name="bbsb" supported="yes">
+	<software name="bbsb">
 		<description>Bounty Bob Strikes Back! (v1.2)</description>
 		<year>1985</year>
 		<publisher>Big Five</publisher>
-		<notes><![CDATA[
-LOAD "*",8 then LOAD "BBSB",8,1
-]]></notes>
 		<info name="usage" value="Needs a joystick in port 1 once it loads"/>
 		<info name="protection" value="halftrack" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
@@ -92,8 +89,6 @@ LOAD "*",8 then LOAD "BBSB",8,1
 		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_5_25">
-			<!-- will not load if disk is not write protected -->
-			<feature name="read_only" value="true"/>
 			<dataarea name="flop" size="208212">
 				<rom name="bbsb.g64" size="208212" crc="69456d8c" sha1="26801eda258f748aa6f6c45df8af7f7cbb2857d4"/>
 			</dataarea>
@@ -104,9 +99,6 @@ LOAD "*",8 then LOAD "BBSB",8,1
 		<description>Commando</description>
 		<year>1985</year>
 		<publisher>Elite</publisher>
-		<notes><![CDATA[
-LOAD "COMMANDO",8,1
-]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -237,6 +229,7 @@ Punts to BASIC, or just fails loading
 		<year>1985</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
+DOES NOT WORK IN VICE EITHER
 LOAD "0:*",8,1
 Locks up during boot
 ]]></notes>
@@ -306,14 +299,10 @@ Punts to BASIC
 		</part>
 	</software>
 
-	<software name="sthassle" supported="no">
+	<software name="sthassle">
 		<description>Street Hassle</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Part of player sprite draws transparent (collisions still works)
-]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -322,7 +311,7 @@ Part of player sprite draws transparent (collisions still works)
 		</part>
 	</software>
 
-	<software name="spoker" supported="yes">
+	<software name="spoker">
 		<description>Strip Poker</description>
 		<year>1984</year>
 		<publisher>Artworx</publisher>
@@ -448,6 +437,81 @@ All games fails loading
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="buddy64.g64" size="333744" crc="986d5e3d" sha1="3aeedd8e4e9c7a9412144fa5f7930e3492b79d33" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos20de">
+		<description>GEOS 2.0 (Germany)</description>
+		<year>1988</year>
+		<publisher>Berkeley Softworks</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="278234">
+				<rom name="geos20de_1a.g64" size="278234" crc="9110479e" sha1="b36f95c2fa7686c7fc412d4b06e8fbca69521af4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="278234">
+				<rom name="geos20de_1b.g64" size="278234" crc="5b7bcfb3" sha1="5529ddac58606b77ec139c37f264daa2bcab9302"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="255154">
+				<rom name="geos20de_2a.g64" size="255154" crc="84451bb3" sha1="d35a261d57f39a389914eef9b55809b88c7a98d0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="278234">
+				<rom name="geos20de_2b.g64" size="278234" crc="67c016ed" sha1="df2f2b0d94d841f605b200e9a05f19d54a58b114"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_3a.d64" size="174848" crc="1893d010" sha1="dae3f3c0f18a4ad99b6cb60fbf61aecfe4fcb0a4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_3b.d64" size="174848" crc="d4ad471f" sha1="8424d81bb0eb0c6d0778ffac33f5421a8928dcd6"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_4a.d64" size="174848" crc="1ce3419d" sha1="5c9c5b720fe62bbcb8a4bae203d2dee328f8317c"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos20de_4b.d64" size="174848" crc="53ae19b1" sha1="bd3739c266aca675589ddf3783b558aad83370c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos15">
+		<description>GEOS deskTop 1.5</description>
+		<year>1988</year>
+		<publisher>Berkeley Softworks</publisher>
+		<info name="serial" value="317749-01" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1: GEOS deskTop 1.5 for the Commodore 64C"/>
+			<dataarea name="flop" size="279582">
+				<rom name="geos15_1a.g64" size="279582" crc="572ca967" sha1="b23b40dd0ac00c4a97a9aa0f00e84c6b9debb947"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2: GEOS Additional for the Commodore 64C"/>
+			<dataarea name="flop" size="287512">
+				<rom name="geos15_1b.g64" size="287512" crc="b6b5004d" sha1="1267ca44e408e5939919d12783adda6ec7f41412"/>
 			</dataarea>
 		</part>
 	</software>
@@ -877,9 +941,7 @@ All games fails loading
 		<description>1541/1571 Drive Alignment</description>
 		<year>1987</year>
 		<publisher>Free Spirit Software</publisher>
-		<notes><![CDATA[
-LOAD "*",8
-]]></notes>
+		<info name="usage" value='LOAD "*",8' />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">

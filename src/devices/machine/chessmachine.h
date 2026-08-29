@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 
 
 class chessmachine_device : public device_t
@@ -37,12 +37,10 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	memory_view m_boot_view;
 
 	devcb_write_line m_data_out;
-
-	emu_timer *m_boot_timer;
 
 	u8 m_latch[2];
 
@@ -50,7 +48,6 @@ private:
 	void data1_w_sync(s32 param);
 	void reset_w_sync(s32 param);
 
-	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.disable(); }
 	u32 disable_bootrom_r();
 
 	u8 internal_r() { return m_latch[0]; }

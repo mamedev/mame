@@ -1165,6 +1165,7 @@ void z80scc_channel::device_reset()
 	{
 		m_uart->reset_interrupts();
 	}
+	m_extint_latch = 0;
 	m_extint_states = m_rr0;
 	m_baudtimer->adjust(attotime::never);
 	m_brg_counter = 0;
@@ -2507,6 +2508,12 @@ void z80scc_channel::data_write(uint8_t data)
 	}
 
 	check_dma_request();
+
+	/* A character has just been loaded into the transmit buffer, so a preceding
+	   "Reset Tx Int Pending" command no longer applies: that command only suppresses
+	   transmit interrupts "until after the next character has been loaded into the
+	   transmit buffer". */
+	m_tx_int_disarm = 0;
 
 	/* Transmitter enabled?  */
 	if (m_wr5 & WR5_TX_ENABLE)

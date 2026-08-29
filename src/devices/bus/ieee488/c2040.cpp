@@ -14,7 +14,7 @@
     or you will get a DISK ID MISMATCH error upon disk commands.
     On the 4040 this is done automatically by the DOS.
 
-    open 15,8,15:print 15,"i":close 15
+    open 15,8,15:print #15,"i":close 15
 
     List directory
     --------------
@@ -31,19 +31,6 @@
     Save file
     ---------
     dsave "name" / dS"name
-
-*/
-
-/*
-
-    TODO:
-
-    - 2040/3040/4040 have a Shugart SA390 drive (FLOPPY_525_SSSD_35T)
-
-    - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
-
-        FE70: jsr  $104D
-        104D: m6502_brk#$00
 
 */
 
@@ -471,7 +458,7 @@ void c2040_device::via_pb_w(uint8_t data)
 
 static void c2040_floppies(device_slot_interface &device)
 {
-	device.option_add("525ssqd", FLOPPY_525_SSQD);
+	device.option_add("525ssqd", FLOPPY_525_SSQD); // Shugart SA390
 }
 
 

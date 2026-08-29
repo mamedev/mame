@@ -137,7 +137,7 @@ u8 coco_ide_device::ide_read(offs_t offset)
 		break;
 	}
 	case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-		result = m_ata->cs0_r(offset, 0xff);
+		result = m_ata->cs0_r(offset);
 		break;
 
 	case 8:
@@ -168,7 +168,7 @@ void coco_ide_device::ide_write(offs_t offset, u8 data)
 		break;
 	}
 	case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-		m_ata->cs0_w(offset, data, 0xff);
+		m_ata->cs0_w(offset, data);
 		break;
 
 	case 8:

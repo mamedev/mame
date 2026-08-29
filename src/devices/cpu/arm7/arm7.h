@@ -3,13 +3,8 @@
 /*****************************************************************************
  *
  *   arm7.h
- *   Portable ARM7TDMI CPU Emulator
- *
- *   Copyright Steve Ellenoff
- *
- *  This work is based on:
- *  #1) 'Atmel Corporation ARM7TDMI (Thumb) Datasheet - January 1999'
- *  #2) Arm 2/3/6 emulator By Bryan McPhail (bmcphail@tendril.co.uk) and Phil Stroffolino (MAME CORE 0.76)
+ *   Portable CPU Emulator for 26/32-bit ARM v1/v2/v3/v4/v5 (including v5TE and v5TDMI)
+ *   Emulation by R. Belmont, Ryan Holtz, and Steve Ellenoff
  *
  *****************************************************************************
 
@@ -56,6 +51,13 @@ public:
 
 	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
+	// 26-bit data space (CP15 DATA32 clear on the parts with the 26-bit modes): a data address with bits 31:26 set takes
+	// the address exception (vector 0x14, SVC mode).  Disabling it gives the old cpu/arm behaviour of silently masking
+	// the address to 26 bits instead.
+	void set_address_exception(bool enable) { m_address_exception = enable; }
+
+	uint32_t vector_base() const;
+
 protected:
 	enum arm_arch_flag : uint32_t;
 	enum arm_copro_id : uint32_t;
@@ -94,6 +96,7 @@ protected:
 	// device_disasm_interface  implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual bool get_t_flag() const override;
+	virtual u8 get_arch_rev() const override;
 
 	void translate_insn_command(const std::vector<std::string_view> &params);
 	void translate_data_command(const std::vector<std::string_view> &params);
@@ -135,7 +138,7 @@ protected:
 	{
 		bool valid;
 		uint8_t domain;
-		uint8_t access;
+		uint8_t access;         // all four subpage AP fields (AP3..AP0, 2 bits each) for pages, AP in bits 1:0 otherwise
 		uint32_t table_bits;
 		uint32_t base_addr;
 		uint8_t type;
@@ -148,6 +151,7 @@ protected:
 	bool m_pendingIrq;
 	bool m_pendingFiq;
 	bool m_pendingAbtD;
+	bool m_pendingAddrExc;      // the pending data abort is a 26-bit data space address exception (vector 0x14)
 	bool m_pendingAbtP;
 	bool m_pendingUnd;
 	bool m_pendingSwi;
@@ -173,6 +177,9 @@ protected:
 	uint32_t m_archFlags;        // architecture flags
 
 	uint32_t m_vectorbase;
+	bool m_address_exception = true;
+	bool m_ldr_pc_round_up = false; // DE156: LDR PC with an unaligned address resumes at the next word boundary
+	uint32_t m_reset_control = 0;   // CP15 control register value at reset (PROG32/DATA32 can be set by grounding/Vcc-ing pins)
 
 //#if ARM7_MMU_ENABLE_HACK
 //  uint32_t mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
@@ -205,6 +212,8 @@ protected:
 	void HandleMemBlock(uint32_t insn);
 
 	void arm7ops_0123(uint32_t insn);
+	void arm7ops_0123_v4(uint32_t insn);
+	void arm7ops_undef_conditional(uint32_t insn);
 	void arm7ops_4567(uint32_t insn);
 	void arm7ops_89(uint32_t insn);
 	void arm7ops_ab(uint32_t insn);
@@ -221,13 +230,16 @@ protected:
 	void arm9ops_e(uint32_t insn);
 
 	void set_cpsr(uint32_t val);
+	void write_r15_psr26(uint32_t value, bool write_pc);
+	bool ldm_loads_base(uint32_t insn, uint32_t rb) const;
+	bool check_data_address(offs_t &addr);
 	bool translate_vaddr_to_paddr(offs_t &addr, const int flags);
 	bool page_table_finish_translation(offs_t &vaddr, const uint8_t type, const uint32_t lvl1, const uint32_t lvl2, const int flags, const uint32_t lvl1a, const uint32_t lvl2a);
 	bool page_table_translate(offs_t &vaddr, const int flags);
 	tlb_entry *tlb_map_entry(const offs_t vaddr, const int flags);
 	tlb_entry *tlb_probe(const offs_t vaddr, const int flags);
 	uint32_t get_fault_from_permissions(const uint8_t access, const uint8_t domain, const uint8_t type, const int flags);
-	uint32_t tlb_check_permissions(tlb_entry *entry, const int flags);
+	uint32_t tlb_check_permissions(tlb_entry *entry, const offs_t vaddr, const int flags);
 	offs_t tlb_translate(tlb_entry *entry, const offs_t vaddr);
 	uint32_t get_lvl2_desc_from_page_table(uint32_t granularity, uint32_t first_desc, uint32_t vaddr);
 	int detect_fault(int desc_lvl1, int ap, int flags);
@@ -240,8 +252,10 @@ protected:
 	virtual uint32_t arm7_cpu_read16(offs_t addr);
 	virtual uint8_t arm7_cpu_read8(offs_t addr);
 
+	virtual uint32_t insn_fetch_word(offs_t addr) { return m_pr32(addr); }
+
 	// Coprocessor support
-	void arm7_do_callback(uint32_t data);
+	virtual void arm7_do_callback(uint32_t insn);
 	virtual uint32_t arm7_rt_r_callback(offs_t offset);
 	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data);
 	void arm7_dt_r_callback(uint32_t insn, uint32_t *prn);
@@ -342,6 +356,8 @@ protected:
 	void tg0d_c(uint32_t pc, uint32_t insn);
 	void tg0d_d(uint32_t pc, uint32_t insn);
 	void tg0d_e(uint32_t pc, uint32_t insn);
+	void thumb_undefined(uint32_t pc, uint32_t insn);
+	void thumb_empty_rlist(uint32_t rb, bool load, bool ascending);
 	void tg0d_f(uint32_t pc, uint32_t insn);
 	void tg0e_0(uint32_t pc, uint32_t insn);
 	void tg0e_1(uint32_t pc, uint32_t insn);
@@ -379,6 +395,35 @@ class arm710a_cpu_device : public arm7_cpu_device
 public:
 	// construction/destruction
 	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	arm710a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+};
+
+// ARM710a with the BIGEND pin tied high
+class arm710a_be_cpu_device : public arm710a_cpu_device
+{
+public:
+	// construction/destruction
+	arm710a_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class arm610_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	arm610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	arm610_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+};
+
+// ARM610 with the BIGEND pin tied high (Apple Newton)
+class arm610_be_cpu_device : public arm610_cpu_device
+{
+public:
+	// construction/destruction
+	arm610_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class arm710t_cpu_device : public arm7_cpu_device
@@ -423,6 +468,8 @@ public:
 	virtual uint32_t arm7_cpu_read32(offs_t addr) override;
 	virtual uint32_t arm7_cpu_read16(offs_t addr) override;
 	virtual uint8_t arm7_cpu_read8(offs_t addr) override;
+
+	virtual uint32_t insn_fetch_word(offs_t addr) override;
 
 protected:
 	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -489,6 +536,24 @@ public:
 	pxa270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class sa110_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	sa110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	sa110_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+};
+
+// SA-110 with the CP15 control register B bit set at reset (Apple Newton MessagePad 2x00)
+class sa110_be_cpu_device : public sa110_cpu_device
+{
+public:
+	// construction/destruction
+	sa110_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class sa1100_cpu_device : public arm7_cpu_device
 {
 public:
@@ -503,9 +568,111 @@ public:
 	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+// ARM2 (VLSI VL86C010 / VY86C010): ARMv2 - the 26-bit modes only, no coprocessor 15
+class arm2_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	arm2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	arm2_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags);
+
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+
+	// no coprocessor 15: every MRC/MCR is an undefined instruction (CDP/LDC/STC already are in the base class)
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
+};
+
+// ARM1 (Acorn ARM Evaluation System): ARMv1 - no multiply, no swap
+class arm1_cpu_device : public arm2_cpu_device
+{
+public:
+	arm1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ARM250 (ARM2aS core with MEMC, IOC and VIDC on the same die): ARMv2a - adds SWP
+class arm250_cpu_device : public arm2_cpu_device
+{
+public:
+	arm250_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ARM3 (VLSI VL86C020): ARMv2a core with a 4 KB cache that is controlled through coprocessor 15
+class arm3_cpu_device : public arm2_cpu_device
+{
+public:
+	arm3_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
+
+private:
+	uint32_t m_cache_control;   // CP15 c2: bit 0 = cache on
+	uint32_t m_cacheable;       // CP15 c3: one bit per 2 MB of address space
+	uint32_t m_updateable;      // CP15 c4
+	uint32_t m_disruptive;      // CP15 c5
+};
+
+// ARM60 / ARM61 (VLSI VY86C060, GEC Plessey P60ARM): ARMv3 core without cache or MMU.  PROG32 and DATA32 are input
+// pins - set_config_pins(); the default is both low, the 26-bit configuration.  (BIGEND is the device's endianness.)
+class arm60_cpu_device : public arm7_cpu_device
+{
+public:
+	arm60_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_config_pins(bool prog32, bool data32);
+
+protected:
+	// CP15 has only the ID register and the pin-strapped, read-only control register
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
+};
+
+// Data East DE101 / DE156: an ARM2 core with a BCD/divide coprocessor 0 that apparently allows unaligned LDR PC
+class de156_cpu_device : public arm2_cpu_device
+{
+public:
+	de156_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	de156_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
+	virtual void arm7_do_callback(uint32_t insn) override;
+
+private:
+	uint32_t m_copro[16];       // coprocessor 0 register file
+};
+
+class de101_cpu_device : public de156_cpu_device
+{
+public:
+	de101_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(ARM1,         arm1_cpu_device)
+DECLARE_DEVICE_TYPE(ARM2,         arm2_cpu_device)
+DECLARE_DEVICE_TYPE(ARM250,       arm250_cpu_device)
+DECLARE_DEVICE_TYPE(ARM3,         arm3_cpu_device)
+DECLARE_DEVICE_TYPE(ARM60,        arm60_cpu_device)
+DECLARE_DEVICE_TYPE(DE156,        de156_cpu_device)
+DECLARE_DEVICE_TYPE(DE101,        de101_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7,         arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device)
+DECLARE_DEVICE_TYPE(ARM610,       arm610_cpu_device)
+DECLARE_DEVICE_TYPE(ARM610_BE,    arm610_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device)
+DECLARE_DEVICE_TYPE(ARM710A_BE,   arm710a_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device)
 DECLARE_DEVICE_TYPE(ARM9,         arm9_cpu_device)
@@ -516,6 +683,8 @@ DECLARE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device)
 DECLARE_DEVICE_TYPE(PXA250,       pxa250_cpu_device)
 DECLARE_DEVICE_TYPE(PXA255,       pxa255_cpu_device)
 DECLARE_DEVICE_TYPE(PXA270,       pxa270_cpu_device)
+DECLARE_DEVICE_TYPE(SA110,        sa110_cpu_device)
+DECLARE_DEVICE_TYPE(SA110_BE,     sa110_be_cpu_device)
 DECLARE_DEVICE_TYPE(SA1100,       sa1100_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,       sa1110_cpu_device)
 DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)

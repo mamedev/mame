@@ -169,12 +169,12 @@ u32 f108_device::ata_data_r(offs_t offset, u32 mem_mask)
 
 	if (mem_mask == 0xffffffff)
 	{
-		retval = m_ata->cs0_swap_r(0, 0xffff) << 16;
-		retval |= m_ata->cs0_swap_r(0, 0xffff);
+		retval = m_ata->cs0_swap_r(0) << 16;
+		retval |= m_ata->cs0_swap_r(0);
 	}
 	else if ((mem_mask & 0xffff0000) != 0)
 	{
-		retval = m_ata->cs0_swap_r(0, mem_mask >> 16) << 16;
+		retval = m_ata->cs0_swap_r(0) << 16;
 	}
 
 	return retval;
@@ -184,12 +184,12 @@ void f108_device::ata_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask == 0xffffffff)
 	{
-		m_ata->cs0_swap_w(0, data >> 16, 0xffff);
-		m_ata->cs0_swap_w(0, data & 0xffff, 0xffff);
+		m_ata->cs0_swap_w(0, data >> 16);
+		m_ata->cs0_swap_w(0, data & 0xffff);
 	}
 	else if ((mem_mask & 0xffff0000) != 0)
 	{
-		m_ata->cs0_swap_w(0, data >> 16, mem_mask >> 16);
+		m_ata->cs0_swap_w(0, data >> 16);
 	}
 }
 

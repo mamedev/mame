@@ -826,6 +826,8 @@ void ppc_device::device_start()
 	state_add(PPC_XER,   "XER", m_debugger_temp).callimport().callexport().formatstr("%08X");
 	state_add(PPC_SRR0,  "SRR0", m_core->spr[SPROEA_SRR0]).formatstr("%08X");
 	state_add(PPC_SRR1,  "SRR1", m_core->spr[SPROEA_SRR1]).formatstr("%08X");
+	state_add(PPC_DAR,   "DAR", m_core->spr[SPROEA_DAR]).formatstr("%08X");
+	state_add(PPC_DSISR, "DSISR", m_core->spr[SPROEA_DSISR]).formatstr("%08X");
 	state_add(PPC_SPRG0, "SPRG0", m_core->spr[SPROEA_SPRG0]).formatstr("%08X");
 	state_add(PPC_SPRG1, "SPRG1", m_core->spr[SPROEA_SPRG1]).formatstr("%08X");
 	state_add(PPC_SPRG2, "SPRG2", m_core->spr[SPROEA_SPRG2]).formatstr("%08X");
@@ -1534,8 +1536,12 @@ bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address, 
 void ppc_device::ppccom_tlb_fill()
 {
 	offs_t address = m_core->param0;
-	if(ppccom_translate_address_internal(m_core->param1, false, address) > 1)
+	if (ppccom_translate_address_internal(m_core->param1, false, address) > 1)
+	{
+		// The page tables no longer translate this address, so kick it out of the TLB
+		vtlb_flush_address(m_core->param0);
 		return;
+	}
 	vtlb_fill(m_core->param0, address, m_core->param1);
 }
 
@@ -1701,13 +1707,22 @@ void ppc_device::ppccom_execute_icbi()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ppccom_get_dsisr - gets the DSISR value for a
-    failing TLB lookup's data access exception.
+    ppccom_get_dsisr - gets the fault reason bits
+    (DSISR for a data access, SRR1 status bits
+    for an instruction fetch) for a failing TLB
+    lookup.  param1 holds the TR_READ/TR_WRITE/
+    TR_FETCH intent of the access that failed.
 -------------------------------------------------*/
 
 void ppc_device::ppccom_get_dsisr()
 {
-	int intent = (m_core->param1 & 1) ? TR_WRITE : TR_READ;
+	int intent = int(m_core->param1) & TR_TYPE;
+
+	// protection faults depend on privilege, so translate in the mode the access was made in
+	if (m_core->msr & MSR_PR)
+	{
+		intent |= TR_USER;
+	}
 
 	offs_t address = m_core->param0;
 	m_core->param1 = ppccom_translate_address_internal(intent, false, address);
@@ -1746,7 +1761,14 @@ void ppc_device::ppccom_dcbz_check()
 
 void ppc_device::ppccom_execute_tlbie()
 {
-	vtlb_flush_address(m_core->param0);
+	// The 603/604/750 TLBs are indexed by the low bits of the effective page index alone
+	// (EA[14-19] on the 750), so tlbie invalidates that whole class.  Mac OS X aliases
+	// user pages through its copyin/copyout window and expects the tlbie of the user
+	// address to flush the alias as well.
+	for (uint32_t seg = 0; seg < 16; seg++)
+	{
+		vtlb_flush_address((m_core->param0 & 0x0fffffff) | (seg << 28));
+	}
 
 	// A page table entry for this page may have changed; if code was compiled
 	// from it, make blocks re-check their mappings on the next entry.

@@ -22,7 +22,6 @@ using util::BIT;
 #include "cpu/apexc/apexcdsm.h"
 #include "cpu/arc/arcdasm.h"
 #include "cpu/arcompact/arcompactdasm.h"
-#include "cpu/arm/armdasm.h"
 #include "cpu/arm7/arm7dasm.h"
 #include "cpu/asap/asapdasm.h"
 #include "cpu/avr8/avr8dasm.h"
@@ -104,6 +103,7 @@ using util::BIT;
 #include "cpu/m6502/m740d.h"
 #include "cpu/m6502/r65c02d.h"
 #include "cpu/m6502/r65c19d.h"
+#include "cpu/m6502/w65816d.h"
 #include "cpu/m6502/w65c02d.h"
 #include "cpu/m6502/xavixd.h"
 #include "cpu/m6502/xavix2000d.h"
@@ -116,6 +116,7 @@ using util::BIT;
 #include "cpu/mb86233/mb86233d.h"
 #include "cpu/mb86235/mb86235d.h"
 #include "cpu/mb88xx/mb88dasm.h"
+#include "cpu/mb88xxx/mb88xxxdasm.h"
 #include "cpu/mc68hc11/hc11dasm.h"
 #include "cpu/mcs40/mcs40dasm.h"
 #include "cpu/mcs48/mcs48dsm.h"
@@ -267,9 +268,11 @@ using u64 = util::u64;
 struct arm7_unidasm_t : public arm7_disassembler::config
 {
 	bool t_flag;
-	arm7_unidasm_t() { t_flag = false; }
+	u8 arch_rev;
+	arm7_unidasm_t() { t_flag = false; arch_rev = 5; }
 	virtual ~arm7_unidasm_t() override = default;
 	virtual bool get_t_flag() const override { return t_flag; }
+	virtual u8 get_arch_rev() const override { return arch_rev; }
 } arm7_unidasm;
 
 // Configuration missing
@@ -291,6 +294,16 @@ struct m740_unidasm_t : m740_disassembler::config
 	virtual ~m740_unidasm_t() override = default;
 	virtual u32 get_state_base() const override { return inst_state_base; }
 } m740_unidasm;
+
+// The 65816 decodes out of one of five banks depending on E, M and X; with no
+// machine to ask, default to emulation mode and let -flags pick another.
+struct w65816_unidasm_t : w65816_disassembler::config
+{
+	u32 inst_state_base;
+	w65816_unidasm_t() { inst_state_base = 0; }
+	virtual ~w65816_unidasm_t() override = default;
+	virtual u32 get_state_base() const override { return inst_state_base; }
+} w65816_unidasm;
 
 // Configuration missing
 struct m7700_unidasm_t : m7700_disassembler::config
@@ -403,11 +416,11 @@ static const dasm_table_entry dasm_table[] =
 	{ "apexc",           be,  0, []() -> util::disasm_interface * { return new apexc_disassembler; } },
 	{ "arc",             be,  0, []() -> util::disasm_interface * { return new arc_disassembler; } },
 	{ "arcompact",       le,  0, []() -> util::disasm_interface * { return new arcompact_disassembler; } },
-	{ "arm",             le,  0, []() -> util::disasm_interface * { return new arm_disassembler; } },
-	{ "arm7",            le,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = false; return new arm7_disassembler(&arm7_unidasm); } },
-	{ "arm7_be",         be,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = false; return new arm7_disassembler(&arm7_unidasm); } },
-	{ "arm7thumb",       le,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = true; return new arm7_disassembler(&arm7_unidasm); } },
-	{ "arm7thumbb",      be,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = true; return new arm7_disassembler(&arm7_unidasm); } },
+	{ "arm",             le,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = false; arm7_unidasm.arch_rev = 2; return new arm7_disassembler(&arm7_unidasm); } },
+	{ "arm7",            le,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = false; arm7_unidasm.arch_rev = 5; return new arm7_disassembler(&arm7_unidasm); } },
+	{ "arm7_be",         be,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = false; arm7_unidasm.arch_rev = 5; return new arm7_disassembler(&arm7_unidasm); } },
+	{ "arm7thumb",       le,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = true; arm7_unidasm.arch_rev = 5; return new arm7_disassembler(&arm7_unidasm); } },
+	{ "arm7thumbb",      be,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = true; arm7_unidasm.arch_rev = 5; return new arm7_disassembler(&arm7_unidasm); } },
 	{ "asap",            le,  0, []() -> util::disasm_interface * { return new asap_disassembler; } },
 	{ "avr8",            le,  0, []() -> util::disasm_interface * { return new avr8_disassembler; } },
 	{ "axc51core",       le,  0, []() -> util::disasm_interface * { return new axc51core_disassembler; } },
@@ -545,6 +558,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mb86233",         le, -2, []() -> util::disasm_interface * { return new mb86233_disassembler; } },
 	{ "mb86235",         le, -3, []() -> util::disasm_interface * { return new mb86235_disassembler; } },
 	{ "mb88xx",          le,  0, []() -> util::disasm_interface * { return new mb88_disassembler; } },
+	{ "mb88xxx",         le,  0, []() -> util::disasm_interface * { return new mb88xxx_disassembler; } },
 	{ "mc88100",         be,  0, []() -> util::disasm_interface * { return new mc88100_disassembler; } },
 	{ "mc88110",         be,  0, []() -> util::disasm_interface * { return new mc88110_disassembler; } },
 	{ "mcs48",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(false, false); } },
@@ -731,6 +745,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "vt50",            le,  0, []() -> util::disasm_interface * { return new vt50_disassembler; } },
 	{ "vt52",            le,  0, []() -> util::disasm_interface * { return new vt52_disassembler; } },
 	{ "vt61",            le, -1, []() -> util::disasm_interface * { return new vt61_disassembler; } },
+	{ "w65816",          le,  0, []() -> util::disasm_interface * { return new w65816_disassembler(&w65816_unidasm); } },
 	{ "w65c02",          le,  0, []() -> util::disasm_interface * { return new w65c02_disassembler; } },
 	{ "we32100",         be,  0, []() -> util::disasm_interface * { return new we32100_disassembler; } },
 	{ "x86_16",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 16; return new i386_disassembler(&i386_unidasm); } },

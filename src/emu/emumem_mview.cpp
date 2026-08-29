@@ -329,6 +329,9 @@ namespace {
 		default: abort();
 		}
 	}
+
+	// machineless dummy object to bind to during validity checking
+	memory_manager s_dummy_manager;
 }
 
 memory_view::memory_view_entry &memory_view::operator[](int slot)
@@ -340,9 +343,8 @@ memory_view::memory_view_entry &memory_view::operator[](int slot)
 	if (i == m_entry_mapping.end()) {
 		memory_view_entry *e;
 		int id = m_entries.size();
-		// FIXME: this is also called during validation, when the running_machine and memory_manager objects don't exist
 		e = mve_make(emu::detail::handler_entry_dispatch_level(m_config->addr_width()), m_config->data_width(), m_config->addr_shift(),
-					 *m_config, m_device.machine().memory(), *this, id);
+					 *m_config, m_device.has_running_machine() ? m_device.machine().memory() : s_dummy_manager, *this, id);
 		m_entries.resize(id+1);
 		m_entries[id].reset(e);
 		m_entry_mapping[slot] = id;

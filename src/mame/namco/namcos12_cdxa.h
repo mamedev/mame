@@ -46,8 +46,11 @@ public:
 
 	void clockgen_w(offs_t offset, uint16_t data);
 
-	uint16_t cdrom_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cdrom_cs0_r(offs_t offset);
+	void cdrom_cs0_w(offs_t offset, uint16_t data);
+
+	uint16_t cdrom_cs1_r(offs_t offset);
+	void cdrom_cs1_w(offs_t offset, uint16_t data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -61,11 +64,14 @@ private:
 
 	void portb_w(uint16_t data);
 
-	uint16_t cdrom_status_flag_r(offs_t offset, uint16_t mem_mask = ~0);
-	void trigger_psx_int10_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cdrom_status_flag_r();
+	void trigger_psx_int10_w(uint16_t data);
 
-	uint16_t sh2_cdrom_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void sh2_cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sh2_cdrom_cs0_r(offs_t offset);
+	void sh2_cdrom_cs0_w(offs_t offset, uint16_t data);
+
+	uint16_t sh2_cdrom_cs1_r(offs_t offset);
+	void sh2_cdrom_cs1_w(offs_t offset, uint16_t data);
 
 	void mb87078_gain_changed(offs_t offset, uint8_t data);
 

@@ -1991,7 +1991,7 @@ private:
 
 		// make a file wrapper for the data and see if it looks like a bitmap
 		util::core_file::ptr file;
-		std::error_condition const filerr(util::core_file::open_ram(m_data.c_str(), m_data.size(), OPEN_FLAG_READ, file));
+		std::error_condition const filerr(util::core_file::open_ram(m_data.data(), m_data.size(), OPEN_FLAG_READ, file));
 		bool const bitmapdata(!filerr && file && load_bitmap(*file));
 		file.reset();
 

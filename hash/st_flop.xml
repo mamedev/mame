@@ -311,7 +311,8 @@ White screen, [68k] stalls on bootstrap
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
+"Incompatible image format or corrupted data" on mount (fixed)
+Asks for a Disk B that isn't provided when running AUTO\A_FOX.PRG
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -328,7 +329,8 @@ White screen, [68k] stalls on bootstrap
 		<year>1988</year>
 		<publisher>Addictive</publisher>
 		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
+"Incompatible image format or corrupted data" on mount (fixed)
+Blue screen hang after title
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -636,13 +638,13 @@ TODO: untested after copy protection
 		</part>
 	</software>
 
-	<software name="bluesb" supported="no">
+	<software name="bluesb" supported="yes">
 		<!-- SPS (CAPS) release 3341 -->
 		<description>The Blues Brothers (Europe)</description>
 		<year>1991</year>
 		<publisher>Titus</publisher>
 		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
+"Incompatible image format or corrupted data" on mount (fixed)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -1404,13 +1406,13 @@ Black screen
 		</part>
 	</software>
 
-	<software name="dicktr" supported="no">
+	<software name="dicktr" supported="yes">
 		<!-- SPS (CAPS) release 3340 -->
 		<description>Dick Tracy (Europe)</description>
 		<year>1990</year>
 		<publisher>Titus</publisher>
 		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
+"Incompatible image format or corrupted data" on mount (fixed)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -1820,13 +1822,13 @@ Red screen
 		</part>
 	</software>
 
-	<software name="firefor2" supported="no">
+	<software name="firefor2" supported="yes">
 		<!-- SPS (CAPS) release 3130 -->
 		<description>Fire and Forget II - The Death Convoy (Europe)</description>
 		<year>1990</year>
 		<publisher>Titus</publisher>
 		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
+"Incompatible image format or corrupted data" on mount (fixed)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -1874,23 +1876,6 @@ Red screen
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="562172">
 				<rom name="foundation's waste (europe) (budget - klassix).ipf" size="562172" crc="1c4935e3" sha1="0da037c8e8a1784d0afa7f4b8a0cd191ec1bae7a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- This is a dual disk Amiga + ST -->
-	<software name="foundwstc" cloneof="foundwst" supported="no">
-		<!-- SPS (CAPS) release 3155? -->
-		<description>Foundation's Waste (Europe, The One issue 22 coverdisk)</description>
-		<year>1990</year>
-		<publisher>&lt;coverdisk&gt;</publisher>
-		<info name="magazine" value="The One 22" />
-		<info name="release" value="199007xx" />
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1034145">
-				<rom name="foundation's waste (europe) (coverdisk - the one - issue 22) (amiga + st).ipf" size="1034145" crc="8cc8484f" sha1="c51cc0cf5005fa6f422383e7f84a00f6bac5915c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2131,8 +2116,10 @@ Unresponsive [mouse] on TOS (random)
 		<year>1989</year>
 		<publisher>Disney Software</publisher>
 		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
+"Incompatible image format or corrupted data" on mount (fixed)
+Not extensively tested, has manual copy protection
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection (figure numbers)"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2871,32 +2858,6 @@ Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
 		</part>
 	</software>
 
-<!-- This is a dual disk Amiga + ST -->
-	<software name="lxcess" supported="no">
-		<!-- SPS (CAPS) release 3058 -->
-		<description>Lethal Xcess (Europe)</description>
-		<year>1991</year>
-		<publisher>Eclipse</publisher>
-		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
-]]></notes>
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1004597">
-				<rom name="lethal xcess - wings of death ii (europe) (amiga + st) (disk a).ipf" size="1004597" crc="33cc029d" sha1="54a268710716f3510918cd8767d9d248798c4ed0" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1008380">
-				<rom name="lethal xcess - wings of death ii (europe) (amiga + st) (disk b).ipf" size="1008380" crc="7c53b994" sha1="8b8cefdb0dbd7e4a515c95235526ed909fe499c7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="leviathan" supported="no">
 		<description>Leviathan (Europe)</description>
 		<year>1987</year>
@@ -3267,24 +3228,6 @@ Pauses itself when pressing fire on joystick during gameplay (?)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="517822">
 				<rom name="mission genocide (europe).ipf" size="517822" crc="060d37dc" sha1="e105683beeaa7bbdd06520fcb3923b11def5a4dd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- This is a dual disk Amiga + ST -->
-	<software name="monstbus" supported="no">
-		<!-- SPS (CAPS) release 3032 -->
-		<description>Monster Business (Europe)</description>
-		<year>1991</year>
-		<publisher>Eclipse</publisher>
-		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
-]]></notes>
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1009109">
-				<rom name="monster business (europe) (amiga + st).ipf" size="1009109" crc="be6095a0" sha1="c6d0706c363f3fd7f5e40864b49568ac9e157c8b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3810,21 +3753,6 @@ Hangs after title screen with a broken icon in the middle.
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="468252">
 				<rom name="police quest - in pursuit of the death angel (europe) (v2.0g 12.3.87) (disk 3).ipf" size="468252" crc="ffddfa40" sha1="c9759deff7b74807b21b8585e65cd94fab768bd9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="populopl" supported="no">
-		<!-- SPS (CAPS) release 3024 -->
-		<description>Populous - The Promised Lands (Europe)</description>
-		<year>1989</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="usage" value="Requires &quot;Populous&quot; to work" />
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1037012">
-				<rom name="populous - the promised lands (europe) (addon) (amiga + st).ipf" size="1037012" crc="de09f0a3" sha1="21301177eb04122183aa716c081e8a4fda35cff8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4499,21 +4427,6 @@ Random hangs, cfr. sharrier
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="517820">
 				<rom name="starglider (europe).ipf" size="517820" crc="b0472c8c" sha1="aae5e32c2bbd5c31631d65da238d947d1a749c5c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- This is a dual disk Amiga + ST -->
-	<software name="stargld2" supported="no">
-		<!-- SPS (CAPS) release 3000 -->
-		<description>Starglider 2 (Europe)</description>
-		<year>1988</year>
-		<publisher>Rainbird</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1019021">
-				<rom name="starglider 2 (europe) (en,fr,de) (amiga + st).ipf" size="1019021" crc="ed38c67f" sha1="c2cb4b2f517e2f20205577b8ba16331920660160" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5454,14 +5367,15 @@ Randomly hangs after few seconds in gameplay or doesn't recognize fire button on
 		</part>
 	</software>
 
-	<software name="wildstrt" supported="no">
+	<software name="wildstrt" supported="yes">
 		<!-- SPS (CAPS) release 3182 -->
 		<description>Wild Streets (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Fox Hits</publisher>
 		<notes><![CDATA[
-"Incompatible image format or corrupted data" on mount
+"Incompatible image format or corrupted data" on mount (fixed)
 ]]></notes>
+		<info name="usage" value="F5 key will kill player in gameplay"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">

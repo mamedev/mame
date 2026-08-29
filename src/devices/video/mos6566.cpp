@@ -14,13 +14,14 @@
     TODO:
 
     - cleanup
-    - http://hitmen.c02.at/temp/palstuff/
+    - https://hitmen.c02.at/temp/palstuff/
 
 */
 
 #include "emu.h"
 #include "mos6566.h"
 
+#include "cpu/m6502/m6502.h"
 #include "screen.h"
 
 
@@ -126,7 +127,7 @@ static const rgb_t PALETTE_MOS[] =
 		} \
 	} while (0)
 
-#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8569))
+#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 #define IS_VICIIE               ((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 
 #define ROW25_YSTART      0x33
@@ -312,7 +313,6 @@ inline void mos6566_device::spr_ba(int num)
 	if (BIT(m_spr_dma_on, num))
 	{
 		set_ba(CLEAR_LINE);
-		m_rdy_cycles += 2;
 	}
 	else if (num > 1 && !BIT(m_spr_dma_on, num - 1))
 	{
@@ -368,7 +368,6 @@ inline void mos6566_device::bad_line_ba()
 		if (m_ba)
 		{
 			set_ba(CLEAR_LINE);
-			m_rdy_cycles += 55 - m_cycle;
 		}
 	}
 	else
@@ -828,7 +827,6 @@ void mos6566_device::device_reset()
 	m_ba = CLEAR_LINE;
 	m_aec = CLEAR_LINE;
 	m_aec_delay = 0xff;
-	m_rdy_cycles = 0;
 
 	set_ba(ASSERT_LINE);
 	set_aec(ASSERT_LINE);
@@ -843,9 +841,6 @@ void mos6566_device::execute_run()
 {
 	do
 	{
-		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
-		uint8_t vic_cycles = total_cycles() & 0xff;
-
 		m_phi0 = 0;
 
 		m_aec_delay <<= 1;
@@ -894,6 +889,8 @@ void mos6566_device::execute_run()
 				m_rasterline = m_vc_base = 0;
 				m_ref_cnt = 0xff;
 				m_vblanking = 0;
+
+				m_bad_lines_enabled = 0;
 
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
@@ -1414,12 +1411,6 @@ void mos6566_device::execute_run()
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
 
-		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
-		{
-			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
-			m_rdy_cycles = 0;
-		}
-
 		m_icount--;
 	} while (m_icount > 0);
 }
@@ -1433,9 +1424,6 @@ void mos6569_device::execute_run()
 {
 	do
 	{
-		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
-		uint8_t vic_cycles = total_cycles() & 0xff;
-
 		m_phi0 = 0;
 
 		m_aec_delay <<= 1;
@@ -1486,6 +1474,8 @@ void mos6569_device::execute_run()
 				m_rasterline = m_vc_base = 0;
 				m_ref_cnt = 0xff;
 				m_vblanking = 0;
+
+				m_bad_lines_enabled = 0;
 
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
@@ -1984,12 +1974,6 @@ void mos6569_device::execute_run()
 
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
-
-		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
-		{
-			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
-			m_rdy_cycles = 0;
-		}
 
 		m_icount--;
 	} while (m_icount > 0);
@@ -2737,7 +2721,7 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 		{
 			if (BIT(m_reg[offset], 0) != BIT(data, 0))
 			{
-				m_cpu->set_unscaled_clock(clock() << BIT(data, 0));
+				m_cpu->set_unscaled_clock((clock() / 8) << BIT(data, 0));
 			}
 
 			m_reg[offset] = data | 0xfc;

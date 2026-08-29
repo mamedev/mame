@@ -699,6 +699,18 @@ cd32: inputs are quite uncontrollable, most notably with raising bets (verify)
 		</part>
 	</software>
 
+	<!-- From TOSEC release -->
+	<software name="covgrlsp_dk" cloneof="covgrlsp" supported="yes">
+		<description>Cover Girl Strip Poker (Danish, Swedish, Norwegian)</description>
+		<year>1992</year>
+		<publisher>Emotional Pictures</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="covergirlstrippoker_dk" sha1="07f7dc6a30b6b662adc03297255018970edbf29c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="cubulus" supported="no">
 		<description>Cubulus &amp; Magic Serpent</description>
 		<year>1991</year>

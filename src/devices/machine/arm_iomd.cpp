@@ -22,7 +22,19 @@ TODO:
 #include "emu.h"
 #include "arm_iomd.h"
 
+#include "bus/pc_kbd/keyboards.h"
 
+enum keyboard_status_register : u8
+{
+	KSR_KCI = 0x01, // keyboard clock in
+	KSR_KDI = 0x02, // keyboard data in
+	KSR_RXP = 0x04, // parity bit in
+	KSR_ENA = 0x08, // enable
+	KSR_RXB = 0x10, // receiver busy
+	KSR_RXF = 0x20, // receiver full
+	KSR_TXB = 0x40, // transmitter busy
+	KSR_TXE = 0x80, // transmitter empty
+};
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -58,9 +70,9 @@ void arm_iomd_device::base_map(address_map &map)
 	map(0x024, 0x027).rw(FUNC(arm_iomd_device::irqrq_r<IRQB>), FUNC(arm_iomd_device::irqrq_w<IRQB>));
 	map(0x028, 0x02b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQB>), FUNC(arm_iomd_device::irqmsk_w<IRQB>));
 
-//  map(0x030, 0x033).r(FUNC(arm_iomd_device::fiqst_r));
-//  map(0x034, 0x037).rw(FUNC(arm_iomd_device::fiqrq_r), FUNC(arm_iomd_device::fiqrq_w));
-//  map(0x038, 0x03b).rw(FUNC(arm_iomd_device::fiqmsk_r), FUNC(arm_iomd_device::fiqmsk_w));
+	map(0x030, 0x033).r(FUNC(arm_iomd_device::fiqst_r));
+	map(0x034, 0x037).rw(FUNC(arm_iomd_device::fiqrq_r), FUNC(arm_iomd_device::fiqrq_w));
+	map(0x038, 0x03b).rw(FUNC(arm_iomd_device::fiqmsk_r), FUNC(arm_iomd_device::fiqmsk_w));
 
 	// timers
 	map(0x040, 0x043).rw(FUNC(arm_iomd_device::tNlow_r<0>), FUNC(arm_iomd_device::tNlow_w<0>));
@@ -143,11 +155,13 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
-	, m_kbdc(*this, finder_base::DUMMY_TAG)
+	, m_ssrt(*this, "ssrt")
 	, m_iocr_read_od_cb(*this, 1)
 	, m_iocr_write_od_cb(*this)
 	, m_iocr_read_id_cb(*this, 1)
 	, m_iocr_write_id_cb(*this)
+	, m_irq_cb(*this)
+	, m_fiq_cb(*this)
 	, m_sndcur(0)
 	, m_sndend(0)
 	, m_sndcur_reg{ 0, 0 }
@@ -186,7 +200,7 @@ void arm7500fe_iomd_device::map(address_map &map)
 	map(0x078, 0x07b).rw(FUNC(arm7500fe_iomd_device::irqmsk_r<IRQD>), FUNC(arm7500fe_iomd_device::irqmsk_w<IRQD>));
 
 	// PS/2 mouse
-//  map(0x0a8, 0x0ab).rw(FUNC(arm7500fe_iomd_device::msedat_r), FUNC(arm7500fe_iomd_device::msedat_w));
+	map(0x0a8, 0x0ab).rw(FUNC(arm7500fe_iomd_device::msedat_r), FUNC(arm7500fe_iomd_device::msedat_w));
 	map(0x0ac, 0x0af).rw(FUNC(arm7500fe_iomd_device::msecr_r), FUNC(arm7500fe_iomd_device::msecr_w));
 	// I/O control
 //  map(0x0cc, 0x0cf).rw(FUNC(arm7500fe_iomd_device::astcr_r), FUNC(arm7500fe_iomd_device::astcr_w));
@@ -226,14 +240,19 @@ arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, cons
 
 void arm_iomd_device::device_add_mconfig(machine_config &config)
 {
-	//DEVICE(config, ...);
-	//TODO: keyboard and mouse interfaces at very least, also they differs by device type
+	//TODO: hookup mouse quadrature interface here ...
+
+	AT_SSRT(config, m_ssrt);
+	m_ssrt->rp().set(FUNC(arm_iomd_device::kbd_rxp_w));
+	m_ssrt->rx().set(FUNC(arm_iomd_device::kbd_rxf_w));
+	m_ssrt->tx().set(FUNC(arm_iomd_device::kbd_txe_w));
 }
 
 void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 {
-	//DEVICE(config, ...);
-	//TODO: above plus new sub-devices
+	arm_iomd_device::device_add_mconfig(config);
+
+	//TODO: ... replace quadrature mouse with AUX PS/2
 }
 
 //-------------------------------------------------
@@ -243,6 +262,7 @@ void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 void arm_iomd_device::device_start()
 {
 	save_item(NAME(m_iocr_ddr));
+	save_item(NAME(m_kbdsr));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vidinita));
 	save_item(NAME(m_vidend));
@@ -250,8 +270,10 @@ void arm_iomd_device::device_start()
 	save_item(NAME(m_videqual));
 	save_item(NAME(m_cursor_enable));
 	save_item(NAME(m_cursinit));
-	save_pointer(NAME(m_irq_mask), std::size(m_irq_mask));
-	save_pointer(NAME(m_irq_status), std::size(m_irq_status));
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_irq_status));
+	save_item(NAME(m_fiq_mask));
+	save_item(NAME(m_fiq_status));
 
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
@@ -305,6 +327,8 @@ void arm_iomd_device::device_reset()
 	for (int i = 0; i < std::size(m_timer); i++)
 		m_timer[i]->adjust(attotime::never);
 
+	m_kbdsr = 0;
+
 	m_sndcur = 0;
 	m_sndend = 0;
 	std::fill_n(m_sndcur_reg, std::size(m_sndcur_reg), 0);
@@ -315,6 +339,8 @@ void arm_iomd_device::device_reset()
 	m_sound_dma_on = false;
 	m_sndcur_buffer = 0;
 
+	m_fiq_status = 0x80;
+	m_fiq_mask = 0;
 	// ...
 }
 
@@ -337,7 +363,6 @@ TIMER_CALLBACK_MEMBER(arm_iomd_device::timer_elapsed)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-// TODO: nINT1
 u32 arm_iomd_device::iocr_r()
 {
 	u8 res = 0;
@@ -346,7 +371,8 @@ u32 arm_iomd_device::iocr_r()
 	res|= m_iocr_read_od_cb[1]() << 1;
 	res|= m_iocr_read_od_cb[0]() << 0;
 
-	return (m_vidc->flyback_r() << 7) | 0x34 | (res & m_iocr_ddr);
+	// bit 6 routes to nINT1 readback (the FDC index one)
+	return (m_vidc->flyback_r() << 7) | (BIT(m_irq_status[IRQA], 2) << 6) | 0x34 | (res & m_iocr_ddr);
 }
 
 void arm_iomd_device::iocr_w(u32 data)
@@ -357,44 +383,104 @@ void arm_iomd_device::iocr_w(u32 data)
 	m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
 }
 
-u32 arm_iomd_device::kbddat_r()
-{
-	if (m_kbdc.found())
-		return m_kbdc->data_r();
-
-	logerror("%s attempted to read kbddat with no controller\n", this->tag());
-	return 0xff;
-}
-
 u32 arm_iomd_device::kbdcr_r()
 {
-	if (m_kbdc.found())
-		return m_kbdc->status_r();
+	u32 data = m_kbdsr;
 
-	logerror("%s attempted to read kbdcr with no controller\n", this->tag());
-	return 0xff;
+	if (m_ssrt->rx_busy())
+		data |= KSR_RXB;
+	if (m_ssrt->tx_busy())
+		data |= KSR_TXB;
+
+	return data;
+}
+
+u32 arm_iomd_device::kbddat_r()
+{
+	return u32(m_ssrt->data_r());
 }
 
 void arm_iomd_device::kbddat_w(u32 data)
 {
-	if (m_kbdc.found())
-	{
-		m_kbdc->data_w(data & 0xff);
-		return;
-	}
-
-	logerror("%s attempted to write %02x on kbddat with no controller\n", this->tag(),data & 0xff);
+	m_ssrt->data_w(u8(data));
 }
 
 void arm_iomd_device::kbdcr_w(u32 data)
 {
-	if (m_kbdc.found())
+	if (!(m_kbdsr & KSR_ENA) && (data & KSR_ENA))
 	{
-		m_kbdc->command_w(data & 0xff);
-		return;
+		m_kbdsr |= KSR_TXE | KSR_ENA;
+		trigger_irq<IRQB>(0x40);
 	}
 
-	logerror("%s attempted to write %02x on kbdcr with no controller\n", this->tag(),data & 0xff);
+	m_kbdsr = (m_kbdsr & ~KSR_ENA) | (data & KSR_ENA);
+}
+
+void arm_iomd_device::kclk_w(int state)
+{
+	if (state)
+		m_kbdsr |= KSR_KCI;
+	else
+		m_kbdsr &= ~KSR_KCI;
+
+	m_ssrt->clk_w(state);
+}
+
+void arm_iomd_device::kdata_w(int state)
+{
+	if (state)
+		m_kbdsr |= KSR_KDI;
+	else
+		m_kbdsr &= ~KSR_KDI;
+
+	m_ssrt->rxd_w(state);
+}
+
+void arm_iomd_device::kbd_rxp_w(int state)
+{
+	if (state)
+		m_kbdsr |= KSR_RXP;
+	else
+		m_kbdsr &= ~KSR_RXP;
+}
+
+void arm_iomd_device::kbd_rxf_w(int state)
+{
+	if (state)
+	{
+		m_kbdsr |= KSR_RXF;
+		trigger_irq<IRQB>(0x80);
+	}
+	else
+	{
+		m_kbdsr &= ~KSR_RXF;
+		irqrq_w<IRQB>(0x80);
+	}
+}
+
+void arm_iomd_device::kbd_txe_w(int state)
+{
+	if (state)
+	{
+		m_kbdsr |= KSR_TXE;
+		trigger_irq<IRQB>(0x40);
+	}
+	else
+	{
+		m_kbdsr &= ~KSR_TXE;
+		irqrq_w<IRQB>(0x40);
+	}
+}
+
+u32 arm7500fe_iomd_device::msedat_r()
+{
+	// a7000p -bios 2 wants at least pulling high at startup
+	return u32(0xff);
+}
+
+void arm7500fe_iomd_device::msedat_w(u32 data)
+{
+	// ...
 }
 
 u32 arm7500fe_iomd_device::msecr_r()
@@ -427,17 +513,20 @@ inline u8 arm_iomd_device::update_irqa_type(u8 data)
 
 // interrupts
 
-inline void arm_iomd_device::flush_irq(unsigned Which)
+inline void arm_iomd_device::flush_irq()
 {
-	// TODO: use external setters, don't use pulse_input_line
-	if (m_irq_status[Which] & m_irq_mask[Which])
-		m_host_cpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_host_cpu->minimum_quantum_time());
+	// collect irq from all sources, not necessarily the caller
+	int irq_output = 0;
+	for (unsigned i = IRQA; i < IRQ_SOURCES_SIZE; i++)
+		irq_output |= !!(m_irq_status[i] & m_irq_mask[i]);
+
+	m_irq_cb(irq_output);
 }
 
 template <unsigned Which> inline void arm_iomd_device::trigger_irq(u8 irq_type)
 {
 	m_irq_status[Which] |= irq_type;
-	flush_irq(Which);
+	flush_irq();
 }
 
 template <unsigned Which> u32 arm_iomd_device::irqst_r()
@@ -461,13 +550,54 @@ template <unsigned Which> void arm_iomd_device::irqrq_w(u32 data)
 	if (Which == IRQA)
 		res = update_irqa_type(res);
 	m_irq_status[Which] = res;
-	flush_irq(Which);
+	flush_irq();
 }
 
 template <unsigned Which> void arm_iomd_device::irqmsk_w(u32 data)
 {
 	m_irq_mask[Which] = data & 0xff;
-	flush_irq(Which);
+	flush_irq();
+}
+
+void arm_iomd_device::flush_fiq()
+{
+	m_fiq_cb(!!(m_fiq_status & m_fiq_mask));
+}
+
+void arm_iomd_device::trigger_fiq(u8 irq_type)
+{
+	m_fiq_status |= irq_type;
+	flush_fiq();
+}
+
+u32 arm_iomd_device::fiqst_r()
+{
+	return m_fiq_status;
+}
+
+u32 arm_iomd_device::fiqrq_r()
+{
+	return m_fiq_status & m_fiq_mask;
+}
+
+u32 arm_iomd_device::fiqmsk_r()
+{
+	return m_fiq_mask;
+}
+
+void arm_iomd_device::fiqrq_w(u32 data)
+{
+	u8 res = m_fiq_status & ~data;
+	m_fiq_status = res;
+	// bit 7 is FIQ force
+	m_fiq_status |= 0x80;
+	flush_fiq();
+}
+
+void arm_iomd_device::fiqmsk_w(u32 data)
+{
+	m_fiq_mask = data & 0xff;
+	flush_fiq();
 }
 
 // master clock control
@@ -492,25 +622,30 @@ void arm7500fe_iomd_device::clkctl_w(u32 data)
 // timers
 inline void arm_iomd_device::trigger_timer(unsigned Which)
 {
-	int timer_count = m_timer_counter[Which];
-	// TODO: it's actually a 2 MHz timer
-	int val = timer_count / 2;
+	int count = m_timer_counter[Which];
 
-	if(val==0)
+	if(count == 0)
 		m_timer[Which]->adjust(attotime::never);
 	else
-		m_timer[Which]->adjust(attotime::from_usec(val), Which ? 0x40 : 0x20, attotime::from_usec(val));
+	{
+		attotime sample_period = attotime::from_ticks(count, XTAL(2'000'000));
+
+		m_timer[Which]->adjust(sample_period, Which ? 0x40 : 0x20, sample_period);
+	}
 }
 
-// TODO: live updates aren't really supported here
+// TODO: not extensively tested
+// just enough to make a7000p -bios 2 to not hang at startup with timer 1
 template <unsigned Which> u32 arm_iomd_device::tNlow_r()
 {
-	return m_timer_out[Which] & 0xff;
+	return m_timer[Which]->elapsed().as_ticks(XTAL(2'000'000)) & 0xff;
+	//  return m_timer_out[Which] & 0xff;
 }
 
 template <unsigned Which> u32 arm_iomd_device::tNhigh_r()
 {
-	return (m_timer_out[Which] >> 8) & 0xff;
+	return (m_timer[Which]->elapsed().as_ticks(XTAL(2'000'000)) >> 8) & 0xff;
+	//  return (m_timer_out[Which] >> 8) & 0xff;
 }
 
 template <unsigned Which> void arm_iomd_device::tNlow_w(u32 data)
@@ -554,8 +689,17 @@ u32 arm_iomd_device::version_r()
 
 // sound DMA
 
+// TODO: shouldn't be read-backable
 template <unsigned Which> u32 arm_iomd_device::sdcur_r() { return m_sndcur_reg[Which]; }
-template <unsigned Which> void arm_iomd_device::sdcur_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_sndcur_reg[Which]); }
+
+template <unsigned Which> void arm_iomd_device::sdcur_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_sndcur_reg[Which]);
+	m_sndbuffer_ok[Which] = true;
+	irqrq_w<IRQDMA>(0x10);
+}
+
+// TODO: shouldn't be read-backable
 template <unsigned Which> u32 arm_iomd_device::sdend_r()
 {
 	return (m_sndstop_reg[Which] << 31) | (m_sndlast_reg[Which] << 30) | (m_sndend_reg[Which] & 0x00fffff0);
@@ -568,6 +712,7 @@ template <unsigned Which> void arm_iomd_device::sdend_w(offs_t offset, u32 data,
 	m_sndstop_reg[Which] = BIT(data, 31);
 	m_sndlast_reg[Which] = BIT(data, 30);
 	m_sndbuffer_ok[Which] = true;
+	irqrq_w<IRQDMA>(0x10);
 }
 
 u32 arm_iomd_device::sdcr_r()
@@ -723,12 +868,14 @@ void arm_iomd_device::sound_drq(int state)
 			return;
 
 		for (int ch = 0; ch < 2; ch++)
-			m_vidc->write_dac32(ch, (m_host_space->read_word(m_sndcur + ch*2)));
+			m_vidc->write_dac32(ch, (m_host_space->read_word(m_sndcur + ch * 2)));
 
 		m_sndcur += 4;
 
 		if (m_sndcur >= m_sndend)
 		{
+			trigger_irq<IRQDMA>(0x10);
+
 			m_vidc->update_sound_mode(m_sound_dma_on);
 			if (m_sound_dma_on)
 			{
@@ -738,28 +885,73 @@ void arm_iomd_device::sound_drq(int state)
 			}
 			else
 			{
-				// ...
+				// TODO: disable sound
 			}
 		}
 	}
 	else
 	{
-		// ...
+		// TODO: VIDC10 compatible mode
 	}
 }
 
-void arm_iomd_device::keyboard_irq(int state)
-{
-	printf("IRQ %d\n",state);
-	if (!state)
-		return;
+// Misc public interrupts
 
-	trigger_irq<IRQB>(0x80);
+// Parallel port
+void arm_iomd_device::int2_w(int state)
+{
+	if (state)
+		trigger_irq<IRQA>(0x01);
+	else
+		irqrq_w<IRQA>(0x01);
 }
 
-void arm_iomd_device::keyboard_reset(int state)
+// FDC index
+// TODO: ARM7500FE claims active low (nINT1)
+void arm_iomd_device::int1_w(int state)
 {
-	printf("RST %d\n",state);
+	if (state)
+		trigger_irq<IRQA>(0x04);
+	else
+		irqrq_w<IRQA>(0x04);
 }
 
+// IDE
+void arm_iomd_device::int7_w(int state)
+{
+	if (state)
+		trigger_irq<IRQB>(0x02);
+	else
+		irqrq_w<IRQB>(0x02);
+}
 
+// Serial
+// TODO: ARM7500FE claims active low (nINT6)
+void arm_iomd_device::int6_w(int state)
+{
+	if (state)
+		trigger_irq<IRQB>(0x04);
+	else
+		irqrq_w<IRQB>(0x04);
+}
+
+// FDC irq
+// TODO: ARM7500FE claims active low (nINT4)
+void arm_iomd_device::int4_w(int state)
+{
+	if (state)
+		trigger_irq<IRQB>(0x10);
+	else
+		irqrq_w<IRQB>(0x10);
+}
+
+// FIQ related
+
+// Floppy DRQ
+void arm_iomd_device::int9_w(int state)
+{
+	if (state)
+		trigger_fiq(0x01);
+	else
+		fiqrq_w(0x01);
+}

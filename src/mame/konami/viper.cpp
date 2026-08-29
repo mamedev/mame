@@ -1256,7 +1256,7 @@ uint64_t viper_state::cf_card_data_r(offs_t offset, uint64_t mem_mask)
 		switch (offset & 0xf)
 		{
 			case 0x8:   // Duplicate Even RD Data
-				r |= m_ata->cs0_r(0, mem_mask >> 16) << 16;
+				r |= m_ata->cs0_r(0) << 16;
 				break;
 
 			default:
@@ -1273,7 +1273,7 @@ void viper_state::cf_card_data_w(offs_t offset, uint64_t data, uint64_t mem_mask
 		switch (offset & 0xf)
 		{
 			case 0x8:   // Duplicate Even RD Data
-				m_ata->cs0_w(0, data >> 16, mem_mask >> 16);
+				m_ata->cs0_w(0, data >> 16);
 				break;
 
 			default:
@@ -1300,18 +1300,18 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 				case 0x5:   // Cylinder High
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Status
-					r |= m_ata->cs0_r(offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->cs0_r(offset & 7) << 16;
 					break;
 
 				//case 0x8: // Duplicate Even RD Data
 				//case 0x9: // Duplicate Odd RD Data
 
 				case 0xd:   // Duplicate Error
-					r |= m_ata->cs0_r(1, mem_mask >> 16) << 16;
+					r |= m_ata->cs0_r(1) << 16;
 					break;
 				case 0xe:   // Alt Status
 				case 0xf:   // Drive Address
-					r |= m_ata->cs1_r(offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->cs1_r(offset & 7) << 16;
 					break;
 
 				default:
@@ -1355,18 +1355,18 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				case 0x5:   // Cylinder High
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Command
-					m_ata->cs0_w(offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->cs0_w(offset & 7, data >> 16);
 					break;
 
 				//case 0x8: // Duplicate Even WR Data
 				//case 0x9: // Duplicate Odd WR Data
 
 				case 0xd:   // Duplicate Features
-					m_ata->cs0_w(1, data >> 16, mem_mask >> 16);
+					m_ata->cs0_w(1, data >> 16);
 					break;
 				case 0xe:   // Device Ctl
 				case 0xf:   // Reserved
-					m_ata->cs1_w(offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->cs1_w(offset & 7, data >> 16);
 					break;
 
 				default:
@@ -1415,10 +1415,10 @@ uint64_t viper_state::ata_r(offs_t offset, uint64_t mem_mask)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			r |= m_ata->cs0_r(reg, mem_mask >> 16) << 16;
+			r |= m_ata->cs0_r(reg) << 16;
 			break;
 		case 0x80:
-			r |= m_ata->cs1_r(reg, mem_mask >> 16) << 16;
+			r |= m_ata->cs1_r(reg) << 16;
 			break;
 		}
 	}
@@ -1435,10 +1435,10 @@ void viper_state::ata_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			m_ata->cs0_w(reg, data >> 16, mem_mask >> 16);
+			m_ata->cs0_w(reg, data >> 16);
 			break;
 		case 0x80:
-			m_ata->cs1_w(reg, data >> 16, mem_mask >> 16);
+			m_ata->cs1_w(reg, data >> 16);
 			break;
 		}
 	}

@@ -33,7 +33,6 @@
 #include "screen.h"
 #include "softlist.h"
 
-#include "formats/flopimg.h"
 #include "strformat.h"
 
 #include <iostream>
@@ -624,19 +623,12 @@ uint32_t next_state::fdc_control_r()
 	if(fdc) {
 		floppy_image_device *fdev = floppy0->get_device();
 		if(fdev->exists()) {
-			uint32_t variant = fdev->get_variant();
-			switch(variant) {
-			case floppy_image::SSSD:
-			case floppy_image::SSDD:
-			case floppy_image::DSDD:
-				return 3 << 24;
-
-			case floppy_image::DSHD:
-				return 2 << 24;
-
-			case floppy_image::DSED:
+			if(fdev->floppy_is_ed())
 				return 1 << 24;
-			}
+			else if(fdev->floppy_is_hd())
+				return 2 << 24;
+			else
+				return 3 << 24;
 		}
 	}
 

@@ -90,6 +90,7 @@ void m6502_device::init()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_apu_irq_state));
 	save_item(NAME(m_v_state));
+	save_item(NAME(m_rdy_state));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_taken));
 	save_item(NAME(m_inst_state));
@@ -115,6 +116,7 @@ void m6502_device::init()
 	m_irq_state = false;
 	m_apu_irq_state = false;
 	m_v_state = false;
+	m_rdy_state = true;
 	m_nmi_pending = false;
 	m_irq_taken = false;
 	m_inst_state = STATE_RESET;
@@ -425,6 +427,9 @@ void m6502_device::execute_set_input(int inputnum, int state)
 		if(!m_v_state && state == ASSERT_LINE && total_cycles())
 			m_P |= F_V;
 		m_v_state = state == ASSERT_LINE;
+		break;
+	case RDY_LINE:
+		m_rdy_state = state == ASSERT_LINE;
 		break;
 	}
 }

@@ -121,6 +121,11 @@ void mesh_device::device_reset()
 
 	update_lines();
 	update_drq();
+
+	// update any external listeners to the status lines (e.g. DBDMA)
+	m_cmd_done_handler(m_cmd_done_line);
+	m_error_handler(m_error_line);
+	m_exception_handler(m_exception_line);
 }
 
 void mesh_device::scsi_ctrl_changed()
@@ -463,7 +468,7 @@ void mesh_device::finish_exception(u8 mask)
 	m_timer->reset();
 	m_state = sequence_state::IDLE;
 	m_exception |= mask;
-	m_cmd_done = false;
+	m_cmd_done = true;
 	update_lines();
 	update_drq();
 }

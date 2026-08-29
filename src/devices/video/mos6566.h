@@ -280,7 +280,6 @@ protected:
 	int m_ba;
 	int m_aec;
 	uint8_t m_aec_delay;
-	int m_rdy_cycles;
 
 	uint8_t m_reg[0x80];
 

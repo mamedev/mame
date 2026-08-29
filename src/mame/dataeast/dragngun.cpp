@@ -109,7 +109,7 @@ from Dragon Gun.
 #include "decocrpt.h"
 #include "namco_c355spr.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
@@ -995,7 +995,7 @@ void dragngun_state::namco_sprites(machine_config &config)
 void dragngun_state::dragngun(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE101(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::dragngun_map);
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3)); // assume same as captaven
@@ -1003,7 +1003,7 @@ void dragngun_state::dragngun(machine_config &config)
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
-	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", arm7_cpu_device::ARM7_IRQ_LINE);
 
 	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
@@ -1114,10 +1114,10 @@ void dragngun_state::lockloadu(machine_config &config)
 void dragngun_state::lockload(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE101(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_map);
 
-	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", arm7_cpu_device::ARM7_IRQ_LINE);
 
 	Z80(config, m_audiocpu, 32.22_MHz_XTAL / 9);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dragngun_state::z80_sound_map);

@@ -1,31 +1,58 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 // thanks-to: Tomasz Slanina, Sarah Walker
-/***************************************************************************
+/**************************************************************************************************
 
-    Acorn RiscPC line of computers
+Acorn RiscPC line of computers
 
-    TODO:
-    - IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about
-      which uses what;
-    - PS/2 keyboard doesn't work properly;
-    - Fix pendingUnd fatalerror from ARM7 core;
-    - Fix pendingAbtD fatalerror for RiscOS 4.xx;
+TODO:
+- a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
 
-****************************************************************************/
+TODO (a7000p -bios 2):
+- Hangs at boot with no harddisk (strike ESC key several times until Boot menu appears,
+  then disable it in Configure machine item);
+- In turn above seems too slow to catch up (verify);
+- Verify floppy hookup (seems working but perhaps one too many OS failures along the way);
+- CD throws "CD drive not ready or disc not present" when mounted
+  (NOTE: needs filesystem changed to CDFS in Configure machine)
+- Serial mouse doesn't work even if selected;
+- No VIDC10 sound even if configured in games;
 
+Notes:
+- List of compatible RiscPC SWs at:
+https://arcwiki.org.uk/index.php?title=Category:Software_compatible_with_the_RiscPC&pageuntil=Minus+4#mw-pages
+- CTRL + F12 brings a Task window in RISCOS 4 in Desktop
+- https://www.riscosopen.org/wiki/documentation/show/CLI%20Basics%20part%201#TOC1
+- "Configure SoundSystem 8bit" to attempt using older VIDC10 sound system;
+
+**************************************************************************************************/
 #include "emu.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
+#include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
-#include "machine/at_keybc.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
+#include "machine/input_merger.h"
+
+#include "formats/acorn_dsk.h"
+#include "formats/apd_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/jfd_dsk.h"
+#include "formats/st_dsk.h"
+
+#include "imagedev/floppy.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-#include "debugger.h"
 
 
 namespace {
@@ -38,9 +65,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
+		, m_superio(*this, "superio")
+		, m_ide(*this, "ide%u", 1U)
+		, m_kbdc(*this, "kbdc")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
-		, m_kbdc(*this, "kbdc")
 		, m_mouse(*this, "MOUSE")
 	{ }
 
@@ -56,10 +85,12 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
-	required_device<arm7500fe_iomd_device> m_iomd;
+	required_device<arm_iomd_device> m_iomd;
+	required_device<fdc37c665gt_device> m_superio;
+	required_device_array<ata_interface_device, 2> m_ide;
+	required_device<pc_kbdc_device> m_kbdc;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
-	required_device<ps2_keyboard_controller_device> m_kbdc;
 	required_ioport m_mouse;
 
 	virtual void machine_reset() override ATTR_COLD;
@@ -73,6 +104,10 @@ private:
 	int iocr_od1_r();
 	void iocr_od0_w(int state);
 	void iocr_od1_w(int state);
+
+	TIMER_CALLBACK_MEMBER(tc_zero_tick);
+
+	emu_timer *m_tc_zero_timer = nullptr;
 };
 
 int riscpc_state::iocr_od1_r()
@@ -97,6 +132,11 @@ void riscpc_state::iocr_od1_w(int state)
 	m_i2cmem->write_scl(state == true ? 1 : 0);
 }
 
+TIMER_CALLBACK_MEMBER(riscpc_state::tc_zero_tick)
+{
+	m_superio->fdc_tc_w(0);
+}
+
 void riscpc_state::a7000_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
@@ -104,16 +144,38 @@ void riscpc_state::a7000_map(address_map &map)
 	//
 //  map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
 //  I/O 03000000 - 033fffff
-//  AM_RANGE(0x03010000, 0x03011fff) //Super IO
-//  AM_RANGE(0x03012000, 0x03029fff) //FDC
-//  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
-//  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
-//  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
+	// NOTE: 0x1fff >> 2 = 0x7ff, the upper $400 used for LPTx ECP regs
+	map(0x03010000, 0x03011fff).rw(m_superio, FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0x000000ff);
+//  map(0x03012000, 0x0302afff) //FDC DMA space
+	map(0x03012000, 0x03029fff).rw(m_superio, FUNC(fdc37c665gt_device::fdc_dma_r), FUNC(fdc37c665gt_device::fdc_dma_w)).umask32(0x000000ff);
+	map(0x0302a000, 0x0302afff).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = m_superio->fdc_dma_r(0);
+			if (!machine().side_effects_disabled())
+			{
+				m_superio->fdc_tc_w(1);
+				// TODO: accurate timing, same as below
+				m_tc_zero_timer->reset();
+				m_tc_zero_timer->adjust(attotime::from_usec(50));
+			}
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_superio->fdc_dma_w(0, data);
+			m_superio->fdc_tc_w(1);
+			m_tc_zero_timer->reset();
+			m_tc_zero_timer->adjust(attotime::from_usec(50));
+		})
+	).umask32(0x000000ff);
+//  map(0x0302b000, 0x0302bfff) //Network podule
+//  map(0x03040000, 0x0304ffff) //podule space 0,1,2,3
+//  map(0x03070000, 0x0307ffff) //podule space 4,5,6,7
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
 	map(0x03310000, 0x03310003).portr(m_mouse);
+//  map(0x033a0004, 0x033a0004) // topbanan, joystick?
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
-//  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
+//  map(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
 
 	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
@@ -130,14 +192,13 @@ void riscpc_state::riscpc_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( a7000 )
-//  PORT_INCLUDE( at_keyboard )
-
 	PORT_START("MOUSE")
 	// for debugging we leave video and sound HWs as options, eventually slotify them
 	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
 	PORT_CONFSETTING(    0x00, "VGA" )
 	PORT_CONFSETTING(    0x01, "TV Screen" )
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	// TODO: unmap for non-quadrature mouse variants
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)
@@ -153,33 +214,62 @@ INPUT_PORTS_END
 
 void riscpc_state::machine_start()
 {
-	// ...
+	m_tc_zero_timer = timer_alloc(FUNC(riscpc_state::tc_zero_tick), this);
 }
 
 void riscpc_state::machine_reset()
 {
+	m_tc_zero_timer->adjust(attotime::never);
+}
 
+// assume same formats as Acorn Archimedes
+static void riscpc_floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_HFE_FORMAT);
+	//fr.add(FLOPPY_HFE3_FORMAT);
+	// Archimedes formats
+	fr.add(FLOPPY_ACORN_ADFS_NEW_FORMAT);
+	fr.add(FLOPPY_APD_FORMAT);
+	fr.add(FLOPPY_JFD_FORMAT);
+	// BBC Micro formats
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	// Atari ST formats
+	fr.add(FLOPPY_ST_FORMAT);
+	fr.add(FLOPPY_MSA_FORMAT);
+}
+
+static void riscpc_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525sd", FLOPPY_525_SD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse",  LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse",     WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse",  MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal",        SERIAL_TERMINAL);
+	device.option_add("null_modem",      NULL_MODEM);
+	device.option_add("sun_kbd",         SUN_KBD_ADAPTOR);
 }
 
 void riscpc_state::base_config(machine_config &config)
 {
 	I2C_24C02(config, m_i2cmem);
 
-	// TODO: verify type
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101));
-	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
-
 	// auxiliary connector
 //  pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 //  aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 //  aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
-	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	m_kbdc->hot_res().set(m_iomd, FUNC(arm_iomd_device::keyboard_reset));
-	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(m_iomd, FUNC(arm_iomd_device::keyboard_irq));
 //  m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 //  m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 //  m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
@@ -194,21 +284,78 @@ void riscpc_state::base_config(machine_config &config)
 
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
-	m_iomd->set_kbdc_tag(m_kbdc);
 	m_iomd->iocr_read_od<0>().set(FUNC(riscpc_state::iocr_od0_r));
 	m_iomd->iocr_read_od<1>().set(FUNC(riscpc_state::iocr_od1_r));
 	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));
 	m_iomd->iocr_write_od<1>().set(FUNC(riscpc_state::iocr_od1_w));
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+	m_iomd->fiq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_iomd->kclk_cb().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_iomd->kdata_cb().set(m_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+
+	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_kbdc->out_clock_cb().set(m_iomd, FUNC(arm_iomd_device::kclk_w));
+	m_kbdc->out_data_cb().set(m_iomd, FUNC(arm_iomd_device::kdata_w));
+
+	// https://arcwiki.org.uk/index.php/FDC37C665GT
+	// sarpc_j233 also uses a 'GT, as per the identifier check it does at startup (65h in CRD)
+	// some systems may use a '672 instead (TBD, which ones?)
+	FDC37C665GT(config, m_superio, XTAL(24'000'000), upd765_family_device::mode_t::AT);
+	m_superio->set_ide<0>(m_ide[0]);
+	m_superio->set_ide<1>(m_ide[1]);
+	m_superio->fintr().set(m_iomd, FUNC(arm_iomd_device::int4_w));
+	m_superio->fdrq().set(m_iomd, FUNC(arm_iomd_device::int9_w));
+	subdevice<upd765_family_device>("superio:fdc")->idx_wr_callback().set(m_iomd, FUNC(arm_iomd_device::int1_w));
+	m_superio->pintr1().set(m_iomd, FUNC(arm_iomd_device::int2_w));
+	m_superio->irq4().set(m_iomd, FUNC(arm_iomd_device::int6_w));
+	// TODO: connection with COM2 irq3 (FIRQ?)
+	m_superio->txd1().set("serport0", FUNC(rs232_port_device::write_txd));
+	m_superio->ndtr1().set("serport0", FUNC(rs232_port_device::write_dtr));
+	m_superio->nrts1().set("serport0", FUNC(rs232_port_device::write_rts));
+	m_superio->txd2().set("serport1", FUNC(rs232_port_device::write_txd));
+	m_superio->ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
+	m_superio->nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
+
+	INPUT_MERGER_ANY_HIGH(config, "ide_irq").output_handler().set(m_iomd, FUNC(arm_iomd_device::int7_w));
+
+	// cfr. note on top, we need to reserve first option for an HDD connector
+	// (even if user don't mount one)
+	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr);
+	m_ide[0]->default_data(0x0000);
+	m_ide[0]->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<0>));
+
+	ATA_INTERFACE(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
+	m_ide[1]->default_data(0x0000);
+	m_ide[1]->irq_handler().set("ide_irq", FUNC(input_merger_device::in_w<1>));
+
+	FLOPPY_CONNECTOR(config, "superio:fdc:0", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "superio:fdc:1", riscpc_floppies, "35hd", riscpc_floppy_formats).enable_sound(true);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("superio", FUNC(fdc37c665gt_device::rxd1_w));
+	serport0.dcd_handler().set("superio", FUNC(fdc37c665gt_device::ndcd1_w));
+	serport0.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr1_w));
+	serport0.ri_handler().set("superio", FUNC(fdc37c665gt_device::nri1_w));
+	serport0.cts_handler().set("superio", FUNC(fdc37c665gt_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("superio", FUNC(fdc37c665gt_device::rxd2_w));
+	serport1.dcd_handler().set("superio", FUNC(fdc37c665gt_device::ndcd2_w));
+	serport1.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr2_w));
+	serport1.ri_handler().set("superio", FUNC(fdc37c665gt_device::nri2_w));
+	serport1.cts_handler().set("superio", FUNC(fdc37c665gt_device::ncts2_w));
+
+	SOFTWARE_LIST(config, "flop_list").set_compatible("archimedes");
 }
 
 void riscpc_state::rpc600(machine_config &config)
 {
 	constexpr XTAL cpuxtal(60_MHz_XTAL/2);
 
-	ARM7(config, m_maincpu, cpuxtal); // really ARM610
+	ARM610(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -218,7 +365,7 @@ void riscpc_state::rpc700(machine_config &config)
 	ARM710A(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -249,10 +396,10 @@ void riscpc_state::sarpc(machine_config &config)
 	// TODO: ranges from 160 to 233 MHz
 	constexpr XTAL cpuxtal(200'000'000);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 
@@ -261,10 +408,10 @@ void riscpc_state::sarpc_j233(machine_config &config)
 	// TODO: 233 MHz, unsupported by xtal module
 	constexpr XTAL cpuxtal(200'000'000);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
 }
 

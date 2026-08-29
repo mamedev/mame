@@ -2501,9 +2501,9 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 		case WAIT_INDEX_DONE:
 			LOGSTATE("WAIT_INDEX_DONE\n");
 			fi.sub_state = TRACK_DONE;
-			cur_live.pll.start_writing(machine().time(), cur_live.fi->dev);
 			LOGSTATE("WRITE_TRACK_PRE_SECTORS\n");
 			live_start(fi, WRITE_TRACK_PRE_SECTORS);
+			cur_live.pll.start_writing(machine().time(), cur_live.fi->dev);
 			return;
 
 		case TRACK_DONE:

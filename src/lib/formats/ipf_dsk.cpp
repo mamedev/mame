@@ -49,7 +49,7 @@ struct ipf_format::ipf_decode {
 	void track_write_raw(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t cells, bool &context);
 	void track_write_mfm(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t start_offset, uint32_t patlen, uint32_t cells, bool &context);
 	void track_write_weak(std::vector<uint32_t>::iterator &tpos, uint32_t cells);
-	bool generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool dmb, bool &context);
+	bool generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool dmb, bool raw, bool &context);
 
 	bool gap_description_to_reserved_size(const uint8_t *&data, const uint8_t *dlimit, uint32_t &res_size);
 	bool generate_gap_from_description(const uint8_t *&data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, uint32_t size, bool pre, bool &context);
@@ -461,9 +461,8 @@ bool ipf_format::ipf_decode::generate_track(track_info &t, floppy_image &image)
 		return true;
 
 	if(t.type == 1) {
-		// Noise/unformatted track
-		std::vector<uint32_t> track(t.size_cells, floppy_image::MG_N);
-		timing_set(track, 0, t.size_cells, 2000);
+		// Noise/unformatted track: a single MG_N cell - the surface has no cell structure
+		std::vector<uint32_t> track(1, floppy_image::MG_N | (t.size_cells*2000));
 		generate_track_from_levels(t.cylinder, t.head, track, 0, image);
 		return true;
 	}
@@ -487,13 +486,11 @@ bool ipf_format::ipf_decode::generate_track(track_info &t, floppy_image &image)
 	bool context = false;
 	uint32_t pos = 0;
 	for(uint32_t i = 0; i != t.block_count; i++) {
-		if(!generate_block(t, i, i == t.block_count-1 ? t.size_cells - t.index_cells : 0xffffffff, track, pos, data_pos[i], gap_pos[i], splice_pos[i], context)) {
+		if(!generate_block(t, i, i == t.block_count-1 ? t.size_cells - t.index_cells : 0xffffffff, track, pos, data_pos[i], gap_pos[i], splice_pos[i], context))
 			return false;
-		}
 	}
-	if(pos != t.size_cells) {
+	if(pos != t.size_cells || t.index_cells >= t.size_cells)
 		return false;
-	}
 
 	data_pos[t.block_count] = pos;
 
@@ -539,7 +536,7 @@ void ipf_format::ipf_decode::track_write_weak(std::vector<uint32_t>::iterator &t
 		*tpos++ = floppy_image::MG_N;
 }
 
-bool ipf_format::ipf_decode::generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool dmb, bool &context)
+bool ipf_format::ipf_decode::generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool dmb, bool raw, bool &context)
 {
 	for(;;) {
 		if(data >= dlimit)
@@ -555,7 +552,9 @@ bool ipf_format::ipf_decode::generate_block_data(const uint8_t *data, const uint
 		case 0: // End of description
 			return !tleft;
 
-		case 1: // Raw bytes
+		case 1: // Sync mark, unencoded cells
+			if(raw)
+				return false;
 			if(bitcount > tleft || bytecount > uint64_t(dlimit-data))
 				return false;
 			track_write_raw(tpos, data, uint32_t(bitcount), context);
@@ -564,13 +563,27 @@ bool ipf_format::ipf_decode::generate_block_data(const uint8_t *data, const uint
 
 		case 2: // MFM-decoded data bytes
 		case 3: // MFM-decoded gap bytes
+			if(raw)
+				return false;
 			if(2*bitcount > tleft || bytecount > uint64_t(dlimit-data))
 				return false;
 			track_write_mfm(tpos, data, 0, uint32_t(bitcount), uint32_t(2*bitcount), context);
 			data += bytecount;
 			break;
+		case 4: // Raw cell bits, size in bytes regardless of the data size mode
+			if(!raw)
+				return false;
+			bitcount = uint64_t(param)*8;
+			bytecount = param;
+			if(bitcount > tleft || bytecount > uint64_t(dlimit-data))
+				return false;
+			track_write_raw(tpos, data, uint32_t(bitcount), context);
+			data += bytecount;
+			break;
 
 		case 5: // Weak bytes
+			if(raw)
+				return false;
 			if(2*bitcount > tleft)
 				return false;
 			track_write_weak(tpos, uint32_t(2*bitcount));
@@ -650,13 +663,6 @@ bool ipf_format::ipf_decode::generate_gap_from_description(const uint8_t *&data,
 			break;
 
 		case 2:
-			// You can't have a pattern at the start of a pre-slice
-			// gap if there's a size afterwards
-			if(pre && res_size && !block_size)
-				return false;
-			// You can't have two consecutive patterns
-			if(pattern_size)
-				return false;
 			pattern_size = param;
 			if(pattern_size > sizeof(pattern)*8)
 				return false;
@@ -664,13 +670,13 @@ bool ipf_format::ipf_decode::generate_gap_from_description(const uint8_t *&data,
 			memcpy(pattern, data, (pattern_size+7)/8);
 			data += (pattern_size+7)/8;
 			if(pre) {
-				if(!block_size)
-					block_size = size;
-				else if(pos + block_size == res_size)
+				// The last data sample of a forward gap stream is the loop point
+				if(data < dlimit && !(*data & 0x1f))
 					block_size = size - pos;
+				else if(!block_size)
+					block_size = pattern_size;
 				if(pos + block_size > size)
 					return false;
-				//              printf("pat=%02x size=%d pre\n", pattern[0], block_size);
 				track_write_mfm(tpos, pattern, 0, pattern_size, block_size, context);
 				pos += block_size;
 			} else {
@@ -680,7 +686,6 @@ bool ipf_format::ipf_decode::generate_gap_from_description(const uint8_t *&data,
 					block_size = size - res_size;
 				if(pos + block_size > size)
 					return false;
-				//              printf("pat=%02x block_size=%d size=%d res_size=%d post\n", pattern[0], block_size, size, res_size);
 				track_write_mfm(tpos, pattern, -block_size, pattern_size, block_size, context);
 				pos += block_size;
 			}
@@ -709,29 +714,48 @@ bool ipf_format::ipf_decode::generate_block_gap_2(uint32_t gap_cells, uint32_t &
 	return generate_gap_from_description(data, dlimit, tpos, gap_cells, false, context);
 }
 
-bool ipf_format::ipf_decode::generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos,  bool &context)
+bool ipf_format::ipf_decode::generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context)
 {
-	if(ipos >= 16 && ipos < gap_cells-16)
-		spos = ipos;
-	else {
-		uint32_t presize, postsize;
-		const uint8_t *data1 = data;
-		if(!gap_description_to_reserved_size(data1, dlimit, presize))
-			return false;
-		if(!gap_description_to_reserved_size(data1, dlimit, postsize))
-			return false;
-		if(presize+postsize > gap_cells)
-			return false;
+	uint32_t presize, postsize;
+	const uint8_t *data1 = data;
+	if(!gap_description_to_reserved_size(data1, dlimit, presize))
+		return false;
+	if(!gap_description_to_reserved_size(data1, dlimit, postsize))
+		return false;
 
-		spos = presize + (gap_cells - presize - postsize)/2;
+	uint32_t delta = gap_cells & 1;
+	uint32_t usable = gap_cells - delta;
+
+	if(presize + postsize > usable) {
+		// Trim both gap streams evenly like the reference decoder
+		uint32_t rem = presize + postsize - usable;
+		uint32_t rem0 = rem >> 1, rem1 = rem - rem0;
+		if(presize < rem0) {
+			rem1 += rem0 - presize;
+			rem0 = presize;
+		}
+		if(postsize < rem1) {
+			rem0 += rem1 - postsize;
+			rem1 = postsize;
+		}
+		presize -= rem0;
+		postsize -= rem1;
 	}
+
+	if(ipos >= 16 && ipos < gap_cells-16) {
+		// Keep the index splice within the region the descriptions can fill
+		spos = ipos;
+		if(spos < presize)
+			spos = presize;
+		if(spos > usable - postsize)
+			spos = usable - postsize;
+	} else
+		spos = presize + (usable - presize - postsize)/2;
+
 	if(!generate_gap_from_description(data, dlimit, tpos, spos, true, context))
 		return false;
-	uint32_t delta = 0;
-	if(gap_cells & 1) {
+	if(delta)
 		tpos[spos] = MG_0;
-		delta++;
-	}
 
 	return generate_gap_from_description(data, dlimit, tpos+spos+delta, gap_cells - spos - delta, false, context);
 }
@@ -762,15 +786,19 @@ bool ipf_format::ipf_decode::generate_block(const track_info &t, uint32_t idx, u
 
 	if(gap_cells < 8)
 		gap_cells = 0;
-
 	// +8  = gap description offset / datasize in bytes (when gap type = 0)
 	//       -- old CAPS_ENCODER (v1): "blocksize", unused, rounded duplicate of data_cells
 	// +12 =                      1 / gap size in bytes (when gap type = 0)
 	//       -- old CAPS_ENCODER (v1): "gapsize", unused, rounded duplicate of gap_cells
-	// +16 = 1
+	// +16 = block encoder type: 1 = MFM, 2 = raw cells (no encoding)
 	// +20 = flags: bits 0-1 = gap type, bit 2 = data size mode (DMB, bits vs bytes)
 	// +24 = type 0 gap pattern (8 bits) / speed mask for sector 0 track type 9
 	// +28 = data description offset
+
+	uint32_t encoder = get_u32be(thead+16);
+	if(encoder != 1 && encoder != 2)
+		return false;
+	bool raw = encoder == 2;
 
 	uint32_t flags = encoder_type == 1 ? 0 : get_u32be(thead+20);
 	uint32_t gap_type = flags & 3;
@@ -781,7 +809,7 @@ bool ipf_format::ipf_decode::generate_block(const track_info &t, uint32_t idx, u
 	pos = gpos + gap_cells;
 	if(pos > t.size_cells)
 		return false;
-	if(!generate_block_data(data + get_u32be(thead+28), data_end, track.begin()+dpos, track.begin()+gpos, dmb, context))
+	if(!generate_block_data(data + get_u32be(thead+28), data_end, track.begin()+dpos, track.begin()+gpos, dmb, raw, context))
 		return false;
 	if(!generate_block_gap(gap_type, gap_cells, get_u32be(thead+24), spos, ipos > gpos ? ipos-gpos : 0, data + get_u32be(thead+8), data_end, track.begin()+gpos, context))
 		return false;

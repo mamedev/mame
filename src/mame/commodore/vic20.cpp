@@ -3,7 +3,6 @@
 /*
     TODO:
 
-    - C1540 is not working currently
     - mos6560_port_r/w should respond at 0x1000-0x100f
     - VIC21 (built in 21K ram)
 
@@ -120,7 +119,10 @@ private:
 
 	void exp_reset_w(int state);
 
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_vc20);
+
 	// keyboard state
 	int m_key_row;
 	int m_key_col;
@@ -130,6 +132,12 @@ private:
 	int m_user_joy2;
 	int m_user_light_pen;
 	int m_user_cassette_switch;
+
+	emu_timer *m_iec_sync_timer;
+
+	int m_iec_atn = 0;
+	int m_iec_clk = 0;
+	int m_iec_data = 0;
 
 	enum
 	{
@@ -608,7 +616,8 @@ void vic20_state::via1_pa_w(uint8_t data)
 
 	// serial attention out
 	m_user->write_9(!BIT(data, 7));
-	m_iec->host_atn_w(!BIT(data, 7));
+	m_iec_atn = !BIT(data, 7);
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void vic20_state::via1_pb_w(uint8_t data)
@@ -733,13 +742,22 @@ void vic20_state::via2_pb_w(uint8_t data)
 void vic20_state::via2_ca2_w(int state)
 {
 	// serial clock out
-	m_iec->host_clk_w(!state);
+	m_iec_clk = !state;
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void vic20_state::via2_cb2_w(int state)
 {
 	// serial data out
-	m_iec->host_data_w(!state);
+	m_iec_data = !state;
+	m_iec_sync_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(vic20_state::iec_sync_tick)
+{
+	m_iec->host_atn_w(m_iec_atn);
+	m_iec->host_clk_w(m_iec_clk);
+	m_iec->host_data_w(m_iec_data);
 }
 
 
@@ -778,6 +796,8 @@ void vic20_state::machine_start()
 	m_key_row = 0xff;
 	m_key_col = 0xff;
 
+	m_iec_sync_timer = timer_alloc(FUNC(vic20_state::iec_sync_tick), this);
+
 	// state saving
 	save_item(NAME(m_key_row));
 	save_item(NAME(m_key_col));
@@ -787,6 +807,9 @@ void vic20_state::machine_start()
 	save_item(NAME(m_user_joy2));
 	save_item(NAME(m_user_light_pen));
 	save_item(NAME(m_user_cassette_switch));
+	save_item(NAME(m_iec_atn));
+	save_item(NAME(m_iec_clk));
+	save_item(NAME(m_iec_data));
 }
 
 
@@ -860,7 +883,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	m_cassette->set_default_option("c1530");
 	m_cassette->read_handler().set(m_via2, FUNC(via6522_device::write_ca1));
 
-	cbm_iec_slot_device::add(config, m_iec, "c1541");
+	cbm_iec_slot_device::add(config, m_iec, "c1540");
 	m_iec->srq_callback().set(m_via2, FUNC(via6522_device::write_cb1));
 
 	VCS_CONTROL_PORT(config, m_joy);

@@ -280,16 +280,6 @@ std::string apollo_kbd_device::cpu_context() const
 }
 
 //**************************************************************************
-// logerror - log an error message (w/o device tags)
-//**************************************************************************
-
-template <typename Format, typename... Params>
-void apollo_kbd_device::logerror(Format &&fmt, Params &&... args) const
-{
-	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
-}
-
-//**************************************************************************
 //  Beeper
 //**************************************************************************
 

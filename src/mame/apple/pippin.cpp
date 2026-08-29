@@ -21,12 +21,11 @@
   CS4217 audio DAC
   Bt856 composite video encoder (I2C controlled)
 
-  TODO:
-    * AppleJack controllers (needs bus/adb)
-
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "cpu/powerpc/ppc.h"
@@ -42,7 +41,6 @@
 #include "bandit.h"
 #include "cuda.h"
 #include "heathrow.h"
-#include "macadb.h"
 #include "mesh.h"
 #include "taos.h"
 
@@ -63,7 +61,7 @@ public:
 	required_device<athensprime_device> m_athensprime;
 	required_device<cuda_device> m_cuda;
 	required_device<taos_device> m_taos;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 
 private:
@@ -87,7 +85,7 @@ pippin_state::pippin_state(const machine_config &mconfig, device_type type, cons
 	m_athensprime(*this, "athensprime"),
 	m_cuda(*this, "cuda"),
 	m_taos(*this, "taos"),
-	m_macadb(*this, "macadb"),
+	m_adbbus(*this, "adb"),
 	m_ram(*this, RAM_TAG)
 {
 }
@@ -216,6 +214,9 @@ void pippin_state::pippin(machine_config &config)
 	m_scsibus->set_external_device(7, m_mesh);
 	m_mesh->drq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_drq));
 	m_mesh->irq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_irq));
+	m_mesh->cmd_done_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(5, !state); });
+	m_mesh->exception_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(6, !state); });
+	m_mesh->error_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(7, !state); });
 	m_grandcentral->scsi1_r_callback().set(m_mesh, FUNC(mesh_device::read));
 	m_grandcentral->scsi1_w_callback().set(m_mesh, FUNC(mesh_device::write));
 	m_grandcentral->scsi1_dma_r_callback().set(m_mesh, FUNC(mesh_device::dma16_r));
@@ -225,6 +226,7 @@ void pippin_state::pippin(machine_config &config)
 
 	awacs_macrisc_device &awacs(AWACS_MACRISC(config, "codec", 45.1584_MHz_XTAL / 2));
 	awacs.dma_output().set(m_grandcentral, FUNC(heathrow_device::codec_dma_read));
+	awacs.dma_input().set(m_grandcentral, FUNC(heathrow_device::codec_dma_write));
 
 	m_grandcentral->codec_r_callback().set(awacs, FUNC(awacs_macrisc_device::read_macrisc));
 	m_grandcentral->codec_w_callback().set(awacs, FUNC(awacs_macrisc_device::write_macrisc));
@@ -236,15 +238,17 @@ void pippin_state::pippin(machine_config &config)
 	APPLE_ATHENSPRIME(config, m_athensprime, 20_MHz_XTAL);
 	m_athensprime->pclock_changed().set(m_taos, FUNC(taos_device::set_pixclock));
 
-	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "pippin_controller");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, nullptr);
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(pippin_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_grandcentral, FUNC(heathrow_device::cb1_w));
 	m_cuda->via_data_callback().set(m_grandcentral, FUNC(heathrow_device::cb2_w));
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 
 	input_merger_device &sda_merger(INPUT_MERGER_ALL_HIGH(config, "sda"));
 	sda_merger.output_handler().append(m_cuda, FUNC(cuda_device::set_iic_sda));

@@ -4,8 +4,9 @@
 #include "emu.h"
 
 #include "cuda.h"
-#include "macadb.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
@@ -73,7 +74,7 @@ private:
 	required_device<via6522_device> m_via1;
 	required_device<awacs_device> m_awacs;
 	required_device<cuda_device> m_cuda;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<z80scc_device> m_scc;
 	required_device<nscsi_bus_device> m_scsibus;
@@ -254,7 +255,7 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 	m_via1(*this, "via6522_1"),
 	m_awacs(*this, "awacs"),
 	m_cuda(*this, "cuda"),
-	m_macadb(*this, "macadb"),
+	m_adbbus(*this, "adb"),
 	m_ram(*this, RAM_TAG),
 	m_scc(*this, "scc"),
 	m_scsibus(*this, "scsi"),
@@ -1384,17 +1385,20 @@ void macpdm_state::pmac6100(machine_config &config)
 	// 6100 with the NuBus adapter has one slot, slot $E
 	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
 
-	MACADB(config, m_macadb, IO_CLOCK / 2);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
+
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->zero_default_pram();                    // the default PRAM that's OK for 68k is bad for PowerMacs
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(macpdm_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	m_cuda->nmi_callback().set(FUNC(macpdm_state::nmi_irq));
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	TIMER(config, "beat_60_15").configure_periodic(FUNC(macpdm_state::via1_60_15_timer), attotime::from_double(1/60.15));

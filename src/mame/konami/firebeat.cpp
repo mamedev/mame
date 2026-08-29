@@ -22,7 +22,7 @@
     GQ974 PWB(A2) 0000070140 Extend board
     -------------------------------------
         ADC0808CCN
-        FDC37C665GT (floppy disk controller)
+        FDC37C665GT (Super I/O floppy disk controller)
         National Semiconductor PC16552DV (dual UART)
         ADM223LJR (RS-232 driver/receiver)
 

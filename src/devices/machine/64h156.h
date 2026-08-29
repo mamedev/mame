@@ -99,6 +99,7 @@ public:
 	void ds_w(int ds);
 
 	void set_floppy(floppy_image_device *floppy);
+	void disable(int state);
 
 protected:
 	// device-level overrides
@@ -133,8 +134,10 @@ private:
 		int cycle_counter = 0;
 		int cell_counter = 0;
 		int bit_counter = 0;
+		int filter_counter = 0;
 		int zero_counter = 0;
 		int cycles_until_random_flux = 0;
+		uint32_t xorshift = 0;
 
 		uint8_t yb = 0;
 		uint8_t shift_reg_write = 0;
@@ -148,6 +151,7 @@ private:
 	floppy_image_device *m_floppy;
 
 	int m_mtr;
+	bool m_disabled;
 	int m_accl;
 	int m_stp;
 	int m_ds;
@@ -176,6 +180,7 @@ private:
 	void live_run(const attotime &limit = attotime::never);
 	void get_next_edge(const attotime &when);
 	int get_next_bit(attotime &tm, const attotime &limit);
+	uint32_t next_rand();
 };
 
 

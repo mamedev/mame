@@ -33,7 +33,6 @@ Undocumented buttons:
 - hold UP+DOWN on boot to start the TestMode
 
 TODO:
-- bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
 - More accurate dynamic cpu clock divider, without the cost of emulation speed.
   The current implementation catches almost everything, luckily ARM opcodes have a
   fixed length. It only fails to detect ALU opcodes that directly modify pc(R15).
@@ -44,7 +43,7 @@ TODO:
 
 #include "emu.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/sensorboard.h"
@@ -96,7 +95,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	memory_view m_boot_view;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
@@ -111,8 +110,6 @@ private:
 	output_finder<12> m_lcd_digit;
 	output_finder<12, 8> m_lcd_seg;
 	output_finder<14> m_lcd_sym;
-
-	emu_timer *m_boot_timer;
 
 	bool m_power = false;
 	u32 m_control = 0;
@@ -130,7 +127,6 @@ private:
 	void power_off();
 
 	u32 disable_bootrom_r();
-	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
 };
 
 
@@ -141,7 +137,6 @@ private:
 
 void risc2500_state::machine_start()
 {
-	m_boot_timer = timer_alloc(FUNC(risc2500_state::disable_bootrom), this);
 	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
@@ -155,7 +150,6 @@ void risc2500_state::machine_start()
 void risc2500_state::machine_reset()
 {
 	m_boot_view.select(0);
-	m_boot_timer->adjust(attotime::never);
 
 	m_power = true;
 	m_control = 0;
@@ -250,7 +244,7 @@ u32 risc2500_state::input_r()
 	}
 
 	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 
 	return data;
 }
@@ -285,8 +279,8 @@ void risc2500_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 u32 risc2500_state::disable_bootrom_r()
 {
 	// disconnect bootrom from the bus after next opcode
-	if (!machine().side_effects_disabled() && m_boot_timer->remaining().is_never())
-		m_boot_timer->adjust(m_maincpu->cycles_to_attotime(10));
+	if (!machine().side_effects_disabled())
+		m_boot_view.select(1);
 
 	return 0;
 }
@@ -397,9 +391,8 @@ INPUT_PORTS_END
 void risc2500_state::risc2500(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28.322_MHz_XTAL / 2);
+	ARM2(config, m_maincpu, 28.322_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc2500_state::risc2500_mem);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_assert), irq_period);

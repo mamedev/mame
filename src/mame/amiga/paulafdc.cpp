@@ -380,6 +380,22 @@ void paula_fdc_device::dma_check()
 		cur_live.pll.start_writing(cur_live.tm, floppy);
 }
 
+/*
+ * x--- ---- ---- ---- SET/CLR
+ * -xx- ---- ---- ---- PRECOMP
+ * -00- ---- ---- ---- no precompensation
+ * -01- ---- ---- ---- 140 nsec
+ * -10- ---- ---- ---- 240 nsec
+ * -11- ---- ---- ---- 560 nsec
+ * ---x ---- ---- ---- MFMPREC (1) MFM (0) GCR
+ * ---- x--- ---- ---- UARTBRK (1) force UART break (TXD low)
+ * ---- -x-- ---- ---- WORDSYNC (1) enables DSKSYNC synchronization
+ * ---- --x- ---- ---- MSB (1) enable disk read sync on MSB
+ * ---- ---x ---- ---- FAST data clock rate control (1) fast 2 usec (0) slow 4 usec
+ * ---- ---- **** **** <Paula modulation regs>
+ *
+ * Usual settings are either 0x1500 (most games) or 0x1100 (workbench floppy loading)
+ */
 void paula_fdc_device::adkcon_set(uint16_t data)
 {
 	live_sync();
