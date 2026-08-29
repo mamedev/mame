@@ -679,9 +679,9 @@ TILE_GET_INFO_MEMBER(st0016_cpu_device::get_tile_info)
 {
 	tilemap_info *const layer = (tilemap_info *)tilemap.user_data();
 	tile_index = layer->vram_base + (tile_index << 2);	
-	u32 const code = get_u16le(&m_spriteram[tile_index]);
-	u32 const color = m_spriteram[tile_index + 2];
-	u8 const flags = TILE_FLIPXY(m_spriteram[tile_index + 3] >> 6); // crownpkr test mode doesn't seem to agree with this
+	const u32 code = get_u16le(&m_spriteram[tile_index]);
+	const u32 color = m_spriteram[tile_index + 2];
+	const u8 flags = TILE_FLIPXY(m_spriteram[tile_index + 3] >> 6); // crownpkr test mode doesn't seem to agree with this
 
 	tileinfo.set(m_ramgfx, code, color & 0x3f, flags);
 }
