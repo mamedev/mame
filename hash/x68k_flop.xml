@@ -25170,7 +25170,7 @@ Corrupt screen drawing on transitions, [CRTC] disabled?
 
 	<software name="directx">
 		<description>Direct-X</description>
-		<year>199?</year>
+		<year>1998</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="PYX" />
 		<part name="flop1" interface="floppy_5_25">
