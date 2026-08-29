@@ -1854,6 +1854,7 @@ license:CC0-1.0
 		<description>Ernie's Quiz</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2E0013" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-06 -->
@@ -1869,6 +1870,7 @@ license:CC0-1.0
 		<description>Mix and Match</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2E0015" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-07 -->
@@ -1884,6 +1886,7 @@ license:CC0-1.0
 		<description>Instant Zoo</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2E0016" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-08 -->
@@ -1899,6 +1902,7 @@ license:CC0-1.0
 		<description>Spotlight</description>
 		<year>1981</year>
 		<publisher>Apple Computers</publisher>
+		<info name="partno" value="C2E0014" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-09 -->
@@ -3392,6 +3396,7 @@ license:CC0-1.0
 		<description>Apple Stellar Invaders</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0031" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-10-03 -->
@@ -3459,6 +3464,7 @@ license:CC0-1.0
 		<description>Galactic Wars</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2H0003" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-10-20 -->
@@ -3987,9 +3993,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="advent">
-		<description>Adventure</description>
+		<description>Apple Adventure</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0034" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-12-06 -->
@@ -11722,6 +11729,27 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 Side B - Programmer's Aids" />
 			<dataarea name="flop" size="234829">
 				<rom name="animate disk 3b - programmer's aids.woz" size="234829" crc="9dcc9915" sha1="9188dff8c25e046188fd3bc602e21583eb54ce4a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplbowl">
+		<description>Apple Bowl</description>
+		<year>1979</year>
+		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0018" />
+		<info name="programmer" value="Charlie Kellner" />
+		<info name="programmer" value="Eric Larson" />
+		<info name="required_ram" value="32K" />
+		<info name="usage" value="Requires Integer BASIC in ROM and a 13-sector floppy drive." />
+		<sharedfeat name="compatibility" value="A2,A2P" />
+		<sharedfeat name="gameio_default" value="paddles" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
+		<!-- Dump released: 2025-11-15 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="Apple Bowl.woz" size="235460" crc="beb42308" sha1="1e6f7ac7eeb149fa32da5344e03908a422465a7b" />
 			</dataarea>
 		</part>
 	</software>
@@ -25413,6 +25441,7 @@ license:CC0-1.0
 		<publisher>Apple Computer</publisher>
 		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="developer" value="Advanced Learning Technology"/>
+		<info name="partno" value="C2E0012" />
 		<info name="programmer" value="Leslie Grimm" />
 		<info name="programmer" value="Corrine Grimm" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
