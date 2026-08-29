@@ -169,7 +169,10 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 		[[fallthrough]];
 	case 1: sectors = header[0];
 		[[fallthrough]];
-	case 0: tracks = (size - header_size) / sector_size / sectors / heads;
+	case 0:
+		if (sector_size == 0 || sectors == 0 || heads == 0)
+			return false;
+		tracks = (size - header_size) / sector_size / sectors / heads;
 		break;
 	}
 
