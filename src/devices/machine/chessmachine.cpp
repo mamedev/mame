@@ -27,7 +27,6 @@ probably went for this solution to get optimum possible speed for each module.
 
 TODO:
 - is interrupt handling correct?
-- timer shouldn't be needed for disabling bootrom, real ARM has already read the next opcode
 
 */
 
@@ -57,7 +56,6 @@ chessmachine_device::chessmachine_device(const machine_config &mconfig, const ch
 void chessmachine_device::device_start()
 {
 	memset(m_latch, 0, sizeof(m_latch));
-	m_boot_timer = timer_alloc(FUNC(chessmachine_device::disable_bootrom), this);
 
 	// register for savestates
 	save_item(NAME(m_latch));
@@ -104,12 +102,9 @@ void chessmachine_device::reset_w_sync(s32 param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 
+	// enable bootrom
 	if (param)
-	{
-		// enable bootrom
 		m_boot_view.select(0);
-		m_boot_timer->adjust(attotime::never);
-	}
 }
 
 void chessmachine_device::reset_w(int state)
@@ -126,8 +121,8 @@ void chessmachine_device::reset_w(int state)
 u32 chessmachine_device::disable_bootrom_r()
 {
 	// disconnect bootrom from the bus after next opcode
-	if (!machine().side_effects_disabled() && m_boot_timer->remaining().is_never())
-		m_boot_timer->adjust(m_maincpu->cycles_to_attotime(5));
+	if (!machine().side_effects_disabled())
+		m_boot_view.disable();
 
 	return 0;
 }

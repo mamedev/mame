@@ -42,15 +42,12 @@ private:
 
 	devcb_write_line m_data_out;
 
-	emu_timer *m_boot_timer;
-
 	u8 m_latch[2];
 
 	void data0_w_sync(s32 param);
 	void data1_w_sync(s32 param);
 	void reset_w_sync(s32 param);
 
-	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.disable(); }
 	u32 disable_bootrom_r();
 
 	u8 internal_r() { return m_latch[0]; }

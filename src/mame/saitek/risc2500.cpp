@@ -33,7 +33,6 @@ Undocumented buttons:
 - hold UP+DOWN on boot to start the TestMode
 
 TODO:
-- bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
 - More accurate dynamic cpu clock divider, without the cost of emulation speed.
   The current implementation catches almost everything, luckily ARM opcodes have a
   fixed length. It only fails to detect ALU opcodes that directly modify pc(R15).
@@ -112,8 +111,6 @@ private:
 	output_finder<12, 8> m_lcd_seg;
 	output_finder<14> m_lcd_sym;
 
-	emu_timer *m_boot_timer;
-
 	bool m_power = false;
 	u32 m_control = 0;
 	u32 m_prev_pc = 0;
@@ -130,7 +127,6 @@ private:
 	void power_off();
 
 	u32 disable_bootrom_r();
-	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
 };
 
 
@@ -141,7 +137,6 @@ private:
 
 void risc2500_state::machine_start()
 {
-	m_boot_timer = timer_alloc(FUNC(risc2500_state::disable_bootrom), this);
 	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
@@ -155,7 +150,6 @@ void risc2500_state::machine_start()
 void risc2500_state::machine_reset()
 {
 	m_boot_view.select(0);
-	m_boot_timer->adjust(attotime::never);
 
 	m_power = true;
 	m_control = 0;
@@ -285,8 +279,8 @@ void risc2500_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 u32 risc2500_state::disable_bootrom_r()
 {
 	// disconnect bootrom from the bus after next opcode
-	if (!machine().side_effects_disabled() && m_boot_timer->remaining().is_never())
-		m_boot_timer->adjust(m_maincpu->cycles_to_attotime(10));
+	if (!machine().side_effects_disabled())
+		m_boot_view.select(1);
 
 	return 0;
 }
