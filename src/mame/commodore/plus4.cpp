@@ -130,6 +130,12 @@ protected:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload) { return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress); }
 
+	bool m_iec_atn;
+	bool m_iec_clk;
+	bool m_iec_data;
+	emu_timer *m_iec_sync_timer;
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+
 	enum
 	{
 		CS0_BASIC = 0,
@@ -689,19 +695,28 @@ void plus4_state::cpu_w(uint8_t data)
 	//logerror("%s cpu write %02x\n", machine().describe_context(), data);
 
 	// serial data
-	m_iec->host_data_w(!BIT(data, 0));
+	m_iec_data = !BIT(data, 0);
 
 	// serial clock
-	m_iec->host_clk_w(!BIT(data, 1));
+	m_iec_clk = !BIT(data, 1);
 
 	// serial attention
-	m_iec->host_atn_w(!BIT(data, 2));
+	m_iec_atn = !BIT(data, 2);
 
 	// cassette motor
 	m_cassette->motor_w(BIT(data, 3));
 
 	// cassette write
 	m_cassette->write(!BIT(data, 1));
+
+	m_iec_sync_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(plus4_state::iec_sync_tick)
+{
+	m_iec->host_atn_w(m_iec_atn);
+	m_iec->host_clk_w(m_iec_clk);
+	m_iec->host_data_w(m_iec_data);
 }
 
 
@@ -784,6 +799,8 @@ void plus4_datassette_devices(device_slot_interface &device)
 
 void plus4_state::machine_start()
 {
+	m_iec_sync_timer = timer_alloc(FUNC(plus4_state::iec_sync_tick), this);
+
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -911,13 +928,13 @@ void plus4_state::plus4(machine_config &config)
 	PET_DATASSETTE_PORT(config, m_cassette, plus4_datassette_devices, "c1531");
 	m_cassette->read_handler().set_nop();
 
-	cbm_iec_slot_device::add(config, m_iec, "c1541");
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
-	PLUS4_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/16, plus4_expansion_cards, nullptr);
+	PLUS4_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/16, plus4_expansion_cards, "c1551");
 	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->cd_rd_callback().set(FUNC(plus4_state::read));
 	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
