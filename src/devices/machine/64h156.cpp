@@ -59,6 +59,7 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_write_atn(*this),
 	m_write_sync(*this),
 	m_write_byte(*this),
+	m_write_yb(*this),
 	m_floppy(nullptr),
 	m_mtr(1),
 	m_disabled(false),
@@ -162,7 +163,7 @@ void c64h156_device::live_start()
 void c64h156_device::checkpoint()
 {
 	if (cur_live.oe) {
-		get_next_edge(machine().time());
+		get_next_edge(cur_live.tm.is_never() ? machine().time() : cur_live.tm);
 	}
 	checkpoint_live = cur_live;
 }
@@ -360,7 +361,6 @@ void c64h156_device::live_run(const attotime &limit)
 			}
 
 			if (syncpoint) {
-				cur_live.tm += m_period;
 				live_delay(RUNNING_SYNCPOINT);
 				return;
 			}
@@ -370,6 +370,11 @@ void c64h156_device::live_run(const attotime &limit)
 		}
 
 		case RUNNING_SYNCPOINT: {
+			if (cur_live.accl)
+				m_write_yb(cur_live.accl_yb);
+			else
+				m_write_yb(cur_live.shift_reg & 0xff);
+
 			m_write_sync(cur_live.sync);
 			m_write_byte(cur_live.byte);
 
@@ -552,6 +557,8 @@ void c64h156_device::mtr_w(int state)
 			if (!m_disabled && cur_live.state == IDLE) {
 				live_start();
 			}
+
+			update_stepper(m_stp);
 		} else {
 			live_abort();
 		}
@@ -668,39 +675,41 @@ void c64h156_device::set_floppy(floppy_image_device *floppy)
 //  stp_w -
 //-------------------------------------------------
 
+void c64h156_device::update_stepper(int stp)
+{
+	int tracks = 0;
+
+	switch (m_floppy->get_cyl() & 3)
+	{
+	case 0: if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+	case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+	case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+	case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+	}
+
+	if (tracks == -1)
+	{
+		m_floppy->dir_w(1);
+		m_floppy->stp_w(1);
+		m_floppy->stp_w(0);
+	}
+	else if (tracks == 1)
+	{
+		m_floppy->dir_w(0);
+		m_floppy->stp_w(1);
+		m_floppy->stp_w(0);
+	}
+}
+
 void c64h156_device::stp_w(int stp)
 {
-	if (m_stp != stp)
+	m_stp = stp;
+
+	if (m_mtr)
 	{
 		live_sync();
 
-		if (m_mtr)
-		{
-			int tracks = 0;
-
-			switch (m_floppy->get_cyl() & 3)
-			{
-			case 0: if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-			case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-			case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-			case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-			}
-
-			if (tracks == -1)
-			{
-				m_floppy->dir_w(1);
-				m_floppy->stp_w(1);
-				m_floppy->stp_w(0);
-			}
-			else if (tracks == 1)
-			{
-				m_floppy->dir_w(0);
-				m_floppy->stp_w(1);
-				m_floppy->stp_w(0);
-			}
-
-			m_stp = stp;
-		}
+		update_stepper(stp);
 
 		checkpoint();
 		live_run();

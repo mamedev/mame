@@ -50,11 +50,12 @@ protected:
 	virtual void parallel_data_w(u8 data) override;
 	virtual void parallel_strobe_w(int state) override;
 
+	required_device<m6502_device> m_maincpu;
 	required_device<floppy_image_device> m_floppy;
 
-	void c1541_mem(address_map &map) ATTR_COLD;
+	void wpt_callback(floppy_image_device *floppy, int state);
 
-	required_device<m6502_device> m_maincpu;
+	void c1541_mem(address_map &map) ATTR_COLD;
 
 private:
 	enum
@@ -70,7 +71,6 @@ private:
 	void via0_pb_w(uint8_t data);
 	void via0_ca2_w(int state);
 	void via1_irq_w(int state);
-	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
 	void atn_w(int state);
 	void byte_w(int state);
