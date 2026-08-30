@@ -20,6 +20,8 @@
 #include "emu.h"
 #include "cmdhd.h"
 
+#include "cmdhd.lh"
+
 
 
 //**************************************************************************
@@ -49,10 +51,12 @@ ROM_START( cmd_hd )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_LOAD( "cmd_hd_bootrom_v280.u17", 0x0000, 0x8000, CRC(da68435d) SHA1(defd8bc04a52904b8a3560f11c82126619513a10) )
 
+	/*
 	ROM_REGION( 0x30c, "plds", 0 )
 	ROM_LOAD( "pal16l8.u24", 0x000, 0x104, NO_DUMP ) // Shirley
 	ROM_LOAD( "pal16l8.u27", 0x104, 0x104, NO_DUMP ) // Julie
 	ROM_LOAD( "pal16l8.u13", 0x208, 0x104, NO_DUMP )
+	*/
 ROM_END
 
 
@@ -232,13 +236,13 @@ void cmd_hd_device::via1_pb_w(uint8_t data)
 
 uint8_t cmd_hd_device::ppi_pa_r()
 {
-	// PD0-7
+	// RamLink parallel data PD0-7
 	return 0;
 }
 
 void cmd_hd_device::ppi_pa_w(uint8_t data)
 {
-	// PD0-7
+	// RamLink parallel data PD0-7
 }
 
 uint8_t cmd_hd_device::ppi_pb_r()
@@ -256,7 +260,12 @@ uint8_t cmd_hd_device::ppi_pb_r()
 	    7		PATN
 
 	*/
-	return 0;
+
+	u8 data = 0;
+
+	data |= (m_pb->read() & 0x07) << 1;
+
+	return data;
 }
 
 void cmd_hd_device::ppi_pc_w(uint8_t data)
@@ -310,6 +319,8 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 	auto &sasi(NSCSI_BUS(config, "sasi"));
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "harddisk");
 	sasi.set_external_device(7, *this);
+
+	config.set_default_layout(layout_cmdhd);
 }
 
 
@@ -317,12 +328,20 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
+INPUT_CHANGED_MEMBER( cmd_hd_device::pbres_changed )
+{
+	if (!newval)
+	{
+		device_reset();
+	}
+}
+
 static INPUT_PORTS_START( cmd_hd )
 	PORT_START("PB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Swap 8")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Swap 9")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Write Protect")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cmd_hd_device::pbres_changed), 0)
 INPUT_PORTS_END
 
 ioport_constructor cmd_hd_device::device_input_ports() const
@@ -424,9 +443,14 @@ void cmd_hd_device::cbm_iec_reset(int state)
 
 void cmd_hd_device::scsi_ctrl_changed()
 {
-	//m_leds[LED_SW8] = !BSY;
-	//m_via0->write_cb1(BSY);
-	//m_via1->write_ca1(RST);
+	u32 const ctrl = m_scsi_bus->ctrl_r();
+
+	bool const bsy = ctrl & S_BSY;
+	m_leds[LED_SW8] = bsy;
+	//m_via0->write_cb1(!bsy);
+
+	//bool const rst = ctrl & S_RST;
+	//m_via1->write_ca1(!rst);
 }
 
 

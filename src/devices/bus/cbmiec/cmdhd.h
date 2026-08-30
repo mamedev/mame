@@ -37,6 +37,8 @@ public:
 	// construction/destruction
 	cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_INPUT_CHANGED_MEMBER( pbres_changed );
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

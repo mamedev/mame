@@ -1616,6 +1616,14 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/c5181.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/c5181.h",
 	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/cbmiec/cmdhd.cpp", GEN_DIR .. "emu/layout/cmdhd.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "cmdhd"),
+	}
 end
 
 
