@@ -19,7 +19,7 @@ NOTES:
 - Japanese release dates from https://refuge.tokyo/3do/3do.html
 
 -->
-<softwarelist name="3do" description="3DO CD-ROMs">
+<softwarelist name="3do" description="3DO Interactive Multiplayer CD-ROMs">
 
 	<!-- https://redump.info/disc/59952 -->
 	<software name="slayer" supported="no">
@@ -39,6 +39,28 @@ Has color bugs on main menu
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="slayer (usa)" sha1="13e835442a6a82458759293e8e2073526be45c3e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/20101 -->
+	<software name="aquawrld" supported="no">
+		<description>Aqua World: Umi Monogatari (Japan)</description>
+		<year>1995</year>
+		<publisher>Mizuki</publisher>
+		<notes><![CDATA[
+[CD drive] intro FMV stutter frames (note the English text running too fast is a btanb)
+[Madam] Option GFX on main menu has RMW transparency bug
+[Madam] "unsupported Packed CEL 5 0" across the application
+]]></notes>
+		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo -->
+		<info name="alt_title" value="アクア・ワールド ～海美物語～"/>
+		<info name="barcode" value="T4984824055261"/>
+		<info name="release" value="19951013"/>
+		<info name="serial" value="FZ-SJ3351"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aqua world - umi monogatari (japan)" sha1="2a929f6803823bd566b38771407ddbf559dc758e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -67,6 +89,29 @@ No cursor for character select, offset p2 graphics
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- https://redump.info/disc/90189 -->
+	<software name="bam" supported="no">
+		<description>Bust-A-Move (USA)</description>
+		<year>1995</year>
+		<publisher>Panasonic</publisher>
+		<notes><![CDATA[
+[Madam] no GFXs for intro and title screen
+[Madam] player pointer GFX needs X flip when facing left
+[Madam] help cursor uses unsupported direct mode GFX
+Runs too slow in gameplay
+]]></notes>
+		<info name="barcode" value="0 37988 83036 7"/>
+		<info name="developer" value="Micro Cabin"/>
+		<info name="serial" value="FZ-SM0252"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bust-a-move (usa)" sha1="263755f37264d8f0f862afe977e426d3b7592452"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Puzzle Bobble published by Micro Cabin -->
 
 	<!-- https://redump.info/disc/45883 -->
 	<software name="cfodder" supported="no">
@@ -122,6 +167,24 @@ Eventually hangs afterwards, on opponent FMV
 		</part>
 	</software>
 
+	<!-- https://redump.info/disc/49372 -->
+	<software name="demoman" supported="no">
+		<description>Demolition Man (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+[AMY] ugly palette on FMV playbacks
+[Madam] gameplay is full of "unsupported Packed CEL 1 0" and "5 1"
+Eventually requires optional [Player] mouse and lightgun
+]]></notes>
+		<info name="barcode" value="0 52145 93003 2"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="demolition man (usa, europe)" sha1="22c8381b3d7ff8c4f537c461c685da5777956ab3"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- https://redump.info/disc/47940/ -->
 	<software name="espnfit" supported="no">
 		<description>ESPN Fitness Pros: Step Aerobics (USA)</description>
@@ -140,6 +203,56 @@ Not extensively tested, may have another GFX glitch on main menu
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- https://redump.info/disc/7221 -->
+	<!-- assume identical between Retail vs. Not for Resale versions -->
+	<software name="gex" supported="no">
+		<description>Gex (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>BMG Interactive Entertainment</publisher>
+		<notes><![CDATA[
+[CD drive] FMV runs too slow, no sound, bit of stutter
+Hangs after second FMV, regardless of skipping or not
+]]></notes>
+		<!-- FIXME: Other two barcodes seen: 7 65979 63060 2, 7 68964 00502 7 -->
+		<info name="barcode" value="7 65979 61060 4"/>
+		<info name="developer" value="Crystal Dynamics"/>
+		<info name="serial" value="61060-C (USA), 61063-C (Europe)"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gex (usa, europe)" sha1="673f7932418baf31aae4d23a44c1832ab32a5552"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/6595 -->
+	<software name="megarace" supported="no">
+		<description>MegaRace (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+[CD drive] slow intro FMV, no sound.
+Successive FMVs have slow GFXs and fast repeating sound
+[Madam] has unsupported direct mode CELs and likely flip X bugs
+Slow in gameplay
+]]></notes>
+		<info name="barcode" value="0 24294 11440 3"/>
+		<!-- ISBN: 0-7911-1440-6 -->
+		<info name="serial" value="2199610-590002/ I 074MP (USA),  /CS090047 (Europe CD print), /IC180012 (Europe back cover)"/>
+		<!-- Multi-5 subtitles regardless of console region -->
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Italian" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="megarace (usa, europe) (en,fr,de,es,it)" sha1="9104821542f60270709deae7d78375eeb8353820"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Japanese version released by Multisoft -->
 
 	<!-- https://redump.info/disc/39303 -->
 	<software name="conandl" supported="no">
@@ -201,6 +314,44 @@ Selection choices have [Madam] direct mode not hooked up for score, no backgroun
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="plumbers don't wear ties (usa)" sha1="bfad6f552e4a2656690a2c3771df9d81af9c60c1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/45884 -->
+	<software name="shanghtt" supported="no">
+		<description>Shanghai: Triple Threat (USA)</description>
+		<year>1994</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Madam] "Unsupported Packed CEL 5 1" on title screen
+Has no backgrounds in gameplay (alpha blended?)
+[DSPP] sound is too slow
+Runs too slow
+]]></notes>
+		<info name="barcode" value="0 47875 11052 6"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shanghai - triple-threat (usa)" sha1="04d57093ea06f72d92a2b7cfbca6a6fbd41f67da"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Shanghai Banri no Choujou (Japan version) released by Eletronic Arts Victor -->
+
+	<!-- https://redump.info/disc/59953 -->
+	<software name="cpubach" supported="no">
+		<description>Sid Meier's C.P.U. Bach (USA)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+[CD drive] black screen after intro, where it's supposed to show "Composing an Allemande"
+]]></notes>
+		<info name="barcode" value="0 19703 38116 3"/>
+		<!-- ISBN: 1-55884-367-1 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sid meier's c.p.u. bach (usa)" sha1="bbf57a9a0069986060fb2f46a5b40e1f10748287"/>
 			</diskarea>
 		</part>
 	</software>
@@ -270,6 +421,25 @@ Center of screen is too dim in gameplay, [AMY]?
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtuoso (usa)" sha1="53dae9f7bc34f28aeb27ac4060fdc7c12ca54dd9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/88188 -->
+	<software name="whoshot" supported="no">
+		<description>Who Shot Johnny Rock? (USA)</description>
+		<year>1995</year>
+		<publisher>American Laser Games</publisher>
+		<notes><![CDATA[
+[CD drive] sound hiccups on intro FMV
+Hangs when entering gameplay (or runs incredibly slow)
+Eventually has optional [Player] lightgun and maybe mouse support
+]]></notes>
+		<info name="barcode" value="7 67861 00004 3"/>
+		<info name="serial" value="ALG 000043"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="who shot johnny rock (usa)" sha1="20d52a017e46aaadd0a0da8be77644653a94199e"/>
 			</diskarea>
 		</part>
 	</software>
