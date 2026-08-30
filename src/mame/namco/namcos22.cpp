@@ -3521,7 +3521,12 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Right") // when in normal testmode, press this to enter the extra testmode
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	// left/right above are the coarse step; these two are the fine step
+	// without them most fields cannot reach every value
+	// eg. in SPRITE CG TEST the CHR NO index moves by 8 with Right and by 1 with Fine Inc.
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Fine Dec")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Fine Inc")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
