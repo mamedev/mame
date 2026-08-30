@@ -1495,7 +1495,7 @@ void pc8001_state::pc8001(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_formats(t88_cassette_formats);
-	m_cassette->set_interface("pc8001_cass");
+	m_cassette->set_interface("pc8801_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 0);
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 1);
 
