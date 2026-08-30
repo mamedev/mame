@@ -528,26 +528,30 @@ void tms320av110_device::map(address_map &map)
 void tms320av110_device::sound_stream_update(sound_stream &stream)
 {
 	const bool playing = BIT(m_registers[REG_PLAY], 0) && !m_reset_asserted && !m_reset_cycle;
+	stream.fill(LEFT_CHANNEL, 0);
+	stream.fill(RIGHT_CHANNEL, 0);
+	if (!playing)
+		return;
+
 	const bool muted = BIT(m_registers[REG_MUTE], 0);
 	const float left_gain = std::pow(10.0F, -float(m_registers[REG_ATTEN_L]) / 10.0F);
 	const float right_gain = std::pow(10.0F, -float(m_registers[REG_ATTEN_R]) / 10.0F);
 
 	for (int sample = 0; sample < stream.samples(); sample++)
 	{
-		if (!playing || ((m_pcm_position == m_pcm_count) && !decode_frame()))
-		{
-			stream.put(LEFT_CHANNEL, sample, 0.0F);
-			stream.put(RIGHT_CHANNEL, sample, 0.0F);
-			continue;
-		}
+		if ((m_pcm_position == m_pcm_count) && !decode_frame())
+			break;
 
 		const u32 position = m_pcm_position * m_pcm_channels;
 		const s16 left = m_pcm[position];
 		const s16 right = (m_pcm_channels == OUTPUT_CHANNELS)
 			? m_pcm[position + RIGHT_CHANNEL]
 			: left;
-		stream.put(LEFT_CHANNEL, sample, muted ? 0.0F : (float(left) / 32'768.0F) * left_gain);
-		stream.put(RIGHT_CHANNEL, sample, muted ? 0.0F : (float(right) / 32'768.0F) * right_gain);
+		if (!muted)
+		{
+			stream.put(LEFT_CHANNEL, sample, (float(left) / 32'768.0F) * left_gain);
+			stream.put(RIGHT_CHANNEL, sample, (float(right) / 32'768.0F) * right_gain);
+		}
 		m_pcm_position++;
 	}
 }

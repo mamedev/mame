@@ -13,7 +13,7 @@ class tms320av110_device : public device_t, public device_sound_interface
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	tms320av110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	tms320av110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
 
 	auto req() { return m_req_cb.bind(); } // active-low compressed-data request output
 	void set_external_dram(bool external) { m_external_dram = external; }
