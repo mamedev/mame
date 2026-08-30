@@ -3485,7 +3485,12 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// enabled with DSW4-8; P1 Start becomes frame advance while paused
+	// not on the dev panel, but also not wired in the cabinet, so hidden behind
+	// the dev machine config
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_NAME("Dev Freeze Toggle")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("OPT.0")
 	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(0x100) PORT_KEYDELTA(0x10)
