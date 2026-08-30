@@ -27,8 +27,7 @@
 // ======================> c1541_device_base
 
 class c1541_device_base :  public device_t,
-					       public device_cbm_iec_interface,
-					       public device_c64_floppy_parallel_interface
+					       public device_cbm_iec_interface
 {
 protected:
 	// construction/destruction
@@ -46,12 +45,9 @@ protected:
 	virtual void cbm_iec_atn(int state) override;
 	virtual void cbm_iec_reset(int state) override;
 
-	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(u8 data) override;
-	virtual void parallel_strobe_w(int state) override;
-
 	required_device<m6502_device> m_maincpu;
 	required_device<floppy_image_device> m_floppy;
+	required_device<via6522_device> m_via0;
 
 	void wpt_callback(floppy_image_device *floppy, int state);
 
@@ -65,19 +61,14 @@ private:
 	};
 
 	void via0_irq_w(int state);
-	virtual uint8_t via0_pa_r();
-	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
-	void via0_ca2_w(int state);
 	void via1_irq_w(int state);
 	void via1_pb_w(uint8_t data);
 	void atn_w(int state);
-	void byte_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 
-	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_ioport m_address;
@@ -133,7 +124,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	virtual uint8_t via0_pa_r() override;
+	virtual uint8_t via0_pa_r();
 };
 
 

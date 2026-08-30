@@ -168,8 +168,9 @@ void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &confi
 
 c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: c1541_device_base(mconfig, C1541_PROLOGIC_DOS_CLASSIC, tag, owner, clock),
-		m_pia(*this, MC6821_TAG),
-		m_cent_data_out(*this, "cent_data_out"),
-		m_mmu_rom(*this, "mmu")
+	  device_c64_floppy_parallel_interface(mconfig, *this),
+	  m_pia(*this, MC6821_TAG),
+	  m_cent_data_out(*this, "cent_data_out"),
+	  m_mmu_rom(*this, "mmu")
 {
 }

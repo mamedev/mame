@@ -418,14 +418,6 @@ void c1571_device::via1_pb_w(uint8_t data)
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-void c1571_device::cia_pc_w(int state)
-{
-	if (m_other != nullptr)
-	{
-		m_other->parallel_strobe_w(state);
-	}
-}
-
 void c1571_device::cia_cnt_w(int state)
 {
 	m_cnt_out = state;
@@ -438,19 +430,6 @@ void c1571_device::cia_sp_w(int state)
 	m_sp_out = state;
 
 	m_iec_sync_timer->adjust(attotime::zero);
-}
-
-uint8_t c1571_device::cia_pb_r()
-{
-	return m_parallel_data;
-}
-
-void c1571_device::cia_pb_w(uint8_t data)
-{
-	if (m_other != nullptr)
-	{
-		m_other->parallel_data_w(data);
-	}
 }
 
 
@@ -537,9 +516,6 @@ void c1571_device::add_cia_mconfig(machine_config &config)
 	m_cia->irq_wr_callback().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_cia->cnt_wr_callback().set(FUNC(c1571_device::cia_cnt_w));
 	m_cia->sp_wr_callback().set(FUNC(c1571_device::cia_sp_w));
-	m_cia->pb_rd_callback().set(FUNC(c1571_device::cia_pb_r));
-	m_cia->pb_wr_callback().set(FUNC(c1571_device::cia_pb_w));
-	m_cia->pc_wr_callback().set(FUNC(c1571_device::cia_pc_w));
 }
 
 void c1570_device::device_add_mconfig(machine_config &config)
@@ -603,7 +579,6 @@ ioport_constructor c1571_device::device_input_ports() const
 c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
-	device_c64_floppy_parallel_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
 	m_via0(*this, M6522_0_TAG),
 	m_via1(*this, M6522_1_TAG),
@@ -724,26 +699,6 @@ void c1571_device::cbm_iec_reset(int state)
 	{
 		device_reset();
 	}
-}
-
-
-//-------------------------------------------------
-//  parallel_data_w -
-//-------------------------------------------------
-
-void c1571_device::parallel_data_w(uint8_t data)
-{
-	m_parallel_data = data;
-}
-
-
-//-------------------------------------------------
-//  parallel_strobe_w -
-//-------------------------------------------------
-
-void c1571_device::parallel_strobe_w(int state)
-{
-	m_cia->flag_w(state);
 }
 
 

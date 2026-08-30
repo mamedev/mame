@@ -37,7 +37,8 @@
 
 // ======================> c1571_device
 
-class c1571_device : public device_t, public device_cbm_iec_interface, public device_c64_floppy_parallel_interface
+class c1571_device : public device_t, 
+					 public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
@@ -53,11 +54,8 @@ public:
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
 
-	void cia_pc_w(int state);
 	void cia_cnt_w(int state);
 	void cia_sp_w(int state);
-	uint8_t cia_pb_r();
-	void cia_pb_w(uint8_t data);
 
 	void byte_w(int state);
 
@@ -66,6 +64,7 @@ public:
 	void wpt_callback(floppy_image_device *floppy, int state);
 
 	void c1571_mem(address_map &map) ATTR_COLD;
+
 protected:
 	c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -83,10 +82,6 @@ protected:
 	virtual void cbm_iec_atn(int state) override;
 	virtual void cbm_iec_data(int state) override;
 	virtual void cbm_iec_reset(int state) override;
-
-	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(uint8_t data) override;
-	virtual void parallel_strobe_w(int state) override;
 
 	void add_base_mconfig(machine_config &config);
 	void add_cia_mconfig(machine_config &config);

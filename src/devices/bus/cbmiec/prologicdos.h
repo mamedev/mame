@@ -23,7 +23,8 @@
 
 // ======================> c1541_prologic_dos_classic_device
 
-class c1541_prologic_dos_classic_device :  public c1541_device_base
+class c1541_prologic_dos_classic_device :  public c1541_device_base,
+					       	  	 		   public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction
@@ -33,6 +34,10 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// device_c64_floppy_parallel_interface overrides
+	virtual void parallel_data_w(u8 data) override {}
+	virtual void parallel_strobe_w(int state) override {}
 
 private:
 	required_device<pia6821_device> m_pia;

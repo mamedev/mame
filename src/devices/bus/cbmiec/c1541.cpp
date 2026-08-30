@@ -308,19 +308,6 @@ void c1541_device_base::c1541_mem(address_map &map)
 }
 
 
-uint8_t c1541_device_base::via0_pa_r()
-{
-	// dummy read to acknowledge ATN IN interrupt
-	return m_parallel_data;
-}
-
-void c1541_device_base::via0_pa_w(uint8_t data)
-{
-	if (m_other != nullptr)
-	{
-		m_other->parallel_data_w(data);
-	}
-}
 
 uint8_t c1541_device_base::via0_pb_r()
 {
@@ -389,14 +376,6 @@ void c1541_device_base::via0_pb_w(uint8_t data)
 	m_ga->atna_w(BIT(data, 4)); // triggers IEC sync
 }
 
-void c1541_device_base::via0_ca2_w(int state)
-{
-	if (m_other != nullptr)
-	{
-		m_other->parallel_strobe_w(state);
-	}
-}
-
 uint8_t c1541c_device::via0_pa_r()
 {
 	/*
@@ -461,13 +440,6 @@ void c1541_device_base::atn_w(int state)
 	m_iec_sync_timer->adjust(attotime::zero);
 }
 
-void c1541_device_base::byte_w(int state)
-{
-	m_maincpu->set_input_line(M6502_SET_OVERFLOW, !state);
-
-	m_via1->write_ca1(state);
-}
-
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
@@ -498,11 +470,8 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MOS6522(config, m_via0, XTAL(16'000'000)/16);
-	m_via0->readpa_handler().set(FUNC(c1541_device_base::via0_pa_r));
 	m_via0->readpb_handler().set(FUNC(c1541_device_base::via0_pb_r));
-	m_via0->writepa_handler().set(FUNC(c1541_device_base::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c1541_device_base::via0_pb_w));
-	m_via0->cb2_handler().set(FUNC(c1541_device_base::via0_ca2_w));
 	m_via0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MOS6522(config, m_via1, XTAL(16'000'000)/16);
@@ -570,7 +539,6 @@ ioport_constructor c1541_device_base::device_input_ports() const
 c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
-	device_c64_floppy_parallel_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
 	m_floppy(*this, C64H156_TAG":0:525ssqd"),
 	m_via0(*this, M6522_0_TAG),
@@ -672,24 +640,4 @@ void c1541_device_base::cbm_iec_reset(int state)
 	{
 		device_reset();
 	}
-}
-
-
-//-------------------------------------------------
-//  parallel_data_w -
-//-------------------------------------------------
-
-void c1541_device_base::parallel_data_w(u8 data)
-{
-	m_parallel_data = data;
-}
-
-
-//-------------------------------------------------
-//  parallel_strobe_w -
-//-------------------------------------------------
-
-void c1541_device_base::parallel_strobe_w(int state)
-{
-	m_via0->write_cb1(state);
 }
