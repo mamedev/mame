@@ -15,6 +15,7 @@
 #include "bus/c64/exp.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/cbmiec/c1571.h"
+#include "bus/cbmiec/c1571cr.h"
 #include "bus/cbmiec/c1581.h"
 #include "bus/vic20/user.h"
 #include "bus/pet/cass.h"
