@@ -1287,12 +1287,12 @@ const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	// 1bpp
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_1bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	// 2bpp
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_2bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
@@ -1309,7 +1309,7 @@ const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 	// 8bpp
 	&madam_device::get_pixel_8bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_8bpp_uncoded_lrform0,
 	&madam_device::get_pixel_invalid,
 	// 16bpp
 	&madam_device::get_pixel_invalid,
@@ -1329,6 +1329,44 @@ u16 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
 {
 	// arbitrary mesh pattern so it will be obvious if triggered
 	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
+	return src_data;
+}
+
+// - plumber "SCORES" display on choice screens
+u16 madam_device::get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x & ~7) >> 3);
+	u8 src_shift = (x & 7) ^ 7;
+
+	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift)) & 0x1;
+	u16 plut_data = (m_dma8_read_cb(cel_address) >> src_shift) & 0x1;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - bam/pbobble in gameplay (1st stage aid marker)
+u16 madam_device::get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x & ~3) >> 2);
+	u8 src_shift = (x & 3) ^ 3;
+
+	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 2)) & 0x3;
+	u16 plut_data = (m_dma8_read_cb(cel_address) >> (src_shift * 2)) & 0x3;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
 	return src_data;
 }
 
@@ -1386,6 +1424,24 @@ u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	plut_data <<= 1;
 
 	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - megarace "now loading" / "prepare to race"
+u16 madam_device::get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += (x);
+//	u8 src_shift = (x & 3) ^ 3;
+	const u8 src_ram = m_dma8_read_cb(cel_address);
+
+	// extend RGB332 into 555, cfr. Figure 2 of The Pixel Decoder "PDC"
+	// rep8 = 0 fills missing bits with 0
+	// TODO: rep8 = 1 (unsupported) fills with high order bits.
+	u16 src_data = (BIT(src_ram, 5, 3) << 12) | (BIT(src_ram, 2, 3) << 7) | (BIT(src_ram, 0, 2) << 3);
 
 	return src_data;
 }

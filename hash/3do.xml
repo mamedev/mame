@@ -98,7 +98,6 @@ No cursor for character select, offset p2 graphics
 		<notes><![CDATA[
 [Madam] no GFXs for intro and title screen
 [Madam] player pointer GFX needs X flip when facing left
-[Madam] help cursor uses unsupported direct mode GFX
 Runs too slow in gameplay
 ]]></notes>
 		<info name="barcode" value="0 37988 83036 7"/>
@@ -231,9 +230,9 @@ Hangs after second FMV, regardless of skipping or not
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-[CD drive] slow intro FMV, no sound.
-Successive FMVs have slow GFXs and fast repeating sound
-[Madam] has unsupported direct mode CELs and likely flip X bugs
+[CD drive] slow intro FMV, no sound. Successive FMVs have slow GFXs and fast repeating sound
+[Madam] doesn't draw background box in Subtitles select screen (transparent?)
+[Madam] has flip X bugs in gameplay, repeated enemy GFX in status bar, shows score all the time (it shouldn't?), fire shots don't draw in playfield
 Slow in gameplay
 ]]></notes>
 		<info name="barcode" value="0 24294 11440 3"/>
@@ -306,7 +305,7 @@ Hangs on Puzzle, no [Player] input works
 		<publisher>Kirin Entertainment</publisher>
 		<notes><![CDATA[
 [DSPP] low pitched sounds, doesn't sync correctly vs. video (cfr. new game intro)
-Selection choices have [Madam] direct mode not hooked up for score, no background and detail loss for choice GFXs
+[Madam/AMY] No background and detail loss for choice GFXs
 [Madam] has zooming portions in places
 ]]></notes>
 		<!-- assume barcode 8 10148 57406 2 is for the Limited Run Games version (same content?) -->
