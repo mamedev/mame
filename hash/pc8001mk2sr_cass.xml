@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="pc8001mk2sr_cass" description="NEC PC-8001mkIISR (N80SR BASIC) cassettes">
+
+
+<!-- these might be 2-sided cassettes? -->
+	<software name="pacland" supported="no">
+		<description>Pac-Land</description>
+		<year>1984?</year>
+		<publisher>エニックス (Enix)?</publisher>
+		<info name="usage" value="Type CLOAD&quot;pac and then RUN"/>
+		<part name="cass1" interface="pc8801_cass">
+			<dataarea name="cass" size="114341">
+				<rom name="pac-land_a.t88" size="114341" crc="42e990c5" sha1="46cbd8e91421ff701e9f0e98444a27a526e33867"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="pc8801_cass">
+			<dataarea name="cass" size="106404">
+				<rom name="pac-land_b.t88" size="106404" crc="0c8a5a96" sha1="ea71b6f51c8cd2fdcd7d62e31fbd5ad356df8168"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="pc8801_cass">
+			<dataarea name="cass" size="110004">
+				<rom name="pac-land_c.t88" size="110004" crc="5c29c64a" sha1="4e1a9dc18a026be4add67db8724ef05da1275e1a"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="pc8801_cass">
+			<dataarea name="cass" size="111401">
+				<rom name="pac-land_d.t88" size="111401" crc="d22bd412" sha1="0858e14003b65bd5024eb5a4a46f3cae4be12f7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- these might be 2-sided cassettes? -->
+	<software name="blckonyxmk2" supported="no">
+		<description>The Black Onyx</description>
+		<year>1984</year>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<info name="release" value="198401xx"/>
+		<info name="alt_title" value="ザ・ブラックオニキス"/>
+		<info name="usage" value="Type CLOAD&quot;onyx and then RUN"/>
+		<part name="cass1" interface="pc8801_cass">
+			<dataarea name="cass" size="64295">
+				<rom name="the_black_onyx_v80.t88" size="64295" crc="3671cfd9" sha1="5e7289c85cd12cb3012533077ceb4355cc151349"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="pc8801_cass">
+			<dataarea name="cass" size="29795">
+				<rom name="the_black_onyx_v80_character creation.t88" size="29795" crc="23f62174" sha1="3960a0cd2987cf655faa406e58b1dc05ec6f9ebf"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 1982 TANAC 2 ?? -->
+	<software name="dualaln" supported="no">
+		<description>Dual Alien</description>
+		<year>1984</year>
+		<publisher>セントラル教育 (Central Kyoku)</publisher>
+		<info name="release" value="198404xx"/>
+		<info name="alt_title" value="デュアルエイリアン"/>
+		<info name="usage" value="Type CLOAD&quot;C-SOFT and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="6696">
+				<rom name="dual alien.t88" size="6696" crc="4bedc799" sha1="8fa64706626663396f98941239e5335e91641ab9"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 600bauds, so that it's N-BASIC, but syntax error at RUN -->
+	<software name="shogita2" supported="no">
+		<!-- or Igo Taikyoku V2? -->
+		<description>Shougi Taikyoku V2</description>
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="release" value="198410xx"/>
+		<info name="alt_title" value="将棋対局V2"/>
+		<info name="usage" value="Type CLOAD&quot;SHOUGI and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="40719">
+				<rom name="shogi taikyoku v2.t88" size="40719" crc="6e8a325d" sha1="84d3ffaf88a150c232e00acafa874363e5da41bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

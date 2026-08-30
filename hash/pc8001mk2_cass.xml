@@ -1,0 +1,258 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="pc8001mk2_cass" description="NEC PC-8001mkII (N80 BASIC) cassettes">
+
+
+	<!-- TO SORT -->
+<!-- 600bauds, so that it's N-BASIC, but out of memory in 8001/MKII/MKIISR -->
+	<software name="chinsnmj" supported="no">
+		<description>Chin-san Mahjong</description>
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="珍さん麻雀"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="23460">
+				<rom name="chin-san mahjong.t88" size="23460" crc="6d5fcfba" sha1="f0d74fa85f8442e64a901849a8ba0a2622be18be"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- PC-8001mkII -->
+
+	<software name="ay1" supported="no">
+		<description>AY-1 Fortress Solomon</description>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="AY-1 フォートロレス・ソロモン"/>
+		<info name="usage" value="Type CLOAD&quot;Solmon and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="30241">
+				<rom name="ay-1.t88" size="30241" crc="f5706072" sha1="be83344cff7fdaadbfb329d5357db7124a1bacd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combat" supported="no">
+		<description>Combat</description>
+		<year>1982</year>
+		<publisher>光栄マイコンシステム (Koei Micom System)</publisher>
+		<info name="alt_title" value="コンバット"/>
+		<info name="usage" value="Type CLOAD&quot;combat and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="19730">
+				<rom name="combat.t88" size="19730" crc="d5f635d6" sha1="e59098c33706b69683575b9644c434e6bf389203"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 600bauds, so that it's N-BASIC, but out of memory in 8001/MKII/MKIISR -->
+	<software name="cosmox" supported="no">
+		<description>Cosmo Cross</description>
+		<year>1982</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="alt_title" value="コスモクロス"/>
+		<info name="usage" value="Type CLOAD&quot;CCROSS and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="85436">
+				<rom name="cosmo cross.t88" size="85436" crc="2670e10c" sha1="e7a089abf1b258cb4885d7cc1fb528727f45cef4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fanfun" supported="no">
+		<description>Fan Fun</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ファンファン"/>
+		<info name="usage" value="Type MON to enter Monitor and then L"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="23168">
+				<rom name="fanfun.t88" size="23168" crc="7e087464" sha1="5a5ef975ecfc5f24556ffb6db77004e5f8d62ece"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fanfuna" cloneof="fanfun" supported="no">
+		<description>Fan Fun (alt maybe)</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ファンファン"/>
+		<info name="usage" value="Type MON to enter Monitor and then L"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="523940">
+				<rom name="fanfun (alt maybe).t88" size="523940" crc="9aa09f20" sha1="1eced4485695044a72784485f7f2b0aa913f3941"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 600bauds, so that it's N-BASIC, but error on RUN -->
+	<software name="galaxian" supported="no">
+		<description>Galaxian</description>
+		<year>1983</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ギャラクシアン"/>
+		<info name="usage" value="Type CLOAD&quot;gala and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="20574">
+				<rom name="galaxian.cmt" size="20574" crc="91723a4b" sha1="49bef0ed48c29b94632b5cc29d2e34cc8854402b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxiana" cloneof="galaxian" supported="no">
+		<description>Galaxian (alt?)</description>
+		<year>1983</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ギャラクシアン"/>
+		<info name="usage" value="Type CLOAD&quot;gala and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="18426">
+				<rom name="galaxian_dempa_v80.t88" size="18426" crc="da9fec0d" sha1="4b8992cec6deaecd6efe7fe401c1d134ec6465a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intadv" supported="no">
+		<description>Intern Adventure +</description>
+		<year>198?</year>
+		<publisher>セントラル教育 (Central Kyoku)</publisher>
+		<info name="usage" value="Type CLOAD&quot;C-SOFT and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="19646">
+				<rom name="intern adventure.t88" size="19646" crc="2392d3f8" sha1="1c7dd07f678a8121da848072966f1a857736570b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jump" supported="no">
+		<description>Jump!</description>
+		<year>19??</year>
+		<publisher>セントラル教育 (Central Kyoku)</publisher>
+		<info name="usage" value="Type CLOAD&quot;99 and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="24466">
+				<rom name="jump.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 600bauds, so that it's N-BASIC, but syntax error at RUN -->
+	<software name="plazmali" supported="no">
+		<description>Plazma Line</description>
+		<year>1984</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<info name="release" value="198412xx"/>
+		<info name="alt_title" value="プラズマライン"/>
+		<info name="usage" value="Type CLOAD&quot;PLAZMA and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="41127">
+				<rom name="plazma line.t88" size="41127" crc="a3ff546b" sha1="f8069b60751412a1838a7ca1f62c2289fe3b405e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzladv" supported="no">
+		<description>Puzzle Adventure</description>
+		<year>1983</year>
+		<publisher>マイコンシティー (Micom City)</publisher>
+		<info name="release" value="198301xx"/>
+		<info name="alt_title" value="パズルアドベンチャー"/>
+		<info name="usage" value="Type MON to enter Monitor and then L"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="19939">
+				<rom name="puzzle adventure.t88" size="19939" crc="df4a9f9a" sha1="6cdece913d5e2450b0fc17d6a8a2abf8fafbd8a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 600bauds, so that it's N-BASIC, but error at RUN -->
+	<software name="starflet" supported="no">
+		<description>Star Fleet</description>
+		<year>1983</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<info name="release" value="198307xx"/>
+		<info name="alt_title" value="スターフリート"/>
+		<info name="usage" value="Type CLOAD&quot;FLEET and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="20553">
+				<rom name="star_fleet_v80.t88" size="20553" crc="47ac3ccb" sha1="2e3d459f12acccc13247f7dc2c42d6732ce7dcdd"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 600bauds, so that it's N-BASIC, but tape error at RUN -->
+	<software name="starques" supported="no">
+		<description>Star Quest</description>
+		<year>1982</year>
+		<publisher>フゲン電子 (Fugen Denshi)</publisher>
+		<info name="usage" value="Type CLOAD&quot;STAR and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="26620">
+				<rom name="star quest.t88" size="26620" crc="c1295c1d" sha1="ce9fe4649a363c4eb6681efaa55d48fab68f369e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starligh" supported="no">
+		<description>Starlight Adventure</description>
+		<year>1983</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="スターライトアドベンチャー"/>
+		<info name="usage" value="Type MON to enter Monitor and then L"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="36281">
+				<rom name="starlight adventure.t88" size="36281" crc="73a93d80" sha1="739304386278be0125e3f6abecb7f227b03afdf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 600bauds, so that it's N-BASIC, but syntax error at RUN -->
+	<software name="univadv" supported="no">
+		<description>Universal Adventure</description>
+		<year>1983</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="usage" value="Type CLOAD&quot;UNI and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="12515">
+				<rom name="universal adventure.t88" size="12515" crc="a1f5aea0" sha1="5d1a28c0fc0d3c8b88bfa4d3fb19da5079c98432"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4dhouset" supported="no">
+		<description>Yojigen no Ie - 4 Dimension House</description>
+		<year>1983</year>
+		<publisher>プロシューマー (Prosumer)</publisher>
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="四次元の家"/>
+		<info name="usage" value="Type MON to enter Monitor and then L"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="24890">
+				<rom name="4 dimension house.t88" size="24890" crc="40e6938c" sha1="b642f87dc619975e60561499dc35b9b5d7afff07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zold" supported="no">
+		<description>Zold</description>
+		<year>1984</year>
+		<publisher>富士音響RAM (Fuji Onkyo RAM)</publisher>
+		<info name="release" value="198407xx"/>
+		<info name="usage" value="Type CLOAD&quot;ZOLD and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="15662">
+				<rom name="zold.t88" size="15662" crc="ca948d73" sha1="2a751237c7474a31d4280117b44344ca7baad732"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -530,6 +530,10 @@
 #include "pasti_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_PC88_T88
+#include "pc88_t88.h"
+#endif
+
 #ifdef HAS_FORMATS_PC98FDI_DSK
 #include "pc98fdi_dsk.h"
 #endif
@@ -1476,7 +1480,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
-//  en.category("NEC");
+    en.category("NEC");
+#ifdef HAS_FORMATS_PC88_T88
+  en.add(t88_cassette_formats); // pc88_t88.h
+#endif	
 //#ifdef HAS_FORMATS_P6001_CAS
 //  en.add(pc6001_cassette_formats); // p6001_cas.h
 //#endif
