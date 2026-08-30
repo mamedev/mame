@@ -738,6 +738,26 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="cmdhd">
+		<description>CMD HD Utilities</description>
+		<year>1993</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="HD Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="hd-utilities.d64" size="174848" crc="4a3ab5df" sha1="b757538611e98fb71dbcfbf17f51dfa3c2ddfb6a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="GEOS Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="hd_geos_utils.d64" size="174848" crc="fd2ae57a" sha1="c132ab9b534aa51236c6622c0a37746b2f5a59ec"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Operating Systems -->
 
 	<software name="contiki">
