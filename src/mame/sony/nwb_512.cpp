@@ -51,6 +51,12 @@ namespace
 		return (y % Y_MAX) * 256 + ((x % X_MAX) >> 3);
 	}
 
+	// Takes in an x,y coordinate and returns the 16-bit aligned byte offset into the framebuffer memory region
+	uint32_t coordinate_to_byte_offset_aligned(const uint16_t x, const uint16_t y)
+	{
+		return coordinate_to_byte_offset(x, y) & ~0x1;
+	}
+
 	// Gets the pixel offset of a given x coordinate
 	uint8_t x_to_pixel_offset(const uint16_t x)
 	{
@@ -101,7 +107,7 @@ void nwb_512_device::device_reset()
 void nwb_512_device::device_add_mconfig(machine_config &config)
 {
 	// NWP-512D 15" Monochrome CRT Monitor
-	constexpr uint16_t HORIZONTAL = 816; // make this 1024 instead of 816 to view offscreen area
+	constexpr uint16_t HORIZONTAL = 816;
 	constexpr uint16_t VERTICAL = 1024;
 	SCREEN(config, m_nwp_512d);
 	m_nwp_512d->set_screen_update(FUNC(nwb_512_device::screen_update));
@@ -141,14 +147,11 @@ u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [
 		{
 			const uint32_t byte_offset = coordinate_to_byte_offset(x, y); // Y: 2048 / 8 = 256 bytes per row, not all visible.
 			const uint16_t x_bit = x_to_pixel_offset(x);
+			const uint8_t pixel = m_vram->read(byte_offset) & (1u << x_bit);
 
-			// Get desired pixel
-			uint8_t pixel = m_vram->read(byte_offset);
-			pixel = pixel & (1u << x_bit);
-
-			// TODO: based on how NEWS-OS usually looks and how limited screenshots of the similar NWS-700 series appear,
-			//       this framebuffer seems to be black-on-white, unlike the color framebuffers. My NWS-831 is not functional
-			//       so I have been unable to confirm on real hardware, but I am pretty sure this is the case.
+			// TODO: based on how NEWS-OS usually looks and how limited pictures of how the similar NWS-700 series appears at
+			//       the monitor ROM prompt, this framebuffer seems to be black-on-white, unlike the color framebuffers. My
+			//       NWS-831 is not functional so I have been unable to confirm on real hardware, but I am pretty sure this is the case.
 			bitmap.pix(y, x) = pixel ? rgb_t::black() : rgb_t::white();
 		}
 	}
@@ -246,7 +249,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 			unsigned panic = 0;
 			while (m_state.busy && panic < 0xf0000)
 			{
-				const uint32_t byte_offset = source_y * 256 + ((source_x >> 4) << 1);
+				const uint32_t byte_offset = coordinate_to_byte_offset_aligned(source_x, source_y);
 				const uint16_t data = (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
 
 				const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source
@@ -511,8 +514,8 @@ void nwb_512_device::rop(uint16_t source)
 {
 	// Get destination data
 	// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
-	uint32_t byte_offset = m_state.destination_y * 256 + ((m_state.current_x >> 4) << 1); // Y: 1024 / 8 = 128 bytes per row. Guarantee X is word-aligned first by chopping LSB TODO: make a function, this is done in multiple places
-	uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
+	const uint32_t byte_offset = coordinate_to_byte_offset_aligned(m_state.current_x, m_state.destination_y);
+	const uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
 
 	// Execute raster operation with the appropriate source and destination data
 	uint16_t result = execute_rop(m_state.rop_function, source, destination);
