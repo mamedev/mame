@@ -923,7 +923,7 @@ void mayjinsn_state::init_mayjisn2()
 
 GAME( 1994, renju,      0,       renju,    renju,    st0016_state,   init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe (ver. 1.0)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, nratechu,   0,       st0016,   nratechu, st0016_state,   init_nratechu, ROT0, "Seta",             "Neratte Chu (ver. 1.10)",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayjisn2,   0,       mayjinsn, mayjisn2, mayjinsn_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayjisn2,   0,       mayjinsn, mayjisn2, mayjinsn_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // incorrect tilemap behaviour
 GAME( 1995, koikois,    0,       st0016,   koikois,  st0016_state,   init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda (E51-00001-A PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, koikoisa,   koikois, st0016,   koikoisa, st0016_state,   init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda (E63-00001 PCB)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 2001, gostop,     0,       st0016,   gostop,   st0016_state,   init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
