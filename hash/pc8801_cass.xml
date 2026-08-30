@@ -416,7 +416,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		<publisher>ツクモ (Tsukumo)</publisher>
 		<info name="release" value="198303xx"/>
 		<info name="alt_title" value="美少女ひっぱがしゲーム"/>
-		<info name="usage" value="Type LOAD&quot;cas&colon; and then RUN"/>
+		<info name="usage" value="Type LOAD&quot;cas: and then RUN"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="22194">
 				<rom name="bishojo hippagashi game.t88" size="22194" crc="d4b6a8d3" sha1="419c1cf949b9d20a4fc64cbe8074779796baecb4"/>
@@ -503,7 +503,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		<year>1983</year>
 		<publisher>ツクモ (Tsukumo)</publisher>
 		<info name="alt_title" value="ドンキーゴリラ"/>
-		<info name="usage" value="Type LOAD&quot;cas&colon; and then RUN"/>
+		<info name="usage" value="Type LOAD&quot;cas: and then RUN"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="6958">
 				<rom name="donkey gorilla.t88" size="6958" crc="8359a32a" sha1="255ca88bedb466e9313c025e3f4397733f000e96"/>
@@ -529,7 +529,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		<description>Downmaze</description>
 		<year>1983?</year>
 		<publisher>&lt;type-in?&gt;</publisher>
-		<info name="usage" value="Type LOAD&quot;cas&colon; and then RUN"/>
+		<info name="usage" value="Type LOAD&quot;cas: and then RUN"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="1433">
 				<rom name="downmaze.t88" size="1433" crc="04dcd527" sha1="2b53984c4f83dcca05fb1b6f6dbd2635f155672b"/>
@@ -648,7 +648,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		<year>1983</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="炎の館"/>
-		<info name="usage" value="Type LOAD&quot;cas&colon; and then RUN"/>
+		<info name="usage" value="Type LOAD&quot;cas: and then RUN"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="32532">
 				<rom name="honoo no yakata.t88" size="32532" crc="dd835108" sha1="e4819b78ad16b28b9c7e057e9018c835f7d187ce"/>
@@ -843,7 +843,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="メネシス88"/>
-		<info name="usage" value="Type LOAD&quot;cas&colon; and then RUN. Once the first tape is loaded, switch to the second and then the third and let the loading continue."/>
+		<info name="usage" value="Type LOAD&quot;cas: and then RUN. Once the first tape is loaded, switch to the second and then the third and let the loading continue."/>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="2146">
 				<rom name="nemesis-88-1.t88" size="2146" crc="14d144a0" sha1="a4d7b39aa41ea3c243b9fe65b02f1ab51d392da2"/>
