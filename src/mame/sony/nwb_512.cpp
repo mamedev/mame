@@ -1,10 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Brice Onken
 
-// Sony NWB-512 Monochrome Framebuffer and NWP-512D 15" Monochrome CRT Monitor
-// The NWB-512 is a NEWS expansion card (model DSC-001) that provides a single-plane monochrome output at 816x1024
-// resolution. It has hardware-accelerated graphics, provided by the Sony CXD1029 raster operation controller, and pairs
-// with the NWP-512D 15" monochrome CRT display.
+/*
+ * Sony NWB-512 Monochrome Framebuffer and NWP-512D 15" Monochrome CRT Monitor
+ *
+ * The NWB-512 is a NEWS expansion card (model DSC-001) that provides a single-plane monochrome output at 816x1024
+ * resolution. It has hardware-accelerated graphics, provided by the Sony CXD1029 raster operation controller, and pairs
+ * with the NWP-512D 15" monochrome CRT display.
+ *
+ * This expansion card supports the following NEWS workstations:
+ *  - All NWS-800/900 machines
+ *  - NWS-1410/1510
+ *  - PWS-1630
+ *  - All NWS-1700/1800/1900 machines
+ *  - All NWS-3800 machines
+ *
+ * Sources:
+ *  - NWS-1510/1530/1580 Service Manual
+ *  - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
+ *
+ * TODO:
+ *   - Framebuffer read-only operations
+ *   - Cycle-accurate timing
+ *   - Convert to NEWS I/O Bus slot device instead of regular device
+ */
 
 #include "emu.h"
 #include "nwb_512.h"
@@ -13,12 +32,53 @@
 #define LOG_ROP_CONFIG 1 << 2
 #define LOG_ROP 1 << 3
 
-#define VERBOSE (LOG_GENERAL|LOG_FB_FB|LOG_ROP_CONFIG)
+#define VERBOSE (LOG_GENERAL|LOG_FB_FB|LOG_ROP_CONFIG|LOG_ROP)
 #include "logmacro.h"
 
 #include <format>
 
 DEFINE_DEVICE_TYPE(NWB_512,  nwb_512_device,  "nwb_512",  "Sony NWB-512 monochrome framebuffer")
+
+namespace
+{
+	// Total memory region is 2048x2048 pixels (512KiB)
+	constexpr uint16_t X_MAX = 2048;
+	constexpr uint16_t Y_MAX = 2048;
+
+	// Takes in an x,y coordinate and returns the byte offset into the framebuffer memory region
+	uint32_t coordinate_to_byte_offset(const uint16_t x, const uint16_t y)
+	{
+		return (y % Y_MAX) * 256 + ((x % X_MAX) >> 3);
+	}
+
+	// Gets the pixel offset of a given x coordinate
+	uint8_t x_to_pixel_offset(const uint16_t x)
+	{
+		return 7 - (x & 7); // pixel 0 = bit 7
+	}
+
+	// Most registers on this card require word alignment.
+	// This helper enforces as such to make it easier to validate assumptions made about this fact.
+	void check_mem_mask(uint16_t mem_mask)
+	{
+		if (mem_mask != 0xffff)
+		{
+			fatalerror("fb: non-word write!");
+		}
+	}
+
+	// Extracts the X address from the data provided to an FB write
+	uint16_t x_address(uint16_t data)
+	{
+		return data & 0xfff; // When X is supplied, it is in D11-D0
+	}
+
+	// Extracts the Y address from the address provided to an FB write
+	uint16_t y_address(uint16_t data) // word offset
+	{
+		return data & 0xfff; // When Y is supplied, it is in A12-A1, but is already shifted down because it is mapped in the memory map function at word width.
+	}
+}
 
 
 nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -79,15 +139,17 @@ u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [
 	{
 		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
 		{
-			const uint32_t byte_offset = y * 256 + (x >> 3); // Y: 2048 / 8 = 256 bytes per row, not all visible.
-			const uint16_t x_bit = 7 - (x & 7); // pixel 0 = bit 7
+			const uint32_t byte_offset = coordinate_to_byte_offset(x, y); // Y: 2048 / 8 = 256 bytes per row, not all visible.
+			const uint16_t x_bit = x_to_pixel_offset(x);
 
-			// Set desired pixel
+			// Get desired pixel
 			uint8_t pixel = m_vram->read(byte_offset);
 			pixel = pixel & (1u << x_bit);
-			bitmap.pix(y, x) = pixel ? rgb_t::white() : rgb_t::black();
-			// bitmap.pix(y, x) = pixel ? rgb_t::black() : rgb_t::white();
 
+			// TODO: based on how NEWS-OS usually looks and how limited screenshots of the similar NWS-700 series appear,
+			//       this framebuffer seems to be black-on-white, unlike the color framebuffers. My NWS-831 is not functional
+			//       so I have been unable to confirm on real hardware, but I am pretty sure this is the case.
+			bitmap.pix(y, x) = pixel ? rgb_t::black() : rgb_t::white();
 		}
 	}
 
@@ -101,24 +163,6 @@ void nwb_512_device::reset_state()
 	m_state = {};
 }
 
-uint16_t x_address(uint16_t data)
-{
-	return data & 0xfff; // When X is supplied, it is in D11-D0
-}
-
-uint16_t y_address(uint16_t data) // word offset
-{
-	return data & 0xfff; // When Y is supplied, it is in A12-A1, but is already shifted down.
-}
-
-void check_mem_mask(uint16_t mem_mask)
-{
-	if (mem_mask != 0xffff)
-	{
-		fatalerror("fb: non-word write!");
-	}
-}
-
 void nwb_512_device::check_operation_start(offs_t offset)
 {
 	if (m_state.fb_read && !m_state.fb_write)
@@ -126,10 +170,33 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		fatalerror("nwb512: fb read only not implemented yet!");
 	}
 
+	logerror("op arm: %-7s func=0x%x %s %s src=(0x%x,0x%x) dst=(0x%x,0x%x) lim=(0x%x,0x%x)\n",
+	(m_state.fb_read && m_state.fb_write) ? "FB->FB"  :
+	(!m_state.fb_read && m_state.fb_write) ? "host->FB" :
+	(m_state.fb_read && !m_state.fb_write) ? "FB->host" : "??",
+	m_state.rop_function,
+	m_state.x_direction ? "xfwd" : "xrev",
+	m_state.y_direction ? "yfwd" : "yrev",
+	m_state.source_x, m_state.source_y,
+	m_state.destination_x, m_state.destination_y,
+	m_state.limit_x, m_state.limit_y);
+
+
 	if (offset & (0x4000 >> 1)) // word offset
 	{
 		LOG("Operation started\n");
+
 		m_state.busy = true;
+		// Adjust source and destination coordinates for the reverse direction if necessary,
+		// because the left edge is always inclusive (right edge exclusive).
+		if (!m_state.x_direction)
+		{
+			--m_state.destination_x;
+			--m_state.source_x;
+			--m_state.limit_x;
+		}
+
+
 		m_state.current_x = m_state.destination_x;
 
 		const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x // fwd: [dest, limit)
@@ -138,6 +205,9 @@ void nwb_512_device::check_operation_start(offs_t offset)
 										m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15) :
 										0;
 		const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
+
+		m_state.prime = src_phase > dest_phase;
+		m_state.prime_pending = m_state.prime;
 		m_state.source_words_per_row = (src_phase  + width + 15) >> 4;
 		m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
 		m_state.source_words_left = m_state.source_words_per_row;
@@ -151,24 +221,48 @@ void nwb_512_device::check_operation_start(offs_t offset)
 			fatalerror("nwb512: fb->fb copy set but source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
 		}
 
+		// Update masks to preserve framebuffer contents that shouldn't be modified
+		uint16_t x_lo, x_hi;
+		if (m_state.x_direction)
+		{
+			x_lo = m_state.destination_x;
+			x_hi = m_state.limit_x - 1;
+		}
+		else
+		{
+			x_lo = m_state.limit_x + 1;
+			x_hi = m_state.destination_x;
+		}
+		m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
+		m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
+
 		// TODO: This executes copies at once, faster than real hardware. Needs more work to be cycle-accurate.
 		// TODO: make m_state.fb_read only work
 		if (m_state.fb_read && m_state.fb_write)
 		{
-			const int dx = int(m_state.source_x) - int(m_state.destination_x);
-			const int dy = int(m_state.source_y) - int(m_state.destination_y);
-			m_state.current_x = m_state.destination_x;
+			uint16_t source_x = m_state.source_x;
+			uint16_t source_y = m_state.source_y;
 
 			unsigned panic = 0;
 			while (m_state.busy && panic < 0xf0000)
 			{
-				const uint16_t sx = m_state.current_x + dx;
-				const uint16_t sy = m_state.destination_y + dy;
-				const uint32_t byte_offset = sy * 256 + ((sx >> 4) << 1);
+				const uint32_t byte_offset = source_y * 256 + ((source_x >> 4) << 1);
 				const uint16_t data = (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
-				// LOGMASKED(LOG_FB_FB, "ROP for sx = 0x%x sy = 0x%x byte_offset = 0x%x data = 0x%x panic = 0x%x\n", sx, sy, byte_offset, data, panic);
+
+				const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source
+				LOGMASKED(LOG_FB_FB, "ROP for sx = 0x%x sy = 0x%x byte_offset = 0x%x data = 0x%x panic = 0x%x\n", source_x, source_y, byte_offset, data, panic);
 				rop_cycle(data); // When the ROP is done, this function will clear m_state.busy
 				++panic;
+
+				if (m_state.destination_y != destination_y_snapshot)
+				{
+					source_x = m_state.source_x;
+					source_y += m_state.y_direction ? 1 : -1;
+				}
+				else
+				{
+					source_x += m_state.x_direction ? 16 : -16;
+				}
 			}
 			if (panic >= 0xf0000)
 			{
@@ -192,13 +286,13 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 	if (offset & (0x2000 >> 1))
 	{
-		// how much do we need to shift source by to align it with destination?
-		m_state.shift = (m_state.destination_x % 16 - m_state.source_x % 16) & 0xf;
-		LOG("destination_w: Calculated shift: 0x%x % 16 - 0x%x % 16 = 0x%x\n", m_state.destination_x, m_state.source_x, m_state.shift);
+		// Determine how much we need to shift source by to align it with destination
+		m_state.shift = (m_state.destination_x - m_state.source_x) & 15;
+		LOG("destination_w: Calculated shift: 0x%x - 0x%x & 15 = 0x%x\n", m_state.destination_x, m_state.source_x, m_state.shift);
 	}
 
 	// Compute first mask
-	m_state.mask1 = ~(0xffff >> (m_state.destination_x % 16)); // determine first mask based on bit offset in first word TODO: direction?
+	// m_state.mask1 = ~(0xffff >> (m_state.destination_x % 16)); // determine first mask based on bit offset in first word TODO: direction?
 
 	LOG("Destination set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
 	check_operation_start(offset);
@@ -238,8 +332,8 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	m_state.limit_x = x_address(data);
 	m_state.limit_y = y_address(offset);
-	const uint16_t last_pixel = (m_state.limit_x - 1) & 0xf;     // last pixel's position in the last word
-	m_state.mask2 = 0xffff >> (last_pixel + 1);        // preserve everything at/after the right edge
+	// const uint16_t last_pixel = (m_state.limit_x - 1) & 0xf;     // last pixel's position in the last word
+	// m_state.mask2 = 0xffff >> (last_pixel + 1);        // preserve everything at/after the right edge
 
 	LOG("Limit set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.limit_x, m_state.limit_y, (m_state.limit_x - 1) >> 4);
 	check_operation_start(offset);
@@ -301,7 +395,16 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// Set pixel to 1 at X (data), Y (offset[12:1])
 	check_mem_mask(mem_mask);
 	LOG("pixel_w(0x%x, 0x%x)\n", offset, data);
-	set_pixel(x_address(data), y_address(offset), true);
+	
+	const uint16_t x = x_address(data);
+	const uint16_t y = y_address(offset);
+	const uint32_t byte_offset = coordinate_to_byte_offset(x, y);
+	const uint16_t x_bit = x_to_pixel_offset(x);
+	const uint8_t destination = m_vram->read(byte_offset) & ~(1u << x_bit) ? 1 : 0;
+
+	// Use the result of the ROP engine before setting the pixel
+	// TODO: consolidate set_pixel into this function, it is only used here.
+	set_pixel(x, y, execute_rop(m_state.rop_function, 1, destination) & 1);
 }
 
 uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
@@ -394,9 +497,11 @@ uint16_t nwb_512_device::shift(uint16_t data)
 		m_state.carry = uint16_t(uint32_t(data) << (16 - m_state.shift) & 0xffff);
 	}
 	else
-	{
-		result = uint16_t(data << m_state.shift | m_state.carry);
-		m_state.carry = uint16_t(uint32_t(data) >> (16 - m_state.shift) & 0xffff);
+	{   // TODO: might be better to calculate shift differently based on rev flag instead, mainly if the computation of state can be centralized
+		//       But, the direction is still different, so doing the computation in the state update doesn't get rid of this if/else
+		const uint16_t shift_complement = (16 - m_state.shift) & 0xf;
+		result = uint16_t(data << shift_complement | m_state.carry);
+		m_state.carry = uint16_t(uint32_t(data) >> (16 - shift_complement) & 0xffff);
 	}
 
 	return result;
@@ -412,19 +517,23 @@ void nwb_512_device::rop(uint16_t source)
 	// Execute raster operation with the appropriate source and destination data
 	uint16_t result = execute_rop(m_state.rop_function, source, destination);
 
-	// LOG("rop_cycle:\n");
-	// LOG("\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_x, m_state.destination_y, byte_offset);
-	// LOG("\tshift = 0x%x, source = 0x%x, carry = 0x%x, destination = 0x%x\n", m_state.shift, source, m_state.carry, destination);
-	// LOG("\trop result = 0x%x\n", result);
+	LOG("rop_cycle:\n");
+	LOG("\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_x, m_state.destination_y, byte_offset);
+	LOG("\tshift = 0x%x, source = 0x%x, carry = 0x%x, destination = 0x%x\n", m_state.shift, source, m_state.carry, destination);
+	LOG("\trop result = 0x%x\n", result);
+	const bool first_word = m_state.dest_words_left == m_state.dest_words_per_row;
+	const bool last_word = m_state.dest_words_left == 1;
 
-	if (m_state.dest_words_left == m_state.dest_words_per_row) // first word of row
+	if (first_word) // first word of row
 	{
-		result = (result & ~m_state.mask1) | (destination & m_state.mask1);
+		const uint16_t mask = m_state.x_direction ? m_state.mask1 : m_state.mask2;
+		result = (result & ~mask) | (destination & mask);
 	}
 
-	if (m_state.dest_words_left == 1) // last word of row
+	if (last_word) // last word of row
 	{
-		result = (result & ~m_state.mask2) | (destination & m_state.mask2);
+		const uint16_t mask = m_state.x_direction ? m_state.mask2 : m_state.mask1;
+		result = (result & ~mask) | (destination & mask);
 	}
 
 	// Write result back to VRAM
@@ -454,21 +563,26 @@ void nwb_512_device::end_row()
 	else
 	{
 		m_state.dest_words_left = m_state.dest_words_per_row;
-		// temp: m_state.source_words_left = m_state.source_words_per_row;
+		m_state.source_words_left = m_state.source_words_per_row;
+		m_state.prime_pending = m_state.prime;
 		m_state.limit_y--;
 		// LOG("\tdecremented limit to 0x%x\n", m_state.limit_y);
 	}
-
-	// temp
-	if (!m_state.source_words_left)
-	{
-		m_state.source_words_left = m_state.source_words_per_row;
-	}
-	// end temp
 }
 
 void nwb_512_device::rop_cycle(uint16_t data)
 {
+	if (m_state.prime_pending)
+	{
+		// If the source row has more data than the dest row, all we need to do is prime the shifter so carry is correct.
+		// After this, the source and destination counts will be aligned.
+		logerror("Applying primed extra read!\n");
+		shift(data);
+		m_state.prime_pending = false;
+		--m_state.source_words_left;
+		return;
+	}
+
 	data = shift(data);
 	rop(data);
 	m_state.source_words_left--;
@@ -519,14 +633,9 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
 {
-	// Wrap to framebuffer size
-	x %= 2048;
-	y %= 2048;
-
-	// LOG("set_pixel(0x%x, 0x%x) = %d\n", x, y, on ? 1 : 0);
 	// Determine byte offset in VRAM
-	const uint32_t byte_offset = y * 256 + (x >> 3); // Y: 1024 / 8 = 128 bytes per row
-	const uint16_t x_bit = 7 - (x & 7); // pixel 0 = bit 7
+	const uint32_t byte_offset = coordinate_to_byte_offset(x, y);
+	const uint16_t x_bit = x_to_pixel_offset(x);
 
 	// Set desired pixel
 	uint8_t pixel = m_vram->read(byte_offset);

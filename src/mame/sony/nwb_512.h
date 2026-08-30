@@ -74,6 +74,8 @@ private:
 		uint16_t dest_words_left = 0;
 		uint16_t mask1 = 0;
 		uint16_t mask2 = 0;
+		bool prime = false; // /PRED - when src phase > dst phase, there are two source words needed to set first dst
+		bool prime_pending = false;
 	} m_state;
 
 	struct debug_info
