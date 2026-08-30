@@ -253,9 +253,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 10th Frame (UK) (1986) [Original].zip... --> <!-- CPC Power -->
-	<software name="10frame" supported="no">
+	<software name="10frame">
 		<description>10th Frame (UK)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
@@ -345,9 +344,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 1943 (UK) (1988) [Original].zip... --> <!-- CPC Power -->
-	<software name="1943" supported="no">
+	<software name="1943">
 		<description>1943 (UK)</description>
 		<year>1988</year>
 		<publisher>Go! ~ Capcom</publisher>
@@ -474,9 +472,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- Possibly BAD DUMP?? (see CPC Power) Anyway, it resets to BASIC when trying to load -->
 	<!-- Identifying 2112 AD (UK,F,G,S) (128K) (1986) (CPM) [Original].zip... --> <!-- CPC Power -->
-	<software name="2112ad" supported="no">
+	<software name="2112ad">
 		<description>2112 AD (Euro?)</description>
 		<year>1986</year>
 		<publisher>Design Design</publisher>
@@ -861,9 +858,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 4x4 Off-Road Racing (UK) (1988) [Original].zip... --> <!-- CPC Power -->
-	<software name="4x4offrd" supported="no">
+	<software name="4x4offrd">
 		<description>4x4 Off-Road Racing (UK)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
@@ -926,9 +922,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 720 (UK) (1988) [Original].zip... --> <!-- CPC Power -->
-	<software name="720" supported="no">
+	<software name="720">
 		<description>720° (UK)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -1561,9 +1556,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, protection related -->
 	<!-- Identifying Ace Of Aces (UK) (1985) [Original] (Weak Sectors).zip... --> <!-- CPC Power -->
-	<software name="aceoface" supported="no">
+	<software name="aceoface">
 		<description>Ace of Aces (UK)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
@@ -1628,9 +1622,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, protection related -->
 	<!-- Identifying Acro Jet The Advanced Flight Simulator (UK) (1986) [Original].zip... --> <!-- CPC Power -->
-	<software name="acrojet" supported="no">
+	<software name="acrojet">
 		<description>AcroJet - The Advanced Flight Simulator (UK)</description>
 		<year>1986</year>
 		<publisher>Microprose</publisher>
@@ -1668,9 +1661,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection related -->
 	<!-- Identifying Action Force (UK) (1988) (CPM) [Original].zip... --> <!-- CPC Power -->
-	<software name="actforce" supported="no">
+	<software name="actforce">
 		<description>Action Force (UK)</description>
 		<year>1988</year>
 		<publisher>Virgin Games</publisher>
@@ -2044,7 +2036,6 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, protection related -->
 	<!-- Identifying Adidas Championship Football (UK) (1990) (Spain retail version) [Original].zip... --> <!-- CPC Power -->
 	<software name="adidasfb">
 		<description>Adidas Championship Football (Spa)</description> <!-- Game in English, was the same disk sold in UK too? -->
@@ -40423,7 +40414,7 @@ stick to CPC-Power disks, when available)
 	</software>
 
 	<!-- Identifying Goody (S) (1987) (CPM) [Original].zip... --> <!-- CPC Power -->
-	<software name="goodys19" supported="no">
+	<software name="goodys19">
 		<description>Goody (Spa) (CPM) [Original]</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -253494,7 +253485,7 @@ stick to CPC-Power disks, when available)
 	</software>
 
 	<!-- Identifying 3D 4 en Raya &amp; Space Trucker &amp; Base Lunar Alfa &amp; Cargamento Espacial &amp; Frutties &amp; Santas Grotty &amp; Egg Blitz &amp; Smaley vs Grumpis &amp; Space Base (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
-	<software name="3d4enray" supported="no">
+	<software name="3d4enray">
 		<description>3D 4 en Raya &amp; Space Trucker &amp; Base Lunar Alfa &amp; Cargamento Espacial &amp; Frutties &amp; Santas Grotty &amp; Egg Blitz &amp; Smaley vs Grumpis &amp; Space Base</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
