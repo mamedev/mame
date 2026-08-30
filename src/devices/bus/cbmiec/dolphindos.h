@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Evesham Micros Dolphin-DOS 2.0
+    Evesham Micros Dolphin-DOS
 
 **********************************************************************/
 
@@ -39,7 +39,7 @@ protected:
 	virtual void parallel_strobe_w(int state) override;
 
 private:
-	virtual uint8_t via0_pa_r();
+	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	void via0_ca2_w(int state);
 
