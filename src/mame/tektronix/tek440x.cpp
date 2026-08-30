@@ -66,6 +66,12 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_MMU (1U << 1)
+#define LOG_FPU (1U << 2)
+#define LOG_SCSI (1U << 3)
+#define LOG_IRQ (1U << 4)
+
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 namespace {
@@ -84,6 +90,7 @@ public:
 		m_scsi(*this, "ncr5385"),
 		m_novram(*this, "novram"),
 		m_vint(*this, "vint"),
+		m_fpu(*this, "fpu"),
 		m_prom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
@@ -114,6 +121,10 @@ private:
 	void mapcntl_w(u8 data);
 	void sound_w(u8 data);
 	void diag_w(u8 data);
+	void fpu_finished(int v);
+	u16 fpu_r(offs_t offset);
+	void fpu_w(offs_t offset, u16 data);
+	
 
 	u8 nvram_r(address_space &space, offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
@@ -138,6 +149,7 @@ private:
 	required_device<ncr5385_device> m_scsi;
 	required_device<x2210_device> m_novram;
 	required_device<input_merger_all_high_device> m_vint;
+	required_device<ns32081_device> m_fpu;
 
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
@@ -151,6 +163,9 @@ private:
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
+	
+	bool m_fpu_finished;
+
 };
 
 
@@ -281,7 +296,79 @@ void tek440x_state::mapcntl_w(u8 data)
 		m_map_view.select(0);
 	else
 		m_map_view.disable();
+
 	m_map_control = data & 0x1f;
+}
+
+void tek440x_state::fpu_finished(int val)
+{
+
+	// active low
+	if (val == 0)
+	{
+		LOGMASKED(LOG_FPU, "fpu_finished\n");
+		m_fpu_finished = true;
+	}
+}
+
+void tek440x_state::fpu_w(offs_t offset, u16 data)
+{
+	//LOGMASKED(LOG_FPU,"fpu_w:  %08x <= 0x%04x\n", offset, data);
+
+	// page 2.1-72  AD.02,AD.03 drive ST0,ST1 of 32081
+	switch(offset)
+	{
+		default:
+			break;
+		
+		// latches opcode.w, arg1.l, arg2.l
+		case 2:
+		case 3:
+			m_fpu->slow_write(data);
+			break;
+
+		// broadcast slave id  (0xbe or 0x3e)
+		case 6:
+			LOGMASKED(LOG_FPU,"fpu_w: broadcast slave 0x%04x\n", data);
+			m_fpu_finished = false;
+			m_fpu->slow_write(data);
+			break;
+		case 7:
+			break;
+	}
+}
+
+u16 tek440x_state::fpu_r(offs_t offset)
+{
+
+	u16 result = 0;
+	switch(offset)
+	{
+		default:
+			break;
+
+		case 2:
+		case 3:
+			result = m_fpu->slow_read();
+			break;
+
+		case 4:
+			if (m_fpu_finished)
+			{
+				result = m_fpu->slow_status();
+				LOGMASKED(LOG_FPU,"fpu_r: status = 0x%04x\n", result);
+			}
+			else
+			{
+				LOGMASKED(LOG_FPU,"fpu_r: status = BUSY\n");
+				
+				// page 2.1.72   FPC.pal:   IF (/Wr*FPSel) /D.15 = /FP.15*/Busy
+				result = 0x8000;
+			}
+			break;
+	}
+	
+	return result;
 }
 
 void tek440x_state::sound_w(u8 data)
@@ -425,6 +512,7 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
 	// 78a000-78bfff: NS32081 FPU
 	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
+	map(0x78a000, 0x78bfff).rw(FUNC(tek440x_state::fpu_r),FUNC(tek440x_state::fpu_w));
 	// 78e000-78ffff: spare
 
 	// 7a0000-7bffff peripheral board I/O
@@ -508,6 +596,9 @@ void tek440x_state::tek4404(machine_config &config)
 	aica.set_xtal(1.8432_MHz_XTAL);
 	aica.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	aica.irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
+	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
+	m_fpu->out_spc().set(FUNC(tek440x_state::fpu_finished));
+
 
 	X2210(config, m_novram);
 
