@@ -403,7 +403,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::lazercmd_timer)
 {
 	int scanline = param;
 
-	if((scanline % 2) == 1)
+	if ((scanline % 2) == 1)
 		return;
 
 	if (++m_timer_count >= 64 * 128)
@@ -418,7 +418,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::bbonk_timer)
 {
 	int scanline = param;
 
-	if((scanline % 2) == 1)
+	if ((scanline % 2) == 1)
 		return;
 
 	if (++m_timer_count >= 64 * 128)
@@ -774,10 +774,8 @@ void lazercmd_state::medlanes(machine_config &config)
 {
 	// basic machine hardware
 	S2650(config, m_maincpu, 8_MHz_XTAL / 12); // 666 kHz
-/*  Main Clock is 8MHz divided by 12
-    but memory and IO access is only possible
-    within the line and frame blanking period
-    thus requiring an extra loading of approx 3-5 */
+	// Main Clock is 8MHz divided by 12, but memory and IO access is only possible within the line
+	// and frame blanking period thus requiring an extra loading of approx 3-5
 	m_maincpu->set_addrmap(AS_PROGRAM, &lazercmd_state::medlanes_map);
 	m_maincpu->set_addrmap(AS_DATA, &lazercmd_state::portmap);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::lazercmd_timer), "screen", 0, 1);
@@ -785,7 +783,7 @@ void lazercmd_state::medlanes(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR);
 	screen.set_visarea(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, VERT_RES * VERT_CHR - 1);
 	screen.set_screen_update(FUNC(lazercmd_state::screen_update));
@@ -796,8 +794,8 @@ void lazercmd_state::medlanes(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_1BIT(config, m_dac[3], 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac[3], 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
@@ -810,8 +808,8 @@ void lazercmd_state::lazercmd(machine_config &config)
 	subdevice<screen_device>("screen")->set_size(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR + 16);
 	subdevice<screen_device>("screen")->set_visarea(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1);
 
-	DAC_1BIT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_1BIT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
