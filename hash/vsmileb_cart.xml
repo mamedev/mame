@@ -30,16 +30,17 @@ VTech V.Smile Baby cartridges
 |   NA   | 80-099000(US)     | Learn and Discover Home (white background on title) (pack-in) (no-ROM cartridge)
 |   NA   | 80-099000(US)     | Learn and Discover Home (green background on title) (standalone) (no-ROM cartridge)
 |   XX   | 80-099002(NL)     | Dierenhuis                                                                 |
-|        | 80-099003(UK)     | Learn and Discover Home (white background on title) (pack-in)              |
+|   NA   | 80-099003(UK)     | Learn and Discover Home (white background on title) (pack-in)  (no-ROM cartridge)
 |   XX   | 80-099004(GE)     | Meine kleinen Tierfreunde (Explore and Learn Home on label)                |
 |   XX   | 80-099005(FR)     | La Maison des animaux                                                      |
+|        | 80-099007(SP)     | La Casa de los Animalitos                                                  |
 |   NA   | 80-099014(SE)     | Lär och upptäck (no-ROM cartridge)                                         |
 +========+===================+============================================================================+
 |   XX   | 80-099020(US)     | Pooh's Hundred Acre Wood Adventure                                         |
 |   NA   | 80-099022(NL)     | Poeh's Honderd Bunderbos Avontuur (no-ROM cartridge)                       |
 |        | 80-099023(UK)     | Pooh's Hundred Acre Wood Adventure                                         |
 |   NA   | 80-099024(GE)     | Puuhs Hundert-Morgen-Wald (no-ROM cartridge)                               |
-|        | 80-099025(FR)     | Winnie et ses amis dans la Forêt des Rêves Bleus (no-ROM cart exists, unknown if a regular cart was sold too)
+|   NA   | 80-099025(FR)     | Winnie et ses amis dans la Forêt des Rêves Bleus (no-ROM cartridge)        |
 |   NA   | 80-099027(SP)     | Aventuras en el Bosque de los Cien Acres (no-ROM cartridge)                |
 |   XX   | 80-099034(SE)     | Nalle Puhs Äventyr i Sjumilaskogen                                         |
 +========+===================+============================================================================+
@@ -47,6 +48,7 @@ VTech V.Smile Baby cartridges
 |   XX   | 80-099040(US)     | Baby Einstein - World of Discoveries (no # on front label)                 |
 |        | 80-099043(UK)     | Baby Einstein - World of Discoveries                                       |
 |   XX   | 80-099045(FR)     | Baby Einstein - Un monde de découvertes                                    |
+|        | 80-099047(SP)     | Baby Einstein - ¡Baby Descubrimientos!                                     |
 +========+===================+============================================================================+
 |   XX   | 80-099060(US)     | A Day On The Farm                                                          |
 |        | 80-099063(UK)     | A Day On The Farm                                                          |
@@ -56,12 +58,12 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 |        | 80-099080(US)     | <Unknown>                                                                  |
 +========+===================+============================================================================+
-|   XX   | 80-099100(US)     | Noah's Ark Animal Adventure                                                |
+|   XX   | 80-099100(US)     | Noah's Ark - Animal Adventure                                              |
 |        | 80-099102(NL)     | De ark van Noach                                                           |
-|        | 80-099103(UK)     | Noah's Ark Animal Adventure                                                |
+|        | 80-099103(UK)     | Noah's Ark - Animal Adventure                                              |
 |   XX   | 80-099105(FR)     | L'arche de Noé - L'aventure des animaux                                    |
 +========+===================+============================================================================+
-|   XX   | 80-099120(US)     | Barney - Let's Go to a Party                                               |
+|   XX   | 80-099120(US)     | Barney - Let's Go to a Party!                                              |
 +========+===================+============================================================================+
 |   XX   | 80-099140(US)     | Teletubbies - Time for Teletubbies                                         |
 |        | 80-099142(NL)     | Teletubbies - Tijd voor Teletubbies                                        |
@@ -75,7 +77,7 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 |        | 80-099180(US)     | Bailey Goes To Town (included Bailey Plush Bear Controller)                |
 |        | 80-099183(UK)     | Bailey Goes To Town (included Bailey Plush Bear Controller)                |
-|        | 80-099185(FR)     | En Ville avec l'ourson Patoune (included Patoune Plush Bear Controller) (no-ROM cart exists, unknown if a regular cart was sold too)
+|   NA   | 80-099185(FR)     | En Ville avec l'ourson Patoune (included Patoune Plush Bear Controller) (pack-in) (no-ROM cartridge)
 +========+===================+============================================================================+
 |   XX   | 80-099200(US)     | Mother Goose                                                               |
 +========+===================+============================================================================+
@@ -103,7 +105,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="babyeinsa" cloneof="babyeins" supported="no">
 		<description>Baby Einstein - World of Discoveries (USA, alt)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099040(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -116,7 +118,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="babyeinsfr" cloneof="babyeins" supported="no">
 		<description>Baby Einstein - Un monde de découvertes (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099045(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -168,7 +170,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="dayfarm" supported="no">
 		<description>A Day on the Farm (USA)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099060(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -181,7 +183,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="dayfarmge" cloneof="dayfarm" supported="no">
 		<description>Mein erster Bauernhof (Germany)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099064(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -196,7 +198,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="dayfarmfr" cloneof="dayfarm" supported="no">
 		<description>Un jour à la ferme (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099065(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -209,7 +211,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="dayfarmsp" cloneof="dayfarm" supported="no">
 		<description>Un Día en la Granja (Spain)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099067(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -224,7 +226,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="dbabymi" supported="no">
 		<description>Discovery with Baby Mickey &amp; Friends (USA)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099160(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -237,7 +239,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="dbabymifr" cloneof="dbabymi" supported="no">
 		<description>Les découvertes de Mickey et ses amis (France)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099165(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -251,7 +253,7 @@ VTech V.Smile Baby cartridges
 	<!-- "Learn and Discover Home" -->
 	<software name="learndhnl" supported="no">
 		<description>Dierenhuis (Netherlands)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099002(NL)" />
 		<part name="cart" interface="vsmile_cart">
@@ -265,7 +267,7 @@ VTech V.Smile Baby cartridges
 	<!-- "Learn and Discover Home" -->
 	<software name="learndhge" cloneof="learndhnl" supported="no">
 		<description>Meine kleinen Tierfreunde (Germany)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099004(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -281,7 +283,7 @@ VTech V.Smile Baby cartridges
 	<!-- "Learn and Discover Home" -->
 	<software name="learndhfr" cloneof="learndhnl" supported="no">
 		<description>La Maison Des Animaux (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099005(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -294,7 +296,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="mothergoo" supported="no">
 		<description>Mother Goose (USA)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099200(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -307,7 +309,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="noahark" supported="no">
 		<description>Noah's Ark - Animal Adventures (USA)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099100(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -320,7 +322,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="noaharkfr" cloneof="noahark" supported="no">
 		<description>L'arche de Noé - L'aventure des animaux (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099105(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -333,7 +335,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="poohhawa" supported="no">
 		<description>Pooh's Hundred Acre Wood Adventure (USA)</description>
-		<year>2007</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099020(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -345,7 +347,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="poohhawase" cloneof="poohhawa" supported="no">
 		<description>Nalle Puhs Äventyr i Sjumilaskogen (Sweden)</description>
-		<year>2007?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099034(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -372,7 +374,7 @@ VTech V.Smile Baby cartridges
 
 	<software name="teletubfr" cloneof="teletub" supported="no">
 		<description>Teletubbies - C'est l'heure des Teletubbies (France)</description>
-		<year>2007?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099145(FR)" />
 		<part name="cart" interface="vsmile_cart">
