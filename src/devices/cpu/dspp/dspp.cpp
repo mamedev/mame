@@ -160,6 +160,7 @@ dspp_device::dspp_device(
 	m_dma_rollover_handler(*this),
 	m_frame_period(568),
 	m_frame_counter(568),
+	m_frame_sync(false),
 	m_tick(0),
 	m_code_config("code", ENDIANNESS_BIG, 16, 10, -1, code_map_ctor),
 	m_data_config("data", ENDIANNESS_BIG, 16, 10, -1, data_map_ctor),
@@ -262,6 +263,7 @@ void dspp_device::device_start()
 	save_item(NAME(m_core->m_flag_sleep));
 	save_item(NAME(m_frame_period));
 	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_frame_sync));
 	save_item(NAME(m_tick));
 
 	save_item(NAME(m_outputs));
@@ -334,6 +336,7 @@ void dspp_device::device_reset()
 	m_core->m_stack_ptr = 0;
 	m_core->m_writeback = ~1; // TODO
 	m_frame_counter = m_frame_period;
+	m_frame_sync = false;
 	set_rbase(0, 0);
 
 	// TODO: CLEAR DMA CHANNELS
@@ -759,6 +762,8 @@ inline void dspp_device::execute_one(bool check_debugger)
 
 // The complete program executes once per frame and then sleeps,
 // in typical audio DSP fashion.
+// If AUDLOCK is set the frame is restarted by the DAC clock,
+// otherwise the clock counter reload does it.
 void dspp_device::execute_run()
 {
 	if (m_isdrc)
@@ -783,17 +788,20 @@ void dspp_device::execute_run()
 
 	do
 	{
+		const int32_t start = m_core->m_icount;
 		update_ticks();
 		update_fifo_dma();
-
-		if (--m_frame_counter == 0)
-		{
-			new_frame();
-		}
 
 		if (!m_core->m_flag_sleep)
 		{
 			execute_one(check_debugger);
+		}
+
+		m_frame_counter -= start - m_core->m_icount;
+
+		if (m_frame_sync || (!m_core->m_flag_audlock && m_frame_counter <= 0))
+		{
+			new_frame();
 		}
 	} while (m_core->m_icount > 0);
 }
@@ -2059,7 +2067,9 @@ void dspp_device::host_gw_control_write(offs_t offset, u16 data)
 
 void dspp_device::new_frame()
 {
-	m_frame_counter = m_frame_period;
+	// a DAC sync or a host restart starts a full count, the clock counter carries its overshoot into the next frame
+	m_frame_counter = (m_frame_sync || m_frame_counter > 0) ? m_frame_period : m_frame_counter + m_frame_period;
+	m_frame_sync = false;
 	m_core->m_pc = 0;
 	m_core->m_flag_sleep = 0;
 
@@ -2070,6 +2080,14 @@ void dspp_device::new_frame()
 	const uint32_t end = (m_output_fifo_start + m_output_fifo_count - 2) & OUTPUT_FIFO_MASK;
 	m_output_fifo[(end + 0) & OUTPUT_FIFO_MASK] = m_outputs[0];
 	m_output_fifo[(end + 1) & OUTPUT_FIFO_MASK] = m_outputs[1];
+}
+
+void dspp_device::frame_sync()
+{
+	if (m_core->m_flag_audlock)
+	{
+		m_frame_sync = true;
+	}
 }
 
 void dspp_device::host_tick_reset(bool default_period)

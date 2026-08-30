@@ -886,6 +886,7 @@ TIMER_CALLBACK_MEMBER(clio_device::dac_update_cb)
 {
 	m_dac_l(m_dspp->read_output_fifo());
 	m_dac_r(m_dspp->read_output_fifo());
+	m_dspp->frame_sync();
 	m_dac_timer->adjust(attotime::from_hz(44100));
 }
 

@@ -37,6 +37,7 @@ public:
 	auto dma_rollover_handler() { return m_dma_rollover_handler.bind(); }
 
 	// Host side interface (DMA registers live in Madam, enables in Clio)
+	void frame_sync();
 	void host_dma_w(int channel, int reg, uint32_t data);
 	uint32_t host_dma_r(int channel, int reg);
 	void host_channel_enable_w(uint32_t set_mask, uint32_t clr_mask);
@@ -172,7 +173,8 @@ private:
 
 	// Audio frame model
 	uint32_t    m_frame_period;
-	uint32_t    m_frame_counter;
+	int32_t     m_frame_counter;
+	bool        m_frame_sync;
 	uint16_t    m_tick;
 	uint16_t fifo_peek_r(offs_t offset);
 	void fifo_head_w(offs_t offset, uint16_t data);
