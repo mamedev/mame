@@ -345,6 +345,12 @@ osd::directory::entry::ptr osd_stat(const std::string &path)
 
 osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 {
+	if (win_check_socket_path(path) ||
+	    win_check_ptty_path(path))
+	{
+		dst = path;
+		return std::error_condition();
+	}
 	// convert the path to TCHARs
 	osd::text::tstring t_path = osd::text::to_tstring(path);
 
