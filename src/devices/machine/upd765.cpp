@@ -925,8 +925,21 @@ void upd765_family_device::live_run(attotime limit)
 			limit = cur_live.fi->dev->time_next_index();
 		if(limit == attotime::never) {
 			// Happens when there's no disk or if the fdc is not
-			// connected to a drive, hence no index pulse. Force a
-			// sync from time to time in that case, so that the main
+			// connected to a drive, hence no index pulse, or when the
+			// drive stopped turning since the command started.  In the
+			// latter case no flux will ever show up, so end the command
+			// with not ready instead of searching forever.
+			if(cur_live.fi->dev && !get_ready(cur_live.fi->id)) {
+				floppy_info &fi(*cur_live.fi);
+				live_abort();
+				fi.st0 = ST0_NR | ST0_FAIL | fi.id;
+				st1 = st2 = 0;
+				fi.sub_state = COMMAND_DONE;
+				general_continue(fi);
+				return;
+			}
+
+			// Force a sync from time to time so that the main
 			// cpu timeout isn't too painful.  Avoids looping into
 			// infinity looking for data too.
 

@@ -173,6 +173,7 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 	TIMER_CALLBACK_MEMBER(index_resync);
+	TIMER_CALLBACK_MEMBER(motor_off_tick);
 
 	virtual void track_changed();
 	virtual void setup_characteristics() = 0;
@@ -189,6 +190,7 @@ protected:
 	std::vector<fs_info>  m_fs;
 	std::vector<const fs::manager_t *> m_fs_managers;
 	emu_timer             *m_index_timer;
+	emu_timer             *m_motor_off_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
 	int m_tracks; /* addressable tracks */

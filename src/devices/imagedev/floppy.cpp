@@ -562,6 +562,7 @@ void floppy_image_device::device_start()
 	m_wpt = 0;
 	m_dskchg = exists() ? 1 : 0;
 	m_index_timer = timer_alloc(FUNC(floppy_image_device::index_resync), this);
+	m_motor_off_timer = timer_alloc(FUNC(floppy_image_device::motor_off_tick), this);
 	m_image_dirty = false;
 	m_ready = true;
 	m_ready_counter = 0;
@@ -819,37 +820,63 @@ bool floppy_image_device::wpt_r()
 	return m_wpt || (m_phases & 2);
 }
 
+TIMER_CALLBACK_MEMBER(floppy_image_device::motor_off_tick)
+{
+	if(m_mon)
+		return;
+	m_mon = 1;
+	if(m_image_dirty)
+		commit_image();
+	cache_clear();
+	m_revolution_start_time = attotime::never;
+	m_index_timer->adjust(attotime::zero);
+	set_ready(true);
+}
+
 /* motor on, active low */
 void floppy_image_device::mon_w(int state)
 {
-	if(m_mon == state)
-		return;
-
-	m_mon = state;
-
 	/* off -> on */
-	if (!m_mon && m_image)
+	if (!state)
 	{
-		m_revolution_start_time = machine().time();
-		cache_clear();
-		if (m_motor_always_on) {
-			// Drives with motor that is always spinning are immediately ready when a disk is loaded
-			// because there is no spin-up time
-			set_ready(false);
-		} else {
-			m_ready_counter = 2;
+		// A transition to motor-on cancels any pending mechanical
+		// spin-down.  When the line only dropped for a moment the spindle
+		// never stopped, so the drive keeps turning as if nothing had
+		// happened.
+		if(m_motor_off_timer->enabled())
+		{
+			m_motor_off_timer->adjust(attotime::never);
+			if(!m_mon)
+				return;
 		}
-		index_resync(0);
+
+		if(!m_mon)
+			return;
+
+		m_mon = 0;
+		if (m_image)
+		{
+			m_revolution_start_time = machine().time();
+			cache_clear();
+			if (m_motor_always_on) {
+				// Drives with motor that is always spinning are immediately ready when a disk is loaded
+				// because there is no spin-up time
+				set_ready(false);
+			} else {
+				m_ready_counter = 2;
+			}
+			index_resync(0);
+		}
 	}
 
 	/* on -> off */
-	else {
-		if(m_image_dirty)
-			commit_image();
-		cache_clear();
-		m_revolution_start_time = attotime::never;
-		m_index_timer->adjust(attotime::zero);
-		set_ready(true);
+	else if(!m_mon || m_motor_off_timer->enabled()) {
+		// The spindle does not stop the instant the motor line is released;
+		// it coasts.  Keep turning (and ready) for a while so that short
+		// drops of the line - loaders flipping memory paging on the same
+		// port do that constantly - do not interrupt a spin, and only take
+		// the mechanical stop once the line has stayed off long enough.
+		m_motor_off_timer->adjust(attotime::from_msec(100));
 	}
 
 	// Create a motor sound (loaded or empty)
