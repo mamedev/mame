@@ -63,7 +63,7 @@ public:
 	void init_gaxeduel() ATTR_COLD;
 	void init_rsgun() ATTR_COLD;
 	void init_groovef() ATTR_COLD;
-	void init_sandr() ATTR_COLD;
+	void init_sandor() ATTR_COLD;
 	void init_cottonbm() ATTR_COLD;
 	void init_smleague() ATTR_COLD;
 	void init_nameclv3() ATTR_COLD;

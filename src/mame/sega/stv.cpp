@@ -708,7 +708,7 @@ void stv_state::init_thunt()
 //  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
-void stv_state::init_sandr()
+void stv_state::init_sandor()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602a0f8);
 	m_maincpu->sh2drc_add_pcflush(0x6013fbe);
@@ -2617,7 +2617,7 @@ ROM_START( rsgun )
 	ROM_PARAMETER( ":315_5881:key", "05272d01" )
 ROM_END
 
-ROM_START( sandr )
+ROM_START( sandor )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
@@ -4295,9 +4295,9 @@ GAME( 1997, seabass,   stvbios, stv,      stv,      stv_state,   init_seabass,  
 GAME( 1995, shanhigw,  stvbios, stv,      stv,      stv_state,   init_shanhigw,   ROT0,   "Sunsoft / Activision",         "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, shienryu,  stvbios, shienryu, stv,      stv_state,   init_shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   init_sss,        ROT0,   "Capcom / Cave / Victor Interactive Software", "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Also credited as Pack In Soft in ending screen
-GAME( 1995, sandr,     stvbios, stv,      stv,      stv_state,   init_sandr,      ROT0,   "Sega",                         "Puzzle & Action: Sand-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, thunt,     sandr,   stv,      stv,      stv_state,   init_thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, thuntk,    sandr,   stv,      stv,      stv_state,   init_sandr,      ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, sandor,    stvbios, stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sand-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, thunt,     sandor,  stv,      stv,      stv_state,   init_thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, thuntk,    sandor,  stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, skychal,   stvbios, hopper,   patocar,  stv_state,   init_stv,        ROT0,   "Sega",                         "Sky Challenger (J 000406 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, smleague,  stvbios, stv,      stv,      stv_state,   init_smleague,   ROT0,   "Sega",                         "Super Major League (U 960108 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, finlarch,  smleague,stv,      stv,      stv_state,   init_finlarch,   ROT0,   "Sega",                         "Final Arch (J 950714 V1.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
