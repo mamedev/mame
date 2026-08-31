@@ -68,7 +68,8 @@ Not extensively tested
 		<year>2010</year>
 		<publisher>Capcom Entertainment</publisher>
 		<notes><![CDATA[
-White screen at SW bootup
+Title screen doesn't draw GFXs beyond selections, gameplay doesn't draw comic balloons, assume using 3d
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="NTR P BGTE"/>
 		<part name="cart" interface="nds_cart">
@@ -121,8 +122,8 @@ No graphics, reacts to touch presses, assume it uses 3d
 		<year>2010</year>
 		<publisher>Rising Star Games</publisher>
 		<notes><![CDATA[
-White screen at SW bootup
-Optional single cart multiplayer support
+Fails at [cart] SRAM check
+Optional single cart Wi-Fi multiplayer support
 ]]></notes>
 		<info name="release" value="20101029"/>
 		<info name="serial" value="NTR P BIVP / NTR-BIVP-EUR"/>
