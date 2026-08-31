@@ -92,6 +92,10 @@ uint16_t mn89304_vga_device::offset()
 
 namespace {
 
+// data wheel: detents per full turn, and the drag adjuster's 0..100 range plus one
+static constexpr int ENCODER_POSITIONS = 24;
+static constexpr int ENCODER_DRAG_POSITIONS = 101;
+
 class kn5000_state : public driver_device
 {
 public:
@@ -113,6 +117,8 @@ public:
 		, m_sstat(0)
 		, m_cpanel_inta(0)
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(encoder_moved);
 
 	void kn5000(machine_config &config) ATTR_COLD;
 
@@ -447,6 +453,20 @@ static INPUT_PORTS_START(kn5000)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DOWN 2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 2")
+	// TEMPO/PROGRAM data wheel below the LCD: an endless rotary encoder, so a wrapping
+	// positional control.  Each step becomes one detent for the control panel device.
+	PORT_START("ENCODER")
+	PORT_BIT(0x1f, 0x00, IPT_POSITIONAL) PORT_NAME("Tempo / Program Data Wheel")
+		PORT_POSITIONS(ENCODER_POSITIONS) PORT_WRAPS PORT_SENSITIVITY(20) PORT_KEYDELTA(1)
+		PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)
+		PORT_FULL_TURN_COUNT(ENCODER_POSITIONS)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_POSITIONS)
+
+	// The same wheel, as an adjuster for the layout script to drag; detents from both are summed.
+	PORT_START("ENCODER_DRAG")
+	PORT_ADJUSTER(50, "Tempo / Program Data Wheel (mouse drag)")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_DRAG_POSITIONS)
+
 INPUT_PORTS_END
 
 
@@ -464,6 +484,22 @@ void kn5000_state::machine_reset()
 {
 	m_checking_device_led_cn11 = 0;
 	m_checking_device_led_cn12 = 0;
+}
+
+// A step of the data wheel.  Both wheel controls arrive here; param is the control's full
+// turn, so that a wrap reads as one detent rather than a full-scale move backwards.
+INPUT_CHANGED_MEMBER(kn5000_state::encoder_moved)
+{
+	int const modulus = int(param);
+	int delta = int(newval) - int(oldval);
+	if (delta > modulus / 2)
+		delta -= modulus;
+	else if (delta < -modulus / 2)
+		delta += modulus;
+
+	// magnitude is kept, not reduced to a direction: the firmware uses it as an acceleration index
+	if (delta != 0)
+		m_cpanel->encoder_detent(delta);
 }
 
 void kn5000_state::kn5000(machine_config &config)
