@@ -41,8 +41,8 @@ public:
 	// MEMC comms
 	void write_vram(u32 offset, u8 data) { m_data_vram[offset & (m_data_vram_mask)] = data; }
 	void write_cram(u32 offset, u8 data) { m_cursor_vram[offset & (m_cursor_vram_mask)] = data; }
+	void enqueue_fifo(u32 data);
 	void write_dac(u8 channel, u8 data);
-	void clear_dac(u8 channel) { m_dac[channel & 7]->write(0); }
 	void update_sound_mode(bool state) { m_sound_mode = state; refresh_sound_frequency(); }
 	void set_cursor_enable(bool state) { m_cursor_enable = state; }
 	u32 get_cursor_size() { return (m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR]) * (32/4); }
@@ -64,7 +64,7 @@ protected:
 	virtual u32 get_pixel_clock();
 
 	TIMER_CALLBACK_MEMBER(vblank_timer);
-	TIMER_CALLBACK_MEMBER(sound_drq_timer);
+	TIMER_CALLBACK_MEMBER(sound_sample_timer);
 
 	address_space_config  m_space_config;
 
@@ -89,7 +89,7 @@ protected:
 	u16 m_sound_frequency_latch;
 	bool m_sound_mode;
 
-	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
+	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	required_device_array<mixer_device, 2> m_mixer;
 	int m_dac_type;
 
@@ -102,6 +102,7 @@ private:
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
+	bool play_fifo_sample();
 	void pal_data_display_w(offs_t offset, u32 data);
 	void pal_data_cursor_w(offs_t offset, u32 data);
 	void crtc_w(offs_t offset, u32 data);
@@ -130,6 +131,9 @@ private:
 	u8       m_stereo_image[8];
 	const float m_sound_input_gain = 0.125f;
 	int16_t  m_ulaw_lookup[256];
+	u8       m_sound_fifo[16];
+	u8       m_sound_fifo_read_ptr;
+	u8       m_sound_fifo_write_ptr;
 };
 
 class acorn_vidc1_device : public acorn_vidc10_device

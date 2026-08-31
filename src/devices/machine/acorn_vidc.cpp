@@ -81,6 +81,8 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_pixel_clock(0)
 	, m_cursor_enable(false)
 	, m_sound_frequency_test_bit(false)
+	, m_sound_fifo_read_ptr(0)
+	, m_sound_fifo_write_ptr(0)
 {
 	std::fill(std::begin(m_crtc_regs), std::end(m_crtc_regs), 0);
 	std::fill(std::begin(m_stereo_image), std::end(m_stereo_image), 0);
@@ -125,14 +127,12 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 
 	MIXER(config, m_mixer[1]);
 
-	for (int i = 0; i < m_sound_max_channels; i++)
-	{
-		// custom DAC
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_mixer[0], 1.0, i).add_route(0, m_mixer[1], 1.0, i);
+	m_mixer[0]->add_route(0, m_speaker, 0.5, 0);
+	m_mixer[1]->add_route(0, m_speaker, 0.5, 1);
 
-		m_mixer[0]->add_route(i, m_speaker, 0.5, 0);
-		m_mixer[1]->add_route(i, m_speaker, 0.5, 1);
-	}
+	// custom DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(0, m_mixer[0], 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(0, m_mixer[1], 1.0);
 }
 
 u32 acorn_vidc10_device::palette_entries() const noexcept
@@ -172,6 +172,9 @@ void acorn_vidc10_device::device_start()
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_sound_frequency_latch));
 	save_item(NAME(m_sound_frequency_test_bit));
+	save_pointer(NAME(m_sound_fifo), 16);
+	save_item(NAME(m_sound_fifo_read_ptr));
+	save_item(NAME(m_sound_fifo_write_ptr));
 	save_item(NAME(m_cursor_enable));
 	save_pointer(NAME(m_crtc_regs), CRTC_VCER+1);
 	save_pointer(NAME(m_crtc_raw_horz), 2);
@@ -182,7 +185,7 @@ void acorn_vidc10_device::device_start()
 	save_pointer(NAME(m_stereo_image), m_sound_max_channels);
 
 	m_video_timer = timer_alloc(FUNC(acorn_vidc10_device::vblank_timer), this);
-	m_sound_timer = timer_alloc(FUNC(acorn_vidc10_device::sound_drq_timer), this);
+	m_sound_timer = timer_alloc(FUNC(acorn_vidc10_device::sound_sample_timer), this);
 
 	// generate u255 law lookup table
 	// cfr. page 48 of the VIDC20 manual, page 33 of the VIDC manual
@@ -228,6 +231,10 @@ void acorn_vidc10_device::device_reset()
 		refresh_stereo_image(ch);
 	m_video_timer->adjust(attotime::never);
 	m_sound_timer->adjust(attotime::never);
+	for (int i = 0; i < 16; i++)
+		m_sound_fifo[i] = 0;
+	m_sound_fifo_read_ptr = 0;
+	m_sound_fifo_write_ptr = 0;
 }
 
 TIMER_CALLBACK_MEMBER(acorn_vidc10_device::vblank_timer)
@@ -236,9 +243,21 @@ TIMER_CALLBACK_MEMBER(acorn_vidc10_device::vblank_timer)
 	screen_vblank_line_update();
 }
 
-TIMER_CALLBACK_MEMBER(acorn_vidc10_device::sound_drq_timer)
+TIMER_CALLBACK_MEMBER(acorn_vidc10_device::sound_sample_timer)
 {
-	m_sound_drq_cb(ASSERT_LINE);
+	if (play_fifo_sample())
+		m_sound_drq_cb(ASSERT_LINE);
+}
+
+bool acorn_vidc10_device::play_fifo_sample()
+{
+	write_dac(m_sound_fifo_read_ptr&7, m_sound_fifo[m_sound_fifo_read_ptr&0xf]);
+	if (m_sound_fifo_read_ptr++ > 0xf)
+	{
+		m_sound_fifo_read_ptr = 0;
+		return true;
+	}
+	return false;
 }
 
 //**************************************************************************
@@ -419,15 +438,12 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 	    -001 full left
 	    -000 <undefined> TODO: verify what it actually means
 	*/
-	const float l_gain_settings[8] = { 1.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
-	const float r_gain_settings[8] = { 1.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
+	const float l_gain_settings[8] = { 2.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
+	const float r_gain_settings[8] = { 0.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
 
 	const float l_gain = l_gain_settings[m_stereo_image[channel]] * m_sound_input_gain;
 	const float r_gain = r_gain_settings[m_stereo_image[channel]] * m_sound_input_gain;
 	LOGMASKED(LOG_STEREO, "%d: %02x -> L %f R %f\n", channel, m_stereo_image[channel], l_gain, r_gain);
-
-	m_mixer[0]->set_input_gain(channel, l_gain);
-	m_mixer[1]->set_input_gain(channel, r_gain);
 }
 
 
@@ -450,21 +466,41 @@ void acorn_vidc10_device::sound_frequency_w(u32 data)
 //  MEMC comms
 //**************************************************************************
 
+void acorn_vidc10_device::enqueue_fifo(u32 data)
+{
+	// for each 32 bit dword sent to the vidc, the sample order is the
+	// lowest byte first, packed. i.e. bytes 3,2,1,0 in that order,
+	// assuming byte 0 is the MSB of the dword.
+	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>0)&0xff);
+	m_sound_fifo_write_ptr &= 0xf;
+	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>8)&0xff);
+	m_sound_fifo_write_ptr &= 0xf;
+	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>16)&0xff);
+	m_sound_fifo_write_ptr &= 0xf;
+	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>24)&0xff);
+	m_sound_fifo_write_ptr &= 0xf;
+}
+
 void acorn_vidc10_device::write_dac(u8 channel, u8 data)
 {
-	int16_t res = m_ulaw_lookup[data];
-	m_dac[channel & 7]->write(res);
+	const float stereo_clocks_l[8] = { 18.0f, 18.0f, 15.0f, 12.0f, 9.0f, 6.0f, 3.0f, 0.0f };
+	const float res = (float)m_ulaw_lookup[data] / 32768.0f;
+	const float percent_l = stereo_clocks_l[m_stereo_image[channel]&7] / 18.0f;
+	const float percent_r = (18.0f-stereo_clocks_l[m_stereo_image[channel]&7]) / 18.0f;
+	m_dac[0]->write((int16_t)(percent_l * res * 32768.0f));
+	m_dac[1]->write((int16_t)(percent_r * res * 32768.0f));
 }
 
 u32 acorn_vidc10_device::get_sound_clock()
 {
-	return clock() / 24 / 8;
+	return clock() / 24;
 }
 
 void acorn_vidc10_device::refresh_sound_frequency()
 {
 	// TODO: check against test bit (reloads sound frequency if 0)
-	// assume a value of zero is invalid (ppcar POST setup)
+	// TODO: does this test bit also clear the fifo?
+	// VERIFY: assume a value of zero is invalid (ppcar POST setup)?
 	if (m_sound_mode == true && m_sound_frequency_latch)
 	{
 		// TODO: Range is between 3 and 256 usecs
