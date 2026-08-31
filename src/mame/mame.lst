@@ -29125,6 +29125,11 @@ mtchxlti
 pubtimed
 pubtimeda
 
+@source:metro/blzntrnd.cpp
+blzntrnd
+gstrik2
+gstrik2j
+
 @source:metro/hyprduel.cpp
 hyprduel
 hyprduel2
@@ -29135,7 +29140,6 @@ magerror
 balcube
 bangball
 batlbubl
-blzntrnd
 daitorid
 daitorida
 dharma
@@ -29147,8 +29151,6 @@ dokyusp
 gakusai
 gakusai2
 gakusaia
-gstrik2
-gstrik2j
 gunmast
 karatour
 karatourj
