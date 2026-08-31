@@ -149,21 +149,21 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_vcount(0),
 	m_scanline_timer(nullptr), m_hblank_timer(nullptr),
 	m_keycnt{},
-	m_ipcfifocnt{},	m_ipcfifo{}, m_ipcfifo_last{}, m_ipcfifo_head{}, m_ipcfifo_count{},
+	m_ipcfifocnt{}, m_ipcfifo{}, m_ipcfifo_last{}, m_ipcfifo_head{}, m_ipcfifo_count{},
 	m_spi_cnt(0), m_spi_data(0),
 	m_fw_ram(std::make_unique<uint8_t[]>(0x40000)),
 	m_fw_cmd(0), m_fw_stat(0), m_fw_addr(0), m_fw_bytes(0), m_fw_powerdown(false),
-	m_pm_regs{ 0x0d, 0, 0, 0, 0, 0, 0, 0 },	m_pm_index(0), m_pm_have_index(false),
+	m_pm_regs{ 0x0d, 0, 0, 0, 0, 0, 0, 0 }, m_pm_index(0), m_pm_have_index(false),
 	m_tsc_result(0), m_tsc_pos(0),
 	m_rtc_io(0),
 	m_gba_mode(false),
 	m_total_lines(TOTAL_LINES), m_visible_lines(VISIBLE_LINES),
 	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_bios_prefetch(0), m_gba_fifo{},
-	m_auxspicnt(0),	m_auxspidata(0),
+	m_auxspicnt(0), m_auxspidata(0),
 	m_romctrl(0),
 	m_card_command{}, m_cartdata_len(0), m_card_cpu(1),
 	m_dma_timer{}, m_dma_srcreg{}, m_dma_dstreg{}, m_dma_ctrl{}, m_dma_src{}, m_dma_dst{}, m_dma_cnt{}, m_dma_fill{},
-	m_timer_regs{},	m_timer_reload{}, m_timer_hz{},	m_timer_start{}, m_tmr_timer{},
+	m_timer_regs{}, m_timer_reload{}, m_timer_hz{}, m_timer_start{}, m_tmr_timer{},
 	m_divcnt(0), m_sqrtcnt(0), m_div_numer(0), m_div_denom(0), m_div_result(0), m_divrem_result(0), m_sqrt_param(0), m_sqrt_result(0)
 	{ }
 
@@ -1809,8 +1809,8 @@ void nds_state::nds_arm9_map(address_map &map)
 /***************************************************************************
     VRAM
 
-	The VRAM mapping on this machine is crazy so we use an indirection table
-	to track what pages are mapped where.
+    The VRAM mapping on this machine is crazy so we use an indirection table
+    to track what pages are mapped where.
 ***************************************************************************/
 
 void nds_state::map_vram_bank(int region, int page, int pages, uint32_t bankoff)
@@ -2589,25 +2589,25 @@ uint32_t nds_state::gba_sound_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0x60/4: return m_gbsound->sound_r(0) | (m_gbsound->sound_r(1) << 16) | (m_gbsound->sound_r(2) << 24);
-		case 0x64/4: return m_gbsound->sound_r(3) | (m_gbsound->sound_r(4) << 8);
-		case 0x68/4: return m_gbsound->sound_r(6) | (m_gbsound->sound_r(7) << 8);
-		case 0x6c/4: return m_gbsound->sound_r(8) | (m_gbsound->sound_r(9) << 8);
-		case 0x70/4: return m_gbsound->sound_r(0xa) | (m_gbsound->sound_r(0xb) << 16) | (m_gbsound->sound_r(0xc) << 24);
-		case 0x74/4: return m_gbsound->sound_r(0xd) | (m_gbsound->sound_r(0xe) << 8);
-		case 0x78/4: return m_gbsound->sound_r(0x10) | (m_gbsound->sound_r(0x11) << 8);
-		case 0x7c/4: return m_gbsound->sound_r(0x12) | (m_gbsound->sound_r(0x13) << 8);
-		case 0x80/4: return m_gbsound->sound_r(0x14) | (m_gbsound->sound_r(0x15) << 8) | (m_gba_soundregs[(0x80 - 0x60)/4] & 0xffff0000);
-		case 0x84/4: return m_gbsound->sound_r(0x16);
+		case 0x00/4: return m_gbsound->sound_r(0) | (m_gbsound->sound_r(1) << 16) | (m_gbsound->sound_r(2) << 24);
+		case 0x04/4: return m_gbsound->sound_r(3) | (m_gbsound->sound_r(4) << 8);
+		case 0x08/4: return m_gbsound->sound_r(6) | (m_gbsound->sound_r(7) << 8);
+		case 0x0c/4: return m_gbsound->sound_r(8) | (m_gbsound->sound_r(9) << 8);
+		case 0x10/4: return m_gbsound->sound_r(0xa) | (m_gbsound->sound_r(0xb) << 16) | (m_gbsound->sound_r(0xc) << 24);
+		case 0x14/4: return m_gbsound->sound_r(0xd) | (m_gbsound->sound_r(0xe) << 8);
+		case 0x18/4: return m_gbsound->sound_r(0x10) | (m_gbsound->sound_r(0x11) << 8);
+		case 0x1c/4: return m_gbsound->sound_r(0x12) | (m_gbsound->sound_r(0x13) << 8);
+		case 0x20/4: return m_gbsound->sound_r(0x14) | (m_gbsound->sound_r(0x15) << 8) | (m_gba_soundregs[(0x80 - 0x60)/4] & 0xffff0000);
+		case 0x24/4: return m_gbsound->sound_r(0x16);
 	}
 
-	if ((offset >= (0x90/4)) && (offset < (0xa0/4)))
+	if ((offset >= (0x30/4)) && (offset < (0x40/4)))
 	{
-		const int base = (offset - (0x90/4)) * 4;
+		const int base = (offset - (0x30/4)) * 4;
 		return m_gbsound->wave_r(base) | (m_gbsound->wave_r(base + 1) << 8) | (m_gbsound->wave_r(base + 2) << 16) | (m_gbsound->wave_r(base + 3) << 24);
 	}
 
-	return m_gba_soundregs[offset - (0x60/4)];
+	return m_gba_soundregs[offset];
 }
 
 void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -2616,7 +2616,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	static const double psg_gain[4] = { 0.25, 0.5, 1.0, 1.0 };
 
 	const uint16_t old_x = m_gba_soundregs[(0x84 - 0x60)/4] & 0xffff;
-	COMBINE_DATA(&m_gba_soundregs[offset - (0x60/4)]);
+	COMBINE_DATA(&m_gba_soundregs[offset]);
 
 	auto reset_fifo = [this] (int ref)
 	{
@@ -2627,7 +2627,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	switch (offset)
 	{
-		case 0x60/4:
+		case 0x0/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0, data);
@@ -2642,7 +2642,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x64/4:
+		case 0x4/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(3, data);
@@ -2653,7 +2653,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x68/4:
+		case 0x8/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(6, data);
@@ -2664,7 +2664,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x6c/4:
+		case 0xc/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(8, data);
@@ -2675,7 +2675,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x70/4:
+		case 0x10/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0xa, data);
@@ -2690,7 +2690,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x74/4:
+		case 0x14/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0xd, data);
@@ -2701,7 +2701,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x78/4:
+		case 0x18/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x10, data);
@@ -2712,7 +2712,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x7c/4:
+		case 0x1c/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x12, data);
@@ -2723,7 +2723,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x80/4:
+		case 0x20/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x14, data);
@@ -2750,7 +2750,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x84/4:
+		case 0x24/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x16, data);
@@ -2762,10 +2762,10 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x90/4:
-		case 0x94/4:
-		case 0x98/4:
-		case 0x9c/4:
+		case 0x30/4:
+		case 0x34/4:
+		case 0x38/4:
+		case 0x3c/4:
 		{
 			const int base = (offset - (0x90/4)) * 4;
 			if (ACCESSING_BITS_0_7)
@@ -2787,8 +2787,8 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 		}
 
-		case 0xa0/4:
-		case 0xa4/4:
+		case 0x40/4:
+		case 0x44/4:
 		{
 			gba_fifo_t &fifo = m_gba_fifo[offset & 1];
 			if (fifo.size < 8)
@@ -2903,7 +2903,7 @@ void nds_state::gba_haltcnt_w(uint8_t data)
 
 uint32_t nds_state::gba_memctrl_r()
 {
-	return 0x0d000020;      	// internal memory control
+	return 0x0d000020;          // internal memory control
 }
 
 
