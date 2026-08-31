@@ -18,4 +18,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cmdhd20">
+		<description>CMD HD-20</description>
+		<year>1990</year>
+		<publisher>Creative Micro Designs</publisher>
+
+		<!-- Seagate ST-125N -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="cmdhd20" sha1="ab1e36af7640eb0fce5c85200a21ffee7e0f12aa" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -8,10 +8,7 @@
 
 /*
 
-	TODO
-
-	- IEC
-	- SCSI
+	LOAD "$",12
 
 	https://mikenaberezny.com/hardware/c64-128/cmd-hd-series/
 
@@ -76,13 +73,18 @@ const tiny_rom_entry *cmd_hd_device::device_rom_region() const
 
 void cmd_hd_device::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram();
+	map(0x0000, 0x3fff).lr8(NAME([this](offs_t offset) { return m_ram[offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[offset] = data; }));
+	map(0x4000, 0x7fff).view(m_ram_view);
+	m_ram_view[0](0x4000, 0x7fff).lr8(NAME([this](offs_t offset) { return m_ram[0xc000 | offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0xc000 + offset] = data; }));
+	m_ram_view[1](0x4000, 0x7fff).lr8(NAME([this](offs_t offset) { return m_ram[0x4000 | offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0x4000 + offset] = data; }));
+	map(0x8000, 0xffff).lr8(NAME([this](offs_t offset) { return m_ram[0x8000 + offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { if (m_wpram) m_ram[0x8000 + offset] = data; }));
 	map(0x8000, 0x800f).mirror(0x1f0).m(m_via0, FUNC(via6522_device::map));
 	map(0x8400, 0x840f).mirror(0x1f0).m(m_via1, FUNC(via6522_device::map));
-	map(0x8800, 0x8803).mirror(0x1fc).w(m_ppi, FUNC(i8255_device::write));
-	map(0x8c00, 0x8c0f).mirror(0x1f0).w(m_rtc, FUNC(rtc72421_device::write));
-	map(0x8f00, 0x8f00).mirror(0xff).w(FUNC(cmd_hd_device::ttl_w));
-	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
+	map(0x8800, 0x8803).mirror(0x1fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8c00, 0x8c0f).mirror(0x1f0).rw(m_rtc, FUNC(rtc72421_device::read), FUNC(rtc72421_device::write));
+	map(0x8e00, 0x8eff).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0x8e00 + offset] = data; }));
+	map(0x8f00, 0x8fff).lw8(NAME([this](offs_t offset, uint8_t data) { ttl_w(data); m_ram[0x8f00 + offset] = data; }));
+	map(0xc000, 0xffff).lr8(NAME([this](offs_t offset) { return m_romos ? m_rom[0x4000 + offset] : m_ram[0xc000 + offset]; }));
 }
 
 uint8_t cmd_hd_device::via0_pa_r()
@@ -150,7 +152,7 @@ uint8_t cmd_hd_device::via0_pb_r()
 
 	data |= !m_bus->data_r();
 	data |= !m_bus->clk_r() << 2;
-	data |= m_bus->atn_r() << 7;
+	data |= !m_bus->atn_r() << 7;
 
 	return data;
 }
@@ -172,28 +174,65 @@ void cmd_hd_device::via0_pb_w(uint8_t data)
 
 	*/
 
-	m_iec_data = !BIT(data, 1);
-	m_iec_clk = !BIT(data, 3);
+	m_iec_data = BIT(data, 1);
+	m_iec_clk = BIT(data, 3);
+	m_atn_ack = BIT(data, 4);
+	m_fst_dir = BIT(data, 5);
 	m_iec_atn = BIT(data, 6);
+
+	m_iec_sync_timer->adjust(attotime::zero);
+}
+
+void cmd_hd_device::via0_cb1_w(int state)
+{
+	m_fst_clk = state;
+
+	m_iec_sync_timer->adjust(attotime::zero);
+}
+
+void cmd_hd_device::via0_cb2_w(int state)
+{
+	m_fst_data = state;
 
 	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(cmd_hd_device::iec_sync_tick)
 {
+	bool const atn = m_bus->atn_r();
+	m_via0->write_ca1(atn);
+
+	m_via0->write_cb1(m_fst_dir || m_bus->srq_r());
+	m_via0->write_cb2(m_fst_dir || m_bus->data_r());
+
 	m_bus->atn_w(this, m_iec_atn);
-	m_bus->clk_w(this, m_iec_clk);
-	m_bus->data_w(this, m_iec_data);
+	m_bus->clk_w(this, !m_iec_clk);
+
+	bool data_out = !m_iec_data && !(m_atn_ack && !atn);
+	if (m_fst_dir)
+		data_out &= m_fst_data;
+	m_bus->data_w(this, data_out);
+
+	bool srq_out = 1;
+	if (m_fst_dir)
+		srq_out &= m_fst_clk;
+	m_bus->srq_w(this, srq_out);
 }
 
 uint8_t cmd_hd_device::via1_pa_r()
 {
-	return m_scsi_bus->data_r() ^ 0xff;
+	if (m_bdirin)
+		return m_scsi_bus->data_r() ^ 0xff;
+	else
+		return 0xff;
 }
 
 void cmd_hd_device::via1_pa_w(uint8_t data)
 {
-	m_scsi_bus->data_w(m_scsi_refid, data ^ 0xff);
+	m_sasi_out = data ^ 0xff;
+
+	if (!m_bdirin)
+		m_scsi_bus->data_w(m_scsi_refid, m_sasi_out);
 }
 
 uint8_t cmd_hd_device::via1_pb_r()
@@ -209,11 +248,22 @@ uint8_t cmd_hd_device::via1_pb_r()
 	    4
 	    5		BSY
 	    6		ACK IN
-	    7
+	    7		REQ
 
 	*/
 
-	return 0;
+	u32 const ctrl = m_scsi_bus->ctrl_r();
+	u8 data = 0;
+
+	if (ctrl & S_CTL) data |= 1 << 0;
+	if (ctrl & S_MSG) data |= 1 << 1;
+	if (ctrl & S_INP) data |= 1 << 2;
+	if (ctrl & S_BSY) data |= 1 << 5;
+	if (ctrl & S_REQ) data |= 1 << 7;
+
+	data |= m_ack_ff << 6;
+
+	return data;
 }
 
 void cmd_hd_device::via1_pb_w(uint8_t data)
@@ -229,15 +279,37 @@ void cmd_hd_device::via1_pb_w(uint8_t data)
 	    4		SEL OUT
 	    5
 	    6
-	    7		REQ
+	    7		
 
 	*/
+
+	m_bdirin = BIT(data, 3);
+
+	if (!m_bdirin)
+		m_scsi_bus->data_w(m_scsi_refid, m_sasi_out);
+
+	m_scsi_bus->ctrl_w(m_scsi_refid, (BIT(data, 4) ? S_SEL : 0), S_SEL);
+}
+
+void cmd_hd_device::via1_ca2_w(int state)
+{
+	if (!state)
+	{
+		m_ack_ff = 1;
+
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+	}
+}
+
+void cmd_hd_device::via1_cb2_w(int state)
+{
+	// FORCE
 }
 
 uint8_t cmd_hd_device::ppi_pa_r()
 {
 	// RamLink parallel data PD0-7
-	return 0;
+	return 0xff;
 }
 
 void cmd_hd_device::ppi_pa_w(uint8_t data)
@@ -261,9 +333,12 @@ uint8_t cmd_hd_device::ppi_pb_r()
 
 	*/
 
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 	u8 data = 0;
 
 	data |= (m_pb->read() & 0x07) << 1;
+
+	if (ctrl & S_SEL) data |= 1 << 4;
 
 	return data;
 }
@@ -283,6 +358,41 @@ void cmd_hd_device::ppi_pc_w(uint8_t data)
 	    7		_PRDY OUT
 
 	*/
+
+	m_romos = BIT(data, 0);
+
+	m_ram_view.select(BIT(data, 1));
+
+	m_scsi_bus->ctrl_w(m_scsi_refid, (BIT(data, 2) ? S_ATN : 0) | (BIT(data, 3) ? S_RST : 0) | (BIT(data, 4) ? S_BSY : 0), S_ATN|S_RST|S_BSY);
+}
+
+void cmd_hd_device::ttl_w(uint8_t data)
+{
+	/*
+
+	    bit     description
+
+	    0		_ACTLED
+	    1		_ERRLED
+	    2		_SW8LED
+	    3		_SW9LED
+	    4		PARITY
+	    5		_WPRAM
+	    6		_GEOLED
+	    7		_WRPLED
+
+	*/
+
+	m_wpram = BIT(data, 5);
+
+	m_leds[LED_ACT] = !BIT(data, 0);
+	m_leds[LED_ERR] = !BIT(data, 1);
+	m_leds[LED_SW8] = !BIT(data, 2);
+	m_leds[LED_SW9] = !BIT(data, 3);
+	m_leds[LED_GEO] = !BIT(data, 6);
+	m_leds[LED_WRP] = !BIT(data, 7);
+
+	m_via1->write_ca2(!BIT(data, 4));
 }
 
 void cmd_hd_device::device_add_mconfig(machine_config &config)
@@ -298,7 +408,8 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 	m_via0->writepa_handler().set(FUNC(cmd_hd_device::via0_pa_w));
 	m_via0->readpb_handler().set(FUNC(cmd_hd_device::via0_pb_r));
 	m_via0->writepb_handler().set(FUNC(cmd_hd_device::via0_pb_w));
-	// CA1 _ATN, CA2 _PARITY, CB1 FST CLK, CB2 FST DATA
+	m_via0->cb1_handler().set(FUNC(cmd_hd_device::via0_cb1_w));
+	m_via0->cb2_handler().set(FUNC(cmd_hd_device::via0_cb2_w));
 
 	MOS6522(config, m_via1, XTAL(16'000'000)/8);
 	m_via1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
@@ -306,7 +417,8 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(cmd_hd_device::via1_pa_w));
 	m_via1->readpb_handler().set(FUNC(cmd_hd_device::via1_pb_r));
 	m_via1->writepb_handler().set(FUNC(cmd_hd_device::via1_pb_w));
-	// CA1 RST, CA2 _ACK FF, CB1 BSY, CB2 FORCE
+	m_via1->ca2_handler().set(FUNC(cmd_hd_device::via1_ca2_w));
+	m_via1->cb2_handler().set(FUNC(cmd_hd_device::via1_cb2_w));
 	
 	I8255A(config, m_ppi, 0);
 	m_ppi->in_pa_callback().set(FUNC(cmd_hd_device::ppi_pa_r));
@@ -318,6 +430,7 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 
 	auto &sasi(NSCSI_BUS(config, "sasi"));
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "sasi:1", default_scsi_devices, nullptr);
 	sasi.set_external_device(7, *this);
 
 	config.set_default_layout(layout_cmdhd);
@@ -332,7 +445,7 @@ INPUT_CHANGED_MEMBER( cmd_hd_device::pbres_changed )
 {
 	if (!newval)
 	{
-		device_reset();
+		reset();
 	}
 }
 
@@ -369,7 +482,10 @@ cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, dev
 	m_ppi(*this, I8255A_TAG),
 	m_rtc(*this, RTC72421A_TAG),
 	m_leds(*this, "led%u", 0U),
-	m_pb(*this, "PB")
+	m_pb(*this, "PB"),
+	m_ram_view(*this, "ram"),
+	m_rom(*this, M6502_TAG),
+	m_ram(*this, "ram", 0x10000, ENDIANNESS_BIG)
 {
 }
 
@@ -381,8 +497,24 @@ cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, dev
 void cmd_hd_device::device_start()
 {
 	m_iec_sync_timer = timer_alloc(FUNC(cmd_hd_device::iec_sync_tick), this);
+	m_ack_clear_timer = timer_alloc(FUNC(cmd_hd_device::clear_ack_tick), this);
 	
 	m_leds[LED_PWR] = 1;
+
+	// state saving
+	save_item(NAME(m_fst_dir));
+	save_item(NAME(m_fst_clk));
+	save_item(NAME(m_fst_data));
+	save_item(NAME(m_atn_ack));
+	save_item(NAME(m_iec_atn));
+	save_item(NAME(m_iec_clk));
+	save_item(NAME(m_iec_data));
+	save_item(NAME(m_sb_reset_ena));
+	save_item(NAME(m_bdirin));
+	save_item(NAME(m_sasi_out));
+	save_item(NAME(m_ack_ff));
+	save_item(NAME(m_romos));
+	save_item(NAME(m_wpram));
 }
 
 
@@ -392,7 +524,12 @@ void cmd_hd_device::device_start()
 
 void cmd_hd_device::device_reset()
 {
-	m_scsi_bus->ctrl_wait(m_scsi_refid, S_ALL, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_BSY|S_RST|S_REQ, S_ALL);
+
+	m_ram_view.select(0);
+	
+	m_romos = 1;
+	m_wpram = 1;
 }
 
 
@@ -402,6 +539,7 @@ void cmd_hd_device::device_reset()
 
 void cmd_hd_device::cbm_iec_srq(int state)
 {
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -411,7 +549,7 @@ void cmd_hd_device::cbm_iec_srq(int state)
 
 void cmd_hd_device::cbm_iec_atn(int state)
 {
-	m_via0->write_ca1(state);
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -421,6 +559,7 @@ void cmd_hd_device::cbm_iec_atn(int state)
 
 void cmd_hd_device::cbm_iec_data(int state)
 {
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -446,39 +585,21 @@ void cmd_hd_device::scsi_ctrl_changed()
 	u32 const ctrl = m_scsi_bus->ctrl_r();
 
 	bool const bsy = ctrl & S_BSY;
-	m_leds[LED_SW8] = bsy;
-	//m_via0->write_cb1(!bsy);
+	m_leds[LED_BSY] = bsy;
+	m_via0->write_cb1(!bsy);
 
-	//bool const rst = ctrl & S_RST;
-	//m_via1->write_ca1(!rst);
+	bool const rst = ctrl & S_RST;
+	m_via1->write_ca1(!rst);
+
+	bool const req = ctrl & S_REQ;
+	if (!req)
+	{
+		m_ack_ff = 0;
+		m_ack_clear_timer->adjust(attotime::zero);
+	}
 }
-
-
-//-------------------------------------------------
-//  ttl_w -
-//-------------------------------------------------
-
-void cmd_hd_device::ttl_w(uint8_t data)
+	
+TIMER_CALLBACK_MEMBER(cmd_hd_device::clear_ack_tick)
 {
-	/*
-
-	    bit     description
-
-	    0		_ACTLED
-	    1		_ERRLED
-	    2		_SW8LED
-	    3		_SW9LED
-	    4		PARITY
-	    5		_WPRAM
-	    6		_GEOLED
-	    7		_WRPLED
-
-	*/
-
-	m_leds[LED_ACT] = !BIT(data, 0);
-	m_leds[LED_ERR] = !BIT(data, 1);
-	m_leds[LED_SW8] = !BIT(data, 2);
-	m_leds[LED_SW9] = !BIT(data, 3);
-	m_leds[LED_GEO] = !BIT(data, 6);
-	m_leds[LED_WRP] = !BIT(data, 7);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 }

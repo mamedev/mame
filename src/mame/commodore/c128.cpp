@@ -1695,6 +1695,7 @@ void c128_state::softlists(machine_config &config, const char *filter)
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter(filter);
 	SOFTWARE_LIST(config, "flop_list_c64_orig").set_compatible("c64_flop_orig").set_filter(filter);
 	SOFTWARE_LIST(config, "flop_list_c64_misc").set_compatible("c64_flop_misc").set_filter(filter);
+	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd");
 }
 
 

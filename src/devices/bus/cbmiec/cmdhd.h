@@ -78,23 +78,37 @@ private:
 	required_device<rtc72421_device> m_rtc;
 	output_finder<8> m_leds;
 	required_ioport m_pb;
-	
+	memory_view m_ram_view;
+	required_region_ptr<uint8_t> m_rom;
+	memory_share_creator<uint8_t> m_ram;
+
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
+	void via0_cb1_w(int state);
+	void via0_cb2_w(int state);
+
 	uint8_t via1_pa_r();
 	void via1_pa_w(uint8_t data);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
+	void via1_ca2_w(int state);
+	void via1_cb2_w(int state);
+
 	uint8_t ppi_pa_r();
 	void ppi_pa_w(uint8_t data);
 	uint8_t ppi_pb_r();
 	void ppi_pc_w(uint8_t data);
+
 	void ttl_w(uint8_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
 
+	bool m_fst_dir = 0;
+	bool m_fst_clk = 0;
+	bool m_fst_data = 0;
+	bool m_atn_ack = 1;
 	bool m_iec_atn = 1;
 	bool m_iec_clk = 1;
 	bool m_iec_data = 1;
@@ -102,6 +116,16 @@ private:
 
 	emu_timer *m_iec_sync_timer;
 	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	
+	bool m_bdirin = 0;
+	u8 m_sasi_out = 0;
+	bool m_ack_ff = 0;
+
+	emu_timer *m_ack_clear_timer;
+	TIMER_CALLBACK_MEMBER(clear_ack_tick);
+
+	bool m_romos = 1;
+	bool m_wpram = 1;
 };
 
 
