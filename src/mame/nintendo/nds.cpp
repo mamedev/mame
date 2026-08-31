@@ -3111,6 +3111,8 @@ void nds_state::nds(machine_config &config)
 
 	// GBA slot: GBA mode is not emulated, so this is for the firmware's "Game Pak" panel and DS expansion paks
 	GBA_CART_SLOT(config, m_gbacart, gba_cart, nullptr);
+
+	SOFTWARE_LIST(config, "nds_list").set_original("nds");
 	SOFTWARE_LIST(config, "gba_list").set_compatible("gba");
 }
 
