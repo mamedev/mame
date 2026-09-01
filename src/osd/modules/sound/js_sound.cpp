@@ -25,16 +25,34 @@ namespace {
 class sound_js : public osd_module, public sound_module
 {
 public:
-
 	sound_js() : osd_module(OSD_SOUND_PROVIDER, "js"), sound_module()
 	{
+		m_current_stream_id = 0;
+		m_next_stream_id = 1;
+		// Query the browser's AudioContext sample rate so MAME can
+		// generate audio at the correct rate, avoiding rate-mismatch
+		// drift and growing latency in the JS ring buffer.
+		m_audio_rate = EM_ASM_INT({
+			try {
+				var Ctx = typeof AudioContext !== "undefined" ? AudioContext
+					: typeof webkitAudioContext !== "undefined" ? webkitAudioContext
+					: null;
+				if (Ctx) {
+					// Construct a temporary context just to read the
+					// sample rate. Browsers return the hardware rate.
+					var c = new Ctx();
+					var rate = c.sampleRate | 0;
+					c.close();
+					return rate;
+				}
+			} catch(e) {}
+			return 44100; // fallback
+		});
 	}
 	virtual ~sound_js() { }
 
 	virtual int init(osd_interface &osd, const osd_options &options) override
 	{
-		m_current_stream_id = 0;
-		m_next_stream_id = 1;
 		return 0;
 	}
 
@@ -58,9 +76,9 @@ public:
 		result.m_nodes[0].m_name = "webaudio";
 		result.m_nodes[0].m_display_name = "Web Audio";
 		result.m_nodes[0].m_id = 1;
-		result.m_nodes[0].m_rate.m_default_rate = 0; // Magic value meaning "use configured sample rate"
-		result.m_nodes[0].m_rate.m_min_rate = 0;
-		result.m_nodes[0].m_rate.m_max_rate = 0;
+		result.m_nodes[0].m_rate.m_default_rate = m_audio_rate;
+		result.m_nodes[0].m_rate.m_min_rate = m_audio_rate;
+		result.m_nodes[0].m_rate.m_max_rate = m_audio_rate;
 		result.m_nodes[0].m_sinks = 2;
 		result.m_nodes[0].m_sources = 0;
 		result.m_nodes[0].m_port_names.reserve(2);
@@ -111,6 +129,7 @@ public:
 private:
 	uint32_t m_current_stream_id;
 	uint32_t m_next_stream_id;
+	uint32_t m_audio_rate;
 };
 
 } // anonymous namespace
