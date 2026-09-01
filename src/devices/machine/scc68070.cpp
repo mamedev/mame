@@ -1358,8 +1358,8 @@ void scc68070_device::ucsr_w(uint8_t data)
 
 	static const uint32_t s_baud_divisors[8] = { 65536, 32768, 16384, 4096, 2048, 1024, 512, 256 };
 
-	attotime rx_rate = attotime::from_ticks(s_baud_divisors[(data >> 4) & 7] * 10, 49152000);
-	attotime tx_rate = attotime::from_ticks(s_baud_divisors[data & 7] * 10, 49152000);
+	attotime rx_rate = attotime::from_ticks(s_baud_divisors[(data >> 4) & 7] * 10, 4915200);
+	attotime tx_rate = attotime::from_ticks(s_baud_divisors[data & 7] * 10, 4915200);
 	m_uart.rx_timer->adjust(rx_rate, 0, rx_rate);
 	m_uart.tx_timer->adjust(tx_rate, 0, tx_rate);
 }
