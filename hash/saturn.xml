@@ -1177,25 +1177,6 @@ Olympic Soccer (Fra) T-7904H-09
 
 <!-- !ReDump images -->
 
-	<software name="sandor" supported="partial">
-		<description>Puzzle &amp; Action: Nidoarukoto wa Sando-R (Japan)</description>
-		<year>1996</year>
-		<publisher>CRI</publisher>
-		<notes><![CDATA[
-Equivalent to stv:sandor, essentially sharing the same issues if any.
-https://mametesters.org/view.php?id=7417
-]]></notes>
-		<info name="serial" value="T-6802G"/>
-		<info name="release" value="19960405"/>
-		<info name="alt_title" value="2度あることはサンドアール"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="2do arukotoha sand-r (japan)" sha1="3f993b00c63e0bd4efd1769858bf4cbf73a4522c" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="6inchmyd" supported="no">
 		<description>6 Inch My Darling (Japan)</description>
 		<year>1998</year>
@@ -5854,6 +5835,25 @@ Runs too slow, enables [SCU] hblank-in irq
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="puyo puyo tsuu (japan) (3m)" sha1="6e2e21d792a1b46451c57556d80cb992f9517d34" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sandor" supported="partial">
+		<description>Puzzle &amp; Action: Nidoarukoto wa Sando-R (Japan)</description>
+		<year>1996</year>
+		<publisher>CRI</publisher>
+		<notes><![CDATA[
+Equivalent to stv:sandor, essentially sharing the same issues if any.
+https://mametesters.org/view.php?id=7417
+]]></notes>
+		<info name="serial" value="T-6802G"/>
+		<info name="release" value="19960405"/>
+		<info name="alt_title" value="2度あることはサンドアール"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2do arukotoha sand-r (japan)" sha1="3f993b00c63e0bd4efd1769858bf4cbf73a4522c" />
 			</diskarea>
 		</part>
 	</software>
@@ -14035,21 +14035,6 @@ Black screen, [CD-Block]
 
 <!-- !linlhutz sets -->
 
-	<software name="sandora" cloneof="sandor" supported="no">
-		<description>Puzzle &amp; Action: Nidoarukoto wa Sando-R (Japan, alt)</description>
-		<year>1996</year>
-		<publisher>CRI</publisher>
-		<info name="serial" value="T-6802G"/>
-		<info name="release" value="19960405"/>
-		<info name="alt_title" value="2度あることはサンドアール"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="2do arukotoha sand-r (t-6802g)" sha1="2ee57e1b943b96cd5adedf0cc629f934dd99acb3" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying 2Tax Gold (T-4305G)... -->
 	<software name="2taxgold" supported="no">
 		<description>2Tax Gold (Japan)</description>
@@ -18921,6 +18906,21 @@ Known to use [SCUDSP]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="puyo puyo tsuu (satakore) (t-6604g)" sha1="52b2519e270c15f4bcdf2214305a9ae35864d0bf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sandora" cloneof="sandor" supported="no">
+		<description>Puzzle &amp; Action: Nidoarukoto wa Sando-R (Japan, alt)</description>
+		<year>1996</year>
+		<publisher>CRI</publisher>
+		<info name="serial" value="T-6802G"/>
+		<info name="release" value="19960405"/>
+		<info name="alt_title" value="2度あることはサンドアール"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2do arukotoha sand-r (t-6802g)" sha1="2ee57e1b943b96cd5adedf0cc629f934dd99acb3" />
 			</diskarea>
 		</part>
 	</software>
