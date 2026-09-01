@@ -829,9 +829,9 @@ u32 arm_vidc20_device::get_sound_clock()
 	}
 
 	// 32-bit mode doubles clock rate
-	const u32 divider = 8 >> get_dac_mode();
+	const u32 divider = 2 >> get_dac_mode();
 
-	return clock() / 24 / divider;
+	return clock() / 12 / divider;
 }
 
 
@@ -856,16 +856,15 @@ void arm_vidc20_device::vidc20_sound_control_w(u32 data)
 
 	if (m_sdac)
 	{
+		m_dac[0]->set_output_gain(0, 1.0);
+		m_dac[1]->set_output_gain(0, 1.0);
 		for (int ch = 0; ch < m_sound_max_channels; ch++)
-		{
-			m_dac[ch]->set_output_gain(0, 1.0);
 			refresh_stereo_image(ch);
-		}
 	}
 	else
 	{
-		for (int ch = 0; ch < m_sound_max_channels; ch++)
-			m_dac[ch]->set_output_gain(0, 0.0);
+		m_dac[0]->set_output_gain(0, 0.0);
+		m_dac[1]->set_output_gain(0, 0.0);
 	}
 
 	if (m_sound_mode == true)
