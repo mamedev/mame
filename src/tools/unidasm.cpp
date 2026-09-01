@@ -228,6 +228,8 @@ using util::BIT;
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
 
+#include "sound/roland_xpd.h"
+
 #include "corestr.h"
 #include "ioprocs.h"
 #include "multibyte.h"
@@ -614,6 +616,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
 	{ "r800",            le,  0, []() -> util::disasm_interface * { return new r800_disassembler; } },
+	{ "roland_xp",       be, -2, []() -> util::disasm_interface * { return new roland_xp_disassembler; } },
 	{ "romp",            be,  0, []() -> util::disasm_interface * { return new romp_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "rupi44",          le,  0, []() -> util::disasm_interface * { return new rupi44_disassembler; } },
