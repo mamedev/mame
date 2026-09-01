@@ -80,6 +80,7 @@ protected:
 	inline void screen_dynamic_res_change();
 	void refresh_sound_frequency();
 	virtual u32 get_sound_clock();
+	virtual bool play_fifo_sample();
 
 	u16 m_pal_4bpp_base;
 	u16 m_pal_cursor_base;
@@ -97,11 +98,12 @@ protected:
 	void stereo_image_w(offs_t offset, u32 data);
 	virtual void refresh_stereo_image(u8 channel);
 	const int m_sound_max_channels = 8;
+	util::fifo<u8, 16> m_sound_fifo;
+	u8       m_sound_fifo_channel;
 private:
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
-	bool play_fifo_sample();
 	void pal_data_display_w(offs_t offset, u32 data);
 	void pal_data_cursor_w(offs_t offset, u32 data);
 	void crtc_w(offs_t offset, u32 data);
@@ -130,9 +132,6 @@ private:
 	u8       m_stereo_image[8];
 	const float m_sound_input_gain = 0.125f;
 	int16_t  m_ulaw_lookup[256];
-	u8       m_sound_fifo[16];
-	u8       m_sound_fifo_read_ptr;
-	u8       m_sound_fifo_write_ptr;
 };
 
 class acorn_vidc1_device : public acorn_vidc10_device

@@ -75,13 +75,12 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_dac(*this, "dac%u", 0)
 	, m_dac_type(dac_type)
 	, m_speaker(*this, "speaker")
+	, m_sound_fifo_channel(0)
 	, m_vblank_cb(*this)
 	, m_sound_drq_cb(*this)
 	, m_pixel_clock(0)
 	, m_cursor_enable(false)
 	, m_sound_frequency_test_bit(false)
-	, m_sound_fifo_read_ptr(0)
-	, m_sound_fifo_write_ptr(0)
 {
 	std::fill(std::begin(m_crtc_regs), std::end(m_crtc_regs), 0);
 	std::fill(std::begin(m_stereo_image), std::end(m_stereo_image), 0);
@@ -164,9 +163,7 @@ void acorn_vidc10_device::device_start()
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_sound_frequency_latch));
 	save_item(NAME(m_sound_frequency_test_bit));
-	save_pointer(NAME(m_sound_fifo), 16);
-	save_item(NAME(m_sound_fifo_read_ptr));
-	save_item(NAME(m_sound_fifo_write_ptr));
+	save_item(NAME(m_sound_fifo_channel));
 	save_item(NAME(m_cursor_enable));
 	save_pointer(NAME(m_crtc_regs), CRTC_VCER+1);
 	save_pointer(NAME(m_crtc_raw_horz), 2);
@@ -223,10 +220,8 @@ void acorn_vidc10_device::device_reset()
 		refresh_stereo_image(ch);
 	m_video_timer->adjust(attotime::never);
 	m_sound_timer->adjust(attotime::never);
-	for (int i = 0; i < 16; i++)
-		m_sound_fifo[i] = 0;
-	m_sound_fifo_read_ptr = 0;
-	m_sound_fifo_write_ptr = 0;
+	m_sound_fifo.clear();
+	m_sound_fifo_channel = 0;
 }
 
 TIMER_CALLBACK_MEMBER(acorn_vidc10_device::vblank_timer)
@@ -243,13 +238,10 @@ TIMER_CALLBACK_MEMBER(acorn_vidc10_device::sound_sample_timer)
 
 bool acorn_vidc10_device::play_fifo_sample()
 {
-	write_dac(m_sound_fifo_read_ptr&7, m_sound_fifo[m_sound_fifo_read_ptr&0xf]);
-	if (m_sound_fifo_read_ptr++ > 0xf)
-	{
-		m_sound_fifo_read_ptr = 0;
-		return true;
-	}
-	return false;
+	write_dac(m_sound_fifo_channel&7, m_sound_fifo.dequeue());
+	m_sound_fifo_channel++;
+	m_sound_fifo_channel&=7;
+	return m_sound_fifo.empty();
 }
 
 //**************************************************************************
@@ -463,14 +455,10 @@ void acorn_vidc10_device::enqueue32_fifo(u32 data)
 	// for each 32 bit dword sent to the VIDC, the sample order is the
 	// lowest byte first, packed. i.e. bytes 3,2,1,0 in that order,
 	// assuming byte 0 is the MSB of the dword.
-	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>0)&0xff);
-	m_sound_fifo_write_ptr &= 0xf;
-	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>8)&0xff);
-	m_sound_fifo_write_ptr &= 0xf;
-	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>16)&0xff);
-	m_sound_fifo_write_ptr &= 0xf;
-	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>24)&0xff);
-	m_sound_fifo_write_ptr &= 0xf;
+	m_sound_fifo.enqueue((u8)((data>>0)&0xff));
+	m_sound_fifo.enqueue((u8)((data>>8)&0xff));
+	m_sound_fifo.enqueue((u8)((data>>16)&0xff));
+	m_sound_fifo.enqueue((u8)((data>>24)&0xff));
 }
 
 void acorn_vidc10_device::write_dac(u8 channel, u8 data)
