@@ -90,7 +90,6 @@ protected:
 	bool m_sound_mode;
 
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
-	required_device_array<mixer_device, 2> m_mixer;
 	int m_dac_type;
 
 	required_device<speaker_device> m_speaker;

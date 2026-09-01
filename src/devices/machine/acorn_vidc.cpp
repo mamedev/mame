@@ -73,7 +73,6 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_sound_frequency_latch(0)
 	, m_sound_mode(false)
 	, m_dac(*this, "dac%u", 0)
-	, m_mixer(*this, "mixer%u", 0)
 	, m_dac_type(dac_type)
 	, m_speaker(*this, "speaker")
 	, m_vblank_cb(*this)
@@ -123,16 +122,9 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, m_speaker, 2).front();
 
-	MIXER(config, m_mixer[0]);
-
-	MIXER(config, m_mixer[1]);
-
-	m_mixer[0]->add_route(0, m_speaker, 0.5, 0);
-	m_mixer[1]->add_route(0, m_speaker, 0.5, 1);
-
 	// custom DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(0, m_mixer[0], 1.0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(0, m_mixer[1], 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(0, m_speaker, 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(0, m_speaker, 1.0, 1);
 }
 
 u32 acorn_vidc10_device::palette_entries() const noexcept
