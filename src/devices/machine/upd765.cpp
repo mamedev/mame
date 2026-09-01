@@ -711,8 +711,10 @@ void upd765_family_device::fifo_w(uint8_t data)
 
 uint8_t upd765_family_device::do_dir_r()
 {
-	floppy_info &fi = flopi[dor & 3];
-	if(fi.dev)
+	int const fid = dor & 3;
+	floppy_info &fi = flopi[fid];
+	// only report dskchg for a drive if the motor is enabled too
+	if(BIT(dor, 4 + fid) && fi.dev)
 		return fi.dev->dskchg_r() ? 0x00 : 0x80;
 	return 0x00;
 }
