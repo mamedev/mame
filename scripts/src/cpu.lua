@@ -3695,6 +3695,23 @@ if CPUS["SWP30"] then
 end
 
 --------------------------------------------------
+-- Roland XP PCM chip and effect DSP
+--@src/devices/sound/roland_xp.h,CPUS["ROLANDXP"] = true
+--------------------------------------------------
+
+if CPUS["ROLANDXP"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_xp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_xp.h",
+	}
+end
+
+if opt_tool(CPUS, "ROLANDXP") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_xpd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_xpd.h")
+end
+
+--------------------------------------------------
 -- Yamaha DSPV
 --@src/devices/sound/dspv.h,CPUS["DSPV"] = true
 --------------------------------------------------
