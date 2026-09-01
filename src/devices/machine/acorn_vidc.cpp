@@ -436,10 +436,10 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 	    -011 67% left, 33% right
 	    -010 83% left, 17% right
 	    -001 full left
-	    -000 <undefined> TODO: verify what it actually means
+	    -000 <undefined> TODO: verify what this actually does, assumed center
 	*/
-	const float l_gain_settings[8] = { 2.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
-	const float r_gain_settings[8] = { 0.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
+	const float l_gain_settings[8] = { 1.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
+	const float r_gain_settings[8] = { 1.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
 
 	const float l_gain = l_gain_settings[m_stereo_image[channel]] * m_sound_input_gain;
 	const float r_gain = r_gain_settings[m_stereo_image[channel]] * m_sound_input_gain;
@@ -468,7 +468,7 @@ void acorn_vidc10_device::sound_frequency_w(u32 data)
 
 void acorn_vidc10_device::enqueue_fifo(u32 data)
 {
-	// for each 32 bit dword sent to the vidc, the sample order is the
+	// for each 32 bit dword sent to the VIDC, the sample order is the
 	// lowest byte first, packed. i.e. bytes 3,2,1,0 in that order,
 	// assuming byte 0 is the MSB of the dword.
 	m_sound_fifo[m_sound_fifo_write_ptr++] = (u8)((data>>0)&0xff);
@@ -483,7 +483,7 @@ void acorn_vidc10_device::enqueue_fifo(u32 data)
 
 void acorn_vidc10_device::write_dac(u8 channel, u8 data)
 {
-	const float stereo_clocks_l[8] = { 18.0f, 18.0f, 15.0f, 12.0f, 9.0f, 6.0f, 3.0f, 0.0f };
+	const float stereo_clocks_l[8] = { 9.0f, 18.0f, 15.0f, 12.0f, 9.0f, 6.0f, 3.0f, 0.0f };
 	const float res = (float)m_ulaw_lookup[data] / 32768.0f;
 	const float percent_l = stereo_clocks_l[m_stereo_image[channel]&7] / 18.0f;
 	const float percent_r = (18.0f-stereo_clocks_l[m_stereo_image[channel]&7]) / 18.0f;
@@ -500,13 +500,11 @@ void acorn_vidc10_device::refresh_sound_frequency()
 {
 	// TODO: check against test bit (reloads sound frequency if 0)
 	// TODO: does this test bit also clear the fifo?
-	// VERIFY: assume a value of zero is invalid (ppcar POST setup)?
+	// TODO: verify that value of 0 or 1 is invalid (ppcar POST setup)?
 	if (m_sound_mode == true && m_sound_frequency_latch)
 	{
 		// Valid range is between 3(load of 0x2) and 256(load of 0xff) usecs
-		// loads of 1 and 0 are invalid and could cause undesirable behavior
-		// presumably by emptying the vidc fifo faster than the memc can
-		// write the first new dword to it
+		// loads of 1 and 0 are invalid according to documentation
 		double sndhz = get_sound_clock() / ((m_sound_frequency_latch & 0xff) + 1);
 		m_sound_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 		LOGMASKED(LOG_AUDIODMA, "VIDC: audio DMA start %02x + 2 -> sndhz = %f\n", m_sound_frequency_latch, sndhz);
