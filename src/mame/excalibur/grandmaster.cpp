@@ -5,6 +5,9 @@
 
 Excalibur Grandmaster
 
+Two versions exist, 747K (black) and 747P (silver, P for Platinum?). Other than
+the housing color, they're presumed to be the same.
+
 Hardware notes:
 - PCB label: EXCAL IBUR ELECTRONICS 1997, KARPOV1, 4/16/97, 00-82652-001
 - Hitachi H8/3214 MCU, 12MHz XTAL
@@ -12,7 +15,7 @@ Hardware notes:
 - piezo, no LEDs, magnet sensors chessboard
 
 TODO:
-- WIP (mainly the LCDs)
+- finish the buttons
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
@@ -23,9 +26,9 @@ TODO:
 #include "cpu/h8/h83217.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-//#include "video/pwm.h"
+#include "video/pwm.h"
 
-//#include "screen_svg.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -41,6 +44,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
+		m_lcd_pwm(*this, "lcd_pwm"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -54,26 +58,28 @@ private:
 	// devices/pointers
 	required_device<h83214_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<3> m_inputs;
 
-	u8 m_port1 = 0xff;
-	u8 m_port3 = 0xff;
 	u8 m_port4 = 0xff;
 	u8 m_port5 = 0xff;
+	u32 m_lcd_segs = 0;
+	u8 m_lcd_com = 0;
 	emu_timer *m_irqtimer;
 
 	// I/O handlers
+	void update_lcd();
 	u8 read_inputs();
 
 	TIMER_CALLBACK_MEMBER(update_irq) { read_inputs(); }
 
-	void p1_w(u8 data) { m_port1 = data; }
-	void p3_w(u8 data) { m_port3 = data; }
+	template <int N> void lcd_segs_w(u8 data);
 	void p4_w(u8 data);
 	u8 p5_r();
 	void p5_w(u8 data);
 	u8 p6_r();
+	void lcd_com_w(offs_t offset, u8 data, u8 mem_mask);
 };
 
 void grandmas_state::machine_start()
@@ -84,10 +90,10 @@ void grandmas_state::machine_start()
 	m_irqtimer->adjust(period, 0, period);
 
 	// register for savestates
-	save_item(NAME(m_port1));
-	save_item(NAME(m_port3));
 	save_item(NAME(m_port4));
 	save_item(NAME(m_port5));
+	save_item(NAME(m_lcd_segs));
+	save_item(NAME(m_lcd_com));
 }
 
 
@@ -95,6 +101,40 @@ void grandmas_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// LCD
+
+void grandmas_state::update_lcd()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		// LCD common is 0/1/Hi-Z
+		const u32 data = BIT(m_lcd_com, i + 3) ? (BIT(m_lcd_com, i) ? ~m_lcd_segs : m_lcd_segs) : 0;
+		m_lcd_pwm->write_row(i, data);
+	}
+}
+
+template <int N>
+void grandmas_state::lcd_segs_w(u8 data)
+{
+	// P1x, P2x, P3x: LCD segments (P10-P13 and P30 also used for p2 input mux)
+	const u8 shift = 8 * N;
+	m_lcd_segs = (m_lcd_segs & ~(0xff << shift)) | (data << shift);
+}
+
+void grandmas_state::lcd_com_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	// P75-P77: LCD common
+	u8 lcd_com = (mem_mask >> 2 & 0x38) | (data >> 5 & 7);
+	if (lcd_com != m_lcd_com)
+	{
+		m_lcd_com = lcd_com;
+		update_lcd();
+	}
+}
+
+
+// misc
 
 u8 grandmas_state::read_inputs()
 {
@@ -136,7 +176,7 @@ u8 grandmas_state::p5_r()
 	u8 data = read_inputs() >> 7;
 
 	// P53: player 2 buttons
-	u8 p2_mux = m_port1 << 1 | (m_port3 & 1);
+	u8 p2_mux = m_lcd_segs << 1 | BIT(m_lcd_segs, 16);
 	data |= (~p2_mux & m_inputs[2]->read()) ? 0 : 8;
 
 	return data | 0xf6;
@@ -166,24 +206,24 @@ u8 grandmas_state::p6_r()
 
 static INPUT_PORTS_START( grandmas )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // -
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // score
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // hint
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // clock
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // to
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // on
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // off
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // from
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // new game
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // mode
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // setup
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // verify
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // monitor
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // move
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // tb
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // level
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // score
@@ -205,12 +245,15 @@ void grandmas_state::grandmas(machine_config &config)
 	H83214(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h83214_device::nvram_set_battery));
-	m_maincpu->write_port1().set(FUNC(grandmas_state::p1_w));
-	m_maincpu->write_port3().set(FUNC(grandmas_state::p3_w));
+	m_maincpu->standby_cb().append([this](int state) { if (state) m_lcd_pwm->clear(); });
+	m_maincpu->write_port1().set(FUNC(grandmas_state::lcd_segs_w<0>));
+	m_maincpu->write_port2().set(FUNC(grandmas_state::lcd_segs_w<1>));
+	m_maincpu->write_port3().set(FUNC(grandmas_state::lcd_segs_w<2>));
 	m_maincpu->write_port4().set(FUNC(grandmas_state::p4_w));
 	m_maincpu->read_port5().set(FUNC(grandmas_state::p5_r));
 	m_maincpu->write_port5().set(FUNC(grandmas_state::p5_w));
 	m_maincpu->read_port6().set(FUNC(grandmas_state::p6_r));
+	m_maincpu->write_port7().set(FUNC(grandmas_state::lcd_com_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -218,6 +261,16 @@ void grandmas_state::grandmas(machine_config &config)
 	//m_board->set_nvram_enable(true);
 
 	// video hardware
+	PWM_DISPLAY(config, m_lcd_pwm).set_size(3, 24);
+
+	screen_svg_device &screen1(SCREEN_SVG(config, "screen1"));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(1920/6, 753/6);
+
+	screen_svg_device &screen2(SCREEN_SVG(config, "screen2"));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(1920/6, 753/6);
+
 	config.set_default_layout(layout_excal_grandmas);
 
 	// sound hardware
@@ -234,6 +287,12 @@ void grandmas_state::grandmas(machine_config &config)
 ROM_START( egrandmas )
 	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
 	ROM_LOAD("1997_rcn_1002a_excal_hd6433214l01p.ic1", 0x0000, 0x8000, CRC(7c3641df) SHA1(454080dcdbfe378403b51df125c1f7c872edf54a) )
+
+	ROM_REGION( 94253, "screen1", 0)
+	ROM_LOAD("egrandmas1.svg", 0, 94253, CRC(6dee6349) SHA1(44db648f2195768cd78cb4af4df23492b527ecbc) )
+
+	ROM_REGION( 94279, "screen2", 0)
+	ROM_LOAD("egrandmas2.svg", 0, 94279, CRC(1613b268) SHA1(281a6ba7dd6a88ce077ac5839c8616d0504ee12e) )
 ROM_END
 
 } // anonymous namespace
