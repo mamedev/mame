@@ -53,10 +53,19 @@ void nscsi_harddisk_device::device_reset()
 	if(!image->exists()) {
 		m_scsi_id = -1;
 		bytes_per_sector = 0;
+		m_byte_period = nscsi_full_device::scsi_data_byte_period();
 	} else {
 		const auto &hdinfo = image->get_info();
 		bytes_per_sector = hdinfo.sectorbytes;
 		image->get_inquiry_data(m_inquiry_data);
+
+		if (!m_seek_model || !hdinfo.sectors || !hdinfo.sectorbytes)
+			m_byte_period = nscsi_full_device::scsi_data_byte_period();
+		else
+		{
+			const uint32_t bytes_per_track = hdinfo.sectors * hdinfo.sectorbytes;
+			m_byte_period = attotime::from_hz(double(m_rpm) / 60.0) / bytes_per_track;
+		}
 	}
 	cur_lba = -1;
 	m_last_cylinder = -1;
@@ -137,6 +146,11 @@ attotime nscsi_harddisk_device::scsi_data_command_delay()
 	default:
 		return attotime::zero;
 	}
+}
+
+attotime nscsi_harddisk_device::scsi_data_byte_period()
+{
+	return m_byte_period;
 }
 
 void nscsi_harddisk_device::device_add_mconfig(machine_config &config)

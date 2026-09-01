@@ -67,6 +67,7 @@ protected:
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 	virtual attotime scsi_data_command_delay() override;
+	virtual attotime scsi_data_byte_period() override;
 
 	// Cylinder-aware seek delay for the block at lba, using the model configured
 	// by set_seek_timing().  Updates the tracked head position.  Subclasses with
@@ -93,6 +94,8 @@ protected:
 	uint32_t m_seek_track_us = 0;    // track-to-track seek time
 	uint32_t m_seek_range_us = 0;    // full-stroke minus track-to-track
 	double   m_seek_exp = 1.0;       // seek(d) = track + range*(d/ncyl)^exp
+
+	attotime m_byte_period;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_HARDDISK, nscsi_harddisk_device)
