@@ -3712,6 +3712,23 @@ if opt_tool(CPUS, "ROLANDXP") then
 end
 
 --------------------------------------------------
+-- Roland LSP (Fujitsu MB87837)
+--@src/devices/sound/roland_lsp.h,CPUS["ROLANDLSP"] = true
+--------------------------------------------------
+
+if CPUS["ROLANDLSP"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_lsp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_lsp.h",
+	}
+end
+
+if opt_tool(CPUS, "ROLANDLSP") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_lspd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_lspd.h")
+end
+
+--------------------------------------------------
 -- Yamaha DSPV
 --@src/devices/sound/dspv.h,CPUS["DSPV"] = true
 --------------------------------------------------
