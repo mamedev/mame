@@ -680,39 +680,38 @@ void segas32_state::compute_tilemap_flips(int bgnum, bool &flipx, bool &flipy)
  *************************************/
 
 /*
-    When NBG2 is inhibited ($31ff04 bit 4) while its rowscroll (H) group is still
-    enabled (bit 0), the two NBG2 line table groups stop being scroll values and
-    become a per-scanline span: the H group ($x000) holds the left edge, the V
-    group ($x200) the right edge, both 10 bits.
+    Same concept as the later Saturn VDP2 line window (VDP2 user's manual,
+    page 184): the clipping rectangle is applied with a per-scanline line
+    table rather than per-screen.  When NBG2 is inhibited ($31ff04 bit 4)
+    while its rowscroll (H) group is still enabled (bit 0), the two NBG2 line
+    table groups become the span for each line - H group ($x000) = left edge,
+    V group ($x200) = right edge, 10 bits each - and the horizontal coverage
+    of the clipping window on every clip-enabled layer is intersected with
+    it, the ordinary clip in/out polarity applying to the result.  A line
+    whose right edge reads 0 is treated as never written and leaves the
+    rectangular clipping untouched (ga2 idles in the armed state with a
+    zeroed table through most of its attract mode).
 
-    The span is not a layer mask on its own.  It is a constraint ANDed into the
-    rectangular clipping window coverage, so a pixel is inside the effective
-    window only when the layer's assigned rectangle AND the span cover it; the
-    ordinary clip in/out polarity is applied afterwards.  Every layer that has
-    clipping enabled is affected.  A line whose right edge reads 0 has never been
-    written by the game and falls back to the plain rectangular result - without
-    that rule an armed game with an untouched table would have its clipping
-    inverted across the whole screen.
-
-    ga2 uses this for the lit torch in the stage 2 cave.  It parks a circle in the
-    table for thousands of frames without ever cleaning it and gates the effect
-    through NBG3's clipping window instead, swinging that rectangle between
-    inverted (empty, so the span is inert and the flat NBG3 fill covers the
-    screen) and full screen (rect == span, so the fill is drawn everywhere except
-    inside the circle, revealing the cave artwork on NBG0 there).  Both phases
-    match footage captured from an original PCB.
-
-    titlef uses it as a horizon rather than a circle: with all five clip windows
-    full screen and all four tilemaps clipped OUT, the span sits off-screen for
-    the top ~140 rows and runs full width below them, so the arena is drawn above
-    the ring floor line and nothing below it.  Without this the whole arena is
-    missing, and every match plays out over a flat blue background.
-
-    intersect_line_window() rewrites one scanline's extent list with every covered
-    run intersected against [left, right].
+    ga2 uses this to draw the lit-torch circle in the stage 2 cave, verified
+    against footage of an original PCB; titlef uses it as the arena horizon.
+    The arming condition and the zero-right-edge rule are inferred from those
+    two games rather than traced.
 */
-static uint16_t const *intersect_line_window(uint16_t const *extents, uint16_t *dest, int left, int right, const rectangle &cliprect)
+uint16_t const *segas32_state::apply_line_window(uint16_t const *extents, uint16_t *dest, int ylookup, const rectangle &cliprect)
 {
+	/* armed by an inhibited NBG2 whose rowscroll group is still enabled */
+	if (!BIT(m_videoram[0x1ff04/2], 4) || !BIT(m_videoram[0x1ff04/2], 0))
+		return extents;
+
+	uint16_t const *const table = &m_videoram[(m_videoram[0x1ff04/2] >> 10) * 0x400];
+	const int left = table[0x000 + ylookup] & 0x3ff;
+	const int right = table[0x200 + ylookup] & 0x3ff;
+
+	/* a zero right edge is a line the game has never written */
+	if (right == 0)
+		return extents;
+
+	/* rewrite the extent list with every covered run intersected against [left, right] */
 	uint16_t *out = dest;
 	*out++ = extents[0];
 
@@ -737,24 +736,6 @@ static uint16_t const *intersect_line_window(uint16_t const *extents, uint16_t *
 
 	*out++ = cliprect.max_x + 1;
 	return dest;
-}
-
-
-uint16_t const *segas32_state::apply_line_window(uint16_t const *extents, uint16_t *dest, int ylookup, const rectangle &cliprect)
-{
-	/* armed by an inhibited NBG2 whose rowscroll group is still enabled */
-	if (!BIT(m_videoram[0x1ff04/2], 4) || !BIT(m_videoram[0x1ff04/2], 0))
-		return extents;
-
-	uint16_t const *const table = &m_videoram[(m_videoram[0x1ff04/2] >> 10) * 0x400];
-	const int left = table[0x000 + ylookup] & 0x3ff;
-	const int right = table[0x200 + ylookup] & 0x3ff;
-
-	/* a zero right edge is a line the game has never written */
-	if (right == 0)
-		return extents;
-
-	return intersect_line_window(extents, dest, left, right, cliprect);
 }
 
 
