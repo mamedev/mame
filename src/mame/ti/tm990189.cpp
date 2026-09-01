@@ -93,6 +93,7 @@ public:
 		, m_tms9902(*this, "tms9902")
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
+        , m_low_ram(*this, "low_ram")
 	{
 	}
 
@@ -147,6 +148,7 @@ private:
 	required_device<tms9902_device> m_tms9902;
 	output_finder<10> m_digits;
 	output_finder<7> m_leds;
+    required_shared_ptr<uint8_t> m_low_ram;
 
 	int m_load_state = 0;
 
@@ -197,25 +199,6 @@ private:
 	uint8_t m_bogus_read_save = 0U;
 };
 
-class tm990189_b_state : public tm990189_state
-{
-public:
-	tm990189_b_state(const machine_config &mconfig, device_type type, const char *tag)
-    : tm990189_state(mconfig, type, tag),
-		m_low_ram(*this, "low_ram")
-	{
-	}
-
-	void tm990_189_b(machine_config &config) ATTR_COLD;
-
-protected:
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_low_ram;
-
-	virtual void machine_start() override ATTR_COLD;
-	void tm990_189_b_memmap(address_map& map) ATTR_COLD;
-};
-
 #define displayena_duration attotime::from_usec(4500)   /* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
 void tm990189_state::machine_start()
@@ -226,6 +209,15 @@ void tm990189_state::machine_start()
 	m_LED_state = 0;
 
 	m_load_timer = timer_alloc(FUNC(tm990189_state::clear_load), this);
+    
+    // When the machine resets it checks to see if register R7 in Workspace 0x80 is 0
+	// If it is then it tries to use an XOP to display the conents of register R14
+	// I'm not sure of the purpose of this check
+	// The problem is that Mame seems to initalize memory to all 0s so this check is
+	// always triggered but the XOP vectors haven't been initalized yet and so
+	// the machine jumps to an unknown location and never starts correctly
+	// This line sets R7 to a non-zero value so that the 0 check fails
+	m_low_ram[0x008E] = 0x01;
 }
 
 void tm990189_v_state::machine_start()
@@ -236,20 +228,6 @@ void tm990189_v_state::machine_start()
 	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-}
-
-void tm990189_b_state::machine_start()
-{
-	tm990189_state::machine_start();
-
-	// When the machine resets it checks to see if register R7 in Workspace 0x80 is 0
-	// If it is then it tries to use an XOP to display the conents of register R14
-	// I'm not sure of the purpose of this check
-	// The problem is that Mame seems to initalize memory to all 0s so this check is
-	// always triggered but the XOP vectors haven't been initalized yet and so
-	// the machine jumps to an unknown location and never starts correctly
-	// This line sets R7 to a non-zero value so that the 0 check fails
-	m_low_ram[0x008E] = 0x01;
 }
 
 void tm990189_state::machine_reset()
@@ -725,18 +703,10 @@ static const tms9901_interface sys9901reset_param =
 
 void tm990189_state::tm990_189_memmap(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();      // RAM
+	map(0x0000, 0x07ff).ram().share("low_ram");;      // RAM
 	map(0x0800, 0x0fff).rom();      // extra ROM - application programs with unibug, remaining 2kb of program for university basic
 	map(0x1000, 0x2fff).noprw();    // reserved for expansion (RAM and/or tms9918 video controller)
 	map(0x3000, 0x3fff).rom();      // main ROM - unibug or university basic
-}
-
-void tm990189_b_state::tm990_189_b_memmap(address_map& map)
-{
-	map(0x0000, 0x07ff).ram().share("low_ram");;      // RAM
-	map(0x0800, 0x0fff).rom();      // extra ROM - application programs
-	map(0x1000, 0x2fff).noprw();    // reserved for expansion (RAM and/or tms9918 video controller)
-	map(0x3000, 0x3fff).rom();      // main ROM - unibug
 }
 
 void tm990189_v_state::tm990_189_v_memmap(address_map &map)
@@ -888,36 +858,27 @@ void tm990189_v_state::tm990_189_v(machine_config &config)
 	config.set_default_layout(layout_tm990189v);
 }
 
-void tm990189_b_state::tm990_189_b(machine_config &config)
-{
-	tm990_189(config);
-
-	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_b_state::tm990_189_b_memmap);
-    
-    config.set_default_layout(layout_tm990189);
-}
-
-
 /*
   ROM loading
 */
 ROM_START(990189)
 	/*CPU memory space*/
 	ROM_REGION(0x4000, "maincpu", 0 )
+    
+    ROM_DEFAULT_BIOS("basic")
+
+    ROM_SYSTEM_BIOS(0, "basic", "University BASIC ROMs")
 
 	/* extra ROM */
-	ROM_LOAD("990-469.u32", 0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53))
+	ROMX_LOAD("990-469.u32", 0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53), ROM_BIOS(0))
 
 	/* boot ROM */
-	ROM_LOAD("990-469.u33", 0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9))
-ROM_END
-
-ROM_START(990189b)
-	/*CPU memory space*/
-	ROM_REGION(0x4000, "maincpu", 0 )
-
-	/* boot ROM */
-	ROM_LOAD("990-unibug.u33", 0x3000, 0x1000, CRC(2C87FC77) SHA1(1E2A0EE86851A51835F167E26738B3269FE1C2CA))
+	ROMX_LOAD("990-469.u33", 0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9), ROM_BIOS(0))
+    
+    ROM_SYSTEM_BIOS(1, "unibug", "Unibug ROM")
+    
+    /* boot ROM */
+	ROMX_LOAD("990-unibug.u33", 0x3000, 0x1000, CRC(2C87FC77) SHA1(1E2A0EE86851A51835F167E26738B3269FE1C2CA), ROM_BIOS(1))
 ROM_END
 
 ROM_START(990189v)
@@ -1031,6 +992,5 @@ INPUT_PORTS_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT      CLASS             INIT        COMPANY              FULLNAME                                                                FLAGS
-COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state,   empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer (University BASIC)",         0 )
-COMP( 1978, 990189b, 990189, 0,      tm990_189_b, tm990_189, tm990189_b_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer (UNIBUG)",                   0 )
+COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state,   empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer",         0 )
 COMP( 1980, 990189v, 990189, 0,      tm990_189_v, tm990_189, tm990189_v_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )
