@@ -503,8 +503,11 @@ void acorn_vidc10_device::refresh_sound_frequency()
 	// VERIFY: assume a value of zero is invalid (ppcar POST setup)?
 	if (m_sound_mode == true && m_sound_frequency_latch)
 	{
-		// TODO: Range is between 3 and 256 usecs
-		double sndhz = get_sound_clock() / ((m_sound_frequency_latch & 0xff) + 2);
+		// Valid range is between 3(load of 0x2) and 256(load of 0xff) usecs
+		// loads of 1 and 0 are invalid and could cause undesirable behavior
+		// presumably by emptying the vidc fifo faster than the memc can
+		// write the first new dword to it
+		double sndhz = get_sound_clock() / ((m_sound_frequency_latch & 0xff) + 1);
 		m_sound_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 		LOGMASKED(LOG_AUDIODMA, "VIDC: audio DMA start %02x + 2 -> sndhz = %f\n", m_sound_frequency_latch, sndhz);
 	}
