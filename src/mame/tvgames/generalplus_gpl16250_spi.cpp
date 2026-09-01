@@ -254,4 +254,4 @@ CONS( 2015, pokegach, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gp
 // ポケでるガチャ 2.0
 // the second release comes in two colours and they can communicate
 CONS( 2015, pokegac2,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha 2.0 Red (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha 2.0 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2015, pokegac2y, pokegac2, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha 2.0 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
