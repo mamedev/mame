@@ -23,12 +23,6 @@
     - Sonic while globally flipped via the service menu, fails to flip
       the "SEGA" and "SEGASONIC" sprite based logos on the title screen.
 
-    - titlef NBG0 and NBG2 layers are currently hidden during gameplay.
-      It sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
-      Game actually uses the "rowscroll/rowselect" tables for a line window
-      effect to draw the boxing ring over NBG0.
-      Same deal for ga2 when in stage 2 cave a wall torch is lit.
-
     - Wrong priority cases (parenthesis for the level setup):
       dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
       dbzvrvs: Sheng-Long speech balloon during Piccoro ending (fixme: check levels).
@@ -89,6 +83,9 @@
                  -------- ------d-  Disable tilemap layer 1
                  -------- -------d  Disable tilemap layer 0
         F04      tttttttt --------  Rowscroll/select table page number
+                 -------- --i-----  Inhibit rowscroll/rowselect for tilemap layer 3
+                 -------- ---i----  Inhibit rowscroll/rowselect for tilemap layer 2
+                                    (with rowscroll left enabled, arms the line window)
                  -------- ----s---  Enable rowselect for tilemap layer 3
                  -------- -----s--  Enable rowselect for tilemap layer 2
                  -------- ------c-  Enable rowscroll for tilemap layer 3
@@ -675,6 +672,92 @@ void segas32_state::compute_tilemap_flips(int bgnum, bool &flipx, bool &flipy)
 	flipy = (layer_flip && !prohibit_flipy) ? !global_flip : global_flip;
 }
 
+
+/*************************************
+ *
+ *  Per-scanline line window
+ *
+ *************************************/
+
+/*
+    When NBG2 is inhibited ($31ff04 bit 4) while its rowscroll (H) group is still
+    enabled (bit 0), the two NBG2 line table groups stop being scroll values and
+    become a per-scanline span: the H group ($x000) holds the left edge, the V
+    group ($x200) the right edge, both 10 bits.
+
+    The span is not a layer mask on its own.  It is a constraint ANDed into the
+    rectangular clipping window coverage, so a pixel is inside the effective
+    window only when the layer's assigned rectangle AND the span cover it; the
+    ordinary clip in/out polarity is applied afterwards.  Every layer that has
+    clipping enabled is affected.  A line whose right edge reads 0 has never been
+    written by the game and falls back to the plain rectangular result - without
+    that rule an armed game with an untouched table would have its clipping
+    inverted across the whole screen.
+
+    ga2 uses this for the lit torch in the stage 2 cave.  It parks a circle in the
+    table for thousands of frames without ever cleaning it and gates the effect
+    through NBG3's clipping window instead, swinging that rectangle between
+    inverted (empty, so the span is inert and the flat NBG3 fill covers the
+    screen) and full screen (rect == span, so the fill is drawn everywhere except
+    inside the circle, revealing the cave artwork on NBG0 there).  Both phases
+    match footage captured from an original PCB.
+
+    titlef uses it as a horizon rather than a circle: with all five clip windows
+    full screen and all four tilemaps clipped OUT, the span sits off-screen for
+    the top ~140 rows and runs full width below them, so the arena is drawn above
+    the ring floor line and nothing below it.  Without this the whole arena is
+    missing, and every match plays out over a flat blue background.
+
+    intersect_line_window() rewrites one scanline's extent list with every covered
+    run intersected against [left, right].
+*/
+static uint16_t const *intersect_line_window(uint16_t const *extents, uint16_t *dest, int left, int right, const rectangle &cliprect)
+{
+	uint16_t *out = dest;
+	*out++ = extents[0];
+
+	/* the first region lies outside every clipping rectangle; coverage alternates from there */
+	bool covered = false;
+	for (int i = 0; ; i++)
+	{
+		if (covered)
+		{
+			const int start = std::max<int>(extents[i], left);
+			const int end = std::min<int>(extents[i + 1], right + 1);
+			if (start < end)
+			{
+				*out++ = start;
+				*out++ = end;
+			}
+		}
+		if (extents[i + 1] > cliprect.max_x)
+			break;
+		covered = !covered;
+	}
+
+	*out++ = cliprect.max_x + 1;
+	return dest;
+}
+
+
+uint16_t const *segas32_state::apply_line_window(uint16_t const *extents, uint16_t *dest, int ylookup, const rectangle &cliprect)
+{
+	/* armed by an inhibited NBG2 whose rowscroll group is still enabled */
+	if (!BIT(m_videoram[0x1ff04/2], 4) || !BIT(m_videoram[0x1ff04/2], 0))
+		return extents;
+
+	uint16_t const *const table = &m_videoram[(m_videoram[0x1ff04/2] >> 10) * 0x400];
+	const int left = table[0x000 + ylookup] & 0x3ff;
+	const int right = table[0x200 + ylookup] & 0x3ff;
+
+	/* a zero right edge is a line the game has never written */
+	if (right == 0)
+		return extents;
+
+	return intersect_line_window(extents, dest, left, right, cliprect);
+}
+
+
 /*************************************
  *
  *  Zooming tilemaps (NBG0/1)
@@ -785,9 +868,15 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	/* loop over the target rows */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		const int ylookup = flipy ? (screen.visible_area().max_y - y) : y;
 		uint16_t const *extents = &clip_extents.extent[clip_extents.scan_extent[y]][0];
 		uint16_t *const dst = &bitmap.pix(y);
 		bool clipdraw = clipdraw_start;
+
+		/* intersect the clipping with this line's window span, if any */
+		uint16_t winextents[std::size(clip_extents.extent[0])];
+		if (clipenable)
+			extents = apply_line_window(extents, winextents, ylookup, cliprect);
 
 		/* optimize for the case where we are clipped out */
 		if (clipdraw || extents[1] <= cliprect.max_x)
@@ -902,9 +991,15 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 	/* render the tilemap into its bitmap */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		const int ylookup = flipy ? (screen.visible_area().max_y - y) : y;
 		uint16_t const *extents = &clip_extents.extent[clip_extents.scan_extent[y]][0];
 		uint16_t *const dst = &bitmap.pix(y);
 		bool clipdraw = clipdraw_start;
+
+		/* intersect the clipping with this line's window span, if any */
+		uint16_t winextents[std::size(clip_extents.extent[0])];
+		if (clipenable)
+			extents = apply_line_window(extents, winextents, ylookup, cliprect);
 
 		/* optimize for the case where we are clipped out */
 		if (clipdraw || extents[1] <= cliprect.max_x)
@@ -925,19 +1020,7 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 				srcxstep = -1;
 			}
 
-			int srcy;
-			int ylookup;
-			if (!flipy)
-			{
-				srcy = yscroll + y;
-				ylookup = y;
-			}
-			else
-			{
-				const rectangle &visarea = screen.visible_area();
-				srcy = yscroll + visarea.max_y - y;
-				ylookup = visarea.max_y - y;
-			}
+			int srcy = yscroll + ylookup;
 
 			/* apply row scroll/select */
 			if (rowscroll)

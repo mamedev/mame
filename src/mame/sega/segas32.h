@@ -181,6 +181,7 @@ protected:
 	void scross_sw1_output(int which, uint16_t data);
 	void scross_sw2_output(int which, uint16_t data);
 	bool compute_clipping_extents(screen_device &screen, bool enable, bool clipout, int clipmask, const rectangle &cliprect, extents_list *list);
+	uint16_t const *apply_line_window(uint16_t const *extents, uint16_t *dest, int ylookup, const rectangle &cliprect);
 	void compute_tilemap_flips(int bgnum, bool &flipx, bool &flipy);
 	void update_tilemap_zoom(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
 	void update_tilemap_rowscroll(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
