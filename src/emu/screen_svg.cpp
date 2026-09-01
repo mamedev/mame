@@ -214,7 +214,6 @@ void screen_svg_device::compute_diff_image(const std::vector<u32> &rend, const b
 			dst++;
 		}
 	}
-
 }
 
 bool screen_svg_device::compute_mask_intersection_bbox(int key1, int key2, bbox &bb) const
@@ -478,7 +477,6 @@ void screen_svg_device::device_start()
 
 	machine().output().add_global_notifier(screen_svg_device::output_notifier, this);
 
-
 	// We don't yet have a way for the rendering to tell us the optimal bitmap size...
 	m_sx = m_render_width;
 	m_sy = m_render_height;
@@ -498,9 +496,11 @@ void screen_svg_device::device_start()
 	// register items for saving
 	save_item(NAME(m_frame_period));
 
-	/* allocate and start the vblank timer */
+	// allocate and start the vblank timer
 	m_vblank_timer = timer_alloc(FUNC(screen_svg_device::vblank_timer_callback), this);
 	m_vblank_timer->adjust(m_frame_period, 0, m_frame_period);
+
+	osd_printf_verbose("Parsed SVG '%s', aspect ratio %f\n", tag(), (m_image->height == 0.0f) ? 0 : m_image->width / m_image->height);
 }
 
 
