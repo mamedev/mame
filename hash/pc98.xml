@@ -68794,6 +68794,7 @@ Throws Abort Retry Fail during boot or if dir is issued
 	</software>
 
 	<software name="sailorez" supported="yes">
+		<!-- uses the English nomenclature on title, also an unlicensed title so we leave it this way -->
 		<description>Pretty Soldier Sailor Moon EZ</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>

@@ -46,6 +46,8 @@ static constexpr uint64_t DOUBLE_ZERO = 0;
 
 static constexpr uint32_t CODEPAGE_SIZE = 0x1'0000'0000ULL / 4096 / 8;
 
+static constexpr uint32_t SPR60X_HID0_ICFI			= 0x0000'0800;
+
 /***************************************************************************
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
@@ -2028,6 +2030,18 @@ void ppc_device::ppccom_execute_mtspr()
 				m_core->spr[m_core->param0] = m_core->param1;
 				return;
 
+			// register that affects the instruction cache
+			case SPR603_HID0:
+				// flush the I-cache on a 0->1 transition of ICFI, konamim2 does this
+				// valid on all OEA parts except 601
+				if ((m_flavor != PPC_MODEL_601) && m_core->m_codepage_any
+						&& ((m_core->param1 & ~m_core->spr[SPR603_HID0]) & SPR60X_HID0_ICFI))
+				{
+					invalidate_code_range(0, 0xffffffff);
+				}
+				m_core->spr[m_core->param0] = m_core->param1;
+				return;
+
 			// registers that affect the memory map
 			case SPROEA_SDR1:
 			case SPROEA_IBAT0L:
@@ -2141,7 +2155,6 @@ void ppc_device::ppccom_execute_mtspr()
 
 			/* write-through no-ops */
 			case SPR603_RPA:
-			case SPR603_HID0:
 			case SPR603_HID1:
 			case SPR603_IABR:
 			case SPR603_HID2:

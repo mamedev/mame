@@ -15,7 +15,6 @@
 
     TODO:
     - Timing for status data or status change is a guess
-    - Serial control lines
 
 ***************************************************************************/
 
@@ -37,6 +36,34 @@
 	m_input_fifo[4], m_input_fifo[5], m_input_fifo[6])
 
 #include "logmacro.h"
+
+
+//**************************************************************************
+//  COMMAND DISPATCH TABLE
+//**************************************************************************
+
+const cr511b_device::command_info cr511b_device::m_cmd_table[] =
+{
+	{ 0x00, 7, &cr511b_device::cmd_check_path,     true  },
+	{ 0x01, 7, &cr511b_device::cmd_seek,           false },
+	{ 0x02, 7, &cr511b_device::cmd_read,           false },
+	{ 0x04, 7, &cr511b_device::cmd_motor_on,       false },
+	{ 0x05, 7, &cr511b_device::cmd_motor_off,      false },
+	{ 0x06, 7, &cr511b_device::cmd_diagnostic,     false },
+	{ 0x09, 7, &cr511b_device::cmd_play_lba,       false },
+	{ 0x0a, 7, &cr511b_device::cmd_play_msf,       false },
+	{ 0x0b, 7, &cr511b_device::cmd_play_track,     false },
+	{ 0x80, 7, &cr511b_device::cmd_check_path,     false },
+	{ 0x81, 1, &cr511b_device::cmd_read_status,    false },
+	{ 0x82, 7, &cr511b_device::cmd_read_error,     true  },
+	{ 0x83, 7, &cr511b_device::cmd_version,        true  },
+	{ 0x84, 7, &cr511b_device::cmd_set_mode,       false },
+	{ 0x87, 7, &cr511b_device::cmd_read_subq,      false },
+	{ 0x89, 7, &cr511b_device::cmd_read_disc_info, false },
+	{ 0x8a, 7, &cr511b_device::cmd_read_toc,       false },
+	{ 0x8b, 7, &cr511b_device::cmd_pause,          false },
+	{ 0xa3, 7, &cr511b_device::cmd_front_panel,    false }
+};
 
 
 //**************************************************************************
@@ -109,6 +136,7 @@ void cr511b_device::device_start()
 	save_item(NAME(m_output_fifo_pos));
 	save_item(NAME(m_output_fifo_length));
 	save_item(NAME(m_status));
+	save_item(NAME(m_error_code));
 	save_item(NAME(m_sector_size));
 	save_item(NAME(m_subcode_symbol));
 	save_item(NAME(m_subcode_buffer));
@@ -146,6 +174,7 @@ void cr511b_device::device_reset()
 	m_subcode_valid = false;
 
 	m_status = STATUS_READY;
+	m_error_code = 0x12; // reset state
 	m_sector_size = 0;
 
 	m_serial_shift = 0;
@@ -527,36 +556,23 @@ void cr511b_device::write(uint8_t data)
 		return;
 	}
 
-	m_input_fifo[m_input_fifo_pos++] = data;
+	if (m_input_fifo_pos < sizeof(m_input_fifo))
+		m_input_fifo[m_input_fifo_pos++] = data;
+	else
+		fatalerror("Input FIFO overflow\n"); // should never happen
 
-	switch (m_input_fifo[0])
-	{
-		case 0x01: if (m_input_fifo_pos == 7) cmd_seek(); break;
-		case 0x02: if (m_input_fifo_pos == 7) cmd_read(); break;
-		case 0x04: if (m_input_fifo_pos == 7) cmd_motor_on(); break;
-		case 0x05: if (m_input_fifo_pos == 7) cmd_motor_off(); break;
-		case 0x09: if (m_input_fifo_pos == 7) cmd_play_lba(); break;
-		case 0x0a: if (m_input_fifo_pos == 7) cmd_play_msf(); break;
-		case 0x0b: if (m_input_fifo_pos == 7) cmd_play_track(); break;
-		case 0x81: if (m_input_fifo_pos == 1) cmd_read_status(); break;
-		case 0x82: if (m_input_fifo_pos == 7) cmd_read_error(); break;
-		case 0x84: if (m_input_fifo_pos == 7) cmd_set_mode(); break;
-		case 0x87: if (m_input_fifo_pos == 7) cmd_read_subq(); break;
-		case 0x89: if (m_input_fifo_pos == 7) cmd_read_disc_info(); break;
-		case 0x8a: if (m_input_fifo_pos == 7) cmd_read_toc(); break;
-		case 0x8b: if (m_input_fifo_pos == 7) cmd_pause(); break;
-		case 0xa3: if (m_input_fifo_pos == 7) cmd_front_panel(); break;
-
-		default:
-			LOG("Unknown command: %02x\n", m_input_fifo[0]);
-			status_enable(0);
-			break;
-	}
+	check_cmd(false);
 }
 
 void cr511b_device::cmd_w(int state)
 {
-	m_cmd = !bool(state); // active low
+	bool const cmd = !bool(state); // active low
+	bool const deassert = m_cmd && !cmd;
+	m_cmd = cmd;
+
+	// it's possible to execute some commands early
+	if (deassert && m_enabled)
+		check_cmd(true);
 }
 
 void cr511b_device::enable_w(int state)
@@ -708,6 +724,41 @@ TIMER_CALLBACK_MEMBER(cr511b_device::scan_cb)
 	m_cdda->cancel_scan();
 }
 
+
+//**************************************************************************
+//  COMMAND HANDLING
+//**************************************************************************
+
+void cr511b_device::check_cmd(bool early_execute)
+{
+	for (const auto &cmd : m_cmd_table)
+	{
+		if (m_input_fifo[0] != cmd.opcode)
+			continue;
+
+		// execute command immediately or once we have all parameters
+		bool const execute = early_execute ? cmd.short_cmd && m_input_fifo_pos == 1 : m_input_fifo_pos == cmd.length;
+		if (execute)
+			(this->*cmd.handler)();
+
+		return;
+	}
+
+	if (!early_execute && m_input_fifo_pos == 7)
+		cmd_unknown();
+}
+
+void cr511b_device::cmd_check_path()
+{
+	LOGMASKED(LOG_CMD, "Command: Check Path\n");
+	LOGPARAM;
+
+	m_output_fifo[0] = 0xaa;
+	m_output_fifo[1] = 0x55;
+
+	status_enable(2);
+}
+
 void cr511b_device::cmd_seek()
 {
 	LOGMASKED(LOG_CMD, "Command: Seek\n");
@@ -768,6 +819,20 @@ void cr511b_device::cmd_motor_off()
 	// TODO: Does this enable STATUS_SUCCESS?
 
 	status_change(m_status & ~STATUS_MOTOR);
+	status_enable(0);
+}
+
+void cr511b_device::cmd_diagnostic()
+{
+	LOGMASKED(LOG_CMD, "Command: Diagnostic\n");
+	LOGPARAM;
+
+	// 0x80 seems to mean "SEEK TEST"
+	if ((m_input_fifo[1] == 0x80) && (m_status & STATUS_MEDIA))
+		status_change(m_status | STATUS_MOTOR | STATUS_SUCCESS);
+	else
+		status_change(m_status | STATUS_ERROR);
+
 	status_enable(0);
 }
 
@@ -865,11 +930,16 @@ void cr511b_device::cmd_read_error()
 	LOGMASKED(LOG_CMD, "Command: Read Error\n");
 	LOGPARAM;
 
-	m_status &= ~STATUS_ERROR;
-	m_status |= STATUS_READY;
-	m_status |= STATUS_SUCCESS;
+	std::fill_n(m_output_fifo, 6, 0x00);
 
-	m_output_fifo[2] |= (m_status & 0x10);
+	m_output_fifo[1] = m_error_code;
+	m_output_fifo[2] = (m_status & STATUS_ERROR);
+
+	// reading clears the error code
+	m_error_code = 0x00;
+
+	m_status &= ~STATUS_ERROR;
+	m_status |= STATUS_READY | STATUS_SUCCESS;
 
 	status_enable(6);
 }
@@ -879,8 +949,12 @@ void cr511b_device::cmd_version()
 	LOGMASKED(LOG_CMD, "Command: Version\n");
 	LOGPARAM;
 
-	// haven't found anything that uses it yet
-	fatalerror("Version: Not implemented\n");
+	// MATSHITA0.97 was also seen
+	std::memcpy(m_output_fifo, "MATSHITA0.96", 12);
+
+	m_status |= STATUS_SUCCESS;
+
+	status_enable(12);
 }
 
 void cr511b_device::cmd_set_mode()
@@ -1092,5 +1166,14 @@ void cr511b_device::cmd_front_panel()
 
 	m_front_panel_enabled = (m_input_fifo[1] == 0x20);
 
+	status_enable(0);
+}
+
+void cr511b_device::cmd_unknown()
+{
+	LOGMASKED(LOG_CMD, "Unknown command: %02x\n", m_input_fifo[0]);
+	LOGPARAM;
+
+	status_change(m_status | STATUS_ERROR);
 	status_enable(0);
 }

@@ -9,14 +9,13 @@ TODO:
 - a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
 
 TODO (a7000p -bios 2):
-- Hangs at boot with no harddisk (strike ESC key several times until Boot menu appears,
+- Hangs at boot with nullptr ide1:0 option (strike ESC key several times until Boot menu appears,
   then disable it in Configure machine item);
-- In turn above seems too slow to catch up (verify);
-- Verify floppy hookup (seems working but perhaps one too many OS failures along the way);
+- In turn the ESC key Cancel looks too slow to catch up (verify);
 - CD throws "CD drive not ready or disc not present" when mounted
   (NOTE: needs filesystem changed to CDFS in Configure machine)
 - Serial mouse doesn't work even if selected;
-- No VIDC10 sound even if configured in games;
+- No VIDC10 sound even if configured in games, needs support in IOMD sound DMA;
 
 Notes:
 - List of compatible RiscPC SWs at:

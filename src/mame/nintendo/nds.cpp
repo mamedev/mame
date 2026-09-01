@@ -149,21 +149,21 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_vcount(0),
 	m_scanline_timer(nullptr), m_hblank_timer(nullptr),
 	m_keycnt{},
-	m_ipcfifocnt{},	m_ipcfifo{}, m_ipcfifo_last{}, m_ipcfifo_head{}, m_ipcfifo_count{},
+	m_ipcfifocnt{}, m_ipcfifo{}, m_ipcfifo_last{}, m_ipcfifo_head{}, m_ipcfifo_count{},
 	m_spi_cnt(0), m_spi_data(0),
 	m_fw_ram(std::make_unique<uint8_t[]>(0x40000)),
 	m_fw_cmd(0), m_fw_stat(0), m_fw_addr(0), m_fw_bytes(0), m_fw_powerdown(false),
-	m_pm_regs{ 0x0d, 0, 0, 0, 0, 0, 0, 0 },	m_pm_index(0), m_pm_have_index(false),
+	m_pm_regs{ 0x0d, 0, 0, 0, 0, 0, 0, 0 }, m_pm_index(0), m_pm_have_index(false),
 	m_tsc_result(0), m_tsc_pos(0),
 	m_rtc_io(0),
 	m_gba_mode(false),
 	m_total_lines(TOTAL_LINES), m_visible_lines(VISIBLE_LINES),
 	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_bios_prefetch(0), m_gba_fifo{},
-	m_auxspicnt(0),	m_auxspidata(0),
+	m_auxspicnt(0), m_auxspidata(0),
 	m_romctrl(0),
 	m_card_command{}, m_cartdata_len(0), m_card_cpu(1),
 	m_dma_timer{}, m_dma_srcreg{}, m_dma_dstreg{}, m_dma_ctrl{}, m_dma_src{}, m_dma_dst{}, m_dma_cnt{}, m_dma_fill{},
-	m_timer_regs{},	m_timer_reload{}, m_timer_hz{},	m_timer_start{}, m_tmr_timer{},
+	m_timer_regs{}, m_timer_reload{}, m_timer_hz{}, m_timer_start{}, m_tmr_timer{},
 	m_divcnt(0), m_sqrtcnt(0), m_div_numer(0), m_div_denom(0), m_div_result(0), m_divrem_result(0), m_sqrt_param(0), m_sqrt_result(0)
 	{ }
 
@@ -327,24 +327,25 @@ void nds_state::update_keypad_irq(int cpu)
 	}
 }
 
-uint16_t nds_state::ipcfifo_cnt_r(int cpu)
+template <int Cpu>
+uint16_t nds_state::ipcfifo_cnt_r()
 {
-	uint16_t data = m_ipcfifocnt[cpu] & 0xc404;
+	uint16_t data = m_ipcfifocnt[Cpu] & 0xc404;
 
-	if (m_ipcfifo_count[cpu] == 0)
+	if (m_ipcfifo_count[Cpu] == 0)
 	{
 		data |= 0x0001;             // send FIFO empty
 	}
-	if (m_ipcfifo_count[cpu] == 16)
+	if (m_ipcfifo_count[Cpu] == 16)
 	{
 		data |= 0x0002;             // send FIFO full
 	}
 
-	if (m_ipcfifo_count[cpu ^ 1] == 0)
+	if (m_ipcfifo_count[Cpu ^ 1] == 0)
 	{
 		data |= 0x0100;             // receive FIFO empty
 	}
-	if (m_ipcfifo_count[cpu ^ 1] == 16)
+	if (m_ipcfifo_count[Cpu ^ 1] == 16)
 	{
 		data |= 0x0200;             // receive FIFO full
 	}
@@ -352,72 +353,75 @@ uint16_t nds_state::ipcfifo_cnt_r(int cpu)
 	return data;
 }
 
-void nds_state::ipcfifo_cnt_w(int cpu, uint16_t data)
+template <int Cpu>
+void nds_state::ipcfifo_cnt_w(uint16_t data)
 {
-	const bool old_send_empty_irq = BIT(m_ipcfifocnt[cpu], 2) && (m_ipcfifo_count[cpu] == 0);
-	const bool old_recv_irq = BIT(m_ipcfifocnt[cpu], 10) && (m_ipcfifo_count[cpu ^ 1] != 0);
+	const bool old_send_empty_irq = BIT(m_ipcfifocnt[Cpu], 2) && (m_ipcfifo_count[Cpu] == 0);
+	const bool old_recv_irq = BIT(m_ipcfifocnt[Cpu], 10) && (m_ipcfifo_count[Cpu ^ 1] != 0);
 
 	if (BIT(data, 3))   // flush our send FIFO
 	{
-		m_ipcfifo_count[cpu] = 0;
-		m_ipcfifo_head[cpu] = 0;
-		m_ipcfifo_last[cpu] = 0;
+		m_ipcfifo_count[Cpu] = 0;
+		m_ipcfifo_head[Cpu] = 0;
+		m_ipcfifo_last[Cpu] = 0;
 	}
 
 	// auto-acknowledge if bit 14 is set
 	if (BIT(data, 14))
 	{
-		m_ipcfifocnt[cpu] &= ~0x4000;
+		m_ipcfifocnt[Cpu] &= ~0x4000;
 	}
 
-	m_ipcfifocnt[cpu] = (m_ipcfifocnt[cpu] & 0x4000) | (data & 0x8404);
+	m_ipcfifocnt[Cpu] = (m_ipcfifocnt[Cpu] & 0x4000) | (data & 0x8404);
 
-	if (!old_send_empty_irq && BIT(m_ipcfifocnt[cpu], 2) && (m_ipcfifo_count[cpu] == 0))
+	if (!old_send_empty_irq && BIT(m_ipcfifocnt[Cpu], 2) && (m_ipcfifo_count[Cpu] == 0))
 	{
-		request_irq(cpu, INT_IPCSENDEMPTY);
+		request_irq(Cpu, INT_IPCSENDEMPTY);
 	}
 
-	if (!old_recv_irq && BIT(m_ipcfifocnt[cpu], 10) && (m_ipcfifo_count[cpu ^ 1] != 0))
+	if (!old_recv_irq && BIT(m_ipcfifocnt[Cpu], 10) && (m_ipcfifo_count[Cpu ^ 1] != 0))
 	{
-		request_irq(cpu, INT_IPCRECVNOTEMPTY);
+		request_irq(Cpu, INT_IPCRECVNOTEMPTY);
 	}
 }
 
-void nds_state::ipcfifo_send(int cpu, uint32_t data)
+template <int Cpu>
+void nds_state::ipcfifo_send(uint32_t data)
 {
-	if (!BIT(m_ipcfifocnt[cpu], 15))
+	if (!BIT(m_ipcfifocnt[Cpu], 15))
 	{
 		return;
 	}
 
 	// indicate an error if the send FIFO is full
-	if (m_ipcfifo_count[cpu] == 16)
+	if (m_ipcfifo_count[Cpu] == 16)
 	{
-		m_ipcfifocnt[cpu] |= 0x4000;
+		m_ipcfifocnt[Cpu] |= 0x4000;
 		return;
 	}
 
-	const bool was_empty = (m_ipcfifo_count[cpu] == 0);
+	const bool was_empty = (m_ipcfifo_count[Cpu] == 0);
 
-	m_ipcfifo[cpu][(m_ipcfifo_head[cpu] + m_ipcfifo_count[cpu]) & 15] = data;
-	m_ipcfifo_count[cpu]++;
+	m_ipcfifo[Cpu][(m_ipcfifo_head[Cpu] + m_ipcfifo_count[Cpu]) & 15] = data;
+	m_ipcfifo_count[Cpu]++;
 
-	LOGMASKED(LOG_IPC, "IPC: CPU%d sends %08x (%d words queued)\n", cpu, data, m_ipcfifo_count[cpu]);
+	LOGMASKED(LOG_IPC, "IPC: CPU%d sends %08x (%d words queued)\n", Cpu, data, m_ipcfifo_count[Cpu]);
 
-	if (was_empty && BIT(m_ipcfifocnt[cpu ^ 1], 10))
+	if (was_empty && BIT(m_ipcfifocnt[Cpu ^ 1], 10))
 	{
-		request_irq(cpu ^ 1, INT_IPCRECVNOTEMPTY);
+		request_irq(Cpu ^ 1, INT_IPCRECVNOTEMPTY);
 	}
 }
 
-uint32_t nds_state::ipcfifo_recv(int cpu)
+template <int Cpu>
+uint32_t nds_state::ipcfifo_recv()
 {
-	const int remote = cpu ^ 1;
+	const int remote = Cpu ^ 1;
 
 	// is the FIFO empty?
 	if (m_ipcfifo_count[remote] == 0)
 	{
-		m_ipcfifocnt[cpu] |= 0x4000;
+		m_ipcfifocnt[Cpu] |= 0x4000;
 		return m_ipcfifo_last[remote];
 	}
 
@@ -425,7 +429,7 @@ uint32_t nds_state::ipcfifo_recv(int cpu)
 	m_ipcfifo_last[remote] = data;
 
 	// when the FIFO is disabled reads do not remove the word
-	if (!BIT(m_ipcfifocnt[cpu], 15))
+	if (!BIT(m_ipcfifocnt[Cpu], 15))
 	{
 		return data;
 	}
@@ -1099,479 +1103,385 @@ void nds_state::sqrt_calculate()
     Common I/O
 ***************************************************************************/
 
-uint32_t nds_state::common_io_r(int cpu, offs_t offset, uint32_t mem_mask, bool &handled)
+template <int Cpu>
+uint32_t nds_state::dispstat_r(offs_t offset, uint32_t mem_mask)
 {
-	handled = true;
-
-	// DMA channels: SAD, DAD and CNT for each of four channels
-	if ((offset >= DMA_OFFSET) && (offset < (DMA_OFFSET + 12)))
-	{
-		const int ch = ((offset - DMA_OFFSET) / 3) + (cpu * 4);
-		switch ((offset - DMA_OFFSET) % 3)
-		{
-			case 0: return m_dma_srcreg[ch];
-			case 1: return m_dma_dstreg[ch];
-			default: return m_dma_ctrl[ch];
-		}
-	}
-
-	if ((offset >= TIMER_OFFSET) && (offset < (TIMER_OFFSET + 4)))
-	{
-		const int timer = (offset - TIMER_OFFSET) + (cpu * 4);
-		LOGMASKED(LOG_TIMER, "Read timer reg %x\n", timer);
-		return (m_timer_regs[timer] & 0xffff0000) | timer_count_r(timer);
-	}
-
-	switch (offset)
-	{
-		case DISPSTAT_OFFSET:
-			return m_dispstat[cpu] | (uint32_t(m_vcount) << 16);
-
-		case KEYINPUT_OFFSET:
-			return (m_keys->read() & 0x03ff) | (uint32_t(m_keycnt[cpu]) << 16);
-
-		case IPCSYNC_OFFSET:
-			return m_ipcsync[cpu];
-
-		case IPCFIFOCNT_OFFSET:
-			return ipcfifo_cnt_r(cpu);
-
-		case EXMEMCNT_OFFSET:
-			return m_exmemcnt;
-
-		case IME_OFFSET:
-			return m_ime[cpu];
-
-		case IE_OFFSET:
-			return m_ie[cpu];
-
-		case IF_OFFSET:
-			return m_if[cpu];
-
-		case AUX_SPI_CNT_OFFSET:
-			LOGMASKED(LOG_GAMECARD, "cpu%d: read AUXSPICNT mask %08x\n", cpu, mem_mask);
-			return m_auxspicnt | (uint32_t(m_auxspidata) << 16);
-
-		case GAMECARD_BUS_CTRL_OFFSET:
-			LOGMASKED(LOG_GAMECARD, "cpu%d: read ROMCTRL (%08x) mask %08x\n", cpu, m_romctrl, mem_mask);
-			return m_romctrl;
-
-		case GAMECARD_DATA_OFFSET:
-			return (m_card_command[0] << 24) | (m_card_command[1] << 16) | (m_card_command[2] << 8) | m_card_command[3];
-
-		case GAMECARD_DATA_2_OFFSET:
-			return (m_card_command[4] << 24) | (m_card_command[5] << 16) | (m_card_command[6] << 8) | m_card_command[7];
-
-		case IPCFIFORECV_OFFSET:
-			return ipcfifo_recv(cpu);
-
-		case GAMECARD_DATA_IN_OFFSET:
-			return gamecard_data_r();
-	}
-
-	handled = false;
-	return 0;
+	return m_dispstat[Cpu] | (uint32_t(m_vcount) << 16);
 }
 
-void nds_state::common_io_w(int cpu, offs_t offset, uint32_t data, uint32_t mem_mask, bool &handled)
+template <int Cpu>
+void nds_state::dispstat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	handled = true;
-
-	if ((offset >= DMA_OFFSET) && (offset < (DMA_OFFSET + 12)))
+	if (ACCESSING_BITS_0_15)
 	{
-		const int ch = ((offset - DMA_OFFSET) / 3) + (cpu * 4);
-		switch ((offset - DMA_OFFSET) % 3)
-		{
-			// the ARM7's DMA reaches internal memory only (27 bit addresses) - except in GBA mode,
-			// where channels 1-3 can read the Game Pak and channel 3 can write it
-			case 0:
-				COMBINE_DATA(&m_dma_srcreg[ch]);
-				m_dma_srcreg[ch] &= (!cpu || (m_gba_mode && (ch != 4))) ? 0x0ffffffe : 0x07fffffe;
-				return;
-
-			case 1:
-				COMBINE_DATA(&m_dma_dstreg[ch]);
-				m_dma_dstreg[ch] &= (!cpu || (m_gba_mode && (ch == 7))) ? 0x0ffffffe : 0x07fffffe;
-				return;
-
-			default:
-				dma_control_w(ch, data, mem_mask);
-				return;
-		}
+		// bits 0-2 are read-only status flags
+		const uint16_t mask = mem_mask & 0xfff8;
+		m_dispstat[Cpu] = (m_dispstat[Cpu] & ~mask) | (data & mask);
 	}
+}
 
-	if ((offset >= TIMER_OFFSET) && (offset < (TIMER_OFFSET + 4)))
+template <int Cpu>
+uint32_t nds_state::dma_r(offs_t offset, uint32_t mem_mask)
+{
+	const int ch = (offset / 3) + (Cpu * 4);
+	switch (offset % 3)
 	{
-		const int timer = (offset - TIMER_OFFSET) + (cpu * 4);
-		const uint32_t old_timer_regs = m_timer_regs[timer];
-
-		LOGMASKED(LOG_TIMER, "%08x to timer %d (mask %08x)\n", data, timer, mem_mask);
-
-		if (ACCESSING_BITS_0_15)
-		{
-			m_timer_reload[timer] = (m_timer_reload[timer] & ~mem_mask) | (data & mem_mask);
-		}
-
-		if (ACCESSING_BITS_16_31)
-		{
-			m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xffff0000)) | (data & mem_mask & 0xffff0000);
-			timer_start(timer, old_timer_regs, data);
-		}
-		return;
+		case 0: return m_dma_srcreg[ch];
+		case 1: return m_dma_dstreg[ch];
+		default: return m_dma_ctrl[ch];
 	}
+}
 
-	switch (offset)
+template <int Cpu>
+void nds_state::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	const int ch = (offset / 3) + (Cpu * 4);
+	switch (offset % 3)
 	{
-		case DISPSTAT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				// bits 0-2 are read-only status flags
-				const uint16_t mask = mem_mask & 0xfff8;
-				m_dispstat[cpu] = (m_dispstat[cpu] & ~mask) | (data & mask);
-			}
+		// the ARM7's DMA reaches internal memory only (27 bit addresses) - except in GBA mode,
+		// where channels 1-3 can read the Game Pak and channel 3 can write it
+		case 0:
+			COMBINE_DATA(&m_dma_srcreg[ch]);
+			m_dma_srcreg[ch] &= (Cpu == 0 || (m_gba_mode && (ch != 4))) ? 0x0ffffffe : 0x07fffffe;
 			return;
 
-		case KEYINPUT_OFFSET:
-			if (ACCESSING_BITS_16_31)
-			{
-				m_keycnt[cpu] = (m_keycnt[cpu] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
-				update_keypad_irq(cpu);
-			}
+		case 1:
+			COMBINE_DATA(&m_dma_dstreg[ch]);
+			m_dma_dstreg[ch] &= (Cpu == 0 || (m_gba_mode && (ch == 7))) ? 0x0ffffffe : 0x07fffffe;
 			return;
 
-		case IPCSYNC_OFFSET:
-		{
-			const int remote = cpu ^ 1;
-
-			LOGMASKED(LOG_IPC, "CPU%d: %04x to IPCSYNC\n", cpu, data & 0xffff);
-
-			// our output nibble becomes the remote CPU's input nibble
-			m_ipcsync[remote] = (m_ipcsync[remote] & ~0x000f) | ((data >> 8) & 0x000f);
-			m_ipcsync[cpu] = (m_ipcsync[cpu] & 0x000f) | (data & 0x4f00);
-
-			if (BIT(data, 13) && BIT(m_ipcsync[remote], 14))
-			{
-				request_irq(remote, INT_IPCSYNC);
-			}
-			return;
-		}
-
-		case IPCFIFOCNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				ipcfifo_cnt_w(cpu, data & 0xffff);
-			}
-			return;
-
-		case IPCFIFOSEND_OFFSET:
-			ipcfifo_send(cpu, data);
-			return;
-
-		case EXMEMCNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				// the ARM7 can only change the low seven bits
-				const uint16_t mask = cpu ? (mem_mask & 0x007f) : (mem_mask & 0xe8ff);
-				m_exmemcnt = (m_exmemcnt & ~mask) | (data & mask);
-			}
-			return;
-
-		case IME_OFFSET:
-			LOGMASKED(LOG_INTERRUPT, "CPU%d: %08x to IME\n", cpu, data);
-			COMBINE_DATA(&m_ime[cpu]);
-			update_irqs(cpu);
-			return;
-
-		case IE_OFFSET:
-			LOGMASKED(LOG_INTERRUPT, "CPU%d: %08x to IE\n", cpu, data);
-			COMBINE_DATA(&m_ie[cpu]);
-			update_irqs(cpu);
-			return;
-
-		case IF_OFFSET:
-			// writing a 1 acknowledges that interrupt
-			m_if[cpu] &= ~(data & mem_mask);
-			update_irqs(cpu);
-			return;
-
-		case AUX_SPI_CNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				LOGMASKED(LOG_GAMECARD, "cpu%d: %04x to AUXSPICNT\n", cpu, data & 0xffff);
-				m_auxspicnt = (m_auxspicnt & ~(mem_mask & 0xe043)) | (data & mem_mask & 0xe043);
-			}
-			if (ACCESSING_BITS_16_31)
-			{
-				// AUXSPIDATA: a transfer with the backup chip on the card
-				m_auxspidata = BIT(m_auxspicnt, 13) ? m_ndscart->spi_transfer((data >> 16) & 0xff) : 0xff;
-				if (!BIT(m_auxspicnt, 6))
-				{
-					m_ndscart->spi_deselect();
-				}
-			}
-			return;
-
-		case GAMECARD_BUS_CTRL_OFFSET:
-		{
-			LOGMASKED(LOG_GAMECARD, "cpu%d: %08x to ROMCTRL mask %08x\n", cpu, data, mem_mask);
-
-			const uint32_t old = m_romctrl;
-			// bit 23 is a read-only status flag, and bit 29 can only ever be set
-			const uint32_t mask = mem_mask & ~GAMECARD_DATA_READY;
-			m_romctrl = (m_romctrl & ~mask) | (data & mask) | (old & 0x20000000);
-
-			if (BIT(m_auxspicnt, 15) && !BIT(old, 31) && BIT(m_romctrl, 31))
-			{
-				m_card_cpu = cpu;
-				gamecard_start_transfer();
-			}
-			return;
-		}
-
-		case GAMECARD_DATA_OFFSET:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_card_command[0] = data & 0xff;
-			}
-			if (ACCESSING_BITS_8_15)
-			{
-				m_card_command[1] = (data >> 8) & 0xff;
-			}
-			if (ACCESSING_BITS_16_23)
-			{
-				m_card_command[2] = (data >> 16) & 0xff;
-			}
-			if (ACCESSING_BITS_24_31)
-			{
-				m_card_command[3] = (data >> 24) & 0xff;
-			}
-			return;
-
-		case GAMECARD_DATA_2_OFFSET:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_card_command[4] = data & 0xff;
-			}
-			if (ACCESSING_BITS_8_15)
-			{
-				m_card_command[5] = (data >> 8) & 0xff;
-			}
-			if (ACCESSING_BITS_16_23)
-			{
-				m_card_command[6] = (data >> 16) & 0xff;
-			}
-			if (ACCESSING_BITS_24_31)
-			{
-				m_card_command[7] = (data >> 24) & 0xff;
-			}
+		default:
+			dma_control_w(ch, data, mem_mask);
 			return;
 	}
+}
 
-	handled = false;
+template <int Cpu>
+uint32_t nds_state::timer_r(offs_t offset, uint32_t mem_mask)
+{
+	const int timer = offset + Cpu * 4;
+	LOGMASKED(LOG_TIMER, "Read timer reg %x\n", timer);
+	return (m_timer_regs[timer] & 0xffff0000) | timer_count_r(timer);
+}
+
+template <int Cpu>
+void nds_state::timer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	const int timer = offset + Cpu * 4;
+	const uint32_t old_timer_regs = m_timer_regs[timer];
+
+	LOGMASKED(LOG_TIMER, "%08x to timer %d (mask %08x)\n", data, timer, mem_mask);
+
+	if (ACCESSING_BITS_0_15)
+	{
+		m_timer_reload[timer] = (m_timer_reload[timer] & ~mem_mask) | (data & mem_mask);
+	}
+
+	if (ACCESSING_BITS_16_31)
+	{
+		m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xffff0000)) | (data & mem_mask & 0xffff0000);
+		timer_start(timer, old_timer_regs, data);
+	}
+}
+
+template <int Cpu>
+uint32_t nds_state::keyinput_r(offs_t offset, uint32_t mem_mask)
+{
+	return (m_keys->read() & 0x03ff) | (uint32_t(m_keycnt[Cpu]) << 16);
+}
+
+template <int Cpu>
+void nds_state::keyinput_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		m_keycnt[Cpu] = (m_keycnt[Cpu] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+		update_keypad_irq(Cpu);
+	}
+}
+
+template <int Cpu>
+uint32_t nds_state::ipcsync_r(offs_t offset, uint32_t mem_mask)
+{
+	return m_ipcsync[Cpu];
+}
+
+template <int Cpu>
+void nds_state::ipcsync_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	const int remote = Cpu ^ 1;
+
+	LOGMASKED(LOG_IPC, "CPU%d: %04x to IPCSYNC\n", Cpu, data & 0xffff);
+
+	// our output nibble becomes the remote CPU's input nibble
+	m_ipcsync[remote] = (m_ipcsync[remote] & ~0x000f) | ((data >> 8) & 0x000f);
+	m_ipcsync[Cpu] = (m_ipcsync[Cpu] & 0x000f) | (data & 0x4f00);
+
+	if (BIT(data, 13) && BIT(m_ipcsync[remote], 14))
+	{
+		request_irq(remote, INT_IPCSYNC);
+	}
+}
+
+uint16_t nds_state::auxspi_cnt_r(offs_t offset, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_GAMECARD, "%s: read AUXSPICNT\n", machine().describe_context());
+	return m_auxspicnt;
+}
+
+void nds_state::auxspi_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_GAMECARD, "%s: %04x to AUXSPICNT\n", machine().describe_context(), data & 0xffff);
+	m_auxspicnt = (m_auxspicnt & ~(mem_mask & 0xe043)) | (data & mem_mask & 0xe043);
+}
+
+uint16_t nds_state::auxspi_data_r()
+{
+	LOGMASKED(LOG_GAMECARD, "%s: read AUXSPIDATA\n", machine().describe_context());
+	return uint16_t(m_auxspidata);
+}
+
+void nds_state::auxspi_data_w(uint16_t data)
+{
+	// AUXSPIDATA: a transfer with the backup chip on the card
+	m_auxspidata = BIT(m_auxspicnt, 13) ? m_ndscart->spi_transfer(data & 0xff) : 0xff;
+	if (!BIT(m_auxspicnt, 6))
+	{
+		m_ndscart->spi_deselect();
+	}
+}
+
+uint32_t nds_state::gamecard_rom_ctrl_r(offs_t offset, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_GAMECARD, "%s: read ROMCTRL (%08x) mask %08x\n", machine().describe_context(), m_romctrl, mem_mask);
+	return m_romctrl;
+}
+
+template <int Cpu>
+void nds_state::gamecard_rom_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_GAMECARD, "%s: %08x to ROMCTRL mask %08x\n", machine().describe_context(), data, mem_mask);
+
+	const uint32_t old = m_romctrl;
+	// bit 23 is a read-only status flag, and bit 29 can only ever be set
+	const uint32_t mask = mem_mask & ~GAMECARD_DATA_READY;
+	m_romctrl = (m_romctrl & ~mask) | (data & mask) | (old & 0x20000000);
+
+	if (BIT(m_auxspicnt, 15) && !BIT(old, 31) && BIT(m_romctrl, 31))
+	{
+		m_card_cpu = Cpu;
+		gamecard_start_transfer();
+	}
+}
+
+uint8_t nds_state::gamecard_command_r(offs_t offset)
+{
+	return m_card_command[offset ^ 3];
+}
+
+void nds_state::gamecard_command_w(offs_t offset, uint8_t data)
+{
+	m_card_command[offset] = data;
+}
+
+uint16_t nds_state::exmemcnt_r()
+{
+	return m_exmemcnt;
+}
+
+template <int Cpu>
+void nds_state::exmemcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// the ARM7 can only change the low seven bits
+	const uint16_t mask = Cpu ? (mem_mask & 0x007f) : (mem_mask & 0xe8ff);
+	m_exmemcnt = (m_exmemcnt & ~mask) | (data & mask);
+}
+
+template <int Cpu>
+uint32_t nds_state::ime_r(offs_t offset, uint32_t mem_mask)
+{
+	return m_ime[Cpu];
+}
+
+template <int Cpu>
+void nds_state::ime_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_INTERRUPT, "CPU%d: %08x to IME\n", Cpu, data);
+	COMBINE_DATA(&m_ime[Cpu]);
+	update_irqs(Cpu);
+}
+
+template <int Cpu>
+uint32_t nds_state::ie_r()
+{
+	return m_ie[Cpu];
+}
+
+template <int Cpu>
+void nds_state::ie_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_INTERRUPT, "CPU%d: %08x to IE\n", Cpu, data);
+	COMBINE_DATA(&m_ie[Cpu]);
+	update_irqs(Cpu);
+}
+
+template <int Cpu>
+uint32_t nds_state::if_r()
+{
+	return m_if[Cpu];
+}
+
+template <int Cpu>
+void nds_state::if_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	// writing a 1 acknowledges that interrupt
+	m_if[Cpu] &= ~(data & mem_mask);
+	update_irqs(Cpu);
 }
 
 /***************************************************************************
     ARM7 I/O
 ***************************************************************************/
 
-uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
+uint32_t nds_state::arm7_sio_r(offs_t offset)
 {
-	bool handled = false;
-	const uint32_t data = common_io_r(1, offset, mem_mask, handled);
-	if (handled)
-	{
-		return data;
-	}
-
-	if ((offset >= SOUND_OFFSET) && (offset < SOUND_END_OFFSET))
-	{
-		return m_ndssound->read(offset - SOUND_OFFSET, mem_mask);
-	}
-
-	if ((offset >= GAMECARD_SEED_OFFSET) && (offset < (GAMECARD_SEED_OFFSET + 3)))
-	{
-		return m_card_seed[offset - GAMECARD_SEED_OFFSET];
-	}
-
-	if ((offset >= SIO_OFFSET) && (offset < (SIO_OFFSET + 4)))
-	{
-		return m_sioregs[offset - SIO_OFFSET];
-	}
-
-	switch (offset)
-	{
-		case RCNT_OFFSET:
-			// RCNT in the low half, EXTKEYIN in the high half
-			return m_rcnt | ((m_extkeys->read() & 0x00ff) << 16);
-
-		case RTC_OFFSET:
-			return rtc_r();
-
-		case SPI_CTRL_OFFSET:
-			LOGMASKED(LOG_SPI, "arm7: read SPICNT (%04x) / SPIDATA (%02x)\n", m_spi_cnt, m_spi_data);
-			return m_spi_cnt | (uint32_t(m_spi_data) << 16);
-
-		case POSTFLG_OFFSET:
-			/* Bit   Use
-			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
-			*/
-			return m_arm7_postflg;
-
-		case POWCNT_OFFSET:
-			return m_powcnt[1];
-
-		case WRAMSTAT_OFFSET:
-		{
-			const uint8_t temp1 = (((m_vramcntc & 3) == 2) && BIT(m_vramcntc, 7)) ? 1 : 0;
-			const uint8_t temp2 = (((m_vramcntd & 3) == 2) && BIT(m_vramcntd, 7)) ? 2 : 0;
-			return (m_wramcnt << 8) | temp1 | temp2;
-		}
-
-		default:
-			LOGMASKED(LOG_UNK_RD, "[ARM7] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
-			break;
-	}
-
-	return 0;
+	return m_sioregs[offset];
 }
 
-void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nds_state::arm7_sio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	bool handled = false;
-	common_io_w(1, offset, data, mem_mask, handled);
-	if (handled)
+	COMBINE_DATA(&m_sioregs[offset]);
+}
+
+uint32_t nds_state::arm7_rcnt_r(offs_t offset, uint32_t mem_mask)
+{
+	// RCNT in the low half, EXTKEYIN in the high half
+	return m_rcnt | ((m_extkeys->read() & 0x00ff) << 16);
+}
+
+void nds_state::arm7_rcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_0_15)
 	{
-		return;
+		m_rcnt = (m_rcnt & ~(mem_mask & 0xffff)) | (data & mem_mask & 0xffff);
+	}
+}
+
+uint16_t nds_state::arm7_spi_cnt_r()
+{
+	LOGMASKED(LOG_SPI, "arm7: read SPICNT (%04x)\n", m_spi_cnt);
+	return m_spi_cnt;
+}
+
+void nds_state::arm7_spi_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_SPI, "arm7: %04x to SPICNT\n", data & 0xffff);
+
+	const uint16_t old = m_spi_cnt;
+	m_spi_cnt = (m_spi_cnt & ~(mem_mask & 0xcf03)) | (data & mem_mask & 0xcf03);
+
+	// changing device or turning the bus off drops the chipselect
+	if (!BIT(m_spi_cnt, 15) || (((old ^ m_spi_cnt) & 0x0300) != 0))
+	{
+		spi_deselect();
+	}
+}
+
+uint16_t nds_state::arm7_spi_data_r()
+{
+	LOGMASKED(LOG_SPI, "arm7: read SPIDATA (%02x)\n", m_spi_data);
+	return uint16_t(m_spi_data);
+}
+
+void nds_state::arm7_spi_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (BIT(m_spi_cnt, 15))
+	{
+		m_spi_data = spi_transfer(data & 0xff);
+
+		// with "chipselect hold" clear the device is deselected after the transfer
+		if (!BIT(m_spi_cnt, 11))
+		{
+			spi_deselect();
+		}
+
+		if (BIT(m_spi_cnt, 14))
+		{
+			request_irq(1, INT_SPIBUS);
+		}
+	}
+	else
+	{
+		m_spi_data = 0;
 	}
 
-	if ((offset >= SOUND_OFFSET) && (offset < SOUND_END_OFFSET))
+	LOGMASKED(LOG_SPI, "arm7: SPI xfer %02x -> %02x\n", data & 0xff, m_spi_data);
+}
+
+uint32_t nds_state::arm7_wramstat_r()
+{
+	const uint8_t temp1 = (((m_vramcntc & 3) == 2) && BIT(m_vramcntc, 7)) ? 1 : 0;
+	const uint8_t temp2 = (((m_vramcntd & 3) == 2) && BIT(m_vramcntd, 7)) ? 2 : 0;
+	return (m_wramcnt << 8) | temp1 | temp2;
+}
+
+uint8_t nds_state::arm7_postflg_r()
+{
+	/* Bit   Use
+	*  0     0=Booting, 1=Booted (set by BIOS/firmware)
+	*/
+	return m_arm7_postflg;
+}
+
+void nds_state::arm7_postflg_w(uint8_t data)
+{
+	/* Bit   Use
+	*  0     0=Booting, 1=Booted (set by BIOS/firmware)
+	*/
+	if (!(m_arm7_postflg & POSTFLG_PBF_MASK) && m_arm7->pc() < 0x4000)
 	{
-		m_ndssound->write(offset - SOUND_OFFSET, data, mem_mask);
-		return;
+		m_arm7_postflg &= ~POSTFLG_PBF_MASK;
+		m_arm7_postflg |= data & POSTFLG_PBF_MASK;
 	}
+}
 
-	if ((offset >= GAMECARD_SEED_OFFSET) && (offset < (GAMECARD_SEED_OFFSET + 3)))
+void nds_state::arm7_haltcnt_w(uint8_t data)
+{
+	// HALTCNT: bits 6-7 select GBA mode / halt / sleep
+	switch ((data >> 6) & 3)
 	{
-		COMBINE_DATA(&m_card_seed[offset - GAMECARD_SEED_OFFSET]);
-		return;
+		case 1:
+			enter_gba_mode();
+			break;
+
+		case 2:
+			LOGMASKED(LOG_INTERRUPT, "arm7: HALT\n");
+			set_halted(1, true);
+			break;
+
+		case 3:
+			LOGMASKED(LOG_INTERRUPT, "arm7: SLEEP\n");
+			set_halted(1, true);
+			break;
 	}
+}
 
-	if ((offset >= SIO_OFFSET) && (offset < (SIO_OFFSET + 4)))
+uint16_t nds_state::arm7_powcnt_r()
+{
+	return m_powcnt[1];
+}
+
+void nds_state::arm7_powcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_powcnt[1] = (m_powcnt[1] & ~(mem_mask & 0x0003)) | (data & mem_mask & 0x0003);
+}
+
+void nds_state::arm7_biosprot_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	// write-once BIOS read protection boundary
+	if (m_biosprot == 0)
 	{
-		COMBINE_DATA(&m_sioregs[offset - SIO_OFFSET]);
-		return;
-	}
-
-	switch (offset)
-	{
-		case RCNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				m_rcnt = (m_rcnt & ~(mem_mask & 0xffff)) | (data & mem_mask & 0xffff);
-			}
-			break;
-
-		case BIOSPROT_OFFSET:
-			// write-once BIOS read protection boundary
-			if (m_biosprot == 0)
-			{
-				COMBINE_DATA(&m_biosprot);
-			}
-			break;
-
-		case RTC_OFFSET:
-			if (ACCESSING_BITS_0_7)
-			{
-				rtc_w(data & 0xff);
-			}
-			break;
-
-		case SPI_CTRL_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				LOGMASKED(LOG_SPI, "arm7: %04x to SPICNT\n", data & 0xffff);
-
-				const uint16_t old = m_spi_cnt;
-				m_spi_cnt = (m_spi_cnt & ~(mem_mask & 0xcf03)) | (data & mem_mask & 0xcf03);
-
-				// changing device or turning the bus off drops the chipselect
-				if (!BIT(m_spi_cnt, 15) || (((old ^ m_spi_cnt) & 0x0300) != 0))
-				{
-					spi_deselect();
-				}
-			}
-
-			if (ACCESSING_BITS_16_31)
-			{
-				if (BIT(m_spi_cnt, 15))
-				{
-					m_spi_data = spi_transfer((data >> 16) & 0xff);
-
-					// with "chipselect hold" clear the device is deselected after the transfer
-					if (!BIT(m_spi_cnt, 11))
-					{
-						spi_deselect();
-					}
-
-					if (BIT(m_spi_cnt, 14))
-					{
-						request_irq(1, INT_SPIBUS);
-					}
-				}
-				else
-				{
-					m_spi_data = 0;
-				}
-
-				LOGMASKED(LOG_SPI, "arm7: SPI xfer %02x -> %02x\n", (data >> 16) & 0xff, m_spi_data);
-			}
-			break;
-
-		case POSTFLG_OFFSET:
-			/* Bit   Use
-			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
-			*/
-			if (ACCESSING_BITS_0_7)
-			{
-				if (!(m_arm7_postflg & POSTFLG_PBF_MASK) && m_arm7->pc() < 0x4000)
-				{
-					m_arm7_postflg &= ~POSTFLG_PBF_MASK;
-					m_arm7_postflg |= data & POSTFLG_PBF_MASK;
-				}
-			}
-
-			if (ACCESSING_BITS_8_15)
-			{
-				// HALTCNT: bits 6-7 select GBA mode / halt / sleep
-				switch ((data >> 14) & 3)
-				{
-					case 1:
-						enter_gba_mode();
-						break;
-
-					case 2:
-						LOGMASKED(LOG_INTERRUPT, "arm7: HALT\n");
-						set_halted(1, true);
-						break;
-
-					case 3:
-						LOGMASKED(LOG_INTERRUPT, "arm7: SLEEP\n");
-						set_halted(1, true);
-						break;
-				}
-			}
-			break;
-
-		case POWCNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				m_powcnt[1] = (m_powcnt[1] & ~(mem_mask & 0x0003)) | (data & mem_mask & 0x0003);
-			}
-			break;
-
-		default:
-			LOGMASKED(LOG_UNK_WR, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
-			break;
+		COMBINE_DATA(&m_biosprot);
 	}
 }
 
@@ -1579,244 +1489,211 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
     ARM9 I/O
 ***************************************************************************/
 
-uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
+uint32_t nds_state::arm9_vramcnt_abcd_r()
 {
-	bool handled = false;
-	const uint32_t data = common_io_r(0, offset, mem_mask, handled);
-	if (handled)
-	{
-		return data;
-	}
-
-	if ((offset >= DMAFILL_OFFSET) && (offset < (DMAFILL_OFFSET + 4)))
-	{
-		return m_dma_fill[offset - DMAFILL_OFFSET];
-	}
-
-	if (offset < ENGINE_A_END_OFFSET)
-	{
-		return m_ppu[0]->regs_r(offset);
-	}
-
-	if ((offset >= ENGINE_B_OFFSET) && (offset < ENGINE_B_END_OFFSET))
-	{
-		return m_ppu[1]->regs_r(offset - ENGINE_B_OFFSET);
-	}
-
-	switch (offset)
-	{
-		case DIVCNT_OFFSET:
-			return m_divcnt;
-
-		case DIV_NUMER_OFFSET:
-			return uint32_t(m_div_numer);
-		case DIV_NUMER_OFFSET+1:
-			return uint32_t(m_div_numer >> 32);
-
-		case DIV_DENOM_OFFSET:
-			return uint32_t(m_div_denom);
-		case DIV_DENOM_OFFSET+1:
-			return uint32_t(m_div_denom >> 32);
-
-		case DIV_RESULT_OFFSET:
-			return uint32_t(m_div_result);
-		case DIV_RESULT_OFFSET+1:
-			return uint32_t(m_div_result >> 32);
-
-		case DIVREM_RESULT_OFFSET:
-			return uint32_t(m_divrem_result);
-		case DIVREM_RESULT_OFFSET+1:
-			return uint32_t(m_divrem_result >> 32);
-
-		case SQRTCNT_OFFSET:
-			return m_sqrtcnt;
-
-		case SQRT_RESULT_OFFSET:
-			return m_sqrt_result;
-
-		case SQRT_PARAM_OFFSET:
-			return uint32_t(m_sqrt_param);
-		case SQRT_PARAM_OFFSET+1:
-			return uint32_t(m_sqrt_param >> 32);
-
-		case VRAMCNT_A_OFFSET:
-			return m_vramcnta | (m_vramcntb << 8) | (m_vramcntc << 16) | (m_vramcntd << 24);
-
-		case WRAMCNT_OFFSET:
-			return m_vramcnte | (m_vramcntf << 8) | (m_vramcntg << 16) | (m_wramcnt << 24);
-
-		case VRAMCNT_H_OFFSET:
-			return m_vramcnth | (m_vramcnti << 8);
-
-		case POSTFLG_OFFSET:
-			/* Bit   Use
-			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
-			*  1     RAM
-			*/
-			return m_arm9_postflg;
-
-		case POWCNT_OFFSET:
-			return m_powcnt[0];
-
-		default:
-			LOGMASKED(LOG_UNK_RD, "[ARM9] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
-			break;
-	}
-
-	return 0;
+	return m_vramcnta | (m_vramcntb << 8) | (m_vramcntc << 16) | (m_vramcntd << 24);
 }
 
-void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nds_state::arm9_vramcnt_a_w(uint8_t data)
 {
-	bool handled = false;
-	common_io_w(0, offset, data, mem_mask, handled);
-	if (handled)
+	m_vramcnta = data;
+	update_vram_mapping();
+}
+
+void nds_state::arm9_vramcnt_b_w(uint8_t data)
+{
+	m_vramcntb = data;
+	update_vram_mapping();
+}
+
+void nds_state::arm9_vramcnt_c_w(uint8_t data)
+{
+	m_vramcntc = data;
+	update_vram_mapping();
+}
+
+void nds_state::arm9_vramcnt_d_w(uint8_t data)
+{
+	m_vramcntd = data;
+	update_vram_mapping();
+}
+
+uint32_t nds_state::arm9_vramcnt_efg_wramcnt_r()
+{
+	return m_vramcnte | (m_vramcntf << 8) | (m_vramcntg << 16) | (m_wramcnt << 24);
+}
+
+void nds_state::arm9_vramcnt_e_w(uint8_t data)
+{
+	m_vramcnte = data;
+	update_vram_mapping();
+}
+
+void nds_state::arm9_vramcnt_f_w(uint8_t data)
+{
+	m_vramcntf = data;
+	update_vram_mapping();
+}
+
+void nds_state::arm9_vramcnt_g_w(uint8_t data)
+{
+	m_vramcntg = data;
+	update_vram_mapping();
+}
+
+void nds_state::arm9_wramcnt_w(uint8_t data)
+{
+	m_wramcnt = data & 0x3;
+	m_arm7wrambnk->set_bank(m_wramcnt);
+	m_arm9wrambnk->set_bank(m_wramcnt);
+	update_vram_mapping();
+}
+
+uint32_t nds_state::arm9_vramcnt_hi_r()
+{
+	return m_vramcnth | (m_vramcnti << 8);
+}
+
+void nds_state::arm9_vramcnt_h_w(uint8_t data)
+{
+	m_vramcnth = data;
+	update_vram_mapping();
+}
+
+void nds_state::arm9_vramcnt_i_w(uint8_t data)
+{
+	m_vramcnti = data;
+	update_vram_mapping();
+}
+
+uint32_t nds_state::arm9_divcnt_r()
+{
+	return m_divcnt;
+}
+
+// TODO: Verify if division calculation is actually kicked when accessing bits 16..31
+void nds_state::arm9_divcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_0_15)
 	{
-		return;
+		m_divcnt = (m_divcnt & ~(mem_mask & 0x0003)) | (data & mem_mask & 0x0003);
 	}
+	div_calculate();
+}
 
-	if ((offset >= DMAFILL_OFFSET) && (offset < (DMAFILL_OFFSET + 4)))
+uint32_t nds_state::arm9_div_numer_lsw_r()
+{
+	return uint32_t(m_div_numer);
+}
+
+void nds_state::arm9_div_numer_lsw_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_div_numer = (m_div_numer & ~uint64_t(mem_mask)) | (uint64_t(data) & mem_mask);
+	div_calculate();
+}
+
+uint32_t nds_state::arm9_div_numer_msw_r()
+{
+	return uint32_t(m_div_numer >> 32);
+}
+
+void nds_state::arm9_div_numer_msw_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_div_numer = (m_div_numer & ~(uint64_t(mem_mask) << 32)) | ((uint64_t(data) & mem_mask) << 32);
+	div_calculate();
+}
+
+uint32_t nds_state::arm9_div_denom_lsw_r()
+{
+	return uint32_t(m_div_denom);
+}
+
+void nds_state::arm9_div_denom_lsw_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_div_denom = (m_div_denom & ~uint64_t(mem_mask)) | (uint64_t(data) & mem_mask);
+	div_calculate();
+}
+
+uint32_t nds_state::arm9_div_denom_msw_r()
+{
+	return uint32_t(m_div_denom >> 32);
+}
+
+void nds_state::arm9_div_denom_msw_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_div_denom = (m_div_denom & ~(uint64_t(mem_mask) << 32)) | ((uint64_t(data) & mem_mask) << 32);
+	div_calculate();
+}
+
+uint32_t nds_state::arm9_sqrtcnt_r()
+{
+	return m_sqrtcnt;
+}
+
+// TODO: Verify if square-root calculation is actually kicked when accessing bits 16..31
+void nds_state::arm9_sqrtcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_0_15)
 	{
-		COMBINE_DATA(&m_dma_fill[offset - DMAFILL_OFFSET]);
-		return;
+		m_sqrtcnt = (m_sqrtcnt & ~(mem_mask & 0x0001)) | (data & mem_mask & 0x0001);
 	}
+	sqrt_calculate();
+}
 
-	if (offset < ENGINE_A_END_OFFSET)
+uint32_t nds_state::arm9_sqrt_param_lsw_r()
+{
+	return uint32_t(m_sqrt_param);
+}
+
+void nds_state::arm9_sqrt_param_lsw_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_sqrt_param = (m_sqrt_param & ~uint64_t(mem_mask)) | (uint64_t(data) & mem_mask);
+	sqrt_calculate();
+}
+
+uint32_t nds_state::arm9_sqrt_param_msw_r()
+{
+	return uint32_t(m_sqrt_param >> 32);
+}
+
+void nds_state::arm9_sqrt_param_msw_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_sqrt_param = (m_sqrt_param & ~(uint64_t(mem_mask) << 32)) | ((uint64_t(data) & mem_mask) << 32);
+	sqrt_calculate();
+}
+
+uint8_t nds_state::arm9_postflg_r()
+{
+	/* Bit   Use
+	*  0     0=Booting, 1=Booted (set by BIOS/firmware)
+	*  1     RAM
+	*/
+	return m_arm9_postflg;
+}
+
+void nds_state::arm9_postflg_w(uint8_t data)
+{
+	/* Bit   Use
+	*  0     0=Booting, 1=Booted (set by BIOS/firmware)
+	*  1     RAM
+	*/
+	if (!(m_arm9_postflg & POSTFLG_PBF_MASK))
 	{
-		m_ppu[0]->regs_w(offset, data, mem_mask);
-		return;
+		m_arm9_postflg &= ~POSTFLG_PBF_MASK;
+		m_arm9_postflg |= data & POSTFLG_PBF_MASK;
 	}
+	m_arm9_postflg &= ~POSTFLG_RAM_MASK;
+	m_arm9_postflg |= data & POSTFLG_RAM_MASK;
+}
 
-	if ((offset >= ENGINE_B_OFFSET) && (offset < ENGINE_B_END_OFFSET))
-	{
-		m_ppu[1]->regs_w(offset - ENGINE_B_OFFSET, data, mem_mask);
-		return;
-	}
+uint16_t nds_state::arm9_powcnt_r()
+{
+	return m_powcnt[0];
+}
 
-	switch (offset)
-	{
-		case DIVCNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				m_divcnt = (m_divcnt & ~(mem_mask & 0x0003)) | (data & mem_mask & 0x0003);
-			}
-			div_calculate();
-			break;
-
-		case DIV_NUMER_OFFSET:
-			m_div_numer = (m_div_numer & ~uint64_t(mem_mask)) | (uint64_t(data) & mem_mask);
-			div_calculate();
-			break;
-		case DIV_NUMER_OFFSET+1:
-			m_div_numer = (m_div_numer & ~(uint64_t(mem_mask) << 32)) | ((uint64_t(data) & mem_mask) << 32);
-			div_calculate();
-			break;
-
-		case DIV_DENOM_OFFSET:
-			m_div_denom = (m_div_denom & ~uint64_t(mem_mask)) | (uint64_t(data) & mem_mask);
-			div_calculate();
-			break;
-		case DIV_DENOM_OFFSET+1:
-			m_div_denom = (m_div_denom & ~(uint64_t(mem_mask) << 32)) | ((uint64_t(data) & mem_mask) << 32);
-			div_calculate();
-			break;
-
-		case SQRTCNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				m_sqrtcnt = (m_sqrtcnt & ~(mem_mask & 0x0001)) | (data & mem_mask & 0x0001);
-			}
-			sqrt_calculate();
-			break;
-
-		case SQRT_PARAM_OFFSET:
-			m_sqrt_param = (m_sqrt_param & ~uint64_t(mem_mask)) | (uint64_t(data) & mem_mask);
-			sqrt_calculate();
-			break;
-		case SQRT_PARAM_OFFSET+1:
-			m_sqrt_param = (m_sqrt_param & ~(uint64_t(mem_mask) << 32)) | ((uint64_t(data) & mem_mask) << 32);
-			sqrt_calculate();
-			break;
-
-		case VRAMCNT_A_OFFSET:
-			if (ACCESSING_BITS_0_7) // VRAMCNT_A
-			{
-				m_vramcnta = data & 0xff;
-			}
-			if (ACCESSING_BITS_8_15) // VRAMCNT_B
-			{
-				m_vramcntb = (data >> 8) & 0xff;
-			}
-			if (ACCESSING_BITS_16_23) // VRAMCNT_C
-			{
-				m_vramcntc = (data >> 16) & 0xff;
-			}
-			if (ACCESSING_BITS_24_31) // VRAMCNT_D
-			{
-				m_vramcntd = (data >> 24) & 0xff;
-			}
-			update_vram_mapping();
-			break;
-
-		case WRAMCNT_OFFSET:
-			if (ACCESSING_BITS_0_7) // VRAMCNT_E
-			{
-				m_vramcnte = data & 0xff;
-			}
-			if (ACCESSING_BITS_8_15) // VRAMCNT_F
-			{
-				m_vramcntf = (data >> 8) & 0xff;
-			}
-			if (ACCESSING_BITS_16_23) // VRAMCNT_G
-			{
-				m_vramcntg = (data >> 16) & 0xff;
-			}
-			if (ACCESSING_BITS_24_31) // WRAMCNT
-			{
-				m_wramcnt = (data>>24) & 0x3;
-				m_arm7wrambnk->set_bank(m_wramcnt);
-				m_arm9wrambnk->set_bank(m_wramcnt);
-			}
-			update_vram_mapping();
-			break;
-
-		case VRAMCNT_H_OFFSET:
-			if (ACCESSING_BITS_0_7) // VRAMCNT_H
-			{
-				m_vramcnth = data & 0xff;
-			}
-			if (ACCESSING_BITS_8_15) // VRAMCNT_I
-			{
-				m_vramcnti = (data >> 8) & 0xff;
-			}
-			update_vram_mapping();
-			break;
-
-		case POSTFLG_OFFSET:
-			/* Bit   Use
-			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
-			*  1     RAM
-			*/
-			if (!(m_arm9_postflg & POSTFLG_PBF_MASK))
-			{
-				m_arm9_postflg &= ~POSTFLG_PBF_MASK;
-				m_arm9_postflg |= data & POSTFLG_PBF_MASK;
-			}
-			m_arm9_postflg &= ~POSTFLG_RAM_MASK;
-			m_arm9_postflg |= data & POSTFLG_RAM_MASK;
-			break;
-
-		case POWCNT_OFFSET:
-			if (ACCESSING_BITS_0_15)
-			{
-				m_powcnt[0] = (m_powcnt[0] & ~(mem_mask & 0x820f)) | (data & mem_mask & 0x820f);
-			}
-			break;
-
-		default:
-			LOGMASKED(LOG_UNK_WR, "[ARM9] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
-			break;
-	}
+void nds_state::arm9_powcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_powcnt[0] = (m_powcnt[0] & ~(mem_mask & 0x820f)) | (data & mem_mask & 0x820f);
 }
 
 /***************************************************************************
@@ -1826,10 +1703,39 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void nds_state::nds_arm7_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom().region("arm7", 0);
-	map(0x02000000, 0x023fffff).ram().mirror(0x00400000).share("mainram");
+	map(0x02000000, 0x023fffff).ram().mirror(0x00c00000).share("mainram");
 	map(0x03000000, 0x0300ffff).mirror(0x007f0000).m(m_arm7wrambnk, FUNC(address_map_bank_device::amap32));
 	map(0x03800000, 0x0380ffff).ram().mirror(0x007f0000).share("arm7ram");
-	map(0x04000000, 0x0410ffff).rw(FUNC(nds_state::arm7_io_r), FUNC(nds_state::arm7_io_w));
+	map(0x04000004, 0x04000007).rw(FUNC(nds_state::dispstat_r<1>), FUNC(nds_state::dispstat_w<1>));
+	map(0x040000b0, 0x040000df).rw(FUNC(nds_state::dma_r<1>), FUNC(nds_state::dma_w<1>));
+	map(0x04000100, 0x0400010f).rw(FUNC(nds_state::timer_r<1>), FUNC(nds_state::timer_w<1>));
+	map(0x04000120, 0x0400012f).rw(FUNC(nds_state::arm7_sio_r), FUNC(nds_state::arm7_sio_w));
+	map(0x04000130, 0x04000133).rw(FUNC(nds_state::keyinput_r<1>), FUNC(nds_state::keyinput_w<1>));
+	map(0x04000134, 0x04000137).rw(FUNC(nds_state::arm7_rcnt_r), FUNC(nds_state::arm7_rcnt_w));
+	map(0x04000138, 0x04000138).rw(FUNC(nds_state::rtc_r), FUNC(nds_state::rtc_w));
+	map(0x04000180, 0x04000183).rw(FUNC(nds_state::ipcsync_r<1>), FUNC(nds_state::ipcsync_w<1>));
+	map(0x04000184, 0x04000185).rw(FUNC(nds_state::ipcfifo_cnt_r<1>), FUNC(nds_state::ipcfifo_cnt_w<1>));
+	map(0x04000188, 0x0400018b).w(FUNC(nds_state::ipcfifo_send<1>));
+	map(0x040001a0, 0x040001a1).rw(FUNC(nds_state::auxspi_cnt_r), FUNC(nds_state::auxspi_cnt_w));
+	map(0x040001a2, 0x040001a3).rw(FUNC(nds_state::auxspi_data_r), FUNC(nds_state::auxspi_data_w));
+	map(0x040001a4, 0x040001a7).rw(FUNC(nds_state::gamecard_rom_ctrl_r), FUNC(nds_state::gamecard_rom_ctrl_w<1>));
+	map(0x040001a8, 0x040001af).rw(FUNC(nds_state::gamecard_command_r), FUNC(nds_state::gamecard_command_w));
+	map(0x040001b0, 0x040001b3).lrw32(NAME([this](offs_t offset){ return m_card_seed[offset]; }),
+		NAME([this](offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_card_seed[offset]); }));
+	map(0x040001c0, 0x040001c1).rw(FUNC(nds_state::arm7_spi_cnt_r), FUNC(nds_state::arm7_spi_cnt_w));
+	map(0x040001c2, 0x040001c3).rw(FUNC(nds_state::arm7_spi_data_r), FUNC(nds_state::arm7_spi_data_w));
+	map(0x04000204, 0x04000205).rw(FUNC(nds_state::exmemcnt_r), FUNC(nds_state::exmemcnt_w<1>));
+	map(0x04000208, 0x0400020b).rw(FUNC(nds_state::ime_r<1>), FUNC(nds_state::ime_w<1>));
+	map(0x04000210, 0x04000213).rw(FUNC(nds_state::ie_r<1>), FUNC(nds_state::ie_w<1>));
+	map(0x04000214, 0x04000217).rw(FUNC(nds_state::if_r<1>), FUNC(nds_state::if_w<1>));
+	map(0x04000240, 0x04000243).r(FUNC(nds_state::arm7_wramstat_r));
+	map(0x04000300, 0x04000300).rw(FUNC(nds_state::arm7_postflg_r), FUNC(nds_state::arm7_postflg_w));
+	map(0x04000301, 0x04000301).w(FUNC(nds_state::arm7_haltcnt_w));
+	map(0x04000304, 0x04000305).rw(FUNC(nds_state::arm7_powcnt_r), FUNC(nds_state::arm7_powcnt_w));
+	map(0x04000308, 0x0400030b).w(FUNC(nds_state::arm7_biosprot_w));
+	map(0x04000400, 0x0400051f).rw(m_ndssound, FUNC(nds_sound_device::read), FUNC(nds_sound_device::write));
+	map(0x04100000, 0x04100003).r(FUNC(nds_state::ipcfifo_recv<1>));
+	map(0x04100010, 0x04100013).r(FUNC(nds_state::gamecard_data_r));
 	map(0x06000000, 0x0603ffff).mirror(0x00fc0000).rw(FUNC(nds_state::vram_region_r<VRAM_REGION_ARM7>), FUNC(nds_state::vram_region_w<VRAM_REGION_ARM7>));
 	map(0x08000000, 0x09ffffff).r(FUNC(nds_state::gba_rom_r<1>)).nopw();
 	map(0x0a000000, 0x0a00ffff).mirror(0x00ff0000).rw(FUNC(nds_state::gba_ram_r<1>), FUNC(nds_state::gba_ram_w<1>));
@@ -1837,9 +1743,57 @@ void nds_state::nds_arm7_map(address_map &map)
 
 void nds_state::nds_arm9_map(address_map &map)
 {
-	map(0x02000000, 0x023fffff).ram().mirror(0x00400000).share("mainram");
+	map(0x02000000, 0x023fffff).ram().mirror(0x00c00000).share("mainram");
 	map(0x03000000, 0x03007fff).mirror(0x00ff8000).m("nds9wram", FUNC(address_map_bank_device::amap32));
-	map(0x04000000, 0x0410ffff).rw(FUNC(nds_state::arm9_io_r), FUNC(nds_state::arm9_io_w));
+	map(0x04000000, 0x0400006f).rw(m_ppu[0], FUNC(gba_ppu_device::regs_r), FUNC(gba_ppu_device::regs_w));
+	map(0x04000004, 0x04000007).rw(FUNC(nds_state::dispstat_r<0>), FUNC(nds_state::dispstat_w<0>));
+	map(0x040000b0, 0x040000df).rw(FUNC(nds_state::dma_r<0>), FUNC(nds_state::dma_w<0>));
+	map(0x040000e0, 0x040000ef).lrw32(NAME([this](offs_t offset){ return m_dma_fill[offset]; }),
+		NAME([this](offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_dma_fill[offset]); }));
+	map(0x04000100, 0x0400010f).rw(FUNC(nds_state::timer_r<0>), FUNC(nds_state::timer_w<0>));
+	map(0x04000130, 0x04000133).rw(FUNC(nds_state::keyinput_r<0>), FUNC(nds_state::keyinput_w<0>));
+	map(0x04000180, 0x04000183).rw(FUNC(nds_state::ipcsync_r<0>), FUNC(nds_state::ipcsync_w<0>));
+	map(0x04000184, 0x04000185).rw(FUNC(nds_state::ipcfifo_cnt_r<0>), FUNC(nds_state::ipcfifo_cnt_w<0>));
+	map(0x04000188, 0x0400018b).w(FUNC(nds_state::ipcfifo_send<0>));
+	map(0x040001a0, 0x040001a1).rw(FUNC(nds_state::auxspi_cnt_r), FUNC(nds_state::auxspi_cnt_w));
+	map(0x040001a2, 0x040001a3).rw(FUNC(nds_state::auxspi_data_r), FUNC(nds_state::auxspi_data_w));
+	map(0x040001a4, 0x040001a7).rw(FUNC(nds_state::gamecard_rom_ctrl_r), FUNC(nds_state::gamecard_rom_ctrl_w<0>));
+	map(0x040001a8, 0x040001af).rw(FUNC(nds_state::gamecard_command_r), FUNC(nds_state::gamecard_command_w));
+	map(0x04000204, 0x04000205).rw(FUNC(nds_state::exmemcnt_r), FUNC(nds_state::exmemcnt_w<0>));
+	map(0x04000208, 0x0400020b).rw(FUNC(nds_state::ime_r<0>), FUNC(nds_state::ime_w<0>));
+	map(0x04000210, 0x04000213).rw(FUNC(nds_state::ie_r<0>), FUNC(nds_state::ie_w<0>));
+	map(0x04000214, 0x04000217).rw(FUNC(nds_state::if_r<0>), FUNC(nds_state::if_w<0>));
+	map(0x04000240, 0x04000243).r(FUNC(nds_state::arm9_vramcnt_abcd_r));
+	map(0x04000240, 0x04000240).w(FUNC(nds_state::arm9_vramcnt_a_w));
+	map(0x04000241, 0x04000241).w(FUNC(nds_state::arm9_vramcnt_b_w));
+	map(0x04000242, 0x04000242).w(FUNC(nds_state::arm9_vramcnt_c_w));
+	map(0x04000243, 0x04000243).w(FUNC(nds_state::arm9_vramcnt_d_w));
+	map(0x04000244, 0x04000247).r(FUNC(nds_state::arm9_vramcnt_efg_wramcnt_r));
+	map(0x04000244, 0x04000244).w(FUNC(nds_state::arm9_vramcnt_e_w));
+	map(0x04000245, 0x04000245).w(FUNC(nds_state::arm9_vramcnt_f_w));
+	map(0x04000246, 0x04000246).w(FUNC(nds_state::arm9_vramcnt_g_w));
+	map(0x04000247, 0x04000247).w(FUNC(nds_state::arm9_wramcnt_w));
+	map(0x04000248, 0x0400024b).r(FUNC(nds_state::arm9_vramcnt_hi_r));
+	map(0x04000248, 0x04000248).w(FUNC(nds_state::arm9_vramcnt_h_w));
+	map(0x04000249, 0x04000249).w(FUNC(nds_state::arm9_vramcnt_i_w));
+	map(0x04000280, 0x04000283).rw(FUNC(nds_state::arm9_divcnt_r), FUNC(nds_state::arm9_divcnt_w));
+	map(0x04000290, 0x04000293).rw(FUNC(nds_state::arm9_div_numer_lsw_r), FUNC(nds_state::arm9_div_numer_lsw_w));
+	map(0x04000294, 0x04000297).rw(FUNC(nds_state::arm9_div_numer_msw_r), FUNC(nds_state::arm9_div_numer_msw_w));
+	map(0x04000298, 0x0400029b).rw(FUNC(nds_state::arm9_div_denom_lsw_r), FUNC(nds_state::arm9_div_denom_lsw_w));
+	map(0x0400029c, 0x0400029f).rw(FUNC(nds_state::arm9_div_denom_msw_r), FUNC(nds_state::arm9_div_denom_msw_w));
+	map(0x040002a0, 0x040002a3).lr32(NAME([this](){ return uint32_t(m_div_result); }));
+	map(0x040002a4, 0x040002a7).lr32(NAME([this](){ return uint32_t(m_div_result >> 32); }));
+	map(0x040002a8, 0x040002ab).lr32(NAME([this](){ return uint32_t(m_divrem_result); }));
+	map(0x040002ac, 0x040002af).lr32(NAME([this](){ return uint32_t(m_divrem_result >> 32); }));
+	map(0x040002b0, 0x040002b3).rw(FUNC(nds_state::arm9_sqrtcnt_r), FUNC(nds_state::arm9_sqrtcnt_w));
+	map(0x040002b4, 0x040002b7).lr32(NAME([this](){ return m_sqrt_result; }));
+	map(0x040002b8, 0x040002bb).rw(FUNC(nds_state::arm9_sqrt_param_lsw_r), FUNC(nds_state::arm9_sqrt_param_lsw_w));
+	map(0x040002bc, 0x040002bf).rw(FUNC(nds_state::arm9_sqrt_param_msw_r), FUNC(nds_state::arm9_sqrt_param_msw_w));
+	map(0x04000300, 0x04000300).rw(FUNC(nds_state::arm9_postflg_r), FUNC(nds_state::arm9_postflg_w));
+	map(0x04000304, 0x04000305).rw(FUNC(nds_state::arm9_powcnt_r), FUNC(nds_state::arm9_powcnt_w));
+	map(0x04001000, 0x0400106f).rw(m_ppu[1], FUNC(gba_ppu_device::regs_r), FUNC(gba_ppu_device::regs_w));
+	map(0x04100000, 0x04100003).r(FUNC(nds_state::ipcfifo_recv<0>));
+	map(0x04100010, 0x04100013).r(FUNC(nds_state::gamecard_data_r));
 	map(0x05000000, 0x050007ff).mirror(0x00fff800).ram().share("palette");
 	map(0x06000000, 0x0607ffff).mirror(0x00180000).rw(FUNC(nds_state::vram_region_r<VRAM_REGION_BG_A>), FUNC(nds_state::vram_region_w<VRAM_REGION_BG_A>));
 	map(0x06200000, 0x0621ffff).mirror(0x001e0000).rw(FUNC(nds_state::vram_region_r<VRAM_REGION_BG_B>), FUNC(nds_state::vram_region_w<VRAM_REGION_BG_B>));
@@ -1855,8 +1809,8 @@ void nds_state::nds_arm9_map(address_map &map)
 /***************************************************************************
     VRAM
 
-	The VRAM mapping on this machine is crazy so we use an indirection table
-	to track what pages are mapped where.
+    The VRAM mapping on this machine is crazy so we use an indirection table
+    to track what pages are mapped where.
 ***************************************************************************/
 
 void nds_state::map_vram_bank(int region, int page, int pages, uint32_t bankoff)
@@ -2362,8 +2316,83 @@ void nds_state::install_ds_arm7_map()
 			read32s_delegate(*m_arm7wrambnk, FUNC(address_map_bank_device::read32)),
 			write32s_delegate(*m_arm7wrambnk, FUNC(address_map_bank_device::write32)));
 	space.install_ram(0x03800000, 0x0380ffff, 0x007f0000, m_arm7ram.target());
-	space.install_readwrite_handler(0x04000000, 0x0410ffff,
-			read32s_delegate(*this, FUNC(nds_state::arm7_io_r)), write32s_delegate(*this, FUNC(nds_state::arm7_io_w)));
+
+	space.install_readwrite_handler(0x04000004, 0x04000007,
+			read32s_delegate(*this, FUNC(nds_state::dispstat_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::dispstat_w<1>)));
+	space.install_readwrite_handler(0x040000b0, 0x040000df,
+			read32s_delegate(*this, FUNC(nds_state::dma_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::dma_w<1>)));
+	space.install_readwrite_handler(0x04000100, 0x0400010f,
+			read32s_delegate(*this, FUNC(nds_state::timer_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::timer_w<1>)));
+	space.install_readwrite_handler(0x04000120, 0x0400012f,
+			read32sm_delegate(*this, FUNC(nds_state::arm7_sio_r)),
+			write32s_delegate(*this, FUNC(nds_state::arm7_sio_w)));
+	space.install_readwrite_handler(0x04000130, 0x04000133,
+			read32s_delegate(*this, FUNC(nds_state::keyinput_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::keyinput_w<1>)));
+	space.install_readwrite_handler(0x04000134, 0x04000137,
+			read32s_delegate(*this, FUNC(nds_state::arm7_rcnt_r)),
+			write32s_delegate(*this, FUNC(nds_state::arm7_rcnt_w)));
+	space.install_readwrite_handler(0x04000138, 0x04000138,
+			read8smo_delegate(*this, FUNC(nds_state::rtc_r)),
+			write8smo_delegate(*this, FUNC(nds_state::rtc_w)));
+	space.install_readwrite_handler(0x04000180, 0x04000183,
+			read32s_delegate(*this, FUNC(nds_state::ipcsync_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::ipcsync_w<1>)));
+	space.install_readwrite_handler(0x04000184, 0x04000185,
+			read16smo_delegate(*this, FUNC(nds_state::ipcfifo_cnt_r<1>)),
+			write16smo_delegate(*this, FUNC(nds_state::ipcfifo_cnt_w<1>)));
+	space.install_write_handler(0x04000188, 0x0400018b, write32smo_delegate(*this, FUNC(nds_state::ipcfifo_send<1>)));
+	space.install_readwrite_handler(0x040001a0, 0x040001a1,
+			read16s_delegate(*this, FUNC(nds_state::auxspi_cnt_r)),
+			write16s_delegate(*this, FUNC(nds_state::auxspi_cnt_w)));
+	space.install_readwrite_handler(0x040001a2, 0x040001a3,
+			read16smo_delegate(*this, FUNC(nds_state::auxspi_data_r)),
+			write16smo_delegate(*this, FUNC(nds_state::auxspi_data_w)));
+	space.install_readwrite_handler(0x040001a4, 0x040001a7,
+			read32s_delegate(*this, FUNC(nds_state::gamecard_rom_ctrl_r)),
+			write32s_delegate(*this, FUNC(nds_state::gamecard_rom_ctrl_w<1>)));
+	space.install_readwrite_handler(0x040001a8, 0x040001af,
+			read8sm_delegate(*this, FUNC(nds_state::gamecard_command_r)),
+			write8sm_delegate(*this, FUNC(nds_state::gamecard_command_w)));
+	space.install_readwrite_handler(0x040001b0, 0x040001b3,
+			emu::detail::make_lr32_delegate(*this, NAME([this](offs_t offset){ return m_card_seed[offset]; })),
+			emu::detail::make_lw32_delegate(*this, NAME([this](offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_card_seed[offset]); })));
+	space.install_readwrite_handler(0x040001c0, 0x040001c1,
+			read16smo_delegate(*this, FUNC(nds_state::arm7_spi_cnt_r)),
+			write16s_delegate(*this, FUNC(nds_state::arm7_spi_cnt_w)));
+	space.install_readwrite_handler(0x040001c2, 0x040001c3,
+			read16smo_delegate(*this, FUNC(nds_state::arm7_spi_data_r)),
+			write16s_delegate(*this, FUNC(nds_state::arm7_spi_data_w)));
+	space.install_readwrite_handler(0x04000204, 0x04000205,
+			read16smo_delegate(*this, FUNC(nds_state::exmemcnt_r)),
+			write16s_delegate(*this, FUNC(nds_state::exmemcnt_w<1>)));
+	space.install_readwrite_handler(0x04000208, 0x0400020b,
+			read32s_delegate(*this, FUNC(nds_state::ime_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::ime_w<1>)));
+	space.install_readwrite_handler(0x04000210, 0x04000213,
+			read32smo_delegate(*this, FUNC(nds_state::ie_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::ie_w<1>)));
+	space.install_readwrite_handler(0x04000214, 0x04000217,
+			read32smo_delegate(*this, FUNC(nds_state::if_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::if_w<1>)));
+	space.install_read_handler(0x04000240, 0x04000243, read32smo_delegate(*this, FUNC(nds_state::if_r<1>)));
+	space.install_readwrite_handler(0x04000300, 0x04000300,
+			read8smo_delegate(*this, FUNC(nds_state::arm7_postflg_r)),
+			write8smo_delegate(*this, FUNC(nds_state::arm7_postflg_w)));
+	space.install_write_handler(0x04000301, 0x04000301, write8smo_delegate(*this, FUNC(nds_state::arm7_haltcnt_w)));
+	space.install_readwrite_handler(0x04000304, 0x04000305,
+			read16smo_delegate(*this, FUNC(nds_state::arm7_powcnt_r)),
+			write16s_delegate(*this, FUNC(nds_state::arm7_powcnt_w)));
+	space.install_write_handler(0x04000308, 0x0400030b, write32s_delegate(*this, FUNC(nds_state::arm7_biosprot_w)));
+	space.install_readwrite_handler(0x04000400, 0x0400051f,
+		read32s_delegate(*m_ndssound, FUNC(nds_sound_device::read)),
+		write32s_delegate(*m_ndssound, FUNC(nds_sound_device::write)));
+	space.install_read_handler(0x04100000, 0x04100003, read32smo_delegate(*this, FUNC(nds_state::ipcfifo_recv<1>)));
+	space.install_read_handler(0x04100010, 0x04100013, read32smo_delegate(*this, FUNC(nds_state::gamecard_data_r)));
+
 	space.install_readwrite_handler(0x06000000, 0x0603ffff, 0, 0x00fc0000, 0,
 			read32sm_delegate(*this, FUNC(nds_state::vram_region_r<VRAM_REGION_ARM7>)),
 			write32s_delegate(*this, FUNC(nds_state::vram_region_w<VRAM_REGION_ARM7>)));
@@ -2384,8 +2413,47 @@ void nds_state::install_gba_map()
 	space.install_read_handler(0x10000000, 0xffffffff, read32s_delegate(*this, FUNC(nds_state::gba_open_bus_r)));
 	space.install_ram(0x02000000, 0x0203ffff, 0x00fc0000, memshare("mainram")->ptr());                  // EWRAM: 256K of main RAM
 	space.install_ram(0x03000000, 0x03007fff, 0x00ff8000, m_arm7ram.target());                          // IWRAM: 32K of the ARM7's WRAM
-	space.install_readwrite_handler(0x04000000, 0x04ffffff,
-			read32s_delegate(*this, FUNC(nds_state::gba_io_r)), write32s_delegate(*this, FUNC(nds_state::gba_io_w)));
+	space.install_readwrite_handler(0x04000000, 0x0400005f,
+			read32sm_delegate(*m_ppu[0], FUNC(gba_ppu_device::regs_r)),
+			write32s_delegate(*m_ppu[0], FUNC(gba_ppu_device::regs_w)));
+	space.install_readwrite_handler(0x04000060, 0x040000af,
+			read32sm_delegate(*this, FUNC(nds_state::gba_sound_r)),
+			write32s_delegate(*this, FUNC(nds_state::gba_sound_w)));
+	space.install_readwrite_handler(0x04000004, 0x04000007,
+			read32s_delegate(*this, FUNC(nds_state::dispstat_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::dispstat_w<1>)));
+	space.install_readwrite_handler(0x040000b0, 0x040000df,
+			read32s_delegate(*this, FUNC(nds_state::dma_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::dma_w<1>)));
+	space.install_readwrite_handler(0x04000100, 0x0400010f,
+			read32s_delegate(*this, FUNC(nds_state::timer_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::timer_w<1>)));
+	space.install_readwrite_handler(0x04000120, 0x0400012f,
+			read32sm_delegate(*this, FUNC(nds_state::arm7_sio_r)),
+			write32s_delegate(*this, FUNC(nds_state::arm7_sio_w)));
+	space.install_readwrite_handler(0x04000130, 0x04000133,
+			read32s_delegate(*this, FUNC(nds_state::keyinput_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::keyinput_w<1>)));
+	space.install_readwrite_handler(0x04000134, 0x04000137,
+			read32s_delegate(*this, FUNC(nds_state::arm7_rcnt_r)),
+			write32s_delegate(*this, FUNC(nds_state::arm7_rcnt_w)));
+	space.install_readwrite_handler(0x04000200, 0x04000203,
+			read16smo_delegate(*this, FUNC(nds_state::gba_ie_r)),
+			write16s_delegate(*this, FUNC(nds_state::gba_ie_w)), 0x0000ffff);
+	space.install_readwrite_handler(0x04000200, 0x04000203,
+			read16smo_delegate(*this, FUNC(nds_state::gba_if_r)),
+			write16s_delegate(*this, FUNC(nds_state::gba_if_w)), 0xffff0000);
+	space.install_readwrite_handler(0x04000204, 0x04000207,
+			read16smo_delegate(*this, FUNC(nds_state::gba_waitcnt_r)),
+			write16s_delegate(*this, FUNC(nds_state::gba_waitcnt_w)), 0x0000ffff);
+	space.install_readwrite_handler(0x04000208, 0x0400020b,
+			read32s_delegate(*this, FUNC(nds_state::ime_r<1>)),
+			write32s_delegate(*this, FUNC(nds_state::ime_w<1>)));
+	space.install_readwrite_handler(0x04000300, 0x04000303,
+			read8smo_delegate(*this, FUNC(nds_state::gba_postflg_r)),
+			write8smo_delegate(*this, FUNC(nds_state::gba_postflg_w)), 0x000000ff);
+	space.install_write_handler(0x04000300, 0x04000303, write8smo_delegate(*this, FUNC(nds_state::gba_haltcnt_w)), 0x0000ff00);
+	space.install_read_handler(0x04000800, 0x04000803, read32smo_delegate(*this, FUNC(nds_state::gba_memctrl_r)));
 	space.install_ram(0x05000000, 0x050003ff, 0x00fffc00, m_palette.target());                          // engine A palette
 	space.install_ram(0x06000000, 0x0600ffff, 0x00fe0000, &m_vram[0]);                                  // VRAM bank A, GBA layout
 	space.install_ram(0x06010000, 0x06017fff, 0x00fe8000, &m_vram[0x10000/4]);                          // OBJ half, mirrored at +0x8000
@@ -2521,25 +2589,25 @@ uint32_t nds_state::gba_sound_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0x60/4: return m_gbsound->sound_r(0) | (m_gbsound->sound_r(1) << 16) | (m_gbsound->sound_r(2) << 24);
-		case 0x64/4: return m_gbsound->sound_r(3) | (m_gbsound->sound_r(4) << 8);
-		case 0x68/4: return m_gbsound->sound_r(6) | (m_gbsound->sound_r(7) << 8);
-		case 0x6c/4: return m_gbsound->sound_r(8) | (m_gbsound->sound_r(9) << 8);
-		case 0x70/4: return m_gbsound->sound_r(0xa) | (m_gbsound->sound_r(0xb) << 16) | (m_gbsound->sound_r(0xc) << 24);
-		case 0x74/4: return m_gbsound->sound_r(0xd) | (m_gbsound->sound_r(0xe) << 8);
-		case 0x78/4: return m_gbsound->sound_r(0x10) | (m_gbsound->sound_r(0x11) << 8);
-		case 0x7c/4: return m_gbsound->sound_r(0x12) | (m_gbsound->sound_r(0x13) << 8);
-		case 0x80/4: return m_gbsound->sound_r(0x14) | (m_gbsound->sound_r(0x15) << 8) | (m_gba_soundregs[(0x80 - 0x60)/4] & 0xffff0000);
-		case 0x84/4: return m_gbsound->sound_r(0x16);
+		case 0x00/4: return m_gbsound->sound_r(0) | (m_gbsound->sound_r(1) << 16) | (m_gbsound->sound_r(2) << 24);
+		case 0x04/4: return m_gbsound->sound_r(3) | (m_gbsound->sound_r(4) << 8);
+		case 0x08/4: return m_gbsound->sound_r(6) | (m_gbsound->sound_r(7) << 8);
+		case 0x0c/4: return m_gbsound->sound_r(8) | (m_gbsound->sound_r(9) << 8);
+		case 0x10/4: return m_gbsound->sound_r(0xa) | (m_gbsound->sound_r(0xb) << 16) | (m_gbsound->sound_r(0xc) << 24);
+		case 0x14/4: return m_gbsound->sound_r(0xd) | (m_gbsound->sound_r(0xe) << 8);
+		case 0x18/4: return m_gbsound->sound_r(0x10) | (m_gbsound->sound_r(0x11) << 8);
+		case 0x1c/4: return m_gbsound->sound_r(0x12) | (m_gbsound->sound_r(0x13) << 8);
+		case 0x20/4: return m_gbsound->sound_r(0x14) | (m_gbsound->sound_r(0x15) << 8) | (m_gba_soundregs[(0x80 - 0x60)/4] & 0xffff0000);
+		case 0x24/4: return m_gbsound->sound_r(0x16);
 	}
 
-	if ((offset >= (0x90/4)) && (offset < (0xa0/4)))
+	if ((offset >= (0x30/4)) && (offset < (0x40/4)))
 	{
-		const int base = (offset - (0x90/4)) * 4;
+		const int base = (offset - (0x30/4)) * 4;
 		return m_gbsound->wave_r(base) | (m_gbsound->wave_r(base + 1) << 8) | (m_gbsound->wave_r(base + 2) << 16) | (m_gbsound->wave_r(base + 3) << 24);
 	}
 
-	return m_gba_soundregs[offset - (0x60/4)];
+	return m_gba_soundregs[offset];
 }
 
 void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -2548,7 +2616,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	static const double psg_gain[4] = { 0.25, 0.5, 1.0, 1.0 };
 
 	const uint16_t old_x = m_gba_soundregs[(0x84 - 0x60)/4] & 0xffff;
-	COMBINE_DATA(&m_gba_soundregs[offset - (0x60/4)]);
+	COMBINE_DATA(&m_gba_soundregs[offset]);
 
 	auto reset_fifo = [this] (int ref)
 	{
@@ -2559,7 +2627,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	switch (offset)
 	{
-		case 0x60/4:
+		case 0x0/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0, data);
@@ -2574,7 +2642,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x64/4:
+		case 0x4/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(3, data);
@@ -2585,7 +2653,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x68/4:
+		case 0x8/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(6, data);
@@ -2596,7 +2664,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x6c/4:
+		case 0xc/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(8, data);
@@ -2607,7 +2675,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x70/4:
+		case 0x10/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0xa, data);
@@ -2622,7 +2690,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x74/4:
+		case 0x14/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0xd, data);
@@ -2633,7 +2701,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x78/4:
+		case 0x18/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x10, data);
@@ -2644,7 +2712,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x7c/4:
+		case 0x1c/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x12, data);
@@ -2655,7 +2723,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x80/4:
+		case 0x20/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x14, data);
@@ -2682,7 +2750,7 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x84/4:
+		case 0x24/4:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_gbsound->sound_w(0x16, data);
@@ -2694,10 +2762,10 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
-		case 0x90/4:
-		case 0x94/4:
-		case 0x98/4:
-		case 0x9c/4:
+		case 0x30/4:
+		case 0x34/4:
+		case 0x38/4:
+		case 0x3c/4:
 		{
 			const int base = (offset - (0x90/4)) * 4;
 			if (ACCESSING_BITS_0_7)
@@ -2719,8 +2787,8 @@ void nds_state::gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 		}
 
-		case 0xa0/4:
-		case 0xa4/4:
+		case 0x40/4:
+		case 0x44/4:
 		{
 			gba_fifo_t &fifo = m_gba_fifo[offset & 1];
 			if (fifo.size < 8)
@@ -2786,112 +2854,56 @@ void nds_state::gba_audio_tick(int ref)
 	}
 }
 
-uint32_t nds_state::gba_io_r(offs_t offset, uint32_t mem_mask)
+uint16_t nds_state::gba_ie_r()
 {
-	if ((offset & 0x3fff) == (0x800/4))
-	{
-		return 0x0d000020;      // internal memory control
-	}
-	if (offset >= 0x400)
-	{
-		return 0;
-	}
-
-	bool handled = false;
-	if (offset < GBA_LCD_END_OFFSET)
-	{
-		if (offset == DISPSTAT_OFFSET)
-		{
-			return common_io_r(1, offset, mem_mask, handled);
-		}
-		return m_ppu[0]->regs_r(offset);
-	}
-	if ((offset >= (0x60/4)) && (offset < (0xb0/4)))
-	{
-		return gba_sound_r(offset);
-	}
-	if (((offset >= DMA_OFFSET) && (offset < (0xe0/4))) || ((offset >= TIMER_OFFSET) && (offset < (0x110/4)))
-		|| ((offset >= SIO_OFFSET) && (offset < (0x130/4))) || (offset == KEYINPUT_OFFSET) || (offset == RCNT_OFFSET) || (offset == IME_OFFSET))
-	{
-		const uint32_t data = common_io_r(1, offset, mem_mask, handled);
-		return handled ? data : 0;
-	}
-	if (offset == (0x200/4))
-	{
-		return (m_ie[1] & 0xffff) | ((m_if[1] & 0xffff) << 16);
-	}
-	if (offset == (0x204/4))
-	{
-		return m_gba_waitcnt;
-	}
-	if (offset == POSTFLG_OFFSET)
-	{
-		return m_arm7_postflg;
-	}
-	return 0;
+	return uint16_t(m_ie[1]);
 }
 
-void nds_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nds_state::gba_ie_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (offset >= 0x400)
-	{
-		return;
-	}
+	m_ie[1] = (m_ie[1] & 0xffff0000) | data;
+	update_irqs(1);
+}
 
-	bool handled = false;
-	if (offset < GBA_LCD_END_OFFSET)
-	{
-		if (offset == DISPSTAT_OFFSET)
-		{
-			common_io_w(1, offset, data, mem_mask, handled);
-			return;
-		}
-		m_ppu[0]->regs_w(offset, data, mem_mask);
-		return;
-	}
-	if ((offset >= (0x60/4)) && (offset < (0xb0/4)))
-	{
-		gba_sound_w(offset, data, mem_mask);
-		return;
-	}
-	if (((offset >= DMA_OFFSET) && (offset < (0xe0/4))) || ((offset >= TIMER_OFFSET) && (offset < (0x110/4)))
-		|| ((offset >= SIO_OFFSET) && (offset < (0x130/4))) || (offset == KEYINPUT_OFFSET) || (offset == RCNT_OFFSET) || (offset == IME_OFFSET))
-	{
-		common_io_w(1, offset, data, mem_mask, handled);
-		return;
-	}
-	switch (offset)
-	{
-		case 0x200/4:   // IE / IF
-			if (ACCESSING_BITS_0_15)
-			{
-				m_ie[1] = (m_ie[1] & 0xffff0000) | (data & 0xffff);
-			}
-			if (ACCESSING_BITS_16_31)
-			{
-				m_if[1] &= ~(data >> 16);
-			}
-			update_irqs(1);
-			break;
+uint16_t nds_state::gba_if_r()
+{
+	return uint16_t(m_if[1]);
+}
 
-		case 0x204/4:   // WAITCNT
-			if (ACCESSING_BITS_0_15)
-			{
-				m_gba_waitcnt = data & 0xffff;
-			}
-			break;
+void nds_state::gba_if_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_if[1] &= ~data;
+	update_irqs(1);
+}
 
-		case POSTFLG_OFFSET:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_arm7_postflg = data & 0xff;
-			}
-			if (ACCESSING_BITS_8_15)
-			{
-				set_halted(1, true);        // HALTCNT: 0x00 halt, 0x80 stop
-			}
-			break;
-	}
+uint16_t nds_state::gba_waitcnt_r()
+{
+	return m_gba_waitcnt;
+}
+
+void nds_state::gba_waitcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_gba_waitcnt = data & 0xffff;
+}
+
+uint8_t nds_state::gba_postflg_r()
+{
+	return m_arm7_postflg;
+}
+
+void nds_state::gba_postflg_w(uint8_t data)
+{
+	m_arm7_postflg = data;
+}
+
+void nds_state::gba_haltcnt_w(uint8_t data)
+{
+	set_halted(1, true);        // HALTCNT: 0x00 halt, 0x80 stop
+}
+
+uint32_t nds_state::gba_memctrl_r()
+{
+	return 0x0d000020;          // internal memory control
 }
 
 
@@ -3099,6 +3111,8 @@ void nds_state::nds(machine_config &config)
 
 	// GBA slot: GBA mode is not emulated, so this is for the firmware's "Game Pak" panel and DS expansion paks
 	GBA_CART_SLOT(config, m_gbacart, gba_cart, nullptr);
+
+	SOFTWARE_LIST(config, "nds_list").set_original("nds");
 	SOFTWARE_LIST(config, "gba_list").set_compatible("gba");
 }
 

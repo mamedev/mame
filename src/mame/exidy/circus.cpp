@@ -558,8 +558,8 @@ ROM_START( robotbwl )
 	ROM_LOAD( "6000.14d", 0x0000, 0x0020, CRC(a402ac06) SHA1(3bd75630786bcc86d9e9fbc826adc909eef9b41f) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // line drawing; not used by the emulation
-	ROM_LOAD( "5000.4d",  0x0000, 0x0200, NO_DUMP ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
-	ROM_LOAD( "5001.5d",  0x0200, 0x0200, NO_DUMP )
+	ROM_LOAD( "5000.4d",  0x0000, 0x0200, CRC(e69d8fc6) SHA1(d901f57f9dc49826d59a214ab612e1fbdb0849c2) ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
+	ROM_LOAD( "5001.5d",  0x0200, 0x0200, CRC(5022c4ea) SHA1(9aee52ea5d20e29196c2b3acd136d0f4cfdda392) )
 ROM_END
 
 ROM_START( trapeze ) // loose roms labelled with pencil

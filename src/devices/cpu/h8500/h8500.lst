@@ -763,8 +763,14 @@ macro take_exception %vector
 # CMP.W EA, #imm16
 05    ff    cmp_ea_16      e        -      -
 	m_tmp1 = read_imm16();
-	m_tmp2 = read_ea_16();
-	do_sub16(m_tmp2, m_tmp1);
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		m_tmp2 = read_ea_16();
+		do_sub16(m_tmp2, m_tmp1);
+	} else {
+		m_tmp1 &= 0xff;
+		m_tmp2 = read_ea_8();
+		do_sub8(m_tmp2, m_tmp1);
+	}
 	cycles 2
 	prefetch
 
@@ -785,8 +791,14 @@ macro take_exception %vector
 # MOV.W #imm, EA
 07    ff    mov_w_imm_ea  e        -      -
 	m_tmp1 = read_imm16();
-	write_ea_16(m_tmp1);
-	set_flags_nzv16 m_tmp1
+	if (BIT(m_ir[0], OP_WIDTH)) {
+		write_ea_16(m_tmp1);
+		set_flags_nzv16 m_tmp1
+	} else {
+		m_tmp1 &= 0xff;
+		write_ea_8(m_tmp1);
+		set_flags_nzv8 m_tmp1
+	}
 	cycles 8
 	prefetch
 
@@ -1345,10 +1357,24 @@ macro take_exception %vector
 # LDC EA, Cx
 88    f8    ldc           e        -      -
 	if (BIT(m_ir[0], OP_WIDTH)) {
-		if (!(op_byte() & 0x7)) {		// only control register 0 (SR) is valid for 16-bit LDC
+		// word-size LDC is documented for SR only; the 8-bit page registers take the
+		// low byte of the word (undocumented, used by Roland SC-55 firmware)
+		m_tmp1 = op_byte() & 7;
+		if (m_tmp1 == 0) {
 			m_sr = read_ea_16() & SR_MASK;
 			update_irq_filter();
 			internal(6);
+		} else if (m_tmp1 == 3) {
+			m_br = read_ea_16() & 0xff;
+			internal(4);
+		} else if (m_tmp1 == 4) {
+			m_ep = read_ea_16() & 0xff;
+			internal(4);
+		} else if (m_tmp1 == 5) {
+			m_dp = read_ea_16() & 0xff;
+			internal(4);
+		} else {
+			logerror("H8/500: invalid word LDC destination %d\n", m_tmp1);
 		}
 	} else if ((op_byte() & 7) == 4 && (m_ir[0] == 0xb7 || m_ir[0] == 0xc7)) {
 		// Byte-size LDC/STC of EP via @-SP/@SP+ is promoted to a word
@@ -1414,9 +1440,23 @@ macro take_exception %vector
 # STC Cx, EA
 98    f8    stc           e:!imm    -      -
 	if (BIT(m_ir[0], OP_WIDTH)) {
-		if (!(op_byte() & 0x7)) {		// only control register 0 (SR) is valid for 16-bit STC
+		// word-size STC is documented for SR only; the 8-bit page registers are
+		// stored duplicated in both bytes (undocumented, used by Roland SC-55 firmware)
+		m_tmp1 = op_byte() & 7;
+		if (m_tmp1 == 0) {
 			write_ea_16(m_sr);
 			internal(2);
+		} else if (m_tmp1 == 3) {
+			write_ea_16((u32(m_br) << 8) | m_br);
+			internal(2);
+		} else if (m_tmp1 == 4) {
+			write_ea_16((u32(m_ep) << 8) | m_ep);
+			internal(2);
+		} else if (m_tmp1 == 5) {
+			write_ea_16((u32(m_dp) << 8) | m_dp);
+			internal(2);
+		} else {
+			logerror("H8/500: invalid word STC source %d\n", m_tmp1);
 		}
 	} else if ((op_byte() & 7) == 4 && (m_ir[0] == 0xb7 || m_ir[0] == 0xc7)) {
 		// see LDC: stack-promoted byte STC of EP pushes the EP:DP pair,

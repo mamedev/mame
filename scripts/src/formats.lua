@@ -1647,6 +1647,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/pc88_t88.h,FORMATS["PC88_T88"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "PC88_T88") then
+       files {
+               MAME_DIR.. "src/lib/formats/pc88_t88.cpp",
+               MAME_DIR.. "src/lib/formats/pc88_t88.h",
+       }
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/pc98fdi_dsk.h,FORMATS["PC98FDI_DSK"] = true
 --------------------------------------------------
 

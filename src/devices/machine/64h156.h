@@ -78,6 +78,7 @@ public:
 	auto atn_callback() { return m_write_atn.bind(); }
 	auto sync_callback() { return m_write_sync.bind(); }
 	auto byte_callback() { return m_write_byte.bind(); }
+	auto yb_wr_cb() { return m_write_yb.bind(); }
 
 	uint8_t yb_r();
 	void yb_w(uint8_t data);
@@ -147,6 +148,7 @@ private:
 	devcb_write_line m_write_atn;
 	devcb_write_line m_write_sync;
 	devcb_write_line m_write_byte;
+	devcb_write8 m_write_yb;
 
 	floppy_image_device *m_floppy;
 
@@ -181,6 +183,7 @@ private:
 	void get_next_edge(const attotime &when);
 	int get_next_bit(attotime &tm, const attotime &limit);
 	uint32_t next_rand();
+	void update_stepper(int stp);
 };
 
 

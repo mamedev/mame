@@ -1854,6 +1854,7 @@ license:CC0-1.0
 		<description>Ernie's Quiz</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2E0013" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-06 -->
@@ -1869,6 +1870,7 @@ license:CC0-1.0
 		<description>Mix and Match</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2E0015" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-07 -->
@@ -1884,6 +1886,7 @@ license:CC0-1.0
 		<description>Instant Zoo</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2E0016" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-08 -->
@@ -1899,6 +1902,7 @@ license:CC0-1.0
 		<description>Spotlight</description>
 		<year>1981</year>
 		<publisher>Apple Computers</publisher>
+		<info name="partno" value="C2E0014" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-03-09 -->
@@ -3392,6 +3396,7 @@ license:CC0-1.0
 		<description>Apple Stellar Invaders</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0031" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-10-03 -->
@@ -3459,6 +3464,7 @@ license:CC0-1.0
 		<description>Galactic Wars</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="C2H0003" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-10-20 -->
@@ -3987,9 +3993,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="advent">
-		<description>Adventure</description>
+		<description>Apple Adventure</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0034" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-12-06 -->
@@ -11722,6 +11729,27 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 Side B - Programmer's Aids" />
 			<dataarea name="flop" size="234829">
 				<rom name="animate disk 3b - programmer's aids.woz" size="234829" crc="9dcc9915" sha1="9188dff8c25e046188fd3bc602e21583eb54ce4a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplbowl">
+		<description>Apple Bowl</description>
+		<year>1979</year>
+		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0018" />
+		<info name="programmer" value="Charlie Kellner" />
+		<info name="programmer" value="Eric Larson" />
+		<info name="required_ram" value="32K" />
+		<info name="usage" value="Requires Integer BASIC in ROM and a 13-sector floppy drive." />
+		<sharedfeat name="compatibility" value="A2,A2P" />
+		<sharedfeat name="gameio_default" value="paddles" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
+		<!-- Dump released: 2025-11-15 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="Apple Bowl.woz" size="234791" crc="beb42308" sha1="1e6f7ac7eeb149fa32da5344e03908a422465a7b" />
 			</dataarea>
 		</part>
 	</software>
@@ -25413,6 +25441,7 @@ license:CC0-1.0
 		<publisher>Apple Computer</publisher>
 		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="developer" value="Advanced Learning Technology"/>
+		<info name="partno" value="C2E0012" />
 		<info name="programmer" value="Leslie Grimm" />
 		<info name="programmer" value="Corrine Grimm" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
@@ -33505,6 +33534,154 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234763">
 				<rom name="participles 1988.woz" size="234763" crc="bcae62a6" sha1="7474adab18b0be0f331a3ac3a8283ec14cb42602" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal13">
+		<description>Apple Pascal (version 1.3)</description>
+		<year>1985</year>
+		<publisher>Apple Computer</publisher>
+		<info name="required_ram" value="64K" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2026-01-21 -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 1" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.3 - APPLE1 (boot).woz" size="234768" crc="50a95cb5" sha1="74e1f43a761966c306223dff5113b498fcb999af" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 0" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.3 - APPLE0.woz" size="234768" crc="507c9c9c" sha1="0a8e67f0ca97a061acc7da864c8ab56eee149364" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 2" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.3 - APPLE2.woz" size="234768" crc="b4c5c92c" sha1="dc3a68f06ccebcc6f96a888407ceda81cdfe9f10" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 3" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.3 - APPLE3.woz" size="234768" crc="6f7899d0" sha1="7a5546b4698a558ba86e20264ebdd77b65c7a950" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal13_35" cloneof="pascal13">
+		<description>Apple Pascal (version 1.3) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>Apple Computer</publisher>
+		<info name="required_ram" value="64K" />
+		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or Apple //e or 64K Apple ][+ with a compatible drive controller card." />
+		<info name="version" value="800K" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2026-01-21 -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296138">
+				<rom name="Apple Pascal v1.3 800K.woz" size="1296138" crc="790a975b" sha1="81ac97691c084a859f4cb5c941d6cbc40f3ef6c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal12" cloneof="pascal13">
+		<description>Apple Pascal (version 1.2)</description>
+		<year>1983</year>
+		<publisher>Apple Computer</publisher>
+		<info name="required_ram" value="64K" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2026-01-21 -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 1" />
+			<dataarea name="flop" size="234788">
+				<rom name="Apple Pascal v1.2 - APPLE1 (boot).woz" size="234788" crc="72a70498" sha1="b7de7e41a23df05b9484ab6da1fef6831122a13f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 0" />
+			<dataarea name="flop" size="234788">
+				<rom name="Apple Pascal v1.2 - APPLE0.woz" size="234788" crc="43180e31" sha1="f20166528765e45412324636934db20f0ec20dcb" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 2" />
+			<dataarea name="flop" size="234788">
+				<rom name="Apple Pascal v1.2 - APPLE2.woz" size="234788" crc="9a8b63c0" sha1="605c3877091fc3cd0f9babfd5be10d4f485f524b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 3" />
+			<dataarea name="flop" size="234788">
+				<rom name="Apple Pascal v1.2 - APPLE3.woz" size="234788" crc="64dcc90e" sha1="712085b0bdfe7d5336474709487fdf10915e6f2c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal11" cloneof="pascal13">
+		<description>Apple Pascal (version 1.1)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="required_ram" value="64K" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2026-01-21 -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 1" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.1 - APPLE1 (boot).woz" size="234768" crc="18d60aa4" sha1="782635cd8049255dc79f4d107fc64350f593c1bb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 0" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.1 - APPLE0.woz" size="234768" crc="1311c8a4" sha1="4cb13708e430c8acc38343b91cd092fb0e2dc179" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 2" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.1 - APPLE2.woz" size="234768" crc="512e9062" sha1="69dd222ab831c5dc417f466006c9e4f51c530ee1" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 3" />
+			<dataarea name="flop" size="234768">
+				<rom name="Apple Pascal v1.1 - APPLE3.woz" size="234768" crc="9261d677" sha1="68d27cd22d506904f872446181fd7d7439e3454c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal10" cloneof="pascal13">
+		<description>Apple Pascal (version 1.0)</description>
+		<year>1979</year>
+		<publisher>Apple Computer</publisher>
+		<info name="required_ram" value="64K" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2026-01-21 -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 1" />
+			<dataarea name="flop" size="234802">
+				<rom name="Apple Pascal v1.0 - APPLE1 (boot).woz" size="234802" crc="eb5b8178" sha1="e9a3de2e3fe8ba8e72a4e62cb09caceb21e8b2e9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 0" />
+			<dataarea name="flop" size="234802">
+				<rom name="Apple Pascal v1.0 - APPLE0.woz" size="234802" crc="dea5b2ae" sha1="cf6fc08e4328ba0314bb1a9d10296a112c9c8e99" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 2" />
+			<dataarea name="flop" size="234802">
+				<rom name="Apple Pascal v1.0 - APPLE2.woz" size="234802" crc="291f0394" sha1="961c78bd911977b36be5b8d0fc59d1b73a30d015" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Apple 3" />
+			<dataarea name="flop" size="234802">
+				<rom name="Apple Pascal v1.0 - APPLE3.woz" size="234802" crc="8765cb3f" sha1="483e47b62f92a129914a127bf706901a4b4fef25" />
 			</dataarea>
 		</part>
 	</software>

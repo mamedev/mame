@@ -218,15 +218,18 @@ void ncr5385_device::map(address_map &map)
 
 u8 ncr5385_device::dat_r()
 {
-	if (m_aux_status & AUX_STATUS_DATA_FULL)
+	if (!machine().side_effects_disabled())
 	{
-		m_aux_status &= ~AUX_STATUS_DATA_FULL;
+		if (m_aux_status & AUX_STATUS_DATA_FULL)
+		{
+			m_aux_status &= ~AUX_STATUS_DATA_FULL;
 
-		if (m_state != IDLE)
-			m_state_timer->adjust(attotime::zero);
+			if (m_state != IDLE)
+				m_state_timer->adjust(attotime::zero);
+		}
+		else
+			logerror("data register empty (%s)\n", machine().describe_context());
 	}
-	else
-		logerror("data register empty (%s)\n", machine().describe_context());
 
 	return m_dat;
 }
@@ -275,12 +278,16 @@ u8 ncr5385_device::int_status_r()
 {
 	u8 const data = m_int_status;
 	LOGMASKED(LOG_REGR, "int_status_r 0x%02x (%s)\n", data, machine().describe_context());
-	m_aux_status &= ~AUX_STATUS_PARITY_ERR;
-	m_int_status = 0;
-	update_int();
 
-	if (m_state != IDLE)
-		m_state_timer->adjust(attotime::zero);
+	if (!machine().side_effects_disabled())
+	{
+		m_aux_status &= ~AUX_STATUS_PARITY_ERR;
+		m_int_status = 0;
+		update_int();
+
+		if (m_state != IDLE)
+			m_state_timer->adjust(attotime::zero);
+	}
 
 	return data;
 }
@@ -575,7 +582,7 @@ int ncr5385_device::state_step()
 	case SEL_DELAY:
 		LOGMASKED(LOG_STATE, "selection: BSY cleared\n");
 		m_state = SEL_WAIT_BSY;
-		delay = m_cnt ? attotime::from_ticks(u64(m_cnt) * 1024, clock()).as_ticks(1'000'000'000) : -1;
+		delay = m_cnt ? attotime::from_ticks(u64(m_cnt) * 1024, clock()).as_ticks(ATTOSECONDS_PER_NANOSECOND) : -1;
 
 		// clear BSY, optionally assert ATN
 		if (!BIT(m_cmd, 0))

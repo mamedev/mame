@@ -114,31 +114,60 @@ arm7_cpu_device::arm7_cpu_device(
 		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", endianness, 32, (archFlags & ARCHFLAG_ONLY26) ? 26 : 32, 0, internal_map)
+	, m_insn_prefetch_depth(3)
+	, m_insn_prefetch_count(0)
+	, m_insn_prefetch_index(0)
 	, m_prefetch_word0_shift(endianness == ENDIANNESS_LITTLE ? 0 : 16)
 	, m_prefetch_word1_shift(endianness == ENDIANNESS_LITTLE ? 16 : 0)
+	, m_tlb_log(0)
+	, m_actual_log(0)
+	, m_pendingIrq(false)
+	, m_pendingFiq(false)
+	, m_pendingAbtD(false)
+	, m_pendingAddrExc(false)
+	, m_pendingAbtP(false)
+	, m_pendingUnd(false)
+	, m_pendingSwi(false)
+	, m_pending_interrupt(false)
 	, m_endian(endianness)
+	, m_control(0)
+	, m_tlbBase(0)
+	, m_tlb_base_mask(0)
+	, m_faultAddress(0)
+	, m_fcsePID(0)
+	, m_pid_offset(0)
+	, m_domainAccessControl(0)
 	, m_archRev(archRev)
 	, m_archFlags(archFlags)
 	, m_vectorbase(0)
 	, m_pc(0)
 {
 	std::fill(std::begin(m_r), std::end(m_r), 0);
+	m_faultStatus[0] = 0;
+	m_faultStatus[1] = 0;
+	std::fill_n(&m_decoded_access_control[0], 16, 0);
+	for (auto &entry : m_dtlb_entries)
+	{
+		entry = tlb_entry();
+	}
+	for (auto &entry : m_itlb_entries)
+	{
+		entry = tlb_entry();
+	}
+	std::fill(std::begin(m_dtlb_entry_index), std::end(m_dtlb_entry_index), 0);
+	std::fill(std::begin(m_itlb_entry_index), std::end(m_itlb_entry_index), 0);
+
 	uint32_t arch = ARM9_COPRO_ID_ARCH_V4;
 	if (m_archFlags & ARCHFLAG_T)
+	{
 		arch = ARM9_COPRO_ID_ARCH_V4T;
+	}
 
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM | arch | ARM9_COPRO_ID_PART_GENERICARM7;
-
-	// TODO[RH]: Default to 3-instruction prefetch for unknown ARM variants. Derived cores should set the appropriate value in their constructors.
-	m_insn_prefetch_depth = 3;
 
 	std::fill_n(&m_insn_prefetch_buffer[0], 3, 0);
 	std::fill_n(&m_insn_prefetch_address[0], 3, 0);
 	std::fill_n(&m_insn_prefetch_valid[0], 3, false);
-	m_insn_prefetch_count = 0;
-	m_insn_prefetch_index = 0;
-	m_tlb_log = 0;
-	m_actual_log = 0;
 }
 
 arm7_cpu_device::~arm7_cpu_device()
@@ -1384,7 +1413,9 @@ void arm7_cpu_device::state_string_export(const device_state_entry &entry, std::
 
 void arm7_cpu_device::device_reset()
 {
-	std::fill(std::begin(m_r), std::end(m_r), 0);
+	const uint32_t old_pc = m_r[eR15];
+	const uint32_t old_cpsr = m_r[eCPSR];
+
 	m_pendingIrq = false;
 	m_pendingFiq = false;
 	m_pendingAbtD = false;
@@ -1419,6 +1450,8 @@ void arm7_cpu_device::device_reset()
 		SwitchMode(eARM7_MODE_SVC);
 		m_r[eR15] = vector_base();
 	}
+	m_r[eR14_SVC] = old_pc;
+	m_r[eSPSR_SVC] = old_cpsr;
 
 	for (auto &entry : m_dtlb_entries)
 	{

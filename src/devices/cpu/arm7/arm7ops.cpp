@@ -459,6 +459,11 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 
 	/* Calculate Rn, accounting for PC */
 	rn = (insn & INSN_RN) >> INSN_RN_SHIFT;
+	rd = (insn & INSN_RD) >> INSN_RD_SHIFT;
+	bool const is_load = (insn & INSN_SDT_L) != 0;
+
+	// A store reads its data before the base write-back, so STR Rn,[Rn,#off]! stores the original Rn.
+	uint32_t const store_value = is_load ? 0 : ((rd == eR15) ? (R15 + 12) : GetRegister(rd));
 
 	if (insn & INSN_SDT_P)
 	{
@@ -510,8 +515,6 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 	}
 
 	/* Do the transfer */
-	rd = (insn & INSN_RD) >> INSN_RD_SHIFT;
-	bool const is_load = (insn & INSN_SDT_L) != 0;
 	if (is_load)
 	{
 		/* Load */
@@ -564,7 +567,7 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 				LOGMASKED(LOG_OPS, "Wrote R15 in byte mode\n");
 #endif
 
-			WRITE8(rnv, (uint8_t) GetRegister(rd) & 0xffu);
+			WRITE8(rnv, uint8_t(store_value));
 		}
 		else
 		{
@@ -573,8 +576,7 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 				LOGMASKED(LOG_OPS, "Wrote R15 in 32bit mode\n");
 #endif
 
-			//WRITE32(rnv, rd == eR15 ? R15 + 8 : GetRegister(rd));
-			WRITE32(rnv, rd == eR15 ? R15 + 8 + 4 : GetRegister(rd)); // manual says STR rd = PC, +12
+			WRITE32(rnv, store_value);
 		}
 		// Store takes only 2 N Cycles, so add + 1
 		ARM7_ICOUNT += 1;
@@ -658,6 +660,11 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 
 	/* Calculate Rn, accounting for PC */
 	rn = (insn & INSN_RN) >> INSN_RN_SHIFT;
+	rd = (insn & INSN_RD) >> INSN_RD_SHIFT;
+	bool const is_load = (insn & INSN_SDT_L) || ((insn & 0x60) == 0x40);   // L bit or LDRD
+
+	const uint32_t store_value = is_load ? 0 : ((rd == eR15) ? (R15 + 12) : GetRegister(rd));
+	const uint32_t store_value_hi = (is_load || (rd >= eR15)) ? 0 : GetRegister(rd + 1);   // STRD
 
 	if (insn & INSN_SDT_P)
 	{
@@ -697,9 +704,6 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 	}
 
 	/* Do the transfer */
-	rd = (insn & INSN_RD) >> INSN_RD_SHIFT;
-	bool const is_load = (insn & INSN_SDT_L) || ((insn & 0x60) == 0x40);   // L bit or LDRD
-
 	/* Load */
 	if (insn & INSN_SDT_L)
 	{
@@ -828,17 +832,16 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 				return;
 			}
 
-			WRITE32(rnv & ~3, GetRegister(rd));
+			WRITE32(rnv & ~3, store_value);
 			if (!m_pendingAbtD)
 			{
-				WRITE32((rnv & ~3) + 4, GetRegister(rd+1));
+				WRITE32((rnv & ~3) + 4, store_value_hi);
 			}
 			R15 += 4;
 		}
 		else
 		{
-			// WRITE16(rnv, rd == eR15 ? R15 + 8 : GetRegister(rd));
-			WRITE16(rnv, rd == eR15 ? R15 + 8 + 4 : GetRegister(rd)); // manual says STR RD=PC, +12 of address
+			WRITE16(rnv, store_value);   // STRH R15 stores PC+12
 
 			// if R15 is not increased then e.g. "STRH R10, [R15,#$10]" will be executed over and over again
 			R15 += 4;

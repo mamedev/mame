@@ -107,6 +107,9 @@ private:
 	void bios_mem(address_map &map) ATTR_COLD;
 
 	void m_slow2_init( void );
+
+	void soft_reset_w(int state);
+	TIMER_CALLBACK_MEMBER(soft_reset_cb);
 };
 
 

@@ -1114,7 +1114,7 @@ void dragngun_state::lockloadu(machine_config &config)
 void dragngun_state::lockload(machine_config &config)
 {
 	// basic machine hardware
-	DE101(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE156(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", arm7_cpu_device::ARM7_IRQ_LINE);

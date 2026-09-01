@@ -45,10 +45,31 @@ References:
 #include "pc88_kbd.h"
 #include "pc8001.h"
 
+#include "formats/pc88_t88.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "utf8.h"
+
+
+namespace {
+
+// A half period of 2400 Hz lasts 1/4800 s, one of 1200 Hz lasts 1/2400 s:
+// anything shorter than 1/3200 s is the high tone.
+constexpr int CMT_FSK_THRESHOLD_HZ = 3200;
+// nothing slower than this counts as a carrier at all
+constexpr int CMT_FSK_DROPOUT_HZ = 1600;
+// poll comfortably above the Nyquist rate of the 2400 Hz tone
+constexpr int CMT_POLL_HZ = 48000;
+// the cassette level is nominally +/-1.0
+constexpr double CMT_LEVEL = 0.1;
+// a real deck needs a moment to come back up to speed, and the signal is
+// unusable until it does; without this the demodulator resumes mid frame and
+// hands the ROM a byte that never existed on the tape
+constexpr int CMT_SPINUP_MS = 150;
+
+} // anonymous namespace
 
 
 void pc8001_base_state::crtc_reverse_w(int state)
@@ -537,6 +558,165 @@ void pc8001_base_state::port30_w(uint8_t data)
 	m_color = BIT(data, 1);
 
 	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	const u8 motor = BIT(data, 3);
+	if (motor != m_cmt_motor)
+	{
+		m_cmt_motor = motor;
+		if (m_cmt_motor > 0)
+		{
+			// discard whatever partial frame we were in the middle of
+			m_cmt_spinup_until = machine().time() + attotime::from_msec(CMT_SPINUP_MS);
+			m_cmt_last_edge = attotime::never;
+			cmt_reset_demod();
+		}
+	}
+
+	const u8 baud_sel = BIT(data, 4, 2);
+	if (baud_sel != m_cmt_baud_sel)
+	{
+		m_cmt_baud_sel = baud_sel;
+		cmt_reset_demod();
+		cmt_update_rxc();
+	}
+}
+
+/*
+ * CMT data in, port $40 bit 2.
+ *
+ * This is the comparator output of the tape input, not the demodulated data,
+ * so it swings at the carrier frequency and software can time the edges
+ * itself.  N-BASIC relies on this to find the carrier.
+ */
+int pc8001_base_state::cmt_cdin_r()
+{
+	if ((!m_cassette->exists()) || ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY) || ((m_cassette->get_state() & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED))
+		return 0;
+
+	return (m_cassette->input() > 0.0) ? 1 : 0;
+}
+
+/*
+ * CMT receive path
+ *
+ * The tape carries a Kansas City style FSK signal: a '0' bit is one full
+ * period of 1200 Hz, a '1' bit is two full periods of 2400 Hz, both doubled
+ * at 600 baud.  So a bit cell is always four half periods of the high tone
+ * or two of the low one, which makes the bit clock recoverable from the
+ * signal itself.
+ *
+ * We poll the cassette level, time the gaps between zero crossings to tell
+ * the two tones apart and reassemble bits out of whole half periods.  The
+ * recovered bits are presented on RxD and the 8251 does its own start bit
+ * hunting and mid cell sampling against the RxC we generate.
+ */
+void pc8001_base_state::cmt_reset_demod()
+{
+	m_cmt_half_2400 = 0;
+	m_cmt_half_1200 = 0;
+	// an idle line reads as a mark
+	m_cmt_usart->write_rxd(1);
+}
+
+void pc8001_base_state::cmt_update_rxc()
+{
+	// RxC runs at the baud rate times the 8251 baud rate factor; the device
+	// only counts rising edges, so the timer has to toggle at twice that
+	const int baud = BIT(m_cmt_baud_sel, 0) ? 1200 : 600;
+	const attotime period = attotime::from_hz(baud * m_cmt_br_factor * 2);
+
+	m_cmt_rxc_timer->adjust(period, 0, period);
+}
+
+TIMER_CALLBACK_MEMBER(pc8001_base_state::cmt_rxc_cb)
+{
+	m_cmt_rxc_state ^= 1;
+	m_cmt_usart->write_rxc(m_cmt_rxc_state);
+}
+
+TIMER_CALLBACK_MEMBER(pc8001_base_state::cmt_poll_cb)
+{
+	// BS2 set means the USART is wired to RS-232C instead
+	if (BIT(m_cmt_baud_sel, 1))
+		return;
+
+	if ((!m_cassette->exists()) || ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY) || ((m_cassette->get_state() & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED))
+		return;
+
+	const double in = m_cassette->input();
+	int level = m_cmt_level;
+	if (in > CMT_LEVEL)
+		level = 1;
+	else if (in < -CMT_LEVEL)
+		level = 0;
+
+	if (level == m_cmt_level)
+		return;
+	m_cmt_level = level;
+
+	// the gap since the previous crossing tells us which tone we are riding
+	const attotime now = machine().time();
+	const attotime delta = now - m_cmt_last_edge;
+	m_cmt_last_edge = now;
+
+	if (delta > attotime::from_hz(CMT_FSK_DROPOUT_HZ))
+	{
+		cmt_reset_demod();
+		return;
+	}
+
+	// four half periods per bit at 1200 baud, eight at 600
+	const u8 scale = BIT(m_cmt_baud_sel, 0) ? 1 : 2;
+
+	if (delta < attotime::from_hz(CMT_FSK_THRESHOLD_HZ))
+	{
+		m_cmt_half_1200 = 0;
+		if (++m_cmt_half_2400 >= 4 * scale)
+		{
+			m_cmt_half_2400 = 0;
+			m_cmt_usart->write_rxd(1);
+		}
+	}
+	else
+	{
+		m_cmt_half_2400 = 0;
+		if (++m_cmt_half_1200 >= 2 * scale)
+		{
+			m_cmt_half_1200 = 0;
+			m_cmt_usart->write_rxd(0);
+		}
+	}
+}
+
+/*
+ * The 8251 does not expose the baud rate factor it was programmed with, so
+ * shadow the control port to pick up the mode instruction and keep RxC in
+ * step with it.  This mirrors the device's own rule: the first control byte
+ * after a reset is the mode instruction, and the internal reset command puts
+ * it back into that state.
+ *
+ * NOTE: only correct for asynchronous mode, which is all the CMT ever uses.
+ */
+void pc8001_base_state::usart_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+	{
+		if (m_cmt_expect_mode)
+		{
+			// bits 1-0: 0 sync, 1 x1, 2 x16, 3 x64
+			static const u8 s_factors[4] = { 1, 1, 16, 64 };
+			m_cmt_br_factor = s_factors[data & 3];
+			m_cmt_expect_mode = false;
+			cmt_update_rxc();
+		}
+		else if (BIT(data, 6))
+		{
+			// internal reset, the next control byte is a mode instruction again
+			m_cmt_expect_mode = true;
+		}
+	}
+
+	m_cmt_usart->write(offset, data);
 }
 
 /*
@@ -593,6 +773,7 @@ uint8_t pc8001_state::port40_r()
 
 	data |= m_centronics_busy;
 	data |= m_centronics_ack << 1;
+	data |= cmt_cdin_r() << 2;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
 	// TODO: enable line from pc80s31k (bit 3, active_low)
@@ -748,7 +929,7 @@ void pc8001_state::pc8001_io(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x0f).r("kbd", FUNC(pc8001_kbd_device::read_direct));
 	map(0x10, 0x10).mirror(0x0f).w(FUNC(pc8001_state::port10_w));
-	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x20, 0x21).mirror(0x0e).r(I8251_TAG, FUNC(i8251_device::read)).w(FUNC(pc8001_state::usart_w));
 	map(0x30, 0x30).mirror(0x0f).w(FUNC(pc8001_state::port30_w));
 	map(0x40, 0x40).mirror(0x0f).rw(FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
 	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
@@ -1115,6 +1296,22 @@ void pc8001_base_state::machine_start()
 {
 	m_screen_reverse = false;
 
+	m_cmt_poll_timer = timer_alloc(FUNC(pc8001_base_state::cmt_poll_cb), this);
+	m_cmt_rxc_timer = timer_alloc(FUNC(pc8001_base_state::cmt_rxc_cb), this);
+	m_cmt_poll_timer->adjust(attotime::from_hz(CMT_POLL_HZ), 0, attotime::from_hz(CMT_POLL_HZ));
+	cmt_update_rxc();
+
+	save_item(NAME(m_cmt_last_edge));
+	save_item(NAME(m_cmt_spinup_until));
+	save_item(NAME(m_cmt_baud_sel));
+	save_item(NAME(m_cmt_br_factor));
+	save_item(NAME(m_cmt_half_2400));
+	save_item(NAME(m_cmt_half_1200));
+	save_item(NAME(m_cmt_motor));
+	save_item(NAME(m_cmt_level));
+	save_item(NAME(m_cmt_rxc_state));
+	save_item(NAME(m_cmt_expect_mode));
+
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -1284,6 +1481,7 @@ void pc8001_state::pc8001(machine_config &config)
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8001_state::clock_irq_w), attotime::from_hz(600));
 
 	I8251(config, I8251_TAG);
+	subdevice<i8251_device>(I8251_TAG)->rxrdy_handler().set(FUNC(pc8001_state::rxrdy_irq_w));
 
 	UPD1990A(config, m_rtc);
 
@@ -1295,7 +1493,9 @@ void pc8001_state::pc8001(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_formats(t88_cassette_formats);
+	m_cassette->set_interface("pc8801_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 0);
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 1);
 
@@ -1320,6 +1520,7 @@ void pc8001_state::pc8001(machine_config &config)
 	snapshot.set_load_callback(FUNC(pc8001_state::snapshot_cb));
 
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
+	SOFTWARE_LIST(config, "cass_n_list").set_original("pc8001_cass");
 }
 
 void pc8001mk2_state::pc8001mk2(machine_config &config)
@@ -1333,6 +1534,7 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 	RAM(config.replace(), RAM_TAG).set_default_size("64K");
 
 	SOFTWARE_LIST(config, "disk_n80_list").set_original("pc8001mk2_flop");
+	SOFTWARE_LIST(config, "cass_n80_list").set_original("pc8001mk2_cass");
 }
 
 void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
@@ -1361,6 +1563,7 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 	m_opn->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
+	SOFTWARE_LIST(config, "cass_n80sr_list").set_original("pc8001mk2sr_cass");
 }
 
 /* ROMs */

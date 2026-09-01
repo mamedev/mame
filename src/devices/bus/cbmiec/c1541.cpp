@@ -308,19 +308,6 @@ void c1541_device_base::c1541_mem(address_map &map)
 }
 
 
-uint8_t c1541_device_base::via0_pa_r()
-{
-	// dummy read to acknowledge ATN IN interrupt
-	return m_parallel_data;
-}
-
-void c1541_device_base::via0_pa_w(uint8_t data)
-{
-	if (m_other != nullptr)
-	{
-		m_other->parallel_data_w(data);
-	}
-}
 
 uint8_t c1541_device_base::via0_pb_r()
 {
@@ -389,14 +376,6 @@ void c1541_device_base::via0_pb_w(uint8_t data)
 	m_ga->atna_w(BIT(data, 4)); // triggers IEC sync
 }
 
-void c1541_device_base::via0_ca2_w(int state)
-{
-	if (m_other != nullptr)
-	{
-		m_other->parallel_strobe_w(state);
-	}
-}
-
 uint8_t c1541c_device::via0_pa_r()
 {
 	/*
@@ -417,34 +396,6 @@ uint8_t c1541c_device::via0_pa_r()
 	return !m_floppy->trk00_r();
 }
 
-
-uint8_t c1541_device_base::via1_pb_r()
-{
-	/*
-
-	    bit     signal      description
-
-	    PB0
-	    PB1
-	    PB2
-	    PB3
-	    PB4     WPS         write protect sense
-	    PB5
-	    PB6
-	    PB7     SYNC        SYNC detect line
-
-	*/
-
-	u8 data = 0;
-
-	// write protect sense
-	data |= !m_floppy->wpt_r() << 4;
-
-	// SYNC detect line
-	data |= m_ga->sync_r() << 7;
-
-	return data;
-}
 
 void c1541_device_base::via1_pb_w(uint8_t data)
 {
@@ -489,13 +440,6 @@ void c1541_device_base::atn_w(int state)
 	m_iec_sync_timer->adjust(attotime::zero);
 }
 
-void c1541_device_base::byte_w(int state)
-{
-	m_maincpu->set_input_line(M6502_SET_OVERFLOW, !state);
-
-	m_via1->write_ca1(state);
-}
-
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
@@ -506,6 +450,11 @@ void c1541_device_base::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_D64_FORMAT);
 	fr.add(FLOPPY_G64_FORMAT);
 	fr.add(fs::CBMDOS);
+}
+
+void c1541_device_base::wpt_callback(floppy_image_device *floppy, int state)
+{
+	m_via1->write_pb4(!state);
 }
 
 
@@ -521,16 +470,11 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MOS6522(config, m_via0, XTAL(16'000'000)/16);
-	m_via0->readpa_handler().set(FUNC(c1541_device_base::via0_pa_r));
 	m_via0->readpb_handler().set(FUNC(c1541_device_base::via0_pb_r));
-	m_via0->writepa_handler().set(FUNC(c1541_device_base::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c1541_device_base::via0_pb_w));
-	m_via0->cb2_handler().set(FUNC(c1541_device_base::via0_ca2_w));
 	m_via0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MOS6522(config, m_via1, XTAL(16'000'000)/16);
-	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
-	m_via1->readpb_handler().set(FUNC(c1541_device_base::via1_pb_r));
 	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
 	m_via1->writepb_handler().set(FUNC(c1541_device_base::via1_pb_w));
 	m_via1->ca2_handler().set(C64H156_TAG, FUNC(c64h156_device::soe_w));
@@ -539,7 +483,10 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 
 	C64H156(config, m_ga, XTAL(16'000'000));
 	m_ga->atn_callback().set(FUNC(c1541_device_base::atn_w));
-	m_ga->byte_callback().set(FUNC(c1541_device_base::byte_w));
+	m_ga->sync_callback().set(m_via1, FUNC(via6522_device::write_pb7));
+	m_ga->byte_callback().set_inputline(m_maincpu, M6502_SET_OVERFLOW).invert();
+	m_ga->byte_callback().append(m_via1, FUNC(via6522_device::write_ca1));
+	m_ga->yb_wr_cb().set(m_via1, FUNC(via6522_device::write_pa));
 
 	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0"));
 	connector.option_add("525ssqd", ALPS_3255190X);
@@ -592,9 +539,8 @@ ioport_constructor c1541_device_base::device_input_ports() const
 c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
-	device_c64_floppy_parallel_interface(mconfig, *this),
-	m_floppy(*this, C64H156_TAG":0:525ssqd"),
 	m_maincpu(*this, M6502_TAG),
+	m_floppy(*this, C64H156_TAG":0:525ssqd"),
 	m_via0(*this, M6522_0_TAG),
 	m_via1(*this, M6522_1_TAG),
 	m_ga(*this, C64H156_TAG),
@@ -654,6 +600,7 @@ void c1541_device_base::device_start()
 
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
+	m_floppy->setup_wpt_cb(floppy_image_device::wpt_cb(&c1541_device_base::wpt_callback, this));
 
 	// register for state saving
 	save_item(NAME(m_iec_clk));
@@ -693,24 +640,4 @@ void c1541_device_base::cbm_iec_reset(int state)
 	{
 		device_reset();
 	}
-}
-
-
-//-------------------------------------------------
-//  parallel_data_w -
-//-------------------------------------------------
-
-void c1541_device_base::parallel_data_w(u8 data)
-{
-	m_parallel_data = data;
-}
-
-
-//-------------------------------------------------
-//  parallel_strobe_w -
-//-------------------------------------------------
-
-void c1541_device_base::parallel_strobe_w(int state)
-{
-	m_via0->write_cb1(state);
 }

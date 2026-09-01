@@ -850,7 +850,7 @@ TODO: untested after copy protection
 		<year>1987</year>
 		<publisher>Gamestar</publisher>
 		<notes><![CDATA[
-4 [bombs] Illegal instruction when trying to execute auto/baseball.prg
+4 [bombs] Illegal instruction when trying to execute AUTO\BASEBALL.PRG
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -1699,7 +1699,7 @@ No sound during gameplay
 		<publisher>Hewson</publisher>
 		<notes><![CDATA[
 11 [bombs] Line 1111 Emulator for a split second
-Manually trying to execute auto/exolon.prg will crash TOS
+Manually trying to execute AUTO\EXOLON.PRG will crash TOS
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -1987,7 +1987,7 @@ Red screen with broken GFXs, tight loops at PC=10bbc
 		<publisher>Empire Interactive</publisher>
 		<notes><![CDATA[
 4 [bombs] Illegal instruction
-Trying to manually launch auto/gazzaeng.prg will just punt to TOS
+Trying to manually launch AUTO\GAZZAENG.PRG will just punt to TOS
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -2476,7 +2476,7 @@ Keeps attempting to bootstrap with no success (cycles between white and black sc
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-4 [bombs] Illegal instruction when trying to start a game "Error loading file: MAZE0.CNM"
+4 [bombs] Illegal instruction when trying to start a game "Error loading file: MAZE0.CNM" (btanb, verify game again)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -4451,7 +4451,7 @@ Random hangs, cfr. sharrier
 		<year>1989</year>
 		<publisher>Hewson</publisher>
 		<notes><![CDATA[
-11 [bombs] Line 1111 Emulator, resets TOS if trying to run auto/steel.prg manually
+11 [bombs] Line 1111 Emulator, resets TOS if trying to run AUTO\STEEL.PRG manually
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 

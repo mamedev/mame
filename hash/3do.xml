@@ -15,15 +15,130 @@ NOTES:
    later models with Anvil chipset, where the BIOS is newer instead (e.g. Road Rash, Bust a Move)
 - As per https://github.com/mamedev/mame/issues/10308#issuecomment-3779261350 several games have
   multiple indices over a given track. These are intentionally omitted until we have a solution.
+- This SW list is USA first then Japan then Europe when it comes to cloneof priority (fwiw).
+- Japanese release dates from https://refuge.tokyo/3do/3do.html
 
 -->
-<softwarelist name="3do" description="3DO CD-ROMs">
+<softwarelist name="3do" description="3DO Interactive Multiplayer CD-ROMs">
+
+	<!-- https://redump.info/disc/59952 -->
+	<software name="slayer" supported="no">
+		<!-- AD&D "2nd Edition" -->
+		<description>Advanced Dungeons &amp; Dragons: Slayer (USA)</description>
+		<year>1994</year>
+		<publisher>SSI</publisher>
+		<notes><![CDATA[
+[Sport] leaves trails on intros
+Has color bugs on main menu
+[Madam] "unsupported Packed CEL 1 0"
+3d game, doesn't work in gameplay
+]]></notes>
+		<info name="alt_title" value="Slayer"/>
+		<info name="barcode" value="0 16685 03211 3"/>
+		<info name="serial" value="EA 9107"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="slayer (usa)" sha1="13e835442a6a82458759293e8e2073526be45c3e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/20101 -->
+	<software name="aquawrld" supported="no">
+		<description>Aqua World: Umi Monogatari (Japan)</description>
+		<year>1995</year>
+		<publisher>Mizuki</publisher>
+		<notes><![CDATA[
+[CD drive] intro FMV stutter frames (note the English text running too fast is a btanb)
+[Madam] Option GFX on main menu has RMW transparency bug
+[Madam] "unsupported Packed CEL 5 0" across the application
+]]></notes>
+		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo -->
+		<info name="alt_title" value="アクア・ワールド ～海美物語～"/>
+		<info name="barcode" value="T4984824055261"/>
+		<info name="release" value="19951013"/>
+		<info name="serial" value="FZ-SJ3351"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aqua world - umi monogatari (japan)" sha1="2a929f6803823bd566b38771407ddbf559dc758e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: slayer Jp version published by T&E Soft -->
+
+	<!-- https://redump.info/disc/55338 -->
+	<software name="sailormn" supported="no">
+		<description>Bishoujo Senshi Sailor Moon S (Japan)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+[CD drive] FMVs have skipping artifacts with audio
+[Madam] "Unsupported Packed CEL 2 0" on title + "1 0" on character select + "5 0" in gameplay
+No cursor for character select, offset p2 graphics
+[DSPP] BGM too quiet on character select
+]]></notes>
+		<info name="alt_title" value="美少女戦士セーラームーンS"/>
+		<info name="barcode" value="T4984824070851"/>
+		<info name="serial" value="FZ-SJ1453"/>
+		<!-- Bandai ID: 104017-0045270-8800 -->
+		<!-- JASRAC ID: V-943187 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pretty soldier sailormoon s (japan)" sha1="06054a2a31eb20e488c4c9fbf933d29650aa8244"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/90189 -->
+	<software name="bam" supported="no">
+		<description>Bust-A-Move (USA)</description>
+		<year>1995</year>
+		<publisher>Panasonic</publisher>
+		<notes><![CDATA[
+[Madam] no GFXs for intro and title screen
+[Madam] player pointer GFX needs X flip when facing left
+Runs too slow in gameplay
+]]></notes>
+		<info name="barcode" value="0 37988 83036 7"/>
+		<info name="developer" value="Micro Cabin"/>
+		<info name="serial" value="FZ-SM0252"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bust-a-move (usa)" sha1="263755f37264d8f0f862afe977e426d3b7592452"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Puzzle Bobble published by Micro Cabin -->
+
+	<!-- https://redump.info/disc/45883 -->
+	<software name="cfodder" supported="no">
+		<description>Cannon Fodder (USA)</description>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Has major color bugs in gameplay
+"War Has Never Been So Much Fun" intro theme (after the cartoon) has low [DSPP] pitch (verify Europe too)
+]]></notes>
+		<info name="barcode" value="0 52145 93011 7"/>
+		<info name="developer" value="Krisalis"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cannon fodder (usa)" sha1="f9a55051204d4900ecd35ae44b26e808d8c96447"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- https://redump.info/disc/13798/ -->
 	<software name="cpquazar" supported="no">
 		<description>Captain Quazar (USA)</description>
 		<year>1996</year>
 		<publisher>The 3DO Company</publisher>
+		<notes><![CDATA[
+Transparency issue on title screen (shared with BIOS fz10)
+[CEL] "using existing values 0|0|1|0" in gameplay
+]]></notes>
 		<info name="barcode" value="7 90561 02379 1"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -37,6 +152,11 @@ NOTES:
 		<description>Cowboy Casino (USA)</description>
 		<year>1994</year>
 		<publisher>IntelliPlay</publisher>
+		<notes><![CDATA[
+[AMY] shifted down video output
+Laggy inputs on opponent select
+Eventually hangs afterwards, on opponent FMV
+]]></notes>
 		<info name="barcode" value="7 69139 84119 8"/>
 		<info name="serial" value="SCC-01-3DO"/>
 		<part name="cdrom" interface="cdrom">
@@ -46,11 +166,33 @@ NOTES:
 		</part>
 	</software>
 
+	<!-- https://redump.info/disc/49372 -->
+	<software name="demoman" supported="no">
+		<description>Demolition Man (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+[AMY] ugly palette on FMV playbacks
+[Madam] gameplay is full of "unsupported Packed CEL 1 0" and "5 1"
+Eventually requires optional [Player] mouse and lightgun
+]]></notes>
+		<info name="barcode" value="0 52145 93003 2"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="demolition man (usa, europe)" sha1="22c8381b3d7ff8c4f537c461c685da5777956ab3"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- https://redump.info/disc/47940/ -->
 	<software name="espnfit" supported="no">
 		<description>ESPN Fitness Pros: Step Aerobics (USA)</description>
 		<year>1994</year>
 		<publisher>IntelliPlay</publisher>
+		<notes><![CDATA[
+Main menu has masking bug on top, [AMY]?
+Not extensively tested, may have another GFX glitch on main menu
+]]></notes>
 		<info name="alt_title" value="ESPN Step Aerobics"/>
 		<info name="barcode" value="7 69139 84500 4"/>
 		<info name="serial" value="SEF-01-3DO"/>
@@ -61,11 +203,195 @@ NOTES:
 		</part>
 	</software>
 
+	<!-- https://redump.info/disc/7221 -->
+	<!-- assume identical between Retail vs. Not for Resale versions -->
+	<software name="gex" supported="no">
+		<description>Gex (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>BMG Interactive Entertainment</publisher>
+		<notes><![CDATA[
+[CD drive] FMV runs too slow, no sound, bit of stutter
+Hangs after second FMV, regardless of skipping or not
+]]></notes>
+		<!-- FIXME: Other two barcodes seen: 7 65979 63060 2, 7 68964 00502 7 -->
+		<info name="barcode" value="7 65979 61060 4"/>
+		<info name="developer" value="Crystal Dynamics"/>
+		<info name="serial" value="61060-C (USA), 61063-C (Europe)"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gex (usa, europe)" sha1="673f7932418baf31aae4d23a44c1832ab32a5552"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/6595 -->
+	<software name="megarace" supported="no">
+		<description>MegaRace (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+[CD drive] slow intro FMV, no sound. Successive FMVs have slow GFXs and fast repeating sound
+[Madam] doesn't draw background box in Subtitles select screen (transparent?)
+[Madam] has flip X bugs in gameplay, repeated enemy GFX in status bar, shows score all the time (it shouldn't?), fire shots don't draw in playfield
+Slow in gameplay
+]]></notes>
+		<info name="barcode" value="0 24294 11440 3"/>
+		<!-- ISBN: 0-7911-1440-6 -->
+		<info name="serial" value="2199610-590002/ I 074MP (USA),  /CS090047 (Europe CD print), /IC180012 (Europe back cover)"/>
+		<!-- Multi-5 subtitles regardless of console region -->
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Italian" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="megarace (usa, europe) (en,fr,de,es,it)" sha1="9104821542f60270709deae7d78375eeb8353820"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Japanese version released by Multisoft -->
+
+	<!-- https://redump.info/disc/39303 -->
+	<software name="conandl" supported="no">
+		<description>Mirai Shounen Conan: Digital Library (Japan)</description>
+		<year>1995</year>
+		<publisher>Bandai Visual</publisher>
+		<notes><![CDATA[
+[DSPP] half pitch for all sounds
+Squashed GFXs when playing back FMVs
+Patapata has only Conan (verify, does SW expect watching stuff first?)
+[Player] Patapata also keep spinning rather than giving user chance to return back
+Hangs on Puzzle, no [Player] input works
+]]></notes>
+		<info name="alt_title" value="未来少年コナン DIGITAL LIBRARY"/>
+		<info name="release" value="19951012"/>
+		<info name="serial" value="FZ-SJ7151"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mirai shounen conan - digital library (japan)" sha1="993a065460b9e9e1cdb30ba28345813ee8730aa6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/39872 -->
+	<software name="oyajihmj" supported="no">
+		<description>Oyaji Hunter Mahjong (Japan)</description>
+		<year>1995</year>
+		<publisher>Warp</publisher>
+		<notes><![CDATA[
+[DSPP] non FMV portions sounds ugly
+[Madam] "unsupported Packed CEL 1 0" on title
+[Madam] "unsupported Packed CEL 5 0" on versus screen
+"Now Loading" likely enables rotate and zoom features of the CEL
+[Madam] "unsupported Packed CEL 2 0" after loading
+]]></notes>
+		<info name="alt_title" value="おやじハンターマージャン"/>
+		<info name="barcode" value="4973934234512"/>
+		<info name="release" value="19950714"/>
+		<info name="serial" value="IMP-SF0703"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="oyaji hunter mahjong (japan)" sha1="9448121e2f088703af1285fdb2b3d013dd84413a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/55455 -->
+	<software name="plumber" supported="no">
+		<description>Plumbers Don't Wear Ties (USA)</description>
+		<year>1994</year>
+		<publisher>Kirin Entertainment</publisher>
+		<notes><![CDATA[
+[DSPP] low pitched sounds, doesn't sync correctly vs. video (cfr. new game intro)
+[Madam/AMY] No background and detail loss for choice GFXs
+[Madam] has zooming portions in places
+]]></notes>
+		<!-- assume barcode 8 10148 57406 2 is for the Limited Run Games version (same content?) -->
+		<info name="barcode" value="7 98694 68688 3"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="plumbers don't wear ties (usa)" sha1="bfad6f552e4a2656690a2c3771df9d81af9c60c1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/45884 -->
+	<software name="shanghtt" supported="no">
+		<description>Shanghai: Triple Threat (USA)</description>
+		<year>1994</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Madam] "Unsupported Packed CEL 5 1" on title screen
+Has no backgrounds in gameplay (alpha blended?)
+[DSPP] sound is too slow
+Runs too slow
+]]></notes>
+		<info name="barcode" value="0 47875 11052 6"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shanghai - triple-threat (usa)" sha1="04d57093ea06f72d92a2b7cfbca6a6fbd41f67da"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Shanghai Banri no Choujou (Japan version) released by Eletronic Arts Victor -->
+
+	<!-- https://redump.info/disc/59953 -->
+	<software name="cpubach" supported="no">
+		<description>Sid Meier's C.P.U. Bach (USA)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+[CD drive] black screen after intro, where it's supposed to show "Composing an Allemande"
+]]></notes>
+		<info name="barcode" value="0 19703 38116 3"/>
+		<!-- ISBN: 1-55884-367-1 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sid meier's c.p.u. bach (usa)" sha1="bbf57a9a0069986060fb2f46a5b40e1f10748287"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: ssf2t published by Panasonic overseas -->
+
+	<!-- https://redump.info/disc/16131 -->
+	<software name="ssf2xj" supported="no">
+		<description>Super Street Fighter II X: Grand Master Challenge (Japan)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+[AMY] sets wrong strips on intro logos
+[Sport] missing layer clearances
+[Madam] "unsupported Packed CEL 1 0" on intro + "2 0" on character select
+Intro has major GFX glitches
+Runs too slow, flip X equivalent bugs in gameplay
+Eventually requires support for [Player] Capcom stick
+]]></notes>
+		<info name="alt_title" value="スーパーストリートファイターIIX"/>
+		<!-- Power-up disc identical to retail -->
+		<info name="barcode" value="T4984824058057, 4 984824 102996 (Power-up Campaign)"/>
+		<info name="release" value="19941113"/>
+		<info name="serial" value="FZ-SJ3851, FZ-SJ3851R (Power-up Campaign)"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="super street fighter ii x - grand master challenge (japan)" sha1="7d0b498900c2711e07f7898588e71095af12b2ab"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- https://redump.info/disc/58378/ -->
 	<software name="vpreika" supported="no">
 		<description>Virtual Puppet Reika (Japan)</description>
 		<year>1994</year>
 		<publisher>Kuki</publisher>
+		<notes><![CDATA[
+[CEL] Cursor in main menu is slightly overdrawing transitional stuff
+https://youtu.be/wmSQZxUQHds likely buggy, TBD
+Not extensively tested
+]]></notes>
 		<info name="alt_title" value="バーチャル・パペット レイカ"/>
 		<info name="barcode" value="4 984824 047532"/>
 		<info name="jasrac_id" value="V-941396"/>
@@ -83,12 +409,36 @@ NOTES:
 		<description>Virtuoso (USA)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Pixelated text in main menu and gameplay
+Center of screen is too dim in gameplay, [AMY]?
+3d game, unplayable in gameplay
+]]></notes>
 		<info name="barcode" value="0 13252 01900 3"/>
 		<info name="developer" value="Elite Systems"/>
 		<info name="serial" value="DE1900"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtuoso (usa)" sha1="53dae9f7bc34f28aeb27ac4060fdc7c12ca54dd9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/88188 -->
+	<software name="whoshot" supported="no">
+		<description>Who Shot Johnny Rock? (USA)</description>
+		<year>1995</year>
+		<publisher>American Laser Games</publisher>
+		<notes><![CDATA[
+[CD drive] sound hiccups on intro FMV
+Hangs when entering gameplay (or runs incredibly slow)
+Eventually has optional [Player] lightgun and maybe mouse support
+]]></notes>
+		<info name="barcode" value="7 67861 00004 3"/>
+		<info name="serial" value="ALG 000043"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="who shot johnny rock (usa)" sha1="20d52a017e46aaadd0a0da8be77644653a94199e"/>
 			</diskarea>
 		</part>
 	</software>

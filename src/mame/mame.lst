@@ -16904,6 +16904,7 @@ ap10
 ctk530
 ctk551
 ctk601
+ctk630
 gz70sp
 
 @source:casio/ctrc1.cpp
@@ -18413,6 +18414,7 @@ kotbinsp
 kotbinyo
 kotbinyosu
 mjchuuka
+mjchuukac
 mjdchuka
 mjflove
 mjgnight
@@ -21829,6 +21831,7 @@ genius6
 genius6a
 genius6b
 happyskl
+hjdmg
 iqblocka
 iqblockf
 jking103a
@@ -26927,15 +26930,15 @@ jr200u
 kn5000
 
 @source:matsushita/kn7000.cpp
-kn6000
 kn2400
-kn2600                          // SX-KN2600, same firmware as SX-KN2400
+kn2600
+kn6000
 kn6500
 kn7000
 
 @source:matsushita/myb3k.cpp
-myb3k
 jb3000
+myb3k
 stepone
 
 @source:mattel/aquarius.cpp
@@ -32058,6 +32061,7 @@ h01jce
 
 @source:misc/haiwei.cpp
 hqdf
+unkhaiwei
 
 @source:misc/hapyfish.cpp
 hapyfsh2
@@ -39042,6 +39046,8 @@ whtforce
 @source:pinball/supstarf.cpp
 supstarf
 supstarfa
+supstarfb
+supstarfc
 
 @source:pinball/taito.cpp
 cavnegro
@@ -43291,6 +43297,11 @@ x68ksupr
 x68kxvi
 
 @source:sharp/zaurus.cpp
+zmi10
+zmi310
+zmie1
+zmie21
+zmt300s
 zsl5500
 zslc500
 zsl5600

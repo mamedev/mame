@@ -7,17 +7,21 @@
     This early real time clock card for the Apple II was released
     in 1979 by Mountain Hardware, Inc. (which became Mountain
     Computer, Inc. the following year); it was later sold as
-    The Clock. It uses a chain of battery-backed CMOS 4518 decade
-    counters counting microseconds (readable to the millisecond)
-    and 4040 ripple counters (extended by a 4013 flip-flop stage)
-    counting seconds with a period of about 388 days. A 1 second
-    interrupt is also provided.
+    The Clock and also distributed by Apple Computer (A2M0024).
+
+    The card uses a chain of battery-backed CMOS 4518 decade counters
+    counting microseconds (readable to the millisecond) and 4040
+    ripple counters (extended by a 4013 flip-flop stage) counting
+    seconds with a period of about 388 days. A 1 second interrupt is
+    also provided. (Other rates can be selected by jumpering various
+    counter outputs, but they are not supported here.)
 
     The manual recommends that this card be placed in slot #4,
     though software that supports it will usually recognize it in
     other slots as well.
 
-    The write-protect switch serves to prevent the clock from
+    The write-protect switch should be kept on except when the date
+    and time need to be set; it serves to prevent the clock from
     glitching when system power is switched off.
 
 *********************************************************************/
