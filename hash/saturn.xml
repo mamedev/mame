@@ -126,7 +126,7 @@ TODO:
 - Pro Yakyuu Greatest Nine '98 (Japan) (Satakore) [GS-9208]
 - Puyo Puyo Sun (Japan) (Satakore) [T-6609G]
 - Puyo Puyo Tsuu (Japan) (Satakore) [T-6604G]
-- Puzzle & Action: Nidoarukoto wa Sando-R (Japan) (Satakore) [T-6804G]
+- Puzzle & Action: Nidoarukoto wa Sand-R (Japan) (Satakore) [T-6804G]
 - Puzzle Bobble 2X (Japan) (Satakore) [T-1114G]
 - Puzzle Bobble 2X + Space Invaders (Japan) [T-1111G]
 - Real Bout Garou Densetsu Special (Japan) (Doukonban) [T-3119G]
@@ -5839,12 +5839,12 @@ Runs too slow, enables [SCU] hblank-in irq
 		</part>
 	</software>
 
-	<software name="sandor" supported="partial">
-		<description>Puzzle &amp; Action: Nidoarukoto wa Sando-R (Japan)</description>
+	<software name="sandr" supported="partial">
+		<description>Puzzle &amp; Action: Nidoarukoto wa Sand-R (Japan)</description>
 		<year>1996</year>
 		<publisher>CRI</publisher>
 		<notes><![CDATA[
-Equivalent to stv:sandor, essentially sharing the same issues if any.
+Equivalent to stv:sandr, essentially sharing the same issues if any.
 https://mametesters.org/view.php?id=7417
 ]]></notes>
 		<info name="serial" value="T-6802G"/>
@@ -18910,8 +18910,8 @@ Known to use [SCUDSP]
 		</part>
 	</software>
 
-	<software name="sandora" cloneof="sandor" supported="no">
-		<description>Puzzle &amp; Action: Nidoarukoto wa Sando-R (Japan, alt)</description>
+	<software name="sandra" cloneof="sandr" supported="no">
+		<description>Puzzle &amp; Action: Nidoarukoto wa Sand-R (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-6802G"/>
