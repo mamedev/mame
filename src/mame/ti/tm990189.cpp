@@ -199,6 +199,7 @@ private:
 	uint8_t m_bogus_read_save = 0U;
 };
 
+
 #define displayena_duration attotime::from_usec(4500)   /* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
 void tm990189_state::machine_start()
@@ -858,6 +859,7 @@ void tm990189_v_state::tm990_189_v(machine_config &config)
 	config.set_default_layout(layout_tm990189v);
 }
 
+
 /*
   ROM loading
 */
@@ -992,5 +994,5 @@ INPUT_PORTS_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT      CLASS             INIT        COMPANY              FULLNAME                                                                FLAGS
-COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state,   empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer",         0 )
+COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state,   empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
 COMP( 1980, 990189v, 990189, 0,      tm990_189_v, tm990_189, tm990189_v_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )
