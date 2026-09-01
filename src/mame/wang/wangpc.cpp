@@ -909,7 +909,12 @@ void wangpc_state::check_level1_interrupts()
 
 void wangpc_state::check_level2_interrupts()
 {
-	int state = !m_dma_eop || m_uart_dr || m_uart_tbre || m_fdc_dd0 || m_fdc_dd1 || m_fdc->get_irq() || m_fpu_irq || m_bus_irq2;
+	// the "door disturbed" latches are reported in the status register but
+	// are deliberately left out here: holding the line for them would keep
+	// level 2 asserted until the floppy control register is written, and
+	// since the keyboard shares this level nothing could be typed to get
+	// there - inserting a disk would wedge the machine
+	int state = !m_dma_eop || m_uart_dr || m_uart_tbre || m_fdc->get_irq() || m_fpu_irq || m_bus_irq2;
 
 	m_pic->ir2_w(state);
 }
@@ -1227,6 +1232,9 @@ void wangpc_state::on_disk0_unload(floppy_image_device *image)
 	LOG("Door 1 disturbed\n");
 
 	m_fdc_dd0 = 1;
+
+	// let the software know with a pulse, not by holding the line
+	m_pic->ir2_w(1);
 	check_level2_interrupts();
 }
 
@@ -1245,6 +1253,9 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 	LOG("Door 2 disturbed\n");
 
 	m_fdc_dd1 = 1;
+
+	// let the software know with a pulse, not by holding the line
+	m_pic->ir2_w(1);
 	check_level2_interrupts();
 }
 
