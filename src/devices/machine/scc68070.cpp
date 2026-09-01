@@ -40,7 +40,7 @@ TODO:
 
 #include "logmacro.h"
 
-#define ENABLE_UART_PRINTING (0)
+static constexpr XTAL XCKI_CLOCK = 4.9152_MHz_XTAL;
 
 //**************************************************************************
 // Register defines
@@ -240,11 +240,13 @@ void scc68070_device::cpu_space_map(address_map &map)
 
 scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scc68070_base_device(mconfig, tag, owner, clock, SCC68070, address_map_constructor(FUNC(scc68070_device::internal_map), this))
+	, device_serial_interface(mconfig, *this)
 	, m_iack2_callback(*this, autovector(2))
 	, m_iack4_callback(*this, autovector(4))
 	, m_iack5_callback(*this, autovector(5))
 	, m_iack7_callback(*this, autovector(7))
 	, m_uart_tx_callback(*this)
+	, m_txd_cb(*this)
 	, m_uart_rtsn_callback(*this)
 	, m_i2c_scl_callback(*this)
 	, m_i2c_sdaw_callback(*this)
@@ -307,12 +309,9 @@ void scc68070_device::device_start()
 	save_item(NAME(m_uart.clock_select));
 	save_item(NAME(m_uart.command_register));
 	save_item(NAME(m_uart.receive_holding_register));
-	save_item(NAME(m_uart.receive_pointer));
-	save_item(NAME(m_uart.receive_buffer));
 	save_item(NAME(m_uart.transmit_holding_register));
-	save_item(NAME(m_uart.transmit_pointer));
-	save_item(NAME(m_uart.transmit_buffer));
 	save_item(NAME(m_uart.transmit_ctsn));
+	save_item(NAME(m_uart.transmit_break));
 
 	save_item(NAME(m_timers.timer_status_register));
 	save_item(NAME(m_timers.timer_control_register));
@@ -340,12 +339,6 @@ void scc68070_device::device_start()
 
 	m_timers.timer0_timer = timer_alloc(FUNC(scc68070_device::timer0_callback), this);
 	m_timers.timer0_timer->adjust(attotime::never);
-
-	m_uart.rx_timer = timer_alloc(FUNC(scc68070_device::rx_callback), this);
-	m_uart.rx_timer->adjust(attotime::never);
-
-	m_uart.tx_timer = timer_alloc(FUNC(scc68070_device::tx_callback), this);
-	m_uart.tx_timer->adjust(attotime::never);
 
 	m_i2c.timer = timer_alloc(FUNC(scc68070_device::i2c_callback), this);
 	m_i2c.timer->adjust(attotime::never);
@@ -380,14 +373,18 @@ void scc68070_device::reset_peripheral_state()
 	m_i2c.clocks = 0;
 
 	m_uart.mode_register = 0;
-	m_uart.status_register = USR_TXRDY;
+	m_uart.status_register = USR_TXRDY | USR_TXEMT;
 	m_uart.clock_select = 0;
 	m_uart.command_register = 0;
 	m_uart.transmit_holding_register = 0;
 	m_uart.receive_holding_register = 0;
-	m_uart.receive_pointer = -1;
-	m_uart.transmit_pointer = -1;
 	m_uart.transmit_ctsn = true;
+	m_uart.transmit_break = false;
+	receive_register_reset();
+	transmit_register_reset();
+	m_txd_cb(1);
+	recalc_framing();
+	recalc_baud();
 
 	m_timers.timer_status_register = 0;
 	m_timers.timer_control_register = 0;
@@ -419,8 +416,6 @@ void scc68070_device::reset_peripheral_state()
 		m_mmu.desc[index].base = 0;
 	}
 
-	m_uart.rx_timer->adjust(attotime::never);
-	m_uart.tx_timer->adjust(attotime::never);
 	m_i2c.timer->adjust(attotime::never);
 
 	set_timer_callback(0);
@@ -625,118 +620,107 @@ TIMER_CALLBACK_MEMBER(scc68070_device::timer0_callback)
 void scc68070_device::uart_ctsn(int state)
 {
 	m_uart.transmit_ctsn = state ? true : false;
+	if (started())
+		check_for_tx_start();
+}
+
+void scc68070_device::recalc_baud()
+{
+	static const uint32_t s_divisors[8] = { 65536, 32768, 16384, 4096, 2048, 1024, 512, 256 };
+
+	const uint8_t cls = m_uart.clock_select;
+	const uint32_t source = BIT(cls, 7) ? XCKI_CLOCK.value() : (clock() / 4);
+
+	set_rcv_rate(source, s_divisors[(cls >> 4) & 7]);
+	set_tra_rate(source, s_divisors[cls & 7]);
+}
+
+void scc68070_device::recalc_framing()
+{
+	const uint8_t umr = m_uart.mode_register;
+	const int data_bits = BIT(umr, 0) ? 8 : 7;
+	const parity_t parity = BIT(umr, 3) ? (BIT(umr, 2) ? PARITY_EVEN : PARITY_ODD) : PARITY_NONE;
+	const stop_bits_t stop_bits = BIT(umr, 1) ? STOP_BITS_2 : STOP_BITS_1;
+
+	set_data_frame(1, data_bits, parity, stop_bits);
+}
+
+void scc68070_device::check_for_tx_start()
+{
+	if (((m_uart.command_register >> 2) & 3) != 1)
+		return;
+
+	if (m_uart.transmit_ctsn && (m_uart.mode_register & UMR_TXC))
+		return;
+
+	if (m_uart.transmit_break)
+		return;
+
+	const bool not_ready = m_uart.status_register & USR_TXRDY;
+	const bool shifter_busy = !is_transmit_register_empty();
+	if (not_ready || shifter_busy)
+		return;
+
+	LOGMASKED(LOG_MORE_UART, "check_for_tx_start: Transmitting %02x\n", m_uart.transmit_holding_register);
+	transmit_register_setup(m_uart.transmit_holding_register);
+	m_uart_tx_callback(m_uart.transmit_holding_register); // Temporary due to tap
+	m_uart.status_register &= ~USR_TXEMT;
+	m_uart.status_register |= USR_TXRDY;
+	m_uart_tx_int = true;
+	update_ipl();
+}
+
+void scc68070_device::tra_callback()
+{
+	m_txd_cb(m_uart.transmit_break ? 0 : transmit_register_get_data_bit());
+}
+
+void scc68070_device::tra_complete()
+{
+	m_uart.status_register |= USR_TXEMT;
+	check_for_tx_start();
+}
+
+void scc68070_device::rcv_complete()
+{
+	receive_register_extract();
+
+	if ((m_uart.command_register & 3) != 1)
+		return;
+
+	if (is_receive_framing_error())
+		m_uart.status_register |= USR_FE;
+	if (is_receive_parity_error())
+		m_uart.status_register |= USR_PE;
+
+	if (m_uart.status_register & USR_RXRDY)
+	{
+		LOGMASKED(LOG_UART, "rcv_complete: receiver overrun\n");
+		m_uart.status_register |= USR_OE;
+		return;
+	}
+
+	m_uart.receive_holding_register = get_received_char();
+	LOGMASKED(LOG_UART, "rcv_complete: Received %02x\n", m_uart.receive_holding_register);
+
+	m_uart.status_register |= USR_RXRDY;
+	m_uart_rx_int = true;
+	update_ipl();
 }
 
 void scc68070_device::uart_rx(uint8_t data)
 {
-	if (m_uart.receive_pointer >= int16_t(std::size(m_uart.receive_buffer) - 1))
+	if (m_uart.status_register & USR_RXRDY)
 	{
 		LOGMASKED(LOG_UART, "%s: uart_rx: receiver overrun, discarding %02x\n", machine().describe_context(), data);
 		m_uart.status_register |= USR_OE;
 		return;
 	}
-	m_uart.receive_pointer++;
-	m_uart.receive_buffer[m_uart.receive_pointer] = data;
-}
 
-void scc68070_device::uart_tx(uint8_t data)
-{
-	if(ENABLE_UART_PRINTING)
-	{
-		// Static variable does not survive load state.
-		static std::string s_line;
-		if (data == '\r' || data == '\n')
-		{
-			if (!s_line.empty())
-			{
-				logerror("UART: %s\n", s_line);
-				s_line.clear();
-			}
-		}
-		else
-		{
-			s_line += char(data);
-		}
-	}
-
-	if (m_uart.transmit_pointer >= int16_t(std::size(m_uart.transmit_buffer) - 1))
-	{
-		LOGMASKED(LOG_UART, "%s: uart_tx: transmit buffer full, discarding %02x\n", machine().describe_context(), data);
-		return;
-	}
-	m_uart.transmit_pointer++;
-	m_uart.transmit_buffer[m_uart.transmit_pointer] = data;
-	m_uart.status_register &= ~USR_TXEMT;
-}
-
-TIMER_CALLBACK_MEMBER(scc68070_device::rx_callback)
-{
-	if ((m_uart.command_register & 3) == 1)
-	{
-		if (m_uart.receive_pointer >= 0)
-		{
-			m_uart.status_register |= USR_RXRDY;
-		}
-		else
-		{
-			m_uart.status_register &= ~USR_RXRDY;
-		}
-
-		m_uart.receive_holding_register = m_uart.receive_buffer[0];
-
-		if (m_uart.receive_pointer > -1)
-		{
-			LOGMASKED(LOG_UART, "scc68070_rx_callback: Receiving %02x\n", m_uart.receive_holding_register);
-
-			m_uart_rx_int = true;
-			update_ipl();
-
-			m_uart.status_register |= USR_RXRDY;
-		}
-		else
-		{
-			m_uart.status_register &= ~USR_RXRDY;
-		}
-	}
-	else
-	{
-		m_uart.status_register &= ~USR_RXRDY;
-	}
-}
-
-TIMER_CALLBACK_MEMBER(scc68070_device::tx_callback)
-{
-	if (((m_uart.command_register >> 2) & 3) != 1)
-	{
-		return;
-	}
-
-	if (m_uart.transmit_pointer > -1)
-	{
-		if (m_uart.transmit_ctsn && BIT(m_uart.mode_register, 4))
-		{
-			return;
-		}
-
-		m_uart.transmit_holding_register = m_uart.transmit_buffer[0];
-		m_uart_tx_callback(m_uart.transmit_holding_register);
-
-		LOGMASKED(LOG_MORE_UART, "tx_callback: Transmitting %02x\n", m_uart.transmit_holding_register);
-		for(int index = 0; index < m_uart.transmit_pointer; index++)
-		{
-			m_uart.transmit_buffer[index] = m_uart.transmit_buffer[index+1];
-		}
-		m_uart.transmit_pointer--;
-
-		m_uart.status_register |= USR_TXRDY;
-		m_uart_tx_int = true;
-		update_ipl();
-	}
-
-	if (m_uart.transmit_pointer < 0)
-	{
-		m_uart.status_register |= USR_TXEMT | USR_TXRDY;
-	}
+	m_uart.receive_holding_register = data;
+	m_uart.status_register |= USR_RXRDY;
+	m_uart_rx_int = true;
+	update_ipl();
 }
 
 uint8_t scc68070_device::lir_r()
@@ -1330,6 +1314,7 @@ void scc68070_device::umr_w(uint8_t data)
 {
 	LOGMASKED(LOG_MORE_UART, "%s: UART Mode Register Write: %02x\n", machine().describe_context(), data);
 	m_uart.mode_register = data;
+	recalc_framing();
 }
 
 uint8_t scc68070_device::usr_r()
@@ -1340,7 +1325,7 @@ uint8_t scc68070_device::usr_r()
 		m_uart.status_register |= (1 << 1);
 		LOGMASKED(LOG_MORE_UART, "%s: UART Status Register Read: %02x\n", machine().describe_context(), m_uart.status_register);
 	}
-	return m_uart.status_register | 0x08; // hack for magicard
+	return m_uart.status_register;
 }
 
 uint8_t scc68070_device::ucsr_r()
@@ -1356,12 +1341,7 @@ void scc68070_device::ucsr_w(uint8_t data)
 	LOGMASKED(LOG_UART, "%s: UART Clock Select Write: %02x\n", machine().describe_context(), data);
 	m_uart.clock_select = data;
 
-	static const uint32_t s_baud_divisors[8] = { 65536, 32768, 16384, 4096, 2048, 1024, 512, 256 };
-
-	attotime rx_rate = attotime::from_ticks(s_baud_divisors[(data >> 4) & 7] * 10, 4915200);
-	attotime tx_rate = attotime::from_ticks(s_baud_divisors[data & 7] * 10, 4915200);
-	m_uart.rx_timer->adjust(rx_rate, 0, rx_rate);
-	m_uart.tx_timer->adjust(tx_rate, 0, tx_rate);
+	recalc_baud();
 }
 
 uint8_t scc68070_device::ucr_r()
@@ -1375,35 +1355,55 @@ uint8_t scc68070_device::ucr_r()
 void scc68070_device::ucr_w(uint8_t data)
 {
 	LOGMASKED(LOG_MORE_UART, "%s: UART Command Register Write: %02x\n", machine().describe_context(), data);
+	const bool was_enabled = (m_uart.command_register & 3) == 1;
 	m_uart.command_register = data;
-	const uint8_t misc_command = (data & 0x70) >> 4;
+	if (!was_enabled && (data & 3) == 1)
+		receive_register_reset();
+
+	const uint8_t misc_command = (data & 0xf0) >> 4;
 	switch (misc_command)
 	{
 	case 0x2: // Reset receiver
 		LOGMASKED(LOG_MORE_UART, "%s: Reset receiver\n", machine().describe_context());
-		m_uart.receive_pointer = -1;
-		m_uart.command_register &= 0xf0;
+		receive_register_reset();
+		m_uart.status_register &= ~USR_RXRDY;
+		m_uart.command_register &= 0xfc;
 		m_uart.receive_holding_register = 0x00;
+		m_uart_rx_int = false;
+		update_ipl();
 		break;
 	case 0x3: // Reset transmitter
 		LOGMASKED(LOG_MORE_UART, "%s: Reset transmitter\n", machine().describe_context());
-		m_uart.transmit_pointer = -1;
+		transmit_register_reset();
 		m_uart.status_register |= USR_TXEMT | USR_TXRDY;
-		m_uart.command_register &= 0xf0;
+		m_uart.command_register &= 0xf3;
 		m_uart.transmit_holding_register = 0x00;
+		m_uart_tx_int = false;
+		update_ipl();
 		break;
 	case 0x4: // Reset error status
 		LOGMASKED(LOG_MORE_UART, "%s: Reset error status\n", machine().describe_context());
-		m_uart.status_register &= ~(USR_RB | USR_FE | USR_PE | USR_OE); // Clear error bits in USR
-		m_uart.command_register &= 0xf0;
+		m_uart.status_register &= ~(USR_RB | USR_FE | USR_PE | USR_OE);
 		break;
 	case 0x6: // Start break
-		LOGMASKED(LOG_MORE_UART, "%s: Start break (not yet implemented)\n", machine().describe_context());
+		LOGMASKED(LOG_MORE_UART, "%s: Start break\n", machine().describe_context());
+		if (!m_uart.transmit_break)
+		{
+			m_uart.transmit_break = true;
+			m_txd_cb(0);
+		}
 		break;
 	case 0x7: // Stop break
-		LOGMASKED(LOG_MORE_UART, "%s: Stop break (not yet implemented)\n", machine().describe_context());
+		LOGMASKED(LOG_MORE_UART, "%s: Stop break\n", machine().describe_context());
+		if (m_uart.transmit_break)
+		{
+			m_uart.transmit_break = false;
+			m_txd_cb(1);
+		}
 		break;
 	}
+
+	check_for_tx_start();
 }
 
 uint8_t scc68070_device::uth_r()
@@ -1417,9 +1417,9 @@ uint8_t scc68070_device::uth_r()
 void scc68070_device::uth_w(uint8_t data)
 {
 	LOGMASKED(LOG_MORE_UART, "%s: UART Transmit Holding Register Write: %02x ('%c')\n", machine().describe_context(), data, (data >= 0x20 && data < 0x7f) ? data : ' ');
-	uart_tx(data);
 	m_uart.transmit_holding_register = data;
-	m_uart.status_register &= ~USR_TXRDY;
+	m_uart.status_register &= ~(USR_TXRDY | USR_TXEMT);
+	check_for_tx_start();
 }
 
 uint8_t scc68070_device::urh_r()
@@ -1435,15 +1435,7 @@ uint8_t scc68070_device::urh_r()
 			update_ipl();
 		}
 
-		m_uart.receive_holding_register = m_uart.receive_buffer[0];
-		if (m_uart.receive_pointer >= 0)
-		{
-			for(int index = 0; index < m_uart.receive_pointer; index++)
-			{
-				m_uart.receive_buffer[index] = m_uart.receive_buffer[index + 1];
-			}
-			m_uart.receive_pointer--;
-		}
+		m_uart.status_register &= ~USR_RXRDY;
 	}
 	return m_uart.receive_holding_register;
 }
