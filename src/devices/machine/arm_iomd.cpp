@@ -866,13 +866,13 @@ void arm_iomd_device::sound_drq(int state)
 	{
 		if (!m_sndbuffer_ok[m_sndcur_buffer])
 			return;
+		for (int i = 0; i < 4; i++)
+		{
+			m_vidc->enqueue32_fifo(m_host_space->read_dword(m_sndcur));
+			m_sndcur += 4;
+		}
 
-		for (int ch = 0; ch < 2; ch++)
-			m_vidc->write_dac32(ch, (m_host_space->read_word(m_sndcur + ch * 2)));
-
-		m_sndcur += 4;
-
-		if (m_sndcur >= m_sndend)
+		if (m_sndcur > m_sndend)
 		{
 			trigger_irq<IRQDMA>(0x10);
 

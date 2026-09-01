@@ -174,6 +174,7 @@ protected:
 	virtual u32 get_pixel_clock() override;
 
 	virtual u32 get_sound_clock() override;
+	virtual bool play_fifo_sample() override;
 
 private:
 	void vidc20_pal_data_display_w(offs_t offset, u32 data);

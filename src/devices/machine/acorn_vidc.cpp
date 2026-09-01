@@ -687,6 +687,26 @@ void arm_vidc20_device::device_reset()
 	write_dac32(1, 0);
 }
 
+bool arm_vidc20_device::play_fifo_sample()
+{
+	if (m_sound_fifo.empty()) return true;
+	if (m_sdac)
+	{
+		write_dac(m_sound_fifo_channel&7, m_sound_fifo.dequeue());
+		m_sound_fifo_channel++;
+		m_sound_fifo_channel&=7;
+	}
+	else if (m_dac_serial_mode)
+	{
+		s16 sample = m_sound_fifo.dequeue()&0xff;
+		sample |= (u16)m_sound_fifo.dequeue()<<8;
+		write_dac32((m_sound_fifo_channel&2)>>1,sample);
+		m_sound_fifo_channel+=2;
+		m_sound_fifo_channel&=7;
+	}
+	return m_sound_fifo.empty();
+}
+
 inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
 {
 	// TODO: ext hookup, supremacy plus other stuff according to the manual
