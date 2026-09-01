@@ -482,9 +482,12 @@ protected:
 	u8 m_reflection = 0;
 	bool m_cullflip = false;
 	u8 m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES] = { };
-	int m_SurfaceNormalFormat = 0;
 	unsigned m_LitSurfaceCount = 0;
 	unsigned m_LitSurfaceIndex = 0;
+	int m_LitSurfaceWidth = 0;
+	int m_LitSurfaceIntensity = 0;
+	bool m_LitSurfaceGouraud = false;
+	bool m_LitSurfaceTriangles = false;
 	int m_pointrom_size = 0;
 	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
