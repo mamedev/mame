@@ -370,7 +370,7 @@ void acorn_memc_device::do_sound_dma()
 	for (int i = 0; i < 4; i++)
 	{
 		if (m_vidc.found())
-			m_vidc->enqueue_fifo(m_space->read_dword(dram_address(m_sndcur)));
+			m_vidc->enqueue32_fifo(m_space->read_dword(dram_address(m_sndcur)));
 		m_sndcur += 4;
 	}
 	if (m_sndcur > m_sndendcur)

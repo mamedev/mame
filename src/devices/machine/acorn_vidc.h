@@ -41,7 +41,7 @@ public:
 	// MEMC comms
 	void write_vram(u32 offset, u8 data) { m_data_vram[offset & (m_data_vram_mask)] = data; }
 	void write_cram(u32 offset, u8 data) { m_cursor_vram[offset & (m_cursor_vram_mask)] = data; }
-	void enqueue_fifo(u32 data);
+	void enqueue32_fifo(u32 data);
 	void write_dac(u8 channel, u8 data);
 	void update_sound_mode(bool state) { m_sound_mode = state; refresh_sound_frequency(); }
 	void set_cursor_enable(bool state) { m_cursor_enable = state; }

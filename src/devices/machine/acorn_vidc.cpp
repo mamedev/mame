@@ -458,7 +458,7 @@ void acorn_vidc10_device::sound_frequency_w(u32 data)
 //  MEMC comms
 //**************************************************************************
 
-void acorn_vidc10_device::enqueue_fifo(u32 data)
+void acorn_vidc10_device::enqueue32_fifo(u32 data)
 {
 	// for each 32 bit dword sent to the VIDC, the sample order is the
 	// lowest byte first, packed. i.e. bytes 3,2,1,0 in that order,
