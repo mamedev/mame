@@ -84,9 +84,9 @@
                  -------- -------d  Disable tilemap layer 0
         F04      tttttttt --------  Rowscroll/select table page number
                  -------- --i-----  Inhibit rowscroll/rowselect for tilemap layer 3
-                                    (with rowscroll enabled: clip window 3 is a line window)
+                                    (clip window 3 becomes a line window fed by its tables)
                  -------- ---i----  Inhibit rowscroll/rowselect for tilemap layer 2
-                                    (with rowscroll enabled: clip window 2 is a line window)
+                                    (clip window 2 becomes a line window fed by its tables)
                  -------- ----s---  Enable rowselect for tilemap layer 3
                  -------- -----s--  Enable rowselect for tilemap layer 2
                  -------- ------c-  Enable rowscroll for tilemap layer 3
@@ -565,12 +565,12 @@ TILE_GET_INFO_MEMBER(segas32_state::get_text_tile_info)
     than per-screen.  Two of the five clipping windows can be driven this way,
     each from the line table of one rowscroll layer:
 
-      - $31FF04 bit 4 set while bit 0 is set (NBG2 inhibited with its rowscroll
-        still enabled): clipping window 2 takes its left edge from the NBG2
-        rowscroll group ($x000) and its right edge from the NBG2 rowselect
-        group ($x200), one entry per scanline.
-      - $31FF04 bit 5 set while bit 1 is set: clipping window 3 likewise, from
-        the NBG3 groups ($x100 and $x300).
+      - $31FF04 bit 4 (NBG2 rowscroll/rowselect inhibited): clipping window 2
+        takes its left edge from the NBG2 rowscroll group ($x000) and its
+        right edge from the NBG2 rowselect group ($x200), one entry per
+        scanline.
+      - $31FF04 bit 5 (NBG3 inhibited): clipping window 3 likewise, from the
+        NBG3 groups ($x100 and $x300).
 
     The window keeps the top and bottom of its register rectangle; only the
     horizontal edges come from the table, 9 bits each like the registers, and
@@ -582,9 +582,14 @@ TILE_GET_INFO_MEMBER(segas32_state::get_text_tile_info)
     matching footage of an original PCB.  titlef is a two-monitor game and
     uses both: the left monitor's NBG0/NBG2 sit on window 2 and the right
     monitor's NBG1/NBG3 on window 3, each fed the ring horizon of its own
-    camera, which is what shows the two windows to be independent.  The
-    arming condition (inhibit together with the rowscroll enable) is inferred
-    from those two games rather than traced.
+    camera, which is what shows the two windows to be independent.  jpark
+    cuts player 1's raptor-tunnel flashlight out of the NBG2 darkness with
+    window 2; player 2's light is a hole in the NBG2 tiles themselves, so
+    with player 2 alone the table stays zero over a full-screen clip-out
+    rectangle and the window has to fall away, which is what reading a zero
+    row literally gives.  All three games leave the layer's rowscroll enable
+    set next to the inhibit bit; the inhibit bit alone is taken as the
+    switch.
 */
 
 void segas32_state::build_clip_extents(uint16_t *extent, const rectangle *clips, int mask, const rectangle &tempclip)
@@ -676,10 +681,10 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		if (i & clipmask)
 			build_clip_extents(&list->extent[i][0], clips, i, tempclip);
 
-	// windows 2 and 3 are line windows while their rowscroll layer is inhibited with rowscroll enabled
+	// windows 2 and 3 are line windows while their rowscroll layer is inhibited
 	const uint16_t rowctl = m_videoram[0x1ff04/2];
 	uint16_t const *const table = &m_videoram[(rowctl >> 10) * 0x400];
-	const int linemask = ((BIT(rowctl, 4) && BIT(rowctl, 0)) ? 0x04 : 0) | ((BIT(rowctl, 5) && BIT(rowctl, 1)) ? 0x08 : 0);
+	const int linemask = (BIT(rowctl, 4) ? 0x04 : 0) | (BIT(rowctl, 5) ? 0x08 : 0);
 
 	// loop over scanlines and build extents
 	for (int y = tempclip.min_y; y < tempclip.max_y; y++)
