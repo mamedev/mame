@@ -217,7 +217,7 @@ floppy_connector::floppy_connector(const machine_config &mconfig, const char *ta
 	device_slot_interface(mconfig, *this),
 	formats(nullptr),
 	m_use_sound(false),
-	m_samples(nullptr),
+	m_sample_set(nullptr),
 	m_sectoring_type(floppy_image::SOFT)
 {
 }
@@ -240,9 +240,10 @@ void floppy_connector::enable_sound(bool use_sound)
 // Activate floppy sounds with lists for various formats
 //------------------------------------------------------
 
-void floppy_connector::enable_sound(floppy_sound_samples *samples)
+void floppy_connector::enable_sound(const char *samplename)
 {
-	m_samples = samples;
+	if (samplename == nullptr) samplename = "default";
+	m_sample_set = samplename;
 	m_use_sound = true;
 }
 
@@ -569,7 +570,7 @@ void floppy_image_device::device_start()
 	floppy_connector *conn = dynamic_cast<floppy_connector*>(device().owner());
 	if (conn != nullptr)  // just in case that the floppy connects to something else
 	{
-		m_sound_out->set_samples(conn->get_samples(), m_form_factor, m_tracks);
+		m_sound_out->set_samples(conn->get_samples_name(), m_form_factor, m_tracks);
 		m_make_sound = conn->use_sound();
 	}
 

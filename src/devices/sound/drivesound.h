@@ -126,6 +126,12 @@ public:
 	/* Search for a suitable seek sample. */
 	int find_seek(double rate, int track, int dir, double& pitch) const;
 
+	/* Append this sample collection to the one in the argument. */
+	void append_to(floppy_sound_samples&);
+
+	/* Delivers the length of the sample list. */
+	int count() { return m_fulllist.size(); }
+
 private:
 	enum
 	{
@@ -145,8 +151,8 @@ private:
 		int maxrate = 0;     // max rate for pitching up the seek sample
 		int spintype = 0;    // type for spin entries
 		int dir = BOTH;      // Direction of the seek or step
-		const char *directory;  // directory where the sample is stored
-		const char *filename;
+		std::string directory;  // directory where the sample is stored
+		std::string filename;
 	};
 
 	std::string m_basedir;          // Subdirectory which contains the samples
@@ -167,19 +173,20 @@ public:
 	void unload() { m_firstturn = true; }
 	bool samples_loaded() { return m_samples_available; }
 	void register_for_save_states();
-	void set_samples(floppy_sound_samples *samples, int form_factor, int maxtrack);
+	void set_samples(const char *name, int form_factor, int maxtrack);
 
 protected:
 	void device_start() override ATTR_COLD;
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	bool load_xml(emu_file &file, int maxtrack, const char* devname);
+
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
 	sound_stream*   m_sound;
 
-	floppy_sound_samples* m_samplelist;
-	floppy_sound_samples m_default_samples;
+	floppy_sound_samples m_samples;
 
 	int    m_max_track;
 	int    m_last_track;

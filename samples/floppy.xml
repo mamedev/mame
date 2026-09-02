@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+
+<drivesound>
+    <!-- Default samples for 5.25 -->
+    <drive name="default" description="Default 5.25&quot; Floppy drive" path="floppy" formfactor="5.25">
+        <spin phase="start" mode="empty" file="525_spin_start_empty"/>
+        <spin phase="start" mode="loaded" file="525_spin_start_loaded"/>
+        <spin phase="run" mode="empty" file="525_spin_empty"/>
+        <spin phase="run" mode="loaded" file="525_spin_loaded"/>
+        <spin phase="stop" mode="empty" file="525_spin_end"/>
+        <spin phase="stop" mode="loaded" file="525_spin_end"/>
+        <step file="525_step_1_1"/>
+        <seek nomrate="6" maxrate="9" file="525_seek_6ms"/>
+        <seek nomrate="12" maxrate="15" file="525_seek_12ms"/>
+        <seek nomrate="20" maxrate="50" file="525_seek_20ms"/>
+     </drive>
+
+     <!-- Default samples for 3.5 -->
+     <drive name="default" description="Default 3.5&quot; Floppy drive" path="floppy" formfactor="3.5">
+        <spin phase="start" mode="empty" file="35_spin_start_empty"/>
+        <spin phase="start" mode="loaded" file="35_spin_start_loaded"/>
+        <spin phase="run" mode="empty" file="35_spin_empty"/>
+        <spin phase="run" mode="loaded" file="35_spin_loaded"/>
+        <spin phase="stop" mode="empty" file="35_spin_end"/>
+        <spin phase="stop" mode="loaded" file="35_spin_end"/>
+        <step file="35_step_1_1"/>
+        <seek nomrate="2" maxrate="3" file="35_seek_2ms"/>
+        <seek nomrate="6" maxrate="9" file="35_seek_6ms"/>
+        <seek nomrate="12" maxrate="15" file="35_seek_12ms"/>
+        <seek nomrate="20" maxrate="50" file="35_seek_20ms"/>
+     </drive>
+
+     <!-- Specific samples -->
+     <drive name="c1541" description="C1541 Floppy Drive" path="floppy_c64" formfactor="5.25">
+        <spin phase="start" mode="empty" file="c1541_spin_start_empty"/>
+        <spin phase="start" mode="loaded" file="c1541_spin_start_loaded"/>
+        <spin phase="run" mode="empty" file="c1541_spin_empty"/>
+        <spin phase="run" mode="loaded" file="c1541_spin_loaded"/>
+        <spin phase="stop" mode="empty" file="c1541_spin_end_empty"/>
+        <spin phase="stop" mode="loaded" file="c1541_spin_end_loaded"/>
+        <step from="0" to="99" file="c1541_step"/>
+        <step from="-1" to="-1" file="c1541_step-1"/>
+        <seek from="0" to="99" nomrate="16" maxrate="50" file="c1541_seek_16"/>
+        <seek from="-1" to="-1" nomrate="15" maxrate="50" file="c1541_track-1"/>
+     </drive>
+
+     <drive name="a2diskiing" description="Apple II Floppy Drive" path="floppy_apple" formfactor="5.25">
+        <spin phase="start" mode="loaded" file="spin_start_loaded"/>
+        <spin phase="run" mode="loaded" file="spin_loaded"/>
+        <spin phase="stop" mode="loaded" file="spin_end_loaded"/>
+        <step file="step"/>
+        <seek nomrate="13" maxrate="20" file="seek"/>
+     </drive>
+ </drivesound>

@@ -436,8 +436,8 @@ public:
 	// Sound support
 	bool use_sound() { return m_use_sound; }
 	void enable_sound(bool doit = true);
-	void enable_sound(floppy_sound_samples *samples);
-	floppy_sound_samples *get_samples() { return m_samples; }
+	void enable_sound(const char *sampleset);
+	const char *get_samples_name() { return m_sample_set; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -447,7 +447,7 @@ private:
 	std::function<void (format_registration &fr)> formats;
 
 	bool m_use_sound;
-	floppy_sound_samples *m_samples;
+	const char* m_sample_set;
 
 	uint32_t m_sectoring_type;
 };
