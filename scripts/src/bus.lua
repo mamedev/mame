@@ -140,6 +140,8 @@ if BUSES["A2BUS"] then
 		MAME_DIR .. "src/devices/bus/a2bus/corvfdc01.h",
 		MAME_DIR .. "src/devices/bus/a2bus/corvfdc02.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/corvfdc02.h",
+		MAME_DIR .. "src/devices/bus/a2bus/covox_smaster.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/covox_smaster.h",
 		MAME_DIR .. "src/devices/bus/a2bus/excel9.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/excel9.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.cpp",

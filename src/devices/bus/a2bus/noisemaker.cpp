@@ -63,7 +63,7 @@ u8 a2bus_noisemaker_device::read_c0nx(u8 offset)
 	if (BIT(offset, 0))
 		return m_psg->data_r();
 	else
-		return 0xff; // BDIR1 = BC1 = 0, so this should be open bus
+		return get_open_bus(); // BDIR1 = BC1 = 0, so this should be open bus
 }
 
 void a2bus_noisemaker_device::write_c0nx(u8 offset, u8 data)
