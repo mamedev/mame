@@ -756,7 +756,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 				{
 					if (BIT(sect, linesorted[j]))
 					{
-						const rectangle *cur = &lineclips[linesorted[j]];
+						const rectangle &cur = lineclips[linesorted[j]];
 
 						if (extent != &list->extent[32 + y][1] && cur.min_x <= extent[-1])
 						{
