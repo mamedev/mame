@@ -3333,16 +3333,18 @@ static void do_dump_metadata(parameters_map &params)
 		else
 		{
 			// flush to stdout
-			// FIXME: check for errors
-			fwrite(buffer.data(), 1, buffer.size(), stdout);
-			fflush(stdout);
+			if (fwrite(buffer.data(), 1, buffer.size(), stdout) != buffer.size())
+				report_error(1, "Error writing metadata to stdout");
+			if (fflush(stdout) != 0)
+				report_error(1, "Error flushing metadata to stdout");
 		}
 	}
 	catch (...)
 	{
 		// delete the output file
 		output_file.reset();
-		osd_file::remove(*output_file_str->second);
+		if (output_file_str != params.end())
+			osd_file::remove(*output_file_str->second);
 		throw;
 	}
 }
