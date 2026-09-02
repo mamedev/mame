@@ -6042,6 +6042,8 @@ if BUSES["TMC600"] then
 	files {
 		MAME_DIR .. "src/devices/bus/tmc600/euro.cpp",
 		MAME_DIR .. "src/devices/bus/tmc600/euro.h",
+		MAME_DIR .. "src/devices/bus/tmc600/ram.cpp",
+		MAME_DIR .. "src/devices/bus/tmc600/ram.h",
 	}
 end
 
