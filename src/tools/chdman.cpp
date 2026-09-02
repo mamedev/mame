@@ -309,29 +309,32 @@ class chd_rawfile_compressor : public chd_file_compressor
 {
 public:
 	// construction/destruction
-	chd_rawfile_compressor(util::random_read &file, std::uint64_t offset = 0, std::uint64_t maxoffset = std::numeric_limits<std::uint64_t>::max())
+	chd_rawfile_compressor(util::random_read &file, std::uint64_t offset, std::uint64_t maxoffset)
 		: m_file(file)
 		, m_offset(offset)
+		, m_maxoffset(maxoffset)
 	{
-		// TODO: what to do about error getting file size?
-		std::uint64_t filelen;
-		if (!file.length(filelen))
-			m_maxoffset = (std::min)(maxoffset, filelen);
-		else
-			m_maxoffset = maxoffset;
 	}
 
 	// read interface
 	virtual std::uint32_t read_data(void *dest, std::uint64_t offset, std::uint32_t length) override
 	{
-		offset += m_offset;
-		if (offset >= m_maxoffset)
+		// initialize destination to 0 so that data beyond the input is padded
+		std::memset(dest, 0, length);
+
+		std::uint64_t const input_length = m_maxoffset - m_offset;
+		if (offset >= input_length)
 			return 0;
-		if (offset + length > m_maxoffset)
-			length = m_maxoffset - offset;
-		if (m_file.seek(offset, SEEK_SET)) // FIXME: better error reporting?
-			return 0;
-		auto const [err, actual] = read(m_file, dest, length); // FIXME: check for error return
+		if (length > input_length - offset)
+			length = input_length - offset;
+
+		// read the portion backed by the input file
+		auto const [err, actual] = read_at(m_file, m_offset + offset, dest, length);
+		if (err)
+			throw err;
+		if (actual != length)
+			throw std::error_condition(std::errc::io_error);
+
 		return actual;
 	}
 
