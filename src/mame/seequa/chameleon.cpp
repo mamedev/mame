@@ -16,6 +16,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "softlist_dev.h"
 
 namespace {
 
@@ -161,6 +162,8 @@ void chameleon_state::chameleon(machine_config &config)
 	pc_kbdc.out_data_cb().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_data_w));
 
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 512K");
+
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 }
 
 ROM_START(chameleon)

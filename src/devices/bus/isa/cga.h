@@ -60,7 +60,7 @@ protected:
 
 public:
 	void mode_control_w(uint8_t data);
-	void set_palette_luts();
+	virtual void set_palette_luts();
 	void plantronics_w(uint8_t data);
 	virtual uint8_t io_read(offs_t offset);
 	virtual void io_write(offs_t offset, uint8_t data);
@@ -331,6 +331,8 @@ private:
 	std::vector<uint8_t> m_charram;
 	uint8_t chr_read(offs_t offset);
 	void chr_write(offs_t offset, uint8_t data);
+	virtual void set_palette_luts() override;
+	uint8_t m_color_lut[2][4];
 };
 
 DECLARE_DEVICE_TYPE(ISA8_CGA_CHAMELEON, isa8_cga_chameleon_device)
