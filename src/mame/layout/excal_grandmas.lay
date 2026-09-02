@@ -433,22 +433,6 @@ authors:hap
 
 <!-- build screen -->
 
-	<view name="Internal Layout (original)"> <!-- upper panel is upside-down -->
-		<bounds left="-14" right="82" top="-14.5" bottom="94.5" />
-
-		<group ref="buttons1"><bounds x="0" y="74.2" width="60" height="30" /></group>
-		<group ref="buttons2"><bounds x="-5" y="-26.5" width="60" height="30" /><orientation rotate="180" /></group>
-
-		<group ref="sb_board"><bounds x="0" y="0" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="-12" y="0" width="10" height="80" /></group>
-
-		<screen index="0"><bounds xc="60" yc="87.3" width="20" height="7.844" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds xc="60" yc="87.3" width="21" height="8.5" /></element>
-
-		<screen index="1"><bounds xc="60" yc="-7.3" width="20" height="7.844" /><orientation rotate="180" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds xc="60" yc="-7.3" width="21" height="8.5" /></element>
-	</view>
-
 	<view name="Internal Layout (unflipped)">
 		<bounds left="-14" right="82" top="-14.5" bottom="94.5" />
 
@@ -462,6 +446,22 @@ authors:hap
 		<element ref="lcdm" blend="multiply"><bounds xc="60" yc="87.3" width="21" height="8.5" /></element>
 
 		<screen index="1"><bounds xc="60" yc="-7.3" width="20" height="7.844" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="60" yc="-7.3" width="21" height="8.5" /></element>
+	</view>
+
+	<view name="Internal Layout (original)"> <!-- upper panel is upside-down -->
+		<bounds left="-14" right="82" top="-14.5" bottom="94.5" />
+
+		<group ref="buttons1"><bounds x="0" y="74.2" width="60" height="30" /></group>
+		<group ref="buttons2"><bounds x="-5" y="-26.5" width="60" height="30" /><orientation rotate="180" /></group>
+
+		<group ref="sb_board"><bounds x="0" y="0" width="80" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-12" y="0" width="10" height="80" /></group>
+
+		<screen index="0"><bounds xc="60" yc="87.3" width="20" height="7.844" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="60" yc="87.3" width="21" height="8.5" /></element>
+
+		<screen index="1"><bounds xc="60" yc="-7.3" width="20" height="7.844" /><orientation rotate="180" /></screen>
 		<element ref="lcdm" blend="multiply"><bounds xc="60" yc="-7.3" width="21" height="8.5" /></element>
 	</view>
 
