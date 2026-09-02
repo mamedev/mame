@@ -1255,7 +1255,7 @@ void segas32_state::update_background(segas32_state::layer_info &layer, const re
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *const dst = &bitmap.pix(flip ? cliprect->max_y - y : y);
+		uint16_t *const dst = &bitmap.pix(flip ? cliprect.max_y - y : y);
 		int color;
 
 		/* determine the color */
