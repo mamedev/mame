@@ -718,8 +718,12 @@ INPUT_PORTS_END
 
 void apple2_state::apple2_common(machine_config &config)
 {
+	// FIXME: averaged value should be 1.020484 MHz = 14.318181_MHz_XTAL * 65 / (65 * 14 + 2),
+	// as specified in "Understanding the Apple II" (Sather 1983) and the Apple II Serial Interface Card manual (A2L0008)
+	constexpr u32 APPLE2_1M_CLOCK = 1021800;
+
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);
+	M6502(config, m_maincpu, APPLE2_1M_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2_state::apple2_map);
 	m_maincpu->set_dasm_override(FUNC(apple2_state::dasm_trampoline));
 
@@ -729,7 +733,7 @@ void apple2_state::apple2_common(machine_config &config)
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen);
-	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
+	m_screen->set_raw(APPLE2_1M_CLOCK * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
 

@@ -78,7 +78,7 @@ void a2bus_noisemaker_device::reset_from_bus()
 
 void a2bus_noisemaker_device::device_add_mconfig(machine_config &config)
 {
-	AY8910(config, m_psg, 1021800); // CLK tied to ϕ1 signal from bus pin 38
+	AY8910(config, m_psg, A2BUS_1M_CLOCK); // CLK tied to ϕ1 signal from bus pin 38
 	m_psg->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	SPEAKER(config, "speaker").front_center();

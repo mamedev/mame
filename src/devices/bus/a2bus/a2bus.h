@@ -162,6 +162,9 @@ public:
 	void defer_host_access() { m_a2bus->defer_host_access(); }
 
 protected:
+	// FIXME: let host configure this value
+	static constexpr u32 A2BUS_1M_CLOCK = 1021800;
+
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
 	uint32_t get_slotiospace() { return 0xc080 + (m_slot<<4); }       // return C0n0 address for this slot
 
