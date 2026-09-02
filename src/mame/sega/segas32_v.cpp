@@ -670,7 +670,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			int line = flip ? visarea.max_y - y : y;
 			uint16_t *table = &m_videoram[(m_videoram[0x1ff04/2] >> 10) * 0x400];
 
-			for (i = 0; i < 5; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				lineclips[i] = clips[i];
 				linesorted[i] = i;
@@ -738,11 +738,11 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			{
 				uint16_t *extent = &list->extent[32 + y][0];
 
-				for (i = 0; i < 5; i++)
+				for (int i = 0; i < 5; i++)
 					linesorted[i] = i;
 
-				for (i = 0; i < 5; i++)
-					for (j = i + 1; j < 5; j++)
+				for (int i = 0; i < 5; i++)
+					for (int j = i + 1; j < 5; j++)
 						if (lineclips[linesorted[i]].min_x > lineclips[linesorted[j]].min_x)
 						{
 							int temp = linesorted[i];
@@ -752,7 +752,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 
 				*extent++ = tempclip.min_x;
 
-				for (j = 0; j < 5; j++)
+				for (int j = 0; j < 5; j++)
 				{
 					if (BIT(sect, linesorted[j]))
 					{
