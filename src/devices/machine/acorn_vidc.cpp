@@ -25,6 +25,8 @@ TODO:
 #include "acorn_vidc.h"
 #include "screen.h"
 
+#include <numbers>
+
 #define LOG_AUDIODMA (1U << 7) // log audio DMA setups
 #define LOG_STEREO   (1U << 8) // log stereo image setup, and sound control in VIDC20
 
