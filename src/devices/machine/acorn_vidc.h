@@ -14,6 +14,8 @@
 #include "speaker.h"
 #include "sound/dac.h"
 #include "sound/mixer.h"
+#include "sound/flt_biquad.h"
+#include "sound/flt_rc.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -54,6 +56,7 @@ protected:
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
+	void device_add_mconfig_common(machine_config &config) ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual u32 palette_entries() const noexcept override;
 	virtual void device_config_complete() override;
@@ -90,6 +93,8 @@ protected:
 	u16 m_sound_frequency_latch;
 	bool m_sound_mode;
 
+	required_device_array<filter_rc_device, 2> m_filter_rc;
+	required_device_array<filter_biquad_device, 4> m_filter;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	int m_dac_type;
 

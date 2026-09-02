@@ -72,6 +72,8 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_crtc_interlace(0)
 	, m_sound_frequency_latch(0)
 	, m_sound_mode(false)
+	, m_filter_rc(*this, "filter_rc%u", 0)
+	, m_filter(*this, "filter%u", 0)
 	, m_dac(*this, "dac%u", 0)
 	, m_dac_type(dac_type)
 	, m_speaker(*this, "speaker")
@@ -117,13 +119,63 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 //  configuration additions
 //-------------------------------------------------
 
-void acorn_vidc10_device::device_add_mconfig(machine_config &config)
+void acorn_vidc10_device::device_add_mconfig_common(machine_config &config)
 {
 	SPEAKER(config, m_speaker, 2).front();
 
+	// The actual filters here are two simple differentiator filters just
+	// after the VIDC itself (to combine the +L and -L, and +R and -R
+	// signals respectively), followed by two third-order Sallen-Key
+	// lowpass filters just after these.
+	// We're ignoring the first two filters, since these don't have that
+	// much effect on the output signal, but these could be added later
+	// if necessary.
+	// MAME's biquad filter emulation cannot directly do third order
+	// Sallen-Key filter calculations based on the component values,
+	// so instead here we're just using the cutoffs directly calculated
+	// using the online okawa-denshi 3rd order Sallen-Key calculator.
+	// Finally, each filter has a DC-blocking capacitors, so we can emulate
+	// this using a pair of stock CR highpass (Fc = 16hz "AC") filters.
+	// This has the added benefit of removing the DC startup offset.
+
+	FILTER_RC(config, m_filter_rc[0]).set_ac(); // CR highpass, left
+	m_filter_rc[0]->add_route(0, m_speaker, 1.0, 0);
+
+	FILTER_RC(config, m_filter_rc[1]).set_ac(); // CR highpass, right
+	m_filter_rc[1]->add_route(0, m_speaker, 1.0, 1);
+
+	FILTER_BIQUAD(config, m_filter[0]); // 2nd order left
+
+	FILTER_BIQUAD(config, m_filter[1]); // 2nd order right
+
+	FILTER_BIQUAD(config, m_filter[2]); // 1st order left
+
+	FILTER_BIQUAD(config, m_filter[3]); // 1st order right
+
 	// custom DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(0, m_speaker, 1.0, 0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(0, m_speaker, 1.0, 1);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(0, m_filter[2], 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(0, m_filter[3], 1.0);
+}
+
+
+void acorn_vidc10_device::device_add_mconfig(machine_config &config)
+{
+	acorn_vidc10_device::device_add_mconfig_common(config);
+
+	// VIDC1x based systems:
+	// Fc = 2441.467, Fq = 1.0/0.385, Gain = 1.0
+
+	m_filter[0]->setup(filter_biquad_device::biquad_type::LOWPASS, 2441.467, 1.0/0.385, 1.0);
+	m_filter[0]->add_route(0, m_filter_rc[0], 1.0);
+
+	m_filter[1]->setup(filter_biquad_device::biquad_type::LOWPASS, 2441.467, 1.0/0.385, 1.0);
+	m_filter[1]->add_route(0, m_filter_rc[1], 1.0);
+
+	m_filter[2]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 2441.467, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[2]->add_route(0, m_filter[0], 1.0);
+
+	m_filter[3]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 2441.467, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[3]->add_route(0, m_filter[1], 1.0);
 }
 
 u32 acorn_vidc10_device::palette_entries() const noexcept
@@ -630,7 +682,22 @@ arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *
 
 void arm_vidc20_device::device_add_mconfig(machine_config &config)
 {
-	acorn_vidc10_device::device_add_mconfig(config);
+	acorn_vidc10_device::device_add_mconfig_common(config);
+
+	// VIDC20 (RiscPC) systems:
+	// Fc = 5258.064, Fq = 1.0/0.464, Gain = 1.0
+
+	m_filter[0]->setup(filter_biquad_device::biquad_type::LOWPASS, 5258.064, 1.0/0.464, 1.0);
+	m_filter[0]->add_route(0, m_filter_rc[0], 1.0);
+
+	m_filter[1]->setup(filter_biquad_device::biquad_type::LOWPASS, 5258.064, 1.0/0.464, 1.0);
+	m_filter[1]->add_route(0, m_filter_rc[1], 1.0);
+
+	m_filter[2]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 5258.064, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[2]->add_route(0, m_filter[0], 1.0);
+
+	m_filter[3]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 5258.064, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[3]->add_route(0, m_filter[1], 1.0);
 
 	// For simplicity we separate DACs for 32-bit mode
 	// TODO: how stereo image copes with this if at all?
