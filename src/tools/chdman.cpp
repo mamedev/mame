@@ -2943,7 +2943,8 @@ static void do_extract_cd(parameters_map &params)
 				}
 
 				// read the data
-				cdrom->read_data(cdrom->get_track_start_phys(trk) + frameofs, &buffer[bufferoffs], toc.tracks[trk].trktype, true);
+				if (!cdrom->read_data(cdrom->get_track_start_phys(trk) + frameofs, &buffer[bufferoffs], toc.tracks[trk].trktype, true))
+					report_error(1, "Error reading frame %d from track %d", frame, trk + 1);
 
 				// for CDRWin and GDI audio tracks must be reversed
 				// in the case of GDI and CHD version < 5 we assuming source CHD image is GDROM so audio tracks is already reversed
@@ -2960,7 +2961,8 @@ static void do_extract_cd(parameters_map &params)
 				// read the subcode data
 				if (toc.tracks[trk].subtype != cdrom_file::CD_SUB_NONE && (mode == MODE_NORMAL))
 				{
-					cdrom->read_subcode(cdrom->get_track_start_phys(trk) + frameofs, &buffer[bufferoffs], true);
+					if (!cdrom->read_subcode(cdrom->get_track_start_phys(trk) + frameofs, &buffer[bufferoffs], true))
+						report_error(1, "Error reading subcode for frame %d from track %d", frame, trk + 1);
 					bufferoffs += toc.tracks[trk].subsize;
 				}
 
