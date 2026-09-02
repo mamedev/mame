@@ -588,7 +588,7 @@ uint8_t upd765_family_device::msr_r()
 		break;
 	case PHASE_EXEC:
 		msr |= MSR_CB;
-		if((spec & SPEC_ND) && internal_drq)
+		if((spec & SPEC_ND) && !(st1 & ST1_ND))
 			msr |= MSR_EXM;
 		if(internal_drq) {
 			msr |= MSR_RQM;
@@ -1881,7 +1881,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 				cur_rate);
 
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	hdl_cb(1);
 	set_ds(command[1] & 3);
@@ -1898,6 +1898,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	st1 = ST1_MA | ST1_ND;
 	read_data_continue(fi);
 }
 
@@ -1925,7 +1926,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 				cur_rate);
 
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	scan_done = false;
 	hdl_cb(1);
@@ -1943,6 +1944,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	st1 = ST1_MA | ST1_ND;
 	read_data_continue(fi);
 }
 
@@ -2155,7 +2157,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
 
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	hdl_cb(1);
 	set_ds(command[1] & 3);
@@ -2178,6 +2180,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 		return;
 	}
 
+	st1 = ST1_MA | ST1_ND;
 	write_data_continue(fi);
 }
 
@@ -2304,7 +2307,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 				command[8],
 				cur_rate);
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	hdl_cb(1);
 	set_ds(command[1] & 3);
@@ -2321,6 +2324,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	st1 = ST1_MA | ST1_ND;
 	read_track_continue(fi);
 }
 
