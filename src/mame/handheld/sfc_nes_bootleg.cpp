@@ -13,6 +13,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "cpu/arm7/arm7.h"
 
 namespace {
 
@@ -21,6 +22,7 @@ class sfc_nes_bootleg : public driver_device
 public:
 	sfc_nes_bootleg(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{
 	}
@@ -33,6 +35,9 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void arm_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };
 
@@ -49,9 +54,14 @@ static INPUT_PORTS_START(sfcnes)
 INPUT_PORTS_END
 
 
+void sfc_nes_bootleg::arm_map(address_map &map)
+{
+}
+
 void sfc_nes_bootleg::sfcnes(machine_config &config)
 {
-	// unknown CPU
+	ARM7(config, m_maincpu, 100000000); // unknown ARM
+	m_maincpu->set_addrmap(AS_PROGRAM, &sfc_nes_bootleg::arm_map);
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
