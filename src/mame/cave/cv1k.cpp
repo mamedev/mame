@@ -589,6 +589,7 @@ void cv1k_state::cv1k(machine_config &config)
 	// 262 total lines, vsync pulse is 3 lines. 19 non-sync lines are empty.
 	// Each line is 407 pixels, hsync pulse is 29 pixels. 58 non-sync pixels are empty.
 	// Framerate is 60.0183806291 Hz (6,400,000 / (262 * 407) ).
+	// cfr. https://github.com/buffis/cv1k_research/tree/main/Video_Timings for details.
 	screen.set_raw(12.8_MHz_XTAL / 2, 407, 0, 320, 262, 0, 240);
 	screen.set_screen_update(m_blitter, FUNC(cv1k_blitter_device::screen_update));
 
