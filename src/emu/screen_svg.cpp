@@ -587,4 +587,3 @@ rectangle screen_svg_device::visible_area() const
 {
 	return rectangle(0, m_render_width-1, 0, m_render_height-1);
 }
-

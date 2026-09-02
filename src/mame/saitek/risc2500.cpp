@@ -157,10 +157,11 @@ void risc2500_state::machine_reset()
 	m_prev_cycle = m_maincpu->total_cycles();
 }
 
+
+
 /*******************************************************************************
     Video
 *******************************************************************************/
-
 
 void risc2500_state::screen_svg_update(screen_svg_device &screen)
 {
@@ -200,6 +201,7 @@ void risc2500_state::screen_svg_update(screen_svg_device &screen)
 	m_lcd_sym[12] = lcd_on ? BIT(dram[0x73], 0) : 0;
 	m_lcd_sym[13] = lcd_on ? BIT(dram[0x5a], 0) : 0;
 }
+
 
 
 /*******************************************************************************

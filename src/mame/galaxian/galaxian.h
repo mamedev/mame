@@ -137,7 +137,7 @@ public:
 	void turtles_ppi8255_1_w(offs_t offset, uint8_t data);
 	uint8_t jumpbug_protection_r(offs_t offset);
 	void checkman_sound_command_w(uint8_t data);
-	uint8_t checkmaj_protection_r();
+	uint8_t checkmanj_protection_r();
 	uint8_t dingo_3000_r();
 	uint8_t dingo_3035_r();
 	uint8_t dingoe_3001_r();
@@ -167,7 +167,7 @@ public:
 	void init_jumpbug() ATTR_COLD;
 	void init_jumpbugbc() ATTR_COLD;
 	void init_checkman() ATTR_COLD;
-	void init_checkmaj() ATTR_COLD;
+	void init_checkmanj() ATTR_COLD;
 	void init_dingo() ATTR_COLD;
 	void init_dingoe() ATTR_COLD;
 	void init_kong() ATTR_COLD;
@@ -208,7 +208,7 @@ public:
 	void eagle_palette(palette_device &palette);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_interrupt_w(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
+	TIMER_DEVICE_CALLBACK_MEMBER(checkmanj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
 	void state_save_register();
@@ -282,7 +282,7 @@ public:
 	void fantastc(machine_config &config) ATTR_COLD;
 	void jumpbug(machine_config &config) ATTR_COLD;
 	void jumpbugbrf(machine_config &config) ATTR_COLD;
-	void checkmaj(machine_config &config) ATTR_COLD;
+	void checkmanj(machine_config &config) ATTR_COLD;
 	void pacmanbl(machine_config &config) ATTR_COLD;
 	void quaak(machine_config &config) ATTR_COLD;
 	void galaxian(machine_config &config) ATTR_COLD;
@@ -347,7 +347,7 @@ protected:
 	void bongo_map(address_map &map) ATTR_COLD;
 	void bongog_map(address_map &map) ATTR_COLD;
 	void bongo_io_map(address_map &map) ATTR_COLD;
-	void checkmaj_sound_map(address_map &map) ATTR_COLD;
+	void checkmanj_sound_map(address_map &map) ATTR_COLD;
 	void checkman_sound_map(address_map &map) ATTR_COLD;
 	void checkman_sound_portmap(address_map &map) ATTR_COLD;
 	void ckongg_map(address_map &map) ATTR_COLD;

@@ -1563,13 +1563,13 @@ void galaxian_state::checkman_sound_command_w(uint8_t data)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmaj_irq0_gen)
+TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmanj_irq0_gen)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
-uint8_t galaxian_state::checkmaj_protection_r()
+uint8_t galaxian_state::checkmanj_protection_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -2952,7 +2952,7 @@ void galaxian_state::checkman_sound_portmap(address_map &map)
 
 // Checkman alternate with 1 x AY-8910A
 
-void galaxian_state::checkmaj_sound_map(address_map &map)
+void galaxian_state::checkmanj_sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom();
@@ -5026,7 +5026,7 @@ static INPUT_PORTS_START( checkman )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( checkmaj )
+static INPUT_PORTS_START( checkmanj )
 	PORT_INCLUDE(checkman)
 
 	PORT_MODIFY("IN0")
@@ -7996,7 +7996,7 @@ void galaxian_state::checkman(machine_config &config)
 }
 
 
-void galaxian_state::checkmaj(machine_config &config)
+void galaxian_state::checkmanj(machine_config &config)
 {
 	galaxian_base(config);
 
@@ -8004,16 +8004,16 @@ void galaxian_state::checkmaj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::galaxian_map_base); // no discrete sound
 
 	Z80(config, m_audiocpu, 1620000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::checkmaj_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::checkmanj_sound_map);
 
-	TIMER(config, "irq0").configure_scanline(FUNC(galaxian_state::checkmaj_irq0_gen), "screen", 0, 8);
+	TIMER(config, "irq0").configure_scanline(FUNC(galaxian_state::checkmanj_irq0_gen), "screen", 0, 8);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// sound hardware
 	AY8910(config, m_ay8910[0], 1620000);
 	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 2);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -9232,7 +9232,7 @@ void galaxian_state::init_checkman()
 }
 
 
-void galaxian_state::init_checkmaj()
+void galaxian_state::init_checkmanj()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -9243,7 +9243,7 @@ void galaxian_state::init_checkmaj()
 	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
 	// for the title screen
-	space.install_read_handler(0x3800, 0x3800, read8smo_delegate(*this, FUNC(galaxian_state::checkmaj_protection_r)));
+	space.install_read_handler(0x3800, 0x3800, read8smo_delegate(*this, FUNC(galaxian_state::checkmanj_protection_r)));
 }
 
 
@@ -17119,8 +17119,8 @@ GAME( 1983, levers,      0,        jumpbug,    levers,     galaxian_state, init_
 
 // 2nd CPU driving AY8910 for sound
 GAME( 1982, checkman,    0,        checkman,   checkman,   galaxian_state, init_checkman,   ROT90,  "Zilec-Zenitone",                                     "Check Man",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, checkmanj,   checkman, checkmaj,   checkmaj,   galaxian_state, init_checkmaj,   ROT90,  "Zilec-Zenitone (Jaleco license)",                    "Check Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dingo,       0,        checkmaj,   dingo,      galaxian_state, init_dingo,      ROT90,  "Ashby Computers and Graphics Ltd. (Jaleco license)", "Dingo",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, checkmanj,   checkman, checkmanj,  checkmanj,  galaxian_state, init_checkmanj,  ROT90,  "Zilec-Zenitone (Jaleco license)",                    "Check Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dingo,       0,        checkmanj,  dingo,      galaxian_state, init_dingo,      ROT90,  "Ashby Computers and Graphics Ltd. (Jaleco license)", "Dingo",             MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dingoe,      dingo,    checkman,   dingo,      galaxian_state, init_dingoe,     ROT90,  "Ashby Computers and Graphics Ltd.",                  "Dingo (encrypted)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Crazy Climber sound plus AY8910 instead of galaxian sound, plus INT instead of NMI
