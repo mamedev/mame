@@ -759,6 +759,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/d2m_dsk.h,FORMATS["D2M_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "D2M_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/d2m_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/d2m_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/d82_dsk.h,FORMATS["D82_DSK"] = true
 --------------------------------------------------
 
