@@ -7,6 +7,7 @@ Acorn RiscPC line of computers
 
 TODO:
 - a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
+- rename a7000/p to aa7000/p for consistency with aa310 driver (helps from command line)
 
 TODO (a7000p -bios 2):
 - Hangs at boot with nullptr ide1:0 option (strike ESC key several times until Boot menu appears,
@@ -18,9 +19,9 @@ TODO (a7000p -bios 2):
 - No VIDC10 sound even if configured in games, needs support in IOMD sound DMA;
 
 Notes:
-- CTRL + F12 brings a Task window in RISCOS 4 in Desktop
+- CTRL + F12 brings a Task window in Risc OS 4+ when in Desktop;
 - https://www.riscosopen.org/wiki/documentation/show/CLI%20Basics%20part%201#TOC1
-- "Configure SoundSystem 8bit" to attempt using older VIDC10 sound system;
+- "Configure SoundSystem 8bit" in CLI to attempt using older VIDC10 sound system (after reboot);
 
 **************************************************************************************************/
 #include "emu.h"
@@ -412,6 +413,8 @@ void riscpc_state::sarpc_j233(machine_config &config)
 	base_config(config);
 }
 
+// TODO: BIOS revisions are identical for all computers, may warrant a dummy MACHINE_IS_BIOS_ROOT romset to hold them all instead.
+
 ROM_START(rpc600)
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.50
@@ -477,10 +480,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  CLASS         INIT        COMPANY  FULLNAME                  FLAGS */
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, empty_init, "Acorn Computers", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, empty_init, "Acorn Computers", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, empty_init, "Acorn Computers", "Acorn A7000",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, empty_init, "Acorn Computers", "Acorn A7000+",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn Computers", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn Computers", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
