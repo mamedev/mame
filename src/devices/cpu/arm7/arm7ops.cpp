@@ -1081,10 +1081,8 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 		if (!(insn & INSN_S))
 			sc = 0;
 
-		// extra cycle (register specified shift).  Only a shift amount taken from a register costs the I cycle
-		// (ARM2 and ARM7TDMI datasheets alike); charging it for every register operand is a long-standing
-		// over-count that is kept for the ARM7+ types for now, so that no ARM7 machine changes timing here
-		if ((insn & 0x10) || m_archRev >= 3)
+		// extra cycle (register specified shift).  Only a shift amount taken from a register costs the I cycle.
+		if (insn & 0x10)
 			ARM7_ICOUNT -= 1;
 	}
 
