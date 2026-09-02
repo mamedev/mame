@@ -15,7 +15,6 @@ Hardware notes:
 - piezo, no LEDs, magnet sensors chessboard
 
 TODO:
-- finish the buttons
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
@@ -62,8 +61,7 @@ private:
 	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<3> m_inputs;
 
-	u8 m_port4 = 0xff;
-	u8 m_port5 = 0xff;
+	u16 m_inp_mux = 0;
 	u32 m_lcd_segs = 0;
 	u8 m_lcd_com = 0;
 	emu_timer *m_irqtimer;
@@ -90,8 +88,7 @@ void grandmas_state::machine_start()
 	m_irqtimer->adjust(period, 0, period);
 
 	// register for savestates
-	save_item(NAME(m_port4));
-	save_item(NAME(m_port5));
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_segs));
 	save_item(NAME(m_lcd_com));
 }
@@ -140,17 +137,14 @@ u8 grandmas_state::read_inputs()
 {
 	u8 data = 0;
 
-	// get board mux from P4/P5
-	u8 board_mux = (~m_port4 & 0xbf) | BIT(~m_port5, 5) << 6;
-
 	// read chessboard
 	for (int i = 0; i < 8; i++)
-		if (BIT(board_mux, i))
+		if (BIT(m_inp_mux, i))
 			data |= m_board->read_rank(i);
 
 	// read buttons
 	for (int i = 0; i < 2; i++)
-		if (BIT(~m_port5, i + 1))
+		if (BIT(m_inp_mux, i + 8))
 			data |= m_inputs[i]->read();
 
 	// P64-P66 are also IRQ pins (the ON button is IRQ1)
@@ -164,7 +158,7 @@ u8 grandmas_state::read_inputs()
 void grandmas_state::p4_w(u8 data)
 {
 	// P40-P45,P47: input mux part
-	m_port4 = data;
+	m_inp_mux = (m_inp_mux & 0x340) | (~data & 0xbf);
 	read_inputs();
 
 	// P46: N/C (not battery status)
@@ -185,7 +179,7 @@ u8 grandmas_state::p5_r()
 void grandmas_state::p5_w(u8 data)
 {
 	// P51,P52,P55: input mux part
-	m_port5 = data;
+	m_inp_mux = (m_inp_mux & 0xbf) | (~data << 1 & 0x40) | (~data << 7 & 0x300);
 	read_inputs();
 
 	// P54: speaker out
@@ -206,31 +200,31 @@ u8 grandmas_state::p6_r()
 
 static INPUT_PORTS_START( grandmas )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // -
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // score
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // hint
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // clock
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // to
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // on
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // off
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // from
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Score")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Clock")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Why Not To")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_C) PORT_NAME("On / Clear")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F2) PORT_NAME("Off")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Why Not From")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // new game
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // mode
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // setup
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // verify
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // monitor
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // move
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // tb
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // level
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Mode")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Setup / King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Queen")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Monitor / Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Move / Pawn")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Takeback / Knight")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Level / Rook")
 
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // score
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // hint
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) // clock
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) // from
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // to
+	PORT_START("IN.2") // ran out of mnemonic keyboard shortcuts
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Score 2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Hint 2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_NAME("Clock 2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_NAME("Why Not From 2")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Why Not To 2")
 INPUT_PORTS_END
 
 
@@ -304,4 +298,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, egrandmas, 0,      0,      grandmas, grandmas, grandmas_state, empty_init, "Excalibur Electronics", "Grandmaster (Excalibur)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1997, egrandmas, 0,      0,      grandmas, grandmas, grandmas_state, empty_init, "Excalibur Electronics", "Grandmaster (Excalibur)", MACHINE_SUPPORTS_SAVE )
