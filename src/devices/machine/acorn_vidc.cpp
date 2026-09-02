@@ -692,17 +692,17 @@ bool arm_vidc20_device::play_fifo_sample()
 	if (m_sound_fifo.empty()) return true;
 	if (m_sdac)
 	{
-		write_dac(m_sound_fifo_channel&7, m_sound_fifo.dequeue());
+		write_dac(m_sound_fifo_channel & 7, m_sound_fifo.dequeue());
 		m_sound_fifo_channel++;
-		m_sound_fifo_channel&=7;
+		m_sound_fifo_channel &= 7;
 	}
 	else if (m_dac_serial_mode)
 	{
-		s16 sample = m_sound_fifo.dequeue()&0xff;
-		sample |= (u16)m_sound_fifo.dequeue()<<8;
-		write_dac32((m_sound_fifo_channel&2)>>1,sample);
-		m_sound_fifo_channel+=2;
-		m_sound_fifo_channel&=7;
+		s16 sample = m_sound_fifo.dequeue() & 0xff;
+		sample |= (u16)m_sound_fifo.dequeue() << 8;
+		write_dac32((m_sound_fifo_channel & 2) >> 1,sample);
+		m_sound_fifo_channel += 2;
+		m_sound_fifo_channel &= 7;
 	}
 	return m_sound_fifo.empty();
 }
@@ -829,10 +829,14 @@ u32 arm_vidc20_device::get_sound_clock()
 		return m_ext_sclk;
 	}
 
-	// 32-bit mode doubles clock rate
-	const u32 divider = 2 >> get_dac_mode();
+	// 32-bit mode doubles clock rate (by clocking on both edges?)
+	// this effectively makes each 16-bit digital serial sample
+	// (assuming a mono serial DAC, rather than a stereo one) have the
+	// same sample rate time base as the analog 8-bit samples based on
+	// the m_sound_frequency_latch register
+	const u32 multiplier = (get_dac_mode() ? 2 : 1);
 
-	return clock() / 12 / divider;
+	return ((clock() * multiplier) / 24);
 }
 
 
