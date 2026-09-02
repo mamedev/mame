@@ -33,6 +33,15 @@ public:
 		m_xoff = x_offset;
 		m_yoff = y_offset;
 	}
+	// separate offsets for a flipped screen, activated by set_flip(): the
+	// unflipped calibration mixes raster-side and picture-side origins, which
+	// mirror differently, so a flipped game needs its own pair
+	void set_flip_offsets(int x_offset, int y_offset)
+	{
+		m_xoff_flip = x_offset;
+		m_yoff_flip = y_offset;
+	}
+	void set_flip(bool state) { m_flip = state; }
 
 	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ctrl_r(offs_t offset);
@@ -55,6 +64,8 @@ private:
 	std::unique_ptr<uint16_t[]>    m_ctrl;
 	std::unique_ptr<uint16_t[]>    m_linectrl;
 	int       m_xoff, m_yoff;
+	int       m_xoff_flip, m_yoff_flip;
+	bool      m_flip;
 	bool      m_wrap;
 };
 
