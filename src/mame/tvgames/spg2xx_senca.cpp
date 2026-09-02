@@ -932,6 +932,10 @@ ROM_START( m521neo )
 	ROM_CONTINUE(0x07800000, 0x800000)
 ROM_END
 
+ROM_START( movesyst ) // CPU glob marked SPG200
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "movesystem.u2", 0x0000, 0x4000000, CRC(e314bce7) SHA1(3903dcb0325c7d6760e03d1bc84b22e2e90a9d02) )
+ROM_END
 
 void oplayer_100in1_state::init_oplayer()
 {
@@ -1077,3 +1081,6 @@ DENMARK
 */
 
 CONS( 200?, dnv200fs, 0, 0, zon32bit_bat, oplayer,  denver_200in1_state,  init_denver,  "Denver / Senca", "Denver (GMP-270CMK2) (Family Sport 200-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// seems similar to the other sets in here, with both upper and lower banks, but might be unique
+CONS( 200?, movesyst, 0, 0, zon32bit,     zon32bit, mywicodx_state,       empty_init,   "<unknown>",      "Move System",  MACHINE_NOT_WORKING )

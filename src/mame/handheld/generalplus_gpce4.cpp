@@ -475,6 +475,13 @@ ROM_START( siddr )
 	ROM_LOAD16_WORD_SWAP( "ddr-toy.bin", 0x0000, 0x400000, CRC(873cbcc8) SHA1(bdd3d12adb1284991a3f8aaa8e451e3a55931267) )
 ROM_END
 
+ROM_START( l2lelmo )
+	ROM_REGION16_BE( 0x20000, "maincpu:internal", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "mcu_otp_love2learnelmo.bin", 0x000000, 0x20000, CRC(6726a044) SHA1(15e821c99932cb1d176fca5441c778fb7738d84d) )
+
+	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "spi_love2learnelmo.bin", 0x000000, 0x800000, CRC(dbe692cc) SHA1(8363992c9fa6ca32fdd900f8f1a53250249e1668) )
+ROM_END
 
 } // anonymous namespace
 
@@ -492,6 +499,8 @@ CONS( 2017, parcade,       0,       0,      generalplus_gpce4,   generalplus_gpc
 CONS( 2019, taturtf,       0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Teenage Mutant Ninja Turtles - Turtle Fighter (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 2022, digicolr,   0,         0,      digicolr,            digicolr,          generalplus_gpce4_digicolr_state, empty_init, "Bandai", "Digimon Color", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+CONS( 2016, l2lelmo,    0,         0,      generalplus_gpce4,    generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Hasbro", "Love2Learn Elmo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Probably not identical hardware, but still not direct mapped SPI.  External ROM after 0x3000 is encrypted (maybe decrypted in software) seems to have jumps to internal ROM
 CONS( 2021, siddr,         0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

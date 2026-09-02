@@ -97,7 +97,7 @@ Regular game cartridges
 |        | 80-090140(US)     | <Unknown> (Should be My Pet Puppy)                                                             |
 |        | 80-090142(NL)     | Mijn Puppy!                                                                                    |
 |   XX   | 80-090144(GE)     | Mein erster Hund                                                                               |
-|        | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
+|   XX   | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
 |   XX   | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475, 52-090147(SP) on back label)                           |
 |        |          (DK)     | Min hundehvalp                                                                                 |
 |   XX   | 80-090154(SE)     | Min hundvalp                                                                                   |
@@ -418,7 +418,7 @@ Regular game cartridges
 |   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label)
 +========+===================+================================================================================================+
 |        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                |
-|        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                             |
+|   XX   |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                             |
 |   XX   | 80-092482(NL)     | The Batman - De Redding van Gotham City (52-92482(NL) on back label)                           |
 |   XX   | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                |
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                           |
@@ -482,7 +482,7 @@ Regular game cartridges
 +========+===================+================================================================================================+
 |   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (rev. 201)                                                |
-|        |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                              |
+|   XX?  |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                              |
 |        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                                           |
 |   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs (alt)                                                     |
@@ -1100,6 +1100,19 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="batmanit" cloneof="batmanuk">
+		<description>The Batman - Il Salvataggio di Gotham City (Italy)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="The Batman - Il Salvataggio di Gotham City (Italy).bin" size="0x800000" crc="d6835b03" sha1="40e849b04fcb9d232fd5d512ba8a321fe25bafa1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmannl" cloneof="batmanuk">
 		<description>The Batman - De redding van Gotham City (Netherlands)</description>
 		<year>2006</year> <!-- (s06) -->
@@ -1594,6 +1607,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x800000">
 				<rom name="C92674-1.u1" size="0x800000" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this fails to boot with 'vsmile' but runs with 'vsmilem' despite not being a motion cart, is it failing a checksum that 'vsmilem' doesn't perform?
+	     reads were consistent but ROM may be bad -->
+	<software name="carsit" cloneof="carsr201" supported="no">
+		<description>Disney-Pixar Cars - Motori Ruggenti a Radiator Springs (Italy)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092671(IT)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="translucent blue" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Disney-Pixar Cars - Motori Ruggenti (Italy).bin" size="0x800000" crc="74a7fb79" sha1="7003d465a59a4627fb5307719d59e4bb3206087d" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3009,6 +3038,19 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x800000">
 				<rom name="90144 OK.u1" size="0x800000" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppyfr" cloneof="mypuppyge">
+		<description>Mon Toutou tout fou! (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-090145(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-090145 - Mon Toutou tout fou (France).bin" size="0x800000" crc="124b11c1" sha1="7b8b612b3f610e22ca4c7054fc612fd30695cc7c" />
 			</dataarea>
 		</part>
 	</software>

@@ -423,6 +423,11 @@ ROM_START( arcade3d )
 	ROM_LOAD16_WORD_SWAP( "arcade3d.u3", 0x0000, 0x800000, CRC(130843a5) SHA1(f6494a34d162e702121cf71d384a4e57e0113498) )
 ROM_END
 
+ROM_START( pokmax20 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pocketmax20.u2", 0x0000, 0x800000, CRC(2013fcef) SHA1(2885ffd18c077756c1a1470f44f8d8d7657515e2) )
+ROM_END
+
 ROM_START( vsplus )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vsplus.bin", 0x0000, 0x1000000, CRC(2b13d2cc) SHA1(accae7606d83a313b8ec0232d2d67b63c9c617af) )
@@ -532,6 +537,8 @@ ROM_END
 CONS( 200?, lexizeus, 0, 0, lexizeus, lexizeus, spg2xx_lexizeus_game_state, init_zeus,     "Lexibook / JungleTac", "Zeus IG900 20-in-1 (US?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 
 CONS( 200?, arcade3d, 0, 0, lexizeus, lexiseal, spg2xx_lexizeus_game_state, init_zeus,     "Millennium 2000 GmbH / JungleTac", "Millennium Arcade 3D 15-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, pokmax20, 0, 0, lexizeus, lexiseal, spg2xx_lexizeus_game_state, init_zeus,     "<unknown> / JungleTac", "Pocket Max 20-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2007.08.02 Rev 05 on PCB
 CONS( 2007, pokermor, 0, 0, lexizeus, pokermor, spg2xx_lexizeus_game_state, init_zeus,     "SA.BI.NE trend", "Poker & More 18-in-1 (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
