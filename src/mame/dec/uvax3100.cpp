@@ -174,7 +174,7 @@ ROM_START( mv3100m10 )
 	ROM_LOAD(  "dec90_lm9031_112l1_pls105anj.bin",    0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x00100, "prom", ROMREGION_ERASEFF ) // On the main PCB
-	ROM_LOAD(  "dec84_fx9206_365a1.bin",              0x00000, 0x00100, NO_DUMP )
+	ROM_LOAD(  "dec84_fx9206_365a1.bin",              0x00000, 0x00100, NO_DUMP ) // Contains the Ethernet address
 ROM_END
 
 } // anonymous namespace
