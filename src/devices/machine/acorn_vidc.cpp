@@ -700,7 +700,7 @@ bool arm_vidc20_device::play_fifo_sample()
 	{
 		s16 sample = m_sound_fifo.dequeue() & 0xff;
 		sample |= (u16)m_sound_fifo.dequeue() << 8;
-		write_dac32((m_sound_fifo_channel & 2) >> 1,sample);
+		write_dac32((m_sound_fifo_channel & 2) >> 1, sample);
 		m_sound_fifo_channel += 2;
 		m_sound_fifo_channel &= 7;
 	}
