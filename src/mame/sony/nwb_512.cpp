@@ -106,7 +106,7 @@ void nwb_512_device::device_reset()
 
 void nwb_512_device::device_add_mconfig(machine_config &config)
 {
-	// NWP-512D 15" Monochrome CRT Monitor
+	// Sony NWP-512D 15" Monochrome CRT Monitor
 	constexpr uint16_t HORIZONTAL = 816;
 	constexpr uint16_t VERTICAL = 1024;
 	SCREEN(config, m_nwp_512d);
@@ -397,17 +397,18 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Set pixel to 1 at X (data), Y (offset[12:1])
 	check_mem_mask(mem_mask);
-	LOG("pixel_w(0x%x, 0x%x)\n", offset, data);
 	
 	const uint16_t x = x_address(data);
 	const uint16_t y = y_address(offset);
 	const uint32_t byte_offset = coordinate_to_byte_offset(x, y);
 	const uint16_t x_bit = x_to_pixel_offset(x);
-	const uint8_t destination = m_vram->read(byte_offset) & ~(1u << x_bit) ? 1 : 0;
+	const uint8_t destination = m_vram->read(byte_offset) & (1u << x_bit) ? 1 : 0;
 
 	// Use the result of the ROP engine before setting the pixel
 	// TODO: consolidate set_pixel into this function, it is only used here.
-	set_pixel(x, y, execute_rop(m_state.rop_function, 1, destination) & 1);
+	const bool new_state = execute_rop(m_state.rop_function, 1, destination) & 1;
+	LOG("pixel_w(0x%x, 0x%x) => Change (0x%x, 0x%x) from %u to %u\n", offset, data, x, y, destination, new_state ? 1u : 0u);
+	set_pixel(x, y, new_state);
 }
 
 uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
