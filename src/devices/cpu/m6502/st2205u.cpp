@@ -103,20 +103,15 @@ st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, d
 
 void st2205u_base_device::sound_stream_update(sound_stream &stream)
 {
-	int samples = stream.samples();
-	int outpos = 0;
-	while (samples-- != 0)
+	for (int channel = 0; channel < 4; channel++)
 	{
-		for (int channel = 0; channel < 4; channel++)
-		{
-			s16 adpcm_contribution = m_adpcm_level[channel];
-			stream.add_int(channel, outpos, adpcm_contribution * 0x10, 32768);
+		// The four channels are mixed into one 10-bit output, so retain enough headroom for their sum.
+		const int output = !BIT(m_psgc, 0) && BIT(m_psgc, channel + 4)
+				? m_psg_output[channel] * (m_psg_vol[channel] & 0x3f)
+				: 0;
 
-			auto psg_contribution = std::sin((double)m_psg_freqcntr[channel]/4096.0f);
-			stream.add_int(channel, outpos, psg_contribution * m_psg_amplitude[channel]*0x80,32768);
-		}
-
-		outpos++;
+		for (int sample = 0; sample < stream.samples(); sample++)
+			stream.put_int(channel, sample, output, 0x200 * 0x3f * 4);
 	}
 }
 
@@ -158,7 +153,7 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 
 	save_item(NAME(m_adpcm_level));
 	save_item(NAME(m_psg_amplitude));
-	save_item(NAME(m_psg_freqcntr));
+	save_item(NAME(m_psg_output));
 
 	m_mintf = std::move(intf);
 	save_common_registers();
@@ -362,7 +357,7 @@ void st2205u_base_device::device_reset()
 
 	std::fill(std::begin(m_adpcm_level), std::end(m_adpcm_level), 0);
 	std::fill(std::begin(m_psg_amplitude), std::end(m_psg_amplitude), 0);
-	std::fill(std::begin(m_psg_freqcntr), std::end(m_psg_freqcntr), 0);
+	std::fill(std::begin(m_psg_output), std::end(m_psg_output), 0);
 }
 
 void st2205u_device::device_reset()
@@ -656,6 +651,17 @@ u8 st2205u_base_device::psgc_r()
 
 void st2205u_base_device::psgc_w(u8 data)
 {
+	m_stream->update();
+	const u8 disabled = ((m_psgc & ~data) >> 4) & 0x0f;
+	for (int channel = 0; channel < 4; channel++)
+	{
+		if (BIT(disabled, channel))
+		{
+			m_adpcm_level[channel] = 0;
+			m_psg_amplitude[channel] = 0;
+			m_psg_output[channel] = 0;
+		}
+	}
 	m_psgc = data;
 	m_psg_on &= (data & 0xf0) >> 4;
 }
@@ -667,6 +673,7 @@ u8 st2205u_base_device::psgm_r()
 
 void st2205u_base_device::psgm_w(u8 data)
 {
+	m_stream->update();
 	m_psgm = data;
 }
 
@@ -677,6 +684,7 @@ u8 st2205u_base_device::vol_r(offs_t offset)
 
 void st2205u_base_device::vol_w(offs_t offset, u8 data)
 {
+	m_stream->update();
 	m_psg_vol[offset] = data & 0xbf;
 }
 
@@ -687,6 +695,7 @@ u8 st2205u_base_device::volm_r(offs_t offset)
 
 void st2205u_base_device::volm_w(offs_t offset, u8 data)
 {
+	m_stream->update();
 	m_psg_volm[offset] = data & (offset == 1 ? 0x7f : 0x3f);
 }
 
@@ -712,11 +721,7 @@ void st2205u_base_device::st2xxx_tclk_stop()
 u32 st2205u_base_device::tclk_pres_div(u8 mode) const
 {
 	assert(mode < 6);
-
-	// dphh8630 game 17 "Gang Nam Style" uses mode 0 for ADPCM music and if a 32Mhz clock is used, requires a divider of 1
-	// alternatively the divider can remain as 2 if the code in timer_12bit_process processes the FIFO every call instead
-	// of toggling it with m_psg_on, which is correct?
-	const int divtable[8] = { 1, 4, 8, 32, 1024, 4096, 4096, 4096 };
+	static constexpr u16 divtable[6] = { 2, 4, 8, 32, 1024, 4096 };
 
 	return divtable[mode];
 }
@@ -741,52 +746,50 @@ TIMER_CALLBACK_MEMBER(st2205u_base_device::t3_interrupt)
 	timer_12bit_process(3);
 }
 
-void st2205u_base_device::push_adpcm_value(int channel, u16 psg_data)
-{
-	// the ADPCM often ends up off-center before samples are played
-	// is the FIFO hookup causing non-ADPCM data to be processed as ADPCM
-	// if mode changes in m_psgm aren't in sync with the FIFO output?
-
-	m_stream->update();
-
-	if (BIT(psg_data, 8))
-		m_adpcm_level[channel] -= psg_data & 0xff;
-	else
-		m_adpcm_level[channel] += psg_data & 0xff;
-
-	LOGDAC("Playing ADPCM sample %c%02X on channel %d (new level is %04x)\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, channel, m_adpcm_level[channel]);
-}
-
-void st2205u_base_device::reset_adpcm_value(int channel)
-{
-	m_stream->update();
-
-	m_adpcm_level[channel] = 0;
-}
-
 void st2205u_base_device::timer_12bit_process(int t)
 {
 	if (BIT(m_psgc, t + 4))
 	{
-		if (BIT(m_psg_on, t))
-			m_psg_on &= ~(1 << t);
+		const u8 mode = (m_psgm >> (2 * t)) & 3;
+		if (mode == 1)
+		{
+			// Tone data is an unsigned amplitude, and the timer toggles at twice the output frequency.
+			m_stream->update();
+			m_psg_on ^= 1 << t;
+			if (m_fifo_filled[t] != 0)
+			{
+				const u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
+				m_adpcm_level[t] = 0;
+				m_psg_amplitude[t] = psg_data & 0xff;
+				LOGDAC("Playing tone sample %02X on channel %d\n", psg_data & 0xff, t);
+				--m_fifo_filled[t];
+				m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;
+			}
+			m_psg_output[t] = (BIT(m_psg_on, t) ? 2 : -2) * m_psg_amplitude[t];
+		}
 		else if (m_fifo_filled[t] != 0)
 		{
-			m_psg_on |= 1 << t;
+			m_stream->update();
+			m_psg_on &= ~(1 << t);
 
-			u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
-			if (BIT(m_psgm, 2 * t + 1))
+			const u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
+			if (mode == 3)
 			{
-				push_adpcm_value(t, psg_data);
+				// The ninth FIFO bit selects subtraction from the signed, 10-bit ADPCM accumulator.
+				const int delta = psg_data & 0xff;
+				m_adpcm_level[t] = std::clamp(m_adpcm_level[t] + (BIT(psg_data, 8) ? -delta : delta), -0x200, 0x1ff);
+				m_psg_output[t] = m_adpcm_level[t];
+				LOGDAC("Playing ADPCM sample %c%02X on channel %d (new level is %04x)\n", BIT(psg_data, 8) ? '-' : '+', delta, t, m_adpcm_level[t]);
+			}
+			else if (mode == 0)
+			{
+				// PCM data is signed and expanded to the same 10-bit range as the other modes.
+				m_adpcm_level[t] = 0;
+				m_psg_output[t] = s8(psg_data & 0xff) * 4;
+				LOGDAC("Playing DAC sample %02X on channel %d\n", psg_data & 0xff, t);
 			}
 			else
-			{
-				reset_adpcm_value(t);
-				LOGDAC("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
-
-				m_psg_amplitude[t] = psg_data & 0xff; // amplitude is controller by the data writes
-				m_psg_freqcntr[t] += 0x80; // the frequency is determined by the timer speed (there must be a better way to do this?)
-			}
+				m_psg_output[t] = 0;
 
 			--m_fifo_filled[t];
 			m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;

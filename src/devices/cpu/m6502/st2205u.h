@@ -74,9 +74,6 @@ protected:
 
 	void base_init(std::unique_ptr<mi_st2xxx> &&intf);
 
-	void push_adpcm_value(int channel, u16 psg_data);
-	void reset_adpcm_value(int channel);
-
 	u8 btc_r();
 	void btc_w(u8 data);
 	u32 tclk_pres_div(u8 mode) const;
@@ -169,7 +166,7 @@ protected:
 
 	s16 m_adpcm_level[4];
 	u8 m_psg_amplitude[4];
-	u32 m_psg_freqcntr[4];
+	s16 m_psg_output[4];
 };
 
 class st2205u_device : public st2205u_base_device
