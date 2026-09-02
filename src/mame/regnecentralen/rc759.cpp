@@ -34,19 +34,21 @@
       Net (optional) Intel 82586 Ethernet   I/O 0x100, IR5 (not emulated)
       DPC (optional) Disk/Printer-Adaptor   0x28a-0x28c, IR2 (not emulated)
 
-    Video modes (82730, per the guide) -- only alphanumeric is currently
-    emulated, and only in monochrome (see rc75x.cpp txt_update_row):
+    Video modes (82730, per the guide):
       alphanumeric        560x250, char cell from 32 KB pixel RAM
-      high-res graphics   560x256, 1 bit/pixel   (m_gfx_mode, not emulated)
-      medium-res graphics 280x256, 2 bits/pixel  (m_gfx_mode, not emulated)
+      high-res graphics   560x256, 1 bit/pixel  -- emulated via programmable
+                          char generator (35 char/row, lpr=15); see rc75x.cpp
+      medium-res graphics 280x256, 2 bits/pixel  (not emulated)
 
-    TODO:
-    - Needs better I82730 emulation: use the 32-entry IRGB palette + the
-      per-character palette-select bits instead of hard-coded black/white;
-      implement the graphics (bitmap) mode selected via PPI port C bit 6
-      (OUT 76H,0CH = graphics / 0DH = alphanumeric).
-    - Floppy I/O errors
-    - Many more things
+    KNOWN LIMITATIONS (2026-09):
+    - Color screen: 32-entry IRGB palette support is missing (currently
+      hard-coded amber/black for text mode).
+    - Medium-res graphics (280x256, 2 bits/pixel) not implemented.
+    - Soft scrolling via 82730 mode block not fully emulated.
+    - External devices: iSBX serial, Centronics parallel, SCSI, 8274 serial
+      (Partner), Ethernet 82586, Disk/Printer-Adaptor (DPC) not emulated.
+    - Floppy disk sharing with configurable lock period in NVRAM (for
+      shared floppy disks between RC759 machines) not implemented.
 
     Notes:
     - Press SPACE during self-test for an extended menu
@@ -304,7 +306,6 @@ void rc759_state::ppi_portc_w(uint8_t data)
 	// -------0  cassette enable
 
 	m_kbd->enable_w(BIT(data, 7));
-	m_gfx_mode = BIT(data, 6);
 	m_nvram_bank = (data >> 4) & 0x03;
 	m_drq_source = (data >> 2) & 0x03;
 	m_cas->change_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);

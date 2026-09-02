@@ -20,6 +20,23 @@
 
 I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 {
+	// The RC759 runs the 82730 in one of two configurations, selected by the
+	// mode block the CPU loads (there is no dedicated graphics bit -- the CPU
+	// swaps the whole mode block): text is 80 char/row with 10-scanline cells
+	// (lpr=9), graphics is 35 char/row with 16-scanline cells (lpr=15). Both
+	// span the same 560 px active field, so the cell pitch is 560/x_count:
+	// 7 px in text, 16 px in graphics. Myresnak's "switch to graphics" loads
+	// the 16-scanline mode block and then draws a 560x256 bitmap into the
+	// programmable character generator (m_vram), tiling the screen with unique
+	// cell codes = (col<<4)|row. Detect that layout by the taller cell and
+	// hand it to gfx_update_row.
+	if (m_txt->rows_per_char() >= 12)
+	{
+		gfx_update_row(bitmap, data, lc, y, x_count, cursor);
+		return;
+	}
+
+	// Text mode - original implementation
 	for (int i = 0; i < x_count; i++)
 	{
 		bool cursor_here = (cursor == i);
@@ -61,6 +78,34 @@ I82730_UPDATE_ROW( rc75x_state::txt_update_row )
 		}
 	}
 }
+
+
+I82730_UPDATE_ROW( rc75x_state::gfx_update_row )
+{
+	// Graphics mode: 35 columns across the 560 px active field -> 16 px per
+	// cell, i.e. the full 16-bit character-generator word is pixel data (bit
+	// 15 = leftmost). Unlike text there is no proportional-width guard in the
+	// low byte, so render all 16 bits and never skip a cell on a zero low
+	// byte. The 82730 feeds one cell code per column; the CPU has arranged the
+	// codes so that (code<<4 | lc) walks the 560x256 bitmap it drew into
+	// m_vram.
+	int cell_w = 560 / x_count; // 16 for the 35-column graphics layout
+	for (int i = 0; i < x_count; i++)
+	{
+		uint16_t gfx = m_vram[(data[i] & 0x3ff) << 4 | lc];
+		bool cursor_here = (cursor == i);
+		for (int p = 0; p < cell_w; p++)
+		{
+			bool on = BIT(gfx, 15 - p);
+			if (cursor_here)
+				on = !on;
+			int x_pos = i * cell_w + p;
+			if (x_pos < bitmap.width())
+				bitmap.pix(y, x_pos) = on ? rgb_t(0xff, 0xb0, 0x00) : rgb_t(0x1a, 0x12, 0x00);
+		}
+	}
+}
+
 
 void rc75x_state::txt_ca_w(uint16_t data)
 {
@@ -129,7 +174,7 @@ void rc75x_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	static const uint8_t defaults[128] =
 	{
 		0x5f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x90, 0x04, 0x00, 0x00, 0xc0, 0x00, 0xa1, 0x05, 0x00, 0x07, 0x07,
+		0x00, 0x90, 0x04, 0x00, 0x00, 0xc0, 0x80, 0xa1, 0x05, 0x00, 0x07, 0x07,
 		0x01, 0x41, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

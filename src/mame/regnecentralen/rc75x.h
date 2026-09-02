@@ -58,8 +58,7 @@ public:
 		m_config(*this, "config"),
 		m_kbd(*this, "kbd"),
 		m_drq_source(0),
-		m_nvram_bank(0),
-		m_gfx_mode(0)
+		m_nvram_bank(0)
 	{ }
 
 protected:
@@ -86,6 +85,7 @@ protected:
 
 	// shared 82730 text/video
 	I82730_UPDATE_ROW(txt_update_row);
+	I82730_UPDATE_ROW(gfx_update_row);
 	void txt_ca_w(uint16_t data);
 	void txt_irst_w(uint16_t data);
 	uint8_t palette_r(offs_t offset);
@@ -109,7 +109,6 @@ protected:
 
 	int m_drq_source;
 	int m_nvram_bank;
-	int m_gfx_mode;
 
 	uint8_t m_rtc_read_addr = 0;
 	uint8_t m_rtc_read_data = 0;
