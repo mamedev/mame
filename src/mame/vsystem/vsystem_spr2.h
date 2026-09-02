@@ -32,9 +32,7 @@ public:
 		m_xoffs = xoffs;
 		m_yoffs = yoffs;
 	}
-	// coordinate mirror constants used when flip_screen is set: the sprite chip
-	// flips the screen itself, so these come from the raster geometry of the
-	// game rather than from the sprite RAM contents
+	// mirror constants for flip_screen, from the game's raster geometry
 	void set_flip_offsets(int xoffs, int yoffs)
 	{
 		m_flip_xoffs = xoffs;

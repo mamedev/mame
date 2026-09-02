@@ -475,9 +475,7 @@ VIDEO_START_MEMBER(pspikes_base_state,turbofrc)
 	m_spritepalettebank = 0;
 	m_sprite_gfx = 2;
 
-	// screen flip: the game compensates for the hardware mirror by offsetting
-	// its scroll registers; the flipped-side dx/dy are those offsets (measured
-	// against the unflipped attract sequence) on top of the unflipped ones
+	// flipped-side dx/dy measured from the game's own scroll compensation
 	m_tilemap[0]->set_scrolldx(0, 185);
 	m_tilemap[1]->set_scrolldx(0, 193);
 	m_tilemap[0]->set_scrolldy(0, 2);

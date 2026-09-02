@@ -229,9 +229,7 @@ void f1gp_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 
-	// screen flip: the game compensates for the hardware mirror by offsetting
-	// its scroll registers; the flipped-side dx/dy are those offsets (measured
-	// against the unflipped attract sequence)
+	// flipped-side dx/dy measured from the game's own scroll compensation
 	m_fg_tilemap->set_scrolldx(0, 160);
 	m_fg_tilemap->set_scrolldy(0, 10);
 
@@ -296,9 +294,7 @@ void f1gp_state::gfxctrl_w(uint8_t data)
 	m_flipscreen = data & 0x20;
 	m_gfxctrl = data & 0xdf;
 
-	// only the character layer follows this bit; the ROZ layer is flipped by
-	// the game itself through the 053936 transform matrix, but the chip's
-	// calibration offsets still need their flipped-side values
+	// the ROZ layer is not flipped here: the game mirrors the 053936 matrix itself
 	m_fg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_k053936->set_flip(m_flipscreen != 0);
 }

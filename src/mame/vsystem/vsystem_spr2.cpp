@@ -171,9 +171,7 @@ void vsystem_spr2_device::draw_sprites_common(uint16_t const *spriteram3,  int s
 
 		if (flip_screen)
 		{
-			// the chip mirrors each (zoom-scaled) cell, so the mirror point
-			// depends on the cell size: 16 - zoom/2 collapses to 0 for
-			// unzoomed sprites
+			// the mirror point depends on the zoomed cell size
 			m_curr_sprite.ox = m_flip_xoffs + 16 - m_curr_sprite.zoomx / 2 - m_curr_sprite.ox;
 			m_curr_sprite.oy = m_flip_yoffs + 16 - m_curr_sprite.zoomy / 2 - m_curr_sprite.oy;
 			fx = !fx;

@@ -33,9 +33,7 @@ public:
 		m_xoff = x_offset;
 		m_yoff = y_offset;
 	}
-	// separate offsets for a flipped screen, activated by set_flip(): the
-	// unflipped calibration mixes raster-side and picture-side origins, which
-	// mirror differently, so a flipped game needs its own pair
+	// separate offsets for a flipped screen, enabled by set_flip()
 	void set_flip_offsets(int x_offset, int y_offset)
 	{
 		m_xoff_flip = x_offset;
