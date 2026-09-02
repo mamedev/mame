@@ -18,8 +18,6 @@ TODO (a7000p -bios 2):
 - No VIDC10 sound even if configured in games, needs support in IOMD sound DMA;
 
 Notes:
-- List of compatible RiscPC SWs at:
-https://arcwiki.org.uk/index.php?title=Category:Software_compatible_with_the_RiscPC&pageuntil=Minus+4#mw-pages
 - CTRL + F12 brings a Task window in RISCOS 4 in Desktop
 - https://www.riscosopen.org/wiki/documentation/show/CLI%20Basics%20part%201#TOC1
 - "Configure SoundSystem 8bit" to attempt using older VIDC10 sound system;

@@ -3,12 +3,13 @@
 <!--
 license:CC0-1.0
 -->
-
 <softwarelist name="archimedes" description="Acorn Archimedes floppy images">
 
-<!-- Notes of interest -->
 <!--
+ Notes:
  - "Missing SWI $401c0" means that it needs RISCOS 3.10
+ - For RISC PC/StrongARM cfr. https://arcwiki.org.uk/index.php/Buyer%27s_Guide and correlated links
+
 -->
 
 <!-- !Games -->
@@ -279,7 +280,7 @@ a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
 		<notes><![CDATA[
-[VIDC10] doesn't playback air shot samples, goes silent
+[VIDC10] doesn't playback air shot samples, goes completely silent
 a7000p -bios 2: "abort on data transfer", incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -742,7 +743,7 @@ a7000p -bios 2: has no text in gameplay
 		<notes><![CDATA[
 aa5000: has player sprite [ARM] timing glitches during gameplay
 aa3010: throws "SWI &401C6 not known", likely incompatible
-a7000p -bios 2: CLI compatible, wants [PS/2] mouse to navigate on level select
+a7000p -bios 2: CLI compatible, optional [PS/2] mouse to navigate on level select
 ]]></notes>
 		<info name="usage" value="Requires RiscOS 3.10 or above" />
 		<part name="flop1" interface="floppy_3_5">
@@ -997,12 +998,14 @@ a7000p -bios 2: CLI compatible
 		</part>
 	</software>
 
-	<software name="darkwood" supported="partial">
+	<software name="darkwood" supported="no">
 		<description>Darkwood</description>
 		<year>1995</year>
 		<publisher>Eclipse</publisher>
 		<notes><![CDATA[
-boot OK, clicking on the paper icon during gameplay causes a "please insert disc 6" that won't work
+[VIDC10] pitch miscalculation in game, no main sprite in gameplay (regression?)
+Untested HDD install
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -1047,7 +1050,9 @@ boot OK, clicking on the paper icon during gameplay causes a "please insert disc
 		<year>1990</year>
 		<publisher>Calderglen Computers</publisher>
 		<notes><![CDATA[
-boot OK, but launching !Boot causes "no writable memory", works fine by launching "Deeva" file
+Launching !BOOT causes "no writable memory", boots fine by launching !DEEVA file
+[VIDC10] video desync at bottom on main menu
+a7000p -bios 2: "configure option not recognized at line 460", incompatible BASIC game
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1056,12 +1061,14 @@ boot OK, but launching !Boot causes "no writable memory", works fine by launchin
 		</part>
 	</software>
 
-	<software name="dropship" supported="no">
+	<software name="dropship" supported="partial">
 		<description>Drop Ship</description>
 		<year>1990</year>
 		<publisher>Fourth Dimension</publisher>
 		<notes><![CDATA[
-Returns to Desktop when prompted to "insert original disk 1", trips unimplemented COPRO opcode
+Untested HDD install
+aa3010: throws "SWI &401C6 not known", likely incompatible
+a7000p -bios 2: "!Drop Ship" has a space in between, can't be tested in CLI?
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -1069,6 +1076,7 @@ Returns to Desktop when prompted to "insert original disk 1", trips unimplemente
 				<rom name="Drop Ship (1990) (The Fourth Dimension) (Disk 1 of 2).apd" size="542036" crc="47cbfe48" sha1="5b1282ba3eade27cad62b91682da015f90cc1aa3"/>
 			</dataarea>
 		</part>
+		<!-- "Levels disc"? -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="182086">
@@ -1082,7 +1090,10 @@ Returns to Desktop when prompted to "insert original disk 1", trips unimplemente
 		<year>1995</year>
 		<publisher>Eclipse</publisher>
 		<notes><![CDATA[
-boot OK but disc swap is excessive (i.e. in-game!?), eventually soft lock during one of those, no sound
+Floppy disc swap is excessive (i.e. in-game!?), eventually soft lock during one of those, no sound
+Not extensively tested with HDD install (install doesn't use disc 8?)
+a7000p -bios 2: "Uncaught trap: Data Abort", should be compatible?
+sarpc_j233: should require a patch to be compatible
 ]]></notes>
 		<info name="usage" value="Protection requires manual, requires a VGA screen mode" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1140,7 +1151,9 @@ boot OK but disc swap is excessive (i.e. in-game!?), eventually soft lock during
 		<year>1993</year>
 		<publisher>Fourth Dimension</publisher>
 		<notes><![CDATA[
-Returns to Desktop when loading !Dungeon, copy protection?
+Not extensively tested
+Untested HDD install
+a7000p -bios 2: "Illegal header field in module", incompatible? (would require [PS/2] mouse anyway)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -1167,14 +1180,16 @@ Returns to Desktop when loading !Dungeon, copy protection?
 		<year>1989</year>
 		<publisher>Fourth Dimension</publisher>
 		<notes><![CDATA[
-boot OK but runs too fast even on A310 class machine
+Runs too fast even for aa310
 ]]></notes>
+		<!-- Non-default Hi-Score table -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="e-type (1989)(fourth dimension)(disk 1 of 2).adf" size="819200" crc="42eb6f96" sha1="93d539a6535c21d0843664005e05eb15766abaa2" />
 			</dataarea>
 		</part>
+		<!-- "Tracks disc" -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819200">
@@ -1188,7 +1203,7 @@ boot OK but runs too fast even on A310 class machine
 		<year>1989</year>
 		<publisher>Fourth Dimension</publisher>
 		<notes><![CDATA[
-boot OK, window track scroll is jerky
+Window track scroll is jerky (retest me again)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1197,12 +1212,12 @@ boot OK, window track scroll is jerky
 		</part>
 	</software>
 
-	<software name="ego">
+	<software name="ego" supported="yes">
 		<description>EGO: Repton 4</description>
 		<year>1992</year>
 		<publisher>Superior Software</publisher>
 		<notes><![CDATA[
-boot OK
+a7000p -bios 2: CLI compatible, runs slower than aa3010 (verify)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="689721">
@@ -1216,7 +1231,7 @@ boot OK
 		<year>1992</year>
 		<publisher>ProAction</publisher>
 		<notes><![CDATA[
-Hangs at boot screen
+Hangs at boot screen, bad disk?
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
@@ -1230,8 +1245,10 @@ Hangs at boot screen
 		<year>1991</year>
 		<publisher>Hybrid Technology</publisher>
 		<notes><![CDATA[
-jumps to lalaland
+Untested, requires manual
+a7000p -bios 2: requires Desktop if truly compatible, also "!élite" cannot be typed in from [PS/2] keyboard
 ]]></notes>
+		<info name="usage" value="Protection requires manual" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
 				<rom name="elite (1991)(hybrid technology).adf" size="814080" crc="c4c32b35" sha1="fde0f540e0d5732646c1eebb54629a162f40db91" />
@@ -1240,11 +1257,12 @@ jumps to lalaland
 	</software>
 
 	<software name="elitea" cloneof="elite" supported="no">
-		<description>Elite (alt)</description>
+		<description>Elite (cracked copy protection)</description>
 		<year>1991</year>
 		<publisher>Hybrid Technology</publisher>
 		<notes><![CDATA[
-jumps to lalaland
+[VIDC10] No sound
+Not extensively tested
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1258,7 +1276,9 @@ jumps to lalaland
 		<year>1995</year>
 		<publisher>Empire</publisher>
 		<notes><![CDATA[
-boot OK but pitch graphics are very glitchy
+[VIDC10] uneven frame updates
+Pitch graphics are very glitchy (check me again)
+a7000p -bios 2: throws "abort on data transfer" at new game, should be compatible?
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1267,12 +1287,14 @@ boot OK but pitch graphics are very glitchy
 		</part>
 	</software>
 
-	<software name="enigma">
+	<software name="enigma" supported="yes">
+		<!-- Has trainer and passwords file -->
 		<description>Enigma</description>
 		<year>1993</year>
 		<publisher>Archimedes World</publisher>
 		<notes><![CDATA[
-boot OK, Has trainer and passwords file
+Asks for a "levels disc", safe to ignore?
+a7000p -bios 2: Seems CLI compatible, needs [PS/2] mouse to bypass disc request screen
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1281,12 +1303,13 @@ boot OK, Has trainer and passwords file
 		</part>
 	</software>
 
-	<software name="enigmaa" cloneof="enigma">
+	<software name="enigmaa" cloneof="enigma" supported="yes">
+		<!-- Has trainer and passwords file -->
 		<description>Enigma (alt)</description>
 		<year>1993</year>
 		<publisher>Archimedes World</publisher>
 		<notes><![CDATA[
-boot OK, Has trainer and passwords file
+(same as enigma)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1300,7 +1323,8 @@ boot OK, Has trainer and passwords file
 		<year>1988</year>
 		<publisher>Robico</publisher>
 		<notes><![CDATA[
-Cannot load
+Cannot load, is the dump right?
+a7000p -bios 2: "Not enough memory in sprite area", likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1314,7 +1338,8 @@ Cannot load
 		<year>1992</year>
 		<publisher>Clares Micro Supplies</publisher>
 		<notes><![CDATA[
-OS locks up with garbage line when trying to load any file
+Throws miscellaneous errors when tried to be executed, bad dump
+Has !ArcFSr/w directory
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1328,7 +1353,8 @@ OS locks up with garbage line when trying to load any file
 		<year>1990</year>
 		<publisher>CIS</publisher>
 		<notes><![CDATA[
-boot OK but sprites flickers way too much, unplayable
+[VIDC10] sprites flickers a bit, particularly when multiball power up is collected
+a7000p -bios 2: "abort on data transfer" when trying to start a game, likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1342,7 +1368,7 @@ boot OK but sprites flickers way too much, unplayable
 		<year>1990</year>
 		<publisher>CIS</publisher>
 		<notes><![CDATA[
-boot OK but sprites flickers way too much, unplayable
+(same as firebal2)
 Compared to above has two extra "FBscreen" files, unknown purpose (edited levels?)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -1357,7 +1383,8 @@ Compared to above has two extra "FBscreen" files, unknown purpose (edited levels
 		<year>1995</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-boot OK
+Uses "Gordian Lock" protection scheme (cracked in this set?)
+a7000p -bios 2: "abort on data transfer", should be compatible with RISC OS 3.xx only
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
@@ -1373,12 +1400,13 @@ boot OK
 		</part>
 	</software>
 
-	<software name="fish">
+	<software name="fish" supported="partial">
 		<description>Fish!</description>
 		<year>1990</year>
 		<publisher>Magnetic Scrolls</publisher>
 		<notes><![CDATA[
-boot OK, has unemulated printer
+Untested [printer] option under Specials tab (use mouse)
+a7000p -bios 2: CLI compatible, eventually needs [PS/2] mouse for above
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1387,12 +1415,16 @@ boot OK, has unemulated printer
 		</part>
 	</software>
 
+	<!-- 2x 2HD version known to exist -->
 	<software name="flashbk" supported="no">
 		<description>Flashback</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-Hangs when launching !Boot
+Not extensively tested (requires manual)
+Untested HDD install
+a7000p -bios 2: "screen mode not available", does it require a patch or just the 2HD version?
+sarpc_j233: should require a patch to be compatible
 ]]></notes>
 		<info name="usage" value="Protection requires manual" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1434,11 +1466,11 @@ Hangs when launching !Boot
 	</software>
 
 	<software name="flashbkc" cloneof="flashbk" supported="no">
-		<description>Flashback [no manual]</description>
+		<description>Flashback (cracked manual protection)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-Hangs when launching !Boot
+(same as flashbk minus the manual requirement)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -1446,6 +1478,7 @@ Hangs when launching !Boot
 				<rom name="Flashback (1994)(US Gold)(Disc 1 of 6).adf" size="819200" crc="c29b07a3" sha1="7815f2e4484c77d82e16caa65c79e495033bd0db"/>
 			</dataarea>
 		</part>
+		<!-- TODO: labeled with Level numbers? -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819200">
@@ -1479,11 +1512,13 @@ Hangs when launching !Boot
 	</software>
 
 	<software name="flashbd" supported="no">
+		<!-- "playable demonstration v1.00" -->
 		<description>Flashback (demo)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-"Internal error: branch through zero" exception
+Not extensively tested
+a7000p -bios 2: "Filing system or path Flashback not present"
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1497,7 +1532,9 @@ Hangs when launching !Boot
 		<year>1991</year>
 		<publisher>Simis</publisher>
 		<notes><![CDATA[
-Most executables either jump to lalaland or exceptions with "unrecoverable error"
+Most executables either jump to lalaland or exceptions with "unrecoverable error" (assume fixed)
+Not extensively tested
+a7000p -bios 2: CLI compatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Tools"/>
@@ -1523,7 +1560,9 @@ Most executables either jump to lalaland or exceptions with "unrecoverable error
 		<year>1988</year>
 		<publisher>Minerva</publisher>
 		<notes><![CDATA[
-Keyboard input doesn't work when prompted to
+[keyboard] eats inputs in gameplay (does not occur with riscpc)
+aa310, aa3010, aa5000: "File Cache not found" ([ARM7] merger regression?)
+a7000p -bios 2: actually boots but runs too fast, likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1537,7 +1576,8 @@ Keyboard input doesn't work when prompted to
 		<year>1994</year>
 		<publisher>TBA Software</publisher>
 		<notes><![CDATA[
-"Disc error", launcher has no icon?
+"Unable to open data file" at game overs
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk FTT1"/>
@@ -1553,13 +1593,14 @@ Keyboard input doesn't work when prompted to
 		</part>
 	</software>
 
-	<software name="galacdan">
+	<software name="galacdan" supported="yes">
 		<description>Galactic Dan</description>
 		<year>1992</year>
 		<publisher>Fourth Dimension</publisher>
 		<notes><![CDATA[
-boot OK
+a7000p -bios 2: "abort on data transfer", likely incompatible
 ]]></notes>
+		<!-- Has 2001 timestamp -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="Galactic Dan (19xx)(Fourth Dimension).adf" size="819200" crc="ebada18b" sha1="8f47f39efa1c83133302982e96c5e0f215eebd77"/>
@@ -1567,12 +1608,11 @@ boot OK
 		</part>
 	</software>
 
-	<software name="gods">
+	<software name="gods" supported="yes">
 		<description>Gods</description>
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-boot OK, title screen logo have few black dots
 a7000p -bios 2: throws "abort on data transfer" at new game, should be compatible with a patch (which implies installing to [HDD]?)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -1589,12 +1629,12 @@ a7000p -bios 2: throws "abort on data transfer" at new game, should be compatibl
 		</part>
 	</software>
 
-	<software name="godsc" cloneof="gods">
+	<software name="godsc" cloneof="gods" supported="yes">
 		<description>Gods (cracked)</description>
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-boot OK, title screen logo have few black dots
+(same as gods)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -1610,13 +1650,14 @@ boot OK, title screen logo have few black dots
 		</part>
 	</software>
 
-	<software name="gorm">
+	<software name="gorm" supported="yes">
 		<description>Gorm</description>
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
 		<notes><![CDATA[
-boot OK
+a7000p -bios 2: "Unknown or missing variable" from game handler, hangs "Without pictures" if bypassed, likely incompatible
 ]]></notes>
+		<!-- Has 2000 timestamp -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="gorm v1.40 (1994)(archimedes world).adf" size="819200" crc="cac30d02" sha1="6cfdbce5224ed8acff35b5c7a0cec9c7a2ae14ac" />
@@ -1630,7 +1671,8 @@ boot OK
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-boot OK, selecting keyboard doesn't work, has huge RMW issues
+[keyboard] hangs if pressing left key after swapping with keyboard control (with middle mouse button)
+a7000p -bios 2: "abort on data transfer" after selecting input device, likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1639,12 +1681,13 @@ boot OK, selecting keyboard doesn't work, has huge RMW issues
 		</part>
 	</software>
 
-	<software name="gribblys">
+	<software name="gribblys" supported="yes">
 		<description>Gribbly's Day Out on the Arc</description>
 		<year>1992</year>
 		<publisher>Coin-Age</publisher>
 		<notes><![CDATA[
-boot OK
+aa3010: resets when executed, incompatible?
+a7000p -bios 2: "abort on data transfer", likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="485302">
@@ -1653,12 +1696,13 @@ boot OK
 		</part>
 	</software>
 
-	<software name="guildthvs">
+	<software name="guildthvs" supported="partial">
 		<description>The Guild of Thieves</description>
 		<year>1989</year>
 		<publisher>Magnetic Scrolls</publisher>
 		<notes><![CDATA[
-boot OK
+Untested [printer] option under Specials tab (use mouse)
+a7000p -bios 2: CLI compatible, eventually needs [PS/2] mouse for above
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1672,8 +1716,10 @@ boot OK
 		<year>1992</year>
 		<publisher>Dream Software</publisher>
 		<notes><![CDATA[
-"cfs has no temp directory" exception
+"cfs has no temp directory" exception, unclear how to run this if not a bad dump
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
+		<info name="usage" value="Run !Cfs first then !Guile"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="guile (19xx)(dream software).adf" size="819200" crc="94baf4ba" sha1="07d171bb3e89ee52f2c88de114a28e239b08ba2a" />
@@ -1681,12 +1727,13 @@ boot OK
 		</part>
 	</software>
 
-	<software name="hamsters">
+	<software name="hamsters" supported="yes">
 		<description>Hamsters (demo)</description>
 		<year>1994</year>
 		<publisher>Eclipse</publisher>
 		<notes><![CDATA[
-boot OK, only stage 1 (recheck on Arculator)
+!HamsPwrPd looks a driver for a pad, depicts a SNES controller
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1700,11 +1747,11 @@ boot OK, only stage 1 (recheck on Arculator)
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-boot OK, mouse event movements autocenters too much and RMW bugs
-joystick claimed to be autodetected but fails for whatever reason
-Claims to support Vertical Twist (MIDI? SCSI? Joystick?) interface
+Untested HDD install
 sarpc_j233: should require a patch to be compatible
+a7000p -bios 2: seems CLI compatible, requires [PS/2] mouse and joystick support
 ]]></notes>
+		<info name="usage" value="Has optional Vertical Twist support (auto-detected)"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 0"/>
 			<dataarea name="flop" size="819200">
@@ -1742,8 +1789,11 @@ sarpc_j233: should require a patch to be compatible
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-Selecting any language other than English causes a stall, has "Sacked" disc protection
+Selecting any language other than English causes a stall (dump omitting them?)
+Prints a "Sacked" on disc protection screen, probably an hacker joke
+a7000p -bios 2: seems CLI compatible, requires [PS/2] mouse
 ]]></notes>
+		<!-- Has 2000 timestamp -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="hero quest (1991)(krisalis)[h].adf" size="819200" crc="f9ef486d" sha1="4f92efecfc1e3a510a816f570ccb7082f0154e37" />
@@ -1751,12 +1801,12 @@ Selecting any language other than English causes a stall, has "Sacked" disc prot
 		</part>
 	</software>
 
-	<software name="hexatoms">
+	<software name="hexatoms" supported="yes">
 		<description>Hex Atoms</description>
 		<year>1992</year>
 		<publisher>BitBox</publisher>
 		<notes><![CDATA[
-boot OK
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1770,9 +1820,12 @@ boot OK
 		<year>1990</year>
 		<publisher>Superior Software/Acornsoft</publisher>
 		<notes><![CDATA[
-boot OK, has a slight RMW bug on the car intro, input not recognized when dying once
+aa310, aa3010, aa5000: "File Cache not found" ([ARM7] merger regression?)
+Input not recognized when dying once
+a7000p -bios 2: CLI compatible
 ]]></notes>
 		<info name="usage" value="Requires RiscOS 2.01 or above" />
+		<!-- Has 1997 timestamp -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="Hostages (Superior Software).adf" size="819200" crc="f42a6fa3" sha1="0c8bce397205bcb3f1d285570086572cd1ca0cc0" />
@@ -1780,12 +1833,12 @@ boot OK, has a slight RMW bug on the car intro, input not recognized when dying 
 		</part>
 	</software>
 
-	<software name="ibix" supported="no">
+	<software name="ibix" supported="yes">
 		<description>Ibix the Viking</description>
 		<year>1989</year>
 		<publisher>Minerva</publisher>
 		<notes><![CDATA[
-"Sprite doesn't exist" exception on intro screen
+a7000p -bios 2: CLI compatible, editor requires [PS/2] mouse
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1794,14 +1847,16 @@ boot OK, has a slight RMW bug on the car intro, input not recognized when dying 
 		</part>
 	</software>
 
-	<software name="interdc2" supported="partial">
+	<software name="interdc2" supported="yes">
 		<description>Interdictor 2</description>
 		<year>1989</year>
 		<publisher>Clares Micro Supplies</publisher>
 		<notes><![CDATA[
-boot OK, protection code seems always the same (yellow then blue), may be cracked or timing issue
+a7000p -bios 2: "abort on data transfer", likely incompatible
 ]]></notes>
-		<info name="usage" value="Protection requires manual" />
+		<!-- NOTE: will eventually give a yellow then blue sequence (naive protections scheme) -->
+		<info name="usage" value="Protection requires manual (4 color codes)" />
+		<!-- Has 1991 timestamp -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="interdictor 2 (1989)(microsupplies).adf" size="819200" crc="43c6ca84" sha1="0be4c7d47da5634b68fda1408daa2c9cfd227e2b" />
@@ -1809,12 +1864,13 @@ boot OK, protection code seems always the same (yellow then blue), may be cracke
 		</part>
 	</software>
 
-	<software name="ironlord">
+	<software name="ironlord" supported="yes">
+		<!-- Has Cheats folder -->
 		<description>Iron Lord</description>
 		<year>1990</year>
 		<publisher>Cygnus</publisher>
 		<notes><![CDATA[
-boot OK, has trainer
+a7000p -bios 2: CLI compatible, requires [PS/2] mouse to be playable
 ]]></notes>
 		<info name="usage" value="Requires RiscOS 3.10 or above" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1824,13 +1880,14 @@ boot OK, has trainer
 		</part>
 	</software>
 
-	<software name="ironlorda" cloneof="ironlord">
+	<software name="ironlorda" cloneof="ironlord" supported="yes">
+		<!-- Has just the main executable vs. ironlord -->
 		<description>Iron Lord (alt)</description>
 		<year>1990</year>
 		<publisher>Ubi Soft</publisher>
 		<notes><![CDATA[
-boot OK
-]]></notes>
+(same as ironlord)
+)]]></notes>
 		<info name="usage" value="Requires RiscOS 3.10 or above" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
@@ -1844,7 +1901,8 @@ boot OK
 		<year>1992</year>
 		<publisher>Eclipse</publisher>
 		<notes><![CDATA[
-boot OK, sound vibrato is unbearable here
+[sound] is particularly aliased here
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -1861,11 +1919,13 @@ boot OK, sound vibrato is unbearable here
 	</software>
 
 	<software name="jksquash" supported="partial">
+		<!-- has trainer -->
 		<description>Jahangir Khan's World Championship Squash</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-boot OK, raster effect bug on title screen, long loading screen with black afterwards?, entering player name has stuck keys, has trainer
+[VIDC10] off by ~10 Hz with mid-frame raster effect on title screen (Krisalis logo colors)
+a7000p -bios 2: "abort on data transfer", likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1879,7 +1939,9 @@ boot OK, raster effect bug on title screen, long loading screen with black after
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-Hardlocks after Krisalis logo
+[VIDC10] color off for stage 1 sky, raster effect
+Not extensively tested
+a700p -bios 2: "abort on data transfer" after Krisalis logo, likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1893,7 +1955,7 @@ Hardlocks after Krisalis logo
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-Hardlocks after Krisalis logo
+(same as jponda)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1907,7 +1969,7 @@ Hardlocks after Krisalis logo
 		<year>1988</year>
 		<publisher>Minerva</publisher>
 		<notes><![CDATA[
-contains a copy of Great Giana Sisters and a mangled Jet Fighter folder
+Contains a copy of Great Giana Sisters and a mangled Jet Fighter folder
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="809984">
@@ -1916,12 +1978,12 @@ contains a copy of Great Giana Sisters and a mangled Jet Fighter folder
 		</part>
 	</software>
 
-	<software name="kaptkonf" supported="no">
+	<software name="kaptkonf" supported="yes">
 		<description>Kaptain Konflict</description>
 		<year>1990</year>
 		<publisher>Calderglen Computers</publisher>
 		<notes><![CDATA[
-"Sprite doesn't exist" exception either by starting a new game or in the key remapper
+a7000p -bios 2: BASIC game, incompatible (NOTE: will also brick i2cmem system settings)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1931,17 +1993,22 @@ contains a copy of Great Giana Sisters and a mangled Jet Fighter folder
 	</software>
 
 	<software name="karmaft" supported="no">
+		<!-- Version 1.05 (FEB 10 1992 14:41:23) -->
 		<description>Karma: The Flight Trainer</description>
 		<year>1991</year>
 		<publisher>Periscope Software</publisher>
 		<notes><![CDATA[
-Trips unimplemented COPRO opcodes on launching !Karma
+Untested HDD install
+Not extensively tested
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
+		<!-- TODO: Global disk as per prompt? -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="Karma_1.adf" size="819200" crc="fa96aad8" sha1="2766b870f9c1366f3a6457c5294771aa54f171bd"/>
 			</dataarea>
 		</part>
+		<!-- TODO: Sector_0 disk as per prompt? -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="Karma_2.adf" size="819200" crc="d3b837b6" sha1="b5ba834c4c1d3321ca48b94fc6b668783e23a4f0"/>
@@ -1949,13 +2016,14 @@ Trips unimplemented COPRO opcodes on launching !Karma
 		</part>
 	</software>
 
-	<software name="lander">
+	<software name="lander" supported="yes">
 		<description>Lander (demo)</description>
 		<year>1987</year>
 		<publisher>Acorn</publisher>
 		<notes><![CDATA[
-boot OK
+a7000p -bios 2: "abort on data transfer", likely incompatible
 ]]></notes>
+		<!-- Has 2001 timestamp -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="lander.adf" size="819200" crc="a9444537" sha1="a627ab8a527210a491f8c6fac88d5e3f4ee1d83e" />
@@ -1963,12 +2031,13 @@ boot OK
 		</part>
 	</software>
 
-	<software name="ldaydoom">
+	<software name="ldaydoom" supported="yes">
 		<description>The Last Days of Doom (includes Hezarin)</description>
 		<year>1993</year>
 		<publisher>Topologika</publisher>
 		<notes><![CDATA[
-boot OK
+Takes a while to draw B option text at game select (verify)
+a7000p -bios 2: CLI compatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1977,12 +2046,15 @@ boot OK
 		</part>
 	</software>
 
-	<software name="lastninja">
+	<software name="lastninja" supported="partial">
 		<description>The Last Ninja</description>
 		<year>1992</year>
 		<publisher>Superior Software</publisher>
 		<notes><![CDATA[
-boot OK
+aa5000: unresponsive [keyboard] on hi-score screen
+How to jump with [mouse] control?
+aa3010: incompatible
+a7000p -bios 2: "abort on data transfer" at new game start (needs multiple Enter key pressed to show up), likely incompatible
 ]]></notes>
 		<info name="usage" value="Requires RiscOS 3.10 or above" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1997,7 +2069,7 @@ boot OK
 		<year>1992</year>
 		<publisher>Superior Software</publisher>
 		<notes><![CDATA[
-boot OK
+(same as lastninja)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -2011,7 +2083,7 @@ boot OK
 		<year>1993</year>
 		<publisher>CDS</publisher>
 		<notes><![CDATA[
-trips a bunch of unimplemented COPRO opcodes, corrupts the "please wait" message screen and hangs
+a7000p -bios 2: "Illegal address" after CDS logo, incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -2020,12 +2092,14 @@ trips a bunch of unimplemented COPRO opcodes, corrupts the "please wait" message
 		</part>
 	</software>
 
-	<software name="losttmpl" supported="no">
+	<software name="losttmpl" supported="partial">
 		<description>Legend of the Lost Temple</description>
 		<year>1992</year>
 		<publisher>Eterna</publisher>
 		<notes><![CDATA[
-Attempting to change inputs causes a jump to lalaland, fire key not recognized by the game, using joystick actually routes to mouse (with wrong inputs)
+Using joystick actually routes to mouse (with wrong inputs)
+Unresponsive [keyboard] on name entry
+a7000p -bios 2: "abort on data transfer", likely incompatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -2041,13 +2115,14 @@ Attempting to change inputs causes a jump to lalaland, fire key not recognized b
 		</part>
 	</software>
 
-	<software name="lemmings" supported="partial">
+	<software name="lemmings" supported="no">
 		<description>Lemmings</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-Cursor sprite is invisible on menu unless you click with A5000 class machine,
-has RMW bug on manhole opening, has raster effect bug on briefing and gameplay
+[VIDC10] Cursor sprite is invisible on menu unless with aa5000 and only when text stop scrolling
+[VIDC10] Has raster effect bugs on stage briefings and gameplay
+a7000p -bios 2: "abort on data transfer", should be compatible with a patch?
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -2061,8 +2136,7 @@ has RMW bug on manhole opening, has raster effect bug on briefing and gameplay
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-Cursor sprite is invisible on menu unless you click with A5000 class machine,
-has RMW bug on manhole opening, has raster effect bug on briefing and gameplay
+(same as lemmings)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
@@ -2076,7 +2150,11 @@ has RMW bug on manhole opening, has raster effect bug on briefing and gameplay
 		<year>1994</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-Mouse cursor autocenters too much especially on A5000 class machine, raster effect bug on gameplay screen
+[VIDC10] raster effect bug on gameplay screen
+No sound in gameplay (verify)
+a7000p -bios 2: CLI compatible, needs [PS/2] mouse (also does an extra roundtrip with disk 2 vs. regular Archimedes)
+a7000p -bios 2: Intro disk "branch through zero", incompatible?
+[VIDC20] Sets doubled height video on intro logos (VGA? btanb?)
 ]]></notes>
 		<info name="usage" value="Requires 2MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -2110,8 +2188,11 @@ Mouse cursor autocenters too much especially on A5000 class machine, raster effe
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-boot OK, has raster effect bugs on gameplay (2p is even worse), sometimes inputs forgets being hit
+[VIDC10] has raster effect bugs on gameplay (even worse when in split screen mode)
+[keyboard] sometimes inputs forgets being hit (verify, fixed?)
+a7000p -bios 2: "abort on data transfer", likely incompatible
 ]]></notes>
+		<info name="usage" value="Press ALT key to go in main menu after game loaded."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
@@ -2795,13 +2876,15 @@ boot OK but flickers like mad due of incorrect raster effects, also seems very s
 		</part>
 	</software>
 
-	<software name="sensoccr" supported="no">
+	<software name="sensoccr" supported="partial">
 		<description>Sensible Soccer (v1.1)</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
-Black screen after title screen
+Untested floppy saving
+a7000p -bios 2: black screen after initial loading, incompatible?
 ]]></notes>
+		<!-- Disk 1 has 1996 timestamp -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="354504">
@@ -2835,7 +2918,8 @@ boot OK
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-Crashes when creating a new city with "fatal internal error (type=3)", throws three unimplemented COPRO opcodes, wants cache?
+Keeps throwing disasters even if disabled, bad [VIDC10] colors, wants cache?
+a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
@@ -2932,11 +3016,11 @@ boot OK, initial speech pitch sounds very low (btanb)
 		<year>1991</year>
 		<publisher>Superior Software/Acornsoft</publisher>
 		<notes><![CDATA[
-none of the files listed launch anything, possible bad dump
+None of the files listed launch anything, possible bad dump
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="337920">
-				<rom name="Speech v1.3 (1991)(Superior Software).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" />
+				<rom name="Speech v1.3 (1991)(Superior Software).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3237,12 +3321,12 @@ Revised version means it can run on RiscOS 3.5+
 		</part>
 	</software>
 
-	<software name="topbanan">
+	<software name="topbanan" supported="yes">
 		<description>Top Banana</description>
 		<year>1988</year>
 		<publisher>Hex</publisher>
 		<notes><![CDATA[
-boot OK
+a7000p -bios 2: CLI compatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -3395,12 +3479,13 @@ boot OK, has ZX Spectrum like raster effect when dying with the fan
 		</part>
 	</software>
 
-	<software name="wolf3d">
+	<software name="wolf3d" supported="partial">
 		<description>Wolfenstein 3D</description>
 		<year>1994</year>
 		<publisher>Powerslave Software</publisher>
 		<notes><![CDATA[
-boot OK
+[VIDC10] Video timings are off on intro
+Untested HDD install
 a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -3409,6 +3494,7 @@ a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support
 				<rom name="Wolfenstein 3D (1994) (Powerslave Software) (Disk 0 of 2).apd" size="403340" crc="1bc46d3e" sha1="76cc19e9d87c10e48117fcf629ef67fa85fc08f1"/>
 			</dataarea>
 		</part>
+		<!-- TODO: "Game Disc N" in-game really 	-->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Games Disc 1"/>
 			<dataarea name="flop" size="391042">
@@ -3668,12 +3754,14 @@ boot OK
 		</part>
 	</software>
 
-	<software name="bluethndr" supported="no">
+	<software name="bluethndr" supported="partial">
 		<description>Blue Thunder (v1.2)</description>
-		<year>199?</year>
+		<!-- '97 main executable, ReadMe has a 2000 mod -->
+		<year>1997?</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-selecting hi-res mode in game causes wrong screen mode (1bpp), no enemy appear in-game, is the game even completed?
+Hi-res requires mode 49, draws in 1bpp for [VIDC10] (incompatible?), draws with half pitch in [VIDC20] (and should set 480p and it doesn't)
+a7000p -bios 2: CLI compatible
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -3880,12 +3968,12 @@ Detects a bogus Escape key pressed after a few seconds of title screen
 		</part>
 	</software>
 
-	<software name="lemings">
+	<software name="lemings" supported="yes">
 		<description>Lemings</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-boot OK
+a7000p -bios 2: CLI compatible, needs [PS/2] mouse
 ]]></notes>
 		<info name="author" value="Tom Cooper" />
 		<part name="flop1" interface="floppy_3_5">
