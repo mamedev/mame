@@ -139,6 +139,9 @@ public:
 		CBM_IEC_SLOT(config, "iec10", 10, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec11", 11, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec12", 12, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec13", 13, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec14", 14, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec15", 15, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec30", 30, cbm_iec_devices, nullptr);
 
 		CBM_IEC(config, std::forward<T>(_bus_tag), 0);
