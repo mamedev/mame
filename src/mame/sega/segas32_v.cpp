@@ -758,15 +758,15 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 					{
 						const rectangle *cur = &lineclips[linesorted[j]];
 
-						if (extent != &list->extent[32 + y][1] && cur->min_x <= extent[-1])
+						if (extent != &list->extent[32 + y][1] && cur.min_x <= extent[-1])
 						{
-							if (cur->max_x > extent[-1])
-								extent[-1] = cur->max_x;
+							if (cur.max_x > extent[-1])
+								extent[-1] = cur.max_x;
 						}
 						else
 						{
-							*extent++ = cur->min_x;
-							*extent++ = cur->max_x;
+							*extent++ = cur.min_x;
+							*extent++ = cur.max_x;
 						}
 					}
 				}
