@@ -126,7 +126,7 @@ void ics2115_device::device_start()
 	// round(1024*2^(frac/32))
 	for (u8 i = 0; i < 32; i++)
 	{
-		m_volinc_frac[i] = u16(std::round(1024.0 * std::pow(2.0, double(i) / 32.0)));
+		m_volinc_frac[i] = u32(std::round(1024.0 * std::pow(2.0, double(i) / 32.0)));
 	}
 
 	save_item(STRUCT_MEMBER(m_timer, period));
@@ -144,14 +144,13 @@ void ics2115_device::device_start()
 	for (int i = 0; i < 32; i++)
 	{
 		save_item(NAME(m_voice[i].osc_conf.value), i);
-		save_item(NAME(m_voice[i].state.on), i);
 		save_item(NAME(m_voice[i].vol_ctrl.value), i);
 		save_item(NAME(m_voice[i].osc.left), i);
 		save_item(NAME(m_voice[i].osc.acc), i);
 		save_item(NAME(m_voice[i].osc.start), i);
 		save_item(NAME(m_voice[i].osc.end), i);
 		save_item(NAME(m_voice[i].osc.fc), i);
-		save_item(NAME(m_voice[i].osc.ctl), i);
+		save_item(NAME(m_voice[i].osc_ctrl.value), i);
 		save_item(NAME(m_voice[i].osc.saddr), i);
 		save_item(NAME(m_voice[i].vol.left), i);
 		save_item(NAME(m_voice[i].vol.add), i);
@@ -195,7 +194,7 @@ void ics2115_device::device_reset()
 		elem.osc.acc = 0;
 		elem.osc.start = 0;
 		elem.osc.end = 0;
-		elem.osc.ctl = 0;
+		elem.osc_ctrl.value = 0;
 		elem.osc.saddr = 0;
 		elem.vol.acc = 0;
 		elem.vol.incr = 0;
@@ -204,7 +203,6 @@ void ics2115_device::device_reset()
 		elem.vol.pan = 0x7f;
 		elem.vol_ctrl.value = 1;
 		elem.vol.mode = 0;
-		elem.state.on = false;
 	}
 }
 
@@ -368,7 +366,7 @@ int ics2115_device::ics2115_voice::update_oscillator()
 	}
 	else
 	{
-		state.on = false;
+		osc_ctrl.bitflags.done = true;
 		osc_conf.bitflags.stop = true;
 		if (!osc_conf.bitflags.invert)
 			osc.acc = osc.end;
@@ -384,7 +382,7 @@ s32 ics2115_device::get_sample(ics2115_voice& voice)
 	const u32 curaddr = voice.osc.acc >> 12;
 	u32 nextaddr;
 
-	if (voice.state.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
+	if ((voice.osc_ctrl.value == 0) && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
 			(voice.osc.left < (voice.osc.fc << 2)))
 	{
 		//LOGVOICE("C?[%x:%x]", voice.osc.left, voice.osc.acc);
@@ -427,13 +425,14 @@ s32 ics2115_device::get_sample(ics2115_voice& voice)
 
 bool ics2115_device::ics2115_voice::playing()
 {
-	return state.on && !(osc_conf.bitflags.stop);
+	return (osc_ctrl.value == 0) && !(osc_conf.bitflags.stop);
 }
 
 int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 {
 	bool irq_invalid = false;
 	// measured from hardware
+	/*
 	switch (voice.vol.mode & 0x3)
 	{
 		case 0x0:
@@ -448,6 +447,10 @@ int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 			voice.vol.add = voice.vol.incr << 10;
 			break;
 	}
+	*/
+	// kov doesn't like above...
+	const u16 fine = 1 << (3 * (voice.vol.incr >> 6));
+	voice.vol.add = (voice.vol.incr & 0x3f) << (10 - fine);
 
 	for (int i = 0; i < stream.samples(); i++)
 	{
@@ -545,7 +548,7 @@ u16 ics2115_device::reg_read()
 	{
 		case 0x00: // [osc] Oscillator Configuration
 			ret = voice.osc_conf.value;
-			if (voice.state.on)
+			if (voice.osc_ctrl.value == 0)
 			{
 				ret |= 8;
 			}
@@ -664,7 +667,7 @@ u16 ics2115_device::reg_read()
 		}
 
 		case 0x10: // [osc] Oscillator Control
-			ret = voice.osc.ctl << 8;
+			ret = voice.osc_ctrl.value << 8;
 			break;
 
 		case 0x11: // [osc] Wavesample static address 27-20
@@ -854,12 +857,11 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			if (ACCESSING_BITS_8_15)
 			{
 				data >>= 8;
-				voice.osc.ctl = data;
-				voice.state.on = !voice.osc.ctl; // some early PGM games need this
-				if (!data)
+				voice.osc_ctrl.value = data & 3;
+				if (!voice.osc_ctrl.bitflags.stop)
 					keyon();
 				//guessing here
-				else if (data == 0xf)
+				else if (voice.osc_ctrl.bitflags.stop)
 				{
 #ifdef ICS2115_ISOLATE
 					if (m_osc_select == ICS2115_ISOLATE)
