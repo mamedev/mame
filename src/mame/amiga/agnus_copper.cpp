@@ -99,6 +99,7 @@ void agnus_copper_device::device_start()
 	save_item(NAME(m_pending_offset));
 	save_item(NAME(m_xpos_state));
 	save_item(NAME(m_resync_pending));
+	save_item(NAME(m_copper_list));
 }
 
 
@@ -113,6 +114,7 @@ void agnus_copper_device::device_reset()
 	m_dma_master_enable = false;
 	m_dma_copen = false;
 	m_resync_pending = false;
+	m_copper_list = 0;
 	// TODO: latches states on soft reset
 }
 
@@ -204,6 +206,7 @@ template <u8 ch> u16 agnus_copper_device::copjmpx_r()
 
 inline void agnus_copper_device::set_pc(u8 ch, bool is_sync)
 {
+	m_copper_list = ch;
 	m_pc = m_lc[ch];
 	m_state_waiting = false;
 	m_state_skipping = false;
@@ -242,9 +245,15 @@ void agnus_copper_device::vblank_sync(bool state)
 		// If copper DMA is disabled at vblank time the restart is deferred
 		// - maglines intro would otherwise squash drawing to a very small portion at screen center
 		if (m_dma_master_enable && m_dma_copen)
+		{
+			m_resync_pending = false;
 			set_pc(0, true);
+		}
 		else
+		{
 			m_resync_pending = true;
+			m_copper_list = 0;
+		}
 		m_xpos_state = 0;
 	}
 	m_vertical_blank = state;
@@ -278,12 +287,12 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 	if (!m_dma_master_enable || !m_dma_copen)
 		return 511;
 
-	// deferred vblank restart: fires at the first DMA opportunity,
-	// after any COP1LC update done while the copper was disabled
+	// deferred vblank restart: fires at the first DMA opportunity after any
+	// location-register update or COPJMP strobe done while the copper was disabled
 	if (m_resync_pending)
 	{
 		m_resync_pending = false;
-		set_pc(0, true);
+		set_pc(m_copper_list, true);
 	}
 
 	/* flush any pending writes */
