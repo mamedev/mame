@@ -258,6 +258,7 @@ protected:
 	int cur_rate;
 	int selected_drive;
 	u8 drive_busy;
+	bool xfer_in_progress;
 
 	emu_timer *poll_timer;
 
