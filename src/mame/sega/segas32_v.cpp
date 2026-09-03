@@ -601,10 +601,18 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		sorted[i] = i;
 	}
 
-	// bubble sort them by min_x
-	for (int i = 0; i < 5; i++)
-		for (int j = i + 1; j < 5; j++)
-			if (clips[sorted[i]].min_x > clips[sorted[j]].min_x) { int temp = sorted[i]; sorted[i] = sorted[j]; sorted[j] = temp; }
+	// insertion sort them by min_x
+	for (int i = 1; i < 5; i++)
+	{
+		int j = i - 1;
+
+		while (j >= 0 && clips[sorted[j]].min_x > clips[sorted[i]].min_x)
+		{
+			sorted[j + 1] = sorted[j];
+			j--;
+		}
+		sorted[j + 1] = sorted[i];
+	}
 
 	// create all valid extent combinations
 	for (int i = 1; i < 32; i++)
@@ -740,14 +748,17 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			{
 				uint16_t *extent = &list->extent[32 + y][0];
 
-				for (int i = 0; i < 5; i++)
-					for (int j = i + 1; j < 5; j++)
-						if (lineclips[linesorted[i]].min_x > lineclips[linesorted[j]].min_x)
-						{
-							int temp = linesorted[i];
-							linesorted[i] = linesorted[j];
-							linesorted[j] = temp;
-						}
+				for (int i = 1; i < 5; i++)
+				{
+					int j = i - 1;
+
+					while (j >= 0 && lineclips[linesorted[j]].min_x > lineclips[linesorted[i]].min_x)
+					{
+						linesorted[j + 1] = linesorted[j];
+						j--;
+					}
+					linesorted[j + 1] = linesorted[i];
+				}
 
 				*extent++ = tempclip.min_x;
 
