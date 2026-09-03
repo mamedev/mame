@@ -17,6 +17,8 @@ TODO:
 - Fence/MMU?  Games seem to run fine with stock ARM60 semantics.
 
 TODO (BIOS programs):
+- 3do_fz1: DSPP is silent on planet splash screen
+- 3do_fz1j: DSPP has repeating noise on planet splash screen
 - 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs on initial logo screen;
 - 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
 - 3do_try, 3do_hc21 (bios 1), 3do_fc2: throws "QueueSport error on cmd 4: xfer across 1M boundary"
