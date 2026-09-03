@@ -139,6 +139,11 @@ protected:
 		HEAD = 0xfe20
 	};
 
+	// BASIC program file layout
+	static constexpr int BAC_BLOCK_SIZE = 253;
+	static constexpr u8 BAC_END_OF_BLOCK = 0x00;
+	static constexpr u8 BAC_END_OF_PROGRAM = 0x01;
+
 	enum
 	{
 		MMU_XM      = 0x01,
