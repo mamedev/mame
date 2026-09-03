@@ -939,15 +939,12 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 		// fetch the metadata for this track
 		if (!chd->read_metadata(CDROM_TRACK_METADATA_TAG, toc.numtrks, metadata, metaindex))
 		{
-			if (sscanf(metadata.c_str(), "TRACK:%d TYPE:%15s SUBTYPE:%15s FRAMES:%d",
-					&tracknum, type, subtype, &frames) != 4)
+			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
 				return chd_file::error::INVALID_DATA;
 		}
 		else if (!chd->read_metadata(CDROM_TRACK_METADATA2_TAG, toc.numtrks, metadata, metaindex))
 		{
-			if (sscanf(metadata.c_str(),
-					"TRACK:%d TYPE:%15s SUBTYPE:%15s FRAMES:%d PREGAP:%d PGTYPE:%15s PGSUB:%15s POSTGAP:%d",
-					&tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
+			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
 				return chd_file::error::INVALID_DATA;
 		}
 		else
@@ -962,9 +959,7 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 			if (err)
 				break;
 
-			if (sscanf(metadata.c_str(),
-					"TRACK:%d TYPE:%15s SUBTYPE:%15s FRAMES:%d PAD:%d PREGAP:%d PGTYPE:%15s PGSUB:%15s POSTGAP:%d",
-					&tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
+			if (sscanf(metadata.c_str(), GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
 				return chd_file::error::INVALID_DATA;
 
 			toc.flags |= CD_FLAG_GDROM;
