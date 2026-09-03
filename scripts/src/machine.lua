@@ -5518,6 +5518,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/unihammer.h,MACHINES["UNIHAMMER"] = true
+---------------------------------------------------
+if MACHINES["UNIHAMMER"] then
+	files {
+		MAME_DIR .. "src/devices/machine/unihammer.cpp",
+		MAME_DIR .. "src/devices/machine/unihammer.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ns32382.h,MACHINES["NS32382"] = true
 ---------------------------------------------------
 if MACHINES["NS32382"] then
