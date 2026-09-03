@@ -169,11 +169,12 @@ void riscpc_state::a7000_map(address_map &map)
 //  map(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  map(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
+//	map(0x03240000, 0x032400ff) a7000p -bios 0 (podule mirror?)
 	map(0x03310000, 0x03310003).portr(m_mouse);
 //  map(0x033a0004, 0x033a0004) // topbanan, joystick?
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
-//  map(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
+//  map(0x08000000, 0x08ffffff).mirror(0x07000000) //EASI space
 
 	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
@@ -392,24 +393,28 @@ void riscpc_state::a7000p(machine_config &config)
 void riscpc_state::sarpc(machine_config &config)
 {
 	// TODO: ranges from 160 to 233 MHz
-	constexpr XTAL cpuxtal(200'000'000);
+	// Base xtal comes from the upgrade StrongARM kit, which may or may not be identical to the
+	// regular mobo.
+	// PLL bump is unverified and may be moved as part of the CPU core actually
+	constexpr XTAL cpuxtal(3'686'400);
 
-	SA110(config, m_maincpu, cpuxtal);
+	SA110(config, m_maincpu, cpuxtal * 44);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM_IOMD(config, m_iomd, cpuxtal);
+	// TODO: bump me up
+	ARM_IOMD(config, m_iomd, cpuxtal * 44);
 	base_config(config);
 }
 
 void riscpc_state::sarpc_j233(machine_config &config)
 {
-	// TODO: 233 MHz, unsupported by xtal module
-	constexpr XTAL cpuxtal(200'000'000);
+	// TODO: 233 MHz, as above
+	constexpr XTAL cpuxtal(3'686'400);
 
-	SA110(config, m_maincpu, cpuxtal);
+	SA110(config, m_maincpu, cpuxtal * 64);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD(config, m_iomd, cpuxtal * 64);
 	base_config(config);
 }
 
@@ -456,20 +461,20 @@ ROM_START(a7000p)
 ROM_END
 
 ROM_START(sarpc)
+	ROM_DEFAULT_BIOS("371")
+
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.70
 	ROM_SYSTEM_BIOS( 0, "370", "RiscOS 3.70" )
 	ROMX_LOAD("1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	// Version 3.71
+	ROM_SYSTEM_BIOS( 1, "371", "RiscOS 3.71" )
+	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
 ROM_END
 
-ROM_START(sarpc_j233)
-	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
-	// Version 3.71
-	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
-	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-ROM_END
+#define rom_sarpc_j233 rom_sarpc
 
 } // anonymous namespace
 
@@ -485,5 +490,5 @@ COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, empty_i
 COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, empty_init, "Acorn Computers", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, empty_init, "Acorn Computers", "Acorn A7000",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, empty_init, "Acorn Computers", "Acorn A7000+",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn Computers", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn Computers", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, sarpc,      0,      0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn Computers", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, sarpc_j233, sarpc,  0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn Computers", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
