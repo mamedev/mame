@@ -32,13 +32,16 @@ public:
 	void fixitflx(machine_config &config) ATTR_COLD;
 	void wiwcs(machine_config &config) ATTR_COLD;
 	void poke(machine_config &config) ATTR_COLD;
+	void pixlstar(machine_config &config) ATTR_COLD;
 	void flufflav(machine_config &config) ATTR_COLD;
 	void puni(machine_config &config) ATTR_COLD;
 	void bubltea(machine_config &config) ATTR_COLD;
 	void dsgnpal(machine_config &config) ATTR_COLD;
 	void bftetris(machine_config &config) ATTR_COLD;
+	void pink218(machine_config &config) ATTR_COLD;
 
 	void init_fif() ATTR_COLD;
+	void init_pink218() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -395,6 +398,14 @@ void generalplus_gpl951xx_game_state::poke(machine_config &config)
 	m_genspi->set_jedec_capacity(0x19);
 }
 
+void generalplus_gpl951xx_game_state::pixlstar(machine_config &config)
+{
+	gpl951xx(config);
+	m_genspi->set_jedec_manufacturer(0xc2);
+	m_genspi->set_jedec_memtype(0x20);
+	m_genspi->set_jedec_capacity(0x18);
+}
+
 void generalplus_gpl951xx_game_state::flufflav(machine_config &config)
 {
 	gpl951xx(config);
@@ -438,6 +449,16 @@ void generalplus_gpl951xx_game_state::bftetris(machine_config &config)
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(generalplus_gpl951xx_game_state::bftetris_screen_update));
+}
+
+void generalplus_gpl951xx_game_state::pink218(machine_config &config)
+{
+	bftetris(config);
+
+	// check!
+	m_genspi->set_jedec_manufacturer(0xc2);
+	m_genspi->set_jedec_memtype(0x20);
+	m_genspi->set_jedec_capacity(0x17);
 }
 
 
@@ -519,6 +540,31 @@ ROM_END
 ROM_START( punistar )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "xm25qh64c.ic3", 0x0000, 0x800000, CRC(72f54f23) SHA1(902955764d0b61decc057eb3afaf2960cf2134c6) )
+ROM_END
+
+ROM_START( pixlstar )
+	ROM_REGION16_BE(0x1000000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "pixel_stars.bin", 0x0000, 0x1000000, CRC(24787fa9) SHA1(104791a1e5783e6d657c6c3b37c2120db8e6f4eb) )
+ROM_END
+
+ROM_START( kenshino )
+	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "kenshi no michi.bin", 0x0000, 0x800000, CRC(259c8393) SHA1(5a1aa31127a188cdce1efb87d48016b49aebfd61) )
+ROM_END
+
+ROM_START( tamasmrt )
+	ROM_REGION16_BE(0x1000000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "tamasmart_mb_spi.bin", 0x0000, 0x1000000, CRC(d1bce309) SHA1(b17f245e1c5919584cd84e8708ed7aba25c3aced) )
+ROM_END
+
+ROM_START( tamasmrta )
+	ROM_REGION16_BE(0x1000000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "tamasmart_s_spi.bin", 0x0000, 0x1000000, CRC(da7296dc) SHA1(92b5f92fc06274ee886d4ce3c11dae9e40c1f219) )
+ROM_END
+
+ROM_START( teriermn )
+	ROM_REGION16_BE(0x1000000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "spi_terriermon.bin", 0x0000, 0x1000000, CRC(02073b42) SHA1(8d4a947cf60463e9896f941d7647359a7eac1c1e) )
 ROM_END
 
 ROM_START( flufflav )
@@ -616,6 +662,23 @@ ROM_START( bubltea )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(56549fa7) SHA1(4a03b4c69035baa48b146ecee3912a3b0672b845) )
 ROM_END
 
+ROM_START( pink218 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "p25q64h.u2", 0x000000, 0x800000, CRC(7209e7bf) SHA1(1cc0a0b74d3f373dae18b52b3f7014d56f0d9b51) )
+ROM_END
+
+ROM_START( smkfrnd )
+	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gpr25l6403.u3", 0x0000, 0x800000, CRC(1a865cc2) SHA1(c7abee0b625c713f22c0ffbc923e0938e503ce55) )
+ROM_END
+
+ROM_START( chiikawa )
+	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "chiikawa_to_issho.bin", 0x0000, 0x800000, CRC(cb65a0f6) SHA1(2c8fa2c52fbb7968c4cebfd4b7bdf9b97f31f2f3) )
+ROM_END
+
+
+
 void generalplus_gpl951xx_game_state::init_fif()
 {
 	u16 *spirom16 = (u16*)memregion("spi")->base();
@@ -625,6 +688,20 @@ void generalplus_gpl951xx_game_state::init_fif()
 			3, 1, 11, 9, 6, 14, 0, 2, 8, 7, 13, 15, 4, 5, 12, 10);
 	}
 }
+
+
+void generalplus_gpl951xx_game_state::init_pink218()
+{
+	u16 *romdata = (u16*)memregion("spi")->base();
+	int romsize = memregion("spi")->bytes();
+
+	for (offs_t i = 0; i < romsize / 2; i++)
+	{
+		romdata[i] = romdata[i] ^ 0xc8a9;
+		romdata[i] = bitswap<16>(romdata[i], 3,1,11,9,  6,14,0,2,  8,7,13,15,  4,5,12,10);
+	}
+}
+
 
 } // anonymous namespace
 
@@ -657,6 +734,16 @@ CONS(2021, punij2pk, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, e
 CONS(2021, punifrnd, 0,        0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2021, punistar, 0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2020, pixlstar, 0,        0, pixlstar, base, generalplus_gpl951xx_game_state, empty_init, "Skyrocket Toys", "Pixel Stars Dreamhouse", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2022, kenshino, 0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Kenshi No Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2021, tamasmrt,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Tamagotchi Smart (Japan, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, tamasmrta, tamasmrt, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Tamagotchi Smart (Japan, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2021, teriermn,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Terriermon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 
 // 'Poo' emoji shaped item, comes in multiple colours, has a solder pad which might change between units
 // this was dumped from the 'Lavender' unit
@@ -707,3 +794,11 @@ CONS( 2020, segapet3a, segapet3, 0, puni, base, generalplus_gpl951xx_game_state,
 
 // まぜまぜミックス！ぷにタピちゃん
 CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// this one has 2 checksums in service mode (like the generalplus_gp3x_unknown.cpp sets) but one is 00000000 and there is only a single ROM
+// BL-519-V1.2 20220822 on PCB
+CONS( 2022, pink218,      0,       0,      pink218,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+CONS( 2022, smkfrnd,      0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+CONS( 2022, chiikawa,     0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Chiikawa to Issho (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

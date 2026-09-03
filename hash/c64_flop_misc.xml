@@ -20,14 +20,10 @@ license:CC0-1.0
 	</software>
 
 	<!-- origin: archive.org -->
-	<software name="bopnrumb" supported="no">
+	<software name="bopnrumb">
 		<description>Bop 'n Rumble (cracked by The Last Science and The Artworx)</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
-		<notes><![CDATA[
-LOAD "BOP N RUMBLE",8,1
-[VIC] player sprite cuts off in the middle
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="bopn_rumble_1987_melbourne_house_h_the_last_sciencethe_artworx.d64" size="174848" crc="9ba2f963" sha1="d3e672d586f8fdc4719adce13cbe14a281bf7696" offset="0" />
@@ -46,6 +42,18 @@ Laggy [joystick] fire button (half the times won't trigger)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="detective_game_the_1986_aps_software.d64" size="174848" crc="d6a07a1d" sha1="702b17a1aec12646283d32c0437295214fcf7dd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elvira2">
+		<description>Elvira II: The Jaws of Cerberus (Germany, FD-2000)</description>
+		<year>1992</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Flair Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1658880">
+				<rom name="elvira_ii_mistress_of_the_dark_1992_flair_software.d2m" size="1658880" crc="4eada167" sha1="03fc4eae44187826cf06e54610f525621e1b7cc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,6 +143,21 @@ Laggy [joystick] fire button (half the times won't trigger)
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="819200">
 				<rom name="metal dust (final) disk4-69306e.d81" size="819200" crc="764f878f" sha1="9149f25990b7cbd8082ba60ea1b5074cacb0941a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metaldstf" cloneof="metaldst" supported="no">
+		<description>Metal Dust (FD-4000)</description>
+		<year>2005</year>
+		<publisher>Protovision</publisher>
+
+		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3317760">
+				<rom name="metal_dust_2005_protovision.d4m" size="3317760" crc="8f06cc6d" sha1="640bedee3b30e1227c0867ff5fb5ef802c2070a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -754,6 +777,18 @@ Hi-score table is corrupt (dump really?)
 			<feature name="part_id" value="GEOS Utilities"/>
 			<dataarea name="flop" size="174848">
 				<rom name="hd_geos_utils.d64" size="174848" crc="fd2ae57a" sha1="c132ab9b534aa51236c6622c0a37746b2f5a59ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmdfdutl">
+		<description>CMD FD Utilities v1.05</description>
+		<year>1993</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="fd-utilities_v105.d64" size="174848" crc="99115313" sha1="be1577a9afafee4ec1e4ef3704d54dcce86a83b8"/>
 			</dataarea>
 		</part>
 	</software>

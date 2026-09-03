@@ -278,6 +278,8 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 		m_samplelist(nullptr),
 		m_last_track(0),
 		m_last_subtrack(0),
+		m_spin_start_timer(nullptr),
+		m_spin_start_withdisk(false),
 		m_motor_on(false),
 		m_with_disk(false),
 		m_spin_kind(floppy_sound_samples::QUIET),
@@ -331,6 +333,7 @@ void floppy_sound_device::register_for_save_states()
 {
 	save_item(NAME(m_last_track));
 	save_item(NAME(m_last_subtrack));
+	save_item(NAME(m_spin_start_withdisk));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_with_disk));
 	save_item(NAME(m_spin_kind));
@@ -383,8 +386,11 @@ void floppy_sound_device::device_start()
 	if (m_samples_available)
 		m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
 
+	m_spin_start_timer = timer_alloc(FUNC(floppy_sound_device::spin_start_timeout), this);
+
 	register_for_save_states();
 
+	m_spin_start_timer->reset();
 	m_motor_on = false;
 	m_spin_kind = floppy_sound_samples::QUIET;
 	m_spin_sample = floppy_sound_samples::QUIET;
@@ -416,9 +422,31 @@ void floppy_sound_device::set_samples(floppy_sound_samples *samples, int form_fa
 }
 
 /*
+    Approximate real-world spindle spin-up time, i.e. the delay between the
+    motor being switched on and the drive actually picking up speed. Heavier
+    5.25"/8" mechanisms take noticeably longer to get going than the lighter
+    3"/3.5" ones. If the motor is switched off again before this time has
+    elapsed, the spin-up sample is never started, so no sound is heard at all.
+*/
+attotime floppy_sound_device::spin_start_delay() const
+{
+	switch (m_samplelist->get_assumed_form_factor())
+	{
+	case floppy_image::FF_8:
+		return attotime::from_msec(1000);
+	case floppy_image::FF_525:
+		return attotime::from_msec(500);
+	default: // FF_35, FF_3
+		return attotime::from_msec(300);
+	}
+}
+
+/*
     Motor sound. Select appropriate sound sample, depending on whether the
     motor is started or keeps running. Motor samples are always fully
-    played.
+    played once started, but actually starting one is delayed by
+    spin_start_delay() to emulate the time a real spindle takes to pick up
+    speed; switching the motor off within that delay cancels the sound.
 */
 void floppy_sound_device::motor(bool running, bool withdisk)
 {
@@ -430,11 +458,10 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 			|| m_spin_kind==floppy_sound_samples::END_EMPTY
 			|| m_spin_kind==floppy_sound_samples::END_LOADED ) && running) // motor was either off or already spinning down
 		{
-			m_spin_samplepos = 0;
-			// 3.5" floppy disks have a special first turn sound when the
-			// spindle motor latch meets the central metal hub hole.
-			m_spin_kind = withdisk? (m_firstturn? floppy_sound_samples::START_LOADED_INITIAL : floppy_sound_samples::START_LOADED) : floppy_sound_samples::START_EMPTY;
-			m_firstturn = false;
+			// Wait for the spindle to pick up speed before starting the
+			// spin-up sample; see spin_start_timeout.
+			m_spin_start_withdisk = withdisk;
+			m_spin_start_timer->adjust(spin_start_delay());
 		}
 		else
 		{
@@ -445,6 +472,9 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 				m_spin_kind = withdisk? floppy_sound_samples::END_LOADED : floppy_sound_samples::END_EMPTY; // go to spin down sound when loop is finished
 			}
 		}
+
+		if (!running)
+			m_spin_start_timer->reset(); // motor switched off again before the spindle sound could start: no sound at all
 
 		int old_sample = m_spin_sample;
 		m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samplelist->find_spin(m_spin_kind);
@@ -457,6 +487,29 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 	}
 	m_motor_on = running;
 	m_with_disk = withdisk;
+}
+
+/*
+    The spindle has picked up speed: actually start the spin-up sample.
+*/
+TIMER_CALLBACK_MEMBER(floppy_sound_device::spin_start_timeout)
+{
+	m_sound->update(); // required
+
+	m_spin_samplepos = 0;
+	// 3.5" floppy disks have a special first turn sound when the
+	// spindle motor latch meets the central metal hub hole.
+	m_spin_kind = m_spin_start_withdisk? (m_firstturn? floppy_sound_samples::START_LOADED_INITIAL : floppy_sound_samples::START_LOADED) : floppy_sound_samples::START_EMPTY;
+	m_firstturn = false;
+
+	int old_sample = m_spin_sample;
+	m_spin_sample = m_samplelist->find_spin(m_spin_kind);
+
+	if (m_spin_sample == floppy_sound_samples::QUIET)
+		LOGMASKED(LOG_SND, "Spin off\n");
+	else
+		if (m_spin_sample != old_sample)
+			LOGMASKED(LOG_SND, "Spin sample = %d\n", m_spin_sample);
 }
 
 /*

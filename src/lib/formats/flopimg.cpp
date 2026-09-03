@@ -933,20 +933,23 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, cons
 	std::vector<uint32_t> &dest = image.get_buffer(track, head);
 	dest.clear();
 
-	uint32_t total_time = 0;
+	uint64_t grand_total = 0;
+	for(auto & elem : trackbuf)
+		grand_total += elem & floppy_image::TIME_MASK;
+
+	uint64_t total_time = 0;
 	for(auto & elem : trackbuf) {
 		uint32_t bit = elem & floppy_image::MG_MASK;
 		uint32_t time = elem & floppy_image::TIME_MASK;
 		if(bit == MG_1)
-			dest.push_back(floppy_image::MG_F | (total_time + (time >> 1)));
+			dest.push_back(floppy_image::MG_F | uint32_t(200000000ULL * (total_time + (time >> 1)) / grand_total));
 
 		else if(bit != MG_0)
-			dest.push_back(bit | total_time);
+			dest.push_back(bit | uint32_t(200000000ULL * total_time / grand_total));
 
 		total_time += time;
 	}
 
-	normalize_times(dest, total_time);
 	image.set_write_splice_position(track, head, splice_angular_pos);
 }
 

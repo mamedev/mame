@@ -218,6 +218,10 @@
 #include "d81_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_D2M_DSK
+#include "d2m_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_D82_DSK
 #include "d82_dsk.h"
 #endif
@@ -999,6 +1003,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_D81_DSK
 	en.add(FLOPPY_D81_FORMAT); // d81_dsk.h
+#endif
+#ifdef HAS_FORMATS_D2M_DSK
+	en.add(FLOPPY_D1M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D2M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D4M_FORMAT); // d2m_dsk.h
 #endif
 #ifdef HAS_FORMATS_D82_DSK
 	en.add(FLOPPY_D82_FORMAT); // d82_dsk.h

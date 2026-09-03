@@ -73,6 +73,7 @@ private:
 	u16 m_pending_data;
 	u16 m_xpos_state;
 	bool m_resync_pending;
+	u8 m_copper_list;
 	bool m_vertical_blank;
 };
 

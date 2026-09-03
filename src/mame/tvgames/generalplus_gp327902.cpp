@@ -206,6 +206,11 @@ ROM_START( fairicam )
 ROM_END
 
 
+ROM_START( dswitch )
+	ROM_REGION( 0x200000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "gpr25l1603.u3", 0x00000, 0x200000, CRC(7998db0b) SHA1(04861b9f88cd5c6d0a80a2de9b2737d0198ab4af) )
+ROM_END
+
 } // anonymous namespace
 
 // Tomy / San-X devices
@@ -240,3 +245,8 @@ CONS( 2021, chikawac, 0, 0, gp327902, gp327902, generalplus_gp327902_game_state,
 
 // リルリルフェアリル　フェアリルカメラ
 CONS( 2016, fairicam, 0, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "Sega Toys", "Rilu Rilu Fairilu Camera (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// has a VT24001 which might be the main SoC or a peripheral chip in this case, although there was another glob (ROM has GPNV header like gp327902 games though)
+// device is a storybook video projector
+CONS( 2017, dswitch, 0, 0, gp327902, gp327902, generalplus_gp327902_game_state, init_spi, "Sega Toys", "Dream Switch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+

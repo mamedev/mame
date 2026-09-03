@@ -178,12 +178,18 @@ private:
 	virtual void sound_stream_update(sound_stream &stream) override;
 	sound_stream*   m_sound;
 
+	TIMER_CALLBACK_MEMBER(spin_start_timeout);
+	attotime spin_start_delay() const;
+
 	floppy_sound_samples* m_samplelist;
 	floppy_sound_samples m_default_samples;
 
 	int    m_max_track;
 	int    m_last_track;
 	int    m_last_subtrack;
+
+	emu_timer* m_spin_start_timer;   // delay between motor on and the spin-up sample actually starting
+	bool   m_spin_start_withdisk;    // withdisk value pending on m_spin_start_timer
 
 	bool   m_motor_on;
 	bool   m_with_disk;

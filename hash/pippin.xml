@@ -54,7 +54,7 @@ license:CC0-1.0
 
 -->
 
-	<software name="atcard" supported="no">
+	<software name="atcard" supported="yes">
 		<description>@Card SD Gundam Gaiden (Japan)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
@@ -67,7 +67,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="atworldb" supported="no">
+	<software name="atworldb" supported="yes">
 		<description>@World Basics (USA)</description>
 		<year>1996</year>
 		<publisher>Apple</publisher>
@@ -103,7 +103,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hanshind" supported="no">
+	<software name="hanshind" supported="yes">
 		<description>1995.1.17 Hanshin Daishinsai (Japan)</description>
 		<year>1996</year>
 		<publisher>Keikakudo</publisher>    <!-- 計画堂 -->
@@ -116,7 +116,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="actdesu" supported="no">
+	<software name="actdesu" supported="yes">
 		<description>ActionDesigner Ultraman Tiga (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -129,7 +129,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="aishogi" supported="no">
+	<software name="aishogi" supported="yes">
 		<description>AI Shogi (Japan)</description>
 		<year>1996</year>
 		<publisher>ASG</publisher>
@@ -142,7 +142,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="animedbz" supported="no">
+	<software name="animedbz" supported="yes">
 		<description>AnimeDesigner - Dragon Ball Z (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -155,7 +155,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="anpanain" supported="no">
+	<software name="anpanain" supported="yes">
 		<description>Anpanman no AIUEO~N! (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -168,7 +168,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="anpanas1" supported="no">
+	<software name="anpanas1" supported="yes">
 		<description>Anpanman to Asobou! 1 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -181,7 +181,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="anpanas2" supported="no">
+	<software name="anpanas2" supported="yes">
 		<description>Anpanman to Asobou! 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -194,7 +194,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="atmtown" supported="no">
+	<software name="atmtown" supported="partial">
 		<description>Atmark Town (Japan, Ver. 1.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -207,7 +207,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="atmtowna" cloneof="atmtown" supported="no">
+	<software name="atmtowna" cloneof="atmtown" supported="partial">
 		<description>Atmark Town (Japan, Ver. 1.0, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -220,7 +220,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="atmtown2" supported="no">
+	<software name="atmtown2" supported="partial">
 		<description>Atmark Town (Japan, Ver. 2.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -233,7 +233,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="chisatom" supported="no">
+	<software name="chisatom" supported="yes">
 		<description>Chisato Moritaka CD-Rom Watarase Bashi (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
@@ -246,7 +246,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="circus" supported="no">
+	<software name="circus" supported="yes">
 		<description>Circus! (Japan)</description>
 		<year>1996</year>
 		<publisher>Voyager</publisher>  <!-- ボイジャー -->
@@ -287,7 +287,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dazzloid" supported="no">
+	<software name="dazzloid" supported="yes">
 		<description>Dazzeloids (Japan)</description>
 		<year>1996</year>
 		<publisher>Voyager</publisher>  <!-- ボイジャー -->
@@ -336,7 +336,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fortulia" supported="no">
+	<software name="fortulia" supported="yes">
 		<description>Fortullia (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -349,7 +349,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ffaliens" supported="no">
+	<software name="ffaliens" supported="yes">
 		<description>Funky Funny Aliens (Japan)</description>
 		<year>1996</year>
 		<publisher>Amuse</publisher>    <!-- アミューズ -->
@@ -374,7 +374,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gakkoku" supported="no">
+	<software name="gakkoku" supported="yes">
 		<description>Gakko no Kowai Uwasa - Hanako-san ga Kita!! (Japan)</description>
 		<year>1996</year>
 		<publisher>Amuse</publisher>    <!-- アミューズ -->
@@ -387,6 +387,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Doesn't boot, bad dump? -->
 	<software name="gundamwe" supported="no">
 		<description>Gundam 0079 - The War for Earth (Japan)</description>
 		<year>1996</year>
@@ -399,7 +400,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gundtact" supported="no">
+	<software name="gundtact" supported="yes">
 		<description>Gundam Tactics - Mobility Fleet0079 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -412,7 +413,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gundtacta" cloneof="gundtact" supported="no">
+	<software name="gundtacta" cloneof="gundtact" supported="yes">
 		<description>Gundam Tactics - Mobility Fleet0079 (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -425,7 +426,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gundamvm" supported="no">
+	<!-- Requires RAM expansion -->
+	<software name="gundamvm" supported="yes">
 		<description>Gundam Virtual Modeler Light (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -438,7 +440,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kidsbox" supported="no">
+	<software name="kidsbox" supported="yes">
 		<description>Kids Box (Japan)</description>
 		<year>1996</year>
 		<publisher>Ask Kodansha</publisher> <!-- アスク講談社 -->
@@ -451,7 +453,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="thomas" supported="no">
+	<software name="thomas" supported="yes">
 		<description>Hashitte Asobou! Kikansha Thomas (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -488,7 +490,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lzone" supported="no">
+	<software name="lzone" supported="yes">
 		<description>L-Zone (Japan)</description>
 		<year>1996</year>
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
@@ -500,7 +502,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="macbin38" supported="no">
+	<software name="macbin38" supported="yes">
 		<description>Mac Bin 38 (Japan)</description>
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -512,7 +514,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="macbin40" supported="no">
+	<software name="macbin40" supported="yes">
 		<description>Mac Bin 40 A (Japan)</description>
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -536,7 +538,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="maconpip" supported="no">
+	<software name="maconpip" supported="yes">
 		<description>Macintosh on Pippin (USA)</description>
 		<!-- Also known as Tuscon -->
 		<year>1996</year>
@@ -548,7 +550,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mrpotatop" supported="no">
+	<software name="mrpotatop" supported="yes">
 		<!--
 		https://redump.info/disc/128568/
 		<rom name="Mr. Potato Head Saves Veggie Valley (USA) (Beta) (1996-10-30).cue" size="127" crc="014a399f" sha1="e1706fed2c4d06ea60df9765d61aca17793c0013"/>
@@ -564,7 +566,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gundamzd" supported="no">
+	<!-- Requires RAM expansion -->
+	<software name="gundamzd" supported="yes">
 		<description>Mobile Suit Gundam - Zion Dukedom Military-File (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -577,7 +580,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gundamwb" supported="no">
+	<software name="gundamwb" supported="yes">
 		<description>Mobile Suit Gundam - White Base (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -590,7 +593,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="music1" supported="no">
+	<software name="music1" supported="yes">
 		<description>Music Island Vol. 1 (Prokofiev Peter &amp; the Wolf) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
@@ -603,7 +606,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="music2" supported="no">
+	<software name="music2" supported="yes">
 		<description>Music Island Vol. 2 (Tchaikovsky The Nutcracker) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
@@ -616,7 +619,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="music3" supported="no">
+	<software name="music3" supported="yes">
 		<description>Music Island Vol. 3 (Vivaldi The Four Seasons) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
@@ -629,7 +632,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="music4" supported="no">
+	<software name="music4" supported="yes">
 		<description>Music Island Vol. 4 (Saint-Saens Carnival of the Animals) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
@@ -642,7 +645,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="nemuyoru" supported="no">
+	<software name="nemuyoru" supported="yes">
 		<description>Nemurenu Yoru no Chiisana Ohanashi (Japan)</description>
 		<year>1996</year>
 		<publisher>Amuse</publisher>    <!-- アミューズ -->
@@ -655,7 +658,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pease" supported="no">
+	<software name="pease" supported="yes">
 		<description>Pease (Japan)</description>
 		<year>1996</year>
 		<publisher>MAKI Enterprise</publisher>
@@ -667,7 +670,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="peasetur" supported="no">
+	<software name="peasetur" supported="yes">
 		<description>Pease Turbo (Japan)</description>
 		<year>1996</year>
 		<publisher>MAKI Enterprise</publisher>
@@ -679,7 +682,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="navcd" supported="no">
+	<software name="navcd" supported="yes">
 		<description>Pippin Navigator CD (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -691,7 +694,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="navcd11" supported="no">
+	<software name="navcd11" supported="yes">
 		<description>Pippin Navigator CD (Japan, Ver. 1.1)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -739,7 +742,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="catalog" supported="no">
+	<software name="catalog" supported="yes">
 		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -751,7 +754,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sdk" supported="no">
+	<software name="sdk" supported="yes">
 		<description>Pippin Software Develepment Kit (1996.11)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -763,6 +766,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Doesn't boot, bad dump? -->
 	<software name="cataloga" cloneof="catalog" supported="no">
 		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Japan, alt)</description>
 		<year>1996</year>
@@ -775,6 +779,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Boots but unresponsive to buttons -->
 	<software name="postcard" supported="no">
 		<description>Post de Card Light (Japan, Ver. 3.0)</description>
 		<year>1996</year>
@@ -787,7 +792,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="powerran" supported="no">
+	<software name="powerran" supported="yes">
 		<description>Power Rangers Zeo Vs. The Machine Empire (USA)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -799,7 +804,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="powerranp" cloneof="powerran" supported="no">
+	<software name="powerranp" cloneof="powerran" supported="yes">
 		<!--
 		https://redump.info/disc/128570/
 		<rom name="Saban's Power Rangers Zeo Versus the Machine Empire (USA) (Beta) (1996-10-23).cue" size="143" crc="a059ce57" sha1="0a47c695bef66a508d73aa2d41979edb834b9ac6"/>
@@ -815,7 +820,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="racingd" supported="no">
+	<software name="racingd" supported="yes">
 		<description>Racing Days (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -828,7 +833,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sdgundam" supported="no">
+	<software name="sdgundam" supported="yes">
 		<description>SD Gundam Wars (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -841,7 +846,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sdultram" supported="no">
+	<software name="sdultram" supported="yes">
 		<description>SD Ultraman no Chyousen! Meiro Island (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -854,7 +859,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="seesawc1" supported="no">
+	<software name="seesawc1" supported="yes">
 		<description>SeesawC 1 - My favorite things - Sukinamonodake Eitango 120 (Japan)</description>
 		<year>1996</year>
 		<publisher>Aigaareba Daijoubu</publisher>   <!-- 愛があれば大丈夫 -->
@@ -867,7 +872,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="seesawc2" supported="no">
+	<software name="seesawc2" supported="yes">
 		<description>SeesawC 2 - My favorite places - Sukinatokorode Eitango 400 (Japan)</description>
 		<year>1996</year>
 		<publisher>Aigaareba Daijoubu</publisher>   <!-- 愛があれば大丈夫 -->
@@ -880,7 +885,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="shichiso" supported="no">
+	<software name="shichiso" supported="yes">
 		<description>Shichisokusen (Japan)</description>
 		<year>1996</year>
 		<publisher>Media Five</publisher>   <!-- メディアファイブ -->
@@ -893,7 +898,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="shockwav" supported="no">
+	<software name="shockwav" supported="yes">
 		<description>Shockwave - Invasion Earth 2019 (Japan)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -906,31 +911,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="supermar" supported="no">
+	<software name="supermar" supported="yes">
 		<description>Super Marathon (USA)</description>
-		<year>19??</year>
+		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="41028C" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="supermar" sha1="b5aed18581524caaf03c582869a9166bc1fdb2f3"/>
+				<disk name="supermar" sha1="f9833a88b0b0ea094be099df3357652dc06d7243"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="supermara" cloneof="supermar" supported="no">
-		<description>Super Marathon (USA, alt)</description>
-		<year>19??</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="41028C" />
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="supermara" sha1="f9833a88b0b0ea094be099df3357652dc06d7243"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="tbreak" supported="no">
+	<software name="tbreak" supported="yes">
 		<description>T-Break (Japan)</description>
 		<year>1996</year>
 		<publisher>Infocity</publisher> <!-- インフォシティ -->
@@ -943,7 +936,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tamagotc" supported="no">
+	<software name="tamagotc" supported="yes">
 		<description>Tamagotchi CD-ROM (Japan)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
@@ -957,6 +950,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Asserts but has no Japanese fonts so I can't tell the message -->
 	<software name="tropicis" supported="no">
 		<description>Tropic Island (Japan)</description>
 		<year>1996</year>
@@ -970,7 +964,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tunglue" supported="no">
+	<software name="tunglue" supported="yes">
 		<description>Tunin' Glue (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -983,7 +977,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tvworks" supported="no">
+	<software name="tvworks" supported="yes">
 		<description>TV Works - Word Paint Mail (Japan, Ver. 1.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -995,6 +989,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Does not boot -->
 	<software name="tvwrks2" supported="no">
 		<description>TV Works (Japan, Ver. 2.0)</description>
 		<year>1996</year>
@@ -1007,6 +1002,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Unresponsive due to no modem on the serial port -->
 	<software name="tvwrks21" supported="no">
 		<description>TV Works (Japan, Ver. 2.1)</description>
 		<year>1996</year>
@@ -1019,6 +1015,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Gets to BDE logo then nothing -->
 	<software name="tvwrks3" supported="no">
 		<description>TV Works (USA, Ver. 3.0)</description>
 		<year>1996</year>
@@ -1031,7 +1028,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tvwrksp" supported="no">
+	<software name="tvwrksp" supported="yes">
 		<description>TV Works (Japan, Ver. POP)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -1043,7 +1040,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ultraman" supported="no">
+	<software name="ultraman" supported="yes">
 		<description>Ultraman - The Digital Board Game (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -1056,7 +1053,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ultramana" cloneof="ultraman" supported="no">
+	<software name="ultramana" cloneof="ultraman" supported="yes">
 		<description>Ultraman - The Digital Board Game (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -1069,7 +1066,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ultramaq" supported="no">
+	<software name="ultramaq" supported="yes">
 		<description>Ultraman Quiz King (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -1082,7 +1079,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="victorp" supported="no">
+	<software name="victorp" supported="yes">
 		<description>Victorian Park (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -1102,6 +1099,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Needs modem, I assume -->
 	<software name="webview" supported="no">
 		<description>WebViewer With Microsoft Internet Explorer 3.0 for Macintosh (Japan)</description>
 		<year>1996</year>
@@ -1114,7 +1112,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="yellow1" supported="no">
+	<!-- Requires RAM expansion -->
+	<software name="yellow1" supported="yes">
 		<description>Yellow Brick Road I (Japan)</description>
 		<year>1996</year>
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
@@ -1127,7 +1126,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="yellow2" supported="no">
+	<!-- Requires RAM expansion -->
+	<software name="yellow2" supported="yes">
 		<description>Yellow Brick Road II - Glinda to Nishi no Majo (Japan)</description>
 		<year>1996</year>
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
@@ -1147,7 +1147,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="yellows" supported="no">
+	<software name="yellows" supported="yes">
 		<description>Yellows - Akira Gomi Photographs (Japan)</description>
 		<year>1996</year>
 		<publisher>Digitalogue</publisher>  <!-- デジタローグ -->
@@ -1159,7 +1159,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="yellws2" supported="no">
+	<software name="yellws2" supported="yes">
 		<description>Yellows 2.0 - Tokyo 1993 Akira Gomi Photographs (Japan)</description>
 		<year>1996</year>
 		<publisher>Digitalogue</publisher>  <!-- デジタローグ -->
@@ -1172,7 +1172,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="yokumite" supported="no">
+	<software name="yokumite" supported="yes">
 		<description>Yoku Mite Goran! (Japan)</description>
 		<year>1996</year>
 		<publisher>Voyager</publisher>  <!-- ボイジャー -->
@@ -1185,7 +1185,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="zukkoke" supported="no">
+	<!-- Requires RAM expansion -->
+	<software name="zukkoke" supported="yes">
 		<description>Zukkoke Sanningumi - Drama Satsujin Jiken (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>

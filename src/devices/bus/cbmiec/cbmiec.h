@@ -134,11 +134,17 @@ public:
 	template <typename T> static void add(machine_config &config, T &&_bus_tag, const char *_default_drive)
 	{
 		CBM_IEC_SLOT(config, "iec4", 4, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec5", 5, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec6", 6, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec7", 7, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec8", 8, cbm_iec_devices, _default_drive);
 		CBM_IEC_SLOT(config, "iec9", 9, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec10", 10, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec11", 11, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec12", 12, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec13", 13, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec14", 14, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec15", 15, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec30", 30, cbm_iec_devices, nullptr);
 
 		CBM_IEC(config, std::forward<T>(_bus_tag), 0);

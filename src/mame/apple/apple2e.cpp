@@ -219,6 +219,9 @@ static constexpr int IRQ_SLOT = 0;
 static constexpr int IRQ_VBL = 1;
 static constexpr int IRQ_MOUSEXY = 2;
 
+// FIXME: some of these values are probably wrong
+static constexpr u32 A2NTSC_1M_CLOCK = 1021800;
+static constexpr u32 A2PAL_1M_CLOCK = 1016966;
 static constexpr XTAL A2BUS_7M_CLOCK = XTAL(14'318'181) / 2;
 
 class apple2e_state : public driver_device
@@ -1316,7 +1319,7 @@ void apple2e_state::machine_reset()
 	else if (m_accel_laser)
 	{
 		m_accel_present = true;
-		m_accel_speed = 1021800;
+		m_accel_speed = A2NTSC_1M_CLOCK;
 		m_accel_slotspk = 0x46; // slots 6, 2, 1 slow
 		if (m_slotdevice[5] != nullptr) m_accel_slotspk |= 0x20;
 		if (m_slotdevice[7] != nullptr) m_accel_slotspk |= 0x80;
@@ -1513,7 +1516,7 @@ void apple2e_state::accel_update_speed()
 {
 	if (!m_accel_fast || m_accel_temp_slowdown)
 	{
-		m_maincpu->set_unscaled_clock(m_pal ? 1016966 : 1021800, true); // re-align to PH0
+		m_maincpu->set_unscaled_clock(m_pal ? A2PAL_1M_CLOCK : A2NTSC_1M_CLOCK, true); // re-align to PH0
 	}
 	else
 	{
@@ -2260,7 +2263,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 					// bit 5 is set if LC caching is disabled
 					const u8 b5 = BIT(m_accel_gameio, 7) ? 0x20 : 0x00;
 					// bit 7 is a tap on the PH0 clock divided by 1024; edge every 512 cycles
-					const int time = machine().time().as_ticks((m_pal ? 1016966 : 1021800) / 512.0F);
+					const int time = machine().time().as_ticks((m_pal ? A2PAL_1M_CLOCK : A2NTSC_1M_CLOCK) / 512.0F);
 					const u8 b7 = (time & 1) ? 0x80 : 0x00;
 					return b7 | b5 | b4 | b3 | b01;
 				}
@@ -2434,7 +2437,7 @@ void apple2e_state::laserprn_w(u8 data)
 	m_next_strobe = 0U;
 	if (!m_strobe_timer->enabled())
 	{
-		m_strobe_timer->adjust(attotime::from_hz(1021800));
+		m_strobe_timer->adjust(attotime::from_hz(A2NTSC_1M_CLOCK));
 	}
 }
 
@@ -2444,7 +2447,7 @@ TIMER_CALLBACK_MEMBER(apple2e_state::update_laserprn_strobe)
 	if (!m_next_strobe)
 	{
 		m_next_strobe = 1U;
-		m_strobe_timer->adjust(attotime::from_hz(1021800));
+		m_strobe_timer->adjust(attotime::from_hz(A2NTSC_1M_CLOCK));
 	}
 }
 
@@ -5257,11 +5260,11 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	/* basic machine hardware */
 	if (enhanced)
 	{
-		W65C02(config, m_maincpu, 1021800);
+		W65C02(config, m_maincpu, A2NTSC_1M_CLOCK);
 	}
 	else
 	{
-		M6502(config, m_maincpu, 1021800);
+		M6502(config, m_maincpu, A2NTSC_1M_CLOCK);
 	}
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
@@ -5286,7 +5289,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	// HBL is positioned to the right of active video here, but to the left on hardware.
 	// this must be compensated for in any use of hpos/vpos/vblank.
 	SCREEN(config, m_screen);
-	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
+	m_screen->set_raw(A2NTSC_1M_CLOCK * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IIE, false, false>)));
 	m_screen->set_palette(m_video);
 
@@ -5363,8 +5366,8 @@ void apple2e_state::apple2e(machine_config &config)
 void apple2e_state::apple2epal(machine_config &config)
 {
 	apple2e(config);
-	m_maincpu->set_clock(1016966);
-	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+	m_maincpu->set_clock(A2PAL_1M_CLOCK);
+	m_screen->set_raw(A2PAL_1M_CLOCK * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 	m_pal = true;
 }
 
@@ -5398,8 +5401,8 @@ void apple2e_state::apple2ee(machine_config &config)
 void apple2e_state::apple2eepal(machine_config &config)
 {
 	apple2ee(config);
-	m_maincpu->set_clock(1016966);
-	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+	m_maincpu->set_clock(A2PAL_1M_CLOCK);
+	m_screen->set_raw(A2PAL_1M_CLOCK * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 	m_pal = true;
 }
 
@@ -5559,8 +5562,8 @@ void apple2e_state::apple2c(machine_config &config)
 void apple2e_state::apple2cpal(machine_config &config)
 {
 	apple2c(config);
-	m_maincpu->set_clock(1016966);
-	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+	m_maincpu->set_clock(A2PAL_1M_CLOCK);
+	m_screen->set_raw(A2PAL_1M_CLOCK * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 	m_pal = true;
 }
 
@@ -5574,7 +5577,7 @@ void apple2e_state::apple2cp(machine_config &config)
 	config.device_remove("sl4");
 	config.device_remove("sl6");
 
-	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800*2);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, A2NTSC_1M_CLOCK*2);
 	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(apple2e_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
@@ -5597,8 +5600,8 @@ void apple2e_state::apple2c_iwm(machine_config &config)
 void apple2e_state::apple2c_iwm_pal(machine_config &config)
 {
 	apple2c_iwm(config);
-	m_maincpu->set_clock(1016966);
-	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+	m_maincpu->set_clock(A2PAL_1M_CLOCK);
+	m_screen->set_raw(A2PAL_1M_CLOCK * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 	m_pal = true;
 }
 
@@ -5616,8 +5619,8 @@ void apple2e_state::apple2c_mem(machine_config &config)
 void apple2e_state::apple2c_mem_pal(machine_config &config)
 {
 	apple2c_mem(config);
-	m_maincpu->set_clock(1016966);
-	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+	m_maincpu->set_clock(A2PAL_1M_CLOCK);
+	m_screen->set_raw(A2PAL_1M_CLOCK * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 	m_pal = true;
 }
 
@@ -5647,7 +5650,7 @@ void apple2e_state::laser128(machine_config &config)
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 
-	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800 * 2);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, A2NTSC_1M_CLOCK * 2);
 	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
 	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
 
@@ -5684,7 +5687,7 @@ void apple2e_state::laser128o(machine_config &config)
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 
-	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800 * 2);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, A2NTSC_1M_CLOCK * 2);
 	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
 	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
 
@@ -5739,7 +5742,7 @@ void apple2e_state::laser128ex2(machine_config &config)
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 
-	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800 * 2);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, A2NTSC_1M_CLOCK * 2);
 	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
 	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
 

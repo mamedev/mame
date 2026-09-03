@@ -215,7 +215,7 @@ arm710a_be_cpu_device::arm710a_be_cpu_device(const machine_config &mconfig, cons
 
 
 arm710t_cpu_device::arm710t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM710T, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, ARM710T, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
 			   | ARM9_COPRO_ID_PART_ARM710

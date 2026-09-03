@@ -70,13 +70,22 @@ void generalplus_mobigo2_state::mobigo2(machine_config &config)
 }
 
 
-ROM_START( mobigo2 )
+ROM_START( mobigo2g )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00) // appears to be the boot ROM, has GPspispi header
 	ROM_LOAD16_WORD_SWAP( "n25s16.u3", 0x00000, 0x200000, CRC(dfbf5029) SHA1(2a079ddd8a13c5f3d8f40fa6d6c3de2dc1573449) )
 
 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 ) // no GPnandnand header so not a boot device
 	ROM_LOAD( "mobigo2_bios_ger.bin", 0x00000, 0x8400000, CRC(d5ab613d) SHA1(6fb104057dc3484fa958e2cb20c5dd0c19589f75) ) // SPANSION S34ML01G100TF100
 ROM_END
+
+ROM_START( mobigo2 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00) // appears to be the boot ROM, has GPspispi header
+	ROM_LOAD16_WORD_SWAP( "mx25l1606e.u3", 0x00000, 0x200000, CRC(cd456167) SHA1(096c1f883956558893554056cb66f1877dc39105) )
+
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 ) // no GPnandnand header so not a boot device
+	ROM_LOAD( "tc58dvg02d5ta00.u5", 0x00000, 0x8400000, CRC(88d07d1d) SHA1(a64f4965c78e00d61e7b45d1117dc83fe12902d6) )
+ROM_END
+
 
 } // anonymous namespace
 
@@ -86,4 +95,5 @@ ROM_END
 // could be GPL16230A, GPL16240A or GPL16250A
 // ----------------------------------------------------
 
-CONS( 2013, mobigo2, 0, 0, mobigo2, mobigo2, generalplus_mobigo2_state, init_spi, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2012, mobigo2,  0,       0, mobigo2, mobigo2, generalplus_mobigo2_state, init_spi, "VTech", "MobiGo 2 (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2013, mobigo2g, mobigo2, 0, mobigo2, mobigo2, generalplus_mobigo2_state, init_spi, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

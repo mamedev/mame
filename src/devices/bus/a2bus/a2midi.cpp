@@ -68,8 +68,8 @@ private:
 
 void a2bus_midi_device::device_add_mconfig(machine_config &config)
 {
-	PTM6840(config, m_ptm, 1021800);
-	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
+	PTM6840(config, m_ptm, A2BUS_1M_CLOCK);
+	m_ptm->set_external_clocks(float(A2BUS_1M_CLOCK), float(A2BUS_1M_CLOCK), float(A2BUS_1M_CLOCK));
 	m_ptm->irq_callback().set(FUNC(a2bus_midi_device::ptm_irq_w));
 
 	ACIA6850(config, m_acia);

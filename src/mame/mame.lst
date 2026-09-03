@@ -18753,6 +18753,9 @@ advision
 @source:entex/sag.cpp
 sag
 
+@source:eolith/eoforce.cpp
+burnstrk
+
 @source:eolith/eolith.cpp
 candy
 fort2b
@@ -20203,6 +20206,7 @@ retro150a
 rhhc152
 supreme
 table108
+tchib158
 throwbck
 touma560
 touma568
@@ -20236,6 +20240,7 @@ gp3x788
 
 @source:handheld/generalplus_gpce4.cpp
 digicolr
+l2lelmo
 mapacman
 parcade
 siddr
@@ -20247,12 +20252,12 @@ taturtf
 tamameet
 
 @source:handheld/generalplus_gpl162xx_lcdtype.cpp
+bkid218
 pcp8718
 pcp8728
-bkid218
 
 @source:handheld/generalplus_gpl951xx.cpp
-fixitflx
+chiikawa
 bfdigdug
 bfgalaga
 bfmpac
@@ -20261,7 +20266,11 @@ bfspyhnt
 bftetris
 bubltea
 dsgnpal
+fixitflx
 flufflav
+kenshino
+pink218
+pixlstar
 pockrmsr
 pokebala
 pokeissh
@@ -20282,10 +20291,17 @@ segapet3
 segapet3a
 segaptdx
 smkcatch
+smkfrnd
 smkgacha
 smkguras
 smkgurasa
+tamasmrt
+tamasmrta
+teriermn
 wiwcs
+
+@source:handheld/gc71_nes_bootleg.cpp
+gc71hh
 
 @source:handheld/gmaster.cpp
 gmaster
@@ -20402,6 +20418,7 @@ tmbaskb
 atw_avbp
 atw_barb
 atw_batm
+atw_blue
 atw_dp
 atw_enc
 atw_fz
@@ -20831,6 +20848,9 @@ rztoshden
 
 @source:handheld/scrablex.cpp
 scrablex
+
+@source:handheld/sfc_nes_bootleg.cpp
+sfcnes
 
 @source:handheld/talkingbb.cpp
 talkingbb
@@ -26851,6 +26871,7 @@ turboex
 @source:leapfrog/leappad.cpp
 leappad
 leappadmic
+leappadw
 mfleappad
 ltleappad
 
@@ -35767,6 +35788,7 @@ zudugo
 @source:nintendo/nes_vt09.cpp
 cybar120
 dturbogt
+gampow50
 gujtv108
 joypad65
 lxplasma
@@ -35780,6 +35802,7 @@ msimm2
 msinamco
 msisinv
 msifrog
+pckarc50
 pumpactv
 rcapnp
 senario25
@@ -35822,14 +35845,20 @@ orb300
 retror30
 rminitv
 tvkunio1
+tvkunio2
+tvkunio3
 typo240
 
 @source:nintendo/nes_vt369_vtunknown.cpp
-36pcase
+100burgr
 168pcase
+200in1fn
 240in1ar
+36pcase
+500in1gf
 500in1hh
 a6plus
+asthh
 d12power
 d9_500
 denv150
@@ -35840,6 +35869,7 @@ dgun2593
 dvnimbus
 egame150
 f5_620
+fined200
 gb50_150
 gbox2020
 gcs2mgp
@@ -35855,6 +35885,7 @@ hkb502a
 jl1810gr
 jl2050
 jl2377
+jl2950
 lexi30
 lpgm240
 lxcap
@@ -35928,6 +35959,7 @@ unkra200
 urban240
 vibes240
 vibes240a
+vibes240e
 zl383
 zonefusn
 
@@ -35945,6 +35977,7 @@ gbox2022
 gprnrs1
 gprnrs16
 hhgc319
+jjfun365
 mc_7x6ss
 mc_8x6ss
 mc_9x6sa
@@ -40822,6 +40855,7 @@ twinktmb
 
 @source:sega/megadriv_firecore.cpp
 atgame40
+bfmk
 dcat16
 mahg156
 matet
@@ -47766,6 +47800,7 @@ tsbuzz
 
 @source:tvgames/generalplus_gp327902.cpp
 chikawac
+dswitch
 fairicam
 smksagas
 smksagasa
@@ -47779,9 +47814,13 @@ tomyeggb
 mobigo
 mobigof
 mobigos
+mobigouk
+mobigouka
+mobigoukb
 
 @source:tvgames/generalplus_gpl16250_mobigo2.cpp
 mobigo2
+mobigo2g
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
 beambox
@@ -47825,6 +47864,7 @@ myac220
 smartfp
 smartfpf
 smartfps
+tfmat
 tkmag220
 typo176
 
@@ -47974,6 +48014,7 @@ zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
 dancef2p
+dbldance
 fundr200
 lx_aven
 lx_frozen
@@ -48005,6 +48046,7 @@ doraphonf
 doyousud
 dreamlss
 drumsups
+dvlaptop
 epo_tetr
 fordrace
 genitvp
@@ -48025,9 +48067,11 @@ lpetshop
 lxairjet
 lxspidaj
 mattelcs
+mgarage
 mpntball
 mpntbalt
 mylpony
+nvpoker
 ordentv
 pballpup
 pdcj
@@ -48042,6 +48086,7 @@ senspeed
 senwfit
 smartcyc
 spidm2
+stvscri
 swclone
 tiktokmm
 tmntbftc
@@ -48157,6 +48202,7 @@ disppal
 lexiseal
 lexizeus
 pokermor
+pokmax20
 vgcaplet
 vgcap35
 vsplus
@@ -48203,6 +48249,7 @@ cdlyoko
 dnv200fs
 m505neo
 m521neo
+movesyst
 mywicodx
 mywicogt
 oplayer

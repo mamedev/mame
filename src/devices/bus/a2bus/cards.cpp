@@ -51,6 +51,7 @@
 #include "ccs7710.h"
 #include "cmsscsi.h"
 #include "computereyes2.h"
+#include "covox_smaster.h"
 #include "excel9.h"
 #include "ezcgi.h"
 #include "grafex.h"
@@ -150,6 +151,7 @@ void apple2_cards(device_slot_interface &device)
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);   // Magic Musician Card
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
+	device.option_add("smaster", A2BUS_SMASTER);               // Covox Sound Master
 	device.option_add("suprterm", A2BUS_SUPRTERMINAL);         // M&R Enterprises SUP'R'TERMINAL 80-column card
 	device.option_add("uniprint", A2BUS_UNIPRINT);             // Videx Uniprint parallel printer card
 	device.option_add("ccs7710", A2BUS_CCS7710);               // California Computer Systems Model 7710 Asynchronous Serial Interface
@@ -235,6 +237,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("applesurance", A2BUS_APPLESURANCE);     // Applesurance Diagnostic Controller
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
+	device.option_add("smaster", A2BUS_SMASTER);               // Covox Sound Master
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);               // CMS Apple II SCSI Card
 	device.option_add("uthernet", A2BUS_UTHERNET);             // A2RetroSystems Uthernet card
 	device.option_add("sider2", A2BUS_SIDER2);                 // Advanced Tech Systems / First Class Peripherals Sider 2 SASI card
@@ -319,6 +322,7 @@ void apple2gs_cards(device_slot_interface &device)
 //  device.option_add("pcxport", A2BUS_PCXPORTER);             // Applied Engineering PC Transporter
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
+	device.option_add("smaster", A2BUS_SMASTER);               // Covox Sound Master
 //  device.option_add("ramfast", A2BUS_RAMFAST);               // C.V. Technologies RAMFast SCSI card
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);               // CMS Apple II SCSI Card
 	device.option_add("uthernet", A2BUS_UTHERNET);             // A2RetroSystems Uthernet card
