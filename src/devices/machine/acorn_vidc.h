@@ -165,7 +165,7 @@ public:
 
 	void set_ext_sclk(u32 clock) { m_ext_sclk = clock; }
 
-	void write_dac32(u8 channel, u16 data);
+	void write_dac32(u8 channel, s16 data);
 	virtual bool get_dac_mode() override;
 
 protected:

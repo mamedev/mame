@@ -121,8 +121,10 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 //  configuration additions
 //-------------------------------------------------
 
+// TODO: bad, compose better
 void acorn_vidc10_device::device_add_mconfig_common(machine_config &config)
 {
+	// TODO: expose, aristmk5.cpp is mono (outputs to left only)
 	SPEAKER(config, m_speaker, 2).front();
 
 	// The actual filters here are two simple differentiator filters just
@@ -182,7 +184,7 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 
 u32 acorn_vidc10_device::palette_entries() const noexcept
 {
-	return 0x100+0x10+4; // 8bpp + 1/2/4bpp + 2bpp for cursor
+	return 0x100 + 0x10 + 4; // 8bpp + 1/2/4bpp + 2bpp for cursor
 }
 
 //-------------------------------------------------
@@ -296,9 +298,9 @@ TIMER_CALLBACK_MEMBER(acorn_vidc10_device::sound_sample_timer)
 bool acorn_vidc10_device::play_fifo_sample()
 {
 	if (m_sound_fifo.empty()) return true;
-	write_dac(m_sound_fifo_channel&7, m_sound_fifo.dequeue());
-	m_sound_fifo_channel++;
-	m_sound_fifo_channel&=7;
+	write_dac(m_sound_fifo_channel & 7, m_sound_fifo.dequeue());
+	m_sound_fifo_channel ++;
+	m_sound_fifo_channel &= 7;
 	return m_sound_fifo.empty();
 }
 
@@ -513,20 +515,19 @@ void acorn_vidc10_device::enqueue32_fifo(u32 data)
 	// for each 32 bit dword sent to the VIDC, the sample order is the
 	// lowest byte first, packed. i.e. bytes 3,2,1,0 in that order,
 	// assuming byte 0 is the MSB of the dword.
-	m_sound_fifo.enqueue((u8)((data>>0)&0xff));
-	m_sound_fifo.enqueue((u8)((data>>8)&0xff));
-	m_sound_fifo.enqueue((u8)((data>>16)&0xff));
-	m_sound_fifo.enqueue((u8)((data>>24)&0xff));
+	for (int i = 0; i < 32; i += 8)
+		m_sound_fifo.enqueue((u8)((data >> i) & 0xff));
 }
 
 void acorn_vidc10_device::write_dac(u8 channel, u8 data)
 {
 	const float stereo_clocks_l[8] = { 9.0f, 18.0f, 15.0f, 12.0f, 9.0f, 6.0f, 3.0f, 0.0f };
 	const float res = (float)m_ulaw_lookup[data] / 32768.0f;
-	const float percent_l = stereo_clocks_l[m_stereo_image[channel]&7] / 18.0f;
-	const float percent_r = (18.0f-stereo_clocks_l[m_stereo_image[channel]&7]) / 18.0f;
-	m_dac[0]->write((int16_t)(percent_l * res * 32768.0f));
-	m_dac[1]->write((int16_t)(percent_r * res * 32768.0f));
+	const u8 setting = m_stereo_image[channel];
+	const float percent_l = stereo_clocks_l[setting] / 18.0f;
+	const float percent_r = (18.0f - stereo_clocks_l[setting]) / 18.0f;
+	m_dac[0]->write((s16)(percent_l * res * 32768.0f));
+	m_dac[1]->write((s16)(percent_r * res * 32768.0f));
 }
 
 u32 acorn_vidc10_device::get_sound_clock()
@@ -707,13 +708,14 @@ void arm_vidc20_device::device_add_mconfig(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 1);
 }
 
+// TODO: move to clients
 void arm_vidc20_device::device_config_complete()
 {
 	if (!has_screen())
 		return;
 
 	if (!screen().has_been_setup())
-		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
+		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624 / 2, 0, 292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())
 		screen().set_screen_update(*this, FUNC(arm_vidc20_device::screen_update));
@@ -762,13 +764,13 @@ bool arm_vidc20_device::play_fifo_sample()
 	if (m_sdac)
 	{
 		write_dac(m_sound_fifo_channel & 7, m_sound_fifo.dequeue());
-		m_sound_fifo_channel++;
+		m_sound_fifo_channel ++;
 		m_sound_fifo_channel &= 7;
 	}
 	else if (m_dac_serial_mode)
 	{
 		s16 sample = m_sound_fifo.dequeue() & 0xff;
-		sample |= (u16)m_sound_fifo.dequeue() << 8;
+		sample |= (u16)(m_sound_fifo.dequeue() << 8);
 		write_dac32((m_sound_fifo_channel & 1), sample);
 		m_sound_fifo_channel ^= 1;
 	}
@@ -896,7 +898,11 @@ u32 arm_vidc20_device::get_sound_clock()
 	{
 		return m_ext_sclk / 24;
 	}
-	return (clock() / 24);
+
+	// 32-bit mode doubles clock rate
+	const u8 divider = 24 << get_dac_mode();
+
+	return (clock() / divider);
 }
 
 
@@ -943,7 +949,7 @@ void arm_vidc20_device::vidc20_sound_frequency_w(u32 data)
 		refresh_sound_frequency();
 }
 
-void arm_vidc20_device::write_dac32(u8 channel, u16 data)
+void arm_vidc20_device::write_dac32(u8 channel, s16 data)
 {
 	m_dac32[channel & 1]->write(data);
 }

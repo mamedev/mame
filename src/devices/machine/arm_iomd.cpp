@@ -872,7 +872,7 @@ void arm_iomd_device::sound_drq(int state)
 			m_sndcur += 4;
 		}
 
-		if (m_sndcur > m_sndend)
+		if (m_sndcur >= m_sndend)
 		{
 			trigger_irq<IRQDMA>(0x10);
 
