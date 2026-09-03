@@ -66,8 +66,8 @@ static INPUT_PORTS_START(adb_hle_pippin_controller)
 	// are kind of a challenge in that respect (they're on the *front* of the controller,
 	// opposite the shoulder buttons, which nobody else ever did to my knowledge)
 	PORT_START("BUTTONS")
-	PORT_BIT(BUTTON_LEFT_SHOULDER, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Left Shoulder")
-	PORT_BIT(BUTTON_RIGHT_SHOULDER, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Right Shoulder")
+	PORT_BIT(BUTTON_LEFT_SHOULDER, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Left Shoulder")
+	PORT_BIT(BUTTON_RIGHT_SHOULDER, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Right Shoulder")
 	PORT_BIT(BUTTON_GREEN, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Green / 1")
 	PORT_BIT(BUTTON_RED, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Red / 2")
 	PORT_BIT(BUTTON_DPAD_DOWN, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_NAME("Directional Pad Down") PORT_8WAY
