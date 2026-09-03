@@ -84,6 +84,8 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
+	void update_irq();
+
 	enum
 	{
 		S_IRQ = 0x80,
