@@ -173,8 +173,10 @@ public:
 	void vt4ffx_32mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_h12p1000(machine_config &config) ATTR_COLD;
 
+	void vt4ffx_vibesswap_1mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_vibesswap_8mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_vibesswap_16mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_gbox2020_4mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_gbox2020_8mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_gbox2020_16mb(machine_config &config) ATTR_COLD;
 	void vt4ffx_s10swap_8mb(machine_config &config) ATTR_COLD;
@@ -667,6 +669,12 @@ void vt4ffx_state::vt4ffx_vibesswap_8mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_8mbyte);
 }
 
+void vt4ffx_state::vt4ffx_vibesswap_1mb(machine_config &config)
+{
+	vt4ffx_vibesswap_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_1mbyte);
+}
+
 void vt4ffx_state::vt4ffx_gbox2020_8mb(machine_config &config)
 {
 	VT4FFX_SOC_GBOX2020(config, m_soc, NTSC_APU_CLOCK);
@@ -680,6 +688,12 @@ void vt4ffx_state::vt4ffx_gbox2020_16mb(machine_config &config)
 {
 	vt4ffx_gbox2020_8mb(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_16mbyte);
+}
+
+void vt4ffx_state::vt4ffx_gbox2020_4mb(machine_config &config)
+{
+	vt4ffx_gbox2020_8mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_4mbyte);
 }
 
 void vt4ffx_state::vt4ffx_s10swap_8mb(machine_config &config)
@@ -942,6 +956,12 @@ ROM_START( urban240 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "urban240.u3", 0x00000, 0x8000000, CRC(73d03f0d) SHA1(a1615dba39e9114ace7a8ad68f46195da655bf35) )
 ROM_END
+
+ROM_START( jl2950 )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "jl2950.u3", 0x00000, 0x8000000, CRC(91aed900) SHA1(a2dfce489a66120237e68908319841440e5e7b60) )
+ROM_END
+
 
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -1408,16 +1428,31 @@ ROM_START( gbox2020 )
 	ROM_LOAD( "fgb2020.bin", 0x00000, 0x1000000, CRC(a685d943) SHA1(9b272daccd8fe244c910f031466a4fedd83d5236) ) // flash ROM
 ROM_END
 
-ROM_START( vibes240 )
+ROM_START( fined200 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "29lv320.u1", 0x00000, 0x400000, CRC(45cefe71) SHA1(0dd5a5eed1fbdd109e831fa52eb5826ffef030d5) )
+ROM_END
+
+ROM_START( vibes240 ) // from a unit with translucent blue case
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u2", 0x000000, 0x1000000, CRC(2b0a26f1) SHA1(0bd6465fc7f1c9c73069245ab6fcd1bdbe3a82d8) )
+ROM_END
+
+ROM_START( vibes240a ) // might just be a bad dump of the same revision as vibes240
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
 	ROM_LOAD( "s29gl128p11tfi01.bin", 0x000000, 0x1000000, BAD_DUMP CRC(c04c5527) SHA1(58737084e1b1a2862f50f07feeab79593ca13862) )
 ROM_END
 
-ROM_START( vibes240a )
+ROM_START( vibes240e )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
 	ROM_LOAD( "vibes.u2", 0x000000, 0x1000000, BAD_DUMP CRC(a747971a) SHA1(2399d4f32d0054a06397bead069b498e634dbe37) )
+ROM_END
+
+ROM_START( asthh )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "29dl800ba.u2", 0x000000, 0x100000, CRC(1fbad073) SHA1(e358d24e2e383a71b41fc4e0cbf9d8a7d09c4d9d) )
 ROM_END
 
 ROM_START( retro620 )
@@ -1604,6 +1639,11 @@ ROM_START( gon100 )
 	ROM_LOAD( "p25d32sh.bin", 0x00000, 0x400000, CRC(6d852ab0) SHA1(4e90054d4632581f15aafff9e950f80d6bbcb1d5) )
 ROM_END
 
+ROM_START( 100burgr )
+    ROM_REGION( 0x800000, "mainrom", 0 )
+    ROM_LOAD( "p25d32sh.bin", 0x00000, 0x400000, CRC(db65f960) SHA1(60a9a716f83033cb0387124611c08e8c6975aa9a) )
+ROM_END
+
 ROM_START( d12power )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "25q128.u2", 0x00000, 0x1000000, CRC(02650ad4) SHA1(ca346409e11732d97b892c356fc5da61dc16ab01) )
@@ -1681,6 +1721,16 @@ ROM_START( rsps300 )
 	ROM_LOAD( "s29gl128p10tfi01.u2", 0x00000, 0x1000000, CRC(77c0a7fc) SHA1(dde5f24596d34e0a1305df92ba267a868bd386d4) )
 ROM_END
 
+ROM_START( 500in1gf )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl256n10tfi01.u2", 0x00000, 0x2000000, CRC(1c7012aa) SHA1(9513b07ed1eb0f19619bd9c9199d261c6e9348bd) )
+ROM_END
+
+ROM_START( 200in1fn )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "200in1.u3", 0x000000, 0x1000000, CRC(9db30eac) SHA1(32cf7db7fc6a3facf59739b3fbe66c8bf1615ea3) )
+ROM_END
+
 void vt369_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -1748,6 +1798,8 @@ void vt369_state::init_tui240()
 // First half of games don't work, probably bad dump
 CONS( 201?, dvnimbus,   0,        0,  vt369_unk_16mb, vt369, vt36x_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 
+// BL-901-V2.0, 20190611 on PCB
+CONS( 2019, 200in1fn, 0,  0,  vt36x_altswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "200 in 1 Handheld Console (with bad menu font)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /****************************************************************************************************************
 
@@ -1843,6 +1895,8 @@ CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_st
 CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
 
 CONS( 201?, urban240,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Urban Outfitters", "Mini Arcade Machine 240-in-1 (translucent case)", MACHINE_NOT_WORKING )
+// same style menu as urban240, but more games (45 Sports, 112 Arcade, 75 Puzzle, 68 Shooting) 
+CONS( 201?, jl2950,    0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Lexibook", "Cyber Arcade 300-in-1 (JL2950)", MACHINE_NOT_WORKING )
 
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
@@ -1867,11 +1921,19 @@ CONS( 2020, gbox2020, gbox2019, 0, vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, em
 // GB-40-36V1.2 and 20180825 on PCB, assuming to be from Sup although unit wasn't branded
 CONS( 2018, rsps300,  0,        0,  vt4ffx_rsps300swap_16mb, vt369, vt4ffx_state, empty_init,   "Sup", "Retro Station Pocket System GB-40 300 in 1",  MACHINE_NOT_WORKING )
 
+// HKDSUP Ver.2.0 2024.09.05 on PCB
+CONS( 2024, fined200, 0,        0, vt4ffx_gbox2020_4mb, vt369, vt4ffx_state, empty_init, "Sup", "Fine & Dandy 200 in 1", MACHINE_NOT_WORKING )
+
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
-// several games don't work (eg. Curly Monkey 2, maybe due to bad dump?)
+// several games don't work (eg. Curly Monkey 2) but the parent set should be a good dump
 CONS( 202?, vibes240, 0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// bad dump
+CONS( 202?, vibes240a,vibes240, 0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // also a bad dump, different encryption, but Curly Monkey 2 works here, only first 2 opcodes are encrypted
-CONS( 202?, vibes240a,vibes240, 0,  vt4ffx_gbox2020_16mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, vibes240e,vibes240, 0,  vt4ffx_gbox2020_16mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (alt encryption)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// uses unsupported screen mode
+CONS( 202?, asthh,    0,        0,  vt4ffx_vibesswap_1mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Asteroids: Classic Arcade Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has TUI (holiday company) logo on packaging, no other manufacturer details
 CONS( 201?, tui240,   0,        0,  vt4ffx_gbox2020_8mb,   vt369, vt4ffx_state, init_tui240, "<unknown>",  "TUI 240-in-1", MACHINE_NOT_WORKING )
@@ -1893,6 +1955,8 @@ CONS( 202?, s10_520,   0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_
 CONS( 202?, s5_520,    0,  0,  vt4ffx_16mb,          vt369, vt4ffx_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
 // fewer games, but does have the scramble
 CONS( 202?, 500in1hh,  0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
+// needs banking? (32MByte ROM, but doesn't expect plain mapping)
+CONS( 202?, 500in1gf,  0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, init_s10fake, "<unknown>", "500-in-1 Handheld Game (German / French / English / Chinese menu)",  MACHINE_NOT_WORKING )
 
 // there were also 'F1' units, shaped like a car, ROM may or may not be the same
 CONS( 202?, f5_620,    0,  0,  vt4ffx_16mb,        vt369, vt4ffx_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
@@ -1979,6 +2043,8 @@ CONS( 201?, supr200,    0,        0,  vt36x_swap_8mb, vt369, vt36x_state, empty_
 CONS( 201?, tiger108,  0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "Zebra AS / Tiger Retail", "Spillekonsol Game console - 108-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, gon100,    0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
+// very similar to gon100, but menu is at a different resolution
+CONS( 201?, 100burgr,  0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "Tiger Retail / Zebra A/S", "100-in-1 Handheld Game (burger shape)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (416-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 

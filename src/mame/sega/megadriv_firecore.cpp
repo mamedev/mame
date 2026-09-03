@@ -382,6 +382,11 @@ ROM_START( msi_sf2 )
 	ROM_LOAD16_WORD_SWAP( "29lv320.bin", 0x000000, 0x400000, CRC(465b12f0) SHA1(7a058f6feb4f08f56ae0f7369c2ca9a9fe2ed40e) )
 ROM_END
 
+ROM_START( bfmk )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29gl032.u2", 0x000000, 0x400000, CRC(d5346d32) SHA1(7aec036436e9941050ae33be3ac7d734cedf2de7) )
+ROM_END
+
 ROM_START( reactmd )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // this contains the MD games and main boot menu
 	ROM_LOAD16_WORD_SWAP( "reactormd.bin", 0x0000, 0x2000000, CRC(fe9664a4) SHA1(d475b524f576c9d1d90aed20c7467cc652396baf) )
@@ -500,6 +505,9 @@ CONS( 201?, mdhh100,   0,        0, megadriv_firecore_3button_ntsc,  firecore_3b
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 CONS( 2018, msi_sf2,   0,        0, megadriv_firecore_6button_ntsc,  msi_6button,      megadriv_firecore_state, init_megadriv, "MSI / Capcom / Sega", "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
+
+// the Firecore video mode part doesn't work correctly, game can boot if you skip over it
+CONS( 2019, bfmk,      0,        0, megadriv_firecore_6button_ntsc,  msi_6button,      megadriv_firecore_state, init_megadriv, "Basic Fun", "Mortal Kombat: Arcade Classics", MACHINE_NOT_WORKING)
 
 // Two systems in one unit - Firecore Genesis and SunPlus
 CONS( 2009, reactmd,   0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_firecore_state, init_reactmd,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -192,6 +192,11 @@ ROM_START( atw_swy )
 	ROM_LOAD( "w25q128jwiq.bin", 0x000000, 0x1000000, CRC(ab3128fd) SHA1(4bc3bf6946b6fbd7c0d783ab48eff5d37828a876) )
 ROM_END
 
+ROM_START( atw_blue )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "25lq128c.bin", 0x000000, 0x1000000, CRC(8ddb5514) SHA1(f7e86b49df08ae88c9fb120b0ff9ec7e14bfbec7) )
+ROM_END
+
 ROM_START( atw_toys )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "w25q128jwiq.bin", 0x000000, 0x1000000, CRC(a748c0f4) SHA1(fa21e16f85cc73109d2ac16286bc345d654e5b94) )
@@ -238,4 +243,5 @@ CONS( 2022, atw_pepa, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "A
 // red PCB
 CONS( 2022, atw_swst, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: Stormtrooper (Accutime, STM4353PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2022, atw_swy,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: The Mandalorian (Accutime, MNL4023PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_blue, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Bluey (Accutime, BLY4070)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

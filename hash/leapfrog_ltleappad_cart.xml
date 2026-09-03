@@ -5,6 +5,34 @@ license:CC0-1.0
 -->
 <softwarelist name="leapfrog_ltleappad_cart" description="LeapFrog Little Touch LeapPad cartridges">
 
+	<software name="animalwl" supported="no">
+		<description>Animal World (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11706"/>
+		<part name="cart" interface="leapfrog_ltleappad_cart">
+			<feature name="pcb" value="CT225V5"/>
+			<feature name="u1" value="Macronix 16MBit ROM: MS23L1610HC"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-11706 - Animal World (UK).bin" size="0x200000" crc="c5973571" sha1="661e35da784b371d094895736b7a095c4a54c8ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animalda" supported="no">
+		<description>Animal Dance (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10244"/>
+		<part name="cart" interface="leapfrog_ltleappad_cart">
+			<feature name="pcb" value="CT337V0"/>
+			<feature name="u1" value="Sunplus ROM: MX23L3210HC"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10244 - Animal Dance (UK).bin" size="0x400000" crc="65ed100c" sha1="20287a62d88f7d4da9342e016e09fb202e93335a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Will be clone of "Baby Animals" once found and dumped -->
 	<software name="babyanimlsg" supported="no">
 		<description>Tierbabys (Germany)</description>
@@ -37,8 +65,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bearbed" supported="no">
+		<description>One Bear in the Bedroom (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10243"/>
+		<part name="cart" interface="leapfrog_ltleappad_cart">
+			<feature name="pcb" value="CT337V0"/>
+			<feature name="u1" value="Sunplus ROM: MX23L3210HC"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10243 - One Bear in the Bedroom (UK).bin" size="0x400000" crc="87e648cf" sha1="1dfa9f18ffec51072a9bca6cea788a2351d4f76e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="babyfwords" supported="no">
-		<description>Baby's First Words (USA)</description>
+		<description>Baby's First Words (UK/USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10247"/>

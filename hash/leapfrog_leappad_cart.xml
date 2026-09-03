@@ -246,6 +246,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- also found as UBL 500-10916 - Monsters, Inc with identical ROM -->
 	<software name="monsters" supported="no">
 		<description>Leap 2 - Reading - Disney/Pixar Monsters, Inc. (UK)</description>
 		<year>2001</year>
@@ -292,7 +293,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="thomasrue" supported="no">
-		<description>Pre Reading - Thomas the Really Useful Engine (UK)</description>
+		<description>Thomas the Really Useful Engine (UK, Pre Reading, set 1)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-00531"/>
@@ -300,6 +301,21 @@ license:CC0-1.0
 			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-00531 - Pre Reading - Thomas the Really Useful Engine.bin" size="0x200000" crc="8122325d" sha1="f76b2e6c4d56fd8616c90bf86d720f267724723e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- also seen as UBL 500-10903 - Thomas and Friends - The Really Useful Engine with identical ROM -->
+	<software name="thomasruea" cloneof="thomasrue" supported="no">
+		<description>Thomas the Really Useful Engine (UK, Pre Reading, set 2)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="xxx"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="ASY-310-00087-FAB-300-00087-A"/>
+			<feature name="u1" value="LeapFrog 2000 16M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00550 - Pre Reading - Thomas the Really Useful Engine.bin" size="0x200000" crc="595e2045" sha1="2846efa96efbc9754e85ae773faf7d598edd0952" />
 			</dataarea>
 		</part>
 	</software>
@@ -451,7 +467,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lionking" supported="no">
-		<description>Leap Start - Pre Reading Storybook - Disney's The Lion King (UK)</description>
+		<description>Disney's The Lion King (UK, Leap Start - Pre Reading Storybook, set 1)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-01354"/>
@@ -461,6 +477,20 @@ license:CC0-1.0
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-01354 - Leap Start - Pre Reading Storybook - The Lion King.bin" size="0x200000" crc="66126bc1" sha1="36f51db4669f29ee1cb8e12b1c13d9e1738e458f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkinga" cloneof="lionking" supported="no">
+		<description>Disney's The Lion King (UK, Leap Start - Pre Reading Storybook, set 2)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01025"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101002V2"/>
+			<feature name="u1" value="MR27V3202E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-01025 - Pre Reading - Storybook - The Lion King.bin" size="0x400000" crc="126f277e" sha1="049e7c860272f319f1a940d5087646b842a0455d" />
 			</dataarea>
 		</part>
 	</software>
@@ -480,6 +510,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- also found as UBL 500-10904-B - Finding Nemo with identical ROM -->
 	<software name="findnemoa" supported="no">
 		<description>Leap 1 - Reading - Disney/Pixar Finding Nemo (UK)</description>
 		<year>2003</year>
@@ -526,7 +557,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lostdino" supported="no">
-		<description>Leap and the lost Dinosaur (UK)</description>
+		<description>Leap and the lost Dinosaur (UK, set 1)</description>
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10136"/>
@@ -536,6 +567,21 @@ license:CC0-1.0
 			<feature name="u1" value="OKi 32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-10136 - Leap and the lost Dinosaur.bin" size="0x400000" crc="eb3b01c7" sha1="bdc3791199e8b04942459c09047202b048ef27dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lostdinoa" cloneof="lostdino" supported="no">
+		<description>Leap and the lost Dinosaur (UK, set 2)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-11430"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="02172-003-7124"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32M VER:J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11430 - Leap and the lost Dinosaur.bin" size="0x400000" crc="69de4c79" sha1="3a4aed688f54ba87f4a2fa56721600fb299c3818" />
 			</dataarea>
 		</part>
 	</software>
@@ -617,13 +663,13 @@ license:CC0-1.0
 		<description>Disney/Pixar Toy Story 2 (UK)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-10497 UBL"/>
+		<info name="serial" value="UBL 500-10497-C"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-2911"/>
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10497 UBL - Toy Story 2.bin" size="0x400000" crc="a5e841e2" sha1="7dbb0f053cbf8e9459a964bec43a5013d84ae87b" />
+				<rom name="UBL 500-10497-C - Toy Story 2.bin" size="0x400000" crc="a5e841e2" sha1="7dbb0f053cbf8e9459a964bec43a5013d84ae87b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1211,6 +1257,259 @@ license:CC0-1.0
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-13044 UBL - Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... .bin" size="0x400000" crc="5ed699f6" sha1="902c70e0437525de94a8febab794e46b8a55f5c1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="braintw" supported="no">
+		<description>Brain Twisters - Search the City! (Leap 3)</description>
+		<year>2001</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00091"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="ASY-310-00087-FAB-300-00087-A"/>
+			<feature name="u1" value="LeapFrog 2000 16M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00091 - Brain Twisters - Search the City.bin" size="0x200000" crc="807c99d9" sha1="9ff255a1ded10b62e8c721833c10064250af4c04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooh" supported="no">
+		<description>Disney Winnie the Pooh - Lots and Lots of Honey Pots (UK, Mar 05 2002, Pre Math)</description> <!-- Honeypots is without a space on the cart label -->
+		<year>2001</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00413"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7210"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00413 - Pre Math - Lots  and Lots of Honeypots.bin" size="0x200000" crc="c6686b03" sha1="4488a1117ceca218746e010a4134fa2c042ebcfe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooha" cloneof="pooh" supported="no">
+		<description>Disney Winnie the Pooh - Lots and Lots of Honey Pots (UK, Apr 15 2002)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10914"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7211"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10914 - Lots and Lots of Honey Pots.bin" size="0x200000" crc="99f7d00d" sha1="41c9da7e8cc07b53448eae7c1f3ce36e780e5236" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobhnt" supported="no">
+		<description>Scooby Doo! and the Haunted Castle (Leap 2, Reading)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00537"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-3317"/>
+			<feature name="pcb_rev" value="REV.03"/>
+			<feature name="u1" value="HY23V16202"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00537 - Reading - Scooby Doo and the Haunted Castle.bin" size="0x200000" crc="fb1e17b5" sha1="49dc4670dcc889ced6e2e580a8043713bdf04322" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- also seen as 500-10961 UBL - The Incredibles (US, 2nd Grade) with identical ROM to UK Ages 6-8 version -->
+	<software name="incred" supported="no">
+		<description>The Incredibles (UK/USA)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-11422"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11422 - The Incredibles (Ages 6-8).bin" size="0x400000" crc="0b6c9a94" sha1="bc592aa72d3418e346384183f776aef708d913fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bratz" supported="no">
+		<description>Bratz - Election Perfection! (UK)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11588"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="335-13845-40"/>
+			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11588 - Bratz - Election Perfection.bin" size="0x200000" crc="9c81785e" sha1="a947a7277597a487e1eb7ccc7f37923b2c0dd517" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars" supported="no">
+		<description>Disney/Pixar Cars (UK)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11686"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11686 - Cars.bin" size="0x200000" crc="95dca7ca" sha1="863904681486afe5fde8f549f7eeaf5b6180b426" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dprnmmm" supported="no">
+		<description>Disney Princess - Maths, Mazes and More (UK)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11687"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11687 - Disney Princess - Maths, Mazes and More.bin" size="0x200000" crc="f92280fa" sha1="ec1809bbe98602c248db7f21e3577f1b81f824ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- no serial printed anywhere -->
+	<software name="leapaz" supported="no">
+		<description>Leap's Friends from A to Z</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7030"/>
+			<feature name="pcb_rev" value="REV.02"/>
+			<feature name="u1" value="Matronix 8m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="Leap's Friends from A to Z.bin" size="0x100000" crc="19ca9cd4" sha1="5acd30955ac7e31f62a44027b2a49dba2aa946d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- no serial printed anywhere -->
+	<software name="wrldgeog" supported="no">
+		<description>LeapPadPro Interactive Geography - World Geography</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="ASY-310-00087-FAB-300-00087-A"/>
+			<feature name="u1" value="LeapFrog 2000 16M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="LeapPad Pro - Interactive Geography - World Geography.bin" size="0x200000" crc="d25cb770" sha1="e58973365e5e96222e27f11ba3d897b3acf8a3c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbobsss" supported="no">
+		<description>Spongebob Squarepants - Salty Sea Stories (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10496 "/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7011"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10496 - Spongebob Squarepants - Salty Sea Stories.bin" size="0x200000" crc="95f9072a" sha1="f92d6c7f0f6c951cabf4f8f31832cb96cf182a4e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cathat" supported="no">
+		<description>The Cat in the Hat</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10532"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="335-13845-00"/>
+			<feature name="u1" value="MX23L3211B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-10532 - The Cat in the Hat.bin" size="0x400000" crc="48369518" sha1="45d16a39fe0c8f0288b80093c89d74071df03cdb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobzom" supported="no">
+		<description>Scooby-Doo! and the Zombie's Treasure (UK)</description>
+		<year>2001</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-11427"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="335-13845-00"/>
+			<feature name="u1" value="MX23L1611B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11427 - Scooby-Doo and the Zombie's Treasure.bin" size="0x400000" crc="d48ec54a" sha1="dfcacf1db04d65579e4ecabe24cbbae8643e92ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madagas" supported="no">
+		<description>Madagascar (UK)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-11819"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7211"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11819 - Madagascar.bin" size="0x400000" crc="966dfdf7" sha1="4ccca7ced2cc8bb4c9653e699d79257b658fd2c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Plus Writing cartridges -->
+
+	<software name="mathmagi" supported="no">
+		<description>Maths Magic (LeapPad Plus Writing)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11281 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11281 UBL - Maths Magic.bin" size="0x400000" crc="f7580e7b" sha1="17f5b1b9b2dc87b4c54a74ad403c0aaf90e376b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildword" supported="no">
+		<description>Wild Word Games (LeapPad Plus Writing)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-11688"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2911"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11688 - Wild Word Games.bin" size="0x400000" crc="04c195c0" sha1="eb2f87a41ae97c952b5302174f75337ec7bc2576" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rwmath" supported="no">
+		<description>Reading, Writing and Maths (LeapPad Plus Writing)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11030 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="30056+003+7124"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32M VER:J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11030 UBL - Reading, Writing and Maths.bin" size="0x400000" crc="e0fed406" sha1="80e9d3c3a97ca09be1f77725a7b683822537d7d0" />
 			</dataarea>
 		</part>
 	</software>

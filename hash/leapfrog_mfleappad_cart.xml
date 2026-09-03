@@ -55,7 +55,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dorafr" supported="no">
+	<software name="dora" supported="no">
+		<description>Dora the Explorer - To the Rescue (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10301"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Oki 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-10301 - Dora the Explorer - To the Rescue.bin" size="0x400000" crc="f54026a8" sha1="b8eae12f6b4800e58b97527571a5353955ddc2ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorafr" cloneof="dora" supported="no">
 		<description>Dora the Explorer - À la rescousse (France)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -85,7 +100,37 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carss" supported="no">
+	<software name="wiggles" supported="no">
+		<description>The Wiggles - Learn, Dance and Sing with The Wiggles! (UK)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12288"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12288 - The Wiggles - Learn, Dance and Sing with The Wiggles.bin" size="0x400000" crc="febe7467" sha1="e35c7e3a1093e6e5b90f836acde4c39ad00addf0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars" supported="no">
+		<description>Disney/Pixar Cars (UK)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11460"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11460 - Cars.bin" size="0x200000" crc="833797c7" sha1="96a8c5aea32bbd9a2242a6f4757c56b7bf7059e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carss" cloneof="cars" supported="no">
 		<description>Disney/Pixar Cars (Spain)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -100,7 +145,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carsfr" cloneof="carss" supported="no">
+	<software name="carsfr" cloneof="cars" supported="no">
 		<description>Disney/Pixar Cars (France)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
