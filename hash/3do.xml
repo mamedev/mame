@@ -232,7 +232,8 @@ Hangs after second FMV, regardless of skipping or not
 		<notes><![CDATA[
 [CD drive] slow intro FMV, no sound. Successive FMVs have slow GFXs and fast repeating sound
 [Madam] doesn't draw background box in Subtitles select screen (transparent?)
-[Madam] has flip X bugs in gameplay, repeated enemy GFX in status bar, shows score all the time (it shouldn't?), fire shots don't draw in playfield
+[Madam] has flip X bugs in gameplay, repeated enemy GFX in status bar, requires blending for score display, fire shots don't draw across playfield
+Untested on name entry screen
 Slow in gameplay
 ]]></notes>
 		<info name="barcode" value="0 24294 11440 3"/>
