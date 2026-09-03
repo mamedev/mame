@@ -556,6 +556,8 @@ TILE_GET_INFO_MEMBER(segas32_state::get_text_tile_info)
 bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable, bool clipout, int clipmask, const rectangle &cliprect, extents_list *list)
 {
 	const bool flip = BIT(m_videoram[0x1ff00 / 2], 9);
+	const bool perlineclip2 = BIT(m_videoram[0x1ff04 / 2], 4);
+	const bool perlineclip3 = BIT(m_videoram[0x1ff04 / 2], 5);
 	rectangle tempclip;
 
 	// expand our cliprect to include the bottom-right
@@ -662,7 +664,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		 *   +100 = min X
 		 *   +300 = max X
 		 */
-		if (BIT(m_videoram[0x1ff04 / 2], 4) || BIT(m_videoram[0x1ff04 / 2], 5))
+		if (perlineclip2 || perlineclip3)
 		{
 			rectangle lineclips[5];
 			int linesorted[5];
@@ -677,7 +679,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			}
 
 			// clip window 2
-			if (BIT(m_videoram[0x1ff04 / 2], 4) && BIT(clipmask, 2))
+			if (perlineclip2 && BIT(clipmask, 2))
 			{
 				uint16_t minx = table[0x000 + line];
 				uint16_t maxx = table[0x200 + line];
@@ -704,7 +706,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			}
 
 			// clip window 3
-			if (BIT(m_videoram[0x1ff04 / 2], 5) && BIT(clipmask, 3))
+			if (perlineclip3 && BIT(clipmask, 3))
 			{
 				uint16_t minx = table[0x100 + line];
 				uint16_t maxx = table[0x300 + line];
@@ -737,9 +739,6 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			 */
 			{
 				uint16_t *extent = &list->extent[32 + y][0];
-
-				for (int i = 0; i < 5; i++)
-					linesorted[i] = i;
 
 				for (int i = 0; i < 5; i++)
 					for (int j = i + 1; j < 5; j++)
