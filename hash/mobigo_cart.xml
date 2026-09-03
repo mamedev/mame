@@ -345,7 +345,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="doraf" cloneof="dora" supported="no">
-		<description>Nickelodeon Dora L' Exploratrice - Dora et Babouche a la fete des jumeaux (France)</description>
+		<description>Nickelodeon Dora l'Exploratrice - Dora et Babouche à la fête des jumeaux (France)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-250805(FR)"/>
@@ -381,7 +381,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hkittyf" cloneof="hkitty" supported="no">
-		<description>Hello Kitty - La fete d'anniversaire (France)</description>
+		<description>Hello Kitty - La fête d'anniversaire (France)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-252405(FR)"/>
