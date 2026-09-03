@@ -731,7 +731,9 @@ void abc80_state::abc80_common(machine_config &config)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "generic_kb"));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
-	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc80_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(abc80_state::quickload_cb));
+	quickload.set_interface("abc80_quik");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K");
@@ -740,6 +742,7 @@ void abc80_state::abc80_common(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
 	SOFTWARE_LIST(config, "rom_list").set_original("abc80_rom");
+	SOFTWARE_LIST(config, "quik_list").set_original("abc80_quik");
 }
 
 void abc80_state::abc80(machine_config &config)
