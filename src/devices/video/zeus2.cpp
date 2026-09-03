@@ -144,7 +144,7 @@ void zeus2_device::device_reset()
 	texel_width = 256;
 	zeus_fifo_words = 0;
 	m_fill_color = 0;
-	m_fill_depth = 0;
+	m_fill_depth = 0xffffff;
 	m_texmodeReg = 0;
 	zeus_trans[3] = 0.0f;
 	m_useZOffset = false;
@@ -815,11 +815,18 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 						logerror("zeus2_register_update: Warning! Mask Register not equal to 0xffffffff\n");
 				}
 				if (m_zeusbase[0x51] == 0x00400000) {
-					// SGRAM Color Register
-					m_fill_color = m_zeusbase[0x58] & 0xffffff;
-					m_fill_depth = ((m_zeusbase[0x5a] & 0xffff) << 8) | (m_zeusbase[0x58] >> 24);
-					//m_fill_depth = -1;
-					if (m_zeusbase[0x58] != m_zeusbase[0x59])
+					// SGRAM Color Register.  R5E bit 5 packs 24 bit color with 24 bit depth,
+					// otherwise it is 32 bit color with 16 bit depth.
+					bool mode24 = m_zeusbase[0x5e] & 0x20;
+					if (mode24) {
+						m_fill_color = m_zeusbase[0x58] & 0xffffff;
+						m_fill_depth = ((m_zeusbase[0x59] & 0xffff) << 8) | (m_zeusbase[0x58] >> 24);
+					}
+					else {
+						m_fill_color = m_zeusbase[0x58];
+						m_fill_depth = (m_zeusbase[0x5a] & 0xffff) << 8;
+					}
+					if (m_zeusbase[0x58] != m_zeusbase[mode24 ? 0x5a : 0x59])
 						logerror("zeus2_register_update: Warning! Different fill colors are set.\n");
 					if (logit)
 						logerror(" -- Setting fill color = %06X depth = %06X ", m_fill_color, m_fill_depth);
@@ -844,12 +851,10 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				}
 				if (logit)
 					logerror(" -- Clearing buffer: numPixels: %08X addr: %08X reg51: %08X", numPixels, addr, m_zeusbase[0x51]);
-				// A depth clear of 0 (nearest) rejects all later depth-tested geometry; reset to far instead.
-				int32_t clearDepth = (m_fill_depth == 0) ? 0xffffff : m_fill_depth;
 				for (int count = 0; count < numPixels; count++) {
 					// Crusn wraps the frame buffer during fill so need to mask address
 					m_frameColor[(addr + count) & (WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2 - 1)] = m_fill_color;
-					m_frameDepth[(addr + count) & (WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2 - 1)] = clearDepth;
+					m_frameDepth[(addr + count) & (WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2 - 1)] = m_fill_depth;
 				}
 			}
 			break;
