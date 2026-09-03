@@ -159,6 +159,8 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 	m_tstate(0),
 	m_tones(0),
 	m_ttimer(nullptr),
+	m_wire_timer(nullptr),
+	m_wire_rate(attotime::zero),   /* zero = refill on pop, the old behaviour */
 	m_rstate(0),
 	m_rreg(0),
 	m_rones(0),
@@ -189,6 +191,7 @@ void mc6854_device::device_start()
 	m_out_frame_cb.resolve_safe();
 
 	m_ttimer = timer_alloc(FUNC(mc6854_device::tfifo_cb), this);
+	m_wire_timer = timer_alloc(FUNC(mc6854_device::wire_feed), this);
 
 	save_item(NAME(m_cr1));
 	save_item(NAME(m_cr2));
@@ -427,6 +430,9 @@ TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
 		m_flen = 0;
 		m_out_frame_cb( m_frame, len );
 	}
+
+	/* the FIFO just gained a free slot: TDRA (and the TDSR line) must follow */
+	update_sr1( );
 }
 
 
@@ -561,8 +567,10 @@ uint8_t mc6854_device::rfifo_pop( )
 		m_sr2 |= FV; /* TODO: check CRC & set ERR instead of FV if error*/
 	}
 
-	/* auto-refill in frame mode */
-	if ( m_flen > 0 )
+	/* auto-refill in frame mode - unless the line is clocking the frame in on
+	   its own, in which case refilling here as well would deliver two bytes
+	   per pop and defeat the whole point (see set_wire_rate) */
+	if ( m_flen > 0 && m_wire_rate.is_zero() )
 	{
 		rfifo_push( m_frame[ m_fpos++ ] );
 		if ( m_fpos == m_flen )
@@ -570,6 +578,23 @@ uint8_t mc6854_device::rfifo_pop( )
 	}
 
 	return data;
+}
+
+
+/* One byte off the wire.  This is what a real line does and what the pop-driven
+   refill cannot do: it keeps arriving whether or not anybody is reading, so a
+   reader that has stopped overruns the three-byte FIFO by itself, which is
+   how the chip behaves. */
+TIMER_CALLBACK_MEMBER(mc6854_device::wire_feed)
+{
+	if ( m_flen == 0 || m_fpos >= m_flen )
+		return;
+
+	rfifo_push( m_frame[ m_fpos++ ] );
+	if ( m_fpos == m_flen )
+		rfifo_terminate( );
+	else
+		m_wire_timer->adjust( m_wire_rate );
 }
 
 
@@ -588,13 +613,26 @@ void mc6854_device::rfifo_clear( )
 	m_rsize = 0;
 	m_rones = 0;
 	m_flen = 0;
+	/* the frame is gone, so nothing more of it comes off the line */
+	if ( m_wire_timer )
+		m_wire_timer->adjust( attotime::never );
 }
 
 
 
 int mc6854_device::send_frame( uint8_t* data, int len )
 {
-	if ( m_rstate > 1 || m_tstate > 1 || RTS )
+	if ( !receive_allowed() )
+		return -2; /* transmitted on the wire, but the receiver is in reset or
+		              has no carrier: the frame is simply not seen */
+
+	/* a frame is still being drained: report busy and let the sender retry */
+	if ( m_flen > 0 )
+		return -1;
+
+	/* the RTS output does not gate the receiver section: a master that keeps
+	   RTS raised while it waits for an answer still hears it */
+	if ( m_rstate > 1 || m_tstate > 1 )
 		return -1; /* busy */
 
 	if ( len > MAX_FRAME_LENGTH )
@@ -615,10 +653,15 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 	}
 	m_flen = len;
 	m_fpos = 0;
+	/* the address and control bytes are in the FIFO as soon as the frame
+	   starts arriving; from there the wire either clocks the rest in on its
+	   own timer, or - the original behaviour - the reader pulls it */
 	rfifo_push( m_frame[ m_fpos++ ] );
 	rfifo_push( m_frame[ m_fpos++ ] );
 	if ( m_fpos == m_flen )
 		rfifo_terminate( );
+	else if ( !m_wire_rate.is_zero() )
+		m_wire_timer->adjust( m_wire_rate );
 	return 0;
 }
 
@@ -630,14 +673,12 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 
 void mc6854_device::set_cts(int state)
 {
+	/* the CTS status bit latches the positive transition of the nCTS input
+	   and is cleared by TRESET or "clear transmitter status", not by the
+	   line going active again */
 	if ( ! m_cts && state )
 		m_sr1 |= CTS;
 	m_cts = state;
-
-	if ( m_cts )
-		m_sr1 |= CTS;
-	else
-		m_sr1 &= ~CTS;
 	update_sr1();
 }
 
@@ -645,7 +686,9 @@ void mc6854_device::set_cts(int state)
 
 void mc6854_device::set_dcd(int state)
 {
-	if ( ! m_dcd && state )
+	/* a receiver section held in reset has its status bits cleared and cannot
+	   latch the loss-of-carrier edge */
+	if ( ! m_dcd && state && !RRESET )
 	{
 		m_sr2 |= DCD;
 		/* partial reset */
@@ -655,6 +698,7 @@ void mc6854_device::set_dcd(int state)
 		m_rones = 0;
 	}
 	m_dcd = state;
+	update_sr1( ); /* the latched loss-of-carrier must be able to raise S2RQ and interrupt */
 }
 
 
@@ -681,14 +725,19 @@ void mc6854_device::update_sr1( )
 {
 	update_sr2( );
 
-	/* update S2RQ */
-	if ( m_sr2 & 0x7f )
+	/* update S2RQ; the address byte does not request status service while the
+	   receiver data path is in DMA mode - it is the DMA channel's business */
+	uint8_t s2_cond = m_sr2 & 0x7f;
+	if ( RDSR )
+		s2_cond &= ~AP;
+	if ( s2_cond )
 		m_sr1 |= S2RQ;
 	else
 		m_sr1 &= ~S2RQ;
 
-	/* update TDRA (always prioritized by CTS) */
-	if ( TRESET || ( m_sr1 & CTS ) )
+	/* update TDRA (always prioritized by CTS: both the latched condition and
+	   the live level of the nCTS input inhibit transmission) */
+	if ( TRESET || ( m_sr1 & CTS ) || m_cts )
 		m_sr1 &= ~TDRA;
 	else
 	{
@@ -712,16 +761,21 @@ void mc6854_device::update_sr1( )
 	{
 		if ( m_sr1 & TU ) m_sr1 |= IRQ;
 		LOGIRQ(" - Update IRQ TU: %d\n", (m_sr1 & IRQ) ? 1 : 0);
+		if ( m_sr1 & CTS ) m_sr1 |= IRQ; /* nCTS is a transmitter side condition (datasheet) */
+		LOGIRQ(" - Update IRQ CTS: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 		if ( ( m_sr1 & TDRA ) && !TDSR ) m_sr1 |= IRQ; // TDRA will not cause interrupt if in DMA mode
 		LOGIRQ(" - Update IRQ TDRA: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 	}
 	if ( RIE )
 	{
-		if ( m_sr1 & (S2RQ | CTS) ) m_sr1 |= IRQ;
-		LOGIRQ(" - Update IRQ S2RQ(%02x)|CTS(%d): %d\n", (m_sr2 & 0x7f), (m_sr1 & CTS) ? 1 : 0, (m_sr1 & IRQ) ? 1 : 0);
+		if ( m_sr1 & S2RQ ) m_sr1 |= IRQ;
+		LOGIRQ(" - Update IRQ S2RQ(%02x): %d\n", (m_sr2 & 0x7f), (m_sr1 & IRQ) ? 1 : 0);
 		if ( ( m_sr1 & RDA ) && !RDSR ) m_sr1 |= IRQ; // RDA will not cause interrupt if in DMA mode
 		LOGIRQ(" - Update IRQ RDA(%d) && !RDSR(%d): %d\n", (m_sr1 & RDA) ? 1 : 0, RDSR ? 1 : 0, (m_sr1 & IRQ) ? 1 : 0);
-		if ( m_sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE | AP) ) m_sr1 |= IRQ;
+		if ( m_sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE) ) m_sr1 |= IRQ;
+		/* the address byte is the DMA channel's business when the receiver
+		   data path is in DMA mode; it only interrupts in CPU-driven mode */
+		if ( !RDSR && ( m_sr2 & AP ) ) m_sr1 |= IRQ;
 		LOGIRQ(" - Update IRQ ERR: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 	}
 
@@ -744,7 +798,9 @@ uint8_t mc6854_device::read(offs_t offset)
 				( m_sr1 & FD ) ? 1 : 0, ( m_sr1 & CTS ) ? 1 : 0,
 				( m_sr1 & TU ) ? 1 : 0, ( m_sr1 & TDRA) ? 1 : 0,
 				( m_sr1 & IRQ) ? 1 : 0 );
-		return m_sr1;
+		/* the CTS bit shows the live level of the nCTS input as well as the
+		   latched transition; only the latter interrupts */
+		return m_sr1 | ( m_cts ? CTS : 0 );
 
 	case 1: /* status register 2 */
 		//update_sr2( );
@@ -762,7 +818,16 @@ uint8_t mc6854_device::read(offs_t offset)
 		uint8_t data = rfifo_pop( );
 		LOG( "%f %s mc6854_r: get data $%02X\n",
 				machine().time().as_double(), machine().describe_context(), data );
-		m_out_rdsr_cb(CLEAR_LINE); // Deactive DMA request line regardless of mode
+		if ( m_wire_rate.is_zero() )
+			m_out_rdsr_cb(CLEAR_LINE); // Deactive DMA request line regardless of mode
+		else
+			/* With the line clocking bytes in, the request has to follow what
+			   is actually in the FIFO: dropping it unconditionally here and
+			   never refreshing the status leaves the reader waiting for a byte
+			   that is already sitting there.  Recomputing says the truth - the
+			   request stays up while another byte is present and falls when the
+			   FIFO empties. */
+			update_sr1();
 		return data;
 	}
 
@@ -805,8 +870,10 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 		if ( TRESET )
 		{
 			tfifo_clear( );
+			/* the CTS status bit is latched on the positive transition of the
+			   nCTS input; once cleared it stays clear until the next edge,
+			   even if the line is still high */
 			m_sr1 &= ~(TU | TDRA | CTS);
-			if ( m_cts ) m_sr1 |= CTS;
 			update_sr1( );
 		}
 		break;
@@ -850,14 +917,16 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 				m_sr2 &= ~(AP | FV | RIDLE | RABT | ERR | OVRN | DCD);
 				if ( m_dcd )
 					m_sr2 |= DCD;
+				/* AP is a latched condition on the real chip: once cleared it must
+				   not reassert for an address byte still unread in the FIFO */
+				for ( int i = 0; i < FIFO_SIZE; i++ )
+					m_rfifo[ i ] &= ~0x400;
 				update_sr1( );
 			}
 			if ( data & 0x40 )
 			{
-				/* clear transmitter status */
+				/* clear transmitter status; CTS is edge-latched, see TRESET */
 				m_sr1 &= ~(TU | TDRA | CTS);
-				if ( m_cts )
-					m_sr1 |= CTS;
 				update_sr1( );
 			}
 
@@ -868,6 +937,7 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 	case 2: /* transmitter data: continue data */
 		LOGSETUP( "%f %smc6854_w: push data=$%02X\n", machine().time().as_double(), machine().describe_context(), data );
 		tfifo_push( data );
+		update_sr1( ); /* a full FIFO must drop TDRA (and the TDSR line), or DMA overruns it */
 		break;
 
 	case 3:
@@ -893,6 +963,7 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 			LOGSETUP( "%f %s mc6854_w: push last-data=$%02X\n", machine().time().as_double(), machine().describe_context(), data );
 			tfifo_push( data );
 			tfifo_terminate( );
+			update_sr1( ); /* a full FIFO must drop TDRA (and the TDSR line), or DMA overruns it */
 		}
 		break;
 
