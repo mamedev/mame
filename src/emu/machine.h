@@ -159,6 +159,9 @@ public:
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 	bool allow_logging() const { return !m_logerror_list.empty(); }
 
+	uint32_t sync_interval() { return m_sync_interval_usec; }
+	void set_sync_interval(uint32_t sync_interval) { m_sync_interval_usec = sync_interval; m_sync_interval = attotime::from_usec(sync_interval); }
+
 	// fetch items by name
 	template <class DeviceClass> [[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(root_device().subdevice(tag)); }
 
@@ -299,6 +302,10 @@ private:
 	int                     m_sample_rate;          // the digital audio sample rate
 	std::unique_ptr<emu_file>  m_logfile;           // pointer to the active error.log file
 	std::unique_ptr<emu_file>  m_debuglogfile;      // pointer to the active debug.log file
+
+	// throttling state
+	uint32_t                m_sync_interval_usec;   // synchronize real & machine time at this interval in microseconds of machine time
+	attotime                m_sync_interval;        // time sychronization interval in attotime
 
 	// load/save management
 	enum class saveload_schedule

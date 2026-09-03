@@ -228,22 +228,22 @@ overwritten.
             <?xml version="1.0"?>
             <!DOCTYPE mame [
             <!ELEMENT mame (machine+)>
-	            <!ATTLIST mame build CDATA #IMPLIED>
-	            <!ATTLIST mame debug (yes|no) "no">
-	            <!ATTLIST mame mameconfig CDATA #REQUIRED>
-	            <!ELEMENT machine (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>
-		            <!ATTLIST machine name CDATA #REQUIRED>
-		            <!ATTLIST machine sourcefile CDATA #IMPLIED>
+              <!ATTLIST mame build CDATA #IMPLIED>
+              <!ATTLIST mame debug (yes|no) "no">
+              <!ATTLIST mame mameconfig CDATA #REQUIRED>
+              <!ELEMENT machine (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>
+                <!ATTLIST machine name CDATA #REQUIRED>
+                <!ATTLIST machine sourcefile CDATA #IMPLIED>
             ...
             <mame build="0.216 (mame0216-154-gabddfb0404c-dirty)" debug="no" mameconfig="10">
-            	<machine name="galaxian" sourcefile="galaxian.cpp">
-		            <description>Galaxian (Namco set 1)</description>
-		            <year>1979</year>
-		            <manufacturer>Namco</manufacturer>
+              <machine name="galaxian" sourcefile="galaxian.cpp">
+                <description>Galaxian (Namco set 1)</description>
+                <year>1979</year>
+                <manufacturer>Namco</manufacturer>
                     ...
-            	<machine name="z80" sourcefile="src/devices/cpu/z80/z80.cpp" isdevice="yes" runnable="no">
-		            <description>Zilog Z80</description>
-	        </machine>
+              <machine name="z80" sourcefile="src/devices/cpu/z80/z80.cpp" isdevice="yes" runnable="no">
+                <description>Zilog Z80</description>
+          </machine>
             </mame>
 
 .. Tip:: Output from this command is typically more useful if redirected to
@@ -597,25 +597,25 @@ overwritten.
             <?xml version="1.0"?>
             <!DOCTYPE softwarelists [
             <!ELEMENT softwarelists (softwarelist*)>
-	            <!ELEMENT softwarelist (software+)>
-		            <!ATTLIST softwarelist name CDATA #REQUIRED>
-		            <!ATTLIST softwarelist description CDATA #IMPLIED>
-		            <!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>
+              <!ELEMENT softwarelist (software+)>
+                <!ATTLIST softwarelist name CDATA #REQUIRED>
+                <!ATTLIST softwarelist description CDATA #IMPLIED>
+                <!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>
                     ...
             <softwarelists>
-	            <softwarelist name="coco_cart" description="Tandy Radio Shack Color Computer cartridges">
-		            <software name="7cardstd">
-			            <description>7 Card Stud</description>
-			            <year>1983</year>
-			            <publisher>Tandy</publisher>
-			            <info name="developer" value="Intelligent Software"/>
-			            <info name="serial" value="26-3074"/>
-			            <part name="cart" interface="coco_cart">
-				            <dataarea name="rom" size="8192">
-					            <rom name="7 card stud (1983) (26-3074) (intelligent software).rom" size="8192" crc="f38d8c97" sha1="5cfcb699ce09840dbb52714c8d91b3d86d3a86c3"/>
-				            </dataarea>
-			            </part>
-		            </software>
+              <softwarelist name="coco_cart" description="Tandy Radio Shack Color Computer cartridges">
+                <software name="7cardstd">
+                  <description>7 Card Stud</description>
+                  <year>1983</year>
+                  <publisher>Tandy</publisher>
+                  <info name="developer" value="Intelligent Software"/>
+                  <info name="serial" value="26-3074"/>
+                  <part name="cart" interface="coco_cart">
+                    <dataarea name="rom" size="8192">
+                      <rom name="7 card stud (1983) (26-3074) (intelligent software).rom" size="8192" crc="f38d8c97" sha1="5cfcb699ce09840dbb52714c8d91b3d86d3a86c3"/>
+                    </dataarea>
+                  </part>
+                </software>
                     ...
 
 .. _mame-commandline-verifysoftware:
@@ -653,22 +653,22 @@ overwritten.
             <?xml version="1.0"?>
             <!DOCTYPE softwarelists [
             <!ELEMENT softwarelists (softwarelist*)>
-	            <!ELEMENT softwarelist (software+)>
-		            <!ATTLIST softwarelist name CDATA #REQUIRED>
-		            <!ATTLIST softwarelist description CDATA #IMPLIED>
-		            <!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>
-			            <!ATTLIST software name CDATA #REQUIRED>
-			            <!ATTLIST software cloneof CDATA #IMPLIED>
-			            <!ATTLIST software supported (yes|partial|no) "yes">
-			            <!ELEMENT description (#PCDATA)>
-			            <!ELEMENT year (#PCDATA)>
-			            <!ELEMENT publisher (#PCDATA)>
-			            <!ELEMENT info EMPTY>
-				            <!ATTLIST info name CDATA #REQUIRED>
-				            <!ATTLIST info value CDATA #IMPLIED>
-			            <!ELEMENT sharedfeat EMPTY>
-				            <!ATTLIST sharedfeat name CDATA #REQUIRED>
-				            <!ATTLIST sharedfeat value CDATA #IMPLIED>
+              <!ELEMENT softwarelist (software+)>
+                <!ATTLIST softwarelist name CDATA #REQUIRED>
+                <!ATTLIST softwarelist description CDATA #IMPLIED>
+                <!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>
+                  <!ATTLIST software name CDATA #REQUIRED>
+                  <!ATTLIST software cloneof CDATA #IMPLIED>
+                  <!ATTLIST software supported (yes|partial|no) "yes">
+                  <!ELEMENT description (#PCDATA)>
+                  <!ELEMENT year (#PCDATA)>
+                  <!ELEMENT publisher (#PCDATA)>
+                  <!ELEMENT info EMPTY>
+                    <!ATTLIST info name CDATA #REQUIRED>
+                    <!ATTLIST info value CDATA #IMPLIED>
+                  <!ELEMENT sharedfeat EMPTY>
+                    <!ATTLIST sharedfeat name CDATA #REQUIRED>
+                    <!ATTLIST sharedfeat value CDATA #IMPLIED>
                         ...
 
 .. _mame-commandline-verifysoftlist:
@@ -1873,6 +1873,23 @@ Core Performance Options
 
             mame gradius4 -frameskip 2
 
+.. _mame-commandline-screenless-framerate:
+
+**-screenless_framerate** *<frames per second>*
+
+    Specifies the frame rate to use for devices that do not have a screen.
+
+    Set to `0` (in fact any value less than `1`) to use the device's default,
+    usually MAME's built-on default of 60 frames per second.
+
+    The default value is **-screenless_framerate 0**, i.e., use the default
+		screenless framerate.
+
+    Example:
+        .. code-block:: bash
+
+            mame sd132 -screenless_framerate 12
+
 .. _mame-commandline-secondstorun:
 
 **-seconds_to_run** / **-str** *<seconds>*
@@ -1961,6 +1978,26 @@ Core Performance Options
         .. code-block:: bash
 
             mame pacman -refreshspeed
+
+.. _mame-commandline-sync-interval:
+
+**-sync_interval** *<interval>*
+
+    Specify an explicit interval between attempts to synchronize emulated and
+    real time (instead of synchronizing and maybe throttling once per frame),
+    according to the current throtting and speed settings, in microseconds of
+    simulated time: that is, after approximately each *<interval>* microseconds
+    of elapsed simulated time, try to synchronize simulated and real time.
+
+    An *<interval>* of ``0`` disables this, letting synchronization happen
+    once per frame.
+
+    The default is ``0``.
+
+    Example:,
+        .. code-block:: bash
+
+            mame sd132 -sync_interval 1000
 
 .. _mame-commandline-numprocessors:
 
