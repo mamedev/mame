@@ -134,6 +134,9 @@ public:
 	template <typename T> static void add(machine_config &config, T &&_bus_tag, const char *_default_drive)
 	{
 		CBM_IEC_SLOT(config, "iec4", 4, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec5", 5, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec6", 6, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec7", 7, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec8", 8, cbm_iec_devices, _default_drive);
 		CBM_IEC_SLOT(config, "iec9", 9, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec10", 10, cbm_iec_devices, nullptr);

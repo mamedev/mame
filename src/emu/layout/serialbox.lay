@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Curt Coder
+R.J. Brachman Serial Box front panel layout
+-->
+<mamelayout version="2">
+
+	<element name="case">
+		<rect><color red="0.10" green="0.11" blue="0.12" /></rect>
+	</element>
+	<element name="plate">
+		<rect><color red="0.85" green="0.83" blue="0.76" /></rect>
+	</element>
+
+	<element name="lbl_run"><text string="RUN"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="lbl_pause"><text string="PAUSE"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="lbl_full"><text string="FULL"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="lbl_reset"><text string="RESET"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+
+	<element name="green_led" defstate="0">
+		<disk state="1"><color red="0.15" green="0.90" blue="0.20" /></disk>
+		<disk state="0"><color red="0.03" green="0.18" blue="0.05" /></disk>
+	</element>
+	<element name="yellow_led" defstate="0">
+		<disk state="1"><color red="1.00" green="0.80" blue="0.05" /></disk>
+		<disk state="0"><color red="0.18" green="0.14" blue="0.02" /></disk>
+	</element>
+	<element name="red_led" defstate="0">
+		<disk state="1"><color red="0.95" green="0.10" blue="0.10" /></disk>
+		<disk state="0"><color red="0.18" green="0.03" blue="0.03" /></disk>
+	</element>
+
+	<element name="button">
+		<disk><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.57" /></disk>
+		<disk state="0"><bounds x="0.12" y="0.12" width="0.76" height="0.76" /><color red="0.75" green="0.08" blue="0.08" /></disk>
+		<disk state="1"><bounds x="0.12" y="0.12" width="0.76" height="0.76" /><color red="0.45" green="0.05" blue="0.05" /></disk>
+	</element>
+
+	<group name="panel">
+		<element ref="case"><bounds x="0" y="0" width="640" height="260" /></element>
+		<element ref="plate"><bounds x="20" y="20" width="600" height="220" /></element>
+
+		<element ref="lbl_run"><bounds x="25" y="60" width="110" height="25" /></element>
+		<element name="led0" ref="green_led"><bounds x="60" y="110" width="40" height="40" /></element>
+
+		<element ref="lbl_pause"><bounds x="145" y="60" width="110" height="25" /></element>
+		<element name="led1" ref="yellow_led"><bounds x="180" y="110" width="40" height="40" /></element>
+
+		<element ref="lbl_full"><bounds x="265" y="60" width="110" height="25" /></element>
+		<element name="led2" ref="red_led"><bounds x="300" y="110" width="40" height="40" /></element>
+
+		<element ref="lbl_pause"><bounds x="385" y="60" width="110" height="25" /></element>
+		<element ref="button" inputtag="PB" inputmask="0x01"><bounds x="395" y="110" width="90" height="90" /></element>
+
+		<element ref="lbl_reset"><bounds x="505" y="60" width="110" height="25" /></element>
+		<element ref="button" inputtag="PB" inputmask="0x02"><bounds x="515" y="110" width="90" height="90" /></element>
+	</group>
+
+	<view name="Front Panel">
+		<group ref="panel"><bounds x="0" y="0" width="640" height="260" /></group>
+	</view>
+
+</mamelayout>
