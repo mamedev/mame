@@ -6,10 +6,11 @@ Skeleton driver for Covielsa "Multigame".
 PC hardware:
 - Gigabyte GA-8SIMLH Rev 2.0 motherboard.
    * Realtek RTL8100BL Ethernet controller.
-   * Winbond W83697HF Super I/O.
-   * Realtek ALC650 AC'97 audio.
+   * Winbond W83697HF Super I/O (near a 24.5 MHz xtal).
+   * Sigmatel STAC9721T Stereo AC'97 Codec.
    * SiS 962L southbridge.
    * SiS 651 northbridge.
+   * Texas Instruments GD75232 Multiple RS-232 Drivers and Receivers.
 - ATI Rage Mobiity-P AGP video.
 - Intel Celeron 1.7 GHz (100x17).
 - 128 MB RAM DDR 256.
