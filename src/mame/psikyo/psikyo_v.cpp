@@ -6,16 +6,6 @@
 
                 driver by   Luca Elia (l.elia@tin.it)
 
-
-Note:   if MAME_DEBUG is defined, pressing Z with:
-
-        Q           shows layer 0
-        W           shows layer 1
-        A           shows the sprites
-
-        Keys can be used together!
-
-
                             [ 2 Scrolling Layers ]
 
         - Dynamic Size
@@ -432,8 +422,8 @@ void psikyo_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u32 bgpen = 0;
-	int i, layers_ctrl = -1;
+	u32 bgpen;
+	int i;
 
 	u32 scrollx[2]{ m_vregs[0x406 / 4], m_vregs[0x40e / 4] }, scrolly[2]{ m_vregs[0x402 / 4], m_vregs[0x40a / 4] };
 	u32 layer_ctrl[2]{ m_vregs[0x412 / 4], m_vregs[0x416 / 4] };
@@ -518,26 +508,25 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		m_tilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
-	// TODO : is this correct? // Note layers_ctrl is hardcoded to -1 above: Coverity 315110
-	if (layers_ctrl & 1)
-		bgpen = m_palette->pen(((layer_ctrl[0] & 8) ? 0x800 : 0x80f));
-	else if (layers_ctrl & 2)
-		bgpen = m_palette->pen(((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f));
-	else
-		bgpen = m_palette->black_pen(); // TODO
-
+	// clear screen
+	bgpen = m_palette->black_pen(); // fallback
+	for (int layer = 0; layer < 2; layer++)
+	{
+		if(~layer_ctrl[layer] & 1) { // enabled
+			if(~layer_ctrl[layer] & 8) { // not transparent
+				bgpen = m_palette->pen(layer*0x400 + 0x400);
+			}
+			if(~layer_ctrl[layer] & 4) { // not transparent
+				bgpen = m_palette->pen(layer*0x400 + 0x40f);
+			}
+		}
+	}
 	bitmap.fill(bgpen, cliprect);
-
 	screen.priority().fill(0, cliprect);
 
-	if (layers_ctrl & 1)
-		m_tilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
-
-	if (layers_ctrl & 2)
-		m_tilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
-
-	if (layers_ctrl & 4)
-		draw_sprites(screen, bitmap, cliprect);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -552,8 +541,8 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 u32 psikyo_bootleg_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u32 bgpen = 0;
-	int i, layers_ctrl = -1;
+	u32 bgpen;
+	int i;
 
 	u32 scrollx[2]{ m_vregs[0x406 / 4], m_vregs[0x40e / 4] }, scrolly[2]{ m_vregs[0x402 / 4], m_vregs[0x40a / 4] };
 	u32 layer_ctrl[2]{ m_vregs[0x412 / 4], m_vregs[0x416 / 4] };
@@ -639,26 +628,26 @@ u32 psikyo_bootleg_state::screen_update_bootleg(screen_device &screen, bitmap_rg
 		m_tilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
-	// TODO : is this correct? // Note layers_ctrl is hardcoded to -1 above: Coverity 315935
-	if (layers_ctrl & 1)
-		bgpen = m_palette->pen(((layer_ctrl[0] & 8) ? 0x800 : 0x80f));
-	else if (layers_ctrl & 2)
-		bgpen = m_palette->pen(((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f));
-	else
-		bgpen = m_palette->black_pen(); // TODO
-
+	// clear screen
+	bgpen = m_palette->black_pen(); // fallback
+	for (int layer = 0; layer < 2; layer++)
+	{
+		if(~layer_ctrl[layer] & 1) { // enabled
+			if(~layer_ctrl[layer] & 8) { // not transparent
+				bgpen = m_palette->pen(layer*0x400 + 0x400);
+			}
+			if(~layer_ctrl[layer] & 4) { // not transparent
+				bgpen = m_palette->pen(layer*0x400 + 0x40f);
+			}
+		}
+	}
 	bitmap.fill(bgpen, cliprect);
 
 	screen.priority().fill(0, cliprect);
 
-	if (layers_ctrl & 1)
-		m_tilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
-
-	if (layers_ctrl & 2)
-		m_tilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
-
-	if (layers_ctrl & 4)
-		draw_sprites(screen, bitmap, cliprect);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
