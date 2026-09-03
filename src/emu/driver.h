@@ -142,6 +142,9 @@ public:
 
 	virtual std::vector<std::string> searchpath() const override;
 
+	// support for screenless devices with non-default frame rates
+	virtual attoseconds_t default_screenless_frame_period() const;
+
 protected:
 	// helpers called at startup
 	virtual void driver_start();

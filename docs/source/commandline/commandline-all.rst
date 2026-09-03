@@ -1873,6 +1873,23 @@ Core Performance Options
 
             mame gradius4 -frameskip 2
 
+.. _mame-commandline-screenless-framerate:
+
+**-screenless_framerate** *<frames per second>*
+
+    Specifies the frame rate to use for devices that do not have a screen.
+
+    Set to `0` (in fact any value less than `1`) to use the device's default,
+    usually MAME's built-on default of 60 frames per second.
+
+    The default value is **-screenless_framerate 0**, i.e., use the default
+		screenless framerate.
+
+    Example:
+        .. code-block:: bash
+
+            mame sd132 -screenless_framerate 12
+
 .. _mame-commandline-secondstorun:
 
 **-seconds_to_run** / **-str** *<seconds>*
