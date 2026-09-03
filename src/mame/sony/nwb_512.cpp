@@ -28,16 +28,15 @@
 #include "emu.h"
 #include "nwb_512.h"
 
-#define LOG_FB_FB 1 << 1
-#define LOG_ROP_CONFIG 1 << 2
-#define LOG_ROP 1 << 3
+#define LOG_ROP_CONFIG 1 << 1
+#define LOG_ROP 1 << 2
 
-#define VERBOSE (LOG_GENERAL|LOG_FB_FB|LOG_ROP_CONFIG|LOG_ROP)
+#define VERBOSE (LOG_GENERAL | LOG_ROP_CONFIG | LOG_ROP)
 #include "logmacro.h"
 
 #include <format>
 
-DEFINE_DEVICE_TYPE(NWB_512,  nwb_512_device,  "nwb_512",  "Sony NWB-512 monochrome framebuffer")
+DEFINE_DEVICE_TYPE(NWB_512, nwb_512_device, "nwb_512", "Sony NWB-512 monochrome framebuffer")
 
 namespace
 {
@@ -86,7 +85,6 @@ namespace
 	}
 }
 
-
 nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NWB_512, tag, owner, clock),
 	m_nwp_512d(*this, "nwp_512d"),
@@ -112,8 +110,8 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, m_nwp_512d);
 	m_nwp_512d->set_screen_update(FUNC(nwb_512_device::screen_update));
 	m_nwp_512d->set_raw(HORIZONTAL * VERTICAL * 60,
-	                    HORIZONTAL, 0, HORIZONTAL,
-	                    VERTICAL, 0, VERTICAL);
+						HORIZONTAL, 0, HORIZONTAL,
+						VERTICAL, 0, VERTICAL);
 
 	// VRAM consists of two types of memory chips:
 	// 4x NEC uPD41264C-12 64K x 4 dual-port DRAM chips (visible screen and small off-screen area)
@@ -125,13 +123,13 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 
 void nwb_512_device::map(address_map &map)
 {
-	map(0x02000, 0x02001).w(FUNC(nwb_512_device::shift_w)); // shift count when only "load shift" is asserted
+	map(0x02000, 0x02001).w(FUNC(nwb_512_device::shift_w));       // shift count when only "load shift" is asserted
 	map(0x08000, 0x0ffff).w(FUNC(nwb_512_device::destination_w)); // A13 = load shift, A14 = start execution
-	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w)); // A13 = load shift, A14 = start execution
-	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w)); // A16 = source-space select (FB vs host), A14 = start execution
+	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));      // A13 = load shift, A14 = start execution
+	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));       // A16 = source-space select (FB vs host), A14 = start execution
 	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
 	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w)); // rop configuration TODO: is the end addr correct here?
-	map(0x70000, 0x70fff).w(FUNC(nwb_512_device::fifo_w)); // data ports
+	map(0x70000, 0x70fff).w(FUNC(nwb_512_device::fifo_w));       // data ports
 	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
 	map(0xa0000, 0xa0000).w(FUNC(nwb_512_device::planemask_w));
 
@@ -140,19 +138,17 @@ void nwb_512_device::map(address_map &map)
 
 u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [[maybe_unused]] const rectangle &cliprect)
 {
-	// TODO: optimize this to read one byte at a time rather than bit
 	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
 		{
 			const uint32_t byte_offset = coordinate_to_byte_offset(x, y); // Y: 2048 / 8 = 256 bytes per row, not all visible.
-			const uint16_t x_bit = x_to_pixel_offset(x);
-			const uint8_t pixel = m_vram->read(byte_offset) & (1u << x_bit);
+			const uint8_t byte = m_vram->read(byte_offset);
 
-			// TODO: based on how NEWS-OS usually looks and how limited pictures of how the similar NWS-700 series appears at
-			//       the monitor ROM prompt, this framebuffer seems to be black-on-white, unlike the color framebuffers. My
-			//       NWS-831 is not functional so I have been unable to confirm on real hardware, but I am pretty sure this is the case.
-			bitmap.pix(y, x) = pixel ? rgb_t::black() : rgb_t::white();
+			for (int i = 0; i < 8 && (x + i) <= screen.visible_area().max_x; i++)
+			{
+				bitmap.pix(y, x + i) = byte & (1u << x_to_pixel_offset(x + i)) ? rgb_t::black() : rgb_t::white();
+			}
 		}
 	}
 
@@ -174,16 +170,15 @@ void nwb_512_device::check_operation_start(offs_t offset)
 	}
 
 	logerror("op arm: %-7s func=0x%x %s %s src=(0x%x,0x%x) dst=(0x%x,0x%x) lim=(0x%x,0x%x)\n",
-	(m_state.fb_read && m_state.fb_write) ? "FB->FB"  :
-	(!m_state.fb_read && m_state.fb_write) ? "host->FB" :
-	(m_state.fb_read && !m_state.fb_write) ? "FB->host" : "??",
-	m_state.rop_function,
-	m_state.x_direction ? "xfwd" : "xrev",
-	m_state.y_direction ? "yfwd" : "yrev",
-	m_state.source_x, m_state.source_y,
-	m_state.destination_x, m_state.destination_y,
-	m_state.limit_x, m_state.limit_y);
-
+			 (m_state.fb_read && m_state.fb_write) ? "FB->FB" : (!m_state.fb_read && m_state.fb_write) ? "host->FB"
+															: (m_state.fb_read && !m_state.fb_write)   ? "FB->host"
+																									   : "??",
+			 m_state.rop_function,
+			 m_state.x_direction ? "xfwd" : "xrev",
+			 m_state.y_direction ? "yfwd" : "yrev",
+			 m_state.source_x, m_state.source_y,
+			 m_state.destination_x, m_state.destination_y,
+			 m_state.limit_x, m_state.limit_y);
 
 	if (offset & (0x4000 >> 1)) // word offset
 	{
@@ -199,27 +194,24 @@ void nwb_512_device::check_operation_start(offs_t offset)
 			--m_state.limit_x;
 		}
 
-
 		m_state.current_x = m_state.destination_x;
 
-		const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x // fwd: [dest, limit)
-												: m_state.destination_x - m_state.limit_x; // rev TODO: double-check this
-		const uint16_t src_phase  = m_state.fb_read && m_state.fb_write ?
-										m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15) :
-										0;
+		const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
+												   : m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
+		const uint16_t src_phase = m_state.fb_read && m_state.fb_write ? m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15) : 0;
 		const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
 
 		m_state.prime = src_phase > dest_phase;
 		m_state.prime_pending = m_state.prime;
-		m_state.source_words_per_row = (src_phase  + width + 15) >> 4;
+		m_state.source_words_per_row = (src_phase + width + 15) >> 4;
 		m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
 		m_state.source_words_left = m_state.source_words_per_row;
 		m_state.dest_words_left = m_state.dest_words_per_row;
 
 		if (m_state.fb_read && m_state.fb_write &&
 			m_state.dest_words_per_row != m_state.source_words_per_row &&
-		    m_state.dest_words_per_row != m_state.source_words_per_row + 1 &&
-		    m_state.dest_words_per_row != m_state.source_words_per_row - 1)
+			m_state.dest_words_per_row != m_state.source_words_per_row + 1 &&
+			m_state.dest_words_per_row != m_state.source_words_per_row - 1)
 		{
 			fatalerror("nwb512: fb->fb copy set but source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
 		}
@@ -253,7 +245,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 				const uint16_t data = (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
 
 				const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source
-				LOGMASKED(LOG_FB_FB, "ROP for sx = 0x%x sy = 0x%x byte_offset = 0x%x data = 0x%x panic = 0x%x\n", source_x, source_y, byte_offset, data, panic);
+				LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x byte_offset = 0x%x data = 0x%x panic = 0x%x\n", source_x, source_y, byte_offset, data, panic);
 				rop_cycle(data); // When the ROP is done, this function will clear m_state.busy
 				++panic;
 
@@ -384,20 +376,20 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	}
 
 	LOGMASKED(LOG_ROP_CONFIG, "%s%s%s%s%s%s%s\n",
-		m_state.fb_write ? "fbwrite " : "",
-		m_state.fb_read ? "fbread " : "",
-		m_state.row_fill ? "rowfill " : "",
-		m_state.y_direction ? "yfwd " : "yrev ",
-		m_state.x_direction ? "xfwd " : "xrev ",
-		m_state.suppress_advance ? "supadv " : "",
-		offset & 400 ? "func=0x" + std::format("{:x}", m_state.rop_function) : "");
+			  m_state.fb_write ? "fbwrite " : "",
+			  m_state.fb_read ? "fbread " : "",
+			  m_state.row_fill ? "rowfill " : "",
+			  m_state.y_direction ? "yfwd " : "yrev ",
+			  m_state.x_direction ? "xfwd " : "xrev ",
+			  m_state.suppress_advance ? "supadv " : "",
+			  offset & 400 ? "func=0x" + std::format("{:x}", m_state.rop_function) : "");
 }
 
 void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Set pixel to 1 at X (data), Y (offset[12:1])
 	check_mem_mask(mem_mask);
-	
+
 	const uint16_t x = x_address(data);
 	const uint16_t y = y_address(offset);
 	const uint32_t byte_offset = coordinate_to_byte_offset(x, y);
@@ -418,72 +410,72 @@ uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source
 
 	switch (opcode)
 	{
-		case 0x0:
-			op = "~S";
-			result = ~source;
-			break;
-		case 0x1:
-			op = "~(S | D)";
-			result = ~(source | destination);
-			break;
-		case 0x2:
-			op = "~S & D";
-			result = ~source & destination;
-			break;
-		case 0x3:
-			op = "0";
-			result = 0;
-			break;
-		case 0x4:
-			op = "~(S & D)";
-			result = ~(source & destination);
-			break;
-		case 0x5:
-			op = "~D";
-			result = ~destination;
-			break;
-		case 0x6:
-			op = "S ^ D";
-			result = source ^ destination;
-			break;
-		case 0x7:
-			op = "S & ~D";
-			result = source & ~destination;
-			break;
-		case 0x8:
-			op = "~S | D";
-			result = ~source | destination;
-			break;
-		case 0x9:
-			op = "~(S ^ D)";
-			result = ~(source ^ destination);
-			break;
-		case 0xa:
-			op = "D";
-			result = destination;
-			break;
-		case 0xb:
-			op = "S & D";
-			result = source & destination;
-			break;
-		case 0xc:
-			op = "1";
-			result = 0xffff;
-			break;
-		case 0xd:
-			op = "S | ~D";
-			result = source | ~destination;
-			break;
-		case 0xe:
-			op = "S | D";
-			result = source | destination;
-			break;
-		case 0xf:
-			op = "S";
-			result = source;
-			break;
-		default:
-			fatalerror("nwb_512: invalid ROP function code 0x%x", opcode);
+	case 0x0:
+		op = "~S";
+		result = ~source;
+		break;
+	case 0x1:
+		op = "~(S | D)";
+		result = ~(source | destination);
+		break;
+	case 0x2:
+		op = "~S & D";
+		result = ~source & destination;
+		break;
+	case 0x3:
+		op = "0";
+		result = 0;
+		break;
+	case 0x4:
+		op = "~(S & D)";
+		result = ~(source & destination);
+		break;
+	case 0x5:
+		op = "~D";
+		result = ~destination;
+		break;
+	case 0x6:
+		op = "S ^ D";
+		result = source ^ destination;
+		break;
+	case 0x7:
+		op = "S & ~D";
+		result = source & ~destination;
+		break;
+	case 0x8:
+		op = "~S | D";
+		result = ~source | destination;
+		break;
+	case 0x9:
+		op = "~(S ^ D)";
+		result = ~(source ^ destination);
+		break;
+	case 0xa:
+		op = "D";
+		result = destination;
+		break;
+	case 0xb:
+		op = "S & D";
+		result = source & destination;
+		break;
+	case 0xc:
+		op = "1";
+		result = 0xffff;
+		break;
+	case 0xd:
+		op = "S | ~D";
+		result = source | ~destination;
+		break;
+	case 0xe:
+		op = "S | D";
+		result = source | destination;
+		break;
+	case 0xf:
+		op = "S";
+		result = source;
+		break;
+	default:
+		fatalerror("nwb_512: invalid ROP function code 0x%x", opcode);
 	}
 
 	LOGMASKED(LOG_ROP, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, op, source, destination, result);
@@ -501,7 +493,8 @@ uint16_t nwb_512_device::shift(uint16_t data)
 		m_state.carry = uint16_t(uint32_t(data) << (16 - m_state.shift) & 0xffff);
 	}
 	else
-	{   // TODO: might be better to calculate shift differently based on rev flag instead, mainly if the computation of state can be centralized
+	{
+		// TODO: might be better to calculate shift differently based on rev flag instead, mainly if the computation of state can be centralized
 		//       But, the direction is still different, so doing the computation in the state update doesn't get rid of this if/else
 		const uint16_t shift_complement = (16 - m_state.shift) & 0xf;
 		result = uint16_t(data << shift_complement | m_state.carry);
