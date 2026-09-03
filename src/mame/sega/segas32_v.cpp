@@ -695,8 +695,8 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 				}
 				else
 				{
-					lineclips[2].min_x = tempclip.max_x - ((maxx & 0x1ff) + 1);
-					lineclips[2].max_x = tempclip.max_x - (minx & 0x1ff);
+					lineclips[2].min_x = (visarea.max_x + 1) - ((maxx & 0x1ff) + 1);
+					lineclips[2].max_x = (visarea.max_x + 1) - (minx & 0x1ff);
 				}
 
 				lineclips[2] &= tempclip;
@@ -722,8 +722,8 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 				}
 				else
 				{
-					lineclips[3].min_x = tempclip.max_x - ((maxx & 0x1ff) + 1);
-					lineclips[3].max_x = tempclip.max_x - (minx & 0x1ff);
+					lineclips[3].min_x = (visarea.max_x + 1) - ((maxx & 0x1ff) + 1);
+					lineclips[3].max_x = (visarea.max_x + 1) - (minx & 0x1ff);
 				}
 
 				lineclips[3] &= tempclip;
