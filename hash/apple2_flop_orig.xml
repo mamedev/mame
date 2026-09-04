@@ -6,6 +6,27 @@ license:CC0-1.0
 
 <softwarelist name="apple2_flop_orig" description="Apple II original disks">
 
+	<software name="acillin">
+		<description>Apple-Cillin II</description>
+		<year>1982</year>
+		<publisher>XPS, Inc.</publisher>
+		<!-- Fully supports the Apple ][ and ][+ and various peripheral cards; will run on later systems but does not recognize them -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A (16-sector version)" />
+			<dataarea name="flop" size="254464">
+				<rom name="Apple-cillin II - Disk 1, Side A.woz" size="254464" crc="d1253672" sha1="9a7798187525dba5409bcc7cd3b0d7f4bf68b0a7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B (13-sector version)" />
+			<dataarea name="flop" size="88376">
+				<!-- Disk takes suspiciously long to boot and runs with serious glitches on an Apple ][ with a non-Autostart monitor -->
+				<rom name="Apple-cillin II - Disk 1, Side B.woz" size="88376" crc="e9e8095b" sha1="bdc4e09fc17bec81818ad987e150342a8ada6f95" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alambush">
 		<description>Alien Ambush</description>
 		<year>1981</year>
