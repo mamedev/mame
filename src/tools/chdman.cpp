@@ -15,6 +15,7 @@
 #include "corefile.h"
 #include "coretmpl.h"
 #include "hashing.h"
+#include "ioprocsstream.h"
 #include "md5.h"
 #include "multibyte.h"
 #include "osdcore.h"
@@ -31,6 +32,7 @@
 #include <ctime>
 #include <iostream>
 #include <limits>
+#include <locale>
 #include <memory>
 #include <new>
 #include <optional>
@@ -1526,24 +1528,24 @@ static void compress_common(chd_file_compressor &chd)
 //  to a CUE file
 //-------------------------------------------------
 
-void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_file::track_info &info, const std::string &filename, uint32_t frameoffs, uint64_t outputoffs)
+void output_track_metadata(int mode, std::ostream &file, int tracknum, const cdrom_file::track_info &info, std::string_view filename, uint32_t frameoffs, uint64_t outputoffs)
 {
 	if (mode == MODE_GDI)
 	{
 		const int tracktype = info.trktype == cdrom_file::CD_TRACK_AUDIO ? 0 : 4;
-		const bool needquote = filename.find(' ') != std::string::npos;
+		const bool needquote = filename.find(' ') != std::string_view::npos;
 		const char *const quotestr = needquote ? "\"" : "";
 
 		if (info.pregap > 0 && info.pgdatasize == 0)
 			frameoffs += info.pregap;
 
-		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, tracktype, info.datasize, quotestr, filename, quotestr, outputoffs);
+		util::stream_format(file, "%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, tracktype, info.datasize, quotestr, filename, quotestr, outputoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
 		// specify a new file when writing to the beginning of a file
 		if (outputoffs == 0)
-			file.printf("FILE \"%s\" BINARY\n", filename);
+			util::stream_format(file, "FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
 		std::string tempstr;
@@ -1568,65 +1570,65 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		}
 
 		// output TRACK entry
-		file.printf("  TRACK %02d %s\n", tracknum + 1, tempstr);
+		util::stream_format(file, "  TRACK %02d %s\n", tracknum + 1, tempstr);
 
 		// output PREGAP tag if pregap sectors are not in the file
 		if ((info.pregap > 0) && (info.pgdatasize == 0))
 		{
-			file.printf("    PREGAP %s\n", msf_string_from_frames(info.pregap));
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
+			util::stream_format(file, "    PREGAP %s\n", msf_string_from_frames(info.pregap));
+			util::stream_format(file, "    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
 		}
 		else if ((info.pregap > 0) && (info.pgdatasize > 0))
 		{
-			file.printf("    INDEX 00 %s\n", msf_string_from_frames(frameoffs));
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs+info.pregap));
+			util::stream_format(file, "    INDEX 00 %s\n", msf_string_from_frames(frameoffs));
+			util::stream_format(file, "    INDEX 01 %s\n", msf_string_from_frames(frameoffs+info.pregap));
 		}
 
 		// if no pregap at all, output index 01 only
 		if (info.pregap == 0)
 		{
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
+			util::stream_format(file, "    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
 		}
 
 		// output POSTGAP
 		if (info.postgap > 0)
-			file.printf("    POSTGAP %s\n", msf_string_from_frames(info.postgap));
+			util::stream_format(file, "    POSTGAP %s\n", msf_string_from_frames(info.postgap));
 	}
 	// non-CUE mode
 	else if (mode == MODE_NORMAL)
 	{
-		file.printf("// Track %d\n", tracknum + 1);
+		util::stream_format(file, "// Track %d\n", tracknum + 1);
 
 		// write out the track type
 		std::string modesubmode;
 		if (info.subtype != cdrom_file::CD_SUB_NONE)
 			modesubmode = string_format("%s %s", cdrom_file::get_type_string(info.trktype), cdrom_file::get_subtype_string(info.subtype));
 		else
-			modesubmode = string_format("%s", cdrom_file::get_type_string(info.trktype));
-		file.printf("TRACK %s\n", modesubmode);
+			modesubmode = cdrom_file::get_type_string(info.trktype);
+		util::stream_format(file, "TRACK %s\n", modesubmode);
 
 		// write out the attributes
-		file.printf("NO COPY\n");
+		file << "NO COPY\n";
 		if (info.trktype == cdrom_file::CD_TRACK_AUDIO)
 		{
-			file.printf("NO PRE_EMPHASIS\n");
-			file.printf("TWO_CHANNEL_AUDIO\n");
+			file << "NO PRE_EMPHASIS\n";
+			file << "TWO_CHANNEL_AUDIO\n";
 		}
 
 		// output pregap
 		if (info.pregap > 0)
-			file.printf("ZERO %s %s\n", modesubmode, msf_string_from_frames(info.pregap));
+			util::stream_format(file, "ZERO %s %s\n", modesubmode, msf_string_from_frames(info.pregap));
 
 		if (outputoffs == 0)
-			file.printf("DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
+			util::stream_format(file, "DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
 		else
-			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, uint32_t(outputoffs), msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
+			util::stream_format(file, "DATAFILE \"%s\" #%u %s // length in bytes: %d\n", filename, outputoffs, msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
 
 		// tracks with pregaps get a START marker too
 		if (info.pregap > 0)
-			file.printf("START %s\n", msf_string_from_frames(info.pregap));
+			util::stream_format(file, "START %s\n", msf_string_from_frames(info.pregap));
 
-		file.printf("\n\n");
+		file << "\n\n";
 	}
 }
 
@@ -2632,7 +2634,7 @@ static void do_extract_raw(parameters_map &params)
 
 		// finish up
 		output_file.reset();
-		util::stream_format(std::cout, "Extraction complete                                    \n");
+		std::cout << "Extraction complete                                    \n";
 	}
 	catch (...)
 	{
@@ -2740,9 +2742,11 @@ static void do_extract_cd(parameters_map &params)
 	try
 	{
 		// process output file
-		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
+		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_toc_file);
 		if (filerr)
 			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
+		util::owritestream str(*output_toc_file, util::owritestream::UTF_8, false);
+		str.imbue(std::locale::classic());
 
 		uint64_t total_bytes = 0;
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
@@ -2823,7 +2827,7 @@ static void do_extract_cd(parameters_map &params)
 		// GDI must start with the # of tracks
 		if (mode == MODE_GDI)
 		{
-			output_toc_file->printf("%d\n", toc.numtrks);
+			util::stream_format(str, "%d\n", toc.numtrks);
 		}
 		else if (mode == MODE_NORMAL)
 		{
@@ -2855,13 +2859,13 @@ static void do_extract_cd(parameters_map &params)
 			}
 
 			if (mode2)
-				output_toc_file->printf("CD_ROM_XA\n\n\n");
+				str << "CD_ROM_XA\n\n\n";
 			else if (cdda && !mode1)
-				output_toc_file->printf("CD_DA\n\n\n");
+				str << "CD_DA\n\n\n";
 			else
-				output_toc_file->printf("CD_ROM\n\n\n");
+				str << "CD_ROM\n\n\n";
 		}
-		
+
 		// iterate over tracks and copy all data
 		uint64_t totaloutputoffs = 0;
 		uint64_t outputoffs = 0;
@@ -2893,9 +2897,9 @@ static void do_extract_cd(parameters_map &params)
 			if (cdrom->is_gdrom() && mode == MODE_CUEBIN)
 			{
 				if (tracknum == 0)
-					output_toc_file->printf("REM SINGLE-DENSITY AREA\n");
+					str << "REM SINGLE-DENSITY AREA\n";
 				else if (toc.tracks[tracknum].physframeofs == cdrom_file::GDI_HIGH_DENSITY_AREA)
-					output_toc_file->printf("REM HIGH-DENSITY AREA\n");
+					str << "REM HIGH-DENSITY AREA\n";
 			}
 
 			// output the metadata about the track to the TOC file
@@ -2903,11 +2907,11 @@ static void do_extract_cd(parameters_map &params)
 
 			if (mode == MODE_CUEBIN && toc.numsessions > 1 && sessionnum != trackinfo.session)
 			{
-				output_toc_file->printf("REM SESSION %02d\n", trackinfo.session+1);
+				util::stream_format(str, "REM SESSION %02d\n", trackinfo.session + 1);
 				sessionnum = trackinfo.session;
 			}
-			
-			output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
+
+			output_track_metadata(mode, str, tracknum, trackinfo, core_filename_extract_base(trackbin_name), discoffs, outputoffs);
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
 			// the subdata size in the buffer calculation.
@@ -2980,9 +2984,10 @@ static void do_extract_cd(parameters_map &params)
 		}
 
 		// finish up
+		str << std::flush;
 		output_bin_file.reset();
 		output_toc_file.reset();
-		util::stream_format(std::cout, "Extraction complete                                    \n");
+		std::cout << "Extraction complete                                    \n";
 	}
 	catch (...)
 	{
@@ -3136,7 +3141,7 @@ static void do_extract_ld(parameters_map &params)
 
 		// close and return
 		output_file.reset();
-		util::stream_format(std::cout, "Extraction complete                                    \n");
+		std::cout << "Extraction complete                                    \n";
 	}
 	catch (...)
 	{

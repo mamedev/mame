@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iosfwd>
 #include <limits>
 #include <memory>
 #include <string>
@@ -149,7 +150,7 @@ public:
 	virtual bool adjust_left() = 0;
 	virtual bool adjust_right() = 0;
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const = 0;
+	virtual void save_ini(std::ostream &file, unsigned indent) const = 0;
 
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const

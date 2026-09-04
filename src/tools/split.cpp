@@ -11,12 +11,14 @@
 #include "corefile.h"
 #include "corestr.h"
 #include "hashing.h"
+#include "ioprocsstream.h"
 
 #include <cassert>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <locale>
 #include <tuple>
 #include <type_traits>
 
@@ -130,68 +132,76 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 	splitfilename.assign(basename).append(".split");
 
 	// create the split file
-	filerr = util::core_file::open(splitfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, splitfile);
+	filerr = util::core_file::open(splitfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, splitfile);
 	if (filerr)
 	{
 		fprintf(stderr, "Fatal error: unable to create split file '%s'\n", splitfilename.c_str());
 		goto cleanup;
 	}
 
-	// write the basics out
-	splitfile->printf("splitfile=%s\n", basefilename.c_str());
-	splitfile->printf("splitsize=%d\n", splitsize);
-
-	printf("Split file is '%s'\n", splitfilename.c_str());
-	printf("Splitting file %s into chunks of %dMB...\n", basefilename.c_str(), splitsize / (1024 * 1024));
-
-	// now iterate until done
-	for (partnum = 0; partnum < 1000; partnum++)
 	{
-		printf("Reading part %d...", partnum);
+		util::owritestream splitstream(*splitfile, util::owritestream::UTF_8, false);
+		splitstream.imbue(std::locale::classic());
 
-		// read as much as we can from the file
-		size_t length;
-		std::tie(filerr, length) = read(*infile, splitbuffer, splitsize); // FIXME check error return
-		if (length == 0)
-			break;
+		// write the basics out
+		util::stream_format(splitstream, "splitfile=%s\n", basefilename);
+		util::stream_format(splitstream, "splitsize=%d\n", splitsize);
 
-		// hash what we have
-		compute_hash_as_string(computedhash, splitbuffer, length);
+		printf("Split file is '%s'\n", splitfilename.c_str());
+		printf("Splitting file %s into chunks of %dMB...\n", basefilename.c_str(), splitsize / (1024 * 1024));
 
-		// write that info to the split file
-		splitfile->printf("hash=%s file=%s.%03d\n", computedhash.c_str(), basefilename.c_str(), partnum);
-
-		// compute the full filename for this guy
-		outfilename = util::string_format("%s.%03d", basename, partnum);
-
-		// create it
-		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
-		if (filerr)
+		// now iterate until done
+		for (partnum = 0; partnum < 1000; partnum++)
 		{
-			printf("\n");
-			fprintf(stderr, "Fatal error: unable to create output file '%s'\n", outfilename.c_str());
-			goto cleanup;
+			printf("Reading part %d...", partnum);
+
+			// read as much as we can from the file
+			size_t length;
+			std::tie(filerr, length) = read(*infile, splitbuffer, splitsize); // FIXME check error return
+			if (length == 0)
+				break;
+
+			// hash what we have
+			compute_hash_as_string(computedhash, splitbuffer, length);
+
+			// write that info to the split file
+			util::stream_format(splitstream, "hash=%s file=%s.%03d\n", computedhash, basefilename, partnum);
+
+			// compute the full filename for this guy
+			outfilename = util::string_format("%s.%03d", basename, partnum);
+
+			// create it
+			filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
+			if (filerr)
+			{
+				printf("\n");
+				fprintf(stderr, "Fatal error: unable to create output file '%s'\n", outfilename.c_str());
+				goto cleanup;
+			}
+
+			printf(" writing %s.%03d...", basefilename.c_str(), partnum);
+
+			// write the data
+			size_t actual;
+			std::tie(filerr, actual) = write(*outfile, splitbuffer, length);
+			if (filerr || outfile->flush())
+			{
+				printf("\n");
+				fprintf(stderr, "Fatal error: Error writing output file (out of space?)\n");
+				goto cleanup;
+			}
+			outfile.reset();
+
+			printf(" done\n");
+
+			// stop if this is the end
+			if (length < splitsize)
+				break;
 		}
 
-		printf(" writing %s.%03d...", basefilename.c_str(), partnum);
-
-		// write the data
-		size_t actual;
-		std::tie(filerr, actual) = write(*outfile, splitbuffer, length);
-		if (filerr || outfile->flush())
-		{
-			printf("\n");
-			fprintf(stderr, "Fatal error: Error writing output file (out of space?)\n");
-			goto cleanup;
-		}
-		outfile.reset();
-
-		printf(" done\n");
-
-		// stop if this is the end
-		if (length < splitsize)
-			break;
+		splitstream << std::flush;
 	}
+
 	printf("File split successfully\n");
 
 	// if we get here, clear the errors

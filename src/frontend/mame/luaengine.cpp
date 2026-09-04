@@ -17,7 +17,6 @@
 #include "ui/ui.h"
 
 #include "imagedev/cassette.h"
-#include "vector.h"
 
 #include "debugger.h"
 #include "drivenum.h"
@@ -31,9 +30,11 @@
 #include "sound.h"
 #include "speaker.h"
 #include "uiinput.h"
+#include "vector.h"
 #include "video.h"
 
 #include "corestr.h"
+#include "ioprocsstream.h"
 
 #include <algorithm>
 #include <condition_variable>
@@ -1175,7 +1176,7 @@ void lua_engine::initialize()
 					}
 					new (&file) emu_file(path, flags);
 				}));
-	file_type.set("read",
+	file_type.set_function("read",
 			[] (emu_file &file, sol::this_state s, size_t len)
 			{
 				buffer_helper buf(s);
@@ -1184,38 +1185,54 @@ void lua_engine::initialize()
 				buf.push();
 				return sol::make_reference(s, sol::stack_reference(s, -1));
 			});
-	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
-	file_type.set("puts", &emu_file::puts);
-	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
-	file_type.set("open_next", &emu_file::open_next);
-	file_type.set("close", &emu_file::close);
-	file_type.set("seek", sol::overload(
-			[](emu_file &file) { return file.tell(); },
-			[this] (emu_file &file, s64 offset, int whence) -> sol::object {
-				if(file.seek(offset, whence))
+	file_type.set_function("write", [] (emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
+	file_type.set_function("puts",
+			[] (emu_file &file, const std::string &data) -> size_t
+			{
+				if (data.empty())
+					return 0U;
+
+				// FIXME: this is horribly inefficient, and the API should be rationalised
+				auto const offs = file.tell();
+				{
+					util::owritestream str(file, util::owritestream::UTF_8, !offs);
+					str << data << std::flush;
+				}
+				return file.tell() - offs;
+			});
+	file_type.set_function("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
+	file_type.set_function("open_next", &emu_file::open_next);
+	file_type.set_function("close", &emu_file::close);
+	file_type.set_function("seek", sol::overload(
+			[] (emu_file &file) { return file.tell(); },
+			[] (emu_file &file, sol::this_state s, s64 offset, int whence) -> sol::object
+			{
+				if (file.seek(offset, whence))
 					return sol::lua_nil;
 				else
-					return sol::make_object(sol(), file.tell());
+					return sol::make_object(s, file.tell());
 			},
-			[this](emu_file &file, const char* whence) -> sol::object {
+			[] (emu_file &file, sol::this_state s, const char *whence) -> sol::object
+			{
 				int wval = s_seek_parser(whence);
-				if(wval < 0 || wval >= 3)
+				if (wval < 0 || wval >= 3)
 					return sol::lua_nil;
-				if(file.seek(0, wval))
+				if (file.seek(0, wval))
 					return sol::lua_nil;
-				return sol::make_object(sol(), file.tell());
+				return sol::make_object(s, file.tell());
 			},
-			[this](emu_file &file, const char* whence, s64 offset) -> sol::object {
+			[] (emu_file &file, sol::this_state s, const char *whence, s64 offset) -> sol::object
+			{
 				int wval = s_seek_parser(whence);
-				if(wval < 0 || wval >= 3)
+				if (wval < 0 || wval >= 3)
 					return sol::lua_nil;
-				if(file.seek(offset, wval))
+				if (file.seek(offset, wval))
 					return sol::lua_nil;
-				return sol::make_object(sol(), file.tell());
+				return sol::make_object(s, file.tell());
 			}));
-	file_type.set("size", &emu_file::size);
-	file_type.set("filename", &emu_file::filename);
-	file_type.set("fullpath", &emu_file::fullpath);
+	file_type.set_function("size", &emu_file::size);
+	file_type.set_function("filename", &emu_file::filename);
+	file_type.set_function("fullpath", &emu_file::fullpath);
 
 
 /*  thread library

@@ -20,10 +20,12 @@
 
 // lib/util
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "xmlfile.h"
 #include "zippath.h"
 
 #include <cctype>
+#include <locale>
 
 
 //**************************************************************************
@@ -196,7 +198,19 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 	if (filerr)
 		return 1;
 
-	file.puts(options.output_ini());
+	try
+	{
+		util::owritestream str(file);
+		str.imbue(std::locale::classic());
+		options.output_ini(str);
+		str << std::flush;
+		if (file.flush() || !str)
+			return 1;
+	}
+	catch (std::bad_alloc const &)
+	{
+		return 1;
+	}
 	return 0;
 }
 

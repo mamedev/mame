@@ -3692,7 +3692,7 @@ ROM_START( pclubsc6 )
 	// TODO: add 1p eeprom default
 ROM_END
 
-// 昭和レトロプリント倶楽部2
+// 昭和レトロ プリント倶楽部2
 ROM_START( pclub2sr ) // 837-12765-01 ROM BD, protection device not present
 	STV_BIOS
 

@@ -22,7 +22,9 @@
 #include "uiinput.h"
 
 #include "util/corestr.h"
+#include "util/ioprocsstream.h"
 
+#include <locale>
 #include <numeric>
 #include <sstream>
 #include <thread>
@@ -239,16 +241,21 @@ void menu_audit::save_available_machines()
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (!file.open(std::string(emulator_info::get_configname()) + "_avail.ini"))
 	{
-		// generate header
-		file.printf("#\n%s%s\n#\n\n", UI_VERSION_TAG, emulator_info::get_bare_build_version());
-
-		// generate available list
-		for (ui_system_info const &info : m_availablesorted)
 		{
-			if (info.available)
-				file.printf("%s\n", info.driver->name);
-		}
+			util::owritestream str(file);
+			str.imbue(std::locale::classic());
 
+			// generate header
+			util::stream_format(str, "#\n%s%s\n#\n\n", UI_VERSION_TAG, emulator_info::get_bare_build_version());
+
+			// generate available list
+			for (ui_system_info const &info : m_availablesorted)
+			{
+				if (info.available)
+					str << info.driver->name << '\n';
+			}
+			str << std::flush;
+		}
 		file.close();
 	}
 }
