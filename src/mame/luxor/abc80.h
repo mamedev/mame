@@ -115,10 +115,14 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y);
+	void update_screen();
+	void update_screen_to(int y, int sx);
+	virtual void draw_character_at(bitmap_rgb32 &bitmap, int y, int sx, bool dv);
 	void draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u8 hsync_data);
+	virtual int chars_per_line() { return 64; }
 	virtual offs_t get_videoram_addr();
 	virtual u8 read_videoram(offs_t offset) { return m_video_ram[offset]; }
+	void video_ram_w(offs_t offset, u8 data);
 
 	void vco_voltage_w(int state);
 
@@ -183,6 +187,8 @@ protected:
 	int m_c = 0;
 	int m_r = 0;
 	bool m_mode = 0;
+	int m_render_y = 0;
+	int m_render_sx = 0;
 
 	// cassette state
 	bool m_motor;
@@ -243,9 +249,11 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_reset() override ATTR_COLD;
 
-	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y) override;
+	virtual void draw_character_at(bitmap_rgb32 &bitmap, int y, int sx, bool dv) override;
+	virtual int chars_per_line() override { return m_80 ? 128 : 64; }
 	virtual offs_t get_videoram_addr() override;
 	virtual u8 read_videoram(offs_t offset) override { return m_char_ram[offset]; };
+	void char_ram_w(offs_t offset, u8 data);
 
 	void set_screen_params(void);
 	void set_80(bool state);

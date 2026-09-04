@@ -247,7 +247,7 @@ void abc80_state::abc80_mem(address_map &map)
 		NAME([this](offs_t offset) { return m_bus->xmemfl_r(offset + 0x4000); }),
 		NAME([this](offs_t offset, uint8_t data) { m_bus->xmemw_w(offset + 0x4000, data); })
 	);
-	map(0x7c00, 0x7fff).ram().share(m_video_ram);
+	map(0x7c00, 0x7fff).ram().w(FUNC(abc80_state::video_ram_w)).share(m_video_ram);
 	map(0xc000, 0xffff).ram();
 }
 
@@ -279,10 +279,10 @@ void tkn80_state::tkn80_mem(address_map &map)
 	m_view_rom2[0](0x2000, 0x23ff).rom().region(Z80_TAG, 0x2000);
 	m_view_rom2[1](0x2000, 0x23ff).rom().region("tkn80", 0x400);
 	m_view_rom2[2](0x2000, 0x23ff).rom().region("tkn80", 0xc00);
-	map(0x5800, 0x5fff).ram().share(m_char_ram);
+	map(0x5800, 0x5fff).ram().w(FUNC(tkn80_state::char_ram_w)).share(m_char_ram);
 	map(0x7c00, 0x7fff).lrw8( // map only the upper 1K of char RAM
 		NAME([this](offs_t offset) { return m_char_ram[0x400 | offset]; }),
-		NAME([this](offs_t offset, uint8_t data) { m_char_ram[0x400 | offset] = data; })
+		NAME([this](offs_t offset, uint8_t data) { char_ram_w(0x400 | offset, data); })
 	);
 }
 
@@ -512,7 +512,7 @@ void abc80_state::kbd_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(abc80_state::scanline_tick)
 {
-	draw_scanline(m_bitmap, m_screen->vpos());
+	update_screen();
 
 	m_pio_astb = !m_pio_astb;
 
@@ -548,6 +548,12 @@ TIMER_CALLBACK_MEMBER(abc80_state::blink_tick)
 TIMER_CALLBACK_MEMBER(abc80_state::vsync_on)
 {
 	if (LOG) logerror("%s vsync 1\n", machine().time().as_string());
+
+	update_screen_to(ABC80_VTOTAL, 0);
+
+	m_render_y = 0;
+	m_render_sx = 0;
+
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -582,6 +588,8 @@ void abc80_state::machine_start()
 	save_item(NAME(m_pio_astb));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_render_y));
+	save_item(NAME(m_render_sx));
 	save_item(NAME(m_motor));
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
@@ -708,6 +716,7 @@ void abc80_state::abc80_common(machine_config &config)
 	m_csg->set_pitch_voltage(0);
 	m_csg->set_slf_params(CAP_U(1), RES_K(220));
 	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
+	m_csg->set_enable(1);
 	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
