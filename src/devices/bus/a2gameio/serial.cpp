@@ -42,8 +42,9 @@ protected:
 
 	// device_a2gameio_interface overrides
 	virtual int sw0_r() override;
+	virtual int sw2_r() override;
 	virtual void an0_w(int state) override;
-	virtual bool has_sw0() const override { return true; }
+	virtual bool has_sw0() const override { return !BIT(m_config->read(), 7); }
 
 private:
 	// device finders
@@ -67,8 +68,12 @@ static INPUT_PORTS_START(gameio_serial)
 		 the hardiest of printers."
 		— Hayden Apple Assembly Language Development System manual, appendix A
 	*/
-	PORT_CONFSETTING(0x00, DEF_STR(None))
-	PORT_CONFSETTING(0x01, "DSR")
+	PORT_CONFSETTING(0x00, "SW0 = always on")
+	PORT_CONFSETTING(0x01, "SW0 = DSR")
+	PORT_CONFSETTING(0x02, "SW0 = CTS")
+	PORT_CONFSETTING(0x80, "SW2 = always on")
+	PORT_CONFSETTING(0x81, "SW2 = DSR")
+	PORT_CONFSETTING(0x82, "SW2 = CTS")
 INPUT_PORTS_END
 
 ioport_constructor apple2_gameio_serial_device::device_input_ports() const
@@ -111,6 +116,25 @@ int apple2_gameio_serial_device::sw0_r()
 	{
 	case 0x01:
 		return !m_rs232->dsr_r();
+
+	case 0x02:
+		return !m_rs232->cts_r();
+
+	default:
+		return 1;
+	}
+}
+
+int apple2_gameio_serial_device::sw2_r()
+{
+	// 1 = ready, 0 = not ready
+	switch (m_config->read())
+	{
+	case 0x81:
+		return !m_rs232->dsr_r();
+
+	case 0x82:
+		return !m_rs232->cts_r();
 
 	default:
 		return 1;
