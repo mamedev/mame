@@ -12,6 +12,8 @@
 
 #include "corefile.h"
 #include "corestr.h"
+#include "strformat.h"
+
 #include "osdcore.h"
 
 #include <cassert>
