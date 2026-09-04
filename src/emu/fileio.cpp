@@ -271,7 +271,7 @@ util::hash_collection &emu_file::hashes(std::string_view types)
 	// load the ZIP file if needed
 	if (compressed_file_ready())
 		return m_hashes;
-	if (m_file == nullptr)
+	if (!m_file)
 		return m_hashes;
 
 	// if we have ZIP data, just hash that directly
@@ -614,39 +614,17 @@ u32 emu_file::write(const void *buffer, u32 length)
 
 
 //-------------------------------------------------
-//  puts - write a line to a text file
-//-------------------------------------------------
-
-int emu_file::puts(std::string_view s)
-{
-	// write the data if we can
-	if (m_file)
-		return m_file->puts(s);
-
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  vfprintf - vfprintf to a text file
-//-------------------------------------------------
-
-int emu_file::vprintf(util::format_argument_pack<char> const &args)
-{
-	// write the data if we can
-	return m_file ? m_file->vprintf(args) : 0;
-}
-
-
-//-------------------------------------------------
 //  flush - flush file buffers
 //-------------------------------------------------
 
-void emu_file::flush()
+std::error_condition emu_file::flush()
 {
 	// flush the buffers if we can
 	if (m_file)
-		m_file->flush();
+		return m_file->flush();
+
+	// TODO: should this be invalid argument instead?
+	return std::error_condition();
 }
 
 

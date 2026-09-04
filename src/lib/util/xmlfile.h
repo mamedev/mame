@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include "corefile.h"
+#include "utilfwd.h"
 
+#include <iosfwd>
 #include <list>
 #include <string>
 #include <string_view>
@@ -170,7 +171,7 @@ protected:
 	data_node();
 	~data_node();
 
-	void write_recursive(int indent, util::core_file &file) const;
+	void write_recursive(int indent, std::ostream &file) const;
 
 
 private:
@@ -230,7 +231,7 @@ public:
 	static ptr string_read(const char *string, parse_options const *opts);
 
 	// write an XML tree to a file
-	void write(util::core_file &file) const;
+	bool write(write_stream &file) const;
 
 
 private:

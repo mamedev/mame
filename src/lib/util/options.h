@@ -208,8 +208,8 @@ public:
 	void copy_from(const core_options &that);
 
 	// output
-	std::string output_ini(const core_options *diff = nullptr) const;
-	std::string output_help() const;
+	void output_ini(std::ostream &str, const core_options *diff = nullptr) const;
+	void output_help(std::ostream &str) const;
 
 	// reading
 	const char *value(std::string_view option) const noexcept;

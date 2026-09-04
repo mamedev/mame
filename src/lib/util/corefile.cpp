@@ -62,8 +62,6 @@ public:
 	virtual int ungetc(int c) override { return m_file.ungetc(c); }
 	virtual char *gets(char *s, int n) override { return m_file.gets(s, n); }
 
-	virtual int puts(std::string_view s) override { return m_file.puts(s); }
-	virtual int vprintf(util::format_argument_pack<char> const &args) override { return m_file.vprintf(args); }
 	virtual std::error_condition truncate(std::uint64_t offset) override { return m_file.truncate(offset); }
 
 private:
@@ -87,8 +85,6 @@ public:
 	virtual int getc() override;
 	virtual int ungetc(int c) override;
 	virtual char *gets(char *s, int n) override;
-	virtual int puts(std::string_view s) override;
-	virtual int vprintf(util::format_argument_pack<char> const &args) override;
 
 protected:
 	core_text_file(std::uint32_t openflags)
@@ -96,13 +92,11 @@ protected:
 		, m_text_type(text_file_type::OSD)
 		, m_back_char_head(0)
 		, m_back_char_tail(0)
-		, m_printf_buffer()
 	{
 	}
 
 	bool read_access() const noexcept { return 0U != (m_openflags & OPEN_FLAG_READ); }
 	bool write_access() const noexcept { return 0U != (m_openflags & OPEN_FLAG_WRITE); }
-	bool no_bom() const noexcept { return 0U != (m_openflags & OPEN_FLAG_NO_BOM); }
 
 	bool has_putback() const noexcept { return m_back_char_head != m_back_char_tail; }
 	void clear_putback() noexcept { m_back_char_head = m_back_char_tail = 0; }
@@ -113,7 +107,6 @@ private:
 	char                m_back_chars[UTF8_CHAR_MAX];    // buffer to hold characters for ungetc
 	int                 m_back_char_head;               // head of ungetc buffer
 	int                 m_back_char_tail;               // tail of ungetc buffer
-	ovectorstream       m_printf_buffer;                // persistent buffer for formatted output
 };
 
 
@@ -451,87 +444,6 @@ char *core_text_file::gets(char *s, int n)
 	if (n > 0)
 		*cur++ = 0;
 	return s;
-}
-
-
-//-------------------------------------------------
-//  puts - write a string to a text file
-//-------------------------------------------------
-
-int core_text_file::puts(std::string_view s)
-{
-	// TODO: what to do about write errors?
-	// The API doesn't lend itself to reporting the error as the return
-	// value includes extra bytes inserted like the UTF-8 marker and
-	// carriage returns.
-	char convbuf[1024];
-	char *pconvbuf = convbuf;
-	int count = 0;
-
-	// is this the beginning of the file?  if so, write a byte order mark
-	if (!no_bom())
-	{
-		std::uint64_t offset;
-		if (!tell(offset))
-		{
-			if (!offset)
-			{
-				*pconvbuf++ = char(0xef);
-				*pconvbuf++ = char(0xbb);
-				*pconvbuf++ = char(0xbf);
-			}
-		}
-	}
-
-	// convert '\n' to platform dependant line endings
-	for (char ch : s)
-	{
-		if (ch == '\n')
-		{
-			if (CRLF == 1)      // CR only
-				*pconvbuf++ = 13;
-			else if (CRLF == 2) // LF only
-				*pconvbuf++ = 10;
-			else if (CRLF == 3) // CR+LF
-			{
-				*pconvbuf++ = 13;
-				*pconvbuf++ = 10;
-			}
-		}
-		else
-			*pconvbuf++ = ch;
-
-		// if we overflow, break into chunks
-		if (pconvbuf >= convbuf + std::size(convbuf) - 10)
-		{
-			auto const [err, written] = write(*this, convbuf, pconvbuf - convbuf); // FIXME: error ignored here
-			count += written;
-			pconvbuf = convbuf;
-		}
-	}
-
-	// final flush
-	if (pconvbuf != convbuf)
-	{
-		auto const [err, written] = write(*this, convbuf, pconvbuf - convbuf); // FIXME: error ignored here
-		count += written;
-	}
-
-	return count;
-}
-
-
-//-------------------------------------------------
-//  vprintf - vfprintf to a text file
-//-------------------------------------------------
-
-int core_text_file::vprintf(util::format_argument_pack<char> const &args)
-{
-	m_printf_buffer.clear();
-	m_printf_buffer.reserve(1024);
-	m_printf_buffer.seekp(0, ovectorstream::beg);
-	util::stream_format(m_printf_buffer, args);
-	return puts(buf_to_string_view(m_printf_buffer));
 }
 
 

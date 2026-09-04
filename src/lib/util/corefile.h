@@ -25,20 +25,13 @@
 namespace util {
 
 /***************************************************************************
-    ADDITIONAL OPEN FLAGS
-***************************************************************************/
-
-#define OPEN_FLAG_NO_BOM        0x0100      /* don't output BOM */
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
 class core_file : public random_read_write
 {
 public:
-	typedef std::unique_ptr<core_file> ptr;
+	using ptr = std::unique_ptr<core_file>;
 
 
 	// ----- file open/close -----
@@ -76,25 +69,14 @@ public:
 	// read a full line of text from the file
 	virtual char *gets(char *s, int n) = 0;
 
-	// open a file with the specified filename, read it into memory, and return a pointer
-	static std::error_condition load(std::string_view filename, void **data, std::size_t &length) noexcept;
-	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data) noexcept;
-
-
-	// ----- file write -----
-
-	// write a line of text to the file
-	virtual int puts(std::string_view s) = 0;
-
-	// printf-style text write to a file
-	virtual int vprintf(util::format_argument_pack<char> const &args) = 0;
-	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
-	{
-		return vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
-	}
 
 	// file truncation
 	virtual std::error_condition truncate(std::uint64_t offset) = 0;
+
+
+	// open a file with the specified filename, read it into memory, and return a pointer
+	static std::error_condition load(std::string_view filename, void **data, std::size_t &length) noexcept;
+	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data) noexcept;
 };
 
 } // namespace util

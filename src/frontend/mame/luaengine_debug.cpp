@@ -413,9 +413,9 @@ void lua_engine::initialize_debug(sol::table &emu)
 			});
 	device_debug_type.set_function("go", &device_debug::go);
 	device_debug_type.set_function("bpset",
-			[] (device_debug &dev, offs_t address, char const *cond, char const *act)
+			[] (device_debug &dev, offs_t address, std::optional<char const *> cond, std::optional<std::string_view> act)
 			{
-				int result(dev.breakpoint_set(address, cond, act));
+				int result(dev.breakpoint_set(address, cond ? *cond : nullptr, act ? *act : std::string_view()));
 				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
 				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 				return result;
@@ -448,10 +448,10 @@ void lua_engine::initialize_debug(sol::table &emu)
 				return table;
 			});
 	device_debug_type.set_function("wpset",
-			[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
+			[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, std::optional<char const *> cond, std::optional<std::string_view> act)
 			{
 				read_or_write const wptype = s_read_or_write_parser(type);
-				int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
+				int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond ? *cond : nullptr, act ? *act : std::string_view()));
 				dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
 				return result;
 			});

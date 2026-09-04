@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -360,537 +360,537 @@ TODO:
 
 TODO: reduce footprint of following tables
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Europe / Australia Master List (PAL)                                                      |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  #                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	3D Lemmings (Europe) [T-11304H-50]                                                      |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  A                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Actua Golf (Europe) [T-12302H-50]                                                       |
-	Actua Soccer: Club Edition (Europe) [T-12305H-50]                                       |
-	Alien Trilogy (Europe) [T-8113H-50]                                                     |
-	Alien Trilogy (Germany) [T-8113H-18]                                                    |
-	Alone in the Dark: Jack is Back (Europe) [T-15101H-50]                                  |
-	AMOK (Europe) [MK81064-50]                                                              |
-	Andretti Racing (France) [T-5020H-09]                                                   |
-	Andretti Racing (Germany) [T-5020H-18]                                                  |
-	Andretti Racing (United Kingdom) [T-5020H-50]                                           |
-	Area 51 (Europe) [T-25408H-50]                                                          |
-	Athlete Kings (Europe) [MK81115-50]                                                     |
-	Atlantis: Secrets d'un monde oublié (France) [MK81091-09]                               |
-	Atlantis: The Lost Tales (Europe) [MK81091-50]                                          |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  B                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Baku Baku (Europe) [MK81501-50]                                                         |
-	Batman Forever: The Arcade Game (Europe) [T-8140H-50]                                   |
-	Battle Arena Toshinden Remix (Europe) [MK81029-50]                                      |
-	Battle Arena Toshinden URA: Ultimate Revenge Attack (Europe) [MK81054-50]               |
-	Battle Monsters (Europe) [T-8137H-50]                                                   |
-	Battle Stations (Europe) [T-5021H-50]                                                   |
-	Black Dawn (Europe) [T-7027H-50]                                                        |
-	Black Fire (Europe) [T-7011H-50]                                                        |
-	Blam!-Machinehead (France) [T-11505H-09]                                                |
-	Blam!-Machinehead (Germany) [T-11505H-18]                                               |
-	Blam!-Machinehead (United Kingdom) [T-11505H-50]                                        |
-	Blast Chamber (Europe) [T-13003H-50]                                                    |
-	Blazing Dragons (France) [T-15913H-09]                                                  |
-	Blazing Dragons (Germany) [T-15913H-18]                                                 |
-	Blazing Dragons (United Kingdom) [T-15913H-50]                                          |
-	Break Point (Europe) [T-16408H-50]                                                      |
-	Bubble Bobble also featuring Rainbow Islands (Europe) [T-8131H-50]                      |
-	Bug! (Europe) [MK81004-50]                                                              |
-	Bug Too! (Europe) [MK81040-50]                                                          |
-	Burning Rangers (Europe) [MK81803-50]                                                   |
-	Bust-A-Move 2: Arcade Edition (Europe) [T-8132H-50]                                     |
-	Bust-A-Move 3 (Europe) [T-8155H-50]                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  C                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Casper (Europe) [T-12512H-50]                                                           |
-	Chaos Control (Europe) [T-15102H-50]                                                    |
-	Clockwork Knight (Europe) [MK81007-50]                                                  |
-	Clockwork Knight 2 (Europe) [MK81021-50]                                                |
-	Command & Conquer (France) [T-7028H-09]                                                 |
-	Command & Conquer (United Kingdom) [T-7028H-50]                                         |
-	Command & Conquer: Teil 1: Der Tiberiumkonflikt (Germany) [T-7028H-18]                  |
-	Courier Crisis (Europe) [MK81099-50]                                                    |
-	CrimeWave (Europe) [T-8807H-50]                                                         |
-	Croc: Legend of the Gobbos (Germany) [T-5029H-18]                                       |
-	Croc: Legend of the Gobbos (United Kingdom) [T-5029H-50]                                |
-	Crow, The: City of Angels (Europe) [T-8124H-50]                                         |
-	Crusader: No Remorse (France) [T-5014H-09]                                              |
-	Crusader: No Remorse (Germany) [T-5014H-18]                                             |
-	Crusader: No Remorse (United Kingdom) [T-5014H-50]                                      |
-	Crypt Killer (Europe) [T-9509H-50]                                                      |
-	Cyber Speedway (Europe) [MK81205-50]                                                    |
-	Cyber Troopers Virtual On (Europe) [MK81042-50]                                         |
-	Cyberia (Europe) [T-12508H-50]                                                          |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  D                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	D (France) [T-8106H-50 F]                                                               |
-	D (Germany) [T-8106H-50 G]                                                              |
-	D (United Kingdom) [T-8106H-50 E]                                                       |
-	Darius Gaiden (Europe) [T-8123H-50]                                                     |
-	Darius II (Europe) [MK81085-50]                                                         |
-	Dark Savior (Europe) [MK81304-50]                                                       |
-	Darklight Conflict (Europe) [T-5022H-50]                                                |
-	Daytona USA (Europe) [MK81200-50]                                                       |
-	Daytona USA: Championship Circuit Edition (Europe) [MK81213-50]                         |
-	Deep Fear (Europe) [MK81804-50]                                                         |
-	Defcon 5 (Europe) [T-25401H-50]                                                         |
-	Defcon 5 (France) [T-25401H-09]                                                         |
-	Destruction Derby (Europe) [T-11303H-50]                                                |
-	Die Hard Arcade (Europe) [MK81057-50]                                                   |
-	Die Hard Trilogy (Europe) [T-16103H-50]                                                 |
-	Die Hard Trilogy (France) [T-16103H-09]                                                 |
-	Digital Pinball (Europe) [MK81680-50]                                                   |
-	Discworld (Europe) [T-11302H-50]                                                        |
-	Discworld II: Missing Presumed...?! (Europe) [MK81093-50]                               |
-	Doom (Europe) [T-25406H-50]                                                             |
-	Dragon Ball Z: Idainaru Dragon Ball Densetsu (France) [T-13301H-09]                     |
-	Dragon Ball Z: The Legend (Spain) [T-13305H-06]                                         |
-	Dragon Force (Europe) [MK81382-50]                                                      |
-	DragonHeart: Fire & Steel (Europe) [T-8117H-50]                                         |
-	Duke Nukem 3D (Europe) [MK81071-50]                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  E                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Earthworm Jim 2 (Europe) [T-7019H-50]                                                   |
-	Enemy Zero (Europe) [MK81076-50]                                                        |
-	Exhumed (Europe) [MK81084-50]                                                           |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  F                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	F1 Challenge (Europe) [MK81206-50]                                                      |
-	FIFA 97 (Europe) [T-5017H-50]                                                           |
-	FIFA 97 (Germany) [T-5017H-18]                                                          |
-	FIFA 98: En Route Pour la Coupe du Monde (France) [T-5025H-50]                          |
-	FIFA 98: Road to World Cup (Europe) [T-5025H-50]                                        |
-	FIFA 98: Road to World Cup (Italy) [T-5025H-50]                                         |
-	FIFA 98: Road to World Cup (United Kingdom) [T-5025H-50]                                |
-	FIFA 98: Rumbo Al Mundial (Spain) [T-5025H-50]                                          |
-	FIFA Soccer 96 (Europe) [T-5003H-50]                                                    |
-	FIFA Soccer 98: Die WM-Qualifikation (Germany) [T-5025H-18]                             |
-	Fighters Megamix (Europe) [MK81073-50]                                                  |
-	Fighting Vipers (Europe) [MK81041-50]                                                   |
-	Firestorm: Thunderhawk 2 (Europe) [T-11501H-50]                                         |
-	Firestorm: Thunderhawk 2 (Germany) [T-11501H-18]                                        |
-	Formula Karts: Special Edition (Europe) [MK81282-50]                                    |
-	Frank Thomas Big Hurt Baseball (Europe) [T-8138H-50]                                    |
-	Frankenstein: Through the Eyes of the Monster (Europe) [T-12511H-50]                    |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  G                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Galactic Attack (Europe) [T-8116H-50]                                                   |
-	Galaxy Fight (Europe) [T-1504H-50]                                                      |
-	Gex (Europe) [T-15904H-50]                                                              |
-	Ghen War (Europe) [T-7010H-50]                                                          |
-	Golden Axe: The Duel (Europe) [MK81045-50]                                              |
-	Grid Run (Europe) [T-7017H-50]                                                          |
-	Guardian Heroes (Europe) [MK81035-50]                                                   |
-	Gungriffon (Europe) [MK81046-50]                                                        |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  H                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Hang On GP '96 (Europe) [MK81202-50]                                                    |
-	Hardcore 4x4 (Europe) [T-12303H-50]                                                     |
-	Hebereke's Popoitto (Europe) [T-1502H-50]                                               |
-	Hexen (Europe) [T-25405H-50]                                                            |
-	Hi-Octane (Europe) [T-5002H-50]                                                         |
-	Highway 2000 (Europe) [T-6012H-50]                                                      |
-	Horde, The (France) [T-15909H-09]                                                       |
-	Horde, The (Germany) [T-15909H-18]                                                      |
-	Horde, The (United Kingdom) [T-15909H-50]                                               |
-	House of the Dead, The (Europe) [MK81802-50]                                            |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  I                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Impact Racing (Europe) [T-6010H-50]                                                     |
-	In the Hunt (Europe) [T-10001H-50]                                                      |
-	Incredible Hulk, The: The Pantheon Saga (Europe) [T-7905H-50]                           |
-	Independence Day: The Game (Europe) [T-16104H-50]                                       |
-	International Victory Goal (Europe) [MK81105-50]                                        |
-	Iron Man / X-O Manowar in Heavy Metal (Europe) [T-8119H-50]                             |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  J                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Jewels of the Oracle (Europe) [T-1503H-50]                                              |
-	Johnny Bazookatone (Europe) [T-7909H-50]                                                |
-	Jonah Lomu Rugby (Europe) [T-12003H-50]                                                 |
-	Jonah Lomu Rugby (United Kingdom) [T-12003H-05]                                         |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  K                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Keio 2: Flying Squadron (Europe) [T-6008H-50]                                           |
-	King of Fighters '95, The (Europe) [MK81088-50]                                         |
-	Krazy Ivan (Germany) [T-11305H-18]                                                      |
-	Krazy Ivan (United Kingdom) [T-11305H-50]                                               |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  L                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	La Mansión de las Almas Ocultas (Spain) [MK81012-06]                                    |
-	Last Bronx (Europe) [MK81078-50]                                                        |
-	Le Manoir des Ames Perdues (France) [MK81012-09]                                        |
-	Loaded (Europe) [T-12301H-50]                                                           |
-	Lost Vikings 2: Norse by Norsewest (Europe) [T12521H-50]                                |
-	Lost World, The: Jurassic Park (Europe) [MK81065-50]                                    |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  M                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Madden NFL 97 (Europe) [T-5018H-50]                                                     |
-	Madden NFL 98 (Europe) [T-5024H-50]                                                     |
-	Magic Carpet (Europe) [T-5006H-50]                                                      |
-	Mansion of Hidden Souls, The (United Kingdom) [MK81012-05]                              |
-	Manx TT Super Bike (Europe) [MK81210-50]                                                |
-	Marvel Super Heroes (Europe) [T-7032H-50]                                               |
-	Marvel Super Heroes (Italy) [T-7032H-51]                                                |
-	Marvel Super Heroes (United Kingdom) [T-7032H-05]                                       |
-	Mass Destruction (Europe) [MK81089-50]                                                  |
-	Maximum Force (Europe) [T-25417H-50]                                                    |
-	MechWarrior 2 (Europe) [T-13004H-50]                                                    |
-	Mega Man X3 (Europe) [T-7029H-50]                                                       |
-	Midway Presents Arcade's Greatest Hits: The Atari Collection 1 (Europe) [T-25413H-50]   |
-	Mighty Hits (Europe) [MK81087]                                                          |
-	Mortal Kombat II (Europe) [T-8103H-50]                                                  |
-	Mortal Kombat Trilogy (Europe) [T-25414H-50]                                            |
-	Mr. Bones (Europe) [MK81016-50]                                                         |
-	Myst (Europe) [MK81081-50]                                                              |
-	Mystaria: The Realms of Lore (Europe) [MK81300-50]                                      |
-	Mystery Mansion: Das Haus der verlorenen Seelen (Germany) [MK81012-18]                  |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  N                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	NASCAR 98 (Germany) [T-5028H-18]                                                        |
-	NASCAR 98 (United Kingdom) [T-5028H-50]                                                 |
-	NBA Action (Europe) [MK81103-50]                                                        |
-	NBA Action 98 (Europe) [MK81124-50]                                                     |
-	NBA Jam Extreme (Europe) [T-8151H-50]                                                   |
-	NBA Jam: Tournament Edition (Europe) [T-8102H-50]                                       |
-	NBA Live 97 (Europe) [T-5015H-50]                                                       |
-	NBA Live 98 (Europe) [T-5027H-50]                                                       |
-	Need for Speed, Road & Track Presents The (Europe) [T-5009H-50]                         |
-	NFL Quarterback Club 96 (Europe) [T-8109H-50]                                           |
-	NFL Quarterback Club 97 (Europe) [T-8136H-50]                                           |
-	NHL 97 (Europe) [T-5016H-50]                                                            |
-	NHL 97 (Germany) [T-5016H-18]                                                           |
-	NHL 98 (Europe) [T-5026H-50]                                                            |
-	NHL All-Star Hockey (Europe) [MK81102-50]                                               |
-	NHL All-Star Hockey 98 (Europe) [MK81122-50]                                            |
-	NHL Powerplay (Europe) [T-7013H-50]                                                     |
-	Night Warriors: Darkstalkers' Revenge (Europe) [T-7009H-50]                             |
-	NiGHTS: into Dreams... (Europe) [MK81020-50]                                            |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  O                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Off-World Interceptor Extreme (Europe) [T-15908H-50]                                    |
-	Off-World Interceptor Extreme (Germany) [T-15908H-18]                                   |
-	Olympic Soccer (Europe) [T-7904H-50]                                                    |
-	Olympic Soccer (Germany) [T-7904H-18]                                                   |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  P                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Pandemonium! (Europe) [MK81090-50]                                                      |
-	Panzer Dragoon (Europe) [MK81009-50]                                                    |
-	Panzer Dragoon II Zwei (Europe) [81022-50]                                              |
-	Panzer Dragoon Saga (Europe) [MK-81307-50]                                              |
-	Parodius (Europe) [T-9501H-50]                                                          |
-	Pebble Beach Golf Links (Europe) [MK-81101-50]                                          |
-	PGA Tour 97 (Europe) [T-5011H-50]                                                       |
-	Photo CD Operating System (Europe) [MK-81681-50]                                        |
-	Pinball Graffiti (Europe) [T-6011H-50]                                                  |
-	Primal Rage (Europe) [T-4802H-50]                                                       |
-	Pro Pinball: The Web (Europe) [T-30701H-50]                                             |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  Q                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Quake (Europe) [MK81066-50]                                                             |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  R                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Rampage World Tour (Europe) [T-25416H-50]                                               |
-	Rayman (Europe) [T-17701H-50]                                                           |
-	Resident Evil (Europe) [MK81092-50]                                                     |
-	Resurrection: Rise 2 (Europe) [T-8114H-50]                                              |
-	Revolution X featuring Aerosmith (Europe) [T-8107H-50]                                  |
-	Riven: The Sequel to Myst (Europe) [MK81801-50]                                         |
-	Road Rash (Europe) [T-5008-50]                                                          |
-	Robo Pit (Europe) [T-10002H-50]                                                         |
-	Robotica: Cybernation Revolt (Europe) [MK81008-50]                                      |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  S                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Saturn Bomberman (Europe) [MK81070-50]                                                  |
-	Saturn Power No. 2 (Europe) [T-12313H-50]                                               |
-	Scorcher (Europe) [MK81214-50]                                                          |
-	Sea Bass Fishing (Europe) [T-6009H-50]                                                  |
-	Sega Ages Vol. 1 (Europe) [MK81604-50]                                                  |
-	Sega Rally Championship (Europe) [MK81207-50]                                           |
-	Sega Touring Car Championship (Europe) [MK81216-50]                                     |
-	Sega Worldwide Soccer '97 (Europe) [MK81112-50]                                         |
-	Sega Worldwide Soccer '98 Club Edition (Europe) [MK81123-50]                            |
-	Shellshock (Germany) [T-11502H-18]                                                      |
-	Shellshock (United Kingdom) [T-11502H-50]                                               |
-	Shining Force III (Europe) [MK81383-50]                                                 |
-	Shining the Holy Ark (Europe) [MK81306-50]                                              |
-	Shining Wisdom (Europe) [MK81381-50]                                                    |
-	Shinobi X (Europe) [MK81082-50]                                                         |
-	Shockwave Assault (Europe) [T-5005H-50]                                                 |
-	Sim City 2000 (Europe) [MK81580-50]                                                     |
-	Skeleton Warriors (Europe) [T-7018H-50]                                                 |
-	Sky Target (Europe) [MK81051-50]                                                        |
-	Slam 'n Jam '96 (Europe) [T-15902H-50]                                                  |
-	Sonic 3D: Flickies' Island (Europe) [MK81062-50]                                        |
-	Sonic Jam (Europe) [MK81079-50]                                                         |
-	Sonic R (Europe) [MK81800-50]                                                           |
-	Soviet Strike (France) [T-5013H-09]                                                     |
-	Soviet Strike (Germany) [T-5013H-18]                                                    |
-	Soviet Strike (United Kingdom) [T-5013H-50]                                             |
-	Space Hulk: Vengeance of the Blood Angels (Europe) [T-5007H-50]                         |
-	Space Jam (Europe) [T-8125H-50]                                                         |
-	Spot Goes to Hollywood (Europe) [T-7001H-50]                                            |
-	Starfighter 3000 (Europe) [T-29701H-50]                                                 |
-	Steep Slope Sliders (Europe) [MK81128-50]                                               |
-	Story of Thor 2, The (Europe) [MK81302-50]                                              |
-	Street Fighter Alpha 2 (Europe) [T-7026H-50]                                            |
-	Street Fighter Alpha: Warriors' Dreams (Europe) [T-7008H-50]                            |
-	Street Fighter Collection (Europe) [T-7033H-50]                                         |
-	Street Fighter: The Movie (Europe) [T-8105H-50]                                         |
-	Street Racer (Europe) [T-17702H-50]                                                     |
-	Striker '96 (Europe) [T-8133H-50]                                                       |
-	Super Puzzle Fighter II Turbo (Europe) [T-7030H-50]                                     |
-	SwagMan (Europe) [T-11502H-50]                                                          |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  T                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Tempest 2000 (Europe) [T-12516H-50]                                                     |
-	Tetris Plus (Europe) [T-5704H-50]                                                       |
-	Theme Park (Europe) [T-5001H-50]                                                        |
-	Three Dirty Dwarves (Europe) [MK81033-50]                                               |
-	Tilt! (Europe) [T-7015H-50]                                                             |
-	Titan Wars (Europe) [T-15911H-50]                                                       |
-	Tomb Raider (Europe) [MK81086-50]                                                       |
-	Torico (Europe) [MK81053-50]                                                            |
-	Trash It! (Europe) [T-25411H-50]                                                        |
-	True Pinball (Europe) [T-16406H-50]                                                     |
-	Tunnel B1 (Europe) [T-16414H-50]                                                        |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  U                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	UEFA Euro 96 England (Europe) [MK81180-50]                                              |
-	Ultimate Mortal Kombat 3 (Europe) [T-25403H-50]                                         |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  V                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Valora Valley Golf (Europe) [T-2303H-50]                                                |
-	Victory Boxing (Europe) [T-6005H-50]                                                    |
-	Virtua Cop (Europe) [MK81015-50]                                                        |
-	Virtua Cop w/ Stunner (Europe) [MK-81026-50]                                            |
-	Virtua Cop 2 (Europe) [MK81043-50]                                                      |
-	Virtua Cop 2 Gun Set (Europe) [MK81052-50]                                              |
-	Virtua Fighter (Europe) [MK81005-50]                                                    |
-	Virtua Fighter 2 (Europe) [MK81014-50]                                                  |
-	Virtua Fighter Kids (Europe) [MK81049-50]                                               |
-	Virtua Fighter Remix + Virtua Fighter CG Portrait Collection (Europe) [MK81083-50]      |
-	Virtua Racing (Europe) [T-4801H-50]                                                     |
-	Virtual Golf (Europe) [T-11506H-50]                                                     |
-	Virtual Hydlide (Europe) [MK81380-50]                                                   |
-	Virtual Open Tennis (Europe) [T-8129H-50]                                               |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  W                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	WarCraft II: The Dark Saga (Europe) [T-5023H-50]                                        |
-	Whizz (Europe) [T-9514H-50]                                                             |
-	Wing Arms (Europe) [MK81024-50]                                                         |
-	Winter Heat (Europe) [MK81129-50]                                                       |
-	WipEout (Europe) [T-11301H-50]                                                          |
-	WipEout 2097 (Europe) [T-11308H-50]                                                     |
-	World Cup Golf: Professional Edition (Europe) [T-7903H-50]                              |
-	World Cup Golf: Professional Edition (Germany) [T-7903H-18]                             |
-	World League Soccer 98 (Europe) [MK81181-50]                                            |
-	World Series Baseball (Europe) [MK81109-50]                                             |
-	World Series Baseball II (Europe) [MK81113-50]                                          |
-	Worms (Europe) [T-16403H-50]                                                            |
-	WWF In Your House (Europe) [T-8126H-50]                                                 |
-	WWF WrestleMania: The Arcade Game (Europe) [T-8112H-50]                                 |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  X                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	X-Men: Children of the Atom (Europe) [T-8108H-50]                                       |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  Y                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	no released titles                                                                        |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  Z                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Z (Europe) [T-25412H-50]                                                                |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Game Demo Discs                                                                           |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Christmas NiGHTS: into Dreams... (Europe) [MK81067-50]                                  |
-	Preview Sega Saturn Vol. 1 (Europe) [610-6377]                                          |
-	Sega Flash Vol.1 (Europe) [MK610-6288A]                                                 |
-	Sega Flash Vol.2 (Europe) [610-6288B]                                                   |
-	Sega Flash Vol.3 (Europe) [610-6288C]                                                   |
-	Sega Flash Vol.4 (Europe) [610-6288D]                                                   |
-	Sega Flash Vol.5 (Europe) [610-6288E]                                                   |
-	Sega Flash Vol.6 (Europe) [610-6288F]                                                   |
-	Sega Flash Vol.7 (Europe) [610-6288G]                                                   |
-	Sega Saturn bootleg sampler (Europe) [610-6165]                                         |
-	WipEout 2097 (Europe) [670-1199-50]                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	END                                                                                       |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	USA / Brazil (NTSC-U)                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  #                                                                                     |
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	3 Free Games Pack (USA) [81606]
-	3D Baseball: The Majors (USA) [T-15906H]
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Europe / Australia Master List (PAL)                                                      |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      #                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    3D Lemmings (Europe) [T-11304H-50]                                                      |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      A                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Actua Golf (Europe) [T-12302H-50]                                                       |
+    Actua Soccer: Club Edition (Europe) [T-12305H-50]                                       |
+    Alien Trilogy (Europe) [T-8113H-50]                                                     |
+    Alien Trilogy (Germany) [T-8113H-18]                                                    |
+    Alone in the Dark: Jack is Back (Europe) [T-15101H-50]                                  |
+    AMOK (Europe) [MK81064-50]                                                              |
+    Andretti Racing (France) [T-5020H-09]                                                   |
+    Andretti Racing (Germany) [T-5020H-18]                                                  |
+    Andretti Racing (United Kingdom) [T-5020H-50]                                           |
+    Area 51 (Europe) [T-25408H-50]                                                          |
+    Athlete Kings (Europe) [MK81115-50]                                                     |
+    Atlantis: Secrets d'un monde oublié (France) [MK81091-09]                               |
+    Atlantis: The Lost Tales (Europe) [MK81091-50]                                          |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      B                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Baku Baku (Europe) [MK81501-50]                                                         |
+    Batman Forever: The Arcade Game (Europe) [T-8140H-50]                                   |
+    Battle Arena Toshinden Remix (Europe) [MK81029-50]                                      |
+    Battle Arena Toshinden URA: Ultimate Revenge Attack (Europe) [MK81054-50]               |
+    Battle Monsters (Europe) [T-8137H-50]                                                   |
+    Battle Stations (Europe) [T-5021H-50]                                                   |
+    Black Dawn (Europe) [T-7027H-50]                                                        |
+    Black Fire (Europe) [T-7011H-50]                                                        |
+    Blam!-Machinehead (France) [T-11505H-09]                                                |
+    Blam!-Machinehead (Germany) [T-11505H-18]                                               |
+    Blam!-Machinehead (United Kingdom) [T-11505H-50]                                        |
+    Blast Chamber (Europe) [T-13003H-50]                                                    |
+    Blazing Dragons (France) [T-15913H-09]                                                  |
+    Blazing Dragons (Germany) [T-15913H-18]                                                 |
+    Blazing Dragons (United Kingdom) [T-15913H-50]                                          |
+    Break Point (Europe) [T-16408H-50]                                                      |
+    Bubble Bobble also featuring Rainbow Islands (Europe) [T-8131H-50]                      |
+    Bug! (Europe) [MK81004-50]                                                              |
+    Bug Too! (Europe) [MK81040-50]                                                          |
+    Burning Rangers (Europe) [MK81803-50]                                                   |
+    Bust-A-Move 2: Arcade Edition (Europe) [T-8132H-50]                                     |
+    Bust-A-Move 3 (Europe) [T-8155H-50]                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      C                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Casper (Europe) [T-12512H-50]                                                           |
+    Chaos Control (Europe) [T-15102H-50]                                                    |
+    Clockwork Knight (Europe) [MK81007-50]                                                  |
+    Clockwork Knight 2 (Europe) [MK81021-50]                                                |
+    Command & Conquer (France) [T-7028H-09]                                                 |
+    Command & Conquer (United Kingdom) [T-7028H-50]                                         |
+    Command & Conquer: Teil 1: Der Tiberiumkonflikt (Germany) [T-7028H-18]                  |
+    Courier Crisis (Europe) [MK81099-50]                                                    |
+    CrimeWave (Europe) [T-8807H-50]                                                         |
+    Croc: Legend of the Gobbos (Germany) [T-5029H-18]                                       |
+    Croc: Legend of the Gobbos (United Kingdom) [T-5029H-50]                                |
+    Crow, The: City of Angels (Europe) [T-8124H-50]                                         |
+    Crusader: No Remorse (France) [T-5014H-09]                                              |
+    Crusader: No Remorse (Germany) [T-5014H-18]                                             |
+    Crusader: No Remorse (United Kingdom) [T-5014H-50]                                      |
+    Crypt Killer (Europe) [T-9509H-50]                                                      |
+    Cyber Speedway (Europe) [MK81205-50]                                                    |
+    Cyber Troopers Virtual On (Europe) [MK81042-50]                                         |
+    Cyberia (Europe) [T-12508H-50]                                                          |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      D                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    D (France) [T-8106H-50 F]                                                               |
+    D (Germany) [T-8106H-50 G]                                                              |
+    D (United Kingdom) [T-8106H-50 E]                                                       |
+    Darius Gaiden (Europe) [T-8123H-50]                                                     |
+    Darius II (Europe) [MK81085-50]                                                         |
+    Dark Savior (Europe) [MK81304-50]                                                       |
+    Darklight Conflict (Europe) [T-5022H-50]                                                |
+    Daytona USA (Europe) [MK81200-50]                                                       |
+    Daytona USA: Championship Circuit Edition (Europe) [MK81213-50]                         |
+    Deep Fear (Europe) [MK81804-50]                                                         |
+    Defcon 5 (Europe) [T-25401H-50]                                                         |
+    Defcon 5 (France) [T-25401H-09]                                                         |
+    Destruction Derby (Europe) [T-11303H-50]                                                |
+    Die Hard Arcade (Europe) [MK81057-50]                                                   |
+    Die Hard Trilogy (Europe) [T-16103H-50]                                                 |
+    Die Hard Trilogy (France) [T-16103H-09]                                                 |
+    Digital Pinball (Europe) [MK81680-50]                                                   |
+    Discworld (Europe) [T-11302H-50]                                                        |
+    Discworld II: Missing Presumed...?! (Europe) [MK81093-50]                               |
+    Doom (Europe) [T-25406H-50]                                                             |
+    Dragon Ball Z: Idainaru Dragon Ball Densetsu (France) [T-13301H-09]                     |
+    Dragon Ball Z: The Legend (Spain) [T-13305H-06]                                         |
+    Dragon Force (Europe) [MK81382-50]                                                      |
+    DragonHeart: Fire & Steel (Europe) [T-8117H-50]                                         |
+    Duke Nukem 3D (Europe) [MK81071-50]                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      E                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Earthworm Jim 2 (Europe) [T-7019H-50]                                                   |
+    Enemy Zero (Europe) [MK81076-50]                                                        |
+    Exhumed (Europe) [MK81084-50]                                                           |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      F                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    F1 Challenge (Europe) [MK81206-50]                                                      |
+    FIFA 97 (Europe) [T-5017H-50]                                                           |
+    FIFA 97 (Germany) [T-5017H-18]                                                          |
+    FIFA 98: En Route Pour la Coupe du Monde (France) [T-5025H-50]                          |
+    FIFA 98: Road to World Cup (Europe) [T-5025H-50]                                        |
+    FIFA 98: Road to World Cup (Italy) [T-5025H-50]                                         |
+    FIFA 98: Road to World Cup (United Kingdom) [T-5025H-50]                                |
+    FIFA 98: Rumbo Al Mundial (Spain) [T-5025H-50]                                          |
+    FIFA Soccer 96 (Europe) [T-5003H-50]                                                    |
+    FIFA Soccer 98: Die WM-Qualifikation (Germany) [T-5025H-18]                             |
+    Fighters Megamix (Europe) [MK81073-50]                                                  |
+    Fighting Vipers (Europe) [MK81041-50]                                                   |
+    Firestorm: Thunderhawk 2 (Europe) [T-11501H-50]                                         |
+    Firestorm: Thunderhawk 2 (Germany) [T-11501H-18]                                        |
+    Formula Karts: Special Edition (Europe) [MK81282-50]                                    |
+    Frank Thomas Big Hurt Baseball (Europe) [T-8138H-50]                                    |
+    Frankenstein: Through the Eyes of the Monster (Europe) [T-12511H-50]                    |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      G                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Galactic Attack (Europe) [T-8116H-50]                                                   |
+    Galaxy Fight (Europe) [T-1504H-50]                                                      |
+    Gex (Europe) [T-15904H-50]                                                              |
+    Ghen War (Europe) [T-7010H-50]                                                          |
+    Golden Axe: The Duel (Europe) [MK81045-50]                                              |
+    Grid Run (Europe) [T-7017H-50]                                                          |
+    Guardian Heroes (Europe) [MK81035-50]                                                   |
+    Gungriffon (Europe) [MK81046-50]                                                        |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      H                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Hang On GP '96 (Europe) [MK81202-50]                                                    |
+    Hardcore 4x4 (Europe) [T-12303H-50]                                                     |
+    Hebereke's Popoitto (Europe) [T-1502H-50]                                               |
+    Hexen (Europe) [T-25405H-50]                                                            |
+    Hi-Octane (Europe) [T-5002H-50]                                                         |
+    Highway 2000 (Europe) [T-6012H-50]                                                      |
+    Horde, The (France) [T-15909H-09]                                                       |
+    Horde, The (Germany) [T-15909H-18]                                                      |
+    Horde, The (United Kingdom) [T-15909H-50]                                               |
+    House of the Dead, The (Europe) [MK81802-50]                                            |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      I                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Impact Racing (Europe) [T-6010H-50]                                                     |
+    In the Hunt (Europe) [T-10001H-50]                                                      |
+    Incredible Hulk, The: The Pantheon Saga (Europe) [T-7905H-50]                           |
+    Independence Day: The Game (Europe) [T-16104H-50]                                       |
+    International Victory Goal (Europe) [MK81105-50]                                        |
+    Iron Man / X-O Manowar in Heavy Metal (Europe) [T-8119H-50]                             |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      J                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Jewels of the Oracle (Europe) [T-1503H-50]                                              |
+    Johnny Bazookatone (Europe) [T-7909H-50]                                                |
+    Jonah Lomu Rugby (Europe) [T-12003H-50]                                                 |
+    Jonah Lomu Rugby (United Kingdom) [T-12003H-05]                                         |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      K                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Keio 2: Flying Squadron (Europe) [T-6008H-50]                                           |
+    King of Fighters '95, The (Europe) [MK81088-50]                                         |
+    Krazy Ivan (Germany) [T-11305H-18]                                                      |
+    Krazy Ivan (United Kingdom) [T-11305H-50]                                               |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      L                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    La Mansión de las Almas Ocultas (Spain) [MK81012-06]                                    |
+    Last Bronx (Europe) [MK81078-50]                                                        |
+    Le Manoir des Ames Perdues (France) [MK81012-09]                                        |
+    Loaded (Europe) [T-12301H-50]                                                           |
+    Lost Vikings 2: Norse by Norsewest (Europe) [T12521H-50]                                |
+    Lost World, The: Jurassic Park (Europe) [MK81065-50]                                    |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      M                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Madden NFL 97 (Europe) [T-5018H-50]                                                     |
+    Madden NFL 98 (Europe) [T-5024H-50]                                                     |
+    Magic Carpet (Europe) [T-5006H-50]                                                      |
+    Mansion of Hidden Souls, The (United Kingdom) [MK81012-05]                              |
+    Manx TT Super Bike (Europe) [MK81210-50]                                                |
+    Marvel Super Heroes (Europe) [T-7032H-50]                                               |
+    Marvel Super Heroes (Italy) [T-7032H-51]                                                |
+    Marvel Super Heroes (United Kingdom) [T-7032H-05]                                       |
+    Mass Destruction (Europe) [MK81089-50]                                                  |
+    Maximum Force (Europe) [T-25417H-50]                                                    |
+    MechWarrior 2 (Europe) [T-13004H-50]                                                    |
+    Mega Man X3 (Europe) [T-7029H-50]                                                       |
+    Midway Presents Arcade's Greatest Hits: The Atari Collection 1 (Europe) [T-25413H-50]   |
+    Mighty Hits (Europe) [MK81087]                                                          |
+    Mortal Kombat II (Europe) [T-8103H-50]                                                  |
+    Mortal Kombat Trilogy (Europe) [T-25414H-50]                                            |
+    Mr. Bones (Europe) [MK81016-50]                                                         |
+    Myst (Europe) [MK81081-50]                                                              |
+    Mystaria: The Realms of Lore (Europe) [MK81300-50]                                      |
+    Mystery Mansion: Das Haus der verlorenen Seelen (Germany) [MK81012-18]                  |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      N                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    NASCAR 98 (Germany) [T-5028H-18]                                                        |
+    NASCAR 98 (United Kingdom) [T-5028H-50]                                                 |
+    NBA Action (Europe) [MK81103-50]                                                        |
+    NBA Action 98 (Europe) [MK81124-50]                                                     |
+    NBA Jam Extreme (Europe) [T-8151H-50]                                                   |
+    NBA Jam: Tournament Edition (Europe) [T-8102H-50]                                       |
+    NBA Live 97 (Europe) [T-5015H-50]                                                       |
+    NBA Live 98 (Europe) [T-5027H-50]                                                       |
+    Need for Speed, Road & Track Presents The (Europe) [T-5009H-50]                         |
+    NFL Quarterback Club 96 (Europe) [T-8109H-50]                                           |
+    NFL Quarterback Club 97 (Europe) [T-8136H-50]                                           |
+    NHL 97 (Europe) [T-5016H-50]                                                            |
+    NHL 97 (Germany) [T-5016H-18]                                                           |
+    NHL 98 (Europe) [T-5026H-50]                                                            |
+    NHL All-Star Hockey (Europe) [MK81102-50]                                               |
+    NHL All-Star Hockey 98 (Europe) [MK81122-50]                                            |
+    NHL Powerplay (Europe) [T-7013H-50]                                                     |
+    Night Warriors: Darkstalkers' Revenge (Europe) [T-7009H-50]                             |
+    NiGHTS: into Dreams... (Europe) [MK81020-50]                                            |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      O                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Off-World Interceptor Extreme (Europe) [T-15908H-50]                                    |
+    Off-World Interceptor Extreme (Germany) [T-15908H-18]                                   |
+    Olympic Soccer (Europe) [T-7904H-50]                                                    |
+    Olympic Soccer (Germany) [T-7904H-18]                                                   |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      P                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Pandemonium! (Europe) [MK81090-50]                                                      |
+    Panzer Dragoon (Europe) [MK81009-50]                                                    |
+    Panzer Dragoon II Zwei (Europe) [81022-50]                                              |
+    Panzer Dragoon Saga (Europe) [MK-81307-50]                                              |
+    Parodius (Europe) [T-9501H-50]                                                          |
+    Pebble Beach Golf Links (Europe) [MK-81101-50]                                          |
+    PGA Tour 97 (Europe) [T-5011H-50]                                                       |
+    Photo CD Operating System (Europe) [MK-81681-50]                                        |
+    Pinball Graffiti (Europe) [T-6011H-50]                                                  |
+    Primal Rage (Europe) [T-4802H-50]                                                       |
+    Pro Pinball: The Web (Europe) [T-30701H-50]                                             |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      Q                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Quake (Europe) [MK81066-50]                                                             |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      R                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Rampage World Tour (Europe) [T-25416H-50]                                               |
+    Rayman (Europe) [T-17701H-50]                                                           |
+    Resident Evil (Europe) [MK81092-50]                                                     |
+    Resurrection: Rise 2 (Europe) [T-8114H-50]                                              |
+    Revolution X featuring Aerosmith (Europe) [T-8107H-50]                                  |
+    Riven: The Sequel to Myst (Europe) [MK81801-50]                                         |
+    Road Rash (Europe) [T-5008-50]                                                          |
+    Robo Pit (Europe) [T-10002H-50]                                                         |
+    Robotica: Cybernation Revolt (Europe) [MK81008-50]                                      |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      S                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Saturn Bomberman (Europe) [MK81070-50]                                                  |
+    Saturn Power No. 2 (Europe) [T-12313H-50]                                               |
+    Scorcher (Europe) [MK81214-50]                                                          |
+    Sea Bass Fishing (Europe) [T-6009H-50]                                                  |
+    Sega Ages Vol. 1 (Europe) [MK81604-50]                                                  |
+    Sega Rally Championship (Europe) [MK81207-50]                                           |
+    Sega Touring Car Championship (Europe) [MK81216-50]                                     |
+    Sega Worldwide Soccer '97 (Europe) [MK81112-50]                                         |
+    Sega Worldwide Soccer '98 Club Edition (Europe) [MK81123-50]                            |
+    Shellshock (Germany) [T-11502H-18]                                                      |
+    Shellshock (United Kingdom) [T-11502H-50]                                               |
+    Shining Force III (Europe) [MK81383-50]                                                 |
+    Shining the Holy Ark (Europe) [MK81306-50]                                              |
+    Shining Wisdom (Europe) [MK81381-50]                                                    |
+    Shinobi X (Europe) [MK81082-50]                                                         |
+    Shockwave Assault (Europe) [T-5005H-50]                                                 |
+    Sim City 2000 (Europe) [MK81580-50]                                                     |
+    Skeleton Warriors (Europe) [T-7018H-50]                                                 |
+    Sky Target (Europe) [MK81051-50]                                                        |
+    Slam 'n Jam '96 (Europe) [T-15902H-50]                                                  |
+    Sonic 3D: Flickies' Island (Europe) [MK81062-50]                                        |
+    Sonic Jam (Europe) [MK81079-50]                                                         |
+    Sonic R (Europe) [MK81800-50]                                                           |
+    Soviet Strike (France) [T-5013H-09]                                                     |
+    Soviet Strike (Germany) [T-5013H-18]                                                    |
+    Soviet Strike (United Kingdom) [T-5013H-50]                                             |
+    Space Hulk: Vengeance of the Blood Angels (Europe) [T-5007H-50]                         |
+    Space Jam (Europe) [T-8125H-50]                                                         |
+    Spot Goes to Hollywood (Europe) [T-7001H-50]                                            |
+    Starfighter 3000 (Europe) [T-29701H-50]                                                 |
+    Steep Slope Sliders (Europe) [MK81128-50]                                               |
+    Story of Thor 2, The (Europe) [MK81302-50]                                              |
+    Street Fighter Alpha 2 (Europe) [T-7026H-50]                                            |
+    Street Fighter Alpha: Warriors' Dreams (Europe) [T-7008H-50]                            |
+    Street Fighter Collection (Europe) [T-7033H-50]                                         |
+    Street Fighter: The Movie (Europe) [T-8105H-50]                                         |
+    Street Racer (Europe) [T-17702H-50]                                                     |
+    Striker '96 (Europe) [T-8133H-50]                                                       |
+    Super Puzzle Fighter II Turbo (Europe) [T-7030H-50]                                     |
+    SwagMan (Europe) [T-11502H-50]                                                          |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      T                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Tempest 2000 (Europe) [T-12516H-50]                                                     |
+    Tetris Plus (Europe) [T-5704H-50]                                                       |
+    Theme Park (Europe) [T-5001H-50]                                                        |
+    Three Dirty Dwarves (Europe) [MK81033-50]                                               |
+    Tilt! (Europe) [T-7015H-50]                                                             |
+    Titan Wars (Europe) [T-15911H-50]                                                       |
+    Tomb Raider (Europe) [MK81086-50]                                                       |
+    Torico (Europe) [MK81053-50]                                                            |
+    Trash It! (Europe) [T-25411H-50]                                                        |
+    True Pinball (Europe) [T-16406H-50]                                                     |
+    Tunnel B1 (Europe) [T-16414H-50]                                                        |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      U                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UEFA Euro 96 England (Europe) [MK81180-50]                                              |
+    Ultimate Mortal Kombat 3 (Europe) [T-25403H-50]                                         |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      V                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Valora Valley Golf (Europe) [T-2303H-50]                                                |
+    Victory Boxing (Europe) [T-6005H-50]                                                    |
+    Virtua Cop (Europe) [MK81015-50]                                                        |
+    Virtua Cop w/ Stunner (Europe) [MK-81026-50]                                            |
+    Virtua Cop 2 (Europe) [MK81043-50]                                                      |
+    Virtua Cop 2 Gun Set (Europe) [MK81052-50]                                              |
+    Virtua Fighter (Europe) [MK81005-50]                                                    |
+    Virtua Fighter 2 (Europe) [MK81014-50]                                                  |
+    Virtua Fighter Kids (Europe) [MK81049-50]                                               |
+    Virtua Fighter Remix + Virtua Fighter CG Portrait Collection (Europe) [MK81083-50]      |
+    Virtua Racing (Europe) [T-4801H-50]                                                     |
+    Virtual Golf (Europe) [T-11506H-50]                                                     |
+    Virtual Hydlide (Europe) [MK81380-50]                                                   |
+    Virtual Open Tennis (Europe) [T-8129H-50]                                               |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      W                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    WarCraft II: The Dark Saga (Europe) [T-5023H-50]                                        |
+    Whizz (Europe) [T-9514H-50]                                                             |
+    Wing Arms (Europe) [MK81024-50]                                                         |
+    Winter Heat (Europe) [MK81129-50]                                                       |
+    WipEout (Europe) [T-11301H-50]                                                          |
+    WipEout 2097 (Europe) [T-11308H-50]                                                     |
+    World Cup Golf: Professional Edition (Europe) [T-7903H-50]                              |
+    World Cup Golf: Professional Edition (Germany) [T-7903H-18]                             |
+    World League Soccer 98 (Europe) [MK81181-50]                                            |
+    World Series Baseball (Europe) [MK81109-50]                                             |
+    World Series Baseball II (Europe) [MK81113-50]                                          |
+    Worms (Europe) [T-16403H-50]                                                            |
+    WWF In Your House (Europe) [T-8126H-50]                                                 |
+    WWF WrestleMania: The Arcade Game (Europe) [T-8112H-50]                                 |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      X                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    X-Men: Children of the Atom (Europe) [T-8108H-50]                                       |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      Y                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    no released titles                                                                        |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      Z                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Z (Europe) [T-25412H-50]                                                                |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Game Demo Discs                                                                           |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Christmas NiGHTS: into Dreams... (Europe) [MK81067-50]                                  |
+    Preview Sega Saturn Vol. 1 (Europe) [610-6377]                                          |
+    Sega Flash Vol.1 (Europe) [MK610-6288A]                                                 |
+    Sega Flash Vol.2 (Europe) [610-6288B]                                                   |
+    Sega Flash Vol.3 (Europe) [610-6288C]                                                   |
+    Sega Flash Vol.4 (Europe) [610-6288D]                                                   |
+    Sega Flash Vol.5 (Europe) [610-6288E]                                                   |
+    Sega Flash Vol.6 (Europe) [610-6288F]                                                   |
+    Sega Flash Vol.7 (Europe) [610-6288G]                                                   |
+    Sega Saturn bootleg sampler (Europe) [610-6165]                                         |
+    WipEout 2097 (Europe) [670-1199-50]                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    END                                                                                       |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    USA / Brazil (NTSC-U)                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      #                                                                                     |
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    3 Free Games Pack (USA) [81606]
+    3D Baseball: The Majors (USA) [T-15906H]
 
 A
 
-	Albert Odyssey: Legend of Eldean (USA) [T-12705H]
-	Alien Trilogy (USA) [T-8113H]
-	All-Star Baseball 1997 featuring Frank Thomas (USA) [T-8150H]
-	Alone in the Dark: One-Eyed Jack's Revenge (USA) [T-29401H]
-	AMOK (USA) [81064]
-	Andretti Racing (USA) [T-5020H]
-	Area 51 (USA) [T-9705H]
-	Astal (USA) [81019]
+    Albert Odyssey: Legend of Eldean (USA) [T-12705H]
+    Alien Trilogy (USA) [T-8113H]
+    All-Star Baseball 1997 featuring Frank Thomas (USA) [T-8150H]
+    Alone in the Dark: One-Eyed Jack's Revenge (USA) [T-29401H]
+    AMOK (USA) [81064]
+    Andretti Racing (USA) [T-5020H]
+    Area 51 (USA) [T-9705H]
+    Astal (USA) [81019]
 
 B
 
-	Baku Baku (USA) [81501]
-	Bases Loaded '96: Double Header (USA) [T-5703H]
-	Batman Forever: The Arcade Game (USA) [T-8140H]
-	Battle Arena Toshinden Remix (USA) [81029]
-	Battle Arena Toshinden URA: Ultimate Revenge Attack (USA) [81054]
-	Battle Monsters (USA) [T-8137H]
-	Battle Stations (USA) [T-5021H]
-	BattleSport (USA) [T-8149H]
-	Black Dawn (USA) [T-7027H]
-	Black Fire (USA) [81003]
-	Blast Chamber (USA) [T-131003]
-	Blazing Dragons (USA) [T-15907H]
-	Blazing Heroes (USA) [81303]
-	Brain Dead 13 (USA) [T-12103H]
-	Break Point Tennis (USA) [T-8145H]
-	Bubble Bobble also featuring Rainbow Islands (USA) [T-8131H]
-	Bug! (USA) [81004]
-	Bug Too! (USA) [81040]
-	Burning Rangers (USA) [81803]
-	Bust-A-Move 2: Arcade Edition (USA) [T-8132H]
-	Bust-A-Move 3 (USA) [T-31103H]
+    Baku Baku (USA) [81501]
+    Bases Loaded '96: Double Header (USA) [T-5703H]
+    Batman Forever: The Arcade Game (USA) [T-8140H]
+    Battle Arena Toshinden Remix (USA) [81029]
+    Battle Arena Toshinden URA: Ultimate Revenge Attack (USA) [81054]
+    Battle Monsters (USA) [T-8137H]
+    Battle Stations (USA) [T-5021H]
+    BattleSport (USA) [T-8149H]
+    Black Dawn (USA) [T-7027H]
+    Black Fire (USA) [81003]
+    Blast Chamber (USA) [T-131003]
+    Blazing Dragons (USA) [T-15907H]
+    Blazing Heroes (USA) [81303]
+    Brain Dead 13 (USA) [T-12103H]
+    Break Point Tennis (USA) [T-8145H]
+    Bubble Bobble also featuring Rainbow Islands (USA) [T-8131H]
+    Bug! (USA) [81004]
+    Bug Too! (USA) [81040]
+    Burning Rangers (USA) [81803]
+    Bust-A-Move 2: Arcade Edition (USA) [T-8132H]
+    Bust-A-Move 3 (USA) [T-31103H]
 
 C
 
-	Casper: The Movie (USA) [T-12512H]
-	Center Ring Boxing (USA) [T-6005H]
-	Clockwork Knight (USA) [81007]
-	Clockwork Knight 2 (USA) [81036]
-	College Slam (USA) [T-8111H]
-	Command & Conquer (USA) [T-7028H]
-	Congo The Movie: The Lost City of Zinj (USA) [81010]
-	Contra: Legacy of War (USA) [T-9507H]
-	Corpse Killer: Graveyard Edition (USA) [T-16201H]
-	Courier Crisis (USA) [T-25415H]
-	Creature Shock: Special Edition (USA) [T-1304H]
-	CrimeWave (USA) [T-8807H]
-	Criticom (USA) [T-2302H]
-	Croc: Legend of the Gobbos (USA) [T-16105H]
-	Crow, The: City of Angels (USA) [T-8124H]
-	Crusader: No Remorse (USA) [T-5014H]
-	Crypt Killer (USA) [T-9509H]
-	Cyber Speedway (USA) [81205]
-	Cyber Troopers Virtual On (USA) [81042]
-	Cyber Troopers Virtual On: Netlink Edition (USA) [81072]
-	Cyberia (USA) [T-12508H]
+    Casper: The Movie (USA) [T-12512H]
+    Center Ring Boxing (USA) [T-6005H]
+    Clockwork Knight (USA) [81007]
+    Clockwork Knight 2 (USA) [81036]
+    College Slam (USA) [T-8111H]
+    Command & Conquer (USA) [T-7028H]
+    Congo The Movie: The Lost City of Zinj (USA) [81010]
+    Contra: Legacy of War (USA) [T-9507H]
+    Corpse Killer: Graveyard Edition (USA) [T-16201H]
+    Courier Crisis (USA) [T-25415H]
+    Creature Shock: Special Edition (USA) [T-1304H]
+    CrimeWave (USA) [T-8807H]
+    Criticom (USA) [T-2302H]
+    Croc: Legend of the Gobbos (USA) [T-16105H]
+    Crow, The: City of Angels (USA) [T-8124H]
+    Crusader: No Remorse (USA) [T-5014H]
+    Crypt Killer (USA) [T-9509H]
+    Cyber Speedway (USA) [81205]
+    Cyber Troopers Virtual On (USA) [81042]
+    Cyber Troopers Virtual On: Netlink Edition (USA) [81072]
+    Cyberia (USA) [T-12508H]
 
 D
 
-	D (USA) [T-8106H]
-	Darius Gaiden (USA) [T-8123H]
-	Dark Legend (USA) [T-1305H]
-	Dark Savior (USA) [81304]
-	Darklight Conflict (USA) [T-5022H]
-	Daytona USA (USA) [81200]
-	Daytona USA: Championship Circuit Edition (USA) [81213]
-	Daytona USA: Championship Circuit Edition: Netlink Edition (USA) [81218]
-	Decathlete (USA) [81115]
-	Defcon 5 (USA) [T-1301H]
-	Die Hard Arcade (USA) [81057]
-	Die Hard Trilogy (USA) [T-16103H]
-	Doom (USA) [T-25405H]
-	Double Switch (USA) [T-16207H]
-	Dragon Force (USA) [T-12703H]
-	DragonHeart: Fire & Steel (USA) [T-8117H]
-	Duke Nukem 3D (USA) [81071]
+    D (USA) [T-8106H]
+    Darius Gaiden (USA) [T-8123H]
+    Dark Legend (USA) [T-1305H]
+    Dark Savior (USA) [81304]
+    Darklight Conflict (USA) [T-5022H]
+    Daytona USA (USA) [81200]
+    Daytona USA: Championship Circuit Edition (USA) [81213]
+    Daytona USA: Championship Circuit Edition: Netlink Edition (USA) [81218]
+    Decathlete (USA) [81115]
+    Defcon 5 (USA) [T-1301H]
+    Die Hard Arcade (USA) [81057]
+    Die Hard Trilogy (USA) [T-16103H]
+    Doom (USA) [T-25405H]
+    Double Switch (USA) [T-16207H]
+    Dragon Force (USA) [T-12703H]
+    DragonHeart: Fire & Steel (USA) [T-8117H]
+    Duke Nukem 3D (USA) [81071]
 
 E
 
-	Earthworm Jim 2 (USA) [T-13203H]
-	Enemy Zero (USA) [81076]
+    Earthworm Jim 2 (USA) [T-13203H]
+    Enemy Zero (USA) [81076]
 
 F
 
-	F1 Challenge (USA) [MK81206]
-	FIFA Soccer 96 (USA) [T-5003H]
-	FIFA Soccer 97 (USA) [T-5017H]
-	FIFA 98: Road to World Cup (USA) [T-5025H]
-	Fighters Megamix (USA) [81073]
-	Fighting Vipers (USA) [81041]
-	Frank Thomas Big Hurt Baseball (USA) [T-8138H]
+    F1 Challenge (USA) [MK81206]
+    FIFA Soccer 96 (USA) [T-5003H]
+    FIFA Soccer 97 (USA) [T-5017H]
+    FIFA 98: Road to World Cup (USA) [T-5025H]
+    Fighters Megamix (USA) [81073]
+    Fighting Vipers (USA) [81041]
+    Frank Thomas Big Hurt Baseball (USA) [T-8138H]
 
 G
 
-	Galactic Attack (USA) [T-8116H]
-	Galaxy Fight (USA) [T-8116H]
-	Gex (USA) [T-15904]
-	Ghen War (USA) [81001]
-	Golden Axe: The Duel (USA) [81045]
-	Grand Slam (USA) [T-7004H]
-	Grid Runner (USA) [T-7004H]
-	Guardian Heroes (USA) [81035]
-	Gungriffon (USA) [81046]
+    Galactic Attack (USA) [T-8116H]
+    Galaxy Fight (USA) [T-8116H]
+    Gex (USA) [T-15904]
+    Ghen War (USA) [81001]
+    Golden Axe: The Duel (USA) [81045]
+    Grand Slam (USA) [T-7004H]
+    Grid Runner (USA) [T-7004H]
+    Guardian Heroes (USA) [81035]
+    Gungriffon (USA) [81046]
 
 H
 
-	Hang-On GP (USA) [81202]
-	Heir of Zendor: The Legend and the Land (USA) [T-7605H]
-	Herc's Adventures (USA) [T-23001H]
-	Hexen (USA) [T-23001H]
-	Hi-Octane (USA) [T-5002H]
-	High Velocity: Mountain Racing Challenge (USA) [T-14402H]
-	Highway 2000 (USA) [T-31101H]
-	Horde, The (USA) [T-15909H]
-	House of the Dead, The (USA) [81802]
-	Hyper 3D Pinball (USA) [T-7015H]
+    Hang-On GP (USA) [81202]
+    Heir of Zendor: The Legend and the Land (USA) [T-7605H]
+    Herc's Adventures (USA) [T-23001H]
+    Hexen (USA) [T-23001H]
+    Hi-Octane (USA) [T-5002H]
+    High Velocity: Mountain Racing Challenge (USA) [T-14402H]
+    Highway 2000 (USA) [T-31101H]
+    Horde, The (USA) [T-15909H]
+    House of the Dead, The (USA) [81802]
+    Hyper 3D Pinball (USA) [T-7015H]
 
 I
 
-	Impact Racing (USA) [T-8139H]
-	In the Hunt (USA) [T-10001H]
-	Incredible Hulk, The: The Pantheon Saga (USA) [T-7905H]
-	Independence Day (USA) [T-16104H]
-	Iron Man / X-O Manowar in Heavy Metal (USA) [T-8119H]
-	Iron Storm (USA) [T-12701H]
+    Impact Racing (USA) [T-8139H]
+    In the Hunt (USA) [T-10001H]
+    Incredible Hulk, The: The Pantheon Saga (USA) [T-7905H]
+    Independence Day (USA) [T-16104H]
+    Iron Man / X-O Manowar in Heavy Metal (USA) [T-8119H]
+    Iron Storm (USA) [T-12701H]
 
 J
 
-	Johnny Bazookatone (USA) [T-7909H]
+    Johnny Bazookatone (USA) [T-7909H]
 
 K
 
@@ -898,192 +898,192 @@ N/A
 
 L
 
-	Last Bronx (USA) [81078]
-	Last Gladiators Digital Pinball (USA) [T-4804H]
-	Legend of Oasis, The (USA) [81302]
-	Loaded (USA) [T-12519H]
-	Lost World, The: Jurassic Park (USA) [81065]
-	Lunacy (USA) [T-14403H]
+    Last Bronx (USA) [81078]
+    Last Gladiators Digital Pinball (USA) [T-4804H]
+    Legend of Oasis, The (USA) [81302]
+    Loaded (USA) [T-12519H]
+    Lost World, The: Jurassic Park (USA) [81065]
+    Lunacy (USA) [T-14403H]
 
 M
 
-	Machine Head (USA) [T-7914H]
-	Madden NFL 97 (USA) [T-5010H]
-	Madden NFL 98 (USA) [T-5024H]
-	Magic Carpet (USA) [T-5006H]
-	Magic Knight Rayearth (USA) [T-12706H]
-	Mansion of Hidden Souls, The (USA) [81012]
-	Manx TT Super Bike (USA) [81210]
-	Marvel Super Heroes (USA) [T-1214H]
-	Mass Destruction (USA) [T-18007H]
-	Maximum Force (USA) [T-9707H]
-	MechWarrior 2 (USA) [T-13004]
-	Mega Man 8: Anniversary Collector's Edition (USA) [T-1216H]
-	Mega Man X4 (USA) [T-1219H]
-	Midway Presents Arcade's Greatest Hits (USA) [T-9703H]
-	Midway Presents Arcade's Greatest Hits: The Atari Collection 1 (USA) [T-9706H]
-	Minnesota Fats: Pool Legend (USA) [T-1302H]
-	MLBPA Bottom of the 9th (USA) [T-9505H]
-	Mortal Kombat II (USA) [T-8103H]
-	Mortal Kombat Trilogy (USA) [T-9704H]
-	Mr. Bones (USA) [81016]
-	Myst (USA) [T-8101H]
-	Mystaria: The Realms of Lore (USA) [81300]
+    Machine Head (USA) [T-7914H]
+    Madden NFL 97 (USA) [T-5010H]
+    Madden NFL 98 (USA) [T-5024H]
+    Magic Carpet (USA) [T-5006H]
+    Magic Knight Rayearth (USA) [T-12706H]
+    Mansion of Hidden Souls, The (USA) [81012]
+    Manx TT Super Bike (USA) [81210]
+    Marvel Super Heroes (USA) [T-1214H]
+    Mass Destruction (USA) [T-18007H]
+    Maximum Force (USA) [T-9707H]
+    MechWarrior 2 (USA) [T-13004]
+    Mega Man 8: Anniversary Collector's Edition (USA) [T-1216H]
+    Mega Man X4 (USA) [T-1219H]
+    Midway Presents Arcade's Greatest Hits (USA) [T-9703H]
+    Midway Presents Arcade's Greatest Hits: The Atari Collection 1 (USA) [T-9706H]
+    Minnesota Fats: Pool Legend (USA) [T-1302H]
+    MLBPA Bottom of the 9th (USA) [T-9505H]
+    Mortal Kombat II (USA) [T-8103H]
+    Mortal Kombat Trilogy (USA) [T-9704H]
+    Mr. Bones (USA) [81016]
+    Myst (USA) [T-8101H]
+    Mystaria: The Realms of Lore (USA) [81300]
 
 N
 
-	NASCAR 98 (USA) [T-5028H]
-	NBA Action (USA) [81103]
-	NBA Action 98 (USA) [81124]
-	NBA Jam Extreme (USA) [T-8120H]
-	NBA Jam: Tournament Edition (USA) [81124]
-	NBA Live 97 (USA) [T-5015H]
-	NBA Live 98 (USA) [T-5027H]
-	Need for Speed, Road & Track Presents The (USA) [T-5009H]
-	Netlink Custom Web Browser Version 2.0 (USA) [80118B]
-	Netlink Custom Web Browser Version 3.0 (USA) [80118D]
-	NFL '97 (USA) [81111]
-	NFL Quarterback Club 96 (USA) [T-8109H]
-	NFL Quarterback Club 97 (USA) [T-8136H]
-	NHL 97 (USA) [T-5016H]
-	NHL 98 (USA) [T-5026H]
-	NHL All-Star Hockey (USA) [81102]
-	NHL All-Star Hockey 98 (USA) [81122]
-	NHL Powerplay '96 (USA) [T-7013H]
-	Night Warriors: Darkstalkers' Revenge (USA) [T-1208H]
-	NiGHTS: into Dreams... (USA) [81020]
-	NiGHTS: into Dreams... w/ 3D Analog Pad (USA) [81048B]
-	Norse by Norsewest: The Return of The Lost Vikings (USA) [T-12522H]
+    NASCAR 98 (USA) [T-5028H]
+    NBA Action (USA) [81103]
+    NBA Action 98 (USA) [81124]
+    NBA Jam Extreme (USA) [T-8120H]
+    NBA Jam: Tournament Edition (USA) [81124]
+    NBA Live 97 (USA) [T-5015H]
+    NBA Live 98 (USA) [T-5027H]
+    Need for Speed, Road & Track Presents The (USA) [T-5009H]
+    Netlink Custom Web Browser Version 2.0 (USA) [80118B]
+    Netlink Custom Web Browser Version 3.0 (USA) [80118D]
+    NFL '97 (USA) [81111]
+    NFL Quarterback Club 96 (USA) [T-8109H]
+    NFL Quarterback Club 97 (USA) [T-8136H]
+    NHL 97 (USA) [T-5016H]
+    NHL 98 (USA) [T-5026H]
+    NHL All-Star Hockey (USA) [81102]
+    NHL All-Star Hockey 98 (USA) [81122]
+    NHL Powerplay '96 (USA) [T-7013H]
+    Night Warriors: Darkstalkers' Revenge (USA) [T-1208H]
+    NiGHTS: into Dreams... (USA) [81020]
+    NiGHTS: into Dreams... w/ 3D Analog Pad (USA) [81048B]
+    Norse by Norsewest: The Return of The Lost Vikings (USA) [T-12522H]
 
 O
 
-	Off-World Interceptor Extreme (USA) [T-15908H]
-	Olympic Soccer (USA) [T-7904H]
+    Off-World Interceptor Extreme (USA) [T-15908H]
+    Olympic Soccer (USA) [T-7904H]
 
 P
 
-	P.T.O. II: Pacific Theater of Operations (USA) [T-7604H]
-	Pandemonium! (USA) [T-7604H]
-	Panzer Dragoon (USA) [81009]
-	Panzer Dragoon II Zwei (USA) [81022]
-	Panzer Dragoon Saga (USA) [81307]
-	Pebble Beach Golf Links (USA) [81101]
-	PGA Tour 97 (USA) [T-5011H]
-	Powerslave (USA) [T-13205H]
-	Primal Rage (USA) [T-4802H]
-	Pro Pinball (USA) [T-12520H]
+    P.T.O. II: Pacific Theater of Operations (USA) [T-7604H]
+    Pandemonium! (USA) [T-7604H]
+    Panzer Dragoon (USA) [81009]
+    Panzer Dragoon II Zwei (USA) [81022]
+    Panzer Dragoon Saga (USA) [81307]
+    Pebble Beach Golf Links (USA) [81101]
+    PGA Tour 97 (USA) [T-5011H]
+    Powerslave (USA) [T-13205H]
+    Primal Rage (USA) [T-4802H]
+    Pro Pinball (USA) [T-12520H]
 
 Q
 
-	Quake (USA) [81066]
-	Quarterback Attack (USA) [T-16213]
+    Quake (USA) [81066]
+    Quarterback Attack (USA) [T-16213]
 
 R
 
-	Rampage World Tour (USA) [T-9708H]
-	Rayman (USA) [T-17701H]
-	Resident Evil (USA) [T-1221H]
-	Resurrection: Rise 2 (USA) [T-8114H]
-	Revolution X featuring Aerosmith (USA) [T-8107H]
-	Road Rash (USA) [T-5008H]
-	Robo Pit (USA) [T-10002H]
-	Robotica (USA) [T-8104H]
-	Romance of the Three Kingdoms IV: Wall of Fire (USA) [T-10002H]
+    Rampage World Tour (USA) [T-9708H]
+    Rayman (USA) [T-17701H]
+    Resident Evil (USA) [T-1221H]
+    Resurrection: Rise 2 (USA) [T-8114H]
+    Revolution X featuring Aerosmith (USA) [T-8107H]
+    Road Rash (USA) [T-5008H]
+    Robo Pit (USA) [T-10002H]
+    Robotica (USA) [T-8104H]
+    Romance of the Three Kingdoms IV: Wall of Fire (USA) [T-10002H]
 
 S
 
-	Saturn Bomberman (USA) [81070]
-	Scorcher (USA) [81214]
-	Scud: The Disposable Assassin (USA) [14003]
-	Sega Ages (USA) [T-12707H]
-	Sega Rally Championship (USA) [81207]
-	Sega Rally Championship Netlink Edition (USA) [81215]
-	Sega Touring Car Championship (USA )[81216]
-	Sega Worldwide Soccer '97 (USA) [81112]
-	Shanghai: Triple Threat (USA) [T-13001H]
-	Shellshock (USA) [T-7901H]
-	Shining Force III (USA) [81383]
-	Shining the Holy Ark (USA) [81306]
-	Shining Wisdom (USA) [T-12702H]
-	Shinobi Legions (USA) [T-2301H]
-	Shockwave Assault (USA) [T-2301H]
-	Sim City 2000 (USA) [T-12601H]
-	Skeleton Warriors (USA) [T-13204H]
-	Sky Target (USA) [81051]
-	Slam 'n Jam '96 featuring Magic & Kareem (USA) [T-15902H]
-	Solar Eclipse (USA) [T-15911H]
-	Sonic 3D Blast (USA) [81062]
-	Sonic Jam (USA) [81079]
-	Sonic R (USA) [81800]
-	Soviet Strike (USA) [T-5013H]
-	Space Hulk: Vengeance of the Blood Angels (USA) [T-5007H]
-	Space Jam (USA) [T-8125H]
-	Spot Goes to Hollywood (USA) [T-7001H]
-	Star Fighter (USA) [T-8135H]
-	Steep Slope Sliders (USA) [81128]
-	Street Fighter Alpha: Warriors' Dreams (USA) [T-1206H]
-	Street Fighter Alpha 2 (USA) [T-1213H]
-	Street Fighter Collection (USA) [T-1222H]
-	Street Fighter: The Movie (USA) [T-8105H]
-	Striker '96 (USA) [T-8133H]
-	Super Puzzle Fighter II Turbo (USA) [T-1215H]
+    Saturn Bomberman (USA) [81070]
+    Scorcher (USA) [81214]
+    Scud: The Disposable Assassin (USA) [14003]
+    Sega Ages (USA) [T-12707H]
+    Sega Rally Championship (USA) [81207]
+    Sega Rally Championship Netlink Edition (USA) [81215]
+    Sega Touring Car Championship (USA )[81216]
+    Sega Worldwide Soccer '97 (USA) [81112]
+    Shanghai: Triple Threat (USA) [T-13001H]
+    Shellshock (USA) [T-7901H]
+    Shining Force III (USA) [81383]
+    Shining the Holy Ark (USA) [81306]
+    Shining Wisdom (USA) [T-12702H]
+    Shinobi Legions (USA) [T-2301H]
+    Shockwave Assault (USA) [T-2301H]
+    Sim City 2000 (USA) [T-12601H]
+    Skeleton Warriors (USA) [T-13204H]
+    Sky Target (USA) [81051]
+    Slam 'n Jam '96 featuring Magic & Kareem (USA) [T-15902H]
+    Solar Eclipse (USA) [T-15911H]
+    Sonic 3D Blast (USA) [81062]
+    Sonic Jam (USA) [81079]
+    Sonic R (USA) [81800]
+    Soviet Strike (USA) [T-5013H]
+    Space Hulk: Vengeance of the Blood Angels (USA) [T-5007H]
+    Space Jam (USA) [T-8125H]
+    Spot Goes to Hollywood (USA) [T-7001H]
+    Star Fighter (USA) [T-8135H]
+    Steep Slope Sliders (USA) [81128]
+    Street Fighter Alpha: Warriors' Dreams (USA) [T-1206H]
+    Street Fighter Alpha 2 (USA) [T-1213H]
+    Street Fighter Collection (USA) [T-1222H]
+    Street Fighter: The Movie (USA) [T-8105H]
+    Striker '96 (USA) [T-8133H]
+    Super Puzzle Fighter II Turbo (USA) [T-1215H]
 
 T
 
-	Tempest 2000 (USA) [T-12516H]
-	Ten Pin Alley (USA) [T-13705H]
-	Tetris Plus (USA) [T-5704H]
-	Theme Park (USA) [T-5001H]
-	Three Dirty Dwarves (USA) [14002]
-	ThunderStrike 2 (USA) [T-7902H]
-	TNN Motorsports: Hardcore 4x4 (USA) [T-13703H]
-	Tomb Raider (USA) [T-7910H]
-	True Pinball (USA) [T-16406H]
-	Tunnel B1 (USA) [T-8144H]
+    Tempest 2000 (USA) [T-12516H]
+    Ten Pin Alley (USA) [T-13705H]
+    Tetris Plus (USA) [T-5704H]
+    Theme Park (USA) [T-5001H]
+    Three Dirty Dwarves (USA) [14002]
+    ThunderStrike 2 (USA) [T-7902H]
+    TNN Motorsports: Hardcore 4x4 (USA) [T-13703H]
+    Tomb Raider (USA) [T-7910H]
+    True Pinball (USA) [T-16406H]
+    Tunnel B1 (USA) [T-8144H]
 
 U
 
-	Ultimate Mortal Kombat 3 (USA) [T-9701H]
+    Ultimate Mortal Kombat 3 (USA) [T-9701H]
 
 V
 
-	Valora Valley Golf (USA) [T-2303H]
-	Virtua Cop (USA) [81015]
-	Virtua Cop w/ Stunner (USA) [81026]
-	Virtua Cop 2 (USA) [81043]
-	Virtua Fighter (USA) [81043]
-	Virtua Fighter 2 (USA) [81014]
-	Virtua Fighter Kids (USA) [81049]
-	Virtua Fighter Remix (cardboard sleeve) (USA) [81023]
-	Virtua Fighter Remix (jewel case) (USA) [81027]
-	Virtua Fighter Remix (long box) (USA) [81028]
-	Virtua Racing (USA) [T-4801H]
-	Virtual Casino (USA) [T-31102H]
-	Virtual Hydlide (USA) [T-14401H]
-	Virtual Open Tennis (USA) [T-8129H]
-	VR Golf '97 (USA) [T-12518H]
-	VR Soccer (USA) [T-12518H]
+    Valora Valley Golf (USA) [T-2303H]
+    Virtua Cop (USA) [81015]
+    Virtua Cop w/ Stunner (USA) [81026]
+    Virtua Cop 2 (USA) [81043]
+    Virtua Fighter (USA) [81043]
+    Virtua Fighter 2 (USA) [81014]
+    Virtua Fighter Kids (USA) [81049]
+    Virtua Fighter Remix (cardboard sleeve) (USA) [81023]
+    Virtua Fighter Remix (jewel case) (USA) [81027]
+    Virtua Fighter Remix (long box) (USA) [81028]
+    Virtua Racing (USA) [T-4801H]
+    Virtual Casino (USA) [T-31102H]
+    Virtual Hydlide (USA) [T-14401H]
+    Virtual Open Tennis (USA) [T-8129H]
+    VR Golf '97 (USA) [T-12518H]
+    VR Soccer (USA) [T-12518H]
 
 W
 
-	WarCraft II: The Dark Saga (USA) [T-5023H]
-	Wing Arms (USA) [81024]
-	Winning Post (USA) [T-7602H]
-	Winter Heat (USA) [81129]
-	WipEout (USA) [81211]
-	World Cup Golf: Professional Edition (USA) [T-7903H]
-	World Series Baseball (USA) [81109]
-	World Series Baseball II (USA) [81113]
-	World Series Baseball '98 (USA) [81127]
-	Worldwide Soccer: Sega International Victory Goal Edition (USA) [81105]
-	Worldwide Soccer '98 (USA) [81123]
-	Worms (USA) [T-16403H]
-	WWF In Your House (USA) [T-8126H]
-	WWF WrestleMania: The Arcade Game (USA) [T-8112H]
+    WarCraft II: The Dark Saga (USA) [T-5023H]
+    Wing Arms (USA) [81024]
+    Winning Post (USA) [T-7602H]
+    Winter Heat (USA) [81129]
+    WipEout (USA) [81211]
+    World Cup Golf: Professional Edition (USA) [T-7903H]
+    World Series Baseball (USA) [81109]
+    World Series Baseball II (USA) [81113]
+    World Series Baseball '98 (USA) [81127]
+    Worldwide Soccer: Sega International Victory Goal Edition (USA) [81105]
+    Worldwide Soccer '98 (USA) [81123]
+    Worms (USA) [T-16403H]
+    WWF In Your House (USA) [T-8126H]
+    WWF WrestleMania: The Arcade Game (USA) [T-8112H]
 
 X
 
-	X-Men: Children of the Atom (USA) [T-8108H]
+    X-Men: Children of the Atom (USA) [T-8108H]
 
 Y
 
@@ -1095,70 +1095,70 @@ N/A
 
 Demo Discs
 
-	Bug! Playable Preview (USA) [81030]
-	Christmas NiGHTS: into Dreams... (USA) [81067]
-	NiGHTS: into Dreams... (USA) [81063]
-	Panzer Dragoon Playable Preview (USA) [81018]
-	Rayman Playable Preview (USA) [610-6164]
-	Sega Saturn bootleg sampler (USA) [81031]
-	Sega Saturn Choice Cuts (USA) [81600]
-	Sega Screams Volume 1 (USA) [81075]
-	Sega Screams Volume 2 (USA) [81077]
+    Bug! Playable Preview (USA) [81030]
+    Christmas NiGHTS: into Dreams... (USA) [81067]
+    NiGHTS: into Dreams... (USA) [81063]
+    Panzer Dragoon Playable Preview (USA) [81018]
+    Rayman Playable Preview (USA) [610-6164]
+    Sega Saturn bootleg sampler (USA) [81031]
+    Sega Saturn Choice Cuts (USA) [81600]
+    Sega Screams Volume 1 (USA) [81075]
+    Sega Screams Volume 2 (USA) [81077]
 
-	*********************************************************************************************************
-	*********************************************************************************************************
-	*********************************************************************************************************
-	*********************************************************************************************************
-	*********************************************************************************************************
-	*********************************************************************************************************
+    *********************************************************************************************************
+    *********************************************************************************************************
+    *********************************************************************************************************
+    *********************************************************************************************************
+    *********************************************************************************************************
+    *********************************************************************************************************
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PROTOTYPES - these are known dumped prototypes, I haven't been able to locate them all yet!
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Chill Beta ?? - (E)                                                                                         (Segasaturno + Segafreak_NL - 2011)                           | (chill)
-	Clockwork Knight Penguin Assault JPN Beta v0.001 20/06/1995 [20/10/1995] (J)                                (Segafreak_NL - 2004)                                         | ###MISSING###
-	Crypt Killer USA Prototype v1.002 08/01/1997 [08/01/1997] (U)                                               (Drx  - 2010)                                                 | (cryptklrp)
-	Deep Fear CD1 USA Prototype v1.000 15/07/1998 [15/07/1998] (U)                                              (Oldergames.com in Lost & Found Volume 3 - 2007)              | (deepfeau)
-	Deep Fear CD2 USA Prototype v1.000 15/07/1998 [15/07/1998] (U)                                              (Oldergames.com in Lost & Found Volume 3 - 2007)              |  ^^
-	Duke Nukem 3D USA Prototype v1.012 18/09/1997 [18/09/1997] (?)                                              (Drx  - 2010)                                                 | (dukenukep)
-	Earthworm Jim 2 Beta v1.000 29/12/1995 [29/12/1995] (JTUBKAEL)                                              (Segafreak_NL - ??)                                           | same as below? with dif. cd mod date?
-	Earthworm Jim 2 Beta v1.000 29/12/1995 [05/01/1996] (JTUBKAEL)                                              (?? - ??)                                                     | (ejim2bet)
-	Fighters Megamix USA Protoype v1.004 08/04/1997 [07/04/1997] (?)                                            (Drx  - 2010)                                                 | (fightmixp)
-	Fighting Force (Judgement Force) Beta v1.000 18/04/1995 [26/11/1996] (JTUBKAEL)                             (Drx  - 2008)                                                 | (judgemen)
-	Fighting Vipers USA Prototype v1.001 06/09/1996 [07/09/1996] (U)                                            (Drx  - 2010)                                                 | (fvipersp)
-	Major Damage rv1 ?? - (U)                                                                                   (MrSaturn  - 2011)                                            | (majordam)
-	Major Damage rv2 ?? - (U)                                                                                   (MrSaturn  - 2011)                                            | (majordama)
-	Loaded (??-??)                                                                                              (Drx)                                                         | (loadedpr)
-	NHL All-Star Hockey 98 USA Beta v0.900 21/07/1997 [11/08/1997] (JU)                                         (Segafreak_NL - 2009)                                         | ###MISSING###
-	Nights Into Dreams... E3 USA Beta v0.200 13/05/1996 [13/05/1996] (JUT)                                      (Drx  - ??)                                                   | (nightse3)
-	Panzer Dragoon Saga CD1 JPN Beta v0.210 16/09/1997 [10/10/1997]  (J)                                        (Drx  - 2008)                                                 | (panzsaga160997)
-	Panzer Dragoon Saga CD1 JPN Beta v1.001 30/11/1997 [29/01/1998]  (JT)                                       (Drx  - 2008)                                                 | (panzsaga301197)
-	Panzer Dragoon Saga CD2 JPN Beta v1.001 30/11/1997 [29/01/1998]  (JT)                                       (Drx  - 2008)                                                 |  ^^
-	Panzer Dragoon Saga CD3 JPN Beta v1.001 30/11/1997 [29/01/1998]  (JT)                                       (Drx  - 2008)                                                 |  ^^
-	Panzer Dragoon Saga CD1 Beta v0.900 22/12/1997 [29/01/1998]  (UJ)                                           (Drx  - 2008)                                                 | (panzsaga221297)
-	Panzer Dragoon Saga CD3 Beta v0.901 30/12/1997 [29/01/1998]  (JUE)                                          (Drx  - 2008)                                                 | (panzsaga301297)
-	Panzer Dragoon Saga CD4 Beta v0.901 30/12/1997 [29/01/1998]  (JUE)                                          (Drx  - 2008)                                                 |  ^^
-	Panzer Dragoon Zwei USA Beta v1.902 02/02/1996 [31/12/1999]  (UT)                                           (Drx  - 2008)                                                 | (panzer2_020296)
-	Primal Rage Prototype v1.000 18/04/1995 [06/02/1996] (JTUBKAEL)                                             (Drx  - 2010)                                                 | (primalrap)
-	Rebellion Prototype v1.000 01/08/1994 [00/00/0000]  (JTUBKAEL)                                              (Oldergames.com, first appears in Lost & Found Vol. 1 - 2004) | (rebel)
-	Return Fire Beta v1.000 15/10/1996 [14/01/2003]  (JTUBKAEL)                                                 (MrSaturn  - 2007)                                            | (returnfi)
-	Scorcher EUR Beta v1.001 12/02/1997 [12/02/1997]  (E)                                                       (Segafreak_NL - 2008)                                         | ###MISSING###
-	Scud - The Disposable Assassin Beta v0.128 06/11/1996 [00/00/0000]  (JTUE)                                  (Segafreak_NL - 2007)                                         | ###MISSING###
-	Slam'n Jam '96 featuring Magic & Kareem Signature Edition USA Prototype v1.000 06/02/1996 [09/02/1996] (U)  (Drx  - 2010)                                                 | (slamnjamp)
-	Sonic 3D Blast Tech Demo Beta v1.000 22/11/1994 [08/10/1996] (JUE)                                          (Drx  - 2008)                                                 | (sonic3dtd)
-	Sonic R Beta v1.000 22/11/1994 [10/09/1997] (JUE)                                                           (Drx  - 2008)                                                 | ###MISSING###
-	Sonic X-Treme JPN Beta v1.000 18/07/1996 [18/07/1996] (J)                                                   (Assemblergames - 2007)                                       | (sonicext)
-	Tennis Arena EUR Beta v1.000 05/07/1997 [15/09/1997] (JUE)                                                  (Segasaturno  - 2009)                                         | ###MISSING###
-	Three Dirty Dwarves USA Beta v0.003 17/04/1996 [17/04/1996] (JUT)                                           (Segasaturno  - 2011)                                         | (3dwarvesp)
-	Tomb Raider Beta v1.000 18/04/1995 [22/07/1996] (JTUBKAEL)                                                  (Segafreak_NL - 2008)                                         | ###MISSING###
-	Ultimate Mortal Kombat 3 Prototype v1.000 22/11/1994 [07/02/1996] (JTUBKAEL)                                (Drx  - 2010)                                                 | (umk3p)
-	Virtua Cop 2 Beta ?? - (?)                                                                                  (Segasaturno + Segafreak_NL - 2011)                           | (vcop2p)
-	Time Warner Interactive's V.R. Virtua Racing Prototype v1.000 30/08/1995 [07/09/1995] (JTUBKAEL)            (Drx  - 2010)                                                 | ###MISSING###
-	Virtua Racing (??-??)                                                                                       (Drx)                                                         | ###MISSING###
-	Werewolf Beta v1.000 01/08/1994 [14/06/1996] (JTUBKAEL)                                                     (Drx + Segasaturno  - 2009)                                   | (werewolfa)
-	Werewolf Beta ?? - (?)                                                                                      (Segasaturno + Segafreak_NL - 2011)                           | (werewolf)
-	Winning Post (??-??)                                                                                        (Drx)                                                         | ###MISSING###
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PROTOTYPES - these are known dumped prototypes, I haven't been able to locate them all yet!
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Chill Beta ?? - (E)                                                                                         (Segasaturno + Segafreak_NL - 2011)                           | (chill)
+    Clockwork Knight Penguin Assault JPN Beta v0.001 20/06/1995 [20/10/1995] (J)                                (Segafreak_NL - 2004)                                         | ###MISSING###
+    Crypt Killer USA Prototype v1.002 08/01/1997 [08/01/1997] (U)                                               (Drx  - 2010)                                                 | (cryptklrp)
+    Deep Fear CD1 USA Prototype v1.000 15/07/1998 [15/07/1998] (U)                                              (Oldergames.com in Lost & Found Volume 3 - 2007)              | (deepfeau)
+    Deep Fear CD2 USA Prototype v1.000 15/07/1998 [15/07/1998] (U)                                              (Oldergames.com in Lost & Found Volume 3 - 2007)              |  ^^
+    Duke Nukem 3D USA Prototype v1.012 18/09/1997 [18/09/1997] (?)                                              (Drx  - 2010)                                                 | (dukenukep)
+    Earthworm Jim 2 Beta v1.000 29/12/1995 [29/12/1995] (JTUBKAEL)                                              (Segafreak_NL - ??)                                           | same as below? with dif. cd mod date?
+    Earthworm Jim 2 Beta v1.000 29/12/1995 [05/01/1996] (JTUBKAEL)                                              (?? - ??)                                                     | (ejim2bet)
+    Fighters Megamix USA Protoype v1.004 08/04/1997 [07/04/1997] (?)                                            (Drx  - 2010)                                                 | (fightmixp)
+    Fighting Force (Judgement Force) Beta v1.000 18/04/1995 [26/11/1996] (JTUBKAEL)                             (Drx  - 2008)                                                 | (judgemen)
+    Fighting Vipers USA Prototype v1.001 06/09/1996 [07/09/1996] (U)                                            (Drx  - 2010)                                                 | (fvipersp)
+    Major Damage rv1 ?? - (U)                                                                                   (MrSaturn  - 2011)                                            | (majordam)
+    Major Damage rv2 ?? - (U)                                                                                   (MrSaturn  - 2011)                                            | (majordama)
+    Loaded (??-??)                                                                                              (Drx)                                                         | (loadedpr)
+    NHL All-Star Hockey 98 USA Beta v0.900 21/07/1997 [11/08/1997] (JU)                                         (Segafreak_NL - 2009)                                         | ###MISSING###
+    Nights Into Dreams... E3 USA Beta v0.200 13/05/1996 [13/05/1996] (JUT)                                      (Drx  - ??)                                                   | (nightse3)
+    Panzer Dragoon Saga CD1 JPN Beta v0.210 16/09/1997 [10/10/1997]  (J)                                        (Drx  - 2008)                                                 | (panzsaga160997)
+    Panzer Dragoon Saga CD1 JPN Beta v1.001 30/11/1997 [29/01/1998]  (JT)                                       (Drx  - 2008)                                                 | (panzsaga301197)
+    Panzer Dragoon Saga CD2 JPN Beta v1.001 30/11/1997 [29/01/1998]  (JT)                                       (Drx  - 2008)                                                 |  ^^
+    Panzer Dragoon Saga CD3 JPN Beta v1.001 30/11/1997 [29/01/1998]  (JT)                                       (Drx  - 2008)                                                 |  ^^
+    Panzer Dragoon Saga CD1 Beta v0.900 22/12/1997 [29/01/1998]  (UJ)                                           (Drx  - 2008)                                                 | (panzsaga221297)
+    Panzer Dragoon Saga CD3 Beta v0.901 30/12/1997 [29/01/1998]  (JUE)                                          (Drx  - 2008)                                                 | (panzsaga301297)
+    Panzer Dragoon Saga CD4 Beta v0.901 30/12/1997 [29/01/1998]  (JUE)                                          (Drx  - 2008)                                                 |  ^^
+    Panzer Dragoon Zwei USA Beta v1.902 02/02/1996 [31/12/1999]  (UT)                                           (Drx  - 2008)                                                 | (panzer2_020296)
+    Primal Rage Prototype v1.000 18/04/1995 [06/02/1996] (JTUBKAEL)                                             (Drx  - 2010)                                                 | (primalrap)
+    Rebellion Prototype v1.000 01/08/1994 [00/00/0000]  (JTUBKAEL)                                              (Oldergames.com, first appears in Lost & Found Vol. 1 - 2004) | (rebel)
+    Return Fire Beta v1.000 15/10/1996 [14/01/2003]  (JTUBKAEL)                                                 (MrSaturn  - 2007)                                            | (returnfi)
+    Scorcher EUR Beta v1.001 12/02/1997 [12/02/1997]  (E)                                                       (Segafreak_NL - 2008)                                         | ###MISSING###
+    Scud - The Disposable Assassin Beta v0.128 06/11/1996 [00/00/0000]  (JTUE)                                  (Segafreak_NL - 2007)                                         | ###MISSING###
+    Slam'n Jam '96 featuring Magic & Kareem Signature Edition USA Prototype v1.000 06/02/1996 [09/02/1996] (U)  (Drx  - 2010)                                                 | (slamnjamp)
+    Sonic 3D Blast Tech Demo Beta v1.000 22/11/1994 [08/10/1996] (JUE)                                          (Drx  - 2008)                                                 | (sonic3dtd)
+    Sonic R Beta v1.000 22/11/1994 [10/09/1997] (JUE)                                                           (Drx  - 2008)                                                 | ###MISSING###
+    Sonic X-Treme JPN Beta v1.000 18/07/1996 [18/07/1996] (J)                                                   (Assemblergames - 2007)                                       | (sonicext)
+    Tennis Arena EUR Beta v1.000 05/07/1997 [15/09/1997] (JUE)                                                  (Segasaturno  - 2009)                                         | ###MISSING###
+    Three Dirty Dwarves USA Beta v0.003 17/04/1996 [17/04/1996] (JUT)                                           (Segasaturno  - 2011)                                         | (3dwarvesp)
+    Tomb Raider Beta v1.000 18/04/1995 [22/07/1996] (JTUBKAEL)                                                  (Segafreak_NL - 2008)                                         | ###MISSING###
+    Ultimate Mortal Kombat 3 Prototype v1.000 22/11/1994 [07/02/1996] (JTUBKAEL)                                (Drx  - 2010)                                                 | (umk3p)
+    Virtua Cop 2 Beta ?? - (?)                                                                                  (Segasaturno + Segafreak_NL - 2011)                           | (vcop2p)
+    Time Warner Interactive's V.R. Virtua Racing Prototype v1.000 30/08/1995 [07/09/1995] (JTUBKAEL)            (Drx  - 2010)                                                 | ###MISSING###
+    Virtua Racing (??-??)                                                                                       (Drx)                                                         | ###MISSING###
+    Werewolf Beta v1.000 01/08/1994 [14/06/1996] (JTUBKAEL)                                                     (Drx + Segasaturno  - 2009)                                   | (werewolfa)
+    Werewolf Beta ?? - (?)                                                                                      (Segasaturno + Segafreak_NL - 2011)                           | (werewolf)
+    Winning Post (??-??)                                                                                        (Drx)                                                         | ###MISSING###
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 Missing European disks

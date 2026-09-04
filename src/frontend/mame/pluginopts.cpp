@@ -177,8 +177,8 @@ void plugin_options::parse_ini_file(util::core_file &inifile)
 //  output_ini
 //-------------------------------------------------
 
-std::string plugin_options::output_ini() const
+void plugin_options::output_ini(std::ostream &str) const
 {
 	core_options opts = create_core_options(*this);
-	return opts.output_ini();
+	opts.output_ini(str);
 }
