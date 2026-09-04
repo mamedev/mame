@@ -332,9 +332,8 @@ uint32_t zeus2_device::zeus2_r(offs_t offset)
 			break;
 
 		case 0x54:
-			// VCOUNT upper 16 bits
-			//result = (screen().vpos() << 16) | screen().vpos();
-			result = (screen().vpos() << 16);
+			// VCOUNT is in unscaled lines. Scale the count back in MAME's fake interlaced mode
+			result = ((screen().vpos() >> m_yScale) << 16);
 			break;
 	}
 
