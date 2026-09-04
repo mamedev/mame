@@ -222,6 +222,7 @@ void device_wangpcbus_card_interface::interface_pre_start()
 
 // slot devices
 #include "emb.h"
+#include "ibmc.h"
 #include "lic.h"
 #include "lvc.h"
 #include "mcc.h"
@@ -233,6 +234,7 @@ void device_wangpcbus_card_interface::interface_pre_start()
 void wangpc_cards(device_slot_interface &device)
 {
 	device.option_add("emb", WANGPC_EMB); // extended memory board
+	device.option_add("ibmc", WANGPC_IBMC); // PC-PM007 IBM PC color emulation card
 	device.option_add("lic", WANGPC_LIC); // local interconnect option card
 	device.option_add("lvc", WANGPC_LVC); // low-resolution video controller
 	device.option_add("mcc", WANGPC_MCC); // multiport communications controller
