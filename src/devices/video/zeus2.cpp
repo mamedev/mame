@@ -1758,6 +1758,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	extra.ucode_src = m_state->m_curUCodeSrc;
 	extra.tex_src = m_state->zeus_texbase;
+	extra.frame_base = m_state->frame_addr_from_xy(0, 0, true);
+	extra.frame_shift = m_state->frame_row_shift();
 	int texmode = texdata & 0xffff;
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
 	extra.solidcolor = m_state->m_zeusbase[0x00] & 0x7fff;
@@ -1858,7 +1860,7 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 	uint32_t solidColor = ((object.solidcolor & 0x7c00) << 9) | ((object.solidcolor & 0x3e0) << 6) | ((object.solidcolor & 0x1f) << 3);
 	int x;
 
-	uint32_t addr = m_state->frame_addr_from_xy(0, scanline, true);
+	uint32_t addr = object.frame_base + (scanline << object.frame_shift);
 	int32_t *depthptr = &m_state->m_frameDepth[addr];
 	uint32_t *colorptr = &m_state->m_frameColor[addr];
 	int32_t curDepthVal;
