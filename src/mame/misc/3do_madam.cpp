@@ -877,24 +877,32 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
-			m_cel.xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
-			m_cel.ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
-			tick_time += 2;
+			const s32 xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
+			const s32 ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
 			// TODO: can be in 17.15 format (?)
-			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
+			m_cel.xpos = (double)xpos / 65536.0;
+			m_cel.ypos = (double)ypos / 65536.0;
+			tick_time += 2;
+			LOGCEL("    xpos=%f ypos=%f\n", xpos, ypos );
 
-			m_cel.hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
-			m_cel.hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
-			m_cel.vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
-			m_cel.vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
+			const s32 hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
+			const s32 hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
+			const s32 vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
+			const s32 vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
+			m_cel.hdx = (double)hdx / 1048576.0;
+			m_cel.hdy = (double)hdy / 1048576.0;
+			m_cel.vdx = (double)vdx / 65536.0;
+			m_cel.vdy = (double)vdy / 65536.0;
 			tick_time += 4;
 			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
 				, (double)m_cel.hdx / 1048576.0, (double)m_cel.hdy / 1048576.0
 				, (double)m_cel.vdx / 65536.0, (double)m_cel.vdy / 65536.0
 			);
 
-			m_cel.hddx = m_dma32_read_cb(m_cel.address + 0x28);
-			m_cel.hddy = m_dma32_read_cb(m_cel.address + 0x2c);
+			const s32 hddx = (s32)m_dma32_read_cb(m_cel.address + 0x28);
+			const s32 hddy = (s32)m_dma32_read_cb(m_cel.address + 0x2c);
+			m_cel.hddx = (double)hddx / 1048576.0;
+			m_cel.hddy = (double)hddy / 1048576.0;
 			tick_time += 2;
 			LOGCEL("    hddx=%f hddy=%f\n", (double)m_cel.hddx / 1048576.0, (double)m_cel.hddy / 1048576.0);
 
@@ -990,16 +998,22 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const u8 actual_src_mode = m_cel.packed ? 32 : (bpp << 2) | (uncoded << 1) | lrform;
 
 			{
+				double actual_hdx = m_cel.hdx;
+				double actual_hdy = m_cel.hdy;
+
 				for (int y = 0; y < vcnt; y++)
 				{
-					int ypos = (m_cel.ypos >> 16) + y;
-
-					if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
-						continue;
-
 					for (int x = 0; x < tlhpcnt; x++)
 					{
-						int xpos = (m_cel.xpos >> 16) + x;
+						// According to "The Projector" section this floors down,
+						// discarding the fractional part
+						// TODO: understand how enlarging truly works
+						int ypos = (s32)(m_cel.ypos + y * m_cel.vdy + x * actual_hdy);
+
+						if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
+							continue;
+
+						int xpos = (s32)(m_cel.xpos + x * actual_hdx + y * m_cel.vdx);
 						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
 							continue;
 
@@ -1021,6 +1035,9 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 						tick_time += 3;
 					}
+
+					actual_hdx += m_cel.hddx;
+					actual_hdy += m_cel.hddy;
 				}
 
 				LOGCEL("CEL Time drawing %d\n", tick_time);

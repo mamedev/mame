@@ -18546,6 +18546,7 @@ dragonmj
 dragonmj103
 ichiban
 ichiban235
+ichiban305
 ippatsu
 jangtaku
 janoh
@@ -35048,6 +35049,7 @@ pc9801vx
 pc286vs
 pc286u
 pc386m
+pc386v
 pc486se
 pc486mu
 
@@ -40359,6 +40361,7 @@ tr808
 tr909
 
 @source:roland/roland_u20.cpp
+u110
 u20
 u220
 
@@ -45429,6 +45432,7 @@ xtrain
 @source:success/big10.cpp
 big10
 big10a
+big10b
 
 @source:success/kurukuru.cpp
 kurukuru

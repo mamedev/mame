@@ -32,6 +32,17 @@ There's no way in setup menu to disable quiet mode, at best you can enable Phoen
 Game runs on a Korean Windows 98SE, with an ACCESSHW ABI, a Vault folder containing the game data +
 an exe for deploying from CD-Rom and a DivX codec installation.
 
+DSW2 dip-sheet (default all OFF?):
+PORT_DIPLOCATION("SW2:1") unused
+PORT_DIPLOCATION("SW2:2,3") difficulty (10=Easy, 00=Normal, 01=Hard, 11=Very Hard)
+PORT_DIPLOCATION("SW2:4,5") coinage (10=1C_1C 00=1C_2C 01=1C_3C 11=1C_5C)
+PORT_DIPLOCATION("SW2:6") Play Time (0=1 minute 30 seconds, 1=2 minutes)
+PORT_DIPLOCATION("SW2:7,8") Game Type (10=A Type 00=B Type 01=C Type 11=D Type)
+The types aren't exactly clear from the sheet, they seem to control in-game features
+(PK, Demo Sounds, Tutorial and Free Play)
+
+===================================================================================================
+
 TODO:
 - Upgrade chipset, add remaining on-board peripherals
 - hangs while checking I/O port $8100 bp e0295,1,{eax^=1;g} bp e02b6,1,{eax^=1;g}
@@ -177,3 +188,6 @@ ROM_END
 
 
 GAME(2003, burnstrk, 0, burnstrk, 0, eoforce_state, empty_init, ROT0, "Eolith", "Burning Striker", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
+// Hidden Catch Movie: Wonderful Days (a light-pen crossover with a Korean animation movie)
+// X-Monster (original unreleased Korean version, lightgun game)
+// X-Monster (2010 Topfull Technology actual release in China, gatling gun mounted game -> AD Stick)

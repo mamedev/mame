@@ -4,7 +4,8 @@
 /* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
 
-   TODO: MPEG decoding currently not implemented
+   MPEG audio decoding is preliminary.
+   TODO: MPEG video decoding is not implemented.
 */
 
 
@@ -17,11 +18,12 @@
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
-#include "video/ramdac.h"
 #include "machine/rescap.h"
 #include "machine/scc66470.h"
 #include "machine/watchdog.h"
+#include "sound/tms320av110.h"
 #include "sound/ymz280b.h"
+#include "video/ramdac.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +39,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cpuregion(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
+		m_av110(*this, "av110"),
 		m_ymz(*this, "ymz280b"),
 		m_palette(*this, "palette"),
 		m_ramdac(*this, "ramdac"),
@@ -56,6 +59,7 @@ protected:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_region_ptr<uint16_t> m_cpuregion;
 	required_device<nvram_device> m_nvram;
+	required_device<tms320av110_device> m_av110;
 	required_device<ymz280b_device> m_ymz;
 	required_device<palette_device> m_palette;
 	required_device<ramdac_device> m_ramdac;
@@ -77,6 +81,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	void volume_control(uint8_t direction, uint8_t clock);
+	void av110_reset_strobe_w(u8 data);
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -91,7 +96,7 @@ protected:
 
 void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 {
-	int clock_changed = m_vol_clock ^ clock;
+	uint8_t const clock_changed = m_vol_clock ^ clock;
 
 	m_vol_clock = clock;
 	if (clock_changed)
@@ -109,12 +114,21 @@ void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 					m_volume--;
 			}
 
-			float fraction = (64 - m_volume) / 64.0f;
+			float const fraction = (32 - m_volume) / 32.0f;
 
 			m_ymz->set_output_gain(0, fraction);
 			m_ymz->set_output_gain(1, fraction);
+			m_av110->set_output_gain(0, fraction);
+			m_av110->set_output_gain(1, fraction);
 		}
 	}
+}
+
+void bfm_cobra3_state::av110_reset_strobe_w(u8)
+{
+	// This decoded write pulses the AV110's active-low RESET input.
+	m_av110->reset_w(0);
+	m_av110->reset_w(1);
 }
 
 uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
@@ -305,6 +319,8 @@ void bfm_cobra3_state::bfm_cobra3_map(address_map &map)
 {
 	map(0x00000000, 0xffffffff).rw(FUNC(bfm_cobra3_state::mem_r), FUNC(bfm_cobra3_state::mem_w));
 	map(0x00800000, 0x009fffff).m(m_scc66470, FUNC(scc66470_device::map)).cswidth(16);
+	map(0x00a80000, 0x00a80001).w(FUNC(bfm_cobra3_state::av110_reset_strobe_w)).umask16(0x00ff);
+	map(0x00a81000, 0x00a810ff).m(m_av110, FUNC(tms320av110_device::map)).umask16(0x00ff);
 }
 
 void bfm_cobra3_state::ramdac_map(address_map &map)
@@ -375,8 +391,13 @@ INPUT_PORTS_END
 void bfm_cobra3_state::machine_start()
 {
 	m_active_strobe = 0;
+	m_vol_clock = 0;
+	m_volume = 0;
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
+
+	save_item(NAME(m_vol_clock));
+	save_item(NAME(m_volume));
 }
 
 
@@ -471,6 +492,14 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	YMZ280B(config, m_ymz, 16.9344_MHz_XTAL);
 	m_ymz->add_route(0, "lspeaker", 1.0);
 	m_ymz->add_route(1, "rspeaker", 1.0);
+
+	TMS320AV110(config, m_av110, 24_MHz_XTAL);
+	// Cobra enables decoder modes that require the optional external DRAM.
+	m_av110->set_external_dram(true);
+	// AV110 REQ and MC68340 DREQ2 are both active low.
+	m_av110->req().set(m_maincpu, FUNC(m68340_cpu_device::dma_dreq2_w));
+	m_av110->add_route(0, "lspeaker", 1.0);
+	m_av110->add_route(1, "rspeaker", 1.0);
 
 	SCC66470(config,m_scc66470,30000000);
 	m_scc66470->set_addrmap(0, &bfm_cobra3_state::scc66470_map);

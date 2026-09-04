@@ -648,7 +648,7 @@ void ssfindo_state::ppcar(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ppcar_map);
 	// sets external sclk, unverified value
-	m_vidc->set_ext_sclk(24'000'000 / (24 * 2));
+	m_vidc->set_ext_sclk(24'000'000);
 
 	subdevice<qs1000_device>("qs1000")->set_external_rom(false); // ppcar has no external ROM
 	subdevice<i8052_device>("qs1000:cpu")->set_disable(); // internal ROM hasn't been dumped yet

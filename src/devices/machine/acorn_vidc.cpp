@@ -25,6 +25,8 @@ TODO:
 #include "acorn_vidc.h"
 #include "screen.h"
 
+#include <numbers>
+
 #define LOG_AUDIODMA (1U << 7) // log audio DMA setups
 #define LOG_STEREO   (1U << 8) // log stereo image setup, and sound control in VIDC20
 
@@ -72,10 +74,12 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_crtc_interlace(0)
 	, m_sound_frequency_latch(0)
 	, m_sound_mode(false)
+	, m_filter_rc(*this, "filter_rc%u", 0)
+	, m_filter(*this, "filter%u", 0)
 	, m_dac(*this, "dac%u", 0)
-	, m_mixer(*this, "mixer%u", 0)
 	, m_dac_type(dac_type)
 	, m_speaker(*this, "speaker")
+	, m_sound_fifo_channel(0)
 	, m_vblank_cb(*this)
 	, m_sound_drq_cb(*this)
 	, m_pixel_clock(0)
@@ -117,27 +121,70 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 //  configuration additions
 //-------------------------------------------------
 
-void acorn_vidc10_device::device_add_mconfig(machine_config &config)
+// TODO: bad, compose better
+void acorn_vidc10_device::device_add_mconfig_common(machine_config &config)
 {
+	// TODO: expose, aristmk5.cpp is mono (outputs to left only)
 	SPEAKER(config, m_speaker, 2).front();
 
-	MIXER(config, m_mixer[0]);
+	// The actual filters here are two simple differentiator filters just
+	// after the VIDC itself (to combine the +L and -L, and +R and -R
+	// signals respectively), followed by two third-order Sallen-Key
+	// lowpass filters just after these.
+	// We're ignoring the first two filters, since these don't have that
+	// much effect on the output signal, but these could be added later
+	// if necessary.
+	// MAME's biquad filter emulation cannot directly do third order
+	// Sallen-Key filter calculations based on the component values,
+	// so instead here we're just using the cutoffs directly calculated
+	// using the online okawa-denshi 3rd order Sallen-Key calculator.
+	// Finally, each filter has a DC-blocking capacitors, so we can emulate
+	// this using a pair of stock CR highpass (Fc = 16hz "AC") filters.
+	// This has the added benefit of removing the DC startup offset.
 
-	MIXER(config, m_mixer[1]);
+	FILTER_RC(config, m_filter_rc[0]).set_ac(); // CR highpass, left
+	m_filter_rc[0]->add_route(0, m_speaker, 1.0, 0);
 
-	for (int i = 0; i < m_sound_max_channels; i++)
-	{
-		// custom DAC
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_mixer[0], 1.0, i).add_route(0, m_mixer[1], 1.0, i);
+	FILTER_RC(config, m_filter_rc[1]).set_ac(); // CR highpass, right
+	m_filter_rc[1]->add_route(0, m_speaker, 1.0, 1);
 
-		m_mixer[0]->add_route(i, m_speaker, 0.5, 0);
-		m_mixer[1]->add_route(i, m_speaker, 0.5, 1);
-	}
+	FILTER_BIQUAD(config, m_filter[0]); // 2nd order left
+
+	FILTER_BIQUAD(config, m_filter[1]); // 2nd order right
+
+	FILTER_BIQUAD(config, m_filter[2]); // 1st order left
+
+	FILTER_BIQUAD(config, m_filter[3]); // 1st order right
+
+	// custom DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(0, m_filter[2], 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(0, m_filter[3], 1.0);
+}
+
+
+void acorn_vidc10_device::device_add_mconfig(machine_config &config)
+{
+	acorn_vidc10_device::device_add_mconfig_common(config);
+
+	// VIDC1x based systems:
+	// Fc = 2441.467, Fq = 1.0/0.385, Gain = 1.0
+
+	m_filter[0]->setup(filter_biquad_device::biquad_type::LOWPASS, 2441.467, 1.0/0.385, 1.0);
+	m_filter[0]->add_route(0, m_filter_rc[0], 1.0);
+
+	m_filter[1]->setup(filter_biquad_device::biquad_type::LOWPASS, 2441.467, 1.0/0.385, 1.0);
+	m_filter[1]->add_route(0, m_filter_rc[1], 1.0);
+
+	m_filter[2]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 2441.467, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[2]->add_route(0, m_filter[0], 1.0);
+
+	m_filter[3]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 2441.467, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[3]->add_route(0, m_filter[1], 1.0);
 }
 
 u32 acorn_vidc10_device::palette_entries() const noexcept
 {
-	return 0x100+0x10+4; // 8bpp + 1/2/4bpp + 2bpp for cursor
+	return 0x100 + 0x10 + 4; // 8bpp + 1/2/4bpp + 2bpp for cursor
 }
 
 //-------------------------------------------------
@@ -172,6 +219,7 @@ void acorn_vidc10_device::device_start()
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_sound_frequency_latch));
 	save_item(NAME(m_sound_frequency_test_bit));
+	save_item(NAME(m_sound_fifo_channel));
 	save_item(NAME(m_cursor_enable));
 	save_pointer(NAME(m_crtc_regs), CRTC_VCER+1);
 	save_pointer(NAME(m_crtc_raw_horz), 2);
@@ -182,7 +230,7 @@ void acorn_vidc10_device::device_start()
 	save_pointer(NAME(m_stereo_image), m_sound_max_channels);
 
 	m_video_timer = timer_alloc(FUNC(acorn_vidc10_device::vblank_timer), this);
-	m_sound_timer = timer_alloc(FUNC(acorn_vidc10_device::sound_drq_timer), this);
+	m_sound_timer = timer_alloc(FUNC(acorn_vidc10_device::sound_sample_timer), this);
 
 	// generate u255 law lookup table
 	// cfr. page 48 of the VIDC20 manual, page 33 of the VIDC manual
@@ -228,6 +276,8 @@ void acorn_vidc10_device::device_reset()
 		refresh_stereo_image(ch);
 	m_video_timer->adjust(attotime::never);
 	m_sound_timer->adjust(attotime::never);
+	m_sound_fifo.clear();
+	m_sound_fifo_channel = 0;
 }
 
 TIMER_CALLBACK_MEMBER(acorn_vidc10_device::vblank_timer)
@@ -236,9 +286,22 @@ TIMER_CALLBACK_MEMBER(acorn_vidc10_device::vblank_timer)
 	screen_vblank_line_update();
 }
 
-TIMER_CALLBACK_MEMBER(acorn_vidc10_device::sound_drq_timer)
+TIMER_CALLBACK_MEMBER(acorn_vidc10_device::sound_sample_timer)
 {
-	m_sound_drq_cb(ASSERT_LINE);
+	if (play_fifo_sample())
+	{
+		m_sound_fifo_channel = 0; // force a stereo channel resync (does the actual hardware do this?)
+		m_sound_drq_cb(ASSERT_LINE);
+	}
+}
+
+bool acorn_vidc10_device::play_fifo_sample()
+{
+	if (m_sound_fifo.empty()) return true;
+	write_dac(m_sound_fifo_channel & 7, m_sound_fifo.dequeue());
+	m_sound_fifo_channel ++;
+	m_sound_fifo_channel &= 7;
+	return m_sound_fifo.empty();
 }
 
 //**************************************************************************
@@ -417,7 +480,7 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 	    -011 67% left, 33% right
 	    -010 83% left, 17% right
 	    -001 full left
-	    -000 <undefined> TODO: verify what it actually means
+	    -000 <undefined> TODO: verify what this actually does, assumed center
 	*/
 	const float l_gain_settings[8] = { 1.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
 	const float r_gain_settings[8] = { 1.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
@@ -425,9 +488,6 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 	const float l_gain = l_gain_settings[m_stereo_image[channel]] * m_sound_input_gain;
 	const float r_gain = r_gain_settings[m_stereo_image[channel]] * m_sound_input_gain;
 	LOGMASKED(LOG_STEREO, "%d: %02x -> L %f R %f\n", channel, m_stereo_image[channel], l_gain, r_gain);
-
-	m_mixer[0]->set_input_gain(channel, l_gain);
-	m_mixer[1]->set_input_gain(channel, r_gain);
 }
 
 
@@ -450,21 +510,36 @@ void acorn_vidc10_device::sound_frequency_w(u32 data)
 //  MEMC comms
 //**************************************************************************
 
+void acorn_vidc10_device::enqueue32_fifo(u32 data)
+{
+	// for each 32 bit dword sent to the VIDC, the sample order is the
+	// lowest byte first, packed. i.e. bytes 3,2,1,0 in that order,
+	// assuming byte 0 is the MSB of the dword.
+	for (int i = 0; i < 32; i += 8)
+		m_sound_fifo.enqueue((u8)((data >> i) & 0xff));
+}
+
 void acorn_vidc10_device::write_dac(u8 channel, u8 data)
 {
-	int16_t res = m_ulaw_lookup[data];
-	m_dac[channel & 7]->write(res);
+	const float stereo_clocks_l[8] = { 9.0f, 18.0f, 15.0f, 12.0f, 9.0f, 6.0f, 3.0f, 0.0f };
+	const float res = (float)m_ulaw_lookup[data] / 32768.0f;
+	const u8 setting = m_stereo_image[channel];
+	const float percent_l = stereo_clocks_l[setting] / 18.0f;
+	const float percent_r = (18.0f - stereo_clocks_l[setting]) / 18.0f;
+	m_dac[0]->write((s16)(percent_l * res * 32768.0f));
+	m_dac[1]->write((s16)(percent_r * res * 32768.0f));
 }
 
 u32 acorn_vidc10_device::get_sound_clock()
 {
-	return clock() / 24 / 8;
+	return clock() / 24;
 }
 
 void acorn_vidc10_device::refresh_sound_frequency()
 {
 	// TODO: check against test bit (reloads sound frequency if 0)
-	// assume a value of zero is invalid (ppcar POST setup)
+	// TODO: does this test bit also clear the fifo?
+	// TODO: verify that value of 0 or 1 is invalid (ppcar POST setup)?
 	if (m_sound_mode == true && m_sound_frequency_latch)
 	{
 		// TODO: Range is between 3 and 256 usecs
@@ -610,7 +685,22 @@ arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *
 
 void arm_vidc20_device::device_add_mconfig(machine_config &config)
 {
-	acorn_vidc10_device::device_add_mconfig(config);
+	acorn_vidc10_device::device_add_mconfig_common(config);
+
+	// VIDC20 (RiscPC) systems:
+	// Fc = 5258.064, Fq = 1.0/0.464, Gain = 1.0
+
+	m_filter[0]->setup(filter_biquad_device::biquad_type::LOWPASS, 5258.064, 1.0/0.464, 1.0);
+	m_filter[0]->add_route(0, m_filter_rc[0], 1.0);
+
+	m_filter[1]->setup(filter_biquad_device::biquad_type::LOWPASS, 5258.064, 1.0/0.464, 1.0);
+	m_filter[1]->add_route(0, m_filter_rc[1], 1.0);
+
+	m_filter[2]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 5258.064, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[2]->add_route(0, m_filter[0], 1.0);
+
+	m_filter[3]->setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 5258.064, std::numbers::sqrt2 / 2.0, 1.0);
+	m_filter[3]->add_route(0, m_filter[1], 1.0);
 
 	// For simplicity we separate DACs for 32-bit mode
 	// TODO: how stereo image copes with this if at all?
@@ -618,13 +708,14 @@ void arm_vidc20_device::device_add_mconfig(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 1);
 }
 
+// TODO: move to clients
 void arm_vidc20_device::device_config_complete()
 {
 	if (!has_screen())
 		return;
 
 	if (!screen().has_been_setup())
-		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
+		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624 / 2, 0, 292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())
 		screen().set_screen_update(*this, FUNC(arm_vidc20_device::screen_update));
@@ -665,6 +756,25 @@ void arm_vidc20_device::device_reset()
 
 	write_dac32(0, 0);
 	write_dac32(1, 0);
+}
+
+bool arm_vidc20_device::play_fifo_sample()
+{
+	if (m_sound_fifo.empty()) return true;
+	if (m_sdac)
+	{
+		write_dac(m_sound_fifo_channel & 7, m_sound_fifo.dequeue());
+		m_sound_fifo_channel ++;
+		m_sound_fifo_channel &= 7;
+	}
+	else if (m_dac_serial_mode)
+	{
+		s16 sample = m_sound_fifo.dequeue() & 0xff;
+		sample |= (u16)(m_sound_fifo.dequeue() << 8);
+		write_dac32((m_sound_fifo_channel & 1), sample);
+		m_sound_fifo_channel ^= 1;
+	}
+	return m_sound_fifo.empty();
 }
 
 inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
@@ -786,13 +896,13 @@ u32 arm_vidc20_device::get_sound_clock()
 	// ppcar
 	if (!m_clksel)
 	{
-		return m_ext_sclk;
+		return m_ext_sclk / 24;
 	}
 
 	// 32-bit mode doubles clock rate
-	const u32 divider = 8 >> get_dac_mode();
+	const u8 divider = 24 << get_dac_mode();
 
-	return clock() / 24 / divider;
+	return (clock() / divider);
 }
 
 
@@ -817,16 +927,15 @@ void arm_vidc20_device::vidc20_sound_control_w(u32 data)
 
 	if (m_sdac)
 	{
+		m_dac[0]->set_output_gain(0, 1.0);
+		m_dac[1]->set_output_gain(0, 1.0);
 		for (int ch = 0; ch < m_sound_max_channels; ch++)
-		{
-			m_dac[ch]->set_output_gain(0, 1.0);
 			refresh_stereo_image(ch);
-		}
 	}
 	else
 	{
-		for (int ch = 0; ch < m_sound_max_channels; ch++)
-			m_dac[ch]->set_output_gain(0, 0.0);
+		m_dac[0]->set_output_gain(0, 0.0);
+		m_dac[1]->set_output_gain(0, 0.0);
 	}
 
 	if (m_sound_mode == true)
@@ -840,7 +949,7 @@ void arm_vidc20_device::vidc20_sound_frequency_w(u32 data)
 		refresh_sound_frequency();
 }
 
-void arm_vidc20_device::write_dac32(u8 channel, u16 data)
+void arm_vidc20_device::write_dac32(u8 channel, s16 data)
 {
 	m_dac32[channel & 1]->write(data);
 }

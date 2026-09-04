@@ -32,6 +32,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	u8 modulate_offset(u8 offset);
+
 private:
 	// printer status inputs
 	void ack_w(int state);
@@ -64,6 +66,20 @@ protected:
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+};
+
+
+class a2bus_printmax_device : public a2bus_parprn_device
+{
+public:
+	a2bus_printmax_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_cnxx(u8 offset) override;
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -106,6 +122,11 @@ ROM_START(4dparprn)
 	ROM_REGION(0x100, "prom", 0)
 	ROM_LOAD( "rom.bin", 0x0000, 0x0100, CRC(189262c9) SHA1(d6179664d6860df5ed26fce72f253e28f933b01a) )
 	ROM_IGNORE(0x700) // same data is repeated 8 times
+ROM_END
+
+ROM_START(printmax)
+	ROM_REGION(0x800, "prom", 0)
+	ROM_LOAD( "printmax_2716_u4.bin", 0x0000, 0x0800, CRC(23ce98af) SHA1(333556fa02925db9b347161a9ed21ccfdd6759f2) )
 ROM_END
 
 
@@ -156,6 +177,12 @@ a2bus_4dparprn_device::a2bus_4dparprn_device(machine_config const &mconfig, char
 }
 
 
+a2bus_printmax_device::a2bus_printmax_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_parprn_device(mconfig, A2BUS_PRINTMAX, tag, owner, clock)
+{
+}
+
+
 //----------------------------------------------
 //  device_a2bus_card_interface implementation
 //----------------------------------------------
@@ -193,7 +220,7 @@ void a2bus_parprn_device::write_c0nx(u8 offset, u8 data)
 }
 
 
-u8 a2bus_parprn_device::read_cnxx(u8 offset)
+u8 a2bus_parprn_device::modulate_offset(u8 offset)
 {
 	ioport_value const cfg(m_input_config->read());
 
@@ -216,7 +243,19 @@ u8 a2bus_parprn_device::read_cnxx(u8 offset)
 		offset ^= 0x40U;
 	}
 
-	return m_prom[offset];
+	return offset;
+}
+
+
+u8 a2bus_parprn_device::read_cnxx(u8 offset)
+{
+	return m_prom[modulate_offset(offset)];
+}
+
+
+u8 a2bus_printmax_device::read_cnxx(u8 offset)
+{
+	return m_prom[modulate_offset(offset) | (slotno() << 8)];
 }
 
 
@@ -234,6 +273,12 @@ tiny_rom_entry const *a2bus_parprn_device::device_rom_region() const
 tiny_rom_entry const *a2bus_4dparprn_device::device_rom_region() const
 {
 	return ROM_NAME(4dparprn);
+}
+
+
+tiny_rom_entry const *a2bus_printmax_device::device_rom_region() const
+{
+	return ROM_NAME(printmax);
 }
 
 
@@ -328,3 +373,4 @@ TIMER_CALLBACK_MEMBER(a2bus_parprn_device::update_strobe)
 
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_PARPRN, device_a2bus_card_interface, a2bus_parprn_device, "a2parprn", "Apple II Parallel Printer Interface Card")
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_4DPARPRN, device_a2bus_card_interface, a2bus_4dparprn_device, "4dparprn", "Fourth Dimension Parallel Printer Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_PRINTMAX, device_a2bus_card_interface, a2bus_printmax_device, "printmax", "Micromax Printmax Parallel Printer Interface")

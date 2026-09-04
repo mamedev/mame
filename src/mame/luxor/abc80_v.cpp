@@ -29,6 +29,11 @@ void tkn80_state::set_80(bool state)
 	u8 config = m_config->read();
 	int view = BIT(config, 2) + 1;
 
+	update_screen();
+
+	m_render_y = 0;
+	m_render_sx = 0;
+
 	/*
 
 	    TKN 000-3ff -> ZA3506 000-3ff (9913/10042)
@@ -78,87 +83,101 @@ uint8_t tkn80_state::in4_r()
 	return 0xff;
 };
 
-void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
+void abc80_state::update_screen()
 {
-	u8 vsync_data = m_vsync_prom->base()[y];
-	bool dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
+	update_screen_to(m_screen->vpos(), m_screen->hpos() / 6);
+}
 
-	if (!(vsync_data & ABC80_K2_FRAME_RESET))
+void abc80_state::update_screen_to(int y, int sx)
+{
+	int cols = chars_per_line();
+
+	while ((m_render_y < y) || ((m_render_y == y) && (m_render_sx < sx)))
 	{
-		// reset F2
-		m_r = 0;
-	}
+		u8 vsync_data = m_vsync_prom->base()[m_render_y];
 
-	for (int sx = 0; sx < 64; sx++)
-	{
-		u8 hsync_data = m_hsync_prom->base()[sx];
-
-		if (hsync_data & ABC80_K5_LINE_END)
+		if (!m_render_sx && !(vsync_data & ABC80_K2_FRAME_RESET))
 		{
-			// reset F4
-			m_c = 0;
-
-			// reset J5
-			m_mode = 0;
+			// reset F2
+			m_r = 0;
 		}
 
-		draw_character(bitmap, y, sx, dv, hsync_data);
+		draw_character_at(m_bitmap, m_render_y, m_render_sx, (vsync_data & ABC80_K2_DV) ? 1 : 0);
 
-		if (hsync_data & ABC80_K5_ROW_START)
+		m_render_sx++;
+
+		if (m_render_sx >= cols)
 		{
+			if (vsync_data & ABC80_K2_FRAME_END)
+			{
+				// clock F2
+				m_r++;
+			}
+
+			m_render_sx = 0;
+			m_render_y++;
+		}
+	}
+}
+
+void abc80_state::draw_character_at(bitmap_rgb32 &bitmap, int y, int sx, bool dv)
+{
+	u8 hsync_data = m_hsync_prom->base()[sx];
+
+	if (hsync_data & ABC80_K5_LINE_END)
+	{
+		// reset F4
+		m_c = 0;
+
+		// reset J5
+		m_mode = 0;
+	}
+
+	draw_character(bitmap, y, sx, dv, hsync_data);
+
+	if (hsync_data & ABC80_K5_ROW_START)
+	{
+		// clock F4
+		m_c++;
+	}
+}
+
+void tkn80_state::draw_character_at(bitmap_rgb32 &bitmap, int y, int sx, bool dv)
+{
+	u8 hsync_data = m_hsync_prom->base()[m_80 ? (sx / 2) : sx];
+
+	if (hsync_data & ABC80_K5_LINE_END)
+	{
+		// reset F4
+		m_c = 0;
+
+		// reset J5
+		m_mode = 0;
+	}
+
+	draw_character(bitmap, y, sx, dv, hsync_data);
+
+	if (hsync_data & ABC80_K5_ROW_START)
+	{
+		if (!m_80 || sx > 30) {
 			// clock F4
 			m_c++;
 		}
 	}
-
-	if (vsync_data & ABC80_K2_FRAME_END)
-	{
-		// clock F2
-		m_r++;
-	}
 }
 
-void tkn80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
+void abc80_state::video_ram_w(offs_t offset, u8 data)
 {
-	u8 vsync_data = m_vsync_prom->base()[y];
-	bool dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
+	update_screen();
 
-	if (!(vsync_data & ABC80_K2_FRAME_RESET))
-	{
-		// reset F2
-		m_r = 0;
-	}
+	m_video_ram[offset] = data;
+}
 
-	int cols = m_80 ? 128 : 64;
-	for (int sx = 0; sx < cols; sx++)
-	{
-		u8 hsync_data = m_hsync_prom->base()[m_80 ? (sx / 2) : sx];
+void tkn80_state::char_ram_w(offs_t offset, u8 data)
+{
+	update_screen();
 
-		if (hsync_data & ABC80_K5_LINE_END)
-		{
-			// reset F4
-			m_c = 0;
-
-			// reset J5
-			m_mode = 0;
-		}
-
-		draw_character(bitmap, y, sx, dv, hsync_data);
-
-		if (hsync_data & ABC80_K5_ROW_START)
-		{
-			if (!m_80 || sx > 30) {
-				// clock F4
-				m_c++;
-			}
-		}
-	}
-
-	if (vsync_data & ABC80_K2_FRAME_END)
-	{
-		// clock F2
-		m_r++;
-	}
+	m_char_ram[offset] = data;
 }
 
 void abc80_state::draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u8 hsync_data)
@@ -330,6 +349,8 @@ void tkn80_state::video_reset()
 
 uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	update_screen();
+
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;

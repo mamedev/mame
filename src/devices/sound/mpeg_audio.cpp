@@ -33,6 +33,12 @@ void mpeg_audio::clear()
 	m_audio_buffer_pos[1] = 16*32;
 }
 
+void mpeg_audio::register_save_state(device_t &device, int index)
+{
+	device.save_item(m_audio_buffer, "mpeg_audio_buffer", index);
+	device.save_item(m_audio_buffer_pos, "mpeg_audio_buffer_pos", index);
+}
+
 bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 								int &output_samples, int &sample_rate, int &channels, int atbl)
 {

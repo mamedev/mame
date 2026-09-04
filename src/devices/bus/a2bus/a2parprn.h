@@ -60,5 +60,6 @@
 
 DECLARE_DEVICE_TYPE(A2BUS_PARPRN, device_a2bus_card_interface)
 DECLARE_DEVICE_TYPE(A2BUS_4DPARPRN, device_a2bus_card_interface)
+DECLARE_DEVICE_TYPE(A2BUS_PRINTMAX, device_a2bus_card_interface)
 
 #endif // MAME_BUS_A2BUS_A2PARPRN_H

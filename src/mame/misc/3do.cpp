@@ -7,29 +7,34 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Incomplete XBus/CD drive semantics (resolved?)
-\- Photo CD appears to work - toilhana shows its images no problem and you can advance through
-   the album.
-\- Audio CD has plenty of Cel, VDLP and sport issues
+- Incomplete XBus/CD drive semantics;
+\- Audio CD has plenty of Cel, VDLP and sport issues. Also needs support between CD drive and DSPP
    (reads random port, asks for audio tracks *with* subcode);
 - Incomplete DSPP mapping (semaphores, audio input, output FIFO flush, FIFO status flags,
   RAM to DSPP N stack DMA);
 - Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, possible mirroring?)
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
-- MMU?  Games seem to run fine with stock ARM60 semantics.
+- Fence/MMU?  Games seem to run fine with stock ARM60 semantics.
 
-Probably obsolete (all of these variants boot cpquazar fine in my testing):
-- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs;
+TODO (BIOS programs):
+- 3do_fz1: DSPP is silent on planet splash screen
+- 3do_fz1j: DSPP has repeating noise on planet splash screen
+- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs on initial logo screen;
 - 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
-- 3do_try, 3do_hc21 (bios 1): throws "QueueSport error on cmd 4: xfer across 1M boundary",
-  has issues with layer clearances, never really pings Sport DMA, needs smaller VRAM?
-- 3do_fc2: same as above
+- 3do_try, 3do_hc21 (bios 1), 3do_fc2: throws "QueueSport error on cmd 4: xfer across 1M boundary"
+  in Logic Analyser (resulting in issues with layer clearances), never really pings Sport DMA,
+  needs smaller VRAM?
 - 3do_fc1: hangs on OpenDiskFile at PC=2e6dc, path="/rom/system/tasks/shell", will "give up" if
   skipped.
+
+TODO (Arcade variants):
+- All needs actual Player bus hookup;
+- md23do: Eventually throws Madam "unsupported Packed CEL 5 1" after credits in attract;
 
 References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
 - https://github.com/trapexit/portfolio_os
+- 3dodev wiki;
 
 Hardware descriptions:
 
@@ -597,32 +602,31 @@ ROM_END
 
 // console section
 // Panasonic
-CONS( 1993, 3do_fz1,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (USA)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1993, 3do_fz1e,   3do_fz1,    0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Europe)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz1j,   3do_fz1,    0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Japan)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz10,   0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (USA)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz10e,  3do_fz10,   0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Europe, Anvil chipset)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz10j,  3do_fz10,   0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1993, 3do_fz1,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (USA)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1993, 3do_fz1e,   3do_fz1,    0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Europe)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz1j,   3do_fz1,    0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Japan)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10,   0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (USA)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10e,  3do_fz10,   0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Europe, Anvil chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10j,  3do_fz10,   0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
 // Goldstar
-CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO GDO-101M Interactive Multiplayer (USA?)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO GDO-101M Interactive Multiplayer (USA?)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
 // Sanyo
-CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J TRY Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J TRY Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
 
 
 // Arcade section
-GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
 // Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
 // (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)
 
 
 // American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
-GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
 
-GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-
+GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )

@@ -8,14 +8,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - Z80 clock speed
-
-*/
-
 #include "emu.h"
 #include "cpm.h"
 
@@ -62,7 +54,7 @@ void c64_cpm_cartridge_device::z80_io(address_map &map)
 
 void c64_cpm_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 3000000);
+	Z80(config, m_maincpu, 3000000); // DOTCLOCK/2 gated by PHI2, approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_cpm_cartridge_device::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c64_cpm_cartridge_device::z80_io);
 }
@@ -79,37 +71,18 @@ void c64_cpm_cartridge_device::device_add_mconfig(machine_config &config)
 
 inline void c64_cpm_cartridge_device::update_signals()
 {
-	if (m_enabled)
+	if (m_enabled && m_reset)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_slot->dma_w(ASSERT_LINE);
-
-		if (m_reset)
-		{
-			m_maincpu->reset();
-			m_maincpu->set_state_int(Z80_PC, 0);
-			m_reset = 0;
-		}
-	}
-	else
-	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_slot->dma_w(CLEAR_LINE);
+		m_maincpu->reset();
+		m_reset = 0;
 	}
 
-/*
-    // NOTE: the following is how it actually works once the Z80 core has been rewritten
+	m_slot->dma_w(m_enabled ? ASSERT_LINE : CLEAR_LINE);
 
-    // C64 DMA
-    m_slot->dma_w(m_enabled ? ASSERT_LINE : CLEAR_LINE);
+	int busreq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, busreq);
 
-    // Z80 BUSREQ
-    int busreq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
-    m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, busreq);
-
-    // Z80 WAIT
-    m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, m_enabled ? CLEAR_LINE : ASSERT_LINE);
-*/
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, m_enabled ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -127,7 +100,8 @@ c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config& mconfig
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_enabled(0),
-	m_ba(1), m_reset(0)
+	m_ba(1),
+	m_reset(0)
 {
 }
 
@@ -135,7 +109,7 @@ c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config& mconfig
 	c64_cpm_cartridge_device(mconfig, C64_CPM, tag, owner, clock)
 {
 }
-
+	
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -145,6 +119,7 @@ void c64_cpm_cartridge_device::device_start()
 	// state saving
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_ba));
+	save_item(NAME(m_reset));
 }
 
 

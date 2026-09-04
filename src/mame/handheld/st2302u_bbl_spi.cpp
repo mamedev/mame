@@ -36,6 +36,14 @@
 #include "emupal.h"
 #include "speaker.h"
 
+#define LOG_BBL_SPI         (1U << 1)
+#define LOG_BBL_UNKNOWN     (1U << 2)
+
+#define LOG_ALL             (LOG_BBL_SPI | LOG_BBL_UNKNOWN)
+
+#define VERBOSE             (0)
+
+#include "logmacro.h"
 
 namespace {
 
@@ -97,7 +105,7 @@ private:
 	required_device<st7735_lcdc_device> m_lcdc;
 	required_device<generic_spi_flash_device> m_genspi;
 
-	u8 ff_r() { logerror("%s reading from 0x14\n", machine().describe_context());  return 0xff; }
+	u8 ff_r() { LOGMASKED(LOG_BBL_UNKNOWN, "%s reading from 0x14\n", machine().describe_context()); return 0xff; }
 };
 
 
@@ -167,13 +175,13 @@ void bbl380_state::spi10_w(u8 data)
 {
 	m_spi10out = data;
 	m_spi10out_has_data = 1;
-	logerror("%s: spi10_w %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_BBL_SPI, "%s: spi10_w %02x\n", machine().describe_context(), data);
 }
 
 void bbl380_state::spi11_w(u8 data)
 {
 	m_spi11out = data;
-	logerror("%s: spi11_w %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_BBL_SPI, "%s: spi11_w %02x\n", machine().describe_context(), data);
 }
 
 u8 bbl380_state::spi10_r()
@@ -190,13 +198,13 @@ u8 bbl380_state::spi10_r()
 		m_spi10 = m_genspi->read();
 	}
 
-	logerror("%s: spi10_r returning %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_BBL_SPI, "%s: spi10_r returning %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 u8 bbl380_state::spi11_r()
 {
-	logerror("%s: spi11_r returning %02x\n", machine().describe_context(), m_spi11);
+	LOGMASKED(LOG_BBL_SPI, "%s: spi11_r returning %02x\n", machine().describe_context(), m_spi11);
 	return m_spi11;
 }
 

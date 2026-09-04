@@ -259,6 +259,9 @@ void clio_device::map(address_map &map)
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("vint0: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_vint0);
+			// TODO: this register doesn't make sense, cfr. below
+			if (mem_mask & 0xffff'ffff && data != 0xffff'ffff)
+				popmessage("vint0 %08x & %08x", data, mem_mask);
 		})
 	);
 	map(0x000c, 0x000f).lw32(
@@ -267,6 +270,11 @@ void clio_device::map(address_map &map)
 			COMBINE_DATA(&m_vint1);
 		})
 	);
+	// on Green chipset
+//  map(0x0010, 0x001f) Multi-chip
+	// on Anvil chipset
+//  map(0x0010, 0x0013) ClioDigVidEnc (Genlock, Progressive/Interlace and other related stuff)
+//  map(0x0014, 0x0017) ClioSbusState
 	map(0x0020, 0x0023).lrw32(
 		NAME([this] () { return m_audin; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -797,8 +805,11 @@ TIMER_CALLBACK_MEMBER(clio_device::scan_timer_cb)
 {
 	int scanline = param;
 
-	// TODO: does it triggers on odd fields only?
-	if (scanline == m_vint1 && m_screen->frame_number() & 1)
+	// TODO: Are we running system in progressive mode somehow?
+	// Somehow we need to run this at 60 Hz, no SW yet actually sets vint0 to any value.
+	// - bam throws massive tearing in gameplay at 30 Hz
+	// - cowcasn will misalign Madam VDLP display
+	if (scanline == m_vint1) //&& m_screen->frame_number() & 1)
 	{
 		request_fiq<0>(1 << IRQ_VINT1);
 	}

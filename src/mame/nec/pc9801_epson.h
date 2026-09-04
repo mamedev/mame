@@ -25,6 +25,7 @@ public:
 	void pc286vs(machine_config &config);
 	void pc286u(machine_config &config);
 	void pc386m(machine_config &config);
+	void pc386v(machine_config &config);
 	void pc486mu(machine_config &config);
 	void pc486se(machine_config &config);
 

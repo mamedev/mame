@@ -172,9 +172,9 @@ private:
 		u32 next_ptr;
 		u32 source_ptr;
 		u32 plut_ptr;
-		s32 xpos, ypos;
-		s32 hdx, hdy, vdx, vdy;
-		u32 hddx, hddy;
+		double xpos, ypos;
+		double hdx, hdy, vdx, vdy;
+		double hddx, hddy;
 		u32 pixc, pre0, pre1;
 		std::vector<u16> buffer;
 	} m_cel;

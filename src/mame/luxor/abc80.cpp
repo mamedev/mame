@@ -247,7 +247,7 @@ void abc80_state::abc80_mem(address_map &map)
 		NAME([this](offs_t offset) { return m_bus->xmemfl_r(offset + 0x4000); }),
 		NAME([this](offs_t offset, uint8_t data) { m_bus->xmemw_w(offset + 0x4000, data); })
 	);
-	map(0x7c00, 0x7fff).ram().share(m_video_ram);
+	map(0x7c00, 0x7fff).ram().w(FUNC(abc80_state::video_ram_w)).share(m_video_ram);
 	map(0xc000, 0xffff).ram();
 }
 
@@ -279,10 +279,10 @@ void tkn80_state::tkn80_mem(address_map &map)
 	m_view_rom2[0](0x2000, 0x23ff).rom().region(Z80_TAG, 0x2000);
 	m_view_rom2[1](0x2000, 0x23ff).rom().region("tkn80", 0x400);
 	m_view_rom2[2](0x2000, 0x23ff).rom().region("tkn80", 0xc00);
-	map(0x5800, 0x5fff).ram().share(m_char_ram);
+	map(0x5800, 0x5fff).ram().w(FUNC(tkn80_state::char_ram_w)).share(m_char_ram);
 	map(0x7c00, 0x7fff).lrw8( // map only the upper 1K of char RAM
 		NAME([this](offs_t offset) { return m_char_ram[0x400 | offset]; }),
-		NAME([this](offs_t offset, uint8_t data) { m_char_ram[0x400 | offset] = data; })
+		NAME([this](offs_t offset, uint8_t data) { char_ram_w(0x400 | offset, data); })
 	);
 }
 
@@ -512,7 +512,7 @@ void abc80_state::kbd_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(abc80_state::scanline_tick)
 {
-	draw_scanline(m_bitmap, m_screen->vpos());
+	update_screen();
 
 	m_pio_astb = !m_pio_astb;
 
@@ -548,6 +548,12 @@ TIMER_CALLBACK_MEMBER(abc80_state::blink_tick)
 TIMER_CALLBACK_MEMBER(abc80_state::vsync_on)
 {
 	if (LOG) logerror("%s vsync 1\n", machine().time().as_string());
+
+	update_screen_to(ABC80_VTOTAL, 0);
+
+	m_render_y = 0;
+	m_render_sx = 0;
+
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -582,6 +588,8 @@ void abc80_state::machine_start()
 	save_item(NAME(m_pio_astb));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_render_y));
+	save_item(NAME(m_render_sx));
 	save_item(NAME(m_motor));
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
@@ -622,18 +630,58 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 	int quickload_size = image.length();
 	std::vector<u8> data(quickload_size);
 	image.fread(&data[0], quickload_size);
-	for (int i = 1; i < quickload_size; i++)
-		space.write_byte(address++, data[i]);
+
+	/*
+
+	    A BASIC program is stored in 253 byte blocks, and a line is never split
+	    across a block boundary. Each line is stored as a length byte, a 16-bit
+	    line number, the tokenized line, and a CR. The lines of a block are
+	    followed by a zero length byte and stale buffer data, which has to be
+	    skipped, and the program is terminated by a length byte of 1.
+
+	*/
+
+	bool done = false;
+
+	for (int block = 0; !done && (block * BAC_BLOCK_SIZE) < quickload_size; block++)
+	{
+		int offset = block * BAC_BLOCK_SIZE;
+
+		// the first block starts with a file type byte
+		int pos = block ? 0 : 1;
+
+		while ((pos < BAC_BLOCK_SIZE) && ((offset + pos) < quickload_size))
+		{
+			u8 length = data[offset + pos];
+
+			if (length == BAC_END_OF_BLOCK) break;
+
+			if (length == BAC_END_OF_PROGRAM)
+			{
+				done = true;
+				break;
+			}
+
+			if ((pos + length) > BAC_BLOCK_SIZE) break;
+
+			for (int i = 0; i < length; i++)
+				space.write_byte(address++, data[offset + pos + i]);
+
+			pos += length;
+		}
+	}
+
+	space.write_byte(address, BAC_END_OF_PROGRAM);
 
 	offs_t eofa = address;
 	space.write_byte(EOFA, eofa & 0xff);
 	space.write_byte(EOFA + 1, eofa >> 8);
-	if (LOG) logerror("EOFA %04x\n",address);
+	if (LOG) logerror("EOFA %04x\n",eofa);
 
-	offs_t head = address + 1;
+	offs_t head = eofa + 1;
 	space.write_byte(HEAD, head & 0xff);
 	space.write_byte(HEAD + 1, head >> 8);
-	if (LOG) logerror("HEAD %04x\n",address);
+	if (LOG) logerror("HEAD %04x\n",head);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -668,6 +716,7 @@ void abc80_state::abc80_common(machine_config &config)
 	m_csg->set_pitch_voltage(0);
 	m_csg->set_slf_params(CAP_U(1), RES_K(220));
 	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
+	m_csg->set_enable(1);
 	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
@@ -691,7 +740,9 @@ void abc80_state::abc80_common(machine_config &config)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "generic_kb"));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
-	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc80_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(abc80_state::quickload_cb));
+	quickload.set_interface("abc80_quik");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K");
@@ -700,6 +751,7 @@ void abc80_state::abc80_common(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
 	SOFTWARE_LIST(config, "rom_list").set_original("abc80_rom");
+	SOFTWARE_LIST(config, "quik_list").set_original("abc80_quik");
 }
 
 void abc80_state::abc80(machine_config &config)
