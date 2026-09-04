@@ -152,7 +152,7 @@ void sh7014_device::execute_set_input(int irqline, int state)
 	sh7014_device::execute_set_input (for externally triggered IRQs)
 	-> sh7014_intc_device::set_input
 	-> sh7014_device::set_irq
-	-> sh2_device::execute_set_input (if not internal peripheral IRQ) OR DMA interception OR set sh2_device's internal IRQ flags
+	-> sh2_device::execute_set_input (NMI only) OR DMA interception OR set sh2_device's internal IRQ flags
 	*/
 	m_intc->set_input(irqline, state);
 }
@@ -166,7 +166,7 @@ void sh7014_device::set_irq(int vector, int level, bool is_internal)
 
 	// SH7014's DMA controller can be configured to trigger based on various
 	// on-board peripheral IRQs, so on-board peripheral IRQs must go through here
-	if (m_dmac->is_dma_activated(vector)) {
+	if (vector >= 0 && m_dmac->is_dma_activated(vector)) {
 		m_intc->set_interrupt(vector, CLEAR_LINE);
 		return;
 	}
