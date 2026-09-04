@@ -12,6 +12,7 @@
 
 #include "ioprocs.h"
 
+#include <algorithm>
 #include <bit>
 #include <cassert>
 #include <cstdlib>
