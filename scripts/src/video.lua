@@ -1003,6 +1003,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mpeg_video.h,VIDEOS["MPEG_VIDEO"] = true
+--------------------------------------------------
+
+if VIDEOS["MPEG_VIDEO"] then
+	files {
+		MAME_DIR .. "src/devices/video/mpeg_video.cpp",
+		MAME_DIR .. "src/devices/video/mpeg_video.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/mr9735.h,VIDEOS["MR9735"] = true
 --------------------------------------------------
 
