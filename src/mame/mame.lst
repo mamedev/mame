@@ -40295,6 +40295,10 @@ cm300
 @source:roland/roland_sc55mk2.cpp
 sc55mk2
 
+@source:roland/roland_sc8850.cpp
+sc8850
+sc8820
+
 @source:roland/roland_sc88.cpp
 sc88
 sc88vl
