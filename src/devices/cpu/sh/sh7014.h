@@ -13,6 +13,7 @@
 
 #include "sh2.h"
 #include "sh7014_adc.h"
+#include "sh7014_wdt.h"
 #include "sh7014_bsc.h"
 #include "sh7014_dmac.h"
 #include "sh7014_intc.h"
@@ -74,6 +75,7 @@ private:
 	void ccr_w(offs_t offset, uint16_t dat, uint16_t mem_mask = ~0);
 
 	required_device<sh7014_adc_device> m_adc;
+	required_device<sh7014_wdt_device> m_wdt;
 	required_device_array<sh7014_sci_device, 2> m_sci;
 	required_device<sh7014_bsc_device> m_bsc;
 	required_device<sh7014_dmac_device> m_dmac;

@@ -933,6 +933,8 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_port.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_sci.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_sci.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh7014_wdt.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh7014_wdt.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7021.cpp",

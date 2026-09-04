@@ -16,6 +16,7 @@ DEFINE_DEVICE_TYPE(SH7014, sh7014_device,  "sh7014",  "Hitachi SH-2 (SH7014)")
 sh7014_device::sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH7014, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh7014_device::sh7014_map), this), 32, 0xffffffff)
 	, m_adc(*this, "adc")
+	, m_wdt(*this, "wdt")
 	, m_sci(*this, "sci%u", 0u)
 	, m_bsc(*this, "bsc")
 	, m_dmac(*this, "dmac")
@@ -60,6 +61,7 @@ void sh7014_device::device_add_mconfig(machine_config &config)
 	);
 
 	SH7014_ADC(config, m_adc, DERIVED_CLOCK(1, 1), m_intc);
+	SH7014_WDT(config, m_wdt, DERIVED_CLOCK(1, 1), m_intc);
 
 	SH7014_BSC(config, m_bsc);
 
@@ -114,6 +116,8 @@ void sh7014_device::sh7014_map(address_map &map)
 
 	// A/D - A/D Converter (Mid Speed, for SH7016/SH7017)
 	map(0xffff8420, 0xffff842b).m(m_adc, FUNC(sh7014_adc_device::map));
+
+	map(0xffff8610, 0xffff8613).m(m_wdt, FUNC(sh7014_wdt_device::map));
 
 	// TODO: WDT - Watchdog Timer
 	// 0xffff8610 - 0xffff8613
