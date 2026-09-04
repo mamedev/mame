@@ -188,10 +188,10 @@ void vegaeo_state::vega(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vegaeo_state::vega_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(vegaeo_state::eolith_speedup), "screen", 0, 1);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 262);

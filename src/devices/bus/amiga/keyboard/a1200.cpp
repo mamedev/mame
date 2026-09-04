@@ -195,8 +195,6 @@ ioport_constructor a1200_kbd_device::device_input_ports() const
 
 void a1200_kbd_device::device_start()
 {
-	m_led_kbd_caps.resolve();
-
 	save_item(NAME(m_row_drive));
 	save_item(NAME(m_host_kdat));
 	save_item(NAME(m_mpu_kdat));

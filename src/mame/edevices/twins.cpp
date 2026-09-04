@@ -104,6 +104,8 @@ To access Service Mode:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -563,7 +565,7 @@ void twins_state::base_config(machine_config &config)
 
 void twins_state::video_config(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(8000000, 512, 0, 320, 312, 0, 204); // Common PAL values, HSync of 15.625 kHz unverified
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -606,7 +608,7 @@ void twins_state::twins(machine_config &config)
 	m_screen->set_screen_update(FUNC(twins_state::screen_update_twins));
 
 	PALETTE(config, m_palette).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &twins_state::ramdac_map);
 	ramdac.set_split_read(0);
 

@@ -20,6 +20,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 /*
 Name        Board No      Maker         Game name
 ----------------------------------------------------------------------------
@@ -451,12 +453,12 @@ void fixeight_state::fixeight(machine_config &config)
 	audiocpu.p0_in_cb().set_ioport("EEPROM");
 	audiocpu.p0_out_cb().set_ioport("EEPROM");
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240); // verified on PCB
 	m_screen->set_screen_update(FUNC(fixeight_state::screen_update));
@@ -494,10 +496,10 @@ void fixeight_bootleg_state::fixeightbl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fixeight_bootleg_state::fixeightbl_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fixeight_bootleg_state::cpu_space_fixeightbl_map);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	//m_screen->set_refresh_hz(60);

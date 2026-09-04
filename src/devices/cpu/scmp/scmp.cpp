@@ -67,16 +67,17 @@ uint16_t scmp_device::ADD12(uint16_t addr, int8_t val)
 
 uint8_t scmp_device::ROP()
 {
-	uint16_t pc = m_PC.w.l;
-	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_cache.read_byte( pc);
+	// PC is incremented before the fetch, not after
+	m_PC.w = ADD12(m_PC.w,1);
+	debugger_instruction_hook(m_PC.w);
+	return m_cache.read_byte(m_PC.w);
 }
 
 uint8_t scmp_device::ARG()
 {
-	uint16_t pc = m_PC.w.l;
-	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_cache.read_byte(pc);
+	// PC is incremented before the fetch, not after
+	m_PC.w = ADD12(m_PC.w,1);
+	return m_cache.read_byte(m_PC.w);
 }
 
 uint8_t scmp_device::RM(uint32_t a)
@@ -91,11 +92,10 @@ void scmp_device::WM(uint32_t a, uint8_t v)
 
 void scmp_device::illegal(uint8_t opcode)
 {
-	uint16_t const pc = m_PC.w.l;
-	LOG("SC/MP illegal instruction %04X $%02X\n", pc-1, opcode);
+	LOG("SC/MP illegal instruction %04X $%02X\n", m_PC.w, opcode);
 }
 
-PAIR *scmp_device::GET_PTR_REG(int num)
+PAIR16 *scmp_device::GET_PTR_REG(int num)
 {
 	switch(num) {
 	case 1: return &m_P1;
@@ -130,7 +130,7 @@ uint16_t scmp_device::GET_ADDR(uint8_t code)
 	uint16_t addr;
 	int8_t offset;
 	uint16_t retVal = 0;
-	uint16_t ptr = GET_PTR_REG(code & 0x03)->w.l;
+	uint16_t ptr = GET_PTR_REG(code & 0x03)->w;
 
 	uint8_t arg = ARG();
 	if (arg == 0x80)
@@ -145,12 +145,12 @@ uint16_t scmp_device::GET_ADDR(uint8_t code)
 			// Auto-indexed
 			if (offset < 0) {
 				// pre decrement
-				GET_PTR_REG(code & 0x03)->w.l = addr;
+				GET_PTR_REG(code & 0x03)->w = addr;
 				retVal = addr;
 			} else {
 				// post increment
 				retVal = ptr;
-				GET_PTR_REG(code & 0x03)->w.l = addr;
+				GET_PTR_REG(code & 0x03)->w = addr;
 			}
 		} else {
 			// Immediate
@@ -271,14 +271,14 @@ void scmp_device::execute_one(int opcode)
 			case 0x90 : case 0x91 : case 0x92 : case 0x93 :// JMP
 						m_icount -= 11;
 						tmp = ARG(); // PC must be updated before the destination address is calculated
-						m_PC.w.l = ADD12(GET_PTR_REG(ptr)->w.l,(int8_t)tmp);
+						m_PC.w = ADD12(GET_PTR_REG(ptr)->w,(int8_t)tmp);
 						break;
 			case 0x94 : case 0x95 : case 0x96 : case 0x97 :
 						// JP
 						m_icount -= 9;
 						tmp = ARG();
 						if (!(m_AC & 0x80)) {
-							m_PC.w.l = ADD12(GET_PTR_REG(ptr)->w.l,(int8_t)tmp);
+							m_PC.w = ADD12(GET_PTR_REG(ptr)->w,(int8_t)tmp);
 							m_icount -= 2;
 						}
 						break;
@@ -287,7 +287,7 @@ void scmp_device::execute_one(int opcode)
 						m_icount -= 9;
 						tmp = ARG();
 						if (!m_AC) {
-							m_PC.w.l = ADD12(GET_PTR_REG(ptr)->w.l,(int8_t)tmp);
+							m_PC.w = ADD12(GET_PTR_REG(ptr)->w,(int8_t)tmp);
 							m_icount -= 2;
 						}
 						break;
@@ -296,7 +296,7 @@ void scmp_device::execute_one(int opcode)
 						m_icount -= 9;
 						tmp = ARG();
 						if (m_AC) {
-							m_PC.w.l = ADD12(GET_PTR_REG(ptr)->w.l,(int8_t)tmp);
+							m_PC.w = ADD12(GET_PTR_REG(ptr)->w,(int8_t)tmp);
 							m_icount -= 2;
 						}
 						break;
@@ -367,12 +367,10 @@ void scmp_device::execute_one(int opcode)
 			case 0x3c:  case 0x3d :case 0x3e: case 0x3f:
 						// XPPC
 						{
-							uint16_t tmp16 = ADD12(m_PC.w.l,-1); // Since PC is incremented we need to fix it
+							uint16_t tmp16 = m_PC.w;
 							m_icount -= 7;
-							m_PC.w.l = GET_PTR_REG(ptr)->w.l;
-							GET_PTR_REG(ptr)->w.l = tmp16;
-							// After exchange CPU increment PC
-							m_PC.w.l = ADD12(m_PC.w.l,1);
+							m_PC.w = GET_PTR_REG(ptr)->w;
+							GET_PTR_REG(ptr)->w = tmp16;
 						}
 						break;
 			// Shift, Rotate, Serial I/O Instructions
@@ -453,15 +451,13 @@ void scmp_device::execute_one(int opcode)
 
 void scmp_device::take_interrupt()
 {
-	uint16_t tmp = ADD12(m_PC.w.l,-1); // We fix PC so at return it goes to current location
+	uint16_t tmp = m_PC.w;
 	m_SR &= 0xf7; // clear IE flag
 
 	m_icount -= 8; // assumption
 	// do XPPC 3
-	m_PC.w.l = GET_PTR_REG(3)->w.l;
-	GET_PTR_REG(3)->w.l = tmp;
-	// After exchange CPU increment PC
-	m_PC.w.l = ADD12(m_PC.w.l,1);
+	m_PC.w = GET_PTR_REG(3)->w;
+	GET_PTR_REG(3)->w = tmp;
 }
 
 void scmp_device::execute_run()
@@ -471,7 +467,6 @@ void scmp_device::execute_run()
 		if ((m_SR & 0x08) && (m_sensea_func())) {
 			take_interrupt();
 		}
-		debugger_instruction_hook(m_PC.d);
 		execute_one(ROP());
 
 	} while (m_icount > 0);
@@ -487,23 +482,23 @@ void scmp_device::device_start()
 	space(AS_PROGRAM).specific(m_program);
 
 	// set up the state table
-	state_add(SCMP_PC, "PC", m_PC.w.l);
-	state_add(STATE_GENPC, "GENPC", m_PC.w.l).noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
+	state_add(SCMP_PC, "PC", m_PC.w);
+	state_add(STATE_GENPC, "GENPC", m_PC.w).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PC.w).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).noshow().formatstr("%8s");
 
-	state_add(SCMP_P1, "P1", m_P1.w.l);
-	state_add(SCMP_P2, "P2", m_P2.w.l);
-	state_add(SCMP_P3, "P3", m_P3.w.l);
+	state_add(SCMP_P1, "P1", m_P1.w);
+	state_add(SCMP_P2, "P2", m_P2.w);
+	state_add(SCMP_P3, "P3", m_P3.w);
 	state_add(SCMP_AC, "AC", m_AC);
 	state_add(SCMP_ER, "ER", m_ER);
 	state_add(SCMP_SR, "SR", m_SR);
 
 	// register for savestates
-	save_item(NAME(m_PC));
-	save_item(NAME(m_P1));
-	save_item(NAME(m_P2));
-	save_item(NAME(m_P3));
+	save_item(NAME(m_PC.w));
+	save_item(NAME(m_P1.w));
+	save_item(NAME(m_P2.w));
+	save_item(NAME(m_P3.w));
 	save_item(NAME(m_AC));
 	save_item(NAME(m_ER));
 	save_item(NAME(m_SR));
@@ -519,10 +514,10 @@ void scmp_device::device_start()
 
 void scmp_device::device_reset()
 {
-	m_PC.d = 0;
-	m_P1.d = 0;
-	m_P2.d = 0;
-	m_P3.d = 0;
+	m_PC.w = 0;
+	m_P1.w = 0;
+	m_P2.w = 0;
+	m_P3.w = 0;
 	m_AC = 0;
 	m_ER = 0;
 	m_SR = 0;

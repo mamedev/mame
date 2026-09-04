@@ -108,9 +108,11 @@
 *******************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -141,8 +143,8 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void chewheel(machine_config &config);
-	void mil4000(machine_config &config);
+	void chewheel(machine_config &config) ATTR_COLD;
+	void mil4000(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -239,8 +241,6 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc3_tile_info)
 
 void mil4000_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_mcucomm));
 	save_item(NAME(m_mcudata));
 }
@@ -576,7 +576,7 @@ void mil4000_state::mil4000(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 240);

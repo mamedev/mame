@@ -23,7 +23,7 @@
 class beta_disk_device : public device_t
 {
 public:
-	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t status_r();
 	uint8_t track_r();

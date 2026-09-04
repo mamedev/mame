@@ -29,12 +29,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void io_isa_map(address_map &map) ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
 	required_device<tvga9000_device> m_vga;
@@ -53,12 +55,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void io_isa_map(address_map &map) ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
 	required_device<tgui9680_device> m_vga;

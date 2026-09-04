@@ -305,7 +305,7 @@ void cdc721_state::cdc721(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MCM51L01C45 (256x4) + battery
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.936_MHz_XTAL, 800, 0, 640, 539, 0, 450);
 	screen.set_screen_update(FUNC(cdc721_state::screen_update));
 	screen.set_palette("palette");

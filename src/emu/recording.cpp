@@ -13,6 +13,8 @@
 #include "fileio.h"
 #include "main.h"
 #include "screen.h"
+#include "sound.h"
+#include "video.h"
 
 #include "aviio.h"
 #include "png.h"

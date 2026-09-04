@@ -419,7 +419,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(labyrunr_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -427,7 +427,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	PALETTE(config, m_palette, FUNC(labyrunr_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 8*16*16, 128);
 
-	K007121(config, m_k007121, 0, gfx_labyrunr, m_palette, "screen");
+	K007121(config, m_k007121, gfx_labyrunr, m_palette, "screen");
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(labyrunr_state::flipscreen_w));

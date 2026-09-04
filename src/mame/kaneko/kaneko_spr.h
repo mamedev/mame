@@ -94,10 +94,10 @@ private:
 	std::unique_ptr<u16[]> m_sprites_regs;
 
 	std::unique_ptr<struct tempsprite_t[]> m_first_sprite;
-	int m_keep_sprites;
-	bitmap_ind16 m_sprites_bitmap;
-	bitmap_ind8 m_sprites_maskmap;
-
+	bool m_keep_sprites;
+	bitmap_ind16 m_sprites_bitmap[2];
+	bitmap_ind8 m_sprites_maskmap[2];
+	u8 m_buffer;
 
 	void draw_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
 
@@ -106,7 +106,7 @@ private:
 			u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
 			int priority);
 
-	int parse_sprite_type012(int i, struct tempsprite_t *s, u16* spriteram16, int spriteram16_bytes);
+	int parse_sprite(int i, struct tempsprite_t *s, u16* spriteram16, int spriteram16_bytes);
 };
 
 //extern const device_type KANEKO16_SPRITE;

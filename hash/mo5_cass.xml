@@ -19590,7 +19590,7 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 -->
 
 	<software name="yiear2">
-		<description>Yie Ar Kung Fu II</description>
+		<description>Yie Ar Kung-Fu II</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="KF 1101"/>
@@ -19603,7 +19603,7 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 	</software>
 
 	<software name="yiear2a" cloneof="yiear2">
-		<description>Yie Ar Kung Fu II (alt)</description>
+		<description>Yie Ar Kung-Fu II (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="KF 1101"/>
@@ -19616,7 +19616,7 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 	</software>
 
 	<software name="yiear2b" cloneof="yiear2">
-		<description>Yie Ar Kung Fu II (alt 2)</description>
+		<description>Yie Ar Kung-Fu II (alt 2)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="KF 1101"/>
@@ -19629,7 +19629,7 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 	</software>
 
 	<software name="yiear2c" cloneof="yiear2">
-		<description>Yie Ar Kung Fu II (alt 3)</description>
+		<description>Yie Ar Kung-Fu II (alt 3)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="KF 1101"/>

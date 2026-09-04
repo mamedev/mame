@@ -314,10 +314,10 @@ void snowbro2_state::snowbro2(machine_config &config)
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbro2_state::snowbro2_68k_mem);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(snowbro2_state::screen_update));

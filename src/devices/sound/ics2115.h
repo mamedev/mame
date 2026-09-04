@@ -53,18 +53,28 @@ private:
 			s32 left;
 			u32 acc, start, end; // address counters (20.9 fixed point)
 			u16 fc;              // frequency (6.9 fixed point)
-			u8 ctl, saddr;
+			u8 saddr;
 		} osc;
 
 		struct {
 			s32 left;
-			u32 add;
-			u32 start, end;
-			u32 acc;
+			s32 add;
+			s32 start, end;
+			s32 acc;
 			u16 regacc;
 			u8 incr;
 			u8 pan, mode;
 		} vol;
+
+		union {
+			struct {
+				u8 done       : 1;   // done flag
+				u8 stop       : 1;   // stop flag
+				u8            : 6;   // padding
+				// IRQ on variable?
+			} bitflags;
+			u8 value;
+		} osc_ctrl;
 
 		union {
 			struct {
@@ -96,18 +106,10 @@ private:
 			u8 value;
 		} vol_ctrl;
 
-		// Possibly redundant state. => improvements of wavetable logic
-		// may lead to its elimination.
-		struct {
-			bool on;
-			int ramp;       // 100 0000 = 0x40 maximum
-		} state;
-
 		u16 regs[0x20]; // channel registers
 		bool playing();
 		int update_volume_envelope();
 		int update_oscillator();
-		void update_ramp();
 	};
 
 	struct ics2115_timer {
@@ -138,7 +140,7 @@ private:
 	s16 m_ulaw[256];
 	u16 m_volume[4096];
 	u16 m_panlaw[256];
-	static const int volume_bits = 15;
+	u32 m_volinc_frac[32];
 
 	ics2115_voice m_voice[32];
 	ics2115_timer m_timer[2];
@@ -150,12 +152,6 @@ private:
 	bool m_irq_on;
 
 	u16 m_regs[0x40]; // global registers
-
-	/*
-	    Unknown variable, seems to be effected by 0x12. Further investigation
-	    Required.
-	*/
-	u8 m_vmode;
 };
 
 

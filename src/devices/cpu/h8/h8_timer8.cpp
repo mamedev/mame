@@ -24,7 +24,7 @@
 // 0 = no messages
 // 1 = timer setup
 // 2 = everything
-static constexpr int V = 1;
+static constexpr int V = 0;
 
 DEFINE_DEVICE_TYPE(H8_TIMER8_CHANNEL,  h8_timer8_channel_device,  "h8_timer8_channel",  "H8 8-bit timer channel")
 DEFINE_DEVICE_TYPE(H8H_TIMER8_CHANNEL, h8h_timer8_channel_device, "h8h_timer8_channel", "H8H 8-bit timer channel")
@@ -55,8 +55,19 @@ u8 h8_timer8_channel_device::tcr_r()
 void h8_timer8_channel_device::tcr_w(u8 data)
 {
 	update_counter();
+
+	const u8 prev = m_tcr;
 	m_tcr = data;
 	update_tcr();
+
+	// fire any pending interrupts if they're being enabled now
+	if(!(prev & TCR_CMIEA) && (m_tcr & TCR_CMIEA) && (m_tcsr & TCSR_CMFA))
+		m_intc->internal_interrupt(m_irq_ca);
+	if(!(prev & TCR_CMIEB) && (m_tcr & TCR_CMIEB) && (m_tcsr & TCSR_CMFB))
+		m_intc->internal_interrupt(m_irq_cb);
+	if(!(prev & TCR_OVIE) && (m_tcr & TCR_OVIE) && (m_tcsr & TCSR_OVF))
+		m_intc->internal_interrupt(m_irq_v);
+
 	recalc_event();
 }
 

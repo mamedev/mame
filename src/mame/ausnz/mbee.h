@@ -137,7 +137,6 @@ private:
 
 	required_device<palette_device> m_palette;
 	void mbee128_io(address_map &map) ATTR_COLD;
-	void mbee128p_io(address_map &map) ATTR_COLD;
 	void mbee256_io(address_map &map) ATTR_COLD;
 	void mbee256_mem(address_map &map) ATTR_COLD;
 	void mbee56_io(address_map &map) ATTR_COLD;

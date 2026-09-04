@@ -26,6 +26,8 @@ TODO:
 #include "hmcs400.h"
 #include "hmcs400d.h"
 
+#include <bit>
+
 
 //-------------------------------------------------
 //  device types
@@ -627,7 +629,7 @@ bool hmcs400_cpu_device::access_mode(u8 mem_mask, bool bit_mode)
 
 	if (bit_mode)
 	{
-		if (population_count_32(mem_mask) == 1)
+		if (std::has_single_bit(mem_mask))
 			return true;
 		err = mem_mask == 0xf;
 	}

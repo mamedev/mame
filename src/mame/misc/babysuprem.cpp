@@ -222,11 +222,6 @@ void bsuprem_state::machine_reset()
 
 void bsuprem_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-	m_buttons.resolve();
-	m_nixie.resolve();
-
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_u1_porta_data));
 	save_item(NAME(m_u10_data));

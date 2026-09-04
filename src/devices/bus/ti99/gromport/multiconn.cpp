@@ -247,7 +247,7 @@ void ti99_multi_cart_conn_device::device_reset(void)
 void ti99_multi_cart_conn_device::device_add_mconfig(machine_config &config)
 {
 	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
-		TI99_CART(config, m_cart[i], 0);
+		TI99_CART(config, m_cart[i]);
 }
 
 INPUT_CHANGED_MEMBER( ti99_multi_cart_conn_device::switch_changed )

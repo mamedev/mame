@@ -688,12 +688,16 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 	// Not perfectly exact, there are some rounding-like issues from
 	// time to time
 	s32 index = (m_pos_dec >> 4) & 2047;
-	s16 result = (
+	// The 4-tap cubic interpolation can overshoot past full scale near loud
+	// peaks; saturate to s16 instead of letting the store wrap (a full-scale
+	// sign flip = an audible click on loud notes).
+	s32 racc = (
 				  - interpolation_table[0][index ^ 2047] * val0
 				  + interpolation_table[1][index ^ 2047] * val1
 				  + interpolation_table[1][index       ] * val2
 				  - interpolation_table[0][index       ] * val3
 				  ) >> 10;
+	s16 result = std::clamp<s32>(racc, -0x8000, 0x7fff);
 
 	u32 pitch = m_pitch + pitch_lfo;
 	if(m_finetune_active) {
@@ -1732,7 +1736,9 @@ void swp30_device::device_start()
 	for(int i=1; i != 0x40; i++)
 		state_add(i+1, util::string_format("m%02x", i).c_str(), m_meg->m_m[i]);
 
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, 0, 1, 9, 0);
+	// SWP30 compiles the entire MEG program as one block, so the max sequence length is
+	// passed as 0 bytes.  In the unlikely event that changes, this should be updated.
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, 0, 1, 9, 0, 0);
 	m_drcuml->symbol_add(&m_meg->m_pc,          sizeof(m_meg->m_pc),          "pc");
 	m_drcuml->symbol_add(&m_meg->m_icount,      sizeof(m_meg->m_icount),      "icount");
 	m_drcuml->symbol_add(&m_meg->m_program,     sizeof(m_meg->m_program),     "program");

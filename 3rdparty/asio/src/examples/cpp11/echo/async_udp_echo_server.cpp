@@ -2,7 +2,7 @@
 // async_udp_echo_server.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -68,10 +68,13 @@ int main(int argc, char* argv[])
     }
 
     asio::io_context io_context;
+    auto work = asio::make_work_guard(io_context);
+    std::thread t([&](){io_context.run();});
 
     server s(io_context, std::atoi(argv[1]));
 
-    io_context.run();
+    work.reset();
+    t.join();
   }
   catch (std::exception& e)
   {

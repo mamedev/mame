@@ -180,6 +180,7 @@ public:
 	void wldgunsb(machine_config &config) ATTR_COLD;
 	void tmntmwb(machine_config &config) ATTR_COLD;
 	void piratdwb(machine_config &config) ATTR_COLD;
+	void issdxb(machine_config &config) ATTR_COLD;
 
 	void init_iron() ATTR_COLD;
 	void init_denseib() ATTR_COLD;
@@ -195,6 +196,7 @@ public:
 	void init_venom() ATTR_COLD;
 	void init_wldgunsb() ATTR_COLD;
 	void init_piratdwb() ATTR_COLD;
+	void init_issdxb() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(piratdwb_coin_w);
 	int prot_nmi_r() { return m_prot_nmi; }
@@ -232,6 +234,7 @@ private:
 	void venom_map(address_map &map) ATTR_COLD;
 	void wldgunsb_map(address_map &map) ATTR_COLD;
 	void tmntmwb_map(address_map &map) ATTR_COLD;
+	void issdxb_map(address_map &map) ATTR_COLD;
 
 	void piratdwb_map(address_map &map) ATTR_COLD;
 	void piratdwb_68k_map(address_map &map) ATTR_COLD;
@@ -505,6 +508,18 @@ void snesb_state::piratdwb_68k_map(address_map &map)
 		NAME([this](offs_t, u8) { m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 0); })
 	);
 }
+
+void snesb_state::issdxb_map(address_map &map)
+{
+	extrainp_map(map);
+
+	map(0x5b0956, 0x5b0956).lr8(NAME([]() { return 0xd3; }));
+	map(0x5b134a, 0x5b134a).lr8(NAME([]() { return 0x69; }));
+	map(0x5b2c8f, 0x5b2c8f).lr8(NAME([]() { return 0xb6; }));
+	map(0x6a6d1d, 0x6a6d1d).r(FUNC(snesb_state::prot_cnt_r));
+	map(0x781000, 0x781013).ram().share(m_shared_ram[0]);
+}
+
 
 static INPUT_PORTS_START( snes_common )
 
@@ -1077,6 +1092,51 @@ static INPUT_PORTS_START( piratdwb )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snesb_state::piratdwb_coin_w), 0)
 INPUT_PORTS_END
 
+// verified from 5A22 code
+static INPUT_PORTS_START( issdxb )
+	PORT_INCLUDE(snes_common)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x05, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hardest ) ) // duplicate settings
+	PORT_DIPSETTING(    0x01, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x18, 0x10, "Time" )
+	PORT_DIPSETTING(    0x18, "3 Minutes" )
+	PORT_DIPSETTING(    0x10, "5 Minutes" )
+	PORT_DIPSETTING(    0x08, "7 Minutes" )
+	PORT_DIPSETTING(    0x00, "7 Minutes" ) // duplicate setting
+	PORT_DIPNAME( 0x20, 0x20, "Sound" )
+	PORT_DIPSETTING(    0x20, "Stereo" )
+	PORT_DIPSETTING(    0x00, "Mono" )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+INPUT_PORTS_END
 
 void snesb_state::base(machine_config &config)
 {
@@ -1093,7 +1153,7 @@ void snesb_state::base(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
 	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	m_screen->set_screen_update(FUNC(snes_state::screen_update));
@@ -1191,6 +1251,13 @@ void snesb_state::tmntmwb(machine_config &config)
 	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::tmntmwb_map);
+}
+
+void snesb_state::issdxb(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::issdxb_map);
 }
 
 void snesb_state::piratdwb(machine_config &config)
@@ -1727,6 +1794,59 @@ void snesb_state::init_piratdwb()
 	init_snes();
 }
 
+void snesb_state::init_issdxb()
+{
+	uint8_t *src = memregion("user7")->base();
+	uint8_t *dst = memregion("user3")->base();
+
+	static const uint8_t address_tab_high[32] = {
+		0x0b, 0x1d, 0x05, 0x15, 0x09, 0x19, 0x04, 0x13, 0x02, 0x1f, 0x07, 0x17, 0x0d, 0x11, 0x0a, 0x1a,
+		0x14, 0x0e, 0x18, 0x06, 0x1e, 0x01, 0x10, 0x0c, 0x1b, 0x0f, 0x16, 0x00, 0x12, 0x08, 0x1c, 0x03
+	};
+
+	static const uint8_t address_tab_low[64] = {
+		0x14, 0x1d, 0x11, 0x3c, 0x0a, 0x29, 0x2d, 0x2e, 0x30, 0x32, 0x16, 0x36, 0x05, 0x25, 0x26, 0x37,
+		0x20, 0x21, 0x27, 0x28, 0x33, 0x34, 0x23, 0x12, 0x1e, 0x1f, 0x3b, 0x24, 0x2c, 0x35, 0x38, 0x39,
+		0x3d, 0x0c, 0x2a, 0x0d, 0x22, 0x18, 0x19, 0x1a, 0x03, 0x08, 0x04, 0x3a, 0x0b, 0x0f, 0x15, 0x17,
+		0x1b, 0x13, 0x00, 0x1c, 0x2b, 0x01, 0x06, 0x2f, 0x07, 0x09, 0x02, 0x31, 0x10, 0x0e, 0x3f, 0x3e
+	};
+
+	static const uint8_t data_high[16] = {
+		0x21, 0x40, 0x49, 0x01, 0x09, 0x69, 0x61, 0x41, 0x68, 0x00, 0x20, 0x28, 0x48, 0x29, 0x60, 0x08
+	};
+
+	static const uint8_t data_low[16] = {
+		0x84, 0x10, 0x92, 0x80, 0x82, 0x96, 0x94, 0x90, 0x16, 0x00, 0x04, 0x06, 0x12, 0x86, 0x14, 0x02
+	};
+
+	for (int i = 0; i < 0x200000; i++)
+	{
+	int j = (address_tab_high[(i >> 15) & 0x1f] << 15) + (i & 0x107fc0) + address_tab_low[i & 0x3f];
+
+	dst[i] = data_high[src[j] >> 4] | data_low[src[j] & 0xf];
+
+	if (i >= 0x00000 && i < 0x10000)
+		dst[i] = bitswap<8>(dst[i], 4, 5, 1, 6, 0, 3, 7, 2) ^ 0xff;
+
+	if (i >= 0x10000 && i < 0x20000)
+		dst[i] = bitswap<8>(dst[i], 0, 2, 3, 7, 4, 5, 6, 1) ^ 0xff;
+
+	if (i >= 0x20000 && i < 0x30000)
+		dst[i] = bitswap<8>(dst[i], 5, 7, 6, 4, 1, 0, 2, 3);
+
+	if (i >= 0x30000 && i < 0x40000)
+		dst[i] = bitswap<8>(dst[i], 6, 3, 0, 1, 2, 4, 5, 7) ^ 0xff;
+	}
+
+	//  boot vector
+	dst[0x7ffc] = 0x00;
+	dst[0x7ffd] = 0x80;
+
+	save_item(NAME(m_cnt));
+
+	init_snes();
+}
+
 
 ROM_START( kinstb )
 	ROM_REGION( 0x400000, "user3", 0 )
@@ -1929,6 +2049,16 @@ ROM_START( piratdwb ) // this PCB has a M68000 in addition to the usual SNES boo
 	ROM_LOAD16_BYTE( "2", 0x00001, 0x20000, CRC(81fb1936) SHA1(ba7168a6f117eb9722180eb6cd78f69fc1db90ec) )
 ROM_END
 
+ROM_START( issdxb )
+	ROM_REGION( 0x300000, "user3", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x300000, "user7", 0 )
+	ROM_LOAD( "gjz004rom.u31", 0x000000, 0x080000, CRC(a529f021) SHA1(4b52f7c7aa62e3a2ddc52401682677eb4fcb4b74) )
+	ROM_LOAD( "gjz003rom.u32", 0x080000, 0x080000, CRC(4e7eb15e) SHA1(b197dd9702afe564ab7f42d421d4a22acb0a2708) )
+	ROM_LOAD( "gjz002rom.u33", 0x100000, 0x080000, CRC(60b874b9) SHA1(fb0ffc23d61e6a135988fcb96ecc596d47d3c3e3) )
+	ROM_LOAD( "gjz001rom.u34", 0x180000, 0x080000, CRC(b5aa3e3a) SHA1(3193e68611709f7fd24c4b52f4f198c6701d819d) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -1948,3 +2078,4 @@ GAME( 1997, rushbets,     0,        rushbets,     legendsb, snesb_state, init_ru
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",         "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",         "Wild Guns (SNES bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
 GAME( 1996, piratdwb,     0,        piratdwb,     piratdwb, snesb_state, init_piratdwb,  ROT0, "bootleg (Conny)", "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, issdxb,       0,        issdxb,       issdxb,   snesb_state, init_issdxb,    ROT0, "bootleg",         "International Superstar Soccer Deluxe (SNES bootleg)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

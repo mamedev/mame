@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <numbers>
+
 
 /***************************************************************************
     CONSTANTS
@@ -59,7 +61,7 @@ enum
 ***************************************************************************/
 
 #define MCS48_LC_CLOCK(_L, _C) \
-	(1 / (2 * M_PI * sqrt(_L * _C)))
+	(1 / (2 * std::numbers::pi * sqrt(_L * _C)))
 
 #define MCS48_ALE_CLOCK(_clock) \
 	attotime::from_hz(_clock/(3*5))
@@ -95,6 +97,7 @@ DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  // 2k internal UV EPROM, 256 bytes
 // Clones
 DECLARE_DEVICE_TYPE(MB8884,  mb8884_device)   // 8035 clone
 DECLARE_DEVICE_TYPE(UPD7751, upd7751_device)  // 8048 clone
+DECLARE_DEVICE_TYPE(MB8881,  mb8881_device)   // 8039 clone
 DECLARE_DEVICE_TYPE(M58715,  m58715_device)   // 8049 clone
 
 
@@ -608,6 +611,13 @@ class upd7751_device : public mcs48_cpu_device
 public:
 	// construction/destruction
 	upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class mb8881_device : public mcs48_cpu_device
+{
+public:
+	// construction/destruction
+	mb8881_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class m58715_device : public mcs48_cpu_device

@@ -8,7 +8,6 @@
 
     Adds the multiply-and-accumulate register and related instructions
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H8S2600_H

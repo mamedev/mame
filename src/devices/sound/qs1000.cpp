@@ -155,7 +155,7 @@ void qs1000_device::qs1000_data_map(address_map &map)
 // ROM definition for the QS1000 internal program ROM
 ROM_START( qs1000 )
 	ROM_REGION( 0x10000, "cpu", 0 )
-	ROM_LOAD_OPTIONAL( "qs1000.bin", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD( "qs1000.bin", 0x0000, 0x10000, NO_DUMP )
 ROM_END
 
 

@@ -62,9 +62,9 @@ public:
 		, m_caps_led(*this, "caps_led")
 	{ }
 
-	void wren(machine_config &config);
+	void wren(machine_config &config) ATTR_COLD;
 
-	void init_wren();
+	void init_wren() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_palette);
 
@@ -171,9 +171,6 @@ void wren_state::io_map(address_map &map)
 
 void wren_state::machine_start()
 {
-	m_power_led.resolve();
-	m_caps_led.resolve();
-
 	m_kbd_col       = 0x00;
 	m_video_control = 0x00;
 	m_relay_control = 0x00;
@@ -592,7 +589,7 @@ void wren_state::wren(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&wren_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

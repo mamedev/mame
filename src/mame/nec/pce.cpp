@@ -58,7 +58,6 @@ Super System Card:
 #include "bus/pce/pce_acard.h"
 #include "bus/pce/pce_rom.h"
 #include "bus/pce/pce_scdsys.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
 #include "video/huc6202.h"
@@ -189,7 +188,7 @@ void pce_state::pce_common(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	screen.set_palette(m_huc6260);
@@ -209,7 +208,7 @@ void pce_state::pce_common(machine_config &config)
 	PCE_CONTROL_PORT(config, m_port_ctrl, pce_control_port_devices, "joypad2");
 
 	// TODO: expansion port not emulated
-	PCE_CD(config, m_cd, 0);
+	PCE_CD(config, m_cd);
 	m_cd->irq().set_inputline(m_maincpu, 1);
 	m_cd->set_maincpu(m_maincpu);
 	m_cd->add_route(0, "speaker", 1.0, 0);
@@ -256,7 +255,7 @@ void pce_state::sgx(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	screen.set_palette(m_huc6260);
@@ -298,7 +297,7 @@ void pce_state::sgx(machine_config &config)
 	SOFTWARE_LIST(config, "pce_list").set_compatible("pce");
 
 	// TODO: expansion port not emulated
-	PCE_CD(config, m_cd, 0);
+	PCE_CD(config, m_cd);
 	m_cd->irq().set_inputline(m_maincpu, 1);
 	m_cd->set_maincpu(m_maincpu);
 	m_cd->add_route(0, "speaker", 1.0, 0);

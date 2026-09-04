@@ -33,6 +33,7 @@
 #include "express.h"
 
 #include "corestr.h"
+#include "endianness.h"
 
 #include <cctype>
 #include <locale>

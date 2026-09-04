@@ -25,12 +25,12 @@ geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, cons
 
 void geforce_7600gs_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(nvidia_nv3_vga_device::screen_update));
 
 	// TODO: very late superset (G73)
-	NVIDIA_NV3_VGA(config, m_vga, 0);
+	NVIDIA_NV3_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// FIXME: shared RAM
 	m_vga->set_vram_size(256*1024*1024);

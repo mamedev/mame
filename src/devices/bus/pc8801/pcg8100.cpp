@@ -35,7 +35,7 @@ void pcg8100_device::device_add_mconfig(machine_config &config)
 {
 	constexpr XTAL pcg_clock = XTAL(31'948'800) / 8;
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(pcg_clock);
 	m_pit->out_handler<0>().set(m_dac1bit[0], FUNC(speaker_sound_device::level_w));
 	m_pit->set_clk<1>(pcg_clock);

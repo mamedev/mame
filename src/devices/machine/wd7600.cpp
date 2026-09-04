@@ -56,16 +56,16 @@ void wd7600_device::device_add_mconfig(machine_config & config)
 	m_dma2->out_dack_callback<2>().set(FUNC(wd7600_device::dma2_dack2_w));
 	m_dma2->out_dack_callback<3>().set(FUNC(wd7600_device::dma2_dack3_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set(FUNC(wd7600_device::pic1_int_w));
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(wd7600_device::pic1_slave_ack_r));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir2_w));
 	m_pic2->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_ctc, 0);
+	PIT8254(config, m_ctc);
 	m_ctc->set_clk<0>(XTAL(14'318'181) / 12.0);
 	m_ctc->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 	m_ctc->set_clk<1>(XTAL(14'318'181) / 12.0);

@@ -79,7 +79,7 @@ GFXDECODE_END
 
 void elan_eu3a14_soc_device::device_add_mconfig(machine_config &config)
 {
-	ELAN_EU3A14_SYS(config, m_sys, 0);
+	ELAN_EU3A14_SYS(config, m_sys);
 	m_sys->set_cpu(DEVICE_SELF);
 	m_sys->bank_change_callback().set(FUNC(elan_eu3a14_soc_device::bank_change));
 
@@ -87,7 +87,7 @@ void elan_eu3a14_soc_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	ELAN_EU3A14_VID(config, m_vid, 0);
+	ELAN_EU3A14_VID(config, m_vid);
 	m_vid->set_cpu(DEVICE_SELF);
 	m_vid->set_palette(m_palette);
 	m_vid->set_entries(512);

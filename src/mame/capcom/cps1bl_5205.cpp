@@ -363,7 +363,7 @@ void cps1bl_5205_state::captcommb2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_5205_state, captcommb2)
 	MCFG_MACHINE_RESET_OVERRIDE(cps1bl_5205_state, captcommb2)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps1bl_5205_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(cps1bl_5205_state::screen_vblank_cps1));
@@ -381,10 +381,10 @@ void cps1bl_5205_state::captcommb2(machine_config &config)
 	ym2151.add_route(0, "mono", 0.35);
 	ym2151.add_route(1, "mono", 0.35);
 
-	LS157(config, m_msm_mux[0], 0);
+	LS157(config, m_msm_mux[0]);
 	m_msm_mux[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_msm_mux[1], 0);
+	LS157(config, m_msm_mux[1]);
 	m_msm_mux[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm[0], 400000);  // 400kHz measured on pcb
@@ -425,7 +425,7 @@ void cps1bl_5205_state::sf2mdt(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(cps1bl_5205_state, captcommb2)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps1bl_5205_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(cps1bl_5205_state::screen_vblank_cps1));
@@ -442,10 +442,10 @@ void cps1bl_5205_state::sf2mdt(machine_config &config)
 
 	YM2151(config, "2151", 3750000).add_route(0, "mono", 0.35).add_route(1, "mono", 0.35);
 
-	LS157(config, m_msm_mux[0], 0);
+	LS157(config, m_msm_mux[0]);
 	m_msm_mux[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_msm_mux[1], 0);
+	LS157(config, m_msm_mux[1]);
 	m_msm_mux[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm[0], 400000);  // 400kHz ?

@@ -92,6 +92,7 @@ void elan_eu3a05vid_device::device_start()
 	save_item(NAME(m_sprite_gfxbase_hi_data));
 	save_item(NAME(m_tile_scroll));
 	save_item(NAME(m_splitpos));
+	save_item(NAME(m_transpen));
 }
 
 void elan_eu3a05vid_device::device_reset()
@@ -112,6 +113,7 @@ void elan_eu3a05vid_device::device_reset()
 	for (int i=0;i<2;i++)
 		m_splitpos[i] = 0x00;
 
+	m_transpen = 0x00;
 }
 
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)

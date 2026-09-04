@@ -105,8 +105,8 @@ void cdi_state::cdimono1_mem(address_map &map)
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("plane0");
-	map(0x200000, 0x27ffff).ram().share("plane1");
+	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
+	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
 #if ENABLE_UART_PRINTING
 	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
@@ -145,6 +145,11 @@ static INPUT_PORTS_START( cdi )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Button 2")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Button 3")
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("TESTPLUG")
+	PORT_CONFNAME( 0x01, 0x00, "Test plug" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
@@ -362,59 +367,13 @@ void cdi_state::dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 *       LCD screen       *
 *************************/
 
-static const uint16_t cdi220_lcd_char[20*22] =
-{
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x0000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0000, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x8000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0002, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0000, 0x8000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0002, 0x0000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0000, 0x0000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0000, 0x0000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0000, 0x0000, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0000, 0x0000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0000, 0x0010, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0008, 0x0000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0010, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0008, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0000, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400
-};
 
 uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!m_slave_hle.found())
-		return 0;
+	uint8_t lcd_state[16];
+	std::copy_n(m_slave_hle->get_lcd_state(), 16, lcd_state);
 
-	for (int y = 0; y < 22; y++)
-	{
-		uint32_t *scanline = &bitmap.pix(y);
-
-		for (int lcd = 0; lcd < 8; lcd++)
-		{
-			uint16_t data = (m_slave_hle->get_lcd_state()[lcd*2] << 8) |
-							m_slave_hle->get_lcd_state()[lcd*2 + 1];
-			for (int x = 0; x < 20; x++)
-			{
-				if (data & cdi220_lcd_char[y*20 + x])
-				{
-					scanline[(7 - lcd)*24 + x] = rgb_t::white();
-				}
-				else
-				{
-					scanline[(7 - lcd)*24 + x] = rgb_t::black();
-				}
-			}
-		}
-	}
-
+	cdi220_lcd::draw(bitmap, cliprect, lcd_state);
 	return 0;
 }
 
@@ -433,16 +392,16 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(960*(312*2-32)*50, 960, 0, 768, 312*2-32, 32, 312*2-32);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(14976000*2, 960, 0, 768, 312*2, 32*2, 312*2); // x2 for interlace
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lcd);
 	m_lcd->set_refresh_hz(50);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(192, 22);
-	m_lcd->set_visarea(0, 192-1, 0, 22-1);
+	m_lcd->set_size(cdi220_lcd::WIDTH, cdi220_lcd::HEIGHT);
+	m_lcd->set_visarea_full();
 	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
 	PALETTE(config, "palette").set_entries(0x100);
@@ -455,7 +414,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_cdic->set_clock2(45.1584_MHz_XTAL * 3 / 7); // generated by PLL circuit incorporating 19.3575 MHz XTAL
 	m_cdic->intreq_callback().set(m_maincpu, FUNC(scc68070_device::in4_w));
 
-	CDI_SLAVE_HLE(config, m_slave_hle, 0);
+	CDI_SLAVE_HLE(config, m_slave_hle);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 	m_slave_hle->atten_callback().set(m_cdic, FUNC(cdicdic_device::atten_w));
 
@@ -484,16 +443,16 @@ void cdi_state::cdimono2(machine_config &config)
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(14976000*2, 960, 0, 768, 312*2, 32*2, 312*2); // x2 for interlace
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lcd);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(192, 22);
-	m_lcd->set_visarea(0, 192-1, 0, 22-1);
+	m_lcd->set_size(cdi220_lcd::WIDTH, cdi220_lcd::HEIGHT);
+	m_lcd->set_visarea_full();
 	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
 	PALETTE(config, "palette").set_entries(0x100);
@@ -528,16 +487,16 @@ void cdi_state::cdi910(machine_config &config)
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(14976000*2, 960, 0, 768, 312*2, 32*2, 312*2); // x2 for interlace
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lcd);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(192, 22);
-	m_lcd->set_visarea(0, 192-1, 0, 22-1);
+	m_lcd->set_size(cdi220_lcd::WIDTH, cdi220_lcd::HEIGHT);
+	m_lcd->set_visarea_full();
 	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
 	PALETTE(config, "palette").set_entries(0x100);
@@ -571,6 +530,7 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousex().set_ioport("MOUSEX");
 	m_slave_hle->read_mousey().set_ioport("MOUSEY");
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
+	m_slave_hle->testplug_callback().set_ioport("TESTPLUG");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");

@@ -103,6 +103,7 @@ void ncr53c94_device::map(address_map &map)
 	ncr53c90a_device::map(map);
 
 	map(0xc, 0xc).rw(FUNC(ncr53c94_device::conf3_r), FUNC(ncr53c94_device::conf3_w));
+	map(0xe, 0xe).lr8(NAME([]() { return 0x00; }));
 	map(0xf, 0xf).w(FUNC(ncr53c94_device::fifo_align_w));
 }
 
@@ -110,6 +111,8 @@ uint8_t ncr53c94_device::read(offs_t offset)
 {
 	if (offset == 12)
 		return conf3_r();
+	else if (offset == 14)
+		return 0x00;
 	return ncr53c90a_device::read(offset);
 }
 

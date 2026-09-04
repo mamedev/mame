@@ -717,7 +717,7 @@ void kangaroo_base_state::fnkyfish(machine_config &config)
 	m_audiocpu->set_vblank_int("screen", FUNC(kangaroo_base_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_raw(10_MHz_XTAL, 320*2, 0*2, 256*2, 260, 8, 248);
 	screen.set_screen_update(FUNC(kangaroo_base_state::screen_update));

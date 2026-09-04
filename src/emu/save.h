@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -178,7 +179,7 @@ public:
 
 	// templatized wrapper for general objects and arrays
 	template <typename ItemType>
-	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname) requires is_atom<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		static_assert(!std::is_pointer<ItemType>::value, "Called save_item on a pointer with no count!");
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT);
@@ -196,7 +197,7 @@ public:
 
 	// templatized wrapper for pointers
 	template <typename ItemType>
-	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count) requires is_atom<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
@@ -212,7 +213,7 @@ public:
 
 	// templatized wrapper for std::unique_ptr
 	template <typename ItemType>
-	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count) requires is_atom<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
@@ -228,7 +229,7 @@ public:
 
 	// templatized wrapper for std::vector
 	template <typename ItemType>
-	std::enable_if_t<is_vector_safe<typename array_unwrap<ItemType>::underlying_type>::value> save_item(device_t *device, const char *module, const char *tag, int index, std::vector<ItemType> &value, const char *valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, std::vector<ItemType> &value, const char *valname) requires is_vector_safe<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		save_pointer(device, module, tag, index, &value[0], valname, value.size());
 	}
@@ -256,7 +257,7 @@ public:
 
 	// specializations for attotimes
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname) requires std::is_same_v<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".attoseconds");
@@ -266,7 +267,7 @@ public:
 	}
 
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count) requires std::is_same_v<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".attoseconds");
@@ -276,7 +277,7 @@ public:
 	}
 
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count) requires std::is_same_v<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".attoseconds");
@@ -300,7 +301,7 @@ public:
 	{ save_pointer(nullptr, "global", nullptr, index, std::forward<ItemType>(value), element, valname, count); }
 
 	// file processing
-	static save_error check_file(running_machine &machine, util::core_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
+	static std::pair<save_error, std::string> check_file(running_machine &machine, util::core_file &file, const char *gamename);
 	save_error write_file(util::core_file &file);
 	save_error read_file(util::core_file &file);
 
@@ -328,7 +329,7 @@ private:
 	save_error do_read(T check_length, U read_block, V start_header, W start_data);
 	u32 signature() const;
 	void dump_registry() const;
-	static save_error validate_header(const u8 *header, const char *gamename, u32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
+	static std::pair<save_error, std::string> validate_header(const u8 *header, const char *gamename, u32 signature);
 
 	// internal state
 	running_machine &         m_machine;              // reference to our machine
@@ -410,7 +411,6 @@ ALLOW_SAVE_TYPE_AND_VECTOR(PAIR)
 ALLOW_SAVE_TYPE_AND_VECTOR(PAIR64)
 ALLOW_SAVE_TYPE_AND_VECTOR(float)
 ALLOW_SAVE_TYPE_AND_VECTOR(double)
-ALLOW_SAVE_TYPE_AND_VECTOR(endianness_t)
 ALLOW_SAVE_TYPE_AND_VECTOR(rgb_t)
 
 

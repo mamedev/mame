@@ -3,63 +3,52 @@
 /***************************************************************************
 
   pippin.cpp: Apple/Bandai Pippin
-  Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
+  Driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
+  Big thanks to the DingusPPC team
 
   Apple ASICs identified:
   -----------------------
-  343S0152    Aspen (Bandit derived PCI host bridge and RAM controller)
-  343S0153    Taos (640x480 framebuffer with double-buffering and convolution to fix interlace flicker)
-  343S1125    Grand Central (SWIM III, Sound, VIA)
-  341S0060    Cuda (68HC05 MCU, handles ADB and parameter ("CMOS") RAM)
-  343S1146    ??? (likely SCSI due to position on board)
+  343S0152 Aspen (Bandit derived PCI host bridge and RAM controller)
+  343S0153 Taos (640x480 framebuffer with double-buffering and convolution to fix interlace flicker)
+  343S1125 Grand Central (SWIM III, Sound, VIA)
+  341S0060 Cuda (68HC05 MCU, handles ADB and parameter ("CMOS") RAM)
+  343S1146 MESH (customized 539x SCSI)
   343S1191(x2) Athens Prime PLL Clock Generator
 
   Other chips
   -----------
   Z8530 SCC
   CS4217 audio DAC
-  Bt856 video DAC
-
-  Pippin-type map
-  00000000 : RAM
-  80000000 : PCI memory (to EFFFFFFF)
-  F0000000 : 1 MB video RAM
-  F0100000 : Space for second 1 MB of video RAM (unused in Pippin)
-  (2 MB VRAM space mirrors every 0x00200000 until F0800000)
-  F0800000 : Taos registers
-  F1000000 : Palette for 256 color mode
-  F3000000 : Grand Central I/O controller
-  F3008000 : DMA channel registers
-  F3010000 : SCSI0
-  F3011000 : MACE Ethernet
-  F3012000 : SCC (68K Mac style addressing)
-  F3013000 : SCC (MacRISC addressing)
-  F3014000 : AWACS audio
-  F3015000 : SWIM III floppy
-  F3016000 : VIA1 (interface to Cuda)
-  F3018000 : SCSI1
-
-  NOTE: the PowerPC starts off disabled; the Cuda 68HC05 starts it up once it's booted.
-
-  NOTE 2: goes off into the weeds in the subroutine at fff05010
+  Bt856 composite video encoder (I2C controlled)
+  AMD Am29F010 1Mbit flash (game save storage) at 0x40000000, one byte per
+    32-bit word, with its data bus wired bit-reversed (DQ7..DQ0 on D0..D7)
 
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/mn1880/mn1880.h"
-#include "imagedev/cdromimg.h"
+#include "machine/input_merger.h"
+#include "machine/intelfsh.h"
 #include "machine/ram.h"
 #include "sound/cdda.h"
 
+#include "endianness.h"
+
+#include "athensprime.h"
 #include "awacs_macrisc.h"
 #include "bandit.h"
 #include "cuda.h"
 #include "heathrow.h"
-#include "macadb.h"
+#include "mesh.h"
+#include "taos.h"
+
 #include "softlist.h"
 #include "speaker.h"
-
 class pippin_state : public driver_device
 {
 public:
@@ -69,42 +58,79 @@ public:
 
 	required_device<ppc_device> m_maincpu;
 	required_device<aspen_host_device> m_aspen;
+	required_device<grandcentral_device> m_grandcentral;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<mesh_device> m_mesh;
+	required_device<athensprime_device> m_athensprime;
 	required_device<cuda_device> m_cuda;
-	required_device<macadb_device> m_macadb;
+	required_device<taos_device> m_taos;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
+	required_device<amd_29f010_device> m_flash;
 
 private:
 	void pippin_map(address_map &map) ATTR_COLD;
 	void cdmcu_mem(address_map &map) ATTR_COLD;
 	void cdmcu_data(address_map &map) ATTR_COLD;
 
+	void cuda_reset_w(int state);
+
+	u8 flash_r(offs_t offset);
+	void flash_w(offs_t offset, u8 data);
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	void cuda_reset_w(int state)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
-	}
-
-	void irq_w(int state)
-	{
-		m_maincpu->set_input_line(PPC_IRQ, state);
-	}
 };
 
 pippin_state::pippin_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_aspen(*this, "pci:00.0"),
+	m_grandcentral(*this, "pci:10.0"),
+	m_scsibus(*this, "scsi"),
+	m_mesh(*this, "mesh"),
+	m_athensprime(*this, "athensprime"),
 	m_cuda(*this, "cuda"),
-	m_macadb(*this, "macadb"),
-	m_ram(*this, RAM_TAG)
+	m_taos(*this, "taos"),
+	m_adbbus(*this, "adb"),
+	m_ram(*this, RAM_TAG),
+	m_flash(*this, "flash")
 {
 }
 
 void pippin_state::machine_start()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	u8 *const bank0 = m_ram->pointer();
+	u8 *const bank1 = m_ram->pointer() + 0x400000;
+
+	// The firmware does some really strange checks for mirroring in the memory sizing routine
+	space.install_ram(0x0000'0000, 0x003f'ffff, bank0);
+	space.install_ram(0x00c0'1000, 0x00c0'1FFF, bank0 + 0x200);
+	space.install_ram(0x00c0'0000, 0x00c0'0FFF, bank0 + 0x200);
+	space.install_ram(0x0040'0000, 0x0040'0FFF, bank0 + 0x200);
+	space.install_ram(0x0100'0000, 0x010f'ffff, bank1);
+	space.install_ram(0x01c0'1000, 0x01c0'1FFF, bank1);
+	space.install_ram(0x01c0'0000, 0x01c0'0FFF, bank1);
+	space.install_ram(0x0140'0000, 0x0140'0FFF, bank1);
+
+	if (m_ram->size() > 0x500000)
+	{
+		u8 *exp = m_ram->pointer() + 0x500000;
+
+		space.install_ram(0x0200'0000, 0x027f'ffff, exp);
+		space.install_ram(0x02c0'1000, 0x02c0'1FFF, exp + 0x600);
+		space.install_ram(0x02c0'0000, 0x02c0'0FFF, exp + 0x600);
+
+		if (m_ram->size() > 0xd00000)
+		{
+			exp += 0x800000;
+
+			space.install_ram(0x0300'0000, 0x037f'ffff, exp);
+			space.install_ram(0x03c0'1000, 0x03c0'1FFF, exp + 0x600);
+			space.install_ram(0x03c0'0000, 0x03c0'0FFF, exp + 0x600);
+		}
+	}
 }
 
 void pippin_state::machine_reset()
@@ -115,21 +141,28 @@ void pippin_state::machine_reset()
 
 void pippin_state::pippin_map(address_map &map)
 {
-	map(0x00000000, 0x005fffff).ram();
+	// 1Mbit save flash: flash A0 is CPU A2, so each byte occupies the top byte lane of a 32-bit word
+	map(0x4000'0000, 0x4007'ffff).rw(FUNC(pippin_state::flash_r), FUNC(pippin_state::flash_w)).umask64(0xff00'0000'ff00'0000);
 
-	/* writes at 0x0*c01000 the string "Mr. Kesh" and wants it to be read back, true color VRAMs perhaps? */
-	map(0x00c00000, 0x00c01007).ram();
-	map(0x01c00000, 0x01c01007).ram();
-	map(0x02c00000, 0x02c01007).ram();
-	map(0x03c00000, 0x03c01007).ram();
+	map(0xf000'0000, 0xf100'ffff).m(m_taos, FUNC(taos_device::map));
 
-	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
-	map(0x40000000, 0x40000000).lr8(NAME([]() { return 0x80; }));   // hack to make flash ROM status check pass (causes 0xe1 to be written to VRAM, which is important later)
-	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a7001; }));
+	map(0xffc0'0000, 0xffff'ffff).rom().region("bootrom", 0);
+}
 
-	map(0xf0000000, 0xf00fffff).ram();  // VRAM
+void pippin_state::cuda_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
 
-	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
+u8 pippin_state::flash_r(offs_t offset)
+{
+	return bitswap<8>(m_flash->read(offset), 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
+void pippin_state::flash_w(offs_t offset, u8 data)
+{
+	m_flash->write(offset, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 void pippin_state::cdmcu_mem(address_map &map)
@@ -170,44 +203,90 @@ void pippin_state::pippin(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pippin_state::pippin_map);
 
 	PCI_ROOT(config, "pci", 0);
-	ASPEN(config, m_aspen, 66000000, "maincpu").set_dev_offset(1);
+	aspen_host_device &aspen(ASPEN(config, m_aspen, 66000000, "maincpu"));
+	aspen.set_dev_offset(1);
 
-	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
-	cdrom.set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
 	RAM(config, m_ram);
-	m_ram->set_default_size("32M");
+	m_ram->set_default_size("13M");
+	m_ram->set_extra_options("5M, 21M");
 
-	grandcentral_device &grandcentral(GRAND_CENTRAL(config, "pci:0d.0", 0));
-	grandcentral.set_maincpu_tag("maincpu");
-	grandcentral.irq_callback().set(FUNC(pippin_state::irq_w));
+	GRAND_CENTRAL(config, m_grandcentral);
+	m_grandcentral->set_maincpu_tag("maincpu");
+	m_grandcentral->irq_callback().set_inputline(m_maincpu, PPC_IRQ);
+
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
+	{
+		device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+		device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
+	});
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+
+	APPLE_MESH_SCSI(config, m_mesh, 50_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_mesh);
+	m_mesh->drq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_drq));
+	m_mesh->irq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_irq));
+	m_mesh->cmd_done_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(5, !state); });
+	m_mesh->exception_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(6, !state); });
+	m_mesh->error_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(7, !state); });
+	m_grandcentral->scsi1_r_callback().set(m_mesh, FUNC(mesh_device::read));
+	m_grandcentral->scsi1_w_callback().set(m_mesh, FUNC(mesh_device::write));
+	m_grandcentral->scsi1_dma_r_callback().set(m_mesh, FUNC(mesh_device::dma16_r));
+	m_grandcentral->scsi1_dma_w_callback().set(m_mesh, FUNC(mesh_device::dma16_w));
+
+	APPLE_TAOS(config, m_taos, 31.3344_MHz_XTAL);
+
+	AMD_29F010(config, m_flash);
 
 	awacs_macrisc_device &awacs(AWACS_MACRISC(config, "codec", 45.1584_MHz_XTAL / 2));
-	awacs.dma_output().set(grandcentral, FUNC(heathrow_device::codec_dma_read));
+	awacs.dma_output().set(m_grandcentral, FUNC(heathrow_device::codec_dma_read));
+	awacs.dma_input().set(m_grandcentral, FUNC(heathrow_device::codec_dma_write));
 
-	grandcentral.codec_r_callback().set(awacs, FUNC(awacs_macrisc_device::read_macrisc));
-	grandcentral.codec_w_callback().set(awacs, FUNC(awacs_macrisc_device::write_macrisc));
+	m_grandcentral->codec_r_callback().set(awacs, FUNC(awacs_macrisc_device::read_macrisc));
+	m_grandcentral->codec_w_callback().set(awacs, FUNC(awacs_macrisc_device::write_macrisc));
 
 	SPEAKER(config, "speaker", 2).front();
 	awacs.add_route(0, "speaker", 1.0, 0);
 	awacs.add_route(1, "speaker", 1.0, 1);
 
-	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
+	APPLE_ATHENSPRIME(config, m_athensprime, 20_MHz_XTAL);
+	m_athensprime->pclock_changed().set(m_taos, FUNC(taos_device::set_pixclock));
+
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "pippin_controller");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, nullptr);
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(pippin_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
-	m_cuda->via_clock_callback().set(grandcentral, FUNC(heathrow_device::cb1_w));
-	m_cuda->via_data_callback().set(grandcentral, FUNC(heathrow_device::cb2_w));
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
+	m_cuda->via_clock_callback().set(m_grandcentral, FUNC(heathrow_device::cb1_w));
+	m_cuda->via_data_callback().set(m_grandcentral, FUNC(heathrow_device::cb2_w));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+
+	input_merger_device &sda_merger(INPUT_MERGER_ALL_HIGH(config, "sda"));
+	sda_merger.output_handler().append(m_cuda, FUNC(cuda_device::set_iic_sda));
+
+	m_athensprime->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
+
+	m_cuda->iic_sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<0>));
+	m_cuda->iic_sda_callback().append(m_athensprime, FUNC(athensprime_device::sda_write));
+
+	m_cuda->iic_scl_callback().set(m_athensprime, FUNC(athensprime_device::scl_write));
+
 	config.set_perfect_quantum(m_maincpu);
 
-	grandcentral.pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
-	grandcentral.pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
-	grandcentral.pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
-	grandcentral.cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
+	m_grandcentral->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
+	m_grandcentral->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
+	m_grandcentral->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
+	m_grandcentral->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
 
 	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
 	cdmcu.set_addrmap(AS_PROGRAM, &pippin_state::cdmcu_mem);
@@ -255,4 +334,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME        FLAGS */
-COMP( 1996, pippin, 0,      0,      pippin,  pippin, pippin_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_NOT_WORKING)
+COMP( 1996, pippin, 0,      0,      pippin,  pippin, pippin_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_SUPPORTS_SAVE)

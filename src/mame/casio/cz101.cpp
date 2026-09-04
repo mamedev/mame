@@ -420,10 +420,6 @@ void cz101_state::port_c_w(uint8_t data)
 
 void cz101_state::machine_start()
 {
-	m_leds.resolve();
-	m_led_env.resolve();
-	m_led_tone.resolve();
-
 	// register for save states
 	save_item(NAME(m_power));
 	save_item(NAME(m_port_b));
@@ -465,7 +461,7 @@ void cz101_state::cz101(machine_config &config)
 	m_maincpu->txd_func().set("mdout", FUNC(midi_port_device::write_txd));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16 + 1, 19);

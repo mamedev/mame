@@ -429,7 +429,7 @@ void decwriter_state::la120(machine_config &config)
 
 	/* video hardware */
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(decwriter_state::screen_update));
 	screen.set_size(640,480);
 	screen.set_visarea_full();

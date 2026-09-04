@@ -315,11 +315,11 @@ void ibmpc_state::ibm5150(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa3", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa4", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
@@ -360,14 +360,14 @@ void ibmpc_state::ibm5160(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa8", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa3", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa4", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa7", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa8", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));

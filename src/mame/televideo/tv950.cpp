@@ -292,7 +292,7 @@ void tv950_state::tv950(machine_config &config)
 	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	mainirq.output_handler().append(m_via, FUNC(via6522_device::write_pa6)).invert();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250);   // not real values
 	screen.set_screen_update("crtc", FUNC(r6545_1_device::screen_update));
 

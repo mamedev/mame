@@ -323,12 +323,9 @@ public:
 	{
 	}
 
-	virtual uint32_t lba_address() override
+	virtual uint64_t lba_address() override
 	{
-		if (m_device_head & IDE_DEVICE_HEAD_L)
-			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;
-
-		return ide_hdd_device::lba_address();
+		return (m_device_head & IDE_DEVICE_HEAD_L) ? ide_hdd_device::lba_address() - 63 : ide_hdd_device::lba_address();
 	}
 };
 
@@ -361,7 +358,7 @@ void turrett_state::turrett(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(turrett_devices, "hdd", nullptr, true);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: Likely not correct. Refresh rate empirically determined
 	// to ensure in-sync streaming sound
 	m_screen->set_raw(4000000, 512, 0, 336, 259, 0, 244);

@@ -787,7 +787,7 @@ void msisaac_state::msisaac(machine_config &config)
 #endif
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -863,4 +863,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, msisaac, 0, msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0, msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

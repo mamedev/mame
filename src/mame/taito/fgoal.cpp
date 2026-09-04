@@ -542,7 +542,7 @@ void fgoal_state::fgoal(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 263);
 	m_screen->set_visarea(0, 255, 16, 255);

@@ -249,8 +249,6 @@ uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_rgb32 &
 
 void dlair_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_last_misc));
 	save_item(NAME(m_laserdisc_data));
 }
@@ -748,7 +746,7 @@ void dlair_state::dlair_base(machine_config &config)
 void dlair_state::dlair_pr7820(machine_config &config)
 {
 	dlair_base(config);
-	PIONEER_PR7820(config, m_pr7820, 0);
+	PIONEER_PR7820(config, m_pr7820);
 	m_pr7820->add_route(0, "speaker", 1.0, 0);
 	m_pr7820->add_route(1, "speaker", 1.0, 1);
 	m_pr7820->add_ntsc_screen(config, "screen");
@@ -758,7 +756,7 @@ void dlair_state::dlair_pr7820(machine_config &config)
 void dlair_state::dlair_ldv1000(machine_config &config)
 {
 	dlair_base(config);
-	PIONEER_LDV1000HLE(config, m_ldv1000, 0);
+	PIONEER_LDV1000HLE(config, m_ldv1000);
 	m_ldv1000->add_route(0, "speaker", 1.0, 0);
 	m_ldv1000->add_route(1, "speaker", 1.0, 1);
 	m_ldv1000->add_ntsc_screen(config, "screen");
@@ -783,7 +781,7 @@ void dlair_state::dleuro(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)));
 
-	PHILIPS_22VP932(config, m_22vp932, 0);
+	PHILIPS_22VP932(config, m_22vp932);
 	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
 	m_22vp932->add_route(0, "speaker", 1.0, 0);
 	m_22vp932->add_route(1, "speaker", 1.0, 1);

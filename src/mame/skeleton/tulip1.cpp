@@ -152,7 +152,7 @@ void tulip1_state::tulip1(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &tulip1_state::io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16000000, 912, 0, 640, 312, 0, 275); // unknown clock
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
@@ -166,7 +166,7 @@ void tulip1_state::tulip1(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(tulip1_state::crtc_update_row));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, "kbd", default_rs232_devices, "keyboard"));

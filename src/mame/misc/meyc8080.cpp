@@ -82,7 +82,7 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void meyc8080(machine_config &config);
+	void meyc8080(machine_config &config) ATTR_COLD;
 
 private:
 	void lights_1_w(uint8_t data);
@@ -94,8 +94,6 @@ private:
 	void meyc8080_dac_4_w(uint8_t data);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void meyc8080_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_shared_ptr<uint8_t> m_videoram_0;
 	required_shared_ptr<uint8_t> m_videoram_1;
@@ -594,7 +592,7 @@ void meyc8080_state::meyc8080(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
 	screen.set_refresh_hz(60);

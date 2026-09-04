@@ -294,7 +294,7 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, 
 
 	// draw the sprites into separate bitmaps and check overlapping region
 	m_sprite_sprite_collbitmap1.fill(TRANSPARENT_PEN);
-		get_sprite_gfx_element(which1)->transpen(m_sprite_sprite_collbitmap1, m_sprite_sprite_collbitmap1.cliprect(),
+	get_sprite_gfx_element(which1)->transpen(m_sprite_sprite_collbitmap1, m_sprite_sprite_collbitmap1.cliprect(),
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,
 			0,
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 2] & 0x01,
@@ -302,7 +302,7 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, 
 			sx1, sy1, 0);
 
 	m_sprite_sprite_collbitmap2.fill(TRANSPARENT_PEN);
-		get_sprite_gfx_element(which2)->transpen(m_sprite_sprite_collbitmap2, m_sprite_sprite_collbitmap2.cliprect(),
+	get_sprite_gfx_element(which2)->transpen(m_sprite_sprite_collbitmap2, m_sprite_sprite_collbitmap2.cliprect(),
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 3] & 0x3f,
 			0,
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 2] & 0x01,
@@ -313,7 +313,7 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, 
 		for (int x = minx; x < maxx; x++)
 			if ((m_sprite_sprite_collbitmap1.pix(y, x) != TRANSPARENT_PEN) &&
 				(m_sprite_sprite_collbitmap2.pix(y, x) != TRANSPARENT_PEN))
-				return 1;  /* collided */
+				return 1; // collided
 
 	return 0;
 }
@@ -336,7 +336,7 @@ void taitosj_state::check_sprite_sprite_collision()
 			{
 				uint8_t sx2, sy2;
 
-				if ((which2 >= 0x10) && (which2 <= 0x17)) continue;   // no sprites here
+				if ((which2 >= 0x10) && (which2 <= 0x17)) continue; // no sprites here
 
 				if (!get_sprite_xy(which2, &sx2, &sy2)) continue;
 
@@ -346,7 +346,7 @@ void taitosj_state::check_sprite_sprite_collision()
 				{
 					int reg;
 
-					if (!check_sprite_sprite_bitpattern(sx1, sy1, which1, sx2, sy2, which2))  continue;
+					if (!check_sprite_sprite_bitpattern(sx1, sy1, which1, sx2, sy2, which2)) continue;
 
 					/* mark sprite as collided
 					   note that only the sprite with the higher number is marked
@@ -357,14 +357,14 @@ void taitosj_state::check_sprite_sprite_collision()
 					if (which2 == 0x1f)
 					{
 						reg = which1 >> 3;
-						if (reg == 3)  reg = 2;
+						if (reg == 3) reg = 2;
 
 						m_collision_reg[reg] |= (1 << (which1 & 0x07));
 					}
 					else
 					{
 						reg = which2 >> 3;
-						if (reg == 3)  reg = 2;
+						if (reg == 3) reg = 2;
 
 						m_collision_reg[reg] |= (1 << (which2 & 0x07));
 					}
@@ -377,14 +377,11 @@ void taitosj_state::check_sprite_sprite_collision()
 
 void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_areas)
 {
-	int width = m_screen->width();
-	int height = m_screen->height();
-
 	for (int which = 0; which < 0x20; which++)
 	{
 		uint8_t sx, sy;
 
-		if ((which >= 0x10) && (which <= 0x17)) continue;   // no sprites here
+		if ((which >= 0x10) && (which <= 0x17)) continue; // no sprites here
 
 		if (get_sprite_xy(which, &sx, &sy))
 		{
@@ -402,14 +399,6 @@ void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_ar
 			maxx = minx + 15;
 			maxy = miny + 15;
 
-			// check for bitmap bounds to avoid illegal memory access
-			if (minx < 0) minx = 0;
-			if (miny < 0) miny = 0;
-			if (maxx >= width - 1)
-				maxx = width - 1;
-			if (maxy >= height - 1)
-				maxy = height - 1;
-
 			sprite_areas[which].min_x = minx;
 			sprite_areas[which].max_x = maxx;
 			sprite_areas[which].min_y = miny;
@@ -420,6 +409,9 @@ void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_ar
 		// sprite is off
 		else
 			sprites_on[which] = 0;
+
+		// check for bitmap bounds to avoid illegal memory access
+		sprite_areas[which] &= m_sprite_layer_collbitmap2[0].cliprect();
 	}
 }
 
@@ -447,20 +439,20 @@ int taitosj_state::check_sprite_layer_bitpattern(int which, rectangle *sprite_ar
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x3f,
 			0,
 			flip_x, flip_y,
-			0,0,0);
+			0, 0, 0);
 
 	for (int y = miny; y < maxy; y++)
 		for (int x = minx; x < maxx; x++)
 			if (m_sprite_layer_collbitmap1.pix(y - miny, x - minx) != TRANSPARENT_PEN) // is there anything to check for ?
 			{
 				if (check_layer_1 && (m_sprite_layer_collbitmap2[0].pix(y, x) != TRANSPARENT_PEN))
-					result |= 0x01;  // collided with layer 1
+					result |= 0x01; // collided with layer 1
 
 				if (check_layer_2 && (m_sprite_layer_collbitmap2[1].pix(y, x) != TRANSPARENT_PEN))
-					result |= 0x02;  // collided with layer 2
+					result |= 0x02; // collided with layer 2
 
 				if (check_layer_3 && (m_sprite_layer_collbitmap2[2].pix(y, x) != TRANSPARENT_PEN))
-					result |= 0x04;  // collided with layer 3
+					result |= 0x04; // collided with layer 3
 			}
 
 	return result;
@@ -474,7 +466,7 @@ void taitosj_state::check_sprite_layer_collision(int *sprites_on, rectangle *spr
 		// check each sprite
 		for (int which = 0; which < 0x20; which++)
 		{
-			if ((which >= 0x10) && (which <= 0x17)) continue;   // no sprites here
+			if ((which >= 0x10) && (which <= 0x17)) continue; // no sprites here
 
 			if (sprites_on[which])
 				m_collision_reg[3] |= check_sprite_layer_bitpattern(which, sprite_areas);
@@ -579,7 +571,7 @@ void taitosj_state::copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	if (*m_video_mode & layer_enable_mask[which])
 	{
-		int i, scrollx, scrolly[32];
+		int scrollx, scrolly[32];
 
 		scrollx = m_scroll[2 * which];
 
@@ -589,16 +581,16 @@ void taitosj_state::copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			scrollx = -(scrollx & 0xf8) + ((scrollx + fudge1[which]) & 7) + fudge2[which];
 
 		if (GLOBAL_FLIP_Y)
-			for (i = 0;i < 32;i++)
+			for (int i = 0; i < 32; i++)
 				scrolly[31 - i] =  m_colscrolly[32 * which + i] + m_scroll[2 * which + 1];
 		else
-			for (i = 0;i < 32;i++)
+			for (int i = 0; i < 32; i++)
 				scrolly[i]      = -m_colscrolly[32 * which + i] - m_scroll[2 * which + 1];
 
 		copyscrollbitmap_trans(bitmap, m_layer_bitmap[which], 1, &scrollx, 32, scrolly, cliprect, TRANSPARENT_PEN);
 
 		// store parts covered with sprites for sprites/layers collision detection
-		for (i = 0; i < 0x20; i++)
+		for (int i = 0; i < 0x20; i++)
 		{
 			if ((i >= 0x10) && (i <= 0x17)) continue; // no sprites here
 
@@ -613,29 +605,29 @@ void taitosj_state::kikstart_copy_layer(bitmap_ind16 &bitmap, const rectangle &c
 {
 	if (*m_video_mode & layer_enable_mask[which])
 	{
-		int i, scrolly, scrollx[32 * 8];
+		int scrolly, scrollx[32 * 8];
 
-		for (i = 1; i < 32*8; i++) // 1-255 !
+		for (int i = 1; i < 32*8; i++) // 1-255 !
 			if (GLOBAL_FLIP_Y)
 				switch (which)
 				{
-				case 0: scrollx[32 * 8 - i] = 0 ;break;
-				case 1: scrollx[32 * 8 - i] = m_kikstart_scrollram[i] + ((m_scroll[2 * which] + 0x0a) & 0xff);break;
-				case 2: scrollx[32 * 8 - i] = m_kikstart_scrollram[0x100 + i] + ((m_scroll[2 * which] + 0xc) & 0xff);break;
+				case 0: scrollx[32 * 8 - i] = 0; break;
+				case 1: scrollx[32 * 8 - i] = m_kikstart_scrollram[i] + ((m_scroll[2 * which] + 0x0a) & 0xff); break;
+				case 2: scrollx[32 * 8 - i] = m_kikstart_scrollram[0x100 + i] + ((m_scroll[2 * which] + 0xc) & 0xff); break;
 				}
 			else
 				switch (which)
 				{
-				case 0: scrollx[i] = 0 ;break;
-				case 1: scrollx[i] = 0xff - m_kikstart_scrollram[i - 1] - ((m_scroll[2 * which] - 0x10) & 0xff);break;
-				case 2: scrollx[i] = 0xff - m_kikstart_scrollram[0x100 + i - 1] - ((m_scroll[2 * which] - 0x12) & 0xff);break;
+				case 0: scrollx[i] = 0; break;
+				case 1: scrollx[i] = 0xff - m_kikstart_scrollram[i - 1] - ((m_scroll[2 * which] - 0x10) & 0xff); break;
+				case 2: scrollx[i] = 0xff - m_kikstart_scrollram[0x100 + i - 1] - ((m_scroll[2 * which] - 0x12) & 0xff); break;
 				}
 
 		scrolly = m_scroll[2 * which + 1]; // always 0
 		copyscrollbitmap_trans(bitmap, m_layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, cliprect, TRANSPARENT_PEN);
 
 		// store parts covered with sprites for sprites/layers collision detection
-		for (i = 0; i < 0x20; i++)
+		for (int i = 0; i < 0x20; i++)
 		{
 			if ((i >= 0x10) && (i <= 0x17)) continue; // no sprites here
 
@@ -663,7 +655,6 @@ void taitosj_state::copy_layers(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	for (int i = 0; i < 4; i++)
 	{
 		int which = m_draw_order[*m_video_priority & 0x1f][i];
-
 		copy_layer(bitmap, cliprect, copy_layer_func, which, sprites_on, sprite_areas);
 	}
 }
@@ -673,6 +664,7 @@ void taitosj_state::check_collision(int *sprites_on, rectangle *sprite_areas)
 {
 	check_sprite_sprite_collision();
 
+	// check_sprite_layer_collision() uses drawn bitmaps, so it must me called _AFTER_ draw_layers()
 	check_sprite_layer_collision(sprites_on, sprite_areas);
 
 	// check_layer_layer_collision(); // not implemented !!!
@@ -684,15 +676,12 @@ int taitosj_state::video_update_common(bitmap_ind16 &bitmap, const rectangle &cl
 	int sprites_on[0x20]; // 1 if sprite is active
 	rectangle sprite_areas[0x20]; // areas on bitmap (sprite locations)
 
+	calculate_sprite_areas(sprites_on, sprite_areas);
 	set_pens();
 
 	draw_layers();
 
-	calculate_sprite_areas(sprites_on, sprite_areas);
-
 	copy_layers(bitmap, cliprect, copy_layer_func, sprites_on, sprite_areas);
-
-	//check_sprite_layer_collision() uses drawn bitmaps, so it must me called _AFTER_ draw_layers()
 	check_collision(sprites_on, sprite_areas);
 
 	return 0;

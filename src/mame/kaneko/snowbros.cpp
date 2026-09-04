@@ -1932,7 +1932,7 @@ void snowbros_state::snowbros_base(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* 8 Mhz - confirmed */
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_pandora_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_pandora_state::scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1941,7 +1941,7 @@ void snowbros_state::snowbros_base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &snowbros_pandora_state::sound_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5); /* ~57.5 - confirmed */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 262);
@@ -1973,7 +1973,7 @@ void snowbros_pandora_state::snowbros(machine_config &config)
 	m_screen->set_screen_update(FUNC(snowbros_pandora_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(snowbros_pandora_state::screen_vblank));
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_snowbros_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_snowbros_spr);
 }
 
 void snowbros_state::wintbob(machine_config &config)
@@ -2000,7 +2000,7 @@ void semicom_state::semicom(machine_config &config)
 
 	m_soundcpu->set_clock(XTAL(16'000'000)/4); /* 4MHz - Confirmed */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &semicom_state::hyperpac_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, address_map_constructor());
+	m_soundcpu->remove_addrmap(AS_IO);
 
 	m_pandora->set_gfxinfo(gfx_hyperpac_spr);
 
@@ -2042,14 +2042,14 @@ void snowbros_state::honeydol(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* MC68000P12 @ 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::honeydol_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_state::scanline), "screen", 0, 1);
 
 	Z80(config, m_soundcpu, XTAL(16'000'000)/4); /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &snowbros_state::honeydol_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &snowbros_state::honeydol_sound_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(32*8, 262);
@@ -2079,7 +2079,7 @@ void snowbros_state::twinadv(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* 12MHz like Honey Doll ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::twinadv_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_state::scanline), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	Z80(config, m_soundcpu, XTAL(16'000'000)/4); /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
@@ -2088,7 +2088,7 @@ void snowbros_state::twinadv(machine_config &config)
 	m_soundcpu->set_vblank_int("screen", FUNC(snowbros_state::irq0_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(32*8, 262);
@@ -2165,11 +2165,11 @@ void snowbros3_state::snowbro3(machine_config &config) /* PCB has 16MHz & 12MHz 
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros3_state::snowbros3_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros3_state::snowbros3_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros3_state::snowbros3_scanline), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -2193,12 +2193,12 @@ void snowbros_pandora_state::yutnori(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_pandora_state::yutnori_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_pandora_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_pandora_state::scanline), "screen", 0, 1);
 
 //  WATCHDOG_TIMER(config, "watchdog"); // maybe
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 262);
@@ -2209,7 +2209,7 @@ void snowbros_pandora_state::yutnori(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_hyperpac_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_hyperpac_spr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

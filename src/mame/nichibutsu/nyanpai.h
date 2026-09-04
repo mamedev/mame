@@ -8,6 +8,8 @@
 #include "nb1413m3.h"
 #include "nichisnd.h"
 
+#include "mahjong.h"
+
 #include "cpu/m68000/tmp68301.h"
 #include "machine/ticket.h"
 
@@ -148,10 +150,11 @@ public:
 	musobana_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nyanpai_state(mconfig, type, tag) ,
 		m_hopper(*this, "hopper"),
-		m_io_key(*this, "KEY%u", 0U)
+		m_key_matrix(*this, "panel%u", 1U)
 	{ }
 
 	void musobana(machine_config &config) ATTR_COLD;
+	void _4psimasy(machine_config &config) ATTR_COLD;
 	void mhhonban(machine_config &config) ATTR_COLD;
 	void zokumahj(machine_config &config) ATTR_COLD;
 
@@ -169,9 +172,9 @@ private:
 	void zokumahj_map(address_map &map) ATTR_COLD;
 
 	required_device<hopper_device> m_hopper;
-	required_ioport_array<5> m_io_key;
+	required_device_array<mahjong_panel_connector_device, 2> m_key_matrix;
 
-	u16 m_input_matrix = 0;
+	u16 m_input_select = 0;
 };
 
 #endif // MAME_NICHIBUTSU_NYANPAI_H

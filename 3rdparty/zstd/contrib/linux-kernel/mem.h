@@ -15,7 +15,7 @@
 /*-****************************************
 *  Dependencies
 ******************************************/
-#include <asm/unaligned.h>  /* get_unaligned, put_unaligned* */
+#include <linux/unaligned.h>  /* get_unaligned, put_unaligned* */
 #include <linux/compiler.h>  /* inline */
 #include <linux/swab.h>  /* swab32, swab64 */
 #include <linux/types.h>  /* size_t, ptrdiff_t */
@@ -24,6 +24,7 @@
 /*-****************************************
 *  Compiler specifics
 ******************************************/
+#undef MEM_STATIC /* may be already defined from common/compiler.h */
 #define MEM_STATIC static inline
 
 /*-**************************************************************

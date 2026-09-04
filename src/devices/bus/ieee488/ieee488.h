@@ -176,7 +176,7 @@ public:
 		set_options(std::forward<T>(opts), dflt, false);
 		set_address(address);
 	}
-	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static void add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot);
 	static void add_cbm_defaults(machine_config &config, const char *_default_drive)

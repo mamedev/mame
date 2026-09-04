@@ -74,31 +74,23 @@ public:
 
 	void sm7238(machine_config &config);
 
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
-	void write_keyboard_clock(int state);
-	void write_printer_clock(int state);
+	void sm7238_io(address_map &map) ATTR_COLD;
+	void sm7238_mem(address_map &map) ATTR_COLD;
+	void videobank_map(address_map &map) ATTR_COLD;
 
 	void control_w(uint8_t data);
 	void text_control_w(uint8_t data);
 	void vmem_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void sm7238_io(address_map &map) ATTR_COLD;
-	void sm7238_mem(address_map &map) ATTR_COLD;
-	void videobank_map(address_map &map) ATTR_COLD;
-
 	void recompute_parameters();
 
-	struct
-	{
-		uint8_t control = 0;
-		uint16_t ptr = 0;
-		int stride = 0;
-		bool reverse = false;
-	} m_video;
-
-	virtual void machine_reset() override ATTR_COLD;
+	void write_keyboard_clock(int state);
+	void write_printer_clock(int state);
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
@@ -118,7 +110,16 @@ private:
 	required_device<pit8253_device> m_t_color;
 	required_device<pit8253_device> m_t_iface;
 	required_device<screen_device> m_screen;
+
+	struct
+	{
+		uint8_t control = 0;
+		uint16_t ptr = 0;
+		int stride = 0;
+		bool reverse = false;
+	} m_video;
 };
+
 
 void sm7238_state::sm7238_mem(address_map &map)
 {
@@ -152,11 +153,13 @@ void sm7238_state::sm7238_io(address_map &map)
 	map(0xbc, 0xbf).rw(m_t_iface, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
+
 void sm7238_state::machine_reset()
 {
 	m_video = decltype(m_video)();
 	m_videobank->set_bank(0);
 }
+
 
 void sm7238_state::control_w(uint8_t data)
 {
@@ -193,6 +196,7 @@ void sm7238_state::vmem_w(offs_t offset, uint8_t data)
 	m_p_videoram[offset + 0x1000] = data;
 }
 
+
 void sm7238_state::write_keyboard_clock(int state)
 {
 	m_i8251kbd->write_txc(state);
@@ -205,20 +209,21 @@ void sm7238_state::write_printer_clock(int state)
 	m_i8251prn->write_rxc(state);
 }
 
+
 void sm7238_state::recompute_parameters()
 {
 	rectangle visarea;
-	attoseconds_t refresh;
+	attotime refresh;
 
 	visarea.set(0, m_video.stride * 8 - 1, 0, KSM_DISP_VERT - 1);
 
 	if (m_video.stride == 80)
 	{
-		refresh = HZ_TO_ATTOSECONDS(12.5_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
+		refresh = attotime::from_ticks(m_video.stride * 10 * KSM_TOTAL_VERT, 12.5_MHz_XTAL);
 	}
 	else
 	{
-		refresh = HZ_TO_ATTOSECONDS(20.625_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
+		refresh = attotime::from_ticks(m_video.stride * 10 * KSM_TOTAL_VERT, 20.625_MHz_XTAL);
 	}
 
 	m_screen->configure(m_video.stride * 10, KSM_TOTAL_VERT, visarea, refresh);
@@ -333,7 +338,6 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
 /* F4 Character Displayer */
 static const gfx_layout sm7238_charlayout =
 {
@@ -352,6 +356,7 @@ static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
+
 void sm7238_state::sm7238(machine_config &config)
 {
 	I8080(config, m_maincpu, 16.5888_MHz_XTAL / 9);
@@ -363,7 +368,7 @@ void sm7238_state::sm7238(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	m_screen->set_screen_update(FUNC(sm7238_state::screen_update));
 	m_screen->screen_vblank().set(m_pic8259, FUNC(pic8259_device::ir2_w));
@@ -372,27 +377,27 @@ void sm7238_state::sm7238(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sm7238);
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	PIT8253(config, m_t_hblank, 0);
+	PIT8253(config, m_t_hblank);
 	m_t_hblank->set_clk<1>(16.384_MHz_XTAL / 9); // FIXME -- keyboard is slower and doesn't sync otherwise
 	m_t_hblank->out_handler<1>().set(FUNC(sm7238_state::write_keyboard_clock));
 
-	PIT8253(config, m_t_vblank, 0);
+	PIT8253(config, m_t_vblank);
 	m_t_vblank->set_clk<2>(16.5888_MHz_XTAL / 9);
 	m_t_vblank->out_handler<2>().set(FUNC(sm7238_state::write_printer_clock));
 
-	PIT8253(config, m_t_color, 0);
+	PIT8253(config, m_t_color);
 
-	PIT8253(config, m_t_iface, 0);
+	PIT8253(config, m_t_iface);
 	m_t_iface->set_clk<1>(16.5888_MHz_XTAL / 9);
 	m_t_iface->out_handler<1>().set(m_i8251line, FUNC(i8251_device::write_txc));
 	m_t_iface->set_clk<2>(16.5888_MHz_XTAL / 9);
 	m_t_iface->out_handler<2>().set(m_i8251line, FUNC(i8251_device::write_rxc));
 
 	// serial connection to host
-	I8251(config, m_i8251line, 0);
+	I8251(config, m_i8251line);
 	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_i8251line->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_i8251line->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -404,16 +409,16 @@ void sm7238_state::sm7238(machine_config &config)
 	rs232.dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
 	// serial connection to KM-035 keyboard
-	I8251(config, m_i8251kbd, 0);
+	I8251(config, m_i8251kbd);
 	m_i8251kbd->txd_handler().set(m_keyboard, FUNC(km035_device::write_rxd));
 	m_i8251kbd->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
-	KM035(config, m_keyboard, 0);
+	KM035(config, m_keyboard);
 	m_keyboard->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 	m_keyboard->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// serial connection to printer
-	I8251(config, m_i8251prn, 0);
+	I8251(config, m_i8251prn);
 	m_i8251prn->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
 
 	rs232_port_device &prtr(RS232_PORT(config, "prtr", default_rs232_devices, nullptr));

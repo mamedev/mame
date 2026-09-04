@@ -199,8 +199,6 @@ protected:
 	u32 irq_enable_r();
 	void irq_enable_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void irq_update();
-	u8 model2_serial_r(offs_t offset);
-	void model2_serial_w(offs_t offset, u8 data);
 	void horizontal_sync_w(u16 data);
 	void vertical_sync_w(u16 data);
 	u32 doa_prot_r(offs_t offset, u32 mem_mask = ~0);

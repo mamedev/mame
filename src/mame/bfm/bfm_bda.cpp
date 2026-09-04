@@ -83,19 +83,13 @@ static const uint16_t BDAcharset[]=
 
 bfm_bda_device::bfm_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BFM_BDA, tag, owner, clock)
-	, m_outputs()
-	, m_port_val(0)
+	, m_outputs(*this, "vfd%u", 0U)
+	, m_brightness(*this, "vfduty%u", 0U)
 {
 }
 
 void bfm_bda_device::device_start()
 {
-	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val) << 4);
-	m_outputs->resolve();
-
-	m_brightness = std::make_unique<output_finder<1> >(*this, "vfdduty%u", unsigned(m_port_val));
-	m_brightness->resolve();
-
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_start));        // display window start pos 0-15
 	save_item(NAME(m_window_end));          // display window end   pos 0-15
@@ -138,7 +132,7 @@ void bfm_bda_device::device_reset()
 	m_user_def = 0;
 	m_duty = 0;
 
-	(*m_brightness)[0] = 0;
+	m_brightness[0] = 0;
 
 	std::fill(std::begin(m_chars), std::end(m_chars), 0);
 	std::fill(std::begin(m_attrs), std::end(m_attrs), AT_NORMAL);
@@ -157,8 +151,8 @@ void bfm_bda_device::device_post_load()
 void bfm_bda_device::update_display()
 {
 	for (int i = 0; i < 16; i++)
-		(*m_outputs)[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
-	(*m_brightness)[0] = m_duty;
+		m_outputs[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
+	m_brightness[0] = m_duty;
 }
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bda_device::blank(int data)

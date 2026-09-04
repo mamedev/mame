@@ -334,8 +334,6 @@ void at_keyboard_device::device_start()
 {
 	pc_keyboard_device::device_start();
 
-	m_leds.resolve();
-
 	save_item(NAME(m_scan_code_set));
 	save_item(NAME(m_input_state));
 }

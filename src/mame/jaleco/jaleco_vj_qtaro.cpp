@@ -521,7 +521,7 @@ void jaleco_vj_king_qtaro_device::device_reset()
 
 void jaleco_vj_king_qtaro_device::device_add_mconfig(machine_config &config)
 {
-	JALECO_VJ_QTARO(config, m_qtaro[0], 0);
-	JALECO_VJ_QTARO(config, m_qtaro[1], 0);
-	JALECO_VJ_QTARO(config, m_qtaro[2], 0);
+	JALECO_VJ_QTARO(config, m_qtaro[0]);
+	JALECO_VJ_QTARO(config, m_qtaro[1]);
+	JALECO_VJ_QTARO(config, m_qtaro[2]);
 }

@@ -258,12 +258,12 @@ void ghox_state::ghox(machine_config &config)
 	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ghox_state::ghox_hd647180_mem_map);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(ghox_state::screen_update));

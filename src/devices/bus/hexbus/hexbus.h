@@ -142,13 +142,13 @@ class hexbus_device : public device_t, public device_single_card_slot_interface<
 {
 public:
 	template <typename U>
-	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
-		: hexbus_device(mconfig, tag, owner, clock)
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, U &&opts, const char *dflt)
+		: hexbus_device(mconfig, tag, owner)
 	{
 		set_options(std::forward<U>(opts), dflt, false);
 	}
 
-	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Used to establish the reverse link (inbound)
 	void set_chain_element(hexbus_chained_device* chain) { m_chain_element = chain; }

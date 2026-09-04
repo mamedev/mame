@@ -119,14 +119,14 @@ DEVICE_INPUT_DEFAULTS_END
 void cms_4080term_device::device_add_mconfig(machine_config &config)
 {
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL, 768, 0, 492, 312, 0, 270);
 	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cms_4080term);
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	EF9345(config, m_ef9345, 0);
+	EF9345(config, m_ef9345);
 	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 
@@ -137,7 +137,7 @@ void cms_4080term_device::device_add_mconfig(machine_config &config)
 	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via->irq_handler().set(FUNC(cms_4080term_device::bus_irq_w));
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));

@@ -26,7 +26,7 @@ class vt100_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
-	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	auto signal_out_callback() { return m_signal_out_cb.bind(); }
@@ -34,7 +34,7 @@ public:
 	void signal_line_w(int state);
 
 protected:
-	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -72,7 +72,7 @@ class ms7002_device : public vt100_keyboard_device
 {
 public:
 	// construction/destruction
-	ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

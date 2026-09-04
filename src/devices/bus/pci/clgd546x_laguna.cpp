@@ -54,12 +54,12 @@ const tiny_rom_entry *cirrus_gd5465_laguna3d_device::device_rom_region() const
 
 void cirrus_gd5465_laguna3d_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(cirrus_gd5446_vga_device::screen_update));
 
 	// TODO: bump to GD5465
-	CIRRUS_GD5446_VGA(config, m_vga, 0);
+	CIRRUS_GD5446_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// FIXME: shared RAM
 	// in 4 and 8 MB versions

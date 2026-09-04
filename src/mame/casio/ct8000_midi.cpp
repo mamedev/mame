@@ -102,6 +102,7 @@ ct8000_midi_device::ct8000_midi_device(const machine_config &mconfig, const char
 	, device_serial_interface(mconfig, *this)
 	, m_channel(*this, "CHANNEL")
 	, m_int_cb(*this)
+	, m_ack_cb(*this)
 	, m_base_program(0)
 {
 }
@@ -121,7 +122,7 @@ void ct8000_midi_device::device_start()
 	std::fill(std::begin(m_out_data), std::end(m_out_data), 0);
 
 	m_in_data = 0xf;
-	m_in_strobe = 0;
+	m_ack_cb(m_in_strobe = 0);
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rcv_rate(31250);
@@ -218,7 +219,7 @@ void ct8000_midi_device::ack_w(int state)
 {
 	if (m_ack && !state)
 	{
-		m_int_cb(m_int = 0);
+		m_int = 0;
 		m_out_data_read++;
 		m_out_data_space++;
 		m_out_data_read %= sizeof(m_out_data);
@@ -226,10 +227,14 @@ void ct8000_midi_device::ack_w(int state)
 	else if (!m_ack && state)
 	{
 		if (m_out_data_read != m_out_data_write)
-			m_int_cb(m_int = 1);
+			m_int = 1;
 	}
 
-	m_ack = state;
+	if (m_ack != state)
+	{
+		m_ack = state;
+		m_int_cb(m_int);
+	}
 }
 
 /**************************************************************************/
@@ -238,7 +243,7 @@ void ct8000_midi_device::strobe_w(int state)
 	if (!m_in_strobe && state)
 		logerror("data write: %x\n", m_in_data);
 
-	m_in_strobe = state;
+	m_ack_cb(m_in_strobe = state);
 }
 
 /**************************************************************************/

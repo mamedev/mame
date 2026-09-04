@@ -31,7 +31,8 @@ enum input_event
 	INPUT_EVENT_ARRIVAL,
 	INPUT_EVENT_REMOVAL,
 	INPUT_EVENT_MOUSE_BUTTON,
-	INPUT_EVENT_MOUSE_WHEEL
+	INPUT_EVENT_MOUSE_WHEEL,
+	INPUT_EVENT_POINTER_UPDATE
 };
 
 struct KeyPressEventArgs
@@ -49,6 +50,20 @@ struct MouseUpdateEventArgs
 	int hdelta;
 	int xpos;
 	int ypos;
+};
+
+struct PointerUpdateEventArgs
+{
+	void *window;
+	unsigned id;
+	int xpos, ypos;
+	int vdelta, hdelta;
+	bool isnew;
+	bool lost;
+	bool inrange;
+	bool incontact;
+	bool primary;
+	bool buttons[5];
 };
 
 

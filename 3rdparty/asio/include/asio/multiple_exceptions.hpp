@@ -2,7 +2,7 @@
 // multiple_exceptions.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +20,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 /// Exception thrown when there are multiple pending exceptions to rethrow.
 class multiple_exceptions
@@ -27,26 +28,35 @@ class multiple_exceptions
 {
 public:
   /// Constructor.
-  ASIO_DECL multiple_exceptions(
-      std::exception_ptr first) noexcept;
+  multiple_exceptions(std::exception_ptr first) noexcept
+    : first_(static_cast<std::exception_ptr&&>(first))
+  {
+  }
+
+  /// Destructor.
+  virtual ~multiple_exceptions() noexcept
+  {
+  }
 
   /// Obtain message associated with exception.
-  ASIO_DECL virtual const char* what() const
-    noexcept;
+  virtual const char* what() const noexcept
+  {
+    return "multiple exceptions";
+  }
 
   /// Obtain a pointer to the first exception.
-  ASIO_DECL std::exception_ptr first_exception() const;
+  std::exception_ptr first_exception() const
+  {
+    return first_;
+  }
 
 private:
   std::exception_ptr first_;
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
-
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/impl/multiple_exceptions.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
 
 #endif // ASIO_MULTIPLE_EXCEPTIONS_HPP

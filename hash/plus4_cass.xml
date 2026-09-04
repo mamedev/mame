@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="plus4_cass" description="Commodore Plus/4 / C16 / C116 cassettes">
 
-	<software name="dtstar">
+	<software name="dtstar" supported="no">
 		<description>Daley Thompson's Star Events</description>
 		<year>1985</year>
 		<publisher>Ocean</publisher>
@@ -19,6 +19,18 @@ license:CC0-1.0
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="662707">
 				<rom name="dt_star_events_side2.tap" size="662707" crc="2acbadbc" sha1="739753b12e98628707a11039fb344009504bed2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piratead">
+		<description>Pirate Adventure</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="155280">
+				<rom name="pirate_adventure.tap" size="155280" crc="a7715fcd" sha1="baecb785ba5094fab591ffe135b815897cb2ecfb"/>
 			</dataarea>
 		</part>
 	</software>

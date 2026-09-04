@@ -398,7 +398,7 @@ void asterix_state::asterix(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 262, 16, 240); // not 264
 	screen.set_screen_update(FUNC(asterix_state::screen_update));
 	screen.set_palette("palette");
@@ -410,11 +410,11 @@ void asterix_state::asterix(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4, 1, 1);
 	m_k056832->set_palette("palette");
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244);
 	m_k053244->set_palette("palette");
 	m_k053244->set_sprite_callback(FUNC(asterix_state::sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

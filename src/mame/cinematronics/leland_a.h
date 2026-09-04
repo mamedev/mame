@@ -22,7 +22,7 @@
 class leland_80186_sound_device : public device_t
 {
 public:
-	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template<class T> void set_master_cpu_tag(T &&tag) { m_master.set_tag(std::forward<T>(tag)); }
 
@@ -35,7 +35,7 @@ public:
 	void command_hi_w(u8 data);
 	u8 response_r();
 	void dac_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void ataxx_dac_control(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ataxx_dac_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void i80186_tmr0_w(int state);
 	void i80186_tmr1_w(int state);
 
@@ -74,7 +74,7 @@ protected:
 	void leland_80186_map_program(address_map &map) ATTR_COLD;
 
 private:
-	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
+	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1 << which)) : (m_clock_active & ~(1 << which)); }
 
 	// internal state
 	u16 m_peripheral;
@@ -86,7 +86,7 @@ private:
 	bool m_response_sync;
 	u32 m_ext_start;
 	u32 m_ext_stop;
-	u8 m_ext_active;
+	bool m_ext_active;
 
 	required_device<cpu_device> m_master;
 
@@ -97,7 +97,7 @@ private:
 class redline_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	void redline_dac_w(offs_t offset, u16 data);
 
 protected:
@@ -110,7 +110,7 @@ private:
 class ataxx_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -120,7 +120,7 @@ protected:
 class wsf_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

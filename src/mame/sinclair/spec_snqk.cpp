@@ -120,7 +120,17 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 
 	image.fread(&snapshot_data[0], snapshot_size);
 
-	if (image.is_filetype("sna"))
+	if (image.is_filetype("snx"))
+	{
+		if (snapshot_data[0] == 'X' && snapshot_data[1] == 'S' && snapshot_data[2] == 'N' && snapshot_data[3] == 'A')
+			setup_snx(&snapshot_data[0], snapshot_size);
+		// snx as alias for sna
+		else if ((snapshot_size == SNA48_SIZE) || (snapshot_size == SNA128_SIZE_1) || (snapshot_size == SNA128_SIZE_2))
+			setup_sna(&snapshot_data[0], snapshot_size);
+		else
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
+	}
+	else if (image.is_filetype("sna"))
 	{
 		if ((snapshot_size != SNA48_SIZE) && (snapshot_size != SNA128_SIZE_1) && (snapshot_size != SNA128_SIZE_2))
 			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SNA file size");
@@ -189,14 +199,6 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SNP file size");
 
 		setup_snp(&snapshot_data[0], snapshot_size);
-	}
-	else if (image.is_filetype("snx"))
-	{
-		if (snapshot_data[0] != 'X' || snapshot_data[1] != 'S'
-			|| snapshot_data[2] != 'N' || snapshot_data[3] != 'A')
-			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
-
-		setup_snx(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("frz"))
 	{

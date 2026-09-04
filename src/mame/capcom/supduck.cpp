@@ -434,7 +434,7 @@ void supduck_state::supduck(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &supduck_state::sound_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(6000000, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(supduck_state::screen_update));
 	screen.set_palette(m_palette);
@@ -444,7 +444,7 @@ void supduck_state::supduck(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
-	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	TIGEROAD_SPRITE(config, m_spritegen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_color_base(512);    // colors 512- 767
 

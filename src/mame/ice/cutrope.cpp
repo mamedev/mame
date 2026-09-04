@@ -58,7 +58,7 @@ void cutrope_state::cutrope(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cutrope_state::cutrope_map);
 	m_maincpu->set_addrmap(AS_IO, &cutrope_state::cutrope_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

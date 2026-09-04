@@ -54,11 +54,9 @@ public:
 		, m_player_lamps(*this, "player_lamp%u", 1U)
 	{ }
 
-	void timetrv(machine_config &config);
+	void timetrv(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void machine_start() override ATTR_COLD;
-
 	void timetrv_map(address_map &map) ATTR_COLD;
 	void timetrv_io(address_map &map) ATTR_COLD;
 
@@ -80,14 +78,6 @@ private:
 	output_finder<> m_cube_lamp;
 	output_finder<2> m_player_lamps;
 };
-
-void timetrv_state::machine_start()
-{
-	m_digits.resolve();
-	m_decimals.resolve();
-	m_cube_lamp.resolve();
-	m_player_lamps.resolve();
-}
 
 void timetrv_state::ppi1_pc_w(uint8_t data)
 {
@@ -320,7 +310,7 @@ void timetrv_state::timetrv(machine_config &config)
 	m_uart->out_tx_callback().set(m_laserdisc, FUNC(pioneer_ldv4200hle_device::rx_w));
 
 	/* video hardware */
-	PIONEER_LDV4200HLE(config, m_laserdisc, 0);
+	PIONEER_LDV4200HLE(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(timetrv_state::screen_update));
 	m_laserdisc->add_route(0, "mono", 0.4);
 	m_laserdisc->add_route(1, "mono", 0.4);

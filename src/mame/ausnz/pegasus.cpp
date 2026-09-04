@@ -491,7 +491,7 @@ void pegasus_state::pegasus(machine_config &config)
 	TIMER(config, "pegasus_firq").configure_periodic(FUNC(pegasus_state::pegasus_firq), attotime::from_hz(400));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(pegasus_state::screen_update));

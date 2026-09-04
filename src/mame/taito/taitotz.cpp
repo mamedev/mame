@@ -89,7 +89,7 @@ E74-06.IC2 is the TMP95C063 program code.
 
 
 
-Rizing Ping Pong
+Raizin Ping Pong
 Taito 2002
 
 This game runs on Taito Type Zero hardware.
@@ -181,6 +181,8 @@ Notes:
 #include "video/poly.h"
 
 #include "screen.h"
+
+#include "corefloat.h"
 
 #include <algorithm>
 
@@ -620,8 +622,8 @@ private:
 	u32 video_reg_r(u32 reg);
 	void video_reg_w(u32 reg, u32 data);
 
-	u16 tlcs_ide0_r(offs_t offset, u16 mem_mask = ~0);
-	u16 tlcs_ide1_r(offs_t offset, u16 mem_mask = ~0);
+	u16 tlcs_ide0_r(offs_t offset);
+	u16 tlcs_ide1_r(offs_t offset);
 	u8 tlcs_common_r(offs_t offset);
 	void tlcs_common_w(offs_t offset, u8 data);
 	u8 tlcs_rtc_r(offs_t offset);
@@ -2167,9 +2169,9 @@ void taitotz_state::tlcs_rtc_w(offs_t offset, u8 data)
 	}
 }
 
-u16 taitotz_state::tlcs_ide0_r(offs_t offset, u16 mem_mask)
+u16 taitotz_state::tlcs_ide0_r(offs_t offset)
 {
-	u16 d = m_ata->cs0_r(offset, mem_mask);
+	u16 d = m_ata->cs0_r(offset);
 	if (offset == 7)
 	{
 		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up.
@@ -2179,9 +2181,9 @@ u16 taitotz_state::tlcs_ide0_r(offs_t offset, u16 mem_mask)
 	return d;
 }
 
-u16 taitotz_state::tlcs_ide1_r(offs_t offset, u16 mem_mask)
+u16 taitotz_state::tlcs_ide1_r(offs_t offset)
 {
-	u16 d = m_ata->cs1_r(offset, mem_mask);
+	u16 d = m_ata->cs1_r(offset);
 	if (offset == 6)
 	{
 		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up.
@@ -2640,7 +2642,7 @@ void taitotz_state::taitotz(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 384);

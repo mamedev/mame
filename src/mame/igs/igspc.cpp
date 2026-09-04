@@ -88,7 +88,7 @@ void speeddrv_state::speeddrv(machine_config &config)
 	MEDIAGX(config, m_maincpu, 40'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &speeddrv_state::speeddrv_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

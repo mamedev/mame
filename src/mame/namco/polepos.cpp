@@ -946,7 +946,7 @@ void polepos_state::polepos(machine_config &config)
 	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1064,7 +1064,7 @@ void polepos_state::topracern(machine_config &config)
 	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1086,7 +1086,7 @@ void polepos_state::topracern(machine_config &config)
 	m_namco_sound->add_route(3, "rspeaker", 0.80, 1);
 
 	/* engine sound */
-	polepos_sound_device &polepos(POLEPOS_SOUND(config, "engine", 0));
+	polepos_sound_device &polepos(POLEPOS_SOUND(config, "engine"));
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 0);
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 1);
 	polepos.add_route(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77, 0);

@@ -143,7 +143,7 @@ protected:
 class ibm21s850_device : public ibm21s85x_base_device
 {
 public:
-	ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 private:
 	virtual void device_reset() override ATTR_COLD;
@@ -161,7 +161,7 @@ private:
 class ibm21s851_device : public ibm21s85x_base_device
 {
 public:
-	ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 private:
 	virtual void device_reset() override ATTR_COLD;

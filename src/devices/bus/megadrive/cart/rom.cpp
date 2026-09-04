@@ -131,10 +131,10 @@ void megadrive_rom_ssf2_device::cart_map(address_map &map)
 void megadrive_rom_ssf2_device::time_io_map(address_map &map)
 {
 	map(0xf1, 0xf1).lw8(NAME([this] (offs_t offset, u8 data) {
-		if (BIT(data, 1))
-			m_sram_view.disable();
-		else
+		if (BIT(data, 0))
 			m_sram_view.select(0);
+		else
+			m_sram_view.disable();
 	}));
 	map(0xf3, 0xf3).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[1]->set_entry(data & 0xf); }));
 	map(0xf5, 0xf5).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[2]->set_entry(data & 0xf); }));

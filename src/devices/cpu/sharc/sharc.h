@@ -35,8 +35,8 @@ public:
 	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
 	void enable_recompiler();
 
-	void external_iop_write(uint32_t address, uint32_t data);
-	void external_dma_write(uint32_t address, uint64_t data);
+	void external_iop_write(offs_t address, uint32_t data);
+	void external_dma_write(offs_t address, uint64_t data);
 
 	void set_flag_input(int flag_num, int state);
 	void write_stall(int state);

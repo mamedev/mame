@@ -2,7 +2,7 @@
 // detail/reactive_socket_service_base.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,16 +21,22 @@
   && !defined(ASIO_WINDOWS_RUNTIME) \
   && !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
+#include "asio/config.hpp"
 #include "asio/detail/reactive_socket_service_base.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 reactive_socket_service_base::reactive_socket_service_base(
     execution_context& context)
-  : reactor_(use_service<reactor>(context))
+  : reactor_(use_service<reactor>(context)),
+    extra_state_(
+        asio::config(context).get(
+          "reactor", "reset_edge_on_partial_read", 0)
+        ? socket_ops::reset_edge_on_partial_read : 0)
 {
   reactor_.init_task();
 }
@@ -194,9 +200,15 @@ asio::error_code reactive_socket_service_base::do_open(
   impl.socket_ = sock.release();
   switch (type)
   {
-  case SOCK_STREAM: impl.state_ = socket_ops::stream_oriented; break;
-  case SOCK_DGRAM: impl.state_ = socket_ops::datagram_oriented; break;
-  default: impl.state_ = 0; break;
+  case SOCK_STREAM:
+    impl.state_ = socket_ops::stream_oriented | extra_state_;
+    break;
+  case SOCK_DGRAM:
+    impl.state_ = socket_ops::datagram_oriented | extra_state_;
+    break;
+  default:
+    impl.state_ = 0;
+    break;
   }
   ec = asio::error_code();
   return ec;
@@ -224,9 +236,15 @@ asio::error_code reactive_socket_service_base::do_assign(
   impl.socket_ = native_socket;
   switch (type)
   {
-  case SOCK_STREAM: impl.state_ = socket_ops::stream_oriented; break;
-  case SOCK_DGRAM: impl.state_ = socket_ops::datagram_oriented; break;
-  default: impl.state_ = 0; break;
+  case SOCK_STREAM:
+    impl.state_ = socket_ops::stream_oriented | extra_state_;
+    break;
+  case SOCK_DGRAM:
+    impl.state_ = socket_ops::datagram_oriented | extra_state_;
+    break;
+  default:
+    impl.state_ = 0;
+    break;
   }
   impl.state_ |= socket_ops::possible_dup;
   ec = asio::error_code();
@@ -234,19 +252,21 @@ asio::error_code reactive_socket_service_base::do_assign(
 }
 
 void reactive_socket_service_base::do_start_op(
-    reactive_socket_service_base::base_implementation_type& impl, int op_type,
-    reactor_op* op, bool is_continuation, bool is_non_blocking, bool noop,
+    reactive_socket_service_base::base_implementation_type& impl,
+    int op_type, reactor_op* op, bool is_continuation,
+    bool allow_speculative, bool noop, bool needs_non_blocking,
     void (*on_immediate)(operation* op, bool, const void*),
     const void* immediate_arg)
 {
   if (!noop)
   {
     if ((impl.state_ & socket_ops::non_blocking)
+        || !needs_non_blocking
         || socket_ops::set_internal_non_blocking(
           impl.socket_, impl.state_, true, op->ec_))
     {
       reactor_.start_op(op_type, impl.socket_, impl.reactor_data_, op,
-          is_continuation, is_non_blocking, on_immediate, immediate_arg);
+          is_continuation, allow_speculative, on_immediate, immediate_arg);
       return;
     }
   }
@@ -263,7 +283,7 @@ void reactive_socket_service_base::do_start_accept_op(
   if (!peer_is_open)
   {
     do_start_op(impl, reactor::read_op, op, is_continuation,
-        true, false, on_immediate, immediate_arg);
+        true, false, true, on_immediate, immediate_arg);
   }
   else
   {
@@ -299,6 +319,7 @@ void reactive_socket_service_base::do_start_connect_op(
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

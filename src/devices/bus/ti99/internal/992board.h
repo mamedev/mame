@@ -140,14 +140,14 @@ private:
 class io992_24_device : public io992_device
 {
 public:
-	io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 /* Variant for TI-99/2 32K */
 class io992_32_device : public io992_device
 {
 public:
-	io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 /********************************************************************
@@ -178,13 +178,13 @@ class ti992_expport_device : public device_t, public device_single_card_slot_int
 {
 public:
 	template <typename U>
-	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
-		: ti992_expport_device(mconfig, tag, owner, clock)
+	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, U &&opts, const char *dflt)
+		: ti992_expport_device(mconfig, tag, owner)
 	{
 		set_options(std::forward<U>(opts), dflt, false);
 	}
 
-	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Methods called from the console
 	// More methods should be added, once we can find further 99/2 cartridges

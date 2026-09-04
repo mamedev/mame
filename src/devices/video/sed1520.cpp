@@ -474,6 +474,11 @@ void nt7502_device::control_write(uint8_t data)
 }
 
 
+std::tuple<bool, bool, uint8_t *, uint8_t, uint8_t, uint8_t> sed1520_device::render()
+{
+	return std::make_tuple(m_static_drive, m_lcd_on, m_ddr.get(), m_start_line, m_adc, m_duty);
+}
+
 uint32_t sed1520_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_static_drive)

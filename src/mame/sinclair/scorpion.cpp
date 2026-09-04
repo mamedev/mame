@@ -506,13 +506,13 @@ void scorpion_state::scorpion(machine_config &config)
 		.add_route(0, "speakers", 0.25, 1)
 		.add_route(2, "speakers", 0.50, 1);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 
 	config.device_remove("exp");
 
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_gmx_cards, nullptr);
-	ZXBUS_SLOT(config, "zxbus:2", 0, zxbus, zxbus_gmx_cards, nullptr);
+	zxbus_device &zxbus(ZXBUS(config, "zxbus"));
+	ZXBUS_SLOT(config, "zxbus:1", X1 / 4, zxbus, zxbus_gmx_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:2", X1 / 4, zxbus, zxbus_gmx_cards, nullptr);
 }
 
 void scorpion_state::profi(machine_config &config)
@@ -802,7 +802,7 @@ void scorpiongmx_state::port_7efd_w(u8 data)
 	m_screen->configure((SPEC_CYCLES_PER_LINE * 2) << m_gfx_ext, m_screen->height()
 		, {scr.left() - broder.left(), scr.right() + broder.right()
 		, scr.top() - broder.top(), scr.bottom() + broder.bottom()}
-		, m_screen->frame_period().as_attoseconds());
+		, m_screen->frame_period());
 
 	m_magic_disabled = BIT(data, 2);
 

@@ -146,8 +146,10 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this),
+		device_serial_interface(mconfig, *this),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
+		m_midi_out_cb(*this),
 		m_BUFPTR(0),
 		m_stream(nullptr),
 		m_IrqTimA(0),
@@ -240,9 +242,14 @@ void scsp_device::device_start()
 	save_item(NAME(m_DELAYPTR));
 #endif
 
+	save_item(NAME(m_latched_MSLC));
+	save_item(NAME(m_latched_MSLC_data));
+
 	save_item(NAME(m_IrqTimA));
 	save_item(NAME(m_IrqTimBC));
 	save_item(NAME(m_IrqMidi));
+	save_item(NAME(m_IrqCPU));
+	save_item(NAME(m_IrqDMA));
 
 	save_item(NAME(m_MidiOutStack));
 	save_item(NAME(m_MidiOutW));
@@ -276,6 +283,16 @@ void scsp_device::device_start()
 	save_item(NAME(m_DSP.EFREG));
 	save_item(NAME(m_DSP.Stopped));
 	save_item(NAME(m_DSP.LastStep));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void scsp_device::device_reset()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(31250);
 }
 
 //-------------------------------------------------
@@ -313,6 +330,22 @@ void scsp_device::rom_bank_pre_change()
 void scsp_device::sound_stream_update(sound_stream &stream)
 {
 	DoMasterSamples(stream);
+
+	// MSLC     |  CA   |SGC|EG
+	// f e d c b a 9 8 7 6 5 4 3 2 1 0
+
+	// latch the new MSLC, updates every 44.1 kHz
+	// cfr. vstriker (GK reflecting ball with heavy shots) and srallyc (PowerGames BGM bleeps at end)
+	u8 MSLC = m_latched_MSLC;
+	SCSP_SLOT *slot = m_Slots + MSLC;
+	u32 SGC = (slot->EG.state) & 3;
+	u32 CA = (slot->cur_addr >> (SHIFT + 12)) & 0xf;
+	u32 EG = (0x1f - (slot->EG.volume >> (EG_SHIFT + 5))) & 0x1f;
+	// NOTE: according to the manual MSLC is write only, CA, SGC and EG read only.
+	// saturn:toughtrk will hang on Human logo otherwise
+	m_latched_MSLC_data =  /*(MSLC << 11) |*/ (CA << 7) | (SGC << 5) | EG;
+
+	// TODO: 1 sample (1Fs) 44.1 kHz irq here.
 }
 
 u8 scsp_device::DecodeSCI(u8 irq)
@@ -339,6 +372,11 @@ void scsp_device::CheckPendingIRQ()
 	}
 	if (!pend)
 		return;
+	if (pend & en & 0x20)
+	{
+		m_irq_cb(m_IrqCPU, ASSERT_LINE);
+		return;
+	}
 	if (pend & 0x40)
 		if (en & 0x40)
 		{
@@ -391,6 +429,12 @@ void scsp_device::ResetInterrupts()
 	{
 		m_irq_cb(m_IrqTimBC, CLEAR_LINE);
 	}
+	if (reset & 0x20)
+	{
+		m_udata.data[0x20/2] &= ~0x20;
+		m_irq_cb(m_IrqCPU, CLEAR_LINE);
+	}
+
 	if (reset & 0x8)
 	{
 		m_irq_cb(m_IrqMidi, CLEAR_LINE);
@@ -571,8 +615,8 @@ void scsp_device::init()
 
 	m_DSP.Init();
 
-	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
-	m_MidiR=m_MidiW = 0;
+	m_IrqTimA = m_IrqTimBC = m_IrqMidi = m_IrqCPU = m_IrqDMA = 0;
+	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
 
 	m_DSP.space = &this->space();
@@ -734,13 +778,23 @@ void scsp_device::UpdateReg(int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			midi_out_w(m_udata.data[0x6/2] & 0xff);
+			{
+				u8 data = m_udata.data[0x6 / 2] & 0xff;
+				if (m_MidiOutR == m_MidiOutW)
+				{
+					// not busy, so start transmission
+					transmit_register_setup(data);
+				}
+				m_MidiOutStack[m_MidiOutW++] = data;
+				m_MidiOutW &= 31;
+			}
 			break;
 		case 8:
 		case 9:
 			/* Only MSLC could be written.  */
-			// NOTE: docs claims MSLC to be 0x7800, but Jikkyou Parodius doesn't agree, why?
-			m_udata.data[0x8/2] &= 0xf800;
+			// docs claims MSLC to be 0x7800 but saturn:jikkparo doesn't agree,
+			// assume doc mistake out of being 0~31 slots
+			m_latched_MSLC = (m_udata.data[0x8/2] & 0xf800) >> 11;
 			break;
 		case 0x12:
 		case 0x13:
@@ -825,7 +879,14 @@ void scsp_device::UpdateReg(int reg)
 			if (!m_irq_cb.isunset())
 			{
 				if (m_udata.data[0x1e/2] & m_udata.data[0x20/2] & 0x20)
-					popmessage("SCSP SCIPD write %04x", m_udata.data[0x20/2]);
+				{
+					// TODO: our use case (arcadegh) still doesn't have sound (but clearly executes irq 7s)
+					// log it anyway so we can validate the behaviour with anything else using this
+					// - documentation claims 7 to "not use because tied to dev board irq",
+					//   that doesn't stop this game using it anyway.
+					popmessage("SCSP SCIPD write CPU irq 0x20");
+					CheckPendingIRQ();
+				}
 			}
 			break;
 		case 0x22:  //SCIRE
@@ -836,7 +897,8 @@ void scsp_device::UpdateReg(int reg)
 				ResetInterrupts();
 
 				// behavior from real hardware: if you SCIRE a timer that's expired,
-				// it'll immediately pop up again in SCIPD.  ask Sakura Taisen on the Saturn...
+				// it'll immediately pop up again in SCIPD.  cfr. saturn:sakurat
+				// TODO: crocj disagrees with this (keeps going spurious irqs)
 				if (m_TimCnt[0] == 0xffff)
 				{
 					m_udata.data[0x20/2] |= 0x40;
@@ -862,6 +924,8 @@ void scsp_device::UpdateReg(int reg)
 				m_IrqTimA = DecodeSCI(SCITMA);
 				m_IrqTimBC = DecodeSCI(SCITMB);
 				m_IrqMidi = DecodeSCI(SCIMID);
+				m_IrqCPU = DecodeSCI(SCIIRQ);
+				m_IrqDMA = DecodeSCI(SCIDMA);
 			}
 			break;
 		case 0x2a:
@@ -917,15 +981,7 @@ void scsp_device::UpdateRegR(int reg)
 		case 8:
 		case 9:
 			{
-				// MSLC     |  CA   |SGC|EG
-				// f e d c b a 9 8 7 6 5 4 3 2 1 0
-				u8 MSLC = (m_udata.data[0x8/2] >> 11) & 0x1f;
-				SCSP_SLOT *slot = m_Slots + MSLC;
-				u32 SGC = (slot->EG.state) & 3;
-				u32 CA = (slot->cur_addr >> (SHIFT + 12)) & 0xf;
-				u32 EG = (0x1f - (slot->EG.volume >> (EG_SHIFT + 5))) & 0x1f;
-				/* note: according to the manual MSLC is write only, CA, SGC and EG read only.  */
-				m_udata.data[0x8/2] =  /*(MSLC << 11) |*/ (CA << 7) | (SGC << 5) | EG;
+				m_udata.data[0x8/2] = m_latched_MSLC_data;
 			}
 			break;
 
@@ -971,7 +1027,13 @@ void scsp_device::w16(u32 addr, u16 val)
 	{
 		if (addr < 0x430)
 		{
-			*((u16 *) (m_udata.datab + ((addr & 0x3f)))) = val;
+			// SCIPD and MCIPD are r/o except for bit 5 CPU irqs
+			if (addr == 0x420 || addr == 0x42e)
+			{
+				*((u16 *) (m_udata.datab + ((addr & 0x3f)))) |= val & 0x20;
+			}
+			else
+				*((u16 *) (m_udata.datab + ((addr & 0x3f)))) = val;
 			UpdateReg(addr & 0x3f);
 		}
 	}
@@ -1055,44 +1117,8 @@ u16 scsp_device::r16(u32 addr)
 			v = *((u16 *) (m_DSP.EFREG + (addr - 0xec0) / 2));
 		else
 		{
-			// TODO: kyutnkai reads from 0xee0/0xee2
-			// it's tied with EXTS register(s) also used for CD-Rom Player equalizer.
-			/*
-			This port is actually an external parallel port, directly connected from the CD Block device, hence code is a bit of an hack.
-
-			Code snippet for reference:
-			004A3A: 207C 0010 0EE0             movea.l #$100ee0, A0
-			004A40: 43EA 0090                  lea     ($90,A2), A1 ;A2=0x700
-			004A44: 6100 0254                  bsr     $4c9a
-			004A48: 207C 0010 0EE2             movea.l #$100ee2, A0
-			004A4E: 43EA 0092                  lea     ($92,A2), A1
-			004A52: 6100 0246                  bsr     $4c9a
-			004A56: 207C 0010 0ED2             movea.l #$100ed2, A0
-			004A5C: 43EA 0094                  lea     ($94,A2), A1
-			004A60: 6100 0238                  bsr     $4c9a
-			004A64: 3540 0096                  move.w  D0, ($96,A2)
-			004A68: 207C 0010 0ED4             movea.l #$100ed4, A0
-			004A6E: 43EA 0098                  lea     ($98,A2), A1
-			004A72: 6100 0226                  bsr     $4c9a
-			004A76: 3540 009A                  move.w  D0, ($9a,A2)
-			004A7A: 207C 0010 0ED6             movea.l #$100ed6, A0
-			004A80: 43EA 009C                  lea     ($9c,A2), A1
-			004A84: 6100 0214                  bsr     $4c9a
-			004A88: 3540 009E                  move.w  D0, ($9e,A2)
-			004A8C: 4E75                       rts
-
-			    004C9A: 48E7 4000                  movem.l D1, -(A7)
-			    004C9E: 3010                       move.w  (A0), D0 ;reads from 0x100ee0/ee2
-			    004CA0: 4A40                       tst.w   D0
-			    004CA2: 6A00 0004                  bpl     $4ca8
-			    004CA6: 4440                       neg.w   D0
-			    004CA8: 3211                       move.w  (A1), D1
-			    004CAA: D041                       add.w   D1, D0
-			    004CAC: E248                       lsr.w   #1, D0
-			    004CAE: 3280                       move.w  D0, (A1) ;writes to RAM buffer 0x790/0x792
-			    004CB0: 4CDF 0002                  movem.l (A7)+, D1
-			    004CB4: 4E75                       rts
-			*/
+			// saturn Multiplayer Audio CDs and kyutnkai (68k PC=004A3A) reads from 0xee0/0xee2 EXTS
+			// returns back current sample, makes the balloons in former to inflate.
 			logerror("%s: SCSP Reading from EXTS register %08x\n", machine().describe_context(), addr);
 			if (addr < 0xEE4)
 				v = *((u16 *) (m_DSP.EXTS + (addr - 0xee0) / 2));
@@ -1290,9 +1316,21 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 
 				s32 sample = UpdateSlot(slot);
 
-				Enc = ((TL(slot)) << 0x0) | ((IMXL(slot)) << 0xd);
+				// SDIR ("sound direct") sends the raw sample straight to the output,
+				// bypassing the envelope generator AND the TL attenuator (the EG/ALFO
+				// bypass is handled in UpdateSlot). BOTH downstream mixes -- the DSP
+				// input feed here and the direct-output mix below -- must therefore
+				// zero TL when SDIR is set, otherwise a slot programmed with SDIR=1 +
+				// a large TL is wrongly muted.
+				// (Flash Beats keys its SFX with SDIR=1, TL=0xff = -95 dB; in
+				// particular its in-game/"Voice" SFX route only through the DSP
+				// (DISDL=0, IMXL>0), so without this the effect path is starved to
+				// near-silence.)
+				u16 eff_tl = SDIR(slot) ? 0 : TL(slot);
+				Enc = ((eff_tl) << 0x0) | ((IMXL(slot)) << 0xd);
 				m_DSP.SetSample((sample*m_LPANTABLE[Enc]) >> (SHIFT-2), ISEL(slot), IMXL(slot));
-				Enc = ((TL(slot)) << 0x0) | ((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd);
+				u16 dir_tl = SDIR(slot) ? 0 : TL(slot);
+				Enc = ((dir_tl) << 0x0) | ((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd);
 				{
 					smpl += (sample * m_LPANTABLE[Enc]) >> SHIFT;
 					smpr += (sample * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1326,10 +1364,10 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 		for (int i = 0; i < 2; ++i)
 		{
 			SCSP_SLOT *slot = m_Slots + i + 16; // 100217, 100237 EFSDL, EFPAN for EXTS0/1
-			if (EFSDL(slot))
+			// !EFSDL case testable in saturn Multiplayer with Audio CD with default values.
+			u16 Enc = EFSDL(slot) ? ((EFPAN(slot)) << 0x8) | ((EFSDL(slot)) << 0xd) : (((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd));
 			{
 				m_DSP.EXTS[i] = s32(stream.get(i, s) * 32768.0);
-				u16 Enc = ((EFPAN(slot)) << 0x8) | ((EFSDL(slot)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
 			}
@@ -1348,7 +1386,9 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 	}
 }
 
-/* TODO: this needs to be timer-ized */
+// TODO: this needs to be timer-ized
+// Very likely this is burst too.
+// - darius2j uses this at startup with DGATE enabled
 void scsp_device::exec_dma()
 {
 	static u16 tmp_dma[3];
@@ -1372,7 +1412,6 @@ void scsp_device::exec_dma()
 	{
 		if (m_dma.dgate)
 		{
-			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for (i = 0; i < m_dma.dtlg; i += 2)
 			{
 				this->space().write_word(m_dma.dmea, 0);
@@ -1395,7 +1434,6 @@ void scsp_device::exec_dma()
 	{
 		if (m_dma.dgate)
 		{
-			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for (i = 0; i < m_dma.dtlg; i += 2)
 			{
 				w16(m_dma.drga, 0);
@@ -1423,11 +1461,12 @@ void scsp_device::exec_dma()
 
 	/* Job done */
 	m_udata.data[0x16/2] &= ~0x1000;
-	/* request a dma end irq (TODO: make it inside the interface) */
+	/* request a dma end irq */
+	// TODO: do it inside CheckPendingIRQ
 	if (m_udata.data[0x1e/2] & 0x10)
 	{
-		popmessage("SCSP DMA IRQ triggered");
-		m_irq_cb(DecodeSCI(SCIDMA), HOLD_LINE);
+		popmessage("SCSP DMA IRQ triggered lv%d", m_IrqDMA);
+		m_irq_cb(m_IrqDMA, HOLD_LINE);
 	}
 }
 
@@ -1447,29 +1486,30 @@ void scsp_device::write(offs_t offset, u16 data, u16 mem_mask)
 	w16(offset * 2, tmp);
 }
 
-void scsp_device::midi_in(u8 data)
+void scsp_device::tra_callback()
 {
-	//    printf("scsp_midi_in: %02x\n", data);
+	m_midi_out_cb(transmit_register_get_data_bit());
+}
 
-	m_MidiStack[m_MidiW++] = data;
+void scsp_device::tra_complete()
+{
+	m_MidiOutR++;
+	m_MidiOutR &= 31;
+
+	// if buffer not empty, transmit next byte
+	if (m_MidiOutR != m_MidiOutW)
+	{
+		transmit_register_setup(m_MidiOutStack[m_MidiOutR]);
+	}
+}
+
+void scsp_device::rcv_complete()
+{
+	receive_register_extract();
+	m_MidiStack[m_MidiW++] = get_received_char();
 	m_MidiW &= 31;
 
 	CheckPendingIRQ();
-}
-
-u16 scsp_device::midi_out_r()
-{
-	u8 val = m_MidiOutStack[m_MidiOutR++];
-	m_MidiOutR &= 31;
-	return val;
-}
-
-void scsp_device::midi_out_w(u8 data)
-{
-	m_MidiOutStack[m_MidiOutW++] = data;
-	m_MidiOutW &= 31;
-
-	//CheckPendingIRQ();
 }
 
 //LFO handling

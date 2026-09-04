@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "iptseqpoll.h"
 
+#include "input.h"
 #include "inputdev.h"
 
 #include <cassert>
@@ -119,7 +120,7 @@ input_code axis_code_poller::poll()
 				m_axis_memory.erase(m_axis_memory.begin() + i);
 				m_axis_active.erase(m_axis_active.begin() + i);
 			}
-			if (!m_manager.device_class(memory.first->device().devclass()).multi())
+			if (!m_manager.device_class(memory.first->device().device_class()).multi())
 				code.set_device_index(0);
 			return code;
 		}

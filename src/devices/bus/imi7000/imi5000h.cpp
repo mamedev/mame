@@ -380,7 +380,7 @@ void imi5000h_device::device_add_mconfig(machine_config & config)
 	pio3.out_pb_callback().set(FUNC(imi5000h_device::pio3_pb_w));
 	pio3.out_brdy_callback().set(Z80PIO_3_TAG, FUNC(z80pio_device::strobe_b));
 
-	//HARDDISK(config, "harddisk1", 0);
+	//HARDDISK(config, "harddisk1");
 }
 
 

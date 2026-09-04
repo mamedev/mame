@@ -131,7 +131,7 @@ void belatra_state::belatra(machine_config &config)
 	ARM7500(config, m_maincpu, 56_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &belatra_state::program_map);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	ARM_VIDC20(config, m_vidc, 24'000'000); // chip type and clock guessed
 	m_vidc->set_screen("screen");
@@ -149,6 +149,9 @@ void belatra_state::belatra(machine_config &config)
 	m_iomd->iocr_write_id().set([this] (int state) { logerror("%s: IOCR write ID %d\n", machine().describe_context(), state); });
 	m_iomd->iolines_read().set([this] () { logerror("%s: IO lines read\n", machine().describe_context()); return uint8_t(0); });
 	m_iomd->iolines_write().set([this] (uint8_t data) { logerror("%s: IO lines write %02x\n", machine().describe_context(), data); });
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+
+	// TODO: actual connection to AUX port, mouse or otherwise
 
 	// AT90S2313(config, "mcu", xxxx); // TODO: AVR 8-bit core, only the fairyl2 set has a dump
 

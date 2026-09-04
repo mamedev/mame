@@ -611,7 +611,7 @@ void jr200_state::jr200(machine_config &config)
 //  MN1544(config, "mn1544", ?);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(16 + 256 + 16, 16 + 192 + 16); /* border size not accurate */
@@ -626,7 +626,7 @@ void jr200_state::jr200(machine_config &config)
 
 	// All sounds are produced by the MN1271
 
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS,"mono",0.50);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS,"mono",0.50);
 }
 
 

@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "mips_rambo.h"
 
+#include "endianness.h"
+
 #define LOG_REG     (1U << 1)
 #define LOG_DMA     (1U << 2)
 

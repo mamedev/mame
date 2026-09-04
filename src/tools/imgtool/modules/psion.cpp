@@ -28,6 +28,7 @@
 #include "opresolv.h"
 
 #include <cstdio>
+#include <cstring>
 
 #define MAXFILES 256
 

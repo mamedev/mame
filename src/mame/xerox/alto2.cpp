@@ -278,7 +278,7 @@ void alto2_state::alto2(machine_config &config)
 	m_maincpu->set_diablo(1, DIABLO_HD_1);
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::white());
 	screen.set_physical_aspect(3, 4); // Portrait CRT
 	screen.set_raw(XTAL(20'160'000), A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH, A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT);

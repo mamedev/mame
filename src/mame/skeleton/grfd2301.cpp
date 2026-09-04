@@ -150,7 +150,7 @@ void grfd2301_state::grfd2301(machine_config &config)
 	PIT8253(config, "pit");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15874560, 848, 0, 640, 312, 0, 288); // parameters guessed
 	screen.set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 

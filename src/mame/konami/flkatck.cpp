@@ -395,14 +395,14 @@ void flkatck_state::flkatck(machine_config &config)
 	KONAMI_007452_MATH(config, "k007452");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
 	screen.set_screen_update(FUNC(flkatck_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121, 0, gfx_flkatck, "palette", "screen");
+	K007121(config, m_k007121, gfx_flkatck, "palette", "screen");
 	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_flipscreen_cb().set(FUNC(flkatck_state::flipscreen_w));

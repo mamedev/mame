@@ -236,8 +236,6 @@ void kaypro84_state::rtc_w(u8 data)
 ************************************************************/
 void kaypro_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_pointer(NAME(m_vram), 0x1000);
 	save_pointer(NAME(m_ram),  0x4000);
 
@@ -267,6 +265,17 @@ void kaypro84_state::machine_start()
 
 	if (m_rtc.found())
 		save_item(NAME(m_rtc_address));
+}
+
+void kaypro10_state::machine_start()
+{
+	kaypro84_state::machine_start();
+
+	m_hdc_buf = std::make_unique<u8[]>(512);
+	save_pointer(NAME(m_hdc_buf), 512);
+	save_item(NAME(m_hdc_ptr));
+	m_hdc->drdy_w(m_hdd->exists() ? 1 : 0);  // WD1002 drive-ready
+	m_hdc->sc_w(1);                          // seek complete (heads at a known track)
 }
 
 void kaypro_state::machine_reset()

@@ -756,14 +756,14 @@ void swyft_state::swyft(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &swyft_state::swyft_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15.8976_MHz_XTAL / 2, 500, 0, 320, 265, 0, 242); // total guess
 	screen.set_screen_update(FUNC(swyft_state::screen_update_swyft));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	ACIA6850(config, m_acia6850, 0);
+	ACIA6850(config, m_acia6850);
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008
 	clock_device &acia_clock(CLOCK(config, "acia_clock", (XTAL(15'897'600)/2)/5)); // out e clock from 68008, ~ 10in clocks per out clock
 	acia_clock.signal_handler().set(FUNC(swyft_state::write_acia_clock));

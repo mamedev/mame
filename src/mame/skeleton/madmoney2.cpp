@@ -90,8 +90,8 @@ void madmoney2_state::madmoney2(machine_config &config)
 
 	// Sound hardware
 
-	NSC810(config, "iotimer1", 0, 3.579'545_MHz_XTAL, 3.579'545_MHz_XTAL); // NSC810AN-3I
-	NSC810(config, "iotimer2", 0, 3.579'545_MHz_XTAL, 3.579'545_MHz_XTAL); // NSC810AN-3I
+	NSC810(config, "iotimer1", 3.579'545_MHz_XTAL, 3.579'545_MHz_XTAL); // NSC810AN-3I
+	NSC810(config, "iotimer2", 3.579'545_MHz_XTAL, 3.579'545_MHz_XTAL); // NSC810AN-3I
 
 	SPEAKER(config, "mono").front_center();
 

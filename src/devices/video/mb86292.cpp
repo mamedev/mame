@@ -628,7 +628,7 @@ void mb86292_device::reconfigure_screen()
 	// FIXME: offset with htp according to manual (expected: 636, actual: 608)
 	LOGCRTC("\tSetting screen to %d x %d (total: %d x %d)\n", hdp, vdp, htp, vtr);
 	rectangle visarea(0, hdp - 1, 0, vdp - 1);
-	screen().configure(htp, vtr, visarea, screen().frame_period().attoseconds());
+	screen().configure(htp, vtr, visarea, screen().frame_period());
 	m_vsync_timer->adjust(screen().time_until_pos(vdp));
 }
 

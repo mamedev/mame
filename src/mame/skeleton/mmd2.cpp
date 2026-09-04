@@ -309,11 +309,6 @@ void mmd2_state::status_callback(u8 data)
 
 void mmd2_state::machine_start()
 {
-	m_digits.resolve();
-	m_p.resolve();
-	m_led_halt.resolve();
-	m_led_hold.resolve();
-
 	save_pointer(NAME(m_ram), 0x1400);
 	save_item(NAME(m_digit));
 }

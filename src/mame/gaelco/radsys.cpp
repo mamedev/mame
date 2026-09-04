@@ -59,7 +59,7 @@ void radsys_state::radikald(machine_config &config)
 	PENTIUM3(config, m_maincpu, 120'000'000); // Celeron SL6C8 Tualatin-256 1.2 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &radsys_state::radsys_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

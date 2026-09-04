@@ -21,6 +21,7 @@
 #include <iterator>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <typeinfo>
 #include <unordered_map>
@@ -62,6 +63,9 @@ using is_device_implementation = std::bool_constant<std::is_base_of_v<device_t, 
 
 template <typename T>
 using is_device_interface = std::bool_constant<std::is_base_of_v<device_interface, T> && !is_device_implementation<T>::value>;
+
+template <typename T> concept device_implementation_class = is_device_implementation<T>::value;
+template <typename T> concept device_interface_class = is_device_interface<T>::value;
 
 
 struct device_flags
@@ -569,7 +573,7 @@ protected:
 	device_t(
 			const machine_config &mconfig,
 			device_type type,
-			const char *tag,
+			std::string_view tag,
 			device_t *owner,
 			u32 clock);
 
@@ -633,7 +637,7 @@ public:
 
 	// getters
 	bool has_running_machine() const { return m_machine != nullptr; }
-	running_machine &machine() const { /*assert(m_machine != nullptr);*/ return *m_machine; }
+	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *basetag() const { return m_basetag.c_str(); }
 	device_type type() const { return m_type; }

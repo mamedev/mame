@@ -9,6 +9,8 @@
 #include "i386.h"
 #include "cache.h"
 
+#include "endianness.h"
+
 class athlonxp_device : public pentium_device
 {
 public:

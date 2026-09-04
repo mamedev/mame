@@ -224,21 +224,21 @@ void hrdvd_ata_controller_device::dma_write(uint16_t data)
 uint16_t hrdvd_ata_controller_device::read(offs_t offset, uint16_t mem_mask)
 {
 	if(mem_mask == 0xffff)
-		return swapendian_int16(internal_read_cs0(offset * 2, 0xffff));
+		return swapendian_int16(internal_read_cs0(offset * 2));
 	else if(ACCESSING_BITS_0_7)
-		return internal_read_cs0(offset * 2 + 1, 0xff);
+		return internal_read_cs0(offset * 2 + 1);
 	else
-		return internal_read_cs0(offset * 2, 0xff) << 8;
+		return internal_read_cs0(offset * 2) << 8;
 }
 
 void hrdvd_ata_controller_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(mem_mask == 0xffff)
-		internal_write_cs0(offset * 2, swapendian_int16(data), 0xffff);
+		internal_write_cs0(offset * 2, swapendian_int16(data));
 	else if(ACCESSING_BITS_0_7)
-		internal_write_cs0(offset * 2 + 1, data, 0xff);
+		internal_write_cs0(offset * 2 + 1, data);
 	else
-		internal_write_cs0(offset * 2, data >> 8, 0xff);
+		internal_write_cs0(offset * 2, data >> 8);
 }
 
 
@@ -508,12 +508,12 @@ void hrdvd_state::hrdvd(machine_config &config)
 	m_video->set_vram_size(0x20000);
 	m_video->int_cb().set_inputline(m_maincpu, 0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	ZR36110(config, m_mpeg, 27_MHz_XTAL/2);
 	m_mpeg->drq_w().set(FUNC(hrdvd_state::mpeg_dreq_w));
 
-	NN71003F(config, m_mpega, 0);
+	NN71003F(config, m_mpega);
 	m_mpega->add_route(0, m_speaker, 1.0, 0);
 	m_mpega->add_route(1, m_speaker, 1.0, 1);
 	m_mpeg->sp2_frm_w().set(m_mpega, FUNC(nn71003f_device::frm_w));
@@ -522,7 +522,7 @@ void hrdvd_state::hrdvd(machine_config &config)
 
 	SPEAKER(config, m_speaker, 2).front();
 
-	NICHISND(config, m_nichisnd, 0);
+	NICHISND(config, m_nichisnd);
 	m_nichisnd->add_route(ALL_OUTPUTS, m_speaker, 1.0, 0);
 	m_nichisnd->add_route(ALL_OUTPUTS, m_speaker, 1.0, 1);
 }

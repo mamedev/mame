@@ -16,6 +16,7 @@
 #include "ioprocs.h"
 
 #include <cstdio>
+#include <cstring>
 
 
 imgtoolerr_t imgtool_floppy_error(floperr_t err)

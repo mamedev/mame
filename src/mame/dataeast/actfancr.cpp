@@ -33,6 +33,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "multibyte.h"
 
 namespace {
 
@@ -47,7 +48,7 @@ public:
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_BIG)
+		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_LITTLE)
 	{ }
 
 	void actfancr(machine_config &config);
@@ -107,14 +108,14 @@ private:
 uint32_t actfancr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Draw playfield
-	bool flip = m_tilegen[1]->get_flip_state();
+	const bool flip = m_tilegen[1]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
 	m_tilegen[1]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram16.target(), 0x800/2);
-	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -147,19 +148,19 @@ void actfancr_state::buffer_spriteram_w(uint8_t data)
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i = 0; i < 0x800 / 2; i++)
 	{
-		m_spriteram16[i] = m_spriteram[i * 2] | (m_spriteram[(i * 2) + 1] << 8);
+		m_spriteram16[i] = get_u16le(&m_spriteram[i * 2]);
 	}
 }
 
 void actfancr_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x02ffff).rom();
-	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x062000, 0x063fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x070000, 0x070007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x070010, 0x07001f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x072000, 0x0727ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x062000, 0x063fff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
+	map(0x070000, 0x070007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x070010, 0x07001f).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x072000, 0x0727ff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
 	map(0x100000, 0x1007ff).ram().share(m_spriteram);
 	map(0x110000, 0x110001).w(FUNC(actfancr_state::buffer_spriteram_w));
 	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -175,14 +176,14 @@ void actfancr_state::prg_map(address_map &map)
 void triothep_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x040007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x040010, 0x04001f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x044000, 0x045fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x046400, 0x0467ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
-	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x064000, 0x0647ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x066400, 0x0667ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
+	map(0x040000, 0x040007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x040010, 0x04001f).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x044000, 0x045fff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
+	map(0x046400, 0x0467ff).rw(m_tilegen[1], FUNC(deco_bac06_device::rowscroll8_r<true>), FUNC(deco_bac06_device::rowscroll8_w<true>));
+	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x064000, 0x0647ff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
+	map(0x066400, 0x0667ff).rw(m_tilegen[0], FUNC(deco_bac06_device::rowscroll8_r<true>), FUNC(deco_bac06_device::rowscroll8_w<true>));
 	map(0x100000, 0x100000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x110000, 0x110001).w(FUNC(triothep_state::buffer_spriteram_w));
 	map(0x120000, 0x1207ff).ram().share("spriteram");
@@ -370,7 +371,7 @@ void actfancr_state::actfancr(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &actfancr_state::dec0_s_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(32*8, 32*8);
@@ -382,15 +383,15 @@ void actfancr_state::actfancr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_actfan);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(1, 1, 2);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_BAC06(config, m_tilegen[1], 0);
+	DECO_BAC06(config, m_tilegen[1]);
 	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0, "palette", gfx_actfan_spr);
+	DECO_MXC06(config, m_spritegen, "palette", gfx_actfan_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -440,7 +441,7 @@ void triothep_state::triothep(machine_config &config)
 /******************************************************************************/
 
 ROM_START( actfancr )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "fe08-3.bin", 0x00000, 0x10000, CRC(35f1999d) SHA1(03b61b6544a21350dbb7a31591db163a00cf7a64) )
 	ROM_LOAD( "fe09-3.bin", 0x10000, 0x10000, CRC(d21416ca) SHA1(2c863042fe7cf5e4d8cf8a1138089b539406bec3) )
 	ROM_LOAD( "fe10-3.bin", 0x20000, 0x10000, CRC(85535fcc) SHA1(c764032463a40c9110ab35c38642de070d528a60) )
@@ -473,7 +474,7 @@ ROM_START( actfancr )
 ROM_END
 
 ROM_START( actfancr2 )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "fe08-2.bin", 0x00000, 0x10000, CRC(0d36fbfa) SHA1(cef5cfd053beac5ca2ac52421024c316bdbfba42) )
 	ROM_LOAD( "fe09-2.bin", 0x10000, 0x10000, CRC(27ce2bb1) SHA1(52a423dfc2bba7b3330d1a10f4149ae6eeb9198c) )
 	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
@@ -506,7 +507,7 @@ ROM_START( actfancr2 )
 ROM_END
 
 ROM_START( actfancr1 )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "08-1", 0x00000, 0x10000, CRC(3bf214a4) SHA1(f7513672b2292d3acb4332b392695888bf6560a5) )
 	ROM_LOAD( "09-1", 0x10000, 0x10000, CRC(13ae78d5) SHA1(eba77d3dbfe273e18c7fa9c0ca305ac2468f9381) )
 	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
@@ -539,7 +540,7 @@ ROM_START( actfancr1 )
 ROM_END
 
 ROM_START( actfancrj )
-	ROM_REGION( 0x30000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "fd08-1.bin", 0x00000, 0x10000, CRC(69004b60) SHA1(7c6b876ca04377d2aa2d3c3f19d8e6cc7345363d) )
 	ROM_LOAD( "fd09-1.bin", 0x10000, 0x10000, CRC(a455ae3e) SHA1(960798271c8370c1c4ffce2a453f59d7a301c9f9) )
 	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
@@ -572,7 +573,7 @@ ROM_START( actfancrj )
 ROM_END
 
 ROM_START( triothep )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "fg-16.bin", 0x00000, 0x20000, CRC(7238355a) SHA1(4ac6c3fd808e7c94025972fdb45956bd707ec89f) )
 	ROM_LOAD( "fg-15.bin", 0x20000, 0x10000, CRC(1c0551ab) SHA1(1f90f80db44d92af4b233bc16cb1023db2797e8a) )
 	ROM_LOAD( "fg-14.bin", 0x30000, 0x10000, CRC(4ba7de4a) SHA1(bf552fa33746f3d27f9b193424a38fef58fe0765) )
@@ -606,7 +607,7 @@ ROM_END
 
 // All ROMSs are FF even the ones matching the parent FG ROMs
 ROM_START( triothepj )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // Need to allow full RAM allocation for now
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ff-16.bin", 0x00000, 0x20000, CRC(84d7e1b6) SHA1(28381d2e1f6d22a959383eb2e8d73f2e03f4d39f) )
 	ROM_LOAD( "ff-15.bin", 0x20000, 0x10000, CRC(6eada47c) SHA1(98fc4e93c47bc42ea7c20e8ac994b117cd7cb5a5) )
 	ROM_LOAD( "ff-14.bin", 0x30000, 0x10000, CRC(4ba7de4a) SHA1(bf552fa33746f3d27f9b193424a38fef58fe0765) )

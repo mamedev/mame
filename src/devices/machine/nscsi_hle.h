@@ -534,6 +534,7 @@ protected:
 	void scsi_status_complete(uint8_t st);
 	void scsi_data_in(int buf, int size);
 	void scsi_data_out(int buf, int size);
+	void scsi_resume_deferred();
 
 	struct sense_data {
 		sense_data()

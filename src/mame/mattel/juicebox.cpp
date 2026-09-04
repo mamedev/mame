@@ -315,7 +315,7 @@ void juicebox_state::juicebox(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(240, 160);
@@ -331,7 +331,7 @@ void juicebox_state::juicebox(machine_config &config)
 	m_s3c44b0->gpio_port_w_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_w));
 	m_s3c44b0->i2s_data_w_cb().set("dac", FUNC(dac_word_interface::data_w));
 
-	SMARTMEDIA(config, m_smartmedia, 0);
+	SMARTMEDIA(config, m_smartmedia);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("juicebox");

@@ -369,22 +369,22 @@
 	<group name="left-buttons">
 		<!-- Full Level -->
 		<element ref="button-black-outline1"><bounds x="20" y="140" width="270" height="126" /><color red="0" green="0" blue="0" /></element>
-		<element ref="button-white" inputtag="Y0" inputmask="0x04">
+		<element ref="button-white" inputtag="Y0" inputmask="0x01">
 			<bounds x="35" y="155" width="240" height="96" /></element>
 		<element ref="button-text-black-fulllevel"><bounds x="0" y="0" width="310" height="70" /><color red="0" green="0" blue="0" /></element>
-		<element ref="led"><bounds x="115" y="75" width="75" height="20" /><animate name="led10" /><color state="0" red="0.6" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="115" y="75" width="75" height="20" /><animate name="led12" /><color state="0" red="0.6" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
 		<!-- 16 Levels -->
 		<element ref="button-black-outline1"><bounds x="20" y="465" width="270" height="126" /><color red="0" green="0" blue="0" /></element>
-		<element ref="button-white" inputtag="Y0" inputmask="0x01">
+		<element ref="button-white" inputtag="Y0" inputmask="0x02">
 			<bounds x="35" y="480" width="240" height="96" /></element>
 		<element ref="button-text-black-16levels"><bounds x="0" y="325" width="310" height="70" /><color red="0" green="0" blue="0" /></element>
-		<element ref="led"><bounds x="115" y="400" width="75" height="20" /><animate name="led12" /><color state="0" red="0.6" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="115" y="400" width="75" height="20" /><animate name="led11" /><color state="0" red="0.6" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
 		<!-- Bank 2 -->
 		<element ref="button-black-outline1"><bounds x="20" y="790" width="270" height="126" /><color red="0" green="0" blue="0" /></element>
-		<element ref="button-white" inputtag="Y0" inputmask="0x02">
+		<element ref="button-white" inputtag="Y0" inputmask="0x04">
 			<bounds x="35" y="805" width="240" height="96" /></element>
 		<element ref="button-text-black-bank2"><bounds x="0" y="650" width="310" height="70" /><color red="0" green="0" blue="0" /></element>
-		<element ref="led"><bounds x="115" y="725" width="75" height="20" /><animate name="led11" /><color state="0" red="0.6" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="115" y="725" width="75" height="20" /><animate name="led10" /><color state="0" red="0.6" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
 		<!-- After -->
 		<element ref="button-black-outline1"><bounds x="20" y="1115" width="270" height="126" /><color red="0" green="0" blue="0" /></element>
 		<element ref="button-white" inputtag="Y0" inputmask="0x08">

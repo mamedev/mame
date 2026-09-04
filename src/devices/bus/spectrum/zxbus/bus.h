@@ -80,7 +80,7 @@ DECLARE_DEVICE_TYPE(ZXBUS_SLOT, zxbus_slot_device)
 class zxbus_device : public device_t
 {
 public:
-	zxbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	zxbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void set_io_space(address_space_installer &io, address_space_installer &shadow_io)
 	{

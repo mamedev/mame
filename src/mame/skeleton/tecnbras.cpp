@@ -38,12 +38,13 @@ public:
 		, m_dmds(*this, "dmd_%u", 0U)
 	{ }
 
-	void tecnbras(machine_config &config);
+	void tecnbras(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	void set_x_position_w(offs_t offset, uint8_t data);
 	void print_column_w(offs_t offset, uint8_t data);
 
@@ -93,8 +94,6 @@ void tecnbras_state::print_column_w(offs_t offset, uint8_t data)
 
 void tecnbras_state::machine_start()
 {
-	m_dmds.resolve();
-
 	save_item(NAME(m_xcoord));
 	save_item(NAME(m_digit));
 

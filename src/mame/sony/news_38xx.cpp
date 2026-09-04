@@ -285,7 +285,6 @@ protected:
 
 void news_38xx_state::machine_start()
 {
-	m_led.resolve();
 	m_cpu->space(AS_PROGRAM).specific(m_memory_access);
 	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 	m_net_ram = std::make_unique<u16[]>(8192);
@@ -851,8 +850,8 @@ void news_38xx_state::reset_cpu_registers()
 void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("tape", NSCSI_TAPE);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_38xx_state::common(machine_config &config)
@@ -875,10 +874,10 @@ void news_38xx_state::common(machine_config &config)
 
 	RTC62421(config, m_rtc, 32.768_kHz_XTAL);
 
-	DMAC_0266(config, m_dma[0], 0);
+	DMAC_0266(config, m_dma[0]);
 	m_dma[0]->set_bus(m_iop, 0);
 
-	DMAC_0266(config, m_dma[1], 0);
+	DMAC_0266(config, m_dma[1]);
 	m_dma[1]->set_bus(m_iop, 0);
 
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
@@ -949,7 +948,7 @@ void news_38xx_state::common(machine_config &config)
 
 	// scsi bus 1 host adapter
 	CXD1180(config, m_scsi[1], 20_MHz_XTAL / 2);
-	m_scsibus[1]->set_external_device(7, m_scsi[0]);
+	m_scsibus[1]->set_external_device(7, m_scsi[1]);
 	m_scsi[1]->irq_handler().set(DEVICE_SELF, FUNC(news_38xx_state::irq_w<iop_irq::SCSI1>));
 	m_scsi[1]->irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
 	m_scsi[1]->drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));

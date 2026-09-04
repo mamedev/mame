@@ -357,7 +357,7 @@ void micro3d_state::micro3d(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400);
 	screen.set_screen_update("vgb", FUNC(tms34010_device::tms340x0_ind16));
 	screen.set_palette(m_palette);

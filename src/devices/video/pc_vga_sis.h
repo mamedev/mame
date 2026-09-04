@@ -14,7 +14,7 @@ public:
 	// Chipset for AGP card, enough for BIOS checks and nothing else (cfr. SDD tests)
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
-	sis6326_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis6326_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -85,7 +85,12 @@ protected:
 	u8 m_turbo_queue_address;
 	u8 m_page_size_select;
 	u8 m_dram_fb_size;
-	u8 m_fast_page_address_latch[3];
+	union FAST_PAGE {
+		u8 b[4];
+		u32 u;
+	};
+	FAST_PAGE m_fast_page_address_latch;
+	u32 m_fast_page_address;
 	u8 m_ext_sr33;
 	u8 m_ext_sr34;
 	u8 m_ext_sr35;
@@ -174,7 +179,7 @@ protected:
 class sis630_vga_device : public sis6326_vga_device
 {
 public:
-	sis630_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis630_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	//virtual void device_start() override ATTR_COLD;

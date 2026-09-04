@@ -75,15 +75,15 @@ void f108_device::device_add_mconfig(machine_config &config)
 	SCC85C30(config, m_scc, 31.3344_MHz_XTAL/4);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(f108_device::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -169,12 +169,12 @@ u32 f108_device::ata_data_r(offs_t offset, u32 mem_mask)
 
 	if (mem_mask == 0xffffffff)
 	{
-		retval = m_ata->cs0_swap_r(0, 0xffff) << 16;
-		retval |= m_ata->cs0_swap_r(0, 0xffff);
+		retval = m_ata->cs0_swap_r(0) << 16;
+		retval |= m_ata->cs0_swap_r(0);
 	}
 	else if ((mem_mask & 0xffff0000) != 0)
 	{
-		retval = m_ata->cs0_swap_r(0, mem_mask >> 16) << 16;
+		retval = m_ata->cs0_swap_r(0) << 16;
 	}
 
 	return retval;
@@ -184,12 +184,12 @@ void f108_device::ata_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask == 0xffffffff)
 	{
-		m_ata->cs0_swap_w(0, data >> 16, 0xffff);
-		m_ata->cs0_swap_w(0, data & 0xffff, 0xffff);
+		m_ata->cs0_swap_w(0, data >> 16);
+		m_ata->cs0_swap_w(0, data & 0xffff);
 	}
 	else if ((mem_mask & 0xffff0000) != 0)
 	{
-		m_ata->cs0_swap_w(0, data >> 16, mem_mask >> 16);
+		m_ata->cs0_swap_w(0, data >> 16);
 	}
 }
 

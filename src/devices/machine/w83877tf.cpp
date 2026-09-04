@@ -39,6 +39,11 @@ w83877tf_device::w83877tf_device(const machine_config &mconfig, const char *tag,
 	, m_ndtr2_callback(*this)
 	, m_nrts2_callback(*this)
 	, m_index(0)
+	, m_fdc_ad(0)
+	, m_prt_ad(0)
+	, m_uart_ad{ 0, 0 }
+	, m_pm1_ad(0)
+	, m_gpe_ad(0)
 {
 }
 
@@ -689,8 +694,8 @@ void w83877tf_device::request_irq(int irq, int state)
 		m_isa->irq12_w(state);
 		break;
 	//case 13:
-	//	m_isa->irq13_w(state);
-	//	break;
+	//  m_isa->irq13_w(state);
+	//  break;
 	case 14:
 		m_isa->irq14_w(state);
 		break;

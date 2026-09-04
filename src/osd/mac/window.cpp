@@ -435,8 +435,8 @@ void mac_window_info::update()
 			// Check whether window has vector screens
 
 			{
-				const screen_device *screen = screen_device_enumerator(machine().root_device()).byindex(index());
-				if ((screen != nullptr) && (screen->screen_type() == SCREEN_TYPE_VECTOR))
+				const device_video_output_interface *screen = video_output_interface_enumerator(machine().root_device()).byindex(index());
+				if ((screen != nullptr) && (screen->is_vector()))
 					renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
 				else
 					renderer().clear_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);

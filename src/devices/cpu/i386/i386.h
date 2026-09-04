@@ -5,16 +5,9 @@
 
 #pragma once
 
-// SoftFloat 2 lacks an include guard
-#ifndef softfloat2_h
-#define softfloat2_h 1
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
-#endif
-
-#include "divtlb.h"
-
 #include "i386dasm.h"
+#include "divtlb.h"
+#include "softfloat3/source/include/softfloat.h"
 #include <algorithm>
 
 #define INPUT_LINE_A20      1
@@ -360,7 +353,7 @@ protected:
 	uint64_t m_perfctr[2];
 
 	// FPU
-	floatx80 m_x87_reg[8];
+	extFloat80_t m_x87_reg[8];
 
 	uint16_t m_x87_cw;
 	uint16_t m_x87_sw;
@@ -1392,11 +1385,11 @@ protected:
 	inline void sse_predicate_compare_double(uint8_t imm8, XMM_REG d, XMM_REG s);
 	inline void sse_predicate_compare_single_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
 	inline void sse_predicate_compare_double_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
-	inline floatx80 READ80(uint32_t ea);
-	inline void WRITE80(uint32_t ea, floatx80 t);
+	inline extFloat80_t READ80(uint32_t ea);
+	inline void WRITE80(uint32_t ea, extFloat80_t t);
 	inline void x87_set_stack_top(int top);
 	inline void x87_set_tag(int reg, int tag);
-	void x87_write_stack(int i, floatx80 value, bool update_tag);
+	void x87_write_stack(int i, extFloat80_t value, bool update_tag);
 	inline void x87_set_stack_underflow();
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
@@ -1406,10 +1399,10 @@ protected:
 	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);
 	void x87_reset();
-	floatx80 x87_add(floatx80 a, floatx80 b);
-	floatx80 x87_sub(floatx80 a, floatx80 b);
-	floatx80 x87_mul(floatx80 a, floatx80 b);
-	floatx80 x87_div(floatx80 a, floatx80 b);
+	extFloat80_t x87_add(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_sub(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_mul(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_div(extFloat80_t a, extFloat80_t b);
 	void x87_fadd_m32real(uint8_t modrm);
 	void x87_fadd_m64real(uint8_t modrm);
 	void x87_fadd_st_sti(uint8_t modrm);

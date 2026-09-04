@@ -477,14 +477,21 @@ int cbm_iec_device::get_signal(int signal)
 
 // slot devices
 #include "c1541.h"
+#include "c1541_clones.h"
 #include "c1571.h"
 #include "c1581.h"
 #include "c64_nl10.h"
 #include "cmdhd.h"
 #include "diag264_lb_iec.h"
+#include "dolphindos.h"
 #include "fd2000.h"
 #include "interpod.h"
+#include "minichief.h"
+#include "prodos.h"
+#include "prologicdos.h"
+#include "rapidos.h"
 #include "serialbox.h"
+#include "turbotrans.h"
 #include "vic1515.h"
 #include "vic1520.h"
 #include "c1526.h"
@@ -500,11 +507,14 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("fsd1", FSD1);
 	device.option_add("fsd2", FSD2);
 	device.option_add("csd1", CSD1);
-	device.option_add("c1541dd", C1541_DOLPHIN_DOS);
+	device.option_add("c1541dd2", C1541_DOLPHIN_DOS_V2);
+	device.option_add("c1541tt", C1541_TURBOTRANS);
 	device.option_add("c1541pd", C1541_PROFESSIONAL_DOS_V1);
 	device.option_add("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC);
+	device.option_add("c1541rp", C1541_RAPIDOS_PROFESSIONAL);
 	device.option_add("c1570", C1570);
 	device.option_add("c1571", C1571);
+	device.option_add("c1571dd3", C1571_DOLPHIN_DOS_V3);
 	device.option_add("c1581", C1581);
 	device.option_add("indusgt", INDUS_GT);
 	device.option_add("cmdhd", CMD_HD);

@@ -491,7 +491,7 @@ void at_state::neat(machine_config &config)
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
 	rtc.set_century_index(0x32);
 
-	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "bios");
+	CS8221(config, "cs8221", "maincpu", "mb:isa", "bios");
 }
 
 void at_state::xb42639(machine_config &config)
@@ -567,8 +567,9 @@ void at_state::at486(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	// FIXME: deteremine ISA bus clock
 	// on-board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: deteremine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true);
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
@@ -606,7 +607,7 @@ void at_state::ct386sx(machine_config &config)
 {
 	at386sx(config);
 	m_maincpu->set_addrmap(AS_IO, &at_state::neat_io);
-	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "maincpu");
+	CS8221(config, "cs8221", "maincpu", "mb:isa", "maincpu");
 }
 
 // Commodore PC 30-III
@@ -640,8 +641,9 @@ void at_vrom_fix_state::megapcpla(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	// FIXME: determine ISA bus clock
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true);
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
@@ -683,7 +685,8 @@ void at_state::ficpio2(machine_config &config)
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M");
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: determine ISA bus clock
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true);
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
 
@@ -692,8 +695,9 @@ void at_state::ficpio2(machine_config &config)
 	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, "cdrom", nullptr, true));
 	ide2.irq_handler().set("mb:pic8259_slave", FUNC(pic8259_device::ir7_w));
 
-	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_BUS(config, "pcibus").set_busnum(0);
 	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "vt82c505", true);
+	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false);
 	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
@@ -813,8 +817,9 @@ void at_state::pg750(machine_config &config)
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
 	rtc.set_century_index(0x32);
 
+	// FIXME: deteremine ISA bus clock
 	// on-board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_dual_1440K); // FIXME: deteremine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_dual_1440K);
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
 	// ISA cards

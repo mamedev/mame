@@ -147,8 +147,6 @@ void msxtr_state::setup_slot_spaces(msx_internal_slot_interface &device)
 void msxtr_state::machine_start()
 {
 	msx2p_base_state::machine_start();
-	m_pause_led.resolve();
-	m_r800_led.resolve();
 
 	save_item(NAME(m_pcm_last_sample));
 	save_item(NAME(m_pcm_held_sample));

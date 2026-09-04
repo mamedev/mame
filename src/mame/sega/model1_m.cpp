@@ -5,21 +5,26 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
+#include "model1.h"
+
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
-#include "model1.h"
+
+#include "debugger.h"
+
 
 void model1_state::machine_start()
 {
-	m_digits.resolve();
-	m_outs.resolve();
-
 	m_copro_ram_data = std::make_unique<u32[]>(0x2000);
 
 	save_pointer(NAME(m_copro_ram_data), 0x2000);
 	save_item(NAME(m_v60_copro_ram_adr));
 	save_item(NAME(m_v60_copro_ram_latch));
+
+	m_irq0_timer[0] = timer_alloc(FUNC(model1_state::irq0_timer_tick), this);
+	m_irq0_timer[1] = timer_alloc(FUNC(model1_state::irq0_timer_tick), this);
+	save_item(NAME(m_timer_period));
+	save_item(NAME(m_timer_mode));
 
 	m_copro_fifo_in->setup(16,
 						   [this]() { m_tgp_copro->stall(); },
@@ -154,21 +159,22 @@ u32 model1_state::copro_ramadr_r(offs_t offset)
 	return m_copro_ram_adr[offset >> 3];
 }
 
+// Sega Model 1 stores vertices to test in RAM at 4 bytes each (X, Y, Z, radius)
+// so a loop wanting to walk all of the X positions needs to skip 4 bytes each time.
+// Page 4 of the coprocessor RAM (0x40000) is used for this purpose, and the low bits
+// of the address are used to select which of the 4 values is being read/written.
+
 void model1_state::copro_ramdata_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if(m_copro_ram_adr[offset >> 3] & 0x40000) {
-		COMBINE_DATA(&m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)]);
-	} else {
-		COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff]);
-	}
-	m_copro_ram_adr[offset >> 3] ++;
+	COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff]);
+	m_copro_ram_adr[offset >> 3] += (m_copro_ram_adr[offset >> 3] & 0x40000) ? 4 : 1;
 }
 
 u32 model1_state::copro_ramdata_r(offs_t offset)
 {
-	u32 val = (m_copro_ram_adr[offset >> 3] & 0x40000) ? m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)] : m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff];
+	u32 val = m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff];
 	if(!machine().side_effects_disabled())
-		m_copro_ram_adr[offset >> 3] ++;
+		m_copro_ram_adr[offset >> 3] += (m_copro_ram_adr[offset >> 3] & 0x40000) ? 4 : 1;
 	return val;
 }
 

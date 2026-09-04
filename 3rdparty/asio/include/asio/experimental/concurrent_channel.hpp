@@ -2,7 +2,7 @@
 // experimental/concurrent_channel.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,6 +26,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -58,11 +59,18 @@ struct concurrent_channel_type<ExecutorOrSignature,
 } // namespace detail
 
 /// Template type alias for common use of channel.
+#if defined(GENERATING_DOCUMENTATION)
+template <typename ExecutorOrSignature, typename... Signatures>
+using concurrent_channel = basic_concurrent_channel<
+    specified_executor_or_any_io_executor, channel_traits<>, signatures...>;
+#else // defined(GENERATING_DOCUMENTATION)
 template <typename ExecutorOrSignature, typename... Signatures>
 using concurrent_channel = typename detail::concurrent_channel_type<
     ExecutorOrSignature>::template inner<Signatures...>::type;
+#endif // defined(GENERATING_DOCUMENTATION)
 
 } // namespace experimental
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

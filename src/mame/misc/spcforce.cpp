@@ -68,8 +68,8 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void meteors(machine_config &config);
-	void spcforce(machine_config &config);
+	void meteors(machine_config &config) ATTR_COLD;
+	void spcforce(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -141,8 +141,6 @@ uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void spcforce_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_sn76496_latch));
 	save_item(NAME(m_sn76496_select));
 	save_item(NAME(m_sn_ready));
@@ -334,7 +332,7 @@ void spcforce_state::spcforce(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, "vblirq").output_handler().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);

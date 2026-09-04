@@ -167,6 +167,8 @@
 
 #include <zlib.h>
 
+#include <cstring>
+
 
 static const uint8_t JFD_HEADER[4] = { 'J', 'F', 'D', 'I' };
 static const uint8_t GZ_HEADER[2] = { 0x1f, 0x8b };
@@ -338,6 +340,7 @@ bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[i].sector  = (header >> 8) & 0xff;
 					sects[i].bad_data_crc = (header >> 4) & 0x02;
 					sects[i].bad_addr_crc = false;
+					sects[i].weak = false;
 					sects[i].deleted = false;
 					ssize = header & 0x03;
 					sects[i].size = ssize;

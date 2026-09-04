@@ -75,10 +75,10 @@ void vme_mvme327a_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &vme_mvme327a_device::cpu_mem);
 	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme327a_device::cpu_int);
 
-	MC68153(config, m_bim, 0);
-	PIT68230(config, m_pit, 0);
+	MC68153(config, m_bim);
+	PIT68230(config, m_pit);
 
-	WD37C65C(config, m_fdc, 0);
+	WD37C65(config, m_fdc, 32_MHz_XTAL / 2); // WD37C65-PL
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);

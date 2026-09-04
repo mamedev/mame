@@ -79,7 +79,7 @@ const tiny_rom_entry *abc_sio_device::device_rom_region() const
 void abc_sio_device::device_add_mconfig(machine_config &config)
 {
 	Z80CTC(config, m_ctc, XTAL(4'915'200));
-	Z80DART(config, m_sio, 0);
+	Z80DART(config, m_sio);
 }
 
 

@@ -8,6 +8,7 @@
 
 #include "romload.h"
 
+#include "endianness.h"
 #include "multibyte.h"
 
 /*
@@ -332,14 +333,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	for(int i = 0; i < 32 ; i+=4) {
 		uint32_t temp;
 
-		temp = rotl_32(r, 1) ^ des_subkeys[subkey];
+		temp = std::rotl(r, 1) ^ des_subkeys[subkey];
 		l ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		l ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = rotr_32(r, 3) ^ des_subkeys[subkey];
+		temp = std::rotr(r, 3) ^ des_subkeys[subkey];
 		l ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -348,14 +349,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 		if(decrypt)
 			subkey -= 4;
 
-		temp = rotl_32(l, 1) ^ des_subkeys[subkey];
+		temp = std::rotl(l, 1) ^ des_subkeys[subkey];
 		r ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		r ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = rotr_32(l, 3) ^ des_subkeys[subkey];
+		temp = std::rotr(l, 3) ^ des_subkeys[subkey];
 		r ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -376,17 +377,10 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 
 // For ide gdrom controller
 
-DEFINE_DEVICE_TYPE(IDE_GDROM, idegdrom_device, "ide_gdrom", "ide gdrom controller")
+DEFINE_DEVICE_TYPE(IDE_GDROM, idegdrom_device, "ide_gdrom", "IDE GDROM controller")
 
-idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id)
-	: idegdrom_device(mconfig, tag, owner, clock)
-{
-	space_owner_tag = space_tag;
-	space_owner_id = space_id;
-}
-
-idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, IDE_GDROM, tag, owner, clock),
+idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, IDE_GDROM, tag, owner, clock),
 	m_ide(*this, "ide"),
 	irq_cb(*this)
 {
@@ -432,7 +426,6 @@ void idegdrom_device::device_add_mconfig(machine_config &config)
 {
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(gdrom_devices, "gdrom", nullptr, true);
 	m_ide->irq_handler().set(*this, FUNC(idegdrom_device::ide_irq));
-	m_ide->set_bus_master_space(space_owner_tag, space_owner_id);
 }
 
 void idegdrom_device::map_command(address_map &map)
@@ -1080,21 +1073,28 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 
-	PCI_ROOT(config, "pci", 0);
-	SEGA315_6154(config, m_315_6154, 0);
+	PCI_ROOT(config, "pci");
+
+	SEGA315_6154(config, m_315_6154);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
-	IDE_GDROM(config, m_idegdrom, 0, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
+
+	IDE_GDROM(config, m_idegdrom);
+	m_idegdrom->set_bus_master_space(m_315_6154, sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
+
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->read_b().set(FUNC(naomi_gdrom_board::pic_dimm_r));
 	m_securitycpu->write_b().set(FUNC(naomi_gdrom_board::pic_dimm_w));
 	m_securitycpu->set_config(0x3fff - 0x04);
-	I2C_24C01(config, m_i2c0, 0);
+
+	I2C_24C01(config, m_i2c0);
 	m_i2c0->set_e0(0);
 	m_i2c0->set_wc(1);
-	I2C_24C01(config, m_i2c1, 0);
+
+	I2C_24C01(config, m_i2c1);
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
+
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);
 }
 

@@ -539,7 +539,7 @@ void m57_state::m57(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(m57_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 8, 248); // based on m52
 	screen.set_screen_update(FUNC(m57_state::screen_update));
 	screen.set_palette(m_palette);
@@ -548,7 +548,7 @@ void m57_state::m57(machine_config &config)
 	PALETTE(config, m_palette, FUNC(m57_state::palette), 32*8+32*8, 256+16);
 
 	// sound hardware
-	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
+	IREM_M52_SOUNDC_AUDIO(config, "irem_audio");
 }
 
 

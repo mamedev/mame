@@ -8,7 +8,7 @@ TODO (pc286vs):
 - Verify A20 gate usage, seems to reuse the same hookup as later Epson variants;
 - Not extensively tested beyond not having a working SASI/SCSI option (using IDE as fallback);
 
-TODO (pc386m):
+TODO (pc386m / pc386v):
 - Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
   (which barely contains program code);
 - "ERR:VR" at POST (GFX VRAM)
@@ -32,6 +32,8 @@ TODO: (pc486se/pc486mu):
 Notes:
 - A detailed list of Epson PC98s can be seen from here:
   http://www.pc-9800.net/db_epson/index.htm
+
+- https://github.com/angelosa/hw_docs/blob/main/nec_pc98/epson_error_codes.md for POST error codes
 
 - Being these knockoffs means that there isn't 100% compatibility with all SWs.
   Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック)
@@ -402,6 +404,29 @@ void pc98_epson_state::pc386m(machine_config &config)
 	// ...
 }
 
+void pc98_epson_state::pc386v(machine_config &config)
+{
+	pc386m(config);
+
+	I386(config.replace(), m_maincpu, 20'000'000); // i386DX 20MHz, switchable to 10/5 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc98_epson_state::pc486se_map);
+	m_maincpu->set_addrmap(AS_IO, &pc98_epson_state::pc386m_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// RAM 1.6MB ~ 14.6MB
+
+	// 5.25" x 2 floppy drives
+
+	// 2 internal memory slots
+	// 4 C-Bus slots
+	// no sound card built-in
+
+	// PC-386V flavours:
+	// -STD: optional HDD
+	// -H20: 20MB HDD
+	// -H40: 40MB HDD
+}
+
 void pc98_epson_state::pc486se(machine_config &config)
 {
 	pc386m(config);
@@ -535,10 +560,32 @@ ROM_START( pc386m )
 ROM_END
 
 /*
+Epson PC-386V
+*/
+
+ROM_START( pc386v )
+	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "cw3v-a01.bin", 0x00000, 0x20000,  CRC(f47fccec) SHA1(eb32c4558e9f8d048113cf85c1feab31f57bd3ac) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
+	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
+	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )  // bank 1, unconfirmed
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+
+/*
 Epson PC-486SE
 
 i486SX @ 25 MHz
-1.6 MB of conventional memory (???)
+1.6 MB of conventional memory
 17.6 MB
 CBus: 2slots
 */
@@ -606,6 +653,7 @@ COMP( 1987, pc286u,     0,        0, pc286u,     pc386m, pc98_epson_state, init_
 
 // PC-386 (i386)
 COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-386M",  MACHINE_NOT_WORKING )
+COMP( 1989, pc386v,     pc386m,   0, pc386v,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-386V",  MACHINE_NOT_WORKING )
 
 // PC-486 (i486SX/DX)
 COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486MU", MACHINE_NOT_WORKING )

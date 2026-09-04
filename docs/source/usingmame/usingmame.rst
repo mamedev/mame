@@ -109,4 +109,4 @@ pre-existing mame.ini by copying changed options into it.
 
 Once you are more confident with MAME options, you may want to adjust the
 configuration of your setup a bit more. In this case, keep in mind the order in
-which options are read; see :ref:`advanced-multi-CFG` for details.
+which options are read; see :ref:`advanced-multicfg-order` for details.

@@ -409,7 +409,7 @@ void n64_console_state::n64(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(500000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	/* Video DACRATE is for quarter pixels, so the horizontal is also given in quarter pixels.  However, the horizontal and vertical timing and sizing is adjustable by register and will be reset when the registers are written. */
 	// TODO: with 480 vertical will generate invalid vblanks
 	// cfr. amenairc -drc
@@ -425,7 +425,7 @@ void n64_console_state::n64(machine_config &config)
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	N64PERIPH(config, m_rcp_periphs, 0);
+	N64PERIPH(config, m_rcp_periphs);
 	m_rcp_periphs->set_sram(m_sram);
 	m_rcp_periphs->set_rdram(m_rdram);
 

@@ -102,7 +102,7 @@ void vme_tp880v_card_device::device_add_mconfig(machine_config &config)
 	m_dma->dma8_read<0>().set(m_scsi, FUNC(ncr53c90_device::dma_r));
 	m_dma->dma8_write<0>().set(m_scsi, FUNC(ncr53c90_device::dma_w));
 
-	M48T02(config, m_rtc, 0); // MK40T02B-25
+	M48T02(config, m_rtc); // MK40T02B-25
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk", false);

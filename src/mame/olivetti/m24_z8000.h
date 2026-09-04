@@ -14,7 +14,7 @@
 class m24_z8000_device :  public device_t
 {
 public:
-	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto halt_callback() { return m_halt_out.bind(); }
 
@@ -37,6 +37,8 @@ public:
 	void z8000_data(address_map &map) ATTR_COLD;
 	void z8000_io(address_map &map) ATTR_COLD;
 	void z8000_prog(address_map &map) ATTR_COLD;
+	uint16_t segment_r();
+	uint16_t segtack_r();
 protected:
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;

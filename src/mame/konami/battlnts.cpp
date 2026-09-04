@@ -134,7 +134,7 @@ void battlnts_state::vblank_irq(int state)
 
 void battlnts_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void battlnts_state::bankswitch_w(uint8_t data)
@@ -318,7 +318,7 @@ void battlnts_state::battlnts(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(battlnts_state::screen_update));
 	screen.set_palette("palette");

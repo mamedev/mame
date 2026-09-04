@@ -1766,7 +1766,7 @@ void pdp1_state::pdp1(machine_config &config)
 	m_maincpu->set_io_sc_callback(FUNC(pdp1_state::io_start_clear));
 
 	/* video hardware (includes the control panel and typewriter output) */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(refresh_rate);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(virtual_width, virtual_height);
@@ -1775,7 +1775,7 @@ void pdp1_state::pdp1(machine_config &config)
 	screen.screen_vblank().set(FUNC(pdp1_state::screen_vblank_pdp1));
 	screen.set_palette(m_palette);
 
-	CRT(config, m_crt, 0);
+	CRT(config, m_crt);
 	m_crt->set_num_levels(pen_crt_num_levels);
 	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
 	m_crt->set_size(crt_window_width, crt_window_height);

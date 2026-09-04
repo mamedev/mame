@@ -49,7 +49,7 @@ class z80dma_device :   public device_t,
 {
 public:
 	// construction/destruction
-	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto out_busreq_callback() { return m_out_busreq_cb.bind(); }
 	auto out_int_callback() { return m_out_int_cb.bind(); }
@@ -93,9 +93,11 @@ protected:
 
 	enum
 	{
-		SEQ_WAIT_READY = 0,
+		SEQ_IDLE = 0,
+		SEQ_WAIT_READY,
 		SEQ_REQUEST_BUS,
 		SEQ_WAITING_ACK,
+		SEQ_TRANS1_SAMPLE_READY,
 		SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS,
 		SEQ_TRANS1_READ_SOURCE,
 		SEQ_TRANS1_INC_DEC_DEST_ADDRESS,
@@ -173,7 +175,7 @@ private:
 
 	int  m_wait;
 	int  m_waits_extra;
-	int  m_busrq;
+	int  m_busrq = CLEAR_LINE;
 	int  m_busrq_ack;
 	bool m_is_pulse;
 	u8   m_latch;

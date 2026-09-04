@@ -122,12 +122,11 @@ u8 cio_base_device::get_current_vector()
 	u8 data = 0xff;
 
 	bool mie = m_register[MASTER_INTERRUPT_CONTROL] & MICR_MIE;
-	bool nv = m_register[MASTER_INTERRUPT_CONTROL] & MICR_NV;
 	bool ct_vis = m_register[MASTER_INTERRUPT_CONTROL] & MICR_CT_VIS;
 	bool pa_vis = m_register[MASTER_INTERRUPT_CONTROL] & MICR_PA_VIS;
 	bool pb_vis = m_register[MASTER_INTERRUPT_CONTROL] & MICR_PB_VIS;
 
-	if (!mie || nv)
+	if (!mie)
 	{
 		// no vector
 	}
@@ -248,10 +247,14 @@ void cio_base_device::check_interrupt()
 		state = ASSERT_LINE;
 	}
 
-	if (m_irq != state)
+	// The under-service level gates everything further down the daisy chain, so a
+	// change there has to be published even when our own request line does not move.
+	if (m_irq != state || m_ius_level != ius_level)
 	{
-		LOG("%s CIO Interrupt: %u\n", machine().describe_context(), state);
+		if (m_irq != state)
+			LOG("%s CIO Interrupt: %u\n", machine().describe_context(), state);
 		m_irq = state;
+		m_ius_level = ius_level;
 		m_write_irq(state);
 	}
 }
@@ -551,11 +554,15 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 	case PORT_A_DATA:
 		m_output[PORT_A] = data;
 		m_write_pa(data ^ m_register[PORT_A_DATA_PATH_POLARITY]);
+		match_pattern(PORT_A);
+		check_interrupt();
 		break;
 
 	case PORT_B_DATA:
 		m_output[PORT_B] = data;
 		m_write_pb(data ^ m_register[PORT_B_DATA_PATH_POLARITY]);
+		match_pattern(PORT_B);
+		check_interrupt();
 		break;
 
 	case PORT_C_DATA:
@@ -814,6 +821,20 @@ void cio_base_device::count(int id)
 		}
 
 		check_interrupt();
+
+		if (id == TIMER_1)
+		{
+			switch (m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_LC_MASK)
+			{
+			case LC_CT1_TRIGGERS_CT2:
+				trigger(TIMER_2);
+				break;
+
+			case LC_CT1_COUNTS_CT2:
+				count(TIMER_2);
+				break;
+			}
+		}
 	}
 }
 
@@ -954,7 +975,7 @@ cio_base_device::cio_base_device(const machine_config &mconfig, device_type type
 	m_write_pb(*this),
 	m_read_pc(*this, 0),
 	m_write_pc(*this),
-	m_irq(CLEAR_LINE)
+	m_irq(CLEAR_LINE), m_ius_level(-1)
 {
 }
 
@@ -1000,6 +1021,7 @@ void cio_base_device::device_start()
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
 
 	save_item(NAME(m_irq));
+	save_item(NAME(m_ius_level));
 	save_item(NAME(m_register));
 	save_item(NAME(m_input));
 	save_item(NAME(m_output));
@@ -1069,7 +1091,7 @@ TIMER_CALLBACK_MEMBER(cio_base_device::advance_counters)
 		count(TIMER_1);
 	}
 
-	if (counter_enabled(TIMER_2) && !counter_external_count(TIMER_2))
+	if (counter_enabled(TIMER_2) && !counter_external_count(TIMER_2) && (m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_LC_MASK) != LC_CT1_COUNTS_CT2)
 	{
 		count(TIMER_2);
 	}

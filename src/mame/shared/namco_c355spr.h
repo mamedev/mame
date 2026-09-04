@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Phil Stroffolino, Bryan McPhail
 
 #ifndef MAME_SHARED_NAMCO_C355SPR_H
 #define MAME_SHARED_NAMCO_C355SPR_H
@@ -13,9 +13,9 @@ class namco_c355spr_device : public device_t, public device_gfx_interface, publi
 public:
 	using c355_obj_code2tile_delegate = device_delegate<int (int)>;
 	using c355_obj_entry_attr_delegate = device_delegate<u16(int, u8)>;
-	using c355_obj_entry_attr_which_delegate = device_delegate<u16(int, u8, int)>;
+	using c355_obj_entry_attr_which_delegate = device_delegate<u16(int, u8)>;
 	using c355_obj_entry_delegate = device_delegate<u16(int)>;
-	using c355_obj_entry_which_delegate = device_delegate<u16(int, int)>;
+	using c355_obj_entry_which_delegate = device_delegate<u16(int)>;
 	using c355_priority_delegate = device_delegate<int(int)>;
 	using c355_mix_delegate = device_delegate<bool (u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)>;
 
@@ -31,7 +31,6 @@ public:
 	void set_alt_precision(bool alt_precision) { m_alt_precision = alt_precision; }
 	void set_colors(int colors) { m_colors = colors; }
 	void set_granularity(int granularity) { m_granularity = granularity; }
-	void set_draw_2_lists(bool draw_2_lists) { m_draw_2_lists = draw_2_lists; }
 
 	// the Namco code currently requires us to allocate memory in the device, the Data East hookup uses access callbacks
 	void set_device_allocates_spriteram(bool allocate_memory) { m_device_allocates_spriteram = allocate_memory;  }
@@ -53,8 +52,6 @@ public:
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri = 0);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri = 0);
-
-	void draw_dg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void build_sprite_list_and_render_sprites(const rectangle cliprect);
 
@@ -82,9 +79,9 @@ protected:
 
 	u16 read_spritetile(int entry);
 	u16 read_spriteformat(int entry, u8 attr);
-	u16 read_spritetable(int entry, u8 attr, int whichlist);
+	u16 read_spritetable(int entry, u8 attr);
 	u16 read_cliptable(int entry, u8 attr);
-	u16 read_spritelist(int entry, int whichlist);
+	u16 read_spritelist(int entry);
 
 	int default_priority(int pal_pri) { return ((pal_pri >> 4) & 0xf); }
 	bool default_mix(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
@@ -116,21 +113,21 @@ protected:
 		int pri;
 	};
 
-	std::unique_ptr<c355_sprite []> m_spritelist[2];
-	const c355_sprite *m_sprite_end[2]{};
+	std::unique_ptr<c355_sprite []> m_spritelist;
+	const c355_sprite *m_sprite_end{};
 	u16 m_position[4];
 	std::unique_ptr<u16 []> m_spriteram[2];
 	bitmap_ind16 m_renderbitmap;
 	bitmap_ind16 m_screenbitmap;
 
-	void build_sprite_list(int no);
+	void build_sprite_list();
 
 private:
 	void copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, int pri = 0);
 	void copybitmap(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, int pri = 0);
 
 	// C355 Motion Object internals
-	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, int no);
+	void get_single_sprite(u16 which, c355_sprite *sprite_ptr);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri = 0);
 
 	int m_scrolloffs[2];
@@ -143,7 +140,6 @@ private:
 	u16 m_colbase;
 	int m_colors;
 	int m_granularity;
-	bool m_draw_2_lists;
 	bool m_device_allocates_spriteram;
 };
 

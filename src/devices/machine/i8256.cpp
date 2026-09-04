@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "i8256.h"
 
+#include <bit>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -508,7 +510,7 @@ void i8256_device::sync1_rxc()
 	// see about parity
 	if (need_parity && (m_rxd_bits == m_data_bits_count))
 	{
-		if ((population_count_32(m_sync1) & 1) != m_rxd)
+		if ((std::popcount(m_sync1) & 1) != m_rxd)
 			m_status |= I8256_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}
@@ -543,7 +545,7 @@ void i8256_device::sync2_rxc()
 	// see about parity
 	if (need_parity && (m_rxd_bits == m_data_bits_count))
 	{
-		if ((population_count_32(m_sync1) & 1) != m_rxd)
+		if ((std::popcount(m_sync1) & 1) != m_rxd)
 			m_status |= I8256_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}

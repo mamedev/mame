@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
-    msdib.h
+    msdib.cpp
 
     Microsoft Device-Independent Bitmap file loading.
 
@@ -14,9 +14,9 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
-#include "eminline.h"
 #include "osdcore.h"
 
+#include <bit>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
@@ -97,9 +97,9 @@ union bitmap_headers
 
 bool dib_parse_mask(std::uint32_t mask, unsigned &shift, unsigned &bits) noexcept
 {
-	shift = count_leading_zeros_32(mask);
+	shift = std::countl_zero(mask);
 	mask <<= shift;
-	bits = count_leading_ones_32(mask);
+	bits = std::countl_one(mask);
 	mask <<= shift;
 	shift = 32 - shift - bits;
 	return !mask;

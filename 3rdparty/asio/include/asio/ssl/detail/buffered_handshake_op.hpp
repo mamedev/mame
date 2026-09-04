@@ -2,7 +2,7 @@
 // ssl/detail/buffered_handshake_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +22,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ssl {
 namespace detail {
 
@@ -49,6 +50,10 @@ public:
     return this->process(eng, ec, bytes_transferred,
         asio::buffer_sequence_begin(buffers_),
         asio::buffer_sequence_end(buffers_));
+  }
+
+  void complete_sync(asio::error_code&) const
+  {
   }
 
   template <typename Handler>
@@ -112,6 +117,7 @@ private:
 
 } // namespace detail
 } // namespace ssl
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

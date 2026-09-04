@@ -12,6 +12,8 @@
 files {
 	MAME_DIR .. "src/devices/sound/bbd.cpp",
 	MAME_DIR .. "src/devices/sound/bbd.h",
+	MAME_DIR .. "src/devices/sound/drivesound.cpp",
+	MAME_DIR .. "src/devices/sound/drivesound.h",
 	MAME_DIR .. "src/devices/sound/flt_biquad.cpp",
 	MAME_DIR .. "src/devices/sound/flt_biquad.h",
 	MAME_DIR .. "src/devices/sound/flt_vol.cpp",
@@ -220,6 +222,18 @@ if SOUNDS["CEM3320"] then
 end
 
 ---------------------------------------------------
+-- CEM 3340 voltage-controlled oscillator chip
+--@src/devices/sound/cem3340.h,SOUNDS["CEM3340"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3340"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3340.cpp",
+		MAME_DIR .. "src/devices/sound/cem3340.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3360 dual voltage-controlled amplifier chip
 --@src/devices/sound/cem3320.h,SOUNDS["CEM3360"] = true
 ---------------------------------------------------
@@ -244,6 +258,18 @@ if SOUNDS["CEM3394"] then
 end
 
 
+
+---------------------------------------------------
+-- Creative Labs CT1741 SB16 DSP
+--@src/devices/sound/ct1741.h,SOUNDS["CT1741"] = true
+---------------------------------------------------
+
+if SOUNDS["CT1741"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ct1741.cpp",
+		MAME_DIR .. "src/devices/sound/ct1741.h",
+	}
+end
 
 ---------------------------------------------------
 -- Creative Labs CT1745 SB16 Mixer
@@ -510,6 +536,7 @@ end
 --@src/devices/sound/k007232.h,SOUNDS["K007232"] = true
 --@src/devices/sound/k051649.h,SOUNDS["K051649"] = true
 --@src/devices/sound/k053260.h,SOUNDS["K053260"] = true
+--@src/devices/sound/k054321.h,SOUNDS["K054321"] = true
 --@src/devices/sound/k054539.h,SOUNDS["K054539"] = true
 --@src/devices/sound/k056800.h,SOUNDS["K056800"] = true
 ---------------------------------------------------
@@ -539,6 +566,13 @@ if SOUNDS["K053260"] then
 	files {
 		MAME_DIR .. "src/devices/sound/k053260.cpp",
 		MAME_DIR .. "src/devices/sound/k053260.h",
+	}
+end
+
+if SOUNDS["K054321"] then
+	files {
+		MAME_DIR .. "src/devices/sound/k054321.cpp",
+		MAME_DIR .. "src/devices/sound/k054321.h",
 	}
 end
 
@@ -604,6 +638,20 @@ if SOUNDS["MAS3507D"] then
 	files {
 		MAME_DIR .. "src/devices/sound/mas3507d.cpp",
 		MAME_DIR .. "src/devices/sound/mas3507d.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Fujitsu MB87077 volume controller
+--@src/devices/sound/mb87077.h,SOUNDS["MB87077"] = true
+---------------------------------------------------
+
+if SOUNDS["MB87077"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb87077.cpp",
+		MAME_DIR .. "src/devices/sound/mb87077.h",
 	}
 end
 
@@ -1274,6 +1322,18 @@ if SOUNDS["VA_VCA"] then
 end
 
 --------------------------------------------------
+-- Virtual analog voltage-controlled oscillator (VCO)
+--@src/devices/sound/va_vco.h,SOUNDS["VA_VCO"] = true
+--------------------------------------------------
+
+if SOUNDS["VA_VCO"] then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vco.cpp",
+		MAME_DIR .. "src/devices/sound/va_vco.h",
+	}
+end
+
+--------------------------------------------------
 -- Virtual analog voltage-controlled filters (VCFs)
 --@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
 --------------------------------------------------
@@ -1475,6 +1535,18 @@ if SOUNDS["MPEG_AUDIO"] then
 end
 
 ---------------------------------------------------
+-- Texas Instruments TMS320AV110 MPEG audio decoder
+--@src/devices/sound/tms320av110.h,SOUNDS["TMS320AV110"] = true
+---------------------------------------------------
+
+if SOUNDS["TMS320AV110"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tms320av110.cpp",
+		MAME_DIR .. "src/devices/sound/tms320av110.h",
+	}
+end
+
+---------------------------------------------------
 -- ZOOM ZSG-2
 --@src/devices/sound/zsg2.h,SOUNDS["ZSG2"] = true
 ---------------------------------------------------
@@ -1566,6 +1638,18 @@ if SOUNDS["TA7630"] then
 	files {
 		MAME_DIR .. "src/devices/sound/ta7630.cpp",
 		MAME_DIR .. "src/devices/sound/ta7630.h",
+	}
+end
+
+---------------------------------------------------
+-- STmicroelectronics TDA7433
+--@src/devices/sound/tda7433.h,SOUNDS["TDA7433"] = true
+---------------------------------------------------
+
+if SOUNDS["TDA7433"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tda7433.cpp",
+		MAME_DIR .. "src/devices/sound/tda7433.h",
 	}
 end
 
@@ -1882,6 +1966,18 @@ if SOUNDS["GT155"] then
 end
 
 ---------------------------------------------------
+-- Nintendo DS Sound
+--@src/devices/sound/nds_sound.h,SOUNDS["NDS_SOUND"] = true
+---------------------------------------------------
+
+if SOUNDS["NDS_SOUND"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nds_sound.cpp",
+		MAME_DIR .. "src/devices/sound/nds_sound.h",
+	}
+end
+
+---------------------------------------------------
 -- Nintendo MMC5 Sound
 --@src/devices/sound/mmc5.h,SOUNDS["MMC5"] = true
 ---------------------------------------------------
@@ -1914,5 +2010,29 @@ if SOUNDS["FZ_PCM"] then
 	files {
 		MAME_DIR .. "src/devices/sound/fz_pcm.cpp",
 		MAME_DIR .. "src/devices/sound/fz_pcm.h",
+	}
+end
+
+---------------------------------------------------
+-- Akai L6009
+--@src/devices/sound/l6009.h,SOUNDS["L6009"] = true
+---------------------------------------------------
+
+if SOUNDS["L6009"] then
+	files {
+		MAME_DIR .. "src/devices/sound/l6009.cpp",
+		MAME_DIR .. "src/devices/sound/l6009.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/gt913.h,SOUNDS["GT913"] = true
+---------------------------------------------------
+
+if SOUNDS["GT913"] then
+	files {
+		MAME_DIR .. "src/devices/sound/gt913.cpp",
+		MAME_DIR .. "src/devices/sound/gt913.h",
 	}
 end

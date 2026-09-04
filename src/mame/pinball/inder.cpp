@@ -73,17 +73,19 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void inder(machine_config &config);
-	void brvteam(machine_config &config);
-	void canasta(machine_config &config);
-	void lapbylap(machine_config &config);
+	void inder(machine_config &config) ATTR_COLD;
+	void brvteam(machine_config &config) ATTR_COLD;
+	void canasta(machine_config &config) ATTR_COLD;
+	void lapbylap(machine_config &config) ATTR_COLD;
 
-	void init_0();
-	void init_1();
+	void init_0() ATTR_COLD;
+	void init_1() ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
+
+private:
 	u8 ppic_r();
 	void ppia_w(u8 data);
 	void ppib_w(u8 data);
@@ -1334,9 +1336,6 @@ void inder_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_pc0));
 	save_item(NAME(m_game));
 	save_item(NAME(m_portc));
@@ -1498,16 +1497,16 @@ void inder_state::inder(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(inder_state::ppic_r));
 	ppi.out_pc_callback().set(FUNC(inder_state::ppic_w));
 
-	TTL7474(config, m_7a, 0);
+	TTL7474(config, m_7a);
 	m_7a->comp_output_cb().set(FUNC(inder_state::qc7a_w));
 
-	TTL7474(config, m_9a, 0); // HCT74
+	TTL7474(config, m_9a); // HCT74
 	m_9a->output_cb().set(FUNC(inder_state::q9a_w));
 
-	TTL7474(config, m_9b, 0); // HCT74
+	TTL7474(config, m_9b); // HCT74
 	m_9b->comp_output_cb().set(FUNC(inder_state::qc9b_w));
 
-	HCT157(config, m_13, 0);
+	HCT157(config, m_13);
 	m_13->out_callback().set("msm", FUNC(msm5205_device::data_w));
 }
 

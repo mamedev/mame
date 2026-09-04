@@ -94,7 +94,7 @@ void e250_state::e250(machine_config &config)
 
 	SOFTWARE_LIST(config, "sun_sparc").set_original("sun_sparc");
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 
 	// PCI Cards
 	SUN_GEM(config, "sun_fcnc_270_4373_07"); // Sun Microsystems 270-4373-07 Gigabit Fiber Channel Network Card

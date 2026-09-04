@@ -8,6 +8,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_DEBUG     (1U << 1)
 #define LOG_GFX       (1U << 2)
 #define LOG_FIRMWARE  (1U << 3)
@@ -882,7 +884,7 @@ u32 cv1k_blitter_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 	if ((m_prev_screen_height != curr_height) || (m_prev_screen_width != curr_width))
 	{
-		screen.configure(curr_width, curr_height, curr_visarea, screen.refresh_attoseconds());
+		screen.configure(curr_width, curr_height, curr_visarea, screen.frame_period());
 		m_prev_screen_height = curr_height;
 		m_prev_screen_width = curr_width;
 	}
@@ -906,6 +908,7 @@ u32 cv1k_blitter_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 u32 cv1k_blitter_device::blitter_r(offs_t offset, u32 mem_mask)
 {
+	m_maincpu->update_access_cycles(0xB8000000 + offset, false);
 	switch (offset * 4)
 	{
 		case 0x10:
@@ -931,6 +934,7 @@ u32 cv1k_blitter_device::blitter_r(offs_t offset, u32 mem_mask)
 
 void cv1k_blitter_device::blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
+	m_maincpu->update_access_cycles(0xB8000000 + offset, true);
 	switch (offset * 4)
 	{
 		case 0x04:

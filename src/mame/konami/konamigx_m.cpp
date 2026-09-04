@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "konamigx.h"
 
+#include <numbers>
+
 /***************************************************************************/
 /*                                                                         */
 /*                           GX/MW Protections                             */
@@ -167,7 +169,7 @@ void konamigx_state::K055550_word_w(offs_t offset, u16 data, u16 mem_mask)
 				{
 					if (dy)
 					{
-						angle = (atan((double)dy / dx) * 128.0) / M_PI;
+						angle = (atan((double)dy / dx) * 128.0) / std::numbers::pi;
 						if (dx < 0) angle += 128;
 						i = (angle - 0x40) & 0xff;
 					}

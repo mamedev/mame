@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "namcos22.h"
 
+#include "video.h"
+
 
 // poly constructor
 
@@ -278,7 +280,27 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 	}
 }
 
+inline void namcos22_renderer::dispatch_scanline_poly(scanline_func callback, int clipverts, vertex_t const *clipv)
+{
+	switch (clipverts)
+	{
+		case 3:
+			render_triangle<4>(m_cliprect, render_delegate(callback, this), clipv[0], clipv[1], clipv[2]);
+			break;
 
+		case 4:
+			render_polygon<4,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+
+		case 5:
+			render_polygon<5,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+
+		case 6:
+			render_polygon<6,4>(m_cliprect, render_delegate(callback, this), clipv);
+			break;
+	}
+}
 
 /*********************************************************************************************/
 
@@ -342,11 +364,10 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
+	const int color = node->data.quad.color;
 	const int cz_value = node->data.quad.cz_value;
 	const int cz_type = node->data.quad.cz_type;
 	const int cz_adjust = node->data.quad.cz_adjust;
-	const int color2 = cz_adjust >> 16 & 0xff;
-	const int color = node->data.quad.color | color2;
 	const int objectflags = node->data.quad.objectflags;
 
 	namcos22_object_data &extra = object_data().next();
@@ -438,13 +459,23 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			extra.shade_enabled = false;
 		}
 		else
-			extra.pens += color2;
+		{
+			// unknown masking? timecris sets pen to 0x3a at the helicopter when it definitely wants 0x1a
+			extra.pens += (cz_adjust >> 16 & 0x7f) & (color | 0x1f);
+		}
+	}
+
+	// disable poly fog
+	if (BIT(cz_adjust, 23))
+	{
+		extra.zfog_enabled = false;
+		extra.fogfactor = 0;
 	}
 
 	if (m_state.m_is_ss22)
-		render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_poly_ss22, this), clipverts, clipv);
+		dispatch_scanline_poly(&namcos22_renderer::renderscanline_poly_ss22, clipverts, clipv);
 	else
-		render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_poly, this), clipverts, clipv);
+		dispatch_scanline_poly(&namcos22_renderer::renderscanline_poly, clipverts, clipv);
 }
 
 
@@ -788,7 +819,7 @@ void namcos22_state::register_normals(int addr, float m[4][4])
 		if (dotproduct < 0.0f)
 			dotproduct = 0.0f;
 
-		m_LitSurfaceInfo[m_LitSurfaceCount++] = m_camera_ambient + m_camera_power * dotproduct;
+		m_LitSurfaceInfo[m_LitSurfaceCount++] = m_camera_ambient + m_LitSurfaceIntensity * dotproduct;
 	}
 }
 
@@ -1039,36 +1070,54 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 	zmax = std::clamp(zmax, 0.0f, (float)0x1fffff);
 	int cz_value = zmax + 0.5f; // not from zsort
 
-	// u, v, bri
+	// u, v
 	for (int i = 0; i < 4; i++)
 	{
-		int bri;
-
 		v[i].u = point_read(0 + i * 2 + addr);
 		v[i].v = point_read(1 + i * 2 + addr);
+	}
 
-		if (m_LitSurfaceCount > 0)
+	// bri
+	if (m_LitSurfaceCount > 0)
+	{
+		// lighting
+		if (m_LitSurfaceGouraud)
 		{
-			// lighting (prelim)
-			int index = m_LitSurfaceIndex++;
-			if (m_LitSurfaceCount > 4)
-				index >>= 2;
-			index %= m_LitSurfaceCount;
+			// Gouraud shading
+			int index = m_LitSurfaceTriangles ? (m_LitSurfaceIndex >> 1) : m_LitSurfaceIndex;
+			const int normal_index[4] = { 0, m_LitSurfaceWidth, m_LitSurfaceWidth + 1, 1 };
+			index = index / (m_LitSurfaceWidth - 1) + index;
 
-			bri = m_LitSurfaceInfo[index];
-		}
-		else if (packetformat & 0x40)
-		{
-			// gourad shading
-			bri = point_read(i + addr) >> 16 & 0xff;
+			for (int i = 0; i < 4; i++)
+				v[i].bri = m_LitSurfaceInfo[index + normal_index[i]];
+
+			// if using triangles, need to remap the normals a little
+			if (m_LitSurfaceTriangles)
+			{
+				if (m_LitSurfaceIndex & 1)
+					v[0].bri = v[1].bri;
+				else
+					v[2].bri = v[3].bri;
+			}
 		}
 		else
 		{
 			// flat shading
-			bri = color >> 16 & 0xff;
+			for (int i = 0; i < 4; i++)
+				v[i].bri = m_LitSurfaceInfo[m_LitSurfaceIndex];
 		}
-
-		v[i].bri = bri;
+	}
+	else if (packetformat & 0x40)
+	{
+		// Gouraud shading
+		for (int i = 0; i < 4; i++)
+			v[i].bri = point_read(i + addr) >> 16 & 0xff;
+	}
+	else
+	{
+		// flat shading
+		for (int i = 0; i < 4; i++)
+			v[i].bri = color >> 16 & 0xff;
 	}
 
 	// allocate quad
@@ -1137,6 +1186,7 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				color = point_read(addr + 2);
 				bias = 0;
 				blit_single_quad(color, addr + 3, m, bias, flags, packetformat);
+				m_LitSurfaceIndex++;
 				break;
 
 			case 0x18:
@@ -1150,16 +1200,22 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				color = point_read(addr + 2);
 				bias  = point_read(addr + 3);
 				blit_single_quad(color, addr + 4, m, bias, flags, packetformat);
+				m_LitSurfaceIndex++;
 				break;
 
 			case 0x10: /* vertex lighting */
-				/*
-				333401 (opcode)
-				000000  [count] [type]
-				000000  000000  007fff // normal vector
-				000000  000000  007fff // normal vector
-				000000  000000  007fff // normal vector
-				000000  000000  007fff // normal vector
+				/**
+				* word 0: opcode (333401)
+				* word 1: lighting mode, mesh width
+				*         ---x.----.----.----.----.----  use triangles (quads with two duplicated vertices)
+				*         ----.xxxx.----.----.----.----  mesh width
+				*         ----.----.----.----.----.--xx  shading mode (0 = flat, 1 = Gouraud, 2 = Gouraud with shared normals)
+				* word 2: number of normals
+				*         ----.--xx.----.----.----.----  normals in last batch minus 1
+				*         ----.----.xx--.----.----.----  56 extra normals for 1, 84 extra normals for 3
+				*         ----.----.----.----.----.xxxx  number of additional batches
+				* word 3: intensity of diffuse light
+				* words 4-15: four normal vectors
 
 				used in:
 				- acedrive/victlap sparks
@@ -1174,9 +1230,13 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				- ridgerac rotating sign before 2nd tunnel
 				- timecris Sherudo's knives
 				*/
-				m_SurfaceNormalFormat = point_read(addr + 3);
 				m_LitSurfaceCount = 0;
 				m_LitSurfaceIndex = 0;
+				m_LitSurfaceGouraud = (point_read(addr + 1) & 3) > 0;
+				m_LitSurfaceWidth = ((point_read(addr + 1) >> 16) & 0xf) + 1;
+				m_LitSurfaceTriangles = ((point_read(addr + 1) >> 20) & 1) > 0;
+				m_LitSurfaceIntensity = ((point_read(addr + 3) & 0xffff) * m_camera_power) >> 15;
+				
 				register_normals(addr + 4, m);
 				break;
 
@@ -1402,15 +1462,16 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 	    00000000: common
 	    00800000: alpinr2b cancel fogging on selection screen
 	    00800000: raverace cancel fogging on sky in attract mode
-		--xx----: pen when textures are disabled with objectflags 003fffff
-		----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
+	    --xx----: pen when textures are disabled with objectflags 003fffff
+	    ----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
 
 	    objectshift:
-        00800000: set at same time as objectflags 009fffff
-		--xxxxxx: low 22 bits: object z bias adjust (see blit_single_quad)
+	    00800000: set at same time as objectflags 009fffff
+	    --xxxxxx: low 22 bits: object z bias adjust (see blit_single_quad)
 
 	    objectflags:
 	    001fffff: common
+	    003fffff: alpinerd distant scenery ground level when reaching finish (white)
 	    003fffff: adillor arrows on level select screen (no effect?)
 	    003fffff: propcycl attract mode particles when Solitar rises (unknown effect)
 	    003fffff: timecris shoot helicopter (white, but shading enabled)
@@ -1528,7 +1589,6 @@ void namcos22_state::draw_polygons()
 	if (m_pdp_render_done && m_slave_simulation_active)
 	{
 		simulate_slavedsp();
-		m_poly->wait("draw_polygons");
 	}
 }
 
@@ -2376,7 +2436,6 @@ void namcos22s_state::recalc_czram()
 
 void namcos22_state::update_mixer()
 {
-	m_poly->wait("update_mixer");
 #if 0 // show reg contents
 	char msg1[0x1000] = {0}, msg2[0x1000] = {0};
 	int st = 0x000 / 16;
@@ -2605,8 +2664,7 @@ void namcos22_state::init_tables()
 	save_pointer(NAME(m_pointram), 0x20000);
 
 	// force all texture tiles to be decoded now
-	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
-		m_gfxdecode->gfx(1)->get_data(i);
+	m_gfxdecode->gfx(1)->decode_all();
 
 	m_texture_tilemap = (u16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (u8 *)m_gfxdecode->gfx(1)->get_data(0);

@@ -252,7 +252,7 @@ void wxstar4k_state::wxstar4k(machine_config &config)
 	m_iocpu->set_addrmap(AS_DATA, &wxstar4k_state::iobd_main_data);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.62);  /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

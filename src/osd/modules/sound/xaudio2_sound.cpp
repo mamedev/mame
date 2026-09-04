@@ -244,9 +244,9 @@ private:
 		bool                    engine_error;
 
 	private:
-		virtual void STDMETHODCALLTYPE OnProcessingPassStart() override { }
-		virtual void STDMETHODCALLTYPE OnProcessingPassEnd() override { }
-		virtual void STDMETHODCALLTYPE OnCriticalError(HRESULT error) override;
+		virtual void STDMETHODCALLTYPE OnProcessingPassStart() noexcept override { }
+		virtual void STDMETHODCALLTYPE OnProcessingPassEnd() noexcept override { }
+		virtual void STDMETHODCALLTYPE OnCriticalError(HRESULT error) noexcept override;
 
 		sound_xaudio2 &         m_host;
 	};
@@ -903,7 +903,7 @@ sound_xaudio2::device_info::~device_info()
 //  IXAudio2EngineCallback::OnCriticalError
 //============================================================
 
-void sound_xaudio2::device_info::OnCriticalError(HRESULT error)
+void sound_xaudio2::device_info::OnCriticalError(HRESULT error) noexcept
 {
 	std::string name;
 	{

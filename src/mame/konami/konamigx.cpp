@@ -1740,7 +1740,7 @@ void konamigx_state::konamigx(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	/* These parameters are actual value written to the CCU.
@@ -1761,13 +1761,13 @@ void konamigx_state::konamigx(machine_config &config)
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K054338(config, m_k054338, 0, m_k055555);
+	K054338(config, m_k054338, m_k055555);
 	m_k054338->set_screen(m_screen);
 	m_k054338->set_alpha_invert(1);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -26, -23);
 	m_k055673->set_screen(m_screen);
@@ -1915,7 +1915,7 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::racinfrc_map);
 
-	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 }
 
@@ -1948,7 +1948,7 @@ void konamigx_state::gxtype3(machine_config &config)
 	m_screen->set_visarea(0, 576-1, 16, 32*8-1-16);
 	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx_left));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
 	screen2.set_size(1024, 1024);
@@ -1970,7 +1970,7 @@ void konamigx_state::gxtype4(machine_config &config)
 	//m_screen->set_visarea(0, 384-1, 16, 32*8-1-16);
 	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx_left));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
 	screen2.set_size(1024, 1024);
@@ -2047,7 +2047,7 @@ void konamigx_state::sexyparoebl(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 
@@ -2066,13 +2066,13 @@ void konamigx_state::sexyparoebl(machine_config &config)
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K054338(config, m_k054338, 0, m_k055555);
+	K054338(config, m_k054338, m_k055555);
 	m_k054338->set_screen(m_screen);
 	m_k054338->set_alpha_invert(1);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -42, -23);
 	m_k055673->set_screen(m_screen);
@@ -3959,8 +3959,6 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
-	m_lamp.resolve();
-
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 
@@ -4231,7 +4229,7 @@ GAME( 1995, dragoonj,    dragoona, dragoonj,      dragoonj, konamigx_state, init
 
 GAME( 1996, sexyparo,    konamigx, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1996, sexyparoa,   sexyparo, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, sexyparoebl, sexyparo, sexyparoebl,   gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver EAA, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, sexyparoebl, sexyparo, sexyparoebl,   gokuparo, konamigx_state, init_konamigx, ROT0, "bootleg", "Sexy Parodius (ver EAA, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 1996, daiskiss,    konamigx, konamigx,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 

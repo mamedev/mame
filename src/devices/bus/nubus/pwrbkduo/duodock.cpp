@@ -56,6 +56,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "endianness.h"
+
 #define LOG_DRQ         (1U << 1)
 #define LOG_HANDSHAKE   (1U << 2)
 #define LOG_VIDEO       (1U << 3)
@@ -212,13 +214,12 @@ ioport_constructor duodock_device::device_input_ports() const
 void duodock_device::device_add_mconfig(machine_config &config)
 {
 	APPLE_PSEUDOVIA(config, m_pvia, 15.6672_MHz_XTAL);
-	m_pvia->set_is_aiv3();          // AIV3 is a "pure" pseudovia that doesn't use the 6522 back-compatible IER
 	m_pvia->readmsc_handler().set(FUNC(duodock_device::vsc_r));
 	m_pvia->writemsc_handler().set(FUNC(duodock_device::vsc_w));
 	m_pvia->writevideo_handler().set(FUNC(duodock_device::vidhandler_w));
 	m_pvia->irq_callback().set(FUNC(duodock_device::dock_irq_w));
 
-	ARIEL(config, m_ramdac, 0);
+	ARIEL(config, m_ramdac);
 
 	ICD2053B(config, m_clockgen, 15.6672_MHz_XTAL);
 	m_clockgen->clkout_changed().set(FUNC(duodock_device::pclock_w));
@@ -260,7 +261,7 @@ void duodock_device::device_add_mconfig(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	if (((nubus_slot_device *)owner())->get_nubus_bustag() != nullptr)
 	{
 		m_fulltag = string_format(":%s", ((nubus_slot_device *)owner())->get_nubus_bustag());
@@ -487,7 +488,7 @@ void duodock_device::recalc_crtc()
 	m_vtotal = (m_video_regs[VSC_VFP] + m_video_regs[VSC_VS] + m_video_regs[VSC_VBP] + m_video_regs[VSC_VA]);
 	LOGMASKED(LOG_VIDEO, "hres %d vres %d htotal %d vtotal %d pclock %d, %f Hz\n", m_hres, m_vres, m_htotal, m_vtotal, m_pclock, (double)((double)m_pclock / (double)(m_htotal*m_vtotal)));
 	rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock).as_attoseconds());
+	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock));
 }
 
 void duodock_device::pclock_w(u32 new_clock)

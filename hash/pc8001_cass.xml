@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="pc8001_cass" description="NEC PC-8001 (N-BASIC) cassettes">
+
+
+<!-- are all type-ins?? -->
+
+	<software name="hosi" supported="no">
+		<description>Hosi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Type CLOAD&quot;hosi and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="5561">
+				<rom name="hosi.t88" size="5561" crc="1fca5d2e" sha1="7c5b7b1e8901b3d64213d760525521d85f83568c"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- BASIC LISTING INCLUDES TITLE "Go! The Great Dipper Snake" AND WIND AS AUTHOR -->
+	<software name="dipper" supported="no">
+		<description>Dipper</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Type CLOAD&quot;dipper and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="6389">
+				<rom name="dipper.t88" size="6389" crc="bc460095" sha1="b547b95e2cbd64c9926f53014a88894fe4951f7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mevius" supported="no">
+		<description>Mevious</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="メピウス"/>
+		<info name="usage" value="Type CLOAD&quot;MEVIOU and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="793">
+				<rom name="moebius.t88" size="793" crc="4c4ab8c4" sha1="e7b0145fb1e087778ff52598a8521f4ad98d0a8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nquest" supported="no">
+		<description>N-Quest</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Type CLOAD&quot;NQUEST and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="3744">
+				<rom name="n-quest.t88" size="3744" crc="aba453b7" sha1="c3a631a3326249daceedd6e1eec8177a3acf461a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="river" supported="no">
+		<description>River</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Type CLOAD&quot;river and then RUN"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="2658">
+				<rom name="river.t88" size="2658" crc="fc1c5fad" sha1="92f7614d81f8c27ce506c6b2ae1eff4b41b64e02"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

@@ -57,6 +57,7 @@
 		-- Visual Studio actions
 		"actions/vstudio/_vstudio.lua",
 		"actions/vstudio/vstudio_solution.lua",
+		"actions/vstudio/vstudio_slnx.lua",
 		"actions/vstudio/vstudio_vcxproj.lua",
 		"actions/vstudio/vstudio_vcxproj_filters.lua",
 		"actions/vstudio/vs2010.lua",
@@ -66,6 +67,7 @@
 		"actions/vstudio/vs2017.lua",
 		"actions/vstudio/vs2019.lua",
 		"actions/vstudio/vs2022.lua",
+		"actions/vstudio/vs2026.lua",
 
 		-- Xcode action
 		"actions/xcode/_xcode.lua",

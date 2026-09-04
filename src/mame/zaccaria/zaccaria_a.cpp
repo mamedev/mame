@@ -232,7 +232,8 @@ void zac1b111xx_melody_base::device_add_mconfig(machine_config &config)
 	M6802(config, m_melodycpu, XTAL(3'579'545)); // verified on pcb
 	m_melodycpu->set_addrmap(AS_PROGRAM, &zac1b111xx_melody_base::zac1b111xx_melody_base_map);
 
-	clock_device &timebase(CLOCK(config, "timebase", XTAL(3'579'545)/4096/2)); // CPU clock divided using 4040 and half of 74LS74
+	clock_device &timebase(CLOCK(config, "timebase"));
+	timebase.set_period(attotime::from_ticks(0x2000, XTAL(3'579'545))); // CPU clock divided using 4040 and half of 74LS74
 	timebase.signal_handler().set(m_melodypia, FUNC(pia6821_device::cb1_w));
 
 	PIA6821(config, m_melodypia);
@@ -242,10 +243,10 @@ void zac1b111xx_melody_base::device_add_mconfig(machine_config &config)
 	m_melodypia->irqa_handler().set_inputline("melodycpu", INPUT_LINE_NMI);
 	m_melodypia->irqb_handler().set_inputline("melodycpu", M6802_IRQ_LINE);
 
-	AY8910(config, m_melodypsg1, XTAL(3'579'545)/2); // CPU clock divided using 4040
+	AY8910(config, m_melodypsg1, XTAL(3'579'545) / 2); // CPU clock divided using 4040
 	m_melodypsg1->port_b_read_callback().set(FUNC(zac1b111xx_melody_base::melodypsg1_portb_r));
 
-	AY8910(config, m_melodypsg2, XTAL(3'579'545)/2); // CPU clock divided using 4040
+	AY8910(config, m_melodypsg2, XTAL(3'579'545) / 2); // CPU clock divided using 4040
 }
 
 void zac1b111xx_melody_base::device_start()

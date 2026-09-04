@@ -87,6 +87,7 @@ Street Fighter III: New Generation                         SF3972A0F  CP3000U0G 
 
 Street Fighter III 2nd Impact: Giant Attack          1997  3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  CAP-3GA000  CAP-3GA-1    970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  ?           ?            971016*
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA    X                                               970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           971016*
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  MEXICO  X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
@@ -589,6 +590,8 @@ Hardware registers info
 #include "machine/wd33c9x.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
 
 #include <algorithm>
 
@@ -1093,12 +1096,11 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	int width = ((m_ppu_crtc_zoom[1] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[0] & 0xffff);
 	if (width > 0 && m_screenwidth != width)
 	{
-		attoseconds_t period = screen.frame_period().attoseconds();
 		rectangle visarea = screen.visible_area();
 
 		int height = ((m_ppu_crtc_zoom[5] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[4] & 0xffff);
 		visarea.set(0, width - 1, 0, height - 1);
-		screen.configure(width, height, visarea, period);
+		screen.configure(width, height, visarea, screen.frame_period());
 		m_screenwidth = width;
 	}
 
@@ -2483,7 +2485,7 @@ void cps3_state::cps3(machine_config &config)
 	scsi.set_external_device(7, wd33c93);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(42'954'545)/5, (454+1)*6/5, 0, 384, 262+2, 0, 224); // H Total counter uses XTAL/6 clock
 	screen.set_screen_update(FUNC(cps3_state::screen_update));
 	screen.screen_vblank().set(FUNC(cps3_state::vbl_interrupt));
@@ -2653,6 +2655,14 @@ ROM_END
 ROM_START( sfiii2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_usa.29f400.u2", 0x000000, 0x080000, CRC(75dd72e0) SHA1(5a12d6ea6734df5de00ecee6f9ef470749d2f242) )
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
+ROM_END
+
+ROM_START( sfiii2a )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "sfiii2_asia.29f400.u2", 0x000000, 0x080000, CRC(4518d589) SHA1(43dba305c1b630e0ee51697b6802109ebb8268b5) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
@@ -4385,6 +4395,7 @@ GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii, 
 GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 ) // layout is for widescreen support
 GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 GAMEL(1997, sfiii2h,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Hispanic 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
+GAMEL(1997, sfiii2a,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 
 /* JoJo's Venture / JoJo no Kimyou na Bouken */

@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="nds" description="Nintendo DS decrypted cartridges">
+
+	<!-- origin: no-intro -->
+	<software name="bublboru" supported="no">
+		<!-- a.k.a. fixed version (TODO: about what?) -->
+		<!-- vanilla version released 3 Oct 2006 -->
+		<description>Bubble Bobble Revolution (USA, rev 1)</description>
+		<year>2007</year>
+		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+Fails at [cart] SRAM check (press OK at name entry)
+]]></notes>
+		<info name="release" value="20070223"/>
+		<!-- TODO: has extra serial on front box -->
+		<info name="serial" value="NTR P AB6E REV1"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="1043 - Bubble Bobble Revolution (USA) (Rev 1).nds" size="33554432" crc="77adda54"  sha1="7af2896291fa0e0182d78d83133f5147b6d3e9e7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="chrntwin" supported="no">
+		<description>Chronos Twin (Europe)</description>
+		<year>2007</year>
+		<publisher>Oxygen Games</publisher>
+		<notes><![CDATA[
+Black screen after language selection, react with sound on input presses
+]]></notes>
+		<info name="release" value="20071018"/>
+		<info name="serial" value="NTR P AW6P / NTR-AW6P-EUR"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="1461 - Chronos Twin (Europe) (En,Fr,De,Es,It).nds" size="8388608" crc="4b6696d8" sha1="d2de3e0a189a54f7f13ef4eb869578f37e420eba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="gunpeyds" supported="no">
+		<description>Gunpey DS: Music x Puzzle (Europe)</description>
+		<year>2006</year>
+		<publisher>Namco Bandai Games</publisher>
+		<notes><![CDATA[
+Overdriven [sound] in main menu, cannot be balanced in options menu
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 22674 70016 0"/>
+		<info name="release" value="20061019"/>
+		<info name="serial" value="NTR P AGPE"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="0944 - Gunpey DS - Music x Puzzle (Europe) (En,Fr,De,Es,It).nds" size="67108864" crc="00073471" sha1="a87144824f5edc4448cf1438d4f05eefdd7ad077" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="ghostriu" supported="no">
+		<description>Ghost Trick: Phantom Detective (USA)</description>
+		<!-- Released 11 Jan 2011 in USA? -->
+		<year>2010</year>
+		<publisher>Capcom Entertainment</publisher>
+		<notes><![CDATA[
+Title screen doesn't draw GFXs beyond selections, gameplay doesn't draw comic balloons, assume using 3d
+Not extensively tested
+]]></notes>
+		<info name="serial" value="NTR P BGTE"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="134217728">
+				<rom name="5478 - Ghost Trick - Phantom Detective (USA) (En,Fr,De,Es,It).nds" size="134217728" crc="5cd93fe5" sha1="bcfe74e5592eef3255fd23758b772226960a1b0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="hokuto" supported="no">
+		<description>Hokuto no Ken: Hokuto Shinken Denshousha no Michi (Japan)</description>
+		<year>2008</year>
+		<publisher>Spike</publisher>
+		<notes><![CDATA[
+Hangs at [cart] SRAM check
+]]></notes>
+		<info name="alt_title" value="北斗の拳 北斗神拳伝承者の道"/>
+		<info name="release" value="20080214"/>
+		<info name="serial" value="NTR-P-YH7J(JPN)"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="134217728">
+				<rom name="2030 - Hokuto no Ken - Hokuto Shinken Denshousha no Michi (Japan).nds" size="134217728" crc="62ec7c45" sha1="f6ca58422db8303cbc53254fa2f87c9887e7eacc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="hoteldsk" supported="no">
+		<description>Hotel Dusk: Room 215 (Europe)</description>
+		<year>2007</year>
+		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+No graphics, reacts to touch presses, assume it uses 3d
+]]></notes>
+		<info name="barcode" value="0 45496 73808 2"/>
+		<info name="release" value="20070122"/>
+		<!-- 61328A -->
+		<info name="serial" value="NTR P AWTE USA"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="134217728">
+				<rom name="1000 - Hotel Dusk - Room 215 (Europe) (En,Fr,De,Es,It).nds" size="134217728" crc="f465638a" sha1="6028c48a55eccf658ca83b4242ee8ca430f59b91" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="ivykiwi" supported="no">
+		<description>Ivy the Kiwi? (Europe)</description>
+		<year>2010</year>
+		<publisher>Rising Star Games</publisher>
+		<notes><![CDATA[
+Fails at [cart] SRAM check
+Optional single cart Wi-Fi multiplayer support
+]]></notes>
+		<info name="release" value="20101029"/>
+		<info name="serial" value="NTR P BIVP / NTR-BIVP-EUR"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="5406 - Ivy the Kiwi (Europe) (En,Fr,De,Es,It).nds" size="8388608" crc="3ab3bc71" sha1="06778ee01c5c00441f3be8fbd56ef29d9445b39f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="mfightc" supported="no">
+		<description>Mahjong Kakutou Club DS: Wi-Fi Taiouban (Japan)</description>
+		<year>2006</year>
+		<publisher>Konami Digital Entertainment</publisher>
+		<notes><![CDATA[
+Video flickers, eventually black screen (assume it uses 3d part)
+Optional Wi-Fi multiplayer connection
+]]></notes>
+		<info name="alt_title" value="麻雀格闘倶楽部DS Wi-Fi対応版"/>
+		<info name="release" value="20061207"/>
+		<info name="serial" value="NTR-P-AC5J(JPN)"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="0731 - Wi-Fi Taiou - Mahjong Fight Club DS (Japan).nds" size="33554432" crc="4f3ea785" sha1="10972bf532f0cf39d9fbd44aac858021f9f7190e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="namcomds" supported="no">
+		<description>Namco Museum DS (Europe)</description>
+		<year>2008</year>
+		<!-- Atari logo on back cover -->
+		<publisher>Namco Bandai Games / Atari</publisher>
+		<notes><![CDATA[
+Has some kind of overdriven [sound] reverb on intro
+No BGM sound in main menu, Music Box doesn't playback anything
+All games in Library crashes in [ARM9]
+Pac-Man VS and Demo requires Wi-Fi connection
+]]></notes>
+		<info name="release" value="20080229"/>
+		<info name="serial" value="NTR P YNMP / NTR-YNMP-EUR"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="2060 - Namco Museum DS (Europe) (En,Fr,De,Es,It).nds" size="16777216" crc="f7343afa" sha1="800955ac5f0e90ec3a4e10d57caff008daddc752" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: no-intro -->
+	<software name="speachu" supported="no">
+		<description>Super Princess Peach (USA)</description>
+		<year>2006</year>
+		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Bad [sound] BGM tunes getting played on title screen and new game intro
+Intro eventually requires [microphone] input
+Shop has no rectangle box background for items
+Concealed vibe gauge GFX in gameplay
+Not extensively tested
+]]></notes>
+		<info name="release" value="20060227"/>
+		<!-- 59687A -->
+		<info name="serial" value="NTR P ASPE USA"/>
+		<part name="cart" interface="nds_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="0340 - Super Princess Peach (USA).nds" size="33554432" crc="ba66a82e" sha1="706958f81053bc54715ab3afa1e80984b003c3f9" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

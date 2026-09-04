@@ -386,8 +386,6 @@ loop:
 
 void crystal_state::machine_start()
 {
-	m_lamps.resolve();
-
 	patchreset();
 
 	if (m_mainbank)
@@ -836,9 +834,18 @@ void crystal_state::init_donghaer()
 void crystal_state::init_maldaiza()
 {
 	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
+
 	rom[0x09b12 / 2] = 0x9004; // PUSH %R2
 	rom[0x09b14 / 2] = 0x8202; // LD   (%SP,0x8),%R2
-	// ...
+
+	rom[0x09b88 / 2] = 0x4000; // LERI 0x0
+	rom[0x09b8a / 2] = 0x401a; // LERI 0x1a
+
+	rom[0x0c370 / 2] = 0x900c; // PUSH %R3-%R2
+	rom[0x0c372 / 2] = 0x4080; // LERI 0x80
+
+	rom[0x098be / 2] = 0x9004; // PUSH %R2
+	rom[0x098c0 / 2] = 0x9001; // PUSH %R0
 }
 
 } // anonymous namespace
@@ -850,6 +857,6 @@ GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,
 GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeoin Cheonha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
 GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
 GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", 0 ) // lamps, verify game timings
-GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
+GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "Sonokong / Expotato", "Top Blade V", 0 )
 GAME( 200?, wulybuly, crysbios, crystal,  wulybuly, crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING )
-GAME( 2002, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "Big A Korea",         "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // PIC hookup
+GAME( 2002, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "GamToU",              "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // controls

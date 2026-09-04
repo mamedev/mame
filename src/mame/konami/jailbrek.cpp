@@ -378,7 +378,7 @@ void jailbrek_state::jailbrek(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	K005849(config, m_k005849, 0);
+	K005849(config, m_k005849);
 	m_k005849->set_irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k005849->set_flipscreen_cb().set(FUNC(jailbrek_state::flip_screen_set));
@@ -386,7 +386,7 @@ void jailbrek_state::jailbrek(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
 	PALETTE(config, m_palette, FUNC(jailbrek_state::palette), 512, 32);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(jailbrek_state::screen_update));
 	screen.set_palette(m_palette);

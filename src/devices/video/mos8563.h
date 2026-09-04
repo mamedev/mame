@@ -27,10 +27,10 @@ class mos8563_device : public mc6845_device,
 public:
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void address_w(uint8_t data);
-	uint8_t status_r();
-	uint8_t register_r();
-	void register_w(uint8_t data);
+	virtual void address_w(uint8_t data) override;
+	virtual uint8_t status_r() override;
+	virtual uint8_t register_r() override;
+	virtual void register_w(uint8_t data) override;
 
 	inline uint8_t read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, uint8_t data);

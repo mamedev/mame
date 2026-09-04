@@ -65,11 +65,11 @@ const tiny_rom_entry *riva128_device::device_rom_region() const
 
 void riva128_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(nvidia_nv3_vga_device::screen_update));
 
-	NVIDIA_NV3_VGA(config, m_vga, 0);
+	NVIDIA_NV3_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// FIXME: shared RAM
 	// reports as 4MB in AIDA16

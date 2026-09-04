@@ -849,7 +849,7 @@ void snk68_state::pow(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &snk68_state::sound_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a SAR board is 59.16Hz.
@@ -859,7 +859,7 @@ void snk68_state::pow(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pow);
 
-	ALPHA68K_PALETTE(config, m_palette, 0);
+	ALPHA68K_PALETTE(config, m_palette);
 	m_palette->set_entries(2048);
 
 	ALPHA68K_SPR(config, m_sprites, XTAL(24'000'000), m_palette, gfx_pow_spr);

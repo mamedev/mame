@@ -55,8 +55,8 @@ TODO:
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay1.h"
+#include "mboard.h"
+#include "mdisplay1.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"

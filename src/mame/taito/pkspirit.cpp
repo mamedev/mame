@@ -437,10 +437,10 @@ void pkspirit_state::pkspirit(machine_config &config)
 	m_mainio->in_port4_cb().set_ioport("IN4");
 
 	for (auto &opto : m_opto)
-		TAITOIO_OPTO(config, opto, 0);
+		TAITOIO_OPTO(config, opto);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: wrong
+	screen_device &screen(SCREEN(config, "screen")); // TODO: wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -455,7 +455,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 
@@ -539,5 +539,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, pkspirit, 0, pkspirit, pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Poker Spirit", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, shun,     0, shun,     pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Shun",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pkspirit, 0, pkspirit, pkspirit, pkspirit_state, empty_init, ROT0, "Taito", "Poker Spirit", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, shun,     0, shun,     pkspirit, pkspirit_state, empty_init, ROT0, "Taito", "Shun",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

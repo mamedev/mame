@@ -82,15 +82,6 @@ MPCs on other hardware:
 #include "cpu/nec/v5x.h"
 #include "cpu/upd7810/upd7810.h"
 #include "imagedev/floppy.h"
-#include "formats/dfi_dsk.h"
-#include "formats/hxchfe_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/td0_dsk.h"
-#include "formats/dsk_dsk.h"
-#include "formats/pc_dsk.h"
-#include "formats/ipf_dsk.h"
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
@@ -108,7 +99,19 @@ MPCs on other hardware:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "formats/dfi_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/td0_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/pc_dsk.h"
+#include "formats/ipf_dsk.h"
+
 #include "mpc3000.lh"
+
+namespace {
 
 static constexpr uint8_t BIT4 = (1 << 4);
 static constexpr uint8_t BIT5 = (1 << 5);
@@ -284,7 +287,13 @@ uint8_t mpc3000_state::subcpu_pa_r()
 
 uint8_t mpc3000_state::subcpu_pb_r()
 {
-	return m_drums[m_drum_scan_row]->read();
+	unsigned hit = 0;
+	for (unsigned i = 0; 4 > i; ++i)
+	{
+		if (!BIT(m_drum_scan_row, 3 - i))
+			hit |= m_drums[i]->read();
+	}
+	return hit;
 }
 
 uint8_t mpc3000_state::subcpu_pc_r()
@@ -318,19 +327,22 @@ uint8_t mpc3000_state::subcpu_pc_r()
 				rv = 0;
 				break;
 		}
-		m_quadrature_phase++;
-		m_quadrature_phase &= 7;
-
-		// generate a complete 4-part pulse train for each single change in the position
-		if (m_quadrature_phase == 0)
+		if (!machine().side_effects_disabled())
 		{
-			if (m_count_dial < 0)
+			m_quadrature_phase++;
+			m_quadrature_phase &= 7;
+
+			// generate a complete 4-part pulse train for each single change in the position
+			if (m_quadrature_phase == 0)
 			{
-				m_count_dial++;
-			}
-			else
-			{
-				m_count_dial--;
+				if (m_count_dial < 0)
+				{
+					m_count_dial++;
+				}
+				else
+				{
+					m_count_dial--;
+				}
 			}
 		}
 	}
@@ -362,12 +374,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpc3000_state::dial_timer_tick)
 // drum pad row select, active low
 void mpc3000_state::subcpu_pb_w(uint8_t data)
 {
-	m_drum_scan_row = (data & 0xf) ^ 0xf;
-	if (m_drum_scan_row != 0)
-	{
-		// get a row number 0-3
-		m_drum_scan_row = count_leading_zeros_32(m_drum_scan_row) - 28;
-	}
+	m_drum_scan_row = data;
 }
 
 uint8_t mpc3000_state::an0_r()
@@ -490,7 +497,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_subcpu->an3_func().set(FUNC(mpc3000_state::an3_r));
 	m_subcpu->an3_func().set(FUNC(mpc3000_state::an4_r));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 64);   //6x20, 8x8
@@ -507,7 +514,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", add_formats).enable_sound(true);
 
-	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
+	pit8254_device &pit(PIT8254(config, "synctmr")); // MB89254
 	pit.set_clk<0>(V53_PCLKOUT);
 	pit.set_clk<1>(V53_PCLKOUT);
 	pit.set_clk<2>(V53_PCLKOUT);
@@ -573,6 +580,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	TIMER(config, "dialtimer").configure_periodic(FUNC(mpc3000_state::dial_timer_tick), attotime::from_hz(60.0));
 
 	SOFTWARE_LIST(config, "flop_mpc3000").set_original("mpc3000_flop");
+	SOFTWARE_LIST(config, "flop_s1000").set_original("s1000_flop");
 
 	config.set_default_layout(layout_mpc3000);
 }
@@ -711,5 +719,7 @@ ROM_END
 void mpc3000_state::init_mpc3000()
 {
 }
+
+} // anonymous namespace
 
 CONS( 1994, mpc3000, 0, 0, mpc3000, mpc3000, mpc3000_state, init_mpc3000, "Akai / Roger Linn", "MPC3000", MACHINE_NOT_WORKING )

@@ -33,7 +33,7 @@ cr1510_device::cr1510_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 void cr1510_device::device_add_mconfig(machine_config &config)
 {
-	WD1000(config, m_hdd, 0);
+	WD1000(config, m_hdd);
 
 	HARDDISK(config, "hdd:0", 0);
 }

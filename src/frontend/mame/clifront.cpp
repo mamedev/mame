@@ -42,6 +42,7 @@
 #include <set>
 #include <tuple>
 #include <cctype>
+#include <cstdio>
 #include <iostream>
 
 
@@ -251,7 +252,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 		return;
 	}
 
-	// read INI's, if appropriate
+	// read INIs, if appropriate
 	if (m_options.read_config())
 	{
 		mame_options::parse_standard_inis(m_options, option_errors);
@@ -1754,10 +1755,13 @@ void cli_frontend::execute_commands(std::string_view exename)
 	}
 
 	// other commands need the INIs parsed
-	std::ostringstream option_errors;
-	mame_options::parse_standard_inis(m_options,option_errors);
-	if (option_errors.tellp() > 0)
-		osd_printf_error("%s\n", option_errors.str());
+	if (m_options.read_config())
+	{
+		std::ostringstream option_errors;
+		mame_options::parse_standard_inis(m_options, option_errors);
+		if (option_errors.tellp() > 0)
+			osd_printf_error("%s\n", option_errors.str());
+	}
 
 	// createconfig?
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)

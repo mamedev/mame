@@ -200,7 +200,7 @@
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -401,8 +401,6 @@ void mhavoc_state::gamma_irq_ack_w(uint8_t data)
 
 void alphaone_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_alpha_irq_clock));
 	save_item(NAME(m_alpha_irq_clock_enable));
 }
@@ -1000,14 +998,11 @@ void alphaone_state::alphaone(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(50);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 580, 0, 500);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(50);
+	vector.set_visarea(0, 580, 0, 500);
 
-	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
+	avg_device &avg(AVG_MHAVOC(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_alpha, AS_PROGRAM, 0x4000);
 
@@ -1033,7 +1028,7 @@ void mhavoc_state::mhavoc(machine_config &config)
 
 	subdevice<timer_device>("5k_timer")->set_callback(FUNC(mhavoc_state::cpu_irq_clock));
 
-	subdevice<screen_device>("screen")->set_visarea(0, 300, 0, 260);
+	subdevice<vector_device>("vector")->set_visarea(0, 300, 0, 260);
 
 	/* FIXME: Outputs 1,2,3 are tied together
 	 * This signal and Output 4 are processed separately.

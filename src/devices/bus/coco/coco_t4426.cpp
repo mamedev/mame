@@ -153,7 +153,7 @@ void coco_t4426_device::device_add_mconfig(machine_config &config)
 	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(coco_t4426_device::pia_A_w));
 
-	ACIA6850(config, m_uart, 0);
+	ACIA6850(config, m_uart);
 	m_uart->txd_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->rts_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_rts));
 

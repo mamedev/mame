@@ -52,12 +52,13 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void techno(machine_config &config);
+	void techno(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void audio_map(address_map &map) ATTR_COLD;
 	void cpu_space_map(address_map &map) ATTR_COLD;
@@ -351,9 +352,6 @@ void techno_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_digwait));
 	save_item(NAME(m_digit));
 	save_item(NAME(m_keyrow));
@@ -369,6 +367,7 @@ void techno_state::machine_start()
 void techno_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

@@ -42,7 +42,7 @@
 class cr511b_device : public cdrom_image_device, public device_mixer_interface
 {
 public:
-	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
 	auto stch_cb() { return m_stch_cb.bind(); }
@@ -50,12 +50,19 @@ public:
 	auto drq_cb() { return m_drq_cb.bind(); }
 	auto dten_cb() { return m_dten_cb.bind(); }
 	auto scor_cb() { return m_scor_cb.bind(); }
+	auto sbcp_cb() { return m_sbcp_cb.bind(); }
+	auto subcode_data_cb() { return m_subcode_data_cb.bind(); }
+
+	auto sdata_cb() { return m_sdata_cb.bind(); }
 
 	uint8_t read();
 	void write(uint8_t data);
 
 	void cmd_w(int state);
 	void enable_w(int state);
+
+	void sdata_w(int state);
+	void sck_w(int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -72,6 +79,10 @@ private:
 	int size_to_track_type();
 
 	TIMER_CALLBACK_MEMBER(frame_cb);
+	TIMER_CALLBACK_MEMBER(subcode_cb);
+	TIMER_CALLBACK_MEMBER(scan_cb);
+	void start_subcode();
+	void stop_subcode();
 
 	TIMER_CALLBACK_MEMBER(stch);
 	void status_change(uint8_t status);
@@ -80,12 +91,17 @@ private:
 	void status_enable(uint8_t output_length);
 
 	void audio_end_cb(int state);
+	void play_audio(uint32_t start, uint32_t end);
 
 	// commands
+	void check_cmd(bool early_execute);
+
+	void cmd_check_path();
 	void cmd_seek();
 	void cmd_read();
 	void cmd_motor_on();
 	void cmd_motor_off();
+	void cmd_diagnostic();
 	void cmd_play_lba();
 	void cmd_play_msf();
 	void cmd_play_track();
@@ -98,6 +114,9 @@ private:
 	void cmd_read_toc();
 	void cmd_pause();
 	void cmd_front_panel();
+	void cmd_unknown();
+
+	void serial_cmd();
 
 	// drive status
 	static constexpr uint8_t STATUS_DOOR_CLOSED = 0x80; // unverified, not used
@@ -117,6 +136,10 @@ private:
 	static constexpr uint8_t AUDIO_STATUS_ERROR = 0x14;
 	static constexpr uint8_t AUDIO_STATUS_NO_STATUS = 0x15;
 
+	static constexpr uint8_t SUBCODE_SYNC_SYMBOLS = 2;
+	static constexpr uint8_t SUBCODE_DATA_SYMBOLS = 96;
+	static constexpr uint8_t SUBCODE_SYMBOLS_PER_FRAME = SUBCODE_SYNC_SYMBOLS + SUBCODE_DATA_SYMBOLS;
+
 	required_device<cdda_device> m_cdda;
 
 	devcb_write_line m_stch_cb;
@@ -124,10 +147,29 @@ private:
 	devcb_write_line m_drq_cb;
 	devcb_write_line m_dten_cb;
 	devcb_write_line m_scor_cb;
+	devcb_write_line m_sbcp_cb;
+	devcb_write8 m_subcode_data_cb;
+
+	devcb_write_line m_sdata_cb;
 
 	emu_timer *m_frame_timer;
+	emu_timer *m_subcode_timer;
+	emu_timer *m_scan_timer;
+
 	emu_timer *m_stch_timer;
 	emu_timer *m_sten_timer;
+
+	typedef void (cr511b_device::*cmd_handler)();
+
+	struct command_info
+	{
+		uint8_t opcode;
+		uint8_t length;
+		cmd_handler handler;
+		bool short_cmd;
+	};
+
+	static const command_info m_cmd_table[];
 
 	uint8_t m_input_fifo[16];
 	uint8_t m_input_fifo_pos;
@@ -137,7 +179,12 @@ private:
 	uint8_t m_output_fifo_length;
 
 	uint8_t m_status;
+	uint8_t m_error_code;
 	uint16_t m_sector_size;
+
+	uint8_t m_subcode_symbol;
+	uint8_t m_subcode_buffer[SUBCODE_DATA_SYMBOLS];
+	bool m_subcode_valid;
 
 	uint32_t m_transfer_lba;
 	uint16_t m_transfer_sectors;
@@ -145,12 +192,19 @@ private:
 	uint8_t m_transfer_buffer[2352];
 	uint16_t m_transfer_buffer_pos;
 
+	uint8_t m_serial_shift;
+	uint8_t m_serial_count;
+	bool m_serial_transmit;
+
 	// external lines
 	bool m_enabled;
 	bool m_cmd;
+	bool m_sdata;
+	bool m_sck;
 
 	bool m_status_ready;
 	bool m_data_ready;
+	bool m_front_panel_enabled;
 };
 
 // device type declaration

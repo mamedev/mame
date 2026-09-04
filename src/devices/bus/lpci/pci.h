@@ -66,7 +66,7 @@ class pci_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

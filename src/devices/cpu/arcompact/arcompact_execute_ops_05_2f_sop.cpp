@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "arcompact_helper.ipp"
 
+#include <bit>
+
+
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SWAP - Swap words (optional extension on ARCtangent-A5 / ARC600, built in on ARC700)
 //
@@ -43,9 +46,9 @@ uint32_t arcompact_device::handleop32_NORM_do_op(arcompact_device &o, uint32_t s
 	if ((src == 0xffffffff) || (src == 0x00000000))
 		result = 0x1f;
 	else if (src & 0x80000000)
-		result = count_leading_ones_32(src);
+		result = std::countl_one(src);
 	else
-		result = count_leading_zeros_32(src);
+		result = std::countl_zero(src);
 
 	if (set_flags)
 		o.do_flags_nz(src);
@@ -166,9 +169,9 @@ uint32_t arcompact_device::handleop32_NORMW_do_op(arcompact_device &o, uint32_t 
 	if ((source == 0x0000ffff) || (source == 0x00000000))
 		result = 0x0f;
 	else if (source & 0x00008000)
-		result = count_leading_ones_32(source) - 0x10;
+		result = std::countl_one(source) - 0x10;
 	else
-		result = count_leading_zeros_32(source) - 0x10;
+		result = std::countl_zero(source) - 0x10;
 
 	if (set_flags)
 		fatalerror("handleop32_NORMW (F set)\n"); // not yet supported

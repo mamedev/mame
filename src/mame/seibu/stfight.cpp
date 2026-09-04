@@ -787,14 +787,14 @@ void stfight_state::stfight(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &stfight_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::vb_interrupt));
 
-	STFIGHT_VIDEO(config, "stfight_vid", 0);
+	STFIGHT_VIDEO(config, "stfight_vid");
 }
 
 void stfight_state::empcityubl(machine_config &config)
 {
 	stfight(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 }
 
 void stfight_state::cshooter(machine_config &config)
@@ -803,7 +803,7 @@ void stfight_state::cshooter(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cshooter_cpu1_map);
 	m_maincpu->set_vblank_int("airraid_vid:screen", FUNC(stfight_state::vb_interrupt));
 
-	AIRRAID_VIDEO(config, "airraid_vid", 0);
+	AIRRAID_VIDEO(config, "airraid_vid");
 }
 
 
@@ -1549,7 +1549,7 @@ GAME( 1986, empcityu,   empcity, stfight,    stfight,  stfight_state, init_stfig
 GAME( 1986, empcityj,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, empcityi,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, empcityfr,  empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Norad license)",           "Empire City: 1931 (France)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityubl, empcity, empcityubl, stfight,  stfight_state, init_ymhack,   ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (US, bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityubl, empcity, empcityubl, stfight,  stfight_state, init_ymhack,   ROT0,   "bootleg",                                  "Empire City: 1931 (US, bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfight,    empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfighta,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfightgb,  empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

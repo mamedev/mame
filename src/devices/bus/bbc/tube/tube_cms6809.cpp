@@ -116,7 +116,7 @@ void bbc_tube_cms6809_device::device_add_mconfig(machine_config &config)
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* 7 Slot Backplane */
-	ACORN_BUS(config, m_bus, 0);
+	ACORN_BUS(config, m_bus);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, cms_bus_devices, nullptr);

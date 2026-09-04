@@ -95,10 +95,9 @@
 
 void grchamp_state::machine_start()
 {
-	m_digits.resolve();
-	m_led0.resolve();
 	m_soundlatch_data = 0x00;
 	m_soundlatch_flag = false;
+
 	save_item(NAME(m_cpu0_out));
 	save_item(NAME(m_cpu1_out));
 	save_item(NAME(m_comm_latch));
@@ -762,7 +761,7 @@ void grchamp_state::grchamp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grchamp);
 	PALETTE(config, m_palette, FUNC(grchamp_state::grchamp_palette), 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(grchamp_state::screen_update));

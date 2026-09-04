@@ -2,7 +2,7 @@
 // bind_executor.cpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,26 +17,15 @@
 #include "asio/bind_executor.hpp"
 
 #include <functional>
+#include "asio/inline_executor.hpp"
 #include "asio/io_context.hpp"
 #include "asio/steady_timer.hpp"
 #include "unit_test.hpp"
 
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/deadline_timer.hpp"
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/steady_timer.hpp"
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
-
 using namespace asio;
 namespace bindns = std;
-
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-typedef deadline_timer timer;
-namespace chronons = boost::posix_time;
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
 typedef steady_timer timer;
 namespace chronons = asio::chrono;
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
 
 void increment(int* count)
 {
@@ -68,7 +57,7 @@ void bind_executor_to_function_object_test()
       bind_executor(
         ioc2.get_executor(),
         bind_executor(
-          asio::system_executor(),
+          asio::inline_executor(),
           bindns::bind(&increment, &count))));
 
   ioc1.restart();
@@ -180,10 +169,46 @@ void bind_executor_to_completion_token_v2_test()
   ASIO_CHECK(count == 1);
 }
 
+void partial_bind_executor_test()
+{
+  io_context ioc1;
+  io_context ioc2;
+
+  int count = 0;
+
+  timer t(ioc1, chronons::seconds(1));
+  t.async_wait(bind_executor(ioc2.get_executor()))(
+      bindns::bind(&increment, &count));
+
+  ioc1.run();
+
+  ASIO_CHECK(count == 0);
+
+  ioc2.run();
+
+  ASIO_CHECK(count == 1);
+
+  t.expires_after(chronons::seconds(1));
+  t.async_wait()(
+      bind_executor(ioc2.get_executor()))(
+        incrementer_token_v2(&count));
+
+  ioc1.restart();
+  ioc1.run();
+
+  ASIO_CHECK(count == 1);
+
+  ioc2.restart();
+  ioc2.run();
+
+  ASIO_CHECK(count == 2);
+}
+
 ASIO_TEST_SUITE
 (
   "bind_executor",
   ASIO_TEST_CASE(bind_executor_to_function_object_test)
   ASIO_TEST_CASE(bind_executor_to_completion_token_v1_test)
   ASIO_TEST_CASE(bind_executor_to_completion_token_v2_test)
+  ASIO_TEST_CASE(partial_bind_executor_test)
 )

@@ -10,10 +10,12 @@
 
 #define CV1K_DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
 
+#include "cpu/sh/sh7709s.h"
+
 class cv1k_blitter_device : public device_t, public device_video_interface
 {
 public:
-	cv1k_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cv1k_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto port_r_callback() { return m_port_r_cb.bind(); }
 	void set_rambase(u16* rambase) { m_ram16 = rambase; }
@@ -36,11 +38,20 @@ public:
 	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
 	void blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
+	void set_maincpu(sh7709s_device* cpu)
+	{
+		m_maincpu = cpu;
+	}
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	// CPU used for tracking accesses to blitter address space for
+	// uncached access penalties
+	sh7709s_device* m_maincpu;
+
 	// Number of bytes that are read each time Blitter fetches operations from SRAM.
 	static inline constexpr int OPERATION_CHUNK_SIZE_BYTES = 64;
 

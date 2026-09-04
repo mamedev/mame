@@ -25,6 +25,8 @@ public:
 	void map(address_map &map) ATTR_COLD;
 	void map_68k(address_map &map) ATTR_COLD;
 	void map_apbus(address_map &map) ATTR_COLD;
+	void map_nws12xx_keyboard(address_map &map) ATTR_COLD;
+	void map_nws12xx_mouse(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t overrides

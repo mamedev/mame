@@ -20,6 +20,8 @@
   10  IFolderArchiveUpdateCallback2
   11  IFolderScanProgress
   12  IFolderSetZoneIdMode
+  13  IFolderSetZoneIdFile
+  14  IFolderArchiveUpdateCallback_MoveArc
   
   20  IFileExtractCallback.h::IGetProp
   30  IFileExtractCallback.h::IFolderExtractToStreamCallback (old)
@@ -93,6 +95,8 @@
   03  ISetProperties
   04  IArchiveKeepModeForNextOpen
   05  IArchiveAllowTail
+
+  09  IArchiveRequestMemoryUseCallback
 
   10  IArchiveOpenCallback
   
@@ -176,7 +180,9 @@ Handler GUIDs:
   0B lzma86
   0C xz
   0D ppmd
+  0E zstd
 
+  BF LVM
   C0 AVB
   C1 LP
   C2 Sparse

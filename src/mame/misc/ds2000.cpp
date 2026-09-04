@@ -239,7 +239,7 @@ void ds2000_state::ds2000(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->refresh_control(1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(ds2000_state::screen_update));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);

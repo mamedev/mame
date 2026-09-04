@@ -79,7 +79,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 
 void compis_hrg_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
@@ -98,7 +98,7 @@ void compis_hrg_device::device_add_mconfig(machine_config &config)
 
 void compis_uhrg_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate

@@ -167,7 +167,7 @@ public:
 	// helper functions
 	template <typename T, typename U> screen_device& add_pal_screen(machine_config &config, T &&screen_tag, U &&clock)
 	{
-		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag), SCREEN_TYPE_RASTER));
+		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag)));
 		screen.set_screen_update(tag(), FUNC(cdp1869_device::screen_update));
 		screen.set_raw(std::forward<U>(clock), cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START,
 			cdp1869_device::TOTAL_SCANLINES_PAL, cdp1869_device::SCANLINE_VBLANK_END_PAL, cdp1869_device::SCANLINE_VBLANK_START_PAL);
@@ -176,7 +176,7 @@ public:
 
 	template <typename T, typename U> screen_device& add_ntsc_screen(machine_config &config, T &&screen_tag, U &&clock)
 	{
-		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag), SCREEN_TYPE_RASTER));
+		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag)));
 		screen.set_screen_update(tag(), FUNC(cdp1869_device::screen_update));
 		screen.set_raw(std::forward<U>(clock), cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START,
 			cdp1869_device::TOTAL_SCANLINES_NTSC, cdp1869_device::SCANLINE_VBLANK_END_NTSC, cdp1869_device::SCANLINE_VBLANK_START_NTSC);
@@ -205,6 +205,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cdp1869(address_map &map) ATTR_COLD;
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -219,7 +220,9 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(prd_update);
 
-	static rgb_t get_rgb(int i, int c, int l);
+	void screen_vblank(screen_device &screen, bool state);
+
+	static rgb_t get_rgb(int c, int l);
 
 	bool is_ntsc();
 	uint8_t read_page_ram_byte(offs_t address);
@@ -229,12 +232,12 @@ protected:
 	int read_pcb(offs_t pma, offs_t cma, uint8_t pmd);
 	void update_prd_changed_timer();
 	int get_lines();
-	uint16_t get_pmemsize(int cols, int rows);
-	uint16_t get_pma();
+	size_t get_pmemsize(int cols, int rows);
+	offs_t get_pma();
 	int get_pen(int ccb0, int ccb1, int pcb);
 
-	void draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint8_t data, int color);
-	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint16_t pma);
+	void draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprect, int x, int y, uint8_t data, int color);
+	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, const rectangle &cliprect, int x, int y, uint16_t pma);
 
 private:
 	devcb_read_line        m_read_pal_ntsc;
@@ -244,7 +247,6 @@ private:
 	char_ram_write_delegate     m_out_char_ram_func;
 	int m_color_clock;
 
-	//address_space *m_page_ram;
 	emu_timer *m_prd_timer;
 	sound_stream *m_stream;
 	required_device<palette_device> m_palette;
@@ -252,7 +254,8 @@ private:
 
 	// video state
 	int m_prd;                      // predisplay
-	int m_dispoff;                  // display off
+	int m_dispoff;                  // display off, as programmed
+	int m_dispoff_frame;            // display off, as recognized for this frame
 	int m_fresvert;                 // full resolution vertical
 	int m_freshorz;                 // full resolution horizontal
 	int m_cmem;                     // character memory access mode
@@ -266,9 +269,11 @@ private:
 	uint16_t m_hma;                   // home memory address
 
 	// sound state
-	sound_stream::sample_t m_signal; // current signal
-	int m_incr;                     // initial wave state
+	u64 m_toneclk;                  // tone clock cycles into the current half cycle, 32.32
+	bool m_toneout;                 // tone output flip-flop
 	int m_toneoff;                  // tone off
+	u64 m_wnclk;                    // white noise clock cycles into the current bit, 32.32
+	u32 m_wnshift;                  // white noise shift register
 	int m_wnoff;                    // white noise off
 	uint8_t m_tonediv;                // tone divisor
 	uint8_t m_tonefreq;               // tone range select

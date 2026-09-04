@@ -14,6 +14,7 @@
 #include "uiinput.h"
 
 #include <algorithm>
+#include <bit>
 #include <cstring>
 
 
@@ -65,12 +66,12 @@ inline bool menu_confswitch::switch_group_descriptor::matches(ioport_field const
 
 inline unsigned menu_confswitch::switch_group_descriptor::switch_count() const noexcept
 {
-	return (sizeof(mask) * 8) - count_leading_zeros_32(mask);
+	return std::bit_width(mask);
 }
 
 
-menu_confswitch::menu_confswitch(mame_ui_manager &mui, render_container &container, uint32_t type)
-	: menu(mui, container)
+menu_confswitch::menu_confswitch(mame_ui_manager &mui, render_target &target, uint32_t type)
+	: menu(mui, target)
 	, m_fields()
 	, m_switch_groups()
 	, m_active_switch_groups(0U)
@@ -128,6 +129,9 @@ void menu_confswitch::populate()
 					flags |= FLAG_LEFT_ARROW;
 				if (field.has_next_setting())
 					flags |= FLAG_RIGHT_ARROW;
+
+				if (field.live().value == field.defvalue())
+					flags |= FLAG_DEEMPHASIZE;
 
 				// add the menu item
 				item_append(field.name(), field.setting_name(), flags, &field);
@@ -322,8 +326,8 @@ void menu_confswitch::find_fields()
     menu_settings_dip_switches
 -------------------------------------------------*/
 
-menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_container &container)
-	: menu_confswitch(mui, container, IPT_DIPSWITCH)
+menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_target &target)
+	: menu_confswitch(mui, target, IPT_DIPSWITCH)
 	, m_switch_group_y()
 	, m_visible_switch_groups(0U)
 	, m_single_width(0.0f)
@@ -533,7 +537,7 @@ void menu_settings_dip_switches::populate()
     menu_settings_machine_config
 -------------------------------------------------*/
 
-menu_settings_machine_config::menu_settings_machine_config(mame_ui_manager &mui, render_container &container) : menu_confswitch(mui, container, IPT_CONFIG)
+menu_settings_machine_config::menu_settings_machine_config(mame_ui_manager &mui, render_target &target) : menu_confswitch(mui, target, IPT_CONFIG)
 {
 	set_heading(_("Machine Configuration"));
 }

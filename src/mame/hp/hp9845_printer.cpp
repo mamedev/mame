@@ -139,8 +139,8 @@ const tiny_rom_entry *hp9845_printer_device::device_rom_region() const
 
 void hp9845_printer_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_prt_alpha_out, 0);
-	BITBANGER(config, m_prt_graph_out, 0);
+	BITBANGER(config, m_prt_alpha_out);
+	BITBANGER(config, m_prt_graph_out);
 }
 
 void hp9845_printer_device::device_start()

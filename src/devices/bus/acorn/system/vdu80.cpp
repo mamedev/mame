@@ -122,7 +122,7 @@ GFXDECODE_END
 
 void acorn_vdu80_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::white());
 	screen.set_raw(12_MHz_XTAL, 768, 132, 612, 312, 20, 270);
 	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));

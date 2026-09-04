@@ -618,7 +618,7 @@ come from... they might be eventually removed -->
 		<info name="usage" value="Requires 36k or more RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="6144">
-				<rom name="spaceintruders.bin" size="6144" crc="2de02cf5" sha1="fd8fc752be6afcbf016f8a33e21ad9e1b7c50c48" offset="00000" />
+				<rom name="spaceintruders.bin" size="6144" crc="2de02cf5" sha1="c1dc73480d1b0f584f8f2b779a2ca8bb0598280e" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

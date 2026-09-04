@@ -46,7 +46,6 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line m_out_rx_handler;
 	devcb_write_line m_out_trxc_handler;

@@ -6,13 +6,11 @@ updated 2021
 This directory implements a JNI library so that Java programs can use
 the PortMidi API. This was mainly created to implement PmDefaults, a
 program to set default input and output devices for PortMidi
-applications.
-
-PmDefaults never found much use. I recommend you implement
-per-application preferences and store default PortMidi device
-numbers for input and output there. (Or better yet, store
-device *names* since numbers can change if you plug in or 
-remove USB devices.) 
+applications. Because it is rarely used, PmDefaults was dropped from
+PortMidi starting with v3. I recommend you implement per-application
+preferences and store default PortMidi device numbers for input and
+output there. (Or better yet, store device *names* since numbers can
+change if you plug in or remove USB devices.)
 
 Even without PmDefaults, a PortMidi API for Java is probably an
 improvement over other Java libraries, but there is very little MIDI
@@ -26,7 +24,7 @@ update it or let your needs be known. Perhaps I or someone can help.
  
 ==================================================================
 
-BUILDING PmDefaults PROGRAM
+BUILDING Java EXTERNAL LIBRARY
 
 You must have a JDK installed (Java development kit including javac
 (the Java compiler), jni.h, etc.
@@ -36,7 +34,6 @@ Test java on the command line, e.g., type: javac -version
 Enable these options in the main CMakeLists.txt file (run CMake
 from your top-level repository directory):
      BUILD_JAVA_NATIVE_INTERFACE
-     BUILD_PMDEFAULTS
 In my Ubuntu linux with jdk-15, ccmake was unable to find my JDK, so
 I have to manually set CMake variables as follows (type 't' to see
 these in ccmake):
@@ -47,20 +44,6 @@ these in ccmake):
     JAVA_JVM_LIBRARY       /usr/lib/jvm/jdk-15/lib
 Of course, your paths may differ.
     
-
-RUNNING PmDefaults PROGRAM
-
-After building the pmdefaults target with make, Visual Studio, or Xcode:
-In Windows:
-   [from the command line:]
-   cd portmidi\pm_java\pmdefaults  -- change to this directory
-   pmdefaults                      -- runs pmdefaults.bat
-   [or from the finder:]
-   double-click on pmdefaults.bat
-In macOS and Linux:
-   cd portmidi\pm_java\pmdefaults -- change to this directory
-   ./pmdefaults                   -- shell script to invoke java
-
 
 ---- old implementation notes ----
 

@@ -9,7 +9,7 @@ Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
 additional DAC port
 
 Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
-It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
+It uses YM3438 OPN2C mapped at 0x78*, and anything that uses the nax.exe sound driver
 expects this to be installed as default (cfr. datsumj).
 To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3"
 respectively, cfr. "nax -?" for additional details.

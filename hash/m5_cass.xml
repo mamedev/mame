@@ -102,7 +102,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- similar to P-Designer cart but simpler-->
 	<software name="peditor">
 		<description>P-Editor</description>
@@ -265,7 +265,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ssf" supported="yes">
+	<software name="ssf" supported="no">
 		<description>Solar System Forces</description>
 		<year>1983</year>
 		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
@@ -273,13 +273,13 @@ license:CC0-1.0
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
 		<part name="cass1" interface="m5_cass">
-			<dataarea name="cass" size="23918">
-				<rom name="solar system forces (19xx)(-)[req basic-g].cas" size="23918" crc="516b448e" sha1="a08ae85b7b30d214e8980ce4befe5fbe9ac44a54"/>
+			<dataarea name="cass" size="17882692">
+				<rom name="solar system forces (19xx)(-)[req basic-g].wav" size="17882692" crc="07b4e0e1" sha1="c057b7d7b964ee3cef516a1f60692e431dce1616"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ssfcm" supported="yes">
+	<software name="ssfcm" supported="no">
 		<description>Solar System Forces - Commando Team</description>
 		<year>1983</year>
 		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
@@ -287,13 +287,13 @@ license:CC0-1.0
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
 		<part name="cass1" interface="m5_cass">
-			<dataarea name="cass" size="9302">
-				<rom name="solar system forces - commando team (19xx)(-)[req basic-g].cas" size="9302" crc="40cb70b9" sha1="5df14e6fccf0bd10037cdd3d52ad98fe9f7fa6ee"/>
+			<dataarea name="cass" size="7273520">
+				<rom name="solar system forces - commando team (19xx)(-)[req basic-g].wav" size="7273520" crc="fb402872" sha1="cb699eaf40c46a3fb61bdf4cd0faa902e8778abb"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ssfom" supported="yes">
+	<software name="ssfom" supported="no">
 		<description>Solar System Forces - Operation Maul</description>
 		<year>1983</year>
 		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
@@ -301,13 +301,13 @@ license:CC0-1.0
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
 		<part name="cass1" interface="m5_cass">
-			<dataarea name="cass" size="9166">
-				<rom name="solar system forces - operation maul (19xx)(-)[req basic-g].cas" size="9166" crc="09cb99aa" sha1="8bcf695fd302a2af5b88183daca9aee15458be05"/>
+			<dataarea name="cass" size="7348024">
+				<rom name="solar system forces - operation maul (19xx)(-)[req basic-g].wav" size="7348024" crc="389b82e5" sha1="baee461d2fde0941eb0c7a5963c5340c32212d76"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ssfvm" supported="yes">
+	<software name="ssfvm" supported="no">
 		<description>Solar System Forces - Victory of Mars</description>
 		<year>1983</year>
 		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
@@ -315,8 +315,8 @@ license:CC0-1.0
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
 		<part name="cass1" interface="m5_cass">
-			<dataarea name="cass" size="9868">
-				<rom name="solar system forces - victory of mars (19xx)(-)[req basic-g].cas" size="9868" crc="ddd353c3" sha1="9784475cf0e0f22025470929c6b041b9443d2fc5"/>
+			<dataarea name="cass" size="7731210">
+				<rom name="solar system forces - victory of mars (19xx)(-)[req basic-g].wav" size="7731210" crc="c711f2bb" sha1="2a266117198bf9290d831941dba7e419e745ccce"/>
 			</dataarea>
 		</part>
 	</software>

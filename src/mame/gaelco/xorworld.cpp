@@ -325,7 +325,7 @@ void xorworld_state::xorworld(machine_config &config)
 	mainlatch.q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)); // EEPROM data (DIN)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);

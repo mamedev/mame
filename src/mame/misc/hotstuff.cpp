@@ -99,7 +99,7 @@ void hotstuff_state::hotstuff(machine_config &config)
 	M68000(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotstuff_state::hotstuff_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128*8, 64*8);

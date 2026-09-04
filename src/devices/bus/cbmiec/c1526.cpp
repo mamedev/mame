@@ -24,7 +24,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "Commodore 1526/MPS-802 Dot Matrix Printer")
-DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "Commodore 4023 Printer")
+DEFINE_DEVICE_TYPE(GPIB_C4023, c4023_device, "c4023", "Commodore 4023 Printer")
 
 
 //-------------------------------------------------
@@ -173,7 +173,7 @@ c1526_device::c1526_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c4023_device::c4023_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c1526_device_base(mconfig, C4023, tag, owner, clock),
+	c1526_device_base(mconfig, GPIB_C4023, tag, owner, clock),
 	device_ieee488_interface(mconfig, *this)
 {
 }

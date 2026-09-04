@@ -23,7 +23,7 @@ PCB has a single OSC at 24MHz
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/acorn_ioc.h"
 #include "machine/acorn_memc.h"
 #include "machine/acorn_vidc.h"
@@ -56,7 +56,7 @@ private:
 	void ertictac_arm_map(address_map &map) ATTR_COLD;
 	void ertictac_map(address_map &map) ATTR_COLD;
 
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
 	required_device<acorn_memc_device> m_memc;
 	required_device<acorn_vidc10_device> m_vidc10;
@@ -124,7 +124,7 @@ static INPUT_PORTS_START( ertictac )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPNAME( 0x02, 0x02, "Demo Sound" )    PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("DSW1:3") // "Demo Sound"
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "Test Mode" )     PORT_DIPLOCATION("DSW1:1")
@@ -237,13 +237,13 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 
 void ertictac_state::ertictac(machine_config &config)
 {
-	ARM(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	ARM2(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_arm_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
 	PCF8583(config, "i2cmem", 32.768_kHz_XTAL); // TODO: Are we sure that this HW have I2C device?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 	screen.screen_vblank().append(m_memc, FUNC(acorn_memc_device::vidrq_w));
 
@@ -252,8 +252,8 @@ void ertictac_state::ertictac(machine_config &config)
 	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
 
 	ACORN_IOC(config, m_ioc, 24_MHz_XTAL/3);
-	m_ioc->fiq_w().set_inputline(m_maincpu, ARM_FIRQ_LINE);
-	m_ioc->irq_w().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ioc->fiq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_ioc->irq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_ioc->peripheral_r<4>().set(FUNC(ertictac_state::ertictac_podule_r));
 	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
 	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));

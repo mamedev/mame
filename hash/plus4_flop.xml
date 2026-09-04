@@ -50,4 +50,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hdnwndrs" supported="no">
+		<description>Hidden Wonders</description>
+		<year>2026</year>
+		<publisher>Desire</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="hidden_wonders.d64" size="174848" crc="ae113f13" sha1="7c1182931d6f92a5abd207aef44efeb7f4325656"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

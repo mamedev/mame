@@ -32,6 +32,7 @@ local p     = premake
 		
 		_p("# Swift project build file")
 		_p("# generated with GENie ninja")
+		_p("# https://github.com/bkaradzic/GENie")
 		_p("")
 
 		-- needed for implicit outputs, introduced in 1.7

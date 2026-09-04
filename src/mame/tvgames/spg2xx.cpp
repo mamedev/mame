@@ -966,6 +966,21 @@ static INPUT_PORTS_START( doyousud )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mgarage )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Left")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Enter")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Back")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Accelerate")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Right")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
 ioport_value spg2xx_game_fordrace_state::wheel_r()
 {
 	return ioport("WHEEL_REAL")->read() >> 1;
@@ -1739,6 +1754,20 @@ static INPUT_PORTS_START( prail )
 	PORT_BIT( 0x0003, 0x0000, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_REMAP_TABLE(handle_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dvlaptop )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_DIPNAME( 0x0040, 0x0000, "Show Display 1" ) // might be a button
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+
+	PORT_MODIFY("P3")
+	PORT_DIPNAME( 0x0020, 0x0000, "Show Display 2" ) // might be a button
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+INPUT_PORTS_END
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -1763,7 +1792,7 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(spg2xx_game_state::portc_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -1871,7 +1900,7 @@ void spg2xx_game_senspeed_state::senspeed(machine_config &config)
 	    02B 1
 	    A7J4565E
 	*/
-	I2C_24C01(config, "i2cmem", 0); // saves 0x80 bytes, but loading fails?
+	I2C_24C01(config, "i2cmem"); // saves 0x80 bytes, but loading fails?
 }
 
 
@@ -2033,7 +2062,7 @@ void spg2xx_game_tmntmutm_state::tmntmutm(machine_config &config)
 	m_maincpu->guny_in().set(FUNC(spg2xx_game_tmntmutm_state::guny_r));
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_tmntmutm_state::gunx_r));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 uint16_t spg2xx_game_albkickb_state::portb_r(offs_t offset, uint16_t mem_mask)
@@ -2165,7 +2194,7 @@ void spg2xx_game_swclone_state::swclone(machine_config &config)
 	m_maincpu->guny_in().set(FUNC(spg2xx_game_swclone_state::base_guny_r));
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_swclone_state::base_gunx_r));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 
@@ -2224,7 +2253,7 @@ void spg2xx_game_dreamlss_state::dreamlss(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_dreamlss_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(spg2xx_game_dreamlss_state::portc_w));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 uint16_t spg2xx_game_lpetshop_state::porta_r()
@@ -2259,7 +2288,7 @@ void spg2xx_game_lpetshop_state::lpetshop(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_lpetshop_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(spg2xx_game_lpetshop_state::portc_w));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 
@@ -2558,7 +2587,7 @@ void spg2xx_game_prail_state::prail(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_prail_state::prail_portb_w));
 
 	// TODO: this is not currently hooked up, it's used to store the unlock states for the gallery
-	I2C_24C02(config, "i2cmem", 0); // ATMLH13402C (24C02 compatible)
+	I2C_24C02(config, "i2cmem"); // ATMLH13402C (24C02 compatible)
 }
 
 
@@ -2636,7 +2665,7 @@ void epo_tetr_game_state::epo_tetr(machine_config& config)
 {
 	spg2xx(config);
 
-	I2C_24C02(config, "i2cmem", 0); // S24CS02A
+	I2C_24C02(config, "i2cmem"); // S24CS02A
 
 	m_maincpu->portb_in().set(FUNC(epo_tetr_game_state::epo_tetr_r));
 	m_maincpu->portb_out().set(FUNC(epo_tetr_game_state::epo_tetr_portb_w));
@@ -2894,6 +2923,11 @@ ROM_START( vtechtvssp )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_sp.bin", 0x000000, 0x800000, CRC(4a2e91eb) SHA1(1ff9cc0360b670cc0ad7efa9de0edd2c68d4d8e3) )
 ROM_END
 
+ROM_START( genitvp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vtechtvstation_fr.bin", 0x000000, 0x800000, CRC(71c2c5f4) SHA1(cc81f67ec1888b40a735383dae09408f9c877314) )
+ROM_END
+
 ROM_START( vtechtvsgr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_gr.bin", 0x000000, 0x800000, CRC(879f1b12) SHA1(c14d52bead2c190130ce88cbdd4f5e93145f13f9) )
@@ -2962,6 +2996,11 @@ ROM_END
 ROM_START( lexiart )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "lexibookartstudio.u3", 0x000000, 0x800000, CRC(fc417abb) SHA1(c0a18a2cf11c47086722f0ec88410614fed7c6f7) )
+ROM_END
+
+ROM_START( stvscri )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "scrivi_disegna.bin", 0x000000, 0x800000, CRC(44392a74) SHA1(ed59d7a2218c047aab3fa151e8fa781b81b59250) )
 ROM_END
 
 ROM_START( lexibds )
@@ -3112,7 +3151,7 @@ ROM_END
 
 ROM_START( smartcyc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	/* no system ROM, all game data is on cartridges */
+	// no system ROM, all game data is on cartridges
 ROM_END
 
 ROM_START( spidm2 )
@@ -3123,6 +3162,24 @@ ROM_END
 ROM_START( dinothun )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "dinothunder.bin", 0x000000, 0x400000, CRC(03e82604) SHA1(c39d72aa8a0750ee38ab01b317e77a46e1d6004e) )
+ROM_END
+
+ROM_START( dvlaptop )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "u3-main.u3-1", 0x000000, 0x800000, CRC(0457c902) SHA1(a0f49627e1e099262b92c2655d42090f32fb1d21) )
+	// 2nd bank? (or to drive the LCD?)  It's a SunPlus SPG2xx program like above
+	ROM_LOAD16_WORD_SWAP( "u8-slave.u8-1", 0x800000, 0x800000, CRC(d0627571) SHA1(029cb3b5d8b9e565c822c0705782770715b4fb53) )
+ROM_END
+
+
+ROM_START( nvpoker )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "poker.bin", 0x000000, 0x400000, CRC(0efbe6a7) SHA1(f266fac7a35535d37557604c782091222830d3d7) )
+ROM_END
+
+ROM_START( mgarage )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "monstergarage.bin", 0x000000, 0x400000, CRC(3a69ca21) SHA1(fc04d40d895db4a66cbb2c573d08041278cd2e2e) )
 ROM_END
 
 ROM_START( pdcj )
@@ -3204,134 +3261,138 @@ void spg2xx_game_state::init_itvphone()
 	rom[0xf152] = 0xee08;
 }
 
-// year, name, parent, compat, machine, input, class, init, company, fullname, flags
+//    Year  Name       Parent     Compat  Machine     Input       Class                            Init           Company   Fullname                       Flags
 
 // Radica TV games
-CONS( 2006, rad_skat,   0,        0, rad_skat,  rad_skat,  spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Skateboarder (NTSC)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp,  rad_skat, 0, rad_skatp, rad_skatp, spg2xx_game_state,          init_crc,      "Radica",                                                 "Connectv Skateboarder (PAL)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skat,  0,         0,      rad_skat,   rad_skat,   spg2xx_game_state,               init_crc,      "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat,  0,      rad_skatp,  rad_skatp,  spg2xx_game_state,               init_crc,      "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, rad_crik,   0,        0, rad_crik,  rad_crik,  spg2xx_game_state,          init_crc,      "Radica",                                                 "Connectv Cricket (PAL)",                                                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2006, rad_crik,  0,         0, rad_crik,   rad_crik,   spg2xx_game_state,               init_crc,      "Radica", "Connectv Cricket (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
 
-CONS( 2007, rad_fb2,    0,        0, rad_skat,  rad_fb2,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Football 2",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
+CONS( 2007, rad_fb2,   0,         0, rad_skat,   rad_fb2,    spg2xx_game_state,               init_crc,      "Radica", "Play TV Football 2", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
 // this is 'voice activated' and one of the other globs is likely doing the voice processing
-CONS( 2006, rad_jib,    0,        0, spg28x,    spg2xx,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Jibbi",                                                                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2006, rad_jib,   0,         0, spg28x,     spg2xx,     spg2xx_game_state,               init_crc,      "Radica",  "Jibbi", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-// ABL TV Games
-CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// ABL TV games
+CONS( 2006, abltenni,  0,         0, spg2xx,     abltenni,   spg2xx_game_state,               empty_init,    "Advance Bright Ltd / V-TAC Technology", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, ablkickb,   0,        0, ablkickb,  ablkickb,  spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
+CONS( 2006, ablkickb,  0,         0, ablkickb,   ablkickb,   spg2xx_game_albkickb_state,      init_ablkickb, "Advance Bright Ltd / Coleco / V-TAC Technology", "Kick Boxing (BJ8888, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
-CONS( 2007, lxspidaj,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, lxspidaj,  0,         0, spg2xx_pal, lxspidaj,   spg2xx_game_albkickb_state,      init_ablkickb, "Lexibook", "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2007, lxairjet,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Super TV Air Jet 6-in-1 (Lexibook Junior)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, lxairjet,  0,         0, spg2xx_pal, lxspidaj,   spg2xx_game_albkickb_state,      init_ablkickb, "Lexibook", "Super TV Air Jet 6-in-1 (Lexibook Junior)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, totspies,  0,         0, spg2xx_pal, totspies,   spg2xx_game_state,               empty_init,    "Senario / Marathon - Mystery Animation Inc.", "Totally Spies! (France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, fordrace,   0,        0, fordrace,  fordrace,  spg2xx_game_fordrace_state, empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, fordrace,  0,         0, fordrace,   fordrace,   spg2xx_game_fordrace_state,      empty_init,    "Excalibur Electronics", "Ford Racing", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, carled99,   0,        0, spg2xx,    carled99,  spg2xx_game_state,          empty_init,    "Excalibur Electronics",                                  "Carl Edwards 99",                                                       MACHINE_IMPERFECT_SOUND )
+CONS( 200?, carled99,  0,         0, spg2xx,     carled99,   spg2xx_game_state,               empty_init,    "Excalibur Electronics", "Carl Edwards 99", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2008, comil,      0,        0, comil,     comil,     spg2xx_game_comil_state,    empty_init,    "Character Options",                                      "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, comil,     0,         0, comil,      comil,      spg2xx_game_comil_state,         empty_init,    "Character Options", "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Same as Excalibur Decathlon? Not identical to the ABL game below, but built on the same engine
-CONS( 2006, tvsprt10,   0,        0, tvsprt10,  tvsprt10,  spg2xx_game_state,          init_tvsprt10, "Simba / V-Tac Technology Co Ltd.",                       "TV Sports 10-in-1 / Decathlon Athletic Sport Games",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, tvsprt10,  0,         0, tvsprt10,   tvsprt10,   spg2xx_game_state,               init_tvsprt10, "Simba / V-TAC Technology", "TV Sports 10-in-1 / Decathlon Athletic Sport Games", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, decathln,   0,        0, tvsprt10,  decathln,  spg2xx_game_state,          init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Decathlon (set 1)",                                                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
-CONS( 200?, decathlna,  decathln, 0, tvsprt10,  decathln,  spg2xx_game_state,          init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Decathlon (set 2, SM570, ABL TV Game)",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in UK
+CONS( 200?, decathln,  0,         0, tvsprt10,   decathln,   spg2xx_game_state,               init_tvsprt10, "Advance Bright Ltd / V-TAC Technology", "Decathlon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
+CONS( 200?, decathlna, decathln,  0, tvsprt10,   decathln,   spg2xx_game_state,               init_tvsprt10, "Advance Bright Ltd / V-TAC Technology", "Decathlon (set 2, SM570, ABL TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in UK
 
-CONS( 2007, guitarfv,   0,        0, guitarfv,  guitarfv,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd",                                     "Guitar Fever (2007.07.03 Ver 2.7)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, guitarfv,  0,         0, guitarfv,   guitarfv,   spg2xx_game_state,               empty_init,    "Advance Bright Ltd", "Guitar Fever (2007.07.03 Ver 2.7)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The box for these has 'YOU take the stage' text, but unlike the sequel, it is not part of the ingame title screen, this sometimes causes confusion
-CONS( 200?, guitarss,   0,        0, spg28x,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star ('Fender Stratocaster' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, guitarssa,  guitarss, 0, spg28x,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star (red 'Gibson Flying V' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarss,  0,         0, spg28x,     guitarss,   spg2xx_game_state,               empty_init,    "Senario", "Guitar Super Star ('Fender Stratocaster' style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarssa, guitarss,  0, spg28x,     guitarss,   spg2xx_game_state,               empty_init,    "Senario", "Guitar Super Star (red 'Gibson Flying V' style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The sequel has 'You Take The Stage' on both the box and title screen
-CONS( 2009, gssytts,    0,        0, gssytts,   guitarss,  spg2xx_game_gssytts_state,  empty_init,    "Senario",                                                "Guitar Super Star: You Take The Stage",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, gssytts,   0,         0, gssytts,    guitarss,   spg2xx_game_gssytts_state,       empty_init,    "Senario", "Guitar Super Star: You Take The Stage", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2007, drumsups,   0,        0, spg28x,    drumsups,  spg2xx_game_state,          empty_init,    "Senario",                                                "Drum Super Star",                                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, drumsups,  0,         0, spg28x,     drumsups,   spg2xx_game_state,               empty_init,    "Senario", "Drum Super Star", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_state,  init_senwfit,  "Senario",                                                "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, senwfit,   0,         0, gssytts,    senwfit,    spg2xx_game_senwfit_state,       init_senwfit,  "Senario", "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
-CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
-CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
+CONS( 2006, genitvp,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "VTech", "Genius TV Progress (VTech, France)",   MACHINE_NOT_WORKING )
+CONS( 2006, vtechtvssp, genitvp,  0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "VTech", "TV Station (VTech, Spain)",            MACHINE_NOT_WORKING )
+CONS( 2006, vtechtvsgr, genitvp,  0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "VTech", "TV Learning Station (VTech, Germany)", MACHINE_NOT_WORKING )
 
-CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Taikee / Oregon Scientific / V-Tac Technology Co Ltd.",  u8"Teléfono interactivo de TV (Spain)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone,   spg2xx_game_state,               init_itvphone, "Taikee / Oregon Scientific / V-TAC Technology", u8"Teléfono interactivo de TV (Spain)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
-CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day (US/UK)",         MACHINE_IMPERFECT_SOUND ) // same ROM confirmed on both US and UK units
-CONS( 2006, doraphonf,  doraphon, 0, doraphonep,doraphonep,spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / L'anniversaire de Babouche (France)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, doraphon,   0,        0, doraphone,  doraphone,  spg2xx_game_doraphone_state,     empty_init,    "VTech", "Dora the Explorer: Dora TV Explorer Phone / Boots's Special Day (US/UK)",         MACHINE_IMPERFECT_SOUND ) // same ROM confirmed on both US and UK units
+CONS( 2006, doraphonf,  doraphon, 0, doraphonep, doraphonep, spg2xx_game_doraphone_state,     empty_init,    "VTech", "Dora the Explorer: Dora TV Explorer Phone / L'anniversaire de Babouche (France)", MACHINE_IMPERFECT_SOUND )
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
 // a Dutch localized version also exists, which again must be different code
-CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (US)",                      MACHINE_IMPERFECT_SOUND )
-CONS( 2007, doraglobuk, doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (UK)",                      MACHINE_IMPERFECT_SOUND )
-CONS( 2007, doraglobf,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Globe-Trotter (France)",                    MACHINE_IMPERFECT_SOUND )
-CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglob,   0,        0, doraphone,  doraglobe,  spg2xx_game_doraphone_state,     empty_init,    "VTech", "Dora the Explorer: Dora TV Adventure Globe (US)",     MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobuk, doraglob, 0, doraphone,  doraglobe,  spg2xx_game_doraphone_state,     empty_init,    "VTech", "Dora the Explorer: Dora TV Adventure Globe (UK)",     MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobf,  doraglob, 0, doraphone,  doraglobe,  spg2xx_game_doraphone_state,     empty_init,    "VTech", "Dora the Explorer: Dora TV Globe-Trotter (France)",   MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobg,  doraglob, 0, doraphone,  doraglobe,  spg2xx_game_doraphone_state,     empty_init,    "VTech", "Dora the Explorer: Doras Abenteuer-Globus (Germany)", MACHINE_IMPERFECT_SOUND )
 
 
 // ROM checksum fails, but is expecting 0 as a result? shows 'CopyRight' when booting normally? protection?
-CONS( 200?, jouet, 0,             0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "<unknown>",                                              "10 Jeux Interactifs / Jeux Pour Filles (France)",                       MACHINE_NOT_WORKING )
+CONS( 200?, jouet,      0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "<unknown>", "10 Jeux Interactifs / Jeux Pour Filles (France)", MACHINE_NOT_WORKING )
 
-CONS( 2008, senspeed,  0,         0, senspeed,  senspeed,  spg2xx_game_senspeed_state, empty_init,    "Senario",                                                "Speed Racer (Senario)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, senspeed,   0,        0, senspeed,   senspeed,   spg2xx_game_senspeed_state,      empty_init,    "Senario", "Speed Racer (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, jjstrip,    0,        0, tvsprt10,  jjstrip,   spg2xx_game_state,          empty_init,    "Shiggles Inc.",                                          "Club Jenna Presents: Jenna Jameson's Strip Poker",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, jjstrip,    0,        0, tvsprt10,   jjstrip,    spg2xx_game_state,               empty_init,    "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, tmntbftc,   0,        0, spg2xx,    tmntbftc,  spg2xx_game_state,          empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Battle for the City",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, tmntbftc,   0,        0, spg2xx,     tmntbftc,   spg2xx_game_state,               empty_init,    "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Battle for the City", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The black flashing square on startup is part of the tilemap layer, it doesn't appear to happen on hardware
 // P.L.U.G.G.U.H.S. = Play Lots of Unbelievable Games, Getting Ultra High Scores
-CONS( 2005, knd,        0,        0, spg2xx,    knd,       spg2xx_game_state,          init_crc,      "Tech2Go / One Man Band",                                 "Codename: Kids Next Door - Operation: P.L.U.G.G.U.H.S.",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, knd,        0,        0, spg2xx,     knd,        spg2xx_game_state,               init_crc,      "Tech2Go / One Man Band", "Codename: Kids Next Door - Operation: P.L.U.G.G.U.H.S.", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_state, empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, tmntmutm,   0,        0, tmntmutm,   tmntmutm,   spg2xx_game_tmntmutm_state,      empty_init,    "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Powered Up",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, pballpup,   0,        0, pballpup,   pballpup,   spg2xx_game_pballpup_state,      empty_init,    "Hasbro / Tiger Games", "Mission: Paintball Powered Up", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, mpntbalt,   0,        0, mpntbalt,  mpntbalt,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Trainer",                                            MACHINE_IMPERFECT_SOUND )
+CONS( 2005, mpntbalt,   0,        0, mpntbalt,   mpntbalt,   spg2xx_game_pballpup_state,      empty_init,    "Hasbro / Tiger Games", "Mission: Paintball Trainer", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, mpntball,   0,        0, mpntball,  mpntball,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball",                                                    MACHINE_IMPERFECT_SOUND )
+CONS( 2004, mpntball,   0,        0, mpntball,   mpntball,   spg2xx_game_pballpup_state,      empty_init,    "Hasbro / Tiger Games", "Mission: Paintball", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, dreamlss,   0,        0, dreamlss,   dreamlss,   spg2xx_game_dreamlss_state,      empty_init,    "Hasbro / Tiger Electronics", "Dream Life Superstar (Version 0.3, Mar 16 2007)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Needs a hack to not show garbage sprite on startup
-CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_state,  init_swclone,  "Hasbro / Tiger Electronics",                             "Star Wars: The Clone Wars - Clone Trooper Blaster Game",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, swclone,    0,        0, swclone,    swclone,    spg2xx_game_swclone_state,       init_swclone,  "Hasbro / Tiger Electronics / Santa Cruz Games", "Star Wars: The Clone Wars - Clone Trooper Blaster Game", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
-CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
+CONS( 2005, mattelcs,   0,        0, rad_skat,   mattelcs,   spg2xx_game_state,               empty_init,    "Mattel", "Mattel Classic Sports", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, hotwhls,    0,        0, spg2xx,    hotwhls,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Hot Wheels (steering wheel controller)",                                MACHINE_IMPERFECT_SOUND )
+CONS( 2005, hotwhls,    0,        0, spg2xx,     hotwhls,    spg2xx_game_state,               empty_init,    "Mattel", "Hot Wheels (steering wheel controller)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, hotwhl2p,   0,        0, hotwheels,  hotwheels,  spg2xx_game_hotwheels_state,     empty_init,    "Mattel", "Hot Wheels (2 player, pad controllers)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, rocksock,   0,        0, spg2xx,    rocksock,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Rock 'Em Sock 'Em Robots (TV Game)",                                    MACHINE_IMPERFECT_SOUND )
+CONS( 2006, rocksock,   0,        0, spg2xx,     rocksock,   spg2xx_game_state,               empty_init,    "Mattel", "Rock 'Em Sock 'Em Robots (TV Game)", MACHINE_IMPERFECT_SOUND )
 
 // there was also an English release of this, simply titled "Interactive TV Computer"
-CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
-CONS( 2007, jeuint,     ordentv,  0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_jeuint,   "Taikee / V-Tac",                                         u8"Jeu Intéractif TV (France)",                                          MACHINE_NOT_WORKING)
+CONS( 2007, ordentv,    0,        0, ordentv,    ordentv,    spg2xx_game_ordentv_state,       init_ordentv,  "Taikee / V-TAC", "Ordenador-TV (Spain)",         MACHINE_NOT_WORKING )
+CONS( 2007, jeuint,     ordentv,  0, ordentv,    ordentv,    spg2xx_game_ordentv_state,       init_jeuint,   "Taikee / V-TAC", u8"Jeu Intéractif TV (France)", MACHINE_NOT_WORKING )
 
-CONS( 200?, wfart,      0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "TV Art Design Center",                                                  MACHINE_NOT_WORKING )
-CONS( 200?, wfcentro,   wfart,    0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+CONS( 200?, wfart,      0,        0, wfcentro,   spg2xx,     spg2xx_game_wfcentro_state,      empty_init,    "WinFun", "TV Art Design Center",                    MACHINE_NOT_WORKING )
+CONS( 200?, wfcentro,   wfart,    0, wfcentro,   spg2xx,     spg2xx_game_wfcentro_state,      empty_init,    "WinFun", u8"Centro TV de Diseño Artistico (Spain)", MACHINE_NOT_WORKING )
 
-CONS( 200?, lexiart,    0,        0, lexiart,   lexiart,   spg2xx_game_lexiart_state,  empty_init,    "Lexibook",                                               "Lexibook Junior My 1st Drawing Studio",                                 MACHINE_NOT_WORKING )
+CONS( 200?, lexiart,    0,        0, lexiart,    lexiart,    spg2xx_game_lexiart_state,       empty_init,    "Lexibook", "Lexibook Junior My 1st Drawing Studio", MACHINE_NOT_WORKING )
 
-CONS( 200?, lexibds,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Lexibook",                                               "Lexibook Junior Barbie Drawing Board / Barbie Drawing Studio",          MACHINE_NOT_WORKING )
+CONS( 200?, stvscri,    0,        0, lexiart,    lexiart,    spg2xx_game_lexiart_state,       empty_init,    "Sapientino", "Smart TV Scrivi & Disegna (Italy)", MACHINE_NOT_WORKING )
+
+CONS( 200?, lexibds,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "Lexibook", "Lexibook Junior Barbie Drawing Board / Barbie Drawing Studio", MACHINE_NOT_WORKING )
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
-CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                               MACHINE_NOT_WORKING )
+CONS( 200?, tiktokmm,   0,        0, spg2xx,     spg2xx,     spg2xx_game_wfcentro_state,      empty_init,    "TikTokTech Ltd. / 3T Games / Senario", "Moving Music (MM-TV110)", MACHINE_NOT_WORKING )
 
-CONS( 2005, doyousud,   0,        0, spg2xx,    doyousud,  spg2xx_game_state,          empty_init,    "SDW Games",                                              "Sudoku: Do You Sudoku?",                                                MACHINE_NOT_WORKING )
+CONS( 2005, doyousud,   0,        0, spg2xx,     doyousud,   spg2xx_game_state,               empty_init,    "SDW Games", "Sudoku: Do You Sudoku?", MACHINE_NOT_WORKING )
 
-CONS( 200?, virtbb,     0,        0, spg2xx,    virtbb,    spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Baseball (VTG)",                                                MACHINE_NOT_WORKING ) // motion controls not fully understood
-CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Tennis (VTG)",                                                  MACHINE_NOT_WORKING ) // motion controls not fully understood
+CONS( 200?, virtbb,     0,        0, spg2xx,     virtbb,     spg2xx_game_state,               empty_init,    "VTG Interactive", "Virtual Baseball (VTG)", MACHINE_NOT_WORKING ) // motion controls not fully understood
+CONS( 200?, virtten,    0,        0, spg2xx,     virtten,    spg2xx_game_state,               empty_init,    "VTG Interactive", "Virtual Tennis (VTG)",   MACHINE_NOT_WORKING ) // motion controls not fully understood
 
 // 2007 ingame, 2008 on box.  Hyperkin is mentioned as being the registered trademark holder alongside DDRGame on the box.
 // Songs "composed by Kenneth Baylon"
-CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,   "DDRGame / Hyperkin",                                    "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
+CONS( 2008, ddr33v,     0,        0, spg2xx,     ddr33v,     spg2xx_game_ddr33v_state,        init_ddr33v,   "DDRGame / Hyperkin", "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)", MACHINE_IMPERFECT_SOUND )
 
 // PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
-CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Bandai",                                                "Anpanman TV (Japan)",                                                   MACHINE_NOT_WORKING )
+CONS( 2006, anpantv,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "Bandai", "Anpanman TV (Japan)", MACHINE_NOT_WORKING )
 
+// Let's!TVプレイ デジタルモンスター バトルジャンクション
 // Has an AT24C08, not currently hooked up (probably for storing database unlocks)
 //
 // There is also a card reader/scanner which can read barcodes from Digimon cards
@@ -3340,38 +3401,45 @@ CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,   
 // Neither is currently emulated
 //
 // Will report 'ERROR' sometimes, maybe as a result of these not being hooked up.
-CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,          empty_init,    "Bandai",                                                "Let's! TV Play Digital Monster Battle Junction (Japan)",                MACHINE_NOT_WORKING )
+CONS( 2006, dmbtjunc,   0,        0, spg2xx,     dmbtjunc,   spg2xx_game_state,               empty_init,    "Bandai", "Let's! TV Play Digital Monster Battle Junction (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ 脳と体を鍛える 体感頭脳ファミリーマットレ  - Let's! TV Play branding appears on the box
-CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Nou to Karada o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_krkk,   0,        0, spg2xx,     ban_krkk,   spg2xx_game_state,               init_crc,      "Bandai", "Let's! TV Play Nou to Karada o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ チームたいこー! カードでパワーUP! たまごっちスクール選手権 - has IR for optional connectivity with external Tamagotchi device, and a card scanner used for gameplay
-CONS( 2007, ban_tam2,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Team Taikou! Card de Power Up! Tamagotchi School Senshuken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ban_tam2,   0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               init_crc,      "Bandai", "Let's! TV Play Team Taikou! Card de Power Up! Tamagotchi School Senshuken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,        empty_init,    "Epoch",                                                 "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, epo_tetr,   0,        0, epo_tetr,   epo_tetr,   epo_tetr_game_state,             empty_init,    "Epoch", "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
-CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,    "Takara Tomy",                                           "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2012, prail,      0,        0, prail,      prail,      spg2xx_game_prail_state,         empty_init,    "Takara Tomy", "Boku wa Plarail Untenshi: Shinkansen de Ikou! (Japan)", MACHINE_IMPERFECT_SOUND )
 // the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp
 
-CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                              "Word Launch (UK)", MACHINE_NOT_WORKING ) // seems to have a PAL/NTSC flag so US ROM might be the same
+CONS( 2007, wordlnch,   0,        0, spg2xx,     wordlnch,   spg2xx_game_state,               empty_init,    "LeapFrog", "Word Launch (UK)", MACHINE_NOT_WORKING ) // seems to have a PAL/NTSC flag so US ROM might be the same
 
-CONS( 2005, whacmole,   0,        0, whacmole,  whacmole,  spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley",                             "Whac-A-Mole (TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, whacmole,   0,        0, whacmole,   whacmole,   spg2xx_game_hasbro_93lc66_state, empty_init,    "Hasbro / Milton Bradley", "Whac-A-Mole (TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, backybbs,   0,        0, whacmole,  backybbs,  spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley / Atari",                     "Backyard Baseball & Soccer", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, backybbs,   0,        0, whacmole,   backybbs,   spg2xx_game_hasbro_93lc66_state, empty_init,    "Hasbro / Milton Bradley / Atari", "Backyard Baseball & Soccer", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, mylpony,    0,        0, mylpony,   mylpony,   spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley",                             "My Little Pony - Grand Puzzleventure", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, mylpony,    0,        0, mylpony,    mylpony,    spg2xx_game_hasbro_93lc66_state, empty_init,    "Hasbro / Milton Bradley", "My Little Pony: Grand Puzzleventure", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, lpetshop,   0,        0, lpetshop,  lpetshop,  spg2xx_game_lpetshop_state,      empty_init, "Hasbro",                                              "Littlest Pet Shop", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, lpetshop,   0,        0, lpetshop,   lpetshop,   spg2xx_game_lpetshop_state,      empty_init,    "Hasbro", "Littlest Pet Shop", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, barbpet,    0,        0, spg2xx,     barbpet,    spg2xx_game_state,               empty_init,    "Mattel", "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc, spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )
+CONS( 2007, smartcyc,   0,        0, smartcycle, smartcyc,   spg2xx_game_smartcycle_state,    empty_init,    "Fisher-Price", "Smart Cycle", MACHINE_NOT_WORKING )
 
-CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,   spg2xx_game_state,               empty_init, "N-Vision",                                            "Spider-Man 2 Web Action", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,     spg2xx_game_state,               empty_init,    "N-Vision", "Spider-Man 2 Web Action", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, dinothun,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,               empty_init, "N-Vision / Toy Quest",                                "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
+CONS( 2004, dinothun,   0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "N-Vision / Toy Quest", "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
+
+CONS( 2004, nvpoker,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               init_crc,      "N-Vision / Toy Quest", "Texas Hold'em Poker: World Poker Challenge - Las Vegas Edition", MACHINE_NOT_WORKING )
+
+CONS( 2004, mgarage,    0,        0, spg2xx,     mgarage,    spg2xx_game_state,               empty_init,    "N-Vision / Toy Quest", "Monster Garage", MACHINE_SUPPORTS_SAVE )
 
 // this Japan version uses different banking to spg2xx_pdc.cpp so is in here instead
-CONS( 2006, pdcj,       0,        0, pdcj,      pdcj,      spg2xx_game_pdcj_state,          empty_init, "Conny / Takara",                                      "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, pdcj,       0,        0, pdcj,       pdcj,       spg2xx_game_pdcj_state,          empty_init,    "Conny / Takara", "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// has an monochrome LCD display (that part might not be dumped if it's done entirely by one of the globs) but can also connect to the TV
+CONS( 200?, dvlaptop,   0,        0, spg2xx,     dvlaptop,   spg2xx_game_state,               empty_init,    "VTech", "Double Vision Laptop (Germany)", MACHINE_NOT_WORKING )

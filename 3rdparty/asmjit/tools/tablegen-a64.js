@@ -83,7 +83,7 @@ class ArmTableGen extends core.TableGen {
   // --------------------------------------------------------------------------
 
   parse() {
-    const rawData = this.dataOfFile("src/asmjit/arm/a64instdb.cpp");
+    const rawData = this.dataOfFile("asmjit/arm/a64instdb.cpp");
     const stringData = StringUtils.extract(rawData, "// ${InstInfo:Begin}", "// ${InstInfo:End");
 
     const re = new RegExp(
@@ -186,11 +186,11 @@ class ArmTableGen extends core.TableGen {
 
   onBeforeRun() {
     this.load([
-      "src/asmjit/arm/a64emitter.h",
-      "src/asmjit/arm/a64globals.h",
-      "src/asmjit/arm/a64instdb.cpp",
-      "src/asmjit/arm/a64instdb.h",
-      "src/asmjit/arm/a64instdb_p.h"
+      "asmjit/arm/a64emitter.h",
+      "asmjit/arm/a64globals.h",
+      "asmjit/arm/a64instdb.cpp",
+      "asmjit/arm/a64instdb.h",
+      "asmjit/arm/a64instdb_p.h"
     ]);
     this.parse();
   }

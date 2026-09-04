@@ -117,17 +117,6 @@ struct pure_virtual_base
 
 
 //-------------------------------------------------
-//  ioport_string_from_index - return an indexed
-//  string from the I/O port system
-//-------------------------------------------------
-
-inline char const *ioport_string_from_index(u32 index)
-{
-	return ioport_configurer::string_from_token(reinterpret_cast<char const *>(uintptr_t(index)));
-}
-
-
-//-------------------------------------------------
 //  random_u64
 //  random_s64
 //  random_u32
@@ -302,47 +291,6 @@ void validate_inlines()
 
 	if (fabsf(recip_approx(100.0f) - 0.01f) > 0.0001f)
 		osd_printf_error("Error testing recip_approx\n");
-
-	for (int i = 0; i <= 32; i++)
-	{
-		u32 t = i < 32 ? (1 << (31 - i) | testu32a >> i) : 0;
-		u8 resultu8 = count_leading_zeros_32(t);
-		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_zeros_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
-
-		t ^= 0xffffffff;
-		resultu8 = count_leading_ones_32(t);
-		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_ones_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
-	}
-
-	u32 expected32 = testu32a << 1 | testu32a >> 31;
-	for (int i = -33; i <= 33; i++)
-	{
-		u32 resultu32r = rotr_32(testu32a, i);
-		u32 resultu32l = rotl_32(testu32a, -i);
-
-		if (resultu32r != expected32)
-			osd_printf_error("Error testing rotr_32 %08x, %d=%08x (expected %08x)\n", u32(testu32a), i, resultu32r, expected32);
-		if (resultu32l != expected32)
-			osd_printf_error("Error testing rotl_32 %08x, %d=%08x (expected %08x)\n", u32(testu32a), -i, resultu32l, expected32);
-
-		expected32 = (expected32 >> 1) | (expected32 << 31);
-	}
-
-	u64 expected64 = testu64a << 1 | testu64a >> 63;
-	for (int i = -65; i <= 65; i++)
-	{
-		u64 resultu64r = rotr_64(testu64a, i);
-		u64 resultu64l = rotl_64(testu64a, -i);
-
-		if (resultu64r != expected64)
-			osd_printf_error("Error testing rotr_64 %016x, %d=%016x (expected %016x)\n", u64(testu64a), i, resultu64r, expected64);
-		if (resultu64l != expected64)
-			osd_printf_error("Error testing rotl_64 %016x, %d=%016x (expected %016x)\n", u64(testu64a), -i, resultu64l, expected64);
-
-		expected64 = (expected64 >> 1) | (expected64 << 63);
-	}
 }
 
 
@@ -616,10 +564,10 @@ void validate_rgb()
 
 	// test factor multiplication (method)
 	imm = random_i32();
-	expected_a *= imm;
-	expected_r *= imm;
-	expected_g *= imm;
-	expected_b *= imm;
+	expected_a = expected_a * imm;
+	expected_r = expected_r * imm;
+	expected_g = expected_g * imm;
+	expected_b = expected_b * imm;
 	rgb.mul_imm(imm);
 	check_expected("rgbaint_t::mul_imm");
 
@@ -730,28 +678,28 @@ void validate_rgb()
 
 	// test uniform or
 	imm = random_i32();
-	expected_a |= imm;
-	expected_r |= imm;
-	expected_g |= imm;
-	expected_b |= imm;
+	expected_a = expected_a | imm;
+	expected_r = expected_r | imm;
+	expected_g = expected_g | imm;
+	expected_b = expected_b | imm;
 	rgb.or_imm(imm);
 	check_expected("rgbaint_t::or_imm");
 
 	// test uniform and
 	imm = random_i32();
-	expected_a &= imm;
-	expected_r &= imm;
-	expected_g &= imm;
-	expected_b &= imm;
+	expected_a = expected_a & imm;
+	expected_r = expected_r & imm;
+	expected_g = expected_g & imm;
+	expected_b = expected_b & imm;
 	rgb.and_imm(imm);
 	check_expected("rgbaint_t::and_imm");
 
 	// test uniform xor
 	imm = random_i32();
-	expected_a ^= imm;
-	expected_r ^= imm;
-	expected_g ^= imm;
-	expected_b ^= imm;
+	expected_a = expected_a ^ imm;
+	expected_r = expected_r ^ imm;
+	expected_g = expected_g ^ imm;
+	expected_b = expected_b ^ imm;
 	rgb.xor_imm(imm);
 	check_expected("rgbaint_t::xor_imm");
 
@@ -1894,13 +1842,13 @@ void validate_delegates_functoid()
 //  strings
 //-------------------------------------------------
 
-inline int validity_checker::get_defstr_index(const char *string, bool suppress_error)
+inline input_string_index validity_checker::get_defstr_index(const char *string, bool suppress_error)
 {
 	// check for strings that should be DEF_STR
-	auto strindex = m_defstr_map.find(string);
-	if (!suppress_error && strindex != m_defstr_map.end() && string != ioport_string_from_index(strindex->second))
+	auto const strindex = m_defstr_map.find(string);
+	if (!suppress_error && (strindex != m_defstr_map.end()) && (string != ioport_configurer::string_from_token(strindex->second)))
 		osd_printf_error("Must use DEF_STR( %s )\n", string);
-	return (strindex != m_defstr_map.end()) ? strindex->second : 0;
+	return (strindex != m_defstr_map.end()) ? strindex->second : input_string_index(0);
 }
 
 
@@ -1978,9 +1926,9 @@ validity_checker::validity_checker(emu_options &options, bool quick)
 	// pre-populate the defstr map with all the default strings
 	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
 	{
-		const char *string = ioport_string_from_index(strnum);
+		const char *string = ioport_configurer::string_from_token(input_string_index(strnum));
 		if (string != nullptr)
-			m_defstr_map.insert(std::make_pair(string, strnum));
+			m_defstr_map.emplace(string, input_string_index(strnum));
 	}
 }
 
@@ -2579,8 +2527,8 @@ void validity_checker::validate_analog_input_field(const ioport_field &field)
 
 void validity_checker::validate_dip_settings(const ioport_field &field)
 {
-	char const *const demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
-	char const *const flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
+	char const *const demo_sounds = ioport_configurer::string_from_token(INPUT_STRING_Demo_Sounds);
+	char const *const flipscreen = ioport_configurer::string_from_token(INPUT_STRING_Flip_Screen);
 	char const *const name = field.specific_name() ? field.specific_name() : "UNNAMED";
 	u8 coin_list[__input_string_coinage_end + 1 - __input_string_coinage_start] = { 0 };
 	bool coin_error = false;
@@ -2589,7 +2537,7 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 	for (auto setting = field.settings().begin(); field.settings().end() != setting; ++setting)
 	{
 		// note any coinage strings
-		int strindex = get_defstr_index(setting->name());
+		input_string_index const strindex = get_defstr_index(setting->name());
 		if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end)
 			coin_list[strindex - __input_string_coinage_start] = 1;
 
@@ -2610,7 +2558,7 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 		if (field.settings().end() != nextsetting)
 		{
 			// check for inverted off/on DIP switch order
-			int next_strindex = get_defstr_index(nextsetting->name(), true);
+			input_string_index next_strindex = get_defstr_index(nextsetting->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
 				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", name);
 
@@ -2638,7 +2586,7 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "   Note proper coin sort order should be:\n");
 		for (int entry = 0; entry < std::size(coin_list); entry++)
 			if (coin_list[entry])
-				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
+				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_configurer::string_from_token(input_string_index(__input_string_coinage_start + entry)));
 	}
 }
 

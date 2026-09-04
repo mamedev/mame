@@ -29,7 +29,7 @@ namespace ui {
 class menu_network_devices : public menu
 {
 public:
-	menu_network_devices(mame_ui_manager &mui, render_container &container);
+	menu_network_devices(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_network_devices();
 
 private:
@@ -40,7 +40,7 @@ private:
 class menu_bookkeeping : public menu_textbox
 {
 public:
-	menu_bookkeeping(mame_ui_manager &mui, render_container &container);
+	menu_bookkeeping(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_bookkeeping();
 
 protected:
@@ -58,7 +58,7 @@ private:
 class menu_crosshair : public menu
 {
 public:
-	menu_crosshair(mame_ui_manager &mui, render_container &container);
+	menu_crosshair(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_crosshair();
 
 private:
@@ -92,7 +92,7 @@ private:
 class menu_bios_selection : public menu
 {
 public:
-	menu_bios_selection(mame_ui_manager &mui, render_container &container);
+	menu_bios_selection(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_bios_selection();
 
 private:
@@ -108,7 +108,7 @@ private:
 class menu_export : public menu
 {
 public:
-	menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver*> &&list);
+	menu_export(mame_ui_manager &mui, render_target &target, std::vector<const game_driver*> &&list);
 	virtual ~menu_export();
 
 private:
@@ -128,7 +128,7 @@ class menu_machine_configure : public menu
 public:
 	menu_machine_configure(
 			mame_ui_manager &mui,
-			render_container &container,
+			render_target &target,
 			ui_system_info const &info,
 			std::function<void (bool, bool)> &&handler = nullptr);
 	virtual ~menu_machine_configure();
@@ -170,7 +170,7 @@ private:
 class menu_plugins_configure : public menu
 {
 public:
-	menu_plugins_configure(mame_ui_manager &mui, render_container &container);
+	menu_plugins_configure(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_plugins_configure();
 
 protected:

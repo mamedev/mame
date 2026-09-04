@@ -574,7 +574,7 @@ void bigevglf_state::bigevglf(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - interleaving is forced on the fly
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -678,5 +678,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, bigevglf,  0,        bigevglf, bigevglf,  bigevglf_state, empty_init, ROT270, "Taito America Corporation", "Big Event Golf (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state, empty_init, ROT270, "Taito Corporation",         "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglf,  0,        bigevglf, bigevglf,  bigevglf_state, empty_init, ROT270, "Taito America", "Big Event Golf (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state, empty_init, ROT270, "Taito",         "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -115,7 +115,7 @@ void sealy_z80_state::sealy(machine_config &config)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -219,6 +219,21 @@ ROM_START( jzuanshi )
 	ROM_LOAD( "4.u6", 0x00000, 0x40000, CRC(e1b8d758) SHA1(2be84474ab2e16a394db9d899d62dd452696ef0e) )
 ROM_END
 
+// 幸运 (Xìngyùn 168)
+ROM_START( xy168 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(64cb5ebb) SHA1(1b7f6c7ad1c065058464614ba1b03896a8d8b006) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "2.u18", 0x000000, 0x200000, CRC(db3b22f3) SHA1(73e32d88a5c463a68927d44932317fd3046c7112) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "1.u21", 0x000000, 0x200000, CRC(bf627727) SHA1(65669dc735b019095dc971d8c5e4df2450d03a02) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u6", 0x00000, 0x40000, NO_DUMP ) // soldered, still to be dumped
+ROM_END
+
 
 void sealy_z80_state::init_djddz() // TODO: not enough
 {
@@ -304,3 +319,4 @@ GAME( 200?, ddz2,     0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy
 GAME( 200?, djddz,    0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Dingji Dou Dizhu",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, pljh,     0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Piaoliang Jinhua",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2003, jzuanshi, 0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Jin Zuanshi",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, xy168,    0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Xingyun 168",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -263,12 +263,12 @@ void tekipaki_state::tekipaki(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &tekipaki_state::hd647180_io_map);
 	audiocpu.in_pa_callback().set(FUNC(tekipaki_state::tekipaki_cmdavailable_r));
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(tekipaki_state::screen_update));

@@ -279,7 +279,7 @@ void hr84_state::hr84(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hr84_state::hr84_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.7456_MHz_XTAL, 472, 0, 320, 312, 0, 240);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -306,7 +306,7 @@ void hr84_state::hr84(machine_config &config)
 	m_ay_5_2376->control().set([this]() { return int(BIT(m_modifiers->read(), 1)); });
 	m_ay_5_2376->strobe().set(m_pia0, FUNC(pia6821_device::ca1_w));
 
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(hr84_state::pa_r));
 	m_pia0->writepb_handler().set(FUNC(hr84_state::pb_w));
 

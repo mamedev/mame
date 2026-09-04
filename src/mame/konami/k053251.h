@@ -15,7 +15,7 @@ public:
 		CI4
 	};
 
-	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void write(offs_t offset, u8 data);
 	u8 get_priority(u8 ci);

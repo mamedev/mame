@@ -119,7 +119,7 @@ void concept_state::corvus_concept(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(16.364_MHz_XTAL * 2, 944, 0, 720, 578, 0, 560);
 	// Horizontal sync is 34.669 kHz; refresh rate is ~50 or ~60 Hz, jumper-selectable
@@ -167,7 +167,7 @@ void concept_state::corvus_concept(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, "keyrxd").output_handler().set(m_kbdacia, FUNC(mos6551_device::write_rxd));
 
 	/* Apple II bus */
-	A2BUS(config, m_a2bus, 0).set_space(m_maincpu, AS_PROGRAM);
+	A2BUS(config, m_a2bus).set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->nmi_w().set("iocint", FUNC(input_merger_device::in_w<0>));
 	m_a2bus->irq_w().set("iocint", FUNC(input_merger_device::in_w<1>));
 	A2BUS_SLOT(config, "sl1", 16.364_MHz_XTAL / 2, m_a2bus, concept_a2_cards, nullptr);

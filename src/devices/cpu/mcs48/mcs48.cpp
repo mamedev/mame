@@ -72,6 +72,7 @@
     UPD7751 64   1k   27  (8048, speech synthesizer in internal ROM)
 
     8039   128    0   27  (external ROM)
+    MB8881 128    0   27  (8039 clone)
     8049   128   2k   27  (ROM)
     8749   128   2k   27  (EPROM)
     M58715 128   2k   27  (8049 clone)
@@ -201,6 +202,7 @@ DEFINE_DEVICE_TYPE(I8742AH, i8742ah_device, "i8742ah", "Intel 8742AH")
 
 DEFINE_DEVICE_TYPE(MB8884,  mb8884_device,  "mb8884",  "Fujitsu MB8884")
 DEFINE_DEVICE_TYPE(UPD7751, upd7751_device, "upd7751", "NEC uPD7751")
+DEFINE_DEVICE_TYPE(MB8881,  mb8881_device,  "mb8881",  "Fujitsu MB8881")
 DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "Mitsubishi M58715")
 
 
@@ -304,6 +306,11 @@ mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, dev
 
 upd7751_device::upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mcs48_cpu_device(mconfig, UPD7751, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
+{
+}
+
+mb8881_device::mb8881_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mcs48_cpu_device(mconfig, MB8881, tag, owner, clock, 0, 128, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 

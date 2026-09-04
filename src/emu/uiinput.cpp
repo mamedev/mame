@@ -35,12 +35,41 @@ enum
 
 ui_input_manager::ui_input_manager(running_machine &machine)
 	: m_machine(machine)
+	, m_focused_target(nullptr)
+	, m_last_focused_target(nullptr)
 	, m_presses_enabled(true)
 	, m_events_start(0)
 	, m_events_end(0)
 {
 	std::fill(std::begin(m_next_repeat), std::end(m_next_repeat), 0);
 	std::fill(std::begin(m_seqpressed), std::end(m_seqpressed), 0);
+}
+
+ui_event_sink::ui_event_sink(running_machine &machine)
+	: ui_input_manager(machine)
+{
+}
+
+ui_input_manager_impl::ui_input_manager_impl(running_machine &machine)
+	: ui_event_sink(machine)
+{
+}
+
+
+//-------------------------------------------------
+//  ~ui_input_manager - constructor
+//-------------------------------------------------
+
+ui_input_manager::~ui_input_manager()
+{
+}
+
+ui_event_sink::~ui_event_sink()
+{
+}
+
+ui_input_manager_impl::~ui_input_manager_impl()
+{
 }
 
 
@@ -131,6 +160,27 @@ void ui_input_manager::reset()
 }
 
 
+/*-------------------------------------------------
+    target_focused - set focused target
+-------------------------------------------------*/
+
+void ui_input_manager::target_focused(render_target &target)
+{
+	m_focused_target = m_last_focused_target = &target;
+}
+
+
+/*-------------------------------------------------
+    target_defocused - track target losing focus
+-------------------------------------------------*/
+
+void ui_input_manager::target_defocused(render_target &target)
+{
+	if (m_focused_target == &target)
+		m_focused_target = nullptr;
+}
+
+
 
 /***************************************************************************
     USER INTERFACE SEQUENCE READING
@@ -185,16 +235,30 @@ bool ui_input_manager::pressed_repeat(int code, int speed)
 	return pressed;
 }
 
+
+/*-------------------------------------------------
+    mark_all_as_pressed - marks all buttons
+    as if they were already pressed once
+-------------------------------------------------*/
+void ui_input_manager::mark_all_as_pressed()
+{
+	for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
+		m_next_repeat[code] = osd_ticks();
+}
+
+
 /*-------------------------------------------------
     push_window_focus_event - pushes a focus
     event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_window_focus_event(render_target *target)
+void ui_event_sink::push_window_focus_event(render_target &target)
 {
+	target_focused(target);
+
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::WINDOW_FOCUS;
-	event.target = target;
+	event.target = &target;
 	push_event(event);
 }
 
@@ -203,11 +267,13 @@ void ui_input_manager::push_window_focus_event(render_target *target)
     event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_window_defocus_event(render_target *target)
+void ui_event_sink::push_window_defocus_event(render_target &target)
 {
+	target_defocused(target);
+
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::WINDOW_DEFOCUS;
-	event.target = target;
+	event.target = &target;
 	push_event(event);
 }
 
@@ -216,8 +282,8 @@ void ui_input_manager::push_window_defocus_event(render_target *target)
     event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_pointer_update(
-		render_target *target,
+void ui_event_sink::push_pointer_update(
+		render_target &target,
 		pointer type,
 		u16 ptrid,
 		u16 device,
@@ -230,7 +296,7 @@ void ui_input_manager::push_pointer_update(
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::POINTER_UPDATE;
-	event.target = target;
+	event.target = &target;
 	event.pointer_type = type;
 	event.pointer_id = ptrid;
 	event.pointer_device = device;
@@ -243,8 +309,8 @@ void ui_input_manager::push_pointer_update(
 	push_event(event);
 }
 
-void ui_input_manager::push_pointer_leave(
-		render_target *target,
+void ui_event_sink::push_pointer_leave(
+		render_target &target,
 		pointer type,
 		u16 ptrid,
 		u16 device,
@@ -255,7 +321,7 @@ void ui_input_manager::push_pointer_leave(
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::POINTER_LEAVE;
-	event.target = target;
+	event.target = &target;
 	event.pointer_type = type;
 	event.pointer_id = ptrid;
 	event.pointer_device = device;
@@ -268,8 +334,8 @@ void ui_input_manager::push_pointer_leave(
 	push_event(event);
 }
 
-void ui_input_manager::push_pointer_abort(
-		render_target *target,
+void ui_event_sink::push_pointer_abort(
+		render_target &target,
 		pointer type,
 		u16 ptrid,
 		u16 device,
@@ -280,7 +346,7 @@ void ui_input_manager::push_pointer_abort(
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::POINTER_ABORT;
-	event.target = target;
+	event.target = &target;
 	event.pointer_type = type;
 	event.pointer_id = ptrid;
 	event.pointer_device = device;
@@ -297,11 +363,11 @@ void ui_input_manager::push_pointer_abort(
     push_char_event - pushes a char event
     to the specified render_target
 -------------------------------------------------*/
-void ui_input_manager::push_char_event(render_target *target, char32_t ch)
+void ui_event_sink::push_char_event(render_target &target, char32_t ch)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::IME_CHAR;
-	event.target = target;
+	event.target = &target;
 	event.ch = ch;
 	push_event(event);
 }
@@ -311,24 +377,14 @@ void ui_input_manager::push_char_event(render_target *target, char32_t ch)
     wheel event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_wheel_event(render_target *target, s32 x, s32 y, short delta, int lines)
+void ui_event_sink::push_mouse_wheel_event(render_target &target, s32 x, s32 y, short delta, int lines)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_WHEEL;
-	event.target = target;
+	event.target = &target;
 	event.mouse_x = x;
 	event.mouse_y = y;
 	event.zdelta = delta;
 	event.num_lines = lines;
 	push_event(event);
-}
-
-/*-------------------------------------------------
-    mark_all_as_pressed - marks all buttons
-    as if they were already pressed once
--------------------------------------------------*/
-void ui_input_manager::mark_all_as_pressed()
-{
-	for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
-		m_next_repeat[code] = osd_ticks();
 }

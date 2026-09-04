@@ -228,7 +228,7 @@ void star_state::sstar28k(machine_config &config)
 	M6502(config, m_maincpu, 1'800'000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	CLOCK(config, m_nmi_clock, 1'800'000 / 0x2000); // 4020 Q13
+	CLOCK(config, m_nmi_clock).set_period(attotime::from_ticks(0x2000, 1'800'000)); // 4020 Q13
 	m_nmi_clock->signal_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -252,8 +252,7 @@ void star_state::tstar432(machine_config &config)
 	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
-	CLOCK(config.replace(), m_nmi_clock, 4_MHz_XTAL / 0x4000); // 4020 Q14
-	m_nmi_clock->signal_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_nmi_clock->set_period(attotime::from_ticks(0x4000, 4_MHz_XTAL)); // 4020 Q14
 
 	config.set_default_layout(layout_saitek_tstar432);
 

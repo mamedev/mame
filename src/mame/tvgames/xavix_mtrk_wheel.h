@@ -15,7 +15,7 @@ class xavix_mtrk_wheel_device :  public device_t
 {
 public:
 	// construction/destruction
-	xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto event_out_cb() { return m_event_out_cb.bind(); }
 

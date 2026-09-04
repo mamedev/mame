@@ -2,51 +2,52 @@
 // copyright-holders:David Haywood, Phil Stroffolino, Bryan McPhail
 
 /*
-    Namco 186/187 Zooming Sprites
-    Namco C355/187 Zooming sprites
 
-    used by
-    namcofl.cpp (all games)
-    namconb1.cpp (all games)
-    gal3.cpp (all games)
-    namcos21*.cpp (Driver's Eyes, Solvalou, Starblade, Air Combat, Cyber Sled) (everything except Winning Run series)
-    namcos2.cpp (Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2)
-    deco32.cpp (Dragon Gun, Lock 'n' Loaded)
+Namco 186/187 Zooming Sprites
+Namco C355/187 Zooming sprites
 
-    earlier titles use the 186/187 pair (eg. Steel Gunner, Dragon Gun) while later boards appear to integrate the
-    186 into the C355 custom (eg. Starblade, NB1 hardware, Final Lap R etc.). It is not known if there are any
-    differences in capability.
+used by:
+- namcofl.cpp (all games)
+- namconb1.cpp (all games)
+- gal3.cpp (all games)
+- namcos21*.cpp (Driver's Eyes, Solvalou, Starblade, Air Combat, Cyber Sled) (everything except Winning Run series)
+- namcos2.cpp (Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2)
+- deco32.cpp (Dragon Gun, Lock 'n' Loaded)
 
-    TODO: verify which boards use which chips
+earlier titles use the 186/187 pair (eg. Steel Gunner, Dragon Gun) while later boards appear to integrate the
+186 into the C355 custom (eg. Starblade, NB1 hardware, Final Lap R etc.). It is not known if there are any
+differences in capability.
 
+TODO:
+- verify which boards use which chips
+- dragngun does a masking trick on the dragon during the attract intro, it should not be visible but rather
+  cause the fire to be invisible in the shape of the dragon
+- dragngun 'waterfall' prior to one of the bosses also needs correct priority
+- aircomb ranking screen during attract also seems masking related, or something else? it appears that the
+  sprites aren't processed (if they even are in the spritelist)
 
-    dragongun does a masking trick on the dragon during the attract intro, it should not be visible but rather
-    cause the fire to be invisible in the shape of the dragon
-    dragongun 'waterfall' prior to one of the bosses also needs correct priority
+relative to the start of the sprite area these offets are typically used
+it is not clear if this is implemented in a single RAM chip, or multiple on some boards
 
+* 0x00000 sprite attr (page0) (solvalou service mode)
+* 0x02000 sprite list (page0) (solvalou service mode)
+*
+* 0x02400 window attributes
+* 0x04000 format
+* 0x08000 tile
+* 0x10000 sprite attr (page1)
+* 0x14000 sprite list (page1)
 
-    relative to the start of the sprite area these offets are typically used
-    it is not clear if this is implemented in a single RAM chip, or multiple on some boards
+solvalou service mode wants lists / attributes at 0x02000/2 & 0x00000/2.
+Do any games need 2 lists at the same time? It seems unlikely there are really 2 lists.
 
-     * 0x00000 sprite attr (page0) (solvalou service mode)
-     * 0x02000 sprite list (page0) (solvalou service mode)
-     *
-     * 0x02400 window attributes
-     * 0x04000 format
-     * 0x08000 tile
-     * 0x10000 sprite attr (page1)
-     * 0x14000 sprite list (page1)
+Maybe the list written by solvalou's service mode is where data gets copied for
+rendering by the sprite DMA trigger, but solvalou is choosing to write it there
+directly rather than trigger the DMA?
 
-     TODO: solvalou service mode wants lists / attributes at 0x02000/2 & 0x00000/2
-     Drawing this is what causes the bad tile in vshoot
-
-     Do any games need 2 lists at the same time or should 1 list be configurable?
-
-     It seems unlikely there are really 2 lists
-
-     Maybe the list written by solvalou's service mode is where data gets copied for
-     rendering by the sprite DMA trigger, but solvalou is choosing to write it there
-     directly rather than trigger the DMA?
+Some other games (eg. nebulray, outfxies) deliberately write 0s to page0. If it's
+presumed this is the buffered list, it means they want to clear it immediately
+without a 1-frame delay?
 
 */
 
@@ -86,7 +87,6 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	m_colbase(0),
 	m_colors(16),
 	m_granularity(256),
-	m_draw_2_lists(true),
 	m_device_allocates_spriteram(true)
 {
 	std::fill(std::begin(m_position), std::end(m_position), 0);
@@ -266,11 +266,8 @@ void namco_c355spr_device::device_start()
 
 	std::fill(std::begin(m_position), std::end(m_position), 0x0000);
 
-	for (int i = 0; i < 2; i++)
-	{
-		m_spritelist[i] = std::make_unique<c355_sprite[]>(0x100);
-		m_sprite_end[i] = m_spritelist[i].get();
-	}
+	m_spritelist = std::make_unique<c355_sprite[]>(0x100);
+	m_sprite_end = m_spritelist.get();
 
 	if (m_device_allocates_spriteram)
 	{
@@ -290,13 +287,11 @@ void namco_c355spr_device::device_start()
 	m_mix_cb.resolve();
 
 	save_item(NAME(m_position));
-
 }
 
 void namco_c355spr_device::device_stop()
 {
-	for (auto &spritelist : m_spritelist)
-		spritelist.reset();
+	m_spritelist.reset();
 	for (auto &spriteram : m_spriteram)
 		spriteram.reset();
 
@@ -344,6 +339,13 @@ void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, con
 void namco_c355spr_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[0][offset]);
+
+	// update page 0 tables
+	if (offset >= 0x10000 / 2 && offset < 0x12000 / 2)
+		COMBINE_DATA(&m_spriteram[0][offset - 0x10000 / 2]);
+
+	else if (offset >= 0x14000 / 2 && offset < 0x14400 / 2)
+		COMBINE_DATA(&m_spriteram[0][offset - 0x12000 / 2]);
 }
 
 u16 namco_c355spr_device::spriteram_r(offs_t offset)
@@ -365,6 +367,27 @@ void namco_c355spr_device::vblank(int state)
 
 /******************************************************************************/
 
+u16 namco_c355spr_device::read_spritetable(int entry, u8 attr)
+{
+	const int buffer = std::max(0, m_buffer - 1);
+	u16 *ram = &m_spriteram[buffer][0x0000 / 2];
+	return ram[(entry << 3) + attr];
+}
+
+u16 namco_c355spr_device::read_spritelist(int entry)
+{
+	const int buffer = std::max(0, m_buffer - 1);
+	u16 *ram = &m_spriteram[buffer][0x2000 / 2];
+	return ram[entry];
+}
+
+u16 namco_c355spr_device::read_cliptable(int entry, u8 attr)
+{
+	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
+	const u16 *ram = &spriteram16[0x2400 / 2];
+	return ram[(entry << 2) + attr];
+}
+
 u16 namco_c355spr_device::read_spriteformat(int entry, u8 attr)
 {
 	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
@@ -379,134 +402,86 @@ u16 namco_c355spr_device::read_spritetile(int entry)
 	return spritetile[entry];
 }
 
-u16 namco_c355spr_device::read_spritetable(int entry, u8 attr, int whichlist)
-{
-	u16 *ram;
-	const int buffer = std::max(0, m_buffer - 1);
-	if (whichlist == 0)
-		ram = &m_spriteram[buffer][0x00000 / 2];
-	else
-		ram = &m_spriteram[buffer][0x10000 / 2];
 
-	return ram[(entry << 3) + attr];
-}
-
-u16 namco_c355spr_device::read_cliptable(int entry, u8 attr)
-{
-	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
-	const u16 *ram = &spriteram16[0x2400 / 2];
-	return ram[(entry << 2) + attr];
-}
-
-u16 namco_c355spr_device::read_spritelist(int entry, int whichlist)
-{
-	u16 *ram;
-	const int buffer = std::max(0, m_buffer - 1);
-	if (whichlist == 0)
-		ram = &m_spriteram[buffer][0x02000 / 2];
-	else
-		ram = &m_spriteram[buffer][0x14000 / 2];
-
-	return ram[entry];
-}
-
-
-void namco_c355spr_device::build_sprite_list(int no)
+void namco_c355spr_device::build_sprite_list()
 {
 	/* draw the sprites */
-	c355_sprite *sprite_ptr = m_spritelist[no].get();
+	c355_sprite *sprite_ptr = m_spritelist.get();
 	for (int i = 0; i < 256; i++)
 	{
 		sprite_ptr->disable = false;
-		const u16 which = m_read_spritelist(i, no);
-		get_single_sprite(which & 0xff, sprite_ptr, no);
+		const u16 which = m_read_spritelist(i);
+		get_single_sprite(which & 0xff, sprite_ptr);
 		sprite_ptr++;
 		if (which & 0x100) break;
 	}
-	m_sprite_end[no] = sprite_ptr;
+	m_sprite_end = sprite_ptr;
 }
 
 void namco_c355spr_device::build_sprite_list_and_render_sprites(const rectangle cliprect)
 {
-	if (m_draw_2_lists)
-		build_sprite_list(0);
-
-	build_sprite_list(1);
-
+	build_sprite_list();
 	render_sprites(cliprect);
 }
 
 void namco_c355spr_device::render_sprites(const rectangle cliprect)
 {
 	m_renderbitmap.fill(0xffff, cliprect);
-	for (int no = 0; no < 2; no++)
+	c355_sprite *sprite_ptr = m_spritelist.get();
+
+	while (sprite_ptr != m_sprite_end)
 	{
-		c355_sprite *sprite_ptr = m_spritelist[no].get();
-
-		while (sprite_ptr != m_sprite_end[no])
+		if (sprite_ptr->disable == false)
 		{
-			if (sprite_ptr->disable == false)
+			rectangle clip = sprite_ptr->clip;
+			clip &= cliprect;
+			for (int ind = 0; ind < sprite_ptr->size; ind++)
 			{
-				rectangle clip = sprite_ptr->clip;
-				clip &= cliprect;
-				for (int ind = 0; ind < sprite_ptr->size; ind++)
+				if ((sprite_ptr->tile[ind] & 0x8000) == 0)
 				{
-					if ((sprite_ptr->tile[ind] & 0x8000) == 0)
+					int sprite_screen_height;
+					int sprite_screen_width;
+
+					if (m_alt_precision)
 					{
-						int sprite_screen_height;
-						int sprite_screen_width;
-
-						if (m_alt_precision)
-						{
-							sprite_screen_width = ((sprite_ptr->x[ind] + (sprite_ptr->zoomx[ind] << 4)) >> 16) - (sprite_ptr->x[ind] >> 16);
-							sprite_screen_height = ((sprite_ptr->y[ind] + (sprite_ptr->zoomy[ind] << 4)) >> 16) - (sprite_ptr->y[ind] >> 16);
-						}
-						else
-						{
-							sprite_screen_height = (sprite_ptr->zoomy[ind] * 16 + 0x8000) >> 16;
-							sprite_screen_width = (sprite_ptr->zoomx[ind] * 16 + 0x8000) >> 16;
-						}
-
-						// TODO: offset is also affected?
-						int tile = sprite_ptr->tile[ind];
-						if (!m_code2tile.isnull())
-							tile = m_code2tile(tile);
-						zdrawgfxzoom(
-							m_renderbitmap,
-							clip,
-							gfx(0),
-							tile + sprite_ptr->offset,
-							sprite_ptr->color,
-							sprite_ptr->flipx, sprite_ptr->flipy,
-							sprite_ptr->x[ind] >> 16, sprite_ptr->y[ind] >> 16,
-							sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
-							sprite_screen_width, sprite_screen_height);
+						sprite_screen_width = ((sprite_ptr->x[ind] + (sprite_ptr->zoomx[ind] << 4)) >> 16) - (sprite_ptr->x[ind] >> 16);
+						sprite_screen_height = ((sprite_ptr->y[ind] + (sprite_ptr->zoomy[ind] << 4)) >> 16) - (sprite_ptr->y[ind] >> 16);
 					}
+					else
+					{
+						sprite_screen_height = (sprite_ptr->zoomy[ind] * 16 + 0x8000) >> 16;
+						sprite_screen_width = (sprite_ptr->zoomx[ind] * 16 + 0x8000) >> 16;
+					}
+
+					// TODO: offset is also affected?
+					int tile = sprite_ptr->tile[ind];
+					if (!m_code2tile.isnull())
+						tile = m_code2tile(tile);
+					zdrawgfxzoom(
+						m_renderbitmap,
+						clip,
+						gfx(0),
+						tile + sprite_ptr->offset,
+						sprite_ptr->color,
+						sprite_ptr->flipx, sprite_ptr->flipy,
+						sprite_ptr->x[ind] >> 16, sprite_ptr->y[ind] >> 16,
+						sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
+						sprite_screen_width, sprite_screen_height);
 				}
 			}
-			sprite_ptr++;
 		}
+		sprite_ptr++;
 	}
 }
 
-void namco_c355spr_device::draw_dg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	build_sprite_list(0);
-
-	render_sprites(cliprect);
-
-	copybitmap(screen, bitmap, cliprect);
-}
-
-void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, int no)
+void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 {
 	/**
 	 * ----xxxx-------- window select
 	 * --------xxxx---- priority
 	 * ------------xxxx palette select
 	 */
-	const u16 palette = m_read_spritetable(which, 6, no);
-
+	u16 palette = m_read_spritetable(which, 6);
 	const int priority = m_pri_cb(palette);
 
 	if (priority == -1)
@@ -517,32 +492,24 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 
 	sprite_ptr->pri = priority;
 
-	const u16 spriteformatram_offset = m_read_spritetable(which, 0, no) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
-	sprite_ptr->offset = m_read_spritetable(which, 1, no);         /* OFFSET */
-	int hpos           = m_read_spritetable(which, 2, no);         /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = m_read_spritetable(which, 3, no);         /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = m_read_spritetable(which, 4, no);         /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = m_read_spritetable(which, 5, no);         /* VSIZE      max 0x3ff pixels */
-	/* m_read_spritetable(which, 6, no)   contains priority/palette */
-	/* m_read_spritetable(which, 7, no)   is used in Lucky & Wild, possibly for sprite-road priority */
+	const u16 spriteformatram_offset = m_read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = m_read_spritetable(which, 1);         /* OFFSET */
+	int hpos           = m_read_spritetable(which, 2);         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = m_read_spritetable(which, 3);         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = m_read_spritetable(which, 4);         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = m_read_spritetable(which, 5);         /* VSIZE      max 0x3ff pixels */
+	/* m_read_spritetable(which, 6)   contains priority/palette (handled above) */
+	/* m_read_spritetable(which, 7)   is used in Lucky & Wild, possibly for sprite-road priority */
 
 	int xscroll = util::sext<s16>(m_position[1], 9);
 	int yscroll = util::sext<s16>(m_position[0], 9);
 
+	/* Medium Resolution: system21 adjust */
 	if (screen().height() > 384)
-	{ /* Medium Resolution: system21 adjust */
-			xscroll = util::sext<s16>(m_position[1], 10);
-			if (yscroll < 0)
-			{ /* solvalou */
-				yscroll += 0x20;
-			}
-			yscroll += 0x10;
-	}
-	else
-	{
-		xscroll += m_scrolloffs[0];
-		yscroll += m_scrolloffs[1];
-	}
+		xscroll = util::sext<s16>(m_position[1], 10);
+
+	xscroll += m_scrolloffs[0];
+	yscroll += m_scrolloffs[1];
 
 	hpos -= xscroll;
 	vpos -= yscroll;
@@ -657,4 +624,3 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 		source_height_remaining -= 16;
 	} /* next row */
 }
-

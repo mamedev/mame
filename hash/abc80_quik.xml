@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="abc80_quik" description="Luxor ABC 80 quickload">
+
+	<software name="flagga">
+		<description>Flagga</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="quik" interface="abc80_quik">
+			<dataarea name="quik" size="4807">
+				<rom name="flagga.bac" size="4807" crc="c431bf05" sha1="00f00a87521c8e31ec78625126a611d8dc1a79a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

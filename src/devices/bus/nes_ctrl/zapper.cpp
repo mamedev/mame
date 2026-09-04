@@ -48,7 +48,7 @@ INPUT_CHANGED_MEMBER(nes_zapper_device::trigger)
 
 void nes_zapper_device::device_add_mconfig(machine_config &config)
 {
-	NES_ZAPPER_SENSOR(config, m_sensor, 0);
+	NES_ZAPPER_SENSOR(config, m_sensor);
 	if (m_port != nullptr)
 		m_sensor->set_screen_tag(m_port->m_screen);
 }

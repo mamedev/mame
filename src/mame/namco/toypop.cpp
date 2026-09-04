@@ -711,25 +711,25 @@ void namcos16_state::liblrabl(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &namcos16_state::sound_map);
 	m_soundcpu->set_periodic_int(FUNC(namcos16_state::irq0_line_hold), attotime::from_hz(60));
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("COINS");
 	m_namco58xx->in_callback<1>().set_ioport("P1_RIGHT");
 	m_namco58xx->in_callback<2>().set_ioport("P2_RIGHT");
 	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namco56xx_1, 0);
+	NAMCO_56XX(config, m_namco56xx_1);
 	m_namco56xx_1->in_callback<0>().set(FUNC(namcos16_state::dip_h<0>));
 	m_namco56xx_1->in_callback<1>().set(FUNC(namcos16_state::dip_l<1>));
 	m_namco56xx_1->in_callback<2>().set(FUNC(namcos16_state::dip_h<1>));
 	m_namco56xx_1->in_callback<3>().set(FUNC(namcos16_state::dip_l<0>));
 	m_namco56xx_1->out_callback<0>().set(FUNC(namcos16_state::flip));
 
-	NAMCO_56XX(config, m_namco56xx_2, 0);
+	NAMCO_56XX(config, m_namco56xx_2);
 	m_namco56xx_2->in_callback<1>().set_ioport("P1_LEFT");
 	m_namco56xx_2->in_callback<2>().set_ioport("P2_LEFT");
 	m_namco56xx_2->in_callback<3>().set_ioport("SERVICE");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 384, 0, 288, 264, 0, 224); // derived from Galaxian HW, 60.606060
 	screen.set_screen_update(FUNC(namcos16_state::screen_update));
 	screen.set_palette(m_palette);

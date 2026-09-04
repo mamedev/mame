@@ -72,7 +72,7 @@ void gaelcopc_state::gaelcopc(machine_config &config)
 	PENTIUM3(config, m_maincpu, 100'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map); // TODO: remove me
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

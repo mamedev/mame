@@ -255,7 +255,8 @@ void patinho_feio_cpu_device::execute_instruction()
 			// Compute Two's complement of the accumulator
 			//    and updates flags according to the result of the operation
 			ACC = ~ACC + 1;
-			FLAGS = 0; //TODO: fix-me (I'm not sure yet how to compute the flags here)
+			// FIXME: I'm not sure yet how to compute the flags here
+			FLAGS = 0;
 			return;
 		case 0x84:
 			//LIM="Limpa":
@@ -266,7 +267,8 @@ void patinho_feio_cpu_device::execute_instruction()
 			//INC:
 			// Increment accumulator
 			ACC++;
-			FLAGS = 0; //TODO: fix-me (I'm not sure yet how to compute the flags here)
+			// FIXME: I'm not sure yet how to compute the flags here
+			FLAGS = 0;
 			return;
 		case 0x86:
 			//UNEG="Um Negativo":

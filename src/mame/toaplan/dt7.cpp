@@ -423,14 +423,14 @@ void dt7_state::dt7(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen[0]->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen[0]->set_screen_update(FUNC(dt7_state::screen_update_dt7_1));
 	m_screen[0]->screen_vblank().set(FUNC(dt7_state::screen_vblank));
 	m_screen[0]->set_palette(m_palette[0]);
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen[1]->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen[1]->set_screen_update(FUNC(dt7_state::screen_update_dt7_2));

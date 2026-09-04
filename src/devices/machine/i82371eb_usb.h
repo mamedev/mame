@@ -12,7 +12,7 @@
 class i82371eb_usb_device : public usb_uhci_device
 {
 public:
-	i82371eb_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371eb_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

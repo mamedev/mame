@@ -6,15 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - write protect
-    - 75,format speed error,01,00,0
-
-*/
-
 #include "emu.h"
 #include "c8050fdc.h"
 
@@ -252,9 +243,9 @@ void c8050_fdc_device::pll_reset(const attotime &when)
 	cur_pll.set_clock(attotime::from_hz(clock() / (16 - m_ds)));
 }
 
-void c8050_fdc_device::pll_start_writing(const attotime &tm)
+void c8050_fdc_device::pll_start_writing(const attotime &tm, floppy_image_device *floppy)
 {
-	cur_pll.start_writing(tm);
+	cur_pll.start_writing(tm, floppy);
 	pll_reset(cur_live.tm);
 }
 
@@ -376,7 +367,7 @@ void c8050_fdc_device::live_run(const attotime &limit)
 
 			// write bit
 			int write_bit = BIT(cur_live.shift_reg_write, 9);
-			if (!cur_live.rw_sel) { // TODO WPS
+			if (!cur_live.rw_sel && !get_floppy()->wpt_r()) {
 				/*
 				write precompensation
 
@@ -558,7 +549,7 @@ void c8050_fdc_device::rw_sel_w(int state)
 		if (m_rw_sel) {
 			pll_stop_writing(get_floppy(), cur_live.tm);
 		} else {
-			pll_start_writing(cur_live.tm);
+			pll_start_writing(cur_live.tm, get_floppy());
 		}
 		live_run();
 	}

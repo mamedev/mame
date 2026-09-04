@@ -55,6 +55,8 @@ psion_asic9_device::psion_asic9_device(const machine_config &mconfig, device_typ
 	, m_col_cb(*this)
 	, m_port_ab_r(*this, 0)
 	, m_port_ab_w(*this)
+	, m_port_cd_r(*this, 0)
+	, m_port_cd_w(*this)
 	, m_pcm_in(*this, 0)
 	, m_pcm_out(*this)
 	, m_data_r(*this, 0x00)
@@ -146,9 +148,10 @@ void psion_asic9_device::device_start()
 	save_item(NAME(m_a9_protection_mode));
 	save_item(NAME(m_a9_protection_upper));
 	save_item(NAME(m_a9_protection_lower));
+	save_item(NAME(m_a9_port_ab_data));
+	save_item(NAME(m_a9_port_cd_data));
 	save_item(NAME(m_a9_port_ab_ddr));
-	save_item(NAME(m_a9_port_c_ddr));
-	save_item(NAME(m_a9_port_d_ddr));
+	save_item(NAME(m_a9_port_cd_ddr));
 	save_item(NAME(m_a9_psel_6000));
 	save_item(NAME(m_a9_psel_7000));
 	save_item(NAME(m_a9_psel_8000));
@@ -227,9 +230,10 @@ void psion_asic9_device::device_reset()
 	m_a9_protection_mode = false;
 	m_a9_protection_lower = 0x00;
 	m_a9_protection_upper = 0x00;
+	m_a9_port_ab_data = 0x00;
+	m_a9_port_cd_data = 0x00;
 	m_a9_port_ab_ddr = 0x00;
-	m_a9_port_c_ddr = 0x00;
-	m_a9_port_d_ddr = 0x00;
+	m_a9_port_cd_ddr = 0x00;
 	m_a9_psel_6000 = 0x00;
 	m_a9_psel_7000 = 0x00;
 	m_a9_psel_8000 = 0x00;
@@ -239,6 +243,7 @@ void psion_asic9_device::device_reset()
 
 	m_a9_status |= 0x0020; // A9MMainsPresent
 	m_a9_status |= 0xe000; // A9MCold
+	//m_a9_status |= 0x4000; // A9MPowerFail
 
 	m_a9_serial_control = 0x00;
 	m_a9_channel_select = 0x00;
@@ -314,14 +319,14 @@ TIMER_CALLBACK_MEMBER(psion_asic9_device::snd)
 			if (!m_snd_fifo.full())
 				m_snd_fifo.enqueue(m_pcm_in());
 			if (m_snd_fifo.full())
-				m_a9_status |= 0x0800;
+				m_a9_status |= 0x0800; // A9MFifoFull
 			break;
 
 		case 1:
 			if (!m_snd_fifo.empty())
 				m_pcm_out(m_snd_fifo.dequeue());
 			if (!m_snd_fifo.full())
-				m_a9_status &= ~0x0800;
+				m_a9_status &= ~0x0800; // A9MFifoFull
 			break;
 		}
 		m_a9_interrupt_status |= 0x01; // Sound
@@ -354,7 +359,7 @@ void psion_asic9_device::eint1_w(int state)
 	if (state)
 		m_a9_interrupt_status |= 0x10; // A9MExpIntA
 	else
-	m_a9_interrupt_status &= ~0x10;
+		m_a9_interrupt_status &= ~0x10;
 
 	update_interrupts();
 }
@@ -675,47 +680,23 @@ uint16_t psion_asic9_device::io_r(offs_t offset, uint16_t mem_mask)
 		break;
 
 	case 0x20: // A9WPortABData
-		data = m_port_ab_r() & ~m_a9_port_ab_ddr;
-		LOG("%s io_r: A9WPortABData => %04x\n", machine().describe_context(), data);
+		data = (m_a9_port_ab_data & m_a9_port_ab_ddr) | (m_port_ab_r() & ~m_a9_port_ab_ddr);
+		LOG("%s io_r: A9WPortABData => %04x & %04x\n", machine().describe_context(), data, mem_mask);
 		break;
 
 	case 0x22: // A9WPortABDDR
-		if (ACCESSING_BITS_0_7)
-		{
-			data |= m_a9_port_ab_ddr & 0x00ff;
-			LOG("%s io_r: A9WPortADDR => %02x\n", machine().describe_context(), data);
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			data |= m_a9_port_ab_ddr & 0xff00;
-			LOG("%s io_r: A9WPortBDDR => %02x\n", machine().describe_context(), data >> 8);
-		}
+		data = m_a9_port_ab_ddr;
+		LOG("%s io_r: A9WPortABDDR => %04x & %04x\n", machine().describe_context(), data, mem_mask);
 		break;
 
 	case 0x24: // A9WPortCDData
-		if (ACCESSING_BITS_0_7)
-		{
-			data |= 0x00;
-			LOG("%s io_r: A9WPortCData => %02x\n", machine().describe_context(), data);
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			data |= 0x00 << 8;
-			LOG("%s io_r: A9WPortDData => %02x\n", machine().describe_context(), data >> 8);
-		}
+		data = (m_a9_port_cd_data & ~m_a9_port_cd_ddr) | (m_port_cd_r() & m_a9_port_cd_ddr);
+		LOG("%s io_r: A9WPortCDData => %04x & %04x\n", machine().describe_context(), data, mem_mask);
 		break;
 
-	case 0x26: // A9BPortCDDDR
-		if (ACCESSING_BITS_0_7)
-		{
-			data |= m_a9_port_c_ddr;
-			LOG("%s io_r: A9BPortCDDR => %04x\n", machine().describe_context(), data);
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			data |= m_a9_port_d_ddr << 8;
-			LOG("%s io_r: A9WPortDDDR <= %02x\n", machine().describe_context(), data >> 8);
-		}
+	case 0x26: // A9WPortCDDDR
+		data = m_a9_port_cd_ddr;
+		LOG("%s io_r: A9WPortCDDDR => %04x & %04x\n", machine().describe_context(), data, mem_mask);
 		break;
 
 	case 0x28: // A9BPageSelect6000
@@ -912,12 +893,12 @@ void psion_asic9_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x0e: // A9Frc1Eoi
 		if (ACCESSING_BITS_0_7)
 		{
-			LOG("%s io_w: A9Frc1Eoi <= %02x\n", machine().describe_context(), data & 0xff);
+			LOG("%s io_w: A9BFrc1Eoi <= %02x\n", machine().describe_context(), data & 0xff);
 			m_a9_interrupt_status &= ~0x40; // Frc1Expired
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			LOG("%s io_w: A9Frc2Eoi <= %02x\n", machine().describe_context(), data >> 8);
+			LOG("%s io_w: A9BFrc2Eoi <= %02x\n", machine().describe_context(), data >> 8);
 			m_a9_interrupt_status &= ~0x80; // Frc2Expired
 		}
 		update_interrupts();
@@ -983,51 +964,25 @@ void psion_asic9_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 
 	case 0x20: // A9WPortABData
-		if (ACCESSING_BITS_0_7)
-		{
-			LOG("%s io_w: A9WPortAData <= %02x\n", machine().describe_context(), data & 0xff);
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			LOG("%s io_w: A9WPortBData <= %02x\n", machine().describe_context(), data >> 8);
-		}
+		LOG("%s io_w: A9WPortABData <= %04x & %04x\n", machine().describe_context(), data, mem_mask);
+		m_a9_port_ab_data = (m_a9_port_ab_data & ~mem_mask) | (data & mem_mask);
+		m_port_ab_w((data & m_a9_port_ab_ddr) | (m_a9_port_ab_data & ~m_a9_port_ab_ddr));
 		break;
 
 	case 0x22: // A9WPortABDDR
-		if (ACCESSING_BITS_0_7)
-		{
-			LOG("%s io_w: A9WPortADDR <= %02x\n", machine().describe_context(), data & 0xff);
-			m_a9_port_ab_ddr = (m_a9_port_ab_ddr & 0xff00) | data;
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			LOG("%s io_w: A9WPortBDDR <= %02x\n", machine().describe_context(), data >> 8);
-			m_a9_port_ab_ddr = (m_a9_port_ab_ddr & 0x00ff) | (data << 8);
-		}
+		LOG("%s io_w: A9WPortABDDR <= %04x & %04x\n", machine().describe_context(), data, mem_mask);
+		m_a9_port_ab_ddr = (m_a9_port_ab_ddr & ~mem_mask) | (data & mem_mask);
 		break;
 
 	case 0x24: // A9WPortCDData
-		if (ACCESSING_BITS_0_7)
-		{
-			LOG("%s io_w: A9WPortCData <= %02x\n", machine().describe_context(), data & 0xff);
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			LOG("%s io_w: A9WPortDData <= %02x\n", machine().describe_context(), data >> 8);
-		}
+		LOG("%s io_w: A9WPortCDData <= %04x & %04x\n", machine().describe_context(), data, mem_mask);
+		m_a9_port_cd_data = (m_a9_port_cd_data & ~mem_mask) | (data & mem_mask);
+		m_port_cd_w((data & ~m_a9_port_cd_ddr) | (m_a9_port_cd_data & m_a9_port_cd_ddr));
 		break;
 
-	case 0x26: // A9BPortCDDDR
-		if (ACCESSING_BITS_0_7)
-		{
-			LOG("%s io_w: A9WPortCDDR <= %02x\n", machine().describe_context(), data & 0xff);
-			m_a9_port_c_ddr = data & 0xff;
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			LOG("%s io_w: A9WPortDDDR <= %02x\n", machine().describe_context(), data >> 8);
-			m_a9_port_d_ddr = data >> 8;
-		}
+	case 0x26: // A9WPortCDDDR
+		LOG("%s io_w: A9WPortCDDDR <= %04x & %04x\n", machine().describe_context(), data, mem_mask);
+		m_a9_port_cd_ddr = (m_a9_port_cd_ddr & ~mem_mask) | (data & mem_mask);
 		break;
 
 	case 0x28: // A9BPageSelect6000
@@ -1125,7 +1080,7 @@ void psion_asic9_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// Asic2SlaveId      001h;  Asic5PackId       002h
 		// Asic5NormalId     003h;  Asic6Id           004h
 		// Asic8Id           005h;  Asic4Id           006h
-		LOG("%s io_w: A2SerialControl <= %02x\n", machine().describe_context(), data & 0xff);
+		LOG("%s io_w: A2BSerialControl <= %02x\n", machine().describe_context(), data & 0xff);
 		m_a9_serial_control = data & 0xff;
 		transmit_frame(CONTROL_FRAME | m_a9_serial_control);
 
@@ -1214,17 +1169,17 @@ uint32_t psion_asic9_device::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	if (m_a9_control & 0x0400) // LCD enable bit
 	{
-		pen_t const *const pens = screen.palette().pens();
+		const pen_t *pens = screen.palette().pens();
 
-		int const width = (BIT(m_a9_lcd_size, 11, 5) + 1) * 32;
-		uint16_t const size = (BIT(m_a9_lcd_size, 0, 11) + 1) * 16;
+		const int width = (BIT(m_a9_lcd_size, 11, 5) + 1) * 32;
+		const uint16_t size = (BIT(m_a9_lcd_size, 0, 11) + 1) * 16;
 
 		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 		{
 			for (int x = screen.visible_area().min_x; x <= (screen.visible_area().max_x / 8); x++)
 			{
-				uint8_t const black = m_ram_space->read_byte(0x0400 + y * (width / 8) + x);
-				uint8_t const grey = m_ram_space->read_byte(0x0400 + size + y * (width / 8) + x);
+				const uint8_t black = m_ram_space->read_byte(0x0400 + y * (width / 8) + x);
+				const uint8_t grey = m_ram_space->read_byte(0x0400 + size + y * (width / 8) + x);
 				uint16_t *p = &bitmap.pix(y, x << 3);
 				for (int i = 0; i < 8; i++)
 					*p++ = BIT(black, i) ? pens[1] : (BIT(grey, i) ? pens[2] : pens[0]);

@@ -12,7 +12,7 @@
 class mediagx_cs5530_video_device : public pci_device
 {
 public:
-	mediagx_cs5530_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mediagx_cs5530_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

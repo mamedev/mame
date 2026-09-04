@@ -298,7 +298,9 @@ void sv8000_state::sv8000(machine_config &config)
 	m_s68047p->set_palette(sv8000_palette);
 	m_s68047p->set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update(m_s68047p, FUNC(s68047_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

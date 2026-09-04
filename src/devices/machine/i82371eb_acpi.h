@@ -14,7 +14,7 @@ class acpi_piix4_device;
 class i82371eb_acpi_device : public pci_device
 {
 public:
-	i82371eb_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371eb_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto apmc_en() { return m_apmc_en_w.bind(); }
 

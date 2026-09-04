@@ -965,7 +965,7 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	io2.out_porte_cb().set(FUNC(cyclwarr_state::cyclwarr_control_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(cyclwarr_state::CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(cyclwarr_state::screen_update));
 

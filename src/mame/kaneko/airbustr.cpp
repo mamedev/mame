@@ -759,7 +759,7 @@ void airbustr_state::airbustrb(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.4);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -771,7 +771,7 @@ void airbustr_state::airbustrb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 768);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_airbustr_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_airbustr_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

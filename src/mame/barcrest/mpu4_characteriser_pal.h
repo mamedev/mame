@@ -16,7 +16,7 @@ class mpu4_characteriser_pal : public device_t
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_cpu_tag(T &&tag)
 	{

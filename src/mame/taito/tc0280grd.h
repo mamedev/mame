@@ -11,7 +11,7 @@
 class tc0280grd_device : public device_t, public device_gfx_interface
 {
 public:
-	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	void set_color_base(u16 base) { m_colorbase = base; }
@@ -50,7 +50,7 @@ private:
 class tc0430grw_device : public tc0280grd_device
 {
 public:
-	tc0430grw_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0430grw_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(TC0280GRD, tc0280grd_device)

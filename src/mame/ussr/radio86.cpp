@@ -472,7 +472,7 @@ void radio86_state::radio86(machine_config &config)
 	crtc.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_raw(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_radio86);

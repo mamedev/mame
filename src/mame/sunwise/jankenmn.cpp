@@ -261,8 +261,6 @@ int jankenmn_state::hopper_status_r()
 
 void jankenmn_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
 }
 
 

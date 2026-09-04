@@ -23,6 +23,8 @@
 #include "v30mz.h"
 #include "cpu/nec/necdasm.h"
 
+#include "endianness.h"
+
 
 enum SREGS { DS1=0, PS, SS, DS0 };
 enum WREGS { AW=0, CW, DW, BW, SP, BP, IX, IY };

@@ -56,7 +56,10 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void thedealr(machine_config &config);
+	void thedealr(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// IOX
@@ -80,8 +83,6 @@ private:
 
 	void thedealr_main(address_map &map) ATTR_COLD;
 	void thedealr_sub(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -447,7 +448,6 @@ GFXDECODE_END
 
 void thedealr_state::machine_start()
 {
-	m_leds.resolve();
 	m_led_timer = timer_alloc(FUNC(thedealr_state::update_leds), this);
 
 	m_iox_p1 = 0xff;
@@ -491,7 +491,7 @@ void thedealr_state::thedealr(machine_config &config)
 	m_spritegen->set_fg_yoffsets( -0x12+1, -0x01 );
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

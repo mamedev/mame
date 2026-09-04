@@ -71,8 +71,6 @@ private:
 
 void elekscmp_state::machine_start()
 {
-	m_digit.resolve();
-
 	save_item(NAME(m_cassinbit));
 	save_item(NAME(m_cassoutbit));
 	save_item(NAME(m_cassold));

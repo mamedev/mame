@@ -43,7 +43,6 @@ u8 cedar_magnet_sprite_device::exzisus_hack_r(offs_t offset)
 	{
 		return m_ram[0x400 + offset + (m_pio2_pb_data & 0x3) * 0x10000];
 	}
-
 }
 
 
@@ -70,7 +69,6 @@ void cedar_magnet_sprite_device::cedar_magnet_sprite_io(address_map &map)
 	map(0x8c, 0x8c).w(FUNC(cedar_magnet_sprite_device::sprite_port8c_w)); // written after 88 (possible data upload?)
 
 	map(0x9c, 0x9c).w(FUNC(cedar_magnet_sprite_device::sprite_port9c_w)); // ?
-
 }
 
 void cedar_magnet_sprite_device::do_blit()

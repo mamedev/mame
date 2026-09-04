@@ -849,7 +849,7 @@ void spacefb_state::spacefb(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(180));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(SPACEFB_PIXEL_CLOCK, SPACEFB_HTOTAL, SPACEFB_HBEND, SPACEFB_HBSTART, SPACEFB_VTOTAL, SPACEFB_VBEND, SPACEFB_VBSTART);
 	m_screen->set_screen_update(FUNC(spacefb_state::screen_update));
 

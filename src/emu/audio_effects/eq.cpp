@@ -5,6 +5,8 @@
 #include "eq.h"
 #include "xmlfile.h"
 
+#include <numbers>
+
 // This effect implements a parametric EQ using peak and shelf filters
 
 // Formulas taken from (with some fixes):
@@ -242,21 +244,22 @@ void audio_effect_eq::build_low_shelf(u32 band)
 	float f = std::clamp(float(m_f[band]), 1.0f, sr/2.0f - 1.0f);
 
 	float V = pow(10, abs(m_db[band])/20);
-	float K = tan(M_PI*f/sr);
+	float K = tan(std::numbers::pi * f / sr);
 	float K2 = K*K;
 
+	constexpr double SQRT2 = std::numbers::sqrt2;
 	if(m_db[band] > 0) {
-		float d = 1 + sqrt(2)*K + K2;
+		float d = 1 + SQRT2*K + K2;
 		fi.m_b0 = (1 + sqrt(2*V)*K + V*K2)/d;
 		fi.m_b1 = 2*(V*K2-1)/d;
 		fi.m_b2 = (1 - sqrt(2*V)*K + V*K2)/d;
 		fi.m_a1 = 2*(K2-1)/d;
-		fi.m_a2 = (1 - sqrt(2)*K + K2)/d;
+		fi.m_a2 = (1 - SQRT2*K + K2)/d;
 	} else {
 		float d = 1 + sqrt(2*V)*K + V*K2;
-		fi.m_b0 = (1 + sqrt(2)*K + K2)/d;
+		fi.m_b0 = (1 + SQRT2*K + K2)/d;
 		fi.m_b1 = 2*(K2-1)/d;
-		fi.m_b2 = (1 - sqrt(2)*K + K2)/d;
+		fi.m_b2 = (1 - SQRT2*K + K2)/d;
 		fi.m_a1 = 2*(V*K2-1)/d;
 		fi.m_a2 = (1 - sqrt(2*V)*K + V*K2)/d;
 	}
@@ -274,21 +277,22 @@ void audio_effect_eq::build_high_shelf(u32 band)
 	float f = std::clamp(float(m_f[band]), 1.0f, sr/2.0f - 1.0f);
 
 	float V = pow(10, m_db[band]/20);
-	float K = tan(M_PI*f/sr);
+	float K = tan(std::numbers::pi * f / sr);
 	float K2 = K*K;
 
+	constexpr double SQRT2 = std::numbers::sqrt2;
 	if(m_db[band] > 0) {
-		float d = 1 + sqrt(2)*K + K2;
+		float d = 1 + SQRT2*K + K2;
 		fi.m_b0 = (V + sqrt(2*V)*K + K2)/d;
 		fi.m_b1 = 2*(K2-V)/d;
 		fi.m_b2 = (V - sqrt(2*V)*K + K2)/d;
 		fi.m_a1 = 2*(K2-1)/d;
-		fi.m_a2 = (1 - sqrt(2)*K + K2)/d;
+		fi.m_a2 = (1 - SQRT2*K + K2)/d;
 	} else {
 		float d = 1 + sqrt(2*V)*K + V*K2;
-		fi.m_b0 = V*(1 + sqrt(2)*K + K2)/d;
+		fi.m_b0 = V*(1 + SQRT2*K + K2)/d;
 		fi.m_b1 = 2*V*(K2-1)/d;
-		fi.m_b2 = V*(1 - sqrt(2)*K + K2)/d;
+		fi.m_b2 = V*(1 - SQRT2*K + K2)/d;
 		fi.m_a1 = 2*(V*K2-1)/d;
 		fi.m_a2 = (1 - sqrt(2*V)*K + V*K2)/d;
 	}
@@ -306,7 +310,7 @@ void audio_effect_eq::build_peak(u32 band)
 	float f = std::clamp(float(m_f[band]), 1.0f, sr/2.0f - 1.0f);
 
 	float V = pow(10, m_db[band]/20);
-	float K = tan(M_PI*f/sr);
+	float K = tan(std::numbers::pi * f / sr);
 	float K2 = K*K;
 	float Q = m_q[band];
 

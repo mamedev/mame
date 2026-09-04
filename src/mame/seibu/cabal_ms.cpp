@@ -108,7 +108,7 @@ void cabal_ms_state::cabalm(machine_config &config)
 	Z80(config, "audiocpu", 20_MHz_XTAL / 5).set_disable(); // divisor unknown
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
+	SCREEN(config, m_screen); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(256, 256);

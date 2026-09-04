@@ -15,7 +15,7 @@ public:
 	// BitBlt
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
-	oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 xga_read(offs_t offset);
 	void xga_write(offs_t offset, u8 data);

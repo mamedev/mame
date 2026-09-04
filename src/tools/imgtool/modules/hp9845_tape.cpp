@@ -120,6 +120,7 @@
 
 #include <bitset>
 #include <cstdio>
+#include <cstring>
 
 
 // Constants

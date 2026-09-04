@@ -6,14 +6,11 @@
 
 #include "sh4.h"
 
-#define SH7709S_CACHE_SIZE (16384)
-#define SH7709S_CACHE_LINE_SIZE (16)
-#define SH7709S_CACHE_ENTRY_COUNT (SH7709S_CACHE_SIZE / SH7709S_CACHE_LINE_SIZE)
-#define SH7709S_CACHE_ASSOCIATIVITY (4)
-#define SH7709S_CACHE_BLOCKS (SH7709S_CACHE_ENTRY_COUNT / SH7709S_CACHE_ASSOCIATIVITY)
+// When enabled switches from icache sampling + heuristic to full icache tracking
+// Heavy on CPU usage but useful for debugging icache penalties if your cpu can handle it
+#define SH7709S_ICACHE_TRACKING_HEAVY (0)
 
 // U bit tracked in the dirty field, V bit currently untracked
-// Assumes all cache lines are valid as cache line invalidation is unimplemented
 struct sh7709s_cache_entry
 {
 	uint32_t tag; // Address tag for entry
@@ -29,29 +26,57 @@ public:
 	// DRC functions used to update the cache state
 	void drc_memory_access_read();
 	void drc_memory_access_write();
+
+	void update_access_cycles(uint32_t address, bool write);
+
+#if SH7709S_ICACHE_TRACKING_HEAVY == 1
 	void drc_update_icache();
+	bool generate_opcode(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint32_t ovrpc) override;
+#endif
 
 protected:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char* name, uml::code_handle*& handleptr) override;
-	virtual bool generate_group_0(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
-	virtual bool generate_group_4(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
-	virtual bool generate_group_15(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
+
+	virtual uint32_t ccr_r(offs_t offset, uint32_t mem_mask) override;
+	virtual void ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask) override;
+
+	void cache_7709s_map(address_map& map);
+	uint32_t cache_address_array_r(offs_t offset, uint32_t mem_mask);
+	void cache_address_array_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 private:
+	static constexpr uint32_t SH7709S_CACHE_SIZE = 16384;
+	static constexpr uint32_t SH7709S_CACHE_LINE_SIZE = 16;
+	static constexpr uint32_t SH7709S_CACHE_ENTRY_COUNT = (SH7709S_CACHE_SIZE / SH7709S_CACHE_LINE_SIZE);
+	static constexpr uint32_t SH7709S_CACHE_ASSOCIATIVITY = 4;
+	static constexpr uint32_t SH7709S_CACHE_BLOCKS = (SH7709S_CACHE_ENTRY_COUNT / SH7709S_CACHE_ASSOCIATIVITY);
 	// Cache state tracking
 	struct sh7709s_cache_entry m_cache[SH7709S_CACHE_BLOCKS][SH7709S_CACHE_ASSOCIATIVITY];
 	uint32_t m_wb_address; // writeback buffer address if there's a dirty cache line to evict
 	uint8_t m_last_area_accessed; // last memory area accessed for WCR1 timing purposes
 	bool m_last_area_accessed_was_write; // last memory area accessed operation also for WCR1 timing purposes
 	unsigned int m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
-	unsigned int m_last_sdram_page; // Last accessed sdram page, used to track when to have to pay tpc(precharge) cost
+	unsigned int m_last_sdram_bank; // Last accessed sdram bank, used to track when to have to pay tpc(precharge) cost
 	unsigned int m_precharge_remaining_cycles;
+	unsigned int m_burst_continuation_remaining_cycles; // Remaining burst words still occupying the bus after the critical word lands
+	uint64_t m_last_op_cycle_count; // Track the last cycle we did a memory operation for background accounting
 
 	bool cache_access(uint32_t address, bool write);
 	unsigned int access_penalty(uint32_t address, bool write);
+
+	// Timing calculation/decode related functions
+	uint32_t get_wcr1_timing(uint32_t area);
+	uint32_t get_wcr2_timing(uint32_t address);
+	uint32_t mcr_tpc();
+	uint32_t mcr_rcd();
+	uint32_t mcr_trwl();
+	uint32_t mcr_tras();
+	uint32_t cache_line_fetch_count(uint32_t address);
+	uint32_t sdram_bank(uint32_t address);
 };
 
 DECLARE_DEVICE_TYPE(SH7709S, sh7709s_device)

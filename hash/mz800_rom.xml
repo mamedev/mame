@@ -18,7 +18,7 @@ license:CC0-1.0
 
 	<software name="rcsharp" supported="no">
 		<description>ROM Card (Sharpsoft, v1.1)</description>
-		<year>????</year>
+		<year>19??</year>
 		<publisher>Sharpsoft</publisher>
 		<part name="rom" interface="mz800_rom">
 			<dataarea name="rom" size="0x10000">
@@ -29,7 +29,7 @@ license:CC0-1.0
 
 	<software name="rcfaix" supported="no">
 		<description>ROM Karta Číslo 004 (Faixsoft)</description>
-		<year>????</year>
+		<year>19??</year>
 		<publisher>Faixsoft</publisher>
 		<part name="rom" interface="mz800_rom">
 			<dataarea name="rom" size="0x10000">
@@ -40,7 +40,7 @@ license:CC0-1.0
 
 	<software name="mspepack" supported="no">
 		<description>ROM-Pack (MSPEsoft, v1.04)</description>
-		<year>????</year>
+		<year>19??</year>
 		<publisher>MSPEsoft</publisher>
 		<part name="rom" interface="mz800_rom">
 			<dataarea name="rom" size="0x10000">

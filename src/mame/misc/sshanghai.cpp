@@ -301,7 +301,7 @@ static INPUT_PORTS_START( ssh2000 )
 	PORT_DIPNAME( 0x10, 0x00, "Extra Take")         PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x10, "OFF:  NO" )
 	PORT_DIPSETTING(    0x00, "ON:  YES" )
-	PORT_DIPNAME( 0x20, 0x00, "Demo Sound" )        PORT_DIPLOCATION("DSWA:3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:3")  // "Demo Sound"
 	PORT_DIPSETTING(    0x20, "OFF:  NO" )
 	PORT_DIPSETTING(    0x00, "ON:  YES" )
 	PORT_DIPNAME( 0x40, 0x00, "Max. BET" )          PORT_DIPLOCATION("DSWA:2")
@@ -462,7 +462,7 @@ void ssh2000_state::ssh2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ssh2000_state::ssh2000_portmap);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);

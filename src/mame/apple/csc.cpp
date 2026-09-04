@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "csc.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(CSC, csc_device, "applecsc", "Apple Color Screen Controller video")
 
 static constexpr u8 CSC_PANEL_ID        = 0x02;
@@ -77,7 +79,7 @@ void csc_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(csc_device::screen_update_csc));
 	m_screen->screen_vblank().set(FUNC(csc_device::csc_irq_w));

@@ -81,7 +81,7 @@ void qg640_device::device_add_mconfig(machine_config &config)
 
 	IDT7201(config, m_fifo);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL / 2, 816, 0, 640, 510, 0, 480); // 25 MHz pixel clock, 30.63 kHz horizontal, 60.07 Hz vertical
 	screen.set_screen_update(FUNC(qg640_device::screen_update));
 
@@ -89,8 +89,8 @@ void qg640_device::device_add_mconfig(machine_config &config)
 	m_acrtc->set_screen("screen");
 	m_acrtc->set_addrmap(0, &qg640_device::videoram_map);
 
-	BT471(config, m_clut[0], 0); // IMSG170P-35
-	BT471(config, m_clut[1], 0); // IMSG170P-35
+	BT471(config, m_clut[0]); // IMSG170P-35
+	BT471(config, m_clut[1]); // IMSG170P-35
 }
 
 ROM_START(qg640)

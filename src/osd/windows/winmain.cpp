@@ -189,20 +189,28 @@ static int is_double_click_start(int argc);
 
 int main(int argc, char *argv[])
 {
-	std::setlocale(LC_ALL, "");
-#if defined(_LIBCPP_VERSION) && defined(_UCRT)
+#if defined(_UCRT)
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
+	std::setlocale(LC_ALL, ".UTF-8");
+#if defined(_LIBCPP_VERSION)
 	// suppress digit grouping for now - too many things don't take it into consideration
-	std::locale const syslocale("");
+	std::locale const syslocale(".UTF-8");
 	std::locale const customlocale(std::locale(syslocale, new suppress_grouping<char>(syslocale)), new suppress_grouping<wchar_t>(syslocale));
 	std::locale::global(customlocale);
-#endif
+#endif // defined(_LIBCPP_VERSION)
+#else // defined(_UCRT)
+	std::setlocale(LC_ALL, "");
+#endif // defined(_UCRT)
+
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
+	bool const is_console = !win_is_gui_application() && !is_double_click_start(args.size());
 
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
-		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
+		setvbuf(stdout, nullptr, _IOFBF, 64);
 	if (!isatty(fileno(stderr)))
-		setvbuf(stderr, (char *) nullptr, _IOFBF, 64);
+		setvbuf(stderr, nullptr, _IOFBF, 64);
 
 	// Disable legacy mouse to pointer event translation - it's broken:
 	// * No WM_POINTERLEAVE event when mouse pointer moves directly to an
@@ -228,7 +236,7 @@ int main(int argc, char *argv[])
 		// Initialize this after the osd interface so that we are first in the
 		// output order
 		winui_output_error winerror;
-		if (win_is_gui_application() || is_double_click_start(args.size()))
+		if (!is_console)
 		{
 			// if we are a GUI app, output errors to message boxes
 			osd_output::push(&winerror);
@@ -237,7 +245,8 @@ int main(int argc, char *argv[])
 		}
 		osd.register_options();
 		result = emulator_info::start_frontend(options, osd, args);
-		osd_output::pop(&winerror);
+		if (!is_console)
+			osd_output::pop(&winerror);
 	}
 
 	return result;

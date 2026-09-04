@@ -303,7 +303,7 @@ void dg680_state::dg680(machine_config &config)
 	maincpu.set_daisy_config(dg680_daisy_chain);
 
 	/* Keyboard */
-	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
+	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb"));
 	keyb.set_keyboard_callback(FUNC(dg680_state::kbd_put));
 
 	/* Devices */

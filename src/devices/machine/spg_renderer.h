@@ -11,7 +11,7 @@
 class spg_renderer_device : public device_t
 {
 public:
-	spg_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram, int sprlimit);
 	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram, uint16_t *scrollram, uint32_t which);

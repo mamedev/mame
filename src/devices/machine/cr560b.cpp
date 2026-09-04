@@ -55,6 +55,7 @@ cr560b_device::cr560b_device(const machine_config &mconfig, const char *tag, dev
 	m_drq_cb(*this),
 	m_dten_cb(*this),
 	m_scor_cb(*this),
+	m_media_cb(*this),
 	m_input_fifo_pos(0),
 	m_output_fifo_pos(0),
 	m_output_fifo_length(0),
@@ -125,18 +126,31 @@ void cr560b_device::device_reset()
 	m_output_fifo_pos = 0;
 	m_output_fifo_length = 0;
 	m_sector_size = 2048;
+	m_transfer_lba = 0;
+	m_transfer_sectors = 0;
+	m_transfer_length = 0;
+	m_transfer_buffer_pos = 0;
 
 	m_status_ready = false;
 	m_data_ready = false;
 	m_cdrom_speed = 1;
 
-	m_status = 0; //STATUS_READY;
+	// door is closed on a console, a disc in the drive is readable straight away
+	m_status = STATUS_DOOR_CLOSED;
 
 	if (exists())
-		m_status |= STATUS_MEDIA;
+		m_status |= STATUS_MEDIA | STATUS_READY;
 
 	m_sten_cb(1);
 	m_stch_cb(0);
+
+	// a disc already in the drive at power-up is reported as a media change,
+	// similar to some floppy drives.
+	if (exists())
+	{
+		m_media_cb(1);
+		m_media_cb(0);
+	}
 }
 
 std::pair<std::error_condition, std::string> cr560b_device::call_load()
@@ -145,7 +159,12 @@ std::pair<std::error_condition, std::string> cr560b_device::call_load()
 
 	if (!ret.first)
 	{
-		status_change(m_status | STATUS_MEDIA | STATUS_DOOR_CLOSED);
+		status_change(m_status | STATUS_MEDIA | STATUS_DOOR_CLOSED | STATUS_READY);
+		if (started())
+		{
+			m_media_cb(1);
+			m_media_cb(0);
+		}
 	}
 
 	return ret;
@@ -153,7 +172,7 @@ std::pair<std::error_condition, std::string> cr560b_device::call_load()
 
 void cr560b_device::call_unload()
 {
-	status_change(0);
+	status_change(STATUS_DOOR_CLOSED);
 
 	cdrom_image_device::call_unload();
 }
@@ -340,6 +359,10 @@ uint8_t cr560b_device::read()
 				{
 					LOGMASKED(LOG_DATA, "Read done\n");
 					status_change(m_status | STATUS_SUCCESS);
+					// completion status for the read command follows the data
+					m_output_fifo[0] = 0x10;
+					m_output_fifo[1] = m_status;
+					status_enable(2);
 				}
 			}
 		}
@@ -412,9 +435,14 @@ void cr560b_device::write(uint8_t data)
 		//case 0x8e: cmd_read_device_driver(); break;
 
 		default:
+		{
 			LOG("Unknown command: %02x\n", m_input_fifo[0]);
-			status_enable(0);
+			// answer with an error so that callers waiting for a status byte don't hang
+			m_output_fifo[0] = m_input_fifo[0];
+			m_output_fifo[1] = m_status | STATUS_ERROR;
+			status_enable(2);
 			break;
+		}
 	}
 }
 
@@ -490,7 +518,7 @@ void cr560b_device::cmd_motor_on()
 
 	// TODO: Does this enable STATUS_SUCCESS?
 	u8 status = m_status;
-	status |= STATUS_SUCCESS;
+	status |= STATUS_MOTOR | STATUS_SUCCESS;
 	m_output_fifo[0] = 0x02;
 	m_output_fifo[1] = status;
 
@@ -682,11 +710,10 @@ void cr560b_device::cmd_read()
 	status &= ~STATUS_PLAYING;
 	status |= STATUS_MOTOR;
 
-	m_output_fifo[0] = 0x10;
-	m_output_fifo[1] = status;
-
+	// NOTE: no immediate acknowledge, status is returned once the data has been transferred
+	// (dipir sends the command then drains data until a status byte shows up)
 	status_change(status);
-	status_enable(2);
+	m_input_fifo_pos = 0;
 }
 
 // checked in BIOS if a CD is inserted
@@ -721,8 +748,7 @@ void cr560b_device::cmd_read_error()
 	m_output_fifo[6]  = 0x00;
 	m_output_fifo[7]  = 0x00;
 	m_output_fifo[8]  = 0x00;
-	// perhaps just the status byte?
-	m_output_fifo[9]  = exists() ? 1 : 0;
+	m_output_fifo[9]  = status;
 
 	status_change(status);
 	status_enable(10);

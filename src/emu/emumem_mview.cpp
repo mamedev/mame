@@ -10,8 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <list>
-#include <map>
 #include "emuopts.h"
 #include "debug/debugcpu.h"
 
@@ -26,6 +24,11 @@
 #include "emumem_hep.h"
 #include "emumem_het.h"
 #include "emumem_hws.h"
+
+#include <bit>
+#include <list>
+#include <map>
+
 
 #define VERBOSE 0
 
@@ -326,6 +329,9 @@ namespace {
 		default: abort();
 		}
 	}
+
+	// machineless dummy object to bind to during validity checking
+	memory_manager s_dummy_manager;
 }
 
 memory_view::memory_view_entry &memory_view::operator[](int slot)
@@ -338,7 +344,7 @@ memory_view::memory_view_entry &memory_view::operator[](int slot)
 		memory_view_entry *e;
 		int id = m_entries.size();
 		e = mve_make(emu::detail::handler_entry_dispatch_level(m_config->addr_width()), m_config->data_width(), m_config->addr_shift(),
-					 *m_config, m_device.machine().memory(), *this, id);
+					 *m_config, m_device.has_running_machine() ? m_device.machine().memory() : s_dummy_manager, *this, id);
 		m_entries.resize(id+1);
 		m_entries[id].reset(e);
 		m_entry_mapping[slot] = id;
@@ -637,7 +643,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		m_space = &space;
 
 		offs_t span = addrstart ^ addrend;
-		u32 awidth = 32 - count_leading_zeros_32(span);
+		u32 awidth = std::bit_width(span);
 
 		h_make(awidth, m_config->data_width(), m_config->addr_shift(), space, *this, addrstart, addrend, m_handler_read, m_handler_write);
 		m_handler_read->ref();

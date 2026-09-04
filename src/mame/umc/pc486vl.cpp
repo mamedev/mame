@@ -109,9 +109,10 @@ void pc486vl_state::base_config(machine_config &config)
 	m_chipset->spkr().set([this] (int state) { m_speaker->level_w(state); });
 
 	// TODO: Chipset can go up to 32M, but will go "memory fail" with that (?)
+	// - doesn't apply with md4duv (that effectively supports 64M)
 	RAM(config, "ram").set_default_size("64M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
@@ -153,6 +154,7 @@ void pc486vl_state::pccm912(machine_config &config)
 {
 	base_config(config);
 	// TODO: actually 4 + 3 VLB
+	// FIXME: set ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
@@ -165,6 +167,7 @@ void pc486vl_state::pccm912(machine_config &config)
 void pc486vl_state::pc486vl(machine_config &config)
 {
 	base_config(config);
+	// FIXME: set ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
@@ -186,6 +189,19 @@ ROM_START( pccm912 )
 	// BIOS-String: 40-P101-001437-00101111-072594-GREEN-H - CPU: Socket 3 - RAM: 4xSIMM30, 2xSIMM72, Cache: 9xUM61256AK-15
 	ROM_SYSTEM_BIOS( 2, "ami_120194a", "12/01/1994A")
 	ROMX_LOAD( "4umm001.bin", 0x10000, 0x10000, CRC(a5b768b4) SHA1(904ce2814d6542b65acec0c84532946172f2296d), ROM_BIOS(2))
+ROM_END
+
+ROM_START( md4duv )
+	ROM_REGION32_LE( 0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS( 0, "v31n", "V3.1N (11/17/94)")
+	ROMX_LOAD( "i376082.bin", 0x10000, 0x10000, CRC(40b350f2) SHA1(9877f24805964ab8c92bf35bf14ff97e508867c1), ROM_BIOS(0))
+	// MB labeled NMB-4DDUV, with minor data changes
+	// i376082.bin  [1/4]      i199030.bin  [1/4]      IDENTICAL
+	// i376082.bin  [3/4]      i199030.bin  [3/4]      IDENTICAL
+	// i376082.bin  [4/4]      i199030.bin  [4/4]      99.993896% (BIOS checksum change at $ffff)
+	// i376082.bin  [2/4]      i199030.bin  [2/4]      99.975586% ($57a3, $6070, $684d, $684f)
+	ROM_SYSTEM_BIOS( 1, "v31na", "V3.1N alt (11/17/94)")
+	ROMX_LOAD( "i199030.bin", 0x10000, 0x10000, CRC(2f437c85) SHA1(841f23ae31e8cf11afa4056f4c7493c890e1be5a), ROM_BIOS(1))
 ROM_END
 
 // ECS UA4985
@@ -212,6 +228,7 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1994, pccm912,   0, 0,       pccm912,     0,     pc486vl_state,     empty_init,        "PC-Chips", "M912 (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
-COMP( 199?, sy019s,    0, 0,       pc486vl,     0,     pc486vl_state,     empty_init,        "Soyo",     "SY-019S (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
-COMP( 1994, tku5s,     0, 0,       pc486vl,     0,     pc486vl_state,     empty_init,        "TK",       "U5S-TK-V03A (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
+COMP( 1994, pccm912,  0, 0, pccm912, 0, pc486vl_state, empty_init, "PC-Chips",                         "M912 (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
+COMP( 1994, md4duv,   0, 0, pccm912, 0, pc486vl_state, empty_init, "Aquarius Systems/Bcom Technology", "MD-4DUV (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING ) // alias "MB-4DUV/UVC" according to Award BIOS POST
+COMP( 199?, sy019s,   0, 0, pc486vl, 0, pc486vl_state, empty_init, "Soyo",                             "SY-019S (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
+COMP( 1994, tku5s,    0, 0, pc486vl, 0, pc486vl_state, empty_init, "TK",                               "U5S-TK-V03A (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )

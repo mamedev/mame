@@ -102,7 +102,7 @@ uint16_t wangpcbus_device::mrdc_r(offs_t offset, uint16_t mem_mask)
 	uint16_t data = 0xffff;
 
 	for (device_wangpcbus_card_interface &entry : m_device_list)
-		data &= entry.wangpcbus_mrdc_r(offset + 0x40000/2, mem_mask);
+		data &= entry.wangpcbus_mrdc_r(offset + 0x20000/2, mem_mask);
 
 	return data;
 }
@@ -115,7 +115,7 @@ uint16_t wangpcbus_device::mrdc_r(offs_t offset, uint16_t mem_mask)
 void wangpcbus_device::amwc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	for (device_wangpcbus_card_interface &entry : m_device_list)
-		entry.wangpcbus_amwc_w(offset + 0x40000/2, mem_mask, data);
+		entry.wangpcbus_amwc_w(offset + 0x20000/2, mem_mask, data);
 }
 
 

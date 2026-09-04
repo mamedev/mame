@@ -110,6 +110,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
 #include "multibyte.h"
 
 #include "igspoker.lh"
@@ -141,7 +142,7 @@ class igs_mux_device :
 	public device_memory_interface
 {
 public:
-	igs_mux_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_mux_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void address_w(u8 data);
 	void data_w(u8 data);
@@ -206,7 +207,7 @@ u8 igs_mux_device::data_r()
 class igs_string_device : public device_t
 {
 public:
-	igs_string_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_string_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();                                  // 0x05:        result_r
 	void do_bitswap_w(offs_t offset, u8 data);      // 0x20-0x27:   do_bitswap_w
@@ -351,7 +352,7 @@ u8 igs_string_device::advance_string_offs_r(address_space &space)
 class igs_bitswap_device : public device_t
 {
 public:
-	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();                              // 0x03:        result_r
 	void word_w(u8 data);                       // 0x40-0x47:   word_w
@@ -522,7 +523,7 @@ void igs_bitswap_device::reset_w(u8 data)
 class igs_incdec_device : public device_t
 {
 public:
-	igs_incdec_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_incdec_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();
 	void reset_w(u8 data);
@@ -591,7 +592,7 @@ void igs_incdec_device::device_reset()
 class igs_inc_device : public device_t
 {
 public:
-	igs_inc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_inc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();
 	void reset_w(u8 data);
@@ -650,7 +651,7 @@ void igs_inc_device::device_reset()
 class igs_incalt_device : public device_t
 {
 public:
-	igs_incalt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_incalt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();
 	void byte_w(u8 data);
@@ -778,6 +779,7 @@ public:
 	void tarzan(machine_config &config) ATTR_COLD;
 	void tjsb(machine_config &config) ATTR_COLD;
 	// 68000
+	void hjdmg(machine_config &config) ATTR_COLD;
 	void jking302us(machine_config &config) ATTR_COLD;
 	void lhzb2(machine_config &config) ATTR_COLD;
 	void lhzb2a(machine_config &config) ATTR_COLD;
@@ -1038,6 +1040,7 @@ private:
 	void happyskl_map(address_map &map) ATTR_COLD;
 	void happyskl_io(address_map &map) ATTR_COLD;
 	void happyskl_mux_map(address_map &map) ATTR_COLD;
+	void hjdmg_map(address_map &map) ATTR_COLD;
 	void iqblocka_io(address_map &map) ATTR_COLD;
 	void iqblocka_map(address_map &map) ATTR_COLD;
 	void iqblocka_mux_map(address_map &map) ATTR_COLD;
@@ -1079,8 +1082,6 @@ private:
 
 void igs017_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_remap_addr));
 	save_item(NAME(m_input_select));
 	save_item(NAME(m_dsw_select));
@@ -3383,6 +3384,29 @@ void igs017_state::sdmg2_mux_map(address_map &map)
 	map(0x02, 0x02).portr("MATRIX").w(NAME((&igs017_state::oki_sound_bank_w<7, 0x7f>)));
 }
 
+void igs017_state::hjdmg_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+
+	// incdec protection
+	map(0x002001, 0x002001).w(m_igs_incdec, FUNC(igs_incdec_device::reset_w));
+	map(0x002003, 0x002003).w(m_igs_incdec, FUNC(igs_incdec_device::dec_w));
+	map(0x002007, 0x002007).w(m_igs_incdec, FUNC(igs_incdec_device::inc_w));
+	map(0x00200b, 0x00200b).r(m_igs_incdec, FUNC(igs_incdec_device::result_r));
+
+	// incalt protection
+	map(0x010000, 0x0107ff).rw(m_igs_incalt, FUNC(igs_incalt_device::result_r), FUNC(igs_incalt_device::byte_w));
+
+	map(0x1f0000, 0x1fffff).ram().share("nvram");
+
+	map(0x200000, 0x20ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	map(0x210001, 0x210001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+
+	map(0x212000, 0x212001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	map(0x212002, 0x212003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+}
+
 // mgdh, mgdha
 
 u8 igs017_state::mgdh_boot_r(offs_t offset)
@@ -5414,12 +5438,12 @@ INPUT_PORTS_END
 void igs017_state::base_machine_oki(machine_config &config, const XTAL &xtal_oki)
 {
 	// i/o
-	IGS_MUX(config, m_igs_mux, 0);
+	IGS_MUX(config, m_igs_mux);
 
 	I8255A(config, m_ppi);
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -5427,7 +5451,7 @@ void igs017_state::base_machine_oki(machine_config &config, const XTAL &xtal_oki
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
 	m_screen->set_palette("igs017_igs031:palette");
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -5467,7 +5491,7 @@ void igs017_state::iqblocka(machine_config &config)
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
 	// protection
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x15d6);
 	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
 	m_igs_bitswap->set_m3_bits<0>(~5,  8, ~10, ~15);
@@ -5475,7 +5499,7 @@ void igs017_state::iqblocka(machine_config &config)
 	m_igs_bitswap->set_m3_bits<2>( 2, ~6, ~11, ~15);
 	m_igs_bitswap->set_m3_bits<3>( 0, ~1, ~3,  ~15);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// sound
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -5527,9 +5551,9 @@ void igs017_state::tarzan(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -5563,9 +5587,9 @@ void igs017_state::starzan(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -5626,9 +5650,9 @@ void igs017_state::cpoker2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
-	IGS_INC(config, m_igs_inc, 0);
+	IGS_INC(config, m_igs_inc);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -5658,7 +5682,7 @@ void igs017_state::tjsb(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap));
@@ -5691,9 +5715,9 @@ void igs017_state::spkrform(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// sound
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -5733,7 +5757,7 @@ void igs017_state::mgcs(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
@@ -5762,9 +5786,9 @@ void igs017_state::mgcsb(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
 	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
@@ -5775,7 +5799,7 @@ void igs017_state::mgcsb(machine_config &config)
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 }
 
 
@@ -5801,9 +5825,9 @@ void igs017_state::lhzb2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS022(config, m_igs022, 0);
+	IGS022(config, m_igs022);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5830,9 +5854,9 @@ void igs017_state::lhzb2a(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
 	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
@@ -5840,7 +5864,7 @@ void igs017_state::lhzb2a(machine_config &config)
 	m_igs_bitswap->set_m3_bits<2>(~3,   4,  ~5, ~15);
 	m_igs_bitswap->set_m3_bits<3>(~9, ~11,  12, ~15);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5866,9 +5890,9 @@ void igs017_state::lhzb2b(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5890,9 +5914,9 @@ void igs017_state::lhzb2c(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
 	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
@@ -5900,7 +5924,7 @@ void igs017_state::lhzb2c(machine_config &config)
 	m_igs_bitswap->set_m3_bits<2>(~3,   4,  ~5, ~15);
 	m_igs_bitswap->set_m3_bits<3>(~9, ~11,  12, ~15);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5929,9 +5953,9 @@ void igs017_state::slqz2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS022(config, m_igs022, 0);
+	IGS022(config, m_igs022);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap));
@@ -5960,11 +5984,17 @@ void igs017_state::sdmg2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
-	IGS_INCALT(config, m_igs_incalt, 0);
+	IGS_INCALT(config, m_igs_incalt);
 }
 
+void igs017_state::hjdmg(machine_config &config)
+{
+	sdmg2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::hjdmg_map);
+}
 
 // mgdh, mgdha
 
@@ -6023,9 +6053,9 @@ void igs017_state::sdmg2p(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 }
 
 void igs017_state::jking302us(machine_config &config)
@@ -6524,6 +6554,21 @@ ROM_START( sdmg2 ) // C5220P001 PCB
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s0206.u3", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
+ROM_END
+
+ROM_START( hjdmg )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "goldmaj_v-739c.u25", 0x00000, 0x80000, CRC(8b2523af) SHA1(04a9805be2cb49a722a10dbaacc65be3af66af33) )
+
+	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m0901.u5",      0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) BAD_DUMP) // not dumped for this set, FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD( "goldmaj-cg.u4", 0x200000, 0x080000, CRC(bb97d83a) SHA1(836635d2805297d3f9fd09cb1d7bfc3f6f9e87a6) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u6", 0x000000, 0x020000, CRC(cb34cbc0) SHA1(ceedbdda085fd1acc9a575502bdf7cf998f54f05) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) BAD_DUMP) // not dumped for this set
 ROM_END
 
 /***************************************************************************
@@ -7481,6 +7526,7 @@ GAME ( 1997,  mgdha,       mgdh,     mgdha,      mgdh,        igs017_state, init
 GAME ( 1997,  sdmg2,       0,        sdmg2,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V765C)",                                MACHINE_SUPPORTS_SAVE ) // 超級大滿貫II
 GAME ( 1997,  sdmg2754ca,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754ca, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         MACHINE_SUPPORTS_SAVE ) // 超級大滿貫II
 GAME ( 1997,  sdmg2754cb,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754cb, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         MACHINE_SUPPORTS_SAVE ) // 超級大滿貫II
+GAME ( 1997,  hjdmg,       0,        hjdmg,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Huangjin Da Manguan (China, V739C)",                                 MACHINE_NOT_WORKING |MACHINE_SUPPORTS_SAVE ) // 黄金大满贯, protection emulation not tested, I/O not verified
 GAME ( 1997,  tjsb,        0,        tjsb,       tjsb,        igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                                MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
 GAME ( 1998,  genius6,     0,        genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                   0 ) // shows Chinese text in puzzle game
 GAME ( 1997,  genius6a,    genius6,  genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                   0 ) // clone because it has older copyright year

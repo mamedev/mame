@@ -278,12 +278,12 @@ void pcfx_state::pcfx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcfx_state::pcfx_mem);
 	m_maincpu->set_addrmap(AS_IO, &pcfx_state::pcfx_io);
 
-	PCFX_INTC(config, m_intc, 0);
+	PCFX_INTC(config, m_intc);
 	m_intc->int_cb().set(FUNC(pcfx_state::int_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(m_huc6261, FUNC(huc6261_device::screen_update));
 	screen.set_raw(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242);
 

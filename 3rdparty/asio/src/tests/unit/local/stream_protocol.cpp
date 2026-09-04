@@ -2,7 +2,7 @@
 // stream_protocol.cpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -82,7 +82,7 @@ void test()
     int native_socket2 = ::socket(AF_UNIX, SOCK_STREAM, 0);
     sp::socket socket8(ioc_ex, sp(), native_socket2);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     sp::socket::executor_type ex = socket1.get_executor();
     (void)ex;

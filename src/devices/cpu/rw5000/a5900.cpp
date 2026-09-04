@@ -12,6 +12,8 @@ TODO:
 #include "emu.h"
 #include "a5900.h"
 
+#include <bit>
+
 
 DEFINE_DEVICE_TYPE(A5900, a5900_cpu_device, "a5900", "Rockwell A5900")
 
@@ -36,7 +38,7 @@ void a5900_cpu_device::program_512x8(address_map &map)
 void a5900_cpu_device::op_read()
 {
 	// READ: add _KB (prioritized) to A, skip next on no overflow
-	m_a += ~((count_leading_zeros_32(m_read_kb() & 0xf) - 28) & 3) & 0xf;
+	m_a += ~((std::countl_zero(u8(m_read_kb() & 0xf)) - 4) & 3) & 0xf;
 	m_skip = !BIT(m_a, 4);
 	m_a &= 0xf;
 }

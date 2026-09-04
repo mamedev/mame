@@ -43,6 +43,10 @@ void a2eauxslot_slot_device::device_resolve_objects()
 		dev->set_a2eauxslot(m_a2eauxslot.target(), tag());
 }
 
+void a2eauxslot_slot_device::device_start()
+{
+}
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -117,9 +121,9 @@ void a2eauxslot_device::nmi_w(int state) { m_out_nmi_cb(state); }
 //-------------------------------------------------
 
 device_a2eauxslot_card_interface::device_a2eauxslot_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "a2eaux"),
-			m_a2eauxslot_finder(device, finder_base::DUMMY_TAG), m_a2eauxslot(nullptr),
-			m_a2eauxslot_slottag(nullptr), m_slot(0), m_next(nullptr)
+	: device_interface(device, "a2eaux")
+	, m_a2eauxslot_finder(device, finder_base::DUMMY_TAG), m_a2eauxslot(nullptr)
+	, m_a2eauxslot_slottag(nullptr), m_slot(0), m_next(nullptr)
 {
 }
 

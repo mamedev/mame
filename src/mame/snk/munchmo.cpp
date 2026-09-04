@@ -548,7 +548,7 @@ void munchmo_state::mnchmobl(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &munchmo_state::sound_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(munchmo_state::irq_ack)); // IORQ clears flip-flop at 1-7H
 
-	LS259(config, m_mainlatch, 0); // 12E
+	LS259(config, m_mainlatch); // 12E
 	m_mainlatch->q_out_cb<0>().set(FUNC(munchmo_state::palette_bank_0_w)); // BCL0 2-11E
 	m_mainlatch->q_out_cb<1>().set(FUNC(munchmo_state::palette_bank_1_w)); // BCL1 2-11E
 	m_mainlatch->q_out_cb<2>().set_nop(); // CL2 2-11E
@@ -558,7 +558,7 @@ void munchmo_state::mnchmobl(machine_config &config)
 	m_mainlatch->q_out_cb<6>().set(FUNC(munchmo_state::nmi_enable_w)); // ENI 1-10C
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256+32+32, 256);

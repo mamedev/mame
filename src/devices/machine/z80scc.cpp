@@ -385,8 +385,8 @@ DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z85
 //-------------------------------------------------
 void z80scc_device::device_add_mconfig(machine_config &config)
 {
-	Z80SCC_CHANNEL(config, CHANA_TAG, 0);
-	Z80SCC_CHANNEL(config, CHANB_TAG, 0);
+	Z80SCC_CHANNEL(config, CHANA_TAG);
+	Z80SCC_CHANNEL(config, CHANB_TAG);
 }
 
 
@@ -1165,6 +1165,7 @@ void z80scc_channel::device_reset()
 	{
 		m_uart->reset_interrupts();
 	}
+	m_extint_latch = 0;
 	m_extint_states = m_rr0;
 	m_baudtimer->adjust(attotime::never);
 	m_brg_counter = 0;
@@ -2461,7 +2462,7 @@ void z80scc_channel::data_write(uint8_t data)
 	if ( !(m_rr0 & RR0_TX_BUFFER_EMPTY) && // NMOS/CMOS 1 slot "FIFO" is controlled by the TBE bit instead of fifo logic
 		( (m_tx_fifo_wp + 1 == m_tx_fifo_rp) || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) )))
 	{
-		logerror("- TX FIFO is full, discarding data\n");
+		LOGTX("- TX FIFO is full, discarding data\n");
 	}
 	else // ..there is still room
 	{
@@ -2507,6 +2508,12 @@ void z80scc_channel::data_write(uint8_t data)
 	}
 
 	check_dma_request();
+
+	/* A character has just been loaded into the transmit buffer, so a preceding
+	   "Reset Tx Int Pending" command no longer applies: that command only suppresses
+	   transmit interrupts "until after the next character has been loaded into the
+	   transmit buffer". */
+	m_tx_int_disarm = 0;
 
 	/* Transmitter enabled?  */
 	if (m_wr5 & WR5_TX_ENABLE)

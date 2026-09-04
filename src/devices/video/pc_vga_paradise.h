@@ -14,7 +14,7 @@ public:
 	// Untested banked modes, later chipsets add non-working BitBlt
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
-	pvga1a_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pvga1a_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -166,7 +166,7 @@ private:
 class wd90c31_vga_device : public wd90c30_vga_device
 {
 public:
-	wd90c31_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd90c31_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void ext_io_map(address_map &map) ATTR_COLD;
 
@@ -194,7 +194,7 @@ private:
 class wd90c33_vga_device : public wd90c31_vga_device
 {
 public:
-	wd90c33_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd90c33_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void ext_io_map(address_map &map) override ATTR_COLD;
 	void localbus_if_map(address_map &map) ATTR_COLD;

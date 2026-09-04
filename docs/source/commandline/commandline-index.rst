@@ -326,11 +326,11 @@ Core Misc Options
 | :ref:`[no]skip_gameinfo <mame-commandline-skipgameinfo>`
 | :ref:`uifont <mame-commandline-uifont>`
 | :ref:`ui <mame-commandline-ui>`
-| :ref:`ramsize <mame-commandline-ramsize>`
 | :ref:`[no]confirm_quit <mame-commandline-confirmquit>`
 | :ref:`[no]ui_mouse <mame-commandline-uimouse>`
 | :ref:`language <mame-commandline-language>`
 | :ref:`[no]nvram_save <mame-commandline-nvramsave>`
+| :ref:`rtc <mame-commandline-rtc>`
 
 
 Scripting Options

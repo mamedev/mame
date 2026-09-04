@@ -26,7 +26,7 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 
 void null_modem_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 static INPUT_PORTS_START(null_modem)

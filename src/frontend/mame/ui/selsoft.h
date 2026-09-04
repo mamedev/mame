@@ -29,7 +29,7 @@ namespace ui {
 class menu_select_software : public menu_select_launch
 {
 public:
-	menu_select_software(mame_ui_manager &mui, render_container &container, ui_system_info const &system);
+	menu_select_software(mame_ui_manager &mui, render_target &target, ui_system_info const &system);
 	virtual ~menu_select_software() override;
 
 protected:

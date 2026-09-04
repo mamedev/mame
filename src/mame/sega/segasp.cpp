@@ -381,7 +381,7 @@ void segasp_state::segasp(machine_config &config)
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
 	X76F100(config, "naomibd_eeprom");  // actually not present
-	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", 0, "naomibd_eeprom", "pic_readout"));
+	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", "naomibd_eeprom", "pic_readout"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 }
 

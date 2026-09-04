@@ -17,41 +17,60 @@
 #include "galaga.h"
 #include "bosco.h"
 
+#include "video/resnet.h"
+
 
 void bosco_state::bosco_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances[3] = { 1000, 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], gweights, 0, 0,
+			2, &resistances[1], bweights, 0, 0);
 
 	// core palette
 	for (int i = 0; i < 32; i++)
 	{
 		int bit0, bit1, bit2;
 
+		// red component
 		bit0 = BIT(*color_prom, 0);
 		bit1 = BIT(*color_prom, 1);
 		bit2 = BIT(*color_prom, 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
+
+		// green component
 		bit0 = BIT(*color_prom, 3);
 		bit1 = BIT(*color_prom, 4);
 		bit2 = BIT(*color_prom, 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;
-		bit1 = BIT(*color_prom, 6);
-		bit2 = BIT(*color_prom, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 
+	// r/g low bit is n/c and effectively becomes a pulldown
+	double rsweights[2], gsweights[2], bsweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			2, &resistances[1], rsweights, resistances[0], 0,
+			2, &resistances[1], gsweights, resistances[0], 0,
+			2, &resistances[1], bsweights, 0, 0);
+
 	// palette for the stars
 	for (int i = 0; i < 64; i++)
 	{
-		static constexpr int map[4] = { 0x00, 0x47, 0x97 ,0xde };
-
-		int const r = map[(i >> 0) & 0x03];
-		int const g = map[(i >> 2) & 0x03];
-		int const b = map[(i >> 4) & 0x03];
+		int const r = combine_weights(rsweights, BIT(i, 0), BIT(i, 1));
+		int const g = combine_weights(gsweights, BIT(i, 2), BIT(i, 3));
+		int const b = combine_weights(bsweights, BIT(i, 4), BIT(i, 5));
 
 		palette.set_indirect_color(32 + i, rgb_t(r, g, b));
 	}

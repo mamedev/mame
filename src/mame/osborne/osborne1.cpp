@@ -976,7 +976,7 @@ void osborne1_state::osborne1_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &osborne1_state::osborne1_io);
 	m_maincpu->irqack_cb().set(FUNC(osborne1_state::irqack_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_osborne1);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
@@ -994,7 +994,7 @@ void osborne1_state::osborne1_base(machine_config &config)
 	m_pia0->cb2_handler().set(m_ieee, FUNC(ieee488_device::host_ren_w));
 	m_pia0->irqa_handler().set(FUNC(osborne1_state::ieee_pia_irq_a_func));
 
-	IEEE488(config, m_ieee, 0);
+	IEEE488(config, m_ieee);
 	m_ieee->srq_callback().set(m_pia0, FUNC(pia6821_device::ca2_w));
 
 	PIA6821(config, m_pia1);

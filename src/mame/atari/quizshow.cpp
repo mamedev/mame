@@ -64,7 +64,6 @@ public:
 	void quizshow(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -411,7 +410,7 @@ void quizshow_state::quizshow(machine_config &config)
 	TIMER(config, "clock_timer").configure_periodic(FUNC(quizshow_state::clock_timer_cb), attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))); // 8V
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(quizshow_state::screen_update));
 	m_screen->set_palette("palette");

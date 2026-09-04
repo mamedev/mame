@@ -19,7 +19,7 @@ bool g_PathTrailReplaceMode =
     ;
 
 
-#ifdef _WIN32
+// #ifdef _WIN32
 static void ReplaceIncorrectChars(UString &s)
 {
   {
@@ -87,7 +87,7 @@ static void ReplaceIncorrectChars(UString &s)
     }
   }
 }
-#endif
+// #endif
 
 /* WinXP-64 doesn't support ':', '\\' and '/' symbols in name of alt stream.
    But colon in postfix ":$DATA" is allowed.
@@ -167,10 +167,10 @@ static void Correct_PathPart(UString &s)
 
   if (s[0] == '.' && (s[1] == 0 || (s[1] == '.' && s[2] == 0)))
     s.Empty();
-  #ifdef _WIN32
+  // #ifdef _WIN32
   else
     ReplaceIncorrectChars(s);
-  #endif
+  // #endif
 }
 
 // static const char * const k_EmptyReplaceName = "[]";
@@ -208,7 +208,7 @@ void Correct_FsPath(bool absIsAllowed, bool keepAndReplaceEmptyPrefixes, UString
       if (parts.Size() > 1 && parts[1].IsEmpty())
       {
         i = 2;
-        if (parts.Size() > 2 && parts[2] == L"?")
+        if (parts.Size() > 2 && parts[2].IsEqualTo("?"))
         {
           i = 3;
           if (parts.Size() > 3 && NWindows::NFile::NName::IsDrivePath2(parts[3]))

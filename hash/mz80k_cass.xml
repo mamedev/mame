@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0-1.0
+
 As with other Sharp MZ series machines, there is no built in BASIC so this needs to be loaded from cassette before any
 BASIC programs can be run.
 
@@ -105,7 +106,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="breakout" supported="yes">
 		<description>Breakout</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="4127330">
@@ -117,7 +118,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="bugfire" supported="yes">
 		<description>Bug Fire</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="2757278">
@@ -160,7 +161,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="crystall" supported="yes">
 		<description>Crystall</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="4787">
@@ -208,7 +209,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="gremlins" supported="yes">
 		<description>Greedy Gremlins</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="17695">
@@ -280,7 +281,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="mntrcave" supported="yes">
 		<description>Minotaur's Cave</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="16865">
@@ -292,7 +293,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="munchies" supported="yes">
 		<description>Munchies</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="7041">
@@ -304,7 +305,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="otoriatk" supported="yes">
 		<description>Otori Attacker</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="12031">
@@ -340,7 +341,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="puckman" supported="yes">
 		<description>Puckman</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="17916">
@@ -352,7 +353,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="scramble" supported="yes">
 		<description>Scrambler</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="6017">
@@ -364,7 +365,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="spaceinv" supported="yes">
 		<description>Space Invader</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="10400">
@@ -436,7 +437,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="towering" supported="yes">
 		<description>Towering Inferno</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="11827">
@@ -460,7 +461,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="ufocaves" supported="yes">
 		<description>UFO Caves</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="29312">
@@ -472,7 +473,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="vidflipr" supported="yes">
 		<description>Video Flipper</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="9505">
@@ -484,7 +485,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 	<software name="zardos" supported="yes">
 		<description>Zardos</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="9152754">

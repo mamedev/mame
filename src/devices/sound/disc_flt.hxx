@@ -29,6 +29,8 @@
  *
  ************************************************************************/
 
+#include <numbers>
+
 /************************************************************************
  *
  * DST_CRFILTER - Usage of node_description values for CR filter
@@ -114,14 +116,12 @@ DISCRETE_RESET(dst_crfilter)
 static void calculate_filter1_coefficients(discrete_base_node *node, double fc, double type,
 											struct discrete_filter_coeff &coeff)
 {
-	double den, wc, two_over_T;
-
 	/* calculate digital filter coefficents */
-	/*wc = 2.0*M_PI*fc; no pre-warping */
-	wc = node->sample_rate()*2.0*tan(M_PI*fc/node->sample_rate()); /* pre-warping */
-	two_over_T = 2.0*node->sample_rate();
+	/*wc = 2.0*PI*fc; no pre-warping */
+	double wc = node->sample_rate() * 2.0 * tan(std::numbers::pi * fc/node->sample_rate()); /* pre-warping */
+	double two_over_T = 2.0*node->sample_rate();
 
-	den = wc + two_over_T;
+	double den = wc + two_over_T;
 	coeff.a1 = (wc - two_over_T)/den;
 	if (type == DISC_FILTER_LOWPASS)
 	{
@@ -229,8 +229,8 @@ static void calculate_filter2_coefficients(discrete_base_node *node,
 	double two_over_T_squared = two_over_T * two_over_T;
 
 	/* calculate digital filter coefficents */
-	/*wc = 2.0*M_PI*fc; no pre-warping */
-	wc = node->sample_rate() * 2.0 * tan(M_PI * fc / node->sample_rate()); /* pre-warping */
+	/*wc = 2.0*PI*fc; no pre-warping */
+	wc = node->sample_rate() * 2.0 * tan(std::numbers::pi * fc / node->sample_rate()); /* pre-warping */
 	wc_squared = wc * wc;
 
 	den = two_over_T_squared + d*wc*two_over_T + wc_squared;
@@ -472,7 +472,7 @@ DISCRETE_RESET(dst_op_amp_filt)
 			[[fallthrough]];
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 		{
-			double fc = 1.0 / (2 * M_PI * sqrt(m_rTotal * info->rF * info->c1 * info->c2));
+			double fc = 1.0 / (2 * std::numbers::pi * sqrt(m_rTotal * info->rF * info->c1 * info->c2));
 			double d  = (info->c1 + info->c2) / sqrt(info->rF / m_rTotal * info->c1 * info->c2);
 			double gain = -info->rF / m_rTotal * info->c2 / (info->c1 + info->c2);
 
@@ -1345,7 +1345,7 @@ DISCRETE_RESET(dst_sallen_key)
 	switch ((int) DST_SALLEN_KEY__TYPE)
 	{
 		case DISC_SALLEN_KEY_LOW_PASS:
-			freq = 1.0 / ( 2.0 * M_PI * sqrt(info->c1 * info->c2 * info->r1 * info->r2));
+			freq = 1.0 / ( 2.0 * std::numbers::pi * sqrt(info->c1 * info->c2 * info->r1 * info->r2));
 			q = sqrt(info->c1 * info->c2 * info->r1 * info->r2) / (info->c2 * (info->r1 + info->r2));
 			break;
 		default:
@@ -1379,7 +1379,7 @@ DISCRETE_RESET(dst_sallen_key)
 DISCRETE_RESET(dst_rcfilterN)
 {
 #if 0
-	double f=1.0/(2*M_PI* DST_RCFILTERN__R * DST_RCFILTERN__C);
+	double f=1.0/(2 * std::numbers::pi * DST_RCFILTERN__R * DST_RCFILTERN__C);
 
 /* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
 /* Put this stuff in a context */
@@ -1412,7 +1412,7 @@ DISCRETE_RESET(dst_rcfilterN)
 DISCRETE_RESET(dst_rcdiscN)
 {
 #if 0
-	double f = 1.0 / (2 * M_PI * DST_RCDISCN__R * DST_RCDISCN__C);
+	double f = 1.0 / (2 * std::numbers::pi * DST_RCDISCN__R * DST_RCDISCN__C);
 
 /* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
 /* Put this stuff in a context */
@@ -1486,10 +1486,8 @@ DISCRETE_STEP(dst_rcdisc2N)
 
 DISCRETE_RESET(dst_rcdisc2N)
 {
-	double f1,f2;
-
-	f1 = 1.0 / (2 * M_PI * DST_RCDISC2N__R0 * DST_RCDISC2N__C);
-	f2 = 1.0 / (2 * M_PI * DST_RCDISC2N__R1 * DST_RCDISC2N__C);
+	double f1 = 1.0 / (2 * std::numbers::pi * DST_RCDISC2N__R0 * DST_RCDISC2N__C);
+	double f2 = 1.0 / (2 * std::numbers::pi * DST_RCDISC2N__R1 * DST_RCDISC2N__C);
 
 	calculate_filter1_coefficients(this, f1, DISC_FILTER_LOWPASS, m_fc0);
 	calculate_filter1_coefficients(this, f2, DISC_FILTER_LOWPASS, m_fc1);

@@ -232,8 +232,8 @@ protected:
 	void kinst_map(address_map &map) ATTR_COLD;
 	void kinst2_map(address_map &map) ATTR_COLD;
 
-	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ide_r(offs_t offset);
+	void ide_w(offs_t offset, uint32_t data);
 
 private:
 	required_shared_ptr<uint32_t> m_rambase;
@@ -388,27 +388,27 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
  *
  *************************************/
 
-uint32_t kinst_state::ide_r(offs_t offset, uint32_t mem_mask)
+uint32_t kinst_state::ide_r(offs_t offset)
 {
-	return m_ata->cs0_r(offset / 2, mem_mask);
+	return m_ata->cs0_r(offset / 2);
 }
 
 
-void kinst_state::ide_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void kinst_state::ide_w(offs_t offset, uint32_t data)
 {
-	m_ata->cs0_w(offset / 2, data, mem_mask);
+	m_ata->cs0_w(offset / 2, data);
 }
 
 
 uint32_t kinst_state::ide_extra_r()
 {
-	return m_ata->cs1_r(6, 0xff);
+	return m_ata->cs1_r(6);
 }
 
 
 void kinst_state::ide_extra_w(uint32_t data)
 {
-	m_ata->cs1_w(6, data, 0xff);
+	m_ata->cs1_w(6, data);
 }
 
 
@@ -425,7 +425,7 @@ uint32_t kinst2uk_state::cpld_r(offs_t offset, uint32_t mem_mask)
 	if (m_prot_sel)
 		return (m_prot_sel << 4) | (m_prot_cnt ^ m_prot_rega ^ m_prot_regb);
 	else
-		return ide_r(0x0c, mem_mask);
+		return ide_r(0x0c);
 }
 
 
@@ -450,7 +450,7 @@ void kinst2uk_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_prot_sel = 0; // deselect IDE slave
 	}
 
-	ide_w(0x0c, data, mem_mask);
+	ide_w(0x0c, data);
 }
 
 
@@ -707,7 +707,7 @@ void kinst_state::kinst(machine_config &config)
 	m_ata->irq_handler().set_inputline(m_maincpu, 1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL/8, 406, 0, 320, 261, 0, 240);
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
@@ -717,7 +717,7 @@ void kinst_state::kinst(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_2K(config, m_dcs, 0);
+	DCS_AUDIO_2K(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
 }

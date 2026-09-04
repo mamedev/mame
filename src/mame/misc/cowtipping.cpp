@@ -91,7 +91,7 @@ void cowtipping_state::cowtipping(machine_config &config)
 
 //  TODO: AMD_29LV640MB (64 MBit with Boot Sector)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));  // wrong
+	screen_device &screen(SCREEN(config, "screen"));  // wrong
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(cowtipping_state::screen_update));
 	screen.set_size(1024, 256);

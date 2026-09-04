@@ -132,10 +132,10 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
-	void pbaction(machine_config &config);
-	void pbactionx(machine_config &config);
+	void pbaction(machine_config &config) ATTR_COLD;
+	void pbactionx(machine_config &config) ATTR_COLD;
 
-	void init_pbaction2();
+	void init_pbaction2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -204,7 +204,7 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void pbactiont(machine_config &config);
+	void pbactiont(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -698,7 +698,7 @@ void pbaction_state::pbaction(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_audiocpu, 0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -744,7 +744,6 @@ void pbaction_tecfri_state::machine_start()
 	pbaction_state::machine_start();
 
 	m_subcommand_timer = timer_alloc(FUNC(pbaction_tecfri_state::sub_trigger), this);
-	m_digits.resolve();
 }
 
 void pbaction_tecfri_state::pbactiont(machine_config &config)

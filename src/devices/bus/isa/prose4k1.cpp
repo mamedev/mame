@@ -70,7 +70,7 @@ void prose4k1_device::device_add_mconfig(machine_config &config)
 {
 	I80188(config, "u8", 8'000'000).set_addrmap(AS_PROGRAM, &prose4k1_device::main_map); // TODO: measure clock
 
-	I8251(config, "u27", 0);
+	I8251(config, "u27");
 }
 
 

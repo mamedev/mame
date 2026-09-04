@@ -24,7 +24,7 @@ class smartmedia_image_device : public nand_device, public device_memcard_image_
 {
 public:
 	// construction/destruction
-	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual bool is_creatable() const noexcept override { return false; }

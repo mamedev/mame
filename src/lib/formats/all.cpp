@@ -218,6 +218,10 @@
 #include "d81_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_D2M_DSK
+#include "d2m_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_D82_DSK
 #include "d82_dsk.h"
 #endif
@@ -522,12 +526,16 @@
 #include "p2000t_cas.h"
 #endif
 
-#ifdef HAS_FORMATS_P6001_CAS
-#include "p6001_cas.h"
-#endif
+//#ifdef HAS_FORMATS_P6001_CAS
+//#include "p6001_cas.h"
+//#endif
 
 #ifdef HAS_FORMATS_PASTI_DSK
 #include "pasti_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_PC88_T88
+#include "pc88_t88.h"
 #endif
 
 #ifdef HAS_FORMATS_PC98FDI_DSK
@@ -584,6 +592,10 @@
 
 #ifdef HAS_FORMATS_RX50_DSK
 #include "rx50_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_S900_DSK
+#include "s900_dsk.h"
 #endif
 
 #ifdef HAS_FORMATS_SAP_DSK
@@ -770,6 +782,10 @@
 #include "fs_hp98x5.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_ADAM_EOS
+#include "fs_adam_eos.h"
+#endif
+
 void mame_formats_full_list(mame_formats_enumerator &en)
 {
 	en.category("Generic");
@@ -895,6 +911,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 
 	en.category("Coleco");
+#ifdef HAS_FORMATS_FS_ADAM_EOS
+	en.add(fs::ADAM_EOS); // fs_adam_eos.h
+#endif
 #ifdef HAS_FORMATS_ADAM_CAS
 	en.add(coleco_adam_cassette_formats); // adam_cas.h
 #endif
@@ -984,6 +1003,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_D81_DSK
 	en.add(FLOPPY_D81_FORMAT); // d81_dsk.h
+#endif
+#ifdef HAS_FORMATS_D2M_DSK
+	en.add(FLOPPY_D1M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D2M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D4M_FORMAT); // d2m_dsk.h
 #endif
 #ifdef HAS_FORMATS_D82_DSK
 	en.add(FLOPPY_D82_FORMAT); // d82_dsk.h
@@ -1229,7 +1253,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("MikroMikko");
 #ifdef HAS_FORMATS_MM_DSK
 	en.add(FLOPPY_MM1_FORMAT); // mm_dsk.h
-	en.add(FLOPPY_MM2_FORMAT); // mm_dsk.h
 #endif
 
 	en.category("Elektronika");
@@ -1466,6 +1489,14 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
+    en.category("NEC");
+#ifdef HAS_FORMATS_PC88_T88
+  en.add(t88_cassette_formats); // pc88_t88.h
+#endif	
+//#ifdef HAS_FORMATS_P6001_CAS
+//  en.add(pc6001_cassette_formats); // p6001_cas.h
+//#endif
+
 	en.category("Orao");
 #ifdef HAS_FORMATS_ORAO_CAS
 	en.add(orao_cassette_formats); // orao_cas.h
@@ -1477,11 +1508,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_P2000T_CAS
 	en.add(p2000t_cassette_formats); // p2000t_cas.h
-#endif
-
-	en.category("NEC");
-#ifdef HAS_FORMATS_P6001_CAS
-	en.add(pc6001_cassette_formats); // p6001_cas.h
 #endif
 
 	en.category("Sanyo");
@@ -1563,5 +1589,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Wren");
 #ifdef HAS_FORMATS_WREN_DSK
 	en.add(FLOPPY_WREN_FORMAT); // wren_dsk.h
+#endif
+
+	en.category("Akai");
+#ifdef HAS_FORMATS_S900_DSK
+	en.add(FLOPPY_S900_FORMAT); // s900_dsk.h
 #endif
 }

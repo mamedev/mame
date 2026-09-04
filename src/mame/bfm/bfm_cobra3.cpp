@@ -4,7 +4,8 @@
 /* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
 
-   TODO: MPEG decoding currently not implemented
+   MPEG audio decoding is preliminary.
+   TODO: MPEG video decoding is not implemented.
 */
 
 
@@ -17,11 +18,12 @@
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
-#include "video/ramdac.h"
 #include "machine/rescap.h"
 #include "machine/scc66470.h"
 #include "machine/watchdog.h"
+#include "sound/tms320av110.h"
 #include "sound/ymz280b.h"
+#include "video/ramdac.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +39,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cpuregion(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
+		m_av110(*this, "av110"),
 		m_ymz(*this, "ymz280b"),
 		m_palette(*this, "palette"),
 		m_ramdac(*this, "ramdac"),
@@ -56,6 +59,7 @@ protected:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_region_ptr<uint16_t> m_cpuregion;
 	required_device<nvram_device> m_nvram;
+	required_device<tms320av110_device> m_av110;
 	required_device<ymz280b_device> m_ymz;
 	required_device<palette_device> m_palette;
 	required_device<ramdac_device> m_ramdac;
@@ -77,12 +81,12 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	void volume_control(uint8_t direction, uint8_t clock);
+	void av110_reset_strobe_w(u8 data);
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void dma1_drq(int state);
 	void scc66470_irq(int state);
 
 	void bfm_cobra3_map(address_map &map) ATTR_COLD;
@@ -92,7 +96,7 @@ protected:
 
 void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 {
-	int clock_changed = m_vol_clock ^ clock;
+	uint8_t const clock_changed = m_vol_clock ^ clock;
 
 	m_vol_clock = clock;
 	if (clock_changed)
@@ -110,12 +114,21 @@ void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 					m_volume--;
 			}
 
-			float fraction = (64 - m_volume) / 64.0f;
+			float const fraction = (32 - m_volume) / 32.0f;
 
 			m_ymz->set_output_gain(0, fraction);
 			m_ymz->set_output_gain(1, fraction);
+			m_av110->set_output_gain(0, fraction);
+			m_av110->set_output_gain(1, fraction);
 		}
 	}
+}
+
+void bfm_cobra3_state::av110_reset_strobe_w(u8)
+{
+	// This decoded write pulses the AV110's active-low RESET input.
+	m_av110->reset_w(0);
+	m_av110->reset_w(1);
 }
 
 uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
@@ -145,8 +158,7 @@ uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
 
 					case 0x400:
 						{
-							//input reads, haven't got far enough to trigger any
-							return m_strobein[m_active_strobe]->read();
+							return m_strobein[m_active_strobe]->read() << 8;
 						}
 					case 0x500: //SCSI DMA
 						if (ACCESSING_BITS_8_15)
@@ -307,6 +319,8 @@ void bfm_cobra3_state::bfm_cobra3_map(address_map &map)
 {
 	map(0x00000000, 0xffffffff).rw(FUNC(bfm_cobra3_state::mem_r), FUNC(bfm_cobra3_state::mem_w));
 	map(0x00800000, 0x009fffff).m(m_scc66470, FUNC(scc66470_device::map)).cswidth(16);
+	map(0x00a80000, 0x00a80001).w(FUNC(bfm_cobra3_state::av110_reset_strobe_w)).umask16(0x00ff);
+	map(0x00a81000, 0x00a810ff).m(m_av110, FUNC(tms320av110_device::map)).umask16(0x00ff);
 }
 
 void bfm_cobra3_state::ramdac_map(address_map &map)
@@ -377,20 +391,19 @@ INPUT_PORTS_END
 void bfm_cobra3_state::machine_start()
 {
 	m_active_strobe = 0;
-	m_lamps.resolve();
+	m_vol_clock = 0;
+	m_volume = 0;
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
+
+	save_item(NAME(m_vol_clock));
+	save_item(NAME(m_volume));
 }
 
-
-void bfm_cobra3_state::dma1_drq(int state)
-{
-//  m_maincpu->dma_dreq1_w(state);
-}
 
 void bfm_cobra3_state::scc66470_irq(int state)
 {
-	m_maincpu->set_input_line(5, !state);
+	m_maincpu->set_input_line(5, state);
 }
 
 uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -462,14 +475,14 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15000000, 960, 0, 768, 312, 32, 312);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(FUNC(bfm_cobra3_state::screen_update));
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	RAMDAC(config, m_ramdac, 0, m_palette); // MUSIC Semiconductor TR9C1710 RAMDAC
+	RAMDAC(config, m_ramdac, m_palette); // MUSIC Semiconductor TR9C1710 RAMDAC
 	m_ramdac->set_addrmap(0, &bfm_cobra3_state::ramdac_map);
 	m_ramdac->set_split_read(1);
 
@@ -479,6 +492,14 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	YMZ280B(config, m_ymz, 16.9344_MHz_XTAL);
 	m_ymz->add_route(0, "lspeaker", 1.0);
 	m_ymz->add_route(1, "rspeaker", 1.0);
+
+	TMS320AV110(config, m_av110, 24_MHz_XTAL);
+	// Cobra enables decoder modes that require the optional external DRAM.
+	m_av110->set_external_dram(true);
+	// AV110 REQ and MC68340 DREQ2 are both active low.
+	m_av110->req().set(m_maincpu, FUNC(m68340_cpu_device::dma_dreq2_w));
+	m_av110->add_route(0, "lspeaker", 1.0);
+	m_av110->add_route(1, "rspeaker", 1.0);
 
 	SCC66470(config,m_scc66470,30000000);
 	m_scc66470->set_addrmap(0, &bfm_cobra3_state::scc66470_map);
@@ -491,10 +512,10 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 
 	NCR5380(config, m_scsic);
 	scsi.set_external_device(6, m_scsic);
-	m_scsic->drq_handler().set(DEVICE_SELF, FUNC(bfm_cobra3_state::dma1_drq));
+	m_scsic->drq_handler().set(m_maincpu, FUNC(m68340_cpu_device::dma_dreq1_w)).invert();
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9)); //TODO: Check timings
-	METERS(config, m_meters, 0).set_number(4);
+	METERS(config, m_meters).set_number(4);
 }
 
 ROM_START( c3_rtime )

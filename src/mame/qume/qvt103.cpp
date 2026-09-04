@@ -122,7 +122,7 @@ void qvt103_state::qvt103(machine_config &config)
 	z80dart_device &dart(Z80DART(config, "dart", 29.376_MHz_XTAL / 9));
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(29.376_MHz_XTAL * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300);
 	//screen.set_raw(29.376_MHz_XTAL, 170 * 9, 0, 132 * 9, 320, 0, 300);
 	screen.set_screen_update(FUNC(qvt103_state::screen_update));

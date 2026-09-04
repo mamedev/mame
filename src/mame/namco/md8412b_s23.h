@@ -16,7 +16,7 @@
 class md8412b_s23_device : public device_t
 {
 public:
-	md8412b_s23_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	md8412b_s23_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void map(address_map &map);
 

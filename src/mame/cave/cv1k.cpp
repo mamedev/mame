@@ -186,7 +186,6 @@ Remaining Video issues
 
 Timing
  - Experimental SH7709S cache/memory timing
- - Requires to measure screen raw params for correct video timing?
 
 Removed games
  - 31/12/2021, Akai Katana and Dodonpachi Saidaioujou were removed at the request of the current
@@ -218,6 +217,7 @@ public:
 		m_blitter(*this, "blitter"),
 		m_nand(*this, "nand"),
 		m_eeprom(*this, "eeprom"),
+		m_ymz770(*this, "ymz770"),
 		m_ram(*this, "mainram"),
 		m_rombase(*this, "maincpu"),
 		m_eepromout(*this, "EEPROMOUT"),
@@ -244,6 +244,7 @@ private:
 	required_device<cv1k_blitter_device> m_blitter;
 	required_device<samsung_k9f1g08u0m_device> m_nand;
 	required_device<rtc9701_device> m_eeprom;
+	required_device<ymz770_device> m_ymz770;
 
 	required_shared_ptr<u64> m_ram;
 	required_region_ptr<u64> m_rombase;
@@ -257,6 +258,7 @@ private:
 	void flash_io_w(offs_t offset, u8 data);
 	u8 serial_rtc_eeprom_r(offs_t offset);
 	void serial_rtc_eeprom_w(offs_t offset, u8 data);
+	void sound_w(offs_t offset, u8 data);
 	u64 flash_port_e_r();
 
 	u64 speedup_r();
@@ -273,14 +275,28 @@ private:
 
 // FLASH interface
 
+// cv1k flash timing notes:
+// - For early titles this has less of an impact
+// - The times this is mostly visible is during midboss final patterns and certain boss patterns
+// - Latter titles lean more and more on mid stage load sequences where combined with the
+//   unneeded cache flush cause a lot of stage slowdown
+// - This behavior is exhibited in quite a bit of bosses, one big example is Pink Sweets final
+//   boss rainbow pattern where it causes the game to pause for an extended number of frames
+//   resulting in very staggered slowdown. Knowingly or unknowingly this in some cases causes
+//   or smooths some slowdown such as some patterns on the Mushi Futari Stage 5 boss
+// - Flash ready time doesn't account for a ton of time (~2500 cycles) but once the flash is ready
+//   to be read each read is done a byte at a time from an uncached area each taking ~10 cycles
+//   (2 base + 3 wait states) = 5 bus cycles -> 10 cpu cycles
 u64 cv1k_state::flash_port_e_r()
 {
 	return ((!m_nand->is_busy() ? 0x20 : 0x00)) | 0xdf;
 }
 
-
+// The cv1k_map is in physical addresses, the titles access registers from
+// uncached region 5 0xB...
 u8 cv1k_state::flash_io_r(offs_t offset)
 {
+	m_maincpu->update_access_cycles(0xB0000000 + offset, false);
 	switch (offset)
 	{
 		default:
@@ -302,6 +318,7 @@ u8 cv1k_state::flash_io_r(offs_t offset)
 
 void cv1k_state::flash_io_w(offs_t offset, u8 data)
 {
+	m_maincpu->update_access_cycles(0xB0000000 + offset, true);
 	switch (offset)
 	{
 		default:
@@ -328,6 +345,7 @@ void cv1k_state::flash_io_w(offs_t offset, u8 data)
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 {
+	m_maincpu->update_access_cycles(0xB0c00000 + offset, false);
 	switch (offset)
 	{
 		case 0x01:
@@ -340,6 +358,7 @@ u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 
 void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 {
+	m_maincpu->update_access_cycles(0xB0c00000 + offset, true);
 	switch (offset)
 	{
 		case 0x01:
@@ -356,14 +375,20 @@ void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 	}
 }
 
+// Sound writes are also done to an uncached area so they should take a penalty hit
+void cv1k_state::sound_w(offs_t offset, u8 data)
+{
+	m_maincpu->update_access_cycles(0xB0400000 + offset, true);
+	m_ymz770->write(offset, data);
+}
 
 void cv1k_state::base_map(address_map &map)
 {
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
-	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
+	map(0x10400000, 0x10400007).w(FUNC(cv1k_state::sound_w));
 	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  map(0x18000000, 0x18000057) // blitter, installed on reset
-	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
+	map(0xf0000000, 0xf0ffffff).ram(); // Memory mapped sh3 cache entry array
 }
 
 void cv1k_state::cv1k_map(address_map &map)
@@ -457,6 +482,79 @@ static INPUT_PORTS_START( cv1ks )
 	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mmmbanc )
+	PORT_INCLUDE( cv1k )
+
+	PORT_MODIFY("PORT_C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Service coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) // acts as reset key on hopper error
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  )
+	PORT_DIPNAME( 0x08, 0x08, "PORT_C" ) // hopper line_r
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // payout?
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+	PORT_MODIFY("PORT_D")
+	PORT_DIPNAME( 0x01, 0x01, "PORT_D" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE4 ) // touch screen calibration, needs long press
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 ) // actual service mode, needs long press and touch screen
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_F has no equivalent in the bare cross hatch test
+
+	PORT_MODIFY("PORT_L")
+	PORT_DIPNAME( 0x01, 0x01, "PORT_L" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 void cv1k_state::machine_reset()
 {
 	m_blitter->set_rambase(reinterpret_cast<u16 *>(m_ram.target()));
@@ -483,20 +581,23 @@ void cv1k_state::cv1k(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold)); // irq2 actually asserted at V-sync pulse, not at V-blank
 
 	RTC9701(config, m_eeprom);
-	SAMSUNG_K9F1G08U0M(config, m_nand, 0);
+	SAMSUNG_K9F1G08U0M(config, m_nand);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(60.024)); // measured from ibara PCB rates - 60.024Hz, 262 total lines
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 512);
-	screen.set_visarea(0, 320-1, 0, 240-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	// Measured from futari15 PCB.
+	// 262 total lines, vsync pulse is 3 lines. 19 non-sync lines are empty.
+	// Each line is 407 pixels, hsync pulse is 29 pixels. 58 non-sync pixels are empty.
+	// Framerate is 60.0183806291 Hz (6,400,000 / (262 * 407) ).
+	// cfr. https://github.com/buffis/cv1k_research/tree/main/Video_Timings for details.
+	screen.set_raw(12.8_MHz_XTAL / 2, 407, 0, 320, 262, 0, 240);
 	screen.set_screen_update(m_blitter, FUNC(cv1k_blitter_device::screen_update));
 
 	SPEAKER(config, "mono").front_center();
 	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
 
-	CV1K_BLITTER(config, m_blitter, 0);
+	CV1K_BLITTER(config, m_blitter);
+	m_blitter->set_maincpu(m_maincpu); // timing tracking of uncached blitter r/w access
 	m_blitter->set_screen("screen");
 	m_blitter->port_r_callback().set_ioport("DSW");
 	m_blitter->set_mainramsize(0x800000);
@@ -1061,4 +1162,4 @@ GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
 //GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                                           MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
-GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
+GAME( 2007, mmmbanc,    0,        cv1k,   mmmbanc, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )

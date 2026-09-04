@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="mbs1_cass" description="Hitachi MB-S1 cassettes">
+
+	<software name="mariosp" supported="no">
+		<description>Mario Bros. Special</description>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="マリオブラザーズ スペシャル" />
+		<info name="serial" value="MA-1006" />
+		<part name="cass1" interface="mbs1_cass">
+			<dataarea name="cass" size="22412844">
+				<rom name="mario bros. special (hitachi s1) [ct].wav" size="22412844" crc="12892be3" sha1="4d4a91a29bca27b2aea97be6aac8984b5e7f5c5a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nutsmilk" supported="no">
+		<description>Nuts &amp; Milk</description>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="ナッツ&amp;ミルク" />
+		<info name="serial" value="MA-3202" />
+		<part name="cass1" interface="mbs1_cass">
+			<dataarea name="cass" size="25840172">
+				<rom name="nuts &amp; milk (hitachi s1) [ct].wav" size="25840172" crc="1113103e" sha1="bcfcca93d5dede90bf6ddadf268b2eb5e33a7e5a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomathim" supported="no">
+		<description>Salad no Kuni no Tomato-hime</description>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="サラダの国のトマト姫" />
+		<info name="serial" value="MA-3204" />
+		<part name="cass1" interface="mbs1_cass">
+			<feature name="part_id" value="ADV-1" />
+			<dataarea name="cass" size="20015660">
+				<rom name="princess tomato in the salad kingdom (hitachi s1) [ct 1].wav" size="20015660" crc="cc919d96" sha1="78841743f3cc1fd409c73acad1b848e8336b2da6" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mbs1_cass">
+			<feature name="part_id" value="ADV-2,3" />
+			<dataarea name="cass" size="38531116">
+				<rom name="princess tomato in the salad kingdom (hitachi s1) [ct 2].wav" size="38531116" crc="11f03004" sha1="5281338f35cdbecf9463df792a83a60c9fbe2031" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mbs1_cass">
+			<feature name="part_id" value="ADV-4,5" />
+			<dataarea name="cass" size="31778860">
+				<rom name="princess tomato in the salad kingdom (hitachi s1) [ct 3].wav" size="31778860" crc="23c04355" sha1="540346060205803e648bb6a098e5e443ae851d71" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

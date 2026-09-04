@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "prot_kof2k3bl.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(NG_KOF2K3BL_PROT, kof2k3bl_prot_device, "ng_kof2k3bl_prot", "Neo Geo KoF 2003 Bootleg Protection")
 
 

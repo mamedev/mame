@@ -128,7 +128,7 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	for (required_device<vr0uart_device> &uart : m_uart)
 		VRENDER0_UART(config, uart, 3'579'500); // DERIVED_CLOCK(1, 24));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// evolution soccer defaults
 	m_screen->set_raw((XTAL(14'318'181)*2)/4, 455, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vrender0soc_device::screen_update));
@@ -139,6 +139,7 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(1, 1));
 	m_vr0vid->set_addrmap(vr0video_device::AS_TEXTURE, &vrender0soc_device::texture_map);
 	m_vr0vid->set_addrmap(vr0video_device::AS_FRAME, &vrender0soc_device::frame_map);
+	m_vr0vid->set_screen(m_screen);
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
@@ -169,6 +170,7 @@ void vrender0soc_device::device_start()
 	{
 		m_uart[i]->set_channel_num(i);
 		m_uart[i]->set_parent(this);
+		m_uart[i]->set_external_clock(m_uart_uclk);
 	}
 
 	save_item(NAME(m_inten));
@@ -686,7 +688,7 @@ void vrender0soc_device::crtc_update()
 	//logerror("%dX%d %dX%d %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
 
 	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
-	m_screen->configure(htot, vtot, visarea, HZ_TO_ATTOSECONDS(pixel_clock) * vtot * htot);
+	m_screen->configure(htot, vtot, visarea, attotime::from_ticks(vtot * htot, pixel_clock));
 }
 
 // accessed by cross puzzle

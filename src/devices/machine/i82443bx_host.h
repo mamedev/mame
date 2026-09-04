@@ -19,7 +19,14 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
 	}
-	i82443bx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	i82443bx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, int ram_size)
+		: i82443bx_host_device(mconfig, tag, owner)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
+	i82443bx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	i82443bx_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

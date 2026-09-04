@@ -488,13 +488,13 @@ void vastar_state::vastar(machine_config &config)
 	mainlatch.q_out_cb<1>().set(m_vasvid, FUNC(vastar_video_device::flipscreen_w));
 
 	// video hardware
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
-	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid);
 	m_vasvid->set_screen("screen");
 	m_vasvid->set_bg_bases(0x800, 0x000, 0xc00);
 	m_vasvid->set_fg_bases(0x800, 0x400, 0x000);
@@ -514,9 +514,9 @@ void dogfightp_state::dogfightp(machine_config &config)
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
 	mainlatch.q_out_cb<1>().set("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
-	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
+	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb"));
 	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }

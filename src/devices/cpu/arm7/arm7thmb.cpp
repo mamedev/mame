@@ -5,6 +5,11 @@
 #include "arm7core.h"
 #include "arm7help.h"
 
+#define LOG_OPS     (1U << 1)
+
+#define VERBOSE     (0)
+#include "logmacro.h"
+
 // this is our master dispatch jump table for THUMB mode, representing [(INSN & 0xffc0) >> 6] bits of the 16-bit decoded instruction
 const arm7_cpu_device::arm7thumb_ophandler arm7_cpu_device::thumb_handler[0x40*0x10] =
 {
@@ -283,6 +288,47 @@ const arm7_cpu_device::arm7thumb_ophandler arm7_cpu_device::thumb_handler[0x40*0
 };
 
 	/* Shift operations */
+
+// Undefined Thumb instruction: take the UND exception. R15 is left pointing at the instruction -
+// the exception entry computes R14_und = R15 + 2.
+void arm7_cpu_device::thumb_undefined(uint32_t pc, uint32_t op)
+{
+	LOGMASKED(LOG_OPS, "%08x: undefined Thumb instruction %04x\n", pc, op);
+	m_pendingUnd = true;
+	update_irq_state();
+}
+
+// LDMIA/STMIA/PUSH/POP with an empty register list: UNPREDICTABLE. Real cores adjust the base by 0x40
+// as if eight registers had been transferred, and ARMv4 cores (ARM7TDMI) also transfer R15 through the
+// first slot (stored as the instruction address + 6, by analogy with the ARM-state + 12).
+void arm7_cpu_device::thumb_empty_rlist(uint32_t rb, bool load, bool ascending)
+{
+	uint32_t const base = GetRegister(rb);
+	uint32_t const addr = ascending ? base : (base - 0x40);
+	LOGMASKED(LOG_OPS, "%08x: Thumb %s with an empty register list\n", R15, load ? "LDMIA/POP" : "STMIA/PUSH");
+	uint32_t const newbase = ascending ? (base + 0x40) : (base - 0x40);
+	if (m_archRev < 5)
+	{
+		if (load)
+		{
+			uint32_t const data = READ32(addr & ~3);
+			if (m_pendingAbtD)
+			{
+				R15 += 2;
+			}
+			else
+			{
+				SetRegister(rb, newbase);
+				R15 = data & ~1;    // ARMv4T: no state change on a load to PC
+			}
+			return;
+		}
+		WRITE32(addr & ~3, R15 + 6);
+	}
+	if (!m_pendingAbtD)
+		SetRegister(rb, newbase);
+	R15 += 2;
+}
 
 void arm7_cpu_device::tg00_0(uint32_t pc, uint32_t op) /* Shift left */
 {
@@ -638,7 +684,7 @@ void arm7_cpu_device::tg04_00_05(uint32_t pc, uint32_t op) /* ADC Rd, Rs */
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	uint32_t op2 = (GET_CPSR & C_MASK) ? 1 : 0;
 	uint32_t rn = GetRegister(rd) + GetRegister(rs) + op2;
-	HandleThumbALUAddFlags(rn, GetRegister(rd), (GetRegister(rs))); // ?
+	HandleThumbALUAddFlags(rn, GetRegister(rd), GetRegister(rs));
 	SetRegister(rd, rn);
 }
 
@@ -660,7 +706,7 @@ void arm7_cpu_device::tg04_00_07(uint32_t pc, uint32_t op) /* ROR Rd, Rs */
 	const uint32_t imm = GetRegister(rs) & 0xff;
 	if (imm > 0)
 	{
-		SetRegister(rd, rotr_32(rrd, imm));
+		SetRegister(rd, std::rotr(rrd, imm));
 		if (rrd & (1 << ((imm - 1) & 0x1f)))
 		{
 			set_cpsr(GET_CPSR | C_MASK);
@@ -753,9 +799,12 @@ void arm7_cpu_device::tg04_00_0f(uint32_t pc, uint32_t op) /* MVN Rd, Rs */
 
 /* ADD Rd, Rs group */
 
-void arm7_cpu_device::tg04_01_00(uint32_t pc, uint32_t op)
+void arm7_cpu_device::tg04_01_00(uint32_t pc, uint32_t op) /* ADD Rd, Rs (H1 = H2 = 0: UNPREDICTABLE, executed as the plain ADD like MOV/CMP) */
 {
-	fatalerror("%08x: G4-1-0 Undefined Thumb instruction: %04x %x\n", pc, op, (op & THUMB_HIREG_H) >> THUMB_HIREG_H_SHIFT);
+	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
+	uint32_t rd = op & THUMB_HIREG_RD;
+	SetRegister(rd, GetRegister(rd) + GetRegister(rs));
+	R15 += 2;
 }
 
 void arm7_cpu_device::tg04_01_01(uint32_t pc, uint32_t op) /* ADD Rd, HRs */
@@ -940,6 +989,11 @@ void arm7_cpu_device::tg04_01_31(uint32_t pc, uint32_t op)
 /* BLX */
 void arm7_cpu_device::tg04_01_32(uint32_t pc, uint32_t op)
 {
+	if (m_archRev < 5)
+	{
+		thumb_undefined(pc, op);    // ARMv5T
+		return;
+	}
 	uint32_t addr = GetRegister((op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT);
 	SetRegister(14, (R15 + 2) | 1);
 
@@ -960,15 +1014,44 @@ void arm7_cpu_device::tg04_01_32(uint32_t pc, uint32_t op)
 	R15 = addr;
 }
 
+/* BLX <Hm> (H1 = 1, H2 = 1: Rm = R8-R15) */
 void arm7_cpu_device::tg04_01_33(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: G4-3 Undefined Thumb instruction: %04x\n", pc, op);
+	if (m_archRev < 5)
+	{
+		thumb_undefined(pc, op);    // ARMv5T
+		return;
+	}
+	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
+	uint32_t addr = GetRegister(rs+8);
+	if (rs == 7)
+	{
+		addr += 2;      // R15 reads as the instruction address + 4
+	}
+	SetRegister(14, (R15 + 2) | 1);
+
+	// are we also switching to ARM mode?
+	if (!(addr & 1))
+	{
+		set_cpsr(GET_CPSR & ~T_MASK);
+		if (addr & 2)
+		{
+			addr += 2;
+		}
+	}
+	else
+	{
+		addr &= ~1;
+	}
+
+	R15 = addr;
 }
 
 void arm7_cpu_device::tg04_0203(uint32_t pc, uint32_t op)
 {
 	uint32_t readword = READ32((R15 & ~2) + 4 + ((op & THUMB_INSN_IMM) << 2));
-	SetRegister((op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT, readword);
+	if (!m_pendingAbtD)
+		SetRegister((op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT, readword);
 	R15 += 2;
 }
 
@@ -1011,7 +1094,8 @@ void arm7_cpu_device::tg05_3(uint32_t pc, uint32_t op)  /* LDRSB Rd, [Rn, Rm] */
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
 	uint32_t op2 = READ8(addr);
-	SetRegister(rd, util::sext(op2, 8));
+	if (!m_pendingAbtD)
+		SetRegister(rd, util::sext(op2, 8));
 	R15 += 2;
 }
 
@@ -1022,7 +1106,8 @@ void arm7_cpu_device::tg05_4(uint32_t pc, uint32_t op)  /* LDR Rd, [Rn, Rm] */
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
 	uint32_t op2 = READ32(addr);
-	SetRegister(rd, op2);
+	if (!m_pendingAbtD)
+		SetRegister(rd, op2);
 	R15 += 2;
 }
 
@@ -1033,7 +1118,8 @@ void arm7_cpu_device::tg05_5(uint32_t pc, uint32_t op)  /* LDRH Rd, [Rn, Rm] */
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
 	uint32_t op2 = READ16(addr);
-	SetRegister(rd, op2);
+	if (!m_pendingAbtD)
+		SetRegister(rd, op2);
 	R15 += 2;
 }
 
@@ -1044,7 +1130,8 @@ void arm7_cpu_device::tg05_6(uint32_t pc, uint32_t op)  /* LDRB Rd, [Rn, Rm] */
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
 	uint32_t op2 = READ8(addr);
-	SetRegister(rd, op2);
+	if (!m_pendingAbtD)
+		SetRegister(rd, op2);
 	R15 += 2;
 }
 
@@ -1057,7 +1144,8 @@ void arm7_cpu_device::tg05_7(uint32_t pc, uint32_t op)  /* LDRSH Rd, [Rn, Rm] */
 	int32_t op2 = (int32_t)(int16_t)(uint16_t)READ16(addr & ~1);
 	if ((addr & 1) && m_archRev < 5)
 		op2 >>= 8;
-	SetRegister(rd, op2);
+	if (!m_pendingAbtD)
+		SetRegister(rd, op2);
 	R15 += 2;
 }
 
@@ -1077,7 +1165,9 @@ void arm7_cpu_device::tg06_1(uint32_t pc, uint32_t op) /* Load */
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = op & THUMB_ADDSUB_RD;
 	int32_t offs = ((op & THUMB_LSOP_OFFS) >> THUMB_LSOP_OFFS_SHIFT) << 2;
-	SetRegister(rd, READ32(GetRegister(rn) + offs)); // fix
+	uint32_t const data = READ32(GetRegister(rn) + offs);
+	if (!m_pendingAbtD)
+		SetRegister(rd, data);
 	R15 += 2;
 }
 
@@ -1097,7 +1187,9 @@ void arm7_cpu_device::tg07_1(uint32_t pc, uint32_t op)  /* Load */
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = op & THUMB_ADDSUB_RD;
 	int32_t offs = (op & THUMB_LSOP_OFFS) >> THUMB_LSOP_OFFS_SHIFT;
-	SetRegister(rd, READ8(GetRegister(rn) + offs));
+	uint32_t const data = READ8(GetRegister(rn) + offs);
+	if (!m_pendingAbtD)
+		SetRegister(rd, data);
 	R15 += 2;
 }
 
@@ -1117,7 +1209,9 @@ void arm7_cpu_device::tg08_1(uint32_t pc, uint32_t op) /* Load */
 	uint32_t imm = (op & THUMB_HALFOP_OFFS) >> THUMB_HALFOP_OFFS_SHIFT;
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-	SetRegister(rd, READ16(GetRegister(rs) + (imm << 1)));
+	uint32_t const data = READ16(GetRegister(rs) + (imm << 1));
+	if (!m_pendingAbtD)
+		SetRegister(rd, data);
 	R15 += 2;
 }
 
@@ -1136,7 +1230,8 @@ void arm7_cpu_device::tg09_1(uint32_t pc, uint32_t op) /* Load */
 	uint32_t rd = (op & THUMB_STACKOP_RD) >> THUMB_STACKOP_RD_SHIFT;
 	int32_t offs = (uint8_t)(op & THUMB_INSN_IMM);
 	uint32_t readword = READ32((GetRegister(13) + ((uint32_t)offs << 2)) & ~3);
-	SetRegister(rd, readword);
+	if (!m_pendingAbtD)
+		SetRegister(rd, readword);
 	R15 += 2;
 }
 
@@ -1170,21 +1265,26 @@ void arm7_cpu_device::tg0b_0(uint32_t pc, uint32_t op) /* ADD SP, #imm */
 
 void arm7_cpu_device::tg0b_1(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_2(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_3(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_4(uint32_t pc, uint32_t op) /* PUSH {Rlist} */
 {
+	if ((op & 0xff) == 0)
+	{
+		thumb_empty_rlist(13, false, false);
+		return;
+	}
 	for (int32_t offs = 7; offs >= 0; offs--)
 	{
 		if (op & (1 << offs))
@@ -1213,58 +1313,79 @@ void arm7_cpu_device::tg0b_5(uint32_t pc, uint32_t op) /* PUSH {Rlist}{LR} */
 
 void arm7_cpu_device::tg0b_6(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_7(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_8(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_9(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_a(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_b(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0b_c(uint32_t pc, uint32_t op) /* POP {Rlist} */
 {
+	if ((op & 0xff) == 0)
+	{
+		thumb_empty_rlist(13, true, true);
+		return;
+	}
+	uint32_t sp = GetRegister(13);
 	for (int32_t offs = 0; offs < 8; offs++)
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(GetRegister(13) & ~3));
-			SetRegister(13, GetRegister(13) + 4);
+			uint32_t const data = READ32(sp & ~3);
+			if (m_pendingAbtD)
+				break;      // loading stops at the abort, no base writeback
+			SetRegister(offs, data);
+			sp += 4;
 		}
 	}
+	if (!m_pendingAbtD)
+		SetRegister(13, sp);
 	R15 += 2;
 }
 
 void arm7_cpu_device::tg0b_d(uint32_t pc, uint32_t op) /* POP {Rlist}{PC} */
 {
+	uint32_t sp = GetRegister(13);
 	for (int32_t offs = 0; offs < 8; offs++)
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(GetRegister(13) & ~3));
-			SetRegister(13, GetRegister(13) + 4);
+			uint32_t const data = READ32(sp & ~3);
+			if (m_pendingAbtD)
+				break;      // loading stops at the abort, no base writeback
+			SetRegister(offs, data);
+			sp += 4;
 		}
 	}
-	uint32_t addr = READ32(GetRegister(13) & ~3);
+	uint32_t addr = m_pendingAbtD ? 0 : READ32(sp & ~3);
+	if (m_pendingAbtD)
+	{
+		R15 += 2;       // no branch, no base writeback
+		return;
+	}
+	SetRegister(13, sp + 4);
 	if (m_archRev < 5)
 	{
 		R15 = addr & ~1;
@@ -1286,17 +1407,25 @@ void arm7_cpu_device::tg0b_d(uint32_t pc, uint32_t op) /* POP {Rlist}{PC} */
 
 		R15 = addr;
 	}
-	SetRegister(13, GetRegister(13) + 4);
 }
 
-void arm7_cpu_device::tg0b_e(uint32_t pc, uint32_t op)
+void arm7_cpu_device::tg0b_e(uint32_t pc, uint32_t op) /* BKPT #imm8 (ARMv5T) */
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	if (m_archRev < 5)
+	{
+		thumb_undefined(pc, op);
+		return;
+	}
+	// With no debug monitor a BKPT is taken as a Prefetch Abort; R14_abt = BKPT address + 4,
+	// which is what the abort entry produces when R15 is left pointing at the instruction.
+	COPRO_FAULT_STATUS_D = COPRO_FAULT_DEBUG;
+	m_pendingAbtP = true;
+	update_irq_state();
 }
 
 void arm7_cpu_device::tg0b_f(uint32_t pc, uint32_t op)
 {
-	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 /* Multiple Load/Store */
@@ -1308,6 +1437,11 @@ void arm7_cpu_device::tg0b_f(uint32_t pc, uint32_t op)
 
 void arm7_cpu_device::tg0c_0(uint32_t pc, uint32_t op) /* Store */
 {
+	if ((op & 0xff) == 0)
+	{
+		thumb_empty_rlist((op & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT, false, true);
+		return;
+	}
 	uint32_t rd = (op & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
 	uint32_t ld_st_address = GetRegister(rd);
 	for (int32_t offs = 0; offs < 8; offs++)
@@ -1324,6 +1458,11 @@ void arm7_cpu_device::tg0c_0(uint32_t pc, uint32_t op) /* Store */
 
 void arm7_cpu_device::tg0c_1(uint32_t pc, uint32_t op) /* Load */
 {
+	if ((op & 0xff) == 0)
+	{
+		thumb_empty_rlist((op & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT, true, true);
+		return;
+	}
 	uint32_t rd = (op & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
 	int rd_in_list = op & (1 << rd);
 	uint32_t ld_st_address = GetRegister(rd);
@@ -1331,11 +1470,14 @@ void arm7_cpu_device::tg0c_1(uint32_t pc, uint32_t op) /* Load */
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(ld_st_address & ~3));
+			uint32_t const data = READ32(ld_st_address & ~3);
+			if (m_pendingAbtD)
+				break;      // loading stops at the abort, no base writeback
+			SetRegister(offs, data);
 			ld_st_address += 4;
 		}
 	}
-	if (!rd_in_list)
+	if (!rd_in_list && !m_pendingAbtD)
 	{
 		SetRegister(rd, ld_st_address);
 	}
@@ -1527,9 +1669,9 @@ void arm7_cpu_device::tg0d_d(uint32_t pc, uint32_t op) // COND_LE:
 	}
 }
 
-void arm7_cpu_device::tg0d_e(uint32_t pc, uint32_t op) // COND_AL:
+void arm7_cpu_device::tg0d_e(uint32_t pc, uint32_t op) // permanently UNDEFINED
 {
-	fatalerror("%08x: Undefined Thumb instruction: %04x (ARM9 reserved)\n", pc, op);
+	thumb_undefined(pc, op);
 }
 
 void arm7_cpu_device::tg0d_f(uint32_t pc, uint32_t op) // COND_NV:   // SWI (this is sort of a "hole" in the opcode encoding)

@@ -50,7 +50,7 @@ electronically measuring them affected the frequency.
 #include "machine/timer.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 
 // internal artwork
 #include "saitek_chesstrv.lh"
@@ -71,8 +71,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void chesstrv(machine_config &config);
-	void chesstrvi(machine_config &config);
+	void chesstrv(machine_config &config) ATTR_COLD;
+	void chesstrvi(machine_config &config) ATTR_COLD;
 
 	// battery status indicator is not software controlled
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { update_display(); }
@@ -113,7 +113,6 @@ private:
 void chesstrv_state::machine_start()
 {
 	m_ram = make_unique_clear<u8[]>(0x100);
-	m_computing.resolve();
 
 	// register for savestates
 	save_pointer(NAME(m_ram), 0x100);
@@ -279,10 +278,9 @@ void chesstrv_state::chesstrvi(machine_config &config)
 	config.set_default_layout(layout_saitek_chesstrvi);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/2, 567/2);
-	screen.set_visarea_full();
 }
 
 

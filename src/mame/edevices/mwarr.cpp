@@ -283,7 +283,7 @@ void mwarr_state::mwarr(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(mwarr_state::irq4_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(54);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
@@ -293,7 +293,7 @@ void mwarr_state::mwarr(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	EDEVICES_VID(config, m_video, 0, m_palette, gfx_mwarr);
+	EDEVICES_VID(config, m_video, m_palette, gfx_mwarr);
 	m_video->set_bg_videoram_tag("bg_videoram");
 	m_video->set_mlow_videoram_tag("mlow_videoram");
 	m_video->set_mhigh_videoram_tag("mhigh_videoram");

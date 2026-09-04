@@ -716,7 +716,7 @@ void wd2010_device::auto_scan_id(uint8_t data)
 		// FIXME: geometry of disk not available here. Assume sector size already set (?)
 		update_sdh( SECTOR_SIZE, 0, 0, 1 ); // new sector_size, head, cylinder, sector
 
-		logerror("\n(WD2010) : UNSUPPORTED DRIVE CHANGE (old = %02x, new = %02x) Sector size assumed: %d !\n", last_drive, DRIVE, SECTOR_SIZES[SECTOR_SIZE]);
+		logerror("\n(WD2010) : UNSUPPORTED DRIVE CHANGE (old = %02x, new = %02x) Sector size assumed: %d !\n", last_drive, DRIVE, SECTOR_SIZE);
 	}
 	last_drive = DRIVE;
 	return; // (see NOTES)

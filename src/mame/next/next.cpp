@@ -33,7 +33,9 @@
 #include "screen.h"
 #include "softlist.h"
 
-#include "formats/flopimg.h"
+#include "strformat.h"
+
+#include <iostream>
 
 
 uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -84,14 +86,14 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 uint32_t next_state::rom_map_r()
 {
 	if(0 && !machine().side_effects_disabled())
-		printf("%08x ROM MAP?\n",maincpu->pc());
+		util::stream_format(std::cout, "%08x ROM MAP?\n", maincpu->pc());
 	return 0x01000000;
 }
 
 uint32_t next_state::scr2_r()
 {
 	if(0 && !machine().side_effects_disabled())
-		printf("%08x\n",maincpu->pc());
+		util::stream_format(std::cout, "%08x\n", maincpu->pc());
 	/*
 	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
 	-x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
@@ -128,7 +130,7 @@ uint32_t next_state::scr2_r()
 void next_state::scr2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(0 && !machine().side_effects_disabled())
-		printf("scr2_w %08x (%08x)\n", data, maincpu->pc());
+		util::stream_format(std::cout, "scr2_w %08x (%08x)\n", data, maincpu->pc());
 	COMBINE_DATA(&scr2);
 
 	rtc->ce_w(BIT(scr2, 8));
@@ -621,19 +623,12 @@ uint32_t next_state::fdc_control_r()
 	if(fdc) {
 		floppy_image_device *fdev = floppy0->get_device();
 		if(fdev->exists()) {
-			uint32_t variant = fdev->get_variant();
-			switch(variant) {
-			case floppy_image::SSSD:
-			case floppy_image::SSDD:
-			case floppy_image::DSDD:
-				return 3 << 24;
-
-			case floppy_image::DSHD:
-				return 2 << 24;
-
-			case floppy_image::DSED:
+			if(fdev->floppy_is_ed())
 				return 1 << 24;
-			}
+			else if(fdev->floppy_is_hd())
+				return 2 << 24;
+			else
+				return 3 << 24;
 		}
 	}
 
@@ -1012,7 +1007,7 @@ static void next_scsi_devices(device_slot_interface &device)
 void next_state::next_base(machine_config &config)
 {
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(next_state::screen_update));
@@ -1028,7 +1023,7 @@ void next_state::next_base(machine_config &config)
 	SCC8530(config, scc, XTAL(25'000'000));
 	scc->out_int_callback().set(FUNC(next_state::scc_irq));
 
-	NEXTKBD(config, keyboard, 0);
+	NEXTKBD(config, keyboard);
 	keyboard->int_change_wr_callback().set(FUNC(next_state::keyboard_irq));
 	keyboard->int_power_wr_callback().set(FUNC(next_state::power_irq));
 	keyboard->int_nmi_wr_callback().set(FUNC(next_state::nmi_irq));
@@ -1046,7 +1041,7 @@ void next_state::next_base(machine_config &config)
 	scsi->irq_handler_cb().set(DEVICE_SELF, FUNC(next_state::scsi_irq));
 	scsi->drq_handler_cb().set(DEVICE_SELF, FUNC(next_state::scsi_drq));
 
-	MB8795(config, net, 0);
+	MB8795(config, net);
 	net->tx_irq().set(FUNC(next_state::net_tx_irq));
 	net->rx_irq().set(FUNC(next_state::net_rx_irq));
 	net->tx_drq().set(FUNC(next_state::net_tx_drq));
@@ -1058,7 +1053,7 @@ void next_state::next_base(machine_config &config)
 
 void next_state::next_mo_config(machine_config &config)
 {
-	NEXTMO(config, mo, 0);
+	NEXTMO(config, mo);
 	mo->irq_wr_callback().set(FUNC(next_state::mo_irq));
 	mo->drq_wr_callback().set(FUNC(next_state::mo_drq));
 }

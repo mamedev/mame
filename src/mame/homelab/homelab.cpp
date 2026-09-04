@@ -913,7 +913,7 @@ void homelab2_state::homelab2(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(homelab2_state::homelab_frame));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::white())); // green
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::white())); // green
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(320, 255);
@@ -942,7 +942,7 @@ void homelab3_state::homelab3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &homelab3_state::homelab3_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64 * 8, 32 * 8);
@@ -1032,9 +1032,9 @@ ROM_START(brailab4)
 	// brl1 to 5 merged, with small changes
 	// 00BF: 28 18 87 -> 30 30 0c
 	// 0138: 07 0a 06 0b -> 0c 06 07 0a (keyboard assignments)
-	ROM_LOAD_OPTIONAL("brl.rom", 0x0000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b))
+	ROM_LOAD("brl.rom",    0x0000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b))
 	// a small prom
-	ROM_LOAD_OPTIONAL("brlcpm.rom", 0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8))
+	ROM_LOAD("brlcpm.rom", 0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8))
 ROM_END
 
 } // anonymous namespace

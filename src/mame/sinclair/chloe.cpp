@@ -227,9 +227,7 @@ u32 chloe_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 	screen.priority().fill(0, cliprect);
 	m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
-
-	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
-	m_ula_scr->draw(screen, bitmap, clip256x192, flash, 0);
+	m_ula_scr->draw(screen, bitmap, clip256x192, 0);
 
 	return 0;
 }
@@ -928,7 +926,7 @@ void chloe_state::chloe(machine_config &config)
 	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 	*/
 
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(chloe_state::spi_miso_w));
 
@@ -939,7 +937,7 @@ void chloe_state::chloe(machine_config &config)
 	PALETTE(config, m_palette, FUNC(chloe_state::spectrum_palette), 256);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	SCREEN_ULA_PLUS(config, m_ula_scr, 0).set_palette(m_palette->device().tag(), 0x000, 0x000);
+	SCREEN_ULA_PLUS(config, m_ula_scr).set_palette(m_palette->device().tag(), 0x000, 0x000);
 	m_ula_scr->set_raster_offset(SCR_256x192.left(), SCR_256x192.top());
 
 	SPEAKER(config.replace(), "speakers", 2).front();

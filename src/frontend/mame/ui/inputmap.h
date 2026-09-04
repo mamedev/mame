@@ -16,6 +16,7 @@
 #include "iptseqpoll.h"
 
 #include <string>
+#include <variant>
 #include <vector>
 
 
@@ -24,7 +25,7 @@ namespace ui {
 class menu_input_groups : public menu
 {
 public:
-	menu_input_groups(mame_ui_manager &mui, render_container &container);
+	menu_input_groups(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_input_groups() override;
 
 private:
@@ -40,9 +41,10 @@ public:
 
 protected:
 	// internal input menu item data
+	using input_item_ref = std::variant<std::nullptr_t, input_type_entry const *, ioport_field *>;
 	struct input_item_data
 	{
-		const void *        ref = nullptr;              // reference to type description for global inputs or field for game inputs
+		input_item_ref      ref = nullptr;              // pointer to type description for global inputs or field for game inputs
 		input_seq_type      seqtype = SEQ_TYPE_INVALID; // sequence type
 		input_seq           seq;                        // copy of the live sequence
 		const input_seq *   defseq = nullptr;           // pointer to the default sequence
@@ -53,7 +55,7 @@ protected:
 	};
 	using data_vector = std::vector<input_item_data>;
 
-	menu_input(mame_ui_manager &mui, render_container &container);
+	menu_input(mame_ui_manager &mui, render_target &target);
 
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
@@ -76,14 +78,20 @@ private:
 	input_seq starting_seq;
 
 	virtual bool handle(event const *ev) override;
-	virtual void update_input(input_item_data &seqchangeditem) = 0;
+
+	void update_assignment(input_item_data &item, std::nullptr_t);
+	void update_assignment(input_item_data &item, input_type_entry const *type_entry);
+	void update_assignment(input_item_data &item, ioport_field *field);
+	bool assignment_is_inherited(input_item_data const &item, std::nullptr_t) const;
+	bool assignment_is_inherited(input_item_data const &item, input_type_entry const *type_entry) const;
+	bool assignment_is_inherited(input_item_data const &item, ioport_field *field) const;
 };
 
 
 class menu_input_general : public menu_input
 {
 public:
-	menu_input_general(mame_ui_manager &mui, render_container &container, int group, std::string &&heading);
+	menu_input_general(mame_ui_manager &mui, render_target &target, int group, std::string &&heading);
 	virtual ~menu_input_general() override;
 
 protected:
@@ -91,7 +99,6 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void update_input(input_item_data &seqchangeditem) override;
 
 	const int group;
 };
@@ -100,7 +107,7 @@ private:
 class menu_input_specific : public menu_input
 {
 public:
-	menu_input_specific(mame_ui_manager &mui, render_container &container);
+	menu_input_specific(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_input_specific() override;
 
 protected:
@@ -108,7 +115,6 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void update_input(input_item_data &seqchangeditem) override;
 };
 
 } // namespace ui

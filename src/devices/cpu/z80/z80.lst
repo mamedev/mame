@@ -185,11 +185,13 @@ macro   retn
 
 macro   z80n:retn
 	m_out_retn_seen_cb(1);
-	if (m_stackless) {
+	if (m_stackless_retn_en) {
+		m_stackless_retn_en = false;
 		SP += 2; //@pop
 		m_pc.b.l = m_in_nextreg_cb(0xc2);
 		m_pc.b.h = m_in_nextreg_cb(0xc3);
 	} else {
+		m_stackless_retn_en = false;
 		@pop
 		PC = TDAT;
 	}
@@ -904,10 +906,11 @@ macro   z80n:take_nmi
 	m_iff1 = 0;
 	m_r++;
 	+ 5
+	m_out_nextreg_cb(0xc2, m_pc.b.l);
+	m_out_nextreg_cb(0xc3, m_pc.b.h);
 	if (m_stackless) {
+		m_stackless_retn_en = true;
 		SP -= 2;
-		m_out_nextreg_cb(0xc2, m_pc.b.l);
-		m_out_nextreg_cb(0xc3, m_pc.b.h);
 	} else {
 		@wm16_sp PC
 		;
@@ -920,7 +923,13 @@ macro   irqfetch
 {
 	// fetch the IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+	if (intf != nullptr) {
+		m_tmp_irq_vector = intf->z80daisy_irq_ack();
+		if (debugger_enabled())
+			device_execute_interface::device().debug()->interrupt_hook(0, m_pc.w);
+	} else {
+		m_tmp_irq_vector = standard_irq_callback(0, m_pc.w);
+	}
 	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
 }
 
@@ -929,7 +938,13 @@ macro   t6a84:irqfetch
 	// fetch the IRQ vector
 	paged_irqfetch();
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+	if (intf != nullptr) {
+		m_tmp_irq_vector = intf->z80daisy_irq_ack();
+		if (debugger_enabled())
+			device_execute_interface::device().debug()->interrupt_hook(0, m_pc.w);
+	} else {
+		m_tmp_irq_vector = standard_irq_callback(0, m_pc.w);
+	}
 	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
 }
 

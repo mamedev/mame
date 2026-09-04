@@ -211,7 +211,7 @@ void pangofun_state::pangofun(machine_config &config)
 	// unknown, not provided. Chipset can go up to 32M, but will go "memory fail" with that (?)
 	RAM(config, "ram").set_default_size("64M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
@@ -234,13 +234,14 @@ void pangofun_state::pangofun(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(um8498f_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(um8498f_device::dreq7_w));
 
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "avga1", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa8_cards,  nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, m_isabus, pc_isa16_cards, "avga1", false);
+	ISA16_SLOT(config, "isa2", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, m_isabus, pc_isa8_cards,  nullptr, false);
 	// TODO: this space will be reserved to the romdisk
-	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, m_isabus, pc_isa16_cards, nullptr, false);
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(um8498f_device::kbrst_w));
@@ -260,16 +261,16 @@ void pangofun_state::pangofun(machine_config &config)
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0x20000, "romdisk", 0 )
-	ROM_LOAD("bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
+	ROM_REGION32_LE( 0x20000, "romdisk", 0 )
+	ROM_LOAD( "bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
 	/*bank8.u19 , NOT POPULATED */
 
-	ROM_REGION32_LE(0x20000, "bios", 0 ) /* motherboard bios */
+	ROM_REGION32_LE( 0x20000, "bios", 0 ) /* motherboard bios */
 	ROM_COPY( "romdisk",  0x000000, 0x00000, 0x10000 )
 	ROM_LOAD( "bios.bin", 0x010000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
 	/* this is what was on the rom board, mapping unknown */
-	ROM_REGION32_LE(0x800000, "game_prg", ROMREGION_ERASEFF )    /* rom board */
+	ROM_REGION32_LE( 0x800000, "game_prg", ROMREGION_ERASEFF )    /* rom board */
 	ROM_LOAD16_BYTE( "bank0.u11", 0x000001, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
 	ROM_LOAD16_BYTE( "bank0.u31", 0x000000, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
 	/* Following two  references to a SB Pro clone sound card. */
@@ -287,6 +288,9 @@ ROM_START(pangofun)
 					/*bank6.u37 , NOT POPULATED */
 					/*bank7.u18 , NOT POPULATED */
 					/*bank7.u37 , NOT POPULATED */
+
+	ROM_REGION( 0x157, "pld", 0 )
+	ROM_LOAD( "palce20v8h.u42", 0x000, 0x157, CRC(56903ef1) SHA1(8fb86d45490455cf09b138202095ede4d3667360) )
 ROM_END
 
 } // anonymous namespace

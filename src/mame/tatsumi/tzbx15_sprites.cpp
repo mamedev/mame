@@ -5,6 +5,8 @@
 #include "tzbx15_sprites.h"
 #include "screen.h"
 
+#include <numbers>
+
 // TZB215 on Apache 3
 // TZB315 on Round Up 5, Big Fight, Cycle Warriors
 // differences, if any, unknown
@@ -264,7 +266,7 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 				//int incxy=0;
 				//int incyx=0;
 				//int incyy=0x10000;
-				double theta=rotate * ((2.0 * M_PI)/512.0);
+				double theta=rotate * ((2.0 * std::numbers::pi)/512.0);
 				double c=cos(theta);
 				double s=sin(theta);
 
@@ -499,7 +501,7 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 
 		if (rotate)
 		{
-			double theta = rotate * ((2.0 * M_PI) / 512.0);
+			double theta = rotate * ((2.0 * std::numbers::pi) / 512.0);
 
 			int incxx = (int)(65536.0 * cos(theta));
 			int incxy = (int)(65536.0 * -sin(theta));

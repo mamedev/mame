@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+NOTE:
+- we treat supported="no" for something that have major issues everywhere,
+  "partial" for stuff running on 1+ systems but don't on others.
+
+-->
+<softwarelist name="generic_flop_35" description="Cross-platform 3.5&quot; disk images">
+
+<!-- !Games -->
+
+	<software name="foundwstc" supported="no">
+		<!-- SPS (CAPS) release 3155? -->
+		<description>Foundation's Waste (Europe, The One issue 22 coverdisk)</description>
+		<year>1990</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<info name="magazine" value="The One 22" />
+		<info name="release" value="199007xx" />
+		<sharedfeat name="compatibility" value="amiga,st"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1034145">
+				<rom name="foundation's waste (europe) (coverdisk - the one - issue 22) (amiga + st).ipf" size="1034145" crc="8cc8484f" sha1="c51cc0cf5005fa6f422383e7f84a00f6bac5915c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lxcess" supported="no">
+		<!-- SPS (CAPS) release 3058 -->
+		<description>Lethal Xcess (Europe)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, OCS, NTSC?) -->
+		<year>1991</year>
+		<publisher>Eclipse</publisher>
+		<notes><![CDATA[
+amiga: black screen after title
+st: throws random game overs during gameplay
+]]></notes>
+		<info name="alt_title" value="Lethal Xcess: Wings of Death II"/>
+		<sharedfeat name="compatibility" value="amiga,st"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1004597">
+				<rom name="lethal xcess - wings of death ii (europe) (amiga + st) (disk a).ipf" size="1004597" crc="33cc029d" sha1="54a268710716f3510918cd8767d9d248798c4ed0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1008380">
+				<rom name="lethal xcess - wings of death ii (europe) (amiga + st) (disk b).ipf" size="1008380" crc="7c53b994" sha1="8b8cefdb0dbd7e4a515c95235526ed909fe499c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstbus" supported="partial">
+		<!-- SPS (CAPS) release 3032 -->
+		<description>Monster Business (Europe)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, OCS, PAL / Atari ST, PAL) -->
+		<year>1991</year>
+		<publisher>Eclipse</publisher>
+		<notes><![CDATA[
+st_uk: randomly throws game overs during gameplay (doesn't happen on a500)
+]]></notes>
+		<sharedfeat name="compatibility" value="amiga,st"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1009109">
+				<rom name="monster business (europe) (amiga + st).ipf" size="1009109" crc="be6095a0" sha1="c6d0706c363f3fd7f5e40864b49568ac9e157c8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="populouspl" supported="no">
+		<!-- SPS (CAPS) release 3024 -->
+		<description>Populous - The Promised Lands (Europe)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, OCS, PAL / Atari ST, PAL) -->
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+ATK test: failed
+]]></notes>
+		<info name="usage" value="Requires &quot;Populous&quot; to work" />
+		<sharedfeat name="compatibility" value="amiga,st"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1037012">
+				<rom name="populous - the promised lands (europe) (addon) (amiga + st).ipf" size="1037012" crc="de09f0a3" sha1="21301177eb04122183aa716c081e8a4fda35cff8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stargld2" supported="no">
+		<!-- SPS (CAPS) release 3000 -->
+		<description>Starglider 2 (Europe)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, OCS, PAL / Atari ST, PAL) -->
+		<year>1988</year>
+		<publisher>Rainbird</publisher>
+		<notes><![CDATA[
+TODO: untested, requires manual
+ATK test: failed
+]]></notes>
+		<info name="usage" value="Sports manual copy protection" />
+		<sharedfeat name="compatibility" value="amiga,st"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1019021">
+				<rom name="starglider 2 (europe) (en,fr,de) (amiga + st).ipf" size="1019021" crc="ed38c67f" sha1="c2cb4b2f517e2f20205577b8ba16331920660160" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

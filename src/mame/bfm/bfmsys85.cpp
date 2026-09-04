@@ -59,7 +59,6 @@ ___________________________________________________________________________
 #include "emu.h"
 #include "bfm_comn.h"
 
-#include "awpvid.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
@@ -84,19 +83,18 @@ public:
 		driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
-		m_reel(*this, "reel%u", 0U),
+		m_reel(*this, "reel%u", 1U),
 		m_acia6850_0(*this, "acia6850_0"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void bfmsys85(machine_config &config);
-	void memmap(address_map &map) ATTR_COLD;
+	void bfmsys85(machine_config &config) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(timer_irq);
 
-	void init_decode();
-	void init_nodecode();
+	void init_decode() ATTR_COLD;
+	void init_nodecode() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -123,6 +121,8 @@ private:
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
+
+	void memmap(address_map &map) ATTR_COLD;
 
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void watchdog_w(uint8_t data);
@@ -220,8 +220,8 @@ void bfmsys85_state::reel12_w(uint8_t data)
 	m_reel[0]->update((data>>4)&0x0f);
 	m_reel[1]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel[0]);
-	awp_draw_reel(machine(),"reel2", *m_reel[1]);
+	m_reel[0]->draw();
+	m_reel[1]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -231,8 +231,8 @@ void bfmsys85_state::reel34_w(uint8_t data)
 	m_reel[2]->update((data>>4)&0x0f);
 	m_reel[3]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel[2]);
-	awp_draw_reel(machine(),"reel4", *m_reel[3]);
+	m_reel[2]->draw();
+	m_reel[3]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -356,8 +356,6 @@ uint8_t bfmsys85_state::triac_r()
 
 void bfmsys85_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_mmtr_latch));
 	save_item(NAME(m_triac_latch));
 	// save_item(NAME(m_alpha_clock));
@@ -414,7 +412,7 @@ void bfmsys85_state::bfmsys85(machine_config &config)
 
 	MSC1937(config, m_vfd);
 
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->txd_handler().set(FUNC(bfmsys85_state::sys85_data_w));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
@@ -434,7 +432,7 @@ void bfmsys85_state::bfmsys85(machine_config &config)
 	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[3]->optic_handler().set(FUNC(bfmsys85_state::reel_optic_cb<3>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
 	config.set_default_layout(layout_bfmsys85);
 }

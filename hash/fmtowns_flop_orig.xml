@@ -444,8 +444,7 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
-	<!-- Triggers the copy protection -->
-	<software name="columns" supported="no">
+	<software name="columns" supported="yes">
 		<description>Columns</description>
 		<year>1990</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>

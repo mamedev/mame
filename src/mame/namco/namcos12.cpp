@@ -18,6 +18,7 @@
     - sws2001 crashes at random times in-game, and always after the opening video. You can spam insert coin and start to get in-game.
     - sws2000 also crashes after opening video
     - toukon3 has garbage graphics
+    - kartduel has unemulated link support
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
@@ -1055,6 +1056,8 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "technodr.lh"
 
 #define LOG_BANK     (1U << 1)
@@ -1082,7 +1085,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_ram(*this, "maincpu:ram"),
+		m_ram(*this, "ram"),
+		m_gpu_ram(*this, "gpu_ram"),
 		m_gpu(*this, "gpu"),
 		m_sub(*this, "sub"),
 		m_adc(*this, "sub:adc"),
@@ -1111,10 +1115,10 @@ public:
 		/* basic machine hardware */
 		CXD8661R(config, m_maincpu, XTAL(100'000'000));
 
-		subdevice<ram_device>("maincpu:ram")->set_default_size("4M"); // 2x KM416V1204s
+		RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0); // 2x KM416V1204s
 
 		/* video hardware */
-		CXD8654Q(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu.target()).set_screen("screen"); // 2x KM4132G271Qs
+		CXD8654Q(config, m_gpu, 100_MHz_XTAL / 2);
 
 		namcos12_base(config);
 	}
@@ -1132,12 +1136,12 @@ public:
 	void coh716(machine_config &config) ATTR_COLD
 	{
 		/* basic machine hardware */
-		CXD8606BQ(config, m_maincpu, XTAL(100'000'000));
+		CXD8606BQ(config, m_maincpu, 100_MHz_XTAL);
 
-		subdevice<ram_device>("maincpu:ram")->set_default_size("16M"); // 2x K4E6416120Ds
+		RAM(config, m_ram).set_bits(32).set_default_size("16M").set_extra_options("4M,8M,16M").set_default_value(0); // 2x K4E6416120Ds
 
 		/* video hardware */
-		CXD8561CQ(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu.target()).set_screen("screen"); // 2x 54V25632As
+		CXD8561CQ(config, m_gpu, 100_MHz_XTAL / 2);
 
 		namcos12_base(config);
 
@@ -1147,9 +1151,17 @@ public:
 	void namcos12_base(machine_config &config) ATTR_COLD
 	{
 		m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::maincpu_map);
+		m_maincpu->set_ram(m_ram);
 		m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
 
-		SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
+		m_gpu->set_cpu(m_maincpu);
+		m_gpu->set_ram(m_gpu_ram);
+		m_gpu->set_screen("screen");
+		m_gpu->set_vclkn(53.693175_MHz_XTAL);
+
+		RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0); // 2x KM4132G271Qs
+
+		SCREEN(config, "screen").screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 
 		/* basic machine hardware */
 		H83002(config, m_sub, 16934400); // frequency based on research (superctr)
@@ -1183,12 +1195,12 @@ public:
 		m_sub->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 		m_sub->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-		NAMCO_SETTINGS(config, m_settings, 0);
+		NAMCO_SETTINGS(config, m_settings);
 
 		RTC4543(config, m_rtc, XTAL(32'768));
 		m_rtc->data_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
-		AT28C16(config, "at28c16", 0);
+		AT28C16(config, "at28c16");
 
 		/* sound hardware */
 		SPEAKER(config, "speaker", 2).front();
@@ -1455,6 +1467,7 @@ protected:
 	required_device<psxcpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
 	required_device<psxgpu_device> m_gpu;
 	required_device<h83002_device> m_sub;
 	required_device<h8_adc_device> m_adc;
@@ -1622,9 +1635,6 @@ protected:
 	{
 		namcos12_state::driver_start();
 
-		m_start_lamp.resolve();
-		m_gun_recoil.resolve();
-
 		/* HACK: patch out wait for dma 5 to complete */
 		*((uint32_t *)(m_mainrom->base() + 0x331c4)) = 0;
 	}
@@ -1766,13 +1776,6 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
-	{
-		namcos12_state::driver_start();
-
-		m_led.resolve();
-	}
-
 	virtual void configure_jvs(machine_config &config, device_jvs_interface &io) override ATTR_COLD
 	{
 		namcos12_state::configure_jvs(config, io);
@@ -3667,7 +3670,7 @@ GAME( 2000, sws2000,    0,        coh700b,  namcos12, namcos12_state,         em
 // truckk can't be a Japanese set despite the game title still being in Japanese.  The option for in-game Japanese text is disabled in this set, and it has a Parental Advisory screen usually associated with US releases
 // TKK1 is probably the Japanese release, although a TKK1 CD contains identical data to a TKK2 CD, so any difference is in the ROM data rather than the CD
 GAME( 2000, truckk,     0,        truckk,   truckk,   truckk_state,           empty_init, ROT0, "Metro / Namco",   "Truck Kyosokyoku (US?, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
-GAME( 2000, kartduel,   0,        kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (World, KTD2/VER.A)", 0 ) /* KC057 */
-GAME( 2000, kartduelja, kartduel, kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", 0 ) /* KC057 */
+GAME( 2000, kartduel,   0,        kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (World, KTD2/VER.A)", MACHINE_NODEVICE_LAN ) /* KC057 */
+GAME( 2000, kartduelja, kartduel, kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NODEVICE_LAN ) /* KC057 */
 GAME( 2000, g13knd,     0,        golgo13,  golgo13,  golgo13_state,          empty_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
 GAME( 2001, sws2001,    0,        coh716,   namcos12, namcos12_altbank_state, empty_init, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */

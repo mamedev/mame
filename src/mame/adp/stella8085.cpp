@@ -29,6 +29,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "emu.h"
 
 #include "cpu/i8085/i8085.h"
+#include "machine/i8255.h"
 #include "machine/i8256.h"
 #include "machine/i8279.h"
 #include "machine/mc146818.h"
@@ -61,9 +62,9 @@ public:
 		m_beep(*this, "beeper")
 	{ }
 
-	void dicemstr(machine_config &config);
-	void doppelpot(machine_config &config);
-	void excellent(machine_config &config);
+	void dicemstr(machine_config &config) ATTR_COLD;
+	void doppelpot(machine_config &config) ATTR_COLD;
+	void excellent(machine_config &config) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -83,10 +84,11 @@ private:
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
-	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
-	void small_program_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void program_4040_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
+	void io_4040_map(address_map &map) ATTR_COLD;
 
 	// I8256 ports
 	uint8_t lw_r(); //P1.0-P1.3
@@ -105,7 +107,6 @@ private:
 	void io70(uint8_t data) ATTR_COLD;
 	void io71(uint8_t data) ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
-	void io73(uint8_t data) ATTR_COLD;
 	uint8_t io9r() ATTR_COLD;
 	void io9w(uint8_t data) ATTR_COLD;
 
@@ -116,12 +117,16 @@ private:
 
 void stella8085_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	m_sound_timer = timer_alloc(FUNC(stella8085_state::sound_stop), this);
 
 	save_item(NAME(m_digit));
+}
+
+void stella8085_state::large_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // ICE6
+	map(0x8000, 0x9fff).ram(); // ICC6
+	map(0xa000, 0xffff).rom(); // ICD6
 }
 
 void stella8085_state::program_map(address_map &map)
@@ -132,14 +137,7 @@ void stella8085_state::program_map(address_map &map)
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
 
-void stella8085_state::large_program_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom(); // ICE6
-	map(0x8000, 0x9fff).ram(); // ICC6
-	map(0xa000, 0xffff).rom(); // ICD6
-}
-
-void stella8085_state::small_program_map(address_map &map)
+void stella8085_state::program_4040_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
@@ -150,14 +148,22 @@ void stella8085_state::small_program_map(address_map &map)
 void stella8085_state::io_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
-	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
 	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x73).w(FUNC(stella8085_state::io73)); // probably extra lamps
+	map(0x73, 0x73).nopw(); // programs contain vestigial code to configure the PPI used on earlier boards
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
+}
+
+void stella8085_state::io_4040_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
+	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x80, 0x81).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x90, 0x9f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 /*********************************************
@@ -358,11 +364,6 @@ void stella8085_state::sounddev(uint8_t data)
 	makesound(tone, octave, 60*(length+1)); // 60 is not correct
 }
 
-void stella8085_state::io73(uint8_t data)
-{
-	//old boards
-}
-
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 {
 	int sfrq = soundfreq(tone, octave);
@@ -427,20 +428,46 @@ int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 	}
 }
 
-static INPUT_PORTS_START( dicemstr )
+static INPUT_PORTS_START( stella8085_service )
+	PORT_START("TZ6") // TASTATUR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Reset")          // TS7
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Continuous run") //     Dauerlauf
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Game counter")   //     Spielzähler
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Coin counter")   //     Münzspeicher
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Hardware-Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Payout quote")   //     Auszahlquote
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Foul")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Win")            // TS0 Gewinn
+
+	PORT_START("TZ7") // TASTATUR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Up 1,-")         // TS7 Hoch 1,-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Down 1,-")       //     Runter 1,-
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Up Series")      //     Hoch Serie
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Down Series")    //     Runter Serie
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Up 0,10")        //     Hoch 0,10
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Down 0,10")      //     Runter 0,10
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Coinage")        //     Münzung
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Initialize")     // TS0 Initialisieren
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( stella8085_dip )
 	PORT_START("DSW")
-	PORT_DIPNAME(0x01, 0x01, "8085 RST75")
+	PORT_DIPNAME(0x01, 0x01, "8085 RST75") PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x00, "8085 HOLD")
+	PORT_DIPNAME(0x02, 0x00, "8085 HOLD")  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x00, "8085 Reset")
+	PORT_DIPNAME(0x04, 0x00, "8085 Reset") PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x04, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x08, "8085 RST55")
+	PORT_DIPNAME(0x08, 0x08, "8085 RST55") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x08, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( servicem )
+	PORT_INCLUDE(stella8085_dip)
 
 	PORT_START("TZ0") //TASTEN
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -466,57 +493,27 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_START("TZ5") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TZ6") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
-
-	PORT_START("TZ7") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
+	PORT_INCLUDE(stella8085_service)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( disc )
-	PORT_START("DSW")
-	PORT_DIPNAME(0x01, 0x01, "8085 RST75")
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x01, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x00, "8085 HOLD")
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x00, "8085 Reset")
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x04, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x08, "8085 RST55")
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x08, DEF_STR(On))
+	PORT_INCLUDE(stella8085_dip)
 
 	PORT_START("TZ0") //TASTEN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_DOOR ) //TS Door switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) //SK Read data button
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) //ZE2
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // Return
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) //STR
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) //NF
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_DOOR ) // TS Türschalter
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT ) // SK Schlagkontakt / Read data button
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ZE2
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // Return
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 ) // STR
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START ) // NF
 
 	PORT_START("TZ1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("DM 0.10")  //LIM1 COIN II
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("DM 1.00")  //LIM2 COIN II
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("DM 2.00")  //LIM3 COIN II
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("DM 5.00")  //LIM4 COIN II
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("DM 0.10")  //LIM1 COIN II
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("DM 1.00")  //LIM2 COIN II
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("DM 2.00")  //LIM3 COIN II
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("DM 5.00")  //LIM4 COIN II
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) //MK
@@ -527,14 +524,20 @@ static INPUT_PORTS_START( disc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("DM 1.00")  //LIA2 COIN I
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("DM 2.00")  //LIA3 COIN I
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("DM 5.00")  //LIA4 COIN I
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TZ3") //ZUSATZ-EINGAENGE
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) // Risiko Leiter 1
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // Risiko Leiter 2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) // Risiko Leiter 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) // Risiko Leiter 2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN) // ZE2
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Serienuebernahme
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Rueckfuehrung
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) // Serienuebernahme
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Rueckfuehrung
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TZ4") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -542,26 +545,7 @@ static INPUT_PORTS_START( disc )
 	PORT_START("TZ5") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TZ6") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
-
-	PORT_START("TZ7") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
-
+	PORT_INCLUDE(stella8085_service)
 INPUT_PORTS_END
 
 void stella8085_state::dicemstr(machine_config &config)
@@ -582,7 +566,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
+	BEEP(config, m_beep)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -610,14 +594,21 @@ void stella8085_state::doppelpot(machine_config &config)
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
+	BEEP(config, m_beep)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void stella8085_state::excellent(machine_config &config)
 {
 	doppelpot(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
+
+	auto &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(stella8085_state::io70));
+	ppi.out_pb_callback().set(FUNC(stella8085_state::io71));
+	ppi.out_pc_callback().set(FUNC(stella8085_state::sounddev));
 }
 
 ROM_START( bahia )
@@ -735,13 +726,6 @@ ROM_START( fullhous )
 	ROM_LOAD( "merkur_full_house_ic1.ice6", 0x0000, 0x4000, CRC(4f984add) SHA1(5a31c96475fe12c4f19658133d97e6bf0536b776) )
 	ROM_LOAD( "merkur_full_house_ic2.icd6", 0x4000, 0x4000, CRC(c0f393a0) SHA1(fa16db49d44e813e68701eb77284d04903cf3ec7) )
 ROM_END
-
-ROM_START( glksstrn )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "glucksstern.ice6", 0x00000, 0x20000, CRC(8e969bae) SHA1(bf66d491932b77dab4c6b15ec7fbf470223636ac) )
-	ROM_LOAD( "glucksstern.icd6", 0x20000, 0x20000, CRC(f31b860a) SHA1(7b016bb7d0699cfe7165c0abb2c1bbcb944cdc86) )
-ROM_END
-
 
 ROM_START( herzas )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
@@ -897,30 +881,30 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL( 1982, excellnt,        0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1983, bahia,           0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1982, excellnt,        0, excellent, servicem, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1983, bahia,           0, excellent, servicem, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1984, disc,            0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1985, dpplstrt,        0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1985, dpplstrt,        0, excellent, servicem, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, discoly,         0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Olympia",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1986, dpplpot,         0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, dpplpot,         0, doppelpot, servicem, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, elitdisc,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1986, sjackpot,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Nova",   "Super Jackpot",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, vmulti,          0, excellent, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Multi",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1987, disc2000,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1987, disc2001,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1987, fullhous,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Full House",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, herzas,   herzasf1, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, herzasf8, herzasf1, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F8)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, herzasf1,        0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F10)",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, kniffi,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, herzas,   herzasf1, doppelpot, servicem, stella8085_state, empty_init, ROT0, "ADP",    "Herz As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf8, herzasf1, doppelpot, servicem, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F8)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf1,        0, doppelpot, servicem, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F10)",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, kniffi,          0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1987, rasant,          0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1987, sesam,           0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Sesam",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, sprmlti,  sprmltib, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, sprmltib,        0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, extrbltt,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, sprmlti,  sprmltib, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, sprmltib,        0, doppelpot, servicem, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, extrbltt,        0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, juwel,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, mastro,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Astro (Merkur)",    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, sherzas,         0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz As",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, mastro,          0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "ADP",    "Astro (Merkur)",    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, sherzas,         0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz As",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1989, disc3000,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1989, disciip,         0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc II Plus",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1989, discryl,  discrylb, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
@@ -931,11 +915,10 @@ GAMEL( 1990, v4assef2,        0, dicemstr,  disc,     stella8085_state, empty_in
 GAMEL( 1991, macao,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Macao",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1991, mbistro,         0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Bistro",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1991, mclub,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Merkur", "Club",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1991, superpro,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Pro",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1992, m21point,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "MEGA",   "21 Point",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1992, karoas,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1992, mmax,            0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "MEGA",   "Max",               MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, superpro,        0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "Merkur", "Super Pro",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, m21point,        0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "MEGA",   "21 Point",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, karoas,          0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, mmax,            0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "MEGA",   "Max",               MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1992, mtrio,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Trio",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 // 'STELLA DICE MASTER F2' and 'COPYRIGHT BY ADP LUEBBECKE GERMANY 1993' in ROM
-GAMEL( 1993, dicemstr,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1998, glksstrn,        0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1993, dicemstr,        0, dicemstr,  servicem, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )

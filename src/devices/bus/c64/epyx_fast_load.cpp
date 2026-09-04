@@ -84,15 +84,21 @@ uint8_t c64_epyx_fast_load_cartridge_device::c64_cd_r(offs_t offset, uint8_t dat
 {
 	if (!roml)
 	{
-		m_exrom = 0;
-		m_exrom_timer->adjust(attotime::from_usec(TIMER_PERIOD), 0);
+		if (!machine().side_effects_disabled())
+		{
+			m_exrom = 0;
+			m_exrom_timer->adjust(attotime::from_usec(TIMER_PERIOD), 0);
+		}
 
 		data = m_roml[offset & 0x1fff];
 	}
 	else if (!io1)
 	{
-		m_exrom = 0;
-		m_exrom_timer->adjust(attotime::from_usec(TIMER_PERIOD), 0);
+		if (!machine().side_effects_disabled())
+		{
+			m_exrom = 0;
+			m_exrom_timer->adjust(attotime::from_usec(TIMER_PERIOD), 0);
+		}
 	}
 	else if (!io2)
 	{

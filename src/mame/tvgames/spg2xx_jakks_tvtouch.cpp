@@ -269,7 +269,7 @@ void jakks_tvtouch_state::tvtouch(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(jakks_tvtouch_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(jakks_tvtouch_state::portc_w));
 
-	I2C_24C04(config, m_i2cmem, 0);
+	I2C_24C04(config, m_i2cmem);
 }
 
 ROM_START( tvtchsw )
@@ -291,7 +291,7 @@ ROM_END
 
 
 // TV Touch Games (these are re-release versions of classic JAKKS games but using a touchpad controller)
-CONS( 2012, tvtchsw,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
-CONS( 2012, tvtchspd, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Spider-Man in Villain Round-Up", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2012, tvtchsb,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: SpongeBob SquarePants Jellyfish Dodge", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, tvtchsw,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific, Inc. / Code Mystics", "TV Touch Games: Star Wars Original Trilogy",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
+CONS( 2012, tvtchspd, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific, Inc. / Code Mystics", "TV Touch Games: Spider-Man in Villain Round-Up",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, tvtchsb,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific, Inc. / Code Mystics", "TV Touch Games: SpongeBob SquarePants Jellyfish Dodge", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // Cut the Rope was planned but never released

@@ -118,6 +118,8 @@ BG0 palette intensity ( $C47F, $C4FF )
 #include "emu.h"
 #include "argus.h"
 
+#include "input.h" // for video debug keys
+
 
 /***************************************************************************
   Callbacks for the tilemap code

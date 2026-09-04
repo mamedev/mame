@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-NEC PC8801-31 CD-ROM I/F
+NEC PC-8801-31 CD-ROM I/F
 
 TODO:
 - Make it a slot option for PC-8801MA (does it have same ROM as the internal MC version?);
@@ -23,7 +23,7 @@ TODO:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC8801_31, pc8801_31_device, "pc8801_31", "NEC PC8801-31 CD-ROM I/F")
+DEFINE_DEVICE_TYPE(PC8801_31, pc8801_31_device, "pc8801_31", "NEC PC-8801-31 CD-ROM I/F")
 
 
 //**************************************************************************
@@ -38,9 +38,9 @@ DEFINE_DEVICE_TYPE(PC8801_31, pc8801_31_device, "pc8801_31", "NEC PC8801-31 CD-R
 
 pc8801_31_device::pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC8801_31, tag, owner, clock)
-	, m_sasibus(*this, "sasi")
-	, m_cddrive(*this, "sasi:0:cdrom")
-	, m_sasi(*this, "sasi:7:sasicb")
+	, m_scsibus(*this, "scsi")
+	, m_cddrive(*this, "scsi:0:cdrom")
+	, m_scsi(*this, "scsi:7:scsicb")
 	, m_rom_bank_cb(*this)
 	, m_drq_cb(*this)
 	, m_sel_off_timer(nullptr)
@@ -63,24 +63,24 @@ void pc8801_31_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "headphone", 2).front_center();
 
-	NSCSI_BUS(config, m_sasibus);
-	NSCSI_CONNECTOR(config, "sasi:0").option_set("cdrom", NSCSI_CDROM_PC8801_30).machine_config(
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0").option_set("cdrom", NSCSI_CDROM_PC8801_30).machine_config(
 		[](device_t *device)
 		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^headphone", 0.5, 0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^headphone", 0.5, 1);
 		});
-	NSCSI_CONNECTOR(config, "sasi:1", pc8801_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "sasi:2", pc8801_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "sasi:3", pc8801_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "sasi:4", pc8801_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "sasi:5", pc8801_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "sasi:6", pc8801_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "sasicb", true)
-		.option_add_internal("sasicb", NSCSI_CB)
+	NSCSI_CONNECTOR(config, "scsi:1", pc8801_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", pc8801_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", pc8801_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", pc8801_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", pc8801_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", pc8801_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
 		.machine_config([this](device_t* device) {
-			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(pc8801_31_device::sasi_req_w));
-			downcast<nscsi_callback_device&>(*device).sel_callback().set(*this, FUNC(pc8801_31_device::sasi_sel_w));
+			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(pc8801_31_device::scsi_req_w));
+			downcast<nscsi_callback_device&>(*device).sel_callback().set(*this, FUNC(pc8801_31_device::scsi_sel_w));
 		});
 
 
@@ -99,8 +99,8 @@ void pc8801_31_device::device_start()
 	save_item(NAME(m_clock_hb));
 	save_item(NAME(m_cddrive_enable));
 	save_item(NAME(m_dma_enable));
-	save_item(NAME(m_sasi_sel));
-	save_item(NAME(m_sasi_req));
+	save_item(NAME(m_scsi_sel));
+	save_item(NAME(m_scsi_req));
 }
 
 
@@ -119,7 +119,7 @@ void pc8801_31_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(pc8801_31_device::select_off_cb)
 {
-	m_sasi->sel_w(0);
+	m_scsi->sel_w(0);
 }
 
 
@@ -163,16 +163,16 @@ void pc8801_31_device::amap(address_map &map)
  */
 u8 pc8801_31_device::status_r()
 {
-	u8 res = (m_sasi->bsy_r() << 7 |
-		m_sasi->req_r() << 6 |
-		m_sasi->msg_r() << 5 |
-		m_sasi->cd_r() << 4 |
-		m_sasi->io_r() << 3 |
+	u8 res = (m_scsi->bsy_r() << 7 |
+		m_scsi->req_r() << 6 |
+		m_scsi->msg_r() << 5 |
+		m_scsi->cd_r() << 4 |
+		m_scsi->io_r() << 3 |
 		m_cddrive_enable);
 
 	// at boot up SEL=1 drives BSY, MSG, CD and IO low
 	// according to Takeda nobubufu (+ redbook CD) also wants this behaviour
-	if (m_sasi_sel)
+	if (m_scsi_sel)
 		res &= ~0xb8;
 
 	return res;
@@ -184,41 +184,41 @@ void pc8801_31_device::select_w(u8 data)
 	{
 		if (m_cddrive_enable)
 		{
-			m_sasi->sel_w(1);
+			m_scsi->sel_w(1);
 
 			// TODO: timing
 			m_sel_off_timer->adjust(attotime::from_usec(5000));
 		}
 	}
 	else
-		m_sasi->sel_w(0);
+		m_scsi->sel_w(0);
 }
 
 u8 pc8801_31_device::data_r()
 {
-	u8 res = m_sasi->read();
+	u8 res = m_scsi->read();
 
-	//if (m_sasi->bsy_r() && m_sasi->io_r() && !machine().side_effects_disabled())
+	//if (m_scsi->bsy_r() && m_scsi->io_r() && !machine().side_effects_disabled())
 	if (!machine().side_effects_disabled())
 	{
-		m_sasi->ack_w(1);
-		//m_sasi->write(0);
-		m_sasi->ack_w(0);
+		m_scsi->ack_w(1);
+		//m_scsi->write(0);
+		m_scsi->ack_w(0);
 	}
 	return res;
 }
 
 void pc8801_31_device::data_w(u8 data)
 {
-	m_sasi->write(data);
+	m_scsi->write(data);
 
 	// do not guard against anything, just ack the byte
 	// (mirrors cares after the Views logo)
-	//if (m_sasi->bsy_r()) //&& !m_sasi->io_r())
+	//if (m_scsi->bsy_r()) //&& !m_scsi->io_r())
 	{
-		m_sasi->ack_w(1);
-		//m_sasi->write(0);
-		m_sasi->ack_w(0);
+		m_scsi->ack_w(1);
+		//m_scsi->write(0);
+		m_scsi->ack_w(0);
 	}
 }
 
@@ -258,7 +258,7 @@ u8 pc8801_31_device::clock_r()
 void pc8801_31_device::scsi_reset_w(u8 data)
 {
 	if (BIT(data, 7))
-		m_sasibus->reset();
+		m_scsibus->reset();
 }
 
 u8 pc8801_31_device::id_r()
@@ -303,30 +303,30 @@ template <unsigned N> u8 pc8801_31_device::volume_meter_r()
 	return m_cddrive->get_channel_sample(N) >> 8;
 }
 
-void pc8801_31_device::sasi_sel_w(int state)
+void pc8801_31_device::scsi_sel_w(int state)
 {
-	m_sasi_sel = state;
+	m_scsi_sel = state;
 }
 
-void pc8801_31_device::sasi_req_w(int state)
+void pc8801_31_device::scsi_req_w(int state)
 {
-	if (!m_sasi_req && state)
+	if (!m_scsi_req && state)
 	{
 		// IO needed otherwise it will keep running the DRQ
-		if (m_dma_enable && !m_sasi->cd_r() && !m_sasi->msg_r() && m_sasi->io_r())
+		if (m_dma_enable && !m_scsi->cd_r() && !m_scsi->msg_r() && m_scsi->io_r())
 		{
 			m_drq_cb(1);
 		}
-		// else if (m_sasi->cd_r())
+		// else if (m_scsi->cd_r())
 		//  m_irq_cb(1);
 	}
-	else if(m_sasi_req && !state)
+	else if(m_scsi_req && !state)
 	{
-		//m_sasi->ack_w(0);
+		//m_scsi->ack_w(0);
 		m_drq_cb(0);
 		// m_irq_cb(0);
 	}
 
-	m_sasi_req = state;
+	m_scsi_req = state;
 }
 

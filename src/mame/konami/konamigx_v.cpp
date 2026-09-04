@@ -6,8 +6,11 @@
  */
 
 #include "emu.h"
-#include "k053250.h"
 #include "konamigx.h"
+
+#include "k053250.h"
+
+#include "input.h" // for video debug keys
 
 
 //#define GX_DEBUG

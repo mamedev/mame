@@ -12,24 +12,25 @@
 
 #pragma once
 
-class ata_hle_device_base : public device_t
+class device_ata_hle_interface :
+	public device_interface
 {
 protected:
-	ata_hle_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	device_ata_hle_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	virtual void interface_post_start() override ATTR_COLD;
+	virtual void interface_post_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(busy_tick);
 	TIMER_CALLBACK_MEMBER(empty_tick);
 
-	uint16_t dma_r();
-	uint16_t command_r(offs_t offset);
-	uint16_t control_r(offs_t offset);
+	void dma_r(PAIR16 &data);
+	void command_r(offs_t offset, PAIR16 &data, uint16_t mem_mask = ~0);
+	void control_r(offs_t offset, PAIR16 &data, uint16_t mem_mask = ~0);
 
 	void dma_w(uint16_t data);
-	void command_w(offs_t offset, uint16_t data);
-	void control_w(offs_t offset, uint16_t data);
+	void command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void set_csel_in(int state) { m_csel = state; }
 	void set_dasp_in(int state) { m_daspin = state; }
@@ -86,12 +87,16 @@ protected:
 	virtual int sector_length() = 0;
 	virtual void process_buffer() = 0;
 	virtual void fill_buffer() = 0;
-	virtual bool is_ready() = 0;
+	virtual bool is_ready() { return true; }
 	virtual void perform_diagnostic() = 0;
 	virtual void signature() = 0;
-	virtual uint16_t read_data();
-	virtual void write_data(uint16_t data);
+	virtual bool is_packet_device() = 0;
+	virtual bool is_hob();
+	virtual bool always_respond() { return m_csel == 0; }
 
+	void read_data(PAIR16 &data, uint16_t mem_mask = ~0);
+	void write_data(uint16_t data, uint16_t mem_mask = ~0);
+	void identify(offs_t word_offset, size_t word_length, std::string_view s);
 	int bit_to_mode(uint16_t word);
 	int single_word_dma_mode();
 	int multi_word_dma_mode();
@@ -134,10 +139,17 @@ protected:
 		IDE_COMMAND_RECALIBRATE = 0x10,
 		IDE_COMMAND_READ_SECTORS = 0x20,
 		IDE_COMMAND_READ_SECTORS_NORETRY = 0x21,
+		IDE_COMMAND_READ_SECTORS_EXT = 0x24,
+		IDE_COMMAND_READ_DMA_EXT = 0x25,
+		IDE_COMMAND_READ_MULTIPLE_EXT = 0x29,
 		IDE_COMMAND_WRITE_SECTORS = 0x30,
 		IDE_COMMAND_WRITE_SECTORS_NORETRY = 0x31,
+		IDE_COMMAND_WRITE_SECTORS_EXT = 0x34,
+		IDE_COMMAND_WRITE_DMA_EXT = 0x35,
+		IDE_COMMAND_WRITE_MULTIPLE_EXT = 0x39,
 		IDE_COMMAND_VERIFY_SECTORS = 0x40,
 		IDE_COMMAND_VERIFY_SECTORS_NORETRY = 0x41,
+		IDE_COMMAND_VERIFY_SECTORS_EXT = 0x42,
 		IDE_COMMAND_SEEK = 0x70,
 		IDE_COMMAND_DIAGNOSTIC = 0x90,
 		IDE_COMMAND_SET_CONFIG = 0x91,
@@ -209,6 +221,12 @@ protected:
 		PARAM_COMMAND
 	};
 
+	enum
+	{
+		COMMAND_SET_SUPPORTED_LBA48 = 1U << 10,
+		IDE_SECURITY_UNLOCK_MASTER = 1U << 0,
+	};
+
 	attotime MINIMUM_COMMAND_TIME;
 
 	std::vector<uint8_t> m_buffer;
@@ -216,10 +234,14 @@ protected:
 	uint16_t m_buffer_size;
 	uint8_t m_error;
 	uint8_t m_feature;
-	uint16_t m_sector_count;
+	uint8_t m_sector_count;
+	uint8_t m_sector_count_hob;
 	uint8_t m_sector_number;
+	uint8_t m_sector_number_hob;
 	uint8_t m_cylinder_low;
+	uint8_t m_cylinder_low_hob;
 	uint8_t m_cylinder_high;
+	uint8_t m_cylinder_high_hob;
 	uint8_t m_device_head;
 	uint8_t m_status;
 	uint8_t m_command;

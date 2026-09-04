@@ -62,11 +62,17 @@ class altos586_mmu_device : public device_t, public device_memory_interface
 public:
 	using violation_delegate = device_delegate<void ()>;
 
-	altos586_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	altos586_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
 	altos586_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&board_tag)
 		: altos586_mmu_device(mconfig, tag, owner, clock)
+	{
+		m_board.set_tag(std::forward<T>(board_tag));
+	}
+	template <typename T>
+	altos586_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&board_tag)
+		: altos586_mmu_device(mconfig, tag, owner, uint32_t(0))
 	{
 		m_board.set_tag(std::forward<T>(board_tag));
 	}
@@ -626,7 +632,7 @@ void altos586_state::mmu_violation()
 
 void altos586_state::altos586(machine_config &config)
 {
-	ALTOS586_MMU(config, m_mmu, 0, *this);
+	ALTOS586_MMU(config, m_mmu, *this);
 	m_mmu->set_violation_callback(FUNC(altos586_state::mmu_violation));
 	m_mmu->syscall_handler().set(m_pic, FUNC(pic8259_device::ir0_w));
 
@@ -653,7 +659,7 @@ void altos586_state::altos586(machine_config &config)
 	m_iop->set_addrmap(AS_PROGRAM, &altos586_state::iop_mem);
 	m_iop->set_addrmap(AS_IO, &altos586_state::iop_io);
 
-	pit8254_device &pit0(PIT8254(config, "iop_pit0", 0));
+	pit8254_device &pit0(PIT8254(config, "iop_pit0"));
 	pit0.set_clk<0>(30_MHz_XTAL);
 	pit0.out_handler<0>().set("iop_sio0", FUNC(z80sio_device::rxca_w));
 	pit0.out_handler<0>().append("iop_sio0", FUNC(z80sio_device::txca_w));
@@ -664,7 +670,7 @@ void altos586_state::altos586(machine_config &config)
 	pit0.out_handler<2>().set("iop_sio1", FUNC(z80sio_device::rxca_w));
 	pit0.out_handler<2>().append("iop_sio1", FUNC(z80sio_device::txca_w));
 
-	pit8254_device &pit1(PIT8254(config, "iop_pit1", 0));
+	pit8254_device &pit1(PIT8254(config, "iop_pit1"));
 	pit1.set_clk<0>(30_MHz_XTAL/6);
 	pit1.out_handler<0>().set("iop_sio1", FUNC(z80sio_device::rxcb_w));
 	pit1.out_handler<0>().append("iop_sio1", FUNC(z80sio_device::txcb_w));

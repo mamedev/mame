@@ -55,8 +55,6 @@ o2_test_device::o2_test_device(const machine_config &mconfig, const char *tag, d
 
 void o2_test_device::device_start()
 {
-	m_digit_out.resolve();
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_bus_data));
 }

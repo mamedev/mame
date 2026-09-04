@@ -101,7 +101,7 @@ public:
 class sn76489_device : public sn76496_base_device
 {
 public:
-	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)

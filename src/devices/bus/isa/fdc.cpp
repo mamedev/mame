@@ -419,7 +419,7 @@ void isa8_ec1841_0003_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config.replace(), "fdc:0", pc_qd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config.replace(), "fdc:1", pc_qd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
 
-	BUS_MOUSE(config, "bus_mouse", 0).extint_callback().set([this] (int state) { m_isa->irq4_w(state); });
+	BUS_MOUSE(config, "bus_mouse").extint_callback().set([this] (int state) { m_isa->irq4_w(state); });
 }
 
 

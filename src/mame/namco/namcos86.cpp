@@ -117,13 +117,15 @@ Address          Dir Data     Name      Description
 
 Notes:
 -----
-- we are using an unusually high CPU interleave factor (800) to avoid hangs
-  in rthunder. The two 6809 in this game synchronize using a semaphore at
-  5606/5607 (CPU1) 1606/1607 (CPU2). CPU1 clears 5606, does some quick things,
-  and then increments 5606. While it does its quick things (which require
-  about 40 clock cycles) it expects CPU2 to clear 5607.
-  Raising the interleave factor to 1000 makes wndrmomo crash during attract
-  mode. I haven't investigated on the cause.
+- We are using an unusually tight CPU quantum to avoid hangs in rthunder.
+  The two 6809 in this game synchronize using a semaphore at CPU1:5606/5607 /
+  CPU2:1606/1607. CPU1 clears 5606, does some quick things, and then increments
+  5606. While it does its quick things (which require about 40 clock cycles)
+  it expects CPU2 to clear 5607.
+  If the quantum is not tight enough, CPU1 will crash in wndrmomo after 10
+  attract mode loops, and there are similar soft crashes in rthunder0 and
+  rthunder1 attract mode. For some reason, if quantum is set to perfect,
+  rthunder1 will still crash (the current quantum of clock/4 works ok).
 
 - There are two watchdogs, one per CPU (or maybe three). Handling them
   separately is necessary to allow entering service mode without manually
@@ -316,8 +318,6 @@ void namcos86_state::machine_start()
 
 	if (m_subbank)
 		m_subbank->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
-
-	m_leds.resolve();
 
 	save_item(NAME(m_wdog));
 }
@@ -1046,12 +1046,12 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_mcu->out_p2_cb().set(FUNC(namcos86_state::led_w));
 	m_mcu->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_hold)); // ???
 
-	config.set_maximum_quantum(attotime::from_hz(48000)); // heavy interleaving needed to avoid hangs in rthunder
+	config.set_maximum_quantum(attotime::from_hz(m_cpu1->clock() / 4)); // heavy interleaving needed to avoid hangs in rthunder
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(49.152_MHz_XTAL/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8);
 	screen.set_screen_update(FUNC(namcos86_state::screen_update));
 	screen.screen_vblank().set(FUNC(namcos86_state::screen_vblank));
@@ -1062,11 +1062,11 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(namcos86_state::sprite_bank_cb));
 	m_spritegen->flip_callback().set(FUNC(namcos86_state::flip_screen_set));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[0], 0, m_palette, gfx_namcos86_tile_0);
+	NAMCO_CUS4XTMAP(config, m_tilegen[0], m_palette, gfx_namcos86_tile_0);
 	m_tilegen[0]->set_offset(47, 422, -9, 9);
 	m_tilegen[0]->set_tile_callback(FUNC(namcos86_state::tile_cb_0));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[1], 0, m_palette, gfx_namcos86_tile_1);
+	NAMCO_CUS4XTMAP(config, m_tilegen[1], m_palette, gfx_namcos86_tile_1);
 	m_tilegen[1]->set_offset(46, 422, -9, 9);
 	m_tilegen[1]->set_tile_callback(FUNC(namcos86_state::tile_cb_1));
 

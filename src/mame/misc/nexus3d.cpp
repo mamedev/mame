@@ -11,6 +11,10 @@
     MagicEyes VRENDER 3D Soc (200 MHz ARM920T CPU / GFX / Sound)
     Also Has 2x QDSP QS1000 for sound
 
+    TODO:
+    - hang at very beginning, cfr. driver inits
+    - identify where the palette is for the texture RAM (8bpp)
+
 */
 
 #include "emu.h"
@@ -100,6 +104,7 @@ uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	uint16_t const *const fbram = reinterpret_cast<uint16_t *>(m_fbram.target());
 	int const width = 640;
 
+	// TODO: framebuffer upload should draw on request and probably be with a defined base somewhere
 	uint16_t const *const visible = fbram + (m_screen->frame_number() & 1) * (0x96000/2);
 
 	uint32_t const dx = cliprect.left();
@@ -229,9 +234,9 @@ uint32_t nexus3d_state::crtc_vblank_r()
 void nexus3d_state::nexus3d_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("mainram");
-	map(0x02000000, 0x023fffff).ram().share("fbram"); // boundary tbd
+	map(0x02000000, 0x023fffff).ram().share("fbram"); // boundary tbd, also 8bpp texture RAM storage at around $020axxxx onward
 
-	map(0x03720000, 0x0373ffff).ram(); // 3d fifo, boundary tbd
+	map(0x03720000, 0x0373ffff).ram(); // 3d FIFO, boundary tbd
 	map(0x046c0000, 0x046fffff).ram(); // """
 
 	map(0x60000000, 0x67ffffff).ram(); // color tables?
@@ -317,7 +322,7 @@ void nexus3d_state::nexus3d(machine_config &config)
 	ARM920T(config, m_maincpu, 200000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nexus3d_state::nexus3d_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw((XTAL(14'318'181)*2), 454*2, 0, 640, 262*2, 0, 480); // not accurate, needs CRTC understanding
 	m_screen->set_screen_update(FUNC(nexus3d_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(nexus3d_state::screen_vblank));
@@ -325,7 +330,7 @@ void nexus3d_state::nexus3d(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
-	SAMSUNG_K9F2G08U0M(config, m_nand, 0);
+	SAMSUNG_K9F2G08U0M(config, m_nand);
 }
 
 
@@ -380,4 +385,4 @@ void nexus3d_state::init_acheartf()
 
 
 GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_acheart,  ROT0, "Examu", "Arcana Heart",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // has a "for use in Japan" texture uploaded at startup right after framebuffer space

@@ -27,7 +27,7 @@ class luxor_x37_sasi_device :  public device_t, public nscsi_device_interface
 {
 public:
 	// construction/destruction
-	luxor_x37_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	luxor_x37_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto int_callback() { return m_write_int.bind(); }
 	auto req0_callback() { return m_write_req0.bind(); }
@@ -53,14 +53,27 @@ private:
 	devcb_write_line m_write_req0;
 
 	memory_share_creator<u16> m_buffer;
+	emu_timer *m_sel_clear_timer;
+	emu_timer *m_ack_set_timer;
+	emu_timer *m_ack_clear_timer;
+
+	TIMER_CALLBACK_MEMBER(clear_sel);
+	TIMER_CALLBACK_MEMBER(set_ack);
+	TIMER_CALLBACK_MEMBER(clear_ack);
+	void transfer();
+	void count();
+	void update_int(bool state) { if (m_int != state) { m_int = state; m_write_int(!state); } }
+	void update_req0(bool state) { if (m_brq != state) { m_brq = state; m_write_req0(state); } }
 
 	bool m_int = 1;
-	bool m_req0 = 1;
+	bool m_brq = 1;
+	bool m_brc = 0;
 	u8 m_data_out = 0;
 	offs_t m_a = 0;
 	bool m_hlc = 0;
 	bool m_dir = 0;
-	bool m_rc = 1;
+	bool m_dxd8 = 0;
+	bool m_bsy = 0;
 };
 
 

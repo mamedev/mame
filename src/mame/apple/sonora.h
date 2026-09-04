@@ -63,8 +63,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mac_video_sonora_device> m_video;
 	required_device<via6522_device> m_via1;
-	required_device<pseudovia_device> m_pseudovia;
-	required_device<asc_device> m_asc;
+	required_device<sonora_pseudovia_device> m_pseudovia;
+	required_device<asc_sonora_device> m_asc;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_region_ptr<u32> m_rom;

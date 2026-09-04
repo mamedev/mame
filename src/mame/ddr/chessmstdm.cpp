@@ -102,8 +102,6 @@ private:
 
 void chessmstdm_state::machine_start()
 {
-	m_digits.resolve();
-
 	// register for savestates
 	save_item(NAME(m_matrix));
 	save_item(NAME(m_direct_leds));

@@ -779,7 +779,7 @@ void nightgal_state::royalqn(machine_config &config)
 
 	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240);
 	screen.set_screen_update(FUNC(nightgal_state::screen_update_nightgal));
 	screen.set_palette(m_palette);

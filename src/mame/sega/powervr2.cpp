@@ -20,6 +20,9 @@
 #include "rendutil.h"
 #include "video/rgbutil.h"
 
+#include "corefloat.h"
+#include "endianness.h"
+
 #define LOG_WARN        (1U << 1) // Show warnings
 #define LOG_TA_CMD      (1U << 2) // Show TA CORE commands
 #define LOG_TA_FIFO     (1U << 3) // Show TA FIFO polygon entries
@@ -1616,7 +1619,7 @@ void powervr2_device::update_screen_format()
 	//int32_t vo_vert_start_pos_f1 = vo_starty & 0x3ff;
 	int pclk = spg_clks[(spg_control >> 6) & 3] * (((spg_control & 0x10) >> 4)+1);
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(pclk) * spg_hsize * spg_vsize;
+	attotime refresh = attotime::from_ticks(spg_hsize * spg_vsize, pclk);
 
 	rectangle visarea = screen().visible_area();
 

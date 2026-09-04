@@ -469,7 +469,7 @@ class X86TableGen extends core.TableGen {
   // --------------------------------------------------------------------------
 
   parse() {
-    const data = this.dataOfFile("src/asmjit/x86/x86instdb.cpp");
+    const data = this.dataOfFile("asmjit/x86/x86instdb.cpp");
     const re = new RegExp(
       "INST\\(" +
         "([A-Za-z0-9_]+)\\s*"              + "," +  // [01] Instruction.
@@ -777,10 +777,10 @@ class X86TableGen extends core.TableGen {
 
   onBeforeRun() {
     this.load([
-      "src/asmjit/x86/x86globals.h",
-      "src/asmjit/x86/x86instdb.cpp",
-      "src/asmjit/x86/x86instdb.h",
-      "src/asmjit/x86/x86instdb_p.h"
+      "asmjit/x86/x86globals.h",
+      "asmjit/x86/x86instdb.cpp",
+      "asmjit/x86/x86instdb.h",
+      "asmjit/x86/x86instdb_p.h"
     ]);
     this.parse();
   }

@@ -38,8 +38,6 @@
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 
-#include "speaker.h"
-
 #define LOG_INTERFACE   (1U << 1)
 #define LOG_INTERNAL    (1U << 2)
 #define VERBOSE (0)
@@ -91,6 +89,7 @@ namespace
 		virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 		virtual void device_reset() override ATTR_COLD;
+		virtual void device_resolve_objects() override ATTR_COLD;
 
 		u8 ssc_port_a_r();
 		void ssc_port_b_w(u8 data);
@@ -104,7 +103,6 @@ namespace
 		virtual void device_start() override ATTR_COLD;
 		u8 ff7d_read(offs_t offset);
 		void ff7d_write(offs_t offset, u8 data);
-		virtual void set_sound_enable(bool sound_enable) override;
 
 	private:
 		u8                                      m_reset_line;
@@ -137,12 +135,18 @@ namespace
 		// sound stream update overrides
 		virtual void sound_stream_update(sound_stream &stream) override;
 
-		// Power of 2
-		static constexpr int BUFFER_SIZE = 4;
+		static constexpr float HPF_ALPHA    = 0.99f;
+		static constexpr float ATTACK_COEFF = 0.0026f;  // fast charge
+		static constexpr float DECAY_COEFF  = 0.0003f; // slow drain
+		static constexpr float THRESH_ON    = 0.05f;
+		static constexpr float THRESH_OFF   = 0.01f;
+
 	private:
 		sound_stream*  m_stream;
-		float m_rms[BUFFER_SIZE];
-		int m_index;
+		bool m_sound_active;
+		float m_envelope;
+		float m_hpf_prev_in;
+		float m_hpf_prev_out;
 	};
 };
 
@@ -171,18 +175,15 @@ void coco_ssc_device::device_add_mconfig(machine_config &config)
 
 	RAM(config, "staticram").set_default_size("2K").set_default_value(0);
 
-	SPEAKER(config, "ssc_audio").front_center();
-
 	SP0256(config, m_spo, XTAL(3'120'000));
-	m_spo->add_route(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN);
 	m_spo->data_request_callback().set_inputline(m_tms7040, TMS7000_INT1_LINE);
 
+	COCOSSC_SAC(config, m_sac, DERIVED_CLOCK(2, 1));
+
+	// Internal AY route goes into the SAC filter
 	AY8913(config, m_ay, DERIVED_CLOCK(2, 1));
 	m_ay->set_flags(AY8910_SINGLE_OUTPUT);
-	m_ay->add_route(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN);
-
-	COCOSSC_SAC(config, m_sac, DERIVED_CLOCK(2, 1));
-	m_sac->add_route(ALL_OUTPUTS, "ssc_audio", 1.0);
+	m_ay->add_route(ALL_OUTPUTS, m_sac, AY8913_GAIN);
 }
 
 ROM_START(coco_ssc)
@@ -243,31 +244,23 @@ void coco_ssc_device::device_reset()
 
 
 //-------------------------------------------------
+//  device_resolve_objects
+//-------------------------------------------------
+
+void coco_ssc_device::device_resolve_objects()
+{
+	add_sound_route(*m_spo, ALL_OUTPUTS, SP0256_GAIN);
+	add_sound_route(*m_sac, ALL_OUTPUTS, 1.0);
+}
+
+
+//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 const tiny_rom_entry *coco_ssc_device::device_rom_region() const
 {
 	return ROM_NAME( coco_ssc );
-}
-
-
-//-------------------------------------------------
-//  set_sound_enable
-//-------------------------------------------------
-
-void coco_ssc_device::set_sound_enable(bool sound_enable)
-{
-	if( sound_enable )
-	{
-		m_sac->set_output_gain(0, 1.0);
-		m_spo->set_output_gain(0, 1.0);
-	}
-	else
-	{
-		m_sac->set_output_gain(0, 0.0);
-		m_spo->set_output_gain(0, 0.0);
-	}
 }
 
 //-------------------------------------------------
@@ -280,25 +273,25 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 
 	switch(offset)
 	{
-		case 0x00:
+		case 0x00: // 0xff7d
 			data = 0xff;
 			LOGINTERFACE( "[%s] ff7d read: %02x\n", machine().describe_context(), data );
 			break;
 
-		case 0x01:
+		case 0x01: // 0xff7e
 			data = 0x1f;
 
-			if( m_tms7000_busy == false )
+			if (m_tms7000_busy == false)
 			{
 				data |= 0x80;
 			}
 
-			if( m_spo->sby_r() )
+			if (m_spo->sby_r())
 			{
 				data |= 0x40;
 			}
 
-			if(  m_sac->sound_activity_circuit_output() )
+			if (m_sac->sound_activity_circuit_output())
 			{
 				data |= 0x20;
 			}
@@ -329,15 +322,15 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
-		case 0x00:
+		case 0x00: // 0xff7d
 			LOGINTERFACE( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
 
-			if( (data & 1) == 1 )
+			if ((data & 1) == 1)
 			{
 				m_spo->reset();
 			}
 
-			if( ((m_reset_line & 1) == 1) && ((data & 1) == 0) )
+			if (((m_reset_line & 1) == 1) && ((data & 1) == 0))
 			{
 				m_tms7040->reset();
 				m_ay->reset();
@@ -347,7 +340,7 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 			m_reset_line = data;
 			break;
 
-		case 0x01:
+		case 0x01: // 0xff7e
 			LOGINTERFACE( "[%s] ff7e write: %02x\n", machine().describe_context(), data );
 			m_tms7000_porta = data;
 			m_tms7000_busy = true;
@@ -365,7 +358,7 @@ u8 coco_ssc_device::ssc_port_a_r()
 {
 	LOGINTERNAL( "[%s] port a read: %02x\n", machine().describe_context(), m_tms7000_porta );
 
-	if( !machine().side_effects_disabled() )
+	if (!machine().side_effects_disabled())
 	{
 		m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
 	}
@@ -389,7 +382,7 @@ u8 coco_ssc_device::ssc_port_c_r()
 
 void coco_ssc_device::ssc_port_c_w(u8 data)
 {
-	if( (data & C_RCS) == 0 && (data & C_RRW) == 0 ) /* static RAM write */
+	if ((data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
 	{
 		u16 address = u16(data) << 8;
 		address += m_tms7000_portb;
@@ -398,25 +391,25 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 		m_staticram->write(address, m_tms7000_portd);
 	}
 
-	if( (data & C_ACS) == 0 ) /* chip select for AY-3-8913 */
+	if ((data & C_ACS) == 0) /* chip select for AY-3-8913 */
 	{
-		if( (data & (C_BDR|C_BC1)) == (C_BDR|C_BC1) ) /* BDIR = 1, BC1 = 1: latch address */
+		if ((data & (C_BDR|C_BC1)) == (C_BDR|C_BC1)) /* BDIR = 1, BC1 = 1: latch address */
 		{
 			m_ay->address_w(m_tms7000_portd);
 		}
 
-		if( ((data & C_BDR) == C_BDR) && ((data & C_BC1) == 0) ) /* BDIR = 1, BC1 = 0: write data */
+		if (((data & C_BDR) == C_BDR) && ((data & C_BC1) == 0)) /* BDIR = 1, BC1 = 0: write data */
 		{
 			m_ay->data_w(m_tms7000_portd);
 		}
 	}
 
-	if( ((m_tms7000_portc & C_ALD) == C_ALD) && ((data & C_ALD) == 0) && (m_tms7000_portd < 64) )
+	if (((m_tms7000_portc & C_ALD) == C_ALD) && ((data & C_ALD) == 0) && (m_tms7000_portd < 64))
 	{
 		m_spo->ald_w(m_tms7000_portd); /* load allophone */
 	}
 
-	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
+	if (((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY))
 	{
 		m_tms7000_busy = false;
 	}
@@ -438,10 +431,10 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 
 u8 coco_ssc_device::ssc_port_d_r()
 {
-	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0) )
+	if (((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0))
 		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
 
-	if( ((m_tms7000_portc & C_RCS) == 0)  && ((m_tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
+	if (((m_tms7000_portc & C_RCS) == 0)  && ((m_tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
 	{
 		u16 address = u16(m_tms7000_portc) << 8;
 		address += m_tms7000_portb;
@@ -450,9 +443,9 @@ u8 coco_ssc_device::ssc_port_d_r()
 		m_tms7000_portd = m_staticram->read(address);
 	}
 
-	if( (m_tms7000_portc & C_ACS) == 0 ) /* chip select for AY-3-8913 */
+	if ((m_tms7000_portc & C_ACS) == 0) /* chip select for AY-3-8913 */
 	{
-		if( ((m_tms7000_portc & C_BDR) == 0) && ((m_tms7000_portc & C_BC1) == C_BC1) ) /* psg read data */
+		if (((m_tms7000_portc & C_BDR) == 0) && ((m_tms7000_portc & C_BC1) == C_BC1)) /* psg read data */
 		{
 			m_tms7000_portd = m_ay->data_r();
 		}
@@ -476,14 +469,15 @@ void coco_ssc_device::ssc_port_d_w(u8 data)
 //-------------------------------------------------
 
 cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, COCOSSC_SAC, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_index(0)
+	: device_t(mconfig, COCOSSC_SAC, tag, owner, clock)
+		, device_sound_interface(mconfig, *this)
+		, m_stream(nullptr)
+		, m_sound_active(false)
+		, m_envelope(0.0f)
+		, m_hpf_prev_in(0.0f)
+		, m_hpf_prev_out(0.0f)
 {
-	std::fill(std::begin(m_rms), std::end(m_rms), 0.0f);
 }
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -492,8 +486,12 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 void cocossc_sac_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
-}
 
+	save_item(NAME(m_sound_active));
+	save_item(NAME(m_envelope));
+	save_item(NAME(m_hpf_prev_in));
+	save_item(NAME(m_hpf_prev_out));
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -502,25 +500,26 @@ void cocossc_sac_device::device_start()
 void cocossc_sac_device::sound_stream_update(sound_stream &stream)
 {
 	int count = stream.samples();
-	m_rms[m_index] = 0;
 
-	if( count > 0 )
+	for (int sampindex = 0; sampindex < count; sampindex++)
 	{
-		for( int sampindex = 0; sampindex < count; sampindex++ )
-		{
-			auto source_sample = stream.get(0, sampindex);
-			m_rms[m_index] += source_sample * source_sample;
-			stream.put(0, sampindex, source_sample);
-		}
+		float x = stream.get(0, sampindex);
 
-		m_rms[m_index] = m_rms[m_index] / count;
-		m_rms[m_index] = sqrt(m_rms[m_index]);
+		// High pass filter to remove DC offset
+		float y = HPF_ALPHA * (m_hpf_prev_out + x - m_hpf_prev_in);
+		m_hpf_prev_in = x;
+		m_hpf_prev_out = y;
+
+		// Envelope follower, asymmetric attack/decay
+		float rect = std::abs(y);
+		if (rect > m_envelope)
+			m_envelope += (rect - m_envelope) * ATTACK_COEFF;
+		else
+			m_envelope += (rect - m_envelope) * DECAY_COEFF;
+
+		stream.put(0, sampindex, x);
 	}
-
-	m_index++;
-	m_index &= (BUFFER_SIZE-1);
 }
-
 
 //-------------------------------------------------
 //  sound_activity_circuit_output - making sound
@@ -528,8 +527,12 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream)
 
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
-	float sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0f);
-	float average = (sum / BUFFER_SIZE);
+	m_stream->update();
 
-	return average < 0.317f;
+	if (m_sound_active && m_envelope < THRESH_OFF)
+		m_sound_active = false;
+	else if (m_envelope > THRESH_ON)
+		m_sound_active = true;
+
+	return !m_sound_active;
 }

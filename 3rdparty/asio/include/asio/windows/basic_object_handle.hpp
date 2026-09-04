@@ -2,7 +2,7 @@
 // windows/basic_object_handle.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2011 Boris Schaeling (boris@highscore.de)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,17 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace windows {
+
+#if !defined(ASIO_WINDOWS_BASIC_OBJECT_HANDLE_FWD_DECL)
+#define ASIO_WINDOWS_BASIC_OBJECT_HANDLE_FWD_DECL
+
+// Forward declaration with defaulted arguments.
+template <typename Executor = any_io_executor>
+class basic_object_handle;
+
+#endif // !defined(ASIO_WINDOWS_BASIC_OBJECT_HANDLE_FWD_DECL)
 
 /// Provides object-oriented handle functionality.
 /**
@@ -43,8 +53,10 @@ namespace windows {
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
  * @e Shared @e objects: Unsafe.
+ *
+ * @sa @ref overview_windows_object_handle "Object HANDLEs"
  */
-template <typename Executor = any_io_executor>
+template <typename Executor>
 class basic_object_handle
 {
 private:
@@ -415,7 +427,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code) @endcode
@@ -475,6 +487,7 @@ private:
 };
 
 } // namespace windows
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

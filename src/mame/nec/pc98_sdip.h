@@ -13,16 +13,19 @@ class pc98_sdip_device : public device_t,
 						  public device_nvram_interface
 {
 public:
-	pc98_sdip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc98_sdip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 	void bank_w(int state);
 
 	// legacy i/f
-	// TODO: not necessarily linear, bit 7 is parity bit
-	ioport_value dsw1_r() { return m_sdip_ram[0]; }
-	ioport_value dsw2_r() { return m_sdip_ram[1]; }
+	// [0] bit 0 odd parity, ignore it for DSW translation
+	// (display type, PC-9821 can't set 15 kHz)
+	ioport_value dsw1_r() { return m_sdip_ram[0] | 1; }
+	// [1] bit 4 odd parity, translates as DSW2 MEMSW init from [3] bit 5
+	ioport_value dsw2_r() { return (m_sdip_ram[1] & 0xef) | (BIT(m_sdip_ram[3], 5) << 4); }
+	// FIXME: not necessarily linear
 	ioport_value dsw3_r() {
 		const u8 fdc_setting = (m_sdip_ram[2] & 3) ^ 2;
 		//popmessage("%s %s", BIT(fdc_setting, 1) ? "2HD" : "2DD", BIT(fdc_setting, 0) ? "fixed" : "auto-detect");

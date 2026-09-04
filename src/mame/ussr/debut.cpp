@@ -76,7 +76,7 @@ public:
 	// assume that RESET button is tied to CPU RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	void debutm(machine_config &config);
+	void debutm(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -107,8 +107,6 @@ private:
 
 void debut_state::machine_start()
 {
-	m_out_digit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_latch));
 	save_item(NAME(m_dac_data));

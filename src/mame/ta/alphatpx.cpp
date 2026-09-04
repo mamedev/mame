@@ -1232,7 +1232,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_12_state::alphatp2_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
 	screen.set_screen_update(FUNC(alphatp_12_state::screen_update));
 
@@ -1250,7 +1250,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1060).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 	// 4.9152_MHz_XTAL serial clock
 
 	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
@@ -1310,7 +1310,7 @@ void alphatp_34_state::alphatp3(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_34_state::alphatp3_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
 	screen.set_screen_update(FUNC(alphatp_34_state::screen_update));
 
@@ -1327,7 +1327,7 @@ void alphatp_34_state::alphatp3(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1060).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 	// 4.9152_MHz_XTAL serial clock
 
 	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
@@ -1347,11 +1347,11 @@ void alphatp_34_state::alphatp30(machine_config &config)
 	m_i8088->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 	m_i8088->set_disable();
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_i8088, 0);
 	m_pic->in_sp_callback().set_constant(0);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(100000);  // 15Mhz osc with unknown divisor
 	pit.set_clk<1>(100000);
 	pit.set_clk<2>(100000);

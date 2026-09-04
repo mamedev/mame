@@ -38,6 +38,10 @@ public:
 		, m_bankdev(*this, "bankdev")
 		, m_mainirq(*this, "mainirq")
 		, m_io_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } }
+		, m_dsw(*this, "DSW%u", 0U)
+		, m_io_fake(*this, "FAKE")
+		, m_bet(*this, "BET")
+		, m_coins(*this, "COINS")
 	{
 	}
 
@@ -47,11 +51,13 @@ public:
 	void tenkai(machine_config &config) ATTR_COLD;
 	void ougonhai(machine_config &config) ATTR_COLD;
 	void ougonhaib1(machine_config &config) ATTR_COLD;
+	void mjtkp2(machine_config &config) ATTR_COLD;
 	void mjreach(machine_config &config) ATTR_COLD;
 	void mjreachp2(machine_config &config) ATTR_COLD;
 	void mjdialq2(machine_config &config) ATTR_COLD;
 	void sprtmtch(machine_config &config) ATTR_COLD;
 	void qyjdzjp(machine_config &config) ATTR_COLD;
+	void baoqingt(machine_config &config) ATTR_COLD;
 
 	void blitter_ack_w(int state);
 	void sprtmtch_blitter_irq_w(int state);
@@ -74,6 +80,10 @@ protected:
 	optional_device<address_map_bank_device> m_bankdev;
 	optional_device<rst_pos_buffer_device> m_mainirq;
 	optional_ioport_array<5> m_io_key[2];
+	optional_ioport_array<5> m_dsw;
+	optional_ioport m_io_fake;
+	optional_ioport m_bet;
+	optional_ioport m_coins;
 
 	/* input / output */
 	uint8_t m_input_sel = 0U;
@@ -86,6 +96,8 @@ protected:
 	void dynax_blit_romregion_w(uint8_t data);
 	void dynax_extra_scrollx_w(uint8_t data);
 	void dynax_extra_scrolly_w(uint8_t data);
+
+	void baoqingt_blit_dest_w(uint8_t data);
 
 	void tenkai_palette_w(offs_t offset, uint8_t data);
 
@@ -115,6 +127,11 @@ protected:
 	void nanajign_palette_lo_w(offs_t offset, uint8_t data);
 	void nanajign_palette_hi_w(offs_t offset, uint8_t data);
 	void nanajign_palette_update(offs_t offset);
+	void mjtkp2_blit_palette12_w(uint8_t data);
+	void mjtkp2_blit_palette30_w(uint8_t data);
+	void mjtkp2_priority_w(uint8_t data);
+	void mjtkp2_blit_scrollx_w(uint8_t data);
+	void mjtkp2_blit_scrolly_w(uint8_t data);
 
 	uint32_t screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -172,11 +189,17 @@ private:
 	void tenkai_p3_w(uint8_t data);
 	void tenkai_p4_w(uint8_t data);
 	uint8_t tenkai_p5_r();
-	void tenkai_p6_w(uint8_t data);
 	void tenkai_p7_w(uint8_t data);
 	void tenkai_p8_w(uint8_t data);
 	uint8_t tenkai_p8_r();
+	void ougonhai_blit_dest_w(uint8_t data);
+	void ougonhai_priority_w(uint8_t data);
+	void ougonhai_p3_w(uint8_t data);
+	void ougonhai_p4_w(uint8_t data);
+	void ougonhai_p6_w(uint8_t data);
 	void ougonhai_p7_w(uint8_t data);
+	void ougonhaib_p7_w(uint8_t data);
+	void mjtkp2_p6_w(uint8_t data);
 	void mjreachp2_p8_w(uint8_t data);
 	void tenkai_6c_w(int state);
 	void tenkai_70_w(int state);
@@ -196,6 +219,7 @@ private:
 	void tenkai_blit_scrollx_w(uint8_t data);
 	void tenkai_blit_scrolly_w(uint8_t data);
 	void tenkai_priority_w(uint8_t data);
+	uint8_t mjtkp2_dsw_r();
 
 	uint32_t screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -211,6 +235,7 @@ private:
 	DECLARE_MACHINE_START(sprtmtch);
 	DECLARE_VIDEO_START(sprtmtch);
 	DECLARE_VIDEO_START(mjdialq2);
+	DECLARE_VIDEO_START(mjtkp2);
 
 	//int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
@@ -234,9 +259,14 @@ private:
 
 	void qyjdzjp_io_map(address_map &map) ATTR_COLD;
 
+	void baoqingt_io_map(address_map &map) ATTR_COLD;
+
+	void mjtkp2_map(address_map &map) ATTR_COLD;
+	void mjtkp2_banked_map(address_map &map) ATTR_COLD;
+
 	// misc
 	int m_rombank = 0;
-	uint8_t m_tenkai_p5_val = 0U;
+	uint8_t m_prot_val = 0U;
 	int m_tenkai_6c = 0;
 	int m_tenkai_70 = 0;
 	uint8_t m_gekisha_val[2]{};

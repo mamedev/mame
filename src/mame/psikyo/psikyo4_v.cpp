@@ -31,6 +31,8 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 #include "emu.h"
 #include "psikyo4.h"
 
+#include "endianness.h"
+
 
 /* --- SPRITES --- */
 void psikyo4_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr)

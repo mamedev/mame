@@ -6,14 +6,18 @@ license:CC0-1.0
 
 <softwarelist name="apple2_cass" description="Apple II cassettes">
 	<!-- To enter BASIC after powering on:
-	AppleII : Type Ctrl-B (nothing shows) and press <Enter>
-	AppleIIe : Press Ctrl-F12
+	Apple II : Type Ctrl-B (nothing shows) and press <Return>.
+	Apple II+: Press Ctrl-F12 (or start a system without any disk interfaces configured).
+	To enter the monitor from BASIC, type CALL -151 and press <Return>.
 
 	To load and run a tape:
 	1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
-	2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
+	2. Enter the address information and monitor command or type LOAD for BASIC programs, but do not press <Return>.
 	3. Play the tape, wait for the leader sound then press <Return>.
-	4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
+	4. For BASIC programs, stop the tape, type RUN and press <Return> to run the program.
+
+    Many Applesoft BASIC cassette programs will also run on the TK2000 or MPF-II, though often with significant
+    graphical glitches. To load Apple-format tapes on these systems, enter MP followed by LOADA. -->
 
 	<software name="3dartgra">
 		<description>3D Art Graphics</description>
@@ -877,7 +881,7 @@ license:CC0-1.0
 		<info name="programmer" value="Jim Connelley" />
 		<info name="required_ram" value="32K" />
 		<info name="usage" value="]Load" />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE" />
 		<!-- role-playing game -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Datestones of Ryn" />
@@ -1186,7 +1190,7 @@ license:CC0-1.0
 	<software name="galaxian">
 		<description>Galaxian</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="required_ram" value="24K" />
 		<info name="usage" value="*800.1FFFR 1000G" />
 		<part name="cass" interface="apple2_cass">
@@ -1217,6 +1221,7 @@ license:CC0-1.0
 		<year>1980</year>
 		<publisher>Tsukumo Original Software</publisher>
 		<info name="alt_title" value="ギャラクシートラベル" />
+		<info name="language" value="Japanese" />
 		<info name="usage" value="*0200.6000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Galaxy Travel" />
@@ -1406,6 +1411,7 @@ license:CC0-1.0
 		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2026-00" />
 		<info name="usage" value="]Load" />
+		<!-- TK2000: To run Lemonade Stand, delete line 10010 after loading. -->
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Hopalong Cassidy" />
 			<dataarea name="cass" size="4846636">
@@ -2013,7 +2019,7 @@ license:CC0-1.0
 	<software name="module1">
 		<description>Instant Library: Module 1</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<!-- side 2 not dumped -->
@@ -2028,7 +2034,7 @@ license:CC0-1.0
 	<software name="module2">
 		<description>Instant Library: Module 2</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<!-- program doesn't load if tape started at beginning so start at 0:08 or second copy at 1:10 -->
@@ -2043,7 +2049,7 @@ license:CC0-1.0
 	<software name="module3">
 		<description>Instant Library: Module 3</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
@@ -2057,7 +2063,7 @@ license:CC0-1.0
 	<software name="module4">
 		<description>Instant Library: Module 4</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<!-- program doesn't load if tape started at beginning so start at second copy at 1:50 -->
@@ -2073,7 +2079,7 @@ license:CC0-1.0
 	<software name="module5">
 		<description>Instant Library: Module 5</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
@@ -2087,7 +2093,7 @@ license:CC0-1.0
 	<software name="module6">
 		<description>Instant Library: Module 6</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
@@ -2101,7 +2107,7 @@ license:CC0-1.0
 	<software name="module7">
 		<description>Instant Library: Module 7</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
@@ -2115,7 +2121,7 @@ license:CC0-1.0
 	<software name="module8">
 		<description>Instant Library: Module 8</description>
 		<year>1978</year>
-		<publisher>Softape</publisher>
+		<publisher>Softape Software Exchange</publisher>
 		<info name="required_ram" value="16K" />
 		<info name="usage" value="*30.3FFFR" />
 		<!-- program doesn't load if tape started at beginning so start at 0:05 second copy at 1:50 -->
@@ -3334,7 +3340,7 @@ license:CC0-1.0
 		<publisher>Speakeasy Software</publisher>
 		<info name="programmer" value="Danielle Bunten Berry" />
 		<info name="required_ram" value="16K" />
-		<info name="usage" value="Shipped with special hardware controllers, but joystick or paddeles can be used by defining directional movement (not button press) to each player." />
+		<info name="usage" value="Shipped with special hardware controllers, but joystick or paddles can be used by defining directional movement (not button press) to each player." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE" />
 		<!-- Dump released: 2024-05-09 -->
 		<!-- simulation game -->

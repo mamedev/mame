@@ -4,6 +4,8 @@
 #include "i960.h"
 #include "i960dis.h"
 
+#include "corefloat.h"
+
 #include <algorithm>
 
 #ifdef _MSC_VER
@@ -1173,7 +1175,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode) & 0x1f;
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, rotl_32(t2, t1));
+				set_ri(opcode, std::rotl(t2, t1));
 				break;
 
 			case 0xe: // shli

@@ -12,7 +12,7 @@ This engine was also used in the newer Mephisto Modena.
 Hardware notes:
 - R65C02P4 or G65SC02P-4 @ 4MHz
 - 32KB ROM, 8KB RAM battery-backed
-- Sanyo LC7582, 2 LCD panels (each 4-digit, some unused segments)
+- Sanyo LC7582, same LCDs as Chess 3008
 - TTL, piezo, 8*8+8 LEDs, button sensors
 
 Sphinx Commander also uses the Dominator program, and is on similar hardware,
@@ -23,11 +23,12 @@ Sphinx Galaxy is on similar hardware too, with less leds.
 
 #include "emu.h"
 
+#include "chess3008_lcd.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "video/lc7580.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -50,9 +51,7 @@ public:
 		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0),
-		m_out_digit(*this, "digit%u", 0U),
-		m_out_lcd(*this, "s%u.%u", 0U, 0U)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine configs
@@ -60,36 +59,24 @@ public:
 	void galaxy(machine_config &config);
 	void commander(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
-	required_device<lc7582_device> m_lcd;
+	required_device<chess3008_lcd_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
-	output_finder<8> m_out_digit;
-	output_finder<2, 52> m_out_lcd;
 
 	// address maps
 	void dominator_map(address_map &map) ATTR_COLD;
 	void galaxy_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void lcd_output_w(offs_t offset, u64 data);
 	void control_w(u8 data);
 	void leds_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
 };
-
-void dominator_state::machine_start()
-{
-	m_out_digit.resolve();
-	m_out_lcd.resolve();
-}
 
 
 
@@ -97,46 +84,10 @@ void dominator_state::machine_start()
     I/O
 *******************************************************************************/
 
-// LC7582 LCD
-
-void dominator_state::lcd_output_w(offs_t offset, u64 data)
-{
-	// output individual segments
-	for (int i = 0; i < 52; i++)
-		m_out_lcd[offset][i] = BIT(data, i);
-
-	// unscramble digit 7segs
-	static const u8 seg2digit[4*7] =
-	{
-		0x03, 0x04, 0x00, 0x40, 0x41, 0x02, 0x42,
-		0x05, 0x06, 0x07, 0x48, 0x44, 0x45, 0x46,
-		0x0c, 0x0d, 0x0b, 0x0a, 0x4a, 0x4c, 0x4b,
-		0x0e, 0x0f, 0x10, 0x50, 0x4d, 0x4e, 0x4f
-	};
-
-	for (int i = 0; i < 8; i++)
-	{
-		u8 digit = 0;
-		for (int seg = 0; seg < 7; seg++)
-		{
-			u8 bit = seg2digit[7 * (i & 3) + seg] + 26 * (i >> 2);
-			digit |= m_out_lcd[BIT(bit, 6)][bit & 0x3f] << seg;
-		}
-		m_out_digit[i] = digit;
-	}
-}
-
-
-// TTL
-
 void dominator_state::control_w(u8 data)
 {
-	// d0: LC7582 DATA
-	// d1: LC7582 CLK
-	// d2: LC7582 CE
-	m_lcd->data_w(BIT(data, 0));
-	m_lcd->clk_w(BIT(data, 1));
-	m_lcd->ce_w(BIT(data, 2));
+	// d0-d2: LC7582 pins
+	m_lcd->lcd_w(data & 7);
 
 	// d3: speaker out
 	m_dac->write(BIT(data, 3));
@@ -218,6 +169,7 @@ static INPUT_PORTS_START( commander )
 	PORT_INCLUDE( dominator )
 
 	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Multi-Move")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Library")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Color")
 INPUT_PORTS_END
@@ -266,8 +218,7 @@ void dominator_state::dominator(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	// video hardware
-	LC7582(config, m_lcd, 0);
-	m_lcd->write_segs().set(FUNC(dominator_state::lcd_output_w));
+	CHESS3008_LCD(config, m_lcd);
 
 	PWM_DISPLAY(config, m_display).set_size(8+1, 8);
 	config.set_default_layout(layout_cxg_dominator);

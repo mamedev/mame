@@ -174,4 +174,4 @@ ROM_END
 
 
 // Jungle Soft TV games
-CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,      "Jungle Soft / KenSingTon / Siatronics",       "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
+CONS( 2007, vii, 0, 0, vii, vii, vii_state, empty_init, "Jungle Soft / KenSingTon / Siatronics", "Vii", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part

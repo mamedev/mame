@@ -115,7 +115,7 @@ c8000000:
         raceon              Locks up after POST.
         aking               Inputs unresponsive.
         500gp               Occasional lockups.
-        crszone(all)        Input issues.
+        crszone(all)        Some visual glitches.
 
 ****************************************************************************
 
@@ -874,7 +874,7 @@ Notes:
             Angler King     AG1      KC028     -
             Crisis Zone     CSZ1     KC039     -
             Downhill Bikers DH1      KC016     3A, 3C, 2M and 2F not populated.
-            Final Furlong 2 FFS1     KC???     -
+            Final Furlong 2 FFS1     KC031     -
             Gunmen Wars     GM1      KC018     3A, 3C, 4A, 4C, 2A, 2F and 2M not populated.
             Motocross Go!   MG1      KC009     3A, 3C, 4A, 4C, 4F and 7F not populated.
             Panic Park      PNP1     KC015     3A, 3C, 4A, 4C, 2M and 2F not populated.
@@ -1246,10 +1246,14 @@ It can also be used with Final Furlong when wired correctly.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "video.h"
 
 #include "md8412b_s23.h"
 #include "namco_settings.h"
 #include "vpx3220a.h"
+
+#include "corefloat.h"
+#include "endianness.h"
 
 #include <cfloat>
 
@@ -2176,6 +2180,8 @@ private:
 class namcoss23_gmen_state : public namcoss23_state
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+
 	namcoss23_gmen_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcoss23_state(mconfig, type, tag),
 		m_sh2(*this, "sh2"),
@@ -2362,7 +2368,7 @@ float namcos23_state::f24_to_f32(u32 v)
 	}
 
 	r = r | (e << 23) | ((m & 0x7fff) << 8);
-	return *(float *)&r;
+	return u2f(r);
 }
 
 s32 *namcos23_state::c435_getv(u16 id)
@@ -6497,8 +6503,6 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_sub_porta));
 	save_item(NAME(m_sub_portb));
 
-	m_lamps.resolve();
-
 	m_c361.timer = timer_alloc(FUNC(namcos23_state::c361_timer_cb), this);
 	m_c361.timer->adjust(attotime::never);
 
@@ -6656,7 +6660,7 @@ void gorgon_state::gorgon(machine_config &config)
 	// Timer at 115200*16 for the jvs serial clock
 	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
-	NAMCO_SETTINGS(config, m_settings, 0);
+	NAMCO_SETTINGS(config, m_settings);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
@@ -6668,7 +6672,7 @@ void gorgon_state::gorgon(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gorgon_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(gorgon_state::vblank));
@@ -6732,7 +6736,7 @@ void namcos23_state::s23(machine_config &config)
 	// Timer at 115200*16 for the jvs serial clock
 	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
-	NAMCO_SETTINGS(config, m_settings, 0);
+	NAMCO_SETTINGS(config, m_settings);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
@@ -6744,7 +6748,7 @@ void namcos23_state::s23(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::vblank));
@@ -6842,11 +6846,11 @@ void namcoss23_gmen_state::gmen(machine_config &config)
 	SH7604(config, m_sh2, XTAL(20'000'000));
 	m_sh2->set_addrmap(AS_PROGRAM, &namcoss23_gmen_state::sh2_map);
 
-	VPX3220A(config, m_vpx, 0);
+	VPX3220A(config, m_vpx);
 	m_vpx->sda_callback().set(FUNC(namcoss23_gmen_state::vpx_i2c_sdao_w));
 	m_vpx->vref_callback().set_inputline(m_sh2, 4);
 
-	MD8412B_S23(config, m_firewire, 0);
+	MD8412B_S23(config, m_firewire);
 	m_firewire->int_callback().set_inputline(m_sh2, 8);
 }
 
@@ -6866,6 +6870,8 @@ void crszone_state::crszone(machine_config &config)
 {
 	ss23(config);
 
+	m_subcpu->read_port7().set_constant(0x80);
+
 	/* basic machine hardware */
 	m_maincpu->set_clock(BUSCLOCK * 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crszone_state::mips_map);
@@ -6873,13 +6879,14 @@ void crszone_state::crszone(machine_config &config)
 	m_jvs->set_default_option("namco_csz1");
 
 	/* debug hardware */
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(crszone_state::acia_irq_w));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1'843'200));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+	acia_clock.set_unscaled_clock(0); // unused debug UART
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));

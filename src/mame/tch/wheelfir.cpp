@@ -798,7 +798,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 
 	TIMER(config, "scan_timer").configure_scanline(FUNC(wheelfir_state::scanline_timer_callback), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(336, NUM_SCANLINES + NUM_VBLANK_LINES);
 	m_screen->set_visarea(0, 335, 0, NUM_SCANLINES - 1);
@@ -811,7 +811,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_wheelfir);
 
 	PALETTE(config, m_palette).set_entries(NUM_COLORS);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &wheelfir_state::ramdac_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");

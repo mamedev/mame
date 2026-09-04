@@ -26,7 +26,7 @@ static constexpr int clamp(int v)
 //
 //
 
-spu_device::reverb::reverb(const int hz, const int maxdelay)
+spu_device::reverb::reverb(const int hz, const size_t maxdelay)
 	:  yp(0),
 		max_delay(maxdelay),
 		sound_hz(hz)

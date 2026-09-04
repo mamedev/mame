@@ -375,7 +375,7 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(100)); // TODO: period is guessed
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -383,7 +383,7 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 	screen.set_screen_update(FUNC(banprestomsz80_state::screen_update));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set([this] (uint16_t data) { m_layer_en = data; });
 	m_crtc->layer_scroll_callback().set([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scrollram[offset]); });
 

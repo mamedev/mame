@@ -50,7 +50,6 @@ protected:
 	void bwidowp_map(address_map &map) ATTR_COLD;
 	void spacduel_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 
 	int m_lastdata = 0;

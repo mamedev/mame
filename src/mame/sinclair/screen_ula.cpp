@@ -84,7 +84,7 @@ void screen_ula_device::draw_border(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 }
 
-void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash, u8 pcode)
+void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode)
 {
 	rectangle clip = { m_ula_clip_x1 << 1, (m_ula_clip_x2 << 1) | 1, m_ula_clip_y1, m_ula_clip_y2 };
 	clip.offset(m_offset_h, m_offset_v);
@@ -95,7 +95,10 @@ void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		if (screen_mode() == 6)
 			draw_hires(bitmap, clip, screen.priority(), pcode);
 		else
+		{
+			const bool flash = u64(screen.frame_number() / FLASH_FRAME_INVERT_COUNT) & 1;
 			draw_ula(bitmap, clip, flash, screen.priority(), pcode);
+		}
 	}
 }
 
@@ -110,6 +113,7 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 		screen_location += 0x2000;
 
 	const u16 x2_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1) + m_ula_fine_scroll_x) % (SCREEN_AREA.width() << 1);
+	bool use_latch = (clip.left() != ((m_ula_clip_x1 << 1) + m_offset_h)) && (x2_min & 0xf);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();
@@ -118,15 +122,21 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 		bool off2 = x2 & 1;
 		const u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | ((x2 >> 3) >> 1)];
 		const u8 *attr = hicolor ? &scr[0x2000] : &screen_location[0x1800 + (((y & 0xf8) << 2) | ((x2 >> 3) >> 1))];
+		if (use_latch)
+			use_latch = false;
+		else
+		{
+			m_ula_attr_latch = *attr;
+			m_ula_scr_latch = *scr;
+		}
 		u32 *pix = &(bitmap.pix(vpos, hpos));
 		u8 *prio = &(priority_bitmap.pix(vpos, hpos));
 		while (hpos <= clip.right())
 		{
-			const std::pair<rgb_t, rgb_t> pi = parse_attribute(*attr);
+			const std::pair<rgb_t, rgb_t> pi = parse_attribute(m_ula_attr_latch);
 			const rgb_t pap = pi.first;
 			const rgb_t ink = pi.second;
-
-			const u8 pix8 = (flash && (*attr & 0x80)) ? ~*scr : *scr;
+			const u8 pix8 = (flash && (m_ula_attr_latch & 0x80)) ? ~m_ula_scr_latch : m_ula_scr_latch;
 			for (u8 b = (0x80 >> ((x2 >> 1) & 7)); b && (hpos <= clip.right()); b >>= 1, x2 += 2, hpos += 2, pix += 2, prio += 2)
 			{
 				const rgb_t pen = (pix8 & b) ? ink : pap;
@@ -149,16 +159,21 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 					off2 = false;
 				}
 			}
-			x2 %= SCREEN_AREA.width() << 1;
-			if (x2 == 0)
+			if (hpos <= clip.right())
 			{
-				scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5)];
-				attr = hicolor ? &scr[0x2000] : &screen_location[0x1800 + (((y & 0xf8) << 2))];
-			}
-			else
-			{
-				++scr;
-				++attr;
+				x2 %= SCREEN_AREA.width() << 1;
+				if (x2 == 0)
+				{
+					scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5)];
+					attr = hicolor ? &scr[0x2000] : &screen_location[0x1800 + (((y & 0xf8) << 2))];
+				}
+				else
+				{
+					++scr;
+					++attr;
+				}
+				m_ula_attr_latch = *attr;
+				m_ula_scr_latch = *scr;
 			}
 		}
 	}
@@ -270,7 +285,6 @@ void screen_ula_device::device_add_mconfig(machine_config &config)
 	m_ula_scroll_y = 0;
 	m_ula_fine_scroll_x = 0;
 }
-
 void screen_ula_device::device_start()
 {
 	save_item(NAME(m_offset_h));
@@ -291,6 +305,8 @@ void screen_ula_device::device_start()
 	save_item(NAME(m_ula_scroll_x));
 	save_item(NAME(m_ula_scroll_y));
 	save_item(NAME(m_ula_fine_scroll_x));
+	save_item(NAME(m_ula_scr_latch));
+	save_item(NAME(m_ula_attr_latch));
 }
 
 // device type definition

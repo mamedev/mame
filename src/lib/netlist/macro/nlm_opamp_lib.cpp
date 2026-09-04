@@ -315,6 +315,84 @@ static NETLIST_START(MC3340_DIP)
 	ALIAS(8, VCC)
 }
 
+static NETLIST_START(MB3730_SIL)
+{
+	// Fujitsu MB3730 bridge-tied-load (BTL) audio power amplifier: a
+	// single-supply ~5.8W amp, used e.g. for the explosion ("BANG") channel
+	// on Namco's Rally-X. Only the IC itself is modelled here; the external
+	// application parts (input-coupling cap, the feedback cap on FB, the
+	// bypass/ripple cap on BYPASS, the output Zobel networks and the speaker)
+	// belong on the host board's netlist.
+	//
+	// 7-pin SIL package (datasheet, front view):
+	//   1:IN  2:FB  3:BYPASS  4:GND  5:OUT-I  6:OUT M  7:Vcc
+	//
+	// Modelled internally:
+	//   * a Vcc/2 self-bias reference (VREF), brought out on BYPASS (pin 3)
+	//     for the external ripple cap, with the input pin biased to it;
+	//   * the closed-loop gain set by internal RF/RG (1 + RF/RG per leg); the
+	//     external feedback cap on FB (pin 2) sets the low-frequency corner,
+	//     so at DC the main output rests at VREF;
+	//   * a unity-gain inverter pivoting on VREF for the second (BTL) output,
+	//     so the bridged speaker sees twice the single-ended swing. At rest
+	//     both outputs sit at VREF and the differential output is zero.
+
+	OPAMP(MAIN, "MB3730")   // main non-inverting gain stage -> OUT M (pin 6)
+	OPAMP(INV,  "MB3730")   // unity-gain inverter           -> OUT-I (pin 5)
+
+	// Vcc/2 reference (VREF) for single-supply self-biasing.
+	RES(RREF1, RES_K(47))   // VCC  -> VREF
+	RES(RREF2, RES_K(47))   // VREF -> GND
+	NET_C(MAIN.VCC, RREF1.1)
+	NET_C(RREF1.2, RREF2.1) // VREF node (= BYPASS pin)
+	NET_C(RREF2.2, MAIN.GND)
+
+	// Input pin biased to VREF (chip input impedance ~70k), through a small
+	// offset source: at DC the gain is unity (FB cap open), so a 0.1V input
+	// offset puts OUT M at VREF+0.1 and OUT-I at VREF-0.1, i.e. a 0.2V
+	// differential output offset (datasheet typ Voo).
+	RES(RIN, RES_K(70))
+	VS(VOFF, 0.1)
+	NET_C(MAIN.PLUS, RIN.1)
+	NET_C(RIN.2, VOFF.1)
+	NET_C(VOFF.2, RREF1.2)
+
+	// Internal closed-loop gain: OUT M -> RF -> MINUS -> RG -> FB pin.
+	// DC (FB cap open) -> unity; AC (FB cap shorted) -> 1 + RF/RG = GAIN per
+	// leg, i.e. ~2*GAIN across the bridge. The default GAIN=281 is the
+	// datasheet-typ ~55dB bridged (RG=100); a board may override it with
+	// PARAM(<instance>.GAIN, ...) to retune the amp without editing this model
+	// (RG is derived as RF/(GAIN-1), RF fixed at 28k).
+	DEFPARAM(GAIN, 281)
+	RES(RF, RES_K(28))
+	RES(RG, 100)
+	PARAM(RG.R, "28000.0 / ($(@.GAIN) - 1.0)")
+	NET_C(MAIN.OUT, RF.1)
+	NET_C(RF.2, RG.1, MAIN.MINUS)
+
+	// BTL inverter: gain -RINV2/RINV1 = -1, pivoting on VREF, so
+	// OUT-I = 2*VREF - OUT M.
+	RES(RINV1, RES_K(10))
+	RES(RINV2, RES_K(10))
+	NET_C(MAIN.OUT, RINV1.1)
+	NET_C(RINV1.2, INV.MINUS, RINV2.1)
+	NET_C(RINV2.2, INV.OUT)
+	NET_C(INV.PLUS, RREF1.2)
+
+	// Shared rails + quiescent supply-current load (80mA off +12V, datasheet typ).
+	RES(RQ, 150)
+	NET_C(MAIN.VCC, INV.VCC, RQ.1)
+	NET_C(MAIN.GND, INV.GND, RQ.2)
+
+	ALIAS(1, MAIN.PLUS)   // IN
+	ALIAS(2, RG.2)        // FB     (external cap)
+	ALIAS(3, RREF1.2)     // BYPASS (= VREF, external cap)
+	ALIAS(4, MAIN.GND)    // GND
+	ALIAS(5, INV.OUT)     // OUT-I  (inverted output)
+	ALIAS(6, MAIN.OUT)    // OUT M  (main output)
+	ALIAS(7, MAIN.VCC)    // Vcc
+}
+
 static NETLIST_START(TL081_DIP)
 {
 	OPAMP(A, "TL084")
@@ -651,6 +729,7 @@ NETLIST_START(opamp_lib)
 	NET_MODEL("LM324       OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=500k SLEW=0.3M RI=1000k RO=50 DAB=0.00075)")
 	NET_MODEL("LM358       OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=500k SLEW=0.3M RI=1000k RO=50 DAB=0.001)")
 	NET_MODEL("MB3614      OPAMP(TYPE=3 VLH=1.4 VLL=0.02 FPF=3 UGF=1000k SLEW=0.6M RI=1000k RO=100 DAB=0.002)")
+	NET_MODEL("MB3730      OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=15 UGF=8430k SLEW=8M RI=1000k RO=8 DAB=0.0015)")
 	NET_MODEL("UA741       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=75 DAB=0.0017)")
 	NET_MODEL("LM747       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=50 DAB=0.0017)")
 	NET_MODEL("LM747A      OPAMP(TYPE=3 VLH=2.0 VLL=2.0 FPF=5 UGF=1000k SLEW=0.7M RI=6000k RO=50 DAB=0.0015)")
@@ -666,6 +745,7 @@ NETLIST_START(opamp_lib)
 #endif
 	LOCAL_LIB_ENTRY(MB3614_DIP)
 	LOCAL_LIB_ENTRY(MC3340_DIP)
+	LOCAL_LIB_ENTRY(MB3730_SIL)
 	LOCAL_LIB_ENTRY(TL081_DIP)
 	LOCAL_LIB_ENTRY(TL082_DIP)
 	LOCAL_LIB_ENTRY(TL084_DIP)

@@ -18,6 +18,7 @@
 #include "modules/netdev/netdev_module.h"
 #include "modules/monitor/monitor_module.h"
 #include "modules/netdev/netdev_module.h"
+#include "modules/output/output_module.h"
 #include "modules/render/render_module.h"
 #include "modules/sound/sound_module.h"
 
@@ -146,11 +147,6 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_SOUND,                           OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "sound output method: " },
 	{ OSDOPTION_AUDIO_LATENCY ";alat(0.0-50.0)", "0.0",            core_options::option_type::FLOAT,     "audio latency, 0 for default (increase to reduce glitches, decrease for responsiveness)" },
 
-#ifdef SDLMAME_MACOSX
-	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
-	{ OSDOPTION_AUDIO_OUTPUT,                    OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "audio output device" },
-#endif
-
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD MIDI OPTIONS" },
 	{ OSDOPTION_MIDI_PROVIDER,                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "MIDI I/O method: " },
 
@@ -161,6 +157,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_PATH,                       "bgfx",            core_options::option_type::PATH,     "path to BGFX-related files" },
 	{ OSDOPTION_BGFX_BACKEND,                    "auto",            core_options::option_type::STRING,   "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
 	{ OSDOPTION_BGFX_DEBUG,                      "0",               core_options::option_type::BOOLEAN,  "enable BGFX debugging statistics" },
+	{ OSDOPTION_BGFX_VECTORCRT,                  "1",               core_options::option_type::BOOLEAN,  "enable BGFX vector CRT rendering" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,              "",                core_options::option_type::STRING,   "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,                "slot-mask.png",   core_options::option_type::STRING,   "shadow mask texture name" },
 	{ OSDOPTION_BGFX_LUT,                        "lut-default.png", core_options::option_type::STRING,   "LUT texture name" },
@@ -299,7 +296,7 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_SDL);
 #endif
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
@@ -307,7 +304,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
 #endif
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_RAWINPUT);
@@ -315,7 +312,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_SDL);
 #endif
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
@@ -323,13 +320,16 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLGAME);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
 #endif
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
+#if !defined(OSD_SDL) && defined(USE_SDL_JOYSTICK)
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
+#endif
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
@@ -472,6 +472,7 @@ void osd_common_t::update(bool skip_redraw)
 	// irregular intervals in some circumstances (e.g., multi-screen games
 	// or games with asynchronous updates).
 	//
+	m_output->update();
 	if (m_watchdog != nullptr)
 		m_watchdog->reset();
 }
@@ -704,11 +705,6 @@ bool osd_common_t::execute_command(const char *command)
 
 }
 
-static void output_notifier_callback(const char *outname, int32_t value, void *param)
-{
-	static_cast<osd_common_t*>(param)->notify(outname, value);
-}
-
 void osd_common_t::init_subsystems()
 {
 	// monitors have to be initialized before video init
@@ -740,7 +736,14 @@ void osd_common_t::init_subsystems()
 	m_network = &select_module_options<netdev_module>(OSD_NETDEV_PROVIDER);
 
 	m_output = &select_module_options<output_module>(OSD_OUTPUT_PROVIDER);
-	machine().output().set_global_notifier(output_notifier_callback, this);
+	machine().output().add_global_notifier(
+			[] (void *param, osd::output_item const &output, s32 seconds, s64 attoseconds)
+			{
+				reinterpret_cast<osd_common_t *>(param)->m_output->notify(output, seconds, attoseconds);
+			},
+			this);
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&output_module::pause, m_output));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&output_module::resume, m_output));
 
 	input_init();
 }

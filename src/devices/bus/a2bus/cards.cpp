@@ -17,6 +17,7 @@
 #include "a2applicard.h"
 #include "a2arcadebd.h"
 #include "a2cffa.h"
+#include "a2clock.h"
 #include "a2corvus.h"
 #include "a2diskiing.h"
 #include "a2dx1.h"
@@ -50,6 +51,7 @@
 #include "ccs7710.h"
 #include "cmsscsi.h"
 #include "computereyes2.h"
+#include "covox_smaster.h"
 #include "excel9.h"
 #include "ezcgi.h"
 #include "grafex.h"
@@ -117,13 +119,15 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("zipdrive", A2BUS_ZIPDRIVE);             // ZIP Technologies IDE card
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);           // Street Electronics Echo Plus (Echo II + Mockingboard clone)
 	device.option_add("scsi", A2BUS_SCSI);                     // Apple II SCSI Card
-	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Appli-Card
+	device.option_add("ace80", A2BUS_ACE80);                   // Franklin ACE 80 CPU Card
 	device.option_add("aesms", A2BUS_AESMS);                   // Applied Engineering Super Music Synthesizer
 	device.option_add("ultraterm", A2BUS_ULTRATERM);           // Videx UltraTerm (original)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);         // Applied Engineering ViewMaster 80
 	device.option_add("parprn", A2BUS_PARPRN);                 // Apple II Parallel Printer Interface Card
 	device.option_add("4dparprn", A2BUS_4DPARPRN);             // Fourth Dimension Parallel Printer Interface
+	device.option_add("printmax", A2BUS_PRINTMAX);             // Micromax Printmax Parallel Printer Interface
 	device.option_add("parallel", A2BUS_PIC);                  // Apple II Parallel Interface Card
 	device.option_add("grappler", A2BUS_GRAPPLER);             // Orange Micro Grappler Printer Interface card
 	device.option_add("grapplus", A2BUS_GRAPPLERPLUS);         // Orange Micro Grappler+ Printer Interface card
@@ -148,6 +152,7 @@ void apple2_cards(device_slot_interface &device)
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);   // Magic Musician Card
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
+	device.option_add("smaster", A2BUS_SMASTER);               // Covox Sound Master
 	device.option_add("suprterm", A2BUS_SUPRTERMINAL);         // M&R Enterprises SUP'R'TERMINAL 80-column card
 	device.option_add("uniprint", A2BUS_UNIPRINT);             // Videx Uniprint parallel printer card
 	device.option_add("ccs7710", A2BUS_CCS7710);               // California Computer Systems Model 7710 Asynchronous Serial Interface
@@ -165,6 +170,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
 	device.option_add("sic", A2BUS_SIC);                       // Apple II Serial Interface Card
 	device.option_add("sweetalk", A2BUS_SWEETALK);             // Micromint Sweet Talker Phonetic Speech Synthesizer Interface
+	device.option_add("clock", APPLE_CLOCK);                   // Mountain Hardware Apple Clock
 }
 
 void apple2e_cards(device_slot_interface &device)
@@ -198,13 +204,15 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);           // Street Electronics Echo Plus (Echo II + Mockingboard clone)
 	device.option_add("scsi", A2BUS_SCSI);                     // Apple II SCSI Card
 	device.option_add("hsscsi", A2BUS_HSSCSI);                 // Apple II High-Speed SCSI Card
-	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Appli-Card
+	device.option_add("ace80", A2BUS_ACE80);                   // Franklin ACE 80 CPU Card
 	device.option_add("aesms", A2BUS_AESMS);                   // Applied Engineering Super Music Synthesizer
 	device.option_add("ultraterm", A2BUS_ULTRATERM);           // Videx UltraTerm (original)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);         // Applied Engineering ViewMaster 80
 	device.option_add("parprn", A2BUS_PARPRN);                 // Apple II Parallel Printer Interface Card
 	device.option_add("4dparprn", A2BUS_4DPARPRN);             // Fourth Dimension Parallel Printer Interface
+	device.option_add("printmax", A2BUS_PRINTMAX);             // Micromax Printmax Parallel Printer Interface
 	device.option_add("parallel", A2BUS_PIC);                  // Apple II Parallel Interface Card
 	device.option_add("grappler", A2BUS_GRAPPLER);             // Orange Micro Grappler Printer Interface card
 	device.option_add("grapplus", A2BUS_GRAPPLERPLUS);         // Orange Micro Grappler+ Printer Interface card
@@ -231,6 +239,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("applesurance", A2BUS_APPLESURANCE);     // Applesurance Diagnostic Controller
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
+	device.option_add("smaster", A2BUS_SMASTER);               // Covox Sound Master
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);               // CMS Apple II SCSI Card
 	device.option_add("uthernet", A2BUS_UTHERNET);             // A2RetroSystems Uthernet card
 	device.option_add("sider2", A2BUS_SIDER2);                 // Advanced Tech Systems / First Class Peripherals Sider 2 SASI card
@@ -254,6 +263,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
 	device.option_add("sic", A2BUS_SIC);                       // Apple II Serial Interface Card
 	device.option_add("sweetalk", A2BUS_SWEETALK);             // Micromint Sweet Talker Phonetic Speech Synthesizer Interface
+	device.option_add("clock", APPLE_CLOCK);                   // Mountain Hardware Apple Clock
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -284,13 +294,15 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);           // Street Electronics Echo Plus (Echo II + Mockingboard clone)
 	device.option_add("scsi", A2BUS_SCSI);                     // Apple II SCSI Card
 	device.option_add("hsscsi", A2BUS_HSSCSI);                 // Apple II High-Speed SCSI Card
-	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);           // PCPI Appli-Card
+	device.option_add("ace80", A2BUS_ACE80);                   // Franklin ACE 80 CPU Card
 	device.option_add("aesms", A2BUS_AESMS);                   // Applied Engineering Super Music Synthesizer
 	device.option_add("ultraterm", A2BUS_ULTRATERM);           // Videx UltraTerm (original)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);         // Applied Engineering ViewMaster 80
 	device.option_add("parprn", A2BUS_PARPRN);                 // Apple II Parallel Printer Interface Card
 	device.option_add("4dparprn", A2BUS_4DPARPRN);             // Fourth Dimension Parallel Printer Interface
+	device.option_add("printmax", A2BUS_PRINTMAX);             // Micromax Printmax Parallel Printer Interface
 	device.option_add("parallel", A2BUS_PIC);                  // Apple Parallel Interface Card
 	device.option_add("grappler", A2BUS_GRAPPLER);             // Orange Micro Grappler Printer Interface card
 	device.option_add("grapplus", A2BUS_GRAPPLERPLUS);         // Orange Micro Grappler+ Printer Interface card
@@ -313,6 +325,7 @@ void apple2gs_cards(device_slot_interface &device)
 //  device.option_add("pcxport", A2BUS_PCXPORTER);             // Applied Engineering PC Transporter
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
+	device.option_add("smaster", A2BUS_SMASTER);               // Covox Sound Master
 //  device.option_add("ramfast", A2BUS_RAMFAST);               // C.V. Technologies RAMFast SCSI card
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);               // CMS Apple II SCSI Card
 	device.option_add("uthernet", A2BUS_UTHERNET);             // A2RetroSystems Uthernet card
@@ -336,7 +349,7 @@ void apple2gs_cards(device_slot_interface &device)
 void apple3_cards(device_slot_interface &device)
 {
 	device.option_add("cffa2", A2BUS_CFFA2_6502);          // CFFA2.0 Compact Flash for Apple II (www.dreher.net), 6502 firmware
-	device.option_add("applicard", A2BUS_APPLICARD);       // PCPI Applicard
+	device.option_add("applicard", A2BUS_APPLICARD);       // PCPI Appli-Card
 	device.option_add("thclock", A2BUS_THUNDERCLOCK);      // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
 	device.option_add("mouse", A2BUS_MOUSE);               // Apple II Mouse Card
 	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);     // Focus Drive IDE card

@@ -146,6 +146,8 @@ Control registers
 #include "taito_helper.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define TC0480SCP_RAM_SIZE 0x10000
 #define TC0480SCP_TOTAL_CHARS 256
 

@@ -69,7 +69,6 @@ void dp8390_device::do_tx() {
 	int i;
 	uint32_t high16 = (m_regs.dcr & 4)?m_regs.rsar<<16:0;
 	if(m_reset) return;
-	if(LOOPBACK) return;  // TODO: loopback
 	m_regs.tsr = 0;
 	if(m_regs.tbcr > 1518) logerror("dp8390: trying to send overlong frame\n");
 	if(!m_regs.tbcr) { // ? Bochs says solaris actually does this
@@ -80,6 +79,18 @@ void dp8390_device::do_tx() {
 
 	buf.resize(m_regs.tbcr);
 	for(i = 0; i < m_regs.tbcr; i++) buf[i] = m_mem_read_cb(high16 + (m_regs.tpsr << 8) + i);
+
+	if(LOOPBACK) {
+		// internal loopback: route the assembled frame back through the
+		// receiver (normal address filtering and ring buffering), as NIC
+		// self-tests expect
+		recv(&buf[0], m_regs.tbcr);
+		m_regs.tsr = 1;
+		m_regs.isr |= 2;
+		m_regs.cr &= ~4;
+		check_irq();
+		return;
+	}
 
 	if(send(&buf[0], m_regs.tbcr)) {
 		m_regs.tsr = 1;

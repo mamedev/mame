@@ -269,7 +269,7 @@ void facit4440_state::facit4440(machine_config &config)
 
 	M6801(config, "kbdmcu", 2.4576_MHz_XTAL).set_disable(); // exact type unknown
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(DOT_CLOCK, 103 * 8, 0, 80 * 8, 621, 0, 500);
 	//screen.set_raw(DOT_CLOCK, 103 * 8, 0, 80 * 8, 621, 0, 560);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

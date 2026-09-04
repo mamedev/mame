@@ -45,8 +45,10 @@ BTANB:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
+
+#include <bit>
 
 // internal artwork
 #include "novag_diamond.lh"
@@ -132,8 +134,6 @@ private:
 
 void diamond_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	if (m_rombank)
 		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 
@@ -201,7 +201,7 @@ void diamond_state::update_lcd()
 		const u8 shift = m_lcd_pwm->width() & 0x18;
 
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_data >> (shift + (i * 2)) & 3);
+		const u8 com = std::popcount(m_lcd_data >> (shift + (i * 2)) & 3U);
 		u16 segs = m_lcd_data & ((1 << shift) - 1);
 		segs |= m_lcd_segs2 << shift; // diamond
 
@@ -256,7 +256,7 @@ u8 diamond_state::read_board()
 	// priority encoded (either a 74148 on d1, or 2*7421 on d2)
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
-			data |= (count_leading_zeros_32(m_board->read_rank(i)) - 24) ^ 8;
+			data |= std::countl_zero(u8(m_board->read_rank(i))) ^ 8;
 
 	return ~data;
 }
@@ -451,10 +451,9 @@ void diamond_state::diamond(machine_config &config)
 	m_lcd_pwm->output_x().set(FUNC(diamond_state::lcd_pwm_w));
 	m_lcd_pwm->set_bri_levels(0.05);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 606/5);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_novag_diamond);
@@ -489,9 +488,8 @@ void diamond_state::diamond2(machine_config &config)
 	// video hardware
 	m_lcd_pwm->set_width(16);
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen_svg_device &screen(*subdevice<screen_svg_device>("screen"));
 	screen.set_size(1920/5, 671/5);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_diamond2);
 }

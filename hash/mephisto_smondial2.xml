@@ -8,7 +8,7 @@ license:CC0-1.0
 
 	<software name="college">
 		<description>College Module</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>Hegener + Glaser</publisher>
 		<part name="cart" interface="smondial2_cart">
 			<dataarea name="rom" size="0x4000">

@@ -127,11 +127,12 @@
 
 #include "dfac.h"
 #include "gsc.h"
-#include "macadb.h"
 #include "macrtc.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "cpu/m68000/m68030.h"
@@ -166,7 +167,7 @@ public:
 		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
 		m_pseudovia(*this, "via2"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_ram(*this, RAM_TAG),
@@ -176,7 +177,7 @@ public:
 		m_gsc(*this, "gsc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_asc(*this, "asc"),
+		m_easc(*this, "easc"),
 		m_dfac(*this, "dfac"),
 		m_scc(*this, "scc"),
 		m_vram(*this, "vram"),
@@ -193,7 +194,6 @@ public:
 		m_scc_interrupt(0),
 		m_last_taken_interrupt(0),
 		m_ca1_data(0),
-		m_adb_line(0),
 		m_overlay(false),
 		m_cur_floppy(nullptr),
 		m_hdsel(0),
@@ -227,8 +227,8 @@ private:
 	required_device<m68030_device> m_maincpu;
 	required_device<m50753_device> m_pmu;
 	required_device<via6522_device> m_via1;
-	required_device<pseudovia_device> m_pseudovia;
-	required_device<macadb_device> m_macadb;
+	required_device<pb030_pseudovia_device> m_pseudovia;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ncr53c80_device> m_ncr5380;
 	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<ram_device> m_ram;
@@ -238,7 +238,7 @@ private:
 	optional_device<gsc_device> m_gsc;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	required_device<asc_device> m_asc;
+	required_device<asc_easc_device> m_easc;
 	required_device<dfac_device> m_dfac;
 	required_device<z80scc_device> m_scc;
 	optional_shared_ptr<u32> m_vram, m_ext_vram;
@@ -251,7 +251,6 @@ private:
 
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	int m_ca1_data;
-	int m_adb_line, m_adb_akd;
 
 	bool m_overlay;
 
@@ -323,8 +322,6 @@ private:
 	void pmu_data_w(u8 data);
 	u8 pmu_comms_r();
 	void pmu_comms_w(u8 data);
-	void set_adb_line(int state);
-	void set_adb_anykeydown(int state);
 	u8 pmu_p4_r();
 	void pmu_p4_w(u8 data);
 	u8 pmu_in_r();
@@ -375,8 +372,6 @@ void macpb030_state::machine_start()
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_last_taken_interrupt));
 	save_item(NAME(m_ca1_data));
-	save_item(NAME(m_adb_line));
-	save_item(NAME(m_adb_akd));
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_hdsel));
 	save_item(NAME(m_pmu_blank_display));
@@ -705,19 +700,9 @@ u8 macpb030_state::battery3_r()
 	return 0x10;
 }
 
-void macpb030_state::set_adb_line(int state)
-{
-	m_adb_line = state;
-}
-
-void macpb030_state::set_adb_anykeydown(int state)
-{
-	m_adb_akd = state;
-}
-
 u8 macpb030_state::pmu_p1_r()
 {
-	if (m_adb_akd)
+	if (m_adbbus->adb_anykeydown_r())
 	{
 		return 0x88 | 0x02;
 	}
@@ -767,12 +752,12 @@ void macpb030_state::pmu_comms_w(u8 data)
 
 u8 macpb030_state::pmu_p4_r()
 {
-	return (m_adb_line << 1);
+	return m_adbbus->adb_line_r() << 1;
 }
 
 void macpb030_state::pmu_p4_w(u8 data)
 {
-	m_macadb->adb_linechange_w((data & 1) ^ 1);
+	m_adbbus->adb_host_line_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	m_pmu_blank_display = BIT(data, 2) ^ 1;
 	if (m_gsc)
 	{
@@ -1024,7 +1009,7 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 	m_via1->write_ca1(m_ca1_data);
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
-	m_macadb->portable_update_keyboard();
+	m_adbbus->poll_devices();
 
 	m_6015_deassert_timer->adjust(attotime::from_hz(60.15 * 525), 0);
 }
@@ -1117,7 +1102,7 @@ void macpb030_state::macpb140_map(address_map &map)
 	map(0x50006000, 0x50007fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w)).mirror(0x01f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w)).mirror(0x01f00000);
 	map(0x50012060, 0x50012063).r(FUNC(macpb030_state::scsi_drq_r)).mirror(0x01f00000);
-	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x01f00000);
+	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write)).mirror(0x01f00000);
 	map(0x50016000, 0x50017fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w)).mirror(0x01f00000);
 	map(0x50024000, 0x50027fff).r(FUNC(macpb030_state::buserror_r)).mirror(0x01f00000); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50080000, 0x500bffff).rw(FUNC(macpb030_state::jaws_r), FUNC(macpb030_state::jaws_w)).mirror(0x01f00000);
@@ -1139,7 +1124,7 @@ void macpb030_state::macpb160_map(address_map &map)
 	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
-	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50f80000, 0x50fbffff).rw(FUNC(macpb030_state::niagra_r), FUNC(macpb030_state::niagra_w));
@@ -1159,7 +1144,7 @@ void macpb030_state::macpb165c_map(address_map &map)
 	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
-	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f20000, 0x50f21fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to detect we're not the grayscale 160/165/180
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
@@ -1269,7 +1254,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_pmu->ad_in<5>().set(FUNC(macpb030_state::battery2_r));
 	m_pmu->ad_in<7>().set(FUNC(macpb030_state::battery3_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.15);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -1280,9 +1265,9 @@ void macpb030_state::macpb140(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
-	MACADB(config, m_macadb, 31.3344_MHz_XTAL/2);
-	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
-	m_macadb->adb_akd_callback().set(FUNC(macpb030_state::set_adb_anykeydown));
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
@@ -1331,7 +1316,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(macpb030_state::via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
 
-	APPLE_PSEUDOVIA(config, m_pseudovia, 31.3344_MHz_XTAL / 20);
+	APPLE_PB030_PSEUDOVIA(config, m_pseudovia, 31.3344_MHz_XTAL / 20);
 	m_pseudovia->readpa_handler().set(FUNC(macpb030_state::via2_in_a));
 	m_pseudovia->readpb_handler().set(FUNC(macpb030_state::via2_in_b));
 	m_pseudovia->writepa_handler().set(FUNC(macpb030_state::via2_out_a));
@@ -1342,10 +1327,10 @@ void macpb030_state::macpb140(machine_config &config)
 	APPLE_DFAC(config, m_dfac, 22257);
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
-	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
-	m_asc->add_route(0, "speaker", 1.0, 0);
-	m_asc->add_route(1, "speaker", 1.0, 1);
+	ASC_EASC(config, m_easc, 22.5792_MHz_XTAL);
+	m_easc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
+	m_easc->add_route(0, "speaker", 1.0, 0);
+	m_easc->add_route(1, "speaker", 1.0, 1);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -1425,7 +1410,7 @@ void macpb030_state::macpb165c(machine_config &config)
 	m_screen->set_screen_update(FUNC(macpb030_state::screen_update_vga));
 	m_screen->set_no_palette();
 
-	WD90C26(config, m_vga, 0);
+	WD90C26(config, m_vga);
 	m_vga->set_screen(m_screen);
 	// 512KB
 	m_vga->set_vram_size(0x80000);

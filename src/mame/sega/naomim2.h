@@ -18,8 +18,14 @@ public:
 	{
 		eeprom.set_tag(std::forward<T>(eeprom_tag));
 	}
+	template <typename T>
+	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, T &&eeprom_tag)
+		: naomi_m2_board(mconfig, tag, owner, 0, std::forward<T>(eeprom_tag))
+	{
+		eeprom.set_tag(std::forward<T>(eeprom_tag));
+	}
 
-	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	uint32_t rom_cur_address;
 	static const int RAM_SIZE = 65536;
 	std::unique_ptr<uint8_t[]> ram;

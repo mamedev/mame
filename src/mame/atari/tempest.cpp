@@ -284,7 +284,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -363,7 +363,6 @@ protected:
 
 void tempest_state::machine_start()
 {
-	m_leds.resolve();
 	save_item(NAME(m_player_select));
 }
 
@@ -648,19 +647,16 @@ void tempest_state::tempest(machine_config &config)
 	ER2055(config, m_earom);
 
 	/* video hardware */
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(60);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 580, 0, 570);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(60);
+	vector.set_visarea(0, 580, 0, 570);
 
-	AVG_TEMPEST(config, m_avg, 0);
+	AVG_TEMPEST(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* Drivers */
-	MATHBOX(config, m_mathbox, 0);
+	MATHBOX(config, m_mathbox);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

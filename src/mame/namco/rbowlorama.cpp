@@ -76,7 +76,7 @@ void rbowlorama_state::rbowlorama(machine_config &config)
 	PENTIUM4(config, m_maincpu, 120'000'000); // Celeron, socket 478, 800/533MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rbowlorama_state::rbowlorama_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

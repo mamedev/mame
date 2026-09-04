@@ -41,6 +41,8 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_irq_dexp_cb(*this)
 	, m_playerbus_read_cb(*this, 0)
 	, m_irq_dply_cb(*this)
+	, m_dspp_dma_read_cb(*this, 0)
+	, m_dspp_dma_write_cb(*this)
 	, m_is_pal(false)
 {
 }
@@ -352,12 +354,19 @@ void madam_device::map(address_map &map)
 		NAME([this] (offs_t offset) {
 			const u16 channel = (offset >> 2) & 0x1f;
 			const u8 reg = offset & 3;
+			if (channel <= DMA_RAM_TO_DSPP12 || (channel >= DMA_DSPP_TO_RAM0 && channel <= DMA_DSPP_TO_RAM3))
+				return m_dspp_dma_read_cb(offset & 0x7f) & 0x3f'fffc;
 			return m_dma[channel][reg] & 0x3f'fffc;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			const u16 channel = (offset >> 2) & 0x1f;
 			const u8 reg = offset & 3;
 			LOGDMA("DMA [%d] reg [%02x]: %08x & %08x\n", channel, reg, data, mem_mask);
+			if (channel <= DMA_RAM_TO_DSPP12 || (channel >= DMA_DSPP_TO_RAM0 && channel <= DMA_DSPP_TO_RAM3))
+			{
+				m_dspp_dma_write_cb(offset & 0x7f, data & 0x3f'fffc);
+				return;
+			}
 			COMBINE_DATA(&m_dma[channel][reg]);
 			// TODO: despite documentation mask really depends on what channel is
 			// (video DMA definitely sets it with 0x20'0000 high)
@@ -570,8 +579,17 @@ void madam_device::vdlp_continue_w(int state)
 	if (!state || !BIT(m_mctl, 14) || !m_vdlp.fetch)
 		return;
 
-	if (m_vdlp.scanlines == 0)
+	// zero length entries (the OS "pre-display" stuff point is one) apply their settings and
+	// chain straight to the next VDL without consuming a scanline
+	for (int hops = 0; m_vdlp.scanlines == 0; hops++)
 	{
+		if (hops >= 16)
+		{
+			m_vdlp.fetch = false;
+			LOGVDLP("line=%d too many zero length VDL entries\n", m_vdlp.y_dest);
+			return;
+		}
+
 		// abort if we are out of VRAM space
 		if (!(m_vdlp.address & 0x20'0000))
 		{
@@ -583,12 +601,6 @@ void madam_device::vdlp_continue_w(int state)
 		const u32 control_word = m_dma32_read_cb(m_vdlp.address);
 
 		m_vdlp.scanlines = (control_word & 0x1ff);
-
-		if (m_vdlp.scanlines == 0)
-		{
-			m_vdlp.fetch = false;
-			return;
-		}
 
 		// upper limit of 34 due of hblank
 		const u16 clut_words = std::min<u16>((control_word >> 9) & 0x3f, 34) << 2;
@@ -633,6 +645,9 @@ void madam_device::vdlp_continue_w(int state)
 
 		m_vdlp.link = m_dma32_read_cb(m_vdlp.address + 0x0c);
 		m_vdlp.y_src = 0;
+
+		if (m_vdlp.scanlines == 0)
+			m_vdlp.address = m_vdlp.link;
 	}
 
 	if (m_vdlp.video_dma)
@@ -862,24 +877,32 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
-			m_cel.xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
-			m_cel.ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
-			tick_time += 2;
+			const s32 xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
+			const s32 ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
 			// TODO: can be in 17.15 format (?)
-			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
+			m_cel.xpos = (double)xpos / 65536.0;
+			m_cel.ypos = (double)ypos / 65536.0;
+			tick_time += 2;
+			LOGCEL("    xpos=%f ypos=%f\n", xpos, ypos );
 
-			m_cel.hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
-			m_cel.hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
-			m_cel.vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
-			m_cel.vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
+			const s32 hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
+			const s32 hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
+			const s32 vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
+			const s32 vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
+			m_cel.hdx = (double)hdx / 1048576.0;
+			m_cel.hdy = (double)hdy / 1048576.0;
+			m_cel.vdx = (double)vdx / 65536.0;
+			m_cel.vdy = (double)vdy / 65536.0;
 			tick_time += 4;
 			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
 				, (double)m_cel.hdx / 1048576.0, (double)m_cel.hdy / 1048576.0
 				, (double)m_cel.vdx / 65536.0, (double)m_cel.vdy / 65536.0
 			);
 
-			m_cel.hddx = m_dma32_read_cb(m_cel.address + 0x28);
-			m_cel.hddy = m_dma32_read_cb(m_cel.address + 0x2c);
+			const s32 hddx = (s32)m_dma32_read_cb(m_cel.address + 0x28);
+			const s32 hddy = (s32)m_dma32_read_cb(m_cel.address + 0x2c);
+			m_cel.hddx = (double)hddx / 1048576.0;
+			m_cel.hddy = (double)hddy / 1048576.0;
 			tick_time += 2;
 			LOGCEL("    hddx=%f hddy=%f\n", (double)m_cel.hddx / 1048576.0, (double)m_cel.hddy / 1048576.0);
 
@@ -975,16 +998,22 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const u8 actual_src_mode = m_cel.packed ? 32 : (bpp << 2) | (uncoded << 1) | lrform;
 
 			{
+				double actual_hdx = m_cel.hdx;
+				double actual_hdy = m_cel.hdy;
+
 				for (int y = 0; y < vcnt; y++)
 				{
-					int ypos = (m_cel.ypos >> 16) + y;
-
-					if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
-						continue;
-
 					for (int x = 0; x < tlhpcnt; x++)
 					{
-						int xpos = (m_cel.xpos >> 16) + x;
+						// According to "The Projector" section this floors down,
+						// discarding the fractional part
+						// TODO: understand how enlarging truly works
+						int ypos = (s32)(m_cel.ypos + y * m_cel.vdy + x * actual_hdy);
+
+						if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
+							continue;
+
+						int xpos = (s32)(m_cel.xpos + x * actual_hdx + y * m_cel.vdx);
 						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
 							continue;
 
@@ -1006,6 +1035,9 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 						tick_time += 3;
 					}
+
+					actual_hdx += m_cel.hddx;
+					actual_hdy += m_cel.hddy;
 				}
 
 				LOGCEL("CEL Time drawing %d\n", tick_time);
@@ -1272,12 +1304,12 @@ const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	// 1bpp
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_1bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	// 2bpp
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_2bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
@@ -1294,7 +1326,7 @@ const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 	// 8bpp
 	&madam_device::get_pixel_8bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_8bpp_uncoded_lrform0,
 	&madam_device::get_pixel_invalid,
 	// 16bpp
 	&madam_device::get_pixel_invalid,
@@ -1314,6 +1346,44 @@ u16 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
 {
 	// arbitrary mesh pattern so it will be obvious if triggered
 	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
+	return src_data;
+}
+
+// - plumber "SCORES" display on choice screens
+u16 madam_device::get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x & ~7) >> 3);
+	u8 src_shift = (x & 7) ^ 7;
+
+	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift)) & 0x1;
+	u16 plut_data = (m_dma8_read_cb(cel_address) >> src_shift) & 0x1;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - bam/pbobble in gameplay (1st stage aid marker)
+u16 madam_device::get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x & ~3) >> 2);
+	u8 src_shift = (x & 3) ^ 3;
+
+	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 2)) & 0x3;
+	u16 plut_data = (m_dma8_read_cb(cel_address) >> (src_shift * 2)) & 0x3;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
 	return src_data;
 }
 
@@ -1371,6 +1441,24 @@ u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	plut_data <<= 1;
 
 	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - megarace "now loading" / "prepare to race"
+u16 madam_device::get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += (x);
+//	u8 src_shift = (x & 3) ^ 3;
+	const u8 src_ram = m_dma8_read_cb(cel_address);
+
+	// extend RGB332 into 555, cfr. Figure 2 of The Pixel Decoder "PDC"
+	// rep8 = 0 fills missing bits with 0
+	// TODO: rep8 = 1 (unsupported) fills with high order bits.
+	u16 src_data = (BIT(src_ram, 5, 3) << 12) | (BIT(src_ram, 2, 3) << 7) | (BIT(src_ram, 0, 2) << 3);
 
 	return src_data;
 }

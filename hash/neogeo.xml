@@ -11346,6 +11346,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+
 	<!-- Unlicensed Prototype -->
 
 	<software name="sbp" supported="no">
@@ -11385,6 +11386,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+
 	<!-- Unlicensed Prototype -->
 
 	<software name="diggerma">
@@ -11415,7 +11417,36 @@ license:CC0-1.0
 		</part>
 	</software>
 
+
 	<!-- Unlicensed 3rd party -->
+
+	<software name="19yy">
+		<description>19YY - Ichikyo Wai Wai</description>
+		<year>2022</year>
+		<publisher>Ekorz</publisher>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="19yy-p1.p1" offset="0x100000" size="0x100000" crc="59374c47" sha1="dfd8f5b8edba3116998c12b77dd2583d0363b76a" />
+				<rom size="0x100000" offset="0x000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="19yy-s1.s1" crc="219b6f40" sha1="a771872489c8b6d4011e412362366d30ed363e22" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="19yy-m1.m1" crc="636d8ac8" sha1="a9155bf34f5046bb3d6fa1d740ab328054f754d5" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x800000">
+				<rom name="19yy-v1.v1" offset="0x000000" size="0x400000" crc="7bb79a6a" sha1="4eb92dcadf8742632ba632e16cf22ead90e3a0c9" />
+				<rom name="19yy-v2.v2" offset="0x400000" size="0x200000" crc="1908a7ce" sha1="78f31bcfea33eb94752bbf5226c481baec1af5ac" />
+			</dataarea>
+			<dataarea name="sprites" size="0x1000000">
+				<rom loadflag="load16_byte" name="19yy-c1.c1" offset="0x000000" size="0x400000" crc="622719d5" sha1="38c51619992bf9b6de07d3739d28e0098295cec0" />
+				<rom loadflag="load16_byte" name="19yy-c2.c2" offset="0x000001" size="0x400000" crc="41b07be5" sha1="3f0bb6ebf2e4b396fbc72e949cff415603c0ae96" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="baddudes">
 		<description>Bad Dudes - Burger Edition (20250628)</description>
@@ -12027,6 +12058,34 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="goldnaxe">
+		<description>Golden Axe</description>
+		<year>2025</year>
+		<publisher>The Twitch Elite</publisher>
+		<info name="developer" value="Hoffman" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="golden axe-p1.bin" offset="0x000000" size="0x100000" crc="3c3ed057" sha1="4f3ba87fb85a6e79d9efd8da0cdf91515630e60a" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="golden axe-s1.bin" crc="707d91c0" sha1="aa9c9c458116d5ca4c40def1f71934a1a94fcf7b" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="golden axe-m1.bin" crc="7805d21b" sha1="15620425344ca4a4bea8364618586f84b3241321" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x800000">
+				<rom name="golden axe-v1.bin" offset="0x000000" size="0x400000" crc="5ed99267" sha1="a720ed8942e88eb883b95f65f9fde10939b7b19a" />
+				<rom name="golden axe-v2.bin" offset="0x400000" size="0x400000" crc="d30632dd" sha1="8e3d17cc3054e842ba36cd4b872929c5163960ec" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<rom loadflag="load16_byte" name="golden axe-c1.bin" offset="0x000000" size="0x200000" crc="7540f3d6" sha1="a505201798f121d02278ca1761fc2dd451a16336" />
+				<rom loadflag="load16_byte" name="golden axe-c2.bin" offset="0x000001" size="0x200000" crc="a78a6647" sha1="19a9b65701935165bd972542f868b71b3d70cb47" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hypernoid">
 		<description>Hypernoid</description>
 		<year>2021</year>
@@ -12277,6 +12336,98 @@ Four player adapter not supported
 				<rom loadflag="load16_byte" name="202-c6.bin" offset="0x2000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
 				<rom loadflag="load16_byte" name="202-c7.bin" offset="0x3000000" size="0x800000" crc="aa469494" sha1="fd98b7445c85174ccb745c74cb9e852b08353324" />
 				<rom loadflag="load16_byte" name="202-c8.bin" offset="0x3000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="violentv">
+		<description>Violent Vengeance (beta 3.28)</description>
+		<year>2026</year>
+		<publisher>Balek Corp.</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<info name="version" value="beta 3.28 FEB 1 2026" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="violentv-b3-p1.bin" offset="0x000000" size="0x100000" crc="59b78bc5" sha1="12dbf637041a9b0b16a24b830a035407e76798bd" />
+				<rom loadflag="load16_word_swap" name="violentv-b3-p2.bin" offset="0x100000" size="0x800000" crc="fdad36d7" sha1="8d8af3bb540185fc25d459608b0c67fd587f49fb" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="violentv-b3-s1.bin" crc="f7302142" sha1="5812ff4a2fedaf33ad085d09673ce2a42fda34fb" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="violentv-b3-m1.bin" crc="2cf78121" sha1="e29f9787a98513a5ae3fd4c1ffb374ec1c0b7634" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="violentv-b3-v1.bin" offset="0x000000" size="0x800000" crc="dd128a57" sha1="d3431e9aa946c3aa294477b46a01e4454ccaf855" />
+				<rom name="violentv-b3-v2.bin" offset="0x400000" size="0x800000" crc="b6ff9217" sha1="da84a7ee79cfad282f8ed7b8763604a814edb2fc" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="violentv-b3-c1.bin" offset="0x000000" size="0x1000000" crc="5b3ef4e1" sha1="7c9a8b22c994d25880e36bb493a16a6b321f950d" />
+				<rom loadflag="load16_byte" name="violentv-b3-c2.bin" offset="0x000001" size="0x1000000" crc="970ba8c2" sha1="c75444236de9aba99f9415f8ab0748376435046e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="violentv_b2" cloneof="violentv">
+		<description>Violent Vengeance (beta 2.05)</description>
+		<year>2026</year>
+		<publisher>Balek Corp.</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<info name="version" value="beta 2.05 JAN 10 2026" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="violentv-b2-p1.bin" offset="0x000000" size="0x100000" crc="9836c86f" sha1="30af2401c94cf94faae6896fe889a4509c5e620d" />
+				<rom loadflag="load16_word_swap" name="violentv-b2-p2.bin" offset="0x100000" size="0x800000" crc="66ed28cb" sha1="867eb70644cfce70d950d2542595eff027d071a2" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="violentv-b3-s1.bin" crc="f7302142" sha1="5812ff4a2fedaf33ad085d09673ce2a42fda34fb" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="violentv-b2-m1.bin" crc="a78e1e3f" sha1="b5ae2a96386d9bc4efc5bdad29caf1f00a6fdc44" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="violentv-b2-v1.bin" offset="0x000000" size="0x800000" crc="065669cc" sha1="aa9a82683e0637df0d1c3749dfd30300ea795652" />
+				<rom name="violentv-b2-v2.bin" offset="0x400000" size="0x800000" crc="1e9d342d" sha1="a00bbb196b21f656b6c823060be493e33fb90392" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="violentv-b2-c1.bin" offset="0x000000" size="0x1000000" crc="261d65ae" sha1="c8884206b9bdc85c60d08c4e8b60cfb3fd49cf58" />
+				<rom loadflag="load16_byte" name="violentv-b2-c2.bin" offset="0x000001" size="0x1000000" crc="500965ca" sha1="3f9d6683bf493ec15d4750bf17b68d44fe563efe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="violentv_b1" cloneof="violentv">
+		<description>Violent Vengeance (beta 1.04)</description>
+		<year>2025</year>
+		<publisher>Balek Corp.</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<info name="version" value="beta 1.04" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="violentv-b1-p1.bin" offset="0x000000" size="0x100000" crc="fc6852b8" sha1="fa53caf10f603e912d7fcd1429d9d866bcf6a0f1" />
+				<rom loadflag="load16_word_swap" name="violentv-b1-p2.bin" offset="0x100000" size="0x800000" crc="a810b0ab" sha1="2c1b650da40882cccb6c0d76e2d59652c6ee02b5" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="violentv-b3-s1.bin" crc="f7302142" sha1="5812ff4a2fedaf33ad085d09673ce2a42fda34fb" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="violentv-b1-m1.bin" crc="988f0366" sha1="cf6c5068445b8f5f1720c90cb45d7836f090e7ab" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="violentv-b1-v1.bin" offset="0x000000" size="0x800000" crc="f8def124" sha1="36d5f473c35e8b5288ed4091214b740abc041af4" />
+				<rom name="violentv-b1-v2.bin" offset="0x400000" size="0x800000" crc="357babe6" sha1="3767aec1f11b2e53e66739287ca15684946daecf" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="violentv-b1-c1.bin" offset="0x000000" size="0x1000000" crc="a5b714a5" sha1="3577db302103b34d360ec9c26826cacb4d6baf3c" />
+				<rom loadflag="load16_byte" name="violentv-b1-c2.bin" offset="0x000001" size="0x1000000" crc="9c9b726c" sha1="df484179642c09ff5d131d32647e74695cb64fdd" />
 			</dataarea>
 		</part>
 	</software>

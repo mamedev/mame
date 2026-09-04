@@ -129,7 +129,7 @@ void basic52_state::basic31(machine_config &config)
 	RS232_PORT(config, m_serial, serial_devices, "terminal");
 	m_serial->rxd_handler().set(FUNC(basic52_state::rx_w));
 
-	I8255(config, "ppi8255", 0);
+	I8255(config, "ppi8255");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

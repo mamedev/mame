@@ -6,12 +6,41 @@
 #include "assert.h"
 
 #define INPUT_BUFFER_SIZE 100
-#define DRIVER_INFO NULL
 #define TIME_PROC ((PmTimeProcPtr) Pt_Time)
 #define TIME_INFO NULL
 #define TIME_START Pt_Start(1, 0, 0) /* timer started w/millisecond accuracy */
 
 #define STRING_MAX 80 /* used for console input */
+
+char *portname = "portmidi";
+
+PmSysDepInfo *sysdepinfo = NULL;
+char *port_name = "portmidi";
+
+static void set_sysdepinfo(char m_or_p, const char *name)
+{
+    if (!sysdepinfo) {
+        // allocate some space we will alias with open-ended PmDriverInfo:
+        // there is space for 4 parameters:
+        static char dimem[sizeof(PmSysDepInfo) + sizeof(void *) * 8];
+        sysdepinfo = (PmSysDepInfo *) dimem;
+        // build the driver info structure:
+        sysdepinfo->structVersion = PM_SYSDEPINFO_VERS;
+        sysdepinfo->length = 0;
+    }
+    if (sysdepinfo->length > 1) {
+        printf("Error: sysdepinfo was allocated to hold 2 parameters\n");
+        exit(1);
+    }
+    int i = sysdepinfo->length++;
+    enum PmSysDepPropertyKey k = pmKeyNone;
+    if (m_or_p == 'm') k = pmKeyCoreMidiManufacturer;
+    else if (m_or_p == 'p') k = pmKeyAlsaPortName;
+    else if (m_or_p == 'c') k = pmKeyAlsaClientName;
+    sysdepinfo->properties[i].key = k;
+    sysdepinfo->properties[i].value = name;
+}
+
 
 static void prompt_and_exit(void)
 {
@@ -53,8 +82,8 @@ void main_test_input(int num)
     TIME_START;
 
     /* create a virtual input device */
-    id = checkerror(Pm_CreateVirtualInput("portmidi", NULL, DRIVER_INFO));
-    checkerror(Pm_OpenInput(&midi, id, NULL, 0, NULL, NULL));
+    id = checkerror(Pm_CreateVirtualInput(port_name, NULL, sysdepinfo));
+    checkerror(Pm_OpenInput(&midi, id, sysdepinfo, 0, NULL, NULL));
 
     printf("Midi Input opened. Reading %d Midi messages...\n", num);
     Pm_SetFilter(midi, PM_FILT_ACTIVE | PM_FILT_CLOCK | PM_FILT_SYSEX);
@@ -91,9 +120,14 @@ void main_test_input(int num)
 }
 
 
-void show_usage()
+void show_usage(void)
 {
-    printf("Usage: recvvirtual [-h] [n]\n    use -h for this message,\n"
+    printf("Usage: recvvirtual [-h] [-m manufacturer] [-c clientname] "
+           "[-p portname] [n]\n"
+           "    -h for this message,\n"
+           "    -m name designates a manufacturer name (macOS only),\n"
+           "    -c name designates a client name (linux only),\n"
+           "    -p name designates a port name (linux only),\n"
            "    n is number of message to wait for.\n");
     exit(0);
 }
@@ -103,17 +137,33 @@ int main(int argc, char *argv[])
 {
     char line[STRING_MAX];
     int num = 10;
-    
-    if (argc > 2) {
+    int i;
+    if (argc <= 1) {
         show_usage();
-    } else if (argc == 2) {
-        if (strcmp(argv[1], "-h") == 0) {
+    }
+    for (i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-h") == 0) {
             show_usage();
+        } else if (strcmp(argv[i], "-m") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            set_sysdepinfo('m', argv[i]);
+            printf("Manufacturer name will be %s\n", argv[i]);
+        } else if (strcmp(argv[i], "-p") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            port_name = argv[i];
+            set_sysdepinfo('p', port_name);
+            printf("Port name will be %s\n", port_name);
+        } else if (strcmp(argv[i], "-c") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            set_sysdepinfo('c', argv[i]);
+            printf("Client name will be %s\n", argv[i]);
         } else {
-            num = atoi(argv[1]);
+            num = atoi(argv[i]);
             if (num <= 0) {
+                printf("Zero value or non-number for n\n");
                 show_usage();
             }
+            printf("Waiting for %d messages.\n", num);
         }
     }
 

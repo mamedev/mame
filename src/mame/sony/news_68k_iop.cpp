@@ -796,8 +796,8 @@ namespace
 	static void news_scsi_devices(device_slot_interface &device)
 	{
 		device.option_add("harddisk", NSCSI_HARDDISK);
-		device.option_add("cdrom", NSCSI_CDROM);
-		device.option_add("tape", NSCSI_TAPE);
+		device.option_add("cdrom", NSCSI_CDROM_NEWS);
+		device.option_add("tape", NSCSI_TAPE_NEWS);
 	}
 
 	void news_iop_state::handle_rts(int data)
@@ -949,7 +949,7 @@ namespace
 		M68020FPU(config, m_cpu, 16.67_MHz_XTAL);
 		m_cpu->set_addrmap(AS_PROGRAM, &news_iop_state::cpu_map);
 
-		NEWS_020_MMU(config, m_mmu, 0);
+		NEWS_020_MMU(config, m_mmu);
 		m_mmu->set_addrmap(AS_PROGRAM, &news_iop_state::mmu_map);
 		m_mmu->set_bus_error_callback(FUNC(news_iop_state::cpu_bus_error));
 
@@ -959,7 +959,7 @@ namespace
 		m_ram->set_default_value(0);
 
 		// NEC uPD8253 programmable interval timer
-		PIT8253(config, m_interval_timer, 0);
+		PIT8253(config, m_interval_timer);
 		constexpr XTAL PIT_INPUT_FREQUENCY = XTAL(2'000'000); // Assume same as 1960 for now
 		m_interval_timer->set_clk<0>(PIT_INPUT_FREQUENCY);
 		m_interval_timer->set_clk<1>(PIT_INPUT_FREQUENCY);

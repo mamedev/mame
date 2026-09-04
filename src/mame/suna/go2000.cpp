@@ -343,7 +343,7 @@ void go2000_state::go2000(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_go2000);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);

@@ -443,7 +443,7 @@ void ddealer_state::ddealer(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL/2); // 8MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddealer_state::ddealer_map);
 
-	NMK_IRQ(config, m_nmk_irq, 0);
+	NMK_IRQ(config, m_nmk_irq);
 	m_nmk_irq->set_screen(m_screen);
 	m_nmk_irq->irq_callback().set(FUNC(ddealer_state::main_irq_cb));
 	m_nmk_irq->set_prom_start_offset(0x75); // previous entries are never addressed
@@ -460,7 +460,7 @@ void ddealer_state::ddealer(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddealer);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL/2, 512, 28, 412, 278, 16, 240); // confirmed
 	screen.set_screen_update(FUNC(ddealer_state::screen_update));
 	screen.set_palette(m_palette);

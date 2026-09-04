@@ -110,8 +110,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
 	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
 
-	void init_cosmicos();
-	void cosmicos(machine_config &config);
+	void init_cosmicos() ATTR_COLD;
+	void cosmicos(machine_config &config) ATTR_COLD;
 
 private:
 	uint8_t read(offs_t offset);
@@ -602,9 +602,6 @@ void cosmicos_state::sc_w(uint8_t data)
 
 void cosmicos_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_wait));
 	save_item(NAME(m_clear));
@@ -673,7 +670,7 @@ void cosmicos_state::cosmicos(machine_config &config)
 	TIMER(config, "digit").configure_periodic(FUNC(cosmicos_state::digit_tick), attotime::from_hz(100));
 	TIMER(config, "interrupt").configure_periodic(FUNC(cosmicos_state::int_tick), attotime::from_hz(1000));
 
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -50,7 +50,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void cardline(machine_config &config);
+	void cardline(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -92,7 +92,6 @@ private:
 
 void cardline_state::machine_start()
 {
-	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
 
@@ -326,7 +325,7 @@ void cardline_state::cardline(machine_config &config)
 	//m_maincpu->set_vblank_int("screen", FUNC(cardline_state::irq1_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 760, 0, 511, 280, 0, 255);
 	//screen.set_screen_update(FUNC(cardline_state::screen_update_cardline));
 	//screen.set_palette(m_palette);

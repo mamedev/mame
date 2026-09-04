@@ -106,7 +106,7 @@ protected:
 class hc55516_device : public cvsd_device_base
 {
 public:
-	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// /FZ (partial reset) pull callback, ok to leave unconnected (we assume it is pulled high)
 	auto fzq_cb() { return m_fzq_pull_cb.bind(); }
@@ -156,7 +156,7 @@ protected:
 class hc55532_device : public hc55516_device
 {
 public:
-	hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
 	// device-level overrides
 	virtual void device_reset() override ATTR_COLD;
@@ -166,7 +166,7 @@ protected:
 class mc3417_device : public cvsd_device_base
 {
 public:
-	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// override for clock_w
 	//virtual void clock_w(int state) override;
@@ -201,7 +201,7 @@ protected:
 class mc3418_device : public mc3417_device
 {
 public:
-	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 

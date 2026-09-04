@@ -5711,7 +5711,7 @@ void vt_vt1682_state::vt_vt1682_ntscbase(machine_config& config)
 	m_system_timer_dev->write_irq_callback().set(FUNC(vt_vt1682_state::maincpu_timer_irq));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(300, 262); // 262 for NTSC, might be 261 if Vblank line is changed
@@ -5737,7 +5737,7 @@ void vt_vt1682_state::vt_vt1682_palbase(machine_config& config)
 	m_system_timer_dev->write_irq_callback().set(FUNC(vt_vt1682_state::maincpu_timer_irq));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_size(300, 312); // 312? for PAL
@@ -5750,8 +5750,8 @@ void vt_vt1682_state::vt_vt1682_common(machine_config& config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(vt_vt1682_state::scanline), "screen", 0, 1);
 	TIMER(config, m_render_timer).configure_generic(FUNC(vt_vt1682_state::line_render_start));
 
-	VT_VT1682_ALU(config, m_maincpu_alu, 0);
-	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
+	VT_VT1682_ALU(config, m_maincpu_alu);
+	VT_VT1682_ALU(config, m_soundcpu_alu);
 	m_soundcpu_alu->set_sound_alu(); // different logging conditions
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -5765,8 +5765,8 @@ void vt_vt1682_state::vt_vt1682_common(machine_config& config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_test);
 
-	VT_VT1682_IO(config, m_io, 0);
-	VT_VT1682_UIO(config, m_uio, 0);
+	VT_VT1682_IO(config, m_io);
+	VT_VT1682_UIO(config, m_uio);
 
 	SPEAKER(config, "speaker", 2).front();
 

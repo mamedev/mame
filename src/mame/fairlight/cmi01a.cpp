@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "cmi01a.h"
 
+#include <numbers>
+
 #define VERBOSE     (0)
 #include "logmacro.h"
 
@@ -655,8 +657,10 @@ void cmi01a_device::update_filters()
 
 	logerror("Filter latch = %02x, octave=%x, fval=%03x, f0 = %g\n", m_flt_latch, m_octave, fval, f0);
 
-	double w1 = 2*M_PI*fc;
-	double w2 = 2*M_PI*fc*1.22474487139159; // sqrt(c1*c2 / (c3*c4)), the ratio between the two cutoff frequencies in the cmi01 configuration of the SSM2045
+	constexpr double PI = std::numbers::pi;
+
+	double w1 = 2*PI*fc;
+	double w2 = 2*PI*fc*1.22474487139159; // sqrt(c1*c2 / (c3*c4)), the ratio between the two cutoff frequencies in the cmi01 configuration of the SSM2045
 	double a1 = 1.81659021245849; // sqrt(c1*10*c2)/c1
 	double a2 = 1.48323969741913; // sqrt(c3*10*c4)/c3
 
@@ -670,7 +674,7 @@ void cmi01a_device::update_filters()
 	double mb1 = 1/(w2*w2);
 
 	// Convert to z, wrap around f0
-	double zc = 2*M_PI*f0/tan(M_PI*f0/48000);
+	double zc = 2*PI*f0/tan(PI*f0/48000);
 	double za0 = ma1 * zc*zc;
 	double za1 = ma0 * zc;
 	double zb0 = mb1 * zc*zc;

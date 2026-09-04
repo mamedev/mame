@@ -9,8 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <list>
-#include <map>
 #include "emuopts.h"
 #include "debug/debugcpu.h"
 
@@ -24,6 +22,12 @@
 #include "emumem_hedw.h"
 #include "emumem_hep.h"
 #include "emumem_het.h"
+
+#include "endianness.h"
+
+#include <cstdio>
+#include <list>
+#include <map>
 
 
 //**************************************************************************
@@ -274,8 +278,13 @@ template class handler_entry_write<3, -3>;
 //  memory_manager - constructor
 //-------------------------------------------------
 
+memory_manager::memory_manager()
+	: m_machine(nullptr)
+{
+}
+
 memory_manager::memory_manager(running_machine &machine)
-	: m_machine(machine)
+	: m_machine(&machine)
 {
 }
 
@@ -293,6 +302,8 @@ memory_manager::~memory_manager()
 
 void memory_manager::initialize()
 {
+	assert(m_machine);
+
 	// loop over devices and spaces within each device
 	std::vector<device_memory_interface *> memories;
 	for (device_memory_interface &memory : memory_interface_enumerator(machine().root_device()))
@@ -322,6 +333,8 @@ void memory_manager::initialize()
 
 void *memory_manager::allocate_memory(device_t &dev, int spacenum, std::string name, u8 width, size_t bytes)
 {
+	assert(m_machine);
+
 	void *const ptr = m_datablocks.emplace_back(malloc(bytes)).get();
 	memset(ptr, 0, bytes);
 	machine().save().save_memory(&dev, "memory", dev.tag(), spacenum, name.c_str(), ptr, width/8, u32(bytes) / (width/8));
@@ -336,6 +349,8 @@ void *memory_manager::allocate_memory(device_t &dev, int spacenum, std::string n
 
 memory_region *memory_manager::region_alloc(std::string name, u32 length, u8 width, endianness_t endian)
 {
+	assert(m_machine);
+
 	// make sure we don't have a region of the same name; also find the end of the list
 	if (m_regionlist.find(name) != m_regionlist.end())
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
@@ -349,7 +364,7 @@ memory_region *memory_manager::region_alloc(std::string name, u32 length, u8 wid
 //  region_find - find a region by name
 //-------------------------------------------------
 
-memory_region *memory_manager::region_find(std::string_view name)
+memory_region *memory_manager::region_find(std::string_view name) const
 {
 	auto const i = m_regionlist.find(name);
 	return (i != m_regionlist.end()) ? i->second.get() : nullptr;
@@ -383,6 +398,8 @@ void *memory_manager::anonymous_alloc(address_space &space, size_t bytes, u8 wid
 
 memory_share *memory_manager::share_alloc(device_t &dev, std::string name, u8 width, size_t bytes, endianness_t endianness)
 {
+	assert(m_machine);
+
 	// make sure we don't have a share of the same name; also find the end of the list
 	if (m_sharelist.find(name) != m_sharelist.end())
 		fatalerror("share_alloc called with duplicate share name \"%s\"\n", name);
@@ -399,7 +416,7 @@ memory_share *memory_manager::share_alloc(device_t &dev, std::string name, u8 wi
 //  share_find - find a share by name
 //-------------------------------------------------
 
-memory_share *memory_manager::share_find(std::string_view name)
+memory_share *memory_manager::share_find(std::string_view name) const
 {
 	auto const i = m_sharelist.find(name);
 	return (i != m_sharelist.end()) ? i->second.get() : nullptr;
@@ -413,6 +430,8 @@ memory_share *memory_manager::share_find(std::string_view name)
 
 memory_bank *memory_manager::bank_alloc(device_t &device, std::string name)
 {
+	assert(m_machine);
+
 	// allocate the bank
 	auto const ins = m_banklist.emplace(name, std::make_unique<memory_bank>(device, name));
 
@@ -428,7 +447,7 @@ memory_bank *memory_manager::bank_alloc(device_t &device, std::string name)
 //  bank_find - find a bank by name
 //-------------------------------------------------
 
-memory_bank *memory_manager::bank_find(std::string_view name)
+memory_bank *memory_manager::bank_find(std::string_view name) const
 {
 	auto const i = m_banklist.find(name);
 	return (i != m_banklist.end()) ? i->second.get() : nullptr;
@@ -489,6 +508,26 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_internal_map(internal)
 {
 }
+
+
+void address_space_config::check_parameters(const char *objname, int width, int addr_shift, endianness_t endian) const
+{
+	if(addr_shift != m_addr_shift)
+		fatalerror("Requesting %s with address shift %d while the config says %d\n", objname, addr_shift, m_addr_shift);
+	if(8 << width != m_data_width)
+		fatalerror("Requesting %s with data width %d while the config says %d\n", objname, 8 << width, m_data_width);
+	if(endian != m_endianness)
+		fatalerror("Requesting %s with endianness %s while the config says %s\n",
+				   objname, util::endian_to_string_view(endian), util::endian_to_string_view(m_endianness));
+}
+
+void address_space_config::check_parameters(const char *objname, int level, int width, int addr_shift, endianness_t endian) const
+{
+	if(level != emu::detail::handler_entry_dispatch_level(m_addr_width))
+		fatalerror("Requesting %s with wrong level, bad address width (the config says %d)\n", objname, m_addr_width);
+	check_parameters(objname, width, addr_shift, endian);
+}
+
 
 
 void address_space_installer::check_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask, int &ncswidth)

@@ -8,14 +8,7 @@
 #include "util/xmlfile.h"
 
 #include <cmath>
-
-#ifndef M_LN2
-#define M_LN2 0.69314718055994530942
-#endif
-
-#ifndef M_SQRT2
-#define M_SQRT2 1.41421356237309504880
-#endif
+#include <numbers>
 
 // This is a reimplementation of the "RoomReverb" by ElephantDSP.com/Christian Voigt
 // which is itself built from early reflection and Progenitor 2 from Freeverb3.
@@ -1104,7 +1097,7 @@ void audio_effect_reverb::set_late_spin_to_wander(double value)
 
 void audio_effect_reverb::iir1::prepare_lpf(double cutoff, u32 sample_rate)
 {
-	double w2 = M_PI*cutoff/sample_rate;
+	double w2 = std::numbers::pi * cutoff / sample_rate;
 	double tw2 = std::tan(w2);
 	m_b1 = tw2/(1+tw2);
 	m_b2 = m_b1;
@@ -1113,7 +1106,7 @@ void audio_effect_reverb::iir1::prepare_lpf(double cutoff, u32 sample_rate)
 
 void audio_effect_reverb::iir1::prepare_hpf(double cutoff, u32 sample_rate)
 {
-	double w2 = M_PI*cutoff/sample_rate;
+	double w2 = std::numbers::pi * cutoff / sample_rate;
 	double tw2 = std::tan(w2);
 	m_b1 = 1/(1+tw2);
 	m_b2 = -m_b1;
@@ -1137,10 +1130,10 @@ audio_effect_reverb::sample_t audio_effect_reverb::iir1::process(iir1h &h, sampl
 
 void audio_effect_reverb::iir2::prepare_lpf(double cutoff, double bw, u32 sample_rate)
 {
-	double w = 2*M_PI*cutoff/sample_rate;
+	double w = 2*std::numbers::pi * cutoff / sample_rate;
 	double s = std::sin(w);
 	double c = std::cos(w);
-	double alpha = s * std::sinh(M_LN2 / 2 * bw * w / s);
+	double alpha = s * std::sinh(std::numbers::ln2 / 2 * bw * w / s);
 	double a0 = 1/(1+alpha);
 	m_b0 = a0*0.5*(1 - c);
 	m_b1 = a0*(1 - c);
@@ -1153,10 +1146,10 @@ void audio_effect_reverb::iir2::prepare_lpf(double cutoff, double bw, u32 sample
 
 void audio_effect_reverb::iir2::prepare_apf(double cutoff, double bw, u32 sample_rate)
 {
-	double w = 2*M_PI*cutoff/sample_rate;
+	double w = 2 * std::numbers::pi * cutoff / sample_rate;
 	double s = std::sin(w);
 	double c = std::cos(w);
-	double alpha = s * std::sinh(M_LN2 / 2 * bw * w / s);
+	double alpha = s * std::sinh(std::numbers::ln2 / 2 * bw * w / s);
 	double a0 = 1/(1+alpha);
 	m_b0 = a0*(1-alpha);
 	m_b1 = a0*(-2 * c);
@@ -1185,10 +1178,10 @@ audio_effect_reverb::sample_t audio_effect_reverb::iir2::process(iir2h &h, sampl
 
 void audio_effect_reverb::dccut::prepare(double cutoff, u32 sample_rate)
 {
-	double w = 2*M_PI*cutoff/sample_rate;
+	double w = 2 * std::numbers::pi * cutoff / sample_rate;
 	double s = std::sin(w);
 	double c = std::cos(w);
-	constexpr double s3 = 1.73205080757; // std::sqrt(3.0);
+	constexpr double s3 = std::numbers::sqrt3;
 
 	m_gain = (s3 - 2*s)/(s + s3*c);
 }
@@ -1626,7 +1619,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::pink::process()
 			for(u32 c = 0; c != SIZE; c += l)
 				m_buffer[c + l/2] = std::clamp((m_buffer[c] + m_buffer[(c+l) & (SIZE-1)]) / 2 + r * m_dis(m_rng), -1.f, 1.f);
 
-			r /= M_SQRT2; // 2**0.5
+			r /= std::numbers::sqrt2; // 2**0.5
 		}
 	}
 	return m_buffer[m_index++];
@@ -1644,7 +1637,7 @@ void audio_effect_reverb::lfo::clear()
 
 void audio_effect_reverb::lfo::prepare(double speed, u32 sample_rate)
 {
-	float w = 2*M_PI*speed/sample_rate;
+	float w = 2 * std::numbers::pi * speed / sample_rate;
 	m_rc = std::cos(w);
 	m_rs = std::sin(w);
 }

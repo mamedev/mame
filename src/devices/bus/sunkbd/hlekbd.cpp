@@ -1039,7 +1039,6 @@ void hle_device_base::device_add_mconfig(machine_config &config)
 
 void hle_device_base::device_start()
 {
-	m_leds.resolve();
 	m_click_timer = timer_alloc(FUNC(hle_device_base::click_off), this);
 
 	save_item(NAME(m_make_count));

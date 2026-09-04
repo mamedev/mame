@@ -1,15 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
+    namespace "org.mamedev.mame"
+    compileSdkVersion 35
 
     defaultConfig {
         applicationId "org.mamedev.mame"
         minSdkVersion 24
+        targetSdkVersion 35
         ndk {
             moduleName 'main'
         }
     }
+
+	compileOptions {
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
+	}
 
     lintOptions {
         abortOnError false
@@ -20,6 +27,12 @@ android {
         jniLibs.srcDir 'src/main/libs'
     }
 
+    packaging {
+        jniLibs {
+            keepDebugSymbols += ["**/*.so"]
+            useLegacyPackaging = true
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false

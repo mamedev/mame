@@ -389,7 +389,7 @@ public:
 
 		// FIXME: GetKeyNameTextW is for scan codes from WM_KEYDOWN, which aren't quite the same as DIK_* keycodes
 		// in particular, NumLock and Pause are reversed for US-style keyboard systems
-		for (unsigned keynum = 0; keynum < MAX_KEYS; keynum++)
+		for (unsigned keynum = 0; keynum < m_keyboard.MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
 			WCHAR keyname[100];
@@ -798,7 +798,7 @@ protected:
 					if (devicelist().end() == target_device)
 						return false;
 
-					(*target_device)->queue_events(input, 1);
+					(*target_device)->queue_event(*input);
 					return true;
 				}
 			}

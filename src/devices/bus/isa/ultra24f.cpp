@@ -69,7 +69,7 @@ void ultra24f_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_uscpu, 32_MHz_XTAL / 4); // custom-marked as USC080-5-12A; clock guessed
 	m_uscpu->set_addrmap(AS_PROGRAM, &ultra24f_device::uscpu_map);
 
-	I82355(config, m_bmic, 0);
+	I82355(config, m_bmic);
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);

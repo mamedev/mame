@@ -437,7 +437,7 @@ void supertnk_state::supertnk(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(supertnk_state::interrupt_enable_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(20.79_MHz_XTAL / 4, 330, 0, 32*8, 315, 0, 32*8); // parameters guessed
 	screen.set_screen_update(FUNC(supertnk_state::screen_update));
 	screen.screen_vblank().set(FUNC(supertnk_state::vblank_interrupt));

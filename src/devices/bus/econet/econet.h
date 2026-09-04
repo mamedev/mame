@@ -27,7 +27,7 @@ class econet_device : public device_t
 {
 public:
 	// construction/destruction
-	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto clk_wr_callback() { return m_write_clk.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
@@ -88,7 +88,7 @@ class econet_slot_device : public device_t, public device_single_card_slot_inter
 {
 public:
 	// construction/destruction
-	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T, typename U>
 	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&econet_tag, U &&devs)

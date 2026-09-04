@@ -1258,7 +1258,7 @@ void changela_state::changela(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL/4, 318, 8, 256, 262, 32, 256);
 	m_screen->set_screen_update(FUNC(changela_state::screen_update_changela));
 	m_screen->set_palette(m_palette);
@@ -1325,5 +1325,5 @@ ROM_END
     Game Driver
 *********************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        SCREEN  COMPANY                      FULLNAME        FLAGS
-GAMEL( 1983, changela, 0,      changela, changela, changela_state, empty_init, ROT180, "Taito America Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        SCREEN  COMPANY          FULLNAME        FLAGS
+GAMEL( 1983, changela, 0,      changela, changela, changela_state, empty_init, ROT180, "Taito America", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )

@@ -37,91 +37,91 @@ private:
 class spacewar_audio_device : public cinemat_audio_device_base
 {
 public:
-	spacewar_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	spacewar_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class barrier_audio_device : public cinemat_audio_device_base
 {
 public:
-	barrier_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	barrier_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class speedfrk_audio_device : public cinemat_audio_device_base
 {
 public:
-	speedfrk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	speedfrk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class starhawk_audio_device : public cinemat_audio_device_base
 {
 public:
-	starhawk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	starhawk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class sundance_audio_device : public cinemat_audio_device_base
 {
 public:
-	sundance_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sundance_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class tailg_audio_device : public cinemat_audio_device_base
 {
 public:
-	tailg_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tailg_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class warrior_audio_device : public cinemat_audio_device_base
 {
 public:
-	warrior_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	warrior_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class armora_audio_device : public cinemat_audio_device_base
 {
 public:
-	armora_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	armora_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class ripoff_audio_device : public cinemat_audio_device_base
 {
 public:
-	ripoff_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ripoff_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class starcas_audio_device : public cinemat_audio_device_base
 {
 public:
-	starcas_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	starcas_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class solarq_audio_device : public cinemat_audio_device_base
 {
 public:
-	solarq_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	solarq_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class boxingb_audio_device : public cinemat_audio_device_base
 {
 public:
-	boxingb_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	boxingb_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class wotw_audio_device : public cinemat_audio_device_base
 {
 public:
-	wotw_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	wotw_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

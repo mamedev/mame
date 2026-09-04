@@ -334,7 +334,7 @@ void galpanic_state::galpanic(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // frames per second, vblank duration
 	m_screen->set_size(256, 256);
@@ -346,7 +346,7 @@ void galpanic_state::galpanic(machine_config &config)
 	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
 	PALETTE(config, m_palette, FUNC(galpanic_state::palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_galpanic_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_galpanic_spr);
 	m_pandora->set_offsets(0, -16);
 
 	// sound hardware

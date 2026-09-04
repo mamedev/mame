@@ -113,10 +113,7 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 	{
 		if (is_filetype("chd") && is_loaded())
 		{
-			util::core_file::ptr proxy;
-			err = util::core_file::open_proxy(image_core_file(), proxy);
-			if (!err)
-				err = m_self_chd.open(std::move(proxy)); // CDs are never writeable
+			err = m_self_chd.open(image_core_file()); // CDs are never writeable
 			if (err)
 				goto error;
 			chd = &m_self_chd;

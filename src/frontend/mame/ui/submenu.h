@@ -49,8 +49,8 @@ public:
 		std::vector<std::string> value;
 	};
 
-	submenu(mame_ui_manager &mui, render_container &container, std::vector<option> const &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
-	submenu(mame_ui_manager &mui, render_container &container, std::vector<option> &&suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
+	submenu(mame_ui_manager &mui, render_target &target, std::vector<option> const &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
+	submenu(mame_ui_manager &mui, render_target &target, std::vector<option> &&suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
 	virtual ~submenu();
 
 	static std::vector<option> misc_options();

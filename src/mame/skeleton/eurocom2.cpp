@@ -416,14 +416,14 @@ void eurocom2_state::eurocom2(machine_config &config)
 	MC6809(config, m_maincpu, 10.7172_MHz_XTAL / 2); // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &eurocom2_state::eurocom2_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT);
 	m_screen->set_screen_update(FUNC(eurocom2_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(eurocom2_state::kbd_put));
 
 	PIA6821(config, m_pia1);
@@ -439,7 +439,7 @@ void eurocom2_state::eurocom2(machine_config &config)
 //  m_pia2->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 //  m_pia2->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
@@ -470,7 +470,7 @@ void waveterm_state::waveterm(machine_config &config)
 	m_pia3->readcb1_handler().set_ioport("FP");
 //  m_pia3->cb2_handler().set(FUNC(waveterm_state::pia3_cb2_w));
 
-	PTM6840(config, m_ptm, 0);
+	PTM6840(config, m_ptm);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("waveterm");
 }

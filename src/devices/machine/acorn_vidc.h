@@ -13,6 +13,9 @@
 
 #include "speaker.h"
 #include "sound/dac.h"
+#include "sound/mixer.h"
+#include "sound/flt_biquad.h"
+#include "sound/flt_rc.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -40,8 +43,8 @@ public:
 	// MEMC comms
 	void write_vram(u32 offset, u8 data) { m_data_vram[offset & (m_data_vram_mask)] = data; }
 	void write_cram(u32 offset, u8 data) { m_cursor_vram[offset & (m_cursor_vram_mask)] = data; }
+	void enqueue32_fifo(u32 data);
 	void write_dac(u8 channel, u8 data);
-	void clear_dac(u8 channel) { m_dac[channel & 7]->write(0); }
 	void update_sound_mode(bool state) { m_sound_mode = state; refresh_sound_frequency(); }
 	void set_cursor_enable(bool state) { m_cursor_enable = state; }
 	u32 get_cursor_size() { return (m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR]) * (32/4); }
@@ -53,6 +56,7 @@ protected:
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
+	void device_add_mconfig_common(machine_config &config) ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual u32 palette_entries() const noexcept override;
 	virtual void device_config_complete() override;
@@ -63,7 +67,7 @@ protected:
 	virtual u32 get_pixel_clock();
 
 	TIMER_CALLBACK_MEMBER(vblank_timer);
-	TIMER_CALLBACK_MEMBER(sound_drq_timer);
+	TIMER_CALLBACK_MEMBER(sound_sample_timer);
 
 	address_space_config  m_space_config;
 
@@ -78,29 +82,35 @@ protected:
 	inline void screen_vblank_line_update();
 	inline void screen_dynamic_res_change();
 	void refresh_sound_frequency();
+	virtual u32 get_sound_clock();
+	virtual bool play_fifo_sample();
 
 	u16 m_pal_4bpp_base;
 	u16 m_pal_cursor_base;
 	u16 m_pal_border_base;
 
 	u8 m_bpp_mode, m_crtc_interlace;
-	u8       m_sound_frequency_latch;
-	bool     m_sound_mode;
+	u16 m_sound_frequency_latch;
+	bool m_sound_mode;
 
-	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
+	required_device_array<filter_rc_device, 2> m_filter_rc;
+	required_device_array<filter_biquad_device, 4> m_filter;
+	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	int m_dac_type;
 
 	required_device<speaker_device> m_speaker;
 
+	void stereo_image_w(offs_t offset, u32 data);
 	virtual void refresh_stereo_image(u8 channel);
 	const int m_sound_max_channels = 8;
+	util::fifo<u8, 16> m_sound_fifo;
+	u8       m_sound_fifo_channel;
 private:
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
 	void pal_data_display_w(offs_t offset, u32 data);
 	void pal_data_cursor_w(offs_t offset, u32 data);
-	void stereo_image_w(offs_t offset, u32 data);
 	void crtc_w(offs_t offset, u32 data);
 	void sound_frequency_w(u32 data);
 	void control_w(u32 data);
@@ -125,7 +135,7 @@ private:
 
 	bool m_sound_frequency_test_bit;
 	u8       m_stereo_image[8];
-	const float m_sound_input_gain = 0.05f;
+	const float m_sound_input_gain = 0.125f;
 	int16_t  m_ulaw_lookup[256];
 };
 
@@ -153,7 +163,9 @@ public:
 	// construction/destruction
 	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void write_dac32(u8 channel, u16 data);
+	void set_ext_sclk(u32 clock) { m_ext_sclk = clock; }
+
+	void write_dac32(u8 channel, s16 data);
 	virtual bool get_dac_mode() override;
 
 protected:
@@ -165,6 +177,9 @@ protected:
 	virtual void device_config_complete() override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock() override;
+
+	virtual u32 get_sound_clock() override;
+	virtual bool play_fifo_sample() override;
 
 private:
 	void vidc20_pal_data_display_w(offs_t offset, u32 data);
@@ -178,7 +193,7 @@ private:
 
 	u8 m_pal_data_index;
 	inline void update_8bpp_palette(u16 index, u32 paldata);
-	bool m_dac_serial_mode;
+	bool m_dac_serial_mode, m_sdac, m_clksel;
 	u8 m_pixel_source;
 	u8 m_pixel_rate;
 	u8 m_vco_r_modulo;
@@ -186,7 +201,9 @@ private:
 
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac32;
 
-	virtual void refresh_stereo_image(u8 channel) override;
+	u32 m_ext_sclk;
+
+//	virtual void refresh_stereo_image(u8 channel) override;
 };
 
 DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)

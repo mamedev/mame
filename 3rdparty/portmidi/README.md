@@ -9,8 +9,19 @@ for related code and bindings (although currently, not much is here).
 
 ## Compiling and Using PortMidi
 
-Use CMake (or ccmake) to create a Makefile for Linux/BSD or a 
+
+Use CMake (or ccmake) to create a Makefile for Linux/BSD or a
 project file for Xcode or MS Visual Studio. Use make or an IDE to compile:
+
+On Linux, you need ALSA.
+
+Ubuntu / Debian:
+`sudo apt install libasound2-dev`
+
+Fedora / Red Hat / CentOS:
+`sudo dnf install alsa-lib-devel`
+
+All:
 ```
 cd portmidi  # start in the top-level portmidi directory
 ccmake .     # set any options interactively, type c to configure
@@ -23,82 +34,107 @@ make         # compile sources and build PortMidi library
 sudo make install  # if you want to install to your system
 ```
 
-**PmDefaults** is a Java-based program for setting default MIDI
-devices. It is necessary if you use `Pm_DefaultInputDeviceID()` or
-`Pm_DefaultOutputDeviceID()` to avoid implementing your own device
-browsing, selection and preferences in your applications. Enable
-`BUILD_PMDEFAULTS` and `BUILD_JAVA_NATIVE_INTERFACE` in ccmake, and
-see `pm_java/README.txt` for more information.
+## Installation
 
-See also notes in `pm_mac/README_MAC.txt`, `pm_win/README_WIN.txt` and
-`pm_linux/README_LINUX.txt`.
+My advice is to build PortMidi and statically link it to your
+application. This gives you more control over versions. However,
+installing PortMidi to your system is preferred by some, and the
+following should do it:
+```
+cmake .
+make
+sudo make install
+```
 
-## What's New?
+## Language Bindings
 
-PortMidi has some fixes for Apple M1 cpus as of May 23, 2022. This has not yet
-been formally released to allow for further testing, but please use the latest
-code if you want to run on an M1.
+Here is a guide to some other projects using PortMidi. There is not
+much coordination, so let us know if there are better or alternative
+bindings for these and other languages:
 
-PortMidi has some changes in 2021:
+- Python: Various libraries and packages exist; search and ye shall
+  find. If you wouldn't like to do research, check out [mido](https://mido.readthedocs.io/en/stable/)
+- [SML](https://github.com/jh-midi/portmidi-sml2)
+- [OCaml](https://ocaml.org/p/portmidi/0.1)
+- [Haskell](https://hackage.haskell.org/package/PortMidi)
+- [Erlang](https://hexdocs.pm/portmidi/PortMidi.html)
+- [Julia](https://github.com/SteffenPL/PortMidi.jl)
+- [C#](https://github.com/net-core-audio/portmidi)
+- [Rust](https://musitdev.github.io/portmidi-rs/)
+- [Go](https://github.com/rakyll/portmidi)
+- [Odin](https://pkg.odin-lang.org/vendor/portmidi/)
+- [Serpent](https://sourceforge.net/projects/serpent/) - a real-time
+  Python-like language has PortMidi built-in, a MIDI-timestamp-aware
+  scheduler, and GUI support for device selection.
+- [Pd (Pure Data)](https://puredata.info/) uses PortMidi.
 
- - added Pm_CreateVirtualInput() and Pm_CreateVirtualOutput() functions that allow
-   applications to create named ports analogous to devices.
-   
- - improvements for macOS CoreMIDI include higher data rates for devices, better
-   handling of Unicode interface names in addition to virtual device creation.
-   
- - the notion of default devices, Pm_GetDefaultInputDeviceID(), 
-   Pm_GetDefaultOutputDeviceID and the PmDefaults program have fallen into disuse
-   and are now deprecated.
-   
- - Native Interfaces for Python, Java, Go, Rust, Lua and more seem best left
-   to individual repos, so support within this repo has been dropped. A Java
-   interface is still here and probably usable -- let me know if you need it
-   and/or would like to help bring it up to date. I am happy to help with, 
-   link to, or collaborate in supporting PortMidi for other languages. 
-   
-For up-to-date PortMidi for languages other than C/C++, check with
-developers. As of 27 Sep 2021, this (and SourceForge) is the only repo with
-the features described above.
+
+## What's New? 
+
+(Not so new, but significant:) Support for the **PmDefaults** program,
+which enabled a graphical interface to select default MIDI devices,
+has been removed for lack of interest. This allowed us to also remove
+C code to read and parse Java preference files on various systems,
+simplifying the library. **PmDefaults** allowed simple command-line
+programs to use `Pm_DefaultInputDeviceID()` and
+`Pm_DefaultOutputDeviceID()` rather than creating device selection
+interfaces. Now, you should either pass devices on the command line or
+create your own selection interface when building a GUI
+application. (See pm_tests for examples.)  `Pm_DefaultInputDeviceID()`
+and `Pm_DefaultOutputDeviceID()` now return a valid device if
+possible, but they may not actually reflect any user preference.
+
+Haiku support in a minimal implementation. See TODO's in source.
+
+sndio is also minimally supported, allowing basic PortMidi functions
+in OpenBSD, FreeBSD, and NetBSD by setting USE_SNDIO for CMake, but
+not delayed/timestamped output and virtual devices.
+
+See CHANGELOG.txt for more details.
 
 # Other Repositories
 
-PortMidi used to be part of the PortMedia suite, but this repo has been reduced to
-mostly just C/C++ code for PortMidi. You will find some other repositories in this PortMidi project
-set up for language bindings (volunteers and contributors are invited!). Other code removed from
-previous releases of PortMedia include:
+PortMidi used to be part of the PortMedia suite, but this repo has
+been reduced to mostly just C/C++ code for PortMidi. You will find
+some other repositories in this PortMidi project set up for language
+bindings (volunteers and contributors are invited!). Other code
+removed from previous releases of PortMedia include:
 
 ## PortSMF
 
-A Standard MIDI File (SMF) (and more) library is in the [portsmf repository](https://github.com/PortMidi/portsmf).
+A Standard MIDI File (SMF) (and more) library is in the [portsmf
+repository](https://github.com/rbdannenberg/portsmf).
 
-PortSMF is a library for reading/writing/editing Standard MIDI Files. It is
-actually much more, with a general representation of events and updates with
-properties consisting of attributes and typed values. Familiar properties of
-pitch, time, duration, and channel are built into events and updates to make
-them faster to access and more compact.
+PortSMF is a library for reading/writing/editing Standard MIDI
+Files. It is actually much more, with a general representation of
+events and updates with properties consisting of attributes and typed
+values. Familiar properties of pitch, time, duration, and channel are
+built into events and updates to make them faster to access and more
+compact.
 
-To my knowledge, PortSMF has the most complete and useful handling of MIDI
-tempo tracks. E.g., you can edit notes according to either beat or time, and
-you can edit tempo tracks, for example, flattening the tempo while preserving
-the beat alignment, preserving the real time while changing the tempo or 
-stretching the tempo over some interval.
+To my knowledge, PortSMF has the most complete and useful handling of
+MIDI tempo tracks. E.g., you can edit notes according to either beat
+or time, and you can edit tempo tracks, for example, flattening the
+tempo while preserving the beat alignment, preserving the real time
+while changing the tempo or stretching the tempo over some interval.
 
-In addition to Standard MIDI Files, PortSMF supports an ASCII representation
-called Allegro. PortSMF and Allegro are used for Audacity Note Tracks.
+In addition to Standard MIDI Files, PortSMF supports an ASCII
+representation called Allegro. PortSMF and Allegro are used for
+Audacity Note Tracks.
 
 ## scorealign
 
-Scorealign used to be part of the PortMedia suite. It is now at the [scorealign repository](https://github.com/rbdannenberg/scorealign).
+Scorealign used to be part of the PortMedia suite. It is now at the
+[scorealign repository](https://github.com/rbdannenberg/scorealign).
 
-Scorealign aligns
-audio-to-audio, audio-to-MIDI or MIDI-to-MIDI using dynamic time warping (DTW)
-of a computed chromagram representation. There are some added smoothing tricks
-to improve performance. This library is written in C and runs substantially 
-faster than most other implementations, especially those written in MATLAB,
-due to the core DTW algorithm. Users should be warned that while chromagrams
-are robust features for alignment, they achieve robustness by operating at 
-fairly high granularity, e.g., durations of around 100ms, which limits 
-time precision. Other more recent algorithms can doubtless do better, but
-be cautious of claims, since it all depends on what assumptions you can 
-make about the music.
+Scorealign aligns audio-to-audio, audio-to-MIDI or MIDI-to-MIDI using
+dynamic time warping (DTW) of a computed chromagram
+representation. There are some added smoothing tricks to improve
+performance. This library is written in C and runs substantially
+faster than most other implementations, especially those written in
+MATLAB, due to the core DTW algorithm. Users should be warned that
+while chromagrams are robust features for alignment, they achieve
+robustness by operating at fairly high granularity, e.g., durations of
+around 100ms, which limits time precision. Other more recent
+algorithms can doubtless do better, but be cautious of claims, since
+it all depends on what assumptions you can make about the music.

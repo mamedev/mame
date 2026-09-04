@@ -679,11 +679,6 @@ ROM_END
 void kenseim_state::init_kenseim()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16s_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
-
-	m_lamps.resolve();
-	m_startlamp.resolve();
-	m_molea.resolve();
-	m_moleb.resolve();
 }
 
 } // anonymous namespace

@@ -115,12 +115,12 @@ void lee1220_state::lee1220(machine_config &config)
 
 	//WD1933(config, m_sdlc); // WDC WD1933PL-11
 
-	i8251_device &usart(I8251(config, "usart", 0)); // NEC D8251AC
+	i8251_device &usart(I8251(config, "usart")); // NEC D8251AC
 	usart.rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 
 	PIT8253(config, "pit"); // Intel D8253-5
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(28'944'000, 1152, 0, 960, 420, 0, 400);
 	screen.set_screen_update(m_crtc, FUNC(hd6845s_device::screen_update));

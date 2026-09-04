@@ -2,7 +2,7 @@
 // any_completion_handler.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,6 +24,7 @@
 #include "asio/bind_executor.hpp"
 #include "asio/bind_immediate_executor.hpp"
 #include "asio/error.hpp"
+#include "asio/inline_executor.hpp"
 #include "asio/thread_pool.hpp"
 
 namespace bindns = std;
@@ -180,7 +181,7 @@ void any_completion_handler_associator_test()
       asio::bind_allocator(handler_allocator<char>(&alloc_count),
         asio::bind_cancellation_slot(sig.slot(),
           asio::bind_executor(pool.get_executor(),
-            asio::bind_immediate_executor(asio::system_executor(),
+            asio::bind_immediate_executor(asio::inline_executor(),
               bindns::bind(&increment, &count))))));
 
   ASIO_CHECK(alloc_count == 1);
@@ -213,7 +214,7 @@ void any_completion_handler_associator_test()
     handler_type, asio::thread_pool::executor_type>::type ex2
       = asio::get_associated_immediate_executor(h1, pool.get_executor());
 
-  ASIO_CHECK(ex2 == asio::system_executor());
+  ASIO_CHECK(ex2 == asio::inline_executor());
 }
 
 void increment_with_error(asio::error_code ec,

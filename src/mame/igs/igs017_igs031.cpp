@@ -14,7 +14,10 @@ providing the interface to the 8255, or is it coincidence?
 #include "emu.h"
 #include "igs017_igs031.h"
 
+#include "input.h" // for video debug keys
+
 #include "multibyte.h"
+
 
 void igs017_igs031_device::map(address_map &map)
 {

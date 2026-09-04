@@ -704,6 +704,7 @@ bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const 
 				sects[i].deleted = false;
 				sects[i].bad_data_crc = false;
 				sects[i].bad_addr_crc = false;
+				sects[i].weak = false;
 			}
 
 			if (mfm)

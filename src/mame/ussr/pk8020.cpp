@@ -253,7 +253,7 @@ void pk8020_state::pk8020(machine_config &config)
 	m_devbank->set_addr_width(6);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL / 2, 656, 0, 512, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(pk8020_state::screen_update_pk8020));
 	m_screen->set_palette(m_palette);

@@ -415,7 +415,7 @@ void micral_state::micral(machine_config &config)
 	keyboard.set_addrmap(AS_IO, &micral_state::io_kbd);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(250));
 	screen.set_screen_update(FUNC(micral_state::screen_update));

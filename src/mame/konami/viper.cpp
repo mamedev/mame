@@ -86,9 +86,6 @@
     - hookup adc0838, reads from i2c;
     - convert epic to be a device, make it input_merger/irq_callback compliant;
     - (more intermediate steps for proper PCI conversions here)
-    - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
-      and camera doesn't really know what to do, CPU core bug?
-    - jpark3: crashes during second attract cycle;
     - sscopex: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
@@ -101,7 +98,9 @@
     Other notes:
     - "Distribution error" means there's a region mismatch.
     - Hold TEST while booting (from the very start) to initialize the RTC for most games.
-    - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting, for example, U region on a K/A image, it won't find some files and will error out with "distribution error".
+    - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting,
+      for example, U region on a K/A image, it won't find some files and will error
+      out with "distribution error".
     - mocapglf: enable "show diag" at boot then disable it once the diag text appears.
       This will allow game to bypass the I/O SENSOR error later on.
 
@@ -407,6 +406,8 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <iostream>
 
 // configurable logging
 //#define LOG_WARN  (1U << 1)
@@ -1255,15 +1256,11 @@ uint64_t viper_state::cf_card_data_r(offs_t offset, uint64_t mem_mask)
 		switch (offset & 0xf)
 		{
 			case 0x8:   // Duplicate Even RD Data
-			{
-				r |= m_ata->cs0_r(0, mem_mask >> 16) << 16;
+				r |= m_ata->cs0_r(0) << 16;
 				break;
-			}
 
 			default:
-			{
 				throw emu_fatalerror("%s:cf_card_data_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
-			}
 		}
 	}
 	return r;
@@ -1276,15 +1273,11 @@ void viper_state::cf_card_data_w(offs_t offset, uint64_t data, uint64_t mem_mask
 		switch (offset & 0xf)
 		{
 			case 0x8:   // Duplicate Even RD Data
-			{
-				m_ata->cs0_w(0, data >> 16, mem_mask >> 16);
+				m_ata->cs0_w(0, data >> 16);
 				break;
-			}
 
 			default:
-			{
 				throw emu_fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)(data >> 16));
-			}
 		}
 	}
 }
@@ -1307,30 +1300,22 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 				case 0x5:   // Cylinder High
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Status
-				{
-					r |= m_ata->cs0_r(offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->cs0_r(offset & 7) << 16;
 					break;
-				}
 
 				//case 0x8: // Duplicate Even RD Data
 				//case 0x9: // Duplicate Odd RD Data
 
 				case 0xd:   // Duplicate Error
-				{
-					r |= m_ata->cs0_r(1, mem_mask >> 16) << 16;
+					r |= m_ata->cs0_r(1) << 16;
 					break;
-				}
 				case 0xe:   // Alt Status
 				case 0xf:   // Drive Address
-				{
-					r |= m_ata->cs1_r(offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->cs1_r(offset & 7) << 16;
 					break;
-				}
 
 				default:
-				{
-					printf("%s:compact_flash_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
-				}
+					util::stream_format(std::cerr, "%s:compact_flash_r: IDE reg %02X\n", machine().describe_context(), offset & 0xf);
 			}
 		}
 		else
@@ -1370,30 +1355,22 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				case 0x5:   // Cylinder High
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Command
-				{
-					m_ata->cs0_w(offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->cs0_w(offset & 7, data >> 16);
 					break;
-				}
 
 				//case 0x8: // Duplicate Even WR Data
 				//case 0x9: // Duplicate Odd WR Data
 
 				case 0xd:   // Duplicate Features
-				{
-					m_ata->cs0_w(1, data >> 16, mem_mask >> 16);
+					m_ata->cs0_w(1, data >> 16);
 					break;
-				}
 				case 0xe:   // Device Ctl
 				case 0xf:   // Reserved
-				{
-					m_ata->cs1_w(offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->cs1_w(offset & 7, data >> 16);
 					break;
-				}
 
 				default:
-				{
 					throw emu_fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
-				}
 			}
 		}
 		else if (offset >= 0x100)
@@ -1401,7 +1378,6 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 			switch (offset)
 			{
 				case 0x100:
-				{
 					if ((data >> 16) & 0x80)
 					{
 						m_cf_card_ide = 1;
@@ -1409,11 +1385,9 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 						m_ata->reset();
 					}
 					break;
-				}
+
 				default:
-				{
 					throw emu_fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context().c_str(), offset, (uint16_t)((data >> 16) & 0xffff));
-				}
 			}
 		}
 	}
@@ -1441,10 +1415,10 @@ uint64_t viper_state::ata_r(offs_t offset, uint64_t mem_mask)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			r |= m_ata->cs0_r(reg, mem_mask >> 16) << 16;
+			r |= m_ata->cs0_r(reg) << 16;
 			break;
 		case 0x80:
-			r |= m_ata->cs1_r(reg, mem_mask >> 16) << 16;
+			r |= m_ata->cs1_r(reg) << 16;
 			break;
 		}
 	}
@@ -1461,10 +1435,10 @@ void viper_state::ata_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			m_ata->cs0_w(reg, data >> 16, mem_mask >> 16);
+			m_ata->cs0_w(reg, data >> 16);
 			break;
 		case 0x80:
-			m_ata->cs1_w(reg, data >> 16, mem_mask >> 16);
+			m_ata->cs1_w(reg, data >> 16);
 			break;
 		}
 	}
@@ -1475,33 +1449,19 @@ uint32_t viper_state::voodoo3_pci_r(int function, int reg, uint32_t mem_mask)
 	switch (reg)
 	{
 		case 0x00:      // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0005 = Voodoo 3)
-		{
 			return 0x0005121a;
-		}
 		case 0x08:      // Device class code
-		{
 			return 0x03000000;
-		}
 		case 0x10:      // memBaseAddr0
-		{
 			return m_voodoo3_pci_reg[0x10/4];
-		}
 		case 0x14:      // memBaseAddr1
-		{
 			return m_voodoo3_pci_reg[0x14/4];
-		}
 		case 0x18:      // memBaseAddr1
-		{
 			return m_voodoo3_pci_reg[0x18/4];
-		}
 		case 0x40:      // fabId
-		{
 			return m_voodoo3_pci_reg[0x40/4];
-		}
 		case 0x50:      // cfgScratch
-		{
 			return m_voodoo3_pci_reg[0x50/4];
-		}
 
 		default:
 			throw emu_fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
@@ -1515,12 +1475,9 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 	switch (reg)
 	{
 		case 0x04:      // Command register
-		{
 			m_voodoo3_pci_reg[0x04/4] = data;
 			break;
-		}
 		case 0x10:      // memBaseAddr0
-		{
 			if (data == 0xffffffff)
 			{
 				m_voodoo3_pci_reg[0x10/4] = 0xfe000000;
@@ -1530,9 +1487,7 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 				m_voodoo3_pci_reg[0x10/4] = data;
 			}
 			break;
-		}
 		case 0x14:      // memBaseAddr1
-		{
 			if (data == 0xffffffff)
 			{
 				m_voodoo3_pci_reg[0x14/4] = 0xfe000008;
@@ -1542,9 +1497,7 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 				m_voodoo3_pci_reg[0x14/4] = data;
 			}
 			break;
-		}
 		case 0x18:      // ioBaseAddr
-		{
 			if (data == 0xffffffff)
 			{
 				m_voodoo3_pci_reg[0x18/4] = 0xffffff01;
@@ -1554,21 +1507,14 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 				m_voodoo3_pci_reg[0x18/4] = data;
 			}
 			break;
-		}
 		case 0x3c:      // InterruptLine
-		{
 			break;
-		}
 		case 0x40:      // fabId
-		{
 			m_voodoo3_pci_reg[0x40/4] = data;
 			break;
-		}
 		case 0x50:      // cfgScratch
-		{
 			m_voodoo3_pci_reg[0x50/4] = data;
 			break;
-		}
 
 		default:
 			throw emu_fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
@@ -2574,7 +2520,7 @@ void viper_state::viper(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	PC16552D(config, "duart_com", 0);
+	PC16552D(config, "duart_com");
 	// TODO: unverified clocks and channel types, likely connects to sensor motion based games
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800)).out_int_callback().set(FUNC(viper_state::uart_int));
@@ -2591,7 +2537,7 @@ void viper_state::viper(machine_config &config)
 	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Screeen size and timing is re-calculated later in voodoo card
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 768);
@@ -2605,7 +2551,7 @@ void viper_state::viper(machine_config &config)
 	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
 	// Each IRQ3 will update the data buffers with 256 samples, and the playback rate is always 44100hz.
 	// The frequency is picked such that the DMADAC buffer should never overflow or underflow.

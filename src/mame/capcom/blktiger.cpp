@@ -761,7 +761,7 @@ void blktiger_state::nomcu(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(blktiger_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
@@ -1065,8 +1065,8 @@ void blktiger_state::init_blktigerb3()
 } // anonymous namespace
 
 
-GAME( 1987, blktiger,   0,        mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigera,  blktiger, mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktiger,   0,        mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger (US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigera,  blktiger, mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger (US, older)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blktigerb1, blktiger, nomcu, blktiger, blktiger_state,     empty_init,      ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blktigerb2, blktiger, nomcu, blktiger, blktiger_state,     empty_init,      ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blkdrgon,   blktiger, mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )

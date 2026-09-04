@@ -433,7 +433,6 @@ void flyball_state::machine_start()
 		m_pot_assert_timer[i] = timer_alloc(FUNC(flyball_state::joystick_callback), this);
 	m_pot_clear_timer = timer_alloc(FUNC(flyball_state::pot_clear_callback), this);
 	m_quarter_timer = timer_alloc(FUNC(flyball_state::quarter_callback), this);
-	m_lamp.resolve();
 
 	save_item(NAME(m_pitcher_vert));
 	save_item(NAME(m_pitcher_horz));
@@ -473,7 +472,7 @@ void flyball_state::flyball(machine_config &config)
 	m_outlatch->q_out_cb<7>().set(FUNC(flyball_state::lamp_w)); // 1 player lamp
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(flyball_state::screen_update));
 	m_screen->set_palette(m_palette);

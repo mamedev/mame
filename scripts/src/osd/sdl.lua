@@ -59,6 +59,8 @@ function maintargetosdoptions(_target,_subtarget)
 				links {
 					"SDL2main",
 					"SDL2",
+					"imm32",
+					"version",
 				}
 			configuration { "vs*" }
 				links {
@@ -83,6 +85,7 @@ function maintargetosdoptions(_target,_subtarget)
 		configuration { }
 
 		links {
+			"bcrypt",
 			"dinput8",
 			"psapi",
 		}
@@ -403,9 +406,12 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/osd/sdl",
+		ext_includedir("asio"),
 	}
 
 	files {
+		MAME_DIR .. "src/osd/asio.cpp",
+		MAME_DIR .. "src/osd/asio.h",
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
 		MAME_DIR .. "src/osd/osdfile.h",

@@ -110,9 +110,9 @@
 #include "emu.h"
 #include "deco_mlc.h"
 
-#include "deco156_m.h"
+#include "deco156.h"
 #include "machine/eepromser.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "cpu/sh/sh7604.h"
 #include "speaker.h"
 
@@ -547,7 +547,7 @@ void deco_mlc_state::avengrgs(machine_config &config)
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
@@ -570,7 +570,7 @@ void deco_mlc_state::avengrgs(machine_config &config)
 void deco_mlc_state::mlc(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 42000000/6); // 42 MHz -> 7MHz clock confirmed on real board
+	DE156(config, m_maincpu, 42000000/6); // 42 MHz -> 7MHz clock confirmed on real board
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_no146_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
@@ -578,7 +578,7 @@ void deco_mlc_state::mlc(machine_config &config)
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
@@ -622,7 +622,7 @@ void deco_mlc_state::stadhr96(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_146_map);
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->set_use_magic_read_address_xor(true);
 }
 
@@ -1056,7 +1056,7 @@ void deco_mlc_state::init_mlc()
 	    effective clock rate here to compensate otherwise we have slowdowns in
 	    Skull Fang where there probably shouldn't be. */
 	m_maincpu->set_clock_scale(2.0);
-	m_irqLevel = ARM_IRQ_LINE;
+	m_irqLevel = arm7_cpu_device::ARM7_IRQ_LINE;
 	deco156_decrypt(machine());
 	descramble_sound();
 }
@@ -1064,7 +1064,7 @@ void deco_mlc_state::init_mlc()
 void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
 {
 	m_maincpu->set_clock_scale(2.0); // avoids hangs in attract mode / end of round, see init_mlc()
-	m_irqLevel = ARM_IRQ_LINE;
+	m_irqLevel = arm7_cpu_device::ARM7_IRQ_LINE;
 	deco156_decrypt(machine());
 }
 
