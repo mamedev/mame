@@ -122,6 +122,7 @@ void vectrex_base_state::vector_update(vector_device &vector)
 	screen_configuration();
 
 	/* start black */
+	m_vector->clear_list();
 	m_vector->add_point(m_points[m_display_start].x,
 						m_points[m_display_start].y,
 						m_points[m_display_start].col,
