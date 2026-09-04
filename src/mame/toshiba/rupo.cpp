@@ -60,6 +60,11 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#define LOG_IO (1U << 1)
+
+//#define VERBOSE (LOG_IO)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -89,11 +94,11 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void jwcolor_am29k_data_map(address_map &map) ATTR_COLD;
-	void jwcolor_am29k_map(address_map &map) ATTR_COLD;
-	void jwcolor_am486_io_map(address_map &map) ATTR_COLD;
-	void jwcolor_am486_map(address_map &map) ATTR_COLD;
-	void jwcolor_palette(palette_device &palette) const ATTR_COLD;
+	void am29k_data_map(address_map &map) ATTR_COLD;
+	void am29k_prg_map(address_map &map) ATTR_COLD;
+	void am486_io_map(address_map &map) ATTR_COLD;
+	void am486_prg_map(address_map &map) ATTR_COLD;
+	void palette(palette_device &palette) const ATTR_COLD { }
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 m_io_00d0;
@@ -120,50 +125,48 @@ void jwcolor_state::floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 }
 
-void jwcolor_state::jwcolor_am29k_data_map(address_map &map)
+void jwcolor_state::am29k_data_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().region("ic49", 0);
 }
 
-void jwcolor_state::jwcolor_am29k_map(address_map &map)
+void jwcolor_state::am29k_prg_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().region("ic49", 0);
 }
 
-void jwcolor_state::jwcolor_am486_io_map(address_map &map)
+void jwcolor_state::am486_io_map(address_map &map)
 {
 	map(0x0398, 0x0398).lr8(
 		NAME([this]() {
-			m_io_0398 = m_io_0398 == 0 ? 0x88 : 0;
-			logerror("%s: io_0398_r = %02x\n", machine().describe_context(), m_io_0398);
+			if (!machine().side_effects_disabled()) {
+				m_io_0398 = m_io_0398 == 0 ? 0x88 : 0;
+				LOGMASKED(LOG_IO, "%s: io_0398_r = %02x\n", machine().describe_context(), m_io_0398);
+			}
 			return m_io_0398;
 		}));
 	map(0x03bd, 0x03bd).lr8(
 		NAME([this]() {
-			logerror("%s: io_03bd_r = 0\n", machine().describe_context());
+			if (!machine().side_effects_disabled()) {
+				LOGMASKED(LOG_IO, "%s: io_03bd_r = 0\n", machine().describe_context());
+			}
 			return 0;
 		}));
 	map(0x00d0, 0x00d1).lr16(
 		NAME([this](offs_t offset) {
-			m_io_00d0 += 100;
-			logerror("%s: io_00d0_r = %02x\n", machine().describe_context(), m_io_00d0);
+			if (!machine().side_effects_disabled()) {
+				m_io_00d0 += 100;
+				LOGMASKED(LOG_IO, "%s: io_00d0_r = %02x\n", machine().describe_context(), m_io_00d0);
+			}
 			return m_io_00d0;
 		}));
 }
 
-void jwcolor_state::jwcolor_am486_map(address_map &map)
+void jwcolor_state::am486_prg_map(address_map &map)
 {
 	map(0x00000000, 0x000001ff).ram();
 	map(0x00020000, 0x0002ffff).rom().region("ic19_ic21", 0x20000);
 	map(0x000ffff0, 0x000fffff).mirror(0xfff00000).rom().region("ic19_ic21", 0x100);
-}
-
-void jwcolor_state::jwcolor_palette(palette_device &palette) const
-{
-	for (size_t i = 0; i < 0xff; i++) {
-		palette.set_pen_color(i, 0xff, 0xff, 0xff);
-	}
-	palette.set_pen_color(0xff, 0x00, 0x00, 0x00);
 }
 
 u32 jwcolor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -174,12 +177,12 @@ u32 jwcolor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 void jwcolor_state::jwcolor(machine_config &config)
 {
 	AM29000(config, m_am29k, 20_MHz_XTAL);
-	m_am29k->set_addrmap(AS_PROGRAM, &jwcolor_state::jwcolor_am29k_map);
-	m_am29k->set_addrmap(AS_DATA, &jwcolor_state::jwcolor_am29k_data_map);
+	m_am29k->set_addrmap(AS_PROGRAM, &jwcolor_state::am29k_prg_map);
+	m_am29k->set_addrmap(AS_DATA, &jwcolor_state::am29k_data_map);
 
 	I486(config, m_am486, 66_MHz_XTAL);
-	m_am486->set_addrmap(AS_PROGRAM, &jwcolor_state::jwcolor_am486_map);
-	m_am486->set_addrmap(AS_IO, &jwcolor_state::jwcolor_am486_io_map);
+	m_am486->set_addrmap(AS_PROGRAM, &jwcolor_state::am486_prg_map);
+	m_am486->set_addrmap(AS_IO, &jwcolor_state::am486_io_map);
 
 	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
@@ -188,7 +191,7 @@ void jwcolor_state::jwcolor(machine_config &config)
 	m_screen->set_screen_update(FUNC(jwcolor_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(jwcolor_state::jwcolor_palette), 256);
+	PALETTE(config, "palette", FUNC(jwcolor_state::palette), 256);
 
 	FLOPPY_CONNECTOR(config, m_flop, jwcolor_floppies, "35hd", jwcolor_state::floppy_formats);
 	SOFTWARE_LIST(config, "fd_list").set_original("rupo_flop");

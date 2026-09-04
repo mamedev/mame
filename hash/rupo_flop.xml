@@ -5,121 +5,37 @@ license:CC0-1.0
 
 Known undumped software releases:
 
-- [T-W003] Jong Kyo (ジャン狂)
-- [T-W004] Lode Runner (ロードランナー)
-- [T-W005] Bomberman (ボンバーマン)
-- [JWS2073B] 毛筆
-- [JWS2086C] アウトラインフォント
-- [JWS2091A] 名簿テータバンク
-- [JWS2092A] 表計算Ⅱ
-- [JWS2092C] 表計算Ⅱソフド
-- [JWS2092D] 表計算Ⅲ
-- [JWS2097C] アウトライン外字作成用ソフト
-- [JWS2931B] MS-DOS テキスト変換ユーティリティ
-- [JWS2953C] アウトラインフォント
-- [JWS2960B] ぼのぼのデザインコレクション
-- [JWS2995A] 企画書上手
-- [JW-S014] はがき上手'89
-- [JW-S016] ワープロ手帳Ⅱ
-- [JW-S031] Knight Moves (ナイトムーブス)
-- [JW-S033] はがき上手「四季」Ⅲ
-- [JW-S039] はがき上手「四季」Ⅳ
-- [PNS0120A] トラベル英会話
-- [PN-S301] Daisenryaku (大戦略)
-- [PN-S302] Mahjong Gokuu (麻雀悟空)
-- [PN-S303] Shanghai II (上海Ⅱ) (1993 Release)
-- [PN-S307] Shanghai II (上海Ⅱ) (Monochrome + Color Release)
-- [PN-S308] Trump World (トランプワールド)
-- [PN-S309] Mahjong Gokuu Tenjiku (麻雀悟空天竺) (SVGA Release)
-- [PN-S401] パーソナル情報バンク
-- [S0330] はがき上手「四季編・特選」
+- [T-W005]   Bomberman (ボンバーマン)
+- [JWS2960B] Bo no Bo no Design Collection (ぼのぼのデザインコレクション)
+- [PN-S301]  Daisenryaku (大戦略)
+- [JW-S014]  Hagaki Jouzu '89 (はがき上手'89)
+- [S0330]    Hagaki Jouzu "Shiki-hen Tokusen" (はがき上手「四季編・特選」)
+- [JW-S033]  Hagaki Jouzu "Shiki" II (はがき上手「四季」Ⅲ)
+- [JW-S039]  Hagaki Jouzu "Shiki" IV (はがき上手「四季」Ⅳ)
+- [T-W003]   Jong Kyo (ジャン狂)
+- [JWS2995A] Kikaku-sho Jouzu (企画書上手)
+- [JW-S031]  Knight Moves (ナイトムーブス)
+- [T-W004]   Lode Runner (ロードランナー)
+- [PN-S309]  Mahjong Gokuu Tenjiku (麻雀悟空天竺) (SVGA Release)
+- [PN-S302]  Mahjong Gokuu (麻雀悟空)
+- [JWS2091A] Meibo Data Bank (名簿テータバンク)
+- [JWS2073B] Mouhitsu (毛筆)
+- [JWS2931B] MS-DOS Tekisuto Henkan Utility (MS-DOS テキスト変換ユーティリティ)
+- [JWS2092D] Omotekeisan III (表計算Ⅲ)
+- [JWS2092C] Omotekeisan II Software (表計算Ⅱソフド)
+- [JWS2092A] Omotekeisan II (表計算Ⅱ)
+- [JWS2086C] Outline Font (アウトラインフォント)
+- [JWS2953C] Outline Font (アウトラインフォント)
+- [JWS2097C] Outline Gaiji Sakusei-you Software (アウトライン外字作成用ソフト)
+- [PN-S401]  Personal Jouhou Bank (パーソナル情報バンク)
+- [PN-S303]  Shanghai II (上海Ⅱ) (1993 Release)
+- [PN-S307]  Shanghai II (上海Ⅱ) (Monochrome + Color Release)
+- [PNS0120A] Travel Eikaiwa (トラベル英会話)
+- [PN-S308]  Trump World (トランプワールド)
+- [JW-S016]  Word Processor Techou II (ワープロ手帳Ⅱ)
 -->
 
 <softwarelist name="rupo_flop" description="Toshiba Rupo Personal Word Processor floppy disk images">
-
-	<software name="ishidou" supported="no">
-		<description>Ishidou - The Way Of Stones</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-256 bytes/sector, 16 sectors/track, 80 tracks/side.
-Dumped from non-original media.
-]]></notes>
-		<info name="alt_title" value="石道"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="655360">
-				<rom name="ishidou.mfm" size="655360" crc="d084d26c" sha1="03d695a22c19e8eeeaa7d0a1ed4e2b2bd84e190c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shanghai" supported="no">
-		<description>Shanghai</description>
-		<year>1990</year>
-		<publisher>ASCII Corporation / Activision</publisher>
-		<notes><![CDATA[
-256 bytes/sector, 16 sectors/track, 80 tracks/side.
-Track 78 null-filled: no flux in MFM pulse intervals.
-]]></notes>
-		<info name="alt_title" value="上海"/>
-		<info name="serial" value="JW-S018"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="655360">
-				<rom name="jw-s018.mfm" size="655360" crc="60355d61" sha1="2b144c200b78be2c2d226bd6d039cad7d1655525"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sokoban" supported="no">
-		<description>Sokoban</description>
-		<year>1990</year>
-		<publisher>ASCII Corporation / Thinking Rabbit</publisher>
-		<notes><![CDATA[
-256 bytes/sector, 16 sectors/track, 80 tracks/side.
-Dumped from non-original media.
-]]></notes>
-		<info name="alt_title" value="倉庫番"/>
-		<info name="serial" value="JW-S019"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="655360">
-				<rom name="jw-s019.mfm" size="655360" crc="d56ed669" sha1="4c2f10f3cabebd2fcdc3a4539f6bb6089eccc11b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mahgokuu" supported="no">
-		<description>Mahjong Gokuu</description>
-		<year>1990</year>
-		<publisher>Chatnoir</publisher>
-		<notes><![CDATA[
-256 bytes/sector, 16 sectors/track, 80 tracks/side.
-Dumped from non-original media.
-]]></notes>
-		<info name="alt_title" value="麻雀悟空"/>
-		<info name="serial" value="JW-S020"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="655360">
-				<rom name="jw-s020.mfm" size="655360" crc="b4511eec" sha1="e9b825d5c9c4d001f177ee9f7cd0b8368b12965b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tetris" supported="no">
-		<description>Tetris</description>
-		<year>1990</year>
-		<publisher>ASCII Corporation / Bullet-Proof Software Inc.</publisher>
-		<notes><![CDATA[
-256 bytes/sector, 16 sectors/track, 80 tracks/side.
-Track 78 null-filled: no flux in MFM pulse intervals.
-]]></notes>
-		<info name="alt_title" value="テトリス"/>
-		<info name="serial" value="JW-S023"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="655360">
-				<rom name="jw-s023.mfm" size="655360" crc="7b92a698" sha1="b398e8148882e30a3e58ae9484bbb1f28003ca99"/>
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="cardcon" supported="no">
 		<description>Card Connection</description>
@@ -139,53 +55,35 @@ Marked bad due to missing file data (leftover graphics from Ishidou?).
 		</part>
 	</software>
 
-	<software name="sanrioc" supported="no">
-		<description>Sanrio Carnival</description>
-		<year>1991</year>
-		<publisher>ASCII Corporation</publisher>
+	<software name="ishidou" supported="no">
+		<description>Ishidou - The Way Of Stones</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Dumped from non-original media.
 ]]></notes>
-		<info name="alt_title" value="サンリオカーニバル"/>
-		<info name="serial" value="JW-S028"/>
+		<info name="alt_title" value="石道"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="jw-s028.mfm" size="655360" crc="da8f9ea1" sha1="46f7e8f627cf8a9092ac7de7a321e135c7200266"/>
+				<rom name="ishidou.mfm" size="655360" crc="d084d26c" sha1="03d695a22c19e8eeeaa7d0a1ed4e2b2bd84e190c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tesserae" supported="no">
-		<description>Tesserae</description>
-		<year>1991</year>
-		<publisher>ASCII Corporation</publisher>
+	<software name="mahgokuu" supported="no">
+		<description>Mahjong Gokuu</description>
+		<year>1990</year>
+		<publisher>Chatnoir</publisher>
 		<notes><![CDATA[
 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Dumped from non-original media.
 ]]></notes>
-		<info name="alt_title" value="テッセラ"/>
-		<info name="serial" value="JW-S029"/>
+		<info name="alt_title" value="麻雀悟空"/>
+		<info name="serial" value="JW-S020"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="jw-s029.mfm" size="655360" crc="86554a35" sha1="25d4a63b88027f78e112ef4b8e6335db6c23c6aa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shang2" supported="no">
-		<description>Shanghai II</description>
-		<year>1991</year>
-		<publisher>ASCII Corporation / Activision</publisher>
-		<notes><![CDATA[
-256 bytes/sector, 16 sectors/track, 80 tracks/side.
-Dumped from non-original media.
-Tracks 47,48 Side 1 Sector 15 have invalid header CRCs.
-]]></notes>
-		<info name="alt_title" value="上海Ⅱ"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="655360">
-				<rom name="shang2.mfm" size="655360" crc="4526dc82" sha1="22c683d5e5af132aa90fe09e74f70ea9eb9620f0" status="baddump"/>
+				<rom name="jw-s020.mfm" size="655360" crc="b4511eec" sha1="e9b825d5c9c4d001f177ee9f7cd0b8368b12965b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,6 +108,108 @@ Color Version: 512 bytes/sector, 18 sectors/track, 80 tracks/side.
 			<feature name="part_id" value="Color Version (カラー液晶対応版)"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="pn-s306.color.mfm" size="1474560" crc="cf111f2e" sha1="a491225a8eeec3481da8a710e03443c097e51660"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanrioc" supported="no">
+		<description>Sanrio Carnival</description>
+		<year>1991</year>
+		<publisher>ASCII Corporation</publisher>
+		<notes><![CDATA[
+256 bytes/sector, 16 sectors/track, 80 tracks/side.
+Dumped from non-original media.
+]]></notes>
+		<info name="alt_title" value="サンリオカーニバル"/>
+		<info name="serial" value="JW-S028"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="jw-s028.mfm" size="655360" crc="da8f9ea1" sha1="46f7e8f627cf8a9092ac7de7a321e135c7200266"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shanghai" supported="no">
+		<description>Shanghai</description>
+		<year>1990</year>
+		<publisher>ASCII Corporation / Activision</publisher>
+		<notes><![CDATA[
+256 bytes/sector, 16 sectors/track, 80 tracks/side.
+Track 78 null-filled: no flux in MFM pulse intervals.
+]]></notes>
+		<info name="alt_title" value="上海"/>
+		<info name="serial" value="JW-S018"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="jw-s018.mfm" size="655360" crc="60355d61" sha1="2b144c200b78be2c2d226bd6d039cad7d1655525"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shang2" supported="no">
+		<description>Shanghai II</description>
+		<year>1991</year>
+		<publisher>ASCII Corporation / Activision</publisher>
+		<notes><![CDATA[
+256 bytes/sector, 16 sectors/track, 80 tracks/side.
+Dumped from non-original media.
+Tracks 47,48 Side 1 Sector 15 have invalid header CRCs.
+]]></notes>
+		<info name="alt_title" value="上海Ⅱ"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="shang2.mfm" size="655360" crc="4526dc82" sha1="22c683d5e5af132aa90fe09e74f70ea9eb9620f0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sokoban" supported="no">
+		<description>Sokoban</description>
+		<year>1990</year>
+		<publisher>ASCII Corporation / Thinking Rabbit</publisher>
+		<notes><![CDATA[
+256 bytes/sector, 16 sectors/track, 80 tracks/side.
+Dumped from non-original media.
+]]></notes>
+		<info name="alt_title" value="倉庫番"/>
+		<info name="serial" value="JW-S019"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="jw-s019.mfm" size="655360" crc="d56ed669" sha1="4c2f10f3cabebd2fcdc3a4539f6bb6089eccc11b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tesserae" supported="no">
+		<description>Tesserae</description>
+		<year>1991</year>
+		<publisher>ASCII Corporation</publisher>
+		<notes><![CDATA[
+256 bytes/sector, 16 sectors/track, 80 tracks/side.
+Dumped from non-original media.
+]]></notes>
+		<info name="alt_title" value="テッセラ"/>
+		<info name="serial" value="JW-S029"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="jw-s029.mfm" size="655360" crc="86554a35" sha1="25d4a63b88027f78e112ef4b8e6335db6c23c6aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris" supported="no">
+		<description>Tetris</description>
+		<year>1990</year>
+		<publisher>ASCII Corporation / Bullet-Proof Software Inc.</publisher>
+		<notes><![CDATA[
+256 bytes/sector, 16 sectors/track, 80 tracks/side.
+Track 78 null-filled: no flux in MFM pulse intervals.
+]]></notes>
+		<info name="alt_title" value="テトリス"/>
+		<info name="serial" value="JW-S023"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="jw-s023.mfm" size="655360" crc="7b92a698" sha1="b398e8148882e30a3e58ae9484bbb1f28003ca99"/>
 			</dataarea>
 		</part>
 	</software>
