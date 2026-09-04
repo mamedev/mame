@@ -50,7 +50,7 @@ protected:
 private:
 	required_device<adsp2181_device> m_dsp;
 
-	//void adsp2181ekl_map(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void adsp2181ekl_map(address_map &map) ATTR_COLD;
 };
 
 void adsp2181ekl_device::device_start()
