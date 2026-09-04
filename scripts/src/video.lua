@@ -1597,6 +1597,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/sti3400.h,VIDEOS["STI3400"] = true
+--------------------------------------------------
+
+if VIDEOS["STI3400"] then
+	files {
+		MAME_DIR .. "src/devices/video/sti3400.cpp",
+		MAME_DIR .. "src/devices/video/sti3400.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/t6963c.h,VIDEOS["T6963C"] = true
 --------------------------------------------------
 
