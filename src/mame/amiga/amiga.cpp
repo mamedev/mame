@@ -2300,8 +2300,8 @@ void amiga_state::amiga_base(machine_config &config)
 	// TODO: shouldn't have a clock
 	// (finite state machine, controlled by Agnus beams)
 	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_PAL);
-	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->custom_write_cb().set(m_chipset, FUNC(address_map_bank_device::write16));
 	m_copper->set_ecs_mode(false);
 
 	// rs232
@@ -2410,6 +2410,7 @@ void a2000_state::a2000(machine_config &config)
 	m_cpuslot->int2_cb().set(FUNC(a2000_state::cpuslot_int2_w));
 	m_cpuslot->int6_cb().set(FUNC(a2000_state::cpuslot_int6_w));
 	m_cpuslot->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
+	m_cpuslot->fc_cb().set([this]() { return m_maincpu->get_fc(); });
 
 	// zorro2 slots
 	ZORRO2_BUS(config, m_zorro, amiga_state::CLK_7M_PAL);
@@ -2465,6 +2466,7 @@ void a500_state::a500(machine_config &config)
 	m_side->int2_cb().set(FUNC(a500_state::side_int2_w));
 	m_side->int6_cb().set(FUNC(a500_state::side_int6_w));
 	m_side->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
+	m_side->fc_cb().set([this]() { return m_maincpu->get_fc(); });
 }
 
 void a500_state::a500n(machine_config &config)
@@ -2691,6 +2693,7 @@ void a500p_state::a500p(machine_config &config)
 	m_side->int2_cb().set(FUNC(a500p_state::side_int2_w));
 	m_side->int6_cb().set(FUNC(a500p_state::side_int6_w));
 	m_side->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
+	m_side->fc_cb().set([this]() { return m_maincpu->get_fc(); });
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
