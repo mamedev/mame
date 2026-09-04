@@ -1,11 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
 -->
 <softwarelist name="s900_flop" description="Akai S900 and S950 floppies">
 
-    <software name="sl505">
+	<software name="sl505">
 		<description>Akai Professional Sound Library SL 505: Orchestra #1</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -16,7 +16,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl506">
+	<software name="sl506">
 		<description>Akai Professional Sound Library SL 506: Strings #1</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -27,7 +27,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl521">
+	<software name="sl521">
 		<description>Akai Professional Sound Library SL 521: Strings #2</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -38,7 +38,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl532">
+	<software name="sl532">
 		<description>Akai Professional Sound Library SL 532: Violin #1</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -49,7 +49,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl542">
+	<software name="sl542">
 		<description>Akai Professional Sound Library SL 542: Fretless Bass</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -60,7 +60,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl548">
+	<software name="sl548">
 		<description>Akai Professional Sound Library SL 548: Rolling Timpani, Gong</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -71,7 +71,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl551">
+	<software name="sl551">
 		<description>Akai Professional Sound Library SL 551: Effects #2</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -82,7 +82,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl552">
+	<software name="sl552">
 		<description>Akai Professional Sound Library SL 552: Harpsichord, Tubular Bells</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -93,7 +93,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl554">
+	<software name="sl554">
 		<description>Akai Professional Sound Library SL 554: Latin Percussion, Conga</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -104,7 +104,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl555">
+	<software name="sl555">
 		<description>Akai Professional Sound Library SL 555: Effects #3</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>

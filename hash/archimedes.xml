@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -3551,7 +3551,7 @@ a7000p -bios 2: requires Desktop if really compatible (i.e. [PS/2] mouse support
 				<rom name="Wolfenstein 3D (1994) (Powerslave Software) (Disk 0 of 2).apd" size="403340" crc="1bc46d3e" sha1="76cc19e9d87c10e48117fcf629ef67fa85fc08f1"/>
 			</dataarea>
 		</part>
-		<!-- TODO: "Game Disc N" in-game really 	-->
+		<!-- TODO: "Game Disc N" in-game really     -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Games Disc 1"/>
 			<dataarea name="flop" size="391042">

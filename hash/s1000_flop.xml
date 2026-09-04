@@ -1,11 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
 -->
 <softwarelist name="s1000_flop" description="Akai S1000 and S1100 floppies">
 
-    <software name="sl012d">
+	<software name="sl012d">
 		<description>Akai Professional Sound Library SL012D: Dance Kit #1</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -16,7 +16,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl095a">
+	<software name="sl095a">
 		<description>Akai Professional Sound Library SL095A: Orchestra #1</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -27,7 +27,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl097w">
+	<software name="sl097w">
 		<description>Akai Professional Sound Library SL097W: Wind #5</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -38,7 +38,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl120w">
+	<software name="sl120w">
 		<description>Akai Professional Sound Library SL120W: Orchestral Wind</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -49,7 +49,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl212e">
+	<software name="sl212e">
 		<description>Akai Professional Sound Library SL212E: Analogue Reed</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -60,7 +60,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl217d">
+	<software name="sl217d">
 		<description>Akai Professional Sound Library SL217D: Wind Chime</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -71,7 +71,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl234e">
+	<software name="sl234e">
 		<description>Akai Professional Sound Library SL234E: Analogue Reed #2</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -82,7 +82,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl1016">
+	<software name="sl1016">
 		<description>Akai Professional Sound Library: DSP Effect Programs SL1016: Grand Piano #2</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -93,7 +93,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl1036">
+	<software name="sl1036">
 		<description>Akai Professional Sound Library SL1036: Wind &amp; Glocken</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -115,7 +115,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl1133">
+	<software name="sl1133">
 		<description>Akai Professional Sound Library: DSP Effect Programs SL1133: Breathy Perc</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -126,7 +126,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl1150">
+	<software name="sl1150">
 		<description>Akai Professional Natural Sound Library SL1150: Caxixi, Surdo, Brazil</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -137,7 +137,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl1152">
+	<software name="sl1152">
 		<description>Akai Professional Natural Sound Library SL1152: Ganza, Ago-go, Brazil</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -148,7 +148,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="sl1156">
+	<software name="sl1156">
 		<description>Akai Professional Natural Sound Library SL1156: Congas, Cuba</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -159,7 +159,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="swm8">
+	<software name="swm8">
 		<description>Akai Professional Sound Library SWM #8: Sample Wave Mixing</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -170,7 +170,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="swm8dsp" cloneof="swm8">
+	<software name="swm8dsp" cloneof="swm8">
 		<description>Akai Professional Sound Library: DSP Effect Programs SWM #8: Sample Wave Mixing</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>
@@ -192,7 +192,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="workstation5dsp" cloneof="workstation5">
+	<software name="workstation5dsp" cloneof="workstation5">
 		<description>Akai Professional Sound Library: DSP Effect Programs Work Station #5: Dance</description>
 		<year>19??</year>
 		<publisher>Akai Electric</publisher>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -16,8 +16,8 @@ license:CC0-1.0
 	3. Play the tape, wait for the leader sound then press <Return>.
 	4. For BASIC programs, stop the tape, type RUN and press <Return> to run the program.
 
-    Many Applesoft BASIC cassette programs will also run on the TK2000 or MPF-II, though often with significant
-    graphical glitches. To load Apple-format tapes on these systems, enter MP followed by LOADA. -->
+	Many Applesoft BASIC cassette programs will also run on the TK2000 or MPF-II, though often with significant
+	graphical glitches. To load Apple-format tapes on these systems, enter MP followed by LOADA. -->
 
 	<software name="3dartgra">
 		<description>3D Art Graphics</description>
