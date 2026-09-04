@@ -136,6 +136,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
+		, m_wheel_motor(*this, "wheel_motor")
 		, m_io_analog(*this, "ANALOG%u", 0U)
 	{ }
 
@@ -167,6 +168,7 @@ private:
 	output_finder<7> m_digits;
 	output_finder<32> m_leds;
 	output_finder<8> m_lamps;
+	output_finder<> m_wheel_motor;
 	required_ioport_array<4> m_io_analog;
 };
 
@@ -560,7 +562,8 @@ void crusnexo_state::crusnexo_leds_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{
-		case 0: // unknown purpose
+		case 0: // steering wheel motor
+			m_wheel_motor = data & 0xff;
 			break;
 
 		case 1: // controls lamps
