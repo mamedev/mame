@@ -18910,7 +18910,7 @@ Known to use [SCUDSP]
 		</part>
 	</software>
 
-	<software name="sandra" cloneof="sandr" supported="no">
+	<software name="sandra" cloneof="sandr" supported="partial">
 		<description>Puzzle &amp; Action: Nido Aru Koto wa Sand-R (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>CRI</publisher>
