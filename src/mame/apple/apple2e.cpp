@@ -5383,7 +5383,8 @@ void apple2e_state::mpf3(machine_config &config)
 	m_mpf3_kbd->kbdout_callback().set(FUNC(apple2e_state::mpf3_kbdout_w));
 	m_mpf3_kbd->reset_callback().set(FUNC(apple2e_state::reset_w));
 
-	AY8912(config, m_psg, A2BUS_7M_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.2);
+	AY8912(config, m_psg, A2BUS_7M_CLOCK / 8); // divider not verified; MPF-III Reference Manual claims a "2MHZ" clock
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	config.device_remove("sl1");
 
@@ -6625,7 +6626,7 @@ ROM_START(ace2200)
 	ROM_LOAD("franklin_ace2000_rom_u1_p3_rev6_franklinrom.bin", 0x004000, 0x002000, CRC(5cc150a7) SHA1(7ac8028bbf8cb7730f432e0bae32e364523555fb))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump controller from detached keyboard (looks a lot like the MPF-III)
 ROM_END
 
 ROM_START(ace500)
@@ -6639,7 +6640,7 @@ ROM_START(ace500)
 	ROM_CONTINUE(0x0000, 0x4000)
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump actual Franklin ROM
 ROM_END
 
 void apple2e_state::init_tk3000()
