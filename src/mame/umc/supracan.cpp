@@ -104,6 +104,9 @@ namespace {
 
 // NOTE: same as sega/segac2.cpp XL2
 static constexpr XTAL U13_CLOCK = XTAL(53'693'175);
+static constexpr XTAL MAIN_CPU_CLOCK = U13_CLOCK / 5;
+// Keep the existing FRC timing independent of the corrected main CPU clock.
+static constexpr XTAL FRC_REFERENCE_CLOCK = U13_CLOCK / 6;
 // TODO: bump to 4 after conversion of video_r/_w to um6618_map
 static constexpr int ROZ_LAYER_NUMBER = 3;
 
@@ -1711,7 +1714,7 @@ void supracan_state::update_frc_state()
 		// - causes a crash at boot if too fast;
 		// - takes roughly 6 seconds for a title screen individual kanji to move right-to-left;
 		case 1:
-			m_frc_timer->adjust(m_maincpu->cycles_to_attotime(1024 * period), 0);
+			m_frc_timer->adjust(attotime::from_ticks(u64(1024) * period, FRC_REFERENCE_CLOCK), 0);
 			break;
 
 		// gamblord: sets 0xa20f normally, plays with frequency register a lot.
@@ -1719,7 +1722,7 @@ void supracan_state::update_frc_state()
 		// - takes ~1 second for character screen to switch;
 		// - during gameplay sometimes switches to 0xa200 / 0xffff;
 		case 0xf:
-			m_frc_timer->adjust(m_maincpu->cycles_to_attotime(8192 * period), 0);
+			m_frc_timer->adjust(attotime::from_ticks(u64(8192) * period, FRC_REFERENCE_CLOCK), 0);
 			break;
 
 		default:
@@ -2417,7 +2420,7 @@ static void superacan_cart_types(device_slot_interface &device)
 void supracan_state::supracan(machine_config &config)
 {
 	// M68000P10
-	M68000(config, m_maincpu, U13_CLOCK / 6);
+	M68000(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::main_map);
 
 	// TODO: Verify type and actual clock
