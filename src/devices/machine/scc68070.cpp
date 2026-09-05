@@ -1561,6 +1561,7 @@ uint16_t scc68070_device::dma_r(offs_t offset, uint16_t mem_mask)
 		}
 		return (m_dma.channel[offset / 32].sequence_control << 8) | m_dma.channel[offset / 32].channel_control;
 	case 0x0a/2:
+	case 0x4a/2:
 		if (!machine().side_effects_disabled())
 			LOGMASKED(LOG_DMA, "%s: DMA(%d) Memory Transfer Counter Read: %04x & %04x\n", machine().describe_context(), offset / 32, m_dma.channel[offset / 32].transfer_counter, mem_mask);
 		return m_dma.channel[offset / 32].transfer_counter;
@@ -1643,6 +1644,7 @@ void scc68070_device::dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		}
 		break;
 	case 0x0a/2:
+	case 0x4a/2:
 		LOGMASKED(LOG_DMA, "%s: DMA(%d) Memory Transfer Counter Write: %04x & %04x\n", machine().describe_context(), offset / 32, data, mem_mask);
 		COMBINE_DATA(&m_dma.channel[offset / 32].transfer_counter);
 		break;
