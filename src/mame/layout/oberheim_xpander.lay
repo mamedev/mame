@@ -28,7 +28,14 @@ copyright-holders:m1macrophage
 	</element>
 
 	<element name="vfd_char">
-		<led14segsc><color red="0.02" green="0.99" blue="0.77"/></led14segsc>
+		<led14seg><color red="0.02" green="0.99" blue="0.77"/></led14seg>
+	</element>
+
+	<element name="vfd_line">
+		<rect>
+			<color state="0" red="0.02" green="0.99" blue="0.77" alpha="0.13"/>
+			<color state="1" red="0.02" green="0.99" blue="0.77" alpha="1.00"/>
+		</rect>
 	</element>
 
 	<element name="vfd_background">
@@ -43,7 +50,10 @@ copyright-holders:m1macrophage
 			<param name="char_i" start="1" increment="1"/>
 			<param name="char_x" start="40" increment="30"/>
 			<element ref="vfd_char" name="vfd_~vfd_id~_char_~char_i~">
-				<bounds x="~char_x~" y="45" width="27" height="53"/>
+				<bounds x="~char_x~" y="45" width="26" height="52"/>
+			</element>
+			<element ref="vfd_line" name="vfd_~vfd_id~_line_~char_i~">
+				<bounds x="~char_x~" y="105" width="24" height="2"/>
 			</element>
 		</repeat>
 	</group>
