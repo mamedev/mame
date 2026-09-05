@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -6,7 +6,7 @@ license:CC0-1.0
 Known undumped software releases:
 
 - [T-W005]   Bomberman (ボンバーマン)
-- [JWS2960B] Bo no Bo no Design Collection (ぼのぼのデザインコレクション)
+- [JWS2960B] Bonobono Design Collection (ぼのぼのデザインコレクション)
 - [PN-S301]  Daisenryaku (大戦略)
 - [JW-S014]  Hagaki Jouzu '89 (はがき上手'89)
 - [S0330]    Hagaki Jouzu "Shiki-hen Tokusen" (はがき上手「四季編・特選」)
@@ -16,14 +16,14 @@ Known undumped software releases:
 - [JWS2995A] Kikaku-sho Jouzu (企画書上手)
 - [JW-S031]  Knight Moves (ナイトムーブス)
 - [T-W004]   Lode Runner (ロードランナー)
-- [PN-S309]  Mahjong Gokuu Tenjiku (麻雀悟空天竺) (SVGA Release)
 - [PN-S302]  Mahjong Gokuu (麻雀悟空)
+- [PN-S309]  Mahjong Gokuu Tenjiku (麻雀悟空天竺) (SVGA Release)
 - [JWS2091A] Meibo Data Bank (名簿テータバンク)
 - [JWS2073B] Mouhitsu (毛筆)
 - [JWS2931B] MS-DOS Tekisuto Henkan Utility (MS-DOS テキスト変換ユーティリティ)
-- [JWS2092D] Omotekeisan III (表計算Ⅲ)
-- [JWS2092C] Omotekeisan II Software (表計算Ⅱソフド)
 - [JWS2092A] Omotekeisan II (表計算Ⅱ)
+- [JWS2092C] Omotekeisan II Software (表計算Ⅱソフド)
+- [JWS2092D] Omotekeisan III (表計算Ⅲ)
 - [JWS2086C] Outline Font (アウトラインフォント)
 - [JWS2953C] Outline Font (アウトラインフォント)
 - [JWS2097C] Outline Gaiji Sakusei-you Software (アウトライン外字作成用ソフト)
