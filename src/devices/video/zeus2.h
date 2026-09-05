@@ -50,6 +50,9 @@ struct zeus2_poly_extra_data
 	uint32_t          ctrl_word;
 	uint32_t          ucode_src;
 	uint32_t          tex_src;
+	// Render window latched here because rendering is deferred and mwskins moves it mid-frame
+	uint32_t          frame_base;
+	uint32_t          frame_shift;
 	bool            texture_alpha;
 	bool            texture_rgb555;
 	bool            solid_enable;
@@ -234,12 +237,14 @@ public:
 			return tms320c3x_device::fp_to_float(val);
 	}
 
+	inline uint32_t frame_row_shift() const { return 9 + m_yScale; }
+
 	inline uint32_t frame_addr_from_xy(uint32_t x, uint32_t y, bool render)
 	{
 		uint32_t addr;
 		if (render) {
-			// Rendering is y location
-			addr = m_renderRegs[0x4] << (9 + m_yScale);
+			// Rend XOffset/YOffset place the render window in the frame buffer
+			addr = (m_renderRegs[0x4] << frame_row_shift()) + m_renderRegs[0x3];
 		}
 		else {
 			// y.16:x.16 row/col
@@ -248,7 +253,7 @@ public:
 		}
 		//uint32_t addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
 		//  : frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
-		addr += (y << (9 + m_yScale)) + x;
+		addr += (y << frame_row_shift()) + x;
 		return addr;
 	}
 
