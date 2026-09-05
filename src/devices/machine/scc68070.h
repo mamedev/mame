@@ -17,7 +17,7 @@ STATUS:
 
 TODO:
 
-- Proper handling of the 68070's internal devices (UART, DMA, Timers, etc.)
+- Proper handling of the 68070's internal devices (DMA, Timers, etc.)
 
 *******************************************************************************/
 
@@ -27,6 +27,7 @@ TODO:
 #pragma once
 
 #include "cpu/m68000/scc68070.h"
+#include "diserial.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,7 +44,7 @@ enum scc68070_ocr_bits
 
 // ======================> scc68070_device
 
-class scc68070_device : public scc68070_base_device
+class scc68070_device : public scc68070_base_device, public device_serial_interface
 {
 public:
 	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -53,6 +54,7 @@ public:
 	auto iack5_callback() { return m_iack5_callback.bind(); }
 	auto iack7_callback() { return m_iack7_callback.bind(); }
 	auto uart_tx_callback() { return m_uart_tx_callback.bind(); }
+	auto out_txd_cb() { return m_txd_cb.bind(); }
 	auto uart_rtsn_callback() { return m_uart_rtsn_callback.bind(); }
 	auto i2c_scl_w() { return m_i2c_scl_callback.bind(); }
 	auto i2c_sda_w() { return m_i2c_sdaw_callback.bind(); }
@@ -68,8 +70,6 @@ public:
 	void write_scl(int state);
 
 	TIMER_CALLBACK_MEMBER(timer0_callback);
-	TIMER_CALLBACK_MEMBER(rx_callback);
-	TIMER_CALLBACK_MEMBER(tx_callback);
 	TIMER_CALLBACK_MEMBER(i2c_callback);
 
 	// external callbacks
@@ -117,14 +117,8 @@ public:
 		uint8_t reserved5;
 		uint8_t receive_holding_register;
 
-		int16_t receive_pointer;
-		uint8_t receive_buffer[32768];
-		emu_timer* rx_timer;
-
-		int16_t transmit_pointer;
-		uint8_t transmit_buffer[32768];
-		emu_timer* tx_timer;
 		bool transmit_ctsn;
+		bool transmit_break;
 	};
 
 	struct timer_regs_t
@@ -195,6 +189,11 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
+	// device_serial_interface implementation
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
+
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
@@ -257,10 +256,9 @@ private:
 	uint16_t mmu_r(offs_t offset, uint16_t mem_mask);
 	void mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	void uart_rx_check();
-	void uart_tx_check();
-	void uart_tx(uint8_t data);
-	void uart_do_tx();
+	void recalc_framing();
+	void recalc_baud();
+	void check_for_tx_start();
 	void set_timer_callback(int channel);
 
 	// callbacks
@@ -269,6 +267,7 @@ private:
 	devcb_read8 m_iack5_callback;
 	devcb_read8 m_iack7_callback;
 	devcb_write8 m_uart_tx_callback;
+	devcb_write_line m_txd_cb;
 	devcb_write_line m_uart_rtsn_callback;
 	devcb_write_line m_i2c_scl_callback;
 	devcb_write_line m_i2c_sdaw_callback;
