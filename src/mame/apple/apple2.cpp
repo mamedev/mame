@@ -418,14 +418,14 @@ u8 apple2_state::flags_r(offs_t offset)
 	case 0: // cassette in, inverted (accidentally read at $C068 by ProDOS to attempt IIgs STATE register)
 		return (m_cassette->input() > 0.0 ? 0 : 0x80) | uFloatingBus7;
 
-	case 1:  // button 0
-		return ((!m_gameio->has_sw0() || m_gameio->sw0_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
+	case 1:  // button 0 (polls high if not connected, unlike IIe)
+		return (((m_sysconfig->read() & 0x0c) == 0x0c ? m_kbd->shift_r() : !m_gameio->has_sw0() || m_gameio->sw0_r()) ? 0x80 : 0) | uFloatingBus7;
 
-	case 2:  // button 1
-		return ((!m_gameio->has_sw1() || m_gameio->sw1_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
+	case 2:  // button 1 (polls high if not connected, unlike IIe)
+		return (((m_sysconfig->read() & 0x0c) == 0x0c ? m_kbd->control_r() : !m_gameio->has_sw1() || m_gameio->sw1_r()) ? 0x80 : 0) | uFloatingBus7;
 
 	case 3:  // button 2 (or SHIFT key, with SHIFT key mod)
-		return (((m_sysconfig->read() & 0x04) ? m_kbd->shift_r() : m_gameio->sw2_r()) ? 0x80 : 0) | uFloatingBus7;
+		return (((m_sysconfig->read() & 0x0c) == 0x04 ? m_kbd->shift_r() : m_gameio->sw2_r()) ? 0x80 : 0) | uFloatingBus7;
 
 	case 4:  // joy 1 X axis
 		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
@@ -436,12 +436,12 @@ u8 apple2_state::flags_r(offs_t offset)
 		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 6: // joy 2 X axis
-		if (m_sysconfig->read() & 0x08) return (m_kbd->shift_r() ? 0x80 : 0) | uFloatingBus7;
+		if ((m_sysconfig->read() & 0x0c) == 0x08) return (m_kbd->shift_r() ? 0x80 : 0) | uFloatingBus7;
 		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 7: // joy 2 Y axis
-		if (m_sysconfig->read() & 0x08) return (m_kbd->control_r() ? 0x80 : 0) | uFloatingBus7;
+		if ((m_sysconfig->read() & 0x0c) == 0x08) return (m_kbd->control_r() ? 0x80 : 0) | uFloatingBus7;
 		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 	}
@@ -710,6 +710,7 @@ INPUT_PORTS_START( apple2_sysconfig )
 	PORT_CONFSETTING(0x00, "Not connected")
 	PORT_CONFSETTING(0x04, "SW2 = Shift")
 	PORT_CONFSETTING(0x08, "PADDL2 = Shift, PADDL3 = Ctrl") // Zardax Word Processor expects this as default
+	PORT_CONFSETTING(0x0c, "SW0 = Shift, SW1 = Ctrl") // supported by certain versions of Format-II and Sandy's Word Processor
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2 )
