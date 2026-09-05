@@ -965,7 +965,7 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 			toc.flags |= CD_FLAG_GDROM;
 		}
 
-		if (tracknum == 0 || tracknum > MAX_TRACKS)
+		if (tracknum <= 0 || tracknum > MAX_TRACKS)
 			return chd_file::error::INVALID_DATA;
 
 		track = &toc.tracks[tracknum - 1];
