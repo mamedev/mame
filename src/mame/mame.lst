@@ -33669,10 +33669,6 @@ vroulet
 @source:misc/whtm68k.cpp
 yizhix
 
-@source:misc/wildpkr.cpp
-tabpkr
-wildpkr
-
 @source:misc/winbingo.cpp
 wbingo06
 
@@ -45668,6 +45664,29 @@ alphatron
 
 @source:tab/tabe22.cpp
 tabe22
+
+@source:tabaustria/royalpkr.cpp
+csmarino
+csmarino020l
+eurodraw
+gmachine
+gmachine010m
+gmachine102m
+jollypk2
+jollypk2116l
+luckyfun
+royalpkr
+royalpkr152l
+royalpkr154l
+royalpkr170h
+royalpkr170l
+royalpkr185l
+royalpkr200l
+tripledr
+tripledr106l
+
+@source:tabaustria/wildpkr.cpp
+wildpkr
 
 @source:taito/2mindril.cpp
 2mindril

@@ -22,7 +22,7 @@ void luna_68k_bm_device::device_reset()
 {
 }
 
-void luna_68k_bm_device::acrtc_display(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)
+void luna_68k_bm_device::acrtc_display(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data, int screen_n)
 {
 }
 
