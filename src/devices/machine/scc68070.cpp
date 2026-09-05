@@ -1307,13 +1307,13 @@ uint8_t scc68070_device::umr_r()
 	// UART mode register: 80002011
 	if (!machine().side_effects_disabled())
 		LOGMASKED(LOG_MORE_UART, "%s: UART Mode Register Read: %02x\n", machine().describe_context(), m_uart.mode_register);
-	return m_uart.mode_register | 0x20;
+	return m_uart.mode_register;
 }
 
 void scc68070_device::umr_w(uint8_t data)
 {
 	LOGMASKED(LOG_MORE_UART, "%s: UART Mode Register Write: %02x\n", machine().describe_context(), data);
-	m_uart.mode_register = data;
+	m_uart.mode_register = data & 0xdf;
 	recalc_framing();
 }
 
