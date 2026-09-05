@@ -564,7 +564,7 @@ void generalplus_gpl32612_game_state::nand_init880()
 } // anonymous namespace
 
 
-//    Year  Name          Parent  Compat  Machine   Input     Class                            Init          Company                         Fullname                    Flags
+//    Year  Name          Parent  Compat  Machine   Input     Class                            Init          Company                         Fullname                     Flags
 CONS( 2015, jak_swbstrik, 0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific, Inc. / HotGen", "Star Wars: Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2014, jak_tmnthp,   0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific, Inc. / HotGen", "Hero Portal: Teenage Mutant Ninja Turtles - Heroes in a Half Shell", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2014, jak_ddhp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific, Inc. / HotGen", "Hero Portal: DreamWorks Dragons", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
