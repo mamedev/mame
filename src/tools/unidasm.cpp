@@ -184,6 +184,7 @@ using util::BIT;
 #include "cpu/st9/st9dasm.h"
 #include "cpu/superfx/sfx_dasm.h"
 #include "cpu/t11/t11dasm.h"
+#include "cpu/t6m53/t6m53_dasm.h"
 #include "cpu/tlcs870/tlcs870d.h"
 #include "cpu/tlcs90/tlcs90d.h"
 #include "cpu/tlcs900/dasm900.h"
@@ -659,6 +660,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "st9p",            be,  0, []() -> util::disasm_interface * { return new st9p_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
+    { "t6m53",           be,  0, []() -> util::disasm_interface * { return new t6m53_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },
 	{ "tlcs900",         le,  0, []() -> util::disasm_interface * { return new tlcs900_disassembler; } },
 	{ "tmp90c051",       le,  0, []() -> util::disasm_interface * { return new tmp90c051_disassembler; } },
