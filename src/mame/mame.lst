@@ -47582,6 +47582,9 @@ pasopia
 pasopia7
 pasopia7lcd
 
+@source:toshiba/rupo.cpp
+jwv860
+
 @source:toshiba/t250.cpp
 t200
 t250
