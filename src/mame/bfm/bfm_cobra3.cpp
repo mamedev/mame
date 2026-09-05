@@ -3,9 +3,6 @@
 
 /* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
-
-   MPEG audio decoding is preliminary.
-   TODO: MPEG video decoding is not implemented.
 */
 
 
@@ -24,6 +21,7 @@
 #include "sound/tms320av110.h"
 #include "sound/ymz280b.h"
 #include "video/ramdac.h"
+#include "video/sti3400.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -41,9 +39,11 @@ public:
 		m_nvram(*this, "nvram"),
 		m_av110(*this, "av110"),
 		m_ymz(*this, "ymz280b"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ramdac(*this, "ramdac"),
 		m_scc66470(*this, "scc66470"),
+		m_sti3400(*this, "sti3400"),
 		m_strobein(*this, "STROBE%u", 0),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -61,9 +61,11 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_device<tms320av110_device> m_av110;
 	required_device<ymz280b_device> m_ymz;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ramdac_device> m_ramdac;
 	required_device<scc66470_device> m_scc66470;
+	required_device<sti3400_device> m_sti3400;
 	required_ioport_array<5> m_strobein;
 	optional_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
@@ -72,6 +74,8 @@ protected:
 	required_device<watchdog_timer_device> m_watchdog;
 
 	std::unique_ptr<uint16_t[]> m_mainram;
+	std::unique_ptr<u8[]> m_scc_line_buffer;
+	std::unique_ptr<u32[]> m_sti_line_buffer;
 
 	uint8_t m_active_strobe;
 	uint8_t m_triac_latch;
@@ -319,6 +323,7 @@ void bfm_cobra3_state::bfm_cobra3_map(address_map &map)
 {
 	map(0x00000000, 0xffffffff).rw(FUNC(bfm_cobra3_state::mem_r), FUNC(bfm_cobra3_state::mem_w));
 	map(0x00800000, 0x009fffff).m(m_scc66470, FUNC(scc66470_device::map)).cswidth(16);
+	map(0x00a40000, 0x00a4007f).m(m_sti3400, FUNC(sti3400_device::map));
 	map(0x00a80000, 0x00a80001).w(FUNC(bfm_cobra3_state::av110_reset_strobe_w)).umask16(0x00ff);
 	map(0x00a81000, 0x00a810ff).m(m_av110, FUNC(tms320av110_device::map)).umask16(0x00ff);
 }
@@ -395,6 +400,8 @@ void bfm_cobra3_state::machine_start()
 	m_volume = 0;
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
+	m_scc_line_buffer = std::make_unique<u8[]>(m_screen->visible_area().width());
+	m_sti_line_buffer = std::make_unique<u32[]>(m_screen->visible_area().width());
 
 	save_item(NAME(m_vol_clock));
 	save_item(NAME(m_volume));
@@ -408,62 +415,56 @@ void bfm_cobra3_state::scc66470_irq(int state)
 
 uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_scc66470->display_enabled())
+	bitmap.fill(0, cliprect);
+
+	rectangle const &visible = screen.visible_area();
+
+	if (m_sti3400->video_valid())
 	{
-		if (cliprect.min_y == cliprect.max_y)
+		int const source_width = m_sti3400->video_width();
+		int const source_height = m_sti3400->video_height();
+		if (source_width && source_height)
 		{
-			uint32_t *dest = &bitmap.pix(cliprect.min_y);
-			uint8_t buffer[768];
-			uint8_t *src = buffer;
-			m_scc66470->line(cliprect.min_y, buffer, sizeof(buffer));
+			rectangle video(visible);
+			video.set_size(std::min(source_width * 2, visible.width()), std::min(source_height, visible.height()));
+			video.set_origin(visible.left() + (visible.width() - video.width()) / 2, visible.top() + (visible.height() - video.height()) / 2);
 
-			src = buffer;
-
-			if (*src == 254)
+			rectangle const draw = video & cliprect;
+			int const source_left = ((source_width * 2 - video.width()) / 2 + draw.left() - video.left()) / 2;
+			int const source_right = ((source_width * 2 - video.width()) / 2 + draw.right() - video.left()) / 2;
+			for (int y = draw.top(); y <= draw.bottom(); y++)
 			{
-				// Other implementations suggest leaving transparency / MPEG border colour here to ease blending
-				src += 32;
-			}
-			else
-			{
-				dest = std::fill_n(dest, 32, m_palette->pen(*src));
-				src += 32;
-			}
-
-			/* mpeg video has significant overscan, 4 lines either side.
-
-			Just crop it out to fit, presume the chip does this IRL */
-
-			for (int x = 0 ; x < 352 ; x++)
-			{
-				if (*src == 254)
+				u32 *const line = &bitmap.pix(y);
+				int const source_y = (source_height - video.height()) / 2 + y - video.top();
+				m_sti3400->video_line(source_y, source_left, source_right - source_left + 1, m_sti_line_buffer.get());
+				for (int x = draw.left(); x <= draw.right(); x++)
 				{
-					*dest++ = 0; // Will allow MPEG to be drawn i.e. transparent
-					src++;
+					// SCC66470 8-bit output repeats each stored pixel twice horizontally.
+					int const source_x = ((source_width * 2 - video.width()) / 2 + x - video.left()) / 2;
+					line[x] = m_sti_line_buffer[source_x - source_left];
 				}
-				else
-				{
-					*dest++ = m_palette->pen(*src++);
-				}
-
-				if (*src == 254)
-				{
-					*dest++ = 0; // This should be mpeg video pixel i.e. transparent
-					src++;
-				}
-				else
-				{
-					*dest++ = m_palette->pen(*src++);
-				}
-			}
-			// TODO: MPEG image will write a border of 32 pixels of mpeg border colour here when it's mixed in, see above.
-
-			if (*src != 254)
-			{
-				std::fill_n(dest, 32, m_palette->pen(*src));
 			}
 		}
 	}
+
+	if (m_scc66470->display_enabled())
+	{
+		rectangle const draw = visible & cliprect;
+		for (int y = draw.top(); y <= draw.bottom(); y++)
+		{
+			u32 *const line = &bitmap.pix(y);
+			m_scc66470->line(y, m_scc_line_buffer.get(), visible.width());
+
+			for (int x = draw.left(); x <= draw.right(); x++)
+			{
+				u8 const pen = m_scc_line_buffer[x - visible.left()];
+				// The Cobra mixer selects external MPEG video for palette index 0xfe.
+				if (pen != 0xfe)
+					line[x] = m_palette->pen(pen);
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -476,9 +477,12 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(15000000, 960, 0, 768, 312, 32, 312);
+	// The SCC66470 produces a pixel clock at half its oscillator frequency.
+	// Cobra uses its 768-pixel, 280-visible-line mode in a 312-line field.
+	screen.set_raw(30_MHz_XTAL / 2, 960, 0, 768, 312, 32, 312);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(FUNC(bfm_cobra3_state::screen_update));
+	screen.screen_vblank().set(m_sti3400, FUNC(sti3400_device::vblank_w));
 
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -501,10 +505,14 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	m_av110->add_route(0, "lspeaker", 1.0);
 	m_av110->add_route(1, "rspeaker", 1.0);
 
-	SCC66470(config,m_scc66470,30000000);
+	SCC66470(config,m_scc66470,30_MHz_XTAL);
 	m_scc66470->set_addrmap(0, &bfm_cobra3_state::scc66470_map);
 	m_scc66470->set_screen("screen");
 	m_scc66470->irq().set(FUNC(bfm_cobra3_state::scc66470_irq));
+
+	STI3400(config, m_sti3400, 0); // decoder clock and external-memory cycle timing are not modelled
+	m_sti3400->set_dram_size(1024 * 1024); // Cobra's buffer pointers cover a 1 MiB address space
+	m_sti3400->irq().set_inputline(m_maincpu, 6);
 
 	auto &scsi(NSCSI_BUS(config, m_scsibus));
 	auto &cdrom(NSCSI_CDROM(config, "cdrom"));
