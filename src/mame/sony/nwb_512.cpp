@@ -128,8 +128,8 @@ void nwb_512_device::map(address_map &map)
 	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));      // A13 = load shift, A14 = start execution
 	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));       // A16 = source-space select (FB vs host), A14 = start execution
 	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
-	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w)); // rop configuration TODO: is the end addr correct here?
-	map(0x70000, 0x70fff).w(FUNC(nwb_512_device::fifo_w));       // data ports
+	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));  // rop configuration TODO: is the end addr correct here?
+	map(0x70000, 0x70fff).w(FUNC(nwb_512_device::fifo_w));
 	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
 	map(0xa0000, 0xa0000).w(FUNC(nwb_512_device::planemask_w));
 
@@ -138,14 +138,14 @@ void nwb_512_device::map(address_map &map)
 
 u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [[maybe_unused]] const rectangle &cliprect)
 {
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; ++y)
 	{
 		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
 		{
 			const uint32_t byte_offset = coordinate_to_byte_offset(x, y); // Y: 2048 / 8 = 256 bytes per row, not all visible.
 			const uint8_t byte = m_vram->read(byte_offset);
 
-			for (int i = 0; i < 8 && (x + i) <= screen.visible_area().max_x; i++)
+			for (int i = 0; i < 8 && (x + i) <= screen.visible_area().max_x; ++i)
 			{
 				bitmap.pix(y, x + i) = byte & (1u << x_to_pixel_offset(x + i)) ? rgb_t::black() : rgb_t::white();
 			}
@@ -207,6 +207,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
 		m_state.source_words_left = m_state.source_words_per_row;
 		m_state.dest_words_left = m_state.dest_words_per_row;
+		LOG("Source words per row: %d, Destination words per row: %d\n", m_state.source_words_per_row, m_state.dest_words_per_row);
 
 		if (m_state.fb_read && m_state.fb_write &&
 			m_state.dest_words_per_row != m_state.source_words_per_row &&
@@ -347,18 +348,6 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	check_enabled();
 	check_mem_mask(mem_mask);
 
-	if (m_state.busy)
-	{
-		// `m_state.limit_y`, `m_state.dest_words_left`,
-		// `m_state.source_words_left`, `m_state.destination_y`, and a running count of
-		// `fifo_w`
-		LOG("IOP tried to reconfigure while op was in progress\n");
-		LOG("limit_y = 0x%x dest_words_left = 0x%x source_words_left = 0x%x destination_y = 0x%x fifo write count = 0x%x\n", m_state.limit_y, m_state.dest_words_left, m_state.source_words_left, m_state.destination_y, m_debug.fifo_call_count);
-		fatalerror("IOP tried to reconfigure while op was in progress!");
-	}
-
-	m_debug = {}; // clear any leftover debug data
-
 	LOGMASKED(LOG_ROP_CONFIG, "(%s) rop_config_w(0x%x, 0x%x) = ", machine().describe_context(), offset, data);
 
 	// These mappings are an educated guess based on NWS-1500 service manual and iopboot/mrx behavior
@@ -369,6 +358,7 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	m_state.row_fill = offset & 0x80;
 	m_state.fb_read = offset & 0x100;
 	m_state.fb_write = offset & 0x200;
+	m_state.pixel_mode = offset & 0x800;
 
 	if (offset & 0x400) // If set, load ROP function
 	{
@@ -382,13 +372,32 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 			  m_state.y_direction ? "yfwd " : "yrev ",
 			  m_state.x_direction ? "xfwd " : "xrev ",
 			  m_state.suppress_advance ? "supadv " : "",
+			  m_state.pixel_mode ? "pixel " : "word ",
 			  offset & 400 ? "func=0x" + std::format("{:x}", m_state.rop_function) : "");
+
+	// TODO: this check causes issues, maybe the ROP engine can be configured on the fly?
+	//       Should also check with not resetting everything when the card is disabled,
+	//       and see if that means this check can come back
+	if (m_state.busy)
+	{
+		// `m_state.limit_y`, `m_state.dest_words_left`, `m_state.source_words_left`, `m_state.destination_y`,
+		// and a running count of `fifo_w`
+		LOG("IOP tried to reconfigure while op was in progress\n");
+		LOG("limit_y = 0x%x dest_words_left = 0x%x source_words_left = 0x%x destination_y = 0x%x fifo write count = 0x%x\n", m_state.limit_y, m_state.dest_words_left, m_state.source_words_left, m_state.destination_y, m_debug.fifo_call_count);
+		// fatalerror("IOP tried to reconfigure while op was in progress!");
+	}
+
+	m_debug = {}; // clear any leftover debug data
 }
 
 void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Set pixel to 1 at X (data), Y (offset[12:1])
 	check_mem_mask(mem_mask);
+	if (!m_state.pixel_mode)
+	{
+		fatalerror("Pixel write in word mode");
+	}
 
 	const uint16_t x = x_address(data);
 	const uint16_t y = y_address(offset);
@@ -600,6 +609,11 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("(%s) fifo_w(0x%x, 0x%x, 0x%x), push #%d\n", machine().describe_context(), offset, data, mem_mask, m_debug.fifo_call_count);
 	check_mem_mask(mem_mask);
+	if (m_state.pixel_mode)
+	{
+		fatalerror("word write in pixel mode");
+	}
+
 	++m_debug.fifo_call_count;
 
 	if (!m_state.busy)

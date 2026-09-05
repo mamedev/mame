@@ -63,6 +63,7 @@ private:
 		bool row_fill = false; // true = write data fifo word across whole line
 		bool fb_read = false; // Tri-state with write - read = fb -> host, write = host -> fb, both = fb -> fb copy
 		bool fb_write = false;
+		bool pixel_mode = false;
 
 		// Internal state
 		uint16_t current_x = 0; // offset from dst/src, DXA
