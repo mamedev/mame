@@ -1547,6 +1547,7 @@ void model2_state::rchase2_drive_board_w(u8 data)
 
 void model2_state::drive_board_w(u8 data)
 {
+	m_wheel_motor = data;
 	m_driveio_comm_data = data;
 	if (m_drivecpu)
 		m_drivecpu->set_input_line(0, HOLD_LINE);
@@ -3025,6 +3026,7 @@ void model2c_state::stcc(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
+	io.out_pe_callback().set(FUNC(model2c_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -3083,6 +3085,7 @@ void model2c_state::overrev2c(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
+	io.out_pe_callback().set(FUNC(model2c_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
