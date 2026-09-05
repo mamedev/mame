@@ -12,6 +12,7 @@
 
 #include "ioprocs.h"
 #include "ioprocsstream.h"
+#include "strformat.h"
 
 #include "osdcore.h"
 

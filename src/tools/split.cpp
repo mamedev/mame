@@ -12,6 +12,7 @@
 #include "corestr.h"
 #include "hashing.h"
 #include "ioprocsstream.h"
+#include "strformat.h"
 
 #include <cassert>
 #include <cctype>

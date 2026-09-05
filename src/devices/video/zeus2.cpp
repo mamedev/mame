@@ -332,9 +332,8 @@ uint32_t zeus2_device::zeus2_r(offs_t offset)
 			break;
 
 		case 0x54:
-			// VCOUNT upper 16 bits
-			//result = (screen().vpos() << 16) | screen().vpos();
-			result = (screen().vpos() << 16);
+			// VCOUNT is in unscaled lines. Scale the count back in MAME's fake interlaced mode
+			result = ((screen().vpos() >> m_yScale) << 16);
 			break;
 	}
 
@@ -444,12 +443,14 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			m_yScale = (((m_zeusbase[0x39] >> 16) & 0xfff) < 0x100) ? 0 : 1;
 			int hor = ((m_zeusbase[0x34] & 0xffff) - (m_zeusbase[0x33] >> 16)) << m_yScale;
 			int ver = ((m_zeusbase[0x35] & 0xffff) + 1) << m_yScale;
-			popmessage("reg[30]: %08X Screen: %dH X %dV yScale: %d", m_zeusbase[0x30], hor, ver, m_yScale);
 			int vtotal = (m_zeusbase[0x37] & 0xffff) << m_yScale;
 			int htotal = (m_zeusbase[0x34] >> 16) << m_yScale;
 			//rectangle visarea((m_zeusbase[0x33] >> 16) << m_yScale, htotal - 1, 0, (m_zeusbase[0x35] & 0xffff) << m_yScale);
 			rectangle visarea(0, hor - 1, 0, ver - 1);
-			screen().configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, ZEUS2_VIDEO_CLOCK / 4.0));
+			// Dot clock is the PLL's 100MHz VCO (video clock x3/2) over reg 0x31's divider, held less one
+			// Interlaced mode doubles both totals (2x*2y), so x4 to scan both fields in one std-res field time
+			const XTAL dotclk = ZEUS2_VIDEO_CLOCK * 3 / 2 / (((m_zeusbase[0x31] >> 16) & 0xff) + 1) * (m_yScale ? 4 : 1);
+			screen().configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, dotclk));
 			zeus_cliprect = visarea;
 			zeus_cliprect.max_x -= zeus_cliprect.min_x;
 			zeus_cliprect.min_x = 0;
@@ -1756,6 +1757,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	extra.ucode_src = m_state->m_curUCodeSrc;
 	extra.tex_src = m_state->zeus_texbase;
+	extra.frame_base = m_state->frame_addr_from_xy(0, 0, true);
+	extra.frame_shift = m_state->frame_row_shift();
 	int texmode = texdata & 0xffff;
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
 	extra.solidcolor = m_state->m_zeusbase[0x00] & 0x7fff;
@@ -1856,7 +1859,7 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 	uint32_t solidColor = ((object.solidcolor & 0x7c00) << 9) | ((object.solidcolor & 0x3e0) << 6) | ((object.solidcolor & 0x1f) << 3);
 	int x;
 
-	uint32_t addr = m_state->frame_addr_from_xy(0, scanline, true);
+	uint32_t addr = object.frame_base + (scanline << object.frame_shift);
 	int32_t *depthptr = &m_state->m_frameDepth[addr];
 	uint32_t *colorptr = &m_state->m_frameColor[addr];
 	int32_t curDepthVal;

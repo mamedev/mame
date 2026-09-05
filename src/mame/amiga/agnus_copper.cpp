@@ -69,8 +69,8 @@ DEFINE_DEVICE_TYPE(AGNUS_COPPER, agnus_copper_device, "agnus_copper", "Amiga Agn
 
 agnus_copper_device::agnus_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AGNUS_COPPER, tag, owner, clock)
-	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_chipmem_r(*this, 0)
+	, m_custom_w(*this)
 {
 }
 
@@ -82,8 +82,6 @@ agnus_copper_device::agnus_copper_device(const machine_config &mconfig, const ch
 
 void agnus_copper_device::device_start()
 {
-	m_host_space = &m_host_cpu->space(AS_PROGRAM);
-
 	save_item(NAME(m_cdang_setting));
 	save_item(NAME(m_cdang_min_reg));
 	save_item(NAME(m_dma_master_enable));
@@ -201,7 +199,7 @@ template <u8 ch> u16 agnus_copper_device::copjmpx_r()
 {
 	if (!machine().side_effects_disabled())
 		set_pc(ch, false);
-	return m_host_space->unmap();
+	return 0xffff;
 }
 
 inline void agnus_copper_device::set_pc(u8 ch, bool is_sync)
@@ -305,7 +303,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 			(m_pending_offset << 1),
 			m_pending_data
 		);
-		m_host_space->write_word(0xdff000 | (m_pending_offset << 1), m_pending_data);
+		m_custom_w(m_pending_offset, m_pending_data, 0xffff);
 		m_pending_offset = 0;
 	}
 
@@ -335,13 +333,13 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 	// TODO: swap between ir0 and ir1 is controlled thru a selins latch
 	// (which can't be this instant too)
 	word0 = m_chipmem_r(m_pc);
-	m_host_space->write_word(0xdff08c, word0);
+	m_custom_w(0x08c >> 1, word0, 0xffff);
 	m_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	/* fetch the second data word */
 	word1 = m_chipmem_r(m_pc);
-	m_host_space->write_word(0xdff08c, word1);
+	m_custom_w(0x08c >> 1, word1, 0xffff);
 	m_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 

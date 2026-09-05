@@ -22,8 +22,8 @@ public:
 	agnus_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// config
-	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	auto mem_read_cb() { return m_chipmem_r.bind(); }
+	auto custom_write_cb() { return m_custom_w.bind(); }
 	void set_ecs_mode(bool ecs_mode) { m_cdang_min_reg = ecs_mode ? 0x00 : 0x20; }
 
 	// I/O operations
@@ -45,10 +45,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	required_device <cpu_device> m_host_cpu;
-	address_space *m_host_space = nullptr;
 	// callbacks
 	devcb_read16 m_chipmem_r;
+	devcb_write16 m_custom_w;
 
 	bool m_dma_master_enable, m_dma_copen;
 	u16 m_cdang_setting, m_cdang_min_reg;

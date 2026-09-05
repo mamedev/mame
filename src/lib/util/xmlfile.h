@@ -14,8 +14,10 @@
 
 #include "utilfwd.h"
 
+#include <cstdint>
 #include <iosfwd>
 #include <list>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -60,7 +62,7 @@ struct parse_options
 
 	parse_error *       error = nullptr;
 	void                (*init_parser)(XML_ParserStruct *parser) = nullptr;
-	uint32_t            flags = 0;
+	std::uint32_t       flags = 0;
 };
 
 
