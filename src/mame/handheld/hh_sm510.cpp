@@ -4876,7 +4876,7 @@ ROM_END
 
   Elektronika Баскетбол (Basketbol) (model ИМ-55)
   * PCB label: ЕНСК.758726.002/3
-  * KB1013VK1-2 MCU
+  * КБ1013ВЕ1-2 93 (KB1013VE1-2 93) MCU
   * 26 LEDs + 4 7seg LEDs, 1-bit sound
 
   It's a LED game with an LCD driver MCU, that's unconventional.
@@ -4963,6 +4963,65 @@ void elbaskb_state::elbaskb(machine_config &config)
 ROM_START( elbaskb )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "im-55.bin", 0x0000, 0x0740, CRC(006f82d0) SHA1(aca582dcb387345cd09a08e42a954c43430772fc) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Суперкубики (model ИМ-20)
+  * unmarked MCU (no decap); seems to be compatible with КБ1013ВК4-2
+    which in turn is compatible with Sharp SM510
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class supkubik_state : public hh_sm510_state
+{
+public:
+	supkubik_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void supkubik(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( supkubik )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Режим (Mode)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Пауза (Pause)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Slow down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME(u8"Вниз (Drop)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME(u8"Поворот (Rotate)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void supkubik_state::supkubik(machine_config &config)
+{
+	sm510_common(config, 609, 1080); // 2084 x 3696
+}
+
+// roms
+
+ROM_START( supkubik )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-20", 0x0000, 0x1000, CRC(a490a1e9) SHA1(3815b52ff69891d9a4915e4ad396114404cb608c) )
+
+	ROM_REGION( 214168, "screen", 0)
+	ROM_LOAD( "supkubik.svg", 0, 214168, CRC(e459ed24) SHA1(dcfccda8160e50056c58aeb08101e28f025bfdc9) )
 ROM_END
 
 
@@ -12376,6 +12435,7 @@ SYST( 199?, vinnpukh,     gnw_dkjrp,   0,      vinnpukh,     gnw_dkjrp,    gnw_d
 // Elektronika (original)
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
+SYST( 199?, supkubik,     0,           0,      supkubik,     supkubik,     supkubik_state,     empty_init, "Elektronika", "Superkubiki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, vesarif,      0,           0,      vesarif,      vesarif,      vesarif_state,      empty_init, "Elektronika", "Vesolaya arifmetika", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE )
 
