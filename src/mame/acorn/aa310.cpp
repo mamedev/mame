@@ -1073,10 +1073,14 @@ void aabase_state::aabase(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
+	SPEAKER(config, "speaker", 2).front();
+
 	ACORN_VIDC1A(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	RAM(config, m_ram).set_default_size("1M");
 
@@ -1118,6 +1122,8 @@ void aa500_state::aa500(machine_config &config)
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	// TODO: implement A500 keyboard, uses M6500/1 MCU
 
@@ -1682,6 +1688,8 @@ void aa4_state::aa4(machine_config &config)
 	//m_vidc->set_screen("screen");
 	//m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	//m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	//m_vidc->add_route(0, "speaker", 1.00, 0);
+	//m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	m_ram->set_default_size("2M").set_extra_options("4M");
 

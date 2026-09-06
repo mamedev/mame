@@ -32,7 +32,8 @@
 class acorn_vidc10_device : public device_t,
 							public device_memory_interface,
 							public device_palette_interface,
-							public device_video_interface
+							public device_video_interface,
+							public device_mixer_interface
 {
 public:
 	// I/O operations
@@ -97,8 +98,6 @@ protected:
 	required_device_array<filter_biquad_device, 4> m_filter;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	int m_dac_type;
-
-	required_device<speaker_device> m_speaker;
 
 	void stereo_image_w(offs_t offset, u32 data);
 	virtual void refresh_stereo_image(u8 channel);

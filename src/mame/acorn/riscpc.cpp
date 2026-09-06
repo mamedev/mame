@@ -278,10 +278,14 @@ void riscpc_state::base_config(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen);
 
+	SPEAKER(config, "speaker", 2).front();
+
 	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);

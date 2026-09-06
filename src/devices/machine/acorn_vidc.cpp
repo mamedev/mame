@@ -13,10 +13,7 @@ TODO:
   * nebulus: 20 lines off with aa310;
   * lotustc2: abuses color flipping;
   * quazer: needs in-flight DMA;
-- move DAC handling into a separate sub-device(s),
-  particularly needed for proper VIDC20 mixing and likely for fixing aliasing
-  issues in VIDC10;
-- complete VIDC20 emulation (RiscPC/ssfindo.cpp);
+- complete VIDC20 emulation (RiscPC/ssfindo.cpp/belatra.cpp);
 - Are CRTC values correct? VGA modes have a +1 in display line;
 
 **********************************************************************************************/
@@ -70,6 +67,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this)
 	, m_bpp_mode(0)
 	, m_crtc_interlace(0)
 	, m_sound_frequency_latch(0)
@@ -78,7 +76,6 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_filter(*this, "filter%u", 0)
 	, m_dac(*this, "dac%u", 0)
 	, m_dac_type(dac_type)
-	, m_speaker(*this, "speaker")
 	, m_sound_fifo_channel(0)
 	, m_vblank_cb(*this)
 	, m_sound_drq_cb(*this)
@@ -124,9 +121,6 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 // TODO: bad, compose better
 void acorn_vidc10_device::device_add_mconfig_common(machine_config &config)
 {
-	// TODO: expose, aristmk5.cpp is mono (outputs to left only)
-	SPEAKER(config, m_speaker, 2).front();
-
 	// The actual filters here are two simple differentiator filters just
 	// after the VIDC itself (to combine the +L and -L, and +R and -R
 	// signals respectively), followed by two third-order Sallen-Key
@@ -143,10 +137,10 @@ void acorn_vidc10_device::device_add_mconfig_common(machine_config &config)
 	// This has the added benefit of removing the DC startup offset.
 
 	FILTER_RC(config, m_filter_rc[0]).set_ac(); // CR highpass, left
-	m_filter_rc[0]->add_route(0, m_speaker, 1.0, 0);
+	m_filter_rc[0]->add_route(0, *this, 1.0, 0);
 
 	FILTER_RC(config, m_filter_rc[1]).set_ac(); // CR highpass, right
-	m_filter_rc[1]->add_route(0, m_speaker, 1.0, 1);
+	m_filter_rc[1]->add_route(0, *this, 1.0, 1);
 
 	FILTER_BIQUAD(config, m_filter[0]); // 2nd order left
 
@@ -706,8 +700,8 @@ void arm_vidc20_device::device_add_mconfig(machine_config &config)
 
 	// For simplicity we separate DACs for 32-bit mode
 	// TODO: how stereo image copes with this if at all?
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[0], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 1);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[0], 0).add_route(ALL_OUTPUTS, *this, 0.50, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, *this, 0.50, 1);
 }
 
 // TODO: move to clients
