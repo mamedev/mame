@@ -1274,6 +1274,19 @@ end
 
 
 ---------------------------------------------------
+-- UM348xA Multi-Instrument Melody Generators
+--@src/devices/sound/um348x.h,SOUNDS["UM348X"] = true
+---------------------------------------------------
+
+if (SOUNDS["UM348X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/um348x.cpp",
+		MAME_DIR .. "src/devices/sound/um348x.h",
+	}
+end
+
+
+---------------------------------------------------
 -- NEC uPD7752
 --@src/devices/sound/upd7752.h,SOUNDS["UPD7752"] = true
 ---------------------------------------------------
