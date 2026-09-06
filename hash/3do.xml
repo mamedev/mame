@@ -118,8 +118,8 @@ Sensitive to CEL timings
 [Madam] check alt_multiply used, looks too bright in gameplay
 "War Has Never Been So Much Fun" intro theme (after the cartoon) has low [DSPP] pitch (verify Europe too)
 [Sport] shows uncleared dots at sides during gameplay
-[Clio] runs too slow
 Not extensively tested
+May optionally use a [Player] mouse
 ]]></notes>
 		<info name="barcode" value="0 52145 93011 7"/>
 		<info name="developer" value="Krisalis"/>

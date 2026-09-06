@@ -176,6 +176,7 @@ private:
 		double hdx, hdy, vdx, vdy;
 		double hddx, hddy;
 		u32 pixc, pre0, pre1;
+		u8 pixc_df[2];
 		std::vector<u16> buffer;
 	} m_cel;
 

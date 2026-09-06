@@ -768,6 +768,7 @@ void madam_device::cel_continue_w(offs_t offset, u32 data, u32 mem_mask)
 // Test cases for the timings:
 // - ssf2xj (roughly in sync with intro);
 // - bam (seems too fast now);
+// - cfodder (gameplay);
 TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 {
 	u32 tick_time;
@@ -932,6 +933,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				m_cel.pixc = m_dma32_read_cb(m_cel.address + 0x30);
 				tick_time += 1;
 				LOGCEL("    pixc=%08x\n", m_cel.pixc);
+				// TODO: only if MS not 2
+				const u8 df_table[4] = { 4, 1, 2, 3 };
+				m_cel.pixc_df[0] = df_table[BIT(m_cel.pixc, 24, 2)];
+				m_cel.pixc_df[1] = df_table[BIT(m_cel.pixc, 8, 2)];
 			}
 
 			// fetch the Preamble words
@@ -1209,7 +1214,7 @@ std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr);
 }
 
-// - sailormn gameplay
+// - sailormn gameplay (DF = 3, used for background shading away from camera)
 // - aquawrld
 // - oyajihmj versus screen (zoom letters shrink)
 std::tuple<u16, u32> madam_device::get_coded_8bpp(u32 ptr, u8 frac)
@@ -1228,10 +1233,9 @@ std::tuple<u16, u32> madam_device::get_coded_8bpp(u32 ptr, u8 frac)
 	s16 g = (src_data & 0x03e0) >> 5;
 	s16 b = (src_data & 0x001f) >> 0;
 
-	// TODO: >> 3 may really be a setting (sailormn expect it like this) ...
-	r = std::min((r * alt_multiply) >> 3, 0x1f);
-	g = std::min((g * alt_multiply) >> 3, 0x1f);
-	b = std::min((b * alt_multiply) >> 3, 0x1f);
+	r = std::min((r * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	g = std::min((g * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	b = std::min((b * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
 
 	const u16 dst_data = (r << 10) | (g << 5) | b;
 
@@ -1526,8 +1530,8 @@ u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 }
 
 // - fz10 Storage Managers
-// - demoman FMVs (options -> difficulty select)
-// - cfodder gameplay
+// - demoman FMVs (options -> difficulty select, DF = 2)
+// - cfodder gameplay (DF = 3)
 u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
@@ -1553,10 +1557,9 @@ u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	s16 g = (src_data & 0x03e0) >> 5;
 	s16 b = (src_data & 0x001f) >> 0;
 
-	// >> 1 makes colors too bright in cfodder
-	r = std::min((r * alt_multiply) >> 2, 0x1f);
-	g = std::min((g * alt_multiply) >> 2, 0x1f);
-	b = std::min((b * alt_multiply) >> 2, 0x1f);
+	r = std::min((r * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	g = std::min((g * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	b = std::min((b * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
 
 	u16 dst_data = (r << 10) | (g << 5) | b;
 
