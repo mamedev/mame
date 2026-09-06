@@ -117,8 +117,6 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-// TEMPORARY, for bringing up the atetb3482 sound hookup. Remove once confirmed.
-#define LOG_SOUNDCMD (1U << 1)   // what the 6502 writes to the Pokey range
 #include "tilemap.h"
 
 
