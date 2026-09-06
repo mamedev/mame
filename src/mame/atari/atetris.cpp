@@ -1024,10 +1024,6 @@ ROM_START( atetb3482 )
 	ROM_REGION( 0x20, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "n82s123an.8n", 0x00, 0x20, NO_DUMP )
 
-	// Must stay ERASEFF: nvram_default() copies this region over the EEPROM, and an erased part reads 0xFF
-	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASEFF )
-	ROM_LOAD( "x2804ap.4j", 0x000, 0x200, NO_DUMP )
-
 	// Not dumped, unused
 	ROM_REGION( 0x71c, "plds", 0 )
 	ROM_LOAD( "pal16r4acn.7.1n" , 0x000, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) )
