@@ -36548,6 +36548,7 @@ ob8
 obsx
 
 @source:oberheim/xpander.cpp
+matrix12
 xpander
 
 @source:olivetti/att6300p.cpp
