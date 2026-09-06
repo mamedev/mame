@@ -47256,6 +47256,9 @@ ti74
 ti74a
 ti95
 
+@source:ti/ti80.cpp
+ti80
+
 @source:ti/ti85.cpp
 ti73
 ti73v7
