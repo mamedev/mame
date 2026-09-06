@@ -1,71 +1,72 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Tomás García-Merás (ClawGrip)
+
 /***************************************************************************
 
-    UMC UM348x multi-instrument melody generator family
+	UMC UM348x multi-instrument melody generator family
 
-    UM3481A  8 melodies
-    UM3482A 12 melodies
+	UM3481A  8 melodies
+	UM3482A 12 melodies
 
-    Both parts have 16 pointer slots and both mask ROMs fill all 16, but the
-    recorded devices play only the counts above; the remaining pointers
-    address filler. Which pointers a part actually exposes is not visible in
-    the dumps, so the melody count is a property of the device type here.
+	Both parts have 16 pointer slots and both mask ROMs fill all 16, but the
+	recorded devices play only the counts above; the remaining pointers
+	address filler. Which pointers a part actually exposes is not visible in
+	the dumps, so the melody count is a property of the device type here.
 
-    Mask-programmed melody generators used in doorbells, toys and low-end
-    arcade bootlegs. A single on-chip RC oscillator, nominally around
-    100 kHz, drives everything: tones are produced by toggling the output
-    every N oscillator cycles, and note lengths are counted in units of 2048
-    cycles off the same divider chain.
+	Mask-programmed melody generators used in doorbells, toys and low-end
+	arcade bootlegs. A single on-chip RC oscillator, nominally around
+	100 kHz, drives everything: tones are produced by toggling the output
+	every N oscillator cycles, and note lengths are counted in units of 2048
+	cycles off the same divider chain.
 
-    Everything below was derived by reverse engineering the mask ROM dumps
-    against logic-level captures of real parts. Full notes, including the
-    evidence behind every constant and the questions still open, are in:
+	Everything below was derived by reverse engineering the mask ROM dumps
+	against logic-level captures of real parts. Full notes, including the
+	evidence behind every constant and the questions still open, are in:
 
-        https://github.com/clawgrip/UM348xDecoder
+		https://github.com/clawgrip/UM348xDecoder
 
-    Based on previous work from:
-      - Sean Riddle: https://www.seanriddle.com/um348x/
-      - ArcadeHacker: https://arcadehacker.blogspot.com/2020/07/um3481a-series-multi-instrument-melody.html
+	Based on previous work from:
+	  - Sean Riddle: https://www.seanriddle.com/um348x/
+	  - ArcadeHacker: https://arcadehacker.blogspot.com/2020/07/um3481a-series-multi-instrument-melody.html
 
-    Note ROM layout
-    ---------------
-    448 bytes = 3584 bits = 64 rows of 56 columns, i.e. 7 column-groups of 8
-    sub-columns. Row r contributes bit s of each group byte to the word of
-    sub-column s. Melodies do not run through the sub-columns in the order
-    0..7 but in the order 0,1,2,3,7,6,5,4, the second half of the array being
-    traversed in reverse, so
+	Note ROM layout
+	---------------
+	448 bytes = 3584 bits = 64 rows of 56 columns, i.e. 7 column-groups of 8
+	sub-columns. Row r contributes bit s of each group byte to the word of
+	sub-column s. Melodies do not run through the sub-columns in the order
+	0..7 but in the order 0,1,2,3,7,6,5,4, the second half of the array being
+	traversed in reverse, so
 
-        noteIndex = position_in_SUBCOLUMN_ORDER * 64 + row      (0..511)
+		noteIndex = position_in_SUBCOLUMN_ORDER * 64 + row      (0..511)
 
-    Each note is a 7-bit word: bits 6-4 a duration code, bits 3-0 a tone code.
-    Tone code 3 is a rest. Tone code 1 is a silent control word which still
-    consumes its word's time. The remaining 14 codes select an oscillator
-    divisor.
+	Each note is a 7-bit word: bits 6-4 a duration code, bits 3-0 a tone code.
+	Tone code 3 is a rest. Tone code 1 is a silent control word which still
+	consumes its word's time. The remaining 14 codes select an oscillator
+	divisor.
 
-    Timing
-    ------
-    One "base unit" is 2048 oscillator cycles. A word lasts
+	Timing
+	------
+	One "base unit" is 2048 oscillator cycles. A word lasts
 
-        ticks(duration code) * multiplier   base units
+		ticks(duration code) * multiplier   base units
 
-    except the first word of a melody, which always lasts exactly 8 base
-    units regardless of its duration code or the melody's multiplier.
+	except the first word of a melody, which always lasts exactly 8 base
+	units regardless of its duration code or the melody's multiplier.
 
-    What is NOT emulated
-    --------------------
-    - The tempo multiplier cannot be derived from any dumped ROM, so a
-      per-melody table measured from real playback is used, falling back to
-      the most common value for melodies that could not be measured.
-    - One melody per part is rendered by the real chip in a staccato
-      articulation: the output is re-struck once per tick, sounding for a
-      fixed 1024 oscillator cycles at the head of each tick. Nothing in the
-      note words marks which melody uses it, so it is not reproduced; the
-      melody plays as sustained tones, correct in pitch and total length but
-      not in texture.
-    - Five UM3482A tone codes never occur in a passage that could be matched
-      against real playback and are estimated within the range that part is
-      observed to produce.
+	What is NOT emulated
+	--------------------
+	- The tempo multiplier cannot be derived from any dumped ROM, so a
+	  per-melody table measured from real playback is used, falling back to
+	  the most common value for melodies that could not be measured.
+	- One melody per part is rendered by the real chip in a staccato
+	  articulation: the output is re-struck once per tick, sounding for a
+	  fixed 1024 oscillator cycles at the head of each tick. Nothing in the
+	  note words marks which melody uses it, so it is not reproduced; the
+	  melody plays as sustained tones, correct in pitch and total length but
+	  not in texture.
+	- Five UM3482A tone codes never occur in a passage that could be matched
+	  against real playback and are estimated within the range that part is
+	  observed to produce.
 
 ***************************************************************************/
 
@@ -180,9 +181,11 @@ DEFINE_DEVICE_TYPE(UM3482A, um3482a_device, "um3482a", "UM3482A Melody Generator
 //  ROM DEFINITIONS
 //**************************************************************************
 
+// All from visual decaps, hence the BAD_DUMP
+
 ROM_START( um3481a )
 	ROM_REGION( 0x1c0, "notes", 0 )
-	ROM_LOAD( "um3481araw.bin",     0x000, 0x1c0, BAD_DUMP CRC(8eef34d8) SHA1(b400e737ec8e7d694d629457d8909e8320715fe5) ) // from visual decap
+	ROM_LOAD( "um3481a_main.bin",    0x000, 0x1c0, BAD_DUMP CRC(8eef34d8) SHA1(b400e737ec8e7d694d629457d8909e8320715fe5) )
 
 	ROM_REGION( 0x018, "offsets", 0 ) // 16 entries of 12 packed bits
 	ROM_LOAD( "um3481a_offsets.bin", 0x000, 0x018, BAD_DUMP CRC(66b16105) SHA1(c74b6da95318909408ddfab42cf21d3493d2b821) )
@@ -193,7 +196,7 @@ ROM_END
 
 ROM_START( um3482a )
 	ROM_REGION( 0x1c0, "notes", 0 )
-	ROM_LOAD( "um3482araw.bin",      0x000, 0x1c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) ) // from visual decap
+	ROM_LOAD( "um3482a_main.bin",    0x000, 0x1c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) )
 
 	ROM_REGION( 0x020, "offsets", 0 ) // 16 entries of 9 bits, padded to 16
 	ROM_LOAD( "um3482a_offsets.bin", 0x000, 0x020, BAD_DUMP CRC(f39aff3c) SHA1(255dcea154ed04c6d1968b09e188ca5fc8821721) )
@@ -384,8 +387,7 @@ void um348x_device::start_word(u16 index)
 	m_note_index = index;
 
 	// A melody's opening rest always lasts 8 base units, whatever its duration
-	// code says and whatever the melody's multiplier is. The rule is about that
-	// rest specifically, so a melody that opens on a note is not affected.
+	// code says and whatever the melody's multiplier is
 	const bool openingRest = (index == m_note_start) && (tone == REST_TONE);
 	const u32 units = openingRest
 			? FIRST_REST_BASE_UNITS : u32(DURATION_TICKS[duration]) * m_multiplier;

@@ -119,20 +119,6 @@ Notes:
 
 // TEMPORARY, for bringing up the atetb3482 sound hookup. Remove once confirmed.
 #define LOG_SOUNDCMD (1U << 1)   // what the 6502 writes to the Pokey range
-#define LOG_MELODY   (1U << 2)   // what the Z80 writes to the UM3482A latch
-#define LOG_INPUTS   (1U << 3)   // what the game reads back as controls
-
-/*  TEMPORARY bisect switch. Set to 0 to put the stock Pokey mapping back while
-	leaving every added device in place: if the screen comes back, the fault is
-	in the address map, and if it stays black it is in the added hardware. */
-#define ATETB3482_TAP_POKEY 1
-
-#define VERBOSE (LOG_SOUNDCMD | LOG_MELODY | LOG_INPUTS)
-#include "logmacro.h"
-
-#define LOGSOUNDCMD(...) LOGMASKED(LOG_SOUNDCMD, __VA_ARGS__)
-#define LOGMELODY(...)   LOGMASKED(LOG_MELODY,   __VA_ARGS__)
-#define LOGINPUTS(...)   LOGMASKED(LOG_INPUTS,   __VA_ARGS__)
 #include "tilemap.h"
 
 
@@ -248,20 +234,8 @@ public:
 
 	void atetb3482(machine_config &config) ATTR_COLD;
 
-protected:
-	// TEMPORARY instrumentation, remove once the hookup is confirmed
-	virtual void machine_start() override ATTR_COLD;
-
 private:
-	// TEMPORARY instrumentation, remove once the hookup is confirmed
-	TIMER_CALLBACK_MEMBER(debug_tick);
-	emu_timer *m_debug_timer = nullptr;
-	uint32_t m_dbg_reads = 0;
-	uint32_t m_dbg_writes = 0;
-	uint32_t m_dbg_melody = 0;
-
 	template <unsigned N> void sound_w(offs_t offset, uint8_t data);
-	template <unsigned N> uint8_t pokey_r(offs_t offset);
 	void melody_ctrl_w(uint8_t data);
 
 	void atetb3482_map(address_map &map) ATTR_COLD;
@@ -498,21 +472,8 @@ void atetris_um3482_state::atetb3482_map(address_map &map)
 	map(0x1000, 0x1fff).ram().w(FUNC(atetris_um3482_state::videoram_w)).share(m_videoram);
 	map(0x2000, 0x20ff).mirror(0x0300).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x25ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	/*  The board has no Pokeys, so the writes go to the latch pair the sound
-		Z80 polls. The reads are left going to the Pokey devices: this ROM is
-		the same data as the original game, so it still reads ALLPOT for the
-		controls and RANDOM for the piece shuffler, and how the bootleg
-		provides those is not known. Removing the Pokeys outright hangs it. */
-	if (ATETB3482_TAP_POKEY)
-	{
-		map(0x2800, 0x280f).mirror(0x03e0).rw(FUNC(atetris_um3482_state::pokey_r<0>), FUNC(atetris_um3482_state::sound_w<0>));
-		map(0x2810, 0x281f).mirror(0x03e0).rw(FUNC(atetris_um3482_state::pokey_r<1>), FUNC(atetris_um3482_state::sound_w<1>));
-	}
-	else
-	{
-		map(0x2800, 0x280f).mirror(0x03e0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
-		map(0x2810, 0x281f).mirror(0x03e0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	}
+	map(0x2800, 0x280f).mirror(0x03e0).r(m_pokey[0], FUNC(pokey_device::read)).w(FUNC(atetris_um3482_state::sound_w<0>));
+	map(0x2810, 0x281f).mirror(0x03e0).r(m_pokey[1], FUNC(pokey_device::read)).w(FUNC(atetris_um3482_state::sound_w<1>));
 	map(0x3000, 0x3000).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_um3482_state::irq_ack_w));
@@ -522,15 +483,13 @@ void atetris_um3482_state::atetb3482_map(address_map &map)
 }
 
 
-/*  The sound Z80 uses no I/O ports at all; everything is memory mapped. It
-	polls both latches in a tight loop and never enables interrupts: there is
-	no EI, no IM and no HALT anywhere in its 8 KB. */
+// The Z80 polls both latches and never enables interrupts
 void atetris_um3482_state::atetb3482_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0); // Same 8K repeated four times
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa000).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); // Value written by the 6502
-	map(0xc000, 0xc000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)); // Pokey register it was written to
+	map(0xa000, 0xa000).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); // Value
+	map(0xc000, 0xc000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)); // Pokey register
 	map(0xf000, 0xf000).w(FUNC(atetris_um3482_state::melody_ctrl_w));
 }
 
@@ -607,100 +566,29 @@ void atetris_mcu_state::mcu_reg_w(offs_t offset, uint8_t data)
 }
 
 
-/*  This bootleg has no Pokeys. A pair of latches captures the register the
-	game meant to write and the value, and the sound Z80 polls them: it reads
-	the value at 0xa000 and the register at 0xc000, and uses the pair to index
-	a dispatch table in its own ROM. */
-/*  TEMPORARY instrumentation. Unlike logerror(), which only reaches error.log
-	when MAME is started with -log, osd_printf_info() prints straight to the
-	terminal, so this works with a plain "mame atetb3482". Remove the whole
-	block, the members it uses and the counters in the handlers once the
-	hookup is confirmed. */
-void atetris_um3482_state::machine_start()
-{
-	atetris_state::machine_start();
-
-	osd_printf_info("atetb3482: machine_start reached\n");
-
-	m_debug_timer = timer_alloc(FUNC(atetris_um3482_state::debug_tick), this);
-	m_debug_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-
-	save_item(NAME(m_dbg_reads));
-	save_item(NAME(m_dbg_writes));
-	save_item(NAME(m_dbg_melody));
-}
-
-TIMER_CALLBACK_MEMBER(atetris_um3482_state::debug_tick)
-{
-	osd_printf_info("atetb3482: 6502 PC=%04X  Z80 PC=%04X  pokey r=%u w=%u  melody w=%u\n",
-			unsigned(m_maincpu->state_int(STATE_GENPC)),
-			unsigned(m_audiocpu->state_int(STATE_GENPC)),
-			m_dbg_reads, m_dbg_writes, m_dbg_melody);
-}
-
-
-/*  TEMPORARY read tap, for bringing up the hookup. A healthy machine shows
-	ALLPOT (register 08) answering with the port value; if it answers 00 the
-	Pokey has not had SKCTL written and the game will not get past its input
-	check. Remove once the hookup is confirmed. */
-template <unsigned N>
-uint8_t atetris_um3482_state::pokey_r(offs_t offset)
-{
-	const uint8_t data = m_pokey[N]->read(offset);
-	if (!machine().side_effects_disabled())
-		m_dbg_reads++;
-	if (!machine().side_effects_disabled() && (offset & 0x0f) == 0x08)
-		LOGINPUTS("%s: pokey%u ALLPOT = %02x\n", machine().describe_context(), N + 1, data);
-	return data;
-}
-
-
+/*  The board has no Pokeys. A pair of latches captures the register the game
+	meant to write and the value, and the sound Z80 polls them to index a
+	dispatch table in its own ROM. The write still reaches the Pokey device
+	because the game reads that address range back for the controls. */
 template <unsigned N>
 void atetris_um3482_state::sound_w(offs_t offset, uint8_t data)
 {
-	m_dbg_writes++;
-	LOGSOUNDCMD("%s: pokey%u reg %02x = %02x\n", machine().describe_context(), N + 1, offset & 0x0f, data);
+	m_pokey[N]->write(offset, data);
 
-	/*  Control writes still reach the Pokey, audio writes do not.
-
-		This ROM is the original game's, so it reads the Pokey range back for
-		the controls, and MAME's Pokey only answers an ALLPOT read through the
-		ioport callback once SKCTL has been written to it: cutting every write
-		leaves SKCTL at zero, ALLPOT reads as 0x00 and the game never gets past
-		its input check. Passing the control registers through fixes that.
-
-		Withholding registers 00-07, the AUDF and AUDC pairs, keeps every
-		channel at volume zero, so the Pokey stays silent without having to
-		touch its routes. The board has no Pokeys at all; this one only stands
-		in for whatever answers the reads there, which nobody has traced. */
-	if ((offset & 0x0f) >= 0x08)
-		m_pokey[N]->write(offset & 0x0f, data);
-
-	m_soundlatch[0]->write(offset & 0x0f);
+	m_soundlatch[0]->write(offset);
 	m_soundlatch[1]->write(data);
 }
 
 
-/*  Control latch at 0xf000 on the Z80 side. Bits 0-3 select the melody and
-	bits 4 and 5 are momentary strobes which the Z80 raises and then drops
-	again after its own countdown. The Z80 keeps a shadow copy of this latch in
-	its I register, which is what makes the bit assignment legible: every
-	routine does LD A,I, alters bits, then LD I,A and LD (F000),A.
-
-	TODO: bits 4 and 5 are clearly two separate lines, but which UM3482A pin
-	each one drives is unverified, so both are treated as "start the selected
-	melody" here. Routine 5 of the Z80 code clears the whole latch, which is
-	the explicit stop. It is also unverified whether melody select is 0-based,
-	as assumed here, or 1-based. */
+// Bits 0-3 select the melody, bits 4 and 5 are strobes the Z80 drops again
+// after its own countdown
 void atetris_um3482_state::melody_ctrl_w(uint8_t data)
 {
-	m_dbg_melody++;
-	LOGMELODY("%s: melody latch = %02x (melody %d, strobe %s)\n",
-			machine().describe_context(), data, data & 0x0f,
-			BIT(data, 4) ? "A" : (BIT(data, 5) ? "B" : "-"));
 	m_melody->melody_w(data & 0x0f);
 	m_melody->trigger_w(BIT(data, 4) || BIT(data, 5));
 }
+
+
 
 
 
@@ -884,21 +772,17 @@ void atetris_um3482_state::atetb3482(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_um3482_state::atetb3482_map);
 
-	/*  This board replaces the Pokeys with a Z80 subsystem driving a UM3482A.
-		The Pokey devices are kept because the game still reads them back for
-		the controls (see sound_w), but they are never given a frequency or a
-		volume, so they stay silent on their own. Note that m_pokey cannot be
-		dereferenced here: the Pokeys are created by tag in atetris_pokey(),
-		not through the finder, so it is still unbound at configuration time. */
+	// Re-added without audio routes: the board has no Pokeys, but the game still reads them for the controls
+	POKEY(config.replace(), m_pokey[0], MASTER_CLOCK / 8).allpot_r().set_ioport("IN0");
+	POKEY(config.replace(), m_pokey[1], MASTER_CLOCK / 8).allpot_r().set_ioport("IN1");
 
-	// TODO: unverified clock, the board has an unread XTAL at C9
-	Z80(config, m_audiocpu, BOOTLEG_CLOCK / 4);
+	Z80(config, m_audiocpu, BOOTLEG_CLOCK / 4); // Unverified clock
 	m_audiocpu->set_addrmap(AS_PROGRAM, &atetris_um3482_state::atetb3482_sound_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	UM3482A(config, m_melody, 100'000); // On-chip RC oscillator, around 100 kHz
+	UM3482A(config, m_melody, 100'000); // On-chip RC oscillator
 	m_melody->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -1116,23 +1000,18 @@ N |PAL16R4 74LS74 14017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
   |_________________________________________________________________|
 	1      2      3       4       5       6       7      8      9
 
-  Sound path, from disassembling the Z80 ROM:
+  Sound path:
 
-  The board has no Pokeys. The 6502's writes to the Pokey range are captured
-  by a pair of latches holding the register number and the value, and the Z80
-  at L1 polls them: register at 0xc000, value at 0xa000. It uses the pair to
-  index a dispatch table at 0x1000-0x1fff in its own ROM, whose entries are
-  page numbers, and jumps to page * 0x100. The registers that appear in that
-  table are Pokey's AUDC1 to AUDC4 at offsets 1, 3, 5 and 7, plus two AUDF.
+  The board has no Pokeys. A pair of latches captures the 6502's writes to the
+  Pokey range, holding the register number and the value, and the Z80 at L1
+  polls them at 0xc000 and 0xa000. It indexes a dispatch table at 0x1000-0x1fff
+  in its own ROM whose entries are page numbers, and jumps to page * 0x100.
+  Only Pokey's AUDC1 to AUDC4 and two AUDF registers appear in that table.
 
   Each routine drives a control latch at 0xf000 wired to the UM3482A at F1:
-  bits 0-3 select the melody, bits 4 and 5 are momentary strobes which the
-  main loop drops again after a countdown. The Z80 keeps a shadow copy of the
-  latch in its I register, doing LD A,I, altering bits, then LD I,A and
-  LD (F000),A. In practice the game only ever selects melody 0 or 9.
-
-  It runs with interrupts disabled throughout: there is no EI, no IM and no
-  HALT anywhere in its 8 KB, and no I/O instructions at all.
+  bits 0-3 select the melody, bits 4 and 5 are momentary strobes. In practice
+  the game only ever selects melody 0 or 9. Which UM3482A pin each strobe
+  drives is unverified, so both are treated as start.
 */
 ROM_START( atetb3482 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1144,23 +1023,22 @@ ROM_START( atetb3482 )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "tet-d3-z80.1k", 0x0000, 0x8000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) ) // Same 8K repeated four times
 
-	// The UM3482A mask ROMs live in the sound device itself, see src/devices/sound/um348x.cpp
-
 	ROM_REGION( 0x20, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "n82s123an.8n", 0x00, 0x20, NO_DUMP )
 
-	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )
+	// Must stay ERASEFF: nvram_default() copies this region over the EEPROM, and an erased part reads 0xFF
+	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASEFF )
 	ROM_LOAD( "x2804ap.4j", 0x000, 0x200, NO_DUMP )
 
 	// Not dumped, unused
 	ROM_REGION( 0x71c, "plds", 0 )
-	//ROM_LOAD( "pal16r4acn.7.1n" , 0x000, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) )
-	//ROM_LOAD( "pal16r4acn.3.7n" , 0x104, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) )
+	ROM_LOAD( "pal16r4acn.7.1n" , 0x000, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) )
+	ROM_LOAD( "pal16r4acn.3.7n" , 0x104, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) )
 	ROM_LOAD( "pal16l8acn.2.9j" , 0x208, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16l8acn.1.9i" , 0x30c, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16r8acn.6.2i" , 0x410, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16r8acn.5.2h" , 0x514, 0x104, NO_DUMP )
-	//ROM_LOAD( "pal16l8acn.4.4g" , 0x618, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) )
+	ROM_LOAD( "pal16l8acn.4.4g" , 0x618, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) )
 ROM_END
 
 

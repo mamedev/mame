@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Tomás García-Merás (ClawGrip)
+
 /***************************************************************************
 
-    UMC UM348x multi-instrument melody generator family
-
-    See um348x.cpp for the reverse-engineering notes this implementation is
-    based on.
+	UMC UM348x multi-instrument melody generator family
 
 ***************************************************************************/
 
