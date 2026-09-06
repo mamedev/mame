@@ -402,8 +402,8 @@ void mips3_device::device_start()
 
 	/* allocate the implementation-specific state from the full cache */
 	m_core = m_drc_cache.alloc_near<internal_mips3_state>();
-	m_icache = (uint8_t *)m_drc_cache.alloc_near(c_dcache_size, std::align_val_t(alignof(uint64_t)));
-	m_dcache = (uint8_t *)m_drc_cache.alloc_near(c_icache_size, std::align_val_t(alignof(uint64_t)));
+	m_icache = (uint8_t *)m_drc_cache.alloc_near(c_icache_size, std::align_val_t(alignof(uint64_t)));
+	m_dcache = (uint8_t *)m_drc_cache.alloc_near(c_dcache_size, std::align_val_t(alignof(uint64_t)));
 
 	/* initialize based on the config */
 	memset(m_core, 0, sizeof(internal_mips3_state));
