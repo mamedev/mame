@@ -122,6 +122,11 @@ Notes:
 #define LOG_MELODY   (1U << 2)   // what the Z80 writes to the UM3482A latch
 #define LOG_INPUTS   (1U << 3)   // what the game reads back as controls
 
+/*  TEMPORARY bisect switch. Set to 0 to put the stock Pokey mapping back while
+	leaving every added device in place: if the screen comes back, the fault is
+	in the address map, and if it stays black it is in the added hardware. */
+#define ATETB3482_TAP_POKEY 1
+
 #define VERBOSE (LOG_SOUNDCMD | LOG_MELODY | LOG_INPUTS)
 #include "logmacro.h"
 
@@ -243,7 +248,18 @@ public:
 
 	void atetb3482(machine_config &config) ATTR_COLD;
 
+protected:
+	// TEMPORARY instrumentation, remove once the hookup is confirmed
+	virtual void machine_start() override ATTR_COLD;
+
 private:
+	// TEMPORARY instrumentation, remove once the hookup is confirmed
+	TIMER_CALLBACK_MEMBER(debug_tick);
+	emu_timer *m_debug_timer = nullptr;
+	uint32_t m_dbg_reads = 0;
+	uint32_t m_dbg_writes = 0;
+	uint32_t m_dbg_melody = 0;
+
 	template <unsigned N> void sound_w(offs_t offset, uint8_t data);
 	template <unsigned N> uint8_t pokey_r(offs_t offset);
 	void melody_ctrl_w(uint8_t data);
@@ -487,8 +503,16 @@ void atetris_um3482_state::atetb3482_map(address_map &map)
 		the same data as the original game, so it still reads ALLPOT for the
 		controls and RANDOM for the piece shuffler, and how the bootleg
 		provides those is not known. Removing the Pokeys outright hangs it. */
-	map(0x2800, 0x280f).mirror(0x03e0).rw(FUNC(atetris_um3482_state::pokey_r<0>), FUNC(atetris_um3482_state::sound_w<0>));
-	map(0x2810, 0x281f).mirror(0x03e0).rw(FUNC(atetris_um3482_state::pokey_r<1>), FUNC(atetris_um3482_state::sound_w<1>));
+	if (ATETB3482_TAP_POKEY)
+	{
+		map(0x2800, 0x280f).mirror(0x03e0).rw(FUNC(atetris_um3482_state::pokey_r<0>), FUNC(atetris_um3482_state::sound_w<0>));
+		map(0x2810, 0x281f).mirror(0x03e0).rw(FUNC(atetris_um3482_state::pokey_r<1>), FUNC(atetris_um3482_state::sound_w<1>));
+	}
+	else
+	{
+		map(0x2800, 0x280f).mirror(0x03e0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+		map(0x2810, 0x281f).mirror(0x03e0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	}
 	map(0x3000, 0x3000).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_um3482_state::irq_ack_w));
@@ -587,6 +611,34 @@ void atetris_mcu_state::mcu_reg_w(offs_t offset, uint8_t data)
 	game meant to write and the value, and the sound Z80 polls them: it reads
 	the value at 0xa000 and the register at 0xc000, and uses the pair to index
 	a dispatch table in its own ROM. */
+/*  TEMPORARY instrumentation. Unlike logerror(), which only reaches error.log
+	when MAME is started with -log, osd_printf_info() prints straight to the
+	terminal, so this works with a plain "mame atetb3482". Remove the whole
+	block, the members it uses and the counters in the handlers once the
+	hookup is confirmed. */
+void atetris_um3482_state::machine_start()
+{
+	atetris_state::machine_start();
+
+	osd_printf_info("atetb3482: machine_start reached\n");
+
+	m_debug_timer = timer_alloc(FUNC(atetris_um3482_state::debug_tick), this);
+	m_debug_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+
+	save_item(NAME(m_dbg_reads));
+	save_item(NAME(m_dbg_writes));
+	save_item(NAME(m_dbg_melody));
+}
+
+TIMER_CALLBACK_MEMBER(atetris_um3482_state::debug_tick)
+{
+	osd_printf_info("atetb3482: 6502 PC=%04X  Z80 PC=%04X  pokey r=%u w=%u  melody w=%u\n",
+			unsigned(m_maincpu->state_int(STATE_GENPC)),
+			unsigned(m_audiocpu->state_int(STATE_GENPC)),
+			m_dbg_reads, m_dbg_writes, m_dbg_melody);
+}
+
+
 /*  TEMPORARY read tap, for bringing up the hookup. A healthy machine shows
 	ALLPOT (register 08) answering with the port value; if it answers 00 the
 	Pokey has not had SKCTL written and the game will not get past its input
@@ -595,6 +647,8 @@ template <unsigned N>
 uint8_t atetris_um3482_state::pokey_r(offs_t offset)
 {
 	const uint8_t data = m_pokey[N]->read(offset);
+	if (!machine().side_effects_disabled())
+		m_dbg_reads++;
 	if (!machine().side_effects_disabled() && (offset & 0x0f) == 0x08)
 		LOGINPUTS("%s: pokey%u ALLPOT = %02x\n", machine().describe_context(), N + 1, data);
 	return data;
@@ -604,6 +658,7 @@ uint8_t atetris_um3482_state::pokey_r(offs_t offset)
 template <unsigned N>
 void atetris_um3482_state::sound_w(offs_t offset, uint8_t data)
 {
+	m_dbg_writes++;
 	LOGSOUNDCMD("%s: pokey%u reg %02x = %02x\n", machine().describe_context(), N + 1, offset & 0x0f, data);
 
 	/*  Control writes still reach the Pokey, audio writes do not.
@@ -639,6 +694,7 @@ void atetris_um3482_state::sound_w(offs_t offset, uint8_t data)
 	as assumed here, or 1-based. */
 void atetris_um3482_state::melody_ctrl_w(uint8_t data)
 {
+	m_dbg_melody++;
 	LOGMELODY("%s: melody latch = %02x (melody %d, strobe %s)\n",
 			machine().describe_context(), data, data & 0x0f,
 			BIT(data, 4) ? "A" : (BIT(data, 5) ? "B" : "-"));
