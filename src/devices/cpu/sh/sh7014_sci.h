@@ -108,6 +108,7 @@ private:
 	uint8_t rdr_r();
 
 	void update_tx_state();
+	void update_interrupts();
 	void update_clock();
 	void update_data_format();
 
