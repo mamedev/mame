@@ -87,7 +87,7 @@ void menu_about::custom_render(uint32_t flags, void *selectedref, float top, flo
 			std::begin(m_header), std::end(m_header),
 			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR);
+			ui().colors().colored_text_color(), ui().colors().accent_color());
 }
 
 
