@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "emupal.h"
 #include "screen.h"
+#include "bus/ti8x/ti8x.h"
 #include "cpu/t6m53/t6m53.h"
 #include "video/t6b79.h"
 
@@ -18,6 +19,7 @@ public:
 	ti80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag), 
           m_maincpu(*this, "maincpu"),
+          m_link_port(*this, "linkport"),
           m_btn_cols(*this, "COL%u", 0U), 
           m_on_button(*this, "ON")
 	{
@@ -27,6 +29,7 @@ public:
     
 private:
 	required_device<t6m53_device> m_maincpu;
+    required_device<ti8x_link_port_device> m_link_port;
 	required_ioport_array<7> m_btn_cols;
 	required_ioport m_on_button;
     
@@ -148,6 +151,14 @@ void ti80_state::ti80(machine_config &config)
     
 	PALETTE(config, "palette", FUNC(ti80_state::ti80_palette), 2, 2);
 	screen.set_palette("palette"); 
+
+    // The link port is only present on viewscreen TI-80s, 
+    // which have the exact same ROMs as a base TI-80.
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
+    m_maincpu->ring_out().set(m_link_port, FUNC(ti8x_link_port_device::ring_w));
+    m_maincpu->tip_out().set(m_link_port, FUNC(ti8x_link_port_device::tip_w));
+    m_maincpu->ring_in().set(m_link_port, FUNC(ti8x_link_port_device::ring_r));
+    m_maincpu->tip_in().set(m_link_port, FUNC(ti8x_link_port_device::tip_r));
 }
 
 ROM_START (ti80)

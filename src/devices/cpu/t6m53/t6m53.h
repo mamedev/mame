@@ -20,6 +20,7 @@ public:
     auto tip_out() { return m_tip_out.bind(); }
     auto ring_in() { return m_ring_in.bind(); }
     auto tip_in() { return m_tip_in.bind(); }
+
     auto lcd_stb() { return m_stb.bind(); }
     auto btn_rows() { return m_btn_rows.bind(); }
     auto on_btn() { return m_on_btn.bind(); }
@@ -36,7 +37,6 @@ protected:
 
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -76,6 +76,7 @@ private:
     devcb_write_line m_tip_out;
     devcb_read_line  m_ring_in;
     devcb_read_line  m_tip_in;
+
     devcb_write_line m_stb;
     devcb_read8 m_btn_rows;
     devcb_read_line m_on_btn;
@@ -94,7 +95,6 @@ private:
 	static uint16_t add4(uint16_t x, uint8_t y);
 
 	static uint16_t bcd(uint8_t x);
-	static uint8_t reverse_bcd(uint16_t x);
 	uint8_t add_with_carry(int bits, uint8_t x, uint8_t y, bool &carry, uint16_t op);
 
 	uint16_t jyx(uint16_t op, uint16_t offset) const;
