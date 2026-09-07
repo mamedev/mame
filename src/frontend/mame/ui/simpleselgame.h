@@ -35,6 +35,7 @@ protected:
 	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 	virtual bool custom_ui_back() override { return !m_search.empty(); }
 	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt) override;
+	virtual menu_color_context color_context() const noexcept override { return menu_color_context::SELECTION; }
 
 private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };

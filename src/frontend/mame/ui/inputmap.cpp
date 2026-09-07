@@ -375,7 +375,7 @@ void menu_input::custom_render(uint32_t flags, void *selectedref, float top, flo
 					std::begin(text), std::end(text),
 					origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-					ui().colors().text_color(), UI_RED_COLOR);
+					ui().colors().text_color(), ui().colors().status_error_color());
 		}
 		else if (selectedref)
 		{
