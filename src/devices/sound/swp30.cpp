@@ -742,7 +742,7 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 
 void swp30_device::streaming_block::update_loop_size()
 {
-	m_loop_size = m_loop & 0x3ffffff;
+	m_loop_size = m_loop & 0xffffff;
 	if(!m_loop_size && !((m_loop & 0x80000000) || (m_start & 0x40000000)))
 		m_loop_size = 0x400;
 }
