@@ -114,7 +114,7 @@ void arm_iomd_device::base_map(address_map &map)
 
 //  map(0x1d0, 0x1d3).rw(FUNC(arm_iomd_device::vidcura_r), FUNC(arm_iomd_device::vidcura_w));
 	map(0x1d4, 0x1d7).rw(FUNC(arm_iomd_device::vidend_r), FUNC(arm_iomd_device::vidend_w));
-//  map(0x1d8, 0x1db).rw(FUNC(arm_iomd_device::vidstart_r), FUNC(arm_iomd_device::vidstart_w));
+	map(0x1d8, 0x1db).rw(FUNC(arm_iomd_device::vidstart_r), FUNC(arm_iomd_device::vidstart_w));
 	map(0x1dc, 0x1df).rw(FUNC(arm_iomd_device::vidinita_r), FUNC(arm_iomd_device::vidinita_w));
 	map(0x1e0, 0x1e3).rw(FUNC(arm_iomd_device::vidcr_r), FUNC(arm_iomd_device::vidcr_w));
 
@@ -266,6 +266,7 @@ void arm_iomd_device::device_start()
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vidinita));
 	save_item(NAME(m_vidend));
+	save_item(NAME(m_vidstart));
 	save_item(NAME(m_vidlast));
 	save_item(NAME(m_videqual));
 	save_item(NAME(m_cursor_enable));
@@ -739,6 +740,9 @@ void arm_iomd_device::sdcr_w(u32 data)
 	// eats samples in ppcar
 //  if (BIT(data, 7))
 //      m_sndbuffer_ok[0] = m_sndbuffer_ok[1] = false;
+
+	// TODO: is dmaid_size settable by base IOMD only?
+	// that would lower the number of enqueued words in sound_drq, TBD
 }
 
 u32 arm_iomd_device::sdst_r()
@@ -786,26 +790,39 @@ void arm_iomd_device::vidcr_w(u32 data)
 
 u32 arm_iomd_device::vidend_r()
 {
-	return (m_vidend & 0x00fffff0);
+	return m_vidend;
 }
 
 void arm_iomd_device::vidend_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vidend);
-	m_vidend &= 0x00fffff0;
+	m_vidend &= 0x00ff'fff0;
+}
+
+u32 arm_iomd_device::vidstart_r()
+{
+	return m_vidstart;
+}
+
+void arm_iomd_device::vidstart_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_vidstart);
+	m_vidstart &= 0x1fff'fff0;
 }
 
 u32 arm_iomd_device::vidinita_r()
 {
-	return (m_vidlast << 30) | (m_videqual << 29) | (m_vidinita & 0x1ffffff0);
+	return (m_vidlast << 30) | (m_videqual << 29) | (m_vidinita);
 }
 
 void arm_iomd_device::vidinita_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vidinita);
-	m_vidinita &= 0x1ffffff0;
+	m_vidinita &= 0x1fff'fff0;
 	m_vidlast = BIT(data, 30);
 	m_videqual = BIT(data, 29);
+	if (m_vidlast || m_videqual)
+		popmessage("arm_iomd.cpp: vidlast %d videqual %d\n", m_vidlast, m_videqual);
 }
 
 
@@ -821,17 +838,25 @@ void arm_iomd_device::vblank_irq(int state)
 	trigger_irq<IRQA>(0x08);
 	if (m_video_enable == true)
 	{
-		// TODO: much more complex, last/end regs, start regs and eventually LCD hooks
 		u32 src = m_vidinita;
 		u32 size = m_vidend;
+		// wrapping works in 4096 segments
+		// - a7000p -bios 2 800x600 SVGA mode 21 sets 0x10000000 0x75ff0
+		// - sarpc 640x480 VGA mode Auto sets 0x02000000 0x0025800
+		// both can be tested in Desktop by F12 shell then Configure/Status/ESCape consecutively.
+		u32 wrap = ((m_vidstart + m_vidend) | 0xfff) & 0x1fff'ffff;
 
-		// TODO: vidcur can be readback, support it once anything makes use of the 0x1d0 reg for obvious reasons
+		// TODO: dispatch to scanline based renderer
+		// Also vidcur can be readback, support it once anything makes use of the 0x1d0 reg
+		// for any reason.
 		// (and using m_ prefix is intentional too)
-		for (u32 m_vidcur = 0; m_vidcur<size; m_vidcur++)
+		for (u32 m_vidcur = 0; m_vidcur < size; m_vidcur++)
 		{
 			m_vidc->write_vram(m_vidcur, m_host_space->read_byte(src));
-			src++;
-			src &= 0x1fffffff;
+			src ++;
+			src &= 0x1fff'ffff;
+			if (src > wrap)
+				src = m_vidstart;
 		}
 
 		if (m_cursor_enable == true)
@@ -840,7 +865,7 @@ void arm_iomd_device::vblank_irq(int state)
 			size = m_vidc->get_cursor_size();
 
 			// TODO: same as above
-			for (u32 m_curscur = 0; m_curscur<size; m_curscur++)
+			for (u32 m_curscur = 0; m_curscur < size; m_curscur++)
 			{
 				m_vidc->write_cram(m_curscur, m_host_space->read_byte(src));
 				src++;

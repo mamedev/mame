@@ -5,55 +5,16 @@
     Atmel 8-bit AVR simulator
 
     - Notes -
-      Cycle counts are generally considered to be 100% accurate per-instruction, does not support mid-instruction
-      interrupts although no software has been encountered yet that requires it. Evidence of cycle accuracy is given
-      in the form of the demoscene 'wild' demo, Craft, by [lft], which uses an ATmega88 to write video out a 6-bit
-      RGB DAC pixel-by-pixel, synchronously with the frame timing. Intentionally modifying the timing of any of
+      Cycle counts are generally considered to be 100% accurate per-instruction. External interrupt sources
+      (pin-change and INT0/INT1) may be triggered mid-instruction by an arbitrary external context; these are
+      latched into PCIFR/EIFR immediately and the actual interrupt is taken at the next execute_run() instruction
+      boundary. Evidence of cycle accuracy is given in the form of the demoscene 'wild' demo, Craft, by [lft],
+      which uses an ATmega88 to write video out a 6-bit RGB DAC pixel-by-pixel, synchronously with the frame
+      timing. Intentionally modifying the timing of any of
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: SPM, SPM Z+, SLEEP, BREAK, WDR, EICALL
-
-    - Changelist -
-      05 Jul. 2015 [Felipe Sanches]
-      - Implemented EIJMP instruction
-
-      29 Dec. 2013 [Felipe Sanches]
-      - Added crude boilerplate code for Timer/Counter #4
-
-      25 Dec. 2013 [Felipe Sanches]
-      - Updated AVR8_REGIDX_* enum based on ATMEGA640/1280/2560 datasheet
-
-      24 Dec. 2013 [Felipe Sanches]
-      - update data memory mapping so that all 0x200 register addresses are accessible
-
-      23 Dec. 2013 [Felipe Sanches]
-      - Added ELPM instructions
-      - Added fuse bits macros
-      - Added reset logic to decide initial program counter based on fuse bits configuration
-      - Added initial support for ATMEGA1280 and ATMEGA2560
-      - Use register names in the disassembly of IN and OUT instructions
-
-      23 Dec. 2012 [Sandro Ronco]
-      - Added CPSE, LD Z+, ST -Z/-Y/-X and ICALL opcodes
-      - Fixed Z flag in CPC, SBC and SBCI opcodes
-      - Fixed V and C flags in SBIW opcode
-
-      30 Oct. 2012
-      - Added FMUL, FMULS, FMULSU opcodes [Ryan Holtz]
-      - Fixed incorrect flag calculation in ROR opcode [Ryan Holtz]
-      - Fixed incorrect bit testing in SBIC/SBIS opcodes [Ryan Holtz]
-
-      25 Oct. 2012
-      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [Ryan Holtz]
-      - Corrected cycle counts for LD and ST opcodes [Ryan Holtz]
-      - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-        all subsequent 1-cycle opcodes to be 2 or 3 cycles [Ryan Holtz]
-      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [Ryan Holtz]
-
-      18 Oct. 2012
-      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [Ryan Holtz]
-      - Fixed COM, NEG, LSR opcodes [Ryan Holtz]
+      Unimplemented opcodes: SPM, SPM Z+, BREAK, WDR, EICALL
 
 */
 
@@ -1153,6 +1114,10 @@ void avr8_device<NumTimers>::device_start()
 	avr8_base_device::device_start();
 
 	m_adc_timer = timer_alloc(FUNC(avr8_device<NumTimers>::adc_conversion_complete), this);
+
+	// GPIO
+	save_item(NAME(m_gpio_in));
+	save_item(NAME(m_pcint_last));
 
 	// Timers
 	save_item(NAME(m_timer_top));
@@ -2656,9 +2621,16 @@ uint8_t avr8_device<NumTimers>::pin_r()
 {
 	static constexpr char PORT_CHARS[GPIO_COUNT] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L' };
 	// TODO: account for DDRH
-	const uint8_t data = m_gpio_in_cb[Port]();
+	const uint8_t data = sample_port<Port>();
 	LOGMASKED(LOG_GPIO, "%s: PIN%c(%d) Read: %02x\n", machine().describe_context(), PORT_CHARS[Port], Port, data);
 	return data;
+}
+
+template <int NumTimers>
+template <int Port>
+uint8_t avr8_device<NumTimers>::sample_port()
+{
+	return m_gpio_in_cb[Port].isunset() ? m_gpio_in[Port] : m_gpio_in_cb[Port]();
 }
 
 template <int NumTimers>
@@ -3007,10 +2979,9 @@ void avr8_device<NumTimers>::check_extint(int line, uint8_t prev, uint8_t state)
 
 template <int NumTimers>
 template <int Port>
-void avr8_device<NumTimers>::pin_change()
+void avr8_device<NumTimers>::latch_pin_change(uint8_t state)
 {
 	const uint8_t prev = m_pcint_last[Port];
-	const uint8_t state = m_gpio_in_cb[Port]();
 	const uint8_t changed = state ^ prev;
 	m_pcint_last[Port] = state;
 	if (!changed)
@@ -3036,6 +3007,18 @@ void avr8_device<NumTimers>::pin_change()
 		if (BIT(changed, 3))
 			check_extint(1, prev, state);
 	}
+}
+
+template <int NumTimers>
+template <int Port>
+void avr8_device<NumTimers>::pin_w(int bit, int state)
+{
+	if (state)
+		m_gpio_in[Port] |= (1 << bit);
+	else
+		m_gpio_in[Port] &= ~(1 << bit);
+
+	latch_pin_change<Port>(sample_port<Port>());
 }
 
 template <int NumTimers>
@@ -3747,7 +3730,7 @@ void avr8_device<NumTimers>::execute_run()
 			m_pc += 2;
 		}
 
-		// pin_change() may have latched a PCIFR/EIFR flag from an arbitrary (possibly mid-instruction)
+		// pin_w() may have latched a PCIFR/EIFR flag from an arbitrary (possibly mid-instruction)
 		// external context; only take the actual interrupt here, at a safe instruction boundary
 		if (m_r[PCIFR])
 		{
@@ -3822,11 +3805,11 @@ template class avr8_device<2>;
 template class avr8_device<3>;
 template class avr8_device<6>;
 
-// explicit instantiations so external devices can call pin_change<Port>() to report input changes
-template void avr8_device<3>::pin_change<avr8_base_device::GPIOA>();
-template void avr8_device<3>::pin_change<avr8_base_device::GPIOB>();
-template void avr8_device<3>::pin_change<avr8_base_device::GPIOC>();
-template void avr8_device<3>::pin_change<avr8_base_device::GPIOD>();
-template void avr8_device<3>::pin_change<avr8_base_device::GPIOE>();
-template void avr8_device<3>::pin_change<avr8_base_device::GPIOF>();
-template void avr8_device<3>::pin_change<avr8_base_device::GPIOG>();
+// explicit instantiations so external devices can call pin_w<Port>() to report input pin changes
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOA>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOB>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOC>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOD>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOE>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOF>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOG>(int, int);

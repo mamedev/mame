@@ -28,10 +28,8 @@ NOTES:
 		<year>1994</year>
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
-[Sport] leaves trails on intros
-Has color bugs on main menu
-[Madam] "unsupported Packed CEL 1 0"
-3d game, doesn't work in gameplay
+[Sport] leaves trails on SSI intro
+[Madam] off with some Packed CELs in main menu, has no 3d in-game
 ]]></notes>
 		<info name="alt_title" value="Slayer"/>
 		<info name="barcode" value="0 16685 03211 3"/>
@@ -51,7 +49,6 @@ Has color bugs on main menu
 		<notes><![CDATA[
 [CD drive] intro FMV stutter frames (note the English text running too fast is a btanb)
 [Madam] Option GFX on main menu has RMW transparency bug
-[Madam] "unsupported Packed CEL 5 0" across the application
 ]]></notes>
 		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo -->
 		<info name="alt_title" value="アクア・ワールド ～海美物語～"/>
@@ -73,10 +70,10 @@ Has color bugs on main menu
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<notes><![CDATA[
-[CD drive] FMVs have skipping artifacts with audio
-[Madam] "Unsupported Packed CEL 2 0" on title + "1 0" on character select + "5 0" in gameplay
-No cursor for character select, offset p2 graphics
-[DSPP] BGM too quiet on character select
+[CD drive] FMVs have skipping artifacts with audio (should be fixed)
+[Madam] glitchy character select cursor, no blink on title screen "Press P button"
+[DSPP] ducks BGM volume too much on main menu, no speech
+[Clio] runs too slow
 ]]></notes>
 		<info name="alt_title" value="美少女戦士セーラームーンS"/>
 		<info name="barcode" value="T4984824070851"/>
@@ -98,7 +95,7 @@ No cursor for character select, offset p2 graphics
 		<notes><![CDATA[
 [Madam] no GFXs for intro and title screen
 [Madam] player pointer GFX needs X flip when facing left
-Runs too slow in gameplay
+Sensitive to CEL timings
 ]]></notes>
 		<info name="barcode" value="0 37988 83036 7"/>
 		<info name="developer" value="Micro Cabin"/>
@@ -118,8 +115,11 @@ Runs too slow in gameplay
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-Has major color bugs in gameplay
+[Madam] check alt_multiply used, looks too bright in gameplay
 "War Has Never Been So Much Fun" intro theme (after the cartoon) has low [DSPP] pitch (verify Europe too)
+[Sport] shows uncleared dots at sides during gameplay
+[Clio] runs too slow
+Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 52145 93011 7"/>
 		<info name="developer" value="Krisalis"/>
@@ -136,8 +136,9 @@ Has major color bugs in gameplay
 		<year>1996</year>
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
-Transparency issue on title screen (shared with BIOS fz10)
-[CEL] "using existing values 0|0|1|0" in gameplay
+[Madam] has no pointer in main menu (check PIXC)
+Has RMW bugs in gameplay
+Not extensively tested, untested preview section
 ]]></notes>
 		<info name="barcode" value="7 90561 02379 1"/>
 		<part name="cdrom" interface="cdrom">
@@ -153,9 +154,9 @@ Transparency issue on title screen (shared with BIOS fz10)
 		<year>1994</year>
 		<publisher>IntelliPlay</publisher>
 		<notes><![CDATA[
-[AMY] shifted down video output
-Laggy inputs on opponent select
-Eventually hangs afterwards, on opponent FMV
+[Madam] IntelliPlay logo at startup seems to need a transparency pen
+Laggy inputs on opponent select, looks stuck
+[CD Block] Eventually hangs afterwards, on opponent FMV
 ]]></notes>
 		<info name="barcode" value="7 69139 84119 8"/>
 		<info name="serial" value="SCC-01-3DO"/>
@@ -172,8 +173,7 @@ Eventually hangs afterwards, on opponent FMV
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-[AMY] ugly palette on FMV playbacks
-[Madam] gameplay is full of "unsupported Packed CEL 1 0" and "5 1"
+Kinda playable with [Madam] Packed CEL glitches
 Eventually requires optional [Player] mouse and lightgun
 ]]></notes>
 		<info name="barcode" value="0 52145 93003 2"/>
@@ -190,7 +190,7 @@ Eventually requires optional [Player] mouse and lightgun
 		<year>1994</year>
 		<publisher>IntelliPlay</publisher>
 		<notes><![CDATA[
-Main menu has masking bug on top, [AMY]?
+[Madam] glitchy 8bpp Packed CEL colors (same as slayer?)
 Not extensively tested, may have another GFX glitch on main menu
 ]]></notes>
 		<info name="alt_title" value="ESPN Step Aerobics"/>
@@ -232,9 +232,9 @@ Hangs after second FMV, regardless of skipping or not
 		<notes><![CDATA[
 [CD drive] slow intro FMV, no sound. Successive FMVs have slow GFXs and fast repeating sound
 [Madam] doesn't draw background box in Subtitles select screen (transparent?)
-[Madam] has flip X bugs in gameplay, repeated enemy GFX in status bar, requires blending for score display, fire shots don't draw across playfield
+[Madam] requires blending for score display in gameplay, has half height CELs in places
 Untested on name entry screen
-Slow in gameplay
+Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 24294 11440 3"/>
 		<!-- ISBN: 0-7911-1440-6 -->
@@ -261,7 +261,7 @@ Slow in gameplay
 		<publisher>Bandai Visual</publisher>
 		<notes><![CDATA[
 [DSPP] half pitch for all sounds
-Squashed GFXs when playing back FMVs
+[Madam] Squashed CELs when playing back FMVs
 Patapata has only Conan (verify, does SW expect watching stuff first?)
 [Player] Patapata also keep spinning rather than giving user chance to return back
 Hangs on Puzzle, no [Player] input works
@@ -283,10 +283,8 @@ Hangs on Puzzle, no [Player] input works
 		<publisher>Warp</publisher>
 		<notes><![CDATA[
 [DSPP] non FMV portions sounds ugly
-[Madam] "unsupported Packed CEL 1 0" on title
-[Madam] "unsupported Packed CEL 5 0" on versus screen
-"Now Loading" likely enables rotate and zoom features of the CEL
-[Madam] "unsupported Packed CEL 2 0" after loading
+[Madam] PIXC example on title screen, ugly 1bpp CEL in versus screen, doesn't repeat CEL background properly in gameplay
+Bonus section (3rd option) is untested
 ]]></notes>
 		<info name="alt_title" value="おやじハンターマージャン"/>
 		<info name="barcode" value="4973934234512"/>
@@ -306,7 +304,7 @@ Hangs on Puzzle, no [Player] input works
 		<publisher>Kirin Entertainment</publisher>
 		<notes><![CDATA[
 [DSPP] low pitched sounds, doesn't sync correctly vs. video (cfr. new game intro)
-[Madam/AMY] No background and detail loss for choice GFXs
+[Madam] Half height for choice screen CELs
 [Madam] has zooming portions in places
 ]]></notes>
 		<!-- assume barcode 8 10148 57406 2 is for the Limited Run Games version (same content?) -->
@@ -324,10 +322,8 @@ Hangs on Puzzle, no [Player] input works
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<notes><![CDATA[
-[Madam] "Unsupported Packed CEL 5 1" on title screen
-Has no backgrounds in gameplay (alpha blended?)
-[DSPP] sound is too slow
-Runs too slow
+[Madam] has no backgrounds in gameplay (PIXC), flashes rather than color fade-ins/-outs
+Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 47875 11052 6"/>
 		<part name="cdrom" interface="cdrom">
@@ -366,10 +362,9 @@ Runs too slow
 		<notes><![CDATA[
 [AMY] sets wrong strips on intro logos
 [Sport] missing layer clearances
-[Madam] "unsupported Packed CEL 1 0" on intro + "2 0" on character select
-Intro has major GFX glitches
-Runs too slow, flip X equivalent bugs in gameplay
-Eventually requires support for [Player] Capcom stick
+[Madam] Intro has major CEL glitches, has 1bpp/2bpp CELs issues in options menu and Arcade mode cursors
+Sensitive to CEL timings
+Eventually requires support for [Player] Capcom fighting pad
 ]]></notes>
 		<info name="alt_title" value="スーパーストリートファイターIIX"/>
 		<!-- Power-up disc identical to retail -->
@@ -389,7 +384,7 @@ Eventually requires support for [Player] Capcom stick
 		<year>1994</year>
 		<publisher>Kuki</publisher>
 		<notes><![CDATA[
-[CEL] Cursor in main menu is slightly overdrawing transitional stuff
+[Madam] doesn't draw middle video on New gameplay (opacity issue? twd=1 bgnd=1 noblk=1)
 https://youtu.be/wmSQZxUQHds likely buggy, TBD
 Not extensively tested
 ]]></notes>
@@ -411,9 +406,8 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
-Pixelated text in main menu and gameplay
-Center of screen is too dim in gameplay, [AMY]?
-3d game, unplayable in gameplay
+Pixelated elements in main menu and gameplay, [AMY] cornerweight?
+[Madam] Center of screen is too dim in gameplay (PIXC)
 ]]></notes>
 		<info name="barcode" value="0 13252 01900 3"/>
 		<info name="developer" value="Elite Systems"/>
@@ -432,7 +426,7 @@ Center of screen is too dim in gameplay, [AMY]?
 		<publisher>American Laser Games</publisher>
 		<notes><![CDATA[
 [CD drive] sound hiccups on intro FMV
-Hangs when entering gameplay (or runs incredibly slow)
+[CD drive] Hangs when entering gameplay (or runs incredibly slow)
 Eventually has optional [Player] lightgun and maybe mouse support
 ]]></notes>
 		<info name="barcode" value="7 67861 00004 3"/>

@@ -189,7 +189,9 @@ private:
 	void vidc20_control_w(u32 data);
 	void vidc20_sound_frequency_w(u32 data);
 	void vidc20_sound_control_w(u32 data);
+	void ereg_w(u32 data);
 	void fsynreg_w(u32 data);
+	void dctl_w(u32 data);
 
 	u8 m_pal_data_index;
 	inline void update_8bpp_palette(u16 index, u32 paldata);
