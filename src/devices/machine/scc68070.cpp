@@ -1321,10 +1321,7 @@ uint8_t scc68070_device::usr_r()
 {
 	// UART status register: 80002013
 	if (!machine().side_effects_disabled())
-	{
-		m_uart.status_register |= (1 << 1);
 		LOGMASKED(LOG_MORE_UART, "%s: UART Status Register Read: %02x\n", machine().describe_context(), m_uart.status_register);
-	}
 	return m_uart.status_register;
 }
 
