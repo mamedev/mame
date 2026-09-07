@@ -181,7 +181,7 @@ void vcs_control_port_devices(device_slot_interface &device)
 	device.option_add("lpu", VCS_LIGHTPEN_UP);
 	device.option_add("lpl", VCS_LIGHTPEN_LEFT);
 	device.option_add("lpr", VCS_LIGHTPEN_RIGHT);
-	device.option_add("magnumlp", MAGNUM_LIGHT_PHASER);
+	device.option_add("magnum", MAGNUM_LIGHT_PHASER);
 	device.option_add("stacklr", STACK_LIGHT_RIFLE);
 	device.option_add("gunstick", GUN_STICK);
 	device.option_add("inkwell184c", INKWELL_184C);
