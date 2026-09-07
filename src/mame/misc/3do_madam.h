@@ -169,6 +169,7 @@ private:
 		u32 address;
 		u32 current_ccb;
 		bool skip, last, ccbpre, packed, bgnd;
+		u8 pluta;
 		u32 next_ptr;
 		u32 source_ptr;
 		u32 plut_ptr;

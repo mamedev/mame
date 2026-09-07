@@ -28,7 +28,7 @@ NOTES:
 		<year>1994</year>
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
-[Sport] leaves trails on SSI intro
+[Sport] leaves trails on SSI intro (uncoded 16bpp with PXOR=1)
 [Madam] requires ACW/ACCW to fill 3d quads in gameplay, uses lrform for map display
 Not extensively tested
 ]]></notes>
@@ -263,8 +263,7 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Bandai Visual</publisher>
 		<notes><![CDATA[
-[DSPP] half pitch for all sounds
-[Madam] lrform=1 CELs when playing back FMVs
+[Madam] lrform=1 CELs when playing back FMVs (fixed)
 Patapata has only Conan (verify, does SW expect watching stuff first?)
 [Player] Patapata also keep spinning rather than giving user chance to return back
 Hangs on Puzzle, no [Player] input works
@@ -307,8 +306,7 @@ Bonus section (3rd option) is untested
 		<publisher>Kirin Entertainment</publisher>
 		<notes><![CDATA[
 [DSPP] low pitched sounds, doesn't sync correctly vs. video (cfr. new game intro)
-[Madam] lrform=1 for choice screen CELs + PIXC for selections
-[Madam] has zooming portions in places
+[Madam] choice screen CELs uses PIXC for selections
 ]]></notes>
 		<!-- assume barcode 8 10148 57406 2 is for the Limited Run Games version (same content?) -->
 		<info name="barcode" value="7 98694 68688 3"/>

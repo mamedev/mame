@@ -868,13 +868,18 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, m_cel.packed
 			);
 			m_cel.bgnd = !!BIT(m_cel.current_ccb, 5);
+			m_cel.pluta = (m_cel.current_ccb & 0xe);
 			LOGCEL("        pover=%d plutpos=%d bgnd=%d noblk=%d pluta=%d\n"
 				, (m_cel.current_ccb & 0x180) >> 7
 				, BIT(m_cel.current_ccb, 6)
 				, m_cel.bgnd
 				, BIT(m_cel.current_ccb, 4)
-				, (m_cel.current_ccb & 0xe) >> 1
+				, m_cel.pluta
 			);
+
+			// should be easy to implement
+			if (m_cel.pluta)
+				popmessage("3do_madam.cpp: unsupported PLUTA CEL %d", m_cel.pluta);
 
 			// relative spabs/ppabs offsets are trusted against orbatak
 			// TODO: negative values, used by bam PLUT entries (can't decode it properly yet)
@@ -1002,7 +1007,6 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 		{
 			tick_time = 1;
 
-			// TODO: doubled with lrform = 1 (?)
 			const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
 			const bool uncoded = !!BIT(m_cel.pre0, 4);
 			const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
@@ -1042,13 +1046,17 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				double actual_hdx = m_cel.hdx;
 				double actual_hdy = m_cel.hdy;
 
-				for (int y = 0; y < vcnt; y++)
+				// lrform enabled doubles vcnt
+				// - plumber choice screen
+				// - conandl FMV playbacks
+				// - retfire main menu
+				for (int y = 0; y < vcnt << lrform; y++)
 				{
 					for (int x = 0; x < tlhpcnt; x++)
 					{
 						// According to "The Projector" section this floors down,
 						// discarding the fractional part
-						// TODO: understand how enlarging truly works
+						// TODO: understand how enlarging truly works (check acw/accw)
 						int ypos = (s32)(m_cel.ypos + y * m_cel.vdy + x * actual_hdy);
 
 						if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
@@ -1614,7 +1622,7 @@ u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
-	cel_address += ((y & ~1) * (woffset)) << 2;
+	cel_address += ((y & ~1) * (woffset)) << (1);
 	cel_address += ((x) << 2);
 	u8 src_shift = (y & 1) ^ 1;
 
