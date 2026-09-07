@@ -43,6 +43,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -52,6 +53,7 @@ protected:
 	virtual const u8 *tone_divisors() const = 0;
 
 private:
+	void stop();
 	void start_word(u16 index);
 	void advance_word();
 	u16 melody_start(u8 melody) const;

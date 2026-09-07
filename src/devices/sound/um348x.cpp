@@ -75,7 +75,7 @@
 
 
 //**************************************************************************
-//  CONSTANTS
+//  CONSTANTS AND NOTE ROM DECODING
 //**************************************************************************
 
 namespace {
@@ -128,14 +128,6 @@ constexpr u8 UM3482A_DIVISORS[16] =
 	 95,  67,  63, 127,  75,  48,  53,  50
 };
 
-} // anonymous namespace
-
-
-//**************************************************************************
-//  NOTE ROM DECODING
-//**************************************************************************
-
-namespace {
 
 // Decode one note word out of the 448-byte array.
 u8 decode_word(const u8 *notes, u16 index)
@@ -311,6 +303,26 @@ void um348x_device::device_start()
 
 void um348x_device::device_reset()
 {
+	stop();
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void um348x_device::device_clock_changed()
+{
+	if (clock() == 0)
+		return;
+
+	m_stream->update();
+	m_stream->set_sample_rate(clock());
+}
+
+
+void um348x_device::stop()
+{
 	m_playing = false;
 	m_divisor = 0;
 	m_div_count = 0;
@@ -372,7 +384,7 @@ void um348x_device::reset_w(int state)
 	if (state && !m_reset)
 	{
 		m_stream->update();
-		device_reset();
+		stop();
 	}
 
 	m_reset = state ? 1 : 0;
@@ -439,23 +451,24 @@ void um348x_device::advance_word()
 
 void um348x_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < stream.samples(); i++)
+	// nothing playing, just leave the stream cleared
+	if (!m_playing)
+		return;
+
+	for (int sampindex = 0; sampindex < stream.samples() && m_playing; sampindex++)
 	{
-		if (m_playing)
+		if (m_divisor)
 		{
-			if (m_divisor)
+			if (--m_div_count == 0)
 			{
-				if (--m_div_count == 0)
-				{
-					m_div_count = m_divisor;
-					m_out = -m_out;
-				}
+				m_div_count = m_divisor;
+				m_out = -m_out;
 			}
 
-			if (--m_word_cycles == 0)
-				advance_word();
+			stream.put(0, sampindex, sound_stream::sample_t(m_out) * 0.5);
 		}
 
-		stream.put(0, i, (m_playing && m_divisor) ? sound_stream::sample_t(m_out) * 0.5 : 0.0);
+		if (--m_word_cycles == 0)
+			advance_word();
 	}
 }
