@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "util/disasmintf.h"
-
 class t6m53_disassembler : public util::disasm_interface
 {
 public:
