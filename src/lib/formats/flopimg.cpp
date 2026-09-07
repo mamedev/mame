@@ -1848,7 +1848,7 @@ void floppy_image_format_t::get_track_data_fm_pc(int track, int head, const flop
 {
 	auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
 	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
-	for(unsigned int sector=1; sector < sector_count; sector++) {
+	for(int sector=1; sector <= sector_count; sector++) {
 		uint8_t *sd = sectdata + (sector-1)*sector_size;
 		if(sector < sectors.size() && !sectors[sector].empty()) {
 			unsigned int asize = sectors[sector].size();
