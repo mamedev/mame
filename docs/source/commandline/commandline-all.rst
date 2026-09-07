@@ -880,7 +880,7 @@ Example:
       - rawinput
       - dinput
       - win32
-      =
+      -
       - sdl [#MIPSDLWindows]_
       - none
     * - **SDL (macOS and Linux)**
