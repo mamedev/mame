@@ -839,12 +839,15 @@ void arm_iomd_device::vblank_irq(int state)
 	if (m_video_enable == true)
 	{
 		u32 src = m_vidinita;
-		u32 size = m_vidend;
-		// wrapping works in 4096 segments
+		// wrapping and size works in 4096 segments
 		// - a7000p -bios 2 800x600 SVGA mode 21 sets 0x10000000 0x75ff0
 		// - sarpc 640x480 VGA mode Auto sets 0x02000000 0x0025800
-		// both can be tested in Desktop by F12 shell then Configure/Status/ESCape consecutively.
+		// - rpc700 640x256 TV mode Auto sets 0x02000000 0x0013800
+		// testable in Desktop by F12 shell then Configure/Status/ESCape consecutively.
+		u32 size = m_vidend | 0xfff;
 		u32 wrap = ((m_vidstart + m_vidend) | 0xfff) & 0x1fff'ffff;
+
+		//printf("%08x %08x %08x -> %08x\n", m_vidstart, m_vidend, m_vidinita, wrap);
 
 		// TODO: dispatch to scanline based renderer
 		// Also vidcur can be readback, support it once anything makes use of the 0x1d0 reg
