@@ -58,6 +58,7 @@ uint16_t i386_device::i386_shift_rotate16(uint8_t modrm, uint32_t value, uint8_t
 				break;
 		}
 	} else {
+		shift &= 31;
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm16, i8 */
@@ -114,21 +115,18 @@ uint16_t i386_device::i386_shift_rotate16(uint8_t modrm, uint32_t value, uint8_t
 				break;
 			case 4:         /* SHL/SAL rm16, i8 */
 			case 6:
-				shift &= 31;
 				dst = src << shift;
 				m_CF = (shift <= 16) && (src & (1 << (16-shift)));
 				SetSZPF16(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 5:         /* SHR rm16, i8 */
-				shift &= 31;
 				dst = src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 7:         /* SAR rm16, i8 */
-				shift &= 31;
 				dst = (int16_t)src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);

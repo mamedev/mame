@@ -18,4 +18,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mousetest2">
+		<description>Mouse Test 2</description>
+		<year>2016</year>
+		<publisher>Marco Baye</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="1795">
+				<rom name="mousetest2.prg" size="1795" crc="d7b97fa2" sha1="422e7d74ae8795bb8b5331aa51616baa94b4278c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

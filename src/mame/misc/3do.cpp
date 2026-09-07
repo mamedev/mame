@@ -10,11 +10,14 @@ TODO:
 - Incomplete XBus/CD drive semantics;
 \- Audio CD has plenty of Cel, VDLP and sport issues. Also needs support between CD drive and DSPP
    (reads random port, asks for audio tracks *with* subcode);
+\- Photo CD (winsenna): ugly DSPP scratching;
 - Incomplete DSPP mapping (semaphores, audio input, output FIFO flush, FIFO status flags,
   RAM to DSPP N stack DMA);
 - Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, possible mirroring?)
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
 - Fence/MMU?  Games seem to run fine with stock ARM60 semantics.
+- Video CD module under Uncle/Woody (allegedly uses a C-Cube CL-450, also seen in Amiga,
+  x86 ReelMagic card and possibly more);
 
 TODO (BIOS programs):
 - 3do_fz1: DSPP is silent on planet splash screen
@@ -28,8 +31,10 @@ TODO (BIOS programs):
   skipped.
 
 TODO (Arcade variants):
-- All needs actual Player bus hookup;
-- md23do: Eventually throws Madam "unsupported Packed CEL 5 1" after credits in attract;
+- md23do/sht3do: lightgun hookup;
+- orbatak: playable with CEL issues in places, not extensively tested;
+- The actual Player bus hookup will require specific subclasses for all these (namely can't use %p
+  for enumerating p2 then p1);
 
 References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
@@ -194,6 +199,83 @@ static INPUT_PORTS_START( 3do )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 LT") // Left Trigger
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( orbatak )
+	// SILLY_CONTROL_PAD
+	// first two bytes 0xc0 - 0x00 for ID
+	PORT_START("P1.0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1.1")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// test mode fumbles the assignment of the coin chutes between
+	// input test, bookkeeping, coinage and actual gameplay.
+	// We go at user end, and make '5' / '6' match the in-game behaviour.
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+
+	// ID = 0x49, same as retail mouse
+	PORT_START("TRACK1.0")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED ) // buttons on retail, N/C from cabinet pic
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_0_r<0>));
+
+	PORT_START("TRACK1.1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_1_r<0>));
+
+	PORT_START("TRACK1.2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_2_r<0>));
+
+	PORT_START("TRACK2.0")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED ) // buttons on retail, N/C
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_0_r<1>));
+
+	PORT_START("TRACK2.1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_1_r<1>));
+
+	PORT_START("TRACK2.2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_2_r<1>));
+
+	// NOTE: retail mouse maps these with reversed direction
+	PORT_START("RAW_ANALOG.0")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(1)
+
+	PORT_START("RAW_ANALOG.1")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(1)
+
+	PORT_START("RAW_ANALOG.2")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(2)
+
+	PORT_START("RAW_ANALOG.3")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+// both games maps player 2 first then player 1 next
+static INPUT_PORTS_START( alg_gun )
+	PORT_START("P1.0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // trigger
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) // unused in md23do
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // holster
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // highest bit for counter?
+
+	PORT_START("P1.1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) // trigger
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) // holster
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // highest bit for counter?
+INPUT_PORTS_END
+
 
 void _3do_state::machine_start()
 {
@@ -423,7 +505,52 @@ void _3do_state::arcade_ntsc(machine_config &config)
 	m_cdrom->add_region("cdimage");
 }
 
+void orbatak_state::orbatak(machine_config &config)
+{
+	arcade_ntsc(config);
+	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		switch(offset)
+		{
+			// SILLY_CONTROL_PAD + ID for player 1 trackball
+			case 0:
+			{
+				// calculate the deltas here for convenience
+				for (int i = 0; i < 4; i++)
+				{
+					const u16 raw_read = m_raw_analog[i]->read();
+					m_track_delta[i] = (raw_read - m_track_previous[i]) & 0x3ff;
+					m_track_previous[i] = raw_read;
+				}
 
+				return (0xc0 << 24) | (m_p1_r[0]->read() << 16) | (m_p1_r[1]->read() << 8) | (0x49);
+			}
+			// player 1 trackball inputs + player 2 trackball ID
+			case 1: return (m_track_p1_r[0]->read() << 24) | (m_track_p1_r[1]->read() << 16) | (m_track_p1_r[2]->read() << 8) | (0x49);
+			// player 2 trackball inputs
+			case 2: return (m_track_p2_r[0]->read() << 24) | (m_track_p2_r[1]->read() << 16) | (m_track_p2_r[2]->read() << 8);
+		}
+
+		return 0;
+	});
+}
+
+void alg_gun_state::alg_gun(machine_config &config)
+{
+	arcade_ntsc(config);
+	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		switch(offset)
+		{
+			case 0:
+				return (0x4d << 24) | (m_p1_r[1]->read() << 16);
+			case 1:
+				// should be 8 bit of ID and 24 of actual inputs but both games expects an extra byte
+				// to make this other side to work (padding or actual meaning?)
+				return (0x4d << 16) | (m_p1_r[0]->read() << 8);
+		}
+
+		return 0;
+	});
+}
 
 ROM_START(3do_fz1)
 	ROM_REGION32_BE( 0x200000, "bios", 0 )
@@ -540,34 +667,7 @@ ROM_START(3do_hc21)
 	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
-
-// Arcade section
-// TODO: still using the old BIOS scheme, determine what they actually used for Orbatak
-#define NTSC_BIOS \
-	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" ) \
-	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) ) \
-	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) ) \
-	ROM_SYSTEM_BIOS( 3, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) ) \
-	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
-
-
-ROM_START(3dobios)
-	NTSC_BIOS
-ROM_END
-
-
-ROM_START(orbatak)
-	NTSC_BIOS
-
-	DISK_REGION( "cdimage" )
-	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
-ROM_END
-
+// American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
 #define ALG_BIOS \
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
@@ -578,6 +678,12 @@ ROM_START(alg3do)
 	ALG_BIOS
 ROM_END
 
+ROM_START(orbatak)
+	ALG_BIOS
+
+	DISK_REGION( "cdimage" )
+	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
+ROM_END
 
 ROM_START(md23do)
 	ALG_BIOS
@@ -618,15 +724,11 @@ CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, emp
 
 
 // Arcade section
-GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
-
-GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
-// Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
-// (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)
-
-
-// American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
 GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
 
-GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, orbatak, alg3do, orbatak,  orbatak,   orbatak_state, empty_init, ROT0,     "American Laser Games", "Orbatak (USA, prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.0
+GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.1
+GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.05
+
+// Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
+// (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)

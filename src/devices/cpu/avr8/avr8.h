@@ -801,8 +801,20 @@ public:
 	template <int Port> void ddr_w(uint8_t data);
 	template <int Port> uint8_t gpio_r();
 
-	// call when an external device may have changed a pin on this port, to raise its pin-change interrupt if enabled
-	template <int Port> void pin_change();
+	// call when an external device pin changes: updates that bit of the port's internal input shadow
+	// (used verbatim if no gpio_in callback is bound, ignored as a value but still triggering a resample
+	// otherwise) and raises the port's pin-change/external interrupt if enabled
+	template <int Port> void pin_w(int bit, int state);
+
+	// single-pin form, e.g. FUNC(atmega1284_device::pin_w<atmega1284_device::GPIOC, 0>) as a write-line target
+	template <gpio_t Port, int Bit> void pin_w(int state) { pin_w<Port>(Bit, state); }
+	template <int Bit> void pa_w(int state) { pin_w<GPIOA, Bit>(state); }
+	template <int Bit> void pb_w(int state) { pin_w<GPIOB, Bit>(state); }
+	template <int Bit> void pc_w(int state) { pin_w<GPIOC, Bit>(state); }
+	template <int Bit> void pd_w(int state) { pin_w<GPIOD, Bit>(state); }
+	template <int Bit> void pe_w(int state) { pin_w<GPIOE, Bit>(state); }
+	template <int Bit> void pf_w(int state) { pin_w<GPIOF, Bit>(state); }
+	template <int Bit> void pg_w(int state) { pin_w<GPIOG, Bit>(state); }
 
 	// checks INT0 (line 0, PD2) or INT1 (line 1, PD3) against EICRA's sense-control bits
 	void check_extint(int line, uint8_t prev, uint8_t state);
@@ -865,7 +877,14 @@ protected:
 
 	devcb_write8::array<11> m_gpio_out_cb;
 	devcb_read8::array<11> m_gpio_in_cb;
+	uint8_t m_gpio_in[GPIO_COUNT]{};
 	uint8_t m_pcint_last[11]{};
+
+	// returns the port's current sampled level: the bound gpio_in callback if set, else the internal input shadow
+	template <int Port> uint8_t sample_port();
+
+	// diffs a freshly-sampled port level against the last-known one, raising PCINT/INT0/INT1 as needed
+	template <int Port> void latch_pin_change(uint8_t state);
 
 	// ADC
 	uint8_t adcl_r();

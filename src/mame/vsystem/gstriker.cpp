@@ -25,7 +25,8 @@ Grand Striker has an IRQ2 which is probably network related.
 
 TODO:
 - Finish hooking up the inputs
-- Tilemap scrolling/rotation/zooming or whatever effect it needs
+- MB60553 words 1, 2, 5 and 6 of the line table and registers 2/3 are
+  never used by these games, so their function is unknown
 - Priorities are wrong. I suspect they need sprite orthogonality
 - Missing mixer registers (mainly layer enable/disable)
 - Tecmo World Cup '94 has missing protection emulation for draw buy-in

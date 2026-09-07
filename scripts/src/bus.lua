@@ -6149,6 +6149,8 @@ if BUSES["VCS_CTRL"] then
 	files {
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/ctrl.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/vcs_ctrl/c1350.cpp",
+		MAME_DIR .. "src/devices/bus/vcs_ctrl/c1350.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/cx85.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/cx85.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/joystick.cpp",
@@ -6159,8 +6161,6 @@ if BUSES["VCS_CTRL"] then
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/keypad.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/lightpen.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/lightpen.h",
-		MAME_DIR .. "src/devices/bus/vcs_ctrl/mouse.cpp",
-		MAME_DIR .. "src/devices/bus/vcs_ctrl/mouse.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/paddles.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/paddles.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/trakball.cpp",

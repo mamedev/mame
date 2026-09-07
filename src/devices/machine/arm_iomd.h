@@ -17,12 +17,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -133,13 +127,15 @@ private:
 	void kbd_txe_w(int state);
 	u8 m_kbdsr;
 
-	u32 m_vidinita, m_vidend;
+	u32 m_vidinita, m_vidend, m_vidstart;
 	bool m_vidlast, m_videqual;
 	bool m_video_enable;
 	u32 vidcr_r();
 	void vidcr_w(u32 data);
 	u32 vidend_r();
 	void vidend_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 vidstart_r();
+	void vidstart_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 vidinita_r();
 	void vidinita_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_cursinit;

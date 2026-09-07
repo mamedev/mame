@@ -24,7 +24,9 @@ Notes:
 - "Configure SoundSystem 8bit" in CLI to attempt using older VIDC10 sound system (after reboot);
 
 **************************************************************************************************/
+
 #include "emu.h"
+
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/rs232/hlemouse.h"

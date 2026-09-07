@@ -2030,7 +2030,7 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 				UML_CALLC(block, cfunc_printf_debug, this);                                 // callc   printf_debug
 			}
 			// Use a mask to only compare the parts of the TLB that actually matter for possibly recompiling a block
-			UML_LOAD(block, I0, &tlbtable[desc->pc >> 12], 0, SIZE_DWORD, SCALE_x4);		// load    i0,tlbtable[desc->pc >> 12],dword
+			UML_LOAD(block, I0, &tlbtable[desc->pc >> 12], 0, SIZE_DWORD, SCALE_x4);        // load    i0,tlbtable[desc->pc >> 12],dword
 			UML_AND(block, I0, I0, VTLB_MAPPING_MASK);                                      // and     i0,i0,VTLB_MAPPING_MASK
 			UML_CMP(block, I0, tlbtable[desc->pc >> 12] & VTLB_MAPPING_MASK);               // cmp     i0,*tlbentry & VTLB_MAPPING_MASK
 			UML_EXHc(block, COND_NE, *m_tlb_mismatch, 0);                                   // exh     tlb_mismatch,0,NE
@@ -2577,6 +2577,16 @@ void ppc_device::generate_branch(drcuml_block &block, compiler_state *compiler, 
 			srcptr = &m_core->tempaddr;
 		}
 		UML_MOV(block, SPR32(SPR_LR), desc->pc + 4);                                    // mov     [lr],desc->pc + 4
+	}
+
+	// Mac OS X kernel panics go to a weird loop where multiple BRAs chain to
+	// form an infinite loop rather than the typical BRA self.  This causes
+	// our branch folding to make an entire compilation block have zero cycles,
+	// which locks up the MAME process.  Detect that and mitigate it.
+	if (compiler_temp.cycles == 0)
+	{
+		compiler_temp.cycles = 1;
+		UML_MAPVAR(block, MAPVAR_CYCLES, compiler_temp.cycles);
 	}
 
 	// update the cycles and jump through the hash table to the target
