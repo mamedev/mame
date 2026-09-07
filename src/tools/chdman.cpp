@@ -587,9 +587,9 @@ public:
 				uint32_t samples = (uint64_t(m_info.rate) * uint64_t(effframe + 1) * uint64_t(1000000) + m_info.fps_times_1million - 1) / uint64_t(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = unsigned(std::min<std::size_t>(m_info.channels, std::size(m_audio)));
+				uint32_t const channels = m_info.channels;
 				EQUIVALENT_ARRAY(m_audio, int16_t *) samplesptr;
-				for (int chnum = 0; chnum < channels; chnum++)
+				for (uint32_t chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
 					m_audio[chnum].resize(samples);
@@ -647,7 +647,7 @@ private:
 	bitmap_yuy16                m_bitmap;
 	uint32_t                    m_start_frame;
 	uint32_t                    m_frame_count;
-	std::vector<int16_t>        m_audio[8];
+	std::array<std::vector<std::int16_t>, AVHUFF_MAX_CHANNELS> m_audio;
 	std::vector<uint8_t>        m_ldframedata;
 	std::vector<uint8_t>        m_rawdata;
 };
@@ -2354,6 +2354,9 @@ static void do_create_ld(parameters_map &params)
 	info.interlaced = ((info.fps_times_1million / 1000000) <= 30) && (info.height % 2 == 0) && (info.height > 288);
 	info.channels = aviinfo.audio_channels;
 	info.rate = aviinfo.audio_samplerate;
+	
+	if (info.channels > AVHUFF_MAX_CHANNELS)
+		report_error(1, "AVI input has too many audio channels (maximum is %u)", AVHUFF_MAX_CHANNELS);
 
 	// adjust for interlacing
 	if (info.interlaced)
@@ -3038,6 +3041,10 @@ static void do_extract_ld(parameters_map &params)
 			report_error(1, "Improperly formatted A/V metadata found");
 		fps_times_1million = fps * 1000000 + fpsfrac;
 	}
+
+	if (channels < 0 || channels > AVHUFF_MAX_CHANNELS)
+		report_error(1, "Invalid audio channel count in A/V metadata");
+	
 	uint8_t interlace_factor = interlaced ? 2 : 1;
 
 	// determine key parameters and validate
@@ -3092,7 +3099,7 @@ static void do_extract_ld(parameters_map &params)
 		// create the codec configuration
 		avhuff_decoder::config avconfig;
 		bitmap_yuy16 avvideo;
-		std::vector<int16_t> audio_data[16];
+		std::array<std::vector<std::int16_t>, AVHUFF_MAX_CHANNELS> audio_data;
 		uint32_t actsamples;
 		avconfig.video = &avvideo;
 		avconfig.maxsamples = max_samples_per_frame;
