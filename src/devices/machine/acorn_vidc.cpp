@@ -13,6 +13,7 @@ TODO:
   * nebulus: 20 lines off with aa310;
   * lotustc2: abuses color flipping;
   * quazer: needs in-flight DMA;
+  * twinwrld: status bar;
 - complete VIDC20 emulation (RiscPC/ssfindo.cpp/belatra.cpp);
 - Are CRTC values correct? VGA modes have a +1 in display line;
 
