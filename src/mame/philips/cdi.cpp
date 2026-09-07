@@ -62,6 +62,8 @@ TODO:
 
 #include "cdrom.h"
 
+#include "cdipcb.h"
+
 #include "cdi.lh"
 
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
@@ -75,6 +77,12 @@ TODO:
 
 #define VERBOSE         (0)
 #include "logmacro.h"
+
+// What can be plugged into the serial connector on the back.
+static void cdi_serial_devices(device_slot_interface &device)
+{
+	device.option_add("cdipcb", CDI_SERVICE_PCB);
+}
 
 /*************************
 *      Memory maps       *
@@ -138,10 +146,10 @@ static INPUT_PORTS_START( cdi )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Button 3")
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("TESTPLUG")
-	PORT_CONFNAME( 0x01, 0x00, "Test plug" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_START("SERVICE")
+	PORT_CONFNAME( 0x01, 0x00, "Service mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x01, "Test plug (service shell)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
@@ -378,6 +386,15 @@ void cdi_state::cdimono1_base(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
+
+
+	// The serial connector on the back, carrying the 68070's UART.
+	RS232_PORT(config, m_serial_port, cdi_serial_devices, nullptr);
+	m_maincpu->out_txd_cb().set(m_serial_port, FUNC(rs232_port_device::write_txd));
+	m_maincpu->uart_rtsn_callback().set(m_serial_port, FUNC(rs232_port_device::write_rts));
+	m_serial_port->rxd_handler().set(m_maincpu, FUNC(scc68070_device::rx_w));
+	m_serial_port->cts_handler().set(m_maincpu, FUNC(scc68070_device::uart_ctsn));
+
 	m_maincpu->iack4_callback().set(m_cdic, FUNC(cdicdic_device::intack_r));
 
 	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
@@ -522,7 +539,7 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousex().set_ioport("MOUSEX");
 	m_slave_hle->read_mousey().set_ioport("MOUSEY");
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
-	m_slave_hle->testplug_callback().set_ioport("TESTPLUG");
+	m_slave_hle->testplug_callback().set_ioport("SERVICE").bit(0);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
