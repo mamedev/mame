@@ -13,6 +13,7 @@
 #include "cpu/mcs51/i8051.h"
 #include "cpu/m6805/m68hc05.h"
 #include "diserial.h"
+#include "bus/rs232/rs232.h"
 #include "screen.h"
 
 /*----------- driver state -----------*/
@@ -33,6 +34,7 @@ public:
 		, m_cdrom(*this, "cdrom")
 		, m_mcd212(*this, "mcd212")
 		, m_dmadac(*this, "dac%u", 1U)
+		, m_serial_port(*this, "serial")
 	{ }
 
 	void cdimono1_base(machine_config &config);
@@ -60,6 +62,8 @@ protected:
 	required_device<mcd212_device> m_mcd212;
 
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
+
+	optional_device<rs232_port_device> m_serial_port;
 
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override ATTR_COLD;
