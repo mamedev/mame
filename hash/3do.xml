@@ -29,7 +29,8 @@ NOTES:
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
 [Sport] leaves trails on SSI intro
-[Madam] off with some Packed CELs in main menu, has no 3d in-game
+[Madam] requires ACW/ACCW to fill 3d quads in gameplay, uses lrform for map display
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="Slayer"/>
 		<info name="barcode" value="0 16685 03211 3"/>
@@ -93,8 +94,7 @@ NOTES:
 		<year>1995</year>
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
-[Madam] no GFXs for intro and title screen
-[Madam] player pointer GFX needs X flip when facing left
+[Madam] Packed CEL bugs for intro and title screen
 Sensitive to CEL timings
 ]]></notes>
 		<info name="barcode" value="0 37988 83036 7"/>
@@ -115,7 +115,6 @@ Sensitive to CEL timings
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-[Madam] check alt_multiply used, looks too bright in gameplay
 "War Has Never Been So Much Fun" intro theme (after the cartoon) has low [DSPP] pitch (verify Europe too)
 [Sport] shows uncleared dots at sides during gameplay
 Not extensively tested
@@ -184,13 +183,17 @@ Eventually requires optional [Player] mouse and lightgun
 		</part>
 	</software>
 
+	<!-- https://redump.info/disc/14119 -->
+	<!-- TODO: docthauz: Doctor Hauzer (Japan only, multi indices CD) -->
+	<!-- ... -->
+
 	<!-- https://redump.info/disc/47940/ -->
 	<software name="espnfit" supported="no">
 		<description>ESPN Fitness Pros: Step Aerobics (USA)</description>
 		<year>1994</year>
 		<publisher>IntelliPlay</publisher>
 		<notes><![CDATA[
-[Madam] glitchy 8bpp Packed CEL colors (same as slayer?)
+[Madam] revisit 8bpp Packed CEL colors (same as slayer?)
 Not extensively tested, may have another GFX glitch on main menu
 ]]></notes>
 		<info name="alt_title" value="ESPN Step Aerobics"/>
@@ -232,7 +235,7 @@ Hangs after second FMV, regardless of skipping or not
 		<notes><![CDATA[
 [CD drive] slow intro FMV, no sound. Successive FMVs have slow GFXs and fast repeating sound
 [Madam] doesn't draw background box in Subtitles select screen (transparent?)
-[Madam] requires blending for score display in gameplay, has half height CELs in places
+[Madam] requires blending for score display in gameplay, has lrform=1 CELs in places
 Untested on name entry screen
 Not extensively tested
 ]]></notes>
@@ -261,7 +264,7 @@ Not extensively tested
 		<publisher>Bandai Visual</publisher>
 		<notes><![CDATA[
 [DSPP] half pitch for all sounds
-[Madam] Squashed CELs when playing back FMVs
+[Madam] lrform=1 CELs when playing back FMVs
 Patapata has only Conan (verify, does SW expect watching stuff first?)
 [Player] Patapata also keep spinning rather than giving user chance to return back
 Hangs on Puzzle, no [Player] input works
@@ -304,7 +307,7 @@ Bonus section (3rd option) is untested
 		<publisher>Kirin Entertainment</publisher>
 		<notes><![CDATA[
 [DSPP] low pitched sounds, doesn't sync correctly vs. video (cfr. new game intro)
-[Madam] Half height for choice screen CELs
+[Madam] lrform=1 for choice screen CELs + PIXC for selections
 [Madam] has zooming portions in places
 ]]></notes>
 		<!-- assume barcode 8 10148 57406 2 is for the Limited Run Games version (same content?) -->
@@ -316,13 +319,17 @@ Bonus section (3rd option) is untested
 		</part>
 	</software>
 
+	<!-- TODO: retfire: Return Fire (USA, Europe) -->
+	<!-- https://redump.info/disc/14759 -->
+	<!-- ... -->
+
 	<!-- https://redump.info/disc/45884 -->
 	<software name="shanghtt" supported="no">
 		<description>Shanghai: Triple Threat (USA)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<notes><![CDATA[
-[Madam] has no backgrounds in gameplay (PIXC), flashes rather than color fade-ins/-outs
+[Madam] has no backgrounds in gameplay (PIXC), flashes rather than color fade-ins/-outs [AMY]?
 Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 47875 11052 6"/>

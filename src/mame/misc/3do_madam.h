@@ -98,7 +98,7 @@ private:
 	uint32_t  m_fence[4]{};         /* 03300200-0330023c (W); 03300200-0330027c (R) */
 	uint32_t  m_mmu[64]{};          /* 03300300-033003fc */
 	uint32_t  m_dma[32][4]{};       /* 03300400-033005fc */
-	uint32_t  m_mult[40]{};         /* 03300600-0330069c */
+	s32       m_mult[40]{};         /* 03300600-0330069c */
 	uint32_t  m_mult_control = 0;   /* 033007f0-033007f4 */
 	uint32_t  m_mult_status = 0;    /* 033007f8 */
 
@@ -189,6 +189,8 @@ private:
 	void mctl_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 regctl0_r();
 	void regctl0_w(offs_t offset, u32 data, u32 mem_mask);
+
+	void mult_start_process_w(offs_t offset, u32 data, u32 mem_mask);
 
 	void cel_start_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
