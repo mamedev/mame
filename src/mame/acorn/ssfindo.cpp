@@ -620,10 +620,14 @@ void ssfindo_state::ssfindo(machine_config &config)
 
 	SCREEN(config, "screen");
 
-	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
+	SPEAKER(config, "speaker", 2).front();
+
+	ARM_VIDC20(config, m_vidc, 54_MHz_XTAL / 2);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	ARM7500FE_IOMD(config, m_iomd, 54_MHz_XTAL);
 	m_iomd->set_host_cpu_tag(m_maincpu);
@@ -631,8 +635,6 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
 	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
-
-	SPEAKER(config, "speaker", 2).front();
 
 	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
@@ -648,7 +650,7 @@ void ssfindo_state::ppcar(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ppcar_map);
 	// sets external sclk, unverified value
-	m_vidc->set_ext_sclk(24'000'000);
+	m_vidc->set_ext_sclk(XTAL(24'000'000));
 
 	subdevice<qs1000_device>("qs1000")->set_external_rom(false); // ppcar has no external ROM
 	subdevice<i8052_device>("qs1000:cpu")->set_disable(); // internal ROM hasn't been dumped yet

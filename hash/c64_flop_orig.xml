@@ -415,6 +415,38 @@ All games fails loading
 		</part>
 	</software>
 
+	<software name="lpactpak">
+		<description>Light Phaser Action Pack</description>
+		<year>198?</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1: Baby Blues, Gunslinger"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LightPhaserActionPack_Disk1_s0.g64" size="279582" crc="c57e8ae8" sha1="756a2bd06955625d5ca32c95a638ac7fd2f78b81"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2: Goosebusters, Ghost Town"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LightPhaserActionPack_Disk1_s1.g64" size="279582" crc="ad11403f" sha1="9714301c84916e564a8a33b6c18d5856a850e746"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1: Cosmic Storm"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LightPhaserActionPack_Disk2_s0.g64" size="279582" crc="69a1b612" sha1="25a755a494a1c7054b39f05a5672f7b593e85dbd"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2: Operation Wolf"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LightPhaserActionPack_Disk2_s1.g64" size="279582" crc="7ae53367" sha1="0cdd33bbda435569a0ad41496d40440e5749430b"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Applications -->
 
 	<software name="basickaa">
@@ -437,6 +469,46 @@ All games fails loading
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="buddy64.g64" size="333744" crc="986d5e3d" sha1="3aeedd8e4e9c7a9412144fa5f7930e3492b79d33" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flexidraw4">
+		<description>Flexidraw 4.0</description>
+		<year>198?</year>
+		<publisher>Inkwell Systems</publisher>
+		<info name="usage" value="Requires Inkwell 184-C light pen (inkwell184c) in joystick port 1"/>
+		
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="287512">
+				<rom name="flexidraw4_s0.g64" size="287512" crc="f96ebfb0" sha1="3f4f2ff64ffb0d76191dd54431a4d4fd2a72c748"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="flexidraw4_s1.g64" size="279582" crc="c64de81c" sha1="5a40b44563d9a01651cb0b18faf86ef2da05bacb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flexifont">
+		<description>Flexifont</description>
+		<year>1984</year>
+		<publisher>Inkwell Systems</publisher>
+		<info name="usage" value="Requires light pen (lpl) in joystick port 1"/>
+		
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="287512">
+				<rom name="flexifont_s0.g64" size="287512" crc="5ea3e8c8" sha1="061b66284fcd0f534cc1535bb386327943b802d0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="flexifont_s1.g64" size="279582" crc="71cddad0" sha1="8373f53e97b7db21c258ac02964200c58a387828"/>
 			</dataarea>
 		</part>
 	</software>
@@ -872,10 +944,24 @@ All games fails loading
 		<year>1984</year>
 		<publisher>Koala Technologies</publisher>
 		<info name="serial" value="00626-001" />
+		<info name="usage" value="Requires light pen (lpu) in joystick port 1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287512">
 				<rom name="koalapainter.g64" size="287512" crc="56f06305" sha1="a4bb43f8f46c3e733e4a2ab7f6cdfa8483159df5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microlpen">
+		<description>Microscribe Light Pen</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires light pen (lpr) in joystick port 1"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="MicroscribeLightPen_s0.g64" size="279582" crc="087dd27a" sha1="03fd06fe3b654e7e611a51a129ff835fc9cb387c"/>
 			</dataarea>
 		</part>
 	</software>

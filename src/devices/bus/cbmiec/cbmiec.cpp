@@ -501,43 +501,49 @@ int cbm_iec_device::get_signal(int signal)
 
 void cbm_iec_devices(device_slot_interface &device)
 {
+	device.option_add("bluechip", BLUE_CHIP);
 	device.option_add("c1540", C1540);
 	device.option_add("c1541", C1541);
 	device.option_add("c1541c", C1541C);
-	device.option_add("c1541ii", C1541II);
-	device.option_add("fsd1", FSD1);
-	device.option_add("fsd2", FSD2);
-	device.option_add("csd1", CSD1);
 	device.option_add("c1541dd2", C1541_DOLPHIN_DOS_V2);
-	device.option_add("c1541tt", C1541_TURBOTRANS);
+	device.option_add("c1541ii", C1541II);
 	device.option_add("c1541pd", C1541_PROFESSIONAL_DOS_V1);
 	device.option_add("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC);
 	device.option_add("c1541rp", C1541_RAPIDOS_PROFESSIONAL);
+	device.option_add("c1541tt", C1541_TURBOTRANS);
 	device.option_add("c1570", C1570);
 	device.option_add("c1571", C1571);
 	device.option_add("c1571dd3", C1571_DOLPHIN_DOS_V3);
 	device.option_add("c1581", C1581);
-	device.option_add("indusgt", INDUS_GT);
+	device.option_add("c5181", XETEC_C5181);
 	device.option_add("cmdhd", CMD_HD);
-	device.option_add("fd2000", FD2000);
-	device.option_add("fd4000", FD4000);
-	device.option_add("interpod", CBM_INTERPOD);
-	device.option_add("minichief", MINI_CHIEF);
-	device.option_add("serialbox", CBM_SERIAL_BOX);
-	device.option_add("diag264", DIAG264_SERIAL_LOOPBACK);
-	device.option_add("nl10", C64_NL10_INTERFACE);
-	device.option_add("vic1515", VIC1515);
-	device.option_add("vic1520", VIC1520);
-	device.option_add("c1526", C1526);
-	device.option_add("technica", TECHNICA);
-	device.option_add("bluechip", BLUE_CHIP);
 	device.option_add("cmdrc2", COMMANDER_C2);
+	device.option_add("csd1", CSD1);
+	device.option_add("diag264", DIAG264_SERIAL_LOOPBACK);
 	device.option_add("enh2000", ENHANCER_2000);
 	device.option_add("fd148", FD148);
+	device.option_add("fd2000", FD2000);
+	device.option_add("fd4000", FD4000);
+	device.option_add("fsd1", FSD1);
+	device.option_add("fsd2", FSD2);
+	device.option_add("indusgt", INDUS_GT);
+	device.option_add("minichief", MINI_CHIEF);
 	device.option_add("msdsd1", MSD_SD1);
 	device.option_add("msdsd2", MSD_SD2);
+	device.option_add("sd2iec", SD2IEC);
+	device.option_add("serialbox", CBM_SERIAL_BOX);
+	device.option_add("technica", TECHNICA);
+}
+
+void cbm_iec_printer_devices(device_slot_interface &device)
+{
+	device.option_add("c1526", C1526);
+	device.option_add("interpod", CBM_INTERPOD);
+	device.option_add("mps802", C1526);
 	device.option_add("mps1200", MPS1200);
 	device.option_add("mps1250", MPS1250);
-	device.option_add("c5181", XETEC_C5181);
-	device.option_add("sd2iec", SD2IEC);
+	device.option_add("nl10", C64_NL10_INTERFACE);
+	device.option_add("serialbox", CBM_SERIAL_BOX);
+	device.option_add("vic1515", VIC1515);
+	device.option_add("vic1520", VIC1520);
 }

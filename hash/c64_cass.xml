@@ -237,6 +237,19 @@ Notes:
 		</part>
 	</software>
 
+	<software name="armydays">
+		<description>Army Days</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="635014">
+				<rom name="Army_Days.tap" size="635014" crc="1058df38" sha1="55f9c0af68a59491718e76a15cb39cbae37b7ee9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aviewtoa">
 		<description>A View to a Kill</description>
 		<year>1985</year>
@@ -1550,6 +1563,7 @@ Fails [tape] loading, light blue screen
 		<description>Blaze Out</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2091822">
@@ -4967,6 +4981,7 @@ Fails [tape] loading, light blue screen
 		<description>Gangster</description>
 		<year>1989</year>
 		<publisher>Mindscape Inc.</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="633400">
@@ -13917,6 +13932,7 @@ Fails [tape] loading after side swap (update: cannot reproduce, random?)
 		<description>Time Traveller</description>
 		<year>1989</year>
 		<publisher>Mindscape Inc.</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="632776">

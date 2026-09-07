@@ -7,12 +7,13 @@
 #define LOG_FENCE   (1U << 1)
 #define LOG_MMU     (1U << 2)
 #define LOG_DMA     (1U << 3)
-#define LOG_MULT    (1U << 4)
-#define LOG_VDLP    (1U << 5)
-#define LOG_CEL     (1U << 6)
-#define LOG_REGIS   (1U << 7)
+#define LOG_VDLP    (1U << 4)
+#define LOG_CEL     (1U << 5)
+#define LOG_REGIS   (1U << 6)
+#define LOG_MULT    (1U << 8) // MULT matrix ops
+#define LOG_MULTV   (1U << 9) // verbose, mult register access
 
-#define VERBOSE (LOG_GENERAL | LOG_MMU | LOG_MULT)
+#define VERBOSE (LOG_GENERAL | LOG_MMU)
 //#define VERBOSE (LOG_VDLP)
 //#define VERBOSE (LOG_CEL | LOG_REGIS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -26,6 +27,7 @@
 #define LOGVDLP(...)    LOGMASKED(LOG_VDLP,    __VA_ARGS__)
 #define LOGCEL(...)     LOGMASKED(LOG_CEL,     __VA_ARGS__)
 #define LOGREGIS(...)   LOGMASKED(LOG_REGIS,   __VA_ARGS__)
+#define LOGMULTV(...)   LOGMASKED(LOG_MULTV,   __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MADAM, madam_device, "madam", "3DO MN7A020UDA \"Madam\" Address Decoder")
 
@@ -71,7 +73,6 @@ void madam_device::device_start()
 	save_item(NAME(m_pip));
 	save_item(NAME(m_fence));
 	save_item(NAME(m_mmu));
-	save_item(NAME(m_mult));
 	save_item(NAME(m_dma));
 
 	save_item(NAME(m_msysbits));
@@ -98,6 +99,8 @@ void madam_device::device_start()
 	save_item(NAME(m_dxyl));
 	save_item(NAME(m_ddxyh));
 	save_item(NAME(m_ddxyl));
+
+	save_item(NAME(m_mult));
 	save_item(NAME(m_mult_control));
 	save_item(NAME(m_mult_status));
 
@@ -124,6 +127,9 @@ void madam_device::device_reset()
 	m_dma_exp_timer->adjust(attotime::never);
 	m_dma_playerbus_timer->adjust(attotime::never);
 	m_cel_timer->adjust(attotime::never);
+
+	// TODO: unknown init value
+	std::fill_n(m_mult, 40, 0);
 }
 
 // $0330'0000 base
@@ -377,28 +383,34 @@ void madam_device::map(address_map &map)
 	// NOTE: only 40 registers, cutoff beyond that
 	map(0x0600, 0x069f).lrw32(
 		NAME([this] (offs_t offset) {
+			LOGMULTV("Mult [%d] R\n", offset);
 			return m_mult[offset & 0x3f];
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMULT("Mult [%d]: %08x & %08x\n", offset, data, mem_mask);
+			LOGMULTV("Mult [%d]: %08x & %08x\n", offset, data, mem_mask);
 			COMBINE_DATA(&m_mult[offset & 0x3f]);
 		})
 	);
 	map(0x07f0, 0x07f3).lrw32(
-		NAME([this] () { return m_mult_control; }),
+		NAME([this] () {
+			LOGMULTV("Control R\n");
+			return m_mult_control; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			m_mult_control |= data;
-			LOGMULT("Mult control set: %08x & %08x -> %08x\n", data, mem_mask, m_mult_control);
+			LOGMULTV("Mult control set: %08x & %08x -> %08x\n", data, mem_mask, m_mult_control);
 		})
 	);
 	map(0x07f4, 0x07f7).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMULT("Mult control clear: %08x & %08x -> %08x\n", data, mem_mask, m_mult_control);
+			LOGMULTV("Mult control clear: %08x & %08x -> %08x\n", data, mem_mask, m_mult_control);
 			m_mult_control &= ~data;
 		})
 	);
-	map(0x07f8, 0x07fb).lr32(NAME([this] () { return m_mult_status; }));
-//  map(0x07fc, 0x07ff) start process
+	map(0x07f8, 0x07fb).lr32(NAME([this] () {
+		LOGMULTV("Status R\n");
+		return m_mult_status;
+	}));
+	map(0x07fc, 0x07ff).w(FUNC(madam_device::mult_start_process_w));
 }
 
 u32 madam_device::mctl_r()
@@ -428,7 +440,8 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 			// Madam can access Player bus from DMA only, and the port(s) are daisy chained thru
 			// bidirectional serial i/f (which also handle headphone jack and ROM device transfers)
 			// Smells a lot like an internal MCU doing the job ...
-			m_dma32_write_cb(m_dma[DMA_CONTROL_PORT][2] + 0x4, m_playerbus_read_cb(0));
+			for (int i = 0; i < 3; i++)
+				m_dma32_write_cb(m_dma[DMA_CONTROL_PORT][2] + (i + 1) * 4, m_playerbus_read_cb(i));
 		}
 		if (BIT(m_mctl, 15) && !BIT(data, 15))
 		{
@@ -730,17 +743,18 @@ void madam_device::regctl0_w(offs_t offset, u32 data, u32 mem_mask)
 
 void madam_device::cel_start_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	LOGCEL("Start CEL engine\n");
 	m_cel.state = FETCH_PARAMS;
 	// 0: control
 	// 1: first CCoB
 	// 2: PIP
 	// 3: data start
 	m_cel.address = m_dma[DMA_CEL_CONTROL][1];
+	LOGCEL("Start CEL engine control %08x first CCoB %08x PIP %08x data start %08x\n", m_dma[DMA_CEL_CONTROL][0], m_dma[DMA_CEL_CONTROL][1], m_dma[DMA_CEL_CONTROL][2], m_dma[DMA_CEL_CONTROL][3]);
 	m_statbits |= 1 << 4;
 	m_statbits &= ~(1 << 6);
-	m_cel.next_ptr = m_cel.source_ptr = m_cel.plut_ptr = 0;
-	m_cel_timer->adjust(attotime::from_ticks(2, this->clock()));
+	// TODO: remove me, cfr. npabs
+	m_cel.next_ptr = 0;
+	m_cel_timer->adjust(attotime::from_ticks(1, this->clock()));
 }
 
 void madam_device::cel_stop_w(offs_t offset, u32 data, u32 mem_mask)
@@ -762,6 +776,11 @@ void madam_device::cel_continue_w(offs_t offset, u32 data, u32 mem_mask)
 // CEL is paused when any irq is issued at the end of current CEL (so during fetch phase)
 // resumed by triggering SPRCNTU port (manually in SW);
 // cfr. 3do_try alternating Sanyo/3do logos spins (way too fast)
+
+// Test cases for the timings:
+// - ssf2xj (roughly in sync with intro);
+// - bam (seems too fast now);
+// - cfodder (gameplay);
 TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 {
 	u32 tick_time;
@@ -801,7 +820,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				LOGCEL("Skip, move to next CCB\n");
 				m_cel.state = FETCH_PARAMS;
 				m_cel.address = m_cel.next_ptr;
-				m_cel_timer->adjust(attotime::from_ticks(2 * 2, this->clock()));
+				m_cel_timer->adjust(attotime::from_ticks(1 * 2, this->clock()));
 				return;
 			}
 			else if (!m_cel.last)
@@ -849,66 +868,93 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, m_cel.packed
 			);
 			m_cel.bgnd = !!BIT(m_cel.current_ccb, 5);
+			m_cel.pluta = (m_cel.current_ccb & 0xe);
 			LOGCEL("        pover=%d plutpos=%d bgnd=%d noblk=%d pluta=%d\n"
 				, (m_cel.current_ccb & 0x180) >> 7
 				, BIT(m_cel.current_ccb, 6)
 				, m_cel.bgnd
 				, BIT(m_cel.current_ccb, 4)
-				, (m_cel.current_ccb & 0xe) >> 1
+				, m_cel.pluta
 			);
-			// FIXME: relative to what?
-			// - 3do_fz1 / 3do_fz10 RGB dots (scaled by hdx/vdy=8.0) are the first & last entry setup, relative to zero?
-			// - ditto for "Welcome To Photo CD Imaging" app startup
-			if ((!spabs && m_cel.source_ptr) || (!ppabs && m_cel.plut_ptr))
+
+			// should be easy to implement
+			if (m_cel.pluta)
+				popmessage("3do_madam.cpp: unsupported PLUTA CEL %d", m_cel.pluta);
+
+			// relative spabs/ppabs offsets are trusted against orbatak
+			// TODO: negative values, used by bam PLUT entries (can't decode it properly yet)
+			const u32 source_addr = m_dma32_read_cb(m_cel.address + 0x08);
+			if (spabs)
+				m_cel.source_ptr = source_addr;
+			else
 			{
-				popmessage("CEL relative address use at %08x %d|%d|%d", m_cel.address, npabs, spabs, ppabs);
-				m_statbits |= (1 << 6);
-				cel_stop_w(0, 0, 0xffffffff);
-				return;
+				LOGCEL("    RELSOURCE %08x\n", source_addr);
+				m_cel.source_ptr = m_cel.address + (s32)source_addr - 4;
 			}
-			m_cel.source_ptr = m_dma32_read_cb(m_cel.address + 0x08);
-			m_cel.plut_ptr = m_dma32_read_cb(m_cel.address + 0x0c);
+
+			const u32 plut_addr = m_dma32_read_cb(m_cel.address + 0x0c);
+			if (ppabs)
+				m_cel.plut_ptr = plut_addr;
+			else
+			{
+				LOGCEL("    RELPLUT %08x\n", plut_addr);
+				m_cel.plut_ptr = m_cel.address + (s32)plut_addr + 0x10;
+			}
 			tick_time += 2;
 			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x PLUTPTR %08x\n", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
-			if (!ldsize || !ldprs || !yoxy || !ldpixc)
-			{
-				popmessage("CEL using existing values at %08x %d|%d|%d|%d", m_cel.address, ldsize, ldprs, yoxy, ldpixc);
-				m_statbits |= (1 << 6);
-				cel_stop_w(0, 0, 0xffffffff);
-				return;
-			}
-			const s32 xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
-			const s32 ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
-			// TODO: can be in 17.15 format (?)
-			m_cel.xpos = (double)xpos / 65536.0;
-			m_cel.ypos = (double)ypos / 65536.0;
-			tick_time += 2;
-			LOGCEL("    xpos=%f ypos=%f\n", xpos, ypos );
 
-			const s32 hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
-			const s32 hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
-			const s32 vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
-			const s32 vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
-			m_cel.hdx = (double)hdx / 1048576.0;
-			m_cel.hdy = (double)hdy / 1048576.0;
-			m_cel.vdx = (double)vdx / 65536.0;
-			m_cel.vdy = (double)vdy / 65536.0;
-			tick_time += 4;
+			// - cpquazar uses all the !ldsize/!ldprs/!ldpixc in gameplay, minus !yoxy
+			if (yoxy)
+			{
+				const s32 xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
+				const s32 ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
+				// TODO: can be in 17.15 format (?)
+				m_cel.xpos = (double)xpos / 65536.0;
+				m_cel.ypos = (double)ypos / 65536.0;
+
+				tick_time += 2;
+			}
+			LOGCEL("    xpos=%f ypos=%f\n", m_cel.xpos, m_cel.ypos );
+
+			if (ldsize)
+			{
+				const s32 hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
+				const s32 hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
+				const s32 vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
+				const s32 vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
+				m_cel.hdx = (double)hdx / 1048576.0;
+				m_cel.hdy = (double)hdy / 1048576.0;
+				m_cel.vdx = (double)vdx / 65536.0;
+				m_cel.vdy = (double)vdy / 65536.0;
+
+				tick_time += 4;
+			}
 			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
-				, (double)m_cel.hdx / 1048576.0, (double)m_cel.hdy / 1048576.0
-				, (double)m_cel.vdx / 65536.0, (double)m_cel.vdy / 65536.0
+				, m_cel.hdx, m_cel.hdy
+				, m_cel.vdx, m_cel.vdy
 			);
 
-			const s32 hddx = (s32)m_dma32_read_cb(m_cel.address + 0x28);
-			const s32 hddy = (s32)m_dma32_read_cb(m_cel.address + 0x2c);
-			m_cel.hddx = (double)hddx / 1048576.0;
-			m_cel.hddy = (double)hddy / 1048576.0;
-			tick_time += 2;
-			LOGCEL("    hddx=%f hddy=%f\n", (double)m_cel.hddx / 1048576.0, (double)m_cel.hddy / 1048576.0);
+			if (ldprs)
+			{
+				const s32 hddx = (s32)m_dma32_read_cb(m_cel.address + 0x28);
+				const s32 hddy = (s32)m_dma32_read_cb(m_cel.address + 0x2c);
+				m_cel.hddx = (double)hddx / 1048576.0;
+				m_cel.hddy = (double)hddy / 1048576.0;
 
-			m_cel.pixc = m_dma32_read_cb(m_cel.address + 0x30);
-			tick_time += 1;
-			LOGCEL("    pixc=%08x\n", m_cel.pixc);
+				tick_time += 2;
+			}
+			LOGCEL("    hddx=%f hddy=%f\n", m_cel.hddx, m_cel.hddy);
+
+			if (ldpixc)
+			{
+				m_cel.pixc = m_dma32_read_cb(m_cel.address + 0x30);
+				tick_time += 1;
+				LOGCEL("    pixc=%08x\n", m_cel.pixc);
+				// TODO: only if MS not 2
+				const u8 df_table[4] = { 4, 1, 2, 3 };
+				m_cel.pixc_df[0] = df_table[BIT(m_cel.pixc, 24, 2)];
+				m_cel.pixc_df[1] = df_table[BIT(m_cel.pixc, 8, 2)];
+			}
 
 			// fetch the Preamble words
 			// May as well do it here because ...
@@ -943,7 +989,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 			// ... we have to take an intermediate step in case the CEL is compressed
 			m_cel.state = m_cel.packed ? DECOMPRESS : DRAW;
-			m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
+			m_cel_timer->adjust(attotime::from_ticks(1 + (tick_time >> 2), this->clock()));
 
 			break;
 		}
@@ -953,7 +999,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (tick_time)
 			{
 				m_cel.state = DRAW;
-				m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
+				m_cel_timer->adjust(attotime::from_ticks(1 + (tick_time >> 2), this->clock()));
 			}
 			break;
 		}
@@ -961,7 +1007,6 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 		{
 			tick_time = 1;
 
-			// TODO: doubled with lrform = 1 (?)
 			const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
 			const bool uncoded = !!BIT(m_cel.pre0, 4);
 			const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
@@ -1001,13 +1046,17 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				double actual_hdx = m_cel.hdx;
 				double actual_hdy = m_cel.hdy;
 
-				for (int y = 0; y < vcnt; y++)
+				// lrform enabled doubles vcnt
+				// - plumber choice screen
+				// - conandl FMV playbacks
+				// - retfire main menu
+				for (int y = 0; y < vcnt << lrform; y++)
 				{
 					for (int x = 0; x < tlhpcnt; x++)
 					{
 						// According to "The Projector" section this floors down,
 						// discarding the fractional part
-						// TODO: understand how enlarging truly works
+						// TODO: understand how enlarging truly works (check acw/accw)
 						int ypos = (s32)(m_cel.ypos + y * m_cel.vdy + x * actual_hdy);
 
 						if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
@@ -1052,7 +1101,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			{
 				m_cel.state = FETCH_PARAMS;
 				m_cel.address = m_cel.next_ptr;
-				m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
+				m_cel_timer->adjust(attotime::from_ticks(1 + (tick_time >> 2), this->clock()));
 			}
 
 			break;
@@ -1099,16 +1148,16 @@ const madam_device::fetch_rle_func madam_device::fetch_rle_table[16] =
 {
 	&madam_device::get_unemulated,  // 0: illegal
 	&madam_device::get_unemulated,
-	&madam_device::get_unemulated,  // 1: 1bpp
+	&madam_device::get_coded_1bpp,  // 1: 1bpp
 	&madam_device::get_unemulated,
-	&madam_device::get_unemulated,  // 2: 2bpp
+	&madam_device::get_coded_2bpp,  // 2: 2bpp
 	&madam_device::get_unemulated,
 	&madam_device::get_coded_4bpp,  // 3: 4bpp
 	&madam_device::get_unemulated,
 	&madam_device::get_coded_6bpp,  // 4: 6bpp
 	&madam_device::get_unemulated,
-	&madam_device::get_unemulated,  // 5: 8bpp
-	&madam_device::get_unemulated,
+	&madam_device::get_coded_8bpp,  // 5: 8bpp
+	&madam_device::get_uncoded_8bpp,
 	&madam_device::get_coded_16bpp, // 6: 16bpp
 	&madam_device::get_uncoded_16bpp,
 	&madam_device::get_unemulated,  // 7: illegal
@@ -1116,10 +1165,42 @@ const madam_device::fetch_rle_func madam_device::fetch_rle_table[16] =
 };
 
 // Stub for unemulated/illegal paths
+// bpp = 0 coded: ssf2xj in versus mode
 std::tuple<u16, u32> madam_device::get_unemulated(u32 ptr, u8 frac)
 {
 	return std::make_tuple(0, ptr + 1);
 };
+
+// - sailormn character select cursor
+// - slayer
+std::tuple<u16, u32> madam_device::get_coded_1bpp(u32 ptr, u8 frac)
+{
+	u8 idx;
+	const u32 plut_ptr = m_cel.plut_ptr;
+	std::tie(idx, ptr) = fetch_byte(ptr, frac);
+
+	// idx >>= 7;
+	// idx &= 0x01;
+	idx >>= 6;
+	idx &= 0x02;
+
+	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr);
+}
+
+// - sailormn cursor in character select (broken)
+std::tuple<u16, u32> madam_device::get_coded_2bpp(u32 ptr, u8 frac)
+{
+	u8 idx;
+	const u32 plut_ptr = m_cel.plut_ptr;
+	std::tie(idx, ptr) = fetch_byte(ptr, frac);
+
+	// idx >>= 6;
+	// idx &= 0x03;
+	idx >>= 5;
+	idx &= 0x06;
+
+	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr);
+}
 
 // - 3do_try "3" charset
 std::tuple<u16, u32> madam_device::get_coded_4bpp(u32 ptr, u8 frac)
@@ -1137,6 +1218,7 @@ std::tuple<u16, u32> madam_device::get_coded_4bpp(u32 ptr, u8 frac)
 }
 
 // - 3do_fz1 / 3do_fz10
+// - orbatak (in particular relative !spabs/!ppabs transitions)
 std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 {
 	u8 idx;
@@ -1144,15 +1226,54 @@ std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 	std::tie(idx, ptr) = fetch_byte(ptr, frac);
 
 	// idx >>= 2;
-	// idx &= 0x3f;
+	// idx &= 0x1f;
 	idx >>= 1;
-	idx &= 0x7e;
+	idx &= 0x3e;
+	// TODO: bit 5 is really p/w selector
 
 	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr);
 }
 
+// - sailormn gameplay (DF = 3, used for background shading away from camera)
+// - aquawrld
+// - oyajihmj versus screen (zoom letters shrink)
+std::tuple<u16, u32> madam_device::get_coded_8bpp(u32 ptr, u8 frac)
+{
+	const u32 plut_ptr = m_cel.plut_ptr;
+	u8 idx = m_dma8_read_cb(ptr);
+
+	const u8 alt_multiply = ((idx & 0xe0) >> 5) + 1;
+
+	idx <<= 1;
+	idx &= 0x3e;
+
+	const u16 src_data = (m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1);
+
+	s16 r = (src_data & 0x7c00) >> 10;
+	s16 g = (src_data & 0x03e0) >> 5;
+	s16 b = (src_data & 0x001f) >> 0;
+
+	r = std::min((r * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	g = std::min((g * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	b = std::min((b * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+
+	const u16 dst_data = (r << 10) | (g << 5) | b;
+
+	return std::make_tuple(dst_data, ptr + 1);
+}
+
+// - shanghtt (title background)
+std::tuple<u16, u32> madam_device::get_uncoded_8bpp(u32 ptr, u8 frac)
+{
+	const u16 src_idx = m_dma8_read_cb(ptr);
+	const u16 dst_data = (BIT(src_idx, 5, 3) << 12) | (BIT(src_idx, 2, 3) << 7) | (BIT(src_idx, 0, 2) << 3);
+
+	return std::make_tuple(dst_data, ptr + 1);
+}
+
 // - 3do_try on Sanyo 3DO logo
-// A wasteful mode, sets woffset10 and 2 bytes per color fetch for a PLUT lookup trip.
+// A wasteful use case, sets woffset10 and 2 bytes per color fetch for a PLUT lookup trip.
+// TODO: actual SW should actually really use 32 PLUTs and the alternate multiply instead
 std::tuple<u16, u32> madam_device::get_coded_16bpp(u32 ptr, u8 frac)
 {
 	const u32 plut_ptr = m_cel.plut_ptr;
@@ -1181,14 +1302,16 @@ u32 madam_device::cel_decompress()
 	const bool uncoded = !!BIT(m_cel.pre0, 4);
 	const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
 
-	if ((bpp == 0 || bpp == 7) ||
-		(bpp == 1) ||
-		(bpp == 2) ||
-		(bpp == 3 && uncoded) ||
-		(bpp == 4 && uncoded) ||
-		(bpp == 5))
+	if ((bpp == 7)
+		|| (bpp == 1 && uncoded)
+		|| (bpp == 2 && uncoded)
+		|| (bpp == 3 && uncoded)
+		|| (bpp == 4 && uncoded)
+		//|| (bpp == 5 && !uncoded)
+		)
 	{
 		popmessage("3do_madam.cpp: unsupported Packed CEL %d %d %08x", bpp, uncoded, source_ptr);
+		LOGCEL("Unemulated: bpp=%d uncoded=%d!\n", bpp, uncoded);
 		m_statbits |= (1 << 6);
 		cel_stop_w(0, 0, 0xffffffff);
 		return 0;
@@ -1427,6 +1550,8 @@ u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 }
 
 // - fz10 Storage Managers
+// - demoman FMVs (options -> difficulty select, DF = 2)
+// - cfodder gameplay (DF = 3)
 u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
@@ -1436,13 +1561,29 @@ u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	cel_address += ((x) << 0);
 	//u8 src_shift = (x & 3) ^ 3;
 
-	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 8)) & 0xff;
-	u16 plut_data = m_dma8_read_cb(cel_address);
+	// Source contains the lower PLUT ...
+	const u8 byte_data = m_dma8_read_cb(cel_address);
+	u16 plut_data = byte_data & 0x1f;
 	plut_data <<= 1;
+
+	// ... then 3 bits that defines highlight/shadow of said PLUT
+	// The algo is not defined by docs, just a sketchy mention of the format in "Cel Engine" Table 2.
+	// Elsewhere it mentions using an "Alternate Multiply" label ...
+	const u8 alt_multiply = ((byte_data & 0xe0) >> 5) + 1;
 
 	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
 
-	return src_data;
+	s16 r = (src_data & 0x7c00) >> 10;
+	s16 g = (src_data & 0x03e0) >> 5;
+	s16 b = (src_data & 0x001f) >> 0;
+
+	r = std::min((r * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	g = std::min((g * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	b = std::min((b * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+
+	u16 dst_data = (r << 10) | (g << 5) | b;
+
+	return dst_data;
 }
 
 // - megarace "now loading" / "prepare to race"
@@ -1481,7 +1622,7 @@ u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
-	cel_address += ((y & ~1) * (woffset)) << 2;
+	cel_address += ((y & ~1) * (woffset)) << (1);
 	cel_address += ((x) << 2);
 	u8 src_shift = (y & 1) ^ 1;
 
@@ -1493,7 +1634,113 @@ u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 u16 madam_device::get_pixel_packed(int x, int y, u16 woffset)
 {
 	const u16 pitch = 0x1000;
+	const u32 src_address = x + (y * pitch);
 
-	u16 src_data = m_cel.buffer[x + (y * pitch)];
+	u16 src_data = m_cel.buffer[src_address];
+	// Clear after use so that the next CEL won't draw glitchy GFXs due of
+	// PACK_EOL + the calculated tlhpcnt.
+	// Location here is primarily performance oriented, would tank if we 0-fill the full vector stack.
+	m_cel.buffer[src_address] = 0;
 	return src_data;
+}
+
+/******************
+ *
+ * Mult(iplier) Math stack
+ *
+ ******************/
+
+// TODO: details of this are sketchy
+// in particular timings and what happens with creative use of it.
+// - docthauz is reportedly slow on real HW
+void madam_device::mult_start_process_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// any data > 0xf has kinky behaviour on HW
+	if (mem_mask != 0xffff'ffff)
+	{
+		popmessage("Mult: illegal access attempt %08x & %08x", data, mem_mask);
+		return;
+	}
+
+	switch(data)
+	{
+		// 0: swap
+		case 0:
+		{
+			LOGMULT("SWAP\n");
+			for (int i = 0; i < 4; i++)
+				m_mult[16 + 8 + i] = m_mult[16 + 12 + i];
+
+			break;
+		}
+		// 1: 4x4 MAC
+		// ...
+
+		// 2: 3x3 MAC
+		// - slayer, docthauz, retfire
+		case 2:
+		{
+			int x, y;
+			double matrix_stack[3][3];
+			//const u8 op_size = 3 + (data == 1);
+
+			// populate the *previous* operation result
+			// i.e. perform a swap first
+			for (x = 0; x < 3; x++)
+				m_mult[16 + 8 + x] = m_mult[16 + 12 + x];
+
+			LOGMULT("3x3 MAC: ");
+			for (y = 0; y < 3; y++)
+			{
+				for (x = 0; x < 3; x++)
+				{
+					matrix_stack[x][y] = (double)m_mult[x + y * 4] / 65536.0;
+					LOGMULT("%f ", matrix_stack[x][y]);
+				}
+				LOGMULT("| ");
+			}
+			LOGMULT("\n");
+			double b_bank[3];
+			double result[3] { 0.0, 0.0, 0.0 };
+
+			for (x = 0; x < 3; x++)
+				b_bank[x] = (double)m_mult[16 + x] / 65536.0;
+
+			LOGMULT("bank [%d]: %f %f %f\n", 16, b_bank[0], b_bank[1], b_bank[2]);
+
+			// perform dot product
+			for (x = 0; x < 3; x++)
+			{
+				for (y = 0; y < 3; y++)
+				{
+					result[y] += matrix_stack[x][y] * b_bank[x];
+				}
+			}
+			LOGMULT("-----\nresult [%d] = ", 16 + 12);
+
+			// TODO: how 4th value gets populated by a 3x3? Untouched? Zero? Other?
+			// Requires a SW that mixes 4x4 with 3x3 ops
+			for (x = 0; x < 3; x++)
+			{
+				m_mult[16 + 12 + x] = (s32)(result[x] * 65536.0);
+				LOGMULT("%f ", result[x]);
+				//LOGMULT("%08x ", m_mult[bank_src + 8 + x]);
+			}
+			LOGMULT("\n\n");
+			//m_mult_control ^= 0x10;
+			break;
+		}
+		// 3: 3x3 MAC w/divide and multiply
+		// 4: 4x1 MAC
+		// 5: 1x1 MAC (4 sets)
+		// 8: CCoB conversion
+		// 9: CCoB conversion w/ pre-divided values
+		// c: Small Divide
+		// d: Big Divide (not implemented on stock 3do)
+
+		// 6,7,a,b,e,f: <reserved>
+		default:
+			popmessage("Mult: unemulated or invalid trigger %02x & %08x", data, mem_mask);
+			break;
+	}
 }
