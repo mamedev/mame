@@ -699,7 +699,7 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 				  ) >> 10;
 	s16 result = std::clamp<s32>(racc, -0x8000, 0x7fff);
 
-	u32 pitch = m_pitch + pitch_lfo;
+	u32 pitch = (m_pitch & 0x3fff) + pitch_lfo;
 	if(m_finetune_active) {
 		s32 ft = (m_loop >> 24) & 0x7f;
 		if(ft & 0x40)
@@ -742,7 +742,7 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 
 void swp30_device::streaming_block::update_loop_size()
 {
-	m_loop_size = m_loop & 0x3ffffff;
+	m_loop_size = m_loop & 0xffffff;
 	if(!m_loop_size && !((m_loop & 0x80000000) || (m_start & 0x40000000)))
 		m_loop_size = 0x400;
 }
