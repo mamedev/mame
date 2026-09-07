@@ -264,6 +264,9 @@ static void isa_com(device_slot_interface &device)
 
 void riscpc_state::base_config(machine_config &config)
 {
+	constexpr XTAL refxtal(24_MHz_XTAL);
+
+	// PCF8583, same as Archimedes
 	I2C_24C02(config, m_i2cmem);
 
 	// auxiliary connector
@@ -280,12 +283,14 @@ void riscpc_state::base_config(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
+	ARM_VIDC20(config, m_vidc, refxtal);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
 	m_vidc->add_route(0, "speaker", 1.00, 0);
 	m_vidc->add_route(1, "speaker", 1.00, 1);
+	m_vidc->set_ext_vclk(refxtal);
+	m_vidc->set_int_sclk(refxtal);
 
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
@@ -305,7 +310,7 @@ void riscpc_state::base_config(machine_config &config)
 	// https://arcwiki.org.uk/index.php/FDC37C665GT
 	// sarpc_j233 also uses a 'GT, as per the identifier check it does at startup (65h in CRD)
 	// some systems may use a '672 instead (TBD, which ones?)
-	FDC37C665GT(config, m_superio, XTAL(24'000'000), upd765_family_device::mode_t::AT);
+	FDC37C665GT(config, m_superio, refxtal, upd765_family_device::mode_t::AT);
 	m_superio->set_ide<0>(m_ide[0]);
 	m_superio->set_ide<1>(m_ide[1]);
 	m_superio->fintr().set(m_iomd, FUNC(arm_iomd_device::int4_w));
@@ -383,6 +388,9 @@ void riscpc_state::a7000(machine_config &config)
 
 	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
+	m_vidc->set_clock(cpuxtal / 2);
+	m_vidc->set_ext_vclk((cpuxtal / 4) * 3);
+	m_vidc->set_int_sclk((cpuxtal / 4) * 3);
 }
 
 void riscpc_state::a7000p(machine_config &config)
@@ -394,6 +402,9 @@ void riscpc_state::a7000p(machine_config &config)
 
 	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
+	m_vidc->set_clock(cpuxtal / 3);
+	m_vidc->set_ext_vclk((cpuxtal / 3) * 2);
+	m_vidc->set_int_sclk(cpuxtal / 2);
 }
 
 void riscpc_state::sarpc(machine_config &config)
@@ -407,7 +418,7 @@ void riscpc_state::sarpc(machine_config &config)
 	SA110(config, m_maincpu, cpuxtal * 44);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	// TODO: bump me up
+	// TODO: bump me up, check VIDC clocks
 	ARM_IOMD(config, m_iomd, cpuxtal * 44);
 	base_config(config);
 }

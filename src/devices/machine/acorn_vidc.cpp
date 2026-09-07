@@ -665,12 +665,15 @@ void arm_vidc20_device::regs_map(address_map &map)
 	map(0xf0, 0xff).w(FUNC(arm_vidc20_device::dctl_w));
 }
 
+// defaults are irrelevant, needs to be set by client depending on what they use.
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock, 2)
-	, m_pixel_source(0)
-	, m_pixel_rate(0)
+	, m_pixel_source(2)
+	, m_pixel_rate(1)
 	, m_dac32(*this, "serial_dac_%u", 0)
-	, m_ext_sclk(24'000'000)
+	, m_ext_vclk(XTAL(24'000'000))
+	, m_ext_sclk(XTAL(24'000'000))
+	, m_int_sclk(XTAL(24'000'000))
 {
 	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
 	m_pal_4bpp_base = 0x000;
@@ -742,6 +745,7 @@ void arm_vidc20_device::device_reset()
 	// TODO: sensible defaults
 	m_vco_r_modulo = 1;
 	m_vco_v_modulo = 1;
+	m_pixel_rate = 1;
 
 	m_clksel = 1;
 
@@ -805,22 +809,21 @@ void arm_vidc20_device::vidc20_pal_data_cursor_w(offs_t offset, u32 data)
 	update_8bpp_palette(m_pal_cursor_base + cursor_pal_index, (ext_data<<24) | data);
 }
 
+// Pixel sources:
+// ---- --00: VCLK (MonitorType 3 or 4 VGA/SVGA)
+// ---- --01: HCLK (?)
+// ---- --10: RCLK (MonitorType 0 TV, reference clock,
+//                  24 MHz for IOMD, CLK16 for 7500FE (i.e. divided by 2))
+// ---- --11: <undefined>, possibly same as RCLK
+// Assume that TV output is ~50 Hz while (S)VGA 56~75 Hz
+// All ssfindo.cpp games uses RCLK and output ~56.20 Hz (again unverified)
 u32 arm_vidc20_device::get_pixel_clock()
 {
-	// RCLK source: passes thru a r-modulus and a phase frequency (PCOMP), the full story is interesting if you're into maths.
-	// TODO: for now we just multiply source clock by 2, enough for ssfindo.cpp games.
-	//printf("%d %02x %02x %d %d\n",this->clock(), 1 << m_pixel_rate, m_pixel_source, m_vco_v_modulo, m_vco_r_modulo);
-	if (m_pixel_source == 2) // RCLK
-		return (this->clock() << 1) >> m_pixel_rate;
+	const u32 pixel_freq = m_pixel_source & 2 ? this->clock() : m_ext_vclk.value();
+	if (m_pixel_source & 1)
+		popmessage("%s unemulated pixel source %d", this->tag(), m_pixel_source);
 
-	// VCLK source is just an external connection
-	// TODO: get clock from outside world, understand how the modulos are really used,
-	//       understand if SW do some VCO testing before setting CRTC params,
-	//       if there isn't a monitor ID mechanism that copes with this
-	if (m_pixel_source == 0) // VCLK
-		return (25175000);
-
-	throw emu_fatalerror("%s unhandled pixel source %02x selected",this->tag(), m_pixel_source);
+	return ((pixel_freq * m_vco_v_modulo) / m_vco_r_modulo) / m_pixel_rate;
 }
 
 void arm_vidc20_device::vidc20_crtc_w(offs_t offset, u32 data)
@@ -874,8 +877,8 @@ void arm_vidc20_device::ereg_w(u32 data)
 
 void arm_vidc20_device::fsynreg_w(u32 data)
 {
-	m_vco_r_modulo = data & 0x3f;
-	m_vco_v_modulo = (data >> 8) & 0x3f;
+	m_vco_r_modulo = (data & 0x3f) + 1;
+	m_vco_v_modulo = ((data >> 8) & 0x3f) + 1;
 	// bits 15-14 and 7-6 are test bits
 
 	LOG("fsynreg [0xd0]: %08x\n", data);
@@ -886,12 +889,8 @@ void arm_vidc20_device::fsynreg_w(u32 data)
 
 void arm_vidc20_device::vidc20_control_w(u32 data)
 {
-	// ---- --00: VCLK
-	// ---- --01: HCLK
-	// ---- --10: RCLK ("recommended" 24 MHz)
-	// ---- --11: undefined, probably same as RCLK
 	m_pixel_source = data & 3;
-	m_pixel_rate = (data >> 2) & 7;
+	m_pixel_rate = ((data >> 2) & 7) + 1;
 	// (data & 0x700) >> 8 FIFO load
 	// BIT(data, 13) enables Duplex LCD mode
 	// BIT(data, 14) power down
@@ -940,13 +939,13 @@ u32 arm_vidc20_device::get_sound_clock()
 	// ppcar
 	if (!m_clksel)
 	{
-		return m_ext_sclk / 24;
+		return m_ext_sclk.value() / 24;
 	}
 
 	// 32-bit mode doubles clock rate
 	const u8 divider = 24 << get_dac_mode();
 
-	return (clock() / divider);
+	return (m_int_sclk.value() / divider);
 }
 
 

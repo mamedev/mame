@@ -162,7 +162,12 @@ public:
 	// construction/destruction
 	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_ext_sclk(u32 clock) { m_ext_sclk = clock; }
+	// external VCLK (used as (S)VGA MonitorType 3/4)
+	void set_ext_vclk(XTAL clock) { m_ext_vclk = clock; }
+	// external SCLK (sound in ppcar)
+	void set_ext_sclk(XTAL clock) { m_ext_sclk = clock; }
+	// internal SCLK (everything else)
+	void set_int_sclk(XTAL clock) { m_int_sclk = clock; }
 
 	void write_dac32(u8 channel, s16 data);
 	virtual bool get_dac_mode() override;
@@ -202,7 +207,9 @@ private:
 
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac32;
 
-	u32 m_ext_sclk;
+	XTAL m_ext_vclk;
+	XTAL m_ext_sclk;
+	XTAL m_int_sclk;
 
 //	virtual void refresh_stereo_image(u8 channel) override;
 };
