@@ -37,10 +37,6 @@ Elektor magazine references (English):
 
 For the German magazine, AVR-Max-Schachzwerg and CC2-Schachzwerg are in 06/2009.
 
-TODO:
-- AVR8 SLEEP opcode is not working, it's used for power-saving here and was
-  harmless to hack out, but needs to be put back when it's emulated
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -305,28 +301,12 @@ ROM_START( avrmax )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "elektor_081101-41.ic1", 0x0000, 0x2000, CRC(86d2a654) SHA1(3c235b8f6f735eaf408f54cbf44872166e7161d5) ) // avrmax_en-v1.0.hex
 
-	// HACK: changed SLEEP to NOP
-	ROM_FILL( 0x025c, 2, 0x00 )
-	ROM_FILL( 0x0f8e, 2, 0x00 )
-	ROM_FILL( 0x0fde, 2, 0x00 )
-	ROM_FILL( 0x1020, 2, 0x00 )
-	ROM_FILL( 0x1060, 2, 0x00 )
-	ROM_FILL( 0x129a, 2, 0x00 )
-
 	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( avrmaxg )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "elektor_081101-41_d.ic1", 0x0000, 0x2000, CRC(18ec7a56) SHA1(a018421aa0ad8cce3d852f7519dec3691f3c55a0) ) // avrmax_de-v1.0.hex
-
-	// HACK: changed SLEEP to NOP
-	ROM_FILL( 0x025c, 2, 0x00 )
-	ROM_FILL( 0x0f8e, 2, 0x00 )
-	ROM_FILL( 0x0fde, 2, 0x00 )
-	ROM_FILL( 0x1020, 2, 0x00 )
-	ROM_FILL( 0x1060, 2, 0x00 )
-	ROM_FILL( 0x129a, 2, 0x00 )
 
 	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )
 ROM_END
@@ -335,28 +315,12 @@ ROM_START( atm18mcc )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "avrmax_cc2_en-v1.0.bin", 0x0000, 0x2000, CRC(715f4642) SHA1(d20739c6caa49a01e002b3dfbf0f39abf7992540) )
 
-	// HACK: changed SLEEP to NOP
-	ROM_FILL( 0x05da, 2, 0x00 )
-	ROM_FILL( 0x1466, 2, 0x00 )
-	ROM_FILL( 0x14a2, 2, 0x00 )
-	ROM_FILL( 0x14de, 2, 0x00 )
-	ROM_FILL( 0x1528, 2, 0x00 )
-	ROM_FILL( 0x16fe, 2, 0x00 )
-
 	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( cc2schach )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "avrmax_cc2_de-v1.0.bin", 0x0000, 0x2000, CRC(64cfc646) SHA1(4c371ea9f48c8745cf5f5bcf10973838e239e564) )
-
-	// HACK: changed SLEEP to NOP
-	ROM_FILL( 0x05da, 2, 0x00 )
-	ROM_FILL( 0x1466, 2, 0x00 )
-	ROM_FILL( 0x14a2, 2, 0x00 )
-	ROM_FILL( 0x14de, 2, 0x00 )
-	ROM_FILL( 0x1528, 2, 0x00 )
-	ROM_FILL( 0x16fe, 2, 0x00 )
 
 	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )
 ROM_END

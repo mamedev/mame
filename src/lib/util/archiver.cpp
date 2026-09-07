@@ -25,7 +25,6 @@
 #include "timeconv.h"
 
 #include <zlib.h>
-#include <zutil.h>
 
 #include <algorithm>
 #include <cassert>
@@ -538,7 +537,7 @@ public:
 			if (m_z_inited)
 				zerr = deflateReset(&m_z_stream);
 			else
-				zerr = deflateInit2(&m_z_stream, 9, Z_DEFLATED, -MAX_WBITS, DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY);
+				zerr = deflateInit2(&m_z_stream, 9, Z_DEFLATED, -MAX_WBITS, 8, Z_DEFAULT_STRATEGY);
 			if (Z_OK != zerr)
 				return std::make_pair(write_stream::ptr(), std::errc::not_enough_memory);
 			m_z_stream.next_out = reinterpret_cast<Bytef *>(&m_buffer[0]);

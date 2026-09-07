@@ -665,8 +665,10 @@ void arm_vidc20_device::regs_map(address_map &map)
 	map(0xa0, 0xa7).w(FUNC(arm_vidc20_device::stereo_image_w));
 	map(0xb0, 0xb0).w(FUNC(arm_vidc20_device::vidc20_sound_frequency_w));
 	map(0xb1, 0xb1).w(FUNC(arm_vidc20_device::vidc20_sound_control_w));
+	map(0xc0, 0xcf).w(FUNC(arm_vidc20_device::ereg_w));
 	map(0xd0, 0xdf).w(FUNC(arm_vidc20_device::fsynreg_w));
 	map(0xe0, 0xef).w(FUNC(arm_vidc20_device::vidc20_control_w));
+	map(0xf0, 0xff).w(FUNC(arm_vidc20_device::dctl_w));
 }
 
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -863,11 +865,27 @@ void arm_vidc20_device::vidc20_crtc_w(offs_t offset, u32 data)
 	screen_dynamic_res_change();
 }
 
+void arm_vidc20_device::ereg_w(u32 data)
+{
+	LOG("ereg [0xc0]: %08x (EREG %02x)\n", data, data & 0xf3);
+	LOG("\tECK %d | PEDON %d | DACs %s | LCD grayscale %d | HiRes %d\n"
+		, BIT(data, 2)
+		, (data >> 8) & 7
+		, BIT(data, 12) ? "on" : "power-down"
+		, BIT(data, 13)
+		, BIT(data, 14)
+	);
+	LOG("\tsyn-HS %d syn-VS %d\n", (data >> 16) & 3, (data >> 18) & 3);
+}
+
 void arm_vidc20_device::fsynreg_w(u32 data)
 {
 	m_vco_r_modulo = data & 0x3f;
 	m_vco_v_modulo = (data >> 8) & 0x3f;
 	// bits 15-14 and 7-6 are test bits
+
+	LOG("fsynreg [0xd0]: %08x\n", data);
+	LOG("\tref clock %d VCO clock %d\n", m_vco_r_modulo, m_vco_v_modulo);
 
 	screen_dynamic_res_change();
 }
@@ -879,16 +897,48 @@ void arm_vidc20_device::vidc20_control_w(u32 data)
 	// ---- --10: RCLK ("recommended" 24 MHz)
 	// ---- --11: undefined, probably same as RCLK
 	m_pixel_source = data & 3;
-	m_pixel_rate = (data & 0x1c) >> 2;
+	m_pixel_rate = (data >> 2) & 7;
 	// (data & 0x700) >> 8 FIFO load
 	// BIT(data, 13) enables Duplex LCD mode
 	// BIT(data, 14) power down
-	// (data & 0xf0000) >> 16 test mode
+	const u8 test_mode = (data >> 16) & 0xf;
 	m_bpp_mode = (data & 0xe0) >> 5;
 	m_crtc_interlace = BIT(data, 12);
 
+	if (BIT(m_bpp_mode, 2))
+		popmessage("%s Unemulated High/True Color mode (%x)", this->tag(), m_bpp_mode);
+
+	LOG("conreg [0xe0]: %08x\n", data);
+	LOG("\tPixel Source %d | Pixel Rate %d | BPP %d | FIFO load %d\n"
+		, m_pixel_source, m_pixel_rate, m_bpp_mode
+		, ((data >> 8) & 7) * 4
+	);
+	LOG("\tINTerlace %d | DUP %d | Power Down %d | TEST %d\n"
+		, m_crtc_interlace
+		, BIT(data, 13)
+		, BIT(data, 14)
+		, test_mode
+	);
+
 	screen_vblank_line_update();
 	screen_dynamic_res_change();
+}
+
+void arm_vidc20_device::dctl_w(u32 data)
+{
+	LOG("dctl [0xf0]: %08x\n", data);
+	LOG("\tHDWR %02x | SnA %s | Hdis %d\n"
+		, data & 0x3ff
+		, BIT(data, 12) ? "Sync" : "Async"
+		, BIT(data, 13) ? "Disable" : "Enable"
+	);
+	LOG("\tBUS %d | VRAM %d\n"
+		// 00=N/S, 01= D[31:0], 10=D[63:32], 11=D[63:0]
+		, (data >> 16) & 3
+		// 00=disable 01=pixclk, 10=pixclk/2 11=pixclk/4
+		, (data >> 18) & 3
+	);
+
 }
 
 u32 arm_vidc20_device::get_sound_clock()

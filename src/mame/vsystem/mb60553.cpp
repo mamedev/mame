@@ -2,7 +2,8 @@
 // copyright-holders:David Haywood
 /* This is the tilemap chip used by Grand Striker, Tecmo World Cup '94 and V Goal Soccer for the backgrounds
 
-  the actual line scroll / zoom is not properly understood
+  the per-line zoom/scroll table format was worked out from the Grand Striker
+  and V Goal Soccer pitch tables and the title screen zooms, see draw() below
 
   interestingly the chip seems to require doubled up ROMs (2 copies of each ROM) to draw just the single layer.
 
@@ -69,7 +70,7 @@ void mb60553_zooming_tilemap_device::device_reset()
 - Map 64x64
 - Scrolling
 - Indexed banking (8 banks)
-- Surely another effect like roz/tilezoom, yet to be implemented
+- Per-line zoom/scroll table (see draw() below)
 
 
     Videoram format
@@ -83,11 +84,11 @@ t=tile, b=bank, p=palette
     Registers
     ---------
 
-0 - Scroll X
-Fixed point 12.4 (seems wrong)
+0 - Start X
+Fixed point 12.4 signed, latched at the top of the frame (see the line table notes below)
 
-1 - Scroll Y
-Fixed point 12.4 (seems wrong)
+1 - Start Y
+Fixed point 12.4 signed, latched at the top of the frame
 
 2 - ????
 
@@ -124,11 +125,8 @@ void mb60553_zooming_tilemap_device::reg_written( int num_reg)
 	switch (num_reg)
 	{
 	case 0:
-		m_tmap->set_scrollx(0, m_regs[0]>>4);
-		break;
-
 	case 1:
-		m_tmap->set_scrolly(0, m_regs[1]>>4);
+		// start X/Y, used directly by draw()
 		break;
 
 	case 2:
@@ -172,120 +170,85 @@ TILEMAP_MAPPER_MEMBER(mb60553_zooming_tilemap_device::twc94_scan)
 	return (row << 6) + (col & 0x003f) + (BIT(col, 6) << 12);
 }
 
-void mb60553_zooming_tilemap_device::draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
+/*
+    Per-line table (0x1000 bytes = 256 entries of 8 words)
+
+    The chip keeps a source X/Y accumulator (16.16 internally here).  At the
+    first line of the frame it is loaded from registers 0/1 (12.4 signed).
+    For every following line the entry's per-line steps are added, and the
+    line is then drawn by stepping the per-pixel increments from the
+    accumulator.  The horizontal pixel counter is 21 pixels ahead of the
+    first visible pixel: a step of 1.0 with register 0 = -21 (0xfeb0, the
+    value the games program at reset and on the title screens) is an
+    identity mapping.
+
+    w0  X step per pixel, 4.12 signed
+    w1  unknown (always 0)
+    w2  unknown (always 0)
+    w3  Y step per line, 4.12 signed
+    w4  Y step per pixel, 4.12 signed
+    w5  unknown (always 0)
+    w6  unknown (always 0)
+    w7  X step per line, 4.12 signed, subtracted
+
+    V Goal Soccer's rotating intro programs w0 = w3 = s*cos(a) and
+    w4 = w7 = s*sin(a) on every line, which fixes the sign of w7.
+
+    Grand Striker and V Goal Soccer draw their pitch with a fixed ROM table
+    of w0/w3/w7 per line (w0 follows a 1/depth law, w7 = -181 * delta(w0)
+    so that the centre column stays under screen X = 160), scrolling only
+    with registers 0/1.  Tecmo World Cup '94 rewrites w0-w3 every frame.
+*/
+void mb60553_zooming_tilemap_device::draw_line(bitmap_ind16 &destbitmap, int line, int min_x, int max_x, int32_t startx, int32_t starty, int32_t incxx, int32_t incxy)
 {
-	// pre-cache all the inner loop values
-	//const rgb_t *clut = m_palette->palette()->entry_list_adjusted();
 	const int xmask = m_tmap->pixmap().width() - 1;
 	const int ymask = m_tmap->pixmap().height() - 1;
-	const int widthshifted = m_tmap->pixmap().width() << 16;
-	const int heightshifted = m_tmap->pixmap().height() << 16;
-	uint8_t mask = 0x1f;// blit.mask;
-	uint8_t value = 0x10;// blit.value;
-	bitmap_ind16 &srcbitmap = m_tmap->pixmap();
-	bitmap_ind8 &flagsbitmap = m_tmap->flagsmap();
+	const bitmap_ind16 &srcbitmap = m_tmap->pixmap();
+	const bitmap_ind8 &flagsbitmap = m_tmap->flagsmap();
 
-	// extract start/end points
-	int sy = cliprect.min_y;
-	int ey = cliprect.max_y;
+	uint16_t *dest = &destbitmap.pix(line, min_x);
+	int32_t xxx = startx + (min_x + PIXEL_OFFSET) * incxx;
+	int32_t yyy = starty + (min_x + PIXEL_OFFSET) * incxy;
 
-	// loop over rows
-	while (sy <= ey)
+	for (int sx = min_x; sx <= max_x; sx++)
 	{
-		// get dest and priority pointers
-		int sx = cliprect.min_x;
-		int ex = cliprect.max_x;
+		const int xx = (xxx >> 16) & xmask;
+		const int yy = (yyy >> 16) & ymask;
 
-		uint16_t *dest = &destbitmap.pix(sy, sx);
+		if ((flagsbitmap.pix(yy, xx) & TILEMAP_PIXEL_LAYER0) != 0)
+			*dest = srcbitmap.pix(yy, xx);
 
-		// loop over columns
-		while (sx <= ex)
-		{
-			int xxx = startx + (sy*incyx) + (sx*incxx);
-			int yyy = starty + (sy*incyy) + (sx*incxy);
-
-			if (wraparound)
-			{
-				yyy = (yyy >> 16) & ymask;
-				xxx = (xxx >> 16) & xmask;
-
-				if ((flagsbitmap.pix(yyy, xxx) & mask) == value)
-				{
-					*dest = (srcbitmap.pix(yyy, xxx));
-				}
-			}
-			else
-			{
-				if (xxx < widthshifted && yyy < heightshifted)
-				{
-					yyy = (yyy >> 16);
-					xxx = (xxx >> 16);
-
-					if ((flagsbitmap.pix(yyy, xxx) & mask) == value)
-					{
-						*dest = (srcbitmap.pix(yyy, xxx));
-					}
-				}
-			}
-
-			// advance in X
-			sx++;
-			dest++;
-			//pri++;
-		}
-
-		// advance in Y
-		sy++;
+		dest++;
+		xxx += incxx;
+		yyy += incxy;
 	}
 }
 
-
-
-
-
-/* THIS IS STILL WRONG! */
-void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority)
+void mb60553_zooming_tilemap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	int line;
-	rectangle clip;
+	const rectangle &visarea = screen.visible_area();
 
-	clip.min_x = screen.visible_area().min_x;
-	clip.max_x = screen.visible_area().max_x;
+	// registers 0/1 are 12.4, line table entries are 4.12, accumulator is 16.16
+	int32_t xacc = int32_t(int16_t(m_regs[0])) << 12;
+	int32_t yacc = int32_t(int16_t(m_regs[1])) << 12;
 
-	for (line = screen.visible_area().min_y; line < screen.visible_area().max_y;line++)
+	for (int line = visarea.min_y; line <= visarea.max_y; line++)
 	{
-//      int scrollx;
-//      int scrolly;
-		uint32_t startx,starty;
-		int32_t incxx,incyy;
-		int32_t incxy,incyx;
-		float xoffset;
+		const uint16_t *const entry = &m_lineram[(line & 0xff) * 8];
 
-		// confirmed on how ROZ is used
-		incyy = ((int16_t)m_lineram[(line)*8+0])<<4;
-		incxx = ((int16_t)m_lineram[(line)*8+3])<<4;
+		if (line != visarea.min_y)
+		{
+			xacc -= int32_t(int16_t(entry[7])) << 4;
+			yacc += int32_t(int16_t(entry[3])) << 4;
+		}
 
-		// startx has an offset based off current x zoom value
-		// This is confirmed by Tecmo World Cup '94 startx being 0xff40 (-192) when showing footballer pics on attract mode (incxx is 0x800)
-		// TODO: slightly offset?
-		xoffset = ((float)incyy/(float)0x10000) * 384.0;
+		if (line >= cliprect.min_y && line <= cliprect.max_y)
+		{
+			const int32_t incxx = int32_t(int16_t(entry[0])) << 4;
+			const int32_t incxy = int32_t(int16_t(entry[4])) << 4;
 
-		startx = m_regs[0] + (int32_t)xoffset;
-		starty = m_regs[1];
-
-		// TODO: what's this? Used by Grand Striker playfield
-		incyx =  ((int16_t)m_lineram[(line)*8+7])<<4;
-		// V Goal Soccer rotation
-		incxy =  ((int16_t)m_lineram[(line)*8+4])<<4;
-
-		clip.min_y = clip.max_y = line;
-
-		draw_roz_core(screen, bitmap, clip, startx<<12,starty<<12,
-				incxx,incxy,-incyx,incyy,
-				1
-				);
-
+			draw_line(bitmap, line, cliprect.min_x, cliprect.max_x, xacc, yacc, incxx, incxy);
+		}
 	}
 }
 
