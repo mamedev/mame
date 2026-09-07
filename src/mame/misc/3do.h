@@ -80,7 +80,11 @@ private:
 	memory_share_creator<uint32_t> m_dram;
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<nvram_device> m_nvram;
+	// HACK: protected for adapting with Arcade systems
+	// The only thing required being protected will eventually be the Player Bus only
+protected:
 	required_device<madam_device> m_madam;
+private:
 	required_device<clio_device> m_clio;
 	required_device<amy_device> m_amy;
 	required_device<cr560b_device> m_cdrom;
@@ -88,7 +92,9 @@ private:
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	memory_view m_overlay_view;
 	required_device<address_map_bank_device> m_bankdev;
+protected:
 	required_ioport_array<2> m_p1_r;
+private:
 
 	SLOW2 m_slow2;
 	UNCLE m_uncle;
@@ -112,5 +118,51 @@ private:
 	TIMER_CALLBACK_MEMBER(soft_reset_cb);
 };
 
+class orbatak_state : public _3do_state
+{
+public:
+	orbatak_state(const machine_config &mconfig, device_type type, const char *tag)
+		: _3do_state(mconfig, type, tag)
+		, m_track_p1_r(*this, "TRACK1.%u", 0)
+		, m_track_p2_r(*this, "TRACK2.%u", 0)
+		, m_raw_analog(*this, "RAW_ANALOG.%u", 0)
+	{ }
+
+	void orbatak(machine_config &config);
+
+	template <unsigned P> ioport_value analog_0_r()
+	{
+		return (m_track_delta[P * 2] >> 6) & 0xf;
+	}
+
+	template <unsigned P> ioport_value analog_1_r()
+	{
+		const u8 track_y = (m_track_delta[P * 2] & 0x3f) << 2;
+		const u8 track_x = (m_track_delta[P * 2 + 1] & 0x300) >> 8;
+		return track_x | track_y;
+	}
+
+	template <unsigned P> ioport_value analog_2_r()
+	{
+		return m_track_delta[P * 2 + 1] & 0xff;
+	}
+
+private:
+	required_ioport_array<3> m_track_p1_r;
+	required_ioport_array<3> m_track_p2_r;
+	required_ioport_array<4> m_raw_analog;
+	u16 m_track_previous[4];
+	u16 m_track_delta[4];
+};
+
+class alg_gun_state : public _3do_state
+{
+public:
+	alg_gun_state(const machine_config &mconfig, device_type type, const char *tag)
+		: _3do_state(mconfig, type, tag)
+	{ }
+
+	void alg_gun(machine_config &config);
+};
 
 #endif // MAME_MISC_3DO_H

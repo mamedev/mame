@@ -73,7 +73,7 @@ void sd2iec_device::device_add_mconfig(machine_config &config)
 
 	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set(FUNC(sd2iec_device::sdcard_miso_w));
-	m_sdcard->card_present_callback().set(FUNC(sd2iec_device::card_exists_w));
+	m_sdcard->card_present_callback().set(m_maincpu, FUNC(atmega1284_device::pd_w<2>));
 }
 
 void sd2iec_device::sdcard_miso_w(int state)
@@ -81,24 +81,19 @@ void sd2iec_device::sdcard_miso_w(int state)
 	m_sdcard_miso = state;
 }
 
-void sd2iec_device::card_exists_w(int state)
-{
-	m_maincpu->pin_change<atmega1284_device::GPIOD>();
-}
-
 void sd2iec_device::cbm_iec_atn(int state)
 {
-	m_maincpu->pin_change<atmega1284_device::GPIOC>();
+	m_maincpu->pc_w<0>(state);
 }
 
 void sd2iec_device::cbm_iec_clk(int state)
 {
-	m_maincpu->pin_change<atmega1284_device::GPIOC>();
+	m_maincpu->pc_w<2>(state);
 }
 
 void sd2iec_device::cbm_iec_data(int state)
 {
-	m_maincpu->pin_change<atmega1284_device::GPIOC>();
+	m_maincpu->pc_w<1>(state);
 }
 
 void sd2iec_device::main_map(address_map &map)

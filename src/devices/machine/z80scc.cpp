@@ -799,7 +799,7 @@ int z80scc_device::update_extint(int index)
 
 	LOGINT("%s(%02x)\n", FUNCNAME, index);
 	// Check if any of the enabled external interrupt sources has changed and requiresd service TODO: figure out Zero Count
-	if ( ((lrr0 & wr15 & 0xf8) ^ (rr0 & wr15 & 0xf8)) == 0 ) // mask off disabled and non relevant bits
+	if ( ((lrr0 ^ rr0) & wr15 & 0xf8) == 0 ) // mask off disabled and non relevant bits
 	{
 		LOGINT(" - All interrupts serviced\n");
 
@@ -812,7 +812,12 @@ int z80scc_device::update_extint(int index)
 	}
 	else
 	{
-		LOGINT(" - More external/status interrupts to serve: %02x\n", ((lrr0 & wr15 & 0xf8) ^ (rr0 & wr15 & 0xf8)));
+		LOGINT(" - More external/status interrupts to serve: %02x\n", (lrr0 ^ rr0) & wr15 & 0xf8);
+		// Update latched value to match current status
+		if (index == CHANNEL_A)
+			m_chanA->m_extint_states = rr0;
+		else
+			m_chanB->m_extint_states = rr0;
 	}
 	return ret;
 }
