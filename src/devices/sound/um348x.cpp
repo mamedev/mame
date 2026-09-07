@@ -400,10 +400,16 @@ void um348x_device::start_word(u16 index)
 	}
 	else
 	{
+		/*  The divider free-runs across word boundaries: a new value only takes
+			effect when the counter next expires. A note spread over several
+			words therefore sounds continuous, and a change of tone completes
+			the half cycle already in progress before adopting the new divisor,
+			which is what the logic captures show. The counter is only loaded
+			when starting a note out of silence. */
 		const u8 div = tone_divisors()[tone];
-		m_divisor = div;
-		if (div)
+		if (div && (!m_divisor || !m_div_count))
 			m_div_count = div;
+		m_divisor = div;
 	}
 }
 
