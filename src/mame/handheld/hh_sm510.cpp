@@ -5020,8 +5020,8 @@ ROM_START( supkubik )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-20", 0x0000, 0x1000, CRC(a490a1e9) SHA1(3815b52ff69891d9a4915e4ad396114404cb608c) )
 
-	ROM_REGION( 214168, "screen", 0)
-	ROM_LOAD( "supkubik.svg", 0, 214168, CRC(e459ed24) SHA1(dcfccda8160e50056c58aeb08101e28f025bfdc9) )
+	ROM_REGION( 115698, "screen", 0)
+	ROM_LOAD( "supkubik.svg", 0, 115698, BAD_DUMP CRC(6f5840be) SHA1(2ac980f6b0c01bbada162c4f826684a932532c61) ) // original LCD scan needed
 ROM_END
 
 
