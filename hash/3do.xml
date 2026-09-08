@@ -342,7 +342,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- TODO: Shanghai Banri no Choujou (Japan version) released by Eletronic Arts Victor -->
+	<!-- TODO: Shanghai Banri no Choujou (Japan version) released by Electronic Arts Victor -->
 
 	<!-- https://redump.info/disc/59953 -->
 	<software name="cpubach" supported="no">
@@ -360,6 +360,10 @@ Not extensively tested
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- TODO: soccerkd: Soccer Kid (USA) -->
+	<!-- https://redump.info/disc/35971 -->
+	<!-- ... -->
 
 	<!-- TODO: ssf2t published by Panasonic overseas -->
 

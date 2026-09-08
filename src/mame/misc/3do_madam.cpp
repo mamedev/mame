@@ -68,7 +68,7 @@ void madam_device::device_start()
 	// TODO: reduce footprint
 	// - a possible Cel this big should tank the system a lot
 	// - there's just not enough work RAM in base system
-	m_cel.buffer.resize(0x1000*0x800);
+	m_cel.buffer.resize(0x400 * 0x800);
 
 	save_item(NAME(m_pip));
 	save_item(NAME(m_fence));
@@ -1020,7 +1020,12 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 		{
 			tick_time = 1;
 
-			const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
+			// bits 31-28, 23-16 and 5 are <reserved>
+
+			// vcnt is 15-6
+			// - soccerkd sets reserved part for background in gamemplay, causing corruption
+			//   if not masked properly.
+			const u16 vcnt = ((m_cel.pre0 >> 6) & 0x3ff) + 1;
 			const bool uncoded = !!BIT(m_cel.pre0, 4);
 			const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
 			static const char *const BPP_VALUES[8] = { "<0 reserved>", "1bpp", "2bpp", "4bpp", "6bpp", "8bpp", "16bpp", "<7 reserved>" };
@@ -1331,7 +1336,7 @@ u32 madam_device::cel_decompress()
 	}
 
 	u16 tlhpcnt = 1;
-	const u16 pitch = 0x1000;
+	const u16 pitch = 0x400;
 	const u8 woffset_type = bpp >= 5;
 	const u8 woffset_inc = woffset_type + 1;
 	// Reminders:
@@ -1646,7 +1651,7 @@ u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 
 u16 madam_device::get_pixel_packed(int x, int y, u16 woffset)
 {
-	const u16 pitch = 0x1000;
+	const u16 pitch = 0x400;
 	const u32 src_address = x + (y * pitch);
 
 	u16 src_data = m_cel.buffer[src_address];
