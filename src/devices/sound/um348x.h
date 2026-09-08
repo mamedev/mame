@@ -20,21 +20,12 @@
 class um348x_device : public device_t, public device_sound_interface
 {
 public:
-	// Select the melody to play (0-based, 0 to 15). Latched; takes effect at
-	// the next trigger. A value whose pointer addresses the ROM's trailing
-	// filler is refused.
-	void melody_w(u8 data);
+	void ce_w(int state);
+	void lp_w(int state);
+	void sl_w(int state);
+	void as_w(int state);
 
-	// Start playing the selected melody from its beginning. Asserting while a
-	// melody is already playing restarts it.
-	void trigger_w(int state);
-
-	// Stop immediately and silence the output.
-	void reset_w(int state);
-
-	// True while a melody is sounding. Some boards wire the chip's busy pin
-	// back to the driving CPU.
-	int busy_r() { m_stream->update(); return m_playing ? 1 : 0; }
+	int tsp_r() { m_stream->update(); return m_playing ? 1 : 0; }
 
 protected:
 	um348x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u8 *multipliers);
@@ -47,11 +38,12 @@ protected:
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	// Rebuild the tone table from the tone ROM (section 3).
 	void decode_tone_rom() ATTR_COLD;
 
 private:
 	void stop();
+	void start_song();
+	void next_song();
 	void start_word(u16 index);
 	void advance_word();
 	u16 melody_start(u8 melody) const;
@@ -65,10 +57,12 @@ private:
 	u8   m_divisors[16];    // oscillator half-period per tone code, 0 = silent
 	u16 m_data_end;         // last word that can sound; everything after is filler
 
-	// latched inputs
-	u8  m_melody;
-	u8  m_trigger;
-	u8  m_reset;
+	u8  m_ce;
+	u8  m_lp;
+	u8  m_sl;
+	u8  m_as;
+
+	u8  m_song;             // where the select counter is pointing
 
 	// playback state
 	bool m_playing;
