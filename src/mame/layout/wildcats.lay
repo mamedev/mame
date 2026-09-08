@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!-- license:CC0
+     copyright-holders:gregre365
+     Functional layout with text placeholders. Wild Cats reel order and
+     scroll alignment preserved.
+-->
+<mamelayout version="2">
+	<element name="strip1">
+		<rect><bounds x="0" y="0" width="109" height="1470" /><color red="1" green="1" blue="1" /></rect>
+		<text string="O AAA"><bounds x="5" y="10" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="80" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="777"><bounds x="5" y="150" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT"><bounds x="5" y="220" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="C"><bounds x="5" y="290" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L AAA"><bounds x="5" y="360" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT"><bounds x="5" y="430" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B"><bounds x="5" y="500" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L"><bounds x="5" y="570" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O AAA"><bounds x="5" y="640" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="710" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="777"><bounds x="5" y="780" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT"><bounds x="5" y="850" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="C"><bounds x="5" y="920" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O AAA"><bounds x="5" y="990" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT"><bounds x="5" y="1060" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B"><bounds x="5" y="1130" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L"><bounds x="5" y="1200" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT AAA"><bounds x="5" y="1270" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="777"><bounds x="5" y="1340" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT"><bounds x="5" y="1410" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="strip2">
+		<rect><bounds x="0" y="0" width="109" height="1470" /><color red="1" green="1" blue="1" /></rect>
+		<text string="P"><bounds x="5" y="10" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B"><bounds x="5" y="80" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O"><bounds x="5" y="150" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L AAA"><bounds x="5" y="220" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="777"><bounds x="5" y="290" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="360" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B"><bounds x="5" y="430" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O"><bounds x="5" y="500" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L AAA"><bounds x="5" y="570" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT"><bounds x="5" y="640" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="710" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B"><bounds x="5" y="780" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O"><bounds x="5" y="850" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L AAA"><bounds x="5" y="920" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="777"><bounds x="5" y="990" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="1060" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B AAA"><bounds x="5" y="1130" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O"><bounds x="5" y="1200" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L"><bounds x="5" y="1270" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="1340" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B AAA"><bounds x="5" y="1410" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="strip3">
+		<rect><bounds x="0" y="0" width="109" height="1470" /><color red="1" green="1" blue="1" /></rect>
+		<text string="O"><bounds x="5" y="10" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B AAA"><bounds x="5" y="80" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L"><bounds x="5" y="150" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="220" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O AAA"><bounds x="5" y="290" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B"><bounds x="5" y="360" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="430" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L"><bounds x="5" y="500" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B AAA"><bounds x="5" y="570" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O"><bounds x="5" y="640" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="CAT"><bounds x="5" y="710" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="780" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L"><bounds x="5" y="850" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B AAA"><bounds x="5" y="920" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O"><bounds x="5" y="990" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="777"><bounds x="5" y="1060" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="1130" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="L"><bounds x="5" y="1200" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="B AAA"><bounds x="5" y="1270" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="O"><bounds x="5" y="1340" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+		<text string="P"><bounds x="5" y="1410" width="99" height="50" /><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="led"><disk state="0"><color red="0.15" green="0.15" blue="0.15" /></disk><disk state="1"><color red="1" green="0.6" blue="0.1" /></disk></element>
+	<element name="digit"><led7seg><color red="1" green="0.2" blue="0.1" /></led7seg></element>
+	<element name="label_top_lamp"><text string="top lamp" /></element>
+	<element name="label_cat_lamp"><text string="cat lamp" /></element>
+	<element name="label_seven_lamp0"><text string="seven lamp0" /></element>
+	<element name="label_seven_lamp1"><text string="seven lamp1" /></element>
+	<element name="label_seven_lamp2"><text string="seven lamp2" /></element>
+	<element name="label_credit_lamp"><text string="credit lamp" /></element>
+	<element name="label_insert_medal_lamp"><text string="insert medal lamp" /></element>
+	<element name="label_time_up_lamp"><text string="time up lamp" /></element>
+	<element name="label_payline_lamp0"><text string="payline lamp0" /></element>
+	<element name="label_payline_lamp1"><text string="payline lamp1" /></element>
+	<element name="label_payline_lamp2"><text string="payline lamp2" /></element>
+	<element name="label_payline_lamp3"><text string="payline lamp3" /></element>
+	<element name="label_payline_lamp4"><text string="payline lamp4" /></element>
+	<element name="label_stop_lamp0"><text string="stop lamp0" /></element>
+	<element name="label_stop_lamp1"><text string="stop lamp1" /></element>
+	<element name="label_stop_lamp2"><text string="stop lamp2" /></element>
+	<element name="label_reel_opto0"><text string="reel opto0" /></element>
+	<element name="label_reel_opto1"><text string="reel opto1" /></element>
+	<element name="label_reel_opto2"><text string="reel opto2" /></element>
+	<element name="label_hopper_motor"><text string="hopper motor" /></element>
+	<element name="label_hopper_sensor"><text string="hopper sensor" /></element>
+	<element name="label_coin_block_solenoid"><text string="coin block solenoid" /></element>
+	<element name="label_medal_in_terminal"><text string="medal in terminal" /></element>
+	<element name="label_medal_out_terminal"><text string="medal out terminal" /></element>
+	<element name="label_big_bonus_terminal"><text string="big bonus terminal" /></element>
+	<element name="label_jac_terminal"><text string="jac terminal" /></element>
+	<view name="Functional layout">
+		<element ref="strip1"><bounds x="0" y="0" width="109" height="267" /><yscroll name="reel0:scroll" size="0.1816327" wrap="yes" min="63687" max="129222" /></element>
+		<element ref="strip2"><bounds x="130" y="0" width="109" height="267" /><yscroll name="reel1:scroll" size="0.1816327" wrap="yes" min="63687" max="129222" /></element>
+		<element ref="strip3"><bounds x="260" y="0" width="109" height="267" /><yscroll name="reel2:scroll" size="0.1816327" wrap="yes" min="63687" max="129222" /></element>
+		<element ref="digit" name="digit0"><bounds x="0" y="285" width="28" height="42" /></element>
+		<element ref="digit" name="digit1"><bounds x="35" y="285" width="28" height="42" /></element>
+		<element ref="digit" name="digit2"><bounds x="70" y="285" width="28" height="42" /></element>
+		<element ref="digit" name="digit3"><bounds x="105" y="285" width="28" height="42" /></element>
+		<element ref="led" name="top_lamp"><bounds x="420" y="0" width="14" height="14" /></element>
+		<element ref="label_top_lamp"><bounds x="442" y="0" width="180" height="14" /></element>
+		<element ref="led" name="cat_lamp"><bounds x="420" y="20" width="14" height="14" /></element>
+		<element ref="label_cat_lamp"><bounds x="442" y="20" width="180" height="14" /></element>
+		<element ref="led" name="seven_lamp0"><bounds x="420" y="40" width="14" height="14" /></element>
+		<element ref="label_seven_lamp0"><bounds x="442" y="40" width="180" height="14" /></element>
+		<element ref="led" name="seven_lamp1"><bounds x="420" y="60" width="14" height="14" /></element>
+		<element ref="label_seven_lamp1"><bounds x="442" y="60" width="180" height="14" /></element>
+		<element ref="led" name="seven_lamp2"><bounds x="420" y="80" width="14" height="14" /></element>
+		<element ref="label_seven_lamp2"><bounds x="442" y="80" width="180" height="14" /></element>
+		<element ref="led" name="credit_lamp"><bounds x="420" y="100" width="14" height="14" /></element>
+		<element ref="label_credit_lamp"><bounds x="442" y="100" width="180" height="14" /></element>
+		<element ref="led" name="insert_medal_lamp"><bounds x="420" y="120" width="14" height="14" /></element>
+		<element ref="label_insert_medal_lamp"><bounds x="442" y="120" width="180" height="14" /></element>
+		<element ref="led" name="time_up_lamp"><bounds x="420" y="140" width="14" height="14" /></element>
+		<element ref="label_time_up_lamp"><bounds x="442" y="140" width="180" height="14" /></element>
+		<element ref="led" name="payline_lamp0"><bounds x="420" y="160" width="14" height="14" /></element>
+		<element ref="label_payline_lamp0"><bounds x="442" y="160" width="180" height="14" /></element>
+		<element ref="led" name="payline_lamp1"><bounds x="420" y="180" width="14" height="14" /></element>
+		<element ref="label_payline_lamp1"><bounds x="442" y="180" width="180" height="14" /></element>
+		<element ref="led" name="payline_lamp2"><bounds x="420" y="200" width="14" height="14" /></element>
+		<element ref="label_payline_lamp2"><bounds x="442" y="200" width="180" height="14" /></element>
+		<element ref="led" name="payline_lamp3"><bounds x="420" y="220" width="14" height="14" /></element>
+		<element ref="label_payline_lamp3"><bounds x="442" y="220" width="180" height="14" /></element>
+		<element ref="led" name="payline_lamp4"><bounds x="420" y="240" width="14" height="14" /></element>
+		<element ref="label_payline_lamp4"><bounds x="442" y="240" width="180" height="14" /></element>
+		<element ref="led" name="stop_lamp0"><bounds x="420" y="260" width="14" height="14" /></element>
+		<element ref="label_stop_lamp0"><bounds x="442" y="260" width="180" height="14" /></element>
+		<element ref="led" name="stop_lamp1"><bounds x="420" y="280" width="14" height="14" /></element>
+		<element ref="label_stop_lamp1"><bounds x="442" y="280" width="180" height="14" /></element>
+		<element ref="led" name="stop_lamp2"><bounds x="420" y="300" width="14" height="14" /></element>
+		<element ref="label_stop_lamp2"><bounds x="442" y="300" width="180" height="14" /></element>
+		<element ref="led" name="reel_opto0"><bounds x="420" y="320" width="14" height="14" /></element>
+		<element ref="label_reel_opto0"><bounds x="442" y="320" width="180" height="14" /></element>
+		<element ref="led" name="reel_opto1"><bounds x="420" y="340" width="14" height="14" /></element>
+		<element ref="label_reel_opto1"><bounds x="442" y="340" width="180" height="14" /></element>
+		<element ref="led" name="reel_opto2"><bounds x="420" y="360" width="14" height="14" /></element>
+		<element ref="label_reel_opto2"><bounds x="442" y="360" width="180" height="14" /></element>
+		<element ref="led" name="hopper_motor"><bounds x="420" y="380" width="14" height="14" /></element>
+		<element ref="label_hopper_motor"><bounds x="442" y="380" width="180" height="14" /></element>
+		<element ref="led" name="hopper_sensor"><bounds x="420" y="400" width="14" height="14" /></element>
+		<element ref="label_hopper_sensor"><bounds x="442" y="400" width="180" height="14" /></element>
+		<element ref="led" name="coin_block_solenoid"><bounds x="420" y="420" width="14" height="14" /></element>
+		<element ref="label_coin_block_solenoid"><bounds x="442" y="420" width="180" height="14" /></element>
+		<element ref="led" name="medal_in_terminal"><bounds x="420" y="440" width="14" height="14" /></element>
+		<element ref="label_medal_in_terminal"><bounds x="442" y="440" width="180" height="14" /></element>
+		<element ref="led" name="medal_out_terminal"><bounds x="420" y="460" width="14" height="14" /></element>
+		<element ref="label_medal_out_terminal"><bounds x="442" y="460" width="180" height="14" /></element>
+		<element ref="led" name="big_bonus_terminal"><bounds x="420" y="480" width="14" height="14" /></element>
+		<element ref="label_big_bonus_terminal"><bounds x="442" y="480" width="180" height="14" /></element>
+		<element ref="led" name="jac_terminal"><bounds x="420" y="500" width="14" height="14" /></element>
+		<element ref="label_jac_terminal"><bounds x="442" y="500" width="180" height="14" /></element>
+	</view>
+</mamelayout>
