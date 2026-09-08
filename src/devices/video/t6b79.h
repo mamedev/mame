@@ -32,7 +32,6 @@ protected:
 private:
 	uint8_t m_lcd_ram[64 * 48];
 
-	uint8_t m_busy_flag;
 	uint8_t m_display_on;
 	uint8_t m_contrast;
 	uint8_t m_xpos;

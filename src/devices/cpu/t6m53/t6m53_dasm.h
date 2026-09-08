@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:grubbyplaya
 
-#ifndef MAME_CPU_T6M53_T6M53D_H
-#define MAME_CPU_T6M53_T6M53D_H
+#ifndef MAME_CPU_T6M53_T6M53_DASM_H
+#define MAME_CPU_T6M53_T6M53_DASM_H
 
 #pragma once
 
@@ -30,4 +30,4 @@ private:
 	static bool has_branch(u16 op);
 };
 
-#endif // MAME_CPU_T6M53_T6M53D_H
+#endif // MAME_CPU_T6M53_T6M53_DASM_H
