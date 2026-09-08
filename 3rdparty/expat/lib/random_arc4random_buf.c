@@ -1,7 +1,4 @@
-/* C++ compilation harness for the test suite.
-
-   This is used to ensure the Expat headers can be included from C++
-   and have everything work as expected.
+/*
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -9,8 +6,8 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 2005      Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
-   Copyright (c) 2017-2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2026 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2026 Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -31,6 +28,22 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
-#include "runtests.c"
+#include "random_arc4random_buf.h"
+
+#if ! defined(_DEFAULT_SOURCE)
+#  define _DEFAULT_SOURCE 1 /* for glibc */
+#endif
+
+#include "memory_sanitizer.h"
+#include <stdlib.h> // for arc4random_buf
+
+void
+writeRandomBytes_arc4random_buf(void *target, size_t count) {
+  arc4random_buf(target, count);
+  // MSan does not understand `arc4random_buf`, so explain its effects
+  MSAN_UNPOISON(target, count);
+}

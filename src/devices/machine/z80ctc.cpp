@@ -437,6 +437,11 @@ void z80ctc_channel_device::write(u8 data)
 			m_timer->adjust(attotime::never);
 		}
 
+		// counter -> timer without reset keeps the old time constant and starts the timer
+		bool const start_timer =
+				(m_mode & MODE) == MODE_COUNTER && (data & MODE) == MODE_TIMER &&
+				(data & RESET) == 0 && (data & CONSTANT) != CONSTANT_LOAD;
+
 		// if we're being reset, clear out any pending timers for this channel
 		if ((data & RESET) == RESET_ACTIVE)
 		{
@@ -449,6 +454,25 @@ void z80ctc_channel_device::write(u8 data)
 		// set the new mode
 		m_mode = data;
 		LOG("Channel mode = %02x\n", data);
+
+		if (start_timer)
+		{
+			// automatic trigger starts counting immediately
+			if ((m_mode & TRIGGER) == TRIGGER_AUTO)
+			{
+				attotime curperiod = period();
+				m_timer->adjust(curperiod, 0, curperiod);
+			}
+
+			// else wait for the trigger
+			else
+			{
+				m_mode |= WAITING_FOR_TRIG;
+				m_timer->adjust(clocks_to_attotime(1));
+			}
+
+			m_down = m_tconst;
+		}
 
 		// clearing this bit resets the interrupt state regardless of M1 activity (or lack thereof)
 		if ((data & INTERRUPT) == INTERRUPT_OFF && (m_int_state & Z80_DAISY_INT))

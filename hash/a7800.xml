@@ -2235,6 +2235,19 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+	<software name="readriot">
+		<description>Read RIOT</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="readriot.a7800.bin" size="0x8000" crc="7a4d622c" sha1="c57c8041d67d100aefe91286acbcdd8dafd48181"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ripoffu" cloneof="ripoff">
 		<description>Rip-Off (NTSC)</description>
 		<year>2012</year>

@@ -137,16 +137,6 @@ Notes:
 
 */
 
-/*
-
-    TODO:
-
-    - abc806 30K banking
-    - cassette
-    - abc800 video card bus
-
-*/
-
 #include "emu.h"
 #include "abc80x.h"
 #include "softlist_dev.h"
@@ -299,6 +289,11 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 	uint8_t map = m_map[offset >> 12] ^ 0xff;
 	bool enl = BIT(map, 7);
 
+	if (!m1l)
+	{
+		m_30k = ((offset & 0xf800) == 0x7800);
+	}
+
 	/*
 	uint16_t input = 1 << 14 | m_keydtr << 12 | xml << 9 | enl << 8 | m_eme << 7 | m1l << 6 | BIT(offset, 11) << 5 | BIT(offset, 12) << 4 | BIT(offset, 13) << 3 | BIT(offset, 14) << 2 | BIT(offset, 15) << 1 | 1;
 	int palout = m_pal->read(input);
@@ -336,15 +331,12 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 	{
 		vr = 1;
 	}
-/*
-    if (!m1l && (offset < 0x7800)
-    {
-        TODO 0..30k read from videoram if fetch opcode from 7800-7fff
-        romd = 1;
-        hre = 1;
-        mux = 0;
-    }
-*/
+	else if (m_30k && offset < 0x7800)
+	{
+		romd = ramd = hre = vr = 1;
+		mux = 0;
+	}
+
 	m = (mux ? ((map & 0x7f) << 12 | (offset & 0xfff)) : ((m_hrs & 0xf0) << 11 | (offset & 0x7fff))) & videoram_mask();
 }
 
@@ -683,14 +675,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( abc800_state::cassette_input_tick )
 
 	int dfd_in = m_cassette->input() > 0;
 
-	if (m_dfd_in && !dfd_in)
+	if (dfd_in != m_dfd_in)
 	{
 		m_sio->rxb_w(!(m_tape_ctr == 15));
-	}
 
-	if (!dfd_in && (m_tape_ctr == 15))
-	{
-		m_tape_ctr = 4;
+		if (m_tape_ctr == 15)
+		{
+			m_tape_ctr = 4;
+		}
 	}
 
 	m_dfd_in = dfd_in;
@@ -778,7 +770,7 @@ void abc800_state::sio_dtrb_w(int state)
 {
 	if (m_cassette == nullptr) return;
 
-	if (state)
+	if (!state)
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 	}
@@ -942,6 +934,7 @@ void abc806_state::machine_start()
 	save_item(NAME(m_keydtr));
 	save_item(NAME(m_eme));
 	save_item(NAME(m_map));
+	save_item(NAME(m_30k));
 }
 
 void abc806_state::machine_reset()
@@ -956,6 +949,7 @@ void abc806_state::machine_reset()
 	m_dfd_in = 0;
 
 	m_hrs = 0;
+	m_30k = false;
 }
 
 
@@ -1069,12 +1063,6 @@ void abc800_state::common(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, abc800_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->set_interface("abc800_cass");
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
-
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, printer_devices, nullptr));
 	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 	rs232a.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
@@ -1124,6 +1112,12 @@ void abc800c_state::abc800c(machine_config &config)
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("abc800_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
+
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K");
 }
@@ -1153,6 +1147,12 @@ void abc800m_state::abc800m(machine_config &config)
 	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("abc800_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K");
@@ -1184,6 +1184,12 @@ void abc802_state::abc802(machine_config &config)
 	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc834");
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("abc800_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

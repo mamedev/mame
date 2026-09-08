@@ -37,6 +37,8 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
 #ifdef __cplusplus
@@ -134,8 +136,7 @@ void _check_set_test_info(char const *function, char const *filename,
 __attribute__((noreturn))
 #    endif
 #  endif
-void
-_fail(const char *file, int line, const char *msg);
+void _fail(const char *file, int line, const char *msg);
 Suite *suite_create(const char *name);
 TCase *tcase_create(const char *name);
 void suite_add_tcase(Suite *suite, TCase *tc);

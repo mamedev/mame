@@ -175,6 +175,7 @@ public:
 	void init_rbspm() ATTR_COLD;
 	void init_sball2k1() ATTR_COLD;
 	void init_sglc() ATTR_COLD;
+	void init_sjms() ATTR_COLD;
 	void init_smwc() ATTR_COLD;
 	void init_ssanguoj() ATTR_COLD;
 	void init_sscs() ATTR_COLD;
@@ -3356,6 +3357,22 @@ ROM_START( tbss )
 	ROM_LOAD( "u39", 0x80000, 0x80000, CRC(4be91081) SHA1(0a3691bb2c7b5ba7fb5617cb16aacecb2fa93519) )
 ROM_END
 
+// 神机妙算 (Shénjī Miàosuàn)
+ROM_START( sjms )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "u64", 0x00000, 0x80000, CRC(da94db1f) SHA1(33463e88645aedb5551cf17ef1960b47a784deaa) ) // no label
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "bj-s1-s02.u83", 0x00000, 0x80000, CRC(831b021d) SHA1(ee2f13a4eb8e17a7d8328fa916d1c0bc0888384f) ) // same as tbss
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "bj-a1-a06.u41", 0x000000, 0x100000, CRC(f758d95e) SHA1(d1da16f3ef618a8c1118784bdc39dd93acf86aff) ) // same as tbss
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
+	// u29 not populated
+	ROM_LOAD( "5.u39", 0x80000, 0x80000, CRC(6b07843c) SHA1(70c873828fcf7222f617eae0edd0cfb6b1218ba1) )
+ROM_END
+
 // 三国列车 (Sānguó Lièchē)
 ROM_START( sglc )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -3617,6 +3634,12 @@ void gms_2layers_state::init_sglc()
 	rom[0x129a2 / 2] = 0x4e71;
 }
 
+void gms_2layers_state::init_sjms()
+{
+	// TODO
+	//uint16_t *rom = &memregion("maincpu")->as_u16();
+}
+
 } // anonymous namespace
 
 
@@ -3630,6 +3653,7 @@ GAME( 2005, yyhm,     0,    magslot,  yyhm,     gms_3layers_state, init_yyhm,   
 
 // card games
 GAME( 1998, tbss,     0,    super555, super555, gms_2layers_state, init_tbss,     ROT0,  "GMS", "Tieban Shensuan (Mainland version 2.0)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface doesn't quite work.
+GAME( 1998, sjms,     0,    super555, super555, gms_2layers_state, init_sjms,     ROT0,  "GMS", "Shenji Miaosuan (Mainland version 2.0)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface doesn't quite work.
 GAME( 1999, super555, 0,    super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
 GAME( 1999, sscs,     0,    super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
 GAME( 1999, sscs0118, sscs, super555, sscs,     gms_2layers_state, init_sscs0118, ROT0,  "GMS", "San Se Caishen (Version 0118)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
