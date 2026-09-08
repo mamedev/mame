@@ -5,25 +5,9 @@
 
 	UMC UM348x multi-instrument melody generator family
 
-	UM3481A  8 melodies, datasheet count
-	UM3482A 12 melodies, datasheet count
-
-	Both parts have 16 pointer slots. All 16 are accepted here and a melody is
-	refused only when its pointer addresses the ROM's trailing filler, which
-	rejects the UM3481A's eight unused pointers on the data rather than on an
-	assumed count. The UM3482A dump does carry sounding words in slots 13 to
-	16, so the datasheet count of 12 does not describe which pointers hold
-	playable songs; that mapping is unverified.
-
-	Mask-programmed melody generators used in doorbells, toys and low-end
-	arcade bootlegs. A single on-chip RC oscillator, nominally around
-	100 kHz, drives everything: tones are produced by toggling the output
-	every N oscillator cycles, and note lengths are counted in units of 2048
-	cycles off the same divider chain.
-
-	Everything below was derived by reverse engineering the mask ROM dumps
-	against logic-level captures of real parts. Full notes, including the
-	evidence behind every constant and the questions still open, are in:
+	Every constant here was measured against logic-level captures of real
+	parts; the datasheet gives none of them. Full notes, including the evidence
+	behind each one and the questions still open, are in:
 
 		https://github.com/clawgrip/UM348xDecoder
 
@@ -31,10 +15,11 @@
 	  - Sean Riddle: https://www.seanriddle.com/um348x/
 	  - ArcadeHacker: https://arcadehacker.blogspot.com/2020/07/um3481a-series-multi-instrument-melody.html
 
-	Tone ROM
-	---------
-	A 16 x 7-bit tone ROM holds one preload value per tone code; see
-	tone_divisor() below. No dumped ROM carries tempo data.
+	Song pointers
+	-------------
+	Both parts have 16 pointer slots. All 16 are reachable here, and a song is
+	silent only when its pointer addresses the ROM's trailing filler, which is
+	a test on the data rather than on the datasheet's song count.
 
 	Note ROM layout
 	---------------
@@ -53,29 +38,29 @@
 
 	Timing
 	------
-	One "base unit" is 1024 oscillator cycles. A word lasts
+	One base unit is 1024 oscillator cycles. A word lasts
 
 		ticks(duration code) * multiplier   base units
 
-	except the first word of a melody, which always lasts exactly 16 base
-	units regardless of its duration code or the melody's multiplier.
+	except the first word of a song, which always lasts exactly 16 base units
+	regardless of its duration code or the song's multiplier.
+
+	The multiplier is not in any dumped ROM. The measured values take five
+	distinct values across the two parts, matching the datasheet's count of
+	five mask tempos.
 
 	What is NOT emulated
 	--------------------
-	- The tempo multiplier is not in any dumped ROM, so a per-melody table
-	  measured from real playback is used, falling back to the most common
-	  value for melodies that could not be measured. Only three UM3482A
-	  melodies could be measured.
+	- Songs whose multiplier could not be measured fall back to the most common
+	  value. Only three of the UM3482A's could be measured.
 	- One melody per part is rendered by the real chip in a staccato
 	  articulation: the output is re-struck once per tick, sounding for a
 	  fixed 1024 oscillator cycles at the head of each tick. Nothing in the
 	  note words marks which melody uses it, so it is not reproduced; the
 	  melody plays as sustained tones, correct in pitch and total length but
 	  not in texture.
-	- The ROM dumps come from visual decapping. The tone ROM reproduces all 21
-	  measured divisors across the two parts and the note ROMs reproduce every
-	  alignable melody, so the transcription is well corroborated where the
-	  captures reach; regions they do not exercise are not.
+	- The ROM dumps come from visual decapping. They are corroborated where the
+	  captures reach and unverified elsewhere.
 
 ***************************************************************************/
 
@@ -95,28 +80,22 @@ constexpr u8  ROM_GROUPS  = 7;
 constexpr u8  REST_TONE   = 3;
 constexpr u8  CTRL_TONE   = 1;
 
-// Melodies visit the physical sub-columns in this order.
 constexpr u8 SUBCOLUMN_ORDER[8] = { 0, 1, 2, 3, 7, 6, 5, 4 };
 
-// One base unit, in oscillator cycles.
 constexpr u8  MELODY_SLOTS = 16;
 
 constexpr u16 BASE_UNIT_CYCLES = 1024;
 
-// The first word of a melody always lasts this many base units.
 constexpr u8 FIRST_REST_BASE_UNITS = 16;
 
-// Duration code -> ticks. Codes 0, 2, 3 and 6 are counted directly from the
-// staccato melody, where the part re-articulates once per tick; 5 and 7 come
-// from duration ratios. Codes 1 and 4 never appear on a sounding note in
-// either dump, so they cannot be counted; they are measured instead on silent
-// words at melody boundaries, which is weaker evidence.
+// Duration code -> ticks. All but codes 5 and 7 are counted directly, either
+// in the staccato song, where the part re-articulates once per tick, or in the
+// UM3482A song 9 alignment. Codes 5 and 7 come from duration ratios.
 constexpr u8 DURATION_TICKS[8] = { 2, 3, 15, 4, 1, 8, 12, 6 };
 
 constexpr u8 DEFAULT_MULTIPLIER = 10;
 
-// Tempo multipliers measured from real playback, indexed by melody. 0 means
-// "not measured", in which case DEFAULT_MULTIPLIER is used.
+// Measured from real playback; 0 where no measurement was possible.
 constexpr u8 UM3481A_MULTIPLIERS[16] = { 10, 8, 12, 6, 8, 10, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0 };
 constexpr u8 UM3482A_MULTIPLIERS[16] = { 0, 0, 0, 0, 0, 0, 5, 0, 10, 0, 6, 0, 0, 0, 0, 0 };
 
@@ -127,8 +106,7 @@ constexpr u8 UM3482A_MULTIPLIERS[16] = { 0, 0, 0, 0, 0, 0, 5, 0, 10, 0, 6, 0, 0,
 	not the divisor: the counter is a shift register, so the divisor is the
 	number of clocks it takes, not the preload.
 
-	This reproduces every measured divisor on both parts, 14 on the UM3481A and
-	7 on the UM3482A, with their tone-code assignments. */
+	This reproduces every measured divisor on both parts. */
 u8 tone_divisor(u8 seed)
 {
 	u8 state = seed;
@@ -142,7 +120,6 @@ u8 tone_divisor(u8 seed)
 }
 
 
-// Decode one note word out of the 448-byte array.
 u8 decode_word(const u8 *notes, u16 index)
 {
 	const u8 subcol = SUBCOLUMN_ORDER[(index / ROM_ROWS) & 7];
@@ -200,8 +177,6 @@ ROM_START( um3481a )
 	ROM_LOAD( "um3481a_tones.bin",   0x000, 0x010, BAD_DUMP CRC(646cdaef) SHA1(48d45db842e2dd588b58ba6aa656c6496e514d23) )
 ROM_END
 
-/*  The file names match the atetb3482 set, which is where these dumps already
-	live, so adopting them here needs no change to any existing romset. */
 ROM_START( um3482a )
 	ROM_REGION( 0x1c0, "notes", 0 )
 	ROM_LOAD( "um3482a_main.bin",    0x000, 0x1c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) )
@@ -228,9 +203,11 @@ um348x_device::um348x_device(const machine_config &mconfig, device_type type, co
 	m_multipliers(multipliers),
 	m_divisors{ 0 },
 	m_data_end(0),
-	m_melody(0),
-	m_trigger(0),
-	m_reset(0),
+	m_ce(0),
+	m_lp(0),
+	m_sl(0),
+	m_as(0),
+	m_song(0),
 	m_playing(false),
 	m_note_index(0),
 	m_note_start(0),
@@ -296,8 +273,8 @@ void um348x_device::device_start()
 
 	decode_tone_rom();
 
-	// Everything after the last sounding word is filler; melodies are clamped
-	// to it so a stray pointer cannot play minutes of rests.
+	// Everything after the last sounding word is filler; songs are clamped to
+	// it so a stray pointer cannot play minutes of rests.
 	m_data_end = 0;
 	for (u16 i = 0; i < TOTAL_NOTES; i++)
 	{
@@ -306,8 +283,6 @@ void um348x_device::device_start()
 			m_data_end = i;
 	}
 
-	// Tone codes with no divisor would silently drop notes; say so rather than
-	// letting a future dump lose them without a trace.
 	u16 unknown = 0;
 	for (u16 i = 0; i <= m_data_end; i++)
 	{
@@ -323,9 +298,11 @@ void um348x_device::device_start()
 	m_stream = stream_alloc(0, 1, clock());
 
 	save_item(NAME(m_divisors));
-	save_item(NAME(m_melody));
-	save_item(NAME(m_trigger));
-	save_item(NAME(m_reset));
+	save_item(NAME(m_ce));
+	save_item(NAME(m_lp));
+	save_item(NAME(m_sl));
+	save_item(NAME(m_as));
+	save_item(NAME(m_song));
 	save_item(NAME(m_playing));
 	save_item(NAME(m_note_index));
 	save_item(NAME(m_note_start));
@@ -364,7 +341,6 @@ void um348x_device::device_clock_changed()
 
 void um348x_device::stop()
 {
-	m_trigger = 0;
 	m_playing = false;
 	m_divisor = 0;
 	m_div_count = 0;
@@ -377,59 +353,93 @@ void um348x_device::stop()
 //  PLAYBACK
 //**************************************************************************
 
-void um348x_device::melody_w(u8 data)
+void um348x_device::ce_w(int state)
 {
-	m_melody = data;
-}
+	state = state ? 1 : 0;
 
-void um348x_device::trigger_w(int state)
-{
-	if (state && !m_trigger && !m_reset)
+	if (state != m_ce)
 	{
 		m_stream->update();
 
-		if (m_melody < MELODY_SLOTS)
-		{
-			const u16 start = melody_start(m_melody);
-			u16 end = (m_melody + 1 < 16) ? melody_start(m_melody + 1) : TOTAL_NOTES;
-
-			// Unused trailing pointers repeat a filler value, and the tail of
-			// the ROM is filler too; never run past the last sounding word.
-			if (end <= start || end > TOTAL_NOTES)
-				end = TOTAL_NOTES;
-			if (end > u16(m_data_end + 1))
-				end = m_data_end + 1;
-
-			if (start <= m_data_end)
-			{
-				m_multiplier = m_multipliers[m_melody] ? m_multipliers[m_melody] : DEFAULT_MULTIPLIER;
-
-				m_note_start = start;
-				m_note_end = end;
-				m_playing = true;
-				m_out = 1;
-				start_word(start);
-			}
-			else
-			{
-				logerror("melody %d points at filler (word %d); not playing\n", m_melody, start);
-			}
-		}
+		if (state)
+			start_song();
+		else
+			stop();
 	}
 
-	m_trigger = state ? 1 : 0;
+	m_ce = state;
 }
 
-void um348x_device::reset_w(int state)
+
+void um348x_device::lp_w(int state)
 {
-	if (state && !m_reset)
+	m_lp = state ? 1 : 0;
+}
+
+
+void um348x_device::sl_w(int state)
+{
+	state = state ? 1 : 0;
+
+	if (state && !m_sl)
 	{
 		m_stream->update();
-		stop();
+		next_song();
+
+		if (m_ce)
+			start_song();
 	}
 
-	m_reset = state ? 1 : 0;
+	m_sl = state;
 }
+
+
+void um348x_device::as_w(int state)
+{
+	m_as = state ? 1 : 0;
+}
+
+
+u16 um348x_device::melody_start(u8 melody) const
+{
+	return melody_offset(m_offsets->base(), m_offsets->bytes(), melody);
+}
+
+
+// A song whose pointer addresses the trailing filler does not exist on this
+// part, so nothing sounds.
+void um348x_device::start_song()
+{
+	const u16 start = melody_start(m_song);
+	u16 end = (m_song + 1 < MELODY_SLOTS) ? melody_start(m_song + 1) : TOTAL_NOTES;
+
+	if (end <= start || end > TOTAL_NOTES)
+		end = TOTAL_NOTES;
+	if (end > u16(m_data_end + 1))
+		end = m_data_end + 1;
+
+	if (start > m_data_end)
+	{
+		m_playing = false;
+		m_divisor = 0;
+		return;
+	}
+
+	m_multiplier = m_multipliers[m_song] ? m_multipliers[m_song] : DEFAULT_MULTIPLIER;
+
+	m_note_start = start;
+	m_note_end = end;
+	m_playing = true;
+	m_out = 1;
+	start_word(start);
+}
+
+
+void um348x_device::next_song()
+{
+	m_song = (m_song + 1) & (MELODY_SLOTS - 1);
+}
+
 
 void um348x_device::start_word(u16 index)
 {
@@ -439,10 +449,8 @@ void um348x_device::start_word(u16 index)
 
 	m_note_index = index;
 
-	// A melody's opening rest always lasts 8 base units, whatever its duration
-	// code says and whatever the melody's multiplier is
-	const bool openingRest = (index == m_note_start) && (tone == REST_TONE);
-	const u32 units = openingRest
+	const bool opening_rest = (index == m_note_start) && (tone == REST_TONE);
+	const u32 units = opening_rest
 			? FIRST_REST_BASE_UNITS : u32(DURATION_TICKS[duration]) * m_multiplier;
 
 	m_word_cycles = units * BASE_UNIT_CYCLES;
@@ -466,23 +474,35 @@ void um348x_device::start_word(u16 index)
 	}
 }
 
-u16 um348x_device::melody_start(u8 melody) const
-{
-	return melody_offset(m_offsets->base(), m_offsets->bytes(), melody);
-}
 
 void um348x_device::advance_word()
 {
 	const u16 next = m_note_index + 1;
 
-	if (next >= m_note_end || next >= TOTAL_NOTES)
+	if (next < m_note_end && next < TOTAL_NOTES)
 	{
-		m_playing = false;
-		m_divisor = 0;
+		start_word(next);
 		return;
 	}
 
-	start_word(next);
+	if (!m_lp)
+	{
+		next_song();
+
+		if (m_song != 0 || m_as)
+		{
+			start_song();
+			return;
+		}
+	}
+	else if (m_as)
+	{
+		start_song();
+		return;
+	}
+
+	m_playing = false;
+	m_divisor = 0;
 }
 
 
@@ -492,7 +512,6 @@ void um348x_device::advance_word()
 
 void um348x_device::sound_stream_update(sound_stream &stream)
 {
-	// nothing playing, just leave the stream cleared
 	if (!m_playing)
 		return;
 

@@ -577,12 +577,13 @@ void atetris_um3482_state::sound_w(offs_t offset, uint8_t data)
 }
 
 
-// Bits 0-3 select the melody, bits 4 and 5 are strobes the Z80 drops again
-// after its own countdown
+//  The bit assignment is from the sound Z80's ROM, not traced on the PCB.
 void atetris_um3482_state::melody_ctrl_w(uint8_t data)
 {
-	m_melody->melody_w(data & 0x0f);
-	m_melody->trigger_w(BIT(data, 4) || BIT(data, 5));
+	m_melody->ce_w(BIT(data, 0));
+	m_melody->as_w(BIT(data, 3));
+	m_melody->lp_w(BIT(data, 4));
+	m_melody->sl_w(BIT(data, 5));
 }
 
 
@@ -769,7 +770,8 @@ void atetris_um3482_state::atetb3482(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_um3482_state::atetb3482_map);
 
-	// Re-added without audio routes: the board has no Pokeys, but the game still reads them for the controls
+	// Re-added without audio routes: the board has no Pokeys, but the game
+	// still reads them for the controls
 	POKEY(config.replace(), m_pokey[0], MASTER_CLOCK / 8).allpot_r().set_ioport("IN0");
 	POKEY(config.replace(), m_pokey[1], MASTER_CLOCK / 8).allpot_r().set_ioport("IN1");
 
@@ -1005,10 +1007,10 @@ N |PAL16R4 74LS74 14017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
   in its own ROM whose entries are page numbers, and jumps to page * 0x100.
   Only Pokey's AUDC1 to AUDC4 and two AUDF registers appear in that table.
 
-  Each routine drives a control latch at 0xf000 wired to the UM3482A at F1:
-  bits 0-3 select the melody, bits 4 and 5 are momentary strobes. In practice
-  the game only ever selects melody 0 or 9. Which UM3482A pin each strobe
-  drives is unverified, so both are treated as start.
+  Each routine drives a control latch at 0xf000 wired to the UM3482A at F1,
+  reaching its CE, AS, LP and SL pins on bits 0, 3, 4 and 5. A song is reached
+  by pulsing SL; the routine at 0x0800 does that four times before starting
+  playback. The bit assignment is read off the firmware, not traced.
 */
 ROM_START( atetb3482 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
