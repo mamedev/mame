@@ -8929,6 +8929,19 @@ void pisces_state::init_pisces()
 	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&pisces_state::pisces_extend_sprite_info, this);
 }
 
+void pisces_state::init_porterb()
+{
+	init_pisces();
+
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t buffer[0x1000];
+	memcpy(buffer, &rom[0x4000], 0x1000);
+
+	// unscramble each block
+	for (int i = 0; i < 0x04; i++)
+		for (int j = 0; j < 0x400; j++)
+			rom[0x4000 | (i * 0x400 + j)] = buffer[i * 0x400 + (j ^ 0x3ff)];
+}
 
 void galaxian_state::init_batman2()
 {
@@ -13756,6 +13769,29 @@ ROM_START( portera )
 	ROM_LOAD( "port_man_82s123.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( porterb )
+	ROM_REGION( 0x5000, "maincpu", 0 )
+	ROM_LOAD( "pm-1_2716.bin",       0x0000, 0x0800, CRC(09b80d10) SHA1(d2de4023fd71434fa9f53b5a900fc962729882e0) )
+	ROM_LOAD( "pm-2_2716.bin",       0x0800, 0x0800, CRC(a5463473) SHA1(5d856fc011bd8465b4d2c93e108f30123f406c7d) )
+	ROM_LOAD( "pm-3_2532.bin",       0x1000, 0x1000, CRC(322c5b18) SHA1(02a700a52d5a13a225ce0a5f7d667f56ae0ffd5a) )
+	ROM_LOAD( "pm-4_2532.bin",       0x2000, 0x1000, CRC(3df03cd5) SHA1(f7d9a41adc20ebcce3e88061035e35711def0cdc) )
+	ROM_LOAD( "pm-5-2532.bin",       0x3000, 0x1000, CRC(37408062) SHA1(96961353d6c32303280004e36a81c83869de75e5) )
+	ROM_LOAD( "pm-6_2532.bin",       0x4000, 0x1000, CRC(1d6e6442) SHA1(6fce4fd548d54ecc477992ea0deaf4505b036a73) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "2716.1h_bottom.bin ", 0x0000, 0x0800, BAD_DUMP CRC(147dc4b6) SHA1(8a3ffefec829cb2120c1a863937836c191fb12b0) ) // bitrotten
+	ROM_LOAD( "2716.1h_upper.bin",   0x0800, 0x0800, CRC(a85b080b) SHA1(bf208607613c5f6b039950df11d19e1149671ccc) )
+	ROM_LOAD( "2716.1k_bottom.bin",  0x1000, 0x0800, BAD_DUMP CRC(cd4fcabc) SHA1(d0d51d701a12231c3dafcb91b3df21e05915138e) ) // bitrotten
+	ROM_LOAD( "2716.1k_upper.bin",   0x1800, 0x0800, CRC(44e5cc3c) SHA1(e372f49e1785914512c58df216723c4782eb8918) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6l",           0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	// Additional PROM on program ROMs PCB
+	ROM_REGION( 0x0020, "proms2", 0 )
+	ROM_LOAD( "topboard_82s123.bin", 0x0000, 0x0020, CRC(97c473cc) SHA1(1bbb7f17b8d6a3a621e8c22d473eb26d4c1a750b) )
+ROM_END
+
 
 ROM_START( skybase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -17097,10 +17133,11 @@ GAME( 1982, bagmanm3,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_
 
 
 // Other games on basic mooncrst hardware
-GAME( 1982, porter,      dockman,  porter,     porter,     pisces_state,   init_pisces,     ROT90,  "bootleg",                  "Port Man (bootleg on Moon Cresta hardware)",                      MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1982, portera,     dockman,  porter,     portera,    pisces_state,   init_pisces,     ROT90,  "bootleg",                  "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL ) // May be Portuguese, not Spanish
-GAME( 1982, skybase,     0,        skybase,    skybase,    pisces_state,   init_pisces,     ROT90,  "Omori Electric Co., Ltd.", "Sky Base",                                                        MACHINE_SUPPORTS_SAVE )
-GAME( 198?, kong,        0,        kong,       kong,       galaxian_state, init_kong,       ROT90,  "Taito do Brasil",          "Kong (Donkey Kong conversion on Galaxian hardware)",              MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
+GAME( 1982, porter,      dockman,  porter,     porter,     pisces_state,   init_pisces,     ROT90,  "bootleg",                  "Port Man (bootleg on Moon Cresta hardware)",                             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1982, portera,     dockman,  porter,     portera,    pisces_state,   init_pisces,     ROT90,  "bootleg",                  "El Estivador (Spanish bootleg of Port Man on Galaxian hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL ) // May be Portuguese, not Spanish
+GAME( 1982, porterb,     dockman,  porter,     portera,    pisces_state,   init_porterb,    ROT90,  "bootleg",                  "El Estivador (Spanish bootleg of Port Man on Galaxian hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL ) // Bad Gfx ROMs. May be Portuguese, not Spanish
+GAME( 1982, skybase,     0,        skybase,    skybase,    pisces_state,   init_pisces,     ROT90,  "Omori Electric Co., Ltd.", "Sky Base",                                                               MACHINE_SUPPORTS_SAVE )
+GAME( 198?, kong,        0,        kong,       kong,       galaxian_state, init_kong,       ROT90,  "Taito do Brasil",          "Kong (Donkey Kong conversion on Galaxian hardware)",                     MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 // Larger romspace, 2*AY8910, based on Super Star Crest board?
 // There may be an alternate version called "Fantasy" according to flyers; is it the same?
