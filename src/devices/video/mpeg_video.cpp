@@ -47,13 +47,13 @@ struct dct_vlc_entry
 	u8 level;
 };
 
-template <typename T, std::size_t N>
-constexpr T make_vlc(const char (&text)[N], int value)
+template <std::size_t N>
+constexpr vlc_entry make_vlc(const char (&text)[N], int value)
 {
 	u32 code = 0;
 	for (unsigned i = 0; i != (N - 1); i++)
 		code = (code << 1) | (text[i] == '1');
-	return T{ code, u8(N - 1), value };
+	return vlc_entry{ code, u8(N - 1), value };
 }
 
 template <std::size_t N>
@@ -67,96 +67,96 @@ constexpr dct_vlc_entry make_dct_vlc(const char (&text)[N], unsigned run, unsign
 
 constexpr vlc_entry s_macroblock_address_increment[] =
 {
-	make_vlc<vlc_entry>("1", 1),
-	make_vlc<vlc_entry>("011", 2),
-	make_vlc<vlc_entry>("010", 3),
-	make_vlc<vlc_entry>("0011", 4),
-	make_vlc<vlc_entry>("0010", 5),
-	make_vlc<vlc_entry>("00011", 6),
-	make_vlc<vlc_entry>("00010", 7),
-	make_vlc<vlc_entry>("0000111", 8),
-	make_vlc<vlc_entry>("0000110", 9),
-	make_vlc<vlc_entry>("00001011", 10),
-	make_vlc<vlc_entry>("00001010", 11),
-	make_vlc<vlc_entry>("00001001", 12),
-	make_vlc<vlc_entry>("00001000", 13),
-	make_vlc<vlc_entry>("00000111", 14),
-	make_vlc<vlc_entry>("00000110", 15),
-	make_vlc<vlc_entry>("0000010111", 16),
-	make_vlc<vlc_entry>("0000010110", 17),
-	make_vlc<vlc_entry>("0000010101", 18),
-	make_vlc<vlc_entry>("0000010100", 19),
-	make_vlc<vlc_entry>("0000010011", 20),
-	make_vlc<vlc_entry>("0000010010", 21),
-	make_vlc<vlc_entry>("00000100011", 22),
-	make_vlc<vlc_entry>("00000100010", 23),
-	make_vlc<vlc_entry>("00000100001", 24),
-	make_vlc<vlc_entry>("00000100000", 25),
-	make_vlc<vlc_entry>("00000011111", 26),
-	make_vlc<vlc_entry>("00000011110", 27),
-	make_vlc<vlc_entry>("00000011101", 28),
-	make_vlc<vlc_entry>("00000011100", 29),
-	make_vlc<vlc_entry>("00000011011", 30),
-	make_vlc<vlc_entry>("00000011010", 31),
-	make_vlc<vlc_entry>("00000011001", 32),
-	make_vlc<vlc_entry>("00000011000", 33)
+	make_vlc("1", 1),
+	make_vlc("011", 2),
+	make_vlc("010", 3),
+	make_vlc("0011", 4),
+	make_vlc("0010", 5),
+	make_vlc("00011", 6),
+	make_vlc("00010", 7),
+	make_vlc("0000111", 8),
+	make_vlc("0000110", 9),
+	make_vlc("00001011", 10),
+	make_vlc("00001010", 11),
+	make_vlc("00001001", 12),
+	make_vlc("00001000", 13),
+	make_vlc("00000111", 14),
+	make_vlc("00000110", 15),
+	make_vlc("0000010111", 16),
+	make_vlc("0000010110", 17),
+	make_vlc("0000010101", 18),
+	make_vlc("0000010100", 19),
+	make_vlc("0000010011", 20),
+	make_vlc("0000010010", 21),
+	make_vlc("00000100011", 22),
+	make_vlc("00000100010", 23),
+	make_vlc("00000100001", 24),
+	make_vlc("00000100000", 25),
+	make_vlc("00000011111", 26),
+	make_vlc("00000011110", 27),
+	make_vlc("00000011101", 28),
+	make_vlc("00000011100", 29),
+	make_vlc("00000011011", 30),
+	make_vlc("00000011010", 31),
+	make_vlc("00000011001", 32),
+	make_vlc("00000011000", 33)
 };
 
 constexpr vlc_entry s_coded_block_pattern[] =
 {
-	make_vlc<vlc_entry>("111", 60),
-	make_vlc<vlc_entry>("1101", 4), make_vlc<vlc_entry>("1100", 8),
-	make_vlc<vlc_entry>("1011", 16), make_vlc<vlc_entry>("1010", 32),
-	make_vlc<vlc_entry>("10011", 12), make_vlc<vlc_entry>("10010", 48),
-	make_vlc<vlc_entry>("10001", 20), make_vlc<vlc_entry>("10000", 40),
-	make_vlc<vlc_entry>("01111", 28), make_vlc<vlc_entry>("01110", 44),
-	make_vlc<vlc_entry>("01101", 52), make_vlc<vlc_entry>("01100", 56),
-	make_vlc<vlc_entry>("01011", 1), make_vlc<vlc_entry>("01010", 61),
-	make_vlc<vlc_entry>("01001", 2), make_vlc<vlc_entry>("01000", 62),
-	make_vlc<vlc_entry>("001111", 24), make_vlc<vlc_entry>("001110", 36),
-	make_vlc<vlc_entry>("001101", 3), make_vlc<vlc_entry>("001100", 63),
-	make_vlc<vlc_entry>("0010111", 5), make_vlc<vlc_entry>("0010110", 9),
-	make_vlc<vlc_entry>("0010101", 17), make_vlc<vlc_entry>("0010100", 33),
-	make_vlc<vlc_entry>("0010011", 6), make_vlc<vlc_entry>("0010010", 10),
-	make_vlc<vlc_entry>("0010001", 18), make_vlc<vlc_entry>("0010000", 34),
-	make_vlc<vlc_entry>("00011111", 7), make_vlc<vlc_entry>("00011110", 11),
-	make_vlc<vlc_entry>("00011101", 19), make_vlc<vlc_entry>("00011100", 35),
-	make_vlc<vlc_entry>("00011011", 13), make_vlc<vlc_entry>("00011010", 49),
-	make_vlc<vlc_entry>("00011001", 21), make_vlc<vlc_entry>("00011000", 41),
-	make_vlc<vlc_entry>("00010111", 14), make_vlc<vlc_entry>("00010110", 50),
-	make_vlc<vlc_entry>("00010101", 22), make_vlc<vlc_entry>("00010100", 42),
-	make_vlc<vlc_entry>("00010011", 15), make_vlc<vlc_entry>("00010010", 51),
-	make_vlc<vlc_entry>("00010001", 23), make_vlc<vlc_entry>("00010000", 43),
-	make_vlc<vlc_entry>("00001111", 25), make_vlc<vlc_entry>("00001110", 37),
-	make_vlc<vlc_entry>("00001101", 26), make_vlc<vlc_entry>("00001100", 38),
-	make_vlc<vlc_entry>("00001011", 29), make_vlc<vlc_entry>("00001010", 45),
-	make_vlc<vlc_entry>("00001001", 53), make_vlc<vlc_entry>("00001000", 57),
-	make_vlc<vlc_entry>("00000111", 30), make_vlc<vlc_entry>("00000110", 46),
-	make_vlc<vlc_entry>("00000101", 54), make_vlc<vlc_entry>("00000100", 58),
-	make_vlc<vlc_entry>("000000111", 31), make_vlc<vlc_entry>("000000110", 47),
-	make_vlc<vlc_entry>("000000101", 55), make_vlc<vlc_entry>("000000100", 59),
-	make_vlc<vlc_entry>("000000011", 27), make_vlc<vlc_entry>("000000010", 39)
+	make_vlc("111", 60),
+	make_vlc("1101", 4), make_vlc("1100", 8),
+	make_vlc("1011", 16), make_vlc("1010", 32),
+	make_vlc("10011", 12), make_vlc("10010", 48),
+	make_vlc("10001", 20), make_vlc("10000", 40),
+	make_vlc("01111", 28), make_vlc("01110", 44),
+	make_vlc("01101", 52), make_vlc("01100", 56),
+	make_vlc("01011", 1), make_vlc("01010", 61),
+	make_vlc("01001", 2), make_vlc("01000", 62),
+	make_vlc("001111", 24), make_vlc("001110", 36),
+	make_vlc("001101", 3), make_vlc("001100", 63),
+	make_vlc("0010111", 5), make_vlc("0010110", 9),
+	make_vlc("0010101", 17), make_vlc("0010100", 33),
+	make_vlc("0010011", 6), make_vlc("0010010", 10),
+	make_vlc("0010001", 18), make_vlc("0010000", 34),
+	make_vlc("00011111", 7), make_vlc("00011110", 11),
+	make_vlc("00011101", 19), make_vlc("00011100", 35),
+	make_vlc("00011011", 13), make_vlc("00011010", 49),
+	make_vlc("00011001", 21), make_vlc("00011000", 41),
+	make_vlc("00010111", 14), make_vlc("00010110", 50),
+	make_vlc("00010101", 22), make_vlc("00010100", 42),
+	make_vlc("00010011", 15), make_vlc("00010010", 51),
+	make_vlc("00010001", 23), make_vlc("00010000", 43),
+	make_vlc("00001111", 25), make_vlc("00001110", 37),
+	make_vlc("00001101", 26), make_vlc("00001100", 38),
+	make_vlc("00001011", 29), make_vlc("00001010", 45),
+	make_vlc("00001001", 53), make_vlc("00001000", 57),
+	make_vlc("00000111", 30), make_vlc("00000110", 46),
+	make_vlc("00000101", 54), make_vlc("00000100", 58),
+	make_vlc("000000111", 31), make_vlc("000000110", 47),
+	make_vlc("000000101", 55), make_vlc("000000100", 59),
+	make_vlc("000000011", 27), make_vlc("000000010", 39)
 };
 
 constexpr vlc_entry s_motion_code[] =
 {
-	make_vlc<vlc_entry>("1", 0),
-	make_vlc<vlc_entry>("011", -1), make_vlc<vlc_entry>("010", 1),
-	make_vlc<vlc_entry>("0011", -2), make_vlc<vlc_entry>("0010", 2),
-	make_vlc<vlc_entry>("00011", -3), make_vlc<vlc_entry>("00010", 3),
-	make_vlc<vlc_entry>("0000111", -4), make_vlc<vlc_entry>("0000110", 4),
-	make_vlc<vlc_entry>("00001011", -5), make_vlc<vlc_entry>("00001010", 5),
-	make_vlc<vlc_entry>("00001001", -6), make_vlc<vlc_entry>("00001000", 6),
-	make_vlc<vlc_entry>("00000111", -7), make_vlc<vlc_entry>("00000110", 7),
-	make_vlc<vlc_entry>("0000010111", -8), make_vlc<vlc_entry>("0000010110", 8),
-	make_vlc<vlc_entry>("0000010101", -9), make_vlc<vlc_entry>("0000010100", 9),
-	make_vlc<vlc_entry>("0000010011", -10), make_vlc<vlc_entry>("0000010010", 10),
-	make_vlc<vlc_entry>("00000100011", -11), make_vlc<vlc_entry>("00000100010", 11),
-	make_vlc<vlc_entry>("00000100001", -12), make_vlc<vlc_entry>("00000100000", 12),
-	make_vlc<vlc_entry>("00000011111", -13), make_vlc<vlc_entry>("00000011110", 13),
-	make_vlc<vlc_entry>("00000011101", -14), make_vlc<vlc_entry>("00000011100", 14),
-	make_vlc<vlc_entry>("00000011011", -15), make_vlc<vlc_entry>("00000011010", 15),
-	make_vlc<vlc_entry>("00000011001", -16), make_vlc<vlc_entry>("00000011000", 16)
+	make_vlc("1", 0),
+	make_vlc("011", -1), make_vlc("010", 1),
+	make_vlc("0011", -2), make_vlc("0010", 2),
+	make_vlc("00011", -3), make_vlc("00010", 3),
+	make_vlc("0000111", -4), make_vlc("0000110", 4),
+	make_vlc("00001011", -5), make_vlc("00001010", 5),
+	make_vlc("00001001", -6), make_vlc("00001000", 6),
+	make_vlc("00000111", -7), make_vlc("00000110", 7),
+	make_vlc("0000010111", -8), make_vlc("0000010110", 8),
+	make_vlc("0000010101", -9), make_vlc("0000010100", 9),
+	make_vlc("0000010011", -10), make_vlc("0000010010", 10),
+	make_vlc("00000100011", -11), make_vlc("00000100010", 11),
+	make_vlc("00000100001", -12), make_vlc("00000100000", 12),
+	make_vlc("00000011111", -13), make_vlc("00000011110", 13),
+	make_vlc("00000011101", -14), make_vlc("00000011100", 14),
+	make_vlc("00000011011", -15), make_vlc("00000011010", 15),
+	make_vlc("00000011001", -16), make_vlc("00000011000", 16)
 };
 
 constexpr dct_vlc_entry s_dct_coefficient[] =
@@ -225,57 +225,57 @@ constexpr u8 TYPE_INTRA = 0x10;
 
 constexpr vlc_entry s_i_macroblock_type[] =
 {
-	make_vlc<vlc_entry>("1", TYPE_INTRA),
-	make_vlc<vlc_entry>("01", TYPE_QUANT | TYPE_INTRA)
+	make_vlc("1", TYPE_INTRA),
+	make_vlc("01", TYPE_QUANT | TYPE_INTRA)
 };
 
 constexpr vlc_entry s_p_macroblock_type[] =
 {
-	make_vlc<vlc_entry>("1", TYPE_FORWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("01", TYPE_PATTERN),
-	make_vlc<vlc_entry>("001", TYPE_FORWARD),
-	make_vlc<vlc_entry>("00011", TYPE_INTRA),
-	make_vlc<vlc_entry>("00010", TYPE_QUANT | TYPE_FORWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("00001", TYPE_QUANT | TYPE_PATTERN),
-	make_vlc<vlc_entry>("000001", TYPE_QUANT | TYPE_INTRA)
+	make_vlc("1", TYPE_FORWARD | TYPE_PATTERN),
+	make_vlc("01", TYPE_PATTERN),
+	make_vlc("001", TYPE_FORWARD),
+	make_vlc("00011", TYPE_INTRA),
+	make_vlc("00010", TYPE_QUANT | TYPE_FORWARD | TYPE_PATTERN),
+	make_vlc("00001", TYPE_QUANT | TYPE_PATTERN),
+	make_vlc("000001", TYPE_QUANT | TYPE_INTRA)
 };
 
 constexpr vlc_entry s_b_macroblock_type[] =
 {
-	make_vlc<vlc_entry>("10", TYPE_FORWARD | TYPE_BACKWARD),
-	make_vlc<vlc_entry>("11", TYPE_FORWARD | TYPE_BACKWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("010", TYPE_BACKWARD),
-	make_vlc<vlc_entry>("011", TYPE_BACKWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("0010", TYPE_FORWARD),
-	make_vlc<vlc_entry>("0011", TYPE_FORWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("00011", TYPE_INTRA),
-	make_vlc<vlc_entry>("00010", TYPE_QUANT | TYPE_FORWARD | TYPE_BACKWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("000011", TYPE_QUANT | TYPE_FORWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("000010", TYPE_QUANT | TYPE_BACKWARD | TYPE_PATTERN),
-	make_vlc<vlc_entry>("000001", TYPE_QUANT | TYPE_INTRA)
+	make_vlc("10", TYPE_FORWARD | TYPE_BACKWARD),
+	make_vlc("11", TYPE_FORWARD | TYPE_BACKWARD | TYPE_PATTERN),
+	make_vlc("010", TYPE_BACKWARD),
+	make_vlc("011", TYPE_BACKWARD | TYPE_PATTERN),
+	make_vlc("0010", TYPE_FORWARD),
+	make_vlc("0011", TYPE_FORWARD | TYPE_PATTERN),
+	make_vlc("00011", TYPE_INTRA),
+	make_vlc("00010", TYPE_QUANT | TYPE_FORWARD | TYPE_BACKWARD | TYPE_PATTERN),
+	make_vlc("000011", TYPE_QUANT | TYPE_FORWARD | TYPE_PATTERN),
+	make_vlc("000010", TYPE_QUANT | TYPE_BACKWARD | TYPE_PATTERN),
+	make_vlc("000001", TYPE_QUANT | TYPE_INTRA)
 };
 
 constexpr vlc_entry s_d_macroblock_type[] =
 {
-	make_vlc<vlc_entry>("1", TYPE_INTRA)
+	make_vlc("1", TYPE_INTRA)
 };
 
 constexpr vlc_entry s_dc_size_luminance[] =
 {
-	make_vlc<vlc_entry>("100", 0), make_vlc<vlc_entry>("00", 1),
-	make_vlc<vlc_entry>("01", 2), make_vlc<vlc_entry>("101", 3),
-	make_vlc<vlc_entry>("110", 4), make_vlc<vlc_entry>("1110", 5),
-	make_vlc<vlc_entry>("11110", 6), make_vlc<vlc_entry>("111110", 7),
-	make_vlc<vlc_entry>("1111110", 8)
+	make_vlc("100", 0), make_vlc("00", 1),
+	make_vlc("01", 2), make_vlc("101", 3),
+	make_vlc("110", 4), make_vlc("1110", 5),
+	make_vlc("11110", 6), make_vlc("111110", 7),
+	make_vlc("1111110", 8)
 };
 
 constexpr vlc_entry s_dc_size_chrominance[] =
 {
-	make_vlc<vlc_entry>("00", 0), make_vlc<vlc_entry>("01", 1),
-	make_vlc<vlc_entry>("10", 2), make_vlc<vlc_entry>("110", 3),
-	make_vlc<vlc_entry>("1110", 4), make_vlc<vlc_entry>("11110", 5),
-	make_vlc<vlc_entry>("111110", 6), make_vlc<vlc_entry>("1111110", 7),
-	make_vlc<vlc_entry>("11111110", 8)
+	make_vlc("00", 0), make_vlc("01", 1),
+	make_vlc("10", 2), make_vlc("110", 3),
+	make_vlc("1110", 4), make_vlc("11110", 5),
+	make_vlc("111110", 6), make_vlc("1111110", 7),
+	make_vlc("11111110", 8)
 };
 
 template <typename T, std::size_t N, unsigned MaxBits>
