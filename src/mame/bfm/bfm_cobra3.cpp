@@ -405,6 +405,8 @@ void bfm_cobra3_state::machine_start()
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
 
+	save_pointer(NAME(m_mainram), (1024 * 16) / 2);
+	save_item(NAME(m_active_strobe));
 	save_item(NAME(m_vol_clock));
 	save_item(NAME(m_volume));
 }
