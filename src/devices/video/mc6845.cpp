@@ -245,7 +245,7 @@ void mc6845_device::register_w(uint8_t data)
 			if (m_supports_transparent)
 			{
 				m_update_addr = ((data & 0x3f) << 8) | (m_update_addr & 0x00ff);
-				if(MODE_TRANSPARENT_PHI2)
+				if (MODE_TRANSPARENT_PHI2)
 					call_on_update_address(MODE_UPDATE_STROBE);
 			}
 			break;
@@ -253,7 +253,7 @@ void mc6845_device::register_w(uint8_t data)
 			if (m_supports_transparent)
 			{
 				m_update_addr = ((data & 0xff) << 0) | (m_update_addr & 0xff00);
-				if(MODE_TRANSPARENT_PHI2)
+				if (MODE_TRANSPARENT_PHI2)
 					call_on_update_address(MODE_UPDATE_STROBE);
 			}
 			break;
@@ -367,7 +367,7 @@ void mc6845_device::recompute_parameters(bool postload)
 				//vert_pix_total *= 2;
 			}
 
-			if(m_show_border_area)
+			if (m_show_border_area)
 				visarea.set(0, horiz_pix_total-2, 0, vert_pix_total-2);
 			else
 				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
@@ -379,7 +379,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			if (has_screen())
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
-			if(!m_reconfigure_cb.isnull())
+			if (!m_reconfigure_cb.isnull())
 				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			m_has_valid_parameters = true;
@@ -428,7 +428,7 @@ void mc6845_device::set_de(int state)
 		else
 		{
 			/* if transparent update was requested fire the update timer */
-			if(!m_update_ready_bit)
+			if (!m_update_ready_bit)
 				update_upd_adr_timer();
 		}
 
@@ -477,14 +477,14 @@ void mc6845_device::update_upd_adr_timer()
 bool mc6845_device::match_line()
 {
 	/* Check if we've reached the end of active display */
-	if ( m_line_counter == m_vert_disp )
+	if (m_line_counter == m_vert_disp)
 	{
 		m_line_enable_ff = false;
 		m_current_disp_addr = m_disp_start_addr;
 	}
 
 	/* Check if VSYNC should be enabled */
-	if ( m_line_counter == m_vert_sync_pos )
+	if (m_line_counter == m_vert_sync_pos)
 	{
 		m_vsync_width_counter = 0;
 		m_vsync_ff = 1;
@@ -569,14 +569,14 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	m_cursor_x = -1;
 
 	/* Check if VSYNC is active */
-	if ( m_vsync_ff )
+	if (m_vsync_ff)
 	{
 		uint8_t vsync_width = m_supports_vert_sync_width ? (m_sync_width >> 4) & 0x0f : 0;
 
-		m_vsync_width_counter = ( m_vsync_width_counter + 1 ) & 0x0F;
+		m_vsync_width_counter = (m_vsync_width_counter + 1) & 0x0f;
 
 		/* Check if we've reached end of VSYNC */
-		if ( m_vsync_width_counter == vsync_width )
+		if (m_vsync_width_counter == vsync_width)
 		{
 			m_vsync_ff = 0;
 
@@ -586,19 +586,19 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 
 	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
 	// The correct test would be:
-	// if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
-	if ( m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1 )
+	// if (m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr))
+	if (m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1)
 	{
 		/* Check if we have reached the end of the vertical area */
-		if ( m_line_counter == m_vert_char_total )
+		if (m_line_counter == m_vert_char_total)
 		{
 			m_adjust_counter = 0;
 			m_adjust_active = 1;
 		}
 
 		m_raster_counter = 0;
-		m_line_counter = ( m_line_counter + 1 ) & 0x7F;
-		m_line_address = ( m_line_address + m_horiz_disp ) & 0x3fff;
+		m_line_counter = (m_line_counter + 1) & 0x7f;
+		m_line_address = (m_line_address + m_horiz_disp) & 0x3fff;
 
 		if (match_line())
 			new_vsync = true;
@@ -606,14 +606,14 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	else
 	{
 		// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
-		// m_raster_counter = ( m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
-		m_raster_counter = ( m_raster_counter + 1 ) & 0x1F;
+		// m_raster_counter = (m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1)) & 0x1f;
+		m_raster_counter = (m_raster_counter + 1) & 0x1f;
 	}
 
-	if ( m_adjust_active )
+	if (m_adjust_active)
 	{
 		/* Check if we have reached the end of a full cycle */
-		if ( m_adjust_counter == m_vert_total_adj )
+		if (m_adjust_counter == m_vert_total_adj)
 		{
 			m_adjust_active = 0;
 			m_raster_counter = 0;
@@ -635,11 +635,11 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 		else
 		{
-			m_adjust_counter = ( m_adjust_counter + 1 ) & 0x1F;
+			m_adjust_counter = (m_adjust_counter + 1) & 0x1f;
 		}
 	}
 
-	if ( m_line_enable_ff )
+	if (m_line_enable_ff)
 	{
 		/* Schedule DE off signal change */
 		m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
@@ -661,14 +661,14 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 
 	/* Set VSYNC and DE signals */
-	set_vsync( new_vsync );
-	set_de( m_line_enable_ff ? true : false );
+	set_vsync(new_vsync);
+	set_de(m_line_enable_ff ? true : false);
 }
 
 
 TIMER_CALLBACK_MEMBER(mc6845_device::de_off_tick)
 {
-	set_de( false );
+	set_de(false);
 }
 
 TIMER_CALLBACK_MEMBER(mc6845_device::cursor_on)
@@ -686,10 +686,10 @@ TIMER_CALLBACK_MEMBER(mc6845_device::cursor_off)
 
 TIMER_CALLBACK_MEMBER(mc6845_device::hsync_on)
 {
-	uint8_t hsync_width = ( m_sync_width & 0x0f ) ? ( m_sync_width & 0x0f ) : 0x10;
+	uint8_t hsync_width = (m_sync_width & 0x0f) ? (m_sync_width & 0x0f) : 0x10;
 
 	m_hsync_width_counter = 0;
-	set_hsync( true );
+	set_hsync(true);
 
 	/* Schedule HSYNC off signal */
 	m_hsync_off_timer->adjust(cclks_to_attotime(hsync_width));
@@ -697,7 +697,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::hsync_on)
 
 TIMER_CALLBACK_MEMBER(mc6845_device::hsync_off)
 {
-	set_hsync( false );
+	set_hsync(false);
 }
 
 TIMER_CALLBACK_MEMBER(mc6845_device::latch_light_pen)
@@ -720,7 +720,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::transparent_update_tick)
 	/* call the callback function -- we know it exists */
 	m_on_update_addr_changed_cb(addr, strobe);
 
-	if(!m_update_ready_bit && MODE_TRANSPARENT_BLANK)
+	if (!m_update_ready_bit && MODE_TRANSPARENT_BLANK)
 	{
 		m_update_addr++;
 		m_update_addr &= 0x3fff;
@@ -733,7 +733,7 @@ uint16_t mc6845_device::get_ma()
 {
 	update_counters();
 
-	return ( m_line_address + m_character_counter ) & 0x3fff;
+	return (m_line_address + m_character_counter) & 0x3fff;
 }
 
 
@@ -1383,4 +1383,3 @@ void hd6345_device::register_w(uint8_t data)
 
 	recompute_parameters(false);
 }
-
