@@ -166,6 +166,10 @@ Laggy inputs on opponent select, looks stuck
 		</part>
 	</software>
 
+	<!-- https://redump.info/disc/19365 -->
+	<!-- TODO: crshburn: Crash 'n Burn (USA "not for resale" version, a.k.a. the only English version) -->
+	<!-- ... -->
+
 	<!-- https://redump.info/disc/49372 -->
 	<software name="demoman" supported="no">
 		<description>Demolition Man (USA, Europe)</description>

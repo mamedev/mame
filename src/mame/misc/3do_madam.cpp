@@ -798,15 +798,28 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			m_cel.skip = !!BIT(m_cel.current_ccb, 31);
 			m_cel.last = !!BIT(m_cel.current_ccb, 30);
 			const bool npabs = !!BIT(m_cel.current_ccb, 29);
-			// FIXME: as below
-			if (!npabs && m_cel.next_ptr && !m_cel.last)
+
+			const u32 next_addr = m_dma32_read_cb(m_cel.address + 0x04);
+
+			if (npabs)
+				m_cel.next_ptr = next_addr;
+			else
 			{
-				popmessage("CEL actual relative next_ptr use at %08x (current %08x -> %08x)", m_cel.address, m_cel.next_ptr, m_dma32_read_cb(m_cel.address + 0x04));
-				m_statbits |= (1 << 6);
-				cel_stop_w(0, 0, 0xffffffff);
-				return;
+				// - crshburn uses this as soon as it starts using the engine
+				LOGCEL("    RELNEXT %08x\n", next_addr);
+				// TODO: is offset dependant on preamble words?
+				// also three relative pointers all with their own offset, wtf
+				m_cel.next_ptr = m_cel.address + (s32)next_addr + 8;
 			}
-			m_cel.next_ptr = m_dma32_read_cb(m_cel.address + 0x04);
+
+			// safety net for potentially errand pointer(s) that would cause very bad side effects.
+			// If this ever happens for a real SW fault then it should cause an ARM ABORT with
+			// PrivBits set ...
+			if (!m_cel.last && (!m_cel.next_ptr || m_cel.next_ptr & ~0x3F'FFFF))
+			{
+				popmessage("3do_madam.cpp: CEL engine bad next_ptr at %08x with npabs %d (current %08x next_addr %08x)", m_cel.address, npabs, m_cel.next_ptr, next_addr);
+				m_cel.last = 1;
+			}
 
 			if (m_cel.skip && m_cel.last)
 			{
