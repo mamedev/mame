@@ -175,6 +175,9 @@ ROM_START( um3481a )
 
 	ROM_REGION( 0x010, "tones", 0 ) // 16 entries of 7 bits, padded to bytes
 	ROM_LOAD( "um3481a_tones.bin",   0x000, 0x010, BAD_DUMP CRC(646cdaef) SHA1(48d45db842e2dd588b58ba6aa656c6496e514d23) )
+
+	ROM_REGION( 0x010, "unknown", 0 ) // 8 entries of 7 bits, padded to bytes, same as UM3482A
+	ROM_LOAD( "unknown.bin",   0x000, 0x008, BAD_DUMP CRC(87a9efc4) SHA1(54ec7dea890dea8fd2aac85d7bee6db3c71d5db9) )
 ROM_END
 
 ROM_START( um3482a )
@@ -186,6 +189,9 @@ ROM_START( um3482a )
 
 	ROM_REGION( 0x010, "tones", 0 ) // 16 entries of 7 bits, padded to bytes
 	ROM_LOAD( "um3482a_tones.bin",   0x000, 0x010, BAD_DUMP CRC(c3a37f74) SHA1(67eac8c6530c202760d492f3e52c44f9cd183b46) )
+
+	ROM_REGION( 0x010, "unknown", 0 ) // 8 entries of 7 bits, padded to bytes, same as UM3482A
+	ROM_LOAD( "unknown.bin",   0x000, 0x008, BAD_DUMP CRC(87a9efc4) SHA1(54ec7dea890dea8fd2aac85d7bee6db3c71d5db9) )
 ROM_END
 
 
