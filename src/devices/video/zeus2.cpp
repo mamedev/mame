@@ -1794,8 +1794,6 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			extra.get_texel = m_state->get_texel_8bit_2x2_alpha;
 			extra.texture_alpha = true;
 			extra.get_alpha = m_state->get_alpha_8bit_2x2_alpha;
-			extra.depth_test_enable = false;
-			extra.depth_write_enable = false;
 		}
 		else {
 			extra.texture_rgb555 = true;
