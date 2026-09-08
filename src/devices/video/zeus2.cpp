@@ -1870,15 +1870,12 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 			//curDepthVal = object.zbuf_min;
 			curDepthVal = 0xffffff;
 		} else if (object.depth_min_enable) {
-			curDepthVal = curz + object.zbuf_min;
+			// Render reg 0x15 is a floor on the depth value, not a per-object bias
+			curDepthVal = std::max(curz, object.zbuf_min);
 		}
 		else {
 			curDepthVal = curz;
 		}
-		//if (curz < object.zbuf_min)
-		//  curDepthVal = object.zbuf_min;
-		//else
-		//  curDepthVal = curz;
 		if (curDepthVal < 0)
 			curDepthVal = 0;
 		bool depth_pass = true;
