@@ -20,10 +20,9 @@
 class um348x_device : public device_t, public device_sound_interface
 {
 public:
-	// Select the melody to play (0-based). Latched; takes effect at the next
-	// trigger. Both parts have 16 pointer slots, but only the first 8 (UM3481A)
-	// or 12 (UM3482A) are melodies the part will play; higher values are
-	// ignored.
+	// Select the melody to play (0-based, 0 to 15). Latched; takes effect at
+	// the next trigger. A value whose pointer addresses the ROM's trailing
+	// filler is refused.
 	void melody_w(u8 data);
 
 	// Start playing the selected melody from its beginning. Asserting while a
@@ -38,7 +37,7 @@ public:
 	int busy_r() { m_stream->update(); return m_playing ? 1 : 0; }
 
 protected:
-	um348x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 melodies);
+	um348x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u8 *multipliers);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -48,9 +47,8 @@ protected:
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	// Per-part tone table: oscillator half-period (the divisor N) for each of
-	// the 16 raw tone codes. 0 marks a code that produces no sound.
-	virtual const u8 *tone_divisors() const = 0;
+	// Rebuild the tone table from the tone ROM (section 3).
+	void decode_tone_rom() ATTR_COLD;
 
 private:
 	void stop();
@@ -60,10 +58,11 @@ private:
 
 	required_memory_region m_notes;
 	required_memory_region m_offsets;
-	required_memory_region m_tempos;
+	required_memory_region m_tones;
 
 	sound_stream *m_stream;
-	const u8 m_melodies;
+	const u8 *const m_multipliers;
+	u8   m_divisors[16];    // oscillator half-period per tone code, 0 = silent
 	u16 m_data_end;         // last word that can sound; everything after is filler
 
 	// latched inputs
@@ -91,7 +90,6 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual const u8 *tone_divisors() const override;
 };
 
 
@@ -102,7 +100,6 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual const u8 *tone_divisors() const override;
 };
 
 
