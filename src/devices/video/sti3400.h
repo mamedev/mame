@@ -23,9 +23,7 @@ public:
 	void vblank_w(int state);
 
 	bool video_valid() const;
-	u16 video_width() const;
-	u16 video_height() const;
-	void video_line(u32 y, u32 x, u32 width, u32 *destination) const;
+	bitmap_rgb32 const &bitmap() const { return m_video_bitmap; }
 
 protected:
 	void device_start() override ATTR_COLD;
@@ -98,6 +96,8 @@ private:
 	void reset_decoder();
 	void decoder_soft_reset();
 	bool execute_task();
+	bool presented_picture_valid() const;
+	void update_video_bitmap();
 	TIMER_CALLBACK_MEMBER(decode_tick);
 
 	void stream_byte_w(u8 data);
@@ -167,6 +167,7 @@ private:
 	std::unique_ptr<u8[]> m_dram;
 	std::unique_ptr<u8[]> m_overwrite_display;
 	std::unique_ptr<u8[]> m_picture_valid;
+	bitmap_rgb32 m_video_bitmap;
 	u16 m_display_pointer = 0;
 	u16 m_presented_pointer = 0;
 	u16 m_reconstructed_pointer = 0;
@@ -175,6 +176,7 @@ private:
 	u16 m_width = 0;
 	u16 m_height = 0;
 	bool m_overwrite_display_active = false;
+	bool m_video_bitmap_dirty = false;
 };
 
 DECLARE_DEVICE_TYPE(STI3400, sti3400_device)

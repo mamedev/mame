@@ -36,6 +36,7 @@ void sti3400_device::device_start()
 	m_dram = std::make_unique<u8[]>(m_dram_size);
 	m_overwrite_display = std::make_unique<u8[]>(m_dram_size);
 	m_picture_valid = std::make_unique<u8[]>(m_dram_size / BIT_BUFFER_LEVEL_UNIT_BYTES);
+	m_video_bitmap.allocate(MAX_VIDEO_WIDTH, MAX_VIDEO_HEIGHT);
 	m_decoder = std::make_unique<mpeg_video>(m_input.get(), MAX_VIDEO_WIDTH, MAX_VIDEO_HEIGHT);
 	m_decoder->register_save_state(*this);
 
@@ -88,6 +89,7 @@ void sti3400_device::device_post_load()
 	m_status = decoder_status();
 	m_irq_state = bool(m_interrupt_status & m_registers[REG_ITM]);
 	m_irq_cb(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	update_video_bitmap();
 }
 
 void sti3400_device::reset_decoder()
@@ -112,6 +114,8 @@ void sti3400_device::reset_decoder()
 	m_height = 0;
 	m_decoded_width = 0;
 	m_decoded_height = 0;
+	m_video_bitmap.resize(0, 0);
+	m_video_bitmap_dirty = false;
 	m_frame_rate = FALLBACK_FRAME_RATE;
 	m_task_active = false;
 	m_repeat_pending = false;
@@ -162,6 +166,7 @@ bool sti3400_device::execute_task()
 			m_frame_rate = frame_rate;
 			const u32 picture = m_reconstructed_pointer & ((m_dram_size / BIT_BUFFER_LEVEL_UNIT_BYTES) - 1);
 			m_picture_valid[picture] = 1;
+			m_video_bitmap_dirty = true;
 		}
 		else if (result == mpeg_video::decode_result::INVALID_DATA)
 		{
@@ -196,6 +201,12 @@ void sti3400_device::vblank_w(int state)
 {
 	if (!state)
 		return;
+
+	const u16 previous_pointer = m_presented_pointer;
+	const u16 previous_width = m_width;
+	const u16 previous_height = m_height;
+	const bool previous_overwrite = m_overwrite_display_active;
+	const bool previous_valid = presented_picture_valid();
 
 	// DFP is double-buffered by the hardware and becomes active at VSYNC.  The
 	// physical pipeline can display a buffer while reconstruction finishes;
@@ -237,6 +248,13 @@ void sti3400_device::vblank_w(int state)
 		update_irq();
 		m_decode_timer->adjust(attotime::zero);
 	}
+
+	if (m_video_bitmap_dirty || (m_presented_pointer != previous_pointer) ||
+		(m_width != previous_width) || (m_height != previous_height) ||
+		(m_overwrite_display_active != previous_overwrite) || (presented_picture_valid() != previous_valid))
+	{
+		update_video_bitmap();
+	}
 }
 
 void sti3400_device::stream_byte_w(u8 data)
@@ -274,26 +292,25 @@ void sti3400_device::stream_byte_w(u8 data)
 
 bool sti3400_device::video_valid() const
 {
+	return m_video_bitmap.width() && m_video_bitmap.height();
+}
+
+bool sti3400_device::presented_picture_valid() const
+{
 	const u32 picture = m_presented_pointer & ((m_dram_size / BIT_BUFFER_LEVEL_UNIT_BYTES) - 1);
-	return m_picture_valid[picture];
+	return m_width && m_height && m_picture_valid[picture];
 }
 
-u16 sti3400_device::video_width() const
+void sti3400_device::update_video_bitmap()
 {
-	return m_width;
-}
+	m_video_bitmap_dirty = false;
+	if (!presented_picture_valid())
+	{
+		m_video_bitmap.resize(0, 0);
+		return;
+	}
 
-u16 sti3400_device::video_height() const
-{
-	return m_height;
-}
-
-void sti3400_device::video_line(u32 y, u32 x, u32 width, u32 *destination) const
-{
-	assert(video_valid());
-	assert(y < m_height);
-	assert(x <= m_width);
-	assert(width <= (m_width - x));
+	m_video_bitmap.resize(m_width, m_height);
 
 	const u32 mask = m_dram_size - 1;
 	const u32 base = (u32(m_presented_pointer) * BIT_BUFFER_LEVEL_UNIT_BYTES) & mask;
@@ -302,22 +319,27 @@ void sti3400_device::video_line(u32 y, u32 x, u32 width, u32 *destination) const
 	const u32 luma_bytes = luma_pitch * luma_rows;
 	const u32 chroma_pitch = luma_pitch / 2;
 	const u32 chroma_bytes = chroma_pitch * luma_rows / 2;
-	const u32 luma = base + y * luma_pitch + x;
-	const u32 cb_plane = base + luma_bytes + (y / 2) * chroma_pitch;
+	const u32 cb_plane = base + luma_bytes;
 	const u32 cr_plane = cb_plane + chroma_bytes;
 	const u8 *const picture = m_overwrite_display_active ? m_overwrite_display.get() : m_dram.get();
 
-	for (u32 column = 0; column != width; column++)
+	for (u32 y = 0; y != m_height; y++)
 	{
-		const int luminance = picture[(luma + column) & mask];
-		const u32 chroma_x = (x + column) / 2;
-		const int cb = picture[(cb_plane + chroma_x) & mask] - 128;
-		const int cr = picture[(cr_plane + chroma_x) & mask] - 128;
-		const int scaled_luminance = 298 * (luminance - 16);
-		const u8 red = rgb_t::clamp((scaled_luminance + 409 * cr + 128) >> 8);
-		const u8 green = rgb_t::clamp((scaled_luminance - 100 * cb - 208 * cr + 128) >> 8);
-		const u8 blue = rgb_t::clamp((scaled_luminance + 516 * cb + 128) >> 8);
-		destination[column] = rgb_t(red, green, blue);
+		const u32 luma = base + y * luma_pitch;
+		const u32 chroma = (y / 2) * chroma_pitch;
+		u32 *const destination = &m_video_bitmap.pix(y);
+		for (u32 x = 0; x != m_width; x++)
+		{
+			const int luminance = picture[(luma + x) & mask];
+			const u32 chroma_x = chroma + x / 2;
+			const int cb = picture[(cb_plane + chroma_x) & mask] - 128;
+			const int cr = picture[(cr_plane + chroma_x) & mask] - 128;
+			const int scaled_luminance = 298 * (luminance - 16);
+			const u8 red = rgb_t::clamp((scaled_luminance + 409 * cr + 128) >> 8);
+			const u8 green = rgb_t::clamp((scaled_luminance - 100 * cb - 208 * cr + 128) >> 8);
+			const u8 blue = rgb_t::clamp((scaled_luminance + 516 * cb + 128) >> 8);
+			destination[x] = rgb_t(red, green, blue);
+		}
 	}
 }
 
