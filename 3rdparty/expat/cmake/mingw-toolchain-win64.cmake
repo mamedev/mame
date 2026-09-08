@@ -1,4 +1,3 @@
-#! /usr/bin/env bash
 #                          __  __            _
 #                       ___\ \/ /_ __   __ _| |_
 #                      / _ \\  /| '_ \ / _` | __|
@@ -6,8 +5,7 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2019-2026 Sebastian Pipping <sebastian@pipping.org>
-# Copyright (c) 2024      Dag-Erling Smørgrav <des@des.dev>
+# Copyright (c) 2026 Expat development team
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -29,23 +27,11 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-set -e
+set(CMAKE_SYSTEM_NAME Windows)
 
-sed="$(type -P gsed sed false | head -n 1)"  # e.g. for Solaris
-filename="${1:-tests/xmltest.log}"
+set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)
+set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
+set(CMAKE_RC_COMPILER x86_64-w64-mingw32-windres)
 
-exec "${sed}" -i.bak \
-        -e '# convert DOS line endings to Unix without resorting to dos2unix' \
-        -e $'s/\r//' \
-        \
-        -e 's/^wine: Call .* msvcrt\.dll\._wperror, aborting$/ibm49i02.dtd: No such file or directory/' \
-        \
-        -e '/^wine: /d' \
-        -e '/^Application tried to create a window, but no driver could be loaded.$/d' \
-        -e '/^Make sure that your X server is running and that $DISPLAY is set correctly.$/d' \
-        -e '/^err:systray:initialize_systray Could not create tray window$/d' \
-        -e '/^[0-9a-f]\+:err:/d' \
-        -e '/^wine client error:/d' \
-        -e '/^In ibm\/invalid\/P49\/: Unhandled exception: unimplemented .\+/d' \
-        \
-        "${filename}"
+set(WIN32 ON)
+set(MINGW ON)

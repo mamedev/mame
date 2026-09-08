@@ -1,4 +1,4 @@
-/* C++ compilation harness for the test suite.
+/*
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -6,7 +6,7 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2026 Nick Begg <nick@stunttruck.net>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -27,6 +27,25 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
-#include "acc_tests.c"
+#ifndef FALLTHROUGH_H
+#  define FALLTHROUGH_H 1
+
+// Explicit fallthrough in switch case to avoid warnings
+// with compiler flag -Wimplicit-fallthrough.
+
+#  define EXPAT_FALLTHROUGH                                                    \
+    do {                                                                       \
+    } while (0)
+
+#  if defined(__has_attribute)
+#    if __has_attribute(fallthrough)
+#      undef EXPAT_FALLTHROUGH
+#      define EXPAT_FALLTHROUGH __attribute__((fallthrough))
+#    endif
+#  endif
+
+#endif // FALLTHROUGH_H

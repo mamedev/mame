@@ -1,4 +1,4 @@
-/* C++ compilation harness for the test suite.
+/*
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -6,7 +6,7 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2026 Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -27,6 +27,27 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
-#include "basic_tests.c"
+#if ! defined(MEMORY_SANITIZER_H)
+#  define MEMORY_SANITIZER_H 1
+
+#  if defined(__has_feature)
+#    if __has_feature(memory_sanitizer)
+#      include <sanitizer/msan_interface.h>
+
+// inform Memory Sanitizer that [base, base + extent) is now initialized
+#      define MSAN_UNPOISON(base, extent) __msan_unpoison((base), (extent))
+
+#    endif
+#  endif
+
+#  if ! defined(MSAN_UNPOISON)
+#    define MSAN_UNPOISON(base, extent)                                        \
+      do {                                                                     \
+      } while (0)
+#  endif
+
+#endif // ! defined(MEMORY_SANITIZER_H)
