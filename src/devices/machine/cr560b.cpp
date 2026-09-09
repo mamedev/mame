@@ -416,7 +416,7 @@ void cr560b_device::write(uint8_t data)
 		case 0x0e: cmd_play_msf(); break;
 		case 0x0f: cmd_play_track(); break;
 		case 0x10: cmd_read(); break;
-		//case 0x11: cmd_read_subq(); break;
+		//case 0x11: cmd_subchannel_info(); break;
 
 		case 0x80: cmd_data_path_check(); break;
 		//case 0x81: cmd_read_status(); break;
@@ -436,6 +436,7 @@ void cr560b_device::write(uint8_t data)
 
 		default:
 		{
+			popmessage("cr560b.cpp: unknown command %02x", m_input_fifo[0]);
 			LOG("Unknown command: %02x\n", m_input_fifo[0]);
 			// answer with an error so that callers waiting for a status byte don't hang
 			m_output_fifo[0] = m_input_fifo[0];

@@ -32,7 +32,7 @@ TODO (BIOS programs):
 
 TODO (Arcade variants):
 - md23do/sht3do: lightgun hookup;
-- orbatak: playable with CEL issues in places, not extensively tested;
+- orbatak: ugly colors in service mode, not extensively tested;
 - The actual Player bus hookup will require specific subclasses for all these (namely can't use %p
   for enumerating p2 then p1);
 
