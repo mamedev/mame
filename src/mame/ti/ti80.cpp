@@ -135,7 +135,7 @@ void ti80_state::ti80_palette(palette_device &palette) const
 
 void ti80_state::ti80(machine_config &config)
 {
-    T6M53(config, m_maincpu, 980'000);
+    T6M53(config, m_maincpu, 1'960'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti80_state::ti80_mem);
     m_maincpu->btn_rows().set(FUNC(ti80_state::ti80_btns_r));
     m_maincpu->on_btn().set(FUNC(ti80_state::ti80_on_r));
@@ -152,8 +152,7 @@ void ti80_state::ti80(machine_config &config)
 	PALETTE(config, "palette", FUNC(ti80_state::ti80_palette), 2, 2);
 	screen.set_palette("palette"); 
 
-    // The link port is only present on viewscreen TI-80s, 
-    // which have the exact same ROMs as a base TI-80.
+    // The link port is only present on viewscreen TI-80s, which have the exact same ROMs as a regular TI-80.
 	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
     m_maincpu->ring_out().set(m_link_port, FUNC(ti8x_link_port_device::ring_w));
     m_maincpu->tip_out().set(m_link_port, FUNC(ti8x_link_port_device::tip_w));
@@ -175,4 +174,4 @@ ROM_START (ti80)
 ROM_END
 
 //    YEAR  NAME   PARENT   COMPAT  MACHINE   INPUT  STATE       INIT        COMPANY              FULLNAME    FLAGS
-COMP( 1995, ti80,  0,       0,      ti80,     ti80,  ti80_state, empty_init, "Texas Instruments", "TI-80",    MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_TIMING )
+COMP( 1995, ti80,  0,       0,      ti80,     ti80,  ti80_state, empty_init, "Texas Instruments", "TI-80",    MACHINE_NO_SOUND_HW )

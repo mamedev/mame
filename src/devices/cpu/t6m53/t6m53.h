@@ -47,13 +47,13 @@ private:
 		T6M53_A,
 		T6M53_SP,
 		T6M53_REP,
-		T6M53_KCOL,
-		T6M53_KROW,
 		T6M53_IL,
 		T6M53_IH,
 		T6M53_DPL,
 		T6M53_DPH
 	};
+
+    const uint16_t m_divisors[8] = {5040, 2100, 1575, 1050, 350, 252, 180, 105};
 
 	uint8_t m_regs[0x100];
 	uint16_t m_stack[8];
@@ -92,10 +92,10 @@ private:
 	void set_i(uint16_t value);
 	uint16_t get_dp() const;
 	void set_dp(uint16_t value);
-	static uint16_t add4(uint16_t x, uint8_t y);
 
-	static uint16_t bcd(uint8_t x);
-	uint8_t add_with_carry(int bits, uint8_t x, uint8_t y, bool &carry, uint16_t op);
+	uint16_t add4(uint16_t x, uint8_t y);
+	uint16_t bcd(uint8_t x);
+	uint8_t adc(int bits, uint8_t x, uint8_t y, bool &carry, uint16_t op);
 
 	uint16_t jyx(uint16_t op, uint16_t offset) const;
 	uint16_t wyx(uint16_t op, uint16_t offset) const;
@@ -103,7 +103,7 @@ private:
 	uint16_t wyxs_no_i(uint16_t op, uint16_t offset) const;
 	uint16_t ef(uint16_t op, uint16_t offset) const;
 
-	void jump_call(bool conditional, bool condition);
+	void jump_call(bool is_cond, bool condition);
     void add_cycles(int cycles);
 	void execute_op(uint16_t op, int &repeat, uint16_t offset, bool is_repeat, bool &carry);
 

@@ -4,9 +4,6 @@
 
         Toshiba T6M53 ASIC
 
-        TODO: 
-            - Find the true name of this CPU
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -50,10 +47,10 @@ void t6m53_device::device_start() {
     state_add(T6M53_A, "A", REG_A).formatstr("%02X");
     state_add(T6M53_SP, "SP", m_regs[0x118 >> 1]).formatstr("%01X");
     state_add(T6M53_REP, "REP", m_regs[0x110 >> 1]).formatstr("%01X");
-    state_add(T6M53_IL, "ILO", m_regs[0x100 >> 1]).formatstr("%02X");
-    state_add(T6M53_IH, "IHI", m_regs[0x102 >> 1]).formatstr("%02X");
-    state_add(T6M53_DPL, "DPLO", m_regs[0x11c >> 1]).formatstr("%02X");
-    state_add(T6M53_DPH, "DPHI", m_regs[0x11e >> 1]).formatstr("%02X");
+    state_add(T6M53_IL, "IL", m_regs[0x100 >> 1]).formatstr("%02X");
+    state_add(T6M53_IH, "IH", m_regs[0x102 >> 1]).formatstr("%02X");
+    state_add(T6M53_DPL, "DPL", m_regs[0x11c >> 1]).formatstr("%02X");
+    state_add(T6M53_DPH, "DPH", m_regs[0x11e >> 1]).formatstr("%02X");
 
     save_item(NAME(m_regs));
     save_item(NAME(m_pc));
@@ -65,6 +62,8 @@ void t6m53_device::device_start() {
     save_item(NAME(m_ftimer));
     save_item(NAME(m_vtimer));
     set_icountptr(m_icount);
+    
+    set_clock_scale(105.0 / m_divisors[0]);
 }
 
 
@@ -77,6 +76,8 @@ void t6m53_device::device_reset() {
     m_ftimer = 0;
     m_vtimer = 0;
     m_write_repeat = false;
+    
+    set_clock_scale(105.0 / m_divisors[0]);
 }
 
 
@@ -170,6 +171,10 @@ void t6m53_device::reg_w4_raw(uint16_t index, uint8_t data) {
                 m_regs[0x0f2 >> 1] = temp;
                 m_isel = data;
             }
+            break;
+
+        case 0x10d:
+            set_clock_scale(105.0 / m_divisors[(data >> 1)]);
             break;
 
         case 0x10f:
@@ -268,7 +273,7 @@ inline uint16_t t6m53_device::bcd(uint8_t x) {
     return (x >> 4) * 10 + (x & 0x0f);
 }
 
-uint8_t t6m53_device::add_with_carry(int bits, uint8_t x, uint8_t y, bool &carry, uint16_t op) {
+uint8_t t6m53_device::adc(int bits, uint8_t x, uint8_t y, bool &carry, uint16_t op) {
     if (bits > 0) {
         if (op & 0x0800) {
             const int sum = bcd(x) + bcd(y) + carry;
@@ -282,7 +287,7 @@ uint8_t t6m53_device::add_with_carry(int bits, uint8_t x, uint8_t y, bool &carry
 
         const int sum = x + y + carry;
         carry = (sum >> bits) & 1;
-        return uint8_t(sum);
+        return sum;
     }
 
     if (op & 0x0800) {
@@ -326,30 +331,30 @@ uint16_t t6m53_device::ef(uint16_t op, uint16_t offset) const {
 }
 
 
-void t6m53_device::jump_call(bool conditional, bool condition) {
-    const uint16_t target = m_program->read_word(m_pc);
+void t6m53_device::jump_call(bool is_cond, bool condition) {
+    const uint16_t addr = m_program->read_word(m_pc);
 
-    if (conditional && !condition)
+    if (is_cond && !condition)
         return;
 
-    if (target & 0x8000) {
+    if (addr & 0x8000) {
         const uint8_t sp = reg_r4(0x118);
         if (sp < 8) m_stack[sp] = m_pc + 2;
         reg_w4(0x118, sp + 1);
     }
 
-    m_pc = (target & 0x7fff) << 1;
+    m_pc = (addr & 0x7fff) << 1;
     add_cycles(2);
 }
 
 void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is_repeat, bool &carry) {
-    const int s = BIT(op, 8);
-    const uint8_t SMASK = s ? 0x0f : 0xff;
-    const int SB = s ? 4 : 8;
-    const uint8_t B = ((op >> 9 & 2) | (op >> 8 & 1));
+    const bool s = BIT(op, 8);
+    const uint8_t s_mask = s ? 0x0f : 0xff;
+    const uint8_t SB = s ? 4 : 8;
+    const uint8_t B = (BIT(op, 10) << 1) | BIT(op, 8);
 
-    const auto reg_sr = [&](uint16_t addr) -> uint8_t { return s ? reg_r4(addr) : reg_r8(addr); };
-    const auto reg_sw = [&](uint16_t addr, uint8_t value) { if (s) reg_w4(addr, value); else reg_w8(addr, value); };
+    const auto reg_rS = [&](uint16_t addr) -> uint8_t { return s ? reg_r4(addr) : reg_r8(addr); };
+    const auto reg_wS = [&](uint16_t addr, uint8_t value) { if (s) reg_w4(addr, value); else reg_w8(addr, value); };
     const auto do_m_jump_call = [&](bool cond) {
         if (repeat)
             return;
@@ -374,7 +379,7 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
             if (op & 0x02)
                 m_program->write_byte(get_dp(), s ? reg_r4(get_i()) | (m_lasthigh << 4) : reg_r8(get_i()));
             else
-                reg_sw(get_i(), m_program->read_byte(get_dp()));
+                reg_wS(get_i(), m_program->read_byte(get_dp()));
 
             op & 0x01 ? set_dp(get_dp() - 1) : set_dp(get_dp() + 1);
             if (is_repeat) set_i(add4(get_i(), 2 - s));
@@ -397,15 +402,15 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
         if (op & 0x80) 
             m_pc = (m_regs[0x106 >> 1] << 9) | (m_regs[0x104 >> 1] << 1);
     } else if (op < 0x0400) {
-        reg_sw(jyx(op, offset), reg_sr(get_i()));
+        reg_wS(jyx(op, offset), reg_rS(get_i()));
         if (is_repeat) set_i(add4(get_i(), 2 - s));
     } else if (op < 0x0600) {
-        reg_sw(get_i(), reg_sr(jyx(op, offset)));
+        reg_wS(get_i(), reg_rS(jyx(op, offset)));
         if (is_repeat) set_i(add4(get_i(), 2 - s));
     } else if (op < 0x0800) {
-        const uint8_t temp = reg_sr(jyx(op, offset));
-        reg_sw(jyx(op, offset), reg_sr(get_i()));
-        reg_sw(get_i(), temp);
+        const uint8_t temp = reg_rS(jyx(op, offset));
+        reg_wS(jyx(op, offset), reg_rS(get_i()));
+        reg_wS(get_i(), temp);
         if (is_repeat) set_i(add4(get_i(), 2 - s));
     } else if (op < 0x0c00) {
         reg_w4(0x102, op >> 8);
@@ -413,20 +418,20 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
         if (op & 0x0200)
             jump_call(false, true);
     } else if (op < 0x0e00) {
-        reg_sw(get_i(), op);
+        reg_wS(get_i(), op);
         set_i(add4(get_i(), 2 - s));
     } else if (op < 0x1000) {
         reg_w4(ef(op, offset), op);
     } else if (op < 0x1400) {
-        reg_sw(0x0f0, reg_sr(wyxs_no_i(op, offset)));
+        reg_wS(0x0f0, reg_rS(wyxs_no_i(op, offset)));
     } else if (op < 0x1800) {
-        const uint8_t temp = reg_sr(0x0f0);
-        reg_sw(0x0f0, reg_sr(wyxs_no_i(op, offset)));
-        reg_sw(wyxs_no_i(op, offset), temp);
+        const uint8_t temp = reg_rS(0x0f0);
+        reg_wS(0x0f0, reg_rS(wyxs_no_i(op, offset)));
+        reg_wS(wyxs_no_i(op, offset), temp);
     } else if (op < 0x1c00) {
-        reg_sw(wyxs_no_i(op, offset), reg_sr(0x0f0));
+        reg_wS(wyxs_no_i(op, offset), reg_rS(0x0f0));
     } else if (op < 0x1e00) {
-        reg_sw(0x0f0, op);
+        reg_wS(0x0f0, op);
     } else if (op < 0x2000) {
         reg_w4(ef(op, offset), op);
     } else if (op < 0x2800) {
@@ -440,14 +445,14 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
         reg_w4(addr, reg_r4(addr) | (1 << B));
     } else if (op < 0x3c00) {
         const uint16_t addr = ((op & 0x020f) == 0x020f) ? get_i() : wyxs(op, offset);
-        reg_sw(addr, ~reg_sr(addr));
+        reg_wS(addr, ~reg_rS(addr));
         if (is_repeat && (op & 0x020f) == 0x020f)
             set_i(add4(get_i(), 2 - s));
     } else if (op < 0x3e00) {
-        reg_sw(get_i(), reg_sr(get_i()) ^ reg_sr(jyx(op, offset)));
+        reg_wS(get_i(), reg_rS(get_i()) ^ reg_rS(jyx(op, offset)));
         if (is_repeat) set_i(add4(get_i(), 2 - s));
     } else if (op < 0x4000) {
-        reg_sw(get_i(), reg_sr(get_i()) | reg_sr(jyx(op, offset)));
+        reg_wS(get_i(), reg_rS(get_i()) | reg_rS(jyx(op, offset)));
         if (is_repeat) set_i(add4(get_i(), 2 - s));
     } else if (op < 0x6000) {
         const uint8_t x = reg_r4(ef(op, offset));
@@ -457,22 +462,22 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
             carry = !(op & 0x0800) ^ !carry;
         do_m_jump_call(carry);
     } else if (op < 0x7000) {
-        const uint8_t x = reg_sr(get_i());
-        const uint8_t y = op & SMASK;
+        const uint8_t x = reg_rS(get_i());
+        const uint8_t y = op & s_mask;
         carry = (op & 0x0800) ? (x < y || (carry && x == y)) : (carry || x != y);
         if (!repeat)
             carry = !(op & 0x0800) ^ !carry;
         do_m_jump_call(carry);
         set_i(add4(get_i(), 2 - s));
     } else if (op < 0x8000) {
-        const uint8_t x = reg_sr(0x0f0);
-        const uint8_t y = op & SMASK;
+        const uint8_t x = reg_rS(0x0f0);
+        const uint8_t y = op & s_mask;
         carry = (op & 0x0800) ? (x < y || (carry && x == y)) : (carry || x != y);
         if (!repeat)
             carry = !(op & 0x0800) ^ !carry;
         do_m_jump_call(carry);
     } else if (op < 0xa000) {
-        reg_sw(get_i(), add_with_carry(op & 0x1000 ? -SB : SB, reg_sr(get_i()), reg_sr(jyx(op, offset)), carry, op));
+        reg_wS(get_i(), adc(op & 0x1000 ? -SB : SB, reg_rS(get_i()), reg_rS(jyx(op, offset)), carry, op));
         if (is_repeat) set_i(add4(get_i(), 2 - s));
         do_m_jump_call(carry);
     } else if (op < 0xb000) {
@@ -487,8 +492,8 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
         else
             m_pc += 2;
     } else if (op < 0xc000) {
-        const uint8_t x = reg_sr(get_i());
-        const uint8_t y = reg_sr(jyx(op, offset));
+        const uint8_t x = reg_rS(get_i());
+        const uint8_t y = reg_rS(jyx(op, offset));
         carry = (op & 0x0800) ? (x < y || (carry && x == y)) : (carry || x != y);
         if (!repeat)
             carry = !(op & 0x0800) ^ !carry;
@@ -496,14 +501,14 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
         if (is_repeat) set_i(add4(get_i(), 2 - s));
     } else if (op < 0xe000) {
         const uint16_t addr = ef(op, offset);
-        reg_w4(addr, add_with_carry(4, reg_r4(addr), op & 0x0f, carry, op));
+        reg_w4(addr, adc(4, reg_r4(addr), op & 0x0f, carry, op));
         do_m_jump_call(carry);
     } else if (op < 0xf000) {
-        reg_sw(get_i(), add_with_carry(SB, reg_sr(get_i()), op & SMASK, carry, op));
+        reg_wS(get_i(), adc(SB, reg_rS(get_i()), op & s_mask, carry, op));
         if (is_repeat) set_i(add4(get_i(), 2 - s));
         do_m_jump_call(carry);
     } else {
-        reg_sw(0x0f0, add_with_carry(SB, reg_sr(0x0f0), op & SMASK, carry, op));
+        reg_wS(0x0f0, adc(SB, reg_rS(0x0f0), op & s_mask, carry, op));
         do_m_jump_call(carry);
     }
 }
@@ -511,7 +516,7 @@ void t6m53_device::execute_op(uint16_t op, int &repeat, uint16_t offset, bool is
 void t6m53_device::add_cycles(int cycles) {
     m_icount -= cycles * 4;
 
-    if (((m_regs[0x10d >> 1] >> 4) & 0x01) || ((m_regs[0x10f >> 1] >> 4) & 0x0c)) {
+    if ((m_regs[0x10d >> 1] & 0x10) || (m_regs[0x10f >> 1] & 0xc0)) {
         m_vtimer = 0;
         return;
     }
