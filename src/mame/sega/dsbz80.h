@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "sound/mpeg_audio.h"
 
@@ -24,6 +25,12 @@ public:
 
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }
+
+	void set_clock(clock_device *uart_clock)
+	{
+		uart_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
+		uart_clock->signal_handler().append("uart", FUNC(i8251_device::write_txc));
+	}
 
 	void write_txd(int state);
 

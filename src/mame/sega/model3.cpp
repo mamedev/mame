@@ -724,7 +724,6 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/kl5c80a16.h"
 #include "315_5296.h"
-#include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
@@ -6376,9 +6375,9 @@ void model3_state::add_base_devices(machine_config &config)
 	I8251(config, m_uart, 8000000); // uPD71051
 	m_uart->txd_handler().set(m_scsp1, FUNC(scsp_device::midi_in));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
-	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
-	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+	CLOCK(config, m_uart_clock, 500'000); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
+	m_uart_clock->signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	SEGA_BILLBOARD(config, m_billboard);
 
@@ -6467,6 +6466,7 @@ void model3_state::scud(machine_config &config)
 	model3_15(config);
 
 	DSBZ80(config, m_dsbz80);
+	m_dsbz80->set_clock(m_uart_clock);
 	m_dsbz80->add_route(0, "speaker", 1.0, 0);
 	m_dsbz80->add_route(1, "speaker", 1.0, 1);
 

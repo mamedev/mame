@@ -9,6 +9,7 @@
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
 #include "machine/53c810.h"
+#include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/i8251.h"
 #include "sound/scsp.h"
@@ -129,6 +130,7 @@ public:
 		m_dsbz80(*this, "dsbz80"),
 		m_dsb2(*this, "dsb2"),
 		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -218,6 +220,7 @@ private:
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<dsb2_device> m_dsb2;        // 68k-based MPEG Digital Sound Board
 	required_device<i8251_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	required_shared_ptr<uint16_t> m_soundram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
