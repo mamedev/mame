@@ -191,6 +191,7 @@ void iosb_base::device_start()
 		{
 			fatalerror("iosb init without 68k CPU or PowerPC-to-68k bridge device\n");
 		}
+		m68k_maincpu->set_emmu_enable(true);
 	}
 
 	m_6015_timer = timer_alloc(FUNC(iosb_base::mac_6015_tick), this);
