@@ -127,7 +127,7 @@ void f108_device::device_reset()
 
 	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
+	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
