@@ -539,7 +539,6 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 		{
 			m68k_cpu->restart_this_instruction();
 		}
-		m_maincpu->retry_access();
 		m_maincpu->spin_until_time(attotime::from_usec(50));
 		return 0xffff;
 	}
