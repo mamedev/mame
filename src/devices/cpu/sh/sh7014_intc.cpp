@@ -267,7 +267,7 @@ void sh7014_intc_device::set_interrupt(int vector, int state)
 
 void sh7014_intc_device::update_irq_state()
 {
-	int cur_vector = 0;
+	int cur_vector = -1;
 	int cur_level = -1;
 
 	// isr has the bits in reverse order
@@ -296,11 +296,11 @@ void sh7014_intc_device::update_irq_state()
 		}
 	}
 
+	// the IRQ pins have vectors and priorities of their own, so they go the
+	// same way as the on-chip sources; a vector of -1 says nothing is asking
 	if (cur_vector == INT_VECTOR_NMI)
 		m_set_irq_cb(INPUT_LINE_NMI, cur_level, false);
-	else if ((cur_vector >= INT_VECTOR_IRQ0 && cur_vector <= INT_VECTOR_IRQ3) || cur_vector == INT_VECTOR_IRQ6 || cur_vector == INT_VECTOR_IRQ7)
-		m_set_irq_cb(cur_vector - INT_VECTOR_IRQ0, cur_level, false);
-	else if (cur_vector > INT_VECTOR_IRQ7)
+	else
 		m_set_irq_cb(cur_vector, cur_level, true);
 }
 

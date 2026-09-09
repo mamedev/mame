@@ -12,6 +12,8 @@
 #pragma once
 
 #include "sh2.h"
+#include "sh7014_adc.h"
+#include "sh7014_wdt.h"
 #include "sh7014_bsc.h"
 #include "sh7014_dmac.h"
 #include "sh7014_intc.h"
@@ -26,6 +28,10 @@ public:
 
 	template<int Sci> auto sci_tx_w() {
 		return m_sci[Sci].lookup()->write_sci_tx();
+	}
+
+	template<int Sci> void sci_rx_w(int state) {
+		m_sci[Sci]->rx_w(state);
 	}
 
 	template<int Sci> void sci_set_external_clock_period(const attotime &period) {
@@ -47,6 +53,8 @@ public:
 
 	auto read_portf()  { return m_port.lookup()->port_f_read_callback(); }
 
+	template <int Channel> auto read_adc() { return m_adc.lookup()->analog_callback<Channel>(); }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -66,6 +74,8 @@ private:
 	uint16_t ccr_r();
 	void ccr_w(offs_t offset, uint16_t dat, uint16_t mem_mask = ~0);
 
+	required_device<sh7014_adc_device> m_adc;
+	required_device<sh7014_wdt_device> m_wdt;
 	required_device_array<sh7014_sci_device, 2> m_sci;
 	required_device<sh7014_bsc_device> m_bsc;
 	required_device<sh7014_dmac_device> m_dmac;
