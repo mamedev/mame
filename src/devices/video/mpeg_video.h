@@ -67,6 +67,10 @@ public:
 	void register_save_state(device_t &device, int index = 0);
 
 private:
+	struct vlc_entry;
+	struct dct_vlc_entry;
+	template <typename T, std::size_t N, unsigned MaxBits> class vlc_decoder;
+
 	struct limit_hit { };
 
 	struct invalid_stream { };
@@ -100,6 +104,34 @@ private:
 	static constexpr u32 SEQUENCE_END_CODE = 0x000001b7;
 	static constexpr u32 GROUP_START_CODE = 0x000001b8;
 	static constexpr u32 START_CODE_PREFIX = 0x000001;
+
+	static constexpr u8 TYPE_QUANT = 0x01;
+	static constexpr u8 TYPE_FORWARD = 0x02;
+	static constexpr u8 TYPE_BACKWARD = 0x04;
+	static constexpr u8 TYPE_PATTERN = 0x08;
+	static constexpr u8 TYPE_INTRA = 0x10;
+
+	static const vlc_entry s_macroblock_address_increment[33];
+	static const vlc_entry s_coded_block_pattern[63];
+	static const vlc_entry s_motion_code[33];
+	static const dct_vlc_entry s_dct_coefficient[110];
+	static const vlc_entry s_i_macroblock_type[2];
+	static const vlc_entry s_p_macroblock_type[7];
+	static const vlc_entry s_b_macroblock_type[11];
+	static const vlc_entry s_d_macroblock_type[1];
+	static const vlc_entry s_dc_size_luminance[9];
+	static const vlc_entry s_dc_size_chrominance[9];
+
+	static const vlc_decoder<vlc_entry, 33, 11> s_macroblock_address_increment_decoder;
+	static const vlc_decoder<vlc_entry, 63, 9> s_coded_block_pattern_decoder;
+	static const vlc_decoder<vlc_entry, 33, 11> s_motion_code_decoder;
+	static const vlc_decoder<dct_vlc_entry, 110, 16> s_dct_coefficient_decoder;
+	static const vlc_decoder<vlc_entry, 2, 2> s_i_macroblock_type_decoder;
+	static const vlc_decoder<vlc_entry, 7, 6> s_p_macroblock_type_decoder;
+	static const vlc_decoder<vlc_entry, 11, 6> s_b_macroblock_type_decoder;
+	static const vlc_decoder<vlc_entry, 1, 1> s_d_macroblock_type_decoder;
+	static const vlc_decoder<vlc_entry, 9, 7> s_dc_size_luminance_decoder;
+	static const vlc_decoder<vlc_entry, 9, 8> s_dc_size_chrominance_decoder;
 
 	static const u8 s_default_intra_quantizer_matrix[64];
 	static const u8 s_scan[64];
@@ -159,6 +191,13 @@ private:
 	void inverse_dct(const int *coefficients, int *values, bool dc_only) const;
 	void read_frame(frame &destination, const u8 *source, unsigned source_bytes) const;
 	void write_frame(const frame &source, u8 *output, unsigned output_bytes) const;
+
+	template <std::size_t N> static constexpr vlc_entry make_vlc(const char (&text)[N], int value);
+	template <std::size_t N> static constexpr dct_vlc_entry make_dct_vlc(const char (&text)[N], unsigned run, unsigned level);
+	template <unsigned MaxBits, typename T, std::size_t N> static constexpr auto make_vlc_decoder(const T (&table)[N]);
+	template <typename T, std::size_t N, unsigned MaxBits, typename P, typename S>
+	static const T *decode_vlc(const T (&table)[N], const vlc_decoder<T, N, MaxBits> &decoder,
+			int available, P &&peek, S &&skip);
 
 	int macroblock_address_increment();
 	macroblock_type macroblock_type_code();

@@ -32,14 +32,14 @@
 #include <cmath>
 #include <numbers>
 
-struct vlc_entry
+struct mpeg_video::vlc_entry
 {
 	u32 code;
 	u8 bits;
 	int value;
 };
 
-struct dct_vlc_entry
+struct mpeg_video::dct_vlc_entry
 {
 	u32 code;
 	u8 bits;
@@ -48,7 +48,7 @@ struct dct_vlc_entry
 };
 
 template <std::size_t N>
-constexpr vlc_entry make_vlc(const char (&text)[N], int value)
+constexpr mpeg_video::vlc_entry mpeg_video::make_vlc(const char (&text)[N], int value)
 {
 	u32 code = 0;
 	for (unsigned i = 0; i != (N - 1); i++)
@@ -57,7 +57,7 @@ constexpr vlc_entry make_vlc(const char (&text)[N], int value)
 }
 
 template <std::size_t N>
-constexpr dct_vlc_entry make_dct_vlc(const char (&text)[N], unsigned run, unsigned level)
+constexpr mpeg_video::dct_vlc_entry mpeg_video::make_dct_vlc(const char (&text)[N], unsigned run, unsigned level)
 {
 	u32 code = 0;
 	for (unsigned i = 0; i != (N - 1); i++)
@@ -65,7 +65,7 @@ constexpr dct_vlc_entry make_dct_vlc(const char (&text)[N], unsigned run, unsign
 	return dct_vlc_entry{ code, u8(N - 1), u8(run), u8(level) };
 }
 
-constexpr vlc_entry s_macroblock_address_increment[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_macroblock_address_increment[33] =
 {
 	make_vlc("1", 1),
 	make_vlc("011", 2),
@@ -102,7 +102,7 @@ constexpr vlc_entry s_macroblock_address_increment[] =
 	make_vlc("00000011000", 33)
 };
 
-constexpr vlc_entry s_coded_block_pattern[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_coded_block_pattern[63] =
 {
 	make_vlc("111", 60),
 	make_vlc("1101", 4), make_vlc("1100", 8),
@@ -138,7 +138,7 @@ constexpr vlc_entry s_coded_block_pattern[] =
 	make_vlc("000000011", 27), make_vlc("000000010", 39)
 };
 
-constexpr vlc_entry s_motion_code[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_motion_code[33] =
 {
 	make_vlc("1", 0),
 	make_vlc("011", -1), make_vlc("010", 1),
@@ -159,7 +159,7 @@ constexpr vlc_entry s_motion_code[] =
 	make_vlc("00000011001", -16), make_vlc("00000011000", 16)
 };
 
-constexpr dct_vlc_entry s_dct_coefficient[] =
+constexpr mpeg_video::dct_vlc_entry mpeg_video::s_dct_coefficient[110] =
 {
 	make_dct_vlc("011", 1, 1), make_dct_vlc("0100", 0, 2), make_dct_vlc("0101", 2, 1),
 	make_dct_vlc("00101", 0, 3), make_dct_vlc("00111", 3, 1), make_dct_vlc("00110", 4, 1),
@@ -217,19 +217,13 @@ constexpr dct_vlc_entry s_dct_coefficient[] =
 	make_dct_vlc("0000000000011100", 30, 1), make_dct_vlc("0000000000011011", 31, 1)
 };
 
-constexpr u8 TYPE_QUANT = 0x01;
-constexpr u8 TYPE_FORWARD = 0x02;
-constexpr u8 TYPE_BACKWARD = 0x04;
-constexpr u8 TYPE_PATTERN = 0x08;
-constexpr u8 TYPE_INTRA = 0x10;
-
-constexpr vlc_entry s_i_macroblock_type[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_i_macroblock_type[2] =
 {
 	make_vlc("1", TYPE_INTRA),
 	make_vlc("01", TYPE_QUANT | TYPE_INTRA)
 };
 
-constexpr vlc_entry s_p_macroblock_type[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_p_macroblock_type[7] =
 {
 	make_vlc("1", TYPE_FORWARD | TYPE_PATTERN),
 	make_vlc("01", TYPE_PATTERN),
@@ -240,7 +234,7 @@ constexpr vlc_entry s_p_macroblock_type[] =
 	make_vlc("000001", TYPE_QUANT | TYPE_INTRA)
 };
 
-constexpr vlc_entry s_b_macroblock_type[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_b_macroblock_type[11] =
 {
 	make_vlc("10", TYPE_FORWARD | TYPE_BACKWARD),
 	make_vlc("11", TYPE_FORWARD | TYPE_BACKWARD | TYPE_PATTERN),
@@ -255,12 +249,12 @@ constexpr vlc_entry s_b_macroblock_type[] =
 	make_vlc("000001", TYPE_QUANT | TYPE_INTRA)
 };
 
-constexpr vlc_entry s_d_macroblock_type[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_d_macroblock_type[1] =
 {
 	make_vlc("1", TYPE_INTRA)
 };
 
-constexpr vlc_entry s_dc_size_luminance[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_dc_size_luminance[9] =
 {
 	make_vlc("100", 0), make_vlc("00", 1),
 	make_vlc("01", 2), make_vlc("101", 3),
@@ -269,7 +263,7 @@ constexpr vlc_entry s_dc_size_luminance[] =
 	make_vlc("1111110", 8)
 };
 
-constexpr vlc_entry s_dc_size_chrominance[] =
+constexpr mpeg_video::vlc_entry mpeg_video::s_dc_size_chrominance[9] =
 {
 	make_vlc("00", 0), make_vlc("01", 1),
 	make_vlc("10", 2), make_vlc("110", 3),
@@ -279,7 +273,7 @@ constexpr vlc_entry s_dc_size_chrominance[] =
 };
 
 template <typename T, std::size_t N, unsigned MaxBits>
-class vlc_decoder
+class mpeg_video::vlc_decoder
 {
 public:
 	struct match
@@ -339,24 +333,24 @@ private:
 };
 
 template <unsigned MaxBits, typename T, std::size_t N>
-constexpr auto make_vlc_decoder(const T (&table)[N])
+constexpr auto mpeg_video::make_vlc_decoder(const T (&table)[N])
 {
 	return vlc_decoder<T, N, MaxBits>(table);
 }
 
-constexpr auto s_macroblock_address_increment_decoder = make_vlc_decoder<11>(s_macroblock_address_increment);
-constexpr auto s_coded_block_pattern_decoder = make_vlc_decoder<9>(s_coded_block_pattern);
-constexpr auto s_motion_code_decoder = make_vlc_decoder<11>(s_motion_code);
-constexpr auto s_dct_coefficient_decoder = make_vlc_decoder<16>(s_dct_coefficient);
-constexpr auto s_i_macroblock_type_decoder = make_vlc_decoder<2>(s_i_macroblock_type);
-constexpr auto s_p_macroblock_type_decoder = make_vlc_decoder<6>(s_p_macroblock_type);
-constexpr auto s_b_macroblock_type_decoder = make_vlc_decoder<6>(s_b_macroblock_type);
-constexpr auto s_d_macroblock_type_decoder = make_vlc_decoder<1>(s_d_macroblock_type);
-constexpr auto s_dc_size_luminance_decoder = make_vlc_decoder<7>(s_dc_size_luminance);
-constexpr auto s_dc_size_chrominance_decoder = make_vlc_decoder<8>(s_dc_size_chrominance);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 33, 11> mpeg_video::s_macroblock_address_increment_decoder = make_vlc_decoder<11>(s_macroblock_address_increment);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 63, 9> mpeg_video::s_coded_block_pattern_decoder = make_vlc_decoder<9>(s_coded_block_pattern);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 33, 11> mpeg_video::s_motion_code_decoder = make_vlc_decoder<11>(s_motion_code);
+constexpr mpeg_video::vlc_decoder<mpeg_video::dct_vlc_entry, 110, 16> mpeg_video::s_dct_coefficient_decoder = make_vlc_decoder<16>(s_dct_coefficient);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 2, 2> mpeg_video::s_i_macroblock_type_decoder = make_vlc_decoder<2>(s_i_macroblock_type);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 7, 6> mpeg_video::s_p_macroblock_type_decoder = make_vlc_decoder<6>(s_p_macroblock_type);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 11, 6> mpeg_video::s_b_macroblock_type_decoder = make_vlc_decoder<6>(s_b_macroblock_type);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 1, 1> mpeg_video::s_d_macroblock_type_decoder = make_vlc_decoder<1>(s_d_macroblock_type);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 9, 7> mpeg_video::s_dc_size_luminance_decoder = make_vlc_decoder<7>(s_dc_size_luminance);
+constexpr mpeg_video::vlc_decoder<mpeg_video::vlc_entry, 9, 8> mpeg_video::s_dc_size_chrominance_decoder = make_vlc_decoder<8>(s_dc_size_chrominance);
 
 template <typename T, std::size_t N, unsigned MaxBits, typename P, typename S>
-const T *decode_vlc(const T (&table)[N], const vlc_decoder<T, N, MaxBits> &decoder,
+const T *mpeg_video::decode_vlc(const T (&table)[N], const vlc_decoder<T, N, MaxBits> &decoder,
 		int available, P &&peek, S &&skip)
 {
 	const unsigned lookahead = std::min<unsigned>(decoder.max_bits(), std::max(available, 0));
