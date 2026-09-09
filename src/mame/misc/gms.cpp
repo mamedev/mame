@@ -3371,6 +3371,9 @@ ROM_START( sjms )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
 	// u29 not populated
 	ROM_LOAD( "5.u39", 0x80000, 0x80000, CRC(6b07843c) SHA1(70c873828fcf7222f617eae0edd0cfb6b1218ba1) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(82649062) SHA1(6093da95e0201277f4603147c7898e55e00c3091) )
 ROM_END
 
 // 三国列车 (Sānguó Lièchē)
@@ -3388,6 +3391,9 @@ ROM_START( sglc )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
 	// u29 not populated
 	ROM_LOAD( "t1_0_6b65.u39", 0x80000, 0x80000, CRC(5c703544) SHA1(2bd10804f0a2df577e0494274e5f89ffba850393) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(fd7411c6) SHA1(ce70ab4f0372679cfcb639d8b706cf8403736580) )
 ROM_END
 
 
@@ -3617,7 +3623,7 @@ void gms_2layers_state::init_tbss()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
-	rom[0x11b8 / 2] = 0x6000;
+	rom[0x11ba / 2] = 0x6000;
 	rom[0x12c2 / 2] = 0x6000;
 	rom[0x1634 / 2] = 0x6000;
 	rom[0x164e / 2] = 0x6000;
@@ -3636,8 +3642,16 @@ void gms_2layers_state::init_sglc()
 
 void gms_2layers_state::init_sjms()
 {
-	// TODO
-	//uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = &memregion("maincpu")->as_u16();
+
+	rom[0x11ba / 2] = 0x6000;
+	rom[0x12c2 / 2] = 0x6000;
+	rom[0x1630 / 2] = 0x6000;
+	rom[0x164a / 2] = 0x6000;
+	rom[0x1b5e / 2] = 0x6000;
+	rom[0x1eb6 / 2] = 0x6000;
+	rom[0x1ed0 / 2] = 0x6000;
+	rom[0x9706 / 2] = 0x6000;
 }
 
 } // anonymous namespace
