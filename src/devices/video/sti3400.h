@@ -15,7 +15,7 @@ public:
 
 	sti3400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
 
-	void set_dram_size(u32 bytes) { m_dram_size = bytes; }
+	void set_dram_size(u32 bytes) ATTR_COLD { m_dram_size = bytes; }
 
 	auto irq() { return m_irq_cb.bind(); }
 
@@ -60,7 +60,7 @@ private:
 
 	static constexpr u16 CTL_EDC = 0x0001; // enable decoding
 	static constexpr u16 CTL_SRS = 0x0002; // soft reset
-	static constexpr u16 CTL_DVS = 0x0080; // disable VSYNC-triggered task start
+	static constexpr u16 CTL_DVS = 0x0100; // disable VSYNC-triggered task start
 	static constexpr u16 INS_RPT = 0x0002; // repeat picture for a second VSYNC period
 	static constexpr u16 INS_WAIT = 0x0004; // inhibit DSYNC, decoding and header search
 	static constexpr u16 INS_OVW = 0x8000; // reconstruct into the displayed picture buffer
@@ -71,9 +71,9 @@ private:
 	static constexpr u32 BIT_BUFFER_LEVEL_BIAS_BYTES = 0x40;
 	static constexpr u16 PICTURE_POINTER_MASK = 0x3fff;
 
-	// The hardware header FIFO is 256 bits wide.
-	static constexpr u32 HEADER_FIFO_BYTES = 0x20;
-	// Software buffers cover the maximum amount representable by BBL.
+	// HFF asserts at 16 words (32 bytes) in the 32-word hardware header FIFO.
+	static constexpr u32 HEADER_FIFO_READY_BYTES = 0x20;
+	// The software buffer covers the maximum amount representable by BBL.
 	static constexpr u32 COMPRESSED_DATA_BUFFER_BYTES = 4U * 1024 * 1024;
 	// This software queue holds start codes pending host service; 256 covers the
 	// observed backlog and permits masked ring wrap.
@@ -93,8 +93,8 @@ private:
 	// Used until an MPEG sequence header supplies the picture rate.
 	static constexpr u32 FALLBACK_FRAME_RATE = 25;
 
-	void reset_decoder();
-	void decoder_soft_reset();
+	void reset_decoder() ATTR_COLD;
+	void decoder_soft_reset() ATTR_COLD;
 	bool execute_task();
 	bool presented_picture_valid() const;
 	void update_video_bitmap();
@@ -140,8 +140,8 @@ private:
 
 	// Compressed-data FIFO and start-code queue
 	std::unique_ptr<u8[]> m_fifo;
-	u64 m_event_position[START_CODE_EVENT_COUNT];
-	u8 m_event_code[START_CODE_EVENT_COUNT];
+	u64 m_event_position[START_CODE_EVENT_COUNT]{};
+	u8 m_event_code[START_CODE_EVENT_COUNT]{};
 	u64 m_fifo_write = 0;
 	u64 m_fifo_read = 0;
 	u32 m_start_code_shift = 0;
@@ -152,11 +152,8 @@ private:
 
 	// Decoder input and scheduling
 	emu_timer *m_decode_timer = nullptr;
-	std::unique_ptr<u8[]> m_input;
 	std::unique_ptr<mpeg_video> m_decoder;
 	u64 m_decode_position = 0;
-	u32 m_input_bytes = 0;
-	u32 m_input_bit_position = 0;
 	u16 m_decoded_width = 0;
 	u16 m_decoded_height = 0;
 	double m_frame_rate = FALLBACK_FRAME_RATE;

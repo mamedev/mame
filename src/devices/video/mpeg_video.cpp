@@ -367,7 +367,7 @@ const T *mpeg_video::decode_vlc(const T (&table)[N], const vlc_decoder<T, N, Max
 	return nullptr;
 }
 
-const u8 mpeg_video::s_default_intra_quantizer_matrix[64] =
+constexpr u8 mpeg_video::s_default_intra_quantizer_matrix[64] =
 {
 	8, 16, 19, 22, 26, 27, 29, 34,
 	16, 16, 22, 24, 27, 29, 34, 37,
@@ -380,7 +380,7 @@ const u8 mpeg_video::s_default_intra_quantizer_matrix[64] =
 };
 
 // ISO/IEC 11172-2 Table 2.4.4.1, indexed by natural coefficient position.
-const u8 mpeg_video::s_scan[64] =
+constexpr u8 mpeg_video::s_scan[64] =
 {
 	0, 1, 5, 6, 14, 15, 27, 28,
 	2, 4, 7, 13, 16, 26, 29, 42,
@@ -392,15 +392,14 @@ const u8 mpeg_video::s_scan[64] =
 	35, 36, 48, 49, 57, 58, 62, 63
 };
 
-const double mpeg_video::s_picture_rates[16] =
+constexpr double mpeg_video::s_picture_rates[16] =
 {
 	0.0, 24'000.0 / 1'001.0, 24.0, 25.0,
 	30'000.0 / 1'001.0, 30.0, 50.0, 60'000.0 / 1'001.0,
 	60.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 };
 
-mpeg_video::mpeg_video(const void *base, int maximum_width, int maximum_height) :
-	m_base(reinterpret_cast<const u8 *>(base)),
+mpeg_video::mpeg_video(int maximum_width, int maximum_height) :
 	m_maximum_width(maximum_width),
 	m_maximum_height(maximum_height)
 {
@@ -433,8 +432,17 @@ mpeg_video::mpeg_video(const void *base, int maximum_width, int maximum_height) 
 
 void mpeg_video::clear()
 {
+	std::fill(std::begin(m_input_buffer), std::end(m_input_buffer), 0);
+	m_input_bytes = 0;
 	m_current_pos = 0;
-	m_current_limit = 0;
+	m_phase = SCAN;
+	m_in_picture = false;
+	m_have_slice = false;
+	m_first_in_slice = false;
+	m_slice_vertical_position = 0;
+	m_address_increment = 0;
+	m_input = {};
+	m_consumed = 0;
 	m_horizontal_size = 0;
 	m_vertical_size = 0;
 	m_mb_width = 0;
@@ -461,10 +469,25 @@ void mpeg_video::clear()
 	m_backward_vertical_previous = 0;
 	m_previous_b_forward = false;
 	m_previous_b_backward = false;
+	for (frame *const item : { &m_current_frame, &m_forward_reference, &m_backward_reference })
+	{
+		std::fill(item->y.begin(), item->y.end(), 0);
+		std::fill(item->cb.begin(), item->cb.end(), 0);
+		std::fill(item->cr.begin(), item->cr.end(), 0);
+	}
 }
 
 void mpeg_video::register_save_state(device_t &device, int index)
 {
+	device.save_item(m_input_buffer, "mpeg_video_input_buffer", index);
+	device.save_item(m_input_bytes, "mpeg_video_input_bytes", index);
+	device.save_item(m_current_pos, "mpeg_video_current_pos", index);
+	device.save_item(m_phase, "mpeg_video_phase", index);
+	device.save_item(m_in_picture, "mpeg_video_in_picture", index);
+	device.save_item(m_have_slice, "mpeg_video_have_slice", index);
+	device.save_item(m_first_in_slice, "mpeg_video_first_in_slice", index);
+	device.save_item(m_slice_vertical_position, "mpeg_video_slice_vertical_position", index);
+	device.save_item(m_address_increment, "mpeg_video_address_increment", index);
 	device.save_item(m_horizontal_size, "mpeg_video_horizontal_size", index);
 	device.save_item(m_vertical_size, "mpeg_video_vertical_size", index);
 	device.save_item(m_mb_width, "mpeg_video_mb_width", index);
@@ -474,90 +497,206 @@ void mpeg_video::register_save_state(device_t &device, int index)
 	device.save_item(m_frame_rate, "mpeg_video_frame_rate", index);
 	device.save_item(m_intra_quantizer_matrix, "mpeg_video_intra_quantizer_matrix", index);
 	device.save_item(m_non_intra_quantizer_matrix, "mpeg_video_non_intra_quantizer_matrix", index);
+	device.save_item(m_picture_coding_type, "mpeg_video_picture_coding_type", index);
+	device.save_item(m_full_pel_forward_vector, "mpeg_video_full_pel_forward_vector", index);
+	device.save_item(m_full_pel_backward_vector, "mpeg_video_full_pel_backward_vector", index);
+	device.save_item(m_forward_f, "mpeg_video_forward_f", index);
+	device.save_item(m_backward_f, "mpeg_video_backward_f", index);
+	device.save_item(m_quantizer_scale, "mpeg_video_quantizer_scale", index);
+	device.save_item(m_macroblock_address, "mpeg_video_macroblock_address", index);
+	device.save_item(m_dc_predictor, "mpeg_video_dc_predictor", index);
+	device.save_item(m_forward_horizontal_previous, "mpeg_video_forward_horizontal_previous", index);
+	device.save_item(m_forward_vertical_previous, "mpeg_video_forward_vertical_previous", index);
+	device.save_item(m_backward_horizontal_previous, "mpeg_video_backward_horizontal_previous", index);
+	device.save_item(m_backward_vertical_previous, "mpeg_video_backward_vertical_previous", index);
+	device.save_item(m_previous_b_forward, "mpeg_video_previous_b_forward", index);
+	device.save_item(m_previous_b_backward, "mpeg_video_previous_b_backward", index);
+	device.save_item(m_current_frame.y, "mpeg_video_current_y", index);
+	device.save_item(m_current_frame.cb, "mpeg_video_current_cb", index);
+	device.save_item(m_current_frame.cr, "mpeg_video_current_cr", index);
+	device.save_item(m_forward_reference.y, "mpeg_video_forward_y", index);
+	device.save_item(m_forward_reference.cb, "mpeg_video_forward_cb", index);
+	device.save_item(m_forward_reference.cr, "mpeg_video_forward_cr", index);
+	device.save_item(m_backward_reference.y, "mpeg_video_backward_y", index);
+	device.save_item(m_backward_reference.cb, "mpeg_video_backward_cb", index);
+	device.save_item(m_backward_reference.cr, "mpeg_video_backward_cr", index);
 }
 
-mpeg_video::decode_result mpeg_video::decode_buffer(int &pos, int limit, const picture_buffers &buffers,
+mpeg_video::decode_result mpeg_video::decode(std::span<const u8> input, std::size_t &consumed, const picture_buffers &buffers,
 		int &width, int &height, double &frame_rate)
 {
-	if ((limit - pos) < 32)
-		return decode_result::NEED_DATA;
+	m_input = input;
+	m_consumed = 0;
+	auto const finish = [this, &consumed] (decode_result result)
+	{
+		discard_consumed_bytes();
+		consumed = m_consumed;
+		m_input = {};
+		m_consumed = 0;
+		return result;
+	};
 
-	int scan_position = pos;
 	for (;;)
 	{
-		m_current_pos = scan_position;
-		m_current_limit = limit;
-		int syntax_position = scan_position;
-
+		const u32 checkpoint = m_current_pos;
 		try
 		{
-			next_start_code();
-			syntax_position = m_current_pos;
-			const u32 code = peek(32);
-
-			switch (code)
+			switch (m_phase)
 			{
-			case SEQUENCE_HEADER_CODE:
-				sequence_header();
-				break;
+			case SCAN:
+			case RECOVER:
+			{
+				if (m_current_pos & 7)
+				{
+					const u32 padding = gb(8 - (m_current_pos & 7));
+					if (padding && (m_phase != RECOVER))
+						throw invalid_stream();
+					break;
+				}
+				if (peek(24) != START_CODE_PREFIX)
+				{
+					gb(8);
+					break;
+				}
+				const u32 code = peek(32);
+				if (m_in_picture)
+				{
+					if ((code >= 0x00000101) && (code <= 0x000001af))
+					{
+						gb(32);
+						m_slice_vertical_position = code;
+						m_phase = SLICE_HEADER;
+						break;
+					}
+					if (!m_have_slice && ((code == USER_DATA_START_CODE) || (code == EXTENSION_START_CODE)))
+					{
+						gb(32);
+						break;
+					}
+					if (!m_have_slice)
+						throw invalid_stream();
+					write_frame(m_current_frame, buffers.reconstructed.data, buffers.reconstructed.bytes);
+					m_in_picture = false;
+					// A sequence-end marker completes this task, rather than starting another.
+					if (code == SEQUENCE_END_CODE)
+						gb(32);
+					width = m_horizontal_size;
+					height = m_vertical_size;
+					frame_rate = m_frame_rate;
+					return finish(decode_result::PICTURE);
+				}
 
-			case GROUP_START_CODE:
-				group_of_pictures();
-				break;
-
-			case PICTURE_START_CODE:
-				picture(buffers);
-				// A sequence-end code terminates the preceding coded sequence rather than
-				// describing another decoding task.
-				if (peek(32) == SEQUENCE_END_CODE)
-					gb(32);
-				pos = m_current_pos;
-				width = m_horizontal_size;
-				height = m_vertical_size;
-				frame_rate = m_frame_rate;
-				return decode_result::PICTURE;
-
-			case SEQUENCE_END_CODE:
 				gb(32);
-				pos = m_current_pos;
-				width = m_horizontal_size;
-				height = m_vertical_size;
-				frame_rate = m_frame_rate;
-				return decode_result::SEQUENCE_END;
-
-			default:
-				// Extension, user and system data are delimited by the next start code.
-				gb(32);
+				m_phase = SCAN;
+				switch (code)
+				{
+				case SEQUENCE_HEADER_CODE: m_phase = SEQUENCE_HEADER; break;
+				case GROUP_START_CODE: m_phase = GROUP_HEADER; break;
+				case PICTURE_START_CODE: m_phase = PICTURE_HEADER; break;
+				case SEQUENCE_END_CODE:
+					width = m_horizontal_size;
+					height = m_vertical_size;
+					frame_rate = m_frame_rate;
+					return finish(decode_result::SEQUENCE_END);
+				}
 				break;
 			}
 
-			scan_position = m_current_pos;
+			case SEQUENCE_HEADER:
+				sequence_header();
+				m_phase = SCAN;
+				break;
+
+			case GROUP_HEADER:
+				group_of_pictures();
+				m_phase = SCAN;
+				break;
+
+			case PICTURE_HEADER:
+				picture_header(buffers);
+				m_in_picture = true;
+				m_have_slice = false;
+				m_phase = PICTURE_EXTRA;
+				break;
+
+			case PICTURE_EXTRA:
+			case SLICE_EXTRA:
+				if (gb(1))
+					gb(8);
+				else
+					m_phase = (m_phase == PICTURE_EXTRA) ? SCAN : MACROBLOCK_ADDRESS;
+				break;
+
+			case SLICE_HEADER:
+				slice_header();
+				m_have_slice = true;
+				m_phase = SLICE_EXTRA;
+				break;
+
+			case MACROBLOCK_ADDRESS:
+				// Consume stuffing and escapes separately, so even long runs do not
+				// require unbounded input retention or replay.
+				if (peek(11) == 0x00f)
+				{
+					gb(11);
+					break;
+				}
+				if (peek(11) == 0x008)
+				{
+					gb(11);
+					m_address_increment += 33;
+					if ((m_macroblock_address + m_address_increment) >= (m_mb_width * m_mb_height))
+						throw invalid_stream();
+					break;
+				}
+				{
+					const int address = m_macroblock_address + m_address_increment + macroblock_address_increment();
+					if ((address < 0) || (address >= (m_mb_width * m_mb_height)))
+						throw invalid_stream();
+					if (!m_first_in_slice)
+					{
+						for (int skipped = m_macroblock_address + 1; skipped < address; skipped++)
+							skipped_macroblock(skipped);
+					}
+					m_macroblock_address = address;
+					m_address_increment = 0;
+					m_phase = MACROBLOCK;
+				}
+				break;
+
+			case MACROBLOCK:
+				macroblock();
+				m_first_in_slice = false;
+				m_phase = MACROBLOCK_END;
+				break;
+
+			case MACROBLOCK_END:
+				m_phase = (peek(23) == 0) ? SCAN : MACROBLOCK_ADDRESS;
+				break;
+			}
+			discard_consumed_bytes();
 		}
 		catch (limit_hit const &)
 		{
-			pos = syntax_position;
-			return decode_result::NEED_DATA;
+			m_current_pos = checkpoint;
+			return finish(decode_result::NEED_DATA);
 		}
 		catch (invalid_stream const &)
 		{
-			// Skip the failed syntax element and resume at the next start code.
-			int recovery_position = std::max(syntax_position + 8, (m_current_pos + 7) & ~7);
-			while ((recovery_position + 24) <= limit)
-			{
-				const unsigned byte_position = recovery_position / 8;
-				if (!m_base[byte_position] && !m_base[byte_position + 1] && (m_base[byte_position + 2] == 1))
-					break;
-				recovery_position += 8;
-			}
-			pos = std::min(recovery_position, limit);
-			return decode_result::INVALID_DATA;
+			// Discard the partial picture, then search forward at byte boundaries.
+			// Scanning itself can stop on any input byte and retains prefix lookahead.
+			m_in_picture = false;
+			m_have_slice = false;
+			m_phase = RECOVER;
+			if (m_current_pos == checkpoint)
+				m_current_pos = std::min(m_current_pos + 8, m_input_bytes * 8);
+			return finish(decode_result::INVALID_DATA);
 		}
 	}
 }
 
 void mpeg_video::sequence_header()
 {
-	gb(32);
 	const int horizontal_size = gb(12);
 	const int vertical_size = gb(12);
 	gb(4); // pel aspect ratio
@@ -612,13 +751,6 @@ void mpeg_video::sequence_header()
 		!s_picture_rates[picture_rate])
 		throw invalid_stream();
 
-	next_start_code();
-	while ((peek(32) == EXTENSION_START_CODE) || (peek(32) == USER_DATA_START_CODE))
-	{
-		gb(32);
-		next_start_code();
-	}
-
 	m_horizontal_size = horizontal_size;
 	m_vertical_size = vertical_size;
 	m_frame_rate = s_picture_rates[picture_rate];
@@ -632,7 +764,6 @@ void mpeg_video::sequence_header()
 
 void mpeg_video::group_of_pictures()
 {
-	gb(32);
 	gb(1); // drop frame flag
 	const unsigned hours = gb(5);
 	const unsigned minutes = gb(6);
@@ -644,77 +775,52 @@ void mpeg_video::group_of_pictures()
 		throw invalid_stream();
 	gb(1); // closed GOP
 	gb(1); // broken link
-	next_start_code();
-
-	while ((peek(32) == EXTENSION_START_CODE) || (peek(32) == USER_DATA_START_CODE))
-	{
-		gb(32);
-		next_start_code();
-	}
 }
 
-void mpeg_video::picture(const picture_buffers &buffers)
+void mpeg_video::picture_header(const picture_buffers &buffers)
 {
 	if (!m_horizontal_size || !m_vertical_size)
 		throw invalid_stream();
 
-	gb(32);
 	gb(10); // temporal reference
-	m_picture_coding_type = gb(3);
+	const int picture_coding_type = gb(3);
 	gb(16); // VBV delay
 
-	m_full_pel_forward_vector = false;
-	m_full_pel_backward_vector = false;
-	m_forward_f = 0;
-	m_backward_f = 0;
-	if ((m_picture_coding_type == 2) || (m_picture_coding_type == 3))
+	bool full_pel_forward_vector = false;
+	bool full_pel_backward_vector = false;
+	int forward_f = 0;
+	int backward_f = 0;
+	if ((picture_coding_type == 2) || (picture_coding_type == 3))
 	{
-		m_full_pel_forward_vector = gb(1);
+		full_pel_forward_vector = gb(1);
 		const int forward_f_code = gb(3);
 		if (!forward_f_code)
 			throw invalid_stream();
-		m_forward_f = 1 << (forward_f_code - 1);
+		forward_f = 1 << (forward_f_code - 1);
 	}
-	if (m_picture_coding_type == 3)
+	if (picture_coding_type == 3)
 	{
-		m_full_pel_backward_vector = gb(1);
+		full_pel_backward_vector = gb(1);
 		const int backward_f_code = gb(3);
 		if (!backward_f_code)
 			throw invalid_stream();
-		m_backward_f = 1 << (backward_f_code - 1);
+		backward_f = 1 << (backward_f_code - 1);
 	}
-	if ((m_picture_coding_type < 1) || (m_picture_coding_type > 4))
+	if ((picture_coding_type < 1) || (picture_coding_type > 4))
 		throw invalid_stream();
 
+	m_picture_coding_type = picture_coding_type;
+	m_full_pel_forward_vector = full_pel_forward_vector;
+	m_full_pel_backward_vector = full_pel_backward_vector;
+	m_forward_f = forward_f;
+	m_backward_f = backward_f;
 	if ((m_picture_coding_type == 2) || (m_picture_coding_type == 3))
 		read_frame(m_forward_reference, buffers.forward.data, buffers.forward.bytes);
 	if (m_picture_coding_type == 3)
 		read_frame(m_backward_reference, buffers.backward.data, buffers.backward.bytes);
 
-	while (gb(1))
-		gb(8);
-	next_start_code();
-
-	while ((peek(32) == EXTENSION_START_CODE) || (peek(32) == USER_DATA_START_CODE))
-	{
-		gb(32);
-		next_start_code();
-	}
-
 	// Macroblocks not reconstructed by the task retain their previous contents in RFP.
 	read_frame(m_current_frame, buffers.reconstructed.data, buffers.reconstructed.bytes);
-
-	bool have_slice = false;
-	while ((peek(32) >= 0x00000101) && (peek(32) <= 0x000001af))
-	{
-		const unsigned vertical_position = peek(32) & 0xff;
-		slice(vertical_position);
-		have_slice = true;
-	}
-	if (!have_slice)
-		throw invalid_stream();
-
-	write_frame(m_current_frame, buffers.reconstructed.data, buffers.reconstructed.bytes);
 }
 
 void mpeg_video::reset_dc_predictors()
@@ -722,16 +828,14 @@ void mpeg_video::reset_dc_predictors()
 	std::fill(std::begin(m_dc_predictor), std::end(m_dc_predictor), 128 * 8);
 }
 
-void mpeg_video::slice(unsigned vertical_position)
+void mpeg_video::slice_header()
 {
-	gb(32);
-	m_quantizer_scale = gb(5);
-	if (!m_quantizer_scale)
+	const int quantizer_scale = gb(5);
+	if (!quantizer_scale)
 		throw invalid_stream();
-	while (gb(1))
-		gb(8);
 
-	m_macroblock_address = (vertical_position - 1) * m_mb_width - 1;
+	m_quantizer_scale = quantizer_scale;
+	m_macroblock_address = (m_slice_vertical_position - 1) * m_mb_width - 1;
 	reset_dc_predictors();
 	m_forward_horizontal_previous = 0;
 	m_forward_vertical_previous = 0;
@@ -740,69 +844,84 @@ void mpeg_video::slice(unsigned vertical_position)
 	m_previous_b_forward = false;
 	m_previous_b_backward = false;
 
-	bool first_in_slice = true;
-	do
-	{
-		macroblock(first_in_slice);
-		first_in_slice = false;
-	}
-	while (peek(23) != 0);
-
-	next_start_code();
+	m_first_in_slice = true;
+	m_address_increment = 0;
 }
 
-void mpeg_video::macroblock(bool first_in_slice)
+void mpeg_video::macroblock()
 {
-	const int increment = macroblock_address_increment();
-	const int address = m_macroblock_address + increment;
-	if ((address < 0) || (address >= (m_mb_width * m_mb_height)))
-		throw invalid_stream();
-
-	if (!first_in_slice)
+	const int quantizer_scale = m_quantizer_scale;
+	const int previous[4] =
 	{
-		for (int skipped = m_macroblock_address + 1; skipped < address; skipped++)
-			skipped_macroblock(skipped);
-	}
-	m_macroblock_address = address;
-
-	const macroblock_type type = macroblock_type_code();
-	if (type.quant)
-	{
-		m_quantizer_scale = gb(5);
-		if (!m_quantizer_scale)
-			throw invalid_stream();
-	}
-
+		m_forward_horizontal_previous, m_forward_vertical_previous,
+		m_backward_horizontal_previous, m_backward_vertical_previous
+	};
+	macroblock_type type;
 	motion_vector forward_vector{ 0, 0 };
 	motion_vector backward_vector{ 0, 0 };
+	int pattern;
+	int quantized[6][64]{};
 
-	if (m_picture_coding_type == 2)
+	// Input may stop inside any VLC or coefficient escape.  Stage a single
+	// macroblock before modifying pixels or DC predictors, so only its bounded
+	// syntax is retried and completed macroblocks are never reconstructed twice.
+	try
 	{
-		if (type.forward)
-			decode_motion_vector(true, forward_vector);
-		else
+		type = macroblock_type_code();
+		if (type.quant)
 		{
-			m_forward_horizontal_previous = 0;
-			m_forward_vertical_previous = 0;
+			m_quantizer_scale = gb(5);
+			if (!m_quantizer_scale)
+				throw invalid_stream();
 		}
+
+		if (m_picture_coding_type == 2)
+		{
+			if (type.forward)
+				decode_motion_vector(true, forward_vector);
+			else
+			{
+				m_forward_horizontal_previous = 0;
+				m_forward_vertical_previous = 0;
+			}
+		}
+		else if (m_picture_coding_type == 3)
+		{
+			if (type.forward)
+				decode_motion_vector(true, forward_vector);
+			else
+			{
+				forward_vector.horizontal = m_forward_horizontal_previous * (m_full_pel_forward_vector ? 2 : 1);
+				forward_vector.vertical = m_forward_vertical_previous * (m_full_pel_forward_vector ? 2 : 1);
+			}
+
+			if (type.backward)
+				decode_motion_vector(false, backward_vector);
+			else
+			{
+				backward_vector.horizontal = m_backward_horizontal_previous * (m_full_pel_backward_vector ? 2 : 1);
+				backward_vector.vertical = m_backward_vertical_previous * (m_full_pel_backward_vector ? 2 : 1);
+			}
+		}
+
+		pattern = type.intra ? 0x3f : (type.pattern ? coded_block_pattern() : 0);
+		for (unsigned index = 0; index != 6; index++)
+		{
+			if (BIT(pattern, 5 - index))
+				block(index, type.intra, quantized[index]);
+		}
+
+		if ((m_picture_coding_type == 4) && (gb(1) != 1))
+			throw invalid_stream();
 	}
-	else if (m_picture_coding_type == 3)
+	catch (limit_hit const &)
 	{
-		if (type.forward)
-			decode_motion_vector(true, forward_vector);
-		else
-		{
-			forward_vector.horizontal = m_forward_horizontal_previous * (m_full_pel_forward_vector ? 2 : 1);
-			forward_vector.vertical = m_forward_vertical_previous * (m_full_pel_forward_vector ? 2 : 1);
-		}
-
-		if (type.backward)
-			decode_motion_vector(false, backward_vector);
-		else
-		{
-			backward_vector.horizontal = m_backward_horizontal_previous * (m_full_pel_backward_vector ? 2 : 1);
-			backward_vector.vertical = m_backward_vertical_previous * (m_full_pel_backward_vector ? 2 : 1);
-		}
+		m_quantizer_scale = quantizer_scale;
+		m_forward_horizontal_previous = previous[0];
+		m_forward_vertical_previous = previous[1];
+		m_backward_horizontal_previous = previous[2];
+		m_backward_vertical_previous = previous[3];
+		throw;
 	}
 
 	if (!type.intra)
@@ -811,18 +930,10 @@ void mpeg_video::macroblock(bool first_in_slice)
 		const bool predict_forward = (m_picture_coding_type == 2) || type.forward;
 		predict_macroblock(predict_forward, type.backward, forward_vector, backward_vector);
 	}
-
-	const int pattern = type.intra ? 0x3f : (type.pattern ? coded_block_pattern() : 0);
 	for (unsigned index = 0; index != 6; index++)
 	{
 		if (BIT(pattern, 5 - index))
-			block(index, type.intra);
-	}
-
-	if (m_picture_coding_type == 4)
-	{
-		if (gb(1) != 1)
-			throw invalid_stream();
+			reconstruct_block(index, type.intra, quantized[index]);
 	}
 
 	if (type.intra)
@@ -996,9 +1107,8 @@ void mpeg_video::predict_plane(u8 *destination, int destination_pitch, const u8 
 	}
 }
 
-void mpeg_video::block(unsigned index, bool intra)
+void mpeg_video::block(unsigned index, bool intra, int *quantized)
 {
-	int quantized[64]{};
 	int scan_position = intra ? 0 : -1;
 
 	if (intra)
@@ -1032,7 +1142,10 @@ void mpeg_video::block(unsigned index, bool intra)
 		}
 		gb(2); // end of block
 	}
+}
 
+void mpeg_video::reconstruct_block(unsigned index, bool intra, const int *quantized)
+{
 	int coefficients[64];
 	bool dc_only = true;
 	for (unsigned natural = 0; natural != 64; natural++)
@@ -1162,24 +1275,15 @@ void mpeg_video::write_frame(const frame &source, u8 *output, unsigned output_by
 
 int mpeg_video::macroblock_address_increment()
 {
-	int increment = 0;
-	while (peek(11) == 0x00f)
-		gb(11); // macroblock stuffing
-	while (peek(11) == 0x008)
-	{
-		gb(11); // macroblock escape
-		increment += 33;
-	}
-
 	const vlc_entry *const entry = decode_vlc(
 			s_macroblock_address_increment,
 			s_macroblock_address_increment_decoder,
-			m_current_limit - m_current_pos,
+			available_bits(),
 			[this] (int bits) { return peek(bits); },
 			[this] (int bits) { m_current_pos += bits; });
 	if (!entry)
 		throw invalid_stream();
-	return increment + entry->value;
+	return entry->value;
 }
 
 mpeg_video::macroblock_type mpeg_video::macroblock_type_code()
@@ -1187,7 +1291,7 @@ mpeg_video::macroblock_type mpeg_video::macroblock_type_code()
 	const vlc_entry *entry = nullptr;
 	auto const read = [this, &entry] (auto const &table, auto const &decoder)
 	{
-		entry = decode_vlc(table, decoder, m_current_limit - m_current_pos,
+		entry = decode_vlc(table, decoder, available_bits(),
 				[this] (int bits) { return peek(bits); },
 				[this] (int bits) { m_current_pos += bits; });
 	};
@@ -1218,7 +1322,7 @@ int mpeg_video::coded_block_pattern()
 	const vlc_entry *const entry = decode_vlc(
 			s_coded_block_pattern,
 			s_coded_block_pattern_decoder,
-			m_current_limit - m_current_pos,
+			available_bits(),
 			[this] (int bits) { return peek(bits); },
 			[this] (int bits) { m_current_pos += bits; });
 	if (!entry)
@@ -1231,7 +1335,7 @@ int mpeg_video::motion_code()
 	const vlc_entry *const entry = decode_vlc(
 			s_motion_code,
 			s_motion_code_decoder,
-			m_current_limit - m_current_pos,
+			available_bits(),
 			[this] (int bits) { return peek(bits); },
 			[this] (int bits) { m_current_pos += bits; });
 	if (!entry)
@@ -1243,11 +1347,11 @@ int mpeg_video::dc_size(bool luminance)
 {
 	const vlc_entry *const entry = luminance
 		? decode_vlc(s_dc_size_luminance, s_dc_size_luminance_decoder,
-				m_current_limit - m_current_pos,
+				available_bits(),
 				[this] (int bits) { return peek(bits); },
 				[this] (int bits) { m_current_pos += bits; })
 		: decode_vlc(s_dc_size_chrominance, s_dc_size_chrominance_decoder,
-				m_current_limit - m_current_pos,
+				available_bits(),
 				[this] (int bits) { return peek(bits); },
 				[this] (int bits) { m_current_pos += bits; });
 	if (!entry)
@@ -1300,7 +1404,7 @@ void mpeg_video::dct_coefficient(bool first, int &run, int &level)
 	const dct_vlc_entry *const entry = decode_vlc(
 			s_dct_coefficient,
 			s_dct_coefficient_decoder,
-			m_current_limit - m_current_pos,
+			available_bits(),
 			[this] (int bits) { return peek(bits); },
 			[this] (int bits) { m_current_pos += bits; });
 	if (entry)
@@ -1312,30 +1416,42 @@ void mpeg_video::dct_coefficient(bool first, int &run, int &level)
 	throw invalid_stream();
 }
 
-void mpeg_video::next_start_code()
+void mpeg_video::discard_consumed_bytes()
 {
-	if (m_current_pos & 7)
+	const unsigned bytes = m_current_pos / 8;
+	if (bytes)
 	{
-		if (gb(8 - (m_current_pos & 7)))
-			throw invalid_stream();
+		std::move(m_input_buffer + bytes, m_input_buffer + m_input_bytes, m_input_buffer);
+		m_input_bytes -= bytes;
+		m_current_pos &= 7;
 	}
-	while (peek(24) != START_CODE_PREFIX)
-		gb(8);
 }
 
-u32 mpeg_video::peek(int count) const
+int mpeg_video::available_bits() const
 {
-	if ((count < 0) || (count > 32) || ((m_current_pos + count) > m_current_limit))
-		throw limit_hit();
+	return m_input_bytes * 8 - m_current_pos + std::min<std::size_t>(m_input.size() - m_consumed, 4) * 8;
+}
+
+u32 mpeg_video::peek(int count)
+{
+	assert((count >= 0) && (count <= 32));
 	if (!count)
 		return 0;
+	while ((m_current_pos + count) > (m_input_bytes * 8))
+	{
+		if (m_consumed == m_input.size())
+			throw limit_hit();
+		if (m_input_bytes == INPUT_BUFFER_BYTES)
+			throw invalid_stream();
+		m_input_buffer[m_input_bytes++] = m_input[m_consumed++];
+	}
 
 	const unsigned byte_position = m_current_pos / 8;
 	const unsigned bit_offset = m_current_pos & 7;
 	const unsigned bytes = (bit_offset + count + 7) / 8;
 	u64 source = 0;
 	for (unsigned byte = 0; byte != bytes; byte++)
-		source = (source << 8) | m_base[byte_position + byte];
+		source = (source << 8) | m_input_buffer[byte_position + byte];
 	return (source >> (bytes * 8 - bit_offset - count)) & make_bitmask<u32>(count);
 }
 

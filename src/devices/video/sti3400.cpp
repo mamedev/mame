@@ -32,12 +32,11 @@ void sti3400_device::device_start()
 
 	m_decode_timer = timer_alloc(FUNC(sti3400_device::decode_tick), this);
 	m_fifo = std::make_unique<u8[]>(COMPRESSED_DATA_BUFFER_BYTES);
-	m_input = std::make_unique<u8[]>(COMPRESSED_DATA_BUFFER_BYTES);
 	m_dram = std::make_unique<u8[]>(m_dram_size);
 	m_overwrite_display = std::make_unique<u8[]>(m_dram_size);
 	m_picture_valid = std::make_unique<u8[]>(m_dram_size / BIT_BUFFER_LEVEL_UNIT_BYTES);
 	m_video_bitmap.allocate(MAX_VIDEO_WIDTH, MAX_VIDEO_HEIGHT);
-	m_decoder = std::make_unique<mpeg_video>(m_input.get(), MAX_VIDEO_WIDTH, MAX_VIDEO_HEIGHT);
+	m_decoder = std::make_unique<mpeg_video>(MAX_VIDEO_WIDTH, MAX_VIDEO_HEIGHT);
 	m_decoder->register_save_state(*this);
 
 	save_item(NAME(m_registers));
@@ -53,12 +52,9 @@ void sti3400_device::device_start()
 	save_item(NAME(m_event_count));
 	save_item(NAME(m_interrupt_status));
 	save_item(NAME(m_event_active));
-	save_pointer(NAME(m_input), COMPRESSED_DATA_BUFFER_BYTES);
 	save_pointer(NAME(m_dram), m_dram_size);
 	save_pointer(NAME(m_overwrite_display), m_dram_size);
 	save_pointer(NAME(m_picture_valid), m_dram_size / BIT_BUFFER_LEVEL_UNIT_BYTES);
-	save_item(NAME(m_input_bytes));
-	save_item(NAME(m_input_bit_position));
 	save_item(NAME(m_display_pointer));
 	save_item(NAME(m_presented_pointer));
 	save_item(NAME(m_reconstructed_pointer));
@@ -80,6 +76,20 @@ void sti3400_device::device_reset()
 	m_interrupt_status = 0;
 	m_status = STA_RESET;
 	m_irq_state = false;
+	std::fill_n(m_picture_valid.get(), m_dram_size / BIT_BUFFER_LEVEL_UNIT_BYTES, 0);
+	m_display_pointer = 0;
+	m_presented_pointer = 0;
+	m_reconstructed_pointer = 0;
+	m_forward_pointer = 0;
+	m_backward_pointer = 0;
+	m_width = 0;
+	m_height = 0;
+	m_decoded_width = 0;
+	m_decoded_height = 0;
+	m_video_bitmap.resize(0, 0);
+	m_video_bitmap_dirty = false;
+	m_frame_rate = FALLBACK_FRAME_RATE;
+	m_overwrite_display_active = false;
 	reset_decoder();
 	m_irq_cb(CLEAR_LINE);
 }
@@ -102,30 +112,15 @@ void sti3400_device::reset_decoder()
 	m_event_tail = 0;
 	m_event_count = 0;
 	m_event_active = false;
-	std::fill_n(m_picture_valid.get(), m_dram_size / BIT_BUFFER_LEVEL_UNIT_BYTES, 0);
-	m_input_bytes = 0;
-	m_input_bit_position = 0;
-	m_display_pointer = 0;
-	m_presented_pointer = 0;
-	m_reconstructed_pointer = 0;
-	m_forward_pointer = 0;
-	m_backward_pointer = 0;
-	m_width = 0;
-	m_height = 0;
-	m_decoded_width = 0;
-	m_decoded_height = 0;
-	m_video_bitmap.resize(0, 0);
-	m_video_bitmap_dirty = false;
-	m_frame_rate = FALLBACK_FRAME_RATE;
 	m_task_active = false;
 	m_repeat_pending = false;
-	m_overwrite_display_active = false;
 	m_decoder->clear();
 	m_decode_timer->adjust(attotime::never);
 }
 
 void sti3400_device::decoder_soft_reset()
 {
+	// SRS discards compressed data and decoding work without disturbing display.
 	reset_decoder();
 	update_status();
 }
@@ -146,18 +141,21 @@ bool sti3400_device::execute_task()
 
 	for (;;)
 	{
-		int position = m_input_bit_position;
+		const u32 offset = m_decode_position & (COMPRESSED_DATA_BUFFER_BYTES - 1);
+		const u32 available = std::min<u64>(m_fifo_write - m_decode_position, COMPRESSED_DATA_BUFFER_BYTES - offset);
+		std::size_t consumed = 0;
 		int width = m_decoded_width;
 		int height = m_decoded_height;
 		double frame_rate = m_frame_rate;
-		const u64 stream_position = m_decode_position + (position / 8);
-		const mpeg_video::decode_result result = m_decoder->decode_buffer(
-				position,
-				m_input_bytes * 8,
+		const u64 stream_position = m_decode_position;
+		const mpeg_video::decode_result result = m_decoder->decode(
+				std::span<const u8>(m_fifo.get() + offset, available),
+				consumed,
 				buffers,
 				width,
 				height,
 				frame_rate);
+		assert(consumed <= available);
 
 		if (result == mpeg_video::decode_result::PICTURE)
 		{
@@ -174,14 +172,10 @@ bool sti3400_device::execute_task()
 				machine().describe_context(), u32(stream_position));
 		}
 
-		const u32 bytes_consumed = position / 8;
-		if (bytes_consumed)
-		{
-			std::move(m_input.get() + bytes_consumed, m_input.get() + m_input_bytes, m_input.get());
-			m_input_bytes -= bytes_consumed;
-			m_decode_position += bytes_consumed;
-		}
-		m_input_bit_position = position & 7;
+		m_decode_position += consumed;
+		// A contiguous span can end at the ring boundary while more input is available.
+		if ((result == mpeg_video::decode_result::NEED_DATA) && (consumed == available) && (m_decode_position < m_fifo_write))
+			continue;
 
 		if (result != mpeg_video::decode_result::INVALID_DATA)
 			return result != mpeg_video::decode_result::NEED_DATA;
@@ -210,8 +204,8 @@ void sti3400_device::vblank_w(int state)
 
 	// DFP is double-buffered by the hardware and becomes active at VSYNC.  The
 	// physical pipeline can display a buffer while reconstruction finishes;
-	// retain the preceding complete picture until the whole-picture backend
-	// finishes an active task targeting the newly selected buffer.
+	// retain the preceding complete picture until the decoder publishes the
+	// result of an active task targeting the newly selected buffer.
 	m_display_pointer = m_registers[REG_DFP] & PICTURE_POINTER_MASK;
 	if (!m_task_active || (m_display_pointer != m_reconstructed_pointer))
 	{
@@ -259,13 +253,11 @@ void sti3400_device::vblank_w(int state)
 
 void sti3400_device::stream_byte_w(u8 data)
 {
-	if (m_input_bytes == COMPRESSED_DATA_BUFFER_BYTES)
+	if ((m_fifo_write - m_decode_position) == COMPRESSED_DATA_BUFFER_BYTES)
 	{
 		logerror("%s: compressed-video input overflow\n", machine().describe_context());
 		return;
 	}
-	m_input[m_input_bytes++] = data;
-
 	m_fifo[m_fifo_write & (COMPRESSED_DATA_BUFFER_BYTES - 1)] = data;
 	m_fifo_write++;
 	m_start_code_shift = (m_start_code_shift << 8) | data;
@@ -369,9 +361,9 @@ void sti3400_device::activate_event()
 			if (m_decode_position <= position)
 				return;
 		}
-		else if ((m_fifo_write - position) < HEADER_FIFO_BYTES)
+		else if ((m_fifo_write - position) < HEADER_FIFO_READY_BYTES)
 		{
-			// The software detector runs on CDF writes; defer the hit until HDF can supply a hardware-sized window.
+			// The software detector runs on CDF writes; defer the hit until HDF reaches the HFF threshold.
 			return;
 		}
 
@@ -417,7 +409,7 @@ u16 sti3400_device::decoder_status() const
 		status |= STA_BBF;
 	if (!m_event_active || (m_fifo_read >= m_fifo_write))
 		status |= STA_HFE;
-	if (m_event_active && ((m_fifo_write - m_fifo_read) >= HEADER_FIFO_BYTES))
+	if (m_event_active && ((m_fifo_write - m_fifo_read) >= HEADER_FIFO_READY_BYTES))
 		status |= STA_HFF;
 	if (m_event_active && (m_fifo_read == m_event_position[m_event_head]))
 		status |= STA_SCH;

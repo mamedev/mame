@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <span>
+
 class device_t;
 
 class mpeg_video
@@ -40,13 +42,11 @@ public:
 		picture_buffer backward;
 	};
 
-	// base = start of the MPEG video data block
-
-	mpeg_video(const void *base, int maximum_width, int maximum_height);
+	mpeg_video(int maximum_width, int maximum_height) ATTR_COLD;
 
 	// Decode one MPEG coded picture or sequence-end marker.
-	// pos          = position in bits relative to base
-	// limit        = maximum accepted position in bits
+	// input        = next bytes of the elementary video stream
+	// consumed     = bytes accepted from input, which the caller may discard
 	// buffers      = reconstructed, forward and backward YCbCr picture buffers
 	// width        = width of a completed output picture
 	// height       = height of a completed output picture
@@ -55,16 +55,20 @@ public:
 	// returns PICTURE if a complete coded picture was reconstructed,
 	// SEQUENCE_END if a standalone sequence-end marker was consumed, NEED_DATA
 	// if more input is required, or INVALID_DATA if invalid syntax was skipped.
-	// pos is updated to the first unconsumed bit.
+	// Partial syntax and any accepted lookahead are retained across calls.
+	// NEED_DATA accepts all supplied bytes.  An event can consume zero bytes
+	// when its syntax was retained by a preceding call.  Keep picture buffer
+	// bindings unchanged across NEED_DATA; the references and previous
+	// reconstructed contents are sampled at the picture header.
 
-	decode_result decode_buffer(int &pos, int limit, const picture_buffers &buffers,
+	decode_result decode(std::span<const u8> input, std::size_t &consumed, const picture_buffers &buffers,
 						int &width, int &height, double &frame_rate);
 
 	// Clear persistent decoding state.
-	void clear();
+	void clear() ATTR_COLD;
 
 	// Register persistent decoding state with an owning device.
-	void register_save_state(device_t &device, int index = 0);
+	void register_save_state(device_t &device, int index = 0) ATTR_COLD;
 
 private:
 	struct vlc_entry;
@@ -74,6 +78,21 @@ private:
 	struct limit_hit { };
 
 	struct invalid_stream { };
+
+	enum : u8
+	{
+		SCAN,
+		SEQUENCE_HEADER,
+		GROUP_HEADER,
+		PICTURE_HEADER,
+		PICTURE_EXTRA,
+		SLICE_HEADER,
+		SLICE_EXTRA,
+		MACROBLOCK_ADDRESS,
+		MACROBLOCK,
+		MACROBLOCK_END,
+		RECOVER
+	};
 
 	struct frame
 	{
@@ -137,11 +156,22 @@ private:
 	static const u8 s_scan[64];
 	static const double s_picture_rates[16];
 
-	const u8 *m_base;
+	// A macroblock contains at most six blocks of 64 coefficients, with at
+	// most 28 bits per escape-coded coefficient, plus header and motion bits.
+	static constexpr unsigned INPUT_BUFFER_BYTES = (6 * 64 * 28 + 128) / 8;
+	u8 m_input_buffer[INPUT_BUFFER_BYTES];
+	u32 m_input_bytes;
+	u32 m_current_pos;
+	u8 m_phase;
+	bool m_in_picture;
+	bool m_have_slice;
+	bool m_first_in_slice;
+	u8 m_slice_vertical_position;
+	s32 m_address_increment;
+	std::span<const u8> m_input;
+	std::size_t m_consumed;
 	int m_maximum_width;
 	int m_maximum_height;
-	int m_current_pos;
-	int m_current_limit;
 
 	s32 m_horizontal_size;
 	s32 m_vertical_size;
@@ -153,18 +183,18 @@ private:
 	u8 m_intra_quantizer_matrix[64];
 	u8 m_non_intra_quantizer_matrix[64];
 
-	int m_picture_coding_type;
+	s32 m_picture_coding_type;
 	bool m_full_pel_forward_vector;
 	bool m_full_pel_backward_vector;
-	int m_forward_f;
-	int m_backward_f;
-	int m_quantizer_scale;
-	int m_macroblock_address;
-	int m_dc_predictor[3];
-	int m_forward_horizontal_previous;
-	int m_forward_vertical_previous;
-	int m_backward_horizontal_previous;
-	int m_backward_vertical_previous;
+	s32 m_forward_f;
+	s32 m_backward_f;
+	s32 m_quantizer_scale;
+	s32 m_macroblock_address;
+	s32 m_dc_predictor[3];
+	s32 m_forward_horizontal_previous;
+	s32 m_forward_vertical_previous;
+	s32 m_backward_horizontal_previous;
+	s32 m_backward_vertical_previous;
 	bool m_previous_b_forward;
 	bool m_previous_b_backward;
 
@@ -175,11 +205,12 @@ private:
 
 	void sequence_header();
 	void group_of_pictures();
-	void picture(const picture_buffers &buffers);
-	void slice(unsigned vertical_position);
-	void macroblock(bool first_in_slice);
+	void picture_header(const picture_buffers &buffers);
+	void slice_header();
+	void macroblock();
 	void skipped_macroblock(int address);
-	void block(unsigned index, bool intra);
+	void block(unsigned index, bool intra, int *quantized);
+	void reconstruct_block(unsigned index, bool intra, const int *quantized);
 
 	void reset_dc_predictors();
 	void decode_motion_vector(bool forward, motion_vector &vector);
@@ -206,8 +237,9 @@ private:
 	int dc_size(bool luminance);
 	void dct_coefficient(bool first, int &run, int &level);
 
-	void next_start_code();
-	u32 peek(int count) const;
+	void discard_consumed_bytes();
+	int available_bits() const;
+	u32 peek(int count);
 	u32 gb(int count);
 };
 
