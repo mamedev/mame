@@ -31,6 +31,10 @@
 *   slowdown sections that at a glance don't look like they should be slowing down or causing extra
 *   slowdown.
 *
+*   The real cost above is that CAVE in their wisdom decided that flushing the cache wasn't enough (they
+*   could have set the cache to WT mode or just used uncached aliases to write to SDRAM). After the flush
+*   they invalidate the entire cache meaning *everything* has to be refetched from SDRAM at hefty stall costs.
+*
 * - The code that reads irr0 to check for irq2 also seems to have a ready modify write timing bug where
 *   the register value is read, IRQ2 is masked out of that value, then that masked value is written back.
 *   Documentation does mention in an addendum that this behavior can lead to lost IRQ's but luckily these
@@ -320,9 +324,7 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 	return SH7709S_CACHE_LINE_SIZE >> (bcr2_val - 1);
 }
 
-// Unconfirmed behavior but the math works out based on comparison of misses in a frame to pcb footage
-// This covers a pipeline where we go from miss detect -> victim select -> address to BSC
-#define CACHE_MISS_STALL (3)
+#define CACHE_MISS_STALL (1)
 
 static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
 {
@@ -332,16 +334,36 @@ static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
 // cpu->bus cycle conversion hardcoded to 2x as cv1k sh3 runs the bus at 50mhz
 unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 {
+	// Instead of emulating the whole pipeline since games execute logic + spinwait
+	// we can emulate the cache port contention by just flipping the port free every other
+	// access. Each instruction fetch grabs 2 instructions at once so this leaves
+	// the cache free every other cycle for a data fetch. If we attempt to access
+	// while busy stall for the busy cycle.
+	static bool port_free = true;
 	bool is_in_cache = cache_access(address, write);
+	uint64_t elapsed_cycles = total_cycles() - m_last_op_cycle_count;
+	uint32_t cpu_penalty = 0;
+
+	if (!port_free)
+		cpu_penalty++;
+
+	port_free = !port_free;
 
 	if (is_in_cache)
-		return 0;
+	{
+		// Background fill happening, drain the remaining fill words but leave the rest on the table
+		if (elapsed_cycles < 6 && m_burst_continuation_remaining_cycles >= 6)
+		{
+			uint32_t stall_fetch = m_burst_continuation_remaining_cycles - elapsed_cycles;
+			m_burst_continuation_remaining_cycles -= 6;
+			return stall_fetch + cpu_penalty;
+		}
+		return cpu_penalty;
+	}
 
 	uint32_t area = get_area(address);
-	uint64_t elapsed_cycles = total_cycles() - m_last_op_cycle_count;
-	uint32_t cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
-	uint32_t bank_read = sdram_bank(address);
-	uint32_t bus_penalty = 1; // CPU -> BSC sync cost
+	uint32_t bus_penalty = 0;
+	cpu_penalty += is_cacheable(address) ? CACHE_MISS_STALL : 0;
 
 	// SDRAM timing based on SH7709S documentation
 	// These are copied from the timing charts. These are all in bus cycles
@@ -430,9 +452,6 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 		m_wb_active_cycles = 0;
 	}
 
-	if (is_sdram_region(address))
-		m_last_sdram_bank = bank_read;
-
 	// We had a dirty writeback eviction, total up the background cost penalty we'll pay on subsequent cycles
 	if (m_wb_address != 0)
 	{
@@ -446,7 +465,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 			m_burst_continuation_remaining_cycles = 0;
 			// since this is a dirty cache line eviction we always add wcr1 as it's handled after the miss fetch read
 			// and we're switching from read->write
-			m_wb_active_cycles += (2 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(area) + mcr_tpc()) * 2;
+			m_wb_active_cycles += (1 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(area) + mcr_tpc()) * 2;
 		}
 		else
 		{
@@ -466,6 +485,14 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 
 void sh7709s_device::update_access_cycles(uint32_t address, bool write)
 {
+	// m_last_op_cycle count should be tracking just bus activity
+	// but the carry forward cycles between data accesses act like a decent
+	// heuristic for missing instruction fetch stalls. This does cause a
+	// bit of extra carry forward once you hit a string of cache hits but
+	// since slowdown is ending at that point anyway only minor penalty that
+	// isn't visible is applied. This can be fixed with some extra sampling of
+	// surrounding cache lines on access but that carries a bit of extra cpu
+	// cost and quite a bit of code complexity
 #if SH7709S_ICACHE_TRACKING_HEAVY == 0
 	// For now only handle cacheable instruction fetch sampling when we do
 	// data accesses. The majority of uncached instruction fetches is
@@ -695,7 +722,7 @@ void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// BFS $AC002A66
 		// ADD #$10, R1
 		m_sh2_state->icount -= (2 /*fetches*/ * 2 /*bus cycle convert*/ * 1024 /*loop iterations*/) *
-			(2 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
+			(1 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
 #endif
 	}
 	COMBINE_DATA(&m_ccr);
