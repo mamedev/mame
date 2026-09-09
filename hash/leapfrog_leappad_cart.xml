@@ -1446,8 +1446,8 @@ license:CC0-1.0
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="335-13845-00"/>
 			<feature name="u1" value="MX23L1611B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x400000">
-				<rom name="UBL 500-11427 - Scooby-Doo and the Zombie's Treasure.bin" size="0x400000" crc="d48ec54a" sha1="dfcacf1db04d65579e4ecabe24cbbae8643e92ee" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-11427 - Scooby-Doo and the Zombie's Treasure.bin" size="0x200000" crc="d48ec54a" sha1="dfcacf1db04d65579e4ecabe24cbbae8643e92ee" />
 			</dataarea>
 		</part>
 	</software>
@@ -1461,8 +1461,8 @@ license:CC0-1.0
 			<feature name="pcb" value="57000-003-7211"/>
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x400000">
-				<rom name="UBL 500-11819 - Madagascar.bin" size="0x400000" crc="966dfdf7" sha1="4ccca7ced2cc8bb4c9653e699d79257b658fd2c2" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-11819 - Madagascar.bin" size="0x200000" crc="966dfdf7" sha1="4ccca7ced2cc8bb4c9653e699d79257b658fd2c2" />
 			</dataarea>
 		</part>
 	</software>
