@@ -104,7 +104,7 @@ ROM_START(lotoplayb)
 	ROM_LOAD("lp_vii_sch_mostra_11302_68705p3s.bin", 0x0000, 0x0800, CRC(61b426d3) SHA1(b66dc6c382a04d8cdbaee342f179ce80abfd3c71))
 ROM_END
 
-// Different PCB than the previous sets
+// Different PCB than the previous sets, instead of a LEDs roulette uses a 7-segments 1 digit display
 ROM_START(lotoplayc)
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_LOAD("multn.bin", 0x0000, 0x0800, CRC(20a0e0d0) SHA1(832ed64dfa5f5f150f0e9918b40e9fb4e8e4260d))
