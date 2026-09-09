@@ -87,10 +87,10 @@ public:
 	{
 	}
 
-	void sc88(machine_config &config);
-	void sc88vl(machine_config &config);
-	void sc88pro(machine_config &config);
-	void vegspro(machine_config &config);
+	void sc88(machine_config &config) ATTR_COLD;
+	void sc88vl(machine_config &config) ATTR_COLD;
+	void sc88pro(machine_config &config) ATTR_COLD;
+	void vegspro(machine_config &config) ATTR_COLD;
 
 	void init_sc88() ATTR_COLD;
 
@@ -100,7 +100,7 @@ protected:
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
-	void lcd_palette(palette_device &palette) const;
+	void lcd_palette(palette_device &palette) const ATTR_COLD;
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sc88pro_map(address_map &map) ATTR_COLD;
@@ -157,8 +157,8 @@ void roland_sc88_state::init_sc88()
 	u8 *rom = region->base();
 	const u32 size = region->bytes();
 
-	static const u8 address_lines[18] = { 0, 4, 2, 3, 1, 13, 7, 12, 5, 10, 16, 9, 6, 8, 14, 17, 11, 15 };
-	static const u8 data_lines[8] = { 2, 0, 4, 5, 7, 6, 3, 1 };
+	constexpr u8 address_lines[18] = { 0, 4, 2, 3, 1, 13, 7, 12, 5, 10, 16, 9, 6, 8, 14, 17, 11, 15 };
+	constexpr u8 data_lines[8] = { 2, 0, 4, 5, 7, 6, 3, 1 };
 
 	std::vector<u8> scrambled(rom, rom + size);
 	for (u32 i = 0; i < size; i++)
@@ -199,7 +199,6 @@ void roland_sc88_state::machine_reset()
 	m_lcd_fifo_count = 0;
 	m_lcd_command_pending = false;
 	m_lcd_timer->adjust(attotime::never);
-
 }
 
 
@@ -499,8 +498,8 @@ HD44780_PIXEL_UPDATE(roland_sc88_state::lcd_pixel_update)
 	{
 		if (y == 0 && x == 4)
 		{
-			static constexpr u16 L_SHAPE[12] = { 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x7ff, 0x7ff };
-			static constexpr u16 R_SHAPE[12] = { 0x7fc, 0x7fe, 0x606, 0x606, 0x606, 0x7fe, 0x7fc, 0x630, 0x618, 0x60c, 0x606, 0x603 };
+			constexpr u16 L_SHAPE[12] = { 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x600, 0x7ff, 0x7ff };
+			constexpr u16 R_SHAPE[12] = { 0x7fc, 0x7fe, 0x606, 0x606, 0x606, 0x7fe, 0x7fc, 0x630, 0x618, 0x60c, 0x606, 0x603 };
 			for (int i = 0; i < 12; i++)
 				for (int j = 0; j < 11; j++)
 				{
@@ -530,8 +529,8 @@ HD44780_PIXEL_UPDATE(roland_sc88_state::lcd_pixel_update)
 	else if (line == 1 && pos < 18)
 	{
 		int const field = pos / 3;
-		static constexpr int FIELD_COL[6] = { 0, 1, 1, 0, 0, 1 };
-		static constexpr int FIELD_ROW[6] = { 1, 1, 2, 2, 3, 3 };
+		constexpr int FIELD_COL[6] = { 0, 1, 1, 0, 0, 1 };
+		constexpr int FIELD_ROW[6] = { 1, 1, 2, 2, 3, 3 };
 		cx = (FIELD_COL[field] ? LCD_COL1_X : LCD_COL0_X) + (pos % 3) * LCD_CHAR_PITCH;
 		cy = LCD_ROW_Y[FIELD_ROW[field]];
 	}

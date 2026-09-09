@@ -6,12 +6,14 @@
 #include "emu.h"
 #include "roland_xpd.h"
 
+#include <string_view>
+
 namespace {
 
 // col[5:4] names the multiply input
 const char *const INPUT[4] = { "prev", "acc", "R", "latch" };
 
-const int SHIFT[4] = { 0, 1, 2, 4 };
+constexpr int SHIFT[4] = { 0, 1, 2, 4 };
 
 constexpr int SLOTS = 288;
 
@@ -35,14 +37,14 @@ const char *condition_name(int code)
 	}
 }
 
-} // anonymous namespace
-
-void roland_xp_disassembler::append(std::string &r, const std::string &e)
+void append(std::string &r, std::string_view e)
 {
 	if (!r.empty())
 		r += ", ";
 	r += e;
 }
+
+} // anonymous namespace
 
 std::string roland_xp_disassembler::coefficient(offs_t pc) const
 {
@@ -50,7 +52,7 @@ std::string roland_xp_disassembler::coefficient(offs_t pc) const
 		return "C";
 
 	const u16 c = coefficient_word(pc);
-	const s32 mantissa = s32(s16(c << 2)) >> 2;
+	const s32 mantissa = util::sext(c, 14);
 	return util::string_format("%g", double(mantissa << SHIFT[c >> 14]) / 8192.0);
 }
 
@@ -60,7 +62,7 @@ std::string roland_xp_disassembler::constant(offs_t pc) const
 		return "K";
 
 	const u16 c = coefficient_word(pc);
-	return util::string_format("%d", BIT(c, 15) ? s32(c & 0x3fff) << 13 : s32(s16(c << 2)) >> 2);
+	return util::string_format("%d", BIT(c, 15) ? (s32(c & 0x3fff) << 13) : s32(util::sext(c, 14)));
 }
 
 // an external RAM access spans two slots, so the second slot's field is address, not command

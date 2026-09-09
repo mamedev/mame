@@ -94,8 +94,6 @@
 #include "emu.h"
 #include "roland_xp.h"
 
-#include "roland_xpd.h"
-
 #include <algorithm>
 #include <cmath>
 #include <iterator>
@@ -117,7 +115,7 @@ DEFINE_DEVICE_TYPE(ROLAND_XP, roland_xp_device, "roland_xp", "Roland XP")
 
 namespace {
 
-const s16 interp_weights[3][128] = {
+constexpr s16 interp_weights[3][128] = {
 	{
 		3385, 3401, 3417, 3432, 3448, 3463, 3478, 3492, 3506, 3521, 3535, 3548, 3562, 3575, 3588, 3601,
 		3614, 3626, 3638, 3650, 3662, 3673, 3685, 3696, 3707, 3718, 3728, 3739, 3749, 3759, 3768, 3778,
@@ -150,9 +148,9 @@ const s16 interp_weights[3][128] = {
 	},
 };
 
-const u32 hold_masks[4] = { 0, 7, 31, 127 };
-const u8 phase_dither[4] = { 3, 0, 2, 1 };
-const u8 shift_select[4] = { 0, 1, 2, 4 };
+constexpr u32 hold_masks[4] = { 0, 7, 31, 127 };
+constexpr u8 phase_dither[4] = { 3, 0, 2, 1 };
+constexpr u8 shift_select[4] = { 0, 1, 2, 4 };
 
 // the readback latch takes a page at its own width
 u32 page_mask(int index)
@@ -170,9 +168,9 @@ u32 page_mask(int index)
 	return 0xffffffff;
 }
 
-int bit_reverse4(int v)
+constexpr int bit_reverse4(int v)
 {
-	return ((v & 1) << 3) | ((v & 2) << 1) | ((v & 4) >> 1) | ((v & 8) >> 3);
+	return bitswap<4>(v, 0, 1, 2, 3);
 }
 
 } // anonymous namespace
@@ -259,7 +257,7 @@ device_memory_interface::space_config_vector roland_xp_device::memory_space_conf
 
 std::unique_ptr<util::disasm_interface> roland_xp_device::create_disassembler()
 {
-	return std::make_unique<roland_xp_disassembler>(this);
+	return std::make_unique<roland_xp_disassembler>(static_cast<roland_xp_disassembler::info *>(this));
 }
 
 u32 roland_xp_device::pram_r(offs_t address)
@@ -682,7 +680,7 @@ void roland_xp_device::service_ramp(int n, int k, bool launching)
 	const int rate = control & 0xfff;
 	const bool reso = k == RAMP_RESO;
 	const u32 tpage = page(n, rp.target);
-	const s32 target = s_curve ? 0 : reso ? s32(tpage & 0x3fffe) << 2 : s32(tpage & 0x3fffe);
+	const s32 target = s_curve ? 0 : reso ? (s32(tpage & 0x3fffe) << 2) : s32(tpage & 0x3fffe);
 	s32 current = s32(page(n, rp.current) & (reso ? 0xfffff : 0x3ffff));
 	s32 step = rp.step ? wrap20(s32(page(n, rp.step))) : 0;
 
@@ -720,10 +718,10 @@ void roland_xp_device::service_ramp(int n, int k, bool launching)
 	s32 parity;
 	switch (k)
 	{
-	case RAMP_TVA1: parity = (page(n, SERVICE) >> 1) & 1; break;
-	case RAMP_TVA2: parity = (m_frame_counter >> 3) & 1; break;
+	case RAMP_TVA1: parity = BIT(page(n, SERVICE), 1); break;
+	case RAMP_TVA2: parity = BIT(m_frame_counter, 3); break;
 	case RAMP_RESO: parity = 0; break;
-	default: parity = ((m_frame_counter >> 3) & 1) ^ 1; break;
+	default: parity = BIT(~m_frame_counter, 3); break;
 	}
 
 	if (s_curve)
@@ -732,7 +730,7 @@ void roland_xp_device::service_ramp(int n, int k, bool launching)
 		const s32 next = current + ((step + parity) >> 1);
 		current = (next < 0 || next > 0x3ffff) ? 0 : next;
 		const s32 threshold = s32(tpage & 0x3fffe);
-		set_page(n, rp.step, u32(step + (previous > threshold ? -rate : rate)) & 0xfffff);
+		set_page(n, rp.step, u32(step + ((previous > threshold) ? -rate : rate)) & 0xfffff);
 		set_page(n, rp.current, u32(current));
 		if (previous && !current)
 		{
@@ -794,15 +792,15 @@ roland_xp_device::wave_cell roland_xp_device::cell_at(int n, u32 control, u32 ad
 	if (BIT(v.format, 1))
 	{
 		const int shift = (byte >> 4) & 7;
-		const int mantissa = shift ? (byte & 0x0f) + 16 : (byte & 0x0f);
-		return wave_cell{ BIT(byte, 7) ? -mantissa : mantissa, shift ? shift + 5 : 6 };
+		const int mantissa = shift ? ((byte & 0x0f) + 16) : (byte & 0x0f);
+		return wave_cell{ BIT(byte, 7) ? -mantissa : mantissa, shift ? (shift + 5) : 6 };
 	}
 	if (BIT(v.format, 0))
 		return wave_cell{ s8(byte), 0 };
 
 	const u8 shifts = rom_byte(control, address >> 5);
 	const int exponent = BIT(address, 4) ? (shifts >> 4) : (shifts & 0x0f);
-	return wave_cell{ exponent > 10 ? 0 : s8(byte), exponent };
+	return wave_cell{ (exponent > 10) ? 0 : s8(byte), exponent };
 }
 
 s32 roland_xp_device::delta_of(wave_cell c)
@@ -813,7 +811,7 @@ s32 roland_xp_device::delta_of(wave_cell c)
 s32 roland_xp_device::tap(s32 weight, wave_cell c)
 {
 	const s32 p = (weight * c.mantissa) & ~3;
-	return c.exponent <= 10 ? p >> (10 - c.exponent) : p << (c.exponent - 10);
+	return (c.exponent <= 10) ? (p >> (10 - c.exponent)) : (p << (c.exponent - 10));
 }
 
 void roland_xp_device::launch(int n)
@@ -1233,8 +1231,8 @@ s32 roland_xp_device::factor(int select, bool complement) const
 
 	switch (select)
 	{
-	case 0: f = (acc & 0xfff) << 3; return complement ? 0x7fff - f : f;
-	case 1: f = (acc & 0x7fffff) >> 8; return complement ? 0x7fff - f : f;
+	case 0: f = (acc & 0xfff) << 3; return complement ? (0x7fff - f) : f;
+	case 1: f = (acc & 0x7fffff) >> 8; return complement ? (0x7fff - f) : f;
 	case 2: f = acc >> 8; return complement ? ~f : f;
 	default: f = m_dsp.gain; return complement ? ~f : f;
 	}
@@ -1479,7 +1477,7 @@ void roland_xp_device::strobe(const dsp_slot &s)
 
 u32 roland_xp_device::port_a_out_r(int strobe)
 {
-	return strobe < DSP_SLOTS ? u32(m_port_a_out[strobe]) : 0;
+	return (strobe < DSP_SLOTS) ? u32(m_port_a_out[strobe]) : 0;
 }
 
 void roland_xp_device::dsp_frame_start()

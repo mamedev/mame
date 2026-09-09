@@ -85,8 +85,8 @@ public:
 	{
 	}
 
-	void sc8850(machine_config &config);
-	void sc8820(machine_config &config);
+	void sc8850(machine_config &config) ATTR_COLD;
+	void sc8820(machine_config &config) ATTR_COLD;
 
 	void init_sc8850() ATTR_COLD;
 
@@ -101,7 +101,7 @@ private:
 	void xp_rom_map(address_map &map) ATTR_COLD;
 	void sc8820_xp_rom_map(address_map &map) ATTR_COLD;
 
-	void lcd_palette(palette_device &palette) const;
+	void lcd_palette(palette_device &palette) const ATTR_COLD;
 
 	u8 ga_r(offs_t offset);
 	void ga_w(offs_t offset, u8 data);
@@ -168,8 +168,8 @@ void roland_sc8850_state::init_sc8850()
 	u8 *rom = region->base();
 	const u32 size = region->bytes();
 
-	static const u8 address_lines[18] = { 0, 4, 2, 3, 1, 8, 12, 6, 13, 11, 9, 16, 7, 5, 14, 17, 10, 15 };
-	static const u8 data_lines[8] = { 2, 0, 4, 5, 7, 6, 3, 1 };
+	constexpr u8 address_lines[18] = { 0, 4, 2, 3, 1, 8, 12, 6, 13, 11, 9, 16, 7, 5, 14, 17, 10, 15 };
+	constexpr u8 data_lines[8] = { 2, 0, 4, 5, 7, 6, 3, 1 };
 
 	std::vector<u8> scrambled(rom, rom + size);
 	for (u32 i = 0; i < size; i++)
@@ -280,8 +280,7 @@ void roland_sc8850_state::ga_present()
 	if (m_ga_pending || !enabled)
 		return;
 
-	for (m_ga_source = 0; !BIT(enabled, m_ga_source); m_ga_source++)
-		;
+	for (m_ga_source = 0; !BIT(enabled, m_ga_source); m_ga_source++) { }
 
 	m_ga_pending = true;
 	m_maincpu->set_input_line(2, ASSERT_LINE);
@@ -422,7 +421,7 @@ u8 roland_sc8850_state::uipc_r(offs_t offset)
 	if (Channel == 0)
 		return offset ? 0x02 : 0x00;
 
-	static const u8 boot[][2] = {
+	constexpr u8 boot[][2] = {
 		{ 0x01, 0xfa }, { 0xf1, 0x00 }, { 0x01, 0xfb }, { 0x01, 0xfc }, { 0x01, 0xfd }, { 0x01, 0xff }
 	};
 

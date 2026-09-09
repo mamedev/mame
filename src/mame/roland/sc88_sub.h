@@ -23,12 +23,16 @@ class sc88_sub_rx_device : public device_t, public device_serial_interface
 {
 public:
 	sc88_sub_rx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
 	auto byte_callback() { return m_byte_cb.bind(); }
+
 	using device_serial_interface::rx_w;
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void rcv_complete() override;
+
 private:
 	devcb_write8 m_byte_cb;
 };
@@ -39,6 +43,8 @@ DECLARE_DEVICE_TYPE(SC88_SUB_RX, sc88_sub_rx_device)
 class sc88_sub_device : public device_t
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	sc88_sub_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// INTR pin: raised when a message is waiting in the IPC error registers
@@ -95,27 +101,27 @@ private:
 	devcb_write_line m_tx_cb;
 	required_device_array<sc88_sub_rx_device, 3> m_rx;
 
-	u8 m_dpram[0xd8]{};
-	u8 m_ipcm[4]{};
-	u8 m_ipcer[4]{};
-	u8 m_flags[0x1b]{};
-	u8 m_sem = 0;
-	u8 m_spcon = 0;
-	u8 m_pa = 0, m_pa_dir = 0, m_pb = 0, m_pb_dir = 0;
-	bool m_int_state = false;
-	bool m_in_reset = false;
+	u8 m_dpram[0xd8];
+	u8 m_ipcm[4];
+	u8 m_ipcer[4];
+	u8 m_flags[0x1b];
+	u8 m_sem;
+	u8 m_spcon;
+	u8 m_pa, m_pa_dir, m_pb, m_pb_dir;
+	bool m_int_state;
+	bool m_in_reset;
 
 	source m_src[3];
 	std::deque<message> m_queue;
-	bool m_busy = false;
-	emu_timer *m_deliver_timer = nullptr;
+	bool m_busy;
+	emu_timer *m_deliver_timer;
 
-	u8 m_tx_rd = 0;
-	u8 m_tx_left = 0;
-	u8 m_tx_end = 0;
-	emu_timer *m_tx_timer = nullptr;
-	u16 m_tx_shift = 0;
-	int m_tx_bits = 0;
+	u8 m_tx_rd;
+	u8 m_tx_left;
+	u8 m_tx_end;
+	emu_timer *m_tx_timer;
+	u16 m_tx_shift;
+	int m_tx_bits;
 };
 
 DECLARE_DEVICE_TYPE(SC88_SUB, sc88_sub_device)

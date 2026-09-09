@@ -158,6 +158,23 @@ sc88_sub_device::sc88_sub_device(const machine_config &mconfig, const char *tag,
 	, m_keys_cb(*this, 0xff)
 	, m_tx_cb(*this)
 	, m_rx(*this, "rx%u", 0U)
+	, m_dpram{}
+	, m_ipcm{}
+	, m_ipcer{}
+	, m_flags{}
+	, m_sem(0)
+	, m_spcon(0)
+	, m_pa(0), m_pa_dir(0), m_pb(0), m_pb_dir(0)
+	, m_int_state(false)
+	, m_in_reset(false)
+	, m_busy(false)
+	, m_deliver_timer(nullptr)
+	, m_tx_rd(0)
+	, m_tx_left(0)
+	, m_tx_end(0)
+	, m_tx_timer(nullptr)
+	, m_tx_shift(0)
+	, m_tx_bits(0)
 {
 }
 

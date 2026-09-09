@@ -70,7 +70,7 @@ void sh7014_wdt_device::map(address_map &map)
 
 int sh7014_wdt_device::prescaler() const
 {
-	static const int shift[8] = { 1, 6, 7, 8, 9, 10, 12, 13 };
+	constexpr int shift[8] = { 1, 6, 7, 8, 9, 10, 12, 13 };
 	return shift[m_tcsr & TCSR_CKS];
 }
 

@@ -7,7 +7,7 @@
 
 #include "roland_xpd.h"
 
-class roland_xp_device : public cpu_device, public device_sound_interface, public roland_xp_disassembler::info
+class roland_xp_device : public cpu_device, public device_sound_interface, protected roland_xp_disassembler::info
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
@@ -72,7 +72,6 @@ public:
 	// strobe and the argument is the strobe's ordinal in the frame; what this chip presented at that
 	// strobe in its last frame is port_a_out_r() -- the SC-8850's two chips read each other through it
 	auto port_a_in_callback() { return m_port_a_in_cb.bind(); }
-	u32 port_a_out_r(int strobe);
 
 	// port B's input (SDIB), sampled once per three-strobe group; the argument is the group's ordinal
 	auto port_b_in_callback() { return m_port_b_in_cb.bind(); }
@@ -80,39 +79,17 @@ public:
 	// a chip whose frame another device clocks, as the SC-8850's slave is clocked by its master:
 	// execute_run() stands still and run_frame() is one frame
 	void set_pumped(bool pumped) { m_pumped = pumped; }
-	void run_frame();
+
 	auto frame_callback() { return m_frame_cb.bind(); }
+
+	void run_frame();
+
+	u32 port_a_out_r(int strobe);
 
 	u16 read(offs_t offset, u16 mem_mask = ~0);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	// roland_xp_disassembler::info implementation
-	virtual u16 xpd_cram_r(offs_t address) const override { return m_regs[(CRAM_BASE >> 1) + (address % DSP_SLOTS)]; }
-	virtual int xpd_ramp_base() const override { return ramp_base(); }
-
 protected:
-	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void device_clock_changed() override;
-	virtual void device_post_load() override;
-
-	// device_execute_interface implementation
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 1) / 3; }
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles * 3; }
-	virtual u32 execute_min_cycles() const noexcept override { return 1; }
-	virtual u32 execute_max_cycles() const noexcept override { return 1; }
-	virtual void execute_run() override;
-
-	// device_memory_interface implementation
-	virtual space_config_vector memory_space_config() const override;
-
-	// device_disasm_interface implementation
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	// device_sound_interface implementation
-	virtual void sound_stream_update(sound_stream &stream) override;
-
 	enum ramp_index { RAMP_PITCH, RAMP_TVF, RAMP_RESO, RAMP_TVA2, RAMP_TVA1 };
 	enum ramp_law { LAW_LINEAR, LAW_EXPONENTIAL, LAW_S_CURVE };
 	enum launch_phase { IDLE, PRELOAD, INITIALIZE, STARTING, RUNNING };
@@ -134,8 +111,6 @@ protected:
 		u8 format = 0;
 		u8 fade_entry = 0;
 	};
-
-	static const ramp_pages RAMPS[5];
 
 	struct address_step
 	{
@@ -189,6 +164,32 @@ protected:
 		u16 cursor = 0;
 	};
 
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_clock_changed() override;
+	virtual void device_post_load() override;
+
+	// device_execute_interface implementation
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 1) / 3; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles * 3; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 1; }
+	virtual void execute_run() override;
+
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override;
+
+	// device_disasm_interface implementation
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// device_sound_interface implementation
+	virtual void sound_stream_update(sound_stream &stream) override;
+
+	// roland_xp_disassembler::info implementation
+	virtual u16 xpd_cram_r(offs_t address) const override { return m_regs[(CRAM_BASE >> 1) + (address % DSP_SLOTS)]; }
+	virtual int xpd_ramp_base() const override { return ramp_base(); }
+
 	s32 exp_decode(s32 value) const;
 
 	int voice_count() const { return (m_regs[HIGHEST_VOICE >> 1] & 0x3f) + 1; }
@@ -228,10 +229,10 @@ protected:
 
 	static s32 clamp24(s64 value) { return s32(std::clamp<s64>(value, -0x800000, 0x7fffff)); }
 	static s32 clamp29(s64 value) { return s32(std::clamp<s64>(value, -0x10000000, 0x0fffffff)); }
-	static s32 wrap29(s64 value) { return s32(s64(u64(value) << 35) >> 35); }
-	static s32 wrap24(s32 value) { return s32(u32(value) << 8) >> 8; }
-	static s32 wrap20(s32 value) { return s32(u32(value) << 12) >> 12; }
-	static s32 wrap18(s32 value) { return s32(u32(value) << 14) >> 14; }
+	static constexpr s32 wrap29(s64 value) { return s32(util::sext(value, 29)); }
+	static constexpr s32 wrap24(s32 value) { return util::sext(value, 24); }
+	static constexpr s32 wrap20(s32 value) { return util::sext(value, 20); }
+	static constexpr s32 wrap18(s32 value) { return util::sext(value, 18); }
 	static s32 fold24(s32 value);
 	static s32 multiply(s32 operand, s32 coefficient) { return clamp29((s64(operand) * coefficient) / 8192); }
 	static s32 multiply_q15(s32 operand, s32 factor, int shift) { return clamp29(((s64(operand) * factor) << shift) / 32768); }
@@ -267,6 +268,8 @@ protected:
 	void iram_w(offs_t address, u32 data) { write_iram(address % IRAM_CELLS, data); }
 	u32 eram_r(offs_t address) { return m_eram[address & 0xffff] & 0xffffff; }
 	void eram_w(offs_t address, u32 data) { m_eram[address & 0xffff] = wrap24(data); }
+
+	static const ramp_pages RAMPS[5];
 
 	address_space_config m_pram_config;
 	address_space_config m_wave_config;

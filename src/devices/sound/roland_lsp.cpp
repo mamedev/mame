@@ -232,7 +232,7 @@ void roland_lsp_device::host_w(offs_t offset, u8 data)
 		break;
 
 	case HOST_ADDRESS_HIGH:
-		m_host_address = (m_host_address & 0x00ff) | (data << 8);
+		m_host_address = (m_host_address & 0x00ff) | (u16(data) << 8);
 		break;
 
 	case HOST_DATA_LOW:
@@ -240,11 +240,11 @@ void roland_lsp_device::host_w(offs_t offset, u8 data)
 		break;
 
 	case HOST_DATA_MID:
-		m_host_data = (m_host_data & 0xff00ff) | (data << 8);
+		m_host_data = (m_host_data & 0xff00ff) | (u32(data) << 8);
 		break;
 
 	case HOST_DATA_HIGH:
-		m_host_data = (m_host_data & 0x00ffff) | (data << 16);
+		m_host_data = (m_host_data & 0x00ffff) | (u32(data) << 16);
 		break;
 
 	case HOST_CONFIGURE:
@@ -257,7 +257,7 @@ void roland_lsp_device::host_w(offs_t offset, u8 data)
 		break;
 
 	case HOST_READ_HIGH:
-		m_host_address = (m_host_address & 0x00ff) | (data << 8);
+		m_host_address = (m_host_address & 0x00ff) | (u16(data) << 8);
 		break;
 	}
 }
@@ -361,7 +361,7 @@ void roland_lsp_device::special(const instruction &s)
 		if (s.store == 3)
 		{
 			const s32 raw = m_history[0][2];
-			m_tap = u16(raw >> 10);
+			m_tap = u16((raw >> 10) & 0xffff);
 			m_multiplier[0] = (raw & 0x3ff) << 13;
 		}
 		return;

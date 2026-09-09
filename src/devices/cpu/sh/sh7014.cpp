@@ -102,11 +102,10 @@ void sh7014_device::sh7014_map(address_map &map)
 	map(0xffff839a, 0xffff839b).rw(m_port, FUNC(sh7014_port_device::pbcr2_r), FUNC(sh7014_port_device::pbcr2_w));
 
 	map(0xffff83b0, 0xffff83b1).rw(m_port, FUNC(sh7014_port_device::pedr_r), FUNC(sh7014_port_device::pedr_w));
+	map(0xffff83b3, 0xffff83b3).r(m_port, FUNC(sh7014_port_device::pfdr_r));
 	map(0xffff83b4, 0xffff83b5).rw(m_port, FUNC(sh7014_port_device::peior_r), FUNC(sh7014_port_device::peior_w));
 	map(0xffff83b8, 0xffff83b9).rw(m_port, FUNC(sh7014_port_device::pecr1_r), FUNC(sh7014_port_device::pecr1_w));
 	map(0xffff83ba, 0xffff83bb).rw(m_port, FUNC(sh7014_port_device::pecr2_r), FUNC(sh7014_port_device::pecr2_w));
-
-	map(0xffff83b3, 0xffff83b3).r(m_port, FUNC(sh7014_port_device::pfdr_r));
 
 	// TODO: CMT - Compare Match Timer
 	// 0xffff83d0 - 0xffff83df
@@ -117,10 +116,8 @@ void sh7014_device::sh7014_map(address_map &map)
 	// A/D - A/D Converter (Mid Speed, for SH7016/SH7017)
 	map(0xffff8420, 0xffff842b).m(m_adc, FUNC(sh7014_adc_device::map));
 
+	// WDT - Watchdog Timer
 	map(0xffff8610, 0xffff8613).m(m_wdt, FUNC(sh7014_wdt_device::map));
-
-	// TODO: WDT - Watchdog Timer
-	// 0xffff8610 - 0xffff8613
 
 	// TODO: Power-down state
 	// 0xffff8614
