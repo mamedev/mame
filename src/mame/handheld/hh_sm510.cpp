@@ -4971,7 +4971,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Elektronika Суперкубики (model ИМ-20)
+  Elektronika Суперкубики (Superkubiki) (model ИМ-20)
   * unmarked MCU (no decap); seems to be compatible with КБ1013ВК4-2
     which in turn is compatible with Sharp SM510
   * lcd screen with custom segments, 1-bit sound
@@ -12435,7 +12435,7 @@ SYST( 199?, vinnpukh,     gnw_dkjrp,   0,      vinnpukh,     gnw_dkjrp,    gnw_d
 // Elektronika (original)
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
-SYST( 199?, supkubik,     0,           0,      supkubik,     supkubik,     supkubik_state,     empty_init, "Elektronika", "Superkubiki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 199?, supkubik,     0,           0,      supkubik,     supkubik,     supkubik_state,     empty_init, "Elektronika", "Superkubiki", MACHINE_SUPPORTS_SAVE )
 SYST( 1992, vesarif,      0,           0,      vesarif,      vesarif,      vesarif_state,      empty_init, "Elektronika", "Vesolaya arifmetika", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE )
 
