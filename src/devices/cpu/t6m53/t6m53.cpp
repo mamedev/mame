@@ -264,7 +264,7 @@ inline void t6m53_device::set_dp(uint16_t value) {
 }
 
 
-inline uint16_t t6m53_device::add4(uint16_t x, uint8_t y) {
+inline uint16_t t6m53_device::add4(uint16_t x, uint8_t y) const {
     return (x & 0xfff0) | ((x + y) & 0x0f);
 }
 

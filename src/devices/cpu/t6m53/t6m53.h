@@ -93,7 +93,7 @@ private:
 	uint16_t get_dp() const;
 	void set_dp(uint16_t value);
 
-	uint16_t add4(uint16_t x, uint8_t y);
+	uint16_t add4(uint16_t x, uint8_t y) const;
 	uint16_t bcd(uint8_t x);
 	uint8_t adc(int bits, uint8_t x, uint8_t y, bool &carry, uint16_t op);
 
