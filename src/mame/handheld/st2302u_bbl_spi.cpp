@@ -547,7 +547,7 @@ ROM_END
 
 
 ROM_START(rocoball)
-	INTERNAL_ROM_TYPE2
+	INTERNAL_ROM_TYPE1
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("spi.bin", 0x000000, 0x800000, CRC(59894e3a) SHA1(e05c40de0c52cd8aa972f70e86c77c32cd6b93cc) )
@@ -616,5 +616,4 @@ CONS( 2020, qpet,          0,       0,      bbl380_radio_qpet, bbl380_pet, bbl38
 // yet another internal ROM? (doesn't seem to boot with the ones we have)
 CONS( 2022, tchib158,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Tchibo GmbH", "Tchibo 158-in-1 Retro Game", MACHINE_NOT_WORKING )
 
-// unknown if it uses the same internal ROM as other games, could be a bad dump
-CONS( 2020, rocoball,      0,       0,      bbl380_radio,      bbl380_pet, bbl380_state, empty_init, "<unknown>", "Roco Battle Ball", MACHINE_NOT_WORKING| ROT90 )
+CONS( 2020, rocoball,      0,       0,      bbl380_menuprot,      bbl380_prot, bbl380_state, empty_init, "<unknown>", "Roco Battle Ball", MACHINE_NOT_WORKING )
