@@ -1919,7 +1919,6 @@ void model1_state::swa(machine_config &config)
 
 	SPEAKER(config, "mpeg", 2).front();
 	DSBZ80(config, m_dsbz80);
-	m_dsbz80->set_clock(m_m1uart_clock);
 	m_dsbz80->add_route(0, "mpeg", 1.0, 0);
 	m_dsbz80->add_route(1, "mpeg", 1.0, 1);
 	m_m1uart_clock->signal_handler().append(m_dsbz80, FUNC(dsbz80_device::uart_clock_w));
