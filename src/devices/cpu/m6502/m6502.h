@@ -138,6 +138,7 @@ protected:
 	int m_icount, m_bcount, m_count_before_instruction_step;
 	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state, m_rdy_state;
 	bool m_nmi_pending, m_irq_taken, m_sync, m_inhibit_interrupts;
+	bool m_irq_sampled, m_nmi_sampled;
 	bool m_uses_custom_memory_interface;
 
 	uint8_t read(uint16_t adr) { return m_mintf->read(adr); }
@@ -147,10 +148,14 @@ protected:
 	void write_9(uint16_t adr, uint8_t val) { m_mintf->write_9(adr, val); }
 	uint8_t read_arg(uint16_t adr) { return m_mintf->read_arg(adr); }
 	uint8_t read_pc() { return read_arg(m_PC); }
+	uint8_t read_pc_noirq() { return read_arg(m_PC); }
+	uint8_t read_arg_noirq(uint16_t adr) { return read_arg(adr); }
 	void prefetch_start();
-	void prefetch_end();
+	virtual void prefetch_end();
 	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
+
+	void sample_interrupt() { m_irq_sampled = m_irq_state || m_apu_irq_state; m_nmi_sampled = m_nmi_pending; }
 
 	u32 m_XPC;
 	virtual offs_t pc_to_external(u16 pc); // For paged PCs
