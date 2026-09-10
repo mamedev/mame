@@ -970,10 +970,21 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				m_cel.pixc = m_dma32_read_cb(m_cel.address + 0x30);
 				tick_time += 1;
 				LOGCEL("    pixc=%08x\n", m_cel.pixc);
-				// TODO: only if MS not 2
+				// NOTE: [0] / [1] are P-bits settings (i.e. MSB of CCB, most often)
+				// 31 / 15 1S: primary source (0=decoder 1=fb pixel)
+				// MS: PMV source 00=CCB 01=decoder AMV, 10=decoder PMV & PDV 11=decoder PMV
+				m_cel.pixc_ms[0] = BIT(m_cel.pixc, 29, 2);
+				m_cel.pixc_ms[1] = BIT(m_cel.pixc, 13, 2);
+				// MF: sets PMV if MS == 0
+				m_cel.pixc_mf[0] = m_cel.pixc_ms[0] == 0 ? BIT(m_cel.pixc, 26, 3) + 1 : 0;
+				m_cel.pixc_mf[1] = m_cel.pixc_ms[1] == 0 ? BIT(m_cel.pixc, 10, 3) + 1 : 0;
+				// DF: sets PDV if MS != 2 (TBD)
 				const u8 df_table[4] = { 4, 1, 2, 3 };
 				m_cel.pixc_df[0] = df_table[BIT(m_cel.pixc, 24, 2)];
 				m_cel.pixc_df[1] = df_table[BIT(m_cel.pixc, 8, 2)];
+				// 23-22 / 7-6: 2S secondary source 00=0 01=CCB 10=fb pixel 11=from decoder
+				// 21-17 / 5-1: AV secondary source starting value with 2S=1 (more settings inside ...)
+				// 16 / 0: 2D secondary divider value (value + 1)
 			}
 
 			// fetch the Preamble words
@@ -1049,6 +1060,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
 			// TODO: should be bits 31-24 -> 7-0
 			// (doc claims integer, signed?)
+			// - demoman triggers this on flame transitions with 0xff, no noticeable difference (?)
 			if (bpp < 5 && BIT(m_cel.pre1, 31))
 				popmessage("3do_madam.cpp: CEL check woffset8 (bpp=%d pre1=%08x)", bpp, m_cel.pre1);
 			const u16 woffset = bpp >= 5 ? woffset10 : woffset8;
@@ -1294,9 +1306,9 @@ std::tuple<u16, u32> madam_device::get_coded_8bpp(u32 ptr, u8 frac)
 	s16 g = (src_data & 0x03e0) >> 5;
 	s16 b = (src_data & 0x001f) >> 0;
 
-	r = std::min((r * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
-	g = std::min((g * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
-	b = std::min((b * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	r = std::min((r * (alt_multiply + m_cel.pixc_mf[0])) >> m_cel.pixc_df[0], 0x1f);
+	g = std::min((g * (alt_multiply + m_cel.pixc_mf[0])) >> m_cel.pixc_df[0], 0x1f);
+	b = std::min((b * (alt_multiply + m_cel.pixc_mf[0])) >> m_cel.pixc_df[0], 0x1f);
 
 	const u16 dst_data = (r << 10) | (g << 5) | b;
 
@@ -1627,9 +1639,9 @@ u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	s16 g = (src_data & 0x03e0) >> 5;
 	s16 b = (src_data & 0x001f) >> 0;
 
-	r = std::min((r * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
-	g = std::min((g * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
-	b = std::min((b * alt_multiply) >> m_cel.pixc_df[0], 0x1f);
+	r = std::min((r * (alt_multiply + m_cel.pixc_mf[0])) >> m_cel.pixc_df[0], 0x1f);
+	g = std::min((g * (alt_multiply + m_cel.pixc_mf[0])) >> m_cel.pixc_df[0], 0x1f);
+	b = std::min((b * (alt_multiply + m_cel.pixc_mf[0])) >> m_cel.pixc_df[0], 0x1f);
 
 	u16 dst_data = (r << 10) | (g << 5) | b;
 
