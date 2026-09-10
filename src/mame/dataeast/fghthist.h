@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "deco_bufpal.h"
 #include "deco104.h"
 #include "deco146.h"
 #include "deco16ic.h"
@@ -19,7 +20,6 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -92,7 +92,6 @@ public:
 		: fghthist_common_state(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_paletteram(*this, "paletteram")
 		, m_io_in(*this, "IN%u", 0U)
 	{ }
 
@@ -106,22 +105,15 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<palette_device> m_palette;
+	required_device<deco_buffered_palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<u32> m_paletteram;
-
 	required_ioport_array<2> m_io_in;
-
-	std::unique_ptr<u8[]> m_dirty_palette{};
 
 //  void sound_w(u32 data);
 	u32 unk_status_r();
 
 	void allocate_buffered_palette();
-
-	void buffered_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void palette_dma_w(u32 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

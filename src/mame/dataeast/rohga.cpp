@@ -117,6 +117,7 @@
 
 #include "emu.h"
 
+#include "deco_bufpal.h"
 #include "deco104.h"
 #include "deco146.h"
 #include "deco16ic.h"
@@ -129,7 +130,6 @@
 #include "sound/ymopm.h"
 #include "video/bufsprite.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -151,7 +151,6 @@ public:
 		m_oki(*this, "oki%u", 1),
 		m_spriteram(*this, "spriteram%u", 1),
 		m_sprgen(*this, "spritegen%u", 1),
-		m_paletteram(*this, "paletteram"),
 		m_rowscroll(*this, "rowscroll_%u", 1)
 	{ }
 
@@ -174,24 +173,20 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
-	required_device<palette_device> m_palette;
+	required_device<deco_buffered_palette_device> m_palette;
 	required_device<deco_146_base_device> m_ioprot;
 	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device_array<okim6295_device, 2> m_oki;
 	optional_device_array<buffered_spriteram16_device, 2> m_spriteram;
 	optional_device_array<decospr_device, 2> m_sprgen;
 
-	required_shared_ptr<u16> m_paletteram;
 	optional_shared_ptr_array<u16, 4> m_rowscroll;
 
-	std::unique_ptr<u8[]> m_dirty_palette{};
 	u16 m_priority = 0;
 
 	u16 irq_ack_r();
 	void irq_ack_w(u16 data);
 	void rohga_buffer_spriteram16_w(u16 data);
-	void buffered_palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void palette_dma_w(u16 data = 0);
 	void priority_w(u16 data);
 	void sound_bankswitch_w(u8 data);
 
@@ -230,11 +225,7 @@ void rohga_state::machine_reset()
 
 void rohga_state::video_start()
 {
-	const int entry = m_palette->entries();
-	m_dirty_palette = make_unique_clear<u8[]>(entry);
-
 	save_item(NAME(m_priority));
-	save_pointer(NAME(m_dirty_palette), entry);
 }
 
 void rohga_state::rohga_buffer_spriteram16_w(u16 data)
@@ -242,32 +233,6 @@ void rohga_state::rohga_buffer_spriteram16_w(u16 data)
 	// Spriteram seems to be triple buffered (no sprite lag on real PCB, but there
 	// is on driver with only double buffering)
 	m_spriteram[0]->copy();
-}
-
-void rohga_state::buffered_palette_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_paletteram[offset]);
-
-	m_dirty_palette[offset / 2] = 1;
-}
-
-void rohga_state::palette_dma_w(u16 data)
-{
-	const int m = m_palette->entries();
-
-	for (int i = 0; i < m; i++)
-	{
-		if (m_dirty_palette[i])
-		{
-			m_dirty_palette[i] = 0;
-
-			const u8 b = (m_paletteram[i * 2] >> 0) & 0xff;
-			const u8 g = (m_paletteram[i * 2 + 1] >> 8) & 0xff;
-			const u8 r = (m_paletteram[i * 2 + 1] >> 0) & 0xff;
-
-			m_palette->set_pen_color(i, rgb_t(r, g, b));
-		}
-	}
 }
 
 void rohga_state::priority_w(u16 data)
@@ -657,7 +622,7 @@ void rohga_state::rohga_map(address_map &map)
 
 	map(0x300000, 0x300001).w(FUNC(rohga_state::rohga_buffer_spriteram16_w)); // write 1 for sprite DMA
 	map(0x310000, 0x310009).nopw(); // Palette control?
-	map(0x31000a, 0x31000b).w(FUNC(rohga_state::palette_dma_w)); // Write 1111 for DMA?  (Or any value?)
+	map(0x31000a, 0x31000b).w(m_palette, FUNC(deco_buffered_palette_device::dma_w)); // Write 1111 for DMA?  (Or any value?)
 	map(0x320000, 0x320001).nopw(); // ?
 	map(0x322000, 0x322001).w(FUNC(rohga_state::priority_w));
 	map(0x321100, 0x321101).r(FUNC(rohga_state::irq_ack_r)); // IRQ ack?  Value not used
@@ -673,7 +638,7 @@ void rohga_state::rohga_map(address_map &map)
 	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_rowscroll[3]);
 
 	map(0x3d0000, 0x3d07ff).ram().share("spriteram1");
-	map(0x3e0000, 0x3e1fff).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
+	map(0x3e0000, 0x3e1fff).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
 	map(0x3f0000, 0x3f3fff).ram(); // Main RAM
 }
 
@@ -703,8 +668,8 @@ void rohga_state::wizdfire_map(address_map &map)
 	map(0x360000, 0x3607ff).ram().share("spriteram2");
 	map(0x370000, 0x370001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 
-	map(0x380000, 0x381fff).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
-	map(0x390008, 0x390009).w(FUNC(rohga_state::palette_dma_w));
+	map(0x380000, 0x381fff).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
+	map(0x390008, 0x390009).w(m_palette, FUNC(deco_buffered_palette_device::dma_w));
 
 	map(0xfdc000, 0xfe3fff).ram();
 	map(0xfe4000, 0xfe7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)); // Protection device
@@ -738,8 +703,8 @@ void rohga_state::nitrobal_map(address_map &map)
 	map(0x360000, 0x3607ff).ram().share("spriteram2");
 	map(0x370000, 0x370001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 
-	map(0x380000, 0x381fff).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
-	map(0x390008, 0x390009).w(FUNC(rohga_state::palette_dma_w));
+	map(0x380000, 0x381fff).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
+	map(0x390008, 0x390009).w(m_palette, FUNC(deco_buffered_palette_device::dma_w));
 
 	map(0xfec000, 0xff3fff).ram();
 	map(0xff4000, 0xff7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)); // Protection device
@@ -759,7 +724,7 @@ void rohga_state::hotb_base_map(address_map &map)
 	map(0x300000, 0x300001).portr("DSW3").w(FUNC(rohga_state::rohga_buffer_spriteram16_w)); // write 1 for sprite DMA
 	map(0x310002, 0x310003).portr("SYSTEM");
 	map(0x310000, 0x310009).nopw(); // Palette control?
-	map(0x31000a, 0x31000b).w(FUNC(rohga_state::palette_dma_w)); // Write 1111 for DMA?  (Or any value?)
+	map(0x31000a, 0x31000b).w(m_palette, FUNC(deco_buffered_palette_device::dma_w)); // Write 1111 for DMA?  (Or any value?)
 	map(0x320000, 0x320001).nopw(); // bit 4: cleared on IRQ routine start, set on end
 	map(0x322000, 0x322001).w(FUNC(rohga_state::priority_w));
 	map(0x321100, 0x321101).w(FUNC(rohga_state::irq_ack_w));  // IRQ ack?  Value not used
@@ -774,7 +739,7 @@ void rohga_state::hotb_base_map(address_map &map)
 	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_rowscroll[3]);
 
 	map(0x3d0000, 0x3d07ff).ram().share("spriteram1");
-	map(0x3e0000, 0x3e1fff).mirror(0x2000).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
+	map(0x3e0000, 0x3e1fff).mirror(0x2000).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
 }
 
 void rohga_state::schmeisr_map(address_map &map)
@@ -1366,7 +1331,7 @@ void rohga_state::rohga_base(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 
-	PALETTE(config, m_palette).set_entries(2048);
+	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048, ENDIANNESS_BIG);
 
 	DECO16IC(config, m_tilegen[0]);
 	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x64);
