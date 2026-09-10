@@ -148,4 +148,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, megacrane, 0,     megacrane, megacrane, megacrane_state, empty_init, ROT0, "Elaut", "Megacrane", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME( 2001, megacrane, 0,     megacrane, megacrane, megacrane_state, empty_init, ROT0, "Elaut", "Megacrane", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
