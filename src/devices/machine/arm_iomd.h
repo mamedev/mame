@@ -76,7 +76,6 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(timer_elapsed);
 
-	void base_map(address_map &map) ATTR_COLD;
 	u16 m_id;
 	u8 m_version;
 
@@ -192,6 +191,33 @@ private:
 //  constexpr u8 dmaid_mask = 0x1f;
 };
 
+class arm_iomd20_device : public arm_iomd_device
+{
+public:
+	// construction/destruction
+	arm_iomd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void map(address_map &map) override ATTR_COLD;
+
+	// quadrature mouse input lines
+	void mousex0_w(int state) { mouse_pos_w<0U, 0U>(state); }
+	void mousex1_w(int state) { mouse_pos_w<0U, 1U>(state); }
+	void mousey0_w(int state) { mouse_pos_w<1U, 0U>(state); }
+	void mousey1_w(int state) { mouse_pos_w<1U, 1U>(state); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	template <unsigned Axis, unsigned Signal> void mouse_pos_w(int state);
+
+	template <unsigned Axis> u32 mouse_r();
+	template <unsigned Axis> void mouse_w(u32 data);
+
+	u16 m_mouse_pos[2];
+	bool m_mouse_flag[2];
+};
+
 class arm7500fe_iomd_device : public arm_iomd_device
 {
 public:
@@ -226,7 +252,7 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ARM_IOMD, arm_iomd_device)
+DECLARE_DEVICE_TYPE(ARM_IOMD20, arm_iomd20_device)
 DECLARE_DEVICE_TYPE(ARM7500FE_IOMD, arm7500fe_iomd_device)
 
 
