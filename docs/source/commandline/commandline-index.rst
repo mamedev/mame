@@ -79,6 +79,8 @@ OSD Output Options
 ~~~~~~~~~~~~~~~~~~
 
 | :ref:`output <mame-commandline-output>`
+| :ref:`output_serial_port <mame-commandline-output-serial-port>`
+| :ref:`output_serial_baud <mame-commandline-output-serial-baud>`
 
 
 Configuration Options
