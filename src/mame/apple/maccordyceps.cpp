@@ -1,9 +1,9 @@
-
-
+// license:BSD-3-Clause
+// copyright-holders:wurthless-elektroniks, R. Belmont
 /****************************************************************************
 
     Power Macintosh x200/x300 "Cordyceps" hardware
-    Heavily based on maccquadra630.cpp
+    Heavily based on maccquadra630.cpp by R. Belmont
 
 	The bootrom calls this board "Cordyceps" ("Boot Cordyceps 6")
 	but the Apple codenames "Crusader" and "Elixir" are better known.

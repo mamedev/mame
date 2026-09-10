@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:wurthless-elektroniks
 /****************************************************************************
 
     Apple "Capella" (343S1181) PowerPC-to-68k bus bridge
