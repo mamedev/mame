@@ -692,6 +692,8 @@ void st2204_device::common_map(address_map &map)
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	// PCL is listed as write-only in ST2202 specification, but DynamiDesk suggests otherwise
 	map(0x004e, 0x004e).rw(FUNC(st2204_device::pcl_r), FUNC(st2204_device::pcl_w));
+	map(0x0050, 0x0050).rw(FUNC(st2204_device::sdatal_r), FUNC(st2204_device::sdatal_w));
+	map(0x0051, 0x0051).rw(FUNC(st2204_device::sdatah_r), FUNC(st2204_device::sdatah_w));
 	map(0x0052, 0x0052).rw(FUNC(st2204_device::sctr_r), FUNC(st2204_device::sctr_w));
 	map(0x0053, 0x0053).rw(FUNC(st2204_device::sckr_r), FUNC(st2204_device::sckr_w));
 	map(0x0054, 0x0054).rw(FUNC(st2204_device::ssr_r), FUNC(st2204_device::ssr_w));

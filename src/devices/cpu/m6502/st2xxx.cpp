@@ -49,6 +49,7 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
 	, m_in_port_cb(*this, 0xff)
 	, m_out_port_cb(*this)
+	, m_spi_exchange_cb(*this)
 	, m_prr_mask(data_bits <= 14 ? 0 : ((u16(1) << (data_bits - 14)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_drr_mask(data_bits <= 15 ? 0 : ((u16(1) << (data_bits - 15)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_pdata{0}
@@ -84,6 +85,12 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_sckr(0)
 	, m_ssr(0)
 	, m_smod(0)
+	, m_sdata_tx(0)
+	, m_sdata_rx(0)
+	, m_spi_pending_rx(0)
+	, m_spi_busy(false)
+	, m_spi_tx_pending(false)
+	, m_spi_timer(nullptr)
 	, m_uctr(0)
 	, m_usr(0)
 	, m_irctr(0)
@@ -201,9 +208,16 @@ void st2xxx_device::save_common_registers()
 	}
 	if (st2xxx_has_spi())
 	{
+		m_spi_exchange_cb.resolve();
+		m_spi_timer = timer_alloc(FUNC(st2xxx_device::spi_complete), this);
 		save_item(NAME(m_sctr));
 		save_item(NAME(m_sckr));
 		save_item(NAME(m_ssr));
+		save_item(NAME(m_sdata_tx));
+		save_item(NAME(m_sdata_rx));
+		save_item(NAME(m_spi_pending_rx));
+		save_item(NAME(m_spi_busy));
+		save_item(NAME(m_spi_tx_pending));
 		if (st2xxx_spi_iis())
 			save_item(NAME(m_smod));
 	}
@@ -272,6 +286,13 @@ void st2xxx_device::device_reset()
 	m_sckr = 0;
 	m_ssr = 0;
 	m_smod = 0;
+	m_sdata_tx = 0;
+	m_sdata_rx = 0;
+	m_spi_pending_rx = 0;
+	m_spi_busy = false;
+	m_spi_tx_pending = false;
+	if (m_spi_timer != nullptr)
+		m_spi_timer->adjust(attotime::never);
 
 	// reset UART and BRG
 	m_uctr = 0;
@@ -802,11 +823,105 @@ u8 st2xxx_device::sctr_r()
 
 void st2xxx_device::sctr_w(u8 data)
 {
-	// TXEMP on wakeup?
+	// TODO: Slave operation, external SS/data-ready signals, collision/mode-fault
+	// status and IIS mode are not implemented.
+
+	// Enabling SPI resets its internal state and leaves the transmit buffer empty.
 	if (!BIT(m_sctr, 7) && BIT(data, 7))
-		m_ssr |= 0x20;
+	{
+		m_spi_timer->adjust(attotime::never);
+		m_sdata_tx = 0;
+		m_sdata_rx = 0;
+		m_spi_pending_rx = 0;
+		m_spi_busy = false;
+		m_spi_tx_pending = false;
+		m_ssr = 0x20;
+	}
+	else if (BIT(m_sctr, 7) && !BIT(data, 7))
+	{
+		m_spi_timer->adjust(attotime::never);
+		m_spi_pending_rx = 0;
+		m_spi_busy = false;
+		m_spi_tx_pending = false;
+		m_ssr &= ~0x10;
+	}
 
 	m_sctr = data;
+
+	// A word loaded in slave mode begins shifting if the interface is changed to master mode.
+	if (BIT(m_sctr, 7) && BIT(m_sctr, 0) && !m_spi_busy && m_spi_tx_pending)
+		spi_start();
+}
+
+u8 st2xxx_device::sdatal_r()
+{
+	if (!machine().side_effects_disabled())
+		m_ssr &= ~0x42;
+	return u8(m_sdata_rx);
+}
+
+void st2xxx_device::sdatal_w(u8 data)
+{
+	m_sdata_tx = (m_sdata_tx & 0xff00) | data;
+	m_spi_tx_pending = true;
+	m_ssr &= ~0x20;
+
+	if (BIT(m_sctr, 7) && BIT(m_sctr, 0) && !m_spi_busy)
+		spi_start();
+}
+
+u8 st2xxx_device::sdatah_r()
+{
+	return m_sdata_rx >> 8;
+}
+
+void st2xxx_device::sdatah_w(u8 data)
+{
+	m_sdata_tx = (m_sdata_tx & 0x00ff) | u16(data) << 8;
+}
+
+void st2xxx_device::spi_start()
+{
+	assert(BIT(m_sctr, 7));
+	assert(BIT(m_sctr, 0));
+	assert(!m_spi_busy);
+	assert(m_spi_tx_pending);
+
+	u8 const bits = (m_sckr & 0x0f) + 1;
+	u16 const mask = bits == 16 ? 0xffff : (u16(1) << bits) - 1;
+	m_spi_pending_rx = m_spi_exchange_cb.isnull() ? mask : m_spi_exchange_cb(m_sdata_tx & mask, bits) & mask;
+	m_spi_tx_pending = false;
+	m_spi_busy = true;
+	m_ssr |= 0x30;
+
+	// The transmit request occurs when the shift register takes the buffered word.
+	m_ireq |= 0x0100;
+	update_irq_state();
+
+	unsigned const clocks = bits * (2U << ((m_sckr >> 4) & 0x07));
+	m_spi_timer->adjust(cycles_to_attotime(clocks));
+}
+
+TIMER_CALLBACK_MEMBER(st2xxx_device::spi_complete)
+{
+	m_spi_busy = false;
+	m_ssr &= ~0x10;
+
+	bool const overrun = BIT(m_ssr, 6);
+	if (overrun)
+		m_ssr |= 0x02;
+	m_sdata_rx = m_spi_pending_rx;
+	m_ssr |= 0x40;
+
+	if (BIT(m_sctr, 6) || (overrun && BIT(m_sctr, 5)))
+	{
+		m_ireq |= 0x0200;
+		update_irq_state();
+	}
+
+	// A waiting transmit buffer is reloaded without a gap between words.
+	if (BIT(m_sctr, 7) && BIT(m_sctr, 0) && m_spi_tx_pending)
+		spi_start();
 }
 
 u8 st2xxx_device::sckr_r()
@@ -827,7 +942,7 @@ u8 st2xxx_device::ssr_r()
 void st2xxx_device::ssr_w(u8 data)
 {
 	// Write any value to clear
-	m_ssr = 0;
+	m_ssr = m_spi_busy ? 0x10 : 0;
 }
 
 u8 st2xxx_device::smod_r()
