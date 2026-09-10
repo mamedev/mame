@@ -9,6 +9,15 @@ TODO:
 - a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
 - rename a7000/p to aa7000/p for consistency with aa310 driver (helps from command line)
 
+TODO (rpc600):
+- no sound, no option to set 16-bit in Configure, is it using VIDC10 compatible sound only?
+
+TODO (a7000):
+- farty sound beeps on this specific model alone;
+
+TODO (a7000p -bios 0):
+- Doesn't boot, ROM is same as sarpc one (incompatible with non-StrongARM?)
+
 TODO (a7000p -bios 2):
 - Hangs at boot with nullptr ide1:0 option (strike ESC key several times until Boot menu appears,
   then disable it in Configure machine item);
@@ -19,9 +28,11 @@ TODO (a7000p -bios 2):
 - No VIDC10 sound even if configured in games, needs support in IOMD sound DMA;
 
 Notes:
+- https://wiki.mamedev.org/index.php?title=Driver:RiscOS
 - CTRL + F12 brings a Task window in Risc OS 4+ when in Desktop;
 - https://www.riscosopen.org/wiki/documentation/show/CLI%20Basics%20part%201#TOC1
 - "Configure SoundSystem 8bit" in CLI to attempt using older VIDC10 sound system (after reboot);
+- "Configure MouseType 0" for making quadrature mouse to work with rpc600/rpc700/sarpc
 
 **************************************************************************************************/
 
@@ -189,22 +200,19 @@ void riscpc_state::riscpc_map(address_map &map)
 {
 	a7000_map(map);
 	map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM
-	map(0x03210400, 0x03210400).r("mouse", FUNC(riscpc_mouse_device::buttons_r)); // TODO: monitor ID bit
+//	map(0x03210400, 0x03210400).r("mouse", FUNC(riscpc_mouse_device::buttons_r)); // TODO: monitor ID bit
 }
 
 
 /* Input ports */
-static INPUT_PORTS_START( a7000 )
+static INPUT_PORTS_START( riscpc )
 	PORT_START("MISC")
 	// for debugging we leave video and sound HWs as options, eventually slotify them
 	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
 	PORT_CONFSETTING(    0x00, "VGA" )
 	PORT_CONFSETTING(    0x01, "TV Screen" )
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
-	// TODO: unmap for non-quadrature mouse variants
-	//PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)
-	//PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)
-	//PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("mouse", FUNC(riscpc_mouse_device::buttons_r))
 	// TODO: understand condition where this occurs
 	PORT_CONFNAME( 0x80, 0x00, "CMOS Reset bit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -213,6 +221,13 @@ static INPUT_PORTS_START( a7000 )
 	PORT_CONFSETTING(    0x000, "16-bit" )
 	PORT_CONFSETTING(    0x100, "8-bit" )
 	PORT_BIT(0xfffffe00, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( a7000 )
+	PORT_INCLUDE( riscpc )
+
+	PORT_MODIFY("MISC")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 void riscpc_state::machine_start()
@@ -451,7 +466,8 @@ void riscpc_state::sarpc_j233(machine_config &config)
 	quad_mouse(config);
 }
 
-// TODO: BIOS revisions are identical for all computers, may warrant a dummy MACHINE_IS_BIOS_ROOT romset to hold them all instead.
+// TODO: BIOS revisions are identical for all computers (except StrongARM based?)
+// may warrant a dummy MACHINE_IS_BIOS_ROOT romset to hold them all instead.
 
 ROM_START(rpc600)
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
@@ -519,9 +535,9 @@ ROM_END
 ***************************************************************************/
 
 
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, empty_init, "Acorn Computers", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, empty_init, "Acorn Computers", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, empty_init, "Acorn Computers", "Acorn A7000",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, empty_init, "Acorn Computers", "Acorn A7000+",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, sarpc,      0,      0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn Computers", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, sarpc_j233, sarpc,  0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn Computers", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, rpc600,     0,      0,      rpc600,     riscpc, riscpc_state, empty_init, "Acorn Computers", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     riscpc, riscpc_state, empty_init, "Acorn Computers", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000,  riscpc_state, empty_init, "Acorn Computers", "Acorn A7000",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000,  riscpc_state, empty_init, "Acorn Computers", "Acorn A7000+",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, sarpc,      0,      0,      sarpc,      riscpc, riscpc_state, empty_init, "Acorn Computers", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, sarpc_j233, sarpc,  0,      sarpc_j233, riscpc, riscpc_state, empty_init, "Acorn Computers", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

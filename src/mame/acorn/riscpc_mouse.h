@@ -13,7 +13,7 @@ class riscpc_mouse_device
 public:
 	riscpc_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	u8 buttons_r();
+	ioport_value buttons_r();
 
 protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
