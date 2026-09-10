@@ -1047,12 +1047,16 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			);
 			const u16 woffset8 =  ((m_cel.pre1 >> 24) & 0x7f) + 2;
 			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
+			// TODO: should be bits 31-24 -> 7-0
+			// (doc claims integer, signed?)
+			if (bpp < 5 && BIT(m_cel.pre1, 31))
+				popmessage("3do_madam.cpp: CEL check woffset8 (bpp=%d pre1=%08x)", bpp, m_cel.pre1);
 			const u16 woffset = bpp >= 5 ? woffset10 : woffset8;
 			const bool lrform = !!BIT(m_cel.pre1, 11);
 			const u16 tlhpcnt = ((m_cel.pre1 >> 0) & 0x7ff) + 1;
-			LOGCEL("    woffset(8)=%d woffset(10)=%d noswap=%d unclsb=%d lrform=%d tlhpcnt=%d\n"
-				, woffset8
-				, woffset10
+			LOGCEL("    woffset(%d)=%d noswap=%d unclsb=%d lrform=%d tlhpcnt=%d\n"
+				, 8 + ((bpp >= 5) * 2)
+				, woffset
 				, BIT(m_cel.pre1, 14)
 				, (m_cel.pre1 >> 12) & 3
 				, lrform
@@ -1153,7 +1157,18 @@ u16 madam_device::get_woffset8(u32 ptr)
 
 u16 madam_device::get_woffset10(u32 ptr)
 {
-	return ((m_dma8_read_cb(ptr) << 8) | (m_dma8_read_cb(ptr + 1))) + 2;
+	const u8 vh = m_dma8_read_cb(ptr);
+	// TODO: bam CEL setups are suspect
+	// All its source pointers in intro/title/main menu going *inside* "PDAT" file headers,
+	// including the unpacked versions. Doc claims to not set the other woffset bits,
+	// i.e. don't set woffset8 bits 31-24 when using woffset10 25-16 and viceversa ...
+	//if (vh & 0xfc)
+	//	return 2;
+
+	const u8 vl = m_dma8_read_cb(ptr + 1);
+	// TODO: verify rollover
+	// (bam also needs this)
+	return ((vh << 8 | vl) & 0x3ff) + 2;
 }
 
 std::tuple<u8, u32> madam_device::fetch_byte(u32 ptr, u8 frac)

@@ -111,7 +111,9 @@ Sensitive to CEL timings
 		</part>
 	</software>
 
-	<!-- TODO: Puzzle Bobble published by Micro Cabin -->
+	<!-- TODO: pbobble: Puzzle Bobble (Japan) published by Micro Cabin -->
+	<!-- https://redump.info/disc/24312 -->
+	<!-- ... -->
 
 	<!-- https://redump.info/disc/45883 -->
 	<software name="cfodder" supported="no">
@@ -301,6 +303,7 @@ Has gameplay RNG bugs, background is always cyan and starting hands are always s
 [Madam] PIXC example on title screen, ugly 1bpp CEL in versus screen, doesn't repeat CEL background properly in gameplay
 Bonus section (3rd option) is untested
 ]]></notes>
+		<!-- TODO: must have a cheat for selecting stage, game doesn't use NVRAM -->
 		<info name="alt_title" value="おやじハンターマージャン"/>
 		<info name="barcode" value="4973934234512"/>
 		<info name="release" value="19950714"/>
@@ -384,7 +387,7 @@ Not extensively tested
 		<notes><![CDATA[
 [AMY] sets wrong strips on intro logos
 [Sport] missing layer clearances
-[Madam] Intro has major CEL glitches, has 1bpp/2bpp CELs issues in options menu and Arcade mode cursors
+[Madam] minor RMW bug in options menu, offset "select game speed" in character select
 Sensitive to CEL timings
 Eventually requires support for [Player] Capcom fighting pad
 ]]></notes>

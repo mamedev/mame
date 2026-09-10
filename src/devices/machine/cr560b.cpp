@@ -366,6 +366,8 @@ uint8_t cr560b_device::read()
 				}
 			}
 		}
+		else
+			popmessage("cr560b.cpp: read data while not ready");
 	}
 
 	return data;
