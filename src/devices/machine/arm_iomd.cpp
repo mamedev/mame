@@ -41,7 +41,7 @@ enum keyboard_status_register : u8
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(ARM_IOMD, arm_iomd_device, "arm_iomd", "ARM IOMD controller")
+DEFINE_DEVICE_TYPE(ARM_IOMD20, arm_iomd20_device, "arm_iomd20", "ARM IOMD20 controller")
 // TODO: ssfindo.cpp actually uses a Cirrus Logic 7500FE, is it rebadged?
 DEFINE_DEVICE_TYPE(ARM7500FE_IOMD, arm7500fe_iomd_device, "arm_7500fe_soc", "ARM 7500FE SoC")
 
@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(ARM7500FE_IOMD, arm7500fe_iomd_device, "arm_7500fe_soc", "ARM
 //  arm_iomd_device - constructor
 //-------------------------------------------------
 
-void arm_iomd_device::base_map(address_map &map)
+void arm_iomd_device::map(address_map &map)
 {
 	// I/O
 	map(0x000, 0x003).rw(FUNC(arm_iomd_device::iocr_r), FUNC(arm_iomd_device::iocr_w));
@@ -93,8 +93,6 @@ void arm_iomd_device::base_map(address_map &map)
 	map(0x094, 0x097).r(FUNC(arm_iomd_device::id_r<0>));
 	map(0x098, 0x09b).r(FUNC(arm_iomd_device::id_r<1>));
 	map(0x09c, 0x09f).r(FUNC(arm_iomd_device::version_r));
-	// mouse
-//  map(0x0a0, 0x0a3) // ...
 
 	// I/O control
 //  map(0x0c4, 0x0c7).rw(FUNC(arm_iomd_device::iotcr_r), FUNC(arm_iomd_device::iotcr_w));
@@ -126,17 +124,18 @@ void arm_iomd_device::base_map(address_map &map)
 //  TODO: iomd2 has extra regs in 0x200-0x3ff area, others NOPs / mirrors?
 }
 
-void arm_iomd_device::map(address_map &map)
+void arm_iomd20_device::map(address_map &map)
 {
-	arm_iomd_device::base_map(map);
+	arm_iomd_device::map(map);
+
 //  map(0x088, 0x08b).rw(FUNC(arm_iomd_device::dramcr_r), FUNC(arm_iomd_device::dramcr_w));
 	// VRAM control
 //  map(0x08c, 0x08f).rw(FUNC(arm_iomd_device::vrefcr_r), FUNC(arm_iomd_device::vrefcr_w));
 	// flyback line size
 //  map(0x090, 0x093).rw(FUNC(arm_iomd_device::fsize_r), FUNC(arm_iomd_device::fsize_w));
 	// quadrature mouse control
-//  map(0x0a0, 0x0a3).rw(FUNC(arm_iomd_device::mousex_r), FUNC(arm_iomd_device::mousex_w));
-//  map(0x0a4, 0x0a7).rw(FUNC(arm_iomd_device::mousey_r), FUNC(arm_iomd_device::mousey_w));
+	map(0x0a0, 0x0a3).rw(FUNC(arm_iomd20_device::mouse_r<0>), FUNC(arm_iomd20_device::mouse_w<0>));
+	map(0x0a4, 0x0a7).rw(FUNC(arm_iomd20_device::mouse_r<1>), FUNC(arm_iomd20_device::mouse_w<1>));
 	// DACK timing control
 //  map(0x0c0, 0x0c3).rw(FUNC(arm_iomd_device::dmatcr_r), FUNC(arm_iomd_device::dmatcr_w));
 	// DMA external control
@@ -174,8 +173,10 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 {
 }
 
-arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm_iomd_device(mconfig, ARM_IOMD, tag, owner, clock)
+arm_iomd20_device::arm_iomd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm_iomd_device(mconfig, ARM_IOMD20, tag, owner, clock)
+	, m_mouse_pos{}
+	, m_mouse_flag{}
 {
 	m_id = 0xd4e7;
 	m_version = 0;
@@ -183,7 +184,7 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag,
 
 void arm7500fe_iomd_device::map(address_map &map)
 {
-	arm_iomd_device::base_map(map);
+	arm_iomd_device::map(map);
 
 	map(0x00c, 0x00f).rw(FUNC(arm7500fe_iomd_device::iolines_r), FUNC(arm7500fe_iomd_device::iolines_w));
 	// master clock controls
@@ -238,10 +239,25 @@ arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, cons
 //  configuration addiitons
 //-------------------------------------------------
 
+template <unsigned Axis, unsigned Signal> void arm_iomd20_device::mouse_pos_w(int state)
+{
+	if (m_mouse_flag[Axis] == bool(Signal))
+		// signal 0 leads, negative
+		m_mouse_pos[Axis]--;
+	else
+		// signal 1 leads, positive
+		m_mouse_pos[Axis]++;
+
+	m_mouse_flag[Axis] = !m_mouse_flag[Axis];
+}
+
+template void arm_iomd20_device::mouse_pos_w<0U, 0U>(int state);
+template void arm_iomd20_device::mouse_pos_w<0U, 1U>(int state);
+template void arm_iomd20_device::mouse_pos_w<1U, 0U>(int state);
+template void arm_iomd20_device::mouse_pos_w<1U, 1U>(int state);
+
 void arm_iomd_device::device_add_mconfig(machine_config &config)
 {
-	//TODO: hookup mouse quadrature interface here ...
-
 	AT_SSRT(config, m_ssrt);
 	m_ssrt->rp().set(FUNC(arm_iomd_device::kbd_rxp_w));
 	m_ssrt->rx().set(FUNC(arm_iomd_device::kbd_rxf_w));
@@ -252,7 +268,7 @@ void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 {
 	arm_iomd_device::device_add_mconfig(config);
 
-	//TODO: ... replace quadrature mouse with AUX PS/2
+	// TODO: add AUX PS/2 mouse
 }
 
 //-------------------------------------------------
@@ -297,6 +313,14 @@ void arm_iomd_device::device_start()
 	save_pointer(NAME(m_sndbuffer_ok), std::size(m_sndbuffer_ok));
 
 	// TODO: jumps to EASI space at $0c0016xx for RiscPC if POR is on?
+}
+
+void arm_iomd20_device::device_start()
+{
+	arm_iomd_device::device_start();
+
+	save_item(NAME(m_mouse_pos));
+	save_item(NAME(m_mouse_flag));
 }
 
 void arm7500fe_iomd_device::device_start()
@@ -471,6 +495,16 @@ void arm_iomd_device::kbd_txe_w(int state)
 		m_kbdsr &= ~KSR_TXE;
 		irqrq_w<IRQB>(0x40);
 	}
+}
+
+template <unsigned Axis> u32 arm_iomd20_device::mouse_r()
+{
+	return u32(m_mouse_pos[Axis]);
+}
+
+template <unsigned Axis> void arm_iomd20_device::mouse_w(u32 data)
+{
+	m_mouse_pos[Axis] = u16(data);
 }
 
 u32 arm7500fe_iomd_device::msedat_r()

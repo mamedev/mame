@@ -14,7 +14,7 @@
 DEFINE_DEVICE_TYPE(QUADENCODER, quadencoder_device, "quadencoder", "Generic quadature encoder support")
 DEFINE_DEVICE_TYPE(QUADMOUSE, quadmouse_device, "quadmouse", "Generic quadrature mouse support")
 
-static INPUT_PORTS_START(quadmouse)
+INPUT_PORTS_START(quadmouse)
 	PORT_START("x")
 	PORT_BIT(0xf000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0fff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER("encoder_x", FUNC(quadencoder_device::changed), 0)
@@ -105,7 +105,12 @@ TIMER_CALLBACK_MEMBER(quadencoder_device::tick)
 }
 
 quadmouse_device::quadmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, QUADMOUSE, tag, owner, clock),
+	quadmouse_device(mconfig, QUADMOUSE, tag, owner, clock)
+{
+}
+
+quadmouse_device::quadmouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_enc_x(*this, "encoder_x"),
 	m_enc_y(*this, "encoder_y"),
 	m_port_x(*this, "x"),

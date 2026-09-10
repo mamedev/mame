@@ -26,7 +26,7 @@ Notes:
 **************************************************************************************************/
 
 #include "emu.h"
-
+#include "riscpc_mouse.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/rs232/hlemouse.h"
@@ -70,7 +70,7 @@ public:
 		, m_kbdc(*this, "kbdc")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
-		, m_mouse(*this, "MOUSE")
+		, m_misc(*this, "MISC")
 	{ }
 
 	void rpc700(machine_config &config);
@@ -82,6 +82,7 @@ public:
 
 private:
 	void base_config(machine_config &config);
+	void quad_mouse(machine_config &config);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
@@ -91,7 +92,7 @@ private:
 	required_device<pc_kbdc_device> m_kbdc;
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
-	required_ioport m_mouse;
+	required_ioport m_misc;
 
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
@@ -172,7 +173,7 @@ void riscpc_state::a7000_map(address_map &map)
 //  map(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
 //	map(0x03240000, 0x032400ff) a7000p -bios 0 (podule mirror?)
-	map(0x03310000, 0x03310003).portr(m_mouse);
+	map(0x03310000, 0x03310003).portr(m_misc);
 //  map(0x033a0004, 0x033a0004) // topbanan, joystick?
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
@@ -188,21 +189,22 @@ void riscpc_state::riscpc_map(address_map &map)
 {
 	a7000_map(map);
 	map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM
+	map(0x03210400, 0x03210400).r("mouse", FUNC(riscpc_mouse_device::buttons_r)); // TODO: monitor ID bit
 }
 
 
 /* Input ports */
 static INPUT_PORTS_START( a7000 )
-	PORT_START("MOUSE")
+	PORT_START("MISC")
 	// for debugging we leave video and sound HWs as options, eventually slotify them
 	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
 	PORT_CONFSETTING(    0x00, "VGA" )
 	PORT_CONFSETTING(    0x01, "TV Screen" )
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	// TODO: unmap for non-quadrature mouse variants
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)
+	//PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)
+	//PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)
+	//PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)
 	// TODO: understand condition where this occurs
 	PORT_CONFNAME( 0x80, 0x00, "CMOS Reset bit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -358,6 +360,16 @@ void riscpc_state::base_config(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_compatible("archimedes");
 }
 
+void riscpc_state::quad_mouse(machine_config &config)
+{
+	// TODO: figure out which x/y directions are positive/negative
+	riscpc_mouse_device &mouse(RISCPC_MOUSE(config, "mouse"));
+	mouse.write_right().set(m_iomd, FUNC(arm_iomd20_device::mousex0_w));
+	mouse.write_left().set(m_iomd, FUNC(arm_iomd20_device::mousex1_w));
+	mouse.write_up().set(m_iomd, FUNC(arm_iomd20_device::mousey0_w));
+	mouse.write_down().set(m_iomd, FUNC(arm_iomd20_device::mousey1_w));
+}
+
 void riscpc_state::rpc600(machine_config &config)
 {
 	constexpr XTAL cpuxtal(60_MHz_XTAL/2);
@@ -365,8 +377,9 @@ void riscpc_state::rpc600(machine_config &config)
 	ARM610(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD20(config, m_iomd, cpuxtal);
 	base_config(config);
+	quad_mouse(config);
 }
 
 void riscpc_state::rpc700(machine_config &config)
@@ -375,8 +388,9 @@ void riscpc_state::rpc700(machine_config &config)
 	ARM710A(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD20(config, m_iomd, cpuxtal);
 	base_config(config);
+	quad_mouse(config);
 }
 
 void riscpc_state::a7000(machine_config &config)
@@ -419,8 +433,9 @@ void riscpc_state::sarpc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
 	// TODO: bump me up, check VIDC clocks
-	ARM_IOMD(config, m_iomd, cpuxtal * 44);
+	ARM_IOMD20(config, m_iomd, cpuxtal * 44);
 	base_config(config);
+	quad_mouse(config);
 }
 
 void riscpc_state::sarpc_j233(machine_config &config)
@@ -431,8 +446,9 @@ void riscpc_state::sarpc_j233(machine_config &config)
 	SA110(config, m_maincpu, cpuxtal * 64);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM_IOMD(config, m_iomd, cpuxtal * 64);
+	ARM_IOMD20(config, m_iomd, cpuxtal * 64);
 	base_config(config);
+	quad_mouse(config);
 }
 
 // TODO: BIOS revisions are identical for all computers, may warrant a dummy MACHINE_IS_BIOS_ROOT romset to hold them all instead.
