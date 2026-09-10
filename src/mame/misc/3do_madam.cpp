@@ -1048,8 +1048,11 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
 			static const char *const BPP_VALUES[8] = { "<0 reserved>", "1bpp", "2bpp", "4bpp", "6bpp", "8bpp", "16bpp", "<7 reserved>" };
 
+			// - ssf2xj "Select Game Speed" in Arcade mode
+			const u8 skipx = (m_cel.pre0 >> 24) & 0xf;
+
 			LOGCEL("    skipx=%d vcnt=%d uncoded=%d rep8=%d bpp=%d (%s)\n"
-				, (m_cel.pre0 >> 24) & 0xf
+				, skipx
 				, vcnt
 				, uncoded
 				, BIT(m_cel.pre0, 3)
@@ -1107,7 +1110,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
 							continue;
 
-						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset);
+						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x + skipx, y, woffset);
 
 						// opaque check
 						if (!(src_data & 0x7fff) && !m_cel.bgnd)
