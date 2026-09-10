@@ -605,13 +605,14 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 	for (int i = 1; i < 5; i++)
 	{
 		int j = i - 1;
+		int key = sorted[i];
 
-		while (j >= 0 && clips[sorted[j]].min_x > clips[sorted[i]].min_x)
+		while (j >= 0 && clips[sorted[j]].min_x > clips[key].min_x)
 		{
 			sorted[j + 1] = sorted[j];
 			j--;
 		}
-		sorted[j + 1] = sorted[i];
+		sorted[j + 1] = key;
 	}
 
 	// create all valid extent combinations
@@ -751,13 +752,14 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 				for (int i = 1; i < 5; i++)
 				{
 					int j = i - 1;
+					int key = linesorted[i];
 
-					while (j >= 0 && lineclips[linesorted[j]].min_x > lineclips[linesorted[i]].min_x)
+					while (j >= 0 && lineclips[linesorted[j]].min_x > lineclips[key].min_x)
 					{
 						linesorted[j + 1] = linesorted[j];
 						j--;
 					}
-					linesorted[j + 1] = linesorted[i];
+					linesorted[j + 1] = key;
 				}
 
 				*extent++ = tempclip.min_x;
