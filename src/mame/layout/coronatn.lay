@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+license: CC0-1.0
+-->
+<mamelayout version="2">
+	<!-- debug lamp - used for lamps with debug information -->
+	<repeat count="256">
+		<param name="n" start="0" increment="1"/>
+		<element name="debug_lamp_label_~n~">
+				<rect state="0">
+					<color red="0.00" green="0.20" blue="0.00"/>
+				</rect>
+				<rect state="1">
+					<color red="0.00" green="1.00" blue="0.00"/>
+				</rect>
+			<text string="~n~">
+				<color red="0.0" green="0.0" blue="0.0"/>
+				<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+			</text>
+		</element>
+	</repeat>
+
+	<element name="button_1">
+		<rect state="1"><color red="0.74" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.37" green="0.00" blue="0.00" /></rect>
+		<text string="1">
+			<color red="0.10" green="0.00" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="button_2">
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.50" blue="0.00" /></rect>
+		<text string="2">
+			<color red="0.10" green="0.10" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="button_3">
+		<rect state="1"><color red="0.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.00" green="0.25" blue="0.00" /></rect>
+		<text string="3">
+			<color red="0.00" green="0.10" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="collect_button">
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.50" blue="0.00" /></rect>
+		<text string="Collect">
+			<color red="0.10" green="0.10" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+	</element>
+	<element name="ask_ken_button">
+		<disk state="1"><color red="0.20" green="0.20" blue="1.00" /></disk>
+		<disk state="0"><color red="0.10" green="0.10" blue="0.30" /></disk>
+		<text string="Ask">
+			<color red="1.00" green="1.00" blue="0.00" />
+			<bounds x="0.10" y="0.10" width="0.8" height="0.4" />
+		</text>
+		<text string="Ken">
+			<color red="1.00" green="1.00" blue="0.00" />
+			<bounds x="0.10" y="0.50" width="0.8" height="0.4" />
+		</text>
+	</element>
+
+	<element name="coronation_st_backlight">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+	</element>
+	<element name="quiz_game_backlight">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+	</element>
+	<element name="prize_backlight">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+	</element>
+	<element name="coronation_st_sign">
+		<text string="CORONATION ST.">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="quiz_game_sign">
+		<text string="Quiz Game">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="prize_sign">
+		<text string="AH JACK! IT'S A £40 TOP PRIZE!">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+	<view name="Control Panel">
+		<screen index="0">
+			<bounds x="0" y="0" width="800" height="600" />
+		</screen>
+
+		<!-- lamps 14 and 15 are part of the lamp test, but have an unknown function
+
+		    <element name="lamp14" ref="debug_lamp_label_14" state="0">
+		        <bounds x="0" y="850" width="50" height="50"/>
+		    </element>
+		    <element name="lamp15" ref="debug_lamp_label_15" state="0">
+		        <bounds x="50" y="850" width="50" height="50"/>
+		    </element>
+		-->
+
+
+		<element name="lamp64" ref="coronation_st_backlight" state="0">
+			<bounds x="-160" y="-300" width="160" height="150"/>
+		</element>
+		<element name="lamp65" ref="coronation_st_backlight" state="0">
+			<bounds x="0" y="-300" width="160" height="150"/>
+		</element>
+		<element name="lamp66" ref="coronation_st_backlight" state="0">
+			<bounds x="160" y="-300" width="160" height="150"/>
+		</element>
+		<element name="lamp67" ref="coronation_st_backlight" state="0">
+			<bounds x="320" y="-300" width="160" height="150"/>
+		</element>
+		<element name="lamp68" ref="coronation_st_backlight" state="0">
+			<bounds x="480" y="-300" width="160" height="150"/>
+		</element>
+		<element name="lamp69" ref="coronation_st_backlight" state="0">
+			<bounds x="640" y="-300" width="160" height="150"/>
+		</element>
+		<element name="lamp82" ref="coronation_st_backlight" state="0">
+			<bounds x="800" y="-300" width="160" height="150"/>
+		</element>
+		<element ref="coronation_st_sign" state="0">
+			<bounds x="-160" y="-300" width="1120" height="150"/>
+		</element>
+
+
+		<!-- lamp 70 is part of the lamp test, but has an unknown function
+
+		    <element name="lamp70" ref="debug_lamp_label_70" state="0">
+		        <bounds x="450" y="850" width="50" height="50"/>
+		    </element>
+		-->
+
+
+		<element name="lamp80" ref="quiz_game_backlight" state="0">
+			<bounds x="0" y="-150" width="160" height="150"/>
+		</element>
+		<element name="lamp81" ref="quiz_game_backlight" state="0">
+			<bounds x="160" y="-150" width="160" height="150"/>
+		</element>
+		<element name="lamp73" ref="quiz_game_backlight" state="0">
+			<bounds x="320" y="-150" width="160" height="150"/>
+		</element>
+		<element name="lamp72" ref="quiz_game_backlight" state="0">
+			<bounds x="480" y="-150" width="160" height="150"/>
+		</element>
+		<element name="lamp71" ref="quiz_game_backlight" state="0">
+			<bounds x="640" y="-150" width="160" height="150"/>
+		</element>
+		<element ref="quiz_game_sign" state="0">
+			<bounds x="0" y="-150" width="800" height="150"/>
+		</element>
+
+
+
+		<element name="lamp83" ref="prize_backlight" state="0">
+			<bounds x="0" y="625" width="160" height="50"/>
+		</element>
+		<element name="lamp84" ref="prize_backlight" state="0">
+			<bounds x="160" y="625" width="160" height="50"/>
+		</element>
+		<element name="lamp85" ref="prize_backlight" state="0">
+			<bounds x="320" y="625" width="160" height="50"/>
+		</element>
+		<element name="lamp86" ref="prize_backlight" state="0">
+			<bounds x="480" y="625" width="160" height="50"/>
+		</element>
+		<element name="lamp87" ref="prize_backlight" state="0">
+			<bounds x="640" y="625" width="160" height="50"/>
+		</element>
+		<element ref="prize_sign" state="0">
+			<bounds x="0" y="625" width="800" height="50"/>
+		</element>
+
+
+
+		<element name="lamp51" ref="button_1" state="0" inputtag="J10_0" inputmask="0x04">
+			<bounds x="100" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp52" ref="button_2" state="0" inputtag="J10_0" inputmask="0x08">
+			<bounds x="355" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp53" ref="button_3" state="0" inputtag="J10_0" inputmask="0x10">
+			<bounds x="610" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp50" ref="collect_button" state="0" inputtag="J10_0" inputmask="0x02">
+			<bounds x="825" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp49" ref="ask_ken_button" state="0" inputtag="J10_0" inputmask="0x01">
+			<bounds x="825" y="450" width="100" height="100" />
+		</element>
+
+	</view>
+</mamelayout>
