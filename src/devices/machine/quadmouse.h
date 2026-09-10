@@ -61,7 +61,9 @@ public:
 	bool right_r()  { return m_enc_x->pl_r(); }
 
 protected:
-	// device-level overrides
+	quadmouse_device(const machine_config &mconfig, device_type type,const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 

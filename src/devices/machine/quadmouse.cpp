@@ -105,7 +105,12 @@ TIMER_CALLBACK_MEMBER(quadencoder_device::tick)
 }
 
 quadmouse_device::quadmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, QUADMOUSE, tag, owner, clock),
+	quadmouse_device(mconfig, QUADMOUSE, tag, owner, clock)
+{
+}
+
+quadmouse_device::quadmouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_enc_x(*this, "encoder_x"),
 	m_enc_y(*this, "encoder_y"),
 	m_port_x(*this, "x"),
