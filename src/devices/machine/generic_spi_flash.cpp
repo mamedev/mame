@@ -386,7 +386,7 @@ void generic_spi_flash_device::process_sector_erase_command(u8 data)
 		LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spi_addr);
 		break;
 	default:
-		LOGMASKED(LOG_SPI, "%s unexpected byte %02x when writing sector erase address\n", data);
+		LOGMASKED(LOG_SPI, "unexpected byte %02x when writing sector erase address\n", data);
 		break;
 	}
 }

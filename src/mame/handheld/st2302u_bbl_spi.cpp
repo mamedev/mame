@@ -402,7 +402,7 @@ ROM_START(bbl380)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP) // internal OTPROM BIOS (addresses are different from other sets)
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("bbl 380 180 in 1.bin", 0x000000, 0x400000, BAD_DUMP CRC(146c88da) SHA1(7f18526a6d8cf991f86febce3418d35aac9f49ad))
 	// 0x0022XX, 0x0026XX, 0x002AXX, 0x002CXX, 0x002DXX, 0x0031XX, 0x0036XX, etc. should not be FF fill
 ROM_END
@@ -411,7 +411,7 @@ ROM_START(mc_cb203)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("cb230_st2205u.bin", 0x000000, 0x004000, NO_DUMP) // internal OTPROM BIOS (addresses are different from other sets, including bbl380)
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("s25fl032.bin", 0x000000, 0x400000, CRC(33c4e67b) SHA1(5787db4c8ce4c2569a5f9e9054cbb1944c1b3092))
 ROM_END
 
@@ -420,28 +420,28 @@ ROM_END
 ROM_START(rhhc152)
 	INTERNAL_ROM_TYPE1
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("152_mk25q32amg_ef4016.bin", 0x000000, 0x400000, CRC(5f553895) SHA1(cd21c6ff225e0455531f6b1d9f1c66a284948516))
 ROM_END
 
 ROM_START(ragc153)
 	INTERNAL_ROM_TYPE1
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25q32ams.bin", 0x000000, 0x400000, CRC(de328d73) SHA1(d17b97e9057be4add68b9f5a26e04c9f0a139673)) // first 0x100 bytes would read as 0xff at regular speed, but give valid looking consistent data at a slower rate
 ROM_END
 
 ROM_START(dphh8630)
 	INTERNAL_ROM_TYPE1
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x200000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("bg25q16.bin", 0x000000, 0x200000, CRC(277850d5) SHA1(740087842e1e63bf99b4ca9c1b2053361f267269))
 ROM_END
 
 ROM_START(dgun2953)
 	INTERNAL_ROM_TYPE1
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("dg160_25x32v_ef3016.bin", 0x000000, 0x400000, CRC(2e993bac) SHA1(4b310e326a47df1980aeef38aa9a59018d7fe76f))
 ROM_END
 
@@ -455,15 +455,22 @@ ROM_END
 ROM_START(supreme)
 	INTERNAL_ROM_TYPE1
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25q32.bin", 0x000000, 0x400000, CRC(93072a3d) SHA1(9f8770839032922e64d5ddd8864441357623c45f))
 ROM_END
 
 ROM_START(throwbck)
 	INTERNAL_ROM_TYPE1
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25q32egig.bin", 0x000000, 0x400000, CRC(959eb09d) SHA1(901738e6b6c8fdfe4ed9b268ba3ddd1444551442))
+ROM_END
+
+ROM_START(rocoball)
+	INTERNAL_ROM_TYPE1
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("spi.bin", 0x000000, 0x800000, CRC(59894e3a) SHA1(e05c40de0c52cd8aa972f70e86c77c32cd6b93cc) )
 ROM_END
 
 // sets with 2nd version of internal ROM
@@ -471,28 +478,28 @@ ROM_END
 ROM_START(dphh8633)
 	INTERNAL_ROM_TYPE2
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25lq032.u2", 0x000000, 0x400000, CRC(45b8609a) SHA1(d03615a68465a1a365ba07db0b352424680d62d0) )
 ROM_END
 
 ROM_START(dphh8661)
 	INTERNAL_ROM_TYPE2
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32h.u2", 0x000000, 0x400000, CRC(b91c1dfc) SHA1(97557d10174c74d40aba780398cb2de3974b2f24) )
 ROM_END
 
 ROM_START(retro150)
 	INTERNAL_ROM_TYPE2
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.u2", 0x000000, 0x400000, CRC(294290aa) SHA1(078892b2bb10e347ed07273bafed486e0f52c909) )
 ROM_END
 
 ROM_START(retro150a)
 	INTERNAL_ROM_TYPE2
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("by25q32ess.bin", 0x000000, 0x400000, CRC(ef9e8091) SHA1(5b924d5fd4419956d49379a695b87435df7a1155) )
 ROM_END
 
@@ -506,7 +513,7 @@ ROM_END
 ROM_START(ppg118)
 	INTERNAL_ROM_TYPE2
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25q32.u2", 0x000000, 0x400000, CRC(c96a30b8) SHA1(da2c41e57b852f3a6644a7cbd0d3740e1b0555dc) )
 ROM_END
 
@@ -520,19 +527,19 @@ ROM_END
 ROM_START(toumapet)
 	INTERNAL_ROM_TYPE2
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
 ROM_END
 
 ROM_START(touma560)
-	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
+	INTERNAL_ROM_TYPE2
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("py25q64ha.bin", 0x000000, 0x800000, CRC(7974bf3c) SHA1(8467f869f86b51a86eb115e1408b30daa8f148e7) )
 ROM_END
 
 ROM_START(touma568)
-	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
+	INTERNAL_ROM_TYPE2
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25q64sh.bin", 0x000000, 0x800000, CRC(32f6d834) SHA1(c0dc5b4792a6d86822a666a0f8de7380d1905505) )
@@ -541,23 +548,16 @@ ROM_END
 ROM_START(qpet)
 	INTERNAL_ROM_TYPE2
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x200000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("t25s16.bin", 0x000000, 0x200000, CRC(78a9c285) SHA1(73b0ebe1c88af79fae3357ab3cb4920d685a14f4) )
 ROM_END
 
-
-ROM_START(rocoball)
-	INTERNAL_ROM_TYPE1
-
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
-	ROM_LOAD("spi.bin", 0x000000, 0x800000, CRC(59894e3a) SHA1(e05c40de0c52cd8aa972f70e86c77c32cd6b93cc) )
-ROM_END
 
 ROM_START(tchib158)
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("st2x_internal_tchib158.bin", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_REGION(0x400000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.u2", 0x000000, 0x400000, CRC(274a25ff) SHA1(4c0560ee6cb2d31edd4afdf99adf04ce8d69c6bf) )
 ROM_END
 
@@ -585,6 +585,10 @@ CONS( 201?, arcade10,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl3
 CONS( 201?, supreme,       0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 201?, throwbck,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Westminster", "Throwback Pocket Video Game Console 150+ 8-Bit Games", MACHINE_IMPERFECT_SOUND )
+
+// might not be using the menu protection device, but accesses something there instead
+// could contain corrupt save data
+CONS( 2020, rocoball,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Roco Battle Ball", MACHINE_NOT_WORKING )
 
 // releases with different internal ROM
 
@@ -615,5 +619,3 @@ CONS( 2020, qpet,          0,       0,      bbl380_radio_qpet, bbl380_pet, bbl38
 
 // yet another internal ROM? (doesn't seem to boot with the ones we have)
 CONS( 2022, tchib158,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Tchibo GmbH", "Tchibo 158-in-1 Retro Game", MACHINE_NOT_WORKING )
-
-CONS( 2020, rocoball,      0,       0,      bbl380_menuprot,      bbl380_prot, bbl380_state, empty_init, "<unknown>", "Roco Battle Ball", MACHINE_NOT_WORKING )
