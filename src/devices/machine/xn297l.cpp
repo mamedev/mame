@@ -22,18 +22,10 @@ DEFINE_DEVICE_TYPE(XN297L, xn297l_device, "xn297l", "Panchip XN297L 2.4 GHz tran
 
 xn297l_device::xn297l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, XN297L, tag, owner, clock),
-	m_registers{0},
-	m_tx_fifo{{0}},
-	m_tx_length{0},
-	m_tx_no_ack{0},
 	m_tx_count(0),
-	m_rx_fifo{{0}},
-	m_rx_length{0},
-	m_rx_pipe{0},
 	m_rx_count(0),
 	m_command(CMD_NOP),
 	m_command_pos(0),
-	m_payload{0},
 	m_payload_length(0),
 	m_payload_no_ack(0),
 	m_cs(true),
@@ -44,6 +36,14 @@ xn297l_device::xn297l_device(const machine_config &mconfig, const char *tag, dev
 	m_transmitting(false),
 	m_transmit_timer(nullptr)
 {
+	std::fill(&m_registers[0][0], &m_registers[0][0] + sizeof(m_registers), 0);
+	std::fill(&m_tx_fifo[0][0], &m_tx_fifo[0][0] + sizeof(m_tx_fifo), 0);
+	std::fill(&m_rx_fifo[0][0], &m_rx_fifo[0][0] + sizeof(m_rx_fifo), 0);
+	std::fill(&m_tx_length[0], &m_tx_length[0] + sizeof(m_tx_length), 0);
+	std::fill(&m_tx_no_ack[0], &m_tx_no_ack[0] + sizeof(m_tx_no_ack), 0);
+	std::fill(&m_rx_length[0], &m_rx_length[0] + sizeof(m_rx_length), 0);
+	std::fill(&m_rx_pipe[0], &m_rx_pipe[0] + sizeof(m_rx_pipe), 0);
+	std::fill(&m_payload[0], &m_payload[0] + sizeof(m_payload), 0);
 }
 
 void xn297l_device::device_start()
