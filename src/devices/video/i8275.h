@@ -234,6 +234,7 @@ protected:
 	int m_lpen;
 
 	int m_scanline;
+	int m_column;
 	int m_irq_scanline;
 	int m_vrtc_scanline;
 	int m_vrtc_drq_scanline;
@@ -245,6 +246,9 @@ protected:
 	int m_char_blink;
 	uint8_t m_stored_attr;
 	uint8_t m_field_attr;
+
+	bool m_ibmCRTC;
+	bool m_init;
 
 	// timers
 	emu_timer *m_hrtc_on_timer;
@@ -259,9 +263,16 @@ public:
 	i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class ibm4178629_device : public i8275_device
+{
+public:
+	ibm4178629_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8275, i8275_device)
 DECLARE_DEVICE_TYPE(I8276, i8276_device)
+DECLARE_DEVICE_TYPE(IBM4178629, ibm4178629_device)
 
 #endif // MAME_VIDEO_I8275_H
