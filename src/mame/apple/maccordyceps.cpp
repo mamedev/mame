@@ -12,12 +12,15 @@
 	successor to the 6100, reviewers opened it up and quickly found that
 	it was really a Quadra 630 with a PowerPC 603 grafted onto it,
 	with the expected performance bottlenecks making it perform worse
-	than its predecessor.
+	than its predecessor. Add to that the overall cheapness of the
+	case, poor software support by Mac OS, and unstable clock generators
+	causing freezes on early production boards, and this machine became
+	a perennial contender in the discussion of "worst Mac ever made".
 
-    The often-cited Low End Mac articles listing the issues with the Power Mac 6200
-    mention that the 68k bus is split into "Left 32" and "Right 32" halves.
-    This might really be referring to how the Quadra 630 bus is split into a fast half
-	and a slow half for I/O.
+	The later 5260/100 and 5260/120 upgrade the CPU to a 603e and substitute
+	the PrimeTime II for the PrimeTime III, which adds 16-bit audio.
+	It is not to be confused with the 6360/160, which is a complete redesign
+	and has nothing to do with the Cordyceps architecture.
 
 	The Capella bridge chip, as well as the existence of other PowerPC-to-68k bridge chips,
 	will warrant a cleanup/refactor of some other 68k Mac drivers and devices
@@ -28,7 +31,7 @@
 	but eventually the boot hangs.
 	
 	Machine IDs:
-	pmac5200: 0x3258, 0x325E, 0x3259, 0x325C, 0x325D
+	pmac5200: 0x3258, 0x3259, 0x325C, 0x325D, 0x325E
 	pmac6200: 0x3250, 0x3251, 0x3254, 0x3255, 0x3256
 
 ****************************************************************************/
@@ -106,7 +109,7 @@ private:
 		if (state)
 		{
 			// guessed; NMI on 68000 series is all /IPLx lines low (IRQ level 7)
-			m_capella->set_ipl_lines(0);
+			m_capella->translate_ipl_state_change(7);
 		}
 	}
 };
@@ -163,10 +166,11 @@ INPUT_PORTS_END
 void pmac6200_state::pmac6200(machine_config &config)
 {
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
-
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
     m_maincpu->set_bus_frequency(XTAL(75_MHz_XTAL)); // FSB freq to Capella
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6200_state::pmac6200_map);
-
+	config.set_perfect_quantum(m_maincpu); // chimes of death without it
+	
 	CAPELLA(config, m_capella, 75_MHz_XTAL);
 	m_capella->set_maincpu_tag("maincpu");
 
@@ -198,7 +202,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_cuda->nmi_callback().set(FUNC(pmac6200_state::nmi_irq));
 	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
-	config.set_perfect_quantum(m_maincpu);
+
 
 	input_merger_device &sda_merger(INPUT_MERGER_ALL_HIGH(config, "sda"));
 	sda_merger.output_handler().append(m_cuda, FUNC(cuda_device::set_iic_sda));

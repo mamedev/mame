@@ -39,6 +39,13 @@
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
 
+// same pattern as in amiga/amiga.cpp, but macro'd
+#define RESTART_INSTRUCTION(x) \
+		if (auto *const musashi = dynamic_cast<m68000_musashi_device *>(&*x)) \
+			musashi->restart_this_instruction(); \
+		else \
+			x->retry_access(); \
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -186,12 +193,16 @@ void iosb_base::device_start()
 {
 	if (!m_capella)
 	{
-		m68000_musashi_device* m68k_maincpu = dynamic_cast<m68000_musashi_device *>(&m_maincpu);
-		if (!m68k_maincpu)
+		// if Capella (or some other bridge chip) is not present,
+		// we *MUST* be talking directly to a 680x0
+		if (auto *const musashi = dynamic_cast<m68000_musashi_device *>(&*m_maincpu))
 		{
-			fatalerror("iosb init without 68k CPU or PowerPC-to-68k bridge device\n");
+			musashi->set_emmu_enable(true);
 		}
-		m68k_maincpu->set_emmu_enable(true);
+		else
+		{
+			fatalerror("iosb.cpp: init without 68k CPU or PowerPC-to-68k bridge device\n");
+		}	
 	}
 
 	m_6015_timer = timer_alloc(FUNC(iosb_base::mac_6015_tick), this);
@@ -310,7 +321,7 @@ void iosb_base::field_interrupts()
 	{
 		if (m_capella)
 		{
-			m_capella->set_ipl_lines(-1);
+			m_capella->translate_ipl_state_change(-1);
 		}
 		else
 		{
@@ -323,7 +334,7 @@ void iosb_base::field_interrupts()
 	{
 		if (m_capella)
 		{
-			m_capella->set_ipl_lines(take_interrupt);
+			m_capella->translate_ipl_state_change(take_interrupt);
 		}
 		else
 		{
@@ -535,11 +546,7 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	{
 		// The real DAFB simply holds off /DTACK here, we simulate that
 		// by rewinding and repeating the instruction until DRQ is asserted.
-		m68000_musashi_device* m68k_cpu = dynamic_cast<m68000_musashi_device *>(&m_maincpu); 
-		if (m68k_cpu)
-		{
-			m68k_cpu->restart_this_instruction();
-		}
+		RESTART_INSTRUCTION(m_maincpu);	
 		m_maincpu->spin_until_time(attotime::from_usec(50));
 		return 0xffff;
 	}
@@ -558,11 +565,7 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 		{
 			// The real DAFB simply holds off /DTACK here, we simulate that
 			// by rewinding and repeating the instruction until DRQ is asserted.
-			m68000_musashi_device* m68k_cpu = dynamic_cast<m68000_musashi_device *>(&m_maincpu); 
-			if (m68k_cpu)
-			{
-				m68k_cpu->restart_this_instruction();
-			}
+			RESTART_INSTRUCTION(m_maincpu);
 			m_maincpu->spin_until_time(attotime::from_usec(50));
 			return 0xffff;
 		}
@@ -588,11 +591,7 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (!m_drq)
 	{
-		m68000_musashi_device* m68k_cpu = dynamic_cast<m68000_musashi_device *>(&m_maincpu); 
-		if (m68k_cpu)
-		{
-			m68k_cpu->restart_this_instruction();
-		}
+		RESTART_INSTRUCTION(m_maincpu);
 		m_maincpu->spin_until_time(attotime::from_usec(50));
 		return;
 	}
@@ -606,11 +605,7 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 		m_scsi_second_half = true;
 		if (!m_drq)
 		{
-			m68000_musashi_device* m68k_cpu = dynamic_cast<m68000_musashi_device *>(&m_maincpu); 
-			if (m68k_cpu)
-			{
-				m68k_cpu->restart_this_instruction();
-			}
+			RESTART_INSTRUCTION(m_maincpu);
 			m_maincpu->spin_until_time(attotime::from_usec(50));
 			return;
 		}

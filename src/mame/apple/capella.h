@@ -19,13 +19,15 @@ public:
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 
 
-    void set_ipl_lines(int ipl);
+    void translate_ipl_state_change(int ipl);
 
 	u64 ctrl_r(offs_t offset);
 	void ctrl_w(offs_t offset, u64 data);
 
     u64 ipl_lines_r(offs_t offset);
+
     u64 irq_ack_r(offs_t offset);
+	void irq_ack_w(offs_t offset, u64 data);
 
 	TIMER_CALLBACK_MEMBER(fire_delayed_irq);
 
@@ -39,6 +41,7 @@ private:
 	required_device<ppc_device> m_maincpu;
 
 	int m_last_pending_irq;
+	u8 m_ipl_lines;
 	u8 m_ctrl_reg;
 };
 

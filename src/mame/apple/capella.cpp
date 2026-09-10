@@ -37,6 +37,9 @@
         before sending them off to the 68k emulator.
         See https://github.com/elliotnunn/NanoKernel/blob/master/ExternalInts.s, ExtIntHandlerCordyceps
 
+    The 6260 developer notes mention a "M7 bit" in the Capella that, when toggled, acts as a ROM switch.
+    This isn't really needed to start the system; it's enough to map the ROM where it should go.
+
     Die shot (very sparsely populated):
     https://siliconpr0n.org/archive/doku.php?id=bercovici:vlsi:vy16669-apple-343s1181-a-capella&s[]=capella
 
@@ -54,7 +57,7 @@ void capella_device::map(address_map &map)
 {
     map(0x53000008, 0x5300000f).rw(FUNC(capella_device::ctrl_r), FUNC(capella_device::ctrl_w));
     
-    map(0x53000018, 0x5300001f).r(FUNC(capella_device::irq_ack_r)).nopw();
+    map(0x53000018, 0x5300001f).rw(FUNC(capella_device::irq_ack_r), FUNC(capella_device::irq_ack_w));
     map(0x53000020, 0x53000027).r(FUNC(capella_device::ipl_lines_r));
 }
 
@@ -71,7 +74,8 @@ void capella_device::device_add_mconfig(machine_config &config)
 capella_device::capella_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CAPELLA, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
-    m_last_pending_irq(-1)
+    m_last_pending_irq(-1),
+    m_ipl_lines(7)
 {
 }
 
@@ -107,20 +111,28 @@ void capella_device::ctrl_w(offs_t offset, u64 data)
 
 u64 capella_device::ipl_lines_r(offs_t offset)
 {
-    // TODO: actually return the real IPL state.
-    // the bootrom will hang if it doesn't get an interrupt when it expects
-    return 7;
+    return m_ipl_lines;
 }
 
 u64 capella_device::irq_ack_r(offs_t offset)
 {
-    m_last_pending_irq = -1;
     m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
- 
     return 0;
 }
 
-void capella_device::set_ipl_lines(int ipl)
+void capella_device::irq_ack_w(offs_t offset, u64 data)
+{
+    m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
+
+    // functionality guessed
+    if (!(1 <= m_last_pending_irq && m_last_pending_irq <= 7)) {
+        m_ipl_lines = 7;
+        return;
+    }
+    m_ipl_lines = ~m_last_pending_irq & 7;
+}
+
+void capella_device::translate_ipl_state_change(int ipl)
 {
     // should only see IRQs 1, 2, 4 from primetime and NMI 7 from the CUDA
     if (!(1 <= ipl && ipl <= 7)) {
@@ -129,6 +141,5 @@ void capella_device::set_ipl_lines(int ipl)
     }
 
     m_last_pending_irq = ipl;
-    
-    // actual way to fire the IRQ is unclear; CPU always seems to get hung up
+    m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
 }
