@@ -42,7 +42,7 @@ void ym3802_device::device_start()
 
 void ym3802_device::device_reset()
 {
-	m_reg.clear();
+	m_reg.assign(REG_MAX, 0);
 	reset_irq(0xff);
 	transmit_register_reset();
 	receive_register_reset();
