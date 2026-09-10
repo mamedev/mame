@@ -44,7 +44,7 @@ u32 st7735_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bi
 			{
 				int const count = (y * 0x200) + x;
 
-				u16 const dat = m_displaybuffer[count & 0x1ffff];
+				u16 const dat = m_displaybuffer[count & 0xffff];
 
 				int const b = ((dat >> 0) & 0x1f) << 3;
 				int const g = ((dat >> 5) & 0x3f) << 2;
@@ -200,11 +200,11 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 
 			if (BIT(m_madctl, 5)) // MV
 			{
-				m_displaybuffer[((m_posx + (m_posy * 0x200))) & 0x1ffff] = m_pixellatch;
+				m_displaybuffer[((m_posx + (m_posy * 0x200))) & 0xffff] = m_pixellatch;
 			}
 			else
 			{
-				m_displaybuffer[((m_posy + ((129 - m_posx) * 0x200))) & 0x1ffff] = m_pixellatch;
+				m_displaybuffer[((m_posy + ((129 - m_posx) * 0x200))) & 0xffff] = m_pixellatch;
 			}
 
 			m_posx++;
@@ -222,9 +222,6 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 	}
 	else if (m_command == 0x36) // MADCTL (Memory Data Access Control)
 	{
-
-		// 
-
 		switch (m_commandstep)
 		{
 		case 0:
@@ -373,7 +370,7 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 
 void st7735_lcdc_device::device_start()
 {
-	m_displaybuffer = make_unique_clear<u16 []>(256 * 256 * 2);
+	m_displaybuffer = make_unique_clear<u16 []>(256 * 256);
 	m_posx = 0;
 	m_posy = 0;
 	m_posminx = 0;
@@ -388,7 +385,7 @@ void st7735_lcdc_device::device_start()
 	m_pixelbyte = 0;
 	m_pixellatch = 0;
 
-	save_pointer(NAME(m_displaybuffer), 256 * 256 * 2);
+	save_pointer(NAME(m_displaybuffer), 256 * 256);
 	save_item(NAME(m_posx));
 	save_item(NAME(m_posy));
 	save_item(NAME(m_posminx));
