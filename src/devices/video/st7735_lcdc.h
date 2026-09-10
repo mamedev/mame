@@ -28,7 +28,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	std::unique_ptr<u8 []> m_displaybuffer;
+	std::unique_ptr<u16 []> m_displaybuffer;
 	u16 m_posx, m_posy;
 	u16 m_posminx, m_posmaxx;
 	u16 m_posminy, m_posmaxy;
@@ -36,6 +36,9 @@ private:
 	u8 m_commandstep;
 	u8 m_displayon;
 	u8 m_sleep;
+	u8 m_madctl;
+	u16 m_pixellatch;
+	u8 m_pixelbyte;
 };
 
 #endif // MAME_VIDEO_ST7735_LCDC_H

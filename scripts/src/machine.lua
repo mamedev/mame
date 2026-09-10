@@ -4304,6 +4304,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/xn297l.h,MACHINES["XN297L"] = true
+---------------------------------------------------
+
+if MACHINES["XN297L"] then
+	files {
+		MAME_DIR .. "src/devices/machine/xn297l.cpp",
+		MAME_DIR .. "src/devices/machine/xn297l.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ym2148.h,MACHINES["YM2148"] = true
 ---------------------------------------------------
 

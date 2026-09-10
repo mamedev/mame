@@ -16,6 +16,13 @@
 class st2205u_base_device : public st2xxx_device, public device_sound_interface
 {
 public:
+	enum : unsigned
+	{
+		PSG_OUTPUT_PWM,
+		PSG_OUTPUT_CURRENT_DAC,
+		PSG_OUTPUT_COUNT
+	};
+
 	enum {
 		ST_BTC = ST_BDIV + 1,
 		ST_T0C,

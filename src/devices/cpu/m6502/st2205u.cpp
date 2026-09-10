@@ -103,21 +103,24 @@ st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, d
 
 void st2205u_base_device::sound_stream_update(sound_stream &stream)
 {
+	constexpr int OUTPUT_SCALE = 0x200 * 0x3f * 4;
+	sound_stream::sample_t output = 0.0F;
 	for (int channel = 0; channel < 4; channel++)
-	{
-		// The four channels are mixed into one 10-bit output, so retain enough headroom for their sum.
-		const int output = !BIT(m_psgc, 0) && BIT(m_psgc, channel + 4)
-				? m_psg_output[channel] * (m_psg_vol[channel] & 0x3f)
-				: 0;
+		if (!BIT(m_psgc, 0) && BIT(m_psgc, channel + 4))
+			output += sound_stream::sample_t(double(m_psg_output[channel] * (m_psg_vol[channel] & 0x3f)) / OUTPUT_SCALE);
 
-		for (int sample = 0; sample < stream.samples(); sample++)
-			stream.put_int(channel, sample, output, 0x200 * 0x3f * 4);
+	// The four channels are mixed internally and output mode 3 selects the current DAC rather than PWM.
+	const bool current_dac = BIT(m_psgc, 1, 2) == 3;
+	for (int sample = 0; sample < stream.samples(); sample++)
+	{
+		stream.put(PSG_OUTPUT_PWM, sample, current_dac ? 0.0F : output);
+		stream.put(PSG_OUTPUT_CURRENT_DAC, sample, current_dac ? output : 0.0F);
 	}
 }
 
 void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 {
-	m_stream = stream_alloc(0, 4, 48000);
+	m_stream = stream_alloc(0, PSG_OUTPUT_COUNT, 48000);
 
 	m_timer_12bit[0] = timer_alloc(FUNC(st2205u_device::t0_interrupt), this);
 	m_timer_12bit[1] = timer_alloc(FUNC(st2205u_device::t1_interrupt), this);
@@ -1316,6 +1319,8 @@ void st2205u_device::int_map(address_map &map)
 	map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
 	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
 	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
+	map(0x0050, 0x0050).rw(FUNC(st2205u_device::sdatal_r), FUNC(st2205u_device::sdatal_w));
+	map(0x0051, 0x0051).rw(FUNC(st2205u_device::sdatah_r), FUNC(st2205u_device::sdatah_w));
 	map(0x0052, 0x0052).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
 	map(0x0053, 0x0053).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
 	map(0x0054, 0x0054).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
@@ -1344,6 +1349,8 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0008, 0x000d).rw(FUNC(st2302u_device::pctrl_r), FUNC(st2302u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2302u_device::pfc_r), FUNC(st2302u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2302u_device::pfd_r), FUNC(st2302u_device::pfd_w));
+	map(0x0010, 0x0010).rw(FUNC(st2302u_device::sdatal_r), FUNC(st2302u_device::sdatal_w));
+	map(0x0011, 0x0011).rw(FUNC(st2302u_device::sdatah_r), FUNC(st2302u_device::sdatah_w));
 	map(0x0012, 0x0012).rw(FUNC(st2302u_device::sctr_r), FUNC(st2302u_device::sctr_w));
 	map(0x0013, 0x0013).rw(FUNC(st2302u_device::sckr_r), FUNC(st2302u_device::sckr_w));
 	map(0x0014, 0x0014).rw(FUNC(st2302u_device::ssr_r), FUNC(st2302u_device::ssr_w));
