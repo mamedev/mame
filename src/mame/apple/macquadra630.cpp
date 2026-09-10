@@ -45,6 +45,8 @@
 
 #include "bus/adb/adb.h"
 #include "bus/adb/cards.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
 #include "cpu/m68000/m68040.h"
@@ -164,6 +166,22 @@ void quadra630_state::macqd630(machine_config &config)
 	m_f108->set_primetimeii_tag("primetimeii");
 	m_f108->set_rom_tag("bootrom");
 	m_f108->write_ata_irq().set(m_primetimeii, FUNC(primetimeii_device::ata_irq_w));
+
+	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
+		});
+	NSCSI_CONNECTOR(config, "f108:scsi:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:6", mac_scsi_devices, nullptr);
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 
 	PRIMETIMEII(config, m_primetimeii, 33_MHz_XTAL);
 	m_primetimeii->set_maincpu_tag("maincpu");

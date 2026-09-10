@@ -48,6 +48,8 @@
 
 #include "bus/adb/adb.h"
 #include "bus/adb/cards.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
 #include "cpu/powerpc/ppc.h"
@@ -179,6 +181,16 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_f108->set_primetimeii_tag("primetimeii");
     m_f108->set_rom_tag("bootrom");
     m_f108->write_ata_irq().set(m_primetimeii, FUNC(primetimeii_device::ata_irq_w));
+
+	// attach no SCSI devices for the time being
+	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:6", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:7", mac_scsi_devices, nullptr);
 
 	PRIMETIMEII(config, m_primetimeii, 75_MHz_XTAL / 2); // guessed
 	m_primetimeii->set_maincpu_tag("maincpu");
