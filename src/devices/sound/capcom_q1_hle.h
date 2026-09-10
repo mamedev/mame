@@ -2,11 +2,11 @@
 // copyright-holders:superctr, Valley Bell
 /*********************************************************
 
-  Capcom QSound DL-1425 (HLE)
+  Capcom-Q1 DL 1425 DSP (HLE)
 
 *********************************************************/
-#ifndef MAME_SOUND_QSOUNDHLE_H
-#define MAME_SOUND_QSOUNDHLE_H
+#ifndef MAME_SOUND_CAPCOM_Q1_HLE_H
+#define MAME_SOUND_CAPCOM_Q1_HLE_H
 
 #pragma once
 
@@ -14,16 +14,16 @@
 #include "dirom.h"
 
 
-class qsound_hle_device : public device_t, public device_sound_interface, public device_rom_interface<24>
+class capcom_q1_hle_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
-	qsound_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 60'000'000);
+	capcom_q1_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	static auto parent_rom_device_type(); // QSOUND
+	static auto parent_rom_device_type(); // CAPCOM_Q1
 
-	void qsound_w(offs_t offset, uint8_t data);
-	uint8_t qsound_r();
+	void write(offs_t offset, uint8_t data);
+	uint8_t read();
 
 protected:
 	// device_t implementation
@@ -62,7 +62,7 @@ private:
 	const uint16_t DELAY_BASE_OFFSET = 0x554;
 	const uint16_t DELAY_BASE_OFFSET2 = 0x53c;
 
-	struct qsound_voice {
+	struct capcom_q1_voice {
 		uint16_t m_bank = 0;
 		int16_t m_addr = 0; // top word is the sample address
 		uint16_t m_phase = 0;
@@ -72,10 +72,10 @@ private:
 		int16_t m_volume = 0;
 		int16_t m_echo = 0;
 
-		int16_t update(qsound_hle_device &dsp, int32_t *echo_out);
+		int16_t update(capcom_q1_hle_device &dsp, int32_t *echo_out);
 	};
 
-	struct qsound_adpcm {
+	struct capcom_q1_adpcm {
 		uint16_t m_start_addr = 0;
 		uint16_t m_end_addr = 0;
 		uint16_t m_bank = 0;
@@ -85,13 +85,13 @@ private:
 		int16_t m_step_size = 0;
 		uint16_t m_cur_addr = 0;
 
-		int16_t update(qsound_hle_device &dsp, int16_t curr_sample, int nibble);
+		int16_t update(capcom_q1_hle_device &dsp, int16_t curr_sample, int nibble);
 	};
 
 	// Q1 Filter
-	struct qsound_fir {
-		int m_tap_count = 0;    // usually 95
-		int m_delay_pos = 0;
+	struct capcom_q1_fir {
+		int32_t m_tap_count = 0;    // usually 95
+		int32_t m_delay_pos = 0;
 		uint16_t m_table_pos = 0;
 		int16_t m_taps[95] = { 0 };
 		int16_t m_delay_line[95] = { 0 };
@@ -100,7 +100,7 @@ private:
 	};
 
 	// Delay line
-	struct qsound_delay {
+	struct capcom_q1_delay {
 		int16_t m_delay = 0;
 		int16_t m_volume = 0;
 		int16_t m_write_pos = 0;
@@ -111,7 +111,7 @@ private:
 		void update();
 	};
 
-	struct qsound_echo {
+	struct capcom_q1_echo {
 		uint16_t m_end_pos = 0;
 
 		int16_t m_feedback = 0;
@@ -130,27 +130,27 @@ private:
 	uint16_t m_data_latch;
 	int16_t m_out[2];
 
-	qsound_voice m_voice[16];
-	qsound_adpcm m_adpcm[3];
+	capcom_q1_voice m_voice[16];
+	capcom_q1_adpcm m_adpcm[3];
 
 	uint16_t m_voice_pan[16+3];
 	int16_t m_voice_output[16+3];
 
-	qsound_echo m_echo;
+	capcom_q1_echo m_echo;
 
-	qsound_fir m_filter[2];
-	qsound_fir m_alt_filter[2];
+	capcom_q1_fir m_filter[2];
+	capcom_q1_fir m_alt_filter[2];
 
-	qsound_delay m_wet[2];
-	qsound_delay m_dry[2];
+	capcom_q1_delay m_wet[2];
+	capcom_q1_delay m_dry[2];
 
 	uint16_t m_state;
 	uint16_t m_next_state;
 
 	uint16_t m_delay_update;
 
-	int m_state_counter;
-	int m_ready_flag;
+	int32_t m_state_counter;
+	int32_t m_ready_flag;
 
 	uint16_t *m_register_map[256];
 
@@ -172,6 +172,6 @@ private:
 	int16_t read_sample(uint16_t bank, uint16_t address);
 };
 
-DECLARE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device)
+DECLARE_DEVICE_TYPE(CAPCOM_Q1_HLE, capcom_q1_hle_device)
 
-#endif // MAME_SOUND_QSOUNDHLE_H
+#endif // MAME_SOUND_CAPCOM_Q1_HLE_H
