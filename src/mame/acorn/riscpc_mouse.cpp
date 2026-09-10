@@ -5,7 +5,6 @@
  * Acorn Risc PC Mouse
  *
  * TODO:
- *  - inherit x/y ports from quadmouse_device
  *  - slotify
  */
 
@@ -37,14 +36,8 @@ u8 riscpc_mouse_device::buttons_r()
 }
 
 static INPUT_PORTS_START(riscpc_mouse)
-	// FIXME: include X/Y ports from quadmouse_device?
-	PORT_START("x")
-	PORT_BIT(0xf000, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0fff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER("encoder_x", FUNC(quadencoder_device::changed), 0)
-
-	PORT_START("y")
-	PORT_BIT(0xf000, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0fff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER("encoder_y", FUNC(quadencoder_device::changed), 0)
+	INPUT_PORTS_EXTERN(quadmouse);
+	PORT_INCLUDE(quadmouse)
 
 	PORT_START("buttons")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)

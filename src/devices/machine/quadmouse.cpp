@@ -14,7 +14,7 @@
 DEFINE_DEVICE_TYPE(QUADENCODER, quadencoder_device, "quadencoder", "Generic quadature encoder support")
 DEFINE_DEVICE_TYPE(QUADMOUSE, quadmouse_device, "quadmouse", "Generic quadrature mouse support")
 
-static INPUT_PORTS_START(quadmouse)
+INPUT_PORTS_START(quadmouse)
 	PORT_START("x")
 	PORT_BIT(0xf000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0fff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER("encoder_x", FUNC(quadencoder_device::changed), 0)
