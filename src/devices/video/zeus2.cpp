@@ -1772,10 +1772,12 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
 	extra.depth_write_enable = !(m_state->m_renderRegs[0x14] & 0x001000);
 	extra.depth_clear_enable = (m_state->m_renderRegs[0x14] & 0x000c00);
-	// 021e0e = blend with texture alpha for type 2, 020202 blend src / dst alpha
-	extra.blend_enable = ((m_state->m_renderRegs[0x40] == 0x020202) || (m_state->m_renderRegs[0x40] == 0x021e0e && (texmode & 0x3) == 2));
+	// 021e0e = blend, gated on type 2 here but not by the game.  Otherwise bit 17 turns the pixel
+	// ALU on and the second byte picks the destination factor, 0x02 taking it from reg 0x0d.
+	extra.blend_enable = ((m_state->m_renderRegs[0x40] & 0x02ff00) == 0x020200 || (m_state->m_renderRegs[0x40] == 0x021e0e && (texmode & 0x3) == 2));
+	// The low byte picks the source factor: 0x02 scales it by reg 0x0c, 0x04 takes it at unity.
 	// Clamp translucency (1.8 fixed, 0x100=1.0) to 0x100: scale8() takes a uint8_t, so >=0x100 would truncate to near-black.
-	extra.srcAlpha = std::min<uint32_t>(m_state->m_renderRegs[0x0c], 0x100);
+	extra.srcAlpha = ((m_state->m_renderRegs[0x40] & 0xff) == 0x04) ? 0x100 : std::min<uint32_t>(m_state->m_renderRegs[0x0c], 0x100);
 	extra.dstAlpha = std::min<uint32_t>(m_state->m_renderRegs[0x0d], 0x100);
 	extra.texture_alpha = false;
 	extra.texture_rgb555 = false;
