@@ -66,6 +66,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "tek4404.lh"
+
 #include "logmacro.h"
 
 namespace {
@@ -89,6 +91,8 @@ public:
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
 		m_map_view(*this, "map"),
+		m_leds(*this, "led%u", 0U),
+		m_led_disk(*this, "led_disk"),
 		m_boot(false),
 		m_map_control(0),
 		m_kb_rdata(true),
@@ -145,6 +149,9 @@ private:
 	memory_share_creator<u16> m_map;
 	memory_view m_map_view;
 
+	output_finder<4> m_leds;
+	output_finder<> m_led_disk;
+
 	bool m_boot;
 	u8 m_map_control;
 	bool m_kb_rdata;
@@ -169,8 +176,16 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_kb_tdata));
 	save_item(NAME(m_kb_rclamp));
 	save_item(NAME(m_kb_loop));
-}
+	
+	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7be002, 0x7be003, "led_tap", [this](offs_t offset, u16 &data, u16 mem_mask)
+		{ m_led_disk = !(data & 0x18);});
 
+	m_maincpu->space(AS_PROGRAM).install_write_tap(0x740000, 0x747fff, "leds_tap", [this](offs_t offset, u16 &data, u16 mem_mask)
+		{ 	LOG("LED %c%c%c%c\n",data & 8 ? '*' : '-',data & 4 ? '*' : '-',data & 2 ? '*' : '-',data & 1 ? '*' : '-');
+			m_leds[0] = BIT(data, 0); m_leds[1] = BIT(data, 1); m_leds[2] = BIT(data, 2); m_leds[3] = BIT(data, 3);
+		});
+
+}
 
 
 /*************************************
@@ -183,6 +198,7 @@ void tek440x_state::machine_reset()
 {
 	m_boot = true;
 	diag_w(0);
+	m_led_disk = 1;
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
