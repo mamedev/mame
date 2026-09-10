@@ -4603,17 +4603,17 @@ static INPUT_PORTS_START( hjdmg )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                               // 有
 
 	// Double up game controls are a bit weird - the dedicated keys aren't used:
-	// Double Up (double): A
-	// Double Up:          C
-	// Double Up (half):   E
-	// Take Score:         G  Start
-	// Big/Left:           K
-	// Small/Right         M
+	// Double Up (double):  A
+	// Double Up:           C
+	// Double Up (half):    E
+	// Take Score:          G  Start
+	// Big/Left:            K
+	// Small/Right:         M
 	PORT_INCLUDE(igs_mahjong_matrix)
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                     // 清除      (hold on reset to clear credits)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                     // 清除
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                         // 測試      (hold on start for input test)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                      // 查帳
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
