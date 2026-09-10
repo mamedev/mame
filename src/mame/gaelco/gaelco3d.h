@@ -49,6 +49,7 @@ public:
 		, m_paletteram32(*this, "paletteram32")
 		, m_analog(*this, "ANALOG%u", 0U)
 		, m_adsp_bank(*this, "adspbank")
+		, m_wheel_motor(*this, "wheel_motor")
 	{ }
 
 	void footbpow(machine_config &config);
@@ -126,6 +127,9 @@ private:
 	optional_ioport_array<4> m_analog;
 	required_memory_bank m_adsp_bank;
 
+	output_finder<> m_wheel_motor;
+	uint16_t m_wheel_motor_data = 0;
+
 	uint8_t m_sound_status = 0;
 	uint8_t m_analog_ports[4]{};
 	uint32_t m_fp_analog_ports[2]{};
@@ -178,6 +182,7 @@ private:
 	void main020_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void tms_map(address_map &map) ATTR_COLD;
+	void wheel_motor_w(uint16_t data);
 };
 
 #endif // MAME_GAELCO_GAELCO3D_H
