@@ -1922,6 +1922,7 @@ void model1_state::swa(machine_config &config)
 	m_dsbz80->set_clock(m_m1uart_clock);
 	m_dsbz80->add_route(0, "mpeg", 1.0, 0);
 	m_dsbz80->add_route(1, "mpeg", 1.0, 1);
+	m_m1uart_clock->signal_handler().append(m_dsbz80, FUNC(dsbz80_device::uart_clock_w));
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
 	m_m1audio->rxd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));

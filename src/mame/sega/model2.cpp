@@ -3029,11 +3029,11 @@ void model2c_state::stcc(machine_config &config)
 	io.an_port_callback<2>().set_ioport("BRAKE");
 
 	DSBZ80(config, m_dsbz80);
-	m_dsbz80->set_clock(m_uart_clock);
 	m_dsbz80->add_route(0, "speaker", 1.0, 0);
 	m_dsbz80->add_route(1, "speaker", 1.0, 1);
 
 	m_uart->txd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
+	m_uart_clock->signal_handler().append(m_dsbz80, FUNC(dsbz80_device::uart_clock_w));
 }
 
 void model2c_state::waverunr(machine_config &config)

@@ -131,6 +131,12 @@ void dsbz80_device::device_stop()
 	m_decoder.reset();
 }
 
+void dsbz80_device::uart_clock_w(int state)
+{
+	m_uart->write_rxc(state);
+	m_uart->write_txc(state);
+}
+
 void dsbz80_device::write_txd(int state)
 {
 	m_uart->write_rxd(state);

@@ -26,11 +26,7 @@ public:
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 
-	void set_clock(clock_device *uart_clock)
-	{
-		uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
-		uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_txc));
-	}
+	void uart_clock_w(int state);
 
 	void write_txd(int state);
 
