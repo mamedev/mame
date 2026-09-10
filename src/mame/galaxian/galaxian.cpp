@@ -8934,13 +8934,8 @@ void pisces_state::init_porterb()
 	init_pisces();
 
 	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t buffer[0x1000];
-	memcpy(buffer, &rom[0x4000], 0x1000);
-
-	// unscramble each block
-	for (int i = 0; i < 0x04; i++)
-		for (int j = 0; j < 0x400; j++)
-			rom[0x4000 | (i * 0x400 + j)] = buffer[i * 0x400 + (j ^ 0x3ff)];
+	for (int i = 0; i < 4; i++)
+		std::ranges::reverse(rom + 0x4000 + (i << 10), rom + 0x4000 + ((i + 1) << 10));
 }
 
 void galaxian_state::init_batman2()
