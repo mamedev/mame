@@ -2951,6 +2951,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/ex1280.h",
 		MAME_DIR .. "src/devices/bus/isa/fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/fdc.h",
+		MAME_DIR .. "src/devices/bus/isa/fddda.cpp",
+		MAME_DIR .. "src/devices/bus/isa/fddda.h",
 		MAME_DIR .. "src/devices/bus/isa/finalchs.cpp",
 		MAME_DIR .. "src/devices/bus/isa/finalchs.h",
 		MAME_DIR .. "src/devices/bus/isa/gblaster.cpp",
