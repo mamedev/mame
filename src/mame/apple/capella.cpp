@@ -56,7 +56,7 @@ DEFINE_DEVICE_TYPE(CAPELLA, capella_device, "maccapella", "Apple Capella PowerPC
 void capella_device::map(address_map &map)
 {
     map(0x53000008, 0x5300000f).rw(FUNC(capella_device::ctrl_r), FUNC(capella_device::ctrl_w));
-    
+    map(0x53000010, 0x53000017).rw(FUNC(capella_device::ctrl_b_r), FUNC(capella_device::ctrl_b_w));
     map(0x53000018, 0x5300001f).rw(FUNC(capella_device::irq_ack_r), FUNC(capella_device::irq_ack_w));
     map(0x53000020, 0x53000027).r(FUNC(capella_device::ipl_lines_r));
 }
@@ -74,6 +74,8 @@ void capella_device::device_add_mconfig(machine_config &config)
 capella_device::capella_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CAPELLA, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
+    m_ctrl_reg(0),
+    m_ctrl_reg_b(0),
     m_last_pending_irq(-1),
     m_ipl_lines(7)
 {
@@ -94,6 +96,7 @@ void capella_device::device_start()
 void capella_device::device_reset()
 {
     m_last_pending_irq = -1;
+    m_ctrl_reg_b = 0; // CPU bootloops otherwise
 }
 
 
@@ -107,6 +110,16 @@ u64 capella_device::ctrl_r(offs_t offset)
 void capella_device::ctrl_w(offs_t offset, u64 data)
 {
     m_ctrl_reg = data & 0x1f;
+}
+
+u64 capella_device::ctrl_b_r(offs_t offset)
+{
+    return m_ctrl_reg_b & 0x1F;
+}
+
+void capella_device::ctrl_b_w(offs_t offset, u64 data)
+{
+    m_ctrl_reg_b = data & 0x1f;
 }
 
 u64 capella_device::ipl_lines_r(offs_t offset)

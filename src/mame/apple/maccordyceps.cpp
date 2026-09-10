@@ -278,4 +278,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1995, pmac6200, 0, 0, pmac6200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200", MACHINE_NOT_WORKING)
+COMP( 1995, pmac6200, 0, 0, pmac6200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200/75", MACHINE_NOT_WORKING)

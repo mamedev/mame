@@ -24,6 +24,10 @@ public:
 	u64 ctrl_r(offs_t offset);
 	void ctrl_w(offs_t offset, u64 data);
 
+	u64 ctrl_b_r(offs_t offset);
+	void ctrl_b_w(offs_t offset, u64 data);
+
+
     u64 ipl_lines_r(offs_t offset);
 
     u64 irq_ack_r(offs_t offset);
@@ -40,9 +44,10 @@ protected:
 private:
 	required_device<ppc_device> m_maincpu;
 
+	u8 m_ctrl_reg;
+	u8 m_ctrl_reg_b;
 	int m_last_pending_irq;
 	u8 m_ipl_lines;
-	u8 m_ctrl_reg;
 };
 
 // device type definition
