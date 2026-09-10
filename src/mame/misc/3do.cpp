@@ -188,15 +188,34 @@ static INPUT_PORTS_START( 3do )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p A") PORT_PLAYER(1)
 
 	PORT_START("P1.1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME(u8"P1 P \u23f5/\u23f8") // Play/Pause
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME(u8"P1 X \u23f9") PORT_PLAYER(1) // Stop
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 RT") // Right Trigger
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 LT") // Left Trigger
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("%p C") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START )   PORT_NAME(u8"%p P \u23f5/\u23f8") PORT_PLAYER(1) // Play/Pause
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT )  PORT_NAME(u8"%p X \u23f9") PORT_PLAYER(1) // Stop
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("%p RT") PORT_PLAYER(1) // Right Trigger
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("%p LT") PORT_PLAYER(1) // Left Trigger
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2.0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // ID
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p A") PORT_PLAYER(2)
+
+	PORT_START("P2.1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("%p C") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START )   PORT_NAME(u8"%p P \u23f5/\u23f8") PORT_PLAYER(2) // Play/Pause
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT )  PORT_NAME(u8"%p X \u23f9") PORT_PLAYER(2) // Stop
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("%p RT") PORT_PLAYER(2) // Right Trigger
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("%p LT") PORT_PLAYER(2) // Left Trigger
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -355,7 +374,7 @@ void _3do_state::green_config(machine_config &config)
 	m_madam->irq_dexp_cb().set(m_clio, FUNC(clio_device::dexp_w));
 	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
 		if (offset == 0)
-			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16);
+			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16) | (m_p2_r[0]->read() << 8) | (m_p2_r[1]->read() << 0);
 
 		return 0;
 	});
@@ -726,7 +745,7 @@ CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, emp
 // Arcade section
 GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, orbatak, alg3do, orbatak,  orbatak,   orbatak_state, empty_init, ROT0,     "American Laser Games", "Orbatak (USA, prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.0
+GAME( 1995, orbatak, alg3do, orbatak,  orbatak,   orbatak_state, empty_init, ROT0,     "American Laser Games", "Orbatak (USA, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.0
 GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.1
 GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.05
 
