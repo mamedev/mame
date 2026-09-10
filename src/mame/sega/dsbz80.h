@@ -28,8 +28,8 @@ public:
 
 	void set_clock(clock_device *uart_clock)
 	{
-		uart_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
-		uart_clock->signal_handler().append("uart", FUNC(i8251_device::write_txc));
+		uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+		uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_txc));
 	}
 
 	void write_txd(int state);
