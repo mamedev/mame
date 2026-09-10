@@ -4131,7 +4131,17 @@ ROM_END
 
 Treasure City
 
-unknown hardware
+Black plastic block covering the CPU
+2x HM62H256AK-15
+HM86171-80
+Subsino SS9601
+Subsino SS9602
+U6295
+unpopulated space in the sound section for a 24-pin chip (YM3812?)
+12 MHz XTAL
+20 MHz XTAL
+4x banks of 8 switches + 2 more empty spaces
+reset push-button
 
 ***************************************************************************/
 
@@ -4145,10 +4155,18 @@ ROM_START( treacity )
 	ROM_LOAD32_BYTE( "alpha 207_27c4001_u9.bin",  0x00001, 0x80000, CRC(57241f44) SHA1(f055488710ae624c1c7e92b2adf6b497c72514ea) )
 	ROM_LOAD32_BYTE( "alpha 207_27c4001_u10.bin", 0x00003, 0x80000, CRC(338370f9) SHA1(0e06ed1b71fb44bfd617f4d5112f6d34f0b759bc) )
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "u26", 0x00000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(8c9906fd) SHA1(8afaaf80dbaf5d9763da5fa0c6f95d20887bc336) BAD_DUMP ) // handcrafted to pass protection check
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d.u21",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u22",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u24",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u20",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u20a", 0x000, 0x117, NO_DUMP ) // marked u20, too. Added an a to avoid same name
 ROM_END
 
 ROM_START( treacity202 )
@@ -4161,12 +4179,43 @@ ROM_START( treacity202 )
 	ROM_LOAD32_BYTE( "alpha 142_27c4001_u9.bin",  0x00001, 0x80000, CRC(b0c50891) SHA1(66ebebc327e00d5e8e9eb0a427d34683c4cca8aa) )
 	ROM_LOAD32_BYTE( "alpha 142_27c4001_u10.bin", 0x00003, 0x80000, CRC(8545e8cd) SHA1(0d122a532df81fe2150c1eaf49b5a4e35c8134eb) )
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "u26", 0x00000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(8c9906fd) SHA1(8afaaf80dbaf5d9763da5fa0c6f95d20887bc336) BAD_DUMP ) // handcrafted to pass protection check
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d.u21",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u22",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u24",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u20",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u20a", 0x000, 0x117, NO_DUMP ) // marked u20, too. Added an a to avoid same name
 ROM_END
 
+ROM_START( ntrecity )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "new_t.c_italy_1_v1.6.u33", 0x00000, 0x20000, CRC(b7e4049d) SHA1(5fe508c09015efba4b7feca3958069dc67030a84) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "new_1.6_italy_2_v1.0.u7", 0x00000, 0x80000, CRC(dff268ca) SHA1(0f78a92fa50ebed2d5f05c511d485e9dce281c4d) )
+	ROM_LOAD32_BYTE( "new_1.6_italy_3_v1.0.u8", 0x00002, 0x80000, CRC(9ebe9759) SHA1(a03e892cc9be0f996935632b22bb5c6a72a161ff) )
+	ROM_LOAD32_BYTE( "new_1.6_italy_4_v1.0.u9", 0x00001, 0x80000, CRC(7e01616e) SHA1(5ecb562560462c2d7c90d228a4fe7311ee012f76) )
+	ROM_LOAD32_BYTE( "new_1.6_italy_5_v1.0.u1", 0x00003, 0x80000, CRC(ba2f3171) SHA1(eb88cb464d4b2502dcd5c43caf3ac4824bcb7b69) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "t-city-v1.u26", 0x00000, 0x80000, CRC(76e11588) SHA1(d7b76f00a7c95870bc443e027ab424f273520a23) ) // ROM type deducted, should be correct
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(34b22796) SHA1(c859a3a9709793840058993464204a910df7cb44) BAD_DUMP ) // handcrafted to pass protection check
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d.u21",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u22",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u24",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u20",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u20a", 0x000, 0x117, NO_DUMP ) // marked u20, too. Added an a to avoid same name
+ROM_END
 
 /***************************************************************************
 
@@ -4303,6 +4352,8 @@ GAME( 1999, ptraina,     ptrain,   ptrain,   ptrain,   subsino2_state, empty_ini
 
 GAME( 1997, treacity,    0,        saklove,  treacity, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
 GAME( 1997, treacity202, treacity, saklove,  treacity, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
+
+GAME( 1999, ntrecity,    0,        saklove,  treacity, subsino2_state, empty_init,    ROT0, "Subsino",                          "New Treasure City (Italy, Ver. 1.6)",   MACHINE_NOT_WORKING )
 
 GAME( 1999, bishjan,     0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 GAME( 1999, xiaoao,      bishjan,  xiaoao,   bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Xiao Ao Jiang Hu (China, Ver. 1.00)",   MACHINE_NO_SOUND )

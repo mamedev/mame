@@ -26,6 +26,7 @@ public:
 	void spi_mosi_w(int state) { m_in_bit = state; }
 
 	bool get_card_present() { return m_image->exists(); }
+	auto card_present_callback() { return m_exists_cb.bind(); }
 
 	devcb_write_line write_miso;
 
@@ -80,6 +81,8 @@ private:
 	u32 m_blknext;
 	bool m_crc_off;
 	bool m_bACMD;
+
+	devcb_write_line m_exists_cb;
 };
 
 DECLARE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_device)

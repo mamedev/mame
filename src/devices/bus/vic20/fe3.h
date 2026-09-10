@@ -22,8 +22,8 @@
 
 // ======================> vic20_final_expansion_3_device
 
-class vic20_final_expansion_3_device :  public device_t,
-									public device_vic20_expansion_card_interface
+class vic20_final_expansion_3_device : public device_t,
+									   public device_vic20_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -72,12 +72,12 @@ private:
 		REG2_IO3  = 0x80
 	};
 
+	required_device<amd_29f040_device> m_flash_rom;
+	memory_share_creator<uint8_t> m_ram;
+
 	offs_t get_address(int bank, int block, offs_t offset);
 	uint8_t read_register(offs_t offset);
 	void write_register(offs_t offset, uint8_t data);
-
-	required_device<amd_29f040_device> m_flash_rom;
-	memory_share_creator<uint8_t> m_ram;
 
 	uint8_t m_reg1;
 	uint8_t m_reg2;

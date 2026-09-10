@@ -98,7 +98,7 @@ private:
 	uint32_t  m_fence[4]{};         /* 03300200-0330023c (W); 03300200-0330027c (R) */
 	uint32_t  m_mmu[64]{};          /* 03300300-033003fc */
 	uint32_t  m_dma[32][4]{};       /* 03300400-033005fc */
-	uint32_t  m_mult[40]{};         /* 03300600-0330069c */
+	s32       m_mult[40]{};         /* 03300600-0330069c */
 	uint32_t  m_mult_control = 0;   /* 033007f0-033007f4 */
 	uint32_t  m_mult_status = 0;    /* 033007f8 */
 
@@ -169,6 +169,7 @@ private:
 		u32 address;
 		u32 current_ccb;
 		bool skip, last, ccbpre, packed, bgnd;
+		u8 pluta;
 		u32 next_ptr;
 		u32 source_ptr;
 		u32 plut_ptr;
@@ -176,6 +177,7 @@ private:
 		double hdx, hdy, vdx, vdy;
 		double hddx, hddy;
 		u32 pixc, pre0, pre1;
+		u8 pixc_df[2];
 		std::vector<u16> buffer;
 	} m_cel;
 
@@ -188,6 +190,8 @@ private:
 	void mctl_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 regctl0_r();
 	void regctl0_w(offs_t offset, u32 data, u32 mem_mask);
+
+	void mult_start_process_w(offs_t offset, u32 data, u32 mem_mask);
 
 	void cel_start_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
@@ -218,8 +222,12 @@ private:
 	static const fetch_rle_func fetch_rle_table[16];
 
 	std::tuple<u16, u32> get_unemulated(u32 ptr, u8 frac);
+	std::tuple<u16, u32> get_coded_1bpp(u32 ptr, u8 frac);
+	std::tuple<u16, u32> get_coded_2bpp(u32 ptr, u8 frac);
 	std::tuple<u16, u32> get_coded_4bpp(u32 ptr, u8 frac);
 	std::tuple<u16, u32> get_coded_6bpp(u32 ptr, u8 frac);
+	std::tuple<u16, u32> get_coded_8bpp(u32 ptr, u8 frac);
+	std::tuple<u16, u32> get_uncoded_8bpp(u32 ptr, u8 frac);
 	std::tuple<u16, u32> get_coded_16bpp(u32 ptr, u8 frac);
 	std::tuple<u16, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
 

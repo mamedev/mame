@@ -4,17 +4,9 @@
 
     Final Expansion v3 cartridge emulation
 
+	The SD2IEC on-board is implemented in src/devices/bus/cbmiec/sd2iec.cpp
+
 **********************************************************************/
-
-/*
-
-    TODO:
-
-    - fe3diag register error#2 hp=5592 (same error in VICE)
-    - SD card
-    - RTC
-
-*/
 
 #include "emu.h"
 #include "fe3.h"
@@ -26,11 +18,11 @@
 //**************************************************************************
 
 #define AM29F040_TAG    "ic1"
-#define ATMEGA1284_TAG  "ic5"
 #define ATF1504AS_TAG   "ic4"
 
+// only 512 KB of flash/SRAM is connected, so bits 4-6 of the bank field are unused
 #define REG1_BANK \
-	((m_reg1 & 0x7f) << 15)
+	(m_reg1 & 0x0f)
 
 #define LORAM_HIDDEN \
 	(m_reg2 & REG2_BLK0)
@@ -65,7 +57,7 @@ DEFINE_DEVICE_TYPE(VIC20_FE3, vic20_final_expansion_3_device, "vic20_fe3", "Fina
 
 ROM_START( vic20_fe3 )
 	ROM_REGION( 0x80000, AM29F040_TAG, 0 )
-	ROM_LOAD( "fe3r022d.ic1", 0x00000, 0x80000, CRC(f4ff4aee) SHA1(1a389120159dee09c0f03ecb8fcd51ea2a2d2306) )
+	ROM_LOAD( "fe3r029.ic1", 0x00000, 0x80000, CRC(1895818b) SHA1(76aba501833fcd96eb237c0d7ba418124eadab28) )
 
 	ROM_REGION( 0x10b6, ATF1504AS_TAG, 0 )
 	ROM_LOAD( "vc20final-v3-2.ic4", 0x000, 0x10b6, CRC(975b7197) SHA1(e64d69870b757a409abeb5f19e34866eef37ab18) )
@@ -88,7 +80,7 @@ const tiny_rom_entry *vic20_final_expansion_3_device::device_rom_region() const
 
 void vic20_final_expansion_3_device::device_add_mconfig(machine_config &config)
 {
-	AMD_29F040(config, AM29F040_TAG);
+	AMD_29F040(config, m_flash_rom);
 }
 
 
@@ -105,7 +97,10 @@ vic20_final_expansion_3_device::vic20_final_expansion_3_device(const machine_con
 	device_t(mconfig, VIC20_FE3, tag, owner, clock),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AM29F040_TAG),
-	m_ram(*this, "sram", 0x80000, ENDIANNESS_LITTLE), m_reg1(0), m_reg2(0), m_lockbit(0)
+	m_ram(*this, "sram", 0x80000, ENDIANNESS_LITTLE),
+	m_reg1(0),
+	m_reg2(0),
+	m_lockbit(1)
 {
 }
 
@@ -131,6 +126,7 @@ void vic20_final_expansion_3_device::device_reset()
 {
 	m_reg1 = 0;
 	m_reg2 = 0;
+	m_lockbit = 1;
 }
 
 
@@ -140,15 +136,19 @@ void vic20_final_expansion_3_device::device_reset()
 
 uint8_t vic20_final_expansion_3_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
+	// any read from BLK5 sets the lock bit, regardless of the selected mode
+	if (!blk5)
+	{
+		m_lockbit = 1;
+	}
+
 	switch (m_reg1 & REG1_MODE_MASK)
 	{
 	case REG1_START:
-		// read from ROM
-		if (!blk5)
+		// read from ROM bank 0
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(0, 3, offset));
-
-			m_lockbit = 1;
 		}
 
 		// read from registers
@@ -361,15 +361,31 @@ uint8_t vic20_final_expansion_3_device::vic20_cd_r(offs_t offset, uint8_t data, 
 
 void vic20_final_expansion_3_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
+	// any write to BLK5 clears the lock bit, regardless of the selected mode
+	if (!blk5)
+	{
+		m_lockbit = 0;
+	}
+
 	switch (m_reg1 & REG1_MODE_MASK)
 	{
 	case REG1_START:
 		// write to RAM bank 1
-		if (!blk5)
+		if (!blk1 && !BLK1_HIDDEN)
+		{
+			m_ram[get_address(1, 0, offset)] = data;
+		}
+		if (!blk2 && !BLK2_HIDDEN)
+		{
+			m_ram[get_address(1, 1, offset)] = data;
+		}
+		if (!blk3 && !BLK3_HIDDEN)
+		{
+			m_ram[get_address(1, 2, offset)] = data;
+		}
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			m_ram[get_address(1, 3, offset)] = data;
-
-			m_lockbit = 0;
 		}
 
 		// write to registers
@@ -413,7 +429,7 @@ void vic20_final_expansion_3_device::vic20_cd_w(offs_t offset, uint8_t data, int
 
 	case REG1_RAM_1:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && !(m_reg1 & REG1_BLK0))
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
@@ -445,7 +461,7 @@ void vic20_final_expansion_3_device::vic20_cd_w(offs_t offset, uint8_t data, int
 
 	case REG1_RAM_2:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && !(m_reg1 & REG1_BLK0))
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
@@ -509,7 +525,7 @@ void vic20_final_expansion_3_device::vic20_cd_w(offs_t offset, uint8_t data, int
 
 	case REG1_RAM_ROM:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && !(m_reg1 & REG1_BLK0))
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}

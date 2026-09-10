@@ -6148,6 +6148,22 @@ ROM_START( lluck4x1 )
 ROM_END
 
 
+ROM_START( lluckasd ) // all label hand-written, no locations on PCB. Very similar to lluck3x3
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lucky_lady.bin", 0x8000, 0x8000, CRC(986c5225) SHA1(5f6cf97f81e12199762281ae245455463970c4d0) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "lady_ch2.bin", 0x0000, 0x8000, CRC(730fd4c9) SHA1(1fb36f72a27d75ceea248c6a8b8860d89d79939a) )
+	ROM_LOAD( "lady_ch1.bin", 0x8000, 0x8000, CRC(2af6fd7c) SHA1(0827731efa28342a64329403211b8890a2f77fc1) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "lluckasd_nvram.bin", 0x0000, 0x0800, CRC(486ab861) SHA1(e93f49599f119345398bfdab829c68e3671f6755) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+ROM_END
+
+
 /******************************** Magic Card II sets ************************************/
 
 /*
@@ -8963,6 +8979,7 @@ GAMEL( 199?, witchryl,   0,        witchryl, witchryl,  funworld_state, empty_in
 // Lucky Lady based...
 GAMEL( 1991, lluck3x3,   royalcrd, cuoreuno, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",       "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )
 GAMEL( 1991, lluck4x1,   royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",       "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
+GAMEL( 1991, lluckasd,   royalcrd, cuoreuno, royalcrd,  funworld_state, empty_init,    ROT0, "ASD",               "Lucky Lady (ASD)",                                MACHINE_NOT_WORKING,     layout_jollycrd ) // needs inputs checking
 
 // Magic Card 2 based...
 GAMEL( 1996, magicrd2,   0,        magicrd2, magicrd2,  magicrd2_state, empty_init,    ROT0, "Impera",            "Magic Card II (Bulgarian)",                       0,                       layout_jollycrd )

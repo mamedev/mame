@@ -288,6 +288,7 @@ void clio_device::map(address_map &map)
 			LOG("audout: %08x & %08x\n", data, mem_mask);
 			// c0020f0f is written here during boot
 			COMBINE_DATA(&m_audout);
+			// TODO: latch to DSPP
 		})
 	);
 	/*

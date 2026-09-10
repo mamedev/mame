@@ -1362,6 +1362,12 @@ maclc550
 
 @source:apple/macpdm.cpp
 pmac6100
+pmac6100_66
+pmac7100
+pmac7100_80
+pmac8100
+pmac8100_100
+pmac8100_110
 
 @source:apple/macprtb.cpp
 macpb100
@@ -19295,6 +19301,7 @@ jolyjokrs
 jolyjokrt
 lluck3x3
 lluck4x1
+lluckasd
 lunapark
 lunaparkb
 lunaparkc
@@ -20592,6 +20599,7 @@ nummunch
 nupogodi
 okhota
 rkosmosa
+supkubik
 taddams
 taltbeast
 tapollo13
@@ -29499,7 +29507,6 @@ rodent
 3do_gdo101
 3do_hc21
 3do_try
-3dobios
 alg3do
 md23do
 orbatak
@@ -31836,6 +31843,7 @@ rbspm
 sball2k1
 sc2in1
 sglc
+sjms
 smatch03
 smwc
 ssanguoj
@@ -32381,6 +32389,7 @@ bigdeal0
 dallaspk
 hotslots
 kajotcrd
+libertyc
 lucky7i
 lucky7x
 magicard
@@ -36854,6 +36863,7 @@ pacmanpe
 pacmanso
 pacmansp
 pacmanug
+pacmanvcc
 pacmanvg
 pacmod
 pacplus
@@ -40333,10 +40343,15 @@ cm300
 @source:roland/roland_sc55mk2.cpp
 sc55mk2
 
+@source:roland/roland_sc8850.cpp
+sc8850
+sc8820
+
 @source:roland/roland_sc88.cpp
 sc88
 sc88vl
 sc88pro
+vegspro
 
 @source:roland/roland_tb303.cpp
 tb303
@@ -45407,6 +45422,7 @@ jgaoshou
 mtrain
 mtraina
 new2001
+ntrecity
 ptrain
 ptraina
 qbeebing

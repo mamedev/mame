@@ -1,4 +1,4 @@
-/* C++ compilation harness for the test suite.
+/*
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -6,7 +6,8 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017-2026 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -27,6 +28,31 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
-#include "common.c"
+#include "random_arc4random.h"
+
+#if ! defined(_DEFAULT_SOURCE)
+#  define _DEFAULT_SOURCE 1 /* for glibc */
+#endif
+
+#include <stdint.h> // for uint32_t
+#include <stdlib.h> // for arc4random
+#include <string.h> // for memcpy
+
+void
+writeRandomBytes_arc4random(void *target, size_t count) {
+  size_t bytesWrittenTotal = 0;
+
+  while (bytesWrittenTotal < count) {
+    const uint32_t random32 = arc4random();
+
+    size_t toUse = count - bytesWrittenTotal;
+    if (toUse > sizeof(random32))
+      toUse = sizeof(random32);
+    memcpy((char *)target + bytesWrittenTotal, &random32, toUse);
+    bytesWrittenTotal += toUse;
+  }
+}

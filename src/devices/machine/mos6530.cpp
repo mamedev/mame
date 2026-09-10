@@ -316,7 +316,7 @@ void mos6530_device_base::timer_start(uint8_t data)
 {
 	m_timerstate = TIMER_COUNTING;
 	attotime curtime = machine().time();
-	int64_t target = curtime.as_ticks(clock()) + 1 + (data << m_timershift);
+	int64_t target = curtime.as_ticks(clock()) + (data << m_timershift);
 	m_timer->adjust(attotime::from_ticks(target, clock()) - curtime);
 }
 

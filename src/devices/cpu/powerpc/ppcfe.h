@@ -63,6 +63,8 @@ public:
 	void set_fpscr_used(unsigned n)         { regin.set(REG_BIT_FPSCR0 + n); }
 	void set_fpscr_modified(unsigned n)     { regout.set(REG_BIT_FPSCR0 + n); }
 
+	bool ctr_modified() const               { return regout[REG_BIT_CTR]; }
+
 	uint32_t cr_modified() const            { return regmask_field<64, 32>(regout); }
 	uint8_t cr_modified(unsigned n) const   { return reg_cr(regout, n); }
 	uint32_t cr_required() const            { return regmask_field<64, 32>(regreq); }

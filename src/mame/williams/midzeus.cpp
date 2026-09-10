@@ -1171,7 +1171,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(      0x0400, "Stand Up" )
 	PORT_DIPSETTING(      0x0000, "Sit Down" )
-	PORT_DIPNAME( 0x0800, 0x0800, "Wheel Invert" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Invert Wheel Force Feedback/Shifter Polarity" )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" ) // Manual lists this dip as Unused

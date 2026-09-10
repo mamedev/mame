@@ -116,6 +116,28 @@ enum {
 	VDD_CURR_MAX_200MA   = 0x07
 };
 
+u8 crc7(u8 const *data, unsigned count)
+{
+	u8 crc = 0;
+
+	while (count--)
+	{
+		u8 value = *data++;
+
+		for (unsigned bit = 0; bit < 8; bit++)
+		{
+			crc <<= 1;
+
+			if (((value ^ crc) & 0x80) != 0)
+				crc ^= 0x09;
+
+			value <<= 1;
+		}
+	}
+
+	return crc & 0x7f;
+}
+
 } // anonymous namespace
 
 enum spi_sdcard_device::sd_state : u8
@@ -160,7 +182,8 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 	m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
 	m_out_delay(0), m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_xferblk(512), m_blknext(0),
 	m_crc_off(true),
-	m_bACMD(false)
+	m_bACMD(false),
+	m_exists_cb(*this)
 {
 	std::fill(std::begin(m_csd), std::end(m_csd), 0);
 	std::fill(std::begin(m_cmd), std::end(m_cmd), 0xff);
@@ -262,7 +285,6 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 	m_csd[13] =  0x00;                                       //      .. WRITE_BL_PARTIAL:1 0:5
 	m_csd[13] |= BIT(block_size_exp, 0, 2) << 6;
 	m_csd[14] =  0x00;                                       //  15: FILE_FORMAT_GRP:1 COPY:1 PERM_WRITE_PROTECT:1 TMP_WRITE_PROTECT:1 FILE_FORMAT:2 WP_UPC:1 0:1
-	m_csd[15] =  0x01;                                       //   7: CRC7 1:1
 
 	if (sdhc_ok && ((SD_TYPE_HC == m_preferred_type) || !sd_ok))
 	{
@@ -312,9 +334,11 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 		m_csd[11] |= 0x3f;                                   //      .. WP_GRP_SIZE:7
 	}
 
-	// TODO: calculate CRC7
+	m_csd[15] = (crc7(&m_csd[0], 15) << 1) | 1;              //   7: CRC7 1:1
 
 	LOG("Generated CSD %016x%016x\n", get_u64be(&m_csd[0]), get_u64be(&m_csd[8]));
+
+	m_exists_cb(1);
 
 	return std::error_condition();
 }
@@ -322,6 +346,8 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 void spi_sdcard_device::image_unloaded(device_image_interface &image)
 {
 	std::fill(std::begin(m_csd), std::end(m_csd), 0);
+
+	m_exists_cb(0);
 }
 
 void spi_sdcard_device::device_add_mconfig(machine_config &config)
@@ -429,7 +455,7 @@ void spi_sdcard_device::latch_in()
 					// FIXME: support multi-block read when transfer size is smaller than block size
 					m_data[0] = 0xfe; // data token
 					m_image->read(m_blknext++, &m_data[1]);
-					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[1], m_blksize);
+					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[1], m_blksize, 0);
 					put_u16be(&m_data[m_blksize + 1], crc16);
 					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", m_blknext - 1, m_data[1], m_data[2], m_blksize - 2, m_data[m_blksize - 1], m_data[m_blksize], crc16);
 					send_data(1 + m_blksize + 2, SD_STATE_DATA_MULTI);
@@ -533,7 +559,7 @@ void spi_sdcard_device::do_command()
 			m_data[17] = 0x59; // 0x15 9 = 2021, September
 			m_data[18] = 0x00; // CRC7, bit 0 is always 0
 			{
-				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], 16);
+				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], 16, 0);
 				put_u16be(&m_data[19], crc16);
 			}
 			send_data(3 + 16 + 2, SD_STATE_STBY);
@@ -594,7 +620,7 @@ void spi_sdcard_device::do_command()
 						blk /= m_blksize;
 					}
 					m_image->read(blk, &m_data[3]);
-					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk);
+					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk, 0);
 					put_u16be(&m_data[m_xferblk + 3], crc16);
 					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk, m_data[3], m_data[4], m_xferblk - 2, m_data[m_xferblk + 1], m_data[m_xferblk + 2], crc16);
 					send_data(3 + m_xferblk + 2, SD_STATE_DATA);
@@ -604,7 +630,7 @@ void spi_sdcard_device::do_command()
 					assert(m_type == SD_TYPE_V2);
 					m_image->read(blk / m_blksize, &m_sectorbuf[0]);
 					std::copy_n(&m_sectorbuf[blk % m_blksize], m_xferblk, &m_data[3]);
-					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk);
+					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk, 0);
 					put_u16be(&m_data[m_xferblk + 3], crc16);
 					LOG("reading LBA %x+%x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk / m_blksize, blk % m_blksize, m_data[3], m_data[4], m_xferblk - 2, m_data[m_xferblk + 1], m_data[m_xferblk + 2], crc16);
 					send_data(3 + m_xferblk + 2, SD_STATE_DATA);
