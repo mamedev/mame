@@ -636,8 +636,6 @@ protected:
 
 	u8 gate_r();
 	u8 switch_r(offs_t offset);
-
-	void encoder_moved(int encoder);
 	u8 encoder_dir_r();
 	u8 encoder_sw_r();
 	bool memory_protect_r() const;
@@ -921,15 +919,6 @@ void xpander_state_base::xpander_common(machine_config &config)
 	led1.bit_handler<7>().set_output("led_value").invert();
 
 	for (int i = 0; i < m_encoder.size(); ++i)
-	{
-		QUADENCODER(config, m_encoder[i]);
-		m_encoder[i]->write_mn().set([this, i] (int state) { encoder_moved(i); });
-		m_encoder[i]->write_pl().set([this, i] (int state) { encoder_moved(i); });
-		TTL7474(config, m_encoder_dir_ff[i]);
-		TTL7474(config, m_encoder_changed_ff[i]).d_w(1);  // D tied to +5V.
-	}
-
-	for (int i = 0; i < m_encoder_dir_ff.size(); ++i)
 	{
 		QUADENCODER(config, m_encoder[i]);
 		m_encoder[i]->write_mn().set([this, i] (int state) { encoder_moved(i); });
