@@ -45,12 +45,16 @@
     saved context.  Restoration overwrites the signature, so each saved
     context can be resumed only once.
 
-    The ROM definition supplies deterministic default NVRAM with setting 3
-    and no saved context, allowing a first run to take the normal cold-start
-    path.  If the SRAM is instead all zero, the firmware's RAM-loss stop
-    displays "nE" and stores default setting 3; resetting or restarting then
-    boots normally.  This matches real hardware after the supercapacitor has
-    discharged or the RAM has been cleared.
+    If the SRAM is all zero, the firmware's RAM-loss stop displays "nE" and
+    stores default setting 3; resetting or restarting then boots normally.
+    This matches real hardware after the supercapacitor has discharged or the
+    RAM has been cleared.
+
+    The default NVRAM is not factory content or a hardware dump.  It is a
+    convenience image written by the Wild Cats firmware itself running in
+    MAME: after the "nE" stop, the machine was restarted, left idle at
+    setting 3 and shut down with Main Power Off, so a first run resumes
+    that saved context.
 
     Not every bit of these ports is a lamp. Some are solenoids, a motor,
     sensors, or terminals wired to the hall's management computer, and
@@ -572,8 +576,8 @@ ROM_START( wildcats )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wildcats-ndk.bin", 0x00000, 0x2000, CRC(362b3e92) SHA1(40aa96dded5a55865892868fd09cf5af4c909c85) )
 
-	ROM_REGION( 0x0800, "nvram", ROMREGION_ERASE00 )
-	ROM_FILL( 0x0000, 0x0001, 0x03 ) // default setting 3, no saved context
+	ROM_REGION( 0x0800, "nvram", 0 ) // uPD449C-1 at IC9, default contents generated in MAME (see notes above)
+	ROM_LOAD( "upd449c-1.ic9", 0x0000, 0x0800, CRC(fe35d05d) SHA1(4e3f065a3c014ef8f46d224081b4c46d93e0a8db) )
 ROM_END
 
 } // anonymous namespace
