@@ -51,4 +51,12 @@
         <step file="step"/>
         <seek nomrate="13" maxrate="20" file="seek"/>
      </drive>
+
+     <drive name="ti99_peb_int" base="default"/>
+     <drive name="ti99_peb_ext" base="default"/>
+     <drive name="ti99_peb_dsk1" base="ti99_peb_int"/>
+     <drive name="ti99_peb_dsk2" base="ti99_peb_int"/>
+     <drive name="ti99_peb_dsk3" base="ti99_peb_ext"/>
+     <drive name="ti99_peb_dsk4" base="ti99_peb_ext"/>
+
  </drivesound>

@@ -345,9 +345,12 @@ void floppy_sound_device::device_start()
 	m_firstturn = true;
 }
 
+/* 
+	For the DTD, see the introduction comments in drivesound.h	
+*/
 bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* devname)
 {
-	// read the file
+	// Read the file
 	util::xml::file::ptr const root(util::xml::file::read(file, nullptr));
 	if (!root)
 	{
@@ -355,7 +358,7 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 		return false;
 	}
 
-	// find the samples node
+	// Find the samples node
 	util::xml::data_node const *const samplesnode = root->get_child("drivesound");
 	if (!samplesnode)
 	{
@@ -370,17 +373,110 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 
 	default_samples.clear();
 	m_samples.clear();
-
-	// Iterate over all device nodes
-	// Default sounds must be attributed as "default" for possibly different form factors
-	// Should be appended to the end of the list so that the desired samples can override them
+	
+	/* This is a first pass, serving to resolve the derivations
+	  
+	   Idea: The drive name, passed in by the connector, may refer to a sample set
+	         directly, but also to a name that refers to the actual samples,
+	         or even following a longer path of indirection. This allows us to
+	         set up a categorization (like internal vs. external drives).
+	 	  
+	   Example:         
+	         <drive name="ti99_peb_dsk1" base="ti99_peb_internal" />
+	         <drive name="ti99_peb_dsk2" base="ti99_peb_internal" />
+	         <drive name="ti99_peb_internal" base="default" />
+	           
+	         Both keys "ti99_peb_dsk1" and "ti99_peb_dsk2" refer to the
+	         key "ti99_peb_internal", and this one refers to the default
+	         samples.
+	        
+	   The base attribute is required in this usage. The end of the chain 
+	   is reached with an element without base attribute, which defines the 
+	   sample set. If there is no such element, the default samples are used.
+	        
+	   The value "none" turns off the samples for this name.
+ 
+	     <drive name="..." base="none" />
+	
+	   Distinguishing between form factors is done at the end of the chain,
+	   so this alias naming is not concerned with form factors. 
+	*/
+	bool resolved = false;
+	bool found = false;
+	
+	// We limit the depth to 10 to avoid endless loops by misconfiguration
+	int loopcount = 10;
+	
+	while (!resolved && (loopcount > 0))
+	{
+		loopcount--;
+		found = false;
+		for (util::xml::data_node const *drvnode = samplesnode->get_child("drive"); drvnode; drvnode = drvnode->get_next_sibling("drive"))
+		{
+			char const *name = drvnode->get_attribute_string("name", "");
+			char const *base = drvnode->get_attribute_string("base", "");
+			
+			if (strlen(name) == 0)
+			{
+				LOGMASKED(LOG_CONFIG, "Missing name in sample set definition\n");
+				return false;
+			}
+			
+			if (strcmp(name,devname)==0)
+			{
+				found = true;
+				if (strlen(base)==0)
+				{
+					// Chain end
+					resolved = true;
+					break;
+				}
+				else
+				{
+					if (strcmp(base, "none")==0)
+					{
+						LOGMASKED(LOG_CONFIG, "Samples set to none for name '%s', disabling drive sound. \n", devname);
+						return false;
+					}
+					else
+						devname = base;
+				}
+			}
+		}
+		
+		// If the chain breaks at any position, use default
+		if (!found) 
+		{
+			LOGMASKED(LOG_CONFIG, "Name '%s' cannot be resolved\n", devname);
+			devname = "default";
+			resolved = true;
+			break;
+		}
+	}
+	
+	if (loopcount == 0)
+	{
+		LOGMASKED(LOG_CONFIG, "Sample name '%s' cannot be resolved, loop in definition.\n", devname);  
+		devname = "default";
+	}
+	
+	/*  Now iterate over all drive nodes (except for the derivations).
+	    The name "default" is reserved for the default sample set, which may
+	    be offered for each form factor under this name.
+	    
+	    The first match by name and form factor is selected.
+	*/
 	for (util::xml::data_node const *drvnode = samplesnode->get_child("drive"); drvnode; drvnode = drvnode->get_next_sibling("drive"))
 	{
 		char const *name = drvnode->get_attribute_string("name", "");
 		char const *path = drvnode->get_attribute_string("path", "");
 		char const *form = drvnode->get_attribute_string("formfactor", "");
 		char const *desc = drvnode->get_attribute_string("description", "");
-
+		
+		// Skip the derivations from the first pass
+		if (strlen(drvnode->get_attribute_string("base", ""))!=0)
+			continue;
+		
 		// Check for valid form factor and path
 		if (strlen(form)==0)
 		{
@@ -418,6 +514,7 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 		{
 			if (strcmp(name, "default")==0)
 			{
+				// Store all default samples in an own list
 				current_samples = &default_samples;
 			}
 			else
@@ -552,6 +649,11 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 				}
 			}
 		}
+		
+		// We found the desired sample set, but are there some important 
+		// samples missing? We could now fall back to defaults, 
+		// but these definitions were provided on purpose, and so
+		// we should make that failure explicit.
 		if (!spinloaded_sample)
 		{
 			LOGMASKED(LOG_CONFIG, "No samples for spinning (loaded) in definition\n");
@@ -569,19 +671,19 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 		}
 	}
 
-	// If we could not fund specific samples, copy the default samples into the list
+	// If we could not find the desired samples, copy the default samples into the list
 	if (m_samples.count() == 0)
 	{
 		if (default_samples.count()==0)
 		{
-			LOGMASKED(LOG_CONFIG, "No floppy sound samples found, no default samples available; disabling drive sound\n");
+			LOGMASKED(LOG_CONFIG, "No sound samples found, no default samples available; disabling drive sound.\n");
 			return false;
 		}
 
 		if (strcmp(devname, "default")==0)
 			LOGMASKED(LOG_CONFIG, "Using default samples\n");
 		else
-			LOGMASKED(LOG_CONFIG, "Floppy sound sample set '%s' not found, using default samples\n", devname);
+			LOGMASKED(LOG_CONFIG, "Sound samples '%s' not found, using default samples.\n", devname);
 		default_samples.append_to(m_samples);
 	}
 	return true;
@@ -601,7 +703,7 @@ void floppy_sound_device::set_samples(const char *name, int form_factor, int max
 	std::error_condition const fileerr = file.open(std::string("floppy.xml"));
 	if (fileerr == std::errc::no_such_file_or_directory)
 	{
-		LOGMASKED(LOG_CONFIG, "samples config file 'floppy.xml' not found\n");
+		LOGMASKED(LOG_CONFIG, "Samples configuration file 'floppy.xml' not found, disabling drive sound.\n");
 		return;
 	}
 	else
