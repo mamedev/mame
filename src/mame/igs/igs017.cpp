@@ -4598,9 +4598,9 @@ static INPUT_PORTS_START( hjdmg )
 	PORT_DIPNAME( 0x40, 0x40, "Show Title" )                            PORT_DIPLOCATION("SW2:7")         // 機種名稱
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )                                                               // 無            copyright notice over picture of clouds in the sky
 	PORT_DIPSETTING(    0x40, DEF_STR(Yes) )                                                              // 有            game title and copyright notice with picture of golden statue on black background
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                        PORT_DIPLOCATION("SW2:8")         // 開分卡        TODO: when this is on, it automatically bets up to ten credits, and always pays out immediately on winning (i.e. doesn't use bet and payout buttons)
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                              // 無
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                               // 有
+	PORT_DIPNAME( 0x80, 0x80, "Use External Credit Manager" )           PORT_DIPLOCATION("SW2:8")         // 開分卡
+	PORT_DIPSETTING(    0x80, DEF_STR(No) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                              // 有            automatically bet up to ten credits and pay out immediately on win (i.e. bet and payout buttons aren't needed)
 
 	// Double up game controls are a bit weird - the dedicated keys aren't used:
 	// Double Up (double):  A
