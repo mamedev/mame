@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont,byuu
+// copyright-holders:R. Belmont,byuu,Jonathan Gevaryahu
 /***************************************************************************
 
-    upd7725.h
+    upd7720.h
 
-    Core implementation for the portable NEC uPD7725/uPD96050 emulator
+    Core implementation for the portable NEC uPD7720 emulator
 
 ****************************************************************************/
 
-#ifndef MAME_CPU_UPD7725_UPD7725_H
-#define MAME_CPU_UPD7725_UPD7725_H
+#ifndef MAME_CPU_UPD7725_UPD7720_H
+#define MAME_CPU_UPD7725_UPD7720_H
 
 #pragma once
 
@@ -20,7 +20,7 @@
 // input lines
 enum
 {
-	NECDSP_INPUT_LINE_INT = 0
+	UPD7720_INPUT_LINE_INT = 0
 	// add more here as needed
 };
 
@@ -28,13 +28,14 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> necdsp_device
+// ======================> upd7720_device
 
-class necdsp_device : public cpu_device
+class upd772x_device : public cpu_device
 {
 public:
 	auto p0() { return m_out_p0_cb.bind(); }
 	auto p1() { return m_out_p1_cb.bind(); }
+	auto so16() { return m_out_so16_cb.bind(); }
 
 	uint8_t status_r();
 	uint8_t data_r();
@@ -42,7 +43,7 @@ public:
 
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, uint32_t drambits);
+	upd772x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -85,6 +86,7 @@ private:
 		}
 	};
 
+
 	uint16_t m_pc;          //program counter
 	uint16_t m_stack[16];   //LIFO
 	uint16_t m_rp;          //ROM pointer
@@ -99,7 +101,6 @@ private:
 	Flag     m_flaga;
 	Flag     m_flagb;
 	uint16_t m_tr;        //temporary register
-	uint16_t m_trb;       //temporary register
 	uint16_t m_sr;        //status register
 	uint16_t m_dr;        //data register
 	uint16_t m_si;
@@ -107,6 +108,7 @@ private:
 	uint16_t m_idb;
 	bool     m_siack;     // Serial in ACK
 	bool     m_soack;     // Serial out ACK
+
 
 	void exec_op(uint32_t opcode);
 	void exec_rt(uint32_t opcode);
@@ -122,9 +124,9 @@ private:
 	// 1 = next opcode is the first half of int firing 'NOP'
 	// 2 = next opcode is the second half of int firing 'CALL 0100'
 	int m_irq_firing;
-	memory_access<14, 2, -2, ENDIANNESS_BIG>::cache m_cache;
-	memory_access<14, 2, -2, ENDIANNESS_BIG>::specific m_program;
-	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access<14, 2, -2, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<14, 2, -2, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<12, 1, -1, ENDIANNESS_LITTLE>::specific m_data;
 protected:
 	memory_access<11, 1, -1, ENDIANNESS_BIG>::specific m_dataram;
 
@@ -137,38 +139,24 @@ protected:
 	//devcb_read_line   m_in_dack_cb;
 	devcb_write_line    m_out_p0_cb;
 	devcb_write_line    m_out_p1_cb;
-	//devcb_write8      m_out_so_cb;
+	devcb_write16       m_out_so16_cb;
+	//devcb_write_line  m_out_so_cb;
 	//devcb_write_line  m_out_sorq_cb;
 	//devcb_write_line  m_out_drq_cb;
 
 	void dataram_map(address_map &map) ATTR_COLD;
 };
 
-class upd7725_device : public necdsp_device
+class upd7720_device : public upd772x_device
 {
 public:
 	// construction/destruction
-	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7720_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class upd96050_device : public necdsp_device
-{
-public:
-	// construction/destruction
-	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	uint16_t dataram_r(uint16_t addr) { return m_dataram.read_word(addr & m_drammask); }
-	void dataram_w(uint16_t addr, uint16_t data, uint16_t mem_mask = uint16_t(~0))
-	{
-		uint16_t temp = (m_dataram.read_word(addr & m_drammask) & (~mem_mask));
-		temp |= data & mem_mask;
-		m_dataram.write_word(addr & m_drammask, temp);
-	}
-};
 
 // device type definition
-DECLARE_DEVICE_TYPE(UPD7725,  upd7725_device)
-DECLARE_DEVICE_TYPE(UPD96050, upd96050_device)
+DECLARE_DEVICE_TYPE(UPD7720,  upd7720_device)
 
 //**************************************************************************
 //  ENUMERATIONS
@@ -177,44 +165,43 @@ DECLARE_DEVICE_TYPE(UPD96050, upd96050_device)
 // registers
 enum
 {
-	D7725_PC = 1,
-	D7725_RP,
-	D7725_DP,
-	D7725_K,
-	D7725_L,
-	D7725_M,
-	D7725_N,
-	D7725_A,
-	D7725_B,
-	D7725_FLAGA,
-	D7725_FLAGB,
-	D7725_SR,
-	D7725_DR,
-	D7725_SP,
-	D7725_TR,
-	D7725_TRB,
-	D7725_SI,
-	D7725_SO,
-	D7725_IDB,
-	D7725_SIACK,
-	D7725_SOACK
+	D7720_PC = 1,
+	D7720_RP,
+	D7720_DP,
+	D7720_K,
+	D7720_L,
+	D7720_M,
+	D7720_N,
+	D7720_A,
+	D7720_B,
+	D7720_FLAGA,
+	D7720_FLAGB,
+	D7720_SR,
+	D7720_DR,
+	D7720_SP,
+	D7720_TR,
+	D7720_SI,
+	D7720_SO,
+	D7720_IDB,
+	D7720_SIACK,
+	D7720_SOACK
 };
 
 // sr bitmasks
 enum
 {
-	D7725SR_P0 =  0x0001,
-	D7725SR_P1 =  0x0002,
-	D7725SR_EI =  0x0080,
-	D7725SR_SIC = 0x0100,
-	D7725SR_SOC = 0x0200,
-	D7725SR_DRC = 0x0400,
-	D7725SR_DMA = 0x0800,
-	D7725SR_DRS = 0x1000,
-	D7725SR_USF0= 0x2000,
-	D7725SR_USF1= 0x4000,
-	D7725SR_RQM = 0x8000
+	D7720SR_P0 =  0x0001,
+	D7720SR_P1 =  0x0002,
+	D7720SR_EI =  0x0080,
+	D7720SR_SIC = 0x0100,
+	D7720SR_SOC = 0x0200,
+	D7720SR_DRC = 0x0400,
+	D7720SR_DMA = 0x0800,
+	D7720SR_DRS = 0x1000,
+	D7720SR_USF0= 0x2000,
+	D7720SR_USF1= 0x4000,
+	D7720SR_RQM = 0x8000
 };
 
 
-#endif // MAME_CPU_UPD7725_UPD7725_H
+#endif // MAME_CPU_UPD7725_UPD7720_H
