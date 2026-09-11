@@ -1,0 +1,34 @@
+* license:BSD-3-Clause
+* Run from scratchpad with WP >8300 and interrupts disabled.
+* Each iteration acknowledges VDP INT2 before briefly enabling interrupts.
+* A stale INTREQ sends execution to the console handler and fails the test.
+* Vary the delay to exercise different phases of the /64 timer divider.
+       AORG >8320
+       LIMI 0
+       LWPI >8300
+       CLR R12
+       SBZ 0
+       SBZ 3
+       SBO 2
+       LI R0,>E000
+       MOVB R0,@>8C02
+       LI R0,>8100
+       MOVB R0,@>8C02
+       CLR R7
+LOOP   MOVB @>8802,R1
+WAIT   TB 2
+       JEQ WAIT
+       MOV R7,R6
+       ANDI R6,>003F
+       INC R6
+DELAY  DEC R6
+       JNE DELAY
+       MOVB @>8802,R1
+       LIMI 1
+       NOP
+       LIMI 0
+       INC R7
+       CI R7,256
+       JL LOOP
+DONE   JMP DONE
+       END
