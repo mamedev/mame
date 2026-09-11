@@ -846,9 +846,11 @@ void cdicdic_device::process_disc_sector()
 		uint32_t audio_starts[cdrom_file::MAX_TRACKS];
 		for (uint32_t i = 0; i < toc.numtrks; i++)
 		{
+			frames += toc.tracks[i].frames + toc.tracks[i].extraframes;
+
 			if (toc.tracks[i].trktype != cdrom_file::CD_TRACK_AUDIO)
 			{
-				frames += toc.tracks[i].frames + toc.tracks[i].extraframes;
+				other_tracks++;
 			}
 			else
 			{
@@ -902,7 +904,7 @@ void cdicdic_device::process_disc_sector()
 			*toc_buffer++ = 0xa1;
 			if (audio_tracks > 0)
 			{
-				uint8_t last_audio_track = (uint8_t)(audio_tracks - 1);
+				uint8_t last_audio_track = audio_tracks;
 				*toc_buffer++ = ((last_audio_track / 10) << 4) | (last_audio_track % 10);
 			}
 			else
