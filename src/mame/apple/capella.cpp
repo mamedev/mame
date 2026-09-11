@@ -4,7 +4,7 @@
 
     Apple "Capella" (343S1181) PowerPC-to-68k bus bridge
     This handles bus translation on the Cordyceps (Power Macintosh x200/x300) board.
-    
+
     Memory map based on how the 6200 bootrom behaves:
 
     - $51xxxxxx: Cache RAM, 64 bits wide (on ROM/L2 card)
@@ -39,6 +39,10 @@
         before sending them off to the 68k emulator.
         See https://github.com/elliotnunn/NanoKernel/blob/master/ExternalInts.s, ExtIntHandlerCordyceps
 
+    Interrupt model:
+        Same as AMIC / PDM: the PowerPC must be interrupted whenever the 68k lines *change*, not
+        just when one is raised.
+
     The 6260 developer notes mention a "M7 bit" in the Capella that, when toggled, acts as a ROM switch.
     This isn't really needed to start the system; it's enough to map the ROM where it should go.
 
@@ -46,7 +50,6 @@
     https://siliconpr0n.org/archive/doku.php?id=bercovici:vlsi:vy16669-apple-343s1181-a-capella&s[]=capella
 
 ****************************************************************************/
-
 
 #include "emu.h"
 #include "capella.h"
@@ -57,16 +60,10 @@ DEFINE_DEVICE_TYPE(CAPELLA, capella_device, "maccapella", "Apple Capella PowerPC
 
 void capella_device::map(address_map &map)
 {
-    map(0x53000008, 0x5300000f).rw(FUNC(capella_device::ctrl_r), FUNC(capella_device::ctrl_w));
-    map(0x53000010, 0x53000017).rw(FUNC(capella_device::ctrl_b_r), FUNC(capella_device::ctrl_b_w));
-    map(0x53000018, 0x5300001f).rw(FUNC(capella_device::irq_ack_r), FUNC(capella_device::irq_ack_w));
-    map(0x53000020, 0x53000027).r(FUNC(capella_device::ipl_lines_r));
-}
-
-//-------------------------------------------------
-
-void capella_device::device_add_mconfig(machine_config &config)
-{
+	map(0x53000008, 0x5300000f).rw(FUNC(capella_device::ctrl_r), FUNC(capella_device::ctrl_w));
+	map(0x53000010, 0x53000017).rw(FUNC(capella_device::ctrl_b_r), FUNC(capella_device::ctrl_b_w));
+	map(0x53000018, 0x5300001f).rw(FUNC(capella_device::irq_ack_r), FUNC(capella_device::irq_ack_w));
+	map(0x53000020, 0x53000027).r(FUNC(capella_device::ipl_lines_r));
 }
 
 //-------------------------------------------------
@@ -76,10 +73,12 @@ void capella_device::device_add_mconfig(machine_config &config)
 capella_device::capella_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CAPELLA, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
-    m_ctrl_reg(0),
-    m_ctrl_reg_b(0),
-    m_last_pending_irq(-1),
-    m_ipl_lines(7)
+	m_ctrl_reg(0),
+	m_ctrl_reg_b(0),
+	m_iosb_ipl(0),
+	m_nmi(0),
+	m_ipl(0),
+	m_irq_pending(false)
 {
 }
 
@@ -89,6 +88,12 @@ capella_device::capella_device(const machine_config &mconfig, const char *tag, d
 
 void capella_device::device_start()
 {
+	save_item(NAME(m_ctrl_reg));
+	save_item(NAME(m_ctrl_reg_b));
+	save_item(NAME(m_iosb_ipl));
+	save_item(NAME(m_nmi));
+	save_item(NAME(m_ipl));
+	save_item(NAME(m_irq_pending));
 }
 
 //-------------------------------------------------
@@ -97,64 +102,76 @@ void capella_device::device_start()
 
 void capella_device::device_reset()
 {
-    m_last_pending_irq = -1;
-    m_ctrl_reg_b = 0; // CPU bootloops otherwise
+	m_ctrl_reg = 0;
+	m_ctrl_reg_b = 0; // CPU bootloops otherwise
+	m_ipl = m_nmi ? 7 : m_iosb_ipl;
+	m_irq_pending = false;
+	m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 }
-
 
 //-------------------------------------------------
 
 u64 capella_device::ctrl_r(offs_t offset)
 {
-    return m_ctrl_reg & 0x1F;
+	return m_ctrl_reg & 0x1f;
 }
 
 void capella_device::ctrl_w(offs_t offset, u64 data)
 {
-    m_ctrl_reg = data & 0x1f;
+	m_ctrl_reg = data & 0x1f;
 }
 
 u64 capella_device::ctrl_b_r(offs_t offset)
 {
-    return m_ctrl_reg_b & 0x1F;
+	return m_ctrl_reg_b & 0x1f;
 }
 
 void capella_device::ctrl_b_w(offs_t offset, u64 data)
 {
-    m_ctrl_reg_b = data & 0x1f;
+	m_ctrl_reg_b = data & 0x1f;
 }
 
 u64 capella_device::ipl_lines_r(offs_t offset)
 {
-    return m_ipl_lines;
+	return (~m_ipl) & 7;
 }
 
 u64 capella_device::irq_ack_r(offs_t offset)
 {
-    m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
-    return 0;
+	return m_irq_pending ? 1 : 0;
 }
 
 void capella_device::irq_ack_w(offs_t offset, u64 data)
 {
-    m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
-
-    // functionality guessed
-    if (!(1 <= m_last_pending_irq && m_last_pending_irq <= 7)) {
-        m_ipl_lines = 7;
-        return;
-    }
-    m_ipl_lines = ~m_last_pending_irq & 7;
+	m_irq_pending = false;
+	m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 }
+
+//-------------------------------------------------
 
 void capella_device::translate_ipl_state_change(int ipl)
 {
-    // should only see IRQs 1, 2, 4 from primetime and NMI 7 from the CUDA
-    if (!(1 <= ipl && ipl <= 7)) {
-        m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
-        return;
-    }
+	// should only see IRQs 1, 2, 4 from PrimeTime
+	m_iosb_ipl = ((ipl >= 1) && (ipl <= 7)) ? ipl : 0;
+	update_ipl();
+}
 
-    m_last_pending_irq = ipl;
-    m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
+void capella_device::nmi_w(int state)
+{
+	m_nmi = state ? 1 : 0;
+	update_ipl();
+}
+
+void capella_device::update_ipl()
+{
+	const u8 ipl = m_nmi ? 7 : m_iosb_ipl;
+	if (ipl == m_ipl)
+	{
+		return;
+	}
+
+	// *any* change on the IPL lines interrupts the CPU
+	m_ipl = ipl;
+	m_irq_pending = true;
+	m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
 }
