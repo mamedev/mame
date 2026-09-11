@@ -138,7 +138,7 @@ void sh7014_device::sh7014_map(address_map &map)
 void sh7014_device::sh2_exception_internal(const char *message, int irqline, int vector)
 {
 	// IRQ was taken so clear it in the interrupt controller and pass it down
-	m_intc->set_interrupt(vector, CLEAR_LINE);
+	m_intc->interrupt_taken(vector);
 	sh2_device::sh2_exception_internal(message, irqline, vector);
 }
 
