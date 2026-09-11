@@ -1363,21 +1363,6 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="fe3" supported="no">
-		<description>Final Expansion 3</description>
-		<year>2011</year>
-		<publisher>Denial</publisher>
-		<info name="serial" value="VIC-2011" />
-		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		<part name="cart" interface="vic1001_cart">
-			<feature name="slot" value="fe" />
-			<dataarea name="rom" size="0x80000">
-				<rom name="fe3vice-r020.bin" size="0x80000" crc="c12d844a" sha1="3946b6595f4ac0469a9fd97e4cd156618e868deb" offset="0x0000" />
-			</dataarea>
-			<dataarea name="ram" size="0x80000"/>
-		</part>
-	</software>
-
 	<software name="finalorb">
 		<description>Final Orbit + Bumper Bash (NTSC)</description>
 		<year>1983</year>

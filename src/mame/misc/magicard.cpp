@@ -1911,6 +1911,20 @@ ROM_START( puzzleme )
 	ROM_LOAD("x24c02p.ic26",    0x0000, 0x0100, CRC(bc940f53) SHA1(6b870019752ba5c446a5ad5155e4a81dfbf6e523) )
 ROM_END
 
+ROM_START( libertyc ) // seems the same PCB as puzzleme
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "liberty_card_export_94_v1.02.ic21", 0x00000, 0x80000, CRC(f5bb5dd0) SHA1(9c49ef4b5f42ddc689993d5129653efbfc57bce6) )
+
+	ROM_REGION( 0x1fff, "pic16c54", 0 )
+	ROM_LOAD( "pic16c54.ic29", 0x0000, 0x1fff, CRC(6dd2bd8e) SHA1(380f6b952ddd3183e9ab5404866c30be015b3773) BAD_DUMP ) // from puzzleme, seems to work, but a dump is needed
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD( "x24c02p.ic26", 0x0000, 0x0100, CRC(54145712) SHA1(e2ddeb155c4422c54b621fd5acf4c2b8a4808c62) )
+
+	ROM_REGION( 0x10000, "nvram", 0 ) // pre-initialized
+	ROM_LOAD( "nvram", 0x00000, 0x10000, CRC(7b8150f8) SHA1(58a56401843f9b27ed1b6a4c2f786c20ecc0e3ab) )
+ROM_END
+
 
 /*
   magicrd1
@@ -2482,6 +2496,7 @@ GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, em
 GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init,    ROT0,  "Impera",               "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init,    ROT0,  "Impera",               "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
+GAME(  1994, libertyc,   0,        puzzleme,       magicrde,  hotslots_state, empty_init,    ROT0,  "NovoPlay",             "Liberty Card (v1.02)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE )

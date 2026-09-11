@@ -94,8 +94,6 @@
 #define VIC6567_CLOCK           (XTAL(14'318'181) / 14) // 1022727
 #define VIC6569_CLOCK           (XTAL(17'734'472) / 18) // 985248
 
-#define VIC6566_DOTCLOCK        (VIC6566_CLOCK * 8) // 8000000
-#define VIC6567R56A_DOTCLOCK    (VIC6567R56A_CLOCK * 8) // 8000000
 #define VIC6567_DOTCLOCK        (VIC6567_CLOCK * 8) // 8181818
 #define VIC6569_DOTCLOCK        (VIC6569_CLOCK * 8) // 7881988
 
@@ -109,13 +107,6 @@
 #define VIC6567R56A_VRETRACERATE    (VIC6567R56A_CLOCK / 262 / 64)
 #define VIC6567_VRETRACERATE        (VIC6567_CLOCK / 263 / 65)
 #define VIC6569_VRETRACERATE        (VIC6569_CLOCK / 312 / 63)
-
-#define VIC6566_HRETRACERATE    (VIC6566_CLOCK / VIC6566_CYCLESPERLINE)
-#define VIC6567_HRETRACERATE    (VIC6567_CLOCK / VIC6567_CYCLESPERLINE)
-#define VIC6569_HRETRACERATE    (VIC6569_CLOCK / VIC6569_CYCLESPERLINE)
-
-#define VIC2_HSIZE      320
-#define VIC2_VSIZE      200
 
 #define VIC6567_VISIBLELINES    235
 #define VIC6569_VISIBLELINES    284
@@ -144,35 +135,8 @@
 #define VIC6567_X_2_EMU(a)  (a)
 #define VIC6569_X_2_EMU(a)  (a)
 
-#define VIC6567_STARTVISIBLELINES ((VIC6567_LINES - VIC6567_VISIBLELINES)/2)
-#define VIC6569_STARTVISIBLELINES 16 /* ((VIC6569_LINES - VIC6569_VISIBLELINES)/2) */
-
-#define VIC6567_FIRSTRASTERLINE 34
-#define VIC6569_FIRSTRASTERLINE 0
-
 #define VIC6567_COLUMNS 512
 #define VIC6569_COLUMNS 504
-
-#define VIC6567_STARTVISIBLECOLUMNS ((VIC6567_COLUMNS - VIC6567_VISIBLECOLUMNS)/2)
-#define VIC6569_STARTVISIBLECOLUMNS ((VIC6569_COLUMNS - VIC6569_VISIBLECOLUMNS)/2)
-
-#define VIC6567_FIRSTRASTERCOLUMNS 412
-#define VIC6569_FIRSTRASTERCOLUMNS 404
-
-#define VIC6569_FIRST_X 0x194
-#define VIC6567_FIRST_X 0x19c
-
-#define VIC6569_FIRST_VISIBLE_X 0x1e0
-#define VIC6567_FIRST_VISIBLE_X 0x1e8
-
-#define VIC6569_MAX_X 0x1f7
-#define VIC6567_MAX_X 0x1ff
-
-#define VIC6569_LAST_VISIBLE_X 0x17c
-#define VIC6567_LAST_VISIBLE_X 0x184
-
-#define VIC6569_LAST_X 0x193
-#define VIC6567_LAST_X 0x19b
 
 
 
@@ -203,6 +167,12 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 	void lp_w(int state);
+
+	// time until the chip's own raster counters (as latched by lp_w into LPX/LPY) reach the given position
+	attotime time_until_pos(int rasterline, int raster_x = 0) const;
+
+	// same, but taking a light pen crosshair position in 0-255 fractional-of-visible-picture units
+	attotime time_until_lightpen_pos(int x255, int y255) const;
 
 	int phi0_r() { return m_phi0; } // phi 0
 	int ba_r()   { return m_ba; }   // bus available
@@ -297,6 +267,7 @@ protected:
 	uint16_t m_graphic_x;
 	uint8_t m_last_data;
 	int m_lp;
+	bool m_lp_latched_this_frame; // real VIC-II only allows one LP capture per frame; the internal inhibit clears at vblank, not on a $D019 read/write
 
 	/* convert multicolor byte to background/foreground for sprite collision */
 	uint16_t m_expandx[256];

@@ -48,14 +48,6 @@ Notes:
 
 */
 
-/*
-
-    TODO:
-
-    - entering a bad command locks up the system
-
-*/
-
 #include "emu.h"
 #include "ssa.h"
 

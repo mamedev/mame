@@ -13,10 +13,8 @@ TODO:
   * nebulus: 20 lines off with aa310;
   * lotustc2: abuses color flipping;
   * quazer: needs in-flight DMA;
-- move DAC handling into a separate sub-device(s),
-  particularly needed for proper VIDC20 mixing and likely for fixing aliasing
-  issues in VIDC10;
-- complete VIDC20 emulation (RiscPC/ssfindo.cpp);
+  * twinwrld: status bar;
+- complete VIDC20 emulation (RiscPC/ssfindo.cpp/belatra.cpp);
 - Are CRTC values correct? VGA modes have a +1 in display line;
 
 **********************************************************************************************/
@@ -70,6 +68,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this)
 	, m_bpp_mode(0)
 	, m_crtc_interlace(0)
 	, m_sound_frequency_latch(0)
@@ -78,7 +77,6 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_filter(*this, "filter%u", 0)
 	, m_dac(*this, "dac%u", 0)
 	, m_dac_type(dac_type)
-	, m_speaker(*this, "speaker")
 	, m_sound_fifo_channel(0)
 	, m_vblank_cb(*this)
 	, m_sound_drq_cb(*this)
@@ -124,9 +122,6 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 // TODO: bad, compose better
 void acorn_vidc10_device::device_add_mconfig_common(machine_config &config)
 {
-	// TODO: expose, aristmk5.cpp is mono (outputs to left only)
-	SPEAKER(config, m_speaker, 2).front();
-
 	// The actual filters here are two simple differentiator filters just
 	// after the VIDC itself (to combine the +L and -L, and +R and -R
 	// signals respectively), followed by two third-order Sallen-Key
@@ -143,10 +138,10 @@ void acorn_vidc10_device::device_add_mconfig_common(machine_config &config)
 	// This has the added benefit of removing the DC startup offset.
 
 	FILTER_RC(config, m_filter_rc[0]).set_ac(); // CR highpass, left
-	m_filter_rc[0]->add_route(0, m_speaker, 1.0, 0);
+	m_filter_rc[0]->add_route(0, *this, 1.0, 0);
 
 	FILTER_RC(config, m_filter_rc[1]).set_ac(); // CR highpass, right
-	m_filter_rc[1]->add_route(0, m_speaker, 1.0, 1);
+	m_filter_rc[1]->add_route(0, *this, 1.0, 1);
 
 	FILTER_BIQUAD(config, m_filter[0]); // 2nd order left
 
@@ -665,16 +660,21 @@ void arm_vidc20_device::regs_map(address_map &map)
 	map(0xa0, 0xa7).w(FUNC(arm_vidc20_device::stereo_image_w));
 	map(0xb0, 0xb0).w(FUNC(arm_vidc20_device::vidc20_sound_frequency_w));
 	map(0xb1, 0xb1).w(FUNC(arm_vidc20_device::vidc20_sound_control_w));
+	map(0xc0, 0xcf).w(FUNC(arm_vidc20_device::ereg_w));
 	map(0xd0, 0xdf).w(FUNC(arm_vidc20_device::fsynreg_w));
 	map(0xe0, 0xef).w(FUNC(arm_vidc20_device::vidc20_control_w));
+	map(0xf0, 0xff).w(FUNC(arm_vidc20_device::dctl_w));
 }
 
+// defaults are irrelevant, needs to be set by client depending on what they use.
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock, 2)
-	, m_pixel_source(0)
-	, m_pixel_rate(0)
+	, m_pixel_source(2)
+	, m_pixel_rate(1)
 	, m_dac32(*this, "serial_dac_%u", 0)
-	, m_ext_sclk(24'000'000)
+	, m_ext_vclk(XTAL(24'000'000))
+	, m_ext_sclk(XTAL(24'000'000))
+	, m_int_sclk(XTAL(24'000'000))
 {
 	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
 	m_pal_4bpp_base = 0x000;
@@ -704,8 +704,8 @@ void arm_vidc20_device::device_add_mconfig(machine_config &config)
 
 	// For simplicity we separate DACs for 32-bit mode
 	// TODO: how stereo image copes with this if at all?
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[0], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 1);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[0], 0).add_route(ALL_OUTPUTS, *this, 0.50, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, *this, 0.50, 1);
 }
 
 // TODO: move to clients
@@ -746,6 +746,7 @@ void arm_vidc20_device::device_reset()
 	// TODO: sensible defaults
 	m_vco_r_modulo = 1;
 	m_vco_v_modulo = 1;
+	m_pixel_rate = 1;
 
 	m_clksel = 1;
 
@@ -809,22 +810,21 @@ void arm_vidc20_device::vidc20_pal_data_cursor_w(offs_t offset, u32 data)
 	update_8bpp_palette(m_pal_cursor_base + cursor_pal_index, (ext_data<<24) | data);
 }
 
+// Pixel sources:
+// ---- --00: VCLK (MonitorType 3 or 4 VGA/SVGA)
+// ---- --01: HCLK (?)
+// ---- --10: RCLK (MonitorType 0 TV, reference clock,
+//                  24 MHz for IOMD, CLK16 for 7500FE (i.e. divided by 2))
+// ---- --11: <undefined>, possibly same as RCLK
+// Assume that TV output is ~50 Hz while (S)VGA 56~75 Hz
+// All ssfindo.cpp games uses RCLK and output ~56.20 Hz (again unverified)
 u32 arm_vidc20_device::get_pixel_clock()
 {
-	// RCLK source: passes thru a r-modulus and a phase frequency (PCOMP), the full story is interesting if you're into maths.
-	// TODO: for now we just multiply source clock by 2, enough for ssfindo.cpp games.
-	//printf("%d %02x %02x %d %d\n",this->clock(), 1 << m_pixel_rate, m_pixel_source, m_vco_v_modulo, m_vco_r_modulo);
-	if (m_pixel_source == 2) // RCLK
-		return (this->clock() << 1) >> m_pixel_rate;
+	const u32 pixel_freq = m_pixel_source & 2 ? this->clock() : m_ext_vclk.value();
+	if (m_pixel_source & 1)
+		popmessage("%s unemulated pixel source %d", this->tag(), m_pixel_source);
 
-	// VCLK source is just an external connection
-	// TODO: get clock from outside world, understand how the modulos are really used,
-	//       understand if SW do some VCO testing before setting CRTC params,
-	//       if there isn't a monitor ID mechanism that copes with this
-	if (m_pixel_source == 0) // VCLK
-		return (25175000);
-
-	throw emu_fatalerror("%s unhandled pixel source %02x selected",this->tag(), m_pixel_source);
+	return ((pixel_freq * m_vco_v_modulo) / m_vco_r_modulo) / m_pixel_rate;
 }
 
 void arm_vidc20_device::vidc20_crtc_w(offs_t offset, u32 data)
@@ -863,32 +863,76 @@ void arm_vidc20_device::vidc20_crtc_w(offs_t offset, u32 data)
 	screen_dynamic_res_change();
 }
 
+void arm_vidc20_device::ereg_w(u32 data)
+{
+	LOG("ereg [0xc0]: %08x (EREG %02x)\n", data, data & 0xf3);
+	LOG("\tECK %d | PEDON %d | DACs %s | LCD grayscale %d | HiRes %d\n"
+		, BIT(data, 2)
+		, (data >> 8) & 7
+		, BIT(data, 12) ? "on" : "power-down"
+		, BIT(data, 13)
+		, BIT(data, 14)
+	);
+	LOG("\tsyn-HS %d syn-VS %d\n", (data >> 16) & 3, (data >> 18) & 3);
+}
+
 void arm_vidc20_device::fsynreg_w(u32 data)
 {
-	m_vco_r_modulo = data & 0x3f;
-	m_vco_v_modulo = (data >> 8) & 0x3f;
+	m_vco_r_modulo = (data & 0x3f) + 1;
+	m_vco_v_modulo = ((data >> 8) & 0x3f) + 1;
 	// bits 15-14 and 7-6 are test bits
+
+	LOG("fsynreg [0xd0]: %08x\n", data);
+	LOG("\tref clock %d VCO clock %d\n", m_vco_r_modulo, m_vco_v_modulo);
 
 	screen_dynamic_res_change();
 }
 
 void arm_vidc20_device::vidc20_control_w(u32 data)
 {
-	// ---- --00: VCLK
-	// ---- --01: HCLK
-	// ---- --10: RCLK ("recommended" 24 MHz)
-	// ---- --11: undefined, probably same as RCLK
 	m_pixel_source = data & 3;
-	m_pixel_rate = (data & 0x1c) >> 2;
+	m_pixel_rate = ((data >> 2) & 7) + 1;
 	// (data & 0x700) >> 8 FIFO load
 	// BIT(data, 13) enables Duplex LCD mode
 	// BIT(data, 14) power down
-	// (data & 0xf0000) >> 16 test mode
+	const u8 test_mode = (data >> 16) & 0xf;
 	m_bpp_mode = (data & 0xe0) >> 5;
 	m_crtc_interlace = BIT(data, 12);
 
+	if (BIT(m_bpp_mode, 2))
+		popmessage("%s Unemulated High/True Color mode (%x)", this->tag(), m_bpp_mode);
+
+	LOG("conreg [0xe0]: %08x\n", data);
+	LOG("\tPixel Source %d | Pixel Rate %d | BPP %d | FIFO load %d\n"
+		, m_pixel_source, m_pixel_rate, m_bpp_mode
+		, ((data >> 8) & 7) * 4
+	);
+	LOG("\tINTerlace %d | DUP %d | Power Down %d | TEST %d\n"
+		, m_crtc_interlace
+		, BIT(data, 13)
+		, BIT(data, 14)
+		, test_mode
+	);
+
 	screen_vblank_line_update();
 	screen_dynamic_res_change();
+}
+
+void arm_vidc20_device::dctl_w(u32 data)
+{
+	LOG("dctl [0xf0]: %08x\n", data);
+	LOG("\tHDWR %02x | SnA %s | Hdis %d\n"
+		, data & 0x3ff
+		, BIT(data, 12) ? "Sync" : "Async"
+		, BIT(data, 13) ? "Disable" : "Enable"
+	);
+	LOG("\tBUS %d | VRAM %d\n"
+		// 00=N/S, 01= D[31:0], 10=D[63:32], 11=D[63:0]
+		, (data >> 16) & 3
+		// 00=disable 01=pixclk, 10=pixclk/2 11=pixclk/4
+		, (data >> 18) & 3
+	);
+
 }
 
 u32 arm_vidc20_device::get_sound_clock()
@@ -896,13 +940,13 @@ u32 arm_vidc20_device::get_sound_clock()
 	// ppcar
 	if (!m_clksel)
 	{
-		return m_ext_sclk / 24;
+		return m_ext_sclk.value() / 24;
 	}
 
 	// 32-bit mode doubles clock rate
 	const u8 divider = 24 << get_dac_mode();
 
-	return (clock() / divider);
+	return (m_int_sclk.value() / divider);
 }
 
 

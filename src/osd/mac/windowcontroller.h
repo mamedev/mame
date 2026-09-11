@@ -9,8 +9,12 @@
 //============================================================
 
 #import <Cocoa/Cocoa.h>
-#import "oglview.h"
 
 @interface MAMEWindowController : NSWindowController
+
+// -video none: the window backs the render target but is never shown
+@property (nonatomic, assign) BOOL headless;
+
+- (NSWindow *) getStandardWindow;
 
 @end

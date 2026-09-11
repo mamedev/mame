@@ -3762,8 +3762,8 @@ ROM_START( pclub2ts ) // 837-12765-02 (stickered) ROM BD, protection device not 
 	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic28",    0x0800000, 0x0200000, CRC(4b9df566) SHA1(ac339b204d99db49861721a86f4549ab7e855dd5) )
 	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
 	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic32",    0x0c00000, 0x0200000, CRC(3438c564) SHA1(8da287c22290bd82d7d7a1a2b55ed82711934d3c) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
-	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic32",    0x0e00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // present but empty
-	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic32",    0x1000000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // present but empty
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic34",    0x0e00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // present but empty
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut-10.ic36",    0x1000000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // present but empty
 
 	// TODO: add 1p eeprom default
 

@@ -227,10 +227,11 @@ inline void cv1k_blitter_device::gfx_upload_shadow_copy(address_space &space, of
 	// and then write it to VRAM.
 	// The number of bytes to read are the sum of a 16b fixed header and the pixel
 	// data (2 byte per pixel). RAM accesses are 32bit, so divide by four for clocks.
-	//
-	// TODO: There's additional overhead to these request thats are not included. The BREQ
-	// assertion also puts CPU into WAIT, if it needs uncached RAM accesses.
 	const int num_sram_clk = (16 + dimx * dimy * 2) / 4;
+	// Due to the way cv1k titles handle the flash read -> decompress -> flush -> invalidate
+	// for data for the blitter it's pretty safe to just steal the bus cycles directly from
+	// the cpu. Each bus cycle is 2 cpu cycles
+	m_maincpu->m_sh2_state->icount -= num_sram_clk * 2;
 	m_blit_delay_ns += num_sram_clk * CV1K_SRAM_CLK_NANOSEC;
 	m_blit_idle_op_bytes = 0;
 }

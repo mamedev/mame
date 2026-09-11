@@ -750,7 +750,7 @@ ROM_START( kazaaan )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0626-jpn.ic15", 0, 0x800, BAD_DUMP CRC(4701a7b6) SHA1(edbceb9e5ea019bd434724af69b08a5a36dc1222) ) // bruteforced
+	ROM_LOAD( "317-0626-jpn.ic15", 0, 0x800, CRC(73ce0d56) SHA1(be0ca872d6d8f258fb34aacf1b4730b09595a81f) )
 ROM_END
 
 ROM_START( kazaaana )
@@ -770,7 +770,7 @@ ROM_START( kazaaana )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0626-jpn.ic15", 0, 0x800, BAD_DUMP CRC(4701a7b6) SHA1(edbceb9e5ea019bd434724af69b08a5a36dc1222) ) // bruteforced
+	ROM_LOAD( "317-0626-jpn.ic15", 0, 0x800, CRC(73ce0d56) SHA1(be0ca872d6d8f258fb34aacf1b4730b09595a81f) )
 ROM_END
 
 ROM_START( kazaaan2 )

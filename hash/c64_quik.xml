@@ -18,4 +18,297 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mousetest2">
+		<description>Mouse Test 2</description>
+		<year>2016</year>
+		<publisher>Marco Baye</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="1795">
+				<rom name="mousetest2.prg" size="1795" crc="d7b97fa2" sha1="422e7d74ae8795bb8b5331aa51616baa94b4278c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armydays">
+		<description>Army Days</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="23458">
+				<rom name="army_days.prg" size="23458" crc="b1a1b9db" sha1="6436684def806290aa52f7bbfc3afc33f711c06e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="babyblues">
+		<description>Baby Blues</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="20443">
+				<rom name="baby_blues.prg" size="20443" crc="d617fa33" sha1="f721956759c007f70462c73be109010233619e5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmicstm">
+		<description>Cosmic Storm</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="28143">
+				<rom name="cosmic_storm.prg" size="28143" crc="6e449de0" sha1="d673280f25725141894a1002c88267c38c93abdd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duckhunt">
+		<description>Duck Hunt</description>
+		<year>2022</year>
+		<publisher>Mahna Mahna</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="25017">
+				<rom name="duck_hunt_6581.prg" size="25017" crc="a862bcfc" sha1="551c08b6988a8339ad71fc66c35c833fa732088f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gangster">
+		<description>Gangster</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="36485">
+				<rom name="gangster.prg" size="36485" crc="620a5ee1" sha1="0a389d36d6faafedf174c5cc87063aad99aee6f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostown">
+		<description>Ghost Town</description>
+		<year>1995</year>
+		<publisher>Marex</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="17741">
+				<rom name="ghosttown.prg" size="17741" crc="dc037465" sha1="41e9d210a06452abfdf43df8d9286453669d2400"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goosebstr">
+		<description>GooseBusters</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="20019">
+				<rom name="goosebusters.prg" size="20019" crc="c5383c96" sha1="5159dc47800c2c96a49ece4121f2232f4c23edb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunslngr">
+		<description>Gunslinger</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="20705">
+				<rom name="gunslinger.prg" size="20705" crc="b680b114" sha1="f32ca745e08f3a7afab4da45498370ee1c1867d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitbtns">
+		<description>Hit the Buttons</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) or Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="37919">
+				<rom name="hit_the_buttons.prg" size="37919" crc="5f27f5aa" sha1="6343a44a2fe205a4ee467ce8cf3f44a359cbea7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opwolflg">
+		<description>Operation Wolf (Light Gun Hack)</description>
+		<year>1989</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="41758">
+				<rom name="operation_wolf.prg" size="41758" crc="1e1e3813" sha1="c0c667c2481f7120eab6a1ad13db5ee5f1f2e8a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smackmole">
+		<description>Smack a Mole</description>
+		<year>2016</year>
+		<publisher>Jan Derogee</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) or Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="22095">
+				<rom name="smack_a_mole_v2.prg" size="22095" crc="d541b0b8" sha1="62fb5e3b86a39a87fb9f307ca4da44ba9ff2f90e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timetrav">
+		<description>Time Traveller</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="32599">
+				<rom name="time traveller.prg" size="32599" crc="981d1cfc" sha1="5119b33c655bd01d60189fcdd1ac441e65bcfcb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikegunn">
+		<description>Mike Gunner</description>
+		<year>1988</year>
+		<publisher>Dinamic Software</publisher>
+		<info name="usage" value="Requires Gun Stick (gunstick) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="36302">
+				<rom name="mike_gunner.prg" size="36302" crc="ec4d6720" sha1="1d9d1d2d0ae8b2aff054374b12394b98d87ea626"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="targetplus">
+		<description>Target Plus</description>
+		<year>1988</year>
+		<publisher>Dinamic Software</publisher>
+		<info name="usage" value="Requires Gun Stick (gunstick) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="32455">
+				<rom name="target plus.prg" size="32455" crc="fa934602" sha1="04ae7e0f76e0eb66f1af72a59e594791a53dc7b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coscmdo">
+		<description>Cosmic Commando</description>
+		<year>2016</year>
+		<publisher>Darrell Etherington</publisher>
+		<info name="usage" value="Requires Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="18433">
+				<rom name="cosmic commando.prg" size="18433" crc="a39af982" sha1="baf68d45fd2d74f1a713fbb35b2e6693e80b576a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glorious12">
+		<description>Glorious 12th</description>
+		<year>1983</year>
+		<publisher>Stack Computer Services</publisher>
+		<info name="usage" value="Requires Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="7940">
+				<rom name="glorious_12th.prg" size="7940" crc="229c39e3" sha1="fb699c7d645f79cabfc4918aa6f5ba50591bf3ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hnoonsht">
+		<description>High Noon Shootout</description>
+		<year>1983</year>
+		<publisher>Games Machine</publisher>
+		<info name="usage" value="Requires Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="3453">
+				<rom name="high_noon_shoot.prg" size="3453" crc="622800fc" sha1="5d40e69d32f8132c757d9aaf407cf6e23ab3284e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indianatk">
+		<description>Indian Attack</description>
+		<year>1983</year>
+		<publisher>Anirog Software</publisher>
+		<info name="usage" value="Requires Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="22083">
+				<rom name="indian attack.prg" size="22083" crc="d87774e7" sha1="e9f08ec855cb3a4849beaaa584e0fdbfe9a9be68"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootgal">
+		<description>Shooting Gallery</description>
+		<year>1983</year>
+		<publisher>Stack Computer Services</publisher>
+		<info name="usage" value="Requires Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="6302">
+				<rom name="shooting_gallery.prg" size="6302" crc="5b4398f6" sha1="ef90d086d8cef7fa9e7f41f596feeecf675aab56"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starbdef">
+		<description>Starbase Defence</description>
+		<year>2018</year>
+		<publisher>Anirog Computers</publisher>
+		<info name="usage" value="Requires Stack Light Rifle (stacklr) in joystick port 1"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="10961">
+				<rom name="starbase defence-lightgun.prg" size="10961" crc="5b9ea25e" sha1="72fa1cdc953ded5a25b8124ca625302a26cbde49"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

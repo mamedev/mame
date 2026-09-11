@@ -124,9 +124,10 @@ protected:
 	bool m_irq;
 	int m_ir0;
 	int m_ir1;
+	int m_irq_pending;
 	uint8_t m_icr;
 	uint8_t m_imr;
-//  bool m_icr_read;
+	bool m_icr_read;
 
 	// peripheral ports
 	int m_pc;
@@ -157,6 +158,7 @@ protected:
 	int m_count_a1;
 	int m_count_a2;
 	int m_count_a3;
+	int m_feed_a0;
 	int m_load_a0;
 	int m_load_a1;
 	int m_load_a2;
@@ -165,6 +167,7 @@ protected:
 	int m_count_b1;
 	int m_count_b2;
 	int m_count_b3;
+	int m_feed_b0;
 	int m_load_b0;
 	int m_load_b1;
 	int m_load_b2;

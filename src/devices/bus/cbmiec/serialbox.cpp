@@ -143,10 +143,10 @@ void cbm_serial_box_device::device_add_mconfig(machine_config &config)
 	W65C02(config, m_maincpu, XTAL(4'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm_serial_box_device::serial_box_mem);
 
-	CBM_IEC_SLOT(config, "iec4", 4, cbm_iec_devices, nullptr);
-	CBM_IEC_SLOT(config, "iec5", 5, cbm_iec_devices, nullptr);
-	CBM_IEC_SLOT(config, "iec6", 6, cbm_iec_devices, nullptr);
-	CBM_IEC_SLOT(config, "iec7", 7, cbm_iec_devices, nullptr);
+	CBM_IEC_SLOT(config, "iec4", 4, cbm_iec_printer_devices, nullptr);
+	CBM_IEC_SLOT(config, "iec5", 5, cbm_iec_printer_devices, nullptr);
+	CBM_IEC_SLOT(config, "iec6", 6, cbm_iec_printer_devices, nullptr);
+	CBM_IEC_SLOT(config, "iec7", 7, cbm_iec_printer_devices, nullptr);
 	CBM_IEC(config, m_iec, 0);
 
 	config.set_default_layout(layout_serialbox);

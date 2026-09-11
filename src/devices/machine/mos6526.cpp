@@ -10,14 +10,6 @@
 
     TODO:
 
-    - pass Lorenz test suite 2.15
-        - ICR01
-        - IMR
-        - CIA1TA/TB
-        - CIA2TA/TB
-    - pass VICE cia tests
-    - 8520 read/write
-    - optimize
     - off by one errors in vAmigaTS/showcia1 TODLO (reproducible particularly with -nothrottle)
     - flag_w & amigafdc both auto-inverts index pulses, it also fails ICR vAmigaTS/showcia1 test
       (expected: 0x00, actual: 0x10)
@@ -84,7 +76,7 @@ enum
 #define CRA_PBON        BIT(m_cra, 1)
 #define CRA_OUTMODE     BIT(m_cra, 2)
 #define CRA_RUNMODE     BIT(m_cra, 3)
-#define CRA_LOAD        BIT(m_cra, 4)
+#define CRA_LOAD        0x10
 #define CRA_INMODE      BIT(m_cra, 5)
 #define CRA_SPMODE      BIT(m_cra, 6)
 #define CRA_TODIN       BIT(m_cra, 7)
@@ -104,7 +96,7 @@ enum
 #define CRB_PBON        BIT(m_crb, 1)
 #define CRB_OUTMODE     BIT(m_crb, 2)
 #define CRB_RUNMODE     BIT(m_crb, 3)
-#define CRB_LOAD        BIT(m_crb, 4)
+#define CRB_LOAD        0x10
 #define CRB_INMODE      ((m_crb & 0x60) >> 5)
 #define CRB_ALARM       BIT(m_crb, 7)
 
@@ -197,7 +189,16 @@ void mos6526_device::set_cra(uint8_t data)
 		m_write_sp(0);
 	}
 
-	m_cra = data;
+	m_cra = data & ~CRA_LOAD;
+
+	m_feed_a0 = (data & 0x21) == CRA_START;
+	m_count_a1 = m_count_a0 = m_feed_a0;
+
+	if (data & CRA_LOAD)
+	{
+		m_load_a0 = 1;
+	}
+
 	update_pb();
 }
 
@@ -213,7 +214,16 @@ void mos6526_device::set_crb(uint8_t data)
 		m_tb_pb7 = 1;
 	}
 
-	m_crb = data;
+	m_crb = data & ~CRB_LOAD;
+
+	m_feed_b0 = (data & 0x61) == CRB_START;
+	m_count_b1 = m_count_b0 = m_feed_b0;
+
+	if (data & CRB_LOAD)
+	{
+		m_load_b0 = 1;
+	}
+
 	update_pb();
 }
 
@@ -224,12 +234,10 @@ void mos6526_device::set_crb(uint8_t data)
 
 uint8_t mos6526_device::bcd_increment(uint8_t value)
 {
-	value++;
+	if ((value & 0x0f) == 0x09)
+		return (value & 0xf0) + 0x10;
 
-	if ((value & 0x0f) >= 0x0a)
-		value += 0x10 - 0x0a;
-
-	return value;
+	return value + 1;
 }
 
 
@@ -257,7 +265,7 @@ void mos6526_device::clock_tod()
 			subsecond = 0x00;
 			second = bcd_increment(second);
 
-			if (second >= 60)
+			if (second >= 0x60)
 			{
 				second = 0x00;
 				minute = bcd_increment(minute);
@@ -269,8 +277,8 @@ void mos6526_device::clock_tod()
 					int pm = hour & 0x80;
 					hour &= 0x1f;
 
-					if (hour == 11) pm ^= 0x80;
-					if (hour == 12) hour = 0;
+					if (hour == 0x11) pm ^= 0x80;
+					if (hour == 0x12) hour = 0;
 
 					hour = bcd_increment(hour);
 
@@ -280,10 +288,10 @@ void mos6526_device::clock_tod()
 		}
 	}
 
-	m_tod = (((uint32_t) subsecond)   <<  0)
-			| (((uint32_t) second)        <<  8)
-			| (((uint32_t) minute)        << 16)
-			| (((uint32_t) hour)      << 24);
+	m_tod = (((uint32_t) subsecond) <<  0)
+			| (((uint32_t) second)  <<  8)
+			| (((uint32_t) minute)  << 16)
+			| (((uint32_t) hour)    << 24);
 }
 
 
@@ -324,6 +332,11 @@ uint8_t mos6526_device::read_tod(int offset)
 void mos6526_device::write_tod(int offset, uint8_t data)
 {
 	int shift = 8 * offset;
+
+	if (offset == 3)
+	{
+		data &= 0x9f;
+	}
 
 	if (CRB_ALARM)
 	{
@@ -378,6 +391,12 @@ void mos6526_device::clock_ta()
 		{
 			m_cra &= ~CRA_START;
 			m_count_a0 = m_count_a1 = m_count_a2 = 0;
+			m_feed_a0 = 0;
+		}
+
+		if (CRB_STARTED && (CRB_INMODE == CRB_INMODE_TA || (CRB_INMODE == CRB_INMODE_CNT_TA && m_cnt)))
+		{
+			m_count_b1 = 1;
 		}
 
 		m_load_a1 = 1;
@@ -456,6 +475,7 @@ void mos6526_device::clock_tb()
 		{
 			m_crb &= ~CRB_START;
 			m_count_b0 = m_count_b1 = m_count_b2 = 0;
+			m_feed_b0 = 0;
 		}
 
 		m_load_b1 = 1;
@@ -475,24 +495,18 @@ void mos6526_device::clock_tb()
 
 void mos6526_device::update_interrupt()
 {
-	if (!m_irq && m_ir1)
-	{
-		m_write_irq(ASSERT_LINE);
-		m_irq = true;
-	}
-
 	if (m_ta_out)
 	{
 		m_icr |= ICR_TA;
 	}
 
-	// cpm68k-amiga doesn't want icr_read (it masks in IMR, tight loop otherwise)
-	if (m_tb_out) //&& !m_icr_read)
+	// Timer B underflow immediately after an ICR read is lost on 6526
+	if (m_tb_out && !(m_icr_read && m_variant == TYPE_6526))
 	{
 		m_icr |= ICR_TB;
 	}
 
-//  m_icr_read = false;
+	m_icr_read = false;
 }
 
 
@@ -504,53 +518,43 @@ void mos6526_device::clock_pipeline()
 {
 	// timer A pipeline
 	m_count_a3 = m_count_a2;
-
-	if (CRA_INMODE == CRA_INMODE_PHI2)
-		m_count_a2 = 1;
-
-	m_count_a2 &= CRA_STARTED;
+	m_count_a2 = m_count_a1;
 	m_count_a1 = m_count_a0;
-	m_count_a0 = 0;
+	m_count_a0 = m_feed_a0;
 
 	m_load_a2 = m_load_a1;
 	m_load_a1 = m_load_a0;
-	m_load_a0 = CRA_LOAD;
-	m_cra &= ~0x10;
+	m_load_a0 = 0;
 
 	m_oneshot_a0 = CRA_RUNMODE;
 
 	// timer B pipeline
 	m_count_b3 = m_count_b2;
-
-	switch (CRB_INMODE)
-	{
-	case CRB_INMODE_PHI2:
-		m_count_b2 = 1;
-		break;
-
-	case CRB_INMODE_TA:
-		m_count_b2 = m_ta_out;
-		break;
-
-	case CRB_INMODE_CNT_TA:
-		m_count_b2 = m_ta_out && m_cnt;
-		break;
-	}
-
-	m_count_b2 &= CRB_STARTED;
+	m_count_b2 = m_count_b1;
 	m_count_b1 = m_count_b0;
-	m_count_b0 = 0;
+	m_count_b0 = m_feed_b0;
 
 	m_load_b2 = m_load_b1;
 	m_load_b1 = m_load_b0;
-	m_load_b0 = CRB_LOAD;
-	m_crb &= ~0x10;
+	m_load_b0 = 0;
 
 	m_oneshot_b0 = CRB_RUNMODE;
 
 	// interrupt pipeline
 	if (m_ir0) m_ir1 = 1;
 	m_ir0 = (m_icr & m_imr) ? 1 : 0;
+
+	if (m_irq_pending && !m_irq)
+	{
+		m_write_irq(ASSERT_LINE);
+		m_irq = true;
+	}
+	else if (!m_irq_pending && m_irq && !m_icr)
+	{
+		m_write_irq(CLEAR_LINE);
+		m_irq = false;
+	}
+	m_irq_pending = m_ir1;
 }
 
 
@@ -638,9 +642,12 @@ void mos6526_device::device_start()
 	}
 
 	// state saving
+	save_item(NAME(m_irq));
 	save_item(NAME(m_ir0));
 	save_item(NAME(m_ir1));
+	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_icr));
+	save_item(NAME(m_icr_read));
 	save_item(NAME(m_imr));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_flag));
@@ -648,24 +655,44 @@ void mos6526_device::device_start()
 	save_item(NAME(m_prb));
 	save_item(NAME(m_ddra));
 	save_item(NAME(m_ddrb));
+	save_item(NAME(m_pa));
+	save_item(NAME(m_pb));
+	save_item(NAME(m_pa_in));
+	save_item(NAME(m_pb_in));
 	save_item(NAME(m_sp));
 	save_item(NAME(m_cnt));
 	save_item(NAME(m_sdr));
 	save_item(NAME(m_shift));
 	save_item(NAME(m_sdr_empty));
 	save_item(NAME(m_bits));
-
 	save_item(NAME(m_ta_out));
 	save_item(NAME(m_tb_out));
 	save_item(NAME(m_ta_pb6));
 	save_item(NAME(m_tb_pb7));
+	save_item(NAME(m_count_a0));
+	save_item(NAME(m_count_a1));
+	save_item(NAME(m_count_a2));
+	save_item(NAME(m_count_a3));
+	save_item(NAME(m_feed_a0));
+	save_item(NAME(m_load_a0));
+	save_item(NAME(m_load_a1));
+	save_item(NAME(m_load_a2));
+	save_item(NAME(m_oneshot_a0));
+	save_item(NAME(m_count_b0));
+	save_item(NAME(m_count_b1));
+	save_item(NAME(m_count_b2));
+	save_item(NAME(m_count_b3));
+	save_item(NAME(m_feed_b0));
+	save_item(NAME(m_load_b0));
+	save_item(NAME(m_load_b1));
+	save_item(NAME(m_load_b2));
+	save_item(NAME(m_oneshot_b0));
 	save_item(NAME(m_ta));
 	save_item(NAME(m_tb));
 	save_item(NAME(m_ta_latch));
 	save_item(NAME(m_tb_latch));
 	save_item(NAME(m_cra));
 	save_item(NAME(m_crb));
-
 	save_item(NAME(m_tod_count));
 	save_item(NAME(m_tod));
 	save_item(NAME(m_tod_latch));
@@ -684,9 +711,10 @@ void mos6526_device::device_reset()
 	m_irq = false;
 	m_ir0 = 0;
 	m_ir1 = 0;
+	m_irq_pending = 0;
 	m_icr = 0;
 	m_imr = 0;
-//  m_icr_read = false;
+	m_icr_read = false;
 
 	m_pc = 1;
 	m_flag = 1;
@@ -714,6 +742,7 @@ void mos6526_device::device_reset()
 	m_count_a1 = 0;
 	m_count_a2 = 0;
 	m_count_a3 = 0;
+	m_feed_a0 = 0;
 	m_load_a0 = 0;
 	m_load_a1 = 0;
 	m_load_a2 = 0;
@@ -722,6 +751,7 @@ void mos6526_device::device_reset()
 	m_count_b1 = 0;
 	m_count_b2 = 0;
 	m_count_b3 = 0;
+	m_feed_b0 = 0;
 	m_load_b0 = 0;
 	m_load_b1 = 0;
 	m_load_b2 = 0;
@@ -777,6 +807,7 @@ void mos6526_device::execute_run()
 uint8_t mos6526_device::read(offs_t offset)
 {
 	uint8_t data = 0;
+
 
 	switch (offset & 0x0f)
 	{
@@ -888,13 +919,17 @@ uint8_t mos6526_device::read(offs_t offset)
 	case ICR:
 		data = (m_ir1 << 7) | m_icr;
 
+		if (!machine().side_effects_disabled())
+			m_icr_read = true;
+
 		// Do not reset irqs unless one is effectively issued.
 		// cfr. amigaocs_flop.xml barb2paln4 that polls for Timer B status
 		//      until it expires at PC=7821c and other places.
 		if (machine().side_effects_disabled() || !m_icr)
 			return data;
 
-		//m_icr_read = true;
+		if (m_irq)
+			m_irq_pending = 0;
 
 		m_ir0 = 0;
 		m_ir1 = 0;
@@ -995,8 +1030,10 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 
 		if (CRA_RUNMODE)
 		{
-			m_ta = m_ta_latch;
-			set_cra(m_cra | CRA_START);
+			m_load_a0 = 1;
+			m_cra |= CRA_START;
+			m_feed_a0 = !CRA_INMODE;
+			m_count_a1 = m_count_a0 = m_feed_a0;
 		}
 
 		if (m_load_a2)
@@ -1024,8 +1061,10 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 
 		if (CRB_RUNMODE)
 		{
-			m_tb = m_tb_latch;
-			set_crb(m_crb | CRB_START);
+			m_load_b0 = 1;
+			m_crb |= CRB_START;
+			m_feed_b0 = (CRB_INMODE == CRB_INMODE_PHI2);
+			m_count_b1 = m_count_b0 = m_feed_b0;
 		}
 
 		if (m_load_b2)
@@ -1075,10 +1114,6 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 			m_imr &= ~(data & 0x1f);
 		}
 
-		if (!m_irq && (m_icr & m_imr))
-		{
-			m_ir0 = 1;
-		}
 		break;
 
 	case CRA:
@@ -1133,11 +1168,12 @@ void mos6526_device::cnt_w(int state)
 	{
 		serial_input();
 
-		if (CRA_INMODE == CRA_INMODE_CNT)
-			m_ta--;
+		// cnt counts through the same pipeline as phi2, hence the two cycle delay
+		if (CRA_STARTED && CRA_INMODE == CRA_INMODE_CNT)
+			m_count_a1 = 1;
 
-		if (CRB_INMODE == CRB_INMODE_CNT)
-			m_tb--;
+		if (CRB_STARTED && CRB_INMODE == CRB_INMODE_CNT)
+			m_count_b1 = 1;
 	}
 
 	m_cnt = state;

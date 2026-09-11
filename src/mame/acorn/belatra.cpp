@@ -133,10 +133,16 @@ void belatra_state::belatra(machine_config &config)
 
 	SCREEN(config, "screen");
 
-	ARM_VIDC20(config, m_vidc, 24'000'000); // chip type and clock guessed
+	SPEAKER(config, "speaker", 2).front();
+
+	// TODO: test if VGA or TV mode
+	ARM_VIDC20(config, m_vidc, 56_MHz_XTAL / 2); // chip type and clock guessed
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
+	// TODO: check if mono or stereo
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	ARM7500FE_IOMD(config, m_iomd, 56_MHz_XTAL);
 	m_iomd->set_host_cpu_tag(m_maincpu);
@@ -155,7 +161,6 @@ void belatra_state::belatra(machine_config &config)
 
 	// AT90S2313(config, "mcu", xxxx); // TODO: AVR 8-bit core, only the fairyl2 set has a dump
 
-	SPEAKER(config, "speaker", 2).front();
 	// unknown sound
 }
 

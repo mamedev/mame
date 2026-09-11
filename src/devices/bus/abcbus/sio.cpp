@@ -30,6 +30,14 @@ Notes:
 
 */
 
+/*
+
+    TODO:
+
+    - ROM mapping
+
+*/
+
 #include "emu.h"
 #include "sio.h"
 
@@ -142,7 +150,7 @@ uint8_t abc_sio_device::abcbus_xmemfl(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
+	if (offset >= 0x4000 && offset < 0x5000)
 	{
 		data = m_rom->base()[offset & 0xfff];
 	}

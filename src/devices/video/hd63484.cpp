@@ -2097,10 +2097,13 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	for(int x=cliprect.min_x; x<=cliprect.max_x; x+=ppw)
 	{
 		uint16_t data = 0;
+		int screen_n = layer_n;
+
 		if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
 		{
 			data = readword(wind_offs);
 			wind_offs++;
+			screen_n = 3;
 		}
 		else if (active)
 			data = readword(base_offs);
@@ -2109,7 +2112,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 		{
 			int px = x + b;
 			if (!m_display_cb.isnull())
-				m_display_cb(bitmap, cliprect, y, px, data & mask);
+				m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
 			else if (cliprect.contains(px, y))
 				bitmap.pix(y, px) = data & mask;
 

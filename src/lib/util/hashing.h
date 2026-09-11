@@ -211,10 +211,10 @@ class crc16_creator
 {
 public:
 	// construction/destruction
-	crc16_creator() noexcept { reset(); }
+	crc16_creator(uint16_t initial = 0xffff) noexcept : m_initial(initial) { reset(); }
 
 	// reset
-	void reset() noexcept { m_accum.m_raw = 0xffff; }
+	void reset() noexcept { m_accum.m_raw = m_initial; }
 
 	// append data
 	void append(const void *data, uint32_t length) noexcept;
@@ -223,15 +223,16 @@ public:
 	crc16_t finish() noexcept { return m_accum; }
 
 	// static wrapper to just get the digest from a block
-	static crc16_t simple(const void *data, uint32_t length) noexcept
+	static crc16_t simple(const void *data, uint32_t length, uint16_t initial = 0xffff) noexcept
 	{
-		crc16_creator creator;
+		crc16_creator creator(initial);
 		creator.append(data, length);
 		return creator.finish();
 	}
 
 protected:
 	// internal state
+	uint16_t const      m_initial;      // initial value
 	crc16_t             m_accum;        // internal accumulator
 };
 

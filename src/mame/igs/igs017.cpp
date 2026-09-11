@@ -4525,7 +4525,7 @@ static INPUT_PORTS_START( mgcsb )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sdmg2_common )
+static INPUT_PORTS_START( sdmg2_dsw )
 	PORT_START("DSW1")
 	CREDIT_SETTINGS_COMMON
 	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )                          PORT_DIPLOCATION("SW1:5")     // 進分上限
@@ -4558,12 +4558,12 @@ static INPUT_PORTS_START( sdmg2_common )
 	PORT_DIPNAME( 0x80, 0x80, "Number Type" )                           PORT_DIPLOCATION("SW2:8")     // 數字形態
 	PORT_DIPSETTING(    0x80, "Numbers" )                                                             // 數字
 	PORT_DIPSETTING(    0x00, "Blocks" )                                                              // 方塊       (apples for bet, mahjong tong tiles for numbers)
-
-	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x40, 0x40)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sdmg2 )
-	PORT_INCLUDE(sdmg2_common)
+	PORT_INCLUDE(sdmg2_dsw)
+
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x40, 0x40)
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
@@ -4591,8 +4591,43 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  //           related to joystick BUTTON3
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hjdmg )
+	PORT_INCLUDE(sdmg2_dsw)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x40, 0x40, "Show Title" )                            PORT_DIPLOCATION("SW2:7")         // 機種名稱
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )                                                               // 無            copyright notice over picture of clouds in the sky
+	PORT_DIPSETTING(    0x40, DEF_STR(Yes) )                                                              // 有            game title and copyright notice with picture of golden statue on black background
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                        PORT_DIPLOCATION("SW2:8")         // 開分卡        TODO: when this is on, it automatically bets up to ten credits, and always pays out immediately on winning (i.e. doesn't use bet and payout buttons)
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                              // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                               // 有
+
+	// Double up game controls are a bit weird - the dedicated keys aren't used:
+	// Double Up (double):  A
+	// Double Up:           C
+	// Double Up (half):    E
+	// Take Score:          G  Start
+	// Big/Left:            K
+	// Small/Right:         M
+	PORT_INCLUDE(igs_mahjong_matrix)
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                     // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                         // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                      // 查帳
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )         PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投幣
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )        PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退幣
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )        PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)  // 退幣
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("MATRIX")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )              PORT_CUSTOM_MEMBER(FUNC(igs017_state::keys_ipt_r<>))
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( sdmg2p )
-	PORT_INCLUDE(sdmg2_common)
+	PORT_INCLUDE(sdmg2_dsw)
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x80, 0x80, "Hide Credits" )                          PORT_DIPLOCATION("SW1:8")     // 隐分功能   (hides credits/bets/wins, game plays normally)
@@ -4616,6 +4651,8 @@ static INPUT_PORTS_START( sdmg2p )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW3:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:8" )
+
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x40, 0x40)
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -7526,7 +7563,7 @@ GAME ( 1997,  mgdha,       mgdh,     mgdha,      mgdh,        igs017_state, init
 GAME ( 1997,  sdmg2,       0,        sdmg2,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V765C)",                                MACHINE_SUPPORTS_SAVE ) // 超級大滿貫II
 GAME ( 1997,  sdmg2754ca,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754ca, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         MACHINE_SUPPORTS_SAVE ) // 超級大滿貫II
 GAME ( 1997,  sdmg2754cb,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754cb, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         MACHINE_SUPPORTS_SAVE ) // 超級大滿貫II
-GAME ( 1997,  hjdmg,       0,        hjdmg,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Huangjin Da Manguan (China, V739C)",                                 MACHINE_NOT_WORKING |MACHINE_SUPPORTS_SAVE ) // 黄金大满贯, protection emulation not tested, I/O not verified
+GAME ( 1997,  hjdmg,       0,        hjdmg,      hjdmg,       igs017_state, init_sdmg2,      ROT0, "IGS", "Huangjin Da Manguan (China, V739C)",                                 MACHINE_NOT_WORKING |MACHINE_SUPPORTS_SAVE ) // 黄金大满贯, protection emulation not tested
 GAME ( 1997,  tjsb,        0,        tjsb,       tjsb,        igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                                MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
 GAME ( 1998,  genius6,     0,        genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                   0 ) // shows Chinese text in puzzle game
 GAME ( 1997,  genius6a,    genius6,  genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                   0 ) // clone because it has older copyright year

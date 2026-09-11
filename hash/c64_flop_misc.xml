@@ -212,6 +212,20 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="opthunder">
+		<description>Operation Thunderbolt</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Supports Magnum Light Phaser (magnum) in joystick port 1"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="operation_thunderbolt.d64" size="174848" crc="70737680" sha1="d961171e5519c39930219838f3b79561bbe5115b"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- !Compilations -->
 
 <!-- !Applications -->
