@@ -71,9 +71,6 @@ public:
 	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
 	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
 
-	bool warnings_enabled() const { return m_warnings_enabled; }
-	void set_warnings_enabled(bool enabled) { m_warnings_enabled = enabled; }
-
 private:
 	// construction
 	mame_machine_manager(emu_options &options, osd_interface &osd);
@@ -87,7 +84,6 @@ private:
 
 	const game_driver *     m_new_driver_pending;           // pointer to the next pending driver
 	bool                    m_firstrun;
-	bool                    m_warnings_enabled;
 
 	emu_timer *                        m_autoboot_timer;    // auto-boot timer
 	std::unique_ptr<sol::load_result>  m_autoboot_script;   // auto-boot script

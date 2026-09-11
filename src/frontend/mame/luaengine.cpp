@@ -2436,9 +2436,6 @@ void lua_engine::initialize()
 	mame_manager_type["ui"] = sol::property(&mame_machine_manager::ui);
 	mame_manager_type["options"] = sol::property(&mame_machine_manager::options);
 	mame_manager_type["plugins"] = sol::property([] (mame_machine_manager &m) { return plugin_options_plugins(m.plugins()); });
-	mame_manager_type["warnings_enabled"] = sol::property(
-		[]() { return mame_machine_manager::instance()->warnings_enabled(); },
-		[](bool enabled) { mame_machine_manager::instance()->set_warnings_enabled(enabled); });
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());
 	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());
 
