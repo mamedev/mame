@@ -63,6 +63,7 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 	m_lua(std::make_unique<lua_engine>()),
 	m_new_driver_pending(nullptr),
 	m_firstrun(true),
+	m_warnings_enabled(true),
 	m_autoboot_timer(nullptr)
 {
 }
@@ -362,7 +363,7 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 	m_ui->initialize(machine);
 
 	// display the startup screens
-	m_ui->display_startup_screens(m_firstrun);
+	m_ui->display_startup_screens(m_firstrun, m_warnings_enabled);
 }
 
 void mame_machine_manager::before_load_settings(running_machine& machine)
