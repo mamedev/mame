@@ -11,7 +11,15 @@ class jvc_xvd701_device : public device_t,
 		public device_rs232_port_interface
 {
 public:
+	enum class media_type : u8
+	{
+		VCD,
+		DVD
+	};
+
 	jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_media_type(media_type type) { m_media_type = type; }
 
 	virtual void input_txd(int state) override { device_serial_interface::rx_w(state); }
 protected:
@@ -25,12 +33,6 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
-	enum jvc_xvd701_media_type : uint32_t
-	{
-		JVC_MEDIA_VCD = 0,
-		JVC_MEDIA_DVD = 1,
-	};
-
 	enum jvc_xvd701_playback_status : uint32_t
 	{
 		STATUS_STOP = 0,
@@ -44,7 +46,7 @@ private:
 
 	bool seek_chapter(int chapter);
 
-	jvc_xvd701_media_type m_media_type;
+	media_type m_media_type;
 
 	unsigned char m_command[11];
 	unsigned char m_response[11];
