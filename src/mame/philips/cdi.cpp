@@ -62,6 +62,8 @@ TODO:
 
 #include "cdrom.h"
 
+#include "cdipcb.h"
+
 #include "cdi.lh"
 
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
@@ -76,27 +78,34 @@ TODO:
 #define VERBOSE         (0)
 #include "logmacro.h"
 
-#define ENABLE_UART_PRINTING (0)
+// What can be plugged into the serial connector on the back.
+static void cdi_serial_devices(device_slot_interface &device)
+{
+	device.option_add("cdipcb", CDI_SERVICE_PCB);
+}
 
 /*************************
 *      Memory maps       *
 *************************/
-
-void cdi_state::cdimono1_mem(address_map &map)
+void cdi_state::cdi_common_mem(address_map &map)
 {
 	map(0x000000, 0xffffff).rw(FUNC(cdi_state::bus_error_r), FUNC(cdi_state::bus_error_w));
 	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
 	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
-	map(0x300000, 0x303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
-#if ENABLE_UART_PRINTING
-	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
-#endif
-	map(0x303c00, 0x303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
-	map(0x310000, 0x317fff).rw(m_slave_hle, FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
-	map(0x318000, 0x31ffff).noprw();
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
 	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
+}
+
+void cdi_state::cdimono1_mem(address_map &map)
+{
+	cdi_common_mem(map);
+	map(0x300000, 0x303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
+
+	map(0x303c00, 0x303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
+	map(0x310000, 0x317fff).rw(m_slave_hle, FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
+	map(0x318000, 0x31ffff).noprw();
+
 	map(0x500000, 0x57ffff).ram();
 	map(0xd00000, 0xdfffff).ram(); // DVC RAM block 1
 	map(0xe00000, 0xe7ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
@@ -105,14 +114,7 @@ void cdi_state::cdimono1_mem(address_map &map)
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
-	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
-#if ENABLE_UART_PRINTING
-	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
-#endif
-	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
-	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
+	cdi_common_mem(map);
 }
 
 void cdi_state::cdi910_mem(address_map &map)
@@ -120,9 +122,7 @@ void cdi_state::cdi910_mem(address_map &map)
 	map(0x000000, 0x07ffff).ram().share("plane0");
 	map(0x180000, 0x1fffff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x200000, 0x27ffff).ram().share("plane1");
-#if ENABLE_UART_PRINTING
-	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
-#endif
+
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 	map(0x500000, 0xffffff).noprw();
@@ -146,10 +146,10 @@ static INPUT_PORTS_START( cdi )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Button 3")
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("TESTPLUG")
-	PORT_CONFNAME( 0x01, 0x00, "Test plug" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_START("SERVICE")
+	PORT_CONFNAME( 0x01, 0x00, "Service mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x01, "Test plug (service shell)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
@@ -386,6 +386,15 @@ void cdi_state::cdimono1_base(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
+
+
+	// The serial connector on the back, carrying the 68070's UART.
+	RS232_PORT(config, m_serial_port, cdi_serial_devices, nullptr);
+	m_maincpu->out_txd_cb().set(m_serial_port, FUNC(rs232_port_device::write_txd));
+	m_maincpu->uart_rtsn_callback().set(m_serial_port, FUNC(rs232_port_device::write_rts));
+	m_serial_port->rxd_handler().set(m_maincpu, FUNC(scc68070_device::rx_w));
+	m_serial_port->cts_handler().set(m_maincpu, FUNC(scc68070_device::uart_ctsn));
+
 	m_maincpu->iack4_callback().set(m_cdic, FUNC(cdicdic_device::intack_r));
 
 	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
@@ -530,7 +539,7 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousex().set_ioport("MOUSEX");
 	m_slave_hle->read_mousey().set_ioport("MOUSEY");
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
-	m_slave_hle->testplug_callback().set_ioport("TESTPLUG");
+	m_slave_hle->testplug_callback().set_ioport("SERVICE").bit(0);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");

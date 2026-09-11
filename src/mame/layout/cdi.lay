@@ -3,37 +3,50 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
-	<view name="Main Screen Standard (4:3)">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
-	</view>
+	<element name="pcb_digit" defstate="0">
+		<led7seg><color red="0.9" green="0.25" blue="0.1" /></led7seg>
+	</element>
+	<element name="pcb_bezel">
+		<rect><color red="0.05" green="0.05" blue="0.06" /></rect>
+	</element>
+	<element name="pcb_button" defstate="0">
+		<rect state="0"><color red="0.26" green="0.26" blue="0.28" /></rect>
+		<rect state="1"><color red="0.80" green="0.72" blue="0.20" /></rect>
+	</element>
+	<element name="pcb_yes"><text string="YES"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="pcb_test"><text string="TEST"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="pcb_no"><text string="NO"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
-	<view name="LCD Standard (15:3)">
-		<screen index="1">
-			<bounds left="0" top="0" right="15" bottom="3" />
-		</screen>
-	</view>
-
-	<view name="Main Screen Pixel Aspect (~scr0nativexaspect~:~scr0nativeyaspect~)">
-		<screen index="0">
-			<bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" />
-		</screen>
-	</view>
-
-	<view name="LCD Pixel Aspect (~scr1nativexaspect~:~scr1nativeyaspect~)">
-		<screen index="1">
-			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
-		</screen>
-	</view>
+	<!-- The service PCB fills the space left of the front panel LCD on the top row. Its
+	     digits read 0 and its buttons do nothing when no PCB is plugged in. -->
+	<group name="service_pcb">
+		<bounds x="0" y="0" width="140" height="22" />
+		<element ref="pcb_bezel"><bounds x="0" y="0" width="140" height="22" /></element>
+		<repeat count="8">
+			<param name="digitno" start="0" increment="1" />
+			<param name="digitx" start="4" increment="16" />
+			<element ref="pcb_digit" name="digit~digitno~">
+				<bounds x="~digitx~" y="1" width="14" height="11" />
+			</element>
+		</repeat>
+		<repeat count="3">
+			<param name="btnx" start="8" increment="43" />
+			<param name="btnmask" start="0x01" lshift="1" />
+			<element ref="pcb_button" inputtag=":serial:cdipcb:BUTTONS" inputmask="~btnmask~">
+				<bounds x="~btnx~" y="13" width="38" height="8" />
+			</element>
+		</repeat>
+		<element ref="pcb_yes"><bounds x="8" y="14" width="38" height="6" /></element>
+		<element ref="pcb_test"><bounds x="51" y="14" width="38" height="6" /></element>
+		<element ref="pcb_no"><bounds x="94" y="14" width="38" height="6" /></element>
+	</group>
 
 	<view name="Main Screen + LCD">
-		<screen index="1">
-			<bounds x="0" y="0" width="192" height="22" />
-		</screen>
-		<screen index="0">
-			<bounds x="0" y="22" width="384" height="288" />
-		</screen>
+		<screen index="1"><bounds x="0" y="0" width="192" height="22" /></screen>
+		<collection name="Service PCB" visible="no">
+			<group ref="service_pcb"><bounds x="244" y="0" width="140" height="22" /></group>
+		</collection>
+		<screen index="0"><bounds x="0" y="22" width="384" height="288" /></screen>
 	</view>
 
 </mamelayout>
