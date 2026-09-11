@@ -6,10 +6,6 @@
 
     - floating bus writes to peripheral registers in m6502.c
     - sort out kernals between PAL/NTSC
-    - tsuit215 test failures
-        - IRQ (WRONG $DC0D)
-        - NMI (WRONG $DD0D)
-        - some CIA tests
     - PDC Clipper (C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer)
 
 */

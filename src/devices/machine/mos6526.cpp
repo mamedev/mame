@@ -196,8 +196,8 @@ void mos6526_device::set_cra(uint8_t data)
 		m_write_sp(0);
 	}
 
-	// changing the serial direction abandons a transfer in progress: the
-	// shifter is cleared and CNT returns to its idle high
+	// changing the serial direction abandons a transfer: the shifter is
+	// cleared and CNT returns to its idle high
 	if ((CRA_SPMODE ? 1 : 0) != BIT(data, 6))
 	{
 		if (CRA_SPMODE)
@@ -205,18 +205,16 @@ void mos6526_device::set_cra(uint8_t data)
 			// half bits still to go, counting the one CNT is in the middle of
 			int const left = (m_shift_loaded || m_bits) ? 16 - (2 * m_bits - (m_cnt ? 0 : 1)) : 0;
 
-			// clearing the counter part way through a byte races the byte-done
-			// logic, which fires as a serial interrupt - but not on the first
-			// half bit unless CNT has already gone low, nor on the last one,
-			// where the transfer is far enough along to end by itself
+			// clearing mid-byte races the byte-done logic into a serial
+			// interrupt, except on the first half bit (unless CNT already went
+			// low) and the last, which is far enough along to end by itself
 			if ((left > 1 && left < 15) || (left == 15 && !BIT(m_cnt_hist, 4)))
 			{
 				m_sp_delay = SP_DELAY;
 			}
 
-			// the byte-done logic is left hanging when the transfer is
-			// abandoned before CNT has settled high again, or exactly as CNT
-			// toggles - except on the half-bit that carries the final shift
+			// byte-done is left hanging if CNT has not settled high again, or
+			// is toggling - except on the half bit carrying the final shift
 			bool const settled = BIT(m_cnt_hist, 3) && BIT(m_cnt_hist, 4);
 			bool const toggling = BIT(m_cnt_hist, 1) != BIT(m_cnt_hist, 2);
 
@@ -283,9 +281,8 @@ void mos6526_device::set_crb(uint8_t data)
 //  increment_digits - seconds/minutes counter
 //-------------------------------------------------
 
-// Each digit is a plain binary counter and the carry into the next one comes
-// from comparing the current value, so a digit holding an out-of-range value
-// simply counts on rather than being corrected: 79 -> 00, but 7f -> 70.
+// Each digit is a plain binary counter carried by comparison, so an
+// out-of-range value counts on rather than being corrected: 79 -> 00, 7f -> 70.
 
 uint8_t mos6526_device::increment_digits(uint8_t value)
 {
@@ -312,8 +309,7 @@ uint8_t mos6526_device::increment_hour(uint8_t value)
 	if (hour == 0x12)
 		return pm | 0x01;
 
-	// the carry into the tens digit is suppressed once it is already set,
-	// so an out-of-range 19 counts on to 1a instead of wrapping
+	// the carry into the tens digit is suppressed once set, so 19 counts on to 1a
 	if ((hour & 0x0f) == 0x09 && !(hour & 0x10))
 		return pm | 0x10;
 
@@ -338,8 +334,8 @@ void mos6526_device::clock_tod()
 	{
 		m_tod_count = 0;
 
-		// the carry out of each register is a comparison against its full
-		// value, so only the exact end-of-range value rolls the next one on
+		// the carry is a comparison, so only the exact end value rolls the
+		// next register on
 		if (subsecond == 0x09)
 		{
 			subsecond = 0x00;
@@ -440,9 +436,8 @@ void mos6526_device::update_alarm()
 {
 	bool match = (m_tod == m_alarm);
 
-	// the comparator is live, so a write that lines the two up sets the flag
-	// straight away - the clock does not have to tick for it, and it only
-	// fires on the edge rather than for as long as they stay equal
+	// the comparator is live and edge triggered: a write that lines the two
+	// up sets the flag without waiting for a tick
 	if (match && !m_alarm_match)
 	{
 		m_icr |= ICR_ALARM;
@@ -532,8 +527,8 @@ void mos6526_device::serial_output()
 	{
 		serial_load();
 
-		// CNT rests high between bytes, so the next underflow shifts the
-		// first bit instead of waiting out the previous byte's CNT tail
+		// CNT rests high between bytes, so the next underflow shifts bit 7
+		// instead of waiting out the previous byte's CNT tail
 		if (!m_cnt)
 		{
 			m_cnt = 1;
@@ -545,8 +540,8 @@ void mos6526_device::serial_output()
 
 	if (m_ta_out && shifting)
 	{
-		// back-to-back underflows leave no edge for the shifter to see, so
-		// with timer A at 0 the transfer never gets past the first half-bit
+		// back-to-back underflows leave no edge, so at timer A = 0 the
+		// transfer never gets past the first half bit
 		if (!m_ta_out_last)
 		{
 			if (m_cnt)
@@ -640,10 +635,9 @@ void mos6526_device::update_interrupt()
 
 	if (m_tb_out)
 	{
-		// On the 6526 an ICR read swallows the readable Timer B flag bit of an
-		// underflow landing in the next cycle, but IR is still latched from it,
-		// so the interrupt is taken and the handler reads back $80.
-		if (m_icr_read && m_variant == TYPE_6526)
+		// the flag is swallowed but IR still latches, so the interrupt is
+		// taken and the handler reads back $80
+		if (m_icr_read && icr_read_loses_tb())
 			m_icr_tb_lost = true;
 		else
 			m_icr |= ICR_TB;
@@ -683,9 +677,15 @@ void mos6526_device::clock_pipeline()
 
 	m_oneshot_b0 = CRB_RUNMODE;
 
-	// interrupt pipeline
-	if (m_ir0) m_ir1 = 1;
-	m_ir0 = ((m_icr | (m_icr_tb_lost ? ICR_TB : 0)) & m_imr) ? 1 : 0;
+	// interrupt pipeline: m_ir0 is the masked source term, m_ir1 the IR latch
+	// it feeds (held until an ICR read, mask changes notwithstanding). The 6526
+	// latches the term a cycle after it forms, the later chips as it forms -
+	// that is the one-cycle IRQ delay difference.
+	int const ir0 = ((m_icr | (m_icr_tb_lost ? ICR_TB : 0)) & m_imr) ? 1 : 0;
+
+	if (irq_one_cycle_early() ? ir0 : m_ir0) m_ir1 = 1;
+
+	m_ir0 = ir0;
 	m_icr_tb_lost = false;
 
 	if (m_irq_pending && !m_irq)
@@ -737,11 +737,10 @@ void mos6526_device::synchronize()
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant) :
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_execute_interface(mconfig, *this),
 	m_icount(0),
-	m_variant(variant),
 	m_tod_clock(0),
 	m_write_irq(*this),
 	m_write_pc(*this),
@@ -755,14 +754,14 @@ mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, 
 }
 
 mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS6526, tag, owner, clock, TYPE_6526)
+	: mos6526_device(mconfig, MOS6526, tag, owner, clock)
 { }
 
 mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS6526A, tag, owner, clock, TYPE_6526A) { }
+	: mos6526_device(mconfig, MOS6526A, tag, owner, clock) { }
 
 mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS8520, tag, owner, clock, TYPE_8520) { }
+	: mos6526_device(mconfig, MOS8520, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -1082,11 +1081,10 @@ uint8_t mos6526_device::read(offs_t offset)
 		if (!machine().side_effects_disabled())
 			m_icr_read = true;
 
-		// Do not reset irqs unless one is effectively issued.
-		// cfr. amigaocs_flop.xml barb2paln4 that polls for Timer B status
-		//      until it expires at PC=7821c and other places.
-		// m_irq is checked too: a swallowed Timer B flag leaves m_icr empty
-		// while IR is asserted, and that interrupt still has to be acked.
+		// only reset irqs if one was actually issued - amigaocs_flop.xml
+		// barb2paln4 polls Timer B status until it expires at PC=7821c.
+		// m_irq too: a swallowed Timer B flag leaves m_icr empty with IR
+		// asserted, and that interrupt still needs acking.
 		if (machine().side_effects_disabled() || (!m_icr && !m_irq))
 			return data;
 
@@ -1185,14 +1183,19 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 	case TA_HI:
 		m_ta_latch = (data << 8) | (m_ta_latch & 0xff);
 
-		// A timer-high write loads the counter only while the timer is
-		// stopped. It does not start or reload a one-shot timer: that left a
-		// run in flight across the following force-load, which then underflowed
-		// off the stale counter. Measured against VICE for a stopped and for a
-		// running one-shot timer, on both timers.
 		if (!CRA_STARTED)
 		{
 			m_load_a0 = 1;
+		}
+
+		// on the 8520 the write also force-loads and starts a one-shot timer,
+		// whatever the start bit says - Amiga Kickstart boots off this
+		if (timer_hi_starts_oneshot() && CRA_RUNMODE)
+		{
+			m_load_a0 = 1;
+			m_cra |= CRA_START;
+			m_feed_a0 = !CRA_INMODE;
+			m_count_a1 = m_count_a0 = m_feed_a0;
 		}
 
 		if (m_load_a2)
@@ -1218,6 +1221,14 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 			m_load_b0 = 1;
 		}
 
+		if (timer_hi_starts_oneshot() && CRB_RUNMODE)
+		{
+			m_load_b0 = 1;
+			m_crb |= CRB_START;
+			m_feed_b0 = (CRB_INMODE == CRB_INMODE_PHI2);
+			m_count_b1 = m_count_b0 = m_feed_b0;
+		}
+
 		if (m_load_b2)
 		{
 			m_tb = (data << 8) | (m_tb & 0xff);
@@ -1227,9 +1238,8 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 	case TOD_10THS:
 		write_tod(0, data);
 
-		// restarting the clock resets the frequency divider, so the first
-		// tick is a full period rather than whatever was left of one. A
-		// write with the clock already running leaves the divider alone.
+		// restarting the clock resets the divider, so the first tick is a
+		// full period; a write with it already running leaves the divider alone
 		if (!CRB_ALARM && m_tod_stopped)
 		{
 			m_tod_count = 0;
@@ -1246,8 +1256,7 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case TOD_HR:
-		// only a write to the clock itself stops it - with the alarm
-		// selected these registers neither start nor stop it
+		// only a write to the clock itself stops it, not one to the alarm
 		if (!CRB_ALARM)
 		{
 			m_tod_stopped = true;
@@ -1266,10 +1275,9 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 		m_sdr = data;
 		m_sdr_empty = false;
 
-		// a byte written while the shift register is free passes straight
-		// through, leaving the SDR able to take a second one right away, but
-		// it only reaches the shifter two cycles later - an underflow falling
-		// in between is too early to shift it out
+		// a byte written while the shifter is free passes straight through,
+		// freeing the SDR at once, but only reaches the shifter two cycles
+		// later - an underflow in between is too early to shift it out
 		if (CRA_SPMODE && !m_shift_loaded)
 		{
 			m_sdr_load_delay = SDR_LOAD_DELAY;
