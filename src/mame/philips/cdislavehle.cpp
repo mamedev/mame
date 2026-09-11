@@ -132,6 +132,20 @@ uint16_t cdislave_hle_device::slave_r(offs_t offset)
 	return 0xff;
 }
 
+uint8_t cdislave_hle_device::disc_type()
+{
+	if (!m_cdrom->exists())
+		return 0x00;
+
+	const cdrom_file::toc &toc = m_cdrom->get_toc();
+	for (uint32_t i = 0; i < toc.numtrks; i++)
+	{
+		if (toc.tracks[i].trktype != cdrom_file::CD_TRACK_AUDIO)
+			return 0x02;
+	}
+	return 0x01;
+}
+
 void cdislave_hle_device::set_mouse_position()
 {
 	m_device_mouse_x = ((m_in_buf[1] & 0x70) << 3) | (m_in_buf[2] & 0x7f);
@@ -284,7 +298,7 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 					switch (m_in_buf[0])
 					{
 						case 0xb0: // Request Disc Status
-							prepare_readback(attotime::from_hz(4), 3, 4, 0xb0, 0x00, 0x02, 0x15, 0xb0);
+							prepare_readback(attotime::from_hz(4), 3, 4, 0xb0, 0x00, disc_type(), 0x15, 0xb0);
 							break;
 						//case 0xb1: // Request Disc Base
 							//prepare_readback(attotime::from_hz(10000), 3, 4, 0xb1, 0x00, 0x00, 0x00, 0xb1);
@@ -381,6 +395,7 @@ cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const ch
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_atten_w(*this)
 	, m_testplug_cb(*this, 0)
+	, m_cdrom(*this, ":cdrom")
 {
 }
 
