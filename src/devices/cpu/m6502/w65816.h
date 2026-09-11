@@ -49,6 +49,9 @@ public:
 	auto wdm_handler() { return m_wdm_w.bind(); }
 	auto sync_cb() { return m_sync_w.bind(); }
 	bool get_sync() const { return m_sync; }
+	// the program counter as it stands part way through an instruction, i.e. the address
+	// following the last instruction byte fetched (pc() reports the start of the instruction)
+	uint32_t get_live_pc() const { return (m_PB << 16) | m_PC; }
 
 protected:
 	w65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
