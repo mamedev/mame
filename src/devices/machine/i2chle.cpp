@@ -65,7 +65,20 @@ void i2c_hle_interface::interface_post_start()
 	device().save_item(NAME(m_state_next));
 	device().save_item(NAME(m_data_offset));
 	device().save_item(NAME(m_just_acked));
+	device().save_item(NAME(m_sda));
+	device().save_item(NAME(m_scl));
+	device().save_item(NAME(m_last_address));
 
+	write_sda(1);
+}
+
+void i2c_hle_interface::interface_pre_reset()
+{
+	m_latch = m_bit = 0;
+	m_sda = m_scl = 1;
+	m_state = m_state_next = STATE_IDLE;
+	m_last_address = m_data_offset = 0;
+	m_just_acked = false;
 	write_sda(1);
 }
 
