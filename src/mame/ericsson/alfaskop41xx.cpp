@@ -180,10 +180,18 @@ void alfaskop4110_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
 	map(0x7800, 0x7fff).ram().share(m_vram); // TODO: Video RAM base address is configurable via NVRAM - this is the default
-	map(0x8000, 0xefff).ram();
+	// The display unit was sold with two sizes of read/write memory and its
+	// operating software knows both.  The memory sizing routine in the DUOS
+	// module walks upwards two bytes at a time until an address stops
+	// answering, and then accepts a boundary of either F000 or F680; anything
+	// else stops the IPL with "MRW ERROR" on the status line.  The smaller of
+	// the two is not enough for every product: AlfaWord (4017-021) refuses to
+	// start on it and reports "Wrong Hardware configuration".
+	map(0x8000, 0xf67f).ram();
 
-	// NVRAM
-	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }),
+	// NVRAM.  It cannot begin at F600 on a unit with the larger memory
+	// board, because that address is still read/write memory there.
+	map(0xf680, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }),
 				 NAME( [this](offs_t offset, uint8_t data) {    LOGNVRAM("nvram_w %04x: %02x\n", offset, data); }));
 	// TIA board
 	map(0xf700, 0xf71f).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGDMA("TIA DMA_r %04x: %02x\n", offset, 0); return m_tia_dma->read(offset); }),
