@@ -3695,8 +3695,11 @@ void hd63266f_device::start_command(int cmd)
 		break;
 	}
 
-	// execute the command immediately if there's no motor on delay
-	if(motor_on_counter == 0) {
+	// execute the command immediately if there's no motor on delay.  The delay is counted
+	// in index pulses, and a drive holding no disk never gives any, so a drive that reports
+	// itself not ready has to be let through to fail on its own.
+	if(motor_on_counter == 0 || !get_ready(command[1] & 3)) {
+		motor_on_counter = 0;
 		upd765_family_device::start_command(cmd);
 	} else
 		delayed_command = cmd;
