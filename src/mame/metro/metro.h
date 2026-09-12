@@ -277,49 +277,4 @@ private:
 	emu_timer *m_mouja_irq_timer = nullptr;
 };
 
-// with K053936 PSAC2
-class blzntrnd_state : public metro_state
-{
-public:
-	blzntrnd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: metro_state(mconfig, type, tag)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_soundlatch(*this, "soundlatch")
-		, m_k053936(*this, "k053936")
-		, m_k053936_ram(*this, "k053936_ram")
-	{ }
-
-	void blzntrnd(machine_config &config);
-	void gstrik2(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
-private:
-	void audiobank_w(u8 data);
-	void k053936_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	TILE_GET_INFO_MEMBER(k053936_get_tile_info);
-	TILE_GET_INFO_MEMBER(k053936_gstrik2_get_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
-	DECLARE_VIDEO_START(blzntrnd);
-	DECLARE_VIDEO_START(gstrik2);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void main_map(address_map &map) ATTR_COLD;
-	void sound_io_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-
-	// devices
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<k053936_device> m_k053936;
-
-	// memory pointers
-	required_shared_ptr<u16> m_k053936_ram;
-
-	// video-related
-	tilemap_t *m_k053936_tilemap = nullptr;
-};
-
 #endif // MAME_METRO_METRO_H

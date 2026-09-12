@@ -78,6 +78,7 @@
 #define LOG_INT    (1U << 2)
 #define LOG_BLIT   (1U << 3)
 #define LOG_BLITOP (1U << 4)
+#define LOG_CRTC   (1U << 5)
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -88,6 +89,7 @@
 #define LOGINT(...)     LOGMASKED(LOG_INT, __VA_ARGS__)
 #define LOGBLIT(...)    LOGMASKED(LOG_BLIT, __VA_ARGS__)
 #define LOGBLITOP(...)  LOGMASKED(LOG_BLITOP, __VA_ARGS__)
+#define LOGCRTC(...)    LOGMASKED(LOG_CRTC, __VA_ARGS__)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -376,12 +378,19 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_crtc_horz));
 	save_item(NAME(m_crtc_vert));
 	save_item(NAME(m_sprite_count));
+	save_item(NAME(m_sprite_count_latch));
 	save_item(NAME(m_sprite_priority));
+	save_item(NAME(m_sprite_priority_latch));
 	save_item(NAME(m_sprite_color_code));
+	save_item(NAME(m_sprite_color_code_latch));
 	save_item(NAME(m_sprite_xoffset));
 	save_item(NAME(m_sprite_yoffset));
+	save_item(NAME(m_sprite_xoffset_latch));
+	save_item(NAME(m_sprite_yoffset_latch));
 	save_item(NAME(m_screen_xoffset));
 	save_item(NAME(m_screen_yoffset));
+	save_item(NAME(m_screen_xoffset_latch));
+	save_item(NAME(m_screen_yoffset_latch));
 	save_item(NAME(m_layer_priority));
 	save_item(NAME(m_background_color));
 	save_item(NAME(m_screen_blank));
@@ -421,10 +430,15 @@ void imagetek_i4100_device::device_reset()
 	m_rombank = 0;
 	m_crtc_unlock = false;
 	m_sprite_count = 0;
+	m_sprite_count_latch = 0;
 	m_sprite_priority = 0;
+	m_sprite_priority_latch = 0;
 	m_sprite_xoffset = 0;
 	m_sprite_yoffset = 0;
+	m_sprite_xoffset_latch = 0;
+	m_sprite_yoffset_latch = 0;
 	m_sprite_color_code = 0;
+	m_sprite_color_code_latch = 0;
 	update_irq_state();
 
 	for(int i=0; i != 3; i++) {
@@ -435,6 +449,8 @@ void imagetek_i4100_device::device_reset()
 	m_background_color = 0;
 	m_screen_xoffset = 0;
 	m_screen_yoffset = 0;
+	m_screen_xoffset_latch = 0;
+	m_screen_yoffset_latch = 0;
 	m_screen_blank = false;
 	m_screen_flip = false;
 
@@ -587,8 +603,13 @@ void imagetek_i4100_device::tiletable_w(offs_t offset, uint16_t data, uint16_t m
  * 0.w  ---- ---- ---- ----     Number Of Sprites To Draw
  *
  ************************************************************/
-uint16_t imagetek_i4100_device::sprite_count_r() { return m_sprite_count; }
-void imagetek_i4100_device::sprite_count_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_count); }
+uint16_t imagetek_i4100_device::sprite_count_r() { return m_sprite_count_latch; }
+void imagetek_i4100_device::sprite_count_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_count_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_count = m_sprite_count_latch;
+}
 
 /*************************************************************
  *
@@ -600,8 +621,13 @@ void imagetek_i4100_device::sprite_count_w(offs_t offset, uint16_t data, uint16_
  *      ---- ---- ---4 3210     Sprites Masked Number
  *
  *************************************************************/
-uint16_t imagetek_i4100_device::sprite_priority_r() { return m_sprite_priority; }
-void imagetek_i4100_device::sprite_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_priority); }
+uint16_t imagetek_i4100_device::sprite_priority_r() { return m_sprite_priority_latch; }
+void imagetek_i4100_device::sprite_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_priority_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_priority = m_sprite_priority_latch;
+}
 
 /*************************************************************
  *
@@ -609,18 +635,33 @@ void imagetek_i4100_device::sprite_priority_w(offs_t offset, uint16_t data, uint
  * 6.w  ---- ---- ---- ----     Sprites X Offset
  *
  ************************************************************/
-uint16_t imagetek_i4100_device::sprite_xoffset_r() { return m_sprite_xoffset; }
-void imagetek_i4100_device::sprite_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_xoffset); }
-uint16_t imagetek_i4100_device::sprite_yoffset_r() { return m_sprite_yoffset; }
-void imagetek_i4100_device::sprite_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_yoffset); }
+uint16_t imagetek_i4100_device::sprite_xoffset_r() { return m_sprite_xoffset_latch; }
+void imagetek_i4100_device::sprite_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_xoffset_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_xoffset = m_sprite_xoffset_latch;
+}
+uint16_t imagetek_i4100_device::sprite_yoffset_r() { return m_sprite_yoffset_latch; }
+void imagetek_i4100_device::sprite_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_yoffset_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_yoffset = m_sprite_yoffset_latch;
+}
 
 /*************************************************************
  *
  * 8.w  ---- ---- ---- ----     Sprites Color Codes Start
  *
  ************************************************************/
-uint16_t imagetek_i4100_device::sprite_color_code_r() { return m_sprite_color_code; }
-void imagetek_i4100_device::sprite_color_code_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_color_code); }
+uint16_t imagetek_i4100_device::sprite_color_code_r() { return m_sprite_color_code_latch; }
+void imagetek_i4100_device::sprite_color_code_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sprite_color_code_latch);
+	if (!m_spriteram_buffered)
+		m_sprite_color_code = m_sprite_color_code_latch;
+}
 
 /*************************************************************
  *
@@ -642,8 +683,8 @@ void imagetek_i4100_device::layer_priority_w(offs_t offset, uint16_t data, uint1
 	m_layer_priority[0] = (data >> 0) & 3;
 	if ((data >> 6) != 0)
 	{
-		LOGWARN("%s warning: layer_priority_w write with %04x %04x\n"
-			, this->tag()
+		LOGWARN("%s: warning: layer_priority_w write with %04x %04x\n"
+			, machine().describe_context()
 			, data
 			, mem_mask
 		);
@@ -667,7 +708,7 @@ void imagetek_i4100_device::background_color_w(offs_t offset, uint16_t data, uin
 
 	m_background_color &= 0x0fff;
 	if (data & 0xf000)
-		LOGWARN("%s warning: background_color_w write with %04x %04x\n", this->tag(), data, mem_mask);
+		LOGWARN("%s: warning: background_color_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 /***************************************************************************
@@ -679,10 +720,20 @@ void imagetek_i4100_device::background_color_w(offs_t offset, uint16_t data, uin
  * certain conditions
  *
  ***************************************************************************/
-uint16_t imagetek_i4100_device::screen_xoffset_r() { return m_screen_xoffset; }
-void imagetek_i4100_device::screen_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_screen_xoffset); }
-uint16_t imagetek_i4100_device::screen_yoffset_r() { return m_screen_yoffset; }
-void imagetek_i4100_device::screen_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_screen_yoffset); }
+uint16_t imagetek_i4100_device::screen_xoffset_r() { return m_screen_xoffset_latch; }
+void imagetek_i4100_device::screen_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_screen_xoffset_latch);
+	if (!m_spriteram_buffered)
+		m_screen_xoffset = m_screen_xoffset_latch;
+}
+uint16_t imagetek_i4100_device::screen_yoffset_r() { return m_screen_yoffset_latch; }
+void imagetek_i4100_device::screen_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_screen_yoffset_latch);
+	if (!m_spriteram_buffered)
+		m_screen_yoffset = m_screen_yoffset_latch;
+}
 
 uint16_t imagetek_i4100_device::window_r(offs_t offset) { return m_window[offset]; }
 void imagetek_i4100_device::window_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_window[offset]); }
@@ -723,7 +774,7 @@ void imagetek_i4100_device::screen_ctrl_w(offs_t offset, uint16_t data, uint16_t
 	m_screen_flip = BIT(data,0);
 
 	if (data & 0xf81c)
-		LOGWARN("%s warning: screen_ctrl_w write with %04x %04x\n", this->tag(), data, mem_mask);
+		LOGWARN("%s: warning: screen_ctrl_w write with %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 
@@ -755,7 +806,7 @@ void imagetek_i4100_device::crtc_horz_w(offs_t offset, uint16_t data, uint16_t m
 	if (m_crtc_unlock == true)
 	{
 		COMBINE_DATA(&m_crtc_horz);
-		//logerror("%s CRTC horizontal %04x %04x\n",this->tag(),data,mem_mask);
+		LOGCRTC("%s: CRTC horizontal %04x %04x\n",machine().describe_context(),data,mem_mask);
 	}
 }
 
@@ -764,7 +815,7 @@ void imagetek_i4100_device::crtc_vert_w(offs_t offset, uint16_t data, uint16_t m
 	if (m_crtc_unlock == true)
 	{
 		COMBINE_DATA(&m_crtc_vert);
-		//logerror("%s CRTC vertical %04x %04x\n",this->tag(),data,mem_mask);
+		LOGCRTC("%s: CRTC vertical %04x %04x\n",machine().describe_context(),data,mem_mask);
 	}
 }
 
@@ -772,7 +823,7 @@ void imagetek_i4100_device::crtc_unlock_w(offs_t offset, uint16_t data, uint16_t
 {
 	m_crtc_unlock = BIT(data,0);
 	if (data & ~1)
-		LOGWARN("%s warning: unlock register write with %04x %04x\n",this->tag(),data,mem_mask);
+		LOGWARN("%s: warning: unlock register write with %04x %04x\n",machine().describe_context(),data,mem_mask);
 }
 
 /***************************************************************************
@@ -827,54 +878,8 @@ void imagetek_i4100_device::blt_write(int const tmap, const offs_t offs, u16 con
 	{
 		vram_w(offs, data, mask, tmap - 1);
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s: Blitter [%X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
 }
-
-/***************************************************************************
-
-
-                                    Blitter
-
-    [ Registers ]
-
-        Offset:     Value:
-
-        0.l         Destination Tilemap      (1,2,3)
-        4.l         Blitter Data Address     (byte offset into the gfx ROMs)
-        8.l         Destination Address << 7 (byte offset into the tilemap)
-
-        The Blitter reads a byte and looks at the most significative
-        bits for the opcode, while the remaining bits define a value
-        (usually how many bytes to write). The opcode byte may be
-        followed by a number of other bytes:
-
-            76------            Opcode
-            --543210            N
-            (at most N+1 bytes follow)
-
-
-        The blitter is designed to write every other byte (e.g. it
-        writes a byte and skips the next). Hence 2 blits are needed
-        to fill a tilemap (first even, then odd addresses)
-
-    [ Opcodes ]
-
-            0       Copy the following N+1 bytes. If the whole byte
-                    is $00: stop and generate an IRQ
-
-            1       Fill N+1 bytes with a sequence, starting with
-                    the  value in the following byte
-
-            2       Fill N+1 bytes with the value in the following
-                    byte
-
-            3       Skip N+1 bytes. If the whole byte is $C0:
-                    skip to the next row of the tilemap (+0x200 bytes)
-                    but preserve the column passed at the start of the
-                    blit (destination address % 0x200)
-
-
-***************************************************************************/
 
 
 // TODO: clean this up
@@ -903,7 +908,7 @@ void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem
 			case 3:
 				break;
 			default:
-				LOGWARN("%s Blitter unknown destination: %08X\n", machine().describe_context(), tmap);
+				LOGWARN("%s: Blitter unknown destination: %08X\n", machine().describe_context(), tmap);
 				return;
 		}
 
@@ -914,7 +919,7 @@ void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem
 			src_offs %= m_gfxrom_size;
 			b1 = m_gfxrom[src_offs];
 
-			LOGBLITOP("%s Blitter opcode %02X at %06X\n", machine().describe_context(), b1, src_offs);
+			LOGBLITOP("%s: Blitter opcode %02X at %06X\n", machine().describe_context(), b1, src_offs);
 
 			src_offs++;
 			count = ((~b1) & 0x3f) + 1;
@@ -996,7 +1001,7 @@ void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem
 
 			// shouldn't happen
 			default:
-				//("%s Blitter unknown opcode %02X at %06X\n",machine().describe_context(),b1,src_offs-1);
+				//("%s: Blitter unknown opcode %02X at %06X\n",machine().describe_context(),b1,src_offs-1);
 				return;
 			}
 
@@ -1280,6 +1285,26 @@ void imagetek_i4100_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
+/***************************************************************************
+
+                        Tilemaps: Tiles Set & Window
+
+    Each entry in the Tiles Set RAM uses 2 words to specify a starting
+    tile code and a color code. This adds 16 consecutive tiles with
+    that color code to the set of available tiles.
+
+        Offset:     Bits:                   Value:
+
+        0.w         fedc ---- ---- ----
+                    ---- ba98 7654 ----     Color Code*
+                    ---- ---- ---- 3210     Code High Bits
+
+        2.w                                 Code Low Bits
+
+* 00-ff, but on later chips supporting it, xf means 256 color tile and palette x
+
+***************************************************************************/
+
 inline u8 imagetek_i4100_device::get_tile_pix(u16 code, u8 x, u8 y, bool const big, u32 &pix)
 {
 	// Use code as an index into the tiles set table
@@ -1342,26 +1367,6 @@ inline u8 imagetek_i4100_device::get_tile_pix(u16 code, u8 x, u8 y, bool const b
 			return 0;
 	}
 }
-
-/***************************************************************************
-
-                        Tilemaps: Tiles Set & Window
-
-    Each entry in the Tiles Set RAM uses 2 words to specify a starting
-    tile code and a color code. This adds 16 consecutive tiles with
-    that color code to the set of available tiles.
-
-        Offset:     Bits:                   Value:
-
-        0.w         fedc ---- ---- ----
-                    ---- ba98 7654 ----     Color Code*
-                    ---- ---- ---- 3210     Code High Bits
-
-        2.w                                 Code Low Bits
-
-* 00-ff, but on later chips supporting it, xf means 256 color tile and palette x
-
-***************************************************************************/
 
 void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 const pcode,
 		int sx, int sy, int wx, int wy, bool const big, int const layer)
@@ -1470,6 +1475,15 @@ void imagetek_i4100_device::screen_eof(int state)
 			set_irq(m_vblank_irq_level);
 
 		if (m_spriteram_buffered)
+		{
 			m_spriteram->copy();
+			m_sprite_count = m_sprite_count_latch;
+			m_sprite_priority = m_sprite_priority_latch;
+			m_sprite_color_code = m_sprite_color_code_latch;
+			m_sprite_xoffset = m_sprite_xoffset_latch;
+			m_sprite_yoffset = m_sprite_yoffset_latch;
+			m_screen_xoffset = m_screen_xoffset_latch;
+			m_screen_yoffset = m_screen_yoffset_latch;
+		}
 	}
 }
