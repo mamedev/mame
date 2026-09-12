@@ -1,0 +1,43 @@
+// license:MIT
+// copyright-holders:Felix Kreuzer
+//============================================================
+//
+//  rasterize.json - Gaussian rasterization of the depixelized image
+//
+//  Part of the depixelize chain, see bgfx/chains/depixelize.json.
+//
+//============================================================
+
+{
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+
+	"vertex": "chains/misc/vs_blit",
+	"fragment": "chains/depixelize/fs_rasterize",
+	"uniforms": [
+		{ "name": "s_segments",       "type": "int",  "values": [ 1.0 ] },
+		{ "name": "s_source",         "type": "int",  "values": [ 1.0 ] },
+		{ "name": "s_graph",          "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_tex_size0",      "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_size1",      "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_size2",      "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims",  "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_source_dims",    "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+	]
+}
