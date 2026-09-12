@@ -447,12 +447,10 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		}
 
 		int16_t sampleL = 0, sampleR = 0, outL = 0, outR = 0;
-		// Attenuation is logarithmic (decibels).
-		// Floats are not chip accurate, but the formula is correct.
-		float scaleLL = powf(10.0f, -m_atten[0] / 20.0f);
-		float scaleLR = powf(10.0f, -m_atten[1] / 20.0f);
-		float scaleRR = powf(10.0f, -m_atten[2] / 20.0f);
-		float scaleRL = powf(10.0f, -m_atten[3] / 20.0f);
+		const float scaleLL = m_atten[0] / 255.0f;
+		const float scaleLR = m_atten[1] / 255.0f;
+		const float scaleRR = m_atten[2] / 255.0f;
+		const float scaleRL = m_atten[3] / 255.0f;
 		for (uint16_t i = 0; i < 18 * 28 * num_samples; i++)
 		{
 			sampleL = m_samples[0][i];
@@ -1388,7 +1386,7 @@ void cdicdic_device::device_reset()
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);
 
-	std::fill_n(m_atten, 4, 0);
+	std::fill_n(m_atten, 4, 0xff);
 	std::fill_n(m_xa_last, 4, 0);
 }
 
