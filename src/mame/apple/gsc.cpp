@@ -38,7 +38,9 @@ void gsc_device::map(address_map &map)
 gsc_device::gsc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, GSC, tag, owner, clock),
 	m_screen(*this, "screen"),
-	m_palette(*this, "palette")
+	m_palette(*this, "palette"),
+	m_gsc_panel_id(0),
+	m_pmu_blank_display(false)
 {
 	std::fill(std::begin(m_gsc_regs), std::end(m_gsc_regs), 0);
 }
@@ -52,14 +54,6 @@ void gsc_device::device_start()
 	save_pointer(NAME(m_vram), 0x20000);
 }
 
-void gsc_device::device_reset()
-{
-	if (m_gsc_panel_id == 4)
-	{
-		m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	}
-}
-
 void gsc_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen);
@@ -70,6 +64,14 @@ void gsc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(gsc_device::screen_update_gsc));
 
 	PALETTE(config, m_palette, FUNC(gsc_device::macgsc_palette), 16);
+}
+
+void gsc_device::device_config_complete()
+{
+	if (m_gsc_panel_id == 4)
+	{
+		subdevice<screen_device>(m_screen.finder_tag())->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	}
 }
 
 void gsc_device::macgsc_palette(palette_device &palette) const

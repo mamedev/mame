@@ -21,6 +21,7 @@ public:
 	// source tree, but I'm not sure it's the exact behavior of the real MSC.
 	void pmu_int(int state)
 	{
+		m_pmu_int_state = state;
 		if (state == ASSERT_LINE)
 		{
 			set_int(0x10);              // INT_CB1
@@ -31,22 +32,36 @@ public:
 		}
 	}
 
+	// PGE IRQ is level sensitive so we handle writes specially to minimize changes to the base VIA
+	void write_msc(offs_t offset, u8 data)
+	{
+		write(offset, data);
+
+		if ((offset == VIA_IFR) && (m_pmu_int_state == ASSERT_LINE))
+		{
+			set_int(0x10);
+		}
+	}
+
 	void write_cb1_noint(int state)
 	{
 		if (m_in_cb1 != state)
 		{
 			m_in_cb1 = state;
-		}
 
-		if ((m_acr & 0x1c) == 0x1c)
-		{
-			shift_out();
-		}
-		else if (((m_acr & 0x1c) == 0x0c) || (!(m_acr & 0x1c)))
-		{
-			shift_in();
+			if ((m_acr & 0x1c) == 0x1c)
+			{
+				shift_out();
+			}
+			else if (((m_acr & 0x1c) == 0x0c) || (!(m_acr & 0x1c)))
+			{
+				shift_in();
+			}
 		}
 	}
+
+private:
+	int m_pmu_int_state;
 };
 
 class msc_device :  public device_t, public device_sound_interface
@@ -86,6 +101,7 @@ public:
 	void via_sync();
 
 	int get_pmu_req();
+	int dfac_power();
 	void pmu_ack_w(int state);
 	void pmu_int(int state);
 	void write_cb1(int state);

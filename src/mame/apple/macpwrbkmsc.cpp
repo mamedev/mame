@@ -13,9 +13,7 @@
     PowerBook Duo 270c: 68030 @ 33 MHz, FPU, 640x480 active-matrix 16bpp color screen, 4 MiB RAM (32 max)
     PowerBook Duo 280:  68040 @ 33 MHz, 640x480 active-matrix 4bpp grayscale screen, 4 MiB RAM (40 max)
     PowerBook Duo 280c: 68040 @ 33 MHz, 640x480 active-matrix 16bpp color screen, 4 MiB RAM (40 max)
-
-    Future:
-    PowerBook 150: '030 @ 33 MHz, 640x480 grayscale screen, 4 MiB RAM (40 max), IDE HDD, ADB trackpad, PG&E matrix keyboard
+    PowerBook 150:      68030 @ 33 MHz, 640x480 grayscale screen, 4 MiB RAM (40 max), IDE HDD, ADB trackpad
 
     ============================================================================
     Technical info
@@ -23,6 +21,8 @@
     Pseudo-VIA2 Port B bits 1 and 2 are /PMU_ACK and /PMU_REQ, respectively.
     Main PMU comms are through the VIA shifter, but using a hardware SPI block
     on the PG&E end instead of the 68HC05 losing cycles doing bit-banging.
+
+    The PowerBook 150's ATA hookup is identical to the Quadra/LC 630's.
 
     Brightness: PLM 1 7F (all the way down) to 26 (all the way up)
                 PLM 2 01  "   "   "   "     to 5A
@@ -76,6 +76,9 @@
 #include "mactoolbox.h"
 #include "msc.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
+#include "bus/ata/ataintf.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
@@ -108,6 +111,7 @@ public:
 		m_dfac(*this, "dfac"),
 		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
+		m_ata(*this, "ata"),
 		m_ram(*this, RAM_TAG),
 		m_gsc(*this, "gsc"),
 		m_csc(*this, "csc"),
@@ -146,6 +150,8 @@ public:
 	void macpd280(machine_config &config);
 	void macpd280c(machine_config &config);
 	void macpd280_map(address_map &map) ATTR_COLD;
+	void macpb150(machine_config &config);
+	void macpb150_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m68000_musashi_device> m_maincpu;
@@ -154,13 +160,14 @@ private:
 	required_device<dfac_device> m_dfac;
 	required_device<ncr53c80_device> m_ncr5380;
 	required_device<mac_scsi_helper_device> m_scsihelp;
+	optional_device<ata_interface_device> m_ata;
 	required_device<ram_device> m_ram;
 	optional_device<gsc_device> m_gsc;
 	optional_device<csc_device> m_csc;
 	required_device<z80scc_device> m_scc;
 	required_device<pwrbkduo_device> m_dockslot;
 	required_device<ds2401_device> m_battserial;
-	required_ioport m_mouse0, m_mouse1, m_mouse2;
+	optional_ioport m_mouse0, m_mouse1, m_mouse2;
 	required_ioport_array<8> m_keys;
 	required_ioport m_kbspecial;
 	int m_ca1_data;
@@ -212,6 +219,9 @@ private:
 	u8 pmu_bat_current();
 	u8 pmu_bat_temp();
 	u8 pmu_ambient_temp();
+
+	u32 ata_data_r(offs_t offset, u32 mem_mask);
+	void ata_data_w(offs_t offset, u32 data, u32 mem_mask);
 };
 
 void macpbmsc_state::machine_start()
@@ -260,8 +270,8 @@ void macpbmsc_state::vbl_w(int state)
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
 
-	NewX = m_mouse1->read();
-	NewY = m_mouse2->read();
+	NewX = m_mouse1.read_safe(0);
+	NewY = m_mouse2.read_safe(0);
 
 	//  printf("pollmouse: X %d Y %d\n", NewX, NewY);
 
@@ -295,7 +305,7 @@ void macpbmsc_state::vbl_w(int state)
 		m_lastmousey = NewY;
 	}
 
-	m_lastbutton = m_mouse0->read() & 0x01;
+	m_lastbutton = m_mouse0.read_safe(0) & 0x01;
 	m_mouseX = MouseCountX;
 	m_mouseY = MouseCountY;
 //  printf("X %02x Y %02x\n", m_mouseX, m_mouseY);
@@ -412,7 +422,9 @@ void macpbmsc_state::pmu_portc_w(u8 data)
 // bit 7 = 1 for second mouse button NOT pressed
 u8 macpbmsc_state::pmu_portd_r()
 {
-	return (1 << 7) | (m_dockslot->is_slot_empty() ? (1 << 6) : 0) | (1 << 4);   // US keyboard, get dock presence from slot
+	// US keyboard, get dock presence from slot.  Bit 5 (RdDFACPwr) is driven by the MSC and is
+	// low when sound is powered up; the PG&E resets and reprograms the DFAC when it goes low.
+	return (1 << 7) | (m_dockslot->is_slot_empty() ? (1 << 6) : 0) | (m_msc->dfac_power() ? 0 : (1 << 5)) | (1 << 4);
 }
 
 // bit 1 = screen power on/off
@@ -581,6 +593,36 @@ int macpbmsc_state::pmu_read_mouseButton()
 	return m_lastbutton;
 }
 
+u32 macpbmsc_state::ata_data_r(offs_t offset, u32 mem_mask)
+{
+	u32 retval = 0;
+
+	if (mem_mask == 0xffffffff)
+	{
+		retval = m_ata->cs0_swap_r(0) << 16;
+		retval |= m_ata->cs0_swap_r(0);
+	}
+	else if ((mem_mask & 0xffff0000) != 0)
+	{
+		retval = m_ata->cs0_swap_r(0) << 16;
+	}
+
+	return retval;
+}
+
+void macpbmsc_state::ata_data_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (mem_mask == 0xffffffff)
+	{
+		m_ata->cs0_swap_w(0, data >> 16);
+		m_ata->cs0_swap_w(0, data & 0xffff);
+	}
+	else if ((mem_mask & 0xffff0000) != 0)
+	{
+		m_ata->cs0_swap_w(0, data >> 16);
+	}
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ****************************************************************************/
@@ -634,16 +676,19 @@ void macpbmsc_state::macpd280_map(address_map &map)
 	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a1000; }));
 }
 
-static INPUT_PORTS_START( dblite )
-	PORT_START("MOUSE0") /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+void macpbmsc_state::macpb150_map(address_map &map)
+{
+	macpd210_map(map);
 
-	PORT_START("MOUSE1") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	map(0x50f1a000, 0x50f1a01f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)).umask32(0xffff0000);
+	map(0x50f1a000, 0x50f1a003).rw(FUNC(macpbmsc_state::ata_data_r), FUNC(macpbmsc_state::ata_data_w));
+	map(0x50f1a020, 0x50f1a03f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)).umask32(0xffff0000);
 
-	PORT_START("MOUSE2") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a1001; }));
+}
 
+// PB150 lacks the quadrature trackpad, it uses an ADB one
+static INPUT_PORTS_START( pb150 )
 	PORT_START("Y0")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
@@ -758,6 +803,19 @@ static INPUT_PORTS_START( dblite )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dblite )
+	PORT_INCLUDE(pb150)
+
+	PORT_START("MOUSE0") /* Mouse - button */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+
+	PORT_START("MOUSE1") /* Mouse - X AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START("MOUSE2") /* Mouse - Y AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -792,7 +850,9 @@ void macpbmsc_state::macpd210(machine_config &config)
 	m_pmu->ad_in<2>().set(FUNC(macpbmsc_state::pmu_bat_current));
 	m_pmu->ad_in<3>().set(FUNC(macpbmsc_state::pmu_bat_temp));
 	m_pmu->ad_in<4>().set(FUNC(macpbmsc_state::pmu_ambient_temp));
-	m_pmu->spi_clock_callback().set(m_msc, FUNC(msc_device::cb1_w));
+	// The SPI shift clock must not latch VIA1's CB1 interrupt flag: that flag is how the PG&E's
+	// PGE_IRQ line reaches the host, and the ROM re-enables it after each PMU transaction.
+	m_pmu->spi_clock_callback().set(m_msc, FUNC(msc_device::write_cb1));
 	m_pmu->spi_mosi_callback().set(m_msc, FUNC(msc_device::cb2_w));
 	m_pmu->read_tbB().set(FUNC(macpbmsc_state::pmu_read_mouseButton));
 	m_pmu->read_tbX().set(FUNC(macpbmsc_state::pmu_read_mouseX));
@@ -902,6 +962,8 @@ void macpbmsc_state::macpd280(machine_config &config)
 
 	M68LC040(config.replace(), m_maincpu, 33_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpbmsc_state::macpd280_map);
+
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 }
 
 void macpbmsc_state::macpd280c(machine_config &config)
@@ -909,6 +971,24 @@ void macpbmsc_state::macpd280c(machine_config &config)
 	macpd280(config);
 
 	m_csc->set_panel_id(0);
+}
+
+void macpbmsc_state::macpb150(machine_config &config)
+{
+	macpd230(config);
+	m_maincpu->set_fpu_enable(true);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macpbmsc_state::macpb150_map);
+
+	m_gsc->set_panel_id(4);
+
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	m_ata->irq_handler().set(m_msc, FUNC(msc_device::slot1_irq_w));
+
+	adb_bus_device &adbbus(ADB_BUS(config, "adb"));
+	m_pmu->adb_linechange_callback().set(adbbus, FUNC(adb_bus_device::adb_host_line_w));
+	adbbus.out_adb_callback().set(m_pmu, FUNC(m68hc05pge_device::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_mouse");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, nullptr);
 }
 
 ROM_START(macpd210)
@@ -936,6 +1016,15 @@ ROM_START(macpd280)
 	ROM_LOAD( "duobatid.bin", 0x000000, 0x000008, CRC(7545c341) SHA1(61b094ee5b398077f70eaa1887921c8366f7abfe) )
 ROM_END
 
+ROM_START(macpb150)
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD("fba22562.rom", 0x000000, 0x100000, CRC(7e283b7c) SHA1(ef56fadc8adbe978f9d91fdf1543f66cb8468390))
+
+	// battery serial number, read from an embedded Dallas DS2400
+	ROM_REGION(0x8, "ds2400", ROMREGION_ERASE00)
+	ROM_LOAD( "duobatid.bin", 0x000000, 0x000008, CRC(7545c341) SHA1(61b094ee5b398077f70eaa1887921c8366f7abfe) )
+ROM_END
+
 #define rom_macpd230 rom_macpd210
 #define rom_macpd250 rom_macpd210
 #define rom_macpd280c rom_macpd280
@@ -948,3 +1037,4 @@ COMP(1993, macpd250, macpd210, 0, macpd250, dblite, macpbmsc_state, empty_init, 
 COMP(1993, macpd270c, 0, 0, macpd270c, dblite, macpbmsc_state, empty_init, "Apple Computer", "Macintosh PowerBook Duo 270c", MACHINE_SUPPORTS_SAVE)
 COMP(1994, macpd280, 0, 0, macpd280, dblite, macpbmsc_state, empty_init, "Apple Computer", "Macintosh PowerBook Duo 280", MACHINE_SUPPORTS_SAVE)
 COMP(1994, macpd280c, macpd280, 0, macpd280c, dblite, macpbmsc_state, empty_init, "Apple Computer", "Macintosh PowerBook Duo 280c", MACHINE_SUPPORTS_SAVE)
+COMP(1993, macpb150, macpd210, 0, macpb150, pb150, macpbmsc_state, empty_init, "Apple Computer", "Macintosh PowerBook 150", MACHINE_SUPPORTS_SAVE)

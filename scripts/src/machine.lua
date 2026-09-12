@@ -717,6 +717,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/adbhost.h,MACHINES["ADBHOST"] = true
+---------------------------------------------------
+
+if MACHINES["ADBHOST"] then
+	files {
+		MAME_DIR .. "src/devices/machine/adbhost.cpp",
+		MAME_DIR .. "src/devices/machine/adbhost.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
 ---------------------------------------------------
 
