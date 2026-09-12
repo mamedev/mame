@@ -129,6 +129,47 @@ from Dragon Gun.
 
 namespace {
 
+/***************************************************************************
+
+    Dragon Gun video ROM scrambling
+
+    The twelve video ROMs (MAR-17 to MAR-28 on the DE-0360-4 ROM board) hold
+    five DVI/AVSS containers of PLV2 compressed video for the i750.  The
+    container and frame headers, the directory and the sequence tables are
+    stored in the clear (the ARM reads those directly), but the PLV2 plane
+    packets, which only the i750 ever reads, are scrambled by a fixed
+    transform of each little-endian 32-bit ROM word:
+
+    - Each of the four plaintext bytes of a word is passed through its own
+      8-bit substitution table.
+    - The eight output bits of the table for byte n are wired to fixed,
+      non-contiguous bit positions of the stored word (dvi_lane_bits[n]).
+    - Nothing depends on the address: the stored word 0x4d970254 decrypts
+      to the plaintext word 0x0 everywhere.
+
+    The "dvi_decrypt" region holds the inverse direction: gather the eight
+    bits listed in dvi_lane_bits[n] from the stored word (bit k of the index
+    comes from bit dvi_lane_bits[n][k]) and look the index up in table n to
+    get plaintext byte n.  The file is a reconstruction, but it seems
+    probable that the chip contains a mask ROM with similar tables.
+
+    The transform is presumably done by one of the custom chips between the
+    ROMs and the i750 on the ROM board.  Importantly, the ARM should not
+    see the decrypted view of these ROMs because the DVI headers are not
+    encrypted, just the actual frame data.
+
+***************************************************************************/
+
+// bit position within the stored 32-bit word of output bit k of the substitution for byte lane n
+static const u8 dvi_lane_bits[4][8] =
+{
+	{  1,  3, 11, 12, 16, 19, 27, 28 },
+	{  4, 13, 14, 17, 18, 23, 30, 31 },
+	{  0,  5,  6, 15, 21, 22, 24, 25 },
+	{  2,  7,  8,  9, 10, 20, 26, 29 }
+};
+
+
 class dragngun_state : public driver_device
 {
 public:
@@ -158,6 +199,8 @@ public:
 		, m_io_inputs(*this, "INPUTS")
 		, m_io_light_x(*this, "LIGHT%u_X", 0U)
 		, m_io_light_y(*this, "LIGHT%u_Y", 0U)
+		, m_dvi_rom(*this, "dvi")
+		, m_dvi_decrypt(*this, "dvi_decrypt")
 	{ }
 
 	void dragngun(machine_config &config) ATTR_COLD;
@@ -191,6 +234,8 @@ protected:
 	void gun_irq_ack_w(u32 data);
 	u32 unk_video_r();
 	u32 lockload_gun_mirror_r(offs_t offset);
+
+	u8 read_dvi_byte(offs_t offset);
 
 	template<int Chip> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -253,6 +298,9 @@ protected:
 	optional_ioport m_io_inputs;
 	optional_ioport_array<2> m_io_light_x;
 	optional_ioport_array<2> m_io_light_y;
+
+	optional_region_ptr<u32> m_dvi_rom;
+	optional_region_ptr<u8> m_dvi_decrypt;
 
 	std::unique_ptr<u8[]> m_dirty_palette{};
 	std::unique_ptr<u16[]> m_rowscroll[4]{};
@@ -962,6 +1010,24 @@ GFXDECODE_END
 
 
 //**************************************************************************
+//  VIDEO ROM
+//**************************************************************************
+
+// Read one unscrambled byte of the i750 video ROM (see the description above dvi_lane_bits)
+u8 dragngun_state::read_dvi_byte(offs_t offset)
+{
+	const u32 word = m_dvi_rom[(offset >> 2) & (m_dvi_rom.length() - 1)];
+	const u8 lane = offset & 3;
+	u8 index = 0;
+	for (int bit = 0; bit < 8; bit++)
+	{
+		index |= BIT(word, dvi_lane_bits[lane][bit]) << bit;
+	}
+	return m_dvi_decrypt[(lane << 8) | index];
+}
+
+
+//**************************************************************************
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
@@ -969,6 +1035,25 @@ void dragngun_state::machine_start()
 {
 	save_item(NAME(m_lightgun_port));
 	save_item(NAME(m_oki2_bank));
+
+	// Perform a validation test of the video ROM decryption if valid video ROMs exist
+	if (m_dvi_rom.found() && m_dvi_decrypt.found() && (m_dvi_rom.bytes() >= 0xc00000) && (m_dvi_rom[0] == 0x56445649))
+	{
+		u32 sum = 0;
+		for (offs_t offset = 0; offset < 0xc00000; offset++)
+		{
+			sum += read_dvi_byte(offset);
+		}
+		const u16 codec = read_dvi_byte(0x000450) | (read_dvi_byte(0x000451) << 8);
+		if ((sum != 0x507451fa) || (codec != 0x0014))
+		{
+			osd_printf_error("dragngun: video ROM decryption self-test FAILED (byte sum %08x, expected 0x507451fa; codec ID %04x, expected 0x0014)\n", sum, codec);
+		}
+		else
+		{
+			logerror("dragngun: video ROM decryption self-test passed\n");
+		}
+	}
 }
 
 
@@ -1271,6 +1356,9 @@ ROM_START( dragngun )
 	ROM_LOAD32_BYTE( "mar-26.bin",  0x800001,  0x100000,  CRC(246a06c5) SHA1(447252be976a5059925f4ad98df8564b70198f62) ) // 56 V / 53 S
 	ROM_LOAD32_BYTE( "mar-23.bin",  0x800000,  0x100000,  CRC(ba907d6a) SHA1(1fd99b66e6297c8d927c1cf723a613b4ee2e2f90) ) // 49 I / 53 S
 
+	ROM_REGION( 0x400, "dvi_decrypt", 0 ) // video ROM byte-lane substitution tables, reconstructed (see read_dvi_byte)
+	ROM_LOAD( "dvi_decrypt.bin", 0x000, 0x400, CRC(2d049a30) SHA1(2257038d11b20b0a175ebba9530325e600756b9d) )
+
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mar-06.n17", 0x000000, 0x80000,  CRC(3e006c6e) SHA1(55786e0fde2bf6ba9802f3f4fa8d4c21625b976a) )
 
@@ -1348,6 +1436,9 @@ ROM_START( dragngunj )
 	ROM_LOAD32_BYTE( "mar-22.bin",  0x800002,  0x100000,  CRC(c85f3559) SHA1(a5d5cf9b18c9ef6a92d7643ca1ec9052de0d4a01) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-26.bin",  0x800001,  0x100000,  CRC(246a06c5) SHA1(447252be976a5059925f4ad98df8564b70198f62) ) // 56 V / 53 S
 	ROM_LOAD32_BYTE( "mar-23.bin",  0x800000,  0x100000,  CRC(ba907d6a) SHA1(1fd99b66e6297c8d927c1cf723a613b4ee2e2f90) ) // 49 I / 53 S
+
+	ROM_REGION( 0x400, "dvi_decrypt", 0 ) // video ROM byte-lane substitution tables, reconstructed (see read_dvi_byte)
+	ROM_LOAD( "dvi_decrypt.bin", 0x000, 0x400, CRC(2d049a30) SHA1(2257038d11b20b0a175ebba9530325e600756b9d) )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mar-06.n17", 0x000000, 0x80000,  CRC(3e006c6e) SHA1(55786e0fde2bf6ba9802f3f4fa8d4c21625b976a) )
