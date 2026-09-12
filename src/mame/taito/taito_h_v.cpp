@@ -61,7 +61,7 @@ void syvalion_state::syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 {
 	for (int offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
-		m_tc0080vco->get_sprite_params(offs, false);
+		m_tc0080vco->get_sprite_params(offs, true);
 
 		if (m_tc0080vco->get_sprite_tile_offs())
 		{
@@ -187,9 +187,9 @@ u32 taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &bit
 		dleague_draw_sprites(bitmap, cliprect, 1);
 #else
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	dleague_draw_sprites (bitmap, cliprect, 0);
+	dleague_draw_sprites(bitmap, cliprect, 0);
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
-	dleague_draw_sprites (bitmap, cliprect, 1);
+	dleague_draw_sprites(bitmap, cliprect, 1);
 #endif
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
