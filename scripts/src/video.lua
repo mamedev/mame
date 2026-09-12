@@ -1003,6 +1003,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mpeg_video.h,VIDEOS["MPEG_VIDEO"] = true
+--------------------------------------------------
+
+if VIDEOS["MPEG_VIDEO"] then
+	files {
+		MAME_DIR .. "src/devices/video/mpeg_video.cpp",
+		MAME_DIR .. "src/devices/video/mpeg_video.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/mr9735.h,VIDEOS["MR9735"] = true
 --------------------------------------------------
 
@@ -1580,6 +1592,18 @@ if VIDEOS["ST7735"] then
 	files {
 		MAME_DIR .. "src/devices/video/st7735_lcdc.cpp",
 		MAME_DIR .. "src/devices/video/st7735_lcdc.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sti3400.h,VIDEOS["STI3400"] = true
+--------------------------------------------------
+
+if VIDEOS["STI3400"] then
+	files {
+		MAME_DIR .. "src/devices/video/sti3400.cpp",
+		MAME_DIR .. "src/devices/video/sti3400.h",
 	}
 end
 
