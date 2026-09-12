@@ -13,6 +13,7 @@
 
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/gen_fifo.h"
 #include "machine/mb8421.h"
@@ -35,6 +36,7 @@ public:
 		, m_dpram(*this, "dpram")
 		, m_m1audio(*this, M1AUDIO_TAG)
 		, m_m1uart(*this, "m1uart")
+		, m_m1uart_clock(*this, "m1uart_clock")
 		, m_m1comm(*this, "m1comm")
 		, m_dsbz80(*this, "dsbz80")
 		, m_tgp_copro(*this, "tgp_copro")
@@ -234,6 +236,7 @@ protected:
 	required_device<mb8421_device> m_dpram;
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
 	required_device<i8251_device> m_m1uart;
+	required_device<clock_device> m_m1uart_clock;
 	optional_device<m1comm_device> m_m1comm;        // Model 1 communication board
 	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
 	optional_device<mb86233_device> m_tgp_copro;

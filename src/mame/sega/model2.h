@@ -19,6 +19,7 @@
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
+#include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/gen_fifo.h"
 #include "machine/i8251.h"
@@ -58,6 +59,7 @@ public:
 		m_dsb2(*this, "dsb2"),
 		m_m1audio(*this, M1AUDIO_TAG),
 		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
 		m_m2comm(*this, "m2comm"),
 		m_audiocpu(*this, "audiocpu"),
 		m_copro_fifo_in(*this, "copro_fifo_in"),
@@ -119,6 +121,7 @@ protected:
 	optional_device<dsb2_device> m_dsb2;            // 68k-based MPEG Digital Sound Board
 	optional_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
 	required_device<i8251_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	optional_device<m2comm_device> m_m2comm;        // Model 2 communication board
 	optional_device<cpu_device> m_audiocpu;
 	required_device<generic_fifo_u32_device> m_copro_fifo_in;

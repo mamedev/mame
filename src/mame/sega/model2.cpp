@@ -81,7 +81,6 @@
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/clock.h"
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/mb8421.h"
@@ -2542,9 +2541,9 @@ void model2_state::model2_scsp(machine_config &config)
 	m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
 	m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
-	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
-	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+	CLOCK(config, m_uart_clock, 500'000); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
+	m_uart_clock->signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
 
 /* original Model 2 */
@@ -3034,6 +3033,7 @@ void model2c_state::stcc(machine_config &config)
 	m_dsbz80->add_route(1, "speaker", 1.0, 1);
 
 	m_uart->txd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
+	m_uart_clock->signal_handler().append(m_dsbz80, FUNC(dsbz80_device::uart_clock_w));
 }
 
 void model2c_state::waverunr(machine_config &config)

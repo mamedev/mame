@@ -599,7 +599,6 @@ Notes:
 #include "model1io2.h"
 
 #include "cpu/i386/i386.h"
-#include "machine/clock.h"
 #include "machine/nvram.h"
 
 #include "speaker.h"
@@ -1854,9 +1853,9 @@ void model1_state::model1(machine_config &config)
 	m_m1uart->rxrdy_handler().set(FUNC(model1_state::sound_ready_w));
 	m_m1uart->txrdy_handler().set(FUNC(model1_state::sound_ready_w));
 
-	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
-	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
-	m1uart_clock.signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
+	CLOCK(config, m_m1uart_clock, 16_MHz_XTAL / 2 / 16); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
+	m_m1uart_clock->signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
+	m_m1uart_clock->signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
 }
 
 void model1_state::vf(machine_config &config)
@@ -1922,6 +1921,7 @@ void model1_state::swa(machine_config &config)
 	DSBZ80(config, m_dsbz80);
 	m_dsbz80->add_route(0, "mpeg", 1.0, 0);
 	m_dsbz80->add_route(1, "mpeg", 1.0, 1);
+	m_m1uart_clock->signal_handler().append(m_dsbz80, FUNC(dsbz80_device::uart_clock_w));
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
 	m_m1audio->rxd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
