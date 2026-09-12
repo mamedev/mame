@@ -4,20 +4,20 @@
 
     MOS 6526/8521/8520 Complex Interface Adapter emulation
 
-	Nearly cycle accurate emulation. Passes the following:
+	Nearly cycle accurate emulation. Verified with the following:
 
 	- C64 Emulator Test Suite 2.15 (100%)
-	- VICE testprogs old-CIA tests (100%)
-	- VICE testprogs new-CIA tests (100/102), fails on:
-		- tod/fix-tsec
-		- cia-sdr-icr-19
-	- reDIP-CIA test suite (35/39), fails on:
+	- VICE testprogs CIA tests (100%)
+	- reDIP-CIA gate-level model (48/52), differs on:
 		6526
-		- icr_tb_race (TB flag should be reported every 4 reads)
-		- irq_timing (IRQ is asserted and cleared 1 cycle too late)
+		- icr_tb_race (matches VICE)
+		- irq_timing (matches VICE)
 		8520
-		- tod_mask (reading TOD_HR returns 0xff instead of 0x00)
-		- tod_alarm (TOD counter advances 2 instead of 4)
+		- tod_mask (matches vAmigaTS/showcia1)
+		- tod_alarm (hypothetical)
+
+	Known bug, 8521/8520 only: an ICR read on the cycle a timer A underflow
+	sets the flag re-asserts /IRQ a cycle later off the stale m_irq_pending.
 
 **********************************************************************/
 
@@ -25,7 +25,6 @@
 
     TODO:
 
-    - off by one errors in vAmigaTS/showcia1 TODLO (reproducible particularly with -nothrottle)
     - flag_w & amigafdc both auto-inverts index pulses, it also fails ICR vAmigaTS/showcia1 test
       (expected: 0x00, actual: 0x10)
 
