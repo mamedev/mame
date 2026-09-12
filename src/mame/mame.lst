@@ -37659,6 +37659,9 @@ pm5644p00
 @source:philips/philipsbo.cpp
 pbo
 
+@source:philips/velo.cpp
+pvelo1
+
 @source:philips/vg5k.cpp
 vg5k
 
