@@ -971,7 +971,8 @@ CONS( 2005, pvwwcas, 0, 0, pvwwcas, sudoku, elan_eu3a05_pvwwcas_state, init_pvww
 
 // unknown, might be EU3A05, but bad dump
 // CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?
-CONS( 200?, bratzra, 0, 0, elan_eu3a05_1mb, rad_sinv, elan_eu3a05_state, empty_init, "MGA", "Bratz Rock Angelz", MACHINE_NOT_WORKING )
+// TODO: Could possibly be titled "Bratz: Rock Angelz Guitar Game". Change once it's able to boot up.
+CONS( 200?, bratzra, 0, 0, elan_eu3a05_1mb, rad_sinv, elan_eu3a05_state, empty_init, "MGA", "Bratz: Rock Angelz", MACHINE_NOT_WORKING )
 
 
 // Below seem to be EU3A13, as that was confirmed for the Family Tetris die.  They're like EU3A05, but with a different memory map
@@ -985,7 +986,7 @@ CONS( 2005, sudoku2p, 0, 0, elan_eu3a13_pal_1mb, sudoku2p, elan_eu3a13_state, em
 CONS( 2006, rad_ftet,  0,        0, elan_eu3a13_1mb,     rad_ftet, elan_eu3a13_state, empty_init, "Radica", "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
 CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal_1mb, rad_ftet, elan_eu3a13_state, empty_init, "Radica", "Family Tetris (PAL)",  MACHINE_NOT_WORKING )
 
-CONS( 200?, carlecfg, 0, 0, elan_eu3a13_1mb, carlecfg, elan_eu3a13_state, empty_init, "Excalibur Electronics", "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+CONS( 200?, carlecfg, 0, 0, elan_eu3a13_1mb, carlecfg, elan_eu3a13_state, empty_init, "Excalibur Electronics", "Carl Edwards' Chase for Glory", MACHINE_NOT_WORKING )
 
 // this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
 // however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit
