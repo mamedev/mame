@@ -67,6 +67,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
 // device type definition
 DEFINE_DEVICE_TYPE(MC6844, mc6844_device, "mc6844", "MC6844 DMA")
 
@@ -140,6 +141,7 @@ void mc6844_device::dma_request(int channel, int state)
 
 	m_dreq[channel & 3] = state;
 
+
 	LOGSTATE("Trigger(1)\n");
 	trigger(1);
 }
@@ -167,7 +169,25 @@ void mc6844_device::execute_run()
 					// Rotating or static channel prioritizations
 					int current_channel = priorities[((m_m6844_priority & 0x80) ? m_last_channel : 3) & 3][prio];
 
-				if (m_m6844_channel[current_channel].active == 1 && m_dreq[current_channel] == ASSERT_LINE)
+				// A channel whose byte count is exhausted must not take part
+				// in the arbitration.  Its request line can perfectly well
+				// still be asserted - a peripheral that has been handed the
+				// last byte of a buffer goes on asking for the next one - and
+				// with the count at zero STATE_S0 bounces straight back here,
+				// which picks the same channel again because it is the
+				// highest priority one with a request.  The controller then
+				// ping-pongs between SI and S0 and every lower channel is
+				// locked out for as long as that request stays up.  Measured
+				// on the Alfaskop FDA board: at t=46.122498 channel 0 (the
+				// ADLC transmit, buffer already drained) and channel 2 (the
+				// FD1771, mid sector) both had a request; the controller spun
+				// for 33 us and the disk lost the byte, which the unit
+				// reports as its "09" disk timeout.  On real silicon the byte
+				// count reaching zero sets DMA End and takes the channel out
+				// of service until the processor re-enables it.
+				if (m_m6844_channel[current_channel].active == 1
+					&& m_m6844_channel[current_channel].counter != 0
+					&& m_dreq[current_channel] == ASSERT_LINE)
 					{
 						m_current_channel = m_last_channel = current_channel;
 						m_state = STATE_S0;
@@ -191,9 +211,9 @@ void mc6844_device::execute_run()
 			}
 			else
 			{
-				LOGSTATE("Suspend in S0\n");
-				suspend_until_trigger(1, true);
-				m_icount = 0;
+				// Channel not enabled or byte count exhausted: re-arbitrate
+				LOGSTATE("Channel %d not ready, back to arbitration\n", m_current_channel);
+				m_state = STATE_SI;
 			}
 			break;
 		case STATE_S1: // Wait for Tx RQ == 1
@@ -218,9 +238,13 @@ void mc6844_device::execute_run()
 			}
 			else
 			{
-				LOGSTATE("Suspend in S1\n");
-				suspend_until_trigger(1, true);
-				m_icount = 0;
+				// No request pending on this channel any more.  Go back to
+				// arbitration instead of waiting here: otherwise the channel
+				// that happened to be served first latches the controller for
+				// good and every other channel is ignored, which shows up as
+				// the peripheral raising Tx RQ and getting no DMA cycle at all.
+				LOGSTATE("No request on channel %d, back to arbitration\n", m_current_channel);
+				m_state = STATE_SI;
 			}
 			break;
 		case STATE_S2: // Wait for DGRNT == 1
@@ -240,10 +264,9 @@ void mc6844_device::execute_run()
 					}
 					else // dma write to device from memory
 					{
-						uint8_t data = 0;
-						LOGTFR("DMA from memory location to device %04x: -> %02x\n", m_m6844_channel[m_current_channel].address, data );
-						//uint8_t data = m_in_memr_cb(m_m6844_channel[m_current_channel].address);
-						//m_out_iow_cb[m_current_channel](data);
+						uint8_t data = m_in_memr_cb(m_m6844_channel[m_current_channel].address);
+						LOGTFR("DMA%d from memory location %04x to device: -> %02x\n", m_current_channel, m_m6844_channel[m_current_channel].address, data );
+						m_out_iow_cb[m_current_channel](data);
 					}
 
 					if (m_m6844_channel[m_current_channel].control & 0x08)
@@ -293,8 +316,26 @@ void mc6844_device::execute_run()
 					}
 				}
 			}
+			else if (m_dreq[m_current_channel] != ASSERT_LINE)
+			{
+				// The request that brought us here has gone away before the
+				// cycle was granted.  Do NOT wait for it: this state holds the
+				// controller on behalf of a channel that no longer wants it,
+				// and since the machine only re-arbitrates in STATE_SI every
+				// other channel is locked out until this one asks again.  A
+				// peripheral with a hard deadline then misses its window
+				// through no fault of its own - on the Alfaskop FDA board the
+				// FD1771 has one byte time, 32 us, and exactly the requests
+				// that landed while another channel sat here were the ones
+				// lost, which is what the unit reports as a disk timeout.
+				LOGSTATE("Request withdrawn on channel %d, back to arbitration\n", m_current_channel);
+				m_out_drq1_cb(CLEAR_LINE);
+				m_out_drq2_cb(CLEAR_LINE);
+				m_state = STATE_SI;
+			}
 			else
 			{
+				// still waiting for the processor to grant the bus
 				LOGSTATE("Suspend in S2\n");
 				suspend_until_trigger(1, true);
 				m_icount = 0;
