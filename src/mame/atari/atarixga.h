@@ -13,6 +13,7 @@
 
 DECLARE_DEVICE_TYPE(ATARI_136094_0072, atari_136094_0072_device)
 DECLARE_DEVICE_TYPE(ATARI_136095_0072, atari_136095_0072_device)
+DECLARE_DEVICE_TYPE(ATARI_136094_0004A, atari_136094_0004a_device)
 
 class atari_xga_device : public device_t
 {
@@ -101,6 +102,44 @@ private:
 
 	fpga_mode m_mode{};
 	uint8_t m_poly_lsb = 0;
+	uint16_t m_reply = 0;
+};
+
+
+class atari_136094_0004a_device : public atari_xga_device
+{
+public:
+	atari_136094_0004a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// 16-bit access; offset is the byte offset inside the 0xD80000 color RAM window
+	void write16(offs_t offset, uint16_t data);
+	bool read16(offs_t offset, uint16_t &data, bool side_effects = true);
+
+	virtual void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
+	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) override;
+
+	uint16_t decipher(offs_t index, uint16_t c) const;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	static const size_t RAM_WORDS = 2048;
+
+	static uint16_t key_offset(offs_t index);
+	uint16_t lfsr(uint16_t x) const;
+	void set_character(uint16_t data);
+
+	enum fpga_mode : uint8_t
+	{
+		FPGA_IDLE,
+		FPGA_SETKEY,
+		FPGA_DECIPHER
+	};
+
+	uint8_t m_mode = FPGA_IDLE;
+	uint16_t m_taps = 0;
 	uint16_t m_reply = 0;
 };
 
