@@ -604,18 +604,19 @@ uint32_t cdrom_file::get_track_index(uint32_t frame) const
 	const uint32_t track = get_track(frame);
 	const uint32_t track_start = get_track_start(track);
 	const uint32_t index_offset = frame - track_start;
-	int index = 0;
+	const track_info &trackinfo = cdtoc.tracks[track];
+	int index = 1;
 
-	for (int i = 0; i < std::size(cdtrack_info.track[track].idx); i++)
+	for (int i = 2; i <= MAX_INDEX; i++)
 	{
-		if (index_offset >= cdtrack_info.track[track].idx[i])
+		if (trackinfo.idx[i] == -1)
+			continue;
+
+		if (index_offset >= trackinfo.idx[i])
 			index = i;
 		else
 			break;
 	}
-
-	if (cdtrack_info.track[track].idx[index] == -1)
-		index = 1; // valid index not found, default to index 1
 
 	return index;
 }
@@ -880,6 +881,13 @@ const char *cdrom_file::get_subtype_string(uint32_t subtype)
 /***************************************************************************
     INTERNAL UTILITIES
 ***************************************************************************/
+void cdrom_file::reset_toc(toc &toc)
+{
+	memset(&toc, 0, sizeof(toc));
+
+	for (auto &track : toc.tracks)
+		std::fill(std::begin(track.idx), std::end(track.idx), -1);
+}
 
 /*-------------------------------------------------
     parse_metadata - parse metadata into the
@@ -907,7 +915,7 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 	uint32_t metaindex = 0;
 
 	/* clear structures */
-	memset(&toc, 0, sizeof(toc));
+	reset_toc(toc);
 
 	toc.numsessions = 1;
 
@@ -1014,6 +1022,52 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 
 	if (toc.numsessions > 1)
 		toc.flags |= CD_FLAG_MULTISESSION;
+
+	if (toc.numtrks > 0)
+	{
+		for (uint32_t metaindex = 0; ; metaindex++)
+		{
+			err = chd->read_metadata(CDROM_TRACK_INDEX_METADATA_TAG, metaindex, metadata);
+			if (err == chd_file::error::METADATA_NOT_FOUND)
+				break;
+			if (err)
+				return err;
+
+			int tracknum, index, frame;
+			if (sscanf(metadata.c_str(), CDROM_TRACK_INDEX_METADATA_FORMAT, &tracknum, &index, &frame) != 3)
+				return chd_file::error::INVALID_DATA;
+
+			if ((tracknum < 1) || (tracknum > toc.numtrks) ||
+					(index < 2) || (index > MAX_INDEX) ||
+					(frame < 0))
+				return chd_file::error::INVALID_DATA;
+
+			track_info &track = toc.tracks[tracknum - 1];
+
+			if (track.idx[index] != -1)
+				return chd_file::error::INVALID_DATA;
+
+			track.idx[index] = frame;
+		}
+
+		// validate that indexes occur in ascending frame order
+		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
+		{
+			const track_info &track = toc.tracks[tracknum];
+			int32_t previous = 0;
+
+			for (int index = 2; index <= MAX_INDEX; index++)
+			{
+				if (track.idx[index] == -1)
+					continue;
+
+				if (track.idx[index] <= previous)
+					return chd_file::error::INVALID_DATA;
+
+				previous = track.idx[index];
+			}
+		}
+	}
 
 	/* if we got any tracks this way, we're done */
 	if (toc.numtrks > 0)
@@ -1137,6 +1191,22 @@ std::error_condition cdrom_file::write_metadata(chd_file *chd, const toc &toc)
 		}
 		if (err)
 			return err;
+
+		for (int index = 2; index <= MAX_INDEX; index++)
+		{
+			if (toc.tracks[i].idx[index] == -1)
+				continue;
+
+			metadata = util::string_format(
+					CDROM_TRACK_INDEX_METADATA_FORMAT,
+					i + 1,
+					index,
+					toc.tracks[i].idx[index]);
+
+			err = chd->write_metadata(CDROM_TRACK_INDEX_METADATA_TAG, CHDMETAINDEX_APPEND, metadata);
+			if (err)
+				return err;
+		}
 	}
 	return std::error_condition();
 }
@@ -1894,7 +1964,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 	path = get_file_path(path);
 
 	/* clear structures */
-	memset(&outtoc, 0, sizeof(outtoc));
+	reset_toc(outtoc);
 	outinfo.reset();
 
 	outtoc.numsessions = 1;
@@ -2073,7 +2143,7 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 	path = get_file_path(path);
 
 	/* clear structures */
-	memset(&outtoc, 0, sizeof(outtoc));
+	reset_toc(outtoc);
 	outinfo.reset();
 
 	uint64_t size = get_file_size(tocfname);
@@ -2165,7 +2235,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 	path = get_file_path(path);
 
 	/* clear structures */
-	memset(&outtoc, 0, sizeof(outtoc));
+	reset_toc(outtoc);
 	outinfo.reset();
 
 	outtoc.flags = CD_FLAG_GDROM;
@@ -2402,7 +2472,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	path = get_file_path(path);
 
 	/* clear structures */
-	memset(&outtoc, 0, sizeof(outtoc));
+	reset_toc(outtoc);
 	outinfo.reset();
 
 	trknum = -1;
@@ -2713,6 +2783,30 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			return chd_file::error::INVALID_DATA;
 		}
 
+		// additional indexes must occur in ascending frame order
+		int32_t previous_index_frame = outinfo.track[trknum].idx[1];
+		for (int idx = 2; idx <= MAX_INDEX; idx++)
+		{
+			if (outinfo.track[trknum].idx[idx] == -1)
+				continue;
+
+			if (outinfo.track[trknum].idx[idx] <= previous_index_frame)
+			{
+				osd_printf_error("ERROR: track %d INDEX %02d does not follow the previous index\n", trknum + 1, idx);
+				return chd_file::error::INVALID_DATA;
+			}
+
+			previous_index_frame = outinfo.track[trknum].idx[idx];
+		}
+
+		outtoc.tracks[trknum].idx[1] = 0;
+
+		for (int idx = 2; idx <= MAX_INDEX; idx++)
+		{
+			if (outinfo.track[trknum].idx[idx] != -1)
+				outtoc.tracks[trknum].idx[idx] = outinfo.track[trknum].idx[idx] - outinfo.track[trknum].idx[1];
+		}
+
 		/* this is true for cue/bin and cue/iso, and we need it for cue/wav since .WAV is little-endian */
 		if (outtoc.tracks[trknum].trktype == CD_TRACK_AUDIO)
 		{
@@ -3001,7 +3095,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 	path = get_file_path(path);
 
 	/* clear structures */
-	memset(&outtoc, 0, sizeof(outtoc));
+	reset_toc(outtoc);
 	outinfo.reset();
 
 	int trknum = -1;
