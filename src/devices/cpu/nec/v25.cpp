@@ -86,7 +86,7 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 
 
 v25_device::v25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v25_common_device(mconfig, V25, tag, owner, clock, false, 4, 4, V20_TYPE)
+	: v25_common_device(mconfig, V25, tag, owner, clock, false, 6, 2, V20_TYPE)
 {
 }
 
