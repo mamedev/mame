@@ -35007,6 +35007,9 @@ mini5sx
 @source:nec/ews4800.cpp
 ews4800_310
 
+@source:nec/mobilepro.cpp
+mbpro450
+
 @source:nec/pc_h98.cpp
 pc_h98s
 
