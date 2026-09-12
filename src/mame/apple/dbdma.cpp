@@ -26,7 +26,7 @@ static constexpr u16 STATUS_RUN     = 0x8000;
 static constexpr u16 STATUS_PAUSE   = 0x4000;
 static constexpr u16 STATUS_FLUSH   = 0x2000;
 static constexpr u16 STATUS_WAKE    = 0x1000;
-[[maybe_unused]] static constexpr u16 STATUS_DEAD = 0x0800;
+static constexpr u16 STATUS_DEAD    = 0x0800;
 static constexpr u16 STATUS_ACTIVE  = 0x0400;
 static constexpr u16 STATUS_BT      = 0x0100;
 
@@ -175,14 +175,42 @@ void dbdma_device::control_w(u32 data)
 		m_status &= ~STATUS_FLUSH;
 	}
 
+	// Clearing RUN aborts the channel.  An in-progress transfer command gets
+	// its final status written back (ACTIVE is always set in a written
+	// xferStatus, marking the command as executed) so software can find out
+	// how much of the transfer went through, and its completion interrupt is
+	// evaluated like a normally completed command.
+	if (!(m_status & STATUS_RUN) && (old_status & STATUS_RUN))
+	{
+		const u32 op = m_opcode >> 28;
+		if ((old_status & STATUS_ACTIVE) && (op <= OP_INPUT_LAST))
+		{
+			m_pci_memory->write_word(m_command_pointer + 14, m_status | STATUS_ACTIVE);
+			m_pci_memory->write_word(m_command_pointer + 12, m_bytesLeft);
+			if (test_condition((m_opcode >> 20) & 3, m_intselect))
+			{
+				write_irq(ASSERT_LINE);
+			}
+		}
+		m_waiting = false;
+		m_status &= ~STATUS_DEAD;
+	}
+
 	if (m_status & STATUS_WAKE)
 	{
-		// WAKE releases a waiting channel and is self-clearing
+		// WAKE is self-clearing.  It releases a waiting channel, or makes a
+		// channel that went idle on a STOP command re-fetch the command at
+		// the command pointer (which STOP doesn't advance) so software can
+		// replace the STOP with a NOP and continue the program.
 		m_status &= ~STATUS_WAKE;
 		if (m_waiting)
 		{
 			m_waiting = false;
 			m_wake_timer->adjust(attotime::zero);
+		}
+		else if (((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) == STATUS_ACTIVE) && (old_status & STATUS_RUN) && ((m_opcode >> 28) == OP_STOP))
+		{
+			new_command();
 		}
 	}
 
@@ -200,7 +228,8 @@ void dbdma_device::control_w(u32 data)
 }
 
 u32 dbdma_device::status_r()
-{	return m_status;
+{
+	return m_status;
 }
 
 u32 dbdma_device::cmdpointer_r()
@@ -316,8 +345,8 @@ void dbdma_device::drq_w(int state)
 }
 
 void dbdma_device::status_bit_w(int bit, int state)
-{	const u8 mask = 1 << bit;
-
+{
+	const u8 mask = (1 << bit);
 	m_hw_status_mask |= mask;
 	if (state)
 	{
@@ -479,6 +508,7 @@ void dbdma_device::step_program()
 // we land on a transfer command or the channel stops.
 void dbdma_device::process_commands()
 {
+	u32 commands = 0;
 	while (!m_waiting && ((m_status & (STATUS_ACTIVE | STATUS_PAUSE)) == STATUS_ACTIVE))
 	{
 		switch (m_opcode >> 28)
@@ -543,6 +573,21 @@ void dbdma_device::process_commands()
 				LOG("%s: STOP, clearing ACTIVE\n", tag());
 				m_status &= ~STATUS_ACTIVE;
 				return;
+
+			default:
+				logerror("%s: reserved command %08x at %08x, channel dead\n", tag(), m_opcode, m_command_pointer);
+				m_status |= STATUS_DEAD;
+				m_status &= ~STATUS_ACTIVE;
+				return;
+		}
+
+		// detect a runaway channel program that could hang MAME
+		if (++commands >= 0x10000)
+		{
+			logerror("%s: runaway channel program at %08x, channel dead\n", tag(), m_command_pointer);
+			m_status |= STATUS_DEAD;
+			m_status &= ~STATUS_ACTIVE;
+			return;
 		}
 	}
 }
@@ -583,7 +628,8 @@ bool dbdma_device::test_condition(u32 field, u32 select)
 // the wait condition is no longer met.  The condition is re-checked whenever a
 // ChannelStatus bit changes.
 bool dbdma_device::wait_condition()
-{	return (m_opcode & WAIT_MASK) && test_condition((m_opcode >> 16) & 3, m_waitselect);
+{
+	return (m_opcode & WAIT_MASK) && test_condition((m_opcode >> 16) & 3, m_waitselect);
 }
 
 void dbdma_device::check_wait()
@@ -658,7 +704,8 @@ void dbdma_device::complete_command()
 
 	if (test_condition((m_opcode >> 20) & 3, m_intselect))
 	{
-		LOG("%s: raising completion interrupt\n", tag());		// Latch the completion event and hold it.  The macio IRQ controller
+		LOG("%s: raising completion interrupt\n", tag());
+		// Latch the completion event and hold it.  The macio IRQ controller
 		// keeps the event pending until Mac OS acknowledges it, at which point
 		// it also drops this channel's held level so the next completion is
 		// seen as a fresh edge.

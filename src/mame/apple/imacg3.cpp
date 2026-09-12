@@ -253,4 +253,4 @@ ROM_END
 static INPUT_PORTS_START(imac)
 INPUT_PORTS_END
 
-COMP(1998, imac, 0, 0, imac, imac, imac_state, empty_init, "Apple Computer", "iMac (Bondi blue)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1998, imac, 0, 0, imac, imac, imac_state, empty_init, "Apple Computer", "iMac (Bondi blue)", MACHINE_NOT_WORKING )

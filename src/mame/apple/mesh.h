@@ -195,6 +195,7 @@ private:
 	void command_done();
 	void finish_exception(u8 mask);
 	void finish_error(u8 mask);
+	bool check_disconnect();
 	void do_information_transfer();
 	bool xfer_count_done() const;
 	u32 phase_for_sequence() const;
@@ -212,6 +213,7 @@ private:
 
 	u32 m_xfer_count;
 	bool m_xfer_started;
+	bool m_selected;
 	u8 m_fifo[16];
 	u8 m_fifo_count;
 	u8 m_sequence;
