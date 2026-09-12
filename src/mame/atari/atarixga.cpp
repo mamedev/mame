@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Morten Shearman Kirkegaard, Samuel Neves, Peter Wilhelmsen
+// copyright-holders:Morten Shearman Kirkegaard, Samuel Neves, Peter Wilhelmsen, Andrea Bogazzi
 /*************************************************************************
 
     atarixga.cpp

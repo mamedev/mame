@@ -6,12 +6,15 @@
 
     driver by Aaron Giles
 
+    Primal Rage protection reverse engineered by:
+        Andrea Bogazzi
+
     Games supported:
         * T-Mek (1994) [5 sets]
         * Primal Rage (1994) [3 sets]
 
     Known bugs:
-        * Protection not fully understood
+        * T-Mek protection not understood
         * T-Mek's serial communications hardware is missing. The twin and single cabs seemingly use different link hardware but both link the same.
 
 ****************************************************************************
