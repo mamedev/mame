@@ -182,6 +182,7 @@ private:
 		u8 pixc_ms[2];
 		u8 pixc_mf[2];
 		u8 pixc_df[2];
+		u16 pover_force_high, pover_mask;
 		// NOTE: u16 + 1 bit for marking pixel as transparent.
 		// This is done by the Pixel Decoder (PDC) internally.
 		std::vector<u32> buffer;
@@ -203,6 +204,8 @@ private:
 	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_continue_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 cel_decompress();
+
+	u32 convert_8bpp_alt_multiply(u32 src_data, u8 alt_multiply);
 
 	typedef u32 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
 	static const get_pixel_func get_pixel_table[32 + 1];
