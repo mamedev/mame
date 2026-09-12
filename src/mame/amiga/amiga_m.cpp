@@ -1096,6 +1096,9 @@ uint8_t amiga_state::cia_1_port_a_read()
 
 void amiga_state::cia_1_port_a_write(uint8_t data)
 {
+	m_cia_1->sp_w(BIT(data, 0));
+	m_cia_1->cnt_w(BIT(data, 1));
+
 	if (m_rs232)
 	{
 		m_rs232->write_rts(BIT(data, 6));
