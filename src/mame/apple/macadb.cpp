@@ -528,9 +528,8 @@ void macadb_device::adb_accummouse(u8 *mouseX, u8 *mouseY )
 
 	m_lastbutton = m_mouse0->read() & 0x03;
 
-	// convert to signed 7-bit
-	*mouseX = (mouseCountX & 0x3f) | (mouseCountX & 0x80) >> 1;
-	*mouseY = (mouseCountY & 0x3f) | (mouseCountY & 0x80) >> 1;
+	*mouseX = mouseCountX;
+	*mouseY = mouseCountY;
 }
 
 void macadb_device::adb_talk()
