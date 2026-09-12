@@ -317,7 +317,7 @@ void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, f
 						emulator_info::get_appname()),
 				text_layout::text_justify::CENTER,
 				0.5f, origy2 + tb_border() + (0.5f * (bottom - tb_border())),
-				UI_RED_COLOR);
+				ui().colors().status_error_color());
 		return;
 	}
 	else
@@ -354,13 +354,13 @@ void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, f
 			if (driver != m_cached_driver)
 			{
 				emu_options clean_options;
-				machine_static_info const info(ui().options(), machine_config(*driver, clean_options));
+				machine_static_info const info(machine_config(*driver, clean_options));
 				m_cached_driver = driver;
 				m_cached_machine_flags = info.machine_flags();
 				m_cached_emulation_flags = info.emulation_flags();
 				m_cached_unemulated = info.unemulated_features();
 				m_cached_imperfect = info.imperfect_features();
-				m_cached_color = info.status_color();
+				m_cached_color = info.status_color(ui().colors());
 			}
 
 			// next line is overall driver status
@@ -428,7 +428,7 @@ void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, f
 				target(),
 				_("The selected system is missing one or more required ROMs/disk images. "
 				"Please select a different system.\n\nPress any key to continue."),
-				text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+				text_layout::text_justify::CENTER, 0.5f, 0.5f, ui().colors().status_error_color());
 	}
 }
 

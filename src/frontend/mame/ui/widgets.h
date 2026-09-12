@@ -20,6 +20,9 @@
 #include <functional>
 
 
+class ui_colors;
+
+
 namespace ui {
 
 /***************************************************************************
@@ -29,10 +32,10 @@ TYPE DEFINITIONS
 class widgets_manager
 {
 public:
-	widgets_manager(running_machine &machine);
+	widgets_manager(render_manager &render, ui_colors const &colors);
 
 	render_texture *hilight_texture() { return m_hilight_texture.get(); }
-	render_texture *hilight_main_texture() { return m_hilight_main_texture.get(); }
+	render_texture *hilight_main_texture();
 	render_texture *arrow_texture() { return m_arrow_texture.get(); }
 
 	class texture_destroyer
@@ -49,12 +52,16 @@ public:
 
 private:
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
+	void generate_hilight_main(rgb_t top, rgb_t bottom);
 
+	ui_colors const &m_colors;
 	bitmap_ptr  m_hilight_bitmap;
 	texture_ptr m_hilight_texture;
 	bitmap_ptr  m_hilight_main_bitmap;
 	texture_ptr m_hilight_main_texture;
 	texture_ptr m_arrow_texture;
+	rgb_t       m_hilight_main_top;
+	rgb_t       m_hilight_main_bottom;
 };
 
 } // namespace ui
