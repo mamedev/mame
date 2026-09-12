@@ -22,9 +22,9 @@
     Timer implementation is incomplete: polling is not implemented
     (reading any of the registers just returns the last value written)
 
-    Serial interface and DMA functions not implemented.
-    Note that these functions differ considerably between
-    the V25/35 and the V25+/35+.
+    The serial interface implements asynchronous mode only; I/O interface
+    mode is not emulated.  Note that the serial interface and the DMA
+    controller differ considerably between the V25/35 and the V25+/35+.
 
     Make internal RAM into a real RAM region, and use an
     internal address map (remapped when IDB is written to)
@@ -42,6 +42,8 @@
 //#define VERBOSE (...)
 
 #include "logmacro.h"
+
+#include <bit>
 
 typedef uint8_t BOOLEAN;
 typedef uint8_t BYTE;
@@ -71,6 +73,7 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_p2_out(*this)
 	, m_dma_read(*this, 0xffff)
 	, m_dma_write(*this)
+	, m_txd_handler(*this)
 	, m_tc_handler(*this)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
@@ -105,6 +108,187 @@ device_memory_interface::space_config_vector v25_common_device::memory_space_con
 TIMER_CALLBACK_MEMBER(v25_common_device::v25_timer_callback)
 {
 	m_pending_irq |= param;
+}
+
+static const uint32_t s_serial_irq[2][3] =
+{
+	{ INTSER0, INTSR0, INTST0 },
+	{ INTSER1, INTSR1, INTST1 }
+};
+
+attotime v25_common_device::serial_bit_time(unsigned n) const
+{
+	const unsigned brg = m_brg[n] ? m_brg[n] : 256;
+	return clocks_to_attotime(uint64_t(m_PCK) * (2 << (m_scc[n] & 0x0f)) * brg);
+}
+
+unsigned v25_common_device::serial_data_bits(unsigned n) const
+{
+	return BIT(m_scm[n], 3) ? 8 : 7;
+}
+
+// PRTY1:PRTY0 selects no parity, a parity bit fixed at zero, odd parity or even parity
+static uint8_t v25_parity_bit(uint8_t mode, uint8_t data)
+{
+	if (mode < 2)
+		return 0;
+	const unsigned ones = std::popcount(data);
+	return (mode == 3) ? (ones & 1) : ((ones & 1) ^ 1);
+}
+
+void v25_common_device::scm_w(unsigned n, uint8_t d)
+{
+	const uint8_t old = m_scm[n];
+	m_scm[n] = d;
+
+	if (!BIT(d, 0))
+	{
+		if (BIT(d, 0) != BIT(old, 0))
+			logerror("%06x: SCM%u set to %02x: I/O interface mode not emulated\n", PC(), n, d);
+		return;
+	}
+
+	if (!BIT(d, 6) && BIT(old, 6))
+	{
+		m_rx_timer[n]->adjust(attotime::never);
+		m_rx_count[n] = 0;
+	}
+
+	if (!BIT(d, 7) && BIT(old, 7))
+	{
+		m_tx_timer[n]->adjust(attotime::never);
+		m_tx_count[n] = 0;
+		m_tx_pending[n] = false;
+		m_txd_handler[n](1);
+	}
+	else if (BIT(d, 7) && !BIT(old, 7))
+		serial_tx_enabled(n);
+}
+
+// Appendix A.3 of the user's manual has it that enabling transmission, by setting TxRDY or
+// by taking CTS low, raises a transmission completion interrupt of its own.  Firmware that
+// keeps its output in a queue relies on it: it appends a byte, sets TxRDY, and leaves the
+// handler to move the first byte into the transmit buffer.
+void v25_common_device::serial_tx_enabled(unsigned n)
+{
+	if (!BIT(m_scm[n], 7) || !BIT(m_scm[n], 0) || m_cts_state[n])
+		return;
+
+	if (m_tx_pending[n])
+		serial_load_tx(n);
+	else if (!m_tx_count[n])
+		m_pending_irq |= s_serial_irq[n][2];
+}
+
+uint8_t v25_common_device::rxb_r(unsigned n)
+{
+	if (!machine().side_effects_disabled())
+		m_rx_full[n] = false;
+	return m_rxb[n];
+}
+
+void v25_common_device::txb_w(unsigned n, uint8_t d)
+{
+	m_txb[n] = d;
+	m_tx_pending[n] = true;
+	if (!m_tx_count[n])
+		serial_load_tx(n);
+}
+
+// the frame is shifted out LSB first below a run of ones, so that the line idles high
+// once it has emptied
+void v25_common_device::serial_load_tx(unsigned n)
+{
+	if (!BIT(m_scm[n], 7) || !BIT(m_scm[n], 0) || m_cts_state[n])
+		return;
+
+	const unsigned bits = serial_data_bits(n);
+	const uint8_t data = m_txb[n] & make_bitmask<uint8_t>(bits);
+	const uint8_t parity = BIT(m_scm[n], 4, 2);
+
+	uint16_t frame = uint16_t(data) << 1;
+	unsigned length = 1 + bits;
+	if (parity)
+		frame |= uint16_t(v25_parity_bit(parity, data)) << length++;
+	frame |= 0xffff << length;
+	length += BIT(m_scm[n], 2) ? 2 : 1;
+
+	m_tx_shift[n] = frame;
+	m_tx_count[n] = length;
+	m_tx_pending[n] = false;
+
+	m_txd_handler[n](BIT(frame, 0));
+	m_tx_timer[n]->adjust(serial_bit_time(n), n);
+}
+
+TIMER_CALLBACK_MEMBER(v25_common_device::serial_tx_callback)
+{
+	const unsigned n = param;
+
+	m_tx_shift[n] >>= 1;
+	if (--m_tx_count[n])
+	{
+		m_txd_handler[n](BIT(m_tx_shift[n], 0));
+		m_tx_timer[n]->adjust(serial_bit_time(n), n);
+		return;
+	}
+
+	m_txd_handler[n](1);
+	m_pending_irq |= s_serial_irq[n][2];
+
+	if (m_tx_pending[n])
+		serial_load_tx(n);
+}
+
+void v25_common_device::serial_rxd_w(unsigned n, int state)
+{
+	const uint8_t level = state ? 1 : 0;
+	if (m_rxd_state[n] == level)
+		return;
+	m_rxd_state[n] = level;
+
+	// a start bit is only looked for between frames; the first sample sits one and a
+	// half bits into it, so that it and the rest land in the middle of their cells
+	if (!level && BIT(m_scm[n], 6) && BIT(m_scm[n], 0) && !m_rx_count[n])
+	{
+		m_rx_shift[n] = 0;
+		m_rx_count[n] = 1;
+		m_rx_timer[n]->adjust(serial_bit_time(n) * 3 / 2, n);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(v25_common_device::serial_rx_callback)
+{
+	const unsigned n = param;
+	const unsigned bits = serial_data_bits(n);
+	const uint8_t parity = BIT(m_scm[n], 4, 2);
+
+	if (m_rx_count[n] <= bits + (parity ? 1 : 0))
+	{
+		m_rx_shift[n] |= uint16_t(m_rxd_state[n]) << (m_rx_count[n] - 1);
+		m_rx_count[n]++;
+		m_rx_timer[n]->adjust(serial_bit_time(n), n);
+		return;
+	}
+
+	const uint8_t data = m_rx_shift[n] & make_bitmask<uint16_t>(bits);
+
+	// the last sample is the stop bit: a low one is a framing error, and a byte still
+	// unread in the buffer is an overrun
+	uint8_t error = 0;
+	if (!m_rxd_state[n])
+		error |= 0x02;
+	if (m_rx_full[n])
+		error |= 0x01;
+	if (parity > 1 && BIT(m_rx_shift[n], bits) != v25_parity_bit(parity, data))
+		error |= 0x04;
+
+	m_rxb[n] = data;
+	m_rx_full[n] = true;
+	m_sce[n] = error;
+	m_rx_count[n] = 0;
+
+	m_pending_irq |= s_serial_irq[n][error ? 0 : 1];
 }
 
 void v25_common_device::prefetch()
@@ -228,6 +412,17 @@ void v25_common_device::device_reset()
 		m_scc[i] = 0;
 		m_brg[i] = 0;
 		m_sce[i] = 0;
+		m_txb[i] = 0;
+		m_rxb[i] = 0;
+		m_tx_shift[i] = 0;
+		m_tx_count[i] = 0;
+		m_tx_pending[i] = false;
+		m_rx_shift[i] = 0;
+		m_rx_count[i] = 0;
+		m_rx_full[i] = false;
+		m_tx_timer[i]->adjust(attotime::never);
+		m_rx_timer[i]->adjust(attotime::never);
+		m_txd_handler[i](1);
 	}
 
 	m_dmam[0] = m_dmam[1] = 0;
@@ -729,15 +924,33 @@ void v25_common_device::device_start()
 	for (i = 0; i < 4; i++)
 		m_timers[i] = timer_alloc(FUNC(v25_common_device::v25_timer_callback), this);
 
+	for (i = 0; i < 2; i++)
+	{
+		m_tx_timer[i] = timer_alloc(FUNC(v25_common_device::serial_tx_callback), this);
+		m_rx_timer[i] = timer_alloc(FUNC(v25_common_device::serial_rx_callback), this);
+	}
+
 	std::fill_n(&m_dmarq_state[0], 2, 0);
+	std::fill_n(&m_rxd_state[0], 2, 1);
+	std::fill_n(&m_cts_state[0], 2, 0);
 	std::fill_n(&m_intp_state[0], 3, 0);
 	std::fill_n(&m_ems[0], 3, 0);
 	std::fill_n(&m_srms[0], 2, 0);
 	std::fill_n(&m_stms[0], 2, 0);
 	std::fill_n(&m_tmms[0], 3, 0);
 
+	save_item(NAME(m_txb));
+	save_item(NAME(m_rxb));
+	save_item(NAME(m_tx_shift));
+	save_item(NAME(m_tx_count));
+	save_item(NAME(m_tx_pending));
+	save_item(NAME(m_rx_shift));
+	save_item(NAME(m_rx_count));
+	save_item(NAME(m_rx_full));
 	save_item(NAME(m_dmarq_state));
 	save_item(NAME(m_dmarq_edge));
+	save_item(NAME(m_rxd_state));
+	save_item(NAME(m_cts_state));
 	save_item(NAME(m_intp_state));
 
 	save_item(NAME(m_ip));

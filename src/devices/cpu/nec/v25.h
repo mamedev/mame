@@ -45,11 +45,24 @@ public:
 	auto dma0_write_cb() { return m_dma_write[0].bind(); }
 	auto dma1_write_cb() { return m_dma_write[1].bind(); }
 
+	template <unsigned N> auto txd_handler() { return m_txd_handler[N].bind(); }
 	template <unsigned N> auto tc_handler() { return m_tc_handler[N].bind(); }
 
 	template <unsigned N> void dmarq_w(int state) { dmarq_state_w(N, state); }
+	template <unsigned N> void rxd_w(int state) { serial_rxd_w(N, state); }
+	template <unsigned N> void cts_w(int state)
+	{
+		const uint8_t level = state ? 1 : 0;
+		if (m_cts_state[N] == level)
+			return;
+		m_cts_state[N] = level;
+		if (!level)
+			serial_tx_enabled(N);
+	}
 
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
+	TIMER_CALLBACK_MEMBER(serial_tx_callback);
+	TIMER_CALLBACK_MEMBER(serial_rx_callback);
 
 protected:
 	// construction/destruction
@@ -135,6 +148,18 @@ private:
 	uint8_t   m_scc[2];
 	uint8_t   m_brg[2];
 	uint8_t   m_sce[2];
+	uint8_t   m_txb[2];
+	uint8_t   m_rxb[2];
+	uint16_t  m_tx_shift[2];
+	uint8_t   m_tx_count[2];
+	bool      m_tx_pending[2];
+	uint16_t  m_rx_shift[2];
+	uint8_t   m_rx_count[2];
+	bool      m_rx_full[2];
+	uint8_t   m_rxd_state[2];
+	uint8_t   m_cts_state[2];
+	emu_timer *m_tx_timer[2];
+	emu_timer *m_rx_timer[2];
 
 	// DMA related
 	uint8_t   m_dmac[2];
@@ -169,6 +194,7 @@ private:
 	devcb_read16::array<2> m_dma_read;
 	devcb_write16::array<2> m_dma_write;
 
+	devcb_write_line::array<2> m_txd_handler;
 	devcb_write_line::array<2> m_tc_handler;
 
 	int32_t   m_cur_cycles;
@@ -235,6 +261,18 @@ private:
 	void exic2_w(uint8_t d);
 	void dmarq_state_w(unsigned n, int state);
 	bool dma_requested(unsigned n) const;
+	attotime serial_bit_time(unsigned n) const;
+	unsigned serial_data_bits(unsigned n) const;
+	void serial_rxd_w(unsigned n, int state);
+	void serial_load_tx(unsigned n);
+	void serial_tx_enabled(unsigned n);
+	uint8_t rxb_r(unsigned n);
+	void txb_w(unsigned n, uint8_t d);
+	void scm_w(unsigned n, uint8_t d);
+	uint8_t rxb0_r();
+	void txb0_w(uint8_t d);
+	uint8_t rxb1_r();
+	void txb1_w(uint8_t d);
 	uint8_t srms0_r();
 	void srms0_w(uint8_t d);
 	uint8_t stms0_r();
