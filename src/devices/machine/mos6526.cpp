@@ -1315,7 +1315,11 @@ void mos8520_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case TOD_MIN:
-		m_tod_stopped = true;
+		if (!CRB_ALARM)
+		{
+			m_tod_stopped = true;
+		}
+
 		write_tod(2, data);
 		break;
 
@@ -1332,6 +1336,9 @@ void mos8520_device::write(offs_t offset, uint8_t data)
 
 void mos6526_device::sp_w(int state)
 {
+	if (CRA_SPMODE)
+		return;
+
 	m_sp = state;
 }
 
