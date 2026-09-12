@@ -1110,11 +1110,15 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
 							continue;
 
-						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x + skipx, y, woffset);
+						u32 src_data = (this->*get_pixel_table[actual_src_mode])(x + skipx, y, woffset);
 
-						// opaque check
-						if (!(src_data & 0x7fff) && !m_cel.bgnd)
+						// opaque check, don't draw if resulting pen is pure black or
+						// if packed CEL discarded it.
+						// TODO: is it really pure black for PLUT based CELs, or index=0?
+						if ((!(src_data & 0x7fff) && !m_cel.bgnd) || src_data & CEL_TRANSPARENT)
 							continue;
+
+						src_data &= 0xffff;
 
 						u32 dst_address = m_regctl3;
 						dst_address += ((ypos & ~1) * dst_pitch) << 2;
@@ -1221,13 +1225,13 @@ const madam_device::fetch_rle_func madam_device::fetch_rle_table[16] =
 
 // Stub for unemulated/illegal paths
 // bpp = 0 coded: ssf2xj in versus mode
-std::tuple<u16, u32> madam_device::get_unemulated(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_unemulated(u32 ptr, u8 frac)
 {
 	return std::make_tuple(0, ptr + 1);
 };
 
 // - demoman crosshair in gameplay
-std::tuple<u16, u32> madam_device::get_coded_1bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_coded_1bpp(u32 ptr, u8 frac)
 {
 	u8 idx;
 	const u32 plut_ptr = m_cel.plut_ptr;
@@ -1244,7 +1248,7 @@ std::tuple<u16, u32> madam_device::get_coded_1bpp(u32 ptr, u8 frac)
 // - sailormn cursor in character select
 // - goalfh copyright lettering
 // - orbatak score display
-std::tuple<u16, u32> madam_device::get_coded_2bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_coded_2bpp(u32 ptr, u8 frac)
 {
 	u8 idx;
 	const u32 plut_ptr = m_cel.plut_ptr;
@@ -1259,7 +1263,7 @@ std::tuple<u16, u32> madam_device::get_coded_2bpp(u32 ptr, u8 frac)
 }
 
 // - 3do_try "3" charset
-std::tuple<u16, u32> madam_device::get_coded_4bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_coded_4bpp(u32 ptr, u8 frac)
 {
 	u8 idx;
 	const u32 plut_ptr = m_cel.plut_ptr;
@@ -1275,7 +1279,7 @@ std::tuple<u16, u32> madam_device::get_coded_4bpp(u32 ptr, u8 frac)
 
 // - 3do_fz1 / 3do_fz10
 // - orbatak (in particular relative !spabs/!ppabs transitions)
-std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 {
 	u8 idx;
 	const u32 plut_ptr = m_cel.plut_ptr;
@@ -1293,7 +1297,7 @@ std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 // - sailormn gameplay (DF = 3, used for background shading away from camera)
 // - aquawrld
 // - oyajihmj versus screen (zoom letters shrink)
-std::tuple<u16, u32> madam_device::get_coded_8bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_coded_8bpp(u32 ptr, u8 frac)
 {
 	const u32 plut_ptr = m_cel.plut_ptr;
 	u8 idx = m_dma8_read_cb(ptr);
@@ -1319,7 +1323,7 @@ std::tuple<u16, u32> madam_device::get_coded_8bpp(u32 ptr, u8 frac)
 }
 
 // - shanghtt (title background)
-std::tuple<u16, u32> madam_device::get_uncoded_8bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_uncoded_8bpp(u32 ptr, u8 frac)
 {
 	const u16 src_idx = m_dma8_read_cb(ptr);
 	const u16 dst_data = (BIT(src_idx, 5, 3) << 12) | (BIT(src_idx, 2, 3) << 7) | (BIT(src_idx, 0, 2) << 3);
@@ -1330,7 +1334,7 @@ std::tuple<u16, u32> madam_device::get_uncoded_8bpp(u32 ptr, u8 frac)
 // - 3do_try on Sanyo 3DO logo
 // A wasteful use case, sets woffset10 and 2 bytes per color fetch for a PLUT lookup trip.
 // TODO: actual SW should actually really use 32 PLUTs and the alternate multiply instead
-std::tuple<u16, u32> madam_device::get_coded_16bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_coded_16bpp(u32 ptr, u8 frac)
 {
 	const u32 plut_ptr = m_cel.plut_ptr;
 	u8 idx = m_dma8_read_cb(ptr + 1);
@@ -1342,7 +1346,7 @@ std::tuple<u16, u32> madam_device::get_coded_16bpp(u32 ptr, u8 frac)
 }
 
 // - 3do_gdo101
-std::tuple<u16, u32> madam_device::get_uncoded_16bpp(u32 ptr, u8 frac)
+std::tuple<u32, u32> madam_device::get_uncoded_16bpp(u32 ptr, u8 frac)
 {
 	return std::make_tuple((m_dma8_read_cb(ptr) << 8) | m_dma8_read_cb(ptr + 1), ptr + 2);
 }
@@ -1416,13 +1420,9 @@ u32 madam_device::cel_decompress()
 			switch (packet_type)
 			{
 				// PACK_TRANSPARENT
-				// TODO: doesn't really work properly, particularly when bgnd is 1
-				// - 3do_fz10 CD overlays uses plenty of these, which currently fills solid black
-				// We could cheat and pull bit 15 high, but then we have to deal accordingly
-				// when writing to framebuffer (that uses it as cornerweight or CLUT selector) ...
 				case 2:
 					for (src = 0; src < num_bytes; src++)
-						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = 0;
+						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = CEL_TRANSPARENT;
 
 					tick_time ++;
 					xpos += num_bytes;
@@ -1530,7 +1530,7 @@ const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 	&madam_device::get_pixel_packed
 };
 
-u16 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
 {
 	// arbitrary mesh pattern so it will be obvious if triggered
 	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
@@ -1538,7 +1538,7 @@ u16 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
 }
 
 // - plumber "SCORES" display on choice screens
-u16 madam_device::get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
@@ -1557,7 +1557,7 @@ u16 madam_device::get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset)
 }
 
 // - bam/pbobble in gameplay (1st stage aid marker)
-u16 madam_device::get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
@@ -1577,7 +1577,7 @@ u16 madam_device::get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset)
 
 // - fz1/fz10 spinning RGB cube drops
 // - Photo CD numerical indices
-u16 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
@@ -1596,7 +1596,7 @@ u16 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
 }
 
 // - 'R' letter in "Welcome to the REAL world" for fz1
-u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
@@ -1617,7 +1617,7 @@ u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 // - fz10 Storage Managers
 // - demoman FMVs (options -> difficulty select, DF = 2)
 // - cfodder gameplay (DF = 3)
-u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
@@ -1652,7 +1652,7 @@ u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 }
 
 // - megarace "now loading" / "prepare to race"
-u16 madam_device::get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
@@ -1670,7 +1670,7 @@ u16 madam_device::get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset)
 }
 
 // - BIOSes in general
-u16 madam_device::get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
@@ -1683,7 +1683,7 @@ u16 madam_device::get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset)
 	return src_data;
 }
 
-u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
@@ -1696,16 +1696,16 @@ u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 	return src_data;
 }
 
-u16 madam_device::get_pixel_packed(int x, int y, u16 woffset)
+u32 madam_device::get_pixel_packed(int x, int y, u16 woffset)
 {
 	const u16 pitch = 0x400;
 	const u32 src_address = x + (y * pitch);
 
-	u16 src_data = m_cel.buffer[src_address];
+	u32 src_data = m_cel.buffer[src_address];
 	// Clear after use so that the next CEL won't draw glitchy GFXs due of
 	// PACK_EOL + the calculated tlhpcnt.
 	// Location here is primarily performance oriented, would tank if we 0-fill the full vector stack.
-	m_cel.buffer[src_address] = 0;
+	m_cel.buffer[src_address] = CEL_TRANSPARENT;
 	return src_data;
 }
 
