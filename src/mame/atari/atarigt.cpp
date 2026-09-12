@@ -6,12 +6,15 @@
 
     driver by Aaron Giles
 
+    Primal Rage protection reverse engineered by:
+        Andrea Bogazzi
+
     Games supported:
         * T-Mek (1994) [5 sets]
         * Primal Rage (1994) [3 sets]
 
     Known bugs:
-        * Protection not fully understood
+        * T-Mek protection not understood
         * T-Mek's serial communications hardware is missing. The twin and single cabs seemingly use different link hardware but both link the same.
 
 ****************************************************************************
@@ -381,229 +384,21 @@ void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, uint1
  *
  *************************************/
 
-void atarigt_state::primrage_update_mode(offs_t offset)
-{
-	/* pop us into the readseq */
-	for (int i = 0; i < ADDRSEQ_COUNT - 1; i++)
-		m_protaddr[i] = m_protaddr[i + 1];
-	m_protaddr[ADDRSEQ_COUNT - 1] = offset;
-
-	/* check for particular sequences */
-	if (!m_protmode)
-	{
-		/* this is from the code at $20f90 */
-		if (m_protaddr[1] == 0xdcc7c4 && m_protaddr[2] == 0xdcc7c4 && m_protaddr[3] == 0xdc4010)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 1\n");
-			m_protmode = 1;
-		}
-
-		/* this is from the code at $27592 */
-		if (m_protaddr[0] == 0xdcc7ca && m_protaddr[1] == 0xdcc7ca && m_protaddr[2] == 0xdcc7c6 && m_protaddr[3] == 0xdc4022)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 2\n");
-			m_protmode = 2;
-		}
-
-		/* this is from the code at $3d8dc */
-		if (m_protaddr[0] == 0xdcc7c0 && m_protaddr[1] == 0xdcc7c0 && m_protaddr[2] == 0xdc80f2 && m_protaddr[3] == 0xdc7af2)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 3\n");
-			m_protmode = 3;
-		}
-	}
-}
-
-
+// The 136094-0004A is overlaid on the color RAM window: every access
+// reaches both color RAM and the chip, which only drives the bus for its
+// status and result registers.
 
 void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, uint16_t data)
 {
-	switch (m_maincpu->pcbase())
-	{
-		/* protection code from 20f90 - 21000 */
-		case 0x20fba:
-			if (offset % 16 == 0) logerror("\n   ");
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-
-		/* protection code from 27592 - 27664 */
-		case 0x275f6:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-
-		/* protection code from 3d8dc - 3d95a */
-		case 0x3d908:
-		case 0x3d932:
-		case 0x3d938:
-		case 0x3d93e:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-		case 0x3d944:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) - done\n", offset, data);
-			break;
-
-		/* protection code from 437fa - 43860 */
-		case 0x43830:
-		case 0x43838:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-
-		/* catch anything else */
-		default:
-			LOGMASKED(LOG_PROTECTION, "%s:Unknown protection W@%06X = %04X\n", machine().describe_context(), offset, data);
-			break;
-	}
-
-/* mask = 0x78fff */
-
-	/* track accesses */
-	primrage_update_mode(offset);
-
-	/* check for certain read sequences */
-	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + (0x800 * 2))
-		m_protdata[(offset - 0xdc7800) >> 1] = data;
-
-	if (m_protmode == 2)
-	{
-		int temp = (offset - 0xdc7800) >> 1;
-		LOGMASKED(LOG_PROTECTION, "prot:mode 2 param = %04X\n", temp);
-		m_protresult = temp * 0x6915 + 0x6915;
-	}
-
-	if (m_protmode == 3)
-	{
-		if (offset == 0xdc4700)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 3\n");
-			m_protmode = 0;
-		}
-	}
+	m_xga->write16(offset - 0xd80000, data);
 }
-
 
 
 void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, uint16_t *data)
 {
-	if (!machine().side_effects_disabled())
-	{
-		/* track accesses */
-		primrage_update_mode(offset);
-	}
-
-	uint32_t const pc = m_maincpu->pcbase();
-	uint32_t p1, p2, a6;
-	switch (pc)
-	{
-		/* protection code from 20f90 - 21000 */
-		case 0x20f90:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 20F90: R@%06X ", offset);
-			break;
-		case 0x20f98:
-		case 0x20fa0:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-		case 0x20fcc:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
-			break;
-
-		/* protection code from 27592 - 27664 */
-		case 0x275bc:
-			break;
-		case 0x275cc:
-			a6 = m_maincpu->state_int(M68K_A6);
-			p1 = (space.read_word(a6+8) << 16) | space.read_word(a6+10);
-			p2 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
-			break;
-		case 0x275d2:
-		case 0x275d8:
-		case 0x275de:
-		case 0x2761e:
-		case 0x2762e:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-		case 0x2763e:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
-			break;
-
-		/* protection code from 3d8dc - 3d95a */
-		case 0x3d8f4:
-			a6 = m_maincpu->state_int(M68K_A6);
-			p1 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
-			break;
-		case 0x3d8fa:
-		case 0x3d90e:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-
-		/* protection code from 437fa - 43860 */
-		case 0x43814:
-			a6 = m_maincpu->state_int(M68K_A6);
-			p1 = space.read_dword(a6+14) & 0xffffff;
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 43814(%08X): R@%06X ", p1, offset);
-			break;
-		case 0x4381c:
-		case 0x43840:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-		case 0x43848:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
-			break;
-
-		/* catch anything else */
-		default:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "%s:Unknown protection R@%06X\n", machine().describe_context(), offset);
-			break;
-	}
-
-	/* handle specific reads */
-	switch (offset)
-	{
-		/* status register; the code spins on this waiting for the high bit to be set */
-		case 0xdc4700:
-//          if (m_protmode != 0)
-			{
-				*data = 0x8000;
-			}
-			break;
-
-		/* some kind of result register */
-		case 0xdcc7c2:
-			if (m_protmode == 2)
-			{
-				*data = m_protresult;
-				if (!machine().side_effects_disabled())
-				{
-					m_protmode = 0;
-					LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 2\n");
-				}
-			}
-			break;
-
-		case 0xdcc7c4:
-			if (m_protmode == 1)
-			{
-				if (!machine().side_effects_disabled())
-				{
-					m_protmode = 0;
-					LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 1\n");
-				}
-			}
-			break;
-	}
+	uint16_t result;
+	if (m_xga->read16(offset - 0xd80000, result, !machine().side_effects_disabled()))
+		*data = result;
 }
 
 
@@ -777,6 +572,8 @@ static INPUT_PORTS_START( primrage )
 	PORT_MODIFY( "P1_P2" )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	/* holding both lines opens the developer menu (Center of Mass editor, Dump Keys, ...) */
+	PORT_BIT( 0x00000030, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Developer Menu") PORT_CODE(KEYCODE_M)
 INPUT_PORTS_END
 
 
@@ -793,6 +590,7 @@ static INPUT_PORTS_START( primrageo )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000030, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Developer Menu") PORT_CODE(KEYCODE_M)
 INPUT_PORTS_END
 
 
@@ -938,12 +736,16 @@ void atarigt_state::primrage(machine_config &config)
 {
 	atarigt_stereo(config);
 
+	ATARI_136094_0004A(config, m_xga);
+
 	m_cage->set_speedup(0x42f2);
 }
 
 void atarigt_state::primrage20(machine_config &config)
 {
 	atarigt_stereo(config);
+
+	ATARI_136094_0004A(config, m_xga);
 
 	m_cage->set_speedup(0x48a4);
 }
@@ -1504,9 +1306,6 @@ void atarigt_state::init_primrage()
 	/* install protection */
 	m_protection_r = &atarigt_state::primrage_protection_r;
 	m_protection_w = &atarigt_state::primrage_protection_w;
-
-	m_protdata = make_unique_clear<uint8_t[]>(0x800);
-	save_pointer(NAME(m_protdata), 0x800);
 }
 
 /*************************************

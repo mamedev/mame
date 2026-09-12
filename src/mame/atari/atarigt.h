@@ -9,6 +9,7 @@
 #include "cage.h"
 #include "machine/adc0808.h"
 #include "atarigen.h"
+#include "atarixga.h"
 #include "machine/timer.h"
 #include "atarirle.h"
 #include "emupal.h"
@@ -28,6 +29,7 @@ public:
 		m_rle(*this, "rle"),
 		m_mo_command(*this, "mo_command"),
 		m_cage(*this, "cage"),
+		m_xga(*this, "xga"),
 		m_service_io(*this, "SERVICE"),
 		m_coin_io(*this, "COIN"),
 		m_fake_io(*this, "FAKE")
@@ -60,6 +62,7 @@ private:
 
 	required_shared_ptr<uint32_t> m_mo_command;
 	required_device<atari_cage_device> m_cage;
+	optional_device<atari_136094_0004a_device> m_xga;
 
 	optional_ioport m_service_io;
 	optional_ioport m_coin_io;
@@ -86,8 +89,6 @@ private:
 	bool            m_ignore_writes = false;
 	offs_t          m_protaddr[ADDRSEQ_COUNT]{};
 	uint8_t         m_protmode = 0;
-	uint16_t        m_protresult = 0;
-	std::unique_ptr<uint8_t []> m_protdata;
 
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	void video_int_write_line(int state);
@@ -120,7 +121,6 @@ private:
 	void tmek_update_mode(offs_t offset);
 	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);
 	void tmek_protection_r(address_space &space, offs_t offset, uint16_t *data);
-	void primrage_update_mode(offs_t offset);
 	void primrage_protection_w(address_space &space, offs_t offset, uint16_t data);
 	void primrage_protection_r(address_space &space, offs_t offset, uint16_t *data);
 	void compute_fake_pots(int *pots);
