@@ -31,7 +31,7 @@ TODO (BIOS programs):
   skipped.
 
 TODO (Arcade variants):
-- md23do/sht3do: lightgun hookup;
+- crime3do/md23do/sht3do: lightgun hookup;
 - orbatak: ugly colors in service mode, not extensively tested;
 - The actual Player bus hookup will require specific subclasses for all these (namely can't use %p
   for enumerating p2 then p1);
@@ -704,6 +704,15 @@ ROM_START(orbatak)
 	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
 ROM_END
 
+ROM_START(crime3do)
+	ALG_BIOS
+
+	DISK_REGION( "cdimage" )
+	// https://redump.info/disc/118129
+	// "crime patrol (usa) (arcade cd-rom)"
+	DISK_IMAGE_READONLY( "crime patrol", 0, SHA1(674ef07dbb0c2df3c65741ba81bee80cfb929748) )
+ROM_END
+
 ROM_START(md23do)
 	ALG_BIOS
 
@@ -743,11 +752,14 @@ CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, emp
 
 
 // Arcade section
-GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_IS_BIOS_ROOT )
 
 GAME( 1995, orbatak, alg3do, orbatak,  orbatak,   orbatak_state, empty_init, ROT0,     "American Laser Games", "Orbatak (USA, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.0
-GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.1
-GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.05
+
+// MACHINE_IMPERFECT_TIMING doesn't really matter for the gun games, they are pure FMV based.
+GAME( 1995, crime3do,alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Crime Patrol (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.0
+GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.1
+GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.05
 
 // Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
 // (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)
