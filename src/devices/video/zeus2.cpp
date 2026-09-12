@@ -1093,6 +1093,11 @@ if (subregdata_count[which] < 256)
 				logerror("\t(R%02X)  texbase = %06x", which, zeus_texbase);
 			break;
 
+		case 0x06:
+			if (logit)
+				logerror("\t(R%02X) = %06x Solid Fill Color", which, value);
+			break;
+
 		case 0x07:
 			if (logit)
 				logerror("\t(R%02X)  Texel Mask = %06x", which, value);
@@ -1761,7 +1766,9 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.frame_shift = m_state->frame_row_shift();
 	int texmode = texdata & 0xffff;
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
-	extra.solidcolor = m_state->m_zeusbase[0x00] & 0x7fff;
+	// Solid fill takes its color from render reg 0x06.  Host reg 0x00 is Zeus 1's source and
+	// reads back as STATUS0 here, so the fill was always black.
+	extra.solidcolor = m_state->m_renderRegs[0x06] & 0x7fff;
 	// Flat solid-color fill: texmode bits 10-11 both set (same as Zeus 1)
 	extra.solid_enable = ((texmode & 0x0c00) == 0x0c00);
 	extra.transcolor = (texmode & 0x180) ? 0 : 0x100;
