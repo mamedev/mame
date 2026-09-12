@@ -43,6 +43,22 @@ public:
 	/* high-level, frame-based interface */
 	int send_frame( uint8_t* data, int length ); /* ret -1 if busy */
 
+	/* OPTIONAL: clock a received frame into the FIFO at the line rate.
+	 *
+	 * By default a frame handed to send_frame() is refilled into the receive
+	 * FIFO as the reader pops it, so the FIFO never fills and the chip's own
+	 * overrun can never happen - the frame arrives as fast as the reader can
+	 * take it, however long the wire would really have taken.
+	 *
+	 * Give a per-byte time here and the bytes are instead clocked in by a
+	 * timer, which is what a real line does.  Then a reader that stops (its
+	 * DMA count exhausted on a frame that was not for it, or a CPU slow to
+	 * re-arm) overruns the three-byte FIFO after about three byte times, on
+	 * its own and for the right reason.  attotime::zero (the default) keeps
+	 * the original behaviour, so no existing driver changes.
+	 */
+	void set_wire_rate( const attotime &per_byte ) { m_wire_rate = per_byte; }
+
 	/* control lines */
 	void set_cts(int state); /* 1 = clear-to-send, 0 = busy */
 	void set_dcd(int state); /* 1 = carrier, 0 = no carrier */
@@ -86,6 +102,8 @@ private:
 	uint16_t m_tfifo[FIFO_SIZE];  /* X x 8-bit FIFO + full & last marker bits */
 	uint8_t  m_tones;             /* counter for zero-insertion */
 	emu_timer *m_ttimer;       /* when to ask for more data */
+	emu_timer *m_wire_timer;   /* clocks a received frame in at the line rate */
+	attotime m_wire_rate;      /* per byte; zero = refill on pop, as before */
 
 	/* receive state */
 	uint8_t  m_rstate;
@@ -114,6 +132,7 @@ private:
 	void tfifo_push( uint8_t data );
 	void tfifo_terminate( );
 	TIMER_CALLBACK_MEMBER(tfifo_cb);
+	TIMER_CALLBACK_MEMBER(wire_feed);   /* next byte of a frame off the line */
 	void tfifo_clear( );
 
 	void rfifo_push( uint8_t d );
