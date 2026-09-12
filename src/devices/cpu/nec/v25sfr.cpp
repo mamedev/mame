@@ -325,24 +325,22 @@ void v25_common_device::seic0_w(uint8_t d)
 
 uint8_t v25_common_device::sric0_r()
 {
-	return read_irqcontrol(INTSR0, m_priority_ints0);
+	return read_irqcontrol(INTSR0, 7);
 }
 
 void v25_common_device::sric0_w(uint8_t d)
 {
 	write_irqcontrol(INTSR0, d);
-	m_priority_ints0 = d & 0x7;
 }
 
 uint8_t v25_common_device::stic0_r()
 {
-	return read_irqcontrol(INTST0, m_priority_ints0);
+	return read_irqcontrol(INTST0, 7);
 }
 
 void v25_common_device::stic0_w(uint8_t d)
 {
 	write_irqcontrol(INTST0, d);
-	m_priority_ints0 = d & 0x7;
 }
 
 uint8_t v25_common_device::srms1_r()
@@ -428,24 +426,22 @@ void v25_common_device::seic1_w(uint8_t d)
 
 uint8_t v25_common_device::sric1_r()
 {
-	return read_irqcontrol(INTSR1, m_priority_ints1);
+	return read_irqcontrol(INTSR1, 7);
 }
 
 void v25_common_device::sric1_w(uint8_t d)
 {
 	write_irqcontrol(INTSR1, d);
-	m_priority_ints1 = d & 0x7;
 }
 
 uint8_t v25_common_device::stic1_r()
 {
-	return read_irqcontrol(INTST1, m_priority_ints1);
+	return read_irqcontrol(INTST1, 7);
 }
 
 void v25_common_device::stic1_w(uint8_t d)
 {
 	write_irqcontrol(INTST1, d);
-	m_priority_ints1 = d & 0x7;
 }
 
 uint16_t v25_common_device::tm0_r()
