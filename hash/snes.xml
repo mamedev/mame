@@ -12142,10 +12142,13 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="doom">
+	<software name="doom" supported="no">
 		<description>Doom (Europe)</description>
 		<year>1996</year>
 		<publisher>Williams Entertainment</publisher>
+		<notes><![CDATA[
+Video display flickers, has double width bar at bottom, runs too slow
+]]></notes>
 		<info name="serial" value="SNSP-AD8P-FAH, SNSP-AD8P-NOE" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
@@ -39317,10 +39320,13 @@ Hangs after few seconds of gameplay, [open bus]
 		</part>
 	</software>
 
-	<software name="doomj" cloneof="doom">
+	<software name="doomj" cloneof="doom" supported="no">
 		<description>Doom (Japan)</description>
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
+		<notes><![CDATA[
+(same as doom)
+]]></notes>
 		<info name="serial" value="SHVC-AD8J-JPN" />
 		<info name="release" value="19960301" />
 		<info name="alt_title" value="ドゥーム" />
@@ -39335,10 +39341,13 @@ Hangs after few seconds of gameplay, [open bus]
 		</part>
 	</software>
 
-	<software name="doomu" cloneof="doom">
+	<software name="doomu" cloneof="doom" supported="no">
 		<description>Doom (USA)</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
+		<notes><![CDATA[
+(same as doom)
+]]></notes>
 		<info name="release" value="199509xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />

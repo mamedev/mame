@@ -9,7 +9,8 @@ license:CC0-1.0
 <!--
 
 TODO:
-- Make SW list to follow a stricter alphabetical order (couldn't care less)
+- Make SW list to follow a stricter alphabetical order (couldn't care less about who dumped what,
+  it's also recipe for confusion moving stuff ...)
 
 ## Undumped/missing list (Japan, retail):
 
@@ -3038,6 +3039,7 @@ Hangs on river stage (retest me)
 	<!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc)... -->
 
 	<!-- Redump gives no indication of how these pair up.. -->
+	<!-- TODO: split these up in separate sets -->
 	<software name="enemy0j" cloneof="enemy0" supported="no">
 		<description>Enemy Zero (Japan)</description>
 		<year>1996</year>
@@ -6311,6 +6313,7 @@ Runs too slow, enables [SCU] hblank-in irq
 	<!-- Identifying Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan) (Disc 3) (4M, 5M)... -->
 	<!-- Identifying Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan) (Disc 3) (Rev A) (12M)... -->
 	<!-- Identifying Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan) (Disc 3)... -->
+	<!-- TODO: separate into different sets -->
 	<software name="sakurat2" supported="no">
 		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan)</description>
 		<year>1998</year>
@@ -37732,7 +37735,7 @@ Doesn't accept any input on System Memory requirement screen
 	</software>
 
 
-<!-- Misc images to sort -->
+<!-- !Misc demo discs to sort -->
 
 	<!-- Identifying bootleg... -->
 	<software name="bootlegc" supported="no">
