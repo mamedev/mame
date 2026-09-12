@@ -87,7 +87,7 @@ protected:
 	struct extents_list
 	{
 		uint8_t                   scan_extent[256]{};
-		uint16_t                  extent[32][16]{};
+		uint16_t                  extent[256][16]{};
 	};
 
 
