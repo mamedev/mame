@@ -146,6 +146,14 @@ void mc6852_device::tra_complete()
 		if (m_cr[1] & C2_TX_SYNC)
 		{
 			m_status |= S_TUF;
+			// Without this the flag goes up but the interrupt never does:
+			// update_irq() already counts S_TUF among the conditions EIE
+			// gates, and nothing here called it.  It matters - on the
+			// Alfaskop the communication processor parks its receiver while
+			// it transmits and only re-opens it from this very interrupt, so
+			// without it the line takes twenty seconds to turn around and the
+			// host's text is never read.  Same fix in get_tx_byte() below.
+			update_irq();
 			byte_to_send = m_scr;   // Send Sync Code
 
 			// TODO assert TUF pin for "approximately one Tx CLK high period"
@@ -162,6 +170,34 @@ void mc6852_device::tra_complete()
 	{
 		m_status |= S_TDRA;
 	}
+}
+
+//-------------------------------------------------
+//  update_irq - the device never drove its IRQ
+//  output; per the datasheet IRQ is the OR of
+//  RDA&RIE, TDRA&TIE (transmitter running) and
+//  the error flags under EIE, mirrored in the
+//  status IRQ bit
+//-------------------------------------------------
+void mc6852_device::update_irq()
+{
+	bool irq = false;
+
+	if ((m_cr[0] & C1_RIE) && (m_status & S_RDA))
+		irq = true;
+
+	if ((m_cr[0] & C1_TIE) && !(m_cr[0] & C1_TX_RS) && (m_status & S_TDRA))
+		irq = true;
+
+	if ((m_cr[1] & C2_EIE) && (m_status & (S_RX_OVRN | S_PE | S_TUF | S_CTS | S_DCD)))
+		irq = true;
+
+	if (irq)
+		m_status |= S_IRQ;
+	else
+		m_status &= ~S_IRQ;
+
+	m_write_irq(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -208,6 +244,8 @@ void mc6852_device::receive_byte(uint8_t data)
 	{
 		m_status |= S_RDA;
 	}
+
+	update_irq();
 }
 
 //-------------------------------------------------
@@ -274,6 +312,9 @@ uint8_t mc6852_device::read(offs_t offset)
 		}
 	}
 
+	if (!machine().side_effects_disabled())
+		update_irq();
+
 	return data;
 }
 
@@ -303,6 +344,7 @@ uint8_t mc6852_device::get_tx_byte(int *tuf)
 		if (m_cr[1] & C2_TX_SYNC)
 		{
 			m_status |= S_TUF;
+			update_irq();           // see the note in tx_start_bit()
 			// TODO should the TUF callback be called, TUF is to
 			// be pulsed.
 			*tuf = 1;
@@ -324,6 +366,8 @@ uint8_t mc6852_device::get_tx_byte(int *tuf)
 	{
 		m_status |= S_TDRA;
 	}
+
+	update_irq();
 
 	*tuf = 0;
 	return data;
@@ -490,4 +534,6 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 		m_cr[0] = data;
 	}
+
+	update_irq();
 }
