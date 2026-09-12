@@ -267,7 +267,9 @@ private:
 	void tm1_w(uint16_t d);
 	uint16_t md1_r();
 	void md1_w(uint16_t d);
+	uint8_t tmc0_r();
 	void tmc0_w(uint8_t d);
+	uint8_t tmc1_r();
 	void tmc1_w(uint8_t d);
 	uint8_t tmms_r(offs_t a);
 	void tmms_w(offs_t a, uint8_t d);
