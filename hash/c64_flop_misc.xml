@@ -79,6 +79,109 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
+	<software name="jb1520">
+		<description>1520 Printer/Plotter Demo Disks</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-1.a.d64" size="174848" crc="55a29473" sha1="6e2ebc2968a751b425a417bf21aa361e92454c16"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-1.b.d64" size="174848" crc="4cecd96e" sha1="1b57362903731d1475865a77708d7b4d6d9f25b1"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-1.c.d64" size="174848" crc="ab1305fc" sha1="765d37c370a34bdf48825eee11a43d88948e85f7"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-2.a.d64" size="174848" crc="ec10e299" sha1="425a38a7f44f4ffa806169f17309b23de99fd778"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-2.b.d64" size="174848" crc="3173cc1f" sha1="f1e13a68371a2c0eb4e300879760586ed1e682c3"/>
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-2.c.d64" size="174848" crc="079070ce" sha1="b4cf8cf3544a6008ffe4e3ffcd14a496429e5009"/>
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-3.a.d64" size="174848" crc="121e2e5c" sha1="4671c170e259e1f438ec35296d248598204daac5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-3.b.d64" size="174848" crc="698d84a1" sha1="2b4eb3a97cb2c15bf678e4d3df7b60af6a0cf6b5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-3.c.d64" size="174848" crc="e73ecaad" sha1="bdae4b475a101f7ee2ed8eab2530eb965ed21706"/>
+			</dataarea>
+		</part>
+
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-4.a.d64" size="174848" crc="e883f38d" sha1="bb95a520f3de2754abe3dcd986139f7ae776d06d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-4.b.d64" size="174848" crc="9829b758" sha1="1d9228d4220420d4d8e66a80cdae93e0fefc4e47"/>
+			</dataarea>
+		</part>
+
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-4.c.d64" size="174848" crc="c2ff5fd2" sha1="13c8778a6363e17eb8a4941da5eca4b8661c69ae"/>
+			</dataarea>
+		</part>
+
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-5.a.d64" size="174848" crc="f9e34779" sha1="e09d1dab94766e005412dd7a4a4ca2d684a274ef"/>
+			</dataarea>
+		</part>
+
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-5.b.d64" size="174848" crc="92a526a2" sha1="db299e3727b4b58a28a19ddceca9dc31ad2f4418"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- "Flippy disk", the other side is for Apple II. -->
 	<software name="jingldsk">
 		<description>JingleDisk - Holiday Musical Story with Computer Animation</description>
