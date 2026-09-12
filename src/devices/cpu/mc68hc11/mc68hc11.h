@@ -11,6 +11,7 @@ enum {
 	MC68HC11_XIRQ_LINE          = 1
 };
 
+DECLARE_DEVICE_TYPE(MC68HC11A0, mc68hc11a0_device)
 DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)
 DECLARE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device)
 DECLARE_DEVICE_TYPE(MC68HC11E1, mc68hc11e1_device)
@@ -49,6 +50,9 @@ public:
 	auto in_an7_callback() { return m_analog_cb[7].bind(); }
 	auto in_spi2_data_callback() { return m_spi2_data_input_cb.bind(); }
 	auto out_spi2_data_callback() { return m_spi2_data_output_cb.bind(); }
+
+	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
+	void serial_w(uint8_t val);
 
 	void set_default_config(uint8_t data) { assert(!configured()); m_config = data & m_config_mask; }
 
@@ -114,6 +118,16 @@ protected:
 	template <int N> uint8_t spsr_r();
 	template <int N> uint8_t spdr_r();
 	template <int N> void spdr_w(uint8_t data);
+	uint8_t baud_r();
+	uint8_t sccr1_r();
+	uint8_t sccr2_r();
+	uint8_t scsr_r();
+	uint8_t scdr_r();
+	void baud_w(uint8_t data);
+	void sccr1_w(uint8_t data);
+	void sccr2_w(uint8_t data);
+	void scsr_w(uint8_t data);
+	void scdr_w(uint8_t data);
 	uint8_t adctl_r();
 	void adctl_w(uint8_t data);
 	uint8_t adr_r(offs_t offset);
@@ -128,8 +142,6 @@ protected:
 	uint8_t option_r();
 	void option_w(uint8_t data);
 	uint8_t scbd_r(offs_t offset);
-	uint8_t sccr1_r();
-	uint8_t sccr2_r();
 	uint8_t scsr1_r();
 	uint8_t scrdl_r();
 	uint8_t opt4_r();
@@ -175,6 +187,7 @@ private:
 	devcb_read8::array<8> m_analog_cb;
 	devcb_read8 m_spi2_data_input_cb;
 	devcb_write8 m_spi2_data_output_cb;
+	devcb_write8 m_serial_tx_cb;
 	int m_icount;
 
 	memory_view m_ram_view;
@@ -205,6 +218,12 @@ private:
 	uint8_t m_pactl;
 	uint8_t m_init;
 	uint8_t m_init2;
+
+	uint8_t m_scdr;
+	uint8_t m_sccr1;
+	uint8_t m_sccr2;
+	uint8_t m_scsr;
+	uint8_t m_baud;
 
 protected:
 	uint8_t m_config;
@@ -564,12 +583,21 @@ public:
 	mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	mc68hc11a1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool enable_eeprom);
+
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 
 	uint8_t pactl_ddra7_r();
 	void pactl_ddra7_w(uint8_t data);
+};
+
+class mc68hc11a0_device : public mc68hc11a1_device
+{
+public:
+	// construction/destruction
+	mc68hc11a0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mc68hc11d0_device : public mc68hc11_cpu_device
