@@ -622,7 +622,10 @@ void swp30_device::streaming_block::dpcm_step(u8 input)
 	m_dpcm_s2 = m_dpcm_s3;
 
 	s32 delta = m_dpcm_delta + dpcm_expand[input];
-	s32 sample = m_dpcm_s3 + (delta << scale);
+	s32 acc = m_dpcm_s3;
+	if(mode != 3)
+		acc -= s32((s64(acc) * 3) >> 7);
+	s32 sample = acc + (delta << scale);
 
 	if(sample < -0x8000) {
 		sample = -0x8000;
