@@ -1719,13 +1719,13 @@ void adsp21062_device::generate_update_circular_buffer(drcuml_block &block, comp
 
 		UML_ADD(block, I0, PM_B(i), PM_L(i));
 		UML_CMP(block, PM_I(i), I0);
-		UML_JMPc(block, COND_LE, label2);
+		UML_JMPc(block, COND_L, label2);
 		UML_SUB(block, PM_I(i), PM_I(i), PM_L(i));
 		UML_JMP(block, end);
 
 		UML_LABEL(block, label2);
 		UML_CMP(block, PM_I(i), PM_B(i));
-		UML_JMPc(block, COND_G, end);
+		UML_JMPc(block, COND_GE, end);
 		UML_ADD(block, PM_I(i), PM_I(i), PM_L(i));
 
 		UML_LABEL(block, end);
@@ -1740,13 +1740,13 @@ void adsp21062_device::generate_update_circular_buffer(drcuml_block &block, comp
 
 		UML_ADD(block, I0, DM_B(i), DM_L(i));
 		UML_CMP(block, DM_I(i), I0);
-		UML_JMPc(block, COND_LE, label2);
+		UML_JMPc(block, COND_L, label2);
 		UML_SUB(block, DM_I(i), DM_I(i), DM_L(i));
 		UML_JMP(block, end);
 
 		UML_LABEL(block, label2);
 		UML_CMP(block, DM_I(i), DM_B(i));
-		UML_JMPc(block, COND_G, end);
+		UML_JMPc(block, COND_GE, end);
 		UML_ADD(block, DM_I(i), DM_I(i), DM_L(i));
 
 		UML_LABEL(block, end);
