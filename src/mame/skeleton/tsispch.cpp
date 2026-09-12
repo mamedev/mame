@@ -145,6 +145,7 @@ public:
 		, m_dsp(*this, "dsp")
 		, m_pic(*this, "pic8259")
 		, m_uart(*this, "i8251a_u15")
+		, m_dac(*this, "dac")
 	{
 	}
 
@@ -158,6 +159,7 @@ private:
 	void dsp_status_w(uint8_t data);
 	void dsp_to_8086_p0_w(int state);
 	void dsp_to_8086_p1_w(int state);
+	void dsp_serial_w(uint16_t data);
 
 	void dsp_data_map(address_map &map) ATTR_COLD;
 	void dsp_prg_map(address_map &map) ATTR_COLD;
@@ -167,11 +169,13 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<upd7725_device> m_dsp;
+	required_device<upd7720_device> m_dsp;
 	required_device<pic8259_device> m_pic;
 	required_device<i8251_device> m_uart;
+	required_device<dac_12bit_r2r_device> m_dac;
 
 	uint8_t m_paramReg = 0;           // status leds and resets and etc
+	bool m_dsp_p0 = false;
 };
 
 /*
@@ -203,6 +207,7 @@ void tsispch_state::peripheral_w(uint8_t data)
 	*/
 	m_paramReg = data;
 	m_dsp->set_input_line(INPUT_LINE_RESET, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	m_pic->ir0_w(!((m_paramReg & 0x01) && m_dsp_p0));
 	//LOGPRM("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 	LOGPRM("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 	popmessage("LEDS: 6/Talking:%d 5:%d 4:%d 3:%d\n", 1-BIT(data,1), 1-BIT(data,2), 1-BIT(data,3), 1-BIT(data,4));
@@ -220,7 +225,10 @@ void tsispch_state::dsp_status_w(uint8_t data)
 void tsispch_state::dsp_to_8086_p0_w(int state)
 {
 	LOG("upd772x changed p0 state to %d!\n",state);
-	//TODO: do stuff here!
+	m_dsp_p0 = bool(state);
+	// The DSP request is gated by parameter-register bit 0 and presented to
+	// the PIC as an active-low signal.
+	m_pic->ir0_w(!((m_paramReg & 0x01) && m_dsp_p0));
 }
 
 void tsispch_state::dsp_to_8086_p1_w(int state)
@@ -229,13 +237,23 @@ void tsispch_state::dsp_to_8086_p1_w(int state)
 	//TODO: do stuff here!
 }
 
+void tsispch_state::dsp_serial_w(uint16_t data)
+{
+	// The uPD7720 sends the least-significant bit first.  The board shifts the
+	// 13-bit sample into its output register and discards the least-significant
+	// bit when presenting it to the 12-bit DAC.
+	m_dac->write((bitswap<16>(data, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) & 0x1fff) >> 1);
+}
+
 /*****************************************************************************
  Reset and Driver Init
 *****************************************************************************/
 void tsispch_state::machine_reset()
 {
 	LOG("machine reset\n");
+	m_dsp_p0 = false;
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
+	m_dac->write(0x7f0);
 }
 
 void tsispch_state::init_prose2k()
@@ -280,6 +298,9 @@ void tsispch_state::init_prose2k()
 		*dspprg = byte1t<<24 | byte23t<<8;
 		dspprg++;
 	}
+	// The uPD77P20 programmer dump walks data ROM addresses downward.
+	u16 *const dspdata = &memregion("dspdata")->as_u16();
+	std::reverse(dspdata, dspdata + 0x200);
 	m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
 }
 
@@ -311,8 +332,8 @@ void tsispch_state::i8086_mem(address_map &map)
 	map(0x03200, 0x03203).mirror(0x341fc).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	map(0x03400, 0x03400).mirror(0x341fe).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
 	map(0x03401, 0x03401).mirror(0x341fe).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
-	map(0x03600, 0x03600).mirror(0x341fc).rw(m_dsp, FUNC(upd7725_device::data_r), FUNC(upd7725_device::data_w)); // verified; UPD77P20 data reg r/w
-	map(0x03602, 0x03602).mirror(0x341fc).r(m_dsp, FUNC(upd7725_device::status_r)).w(FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
+	map(0x03600, 0x03600).mirror(0x341fc).rw(m_dsp, FUNC(upd7720_device::data_r), FUNC(upd7720_device::data_w)); // verified; UPD77P20 data reg r/w
+	map(0x03602, 0x03602).mirror(0x341fc).r(m_dsp, FUNC(upd7720_device::status_r)).w(FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
 	map(0xc0000, 0xfffff).rom(); // verified
 }
 
@@ -376,14 +397,15 @@ void tsispch_state::prose2k(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tsispch_state::i8086_io);
 	m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
-	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
-	/* TODO: hook up p0, p1, int */
-	UPD7725(config, m_dsp, XTAL(16'000'000)/2); /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 (which xtal does this come from? guessed 16MHz) */
+	UPD7720(config, m_dsp, XTAL(16'000'000)/4); /* VERIFIED crystal; the uPD77P20 takes two input clocks per instruction */
 	m_dsp->set_addrmap(AS_PROGRAM, &tsispch_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &tsispch_state::dsp_data_map);
 	m_dsp->p0().set(FUNC(tsispch_state::dsp_to_8086_p0_w));
 	m_dsp->p1().set(FUNC(tsispch_state::dsp_to_8086_p1_w));
+	m_dsp->so().set(FUNC(tsispch_state::dsp_serial_w));
+	clock_device &dsp_interrupt(CLOCK(config, "dspint", 10'000));
+	dsp_interrupt.signal_handler().set_inputline(m_dsp, NECDSP_INPUT_LINE_INT);
 
 	/* PIC 8259 */
 	PIC8259(config, m_pic);
@@ -404,7 +426,7 @@ void tsispch_state::prose2k(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_12BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
+	DAC_12BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("i8251a_u15", FUNC(i8251_device::write_rxd));
@@ -547,5 +569,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                                FULLNAME                  FLAGS
-COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING )
+COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING )
