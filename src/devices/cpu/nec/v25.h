@@ -45,6 +45,10 @@ public:
 	auto dma0_write_cb() { return m_dma_write[0].bind(); }
 	auto dma1_write_cb() { return m_dma_write[1].bind(); }
 
+	template <unsigned N> auto tc_handler() { return m_tc_handler[N].bind(); }
+
+	template <unsigned N> void dmarq_w(int state) { dmarq_state_w(N, state); }
+
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 
 protected:
@@ -135,6 +139,8 @@ private:
 	// DMA related
 	uint8_t   m_dmac[2];
 	uint8_t   m_dmam[2];
+	uint8_t   m_dmarq_state[2];
+	bool      m_dmarq_edge[2];
 	int8_t    m_dma_channel;
 	int8_t    m_last_dma_channel;
 
@@ -162,6 +168,8 @@ private:
 
 	devcb_read16::array<2> m_dma_read;
 	devcb_write16::array<2> m_dma_write;
+
+	devcb_write_line::array<2> m_tc_handler;
 
 	int32_t   m_cur_cycles;
 	uint8_t   m_prefetch_size;
@@ -225,6 +233,8 @@ private:
 	void exic1_w(uint8_t d);
 	uint8_t exic2_r();
 	void exic2_w(uint8_t d);
+	void dmarq_state_w(unsigned n, int state);
+	bool dma_requested(unsigned n) const;
 	uint8_t srms0_r();
 	void srms0_w(uint8_t d);
 	uint8_t stms0_r();

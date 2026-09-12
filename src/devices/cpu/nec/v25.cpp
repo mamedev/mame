@@ -71,6 +71,7 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_p2_out(*this)
 	, m_dma_read(*this, 0xffff)
 	, m_dma_write(*this)
+	, m_tc_handler(*this)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
@@ -230,6 +231,7 @@ void v25_common_device::device_reset()
 	}
 
 	m_dmam[0] = m_dmam[1] = 0;
+	m_dmarq_edge[0] = m_dmarq_edge[1] = false;
 	m_dma_channel = -1;
 	m_last_dma_channel = 0;
 
@@ -491,6 +493,37 @@ void v25_common_device::external_int()
 	}
 }
 
+// Single step and burst mode start from the TDMA bit; the modes that move bytes between
+// memory and I/O start from the DMARQ pin instead, one transfer per rising edge or, in
+// demand release mode, for as long as the pin is held high.
+void v25_common_device::dmarq_state_w(unsigned n, int state)
+{
+	const uint8_t level = state ? 1 : 0;
+	if (m_dmarq_state[n] == level)
+		return;
+	m_dmarq_state[n] = level;
+	if (level)
+		m_dmarq_edge[n] = true;
+}
+
+bool v25_common_device::dma_requested(unsigned n) const
+{
+	if (!BIT(m_dmam[n], 3))
+		return false;
+
+	switch (BIT(m_dmam[n], 5, 3))
+	{
+	case 0: case 4:
+		return BIT(m_dmam[n], 2);
+	case 1: case 2:
+		return m_dmarq_state[n] != 0;
+	case 5: case 6:
+		return m_dmarq_edge[n];
+	default:
+		return false;
+	}
+}
+
 void v25_common_device::dma_process()
 {
 	uint16_t sar = m_internal_ram[m_dma_channel * 4];
@@ -501,6 +534,9 @@ void v25_common_device::dma_process()
 
 	uint32_t saddr = ((uint32_t(sarh_darh) & 0xff00) << 4) + sar;
 	uint32_t daddr = ((uint32_t(sarh_darh) & 0x00ff) << 12) + dar;
+
+	if (dmamode > 4)
+		m_dmarq_edge[m_dma_channel] = false;
 
 	switch (dmamode & 3)
 	{
@@ -584,6 +620,9 @@ void v25_common_device::dma_process()
 	uint16_t tc = --m_internal_ram[m_dma_channel * 4 + 3];
 	if (tc == 0)
 	{
+		// the TC pin marks the last transfer for the device on the other end
+		m_tc_handler[m_dma_channel](1);
+		m_tc_handler[m_dma_channel](0);
 		m_dmam[m_dma_channel] &= 0xf0; // disable channel
 		m_pending_irq |= m_dma_channel ? INTD1 : INTD0; // request interrupt
 	}
@@ -690,12 +729,15 @@ void v25_common_device::device_start()
 	for (i = 0; i < 4; i++)
 		m_timers[i] = timer_alloc(FUNC(v25_common_device::v25_timer_callback), this);
 
+	std::fill_n(&m_dmarq_state[0], 2, 0);
 	std::fill_n(&m_intp_state[0], 3, 0);
 	std::fill_n(&m_ems[0], 3, 0);
 	std::fill_n(&m_srms[0], 2, 0);
 	std::fill_n(&m_stms[0], 2, 0);
 	std::fill_n(&m_tmms[0], 3, 0);
 
+	save_item(NAME(m_dmarq_state));
+	save_item(NAME(m_dmarq_edge));
 	save_item(NAME(m_intp_state));
 
 	save_item(NAME(m_ip));
@@ -941,9 +983,9 @@ void v25_common_device::execute_run()
 			(this->*s_nec_instruction[fetchop()])();
 		do_prefetch();
 
-		if ((m_dmam[0] & 0x0c) == 0x0c || (m_dmam[1] & 0x0c) == 0x0c)
+		if (dma_requested(0) || dma_requested(1))
 		{
-			if ((m_dmam[1 - m_last_dma_channel] & 0x0c) == 0x0c)
+			if (dma_requested(1 - m_last_dma_channel))
 				m_dma_channel = 1 - m_last_dma_channel;
 			else
 				m_dma_channel = m_last_dma_channel;

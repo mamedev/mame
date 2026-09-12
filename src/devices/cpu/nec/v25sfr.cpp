@@ -619,13 +619,13 @@ void v25_common_device::dmam0_w(uint8_t d)
 			BIT(d, 5) ? "I/O" : "memory",
 			BIT(d, 6) ? "I/O" : "memory",
 			BIT(d, 4) ? "words" : "bytes");
-	if (BIT(d, 2))
+	if (BIT(d, 3))
 	{
 		uint16_t sar = m_internal_ram[0];
 		uint16_t dar = m_internal_ram[1];
 		uint16_t sarh_darh = m_internal_ram[2];
 		uint16_t tc = m_internal_ram[3];
-		logerror("        DMA enabled%s (%04x:%04x -> %04x:%04x, %u %s)\n", BIT(d, 3) ? " and triggered" : "",
+		logerror("        DMA enabled%s (%04x:%04x -> %04x:%04x, %u %s)\n", BIT(d, 2) ? " and triggered" : "",
 			sarh_darh & 0xff00, sar,
 			(sarh_darh & 0x00ff) << 8, dar,
 			tc, BIT(d, 4) ? "words" : "bytes");
@@ -663,13 +663,13 @@ void v25_common_device::dmam1_w(uint8_t d)
 			BIT(d, 5) ? "I/O" : "memory",
 			BIT(d, 6) ? "I/O" : "memory",
 			BIT(d, 4) ? "words" : "bytes");
-	if (BIT(d, 2))
+	if (BIT(d, 3))
 	{
 		uint16_t sar = m_internal_ram[4];
 		uint16_t dar = m_internal_ram[5];
 		uint16_t sarh_darh = m_internal_ram[6];
 		uint16_t tc = m_internal_ram[7];
-		logerror("        DMA enabled%s (%04x:%04x -> %04x:%04x, %u %s)\n", BIT(d, 3) ? " and triggered" : "",
+		logerror("        DMA enabled%s (%04x:%04x -> %04x:%04x, %u %s)\n", BIT(d, 2) ? " and triggered" : "",
 			sarh_darh & 0xff00, sar,
 			(sarh_darh & 0x00ff) << 8, dar,
 			tc, BIT(d, 4) ? "words" : "bytes");
