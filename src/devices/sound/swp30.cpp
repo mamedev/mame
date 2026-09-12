@@ -155,11 +155,11 @@ TODOs:
   aaaaaa 100011  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 1
   cccccc 100100  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a0
   aaaaaa 100101  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 2
-  cccccc 100110  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a1
+  cccccc 100110  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR2 b1
   aaaaaa 100111  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 3
-  cccccc 101000  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 b1
+  cccccc 101000  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR2 a1
   aaaaaa 101001  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 4
-  cccccc 101010  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a0
+  cccccc 101010  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR2 a0
   aaaaaa 101011  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 5
 
 
@@ -1970,8 +1970,8 @@ void swp30_device::map(address_map &map)
 	rchan(map, 0x20).rw(FUNC(swp30_device::a1_r<0>), FUNC(swp30_device::a1_w<0>));
 	rchan(map, 0x22).rw(FUNC(swp30_device::b1_r<0>), FUNC(swp30_device::b1_w<0>));
 	rchan(map, 0x24).rw(FUNC(swp30_device::a0_r<0>), FUNC(swp30_device::a0_w<0>));
-	rchan(map, 0x26).rw(FUNC(swp30_device::a1_r<1>), FUNC(swp30_device::a1_w<1>));
-	rchan(map, 0x28).rw(FUNC(swp30_device::b1_r<1>), FUNC(swp30_device::b1_w<1>));
+	rchan(map, 0x26).rw(FUNC(swp30_device::b1_r<1>), FUNC(swp30_device::b1_w<1>));
+	rchan(map, 0x28).rw(FUNC(swp30_device::a1_r<1>), FUNC(swp30_device::a1_w<1>));
 	rchan(map, 0x2a).rw(FUNC(swp30_device::a0_r<1>), FUNC(swp30_device::a0_w<1>));
 	// 2c-2f missing
 
