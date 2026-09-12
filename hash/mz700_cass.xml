@@ -873,6 +873,17 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="advoka" supported="yes">
+		<description>Advoka</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="16615">
+				<rom name="advoka.mzf" size="16615" crc="0240d602" sha1="47ff824a494651304f12ed4e157836cc98729b34"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="airbus">
 		<description>Airbus A 310</description>
 		<year>1985</year>
@@ -940,6 +951,17 @@ Easidata (English Version)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="5248">
 				<rom name="apprentissage_nombres.mzf" size="5248" crc="e7b01f7c" sha1="2f7f669f10260b1a919fd05ee0d33fc96db5d023"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid" supported="yes">
+		<description>Arkanoid</description>
+		<year>19??</year>
+		<publisher>Taito</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="11904">
+				<rom name="arkanoid.mzt" size="11904" crc="d783d1bf" sha1="d42cddf3792f33cde80250a8807cc89fe080711a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1027,6 +1049,28 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="blizzard" supported="yes">
+		<description>Blizzard</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="23681">
+				<rom name="blizzard.mzt" size="23681" crc="bf76135c" sha1="d29d5299e70e5a07ee32155750623b0dc8ec6053"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bkuzushi" supported="yes">
+		<description>Block Kuzushi</description>
+		<year>19??</year>
+		<publisher>Sharp</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="3916">
+				<rom name="kuzushi.mzt" size="3916" crc="aa84b3c5" sha1="10db035653808e77382507fe12cebb62d449672c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bloktek">
 		<description>Bloktekeningen</description>
 		<year>19??</year>
@@ -1093,6 +1137,28 @@ Easidata (English Version)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="5248">
 				<rom name="cannon ball.mzf" size="5248" crc="cdcd5637" sha1="2706ce8894d69423244d8d92218d41fd1fd90523"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrier2" supported="yes">
+		<description>Carrier ][</description>
+		<year>1984</year>
+		<publisher>BBG-Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="29808">
+				<rom name="carrier ][.mzt" size="29808" crc="ee526c14" sha1="7d039cd7b26d119fdba5845f1cf03d400d647b82"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="carrier2a" cloneof="carrier2" supported="yes">
+		<description>Carrier ][ (joystick version)</description>
+		<year>1984</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="24398">
+				<rom name="carrier ][ joy.mzt" size="24398" crc="f0e44dd9" sha1="8d6f43d37168064b8848ab929b9447dd538b7bc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1237,6 +1303,17 @@ Easidata (English Version)
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="csmcsmsh" supported="yes">
+		<description>Cosmic Smash</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="9350">
+				<rom name="cosmic smash.mzt" size="9350" crc="b4f6696c" sha1="20790c4b54c7edf04399624ed5d2bbe53770d3ef"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cribbage">
 		<description>Cribbage</description>
@@ -1335,6 +1412,28 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="drop" supported="yes">
+		<description>The Drop</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="25089">
+				<rom name="drop.mzt" size="25089" crc="793f3b50" sha1="ff8cff42ec94762cd897851232daf4187c8287bc"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="eugea" supported="yes">
+		<description>Eugea</description>
+		<year>1989</year>
+		<publisher>K. Furuhata</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="44672">
+				<rom name="eugea.mzt" size="44672" crc="894f63f4" sha1="a01ed591d2ed739ffa7b1cfba7e1285849a7345c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="explatom">
 		<description>Exploding Atoms</description>
 		<year>19??</year>
@@ -1348,7 +1447,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="fantgrov">
+	<software name="fantgrov" supported="yes">
 		<description>Fantastic Grove</description>
 		<year>1984</year>
 		<publisher>BBG Software</publisher>
@@ -1415,6 +1514,28 @@ Easidata (English Version)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="15950">
 				<rom name="full speed.mzf" size="15950" crc="ed38789c" sha1="f613825ed468528b743338f760ce7ceebf09d638"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galactic" supported="yes">
+		<description>Galactic Invaders</description>
+		<year>1983</year>
+		<publisher>Knights</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="17210">
+				<rom name="galactic invaders.mzt" size="17210" crc="ae3a9d09" sha1="bb4c191c50c0d4b0c5476fe0a6bfda27018e02ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxoid" supported="yes">
+		<description>Galaxoids</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="9602">
+				<rom name="galaxoids.mzt" size="9602" crc="43116eb6" sha1="45c6ce35bdbe117d9a9039f29c9eb9ee0d038c99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1508,6 +1629,17 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="gridbugs" supported="yes">
+		<description>Grid Bugs</description>
+		<year>1984</year>
+		<publisher>M.C.W.</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="17787">
+				<rom name="grid bugs.mzt" size="17787" crc="dd91f59f" sha1="8bb7e0a0744ea2cdc8d94da508ebbb8574c281e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="guerre" supported="no">
 		<description>Guerre Spatiale (France)</description>
 		<year>19??</year>
@@ -1520,6 +1652,17 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="gunman" supported="yes">
+		<description>Gunman</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="24220">
+				<rom name="gunman.mzt" size="24220" crc="20cb2559" sha1="77409198d73de5057aab644fd6322331597d68a5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hdcorgel">
 		<description>HDC Orgel</description>
 		<year>19??</year>
@@ -1527,6 +1670,17 @@ Easidata (English Version)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="1921">
 				<rom name="hdc_orgel.mzf" size="1921" crc="ec2146af" sha1="1d0f337604d97197bb068c9c0f400232a3d6b6a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="headdriv" supported="yes">
+		<description>Head Driver</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="18829">
+				<rom name="head driver.mzf" size="18829" crc="2707f55e" sha1="49ff22ee35f614484e7acd26085cf3ed3d349a40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1841,6 +1995,17 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="metrcrss" supported="yes">
+		<description>Metro-cross</description>
+		<year>1985</year>
+		<publisher>Namco</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="27278">
+				<rom name="metro-cross.mzt" size="27278" crc="73ca09c8" sha1="1df82f4819e1569fc122315794396220645dd7e8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="missiona" supported="no">
 		<description>Mission A</description>
 		<year>19??</year>
@@ -1901,13 +2066,25 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="moty">
+	<!-- Requires PCG to display correctly -->
+	<software name="moty" supported="partial">
 		<description>Moty</description>
 		<year>1985</year>
 		<publisher>BBG Software</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47695">
 				<rom name="moty.mzf" size="47695" crc="73567390" sha1="d5c350a672e91a73bf97ddaadaa994109dab32d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrfixit" supported="yes">
+		<description>Mr Fixit</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="38124">
+				<rom name="mr fixit.mzt" size="38124" crc="83a56cb6" sha1="d04663bd37f60763e8619886f52299934b7576a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1966,7 +2143,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="nakamoto">
+	<!-- Requires PCG to display correctly -->
+	<software name="nakamoto" supported="partial">
 		<description>Nakamoto</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1977,7 +2155,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="nibbler">
+	<software name="nibbler" supported="no">
 		<description>Nibbler</description>
 		<year>1984</year>
 		<publisher>BBG Software</publisher>
@@ -2255,6 +2433,17 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="sideroll" supported="yes">
+		<description>Side Roll</description>
+		<year>1988</year>
+		<publisher>K. Furuhata</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="44672">
+				<rom name="sideroll.mzt" size="44672" crc="6556de5a" sha1="10480946bf41673f71ba9ce39cd270031c065bfb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skychaos">
 		<description>Sky Chaos</description>
 		<year>19??</year>
@@ -2332,6 +2521,17 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<software name="spceharr" supported="yes">
+		<description>Space Harrier</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="43520">
+				<rom name="space harrier.mzt" size="43520" crc="143a5c27" sha1="50cc8375b0c9c5dd979e81d1302dc5afb797f910"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="squash">
 		<description>Squash (Germany)</description>
 		<year>19??</year>
@@ -2400,6 +2600,28 @@ Easidata (English Version)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="11283">
 				<rom name="super biorhythm.mzf" size="11283" crc="3f984659" sha1="71a1ba7768144cf5f0824d2176a8e78e91623980"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sgorgon" supported="yes">
+		<description>Super Gorgon</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="27265">
+				<rom name="sgorgon.mzf" size="27265" crc="0472bb8f" sha1="21b6af761b00ab01dd7fe3f05a62747108e94029"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starkill" supported="yes">
+		<description>Star Killer</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="20097">
+				<rom name="star killer.mzt" size="20097" crc="e0a4ae3c" sha1="058e86bc2691447536c3be0370062ea335569363"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2481,6 +2703,17 @@ Easidata (English Version)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="22349">
 				<rom name="telefontarieven.mzf" size="22349" crc="511086d7" sha1="38a6f069830f825af07463e0b1434e20e6940c28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris" supported="yes">
+		<description>Tetris!</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="17013">
+				<rom name="tetris.mzt" size="17013" crc="e0a4ae3c" sha1="2bc76126f45b44ee70d6f809e76adf4fcc0b3fa7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2606,7 +2839,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="wooky">
+	<!-- Requires PCG to display correctly -->
+	<software name="wooky" supported="partial">
 		<description>Wooky</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>

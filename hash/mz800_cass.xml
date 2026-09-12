@@ -27,13 +27,86 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="breakout" supported="no">
+	<software name="appleman" supported="yes">
+		<description>Appleman</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="20749">
+				<rom name="appleman.mzt" size="20749" crc="a10f4777" sha1="87edaf080ceffb3d5316bd83361fe95d2a8ae87b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid" supported="yes">
+		<description>Arkanoids</description>
+		<year>1988</year>
+		<publisher>AT-Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="8778">
+				<rom name="arkanoids - part 1.mzf" size="8778" crc="10c33188" sha1="cc91990928da2271fc278e671d336b4a686facc2"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="43843">
+				<rom name="arkanoids - part 2.mzf" size="43843" crc="2ee2b887" sha1="3d0e1f050d1d9aacbd60b3220495004daf0bca30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash" supported="yes">
+		<description>Boulder Dash</description>
+		<year>1989</year>
+		<publisher>Jozef Jendruch</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="20832">
+				<rom name="boulder dash.mzf" size="20832" crc="de9384fd" sha1="182fd35cdef077bc5489ae1eb216ffc59fae83e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout" supported="yes">
 		<description>Break out-800</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="6786">
 				<rom name="break out-800.mzf" size="6786" crc="bc569aa0" sha1="2dac626d921e7be058c8db0bc17e6594213ec72d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="building" supported="yes">
+		<description>Building Hopper</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="42368">
+				<rom name="building.mzf" size="42368" crc="fa79fff0" sha1="4d3c845519f3acf2f062da0888d564e468453408"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="colossus" supported="yes">
+		<description>Colossus Chess</description>
+		<year>1986</year>
+		<publisher>M. Bryant</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="36992">
+				<rom name="colossus.mzt" size="36992" crc="3c1daef1" sha1="b39d487210fcf57edccf6bf81d9fb4cc9f8ef857"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crzyclmb" supported="yes">
+		<description>Hell Diver Crazy Climber</description>
+		<year>19??</year>
+		<publisher>A.Y.A. Production</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="24705">
+				<rom name="crazy climber.mzt" size="24705" crc="7523c693" sha1="528e9a68d8180fe304e22c6d1a055103050a6008"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,6 +123,50 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
+	<software name="dispecer" supported="yes">
+		<description>Dispecer</description>
+		<year>19??</year>
+		<publisher>Phoenix</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="32237">
+				<rom name="dispecer.mzt" size="32237" crc="f4487c7e" sha1="a3dda35f8cb7d26048024eefe952ba8e3b2e287f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantgrov" supported="yes">
+		<description>Fantastic Grove</description>
+		<year>1984</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="24134">
+				<rom name="fantastic grove.mzf" size="24134" crc="e71e6fe8" sha1="994907ef0b5178cd7bb396a61864143717645bc7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galao" supported="yes">
+		<description>Galao</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="20177">
+				<rom name="galao.mzt" size="20177" crc="fad2a016" sha1="d3e334f7155fbe031a859128bd3b7fb3d08f92a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaoa" cloneof="galao" supported="yes">
+		<description>Galao (joystick version)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="20177">
+				<rom name="galao joy.mzt" size="20177" crc="85bedb36" sha1="ee6c57736274aadb56d97b371901e360c5601956"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gps2" supported="no">
 		<description>Grand Prix Simulator 2</description>
 		<year>19??</year>
@@ -57,6 +174,17 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="48256">
 				<rom name="g.p.s. program.mzf" size="48256" crc="16bba2ba" sha1="7b4394bc88a1f0d37ddcb0951addfdca7f683b90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grndattk" supported="yes">
+		<description>Ground Attack</description>
+		<year>1982</year>
+		<publisher>Silversoft</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="7120">
+				<rom name="ground attack.mzf" size="7120" crc="2b9d66b1" sha1="f4e230be4382fb48dc8d3a5e2fa1fca2b844c0cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -72,7 +200,18 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="james" supported="no">
+	<software name="express" supported="yes">
+		<description>ITA Express</description>
+		<year>1991</year>
+		<publisher>Pro Sharp Upravil Datelsoft</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="15745">
+				<rom name="express.mzf" size="15745" crc="569fe265" sha1="d006d0e33bd329a83aceeba87d31ddaf4d4222bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="james" supported="yes">
 		<description>James v1.0c (Cz)</description>
 		<year>19??</year>
 		<publisher>Pilsoft</publisher>
@@ -83,11 +222,34 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
+	<software name="madman" supported="yes">
+		<description>Madman</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="19840">
+				<rom name="madman.mzf" size="19840" crc="f3d02a4b" sha1="20a6afa8b963ed1d94e27610682ca3020ce93df7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moty" supported="yes">
+		<description>Moty</description>
+		<year>1985</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="47695">
+				<rom name="moty.mzf" size="47695" crc="73567390" sha1="d5c350a672e91a73bf97ddaadaa994109dab32d6"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Cassette contains both an MZ-700 and an MZ-800 version. Proper tagging pending. -->
-	<software name="mucmac">
+	<software name="mucmac" supported="yes">
 		<description>Muc Mac</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>
+
 <!--
         <part name="cass1" interface="mz_cass">
             <dataarea name="cass" size="16585">
@@ -98,6 +260,60 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="20896">
 				<rom name="mucmac8oo.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nakamoto" supported="yes">
+		<description>Nakamoto</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="32384">
+				<rom name="nakamoto.mzf" size="32384" crc="c0c8f731" sha1="8dd0ff1c73b71394a93b09cec7805008478e2fe0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- NOT a clone of Nakamoto - distinct set of levels -->
+	<software name="nakmoto2" supported="yes">
+		<description>Nakamoto 2</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="32384">
+				<rom name="nakamoto 2.mzf" size="32384" crc="2359b276" sha1="76f8cbf64e3a3410a016105515012226727e61f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- NOT a clone of Nakamoto - distinct set of levels -->
+	<software name="nakmoto3" supported="yes">
+		<description>Nakamoto 3</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="32129">
+				<rom name="nakamoto 3.mzt" size="32129" crc="3f42dc21" sha1="c7cee574cd8c3ae13fe0112328863ec164d632cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibbler" supported="yes">
+		<description>Nibbler</description>
+		<year>1984</year>
+		<publisher>BBG Software</publisher>
+		<info name="usage" value="Load Part 1 first, then load Part 2"/>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="13873">
+				<rom name="nibbler_part1.mzt" size="13873" crc="bf7e0fb7" sha1="662e14af4ec688624b3a544611cffd47592bfdff"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="13606">
+				<rom name="nibbler_part2.mzt" size="13606" crc="340c75fd" sha1="779820584b064588151d5708abcff852b2e01a11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,13 +334,46 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="pcgrally" supported="no">
+	<software name="pcgrally" supported="yes">
 		<description>PCG Rally</description>
 		<year>1983</year>
 		<publisher>Namco/HAL Laboratory</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="11856">
 				<rom name="pcgrally.mzf" size="11856" crc="cbdc2558" sha1="711aea4d33feab497c2f6888489fc31d504719e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penguin" supported="yes">
+		<description>Penguin</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="13697">
+				<rom name="penguin.mzt" size="13697" crc="a2b50de3" sha1="571d5d626b97aec039766c422e4256e6579fef8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penguin2" supported="yes">
+		<description>Penguin 2</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="20742">
+				<rom name="penguin 2.mzt" size="20742" crc="d4038869" sha1="425c04e5af4994fb2bc7bc56e39516f92d86f9d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball" supported="yes">
+		<description>Pinball</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="24856">
+				<rom name="pinball.mzt" size="24856" crc="ddac61c9" sha1="90976ddbdec6759f42db791f14484dcd112bac70"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,6 +400,35 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
+	<software name="wooky" supported="yes">
+		<description>Wooky</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Wooky"/>
+			<dataarea name="cass" size="7529">
+				<rom name="wookya.mzf" size="7529" crc="a18ba08d" sha1="9056c1b2200f86a3a08c1e18df977243883b539e"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Wooky II"/>
+			<dataarea name="cass" size="47744">
+				<rom name="wookyb.mzf" size="47744" crc="55e002c8" sha1="2c0c8cff60ac4c8c89f613523cb3ab22eac8a13a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon" supported="yes">
+		<description>Zaxxon</description>
+		<year>1988</year>
+		<publisher>Shakami Software</publisher>
+		<part name="cass" interface="mz_cass">
+			<dataarea name="cass" size="41333">
+				<rom name="zaxxon.mzt" size="41333" crc="0df8416d" sha1="4fed76bd76d95d0071851dc840dd64529857f46b"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- MZ-821 SHARP Basic Trainer (Germany) -->
 
 	<software name="egg" supported="no">
@@ -170,7 +448,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="adrsdata" supported="no">
+	<software name="adrsdata" supported="yes">
 		<description>Adress Data</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>
