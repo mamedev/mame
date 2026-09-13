@@ -169,6 +169,10 @@
 		// scale (optional): Multiply the internal size of this render target by this amount. Certain effects benefit from operating at a higher internal resolution. If you're not sure, omit it.
 		// values: Any integer value
 		// default: 1
+		//
+		// format (optional): The pixel format of this render target. Floating-point formats let a pass store arbitrary numbers (positions, indices) for later passes to read. If you're not sure, omit it.
+		// values: "bgra8", "rgba8", "rgba16f", "rgba32f"
+		// default: "bgra8"
 		{
 			"name": "ntsc",
 			"mode": "guest",

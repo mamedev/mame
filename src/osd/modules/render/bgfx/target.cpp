@@ -10,6 +10,8 @@
 
 #include "target.h"
 
+#include "modules/lib/osdobj_common.h"
+
 bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint16_t xprescale, uint16_t yprescale,
 	uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen)
 	: m_name(name)
@@ -37,6 +39,12 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 		uint32_t wrap_mode = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 		uint32_t filter_mode = filter ? (BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC) : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
 		uint32_t depth_flags = wrap_mode | (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+
+		// chains may ask for formats the backend cannot render to (e.g. floating-point on older hardware)
+		if (!bgfx::isTextureValid(0, false, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT))
+		{
+			osd_printf_warning("BGFX: Render target '%s' uses a texture format this backend cannot render to; the chain will not work correctly\n", m_name);
+		}
 
 		m_textures = new bgfx::TextureHandle[m_page_count * 2];
 		m_targets = new bgfx::FrameBufferHandle[m_page_count];
