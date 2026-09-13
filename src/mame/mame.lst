@@ -40652,6 +40652,7 @@ xy168
 
 @source:seequa/chameleon.cpp
 chameleon
+champroto
 
 @source:sega/angelkds.cpp
 angelkds
