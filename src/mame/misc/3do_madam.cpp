@@ -1739,11 +1739,12 @@ u32 madam_device::convert_8bpp_alt_multiply(u32 src_data, u8 alt_multiply)
 	s16 g = (src_data & 0x03e0) >> 5;
 	s16 b = (src_data & 0x001f) >> 0;
 
+	const u8 pmv = m_cel.pixc_ms[p_mode] == 0 ? m_cel.pixc_mf[p_mode] : alt_multiply;
 	const u8 pdv = m_cel.pixc_1s[p_mode] ? m_cel.pixc_2d[p_mode] : m_cel.pixc_df[p_mode];
 
-	r = std::min((r * (alt_multiply + m_cel.pixc_mf[p_mode])) >> pdv, 0x1f);
-	g = std::min((g * (alt_multiply + m_cel.pixc_mf[p_mode])) >> pdv, 0x1f);
-	b = std::min((b * (alt_multiply + m_cel.pixc_mf[p_mode])) >> pdv, 0x1f);
+	r = std::min((r * pmv) >> pdv, 0x1f);
+	g = std::min((g * pmv) >> pdv, 0x1f);
+	b = std::min((b * pmv) >> pdv, 0x1f);
 
 	return (p_mode << 15) | (r << 10) | (g << 5) | b;
 }

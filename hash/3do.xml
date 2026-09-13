@@ -56,7 +56,8 @@ Not extensively tested
 		<notes><![CDATA[
 [Madam] Mermaid Mode: minor RMW glitches, stage select is offset in some places (check skipx)
 ]]></notes>
-		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo -->
+		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo, -->
+		<!-- pressing play/pause between game 3do logo and now loading will pause with no feedback -->
 		<info name="alt_title" value="アクア・ワールド ～海美物語～"/>
 		<info name="barcode" value="T4984824055261"/>
 		<info name="release" value="19951013"/>
