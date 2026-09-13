@@ -33,6 +33,10 @@ public:
 	// is a menuing system active?  we want to disable certain keyboard/mouse inputs under such context
 	virtual bool is_menu_active() { return false; }
 
+	// is the UI taking input the emulated system would otherwise see?  true while a menu or
+	// startup screen is displayed, or while the key that opens the menu is down
+	virtual bool is_capturing_input() { return is_menu_active(); }
+
 	virtual void popup_time_string(int seconds, std::string message) { }
 
 	virtual void menu_reset() { }

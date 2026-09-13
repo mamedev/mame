@@ -205,6 +205,7 @@ public:
 	bool show_menu();
 	bool show_menu(render_target &target);
 	virtual bool is_menu_active() override;
+	virtual bool is_capturing_input() override;
 	bool can_paste();
 	void image_handler_ingame();
 	void request_quit();
