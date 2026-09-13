@@ -79,16 +79,21 @@ void t6b79_device::advance_y()
 
 uint32_t t6b79_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_display_on && !m_stb) {
-        for (int x = 0; x < m_height; x++) {
-            uint8_t src_x = (x + m_zpos) % m_height;
-            for (int y = 0; y < (m_width >> 3); y++) {
-                uint8_t data = m_lcd_ram[src_x*8 + y];
-                for (int b = 0; b < 8; b++)
-                    bitmap.pix(x, y*8 + b) = BIT(data, 7 - b);
-            }
-        }
-	} else {
+	if (m_display_on && !m_stb)
+	{
+		for (int x = 0; x < m_height; x++)
+		{
+			uint8_t src_x = (x + m_zpos) % m_height;
+			for (int y = 0; y < (m_width >> 3); y++)
+			{
+				uint8_t data = m_lcd_ram[src_x * 8 + y];
+				for (int b = 0; b < 8; b++)
+					bitmap.pix(x, y * 8 + b) = BIT(data, 7 - b);
+			}
+		}
+	}
+	else
+	{
 		bitmap.fill(0, cliprect);
 	}
 
@@ -97,45 +102,44 @@ uint32_t t6b79_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void t6b79_device::control_write(uint8_t data)
 {
-    
-	if ((data & 0xc0) == 0xc0) // SCE (set contrast)
+	if (BIT(data, 6, 2) == 3) // SCE (set contrast)
 	{
 		m_contrast = data & 0x3f;
 	}
-	else if ((data & 0xc0) == 0x80) // SXE (set x address)
+	else if (BIT(data, 6, 2) == 2) // SXE (set x address)
 	{
 		m_xpos = data & 0x3f;
 	}
-	else if ((data & 0xc0) == 0x40) // SZE (set z address)
+	else if (BIT(data, 6, 2) == 1) // SZE (set z address)
 	{
 		m_zpos = data & 0x3f;
 	}
-	else if ((data & 0xe0) == 0x20) // SYE (set y address)
+	else if (BIT(data, 5, 3) == 1) // SYE (set y address)
 	{
 		m_ypos = data & 0x0f;
 	}
-	else if ((data & 0xf8) == 0x18) // CHE (test mode)
+	else if (BIT(data, 3, 5) == 3) // CHE (test mode)
 	{
 		//???
 	}
-	else if ((data & 0xf8) == 0x10) // OPA2 (op-amp control 2)
+	else if (BIT(data, 3, 5) == 2) // OPA2 (op-amp control 2)
 	{
 		m_opa2 = data & 3;
 	}
-	else if ((data & 0xf8) == 0x08) // OPA1 (op-amp control 1)
+	else if (BIT(data, 3, 5) == 1) // OPA1 (op-amp control 1)
 	{
 		m_opa1 = data & 3;
 	}
-	else if ((data & 0xfc) == 0x04) // UDE (up/down mode)
+	else if (BIT(data, 2, 6) == 1) // UDE (up/down mode)
 	{
 		m_active_counter = (data & 0x02) >> 1;
 		m_direction = (data & 0x01) ? 1 : -1;
 	}
-	else if ((data & 0xfe) == 0x02) // DPE (display on/off)
+	else if (BIT(data, 1, 7) == 1) // DPE (display on/off)
 	{
 		m_display_on = data & 1;
 	}
-	else if ((data & 0xfe) == 0x00) // 86E (word length)
+	else if (BIT(data, 1, 7) == 0) // 86E (word length)
 	{
 		m_word_len = data & 1;
 	}
@@ -148,16 +152,23 @@ uint8_t t6b79_device::control_read()
 
 void t6b79_device::data_write(uint8_t data)
 {
-	if (m_xpos > 47 || m_ypos > 10 || (m_word_len && m_ypos > 7)) {
-	} else if (m_word_len) {
-        m_lcd_ram[m_xpos * 8 + m_ypos] = data;
-	} else {
-		uint8_t &slot = m_lcd_ram[m_xpos*8 + m_ypos];
-        
-        if (m_ypos != 10)
-            slot = (slot & 0xc0) | (data & 0x3f);
-        else
-            slot = (slot & 0xc3) | (data & 0x3c);
+	if (m_xpos > 47 || m_ypos > 10 || (m_word_len && m_ypos > 7))
+	{
+		advance_y();
+		return;
+	}
+	else if (m_word_len)
+	{
+		m_lcd_ram[m_xpos * 8 + m_ypos] = data;
+	}
+	else
+	{
+		uint8_t &slot = m_lcd_ram[m_xpos * 8 + m_ypos];
+		
+		if (m_ypos != 10)
+			slot = (slot & 0xc0) | (data & 0x3f);
+		else
+			slot = (slot & 0xc3) | (data & 0x3c);
 	}
 
 	advance_y();

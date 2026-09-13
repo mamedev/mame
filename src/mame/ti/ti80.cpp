@@ -13,6 +13,9 @@
 #include "cpu/t6m53/t6m53.h"
 #include "video/t6b79.h"
 
+
+namespace {
+
 class ti80_state : public driver_device
 {
 public:
@@ -20,8 +23,7 @@ public:
 		: driver_device(mconfig, type, tag), 
           m_maincpu(*this, "maincpu"),
           m_link_port(*this, "linkport"),
-          m_btn_cols(*this, "COL%u", 0U), 
-          m_on_button(*this, "ON")
+          m_btn_cols(*this, "COL%u", 0U)
 	{
 	}
 
@@ -31,15 +33,13 @@ private:
 	required_device<t6m53_device> m_maincpu;
     required_device<ti8x_link_port_device> m_link_port;
 	required_ioport_array<7> m_btn_cols;
-	required_ioport m_on_button;
     
-    void ti80_mem(address_map &map);
-    uint8_t ti80_btns_r(offs_t cols);
-    uint8_t ti80_on_r();
-    void ti80_palette(palette_device &palette) const;
+    void mem(address_map &map);
+    uint8_t btns_r(offs_t cols);
+    void palette(palette_device &palette) const;
 };
 
-void ti80_state::ti80_mem(address_map &map)
+void ti80_state::mem(address_map &map)
 {
     map(0x0000, 0x3FFD).rom();
     map(0x3FFE, 0x3FFE).rw("t6b79", FUNC(t6b79_device::control_read), FUNC(t6b79_device::control_write));
@@ -111,23 +111,18 @@ static INPUT_PORTS_START (ti80)
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/OFF") PORT_CODE(KEYCODE_Q)
 INPUT_PORTS_END
 
-uint8_t ti80_state::ti80_btns_r(offs_t cols)
+uint8_t ti80_state::btns_r(offs_t cols)
 {
     uint8_t data = 0;
     for (int col = 0; col < 7; col++)
-        if (cols & (1 << col))
+        if (BIT(cols, col))
             for (int row = 0; row < 8; row++)
                 data |= BIT(m_btn_cols[col]->read(), row) ? (1 << row) : 0;
 
     return data;
 }
 
-uint8_t ti80_state::ti80_on_r()
-{
-    return m_on_button->read();
-}
-
-void ti80_state::ti80_palette(palette_device &palette) const
+void ti80_state::palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(160, 190, 170));
 	palette.set_pen_color(1, rgb_t(83, 111, 138));
@@ -136,9 +131,9 @@ void ti80_state::ti80_palette(palette_device &palette) const
 void ti80_state::ti80(machine_config &config)
 {
     T6M53(config, m_maincpu, 1'960'000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ti80_state::ti80_mem);
-    m_maincpu->btn_rows().set(FUNC(ti80_state::ti80_btns_r));
-    m_maincpu->on_btn().set(FUNC(ti80_state::ti80_on_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti80_state::mem);
+    m_maincpu->btn_rows().set(FUNC(ti80_state::btns_r));
+    m_maincpu->on_btn().set_ioport("ON");
   
 	screen_device &screen(SCREEN(config, "screen").set_lcd());
     screen.set_refresh_hz(60);
@@ -149,7 +144,7 @@ void ti80_state::ti80(machine_config &config)
 	screen.set_screen_update("t6b79", FUNC(t6b79_device::screen_update));
     m_maincpu->lcd_stb().set("t6b79", FUNC(t6b79_device::stb_write));
     
-	PALETTE(config, "palette", FUNC(ti80_state::ti80_palette), 2, 2);
+	PALETTE(config, "palette", FUNC(ti80_state::palette), 2, 2);
 	screen.set_palette("palette"); 
 
     // The link port is only present on viewscreen TI-80s, which have the exact same ROMs as a regular TI-80.
@@ -159,6 +154,8 @@ void ti80_state::ti80(machine_config &config)
     m_maincpu->ring_in().set(m_link_port, FUNC(ti8x_link_port_device::ring_r));
     m_maincpu->tip_in().set(m_link_port, FUNC(ti8x_link_port_device::tip_r));
 }
+
+} // anonymous namespace
 
 ROM_START (ti80)
     ROM_REGION( 0x10000, "maincpu", 0)
