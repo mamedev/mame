@@ -503,6 +503,7 @@ void v25_common_device::nec_bankswitch(unsigned bank_num)
 {
 	int tmp = CompressFlags();
 
+	m_rep_params = 0;
 	m_TF = m_IF = 0;
 	m_MF = m_mode_state;
 
