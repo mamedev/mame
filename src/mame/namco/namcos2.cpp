@@ -2163,6 +2163,10 @@ ROM_START( assault )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "atvoi1.bin",  0x000000, 0x080000, CRC(d36a649e) SHA1(30173f32c6ec9dda6b8946baa14266e828b0324e) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* ASSAULT (JAPAN) */
@@ -2214,6 +2218,10 @@ ROM_START( assaultj )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "atvoi1.bin",  0x000000, 0x080000, CRC(d36a649e) SHA1(30173f32c6ec9dda6b8946baa14266e828b0324e) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* ASSAULT PLUS (NAMCO) */
@@ -2265,6 +2273,10 @@ ROM_START( assaultp )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "atvoi1.bin",  0x000000, 0x080000, CRC(d36a649e) SHA1(30173f32c6ec9dda6b8946baa14266e828b0324e) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* BURNING FORCE */
@@ -2315,6 +2327,10 @@ ROM_START( burnforc )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "bu_voi-1.bin",  0x000000, 0x080000, CRC(99d8a239) SHA1(1ebc586048e757ac0ac68dc9cc171f4849e67cef) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 ROM_START( burnforco )
@@ -2364,6 +2380,10 @@ ROM_START( burnforco )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "bu_voi-1.bin",  0x000000, 0x080000, CRC(99d8a239) SHA1(1ebc586048e757ac0ac68dc9cc171f4849e67cef) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* COSMO GANG THE VIDEO (USA) */
@@ -2408,7 +2428,7 @@ ROM_START( cosmogng )
 	ROM_LOAD16_BYTE( "co2voi1.bin",  0x000000, 0x080000, CRC(5a301349) SHA1(e333ea5955a66ac8d7c94cd50047efaf6fa95b15) )
 	ROM_LOAD16_BYTE( "co2voi2.bin",  0x100000, 0x080000, CRC(a27cb45a) SHA1(08ccaaf43369e8358e31b213877829bdfd61479e) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -2454,7 +2474,7 @@ ROM_START( cosmogngj )
 	ROM_LOAD16_BYTE( "co1voi1.bin",  0x000000, 0x080000, CRC(b5ba8f15) SHA1(9e54b9ba1cd44353782adf337376dff9eec4e937) )
 	ROM_LOAD16_BYTE( "co1voi2.bin",  0x100000, 0x080000, CRC(b566b105) SHA1(b5530b0f3dea0135f28419044aee923d855f382c) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -2508,6 +2528,10 @@ ROM_START( dirtfoxj )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "nvram",  0x000000, 0x2000, CRC(4b9f7b06) SHA1(384496d2d80a48d31084dc316ebae3a5c1aa1ab9) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* DRAGON SABER */
@@ -2555,6 +2579,10 @@ ROM_START( dsaber )
 	ROM_LOAD( "pal16l8a.4g", 0x0000, 0x0104, CRC(660e1655) SHA1(ffb43238c5ffa3fa831975bc3cde72334c4c2540) )
 	ROM_LOAD( "pal16l8a.5f", 0x0200, 0x0104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) )
 	ROM_LOAD( "pal12l10.8d", 0x0400, 0x0040, CRC(e2379249) SHA1(ad4cdf2e0fd1304a135022eeafa2f61c5f5789cd) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 
@@ -2603,6 +2631,10 @@ ROM_START( dsabera )
 	ROM_LOAD( "pal16l8a.4g", 0x0000, 0x0104, CRC(660e1655) SHA1(ffb43238c5ffa3fa831975bc3cde72334c4c2540) )
 	ROM_LOAD( "pal16l8a.5f", 0x0200, 0x0104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) )
 	ROM_LOAD( "pal12l10.8d", 0x0400, 0x0040, CRC(e2379249) SHA1(ad4cdf2e0fd1304a135022eeafa2f61c5f5789cd) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* DRAGON SABER (JAPAN) */
@@ -2650,6 +2682,10 @@ ROM_START( dsaberj )
 	ROM_LOAD( "pal16l8a.4g", 0x0000, 0x0104, CRC(660e1655) SHA1(ffb43238c5ffa3fa831975bc3cde72334c4c2540) )
 	ROM_LOAD( "pal16l8a.5f", 0x0200, 0x0104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) )
 	ROM_LOAD( "pal12l10.8d", 0x0400, 0x0040, CRC(e2379249) SHA1(ad4cdf2e0fd1304a135022eeafa2f61c5f5789cd) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP (REV E) */
@@ -2695,6 +2731,10 @@ ROM_START( finallap )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v1",  0x000000, CRC(86b21996) SHA1(833ffde729199c81e472fb88ed5b7f4ce08a83d6) )
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v2",  0x100000, CRC(6a164647) SHA1(3162457beccccdb416994ebd32fb83b13eb719e0) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP (revision D) */
@@ -2740,6 +2780,10 @@ ROM_START( finallapd )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v1",  0x000000, CRC(86b21996) SHA1(833ffde729199c81e472fb88ed5b7f4ce08a83d6) )
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v2",  0x100000, CRC(6a164647) SHA1(3162457beccccdb416994ebd32fb83b13eb719e0) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP (revision C) */
@@ -2785,6 +2829,10 @@ ROM_START( finallapc )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v1",  0x000000, CRC(86b21996) SHA1(833ffde729199c81e472fb88ed5b7f4ce08a83d6) )
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v2",  0x100000, CRC(6a164647) SHA1(3162457beccccdb416994ebd32fb83b13eb719e0) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP (Rev C - Japan) */
@@ -2830,6 +2878,10 @@ ROM_START( finallapjc )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v1",  0x000000, CRC(86b21996) SHA1(833ffde729199c81e472fb88ed5b7f4ce08a83d6) )
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v2",  0x100000, CRC(6a164647) SHA1(3162457beccccdb416994ebd32fb83b13eb719e0) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP  (REV B - JAPAN) */
@@ -2875,6 +2927,10 @@ ROM_START( finallapjb )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v1",  0x000000, CRC(86b21996) SHA1(833ffde729199c81e472fb88ed5b7f4ce08a83d6) )
 	NAMCOS2_DATA_LOAD_E_128K( "fl1-v2",  0x100000, CRC(6a164647) SHA1(3162457beccccdb416994ebd32fb83b13eb719e0) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 ROM_START( finalap2 )
@@ -2928,6 +2984,10 @@ ROM_START( finalap2 )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap2.nv",  0x000000, 0x2000, CRC(c7ae5d0a) SHA1(9527e44accec0ec9d1990138d1b0bfc71957cc8a) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP 2 (Japan) */
@@ -2982,6 +3042,10 @@ ROM_START( finalap2j )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap2.nv",  0x000000, 0x2000, CRC(c7ae5d0a) SHA1(9527e44accec0ec9d1990138d1b0bfc71957cc8a) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP 2 (Japan, rev B) */
@@ -3036,6 +3100,10 @@ ROM_START( finalap2jb )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap2.nv",  0x000000, 0x2000, CRC(c7ae5d0a) SHA1(9527e44accec0ec9d1990138d1b0bfc71957cc8a) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* FINAL LAP 3 WORLD (REV. C) */
@@ -3088,7 +3156,7 @@ ROM_START( finalap3 ) // this set displays MOTION (Ver. 3) in the test mode menu
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
@@ -3146,7 +3214,7 @@ ROM_START( finalap3a )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x20000, "unknown", 0 ) /* unknown rom */
@@ -3154,6 +3222,7 @@ ROM_START( finalap3a )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
+
 ROM_END
 
 
@@ -3207,7 +3276,7 @@ ROM_START( finalap3j )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
@@ -3264,7 +3333,7 @@ ROM_START( finalap3jc )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
@@ -3320,7 +3389,7 @@ ROM_START( finalap3bl ) // bootleg set
 	ROM_LOAD16_BYTE( "fltvoi1",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "fltvoi2",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration and machine ID code that passes protection */
@@ -3376,6 +3445,10 @@ ROM_START( finehour )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "fh1_vo1.bin",  0x000000, 0x080000, CRC(07560fc7) SHA1(76f3855f5a4567dc65d513e37072072c2a011e7e) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /*
@@ -3596,6 +3669,10 @@ ROM_START( fourtrax )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "fx_voi-1.3m", 0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 ROM_START( fourtraxj )
@@ -3655,6 +3732,10 @@ ROM_START( fourtraxj )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "fx_voi-1.3m", 0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* This is a strange set, it's based on the fx2 set, but with one of the 68k pair modified (21 bytes changed) and a unique GFX ROM
@@ -3725,6 +3806,10 @@ ROM_START( fourtraxa )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "fx_voi-1.3m", 0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* MARVEL LAND (JAPAN) */
@@ -3771,6 +3856,10 @@ ROM_START( marvland )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "mv1-voi1.bin",  0x000000, 0x080000, CRC(de5cac09) SHA1(2d73e54c4f159e52db2c403a59d6c137cce6f53e) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* MARVEL LAND (USA) */
@@ -3819,6 +3908,10 @@ ROM_START( marvlandup )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "mv1-voi1.bin",  0x000000, 0x080000, BAD_DUMP CRC(de5cac09) SHA1(2d73e54c4f159e52db2c403a59d6c137cce6f53e) ) // either undumped, or PCB was wrongly populated with JP samples ROM?
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* METAL HAWK */
@@ -3877,7 +3970,7 @@ ROM_START( metlhawk )
 	ROM_LOAD16_BYTE( "mhvoi-1.bin",  0x000000, 0x080000, CRC(2723d137) SHA1(f67334f8e456ae9e6aee39f0cf5e73449838f37f) )
 	ROM_LOAD16_BYTE( "mhvoi-2.bin",  0x100000, 0x080000, CRC(dbc92d91) SHA1(a8c50f607d5283c8bd9688d2149b811e7ddb77dd) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "mh5762.7p",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x0500, "plds", 0 )
@@ -3945,7 +4038,7 @@ ROM_START( metlhawkj )
 	ROM_LOAD16_BYTE( "mhvoi-1.bin",  0x000000, 0x080000, CRC(2723d137) SHA1(f67334f8e456ae9e6aee39f0cf5e73449838f37f) )
 	ROM_LOAD16_BYTE( "mhvoi-2.bin",  0x100000, 0x080000, CRC(dbc92d91) SHA1(a8c50f607d5283c8bd9688d2149b811e7ddb77dd) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "mh5762.7p",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x0500, "plds", 0 )
@@ -4007,6 +4100,10 @@ ROM_START( mirninja )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "mn_voi1.bin",  0x000000, 0x080000, CRC(2ca3573c) SHA1(b2af101730de4ccc68acc1ed143c21a8c81f64db) )
 	ROM_LOAD16_BYTE( "mn_voi2.bin",  0x100000, 0x080000, CRC(466c3b47) SHA1(9c282ffda8b0620ae60789c81c6e36c086a9a335) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 ROM_START( mirninjaa )
@@ -4058,6 +4155,10 @@ ROM_START( mirninjaa )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "mn_voi1.bin",  0x000000, 0x080000, CRC(2ca3573c) SHA1(b2af101730de4ccc68acc1ed143c21a8c81f64db) )
 	ROM_LOAD16_BYTE( "mn_voi2.bin",  0x100000, 0x080000, CRC(466c3b47) SHA1(9c282ffda8b0620ae60789c81c6e36c086a9a335) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* ORDYNE */
@@ -4112,7 +4213,7 @@ ROM_START( ordyne )
 	ROM_LOAD16_BYTE( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD16_BYTE( "or_voi2.voice2",  0x100000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -4168,7 +4269,7 @@ ROM_START( ordyneje )
 	ROM_LOAD16_BYTE( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD16_BYTE( "or_voi2.voice2",  0x100000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -4224,7 +4325,7 @@ ROM_START( ordynej )
 	ROM_LOAD16_BYTE( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD16_BYTE( "or_voi2.voice2",  0x100000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
 
-	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -4281,6 +4382,10 @@ ROM_START( phelios )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "ps_voi-1.voice1",  0x000000, 0x080000, CRC(f67376ed) SHA1(b54257aad34c6ad03d5b040e6a5dda94a48b6780) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* PHELIOS (Japan) */
@@ -4336,6 +4441,10 @@ ROM_START( pheliosj )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "ps_voi-1.voice1",  0x000000, 0x080000, CRC(f67376ed) SHA1(b54257aad34c6ad03d5b040e6a5dda94a48b6780) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* ROLLING THUNDER 2 */
@@ -4379,6 +4488,10 @@ ROM_START( rthun2 )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "rts_voi1.3m",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
 	ROM_LOAD16_BYTE( "rts_voi2.3l",  0x100000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* ROLLING THUNDER 2 (Japan) */
@@ -4422,6 +4535,10 @@ ROM_START( rthun2j )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "rts_voi1.3m",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
 	ROM_LOAD16_BYTE( "rts_voi2.3l",  0x100000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	/* stuff below isn't used but loaded because it was on the board .. */
 	ROM_REGION( 0x0950, "plds", 0 )
@@ -4671,6 +4788,10 @@ ROM_START( sws )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "ss_voi1.bin",  0x000000, 0x080000, CRC(503e51b7) SHA1(2e159fcc9bb0bef9a3476ae233bc8d61fabbb4bd) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* SUPER WORLD STADIUM 92 */
@@ -4714,6 +4835,10 @@ ROM_START( sws92 )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "ss_voi1.bin",  0x000000, 0x080000, CRC(503e51b7) SHA1(2e159fcc9bb0bef9a3476ae233bc8d61fabbb4bd) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* SUPER WORLD STADIUM 92 */
@@ -4759,6 +4884,10 @@ ROM_START( sws92g )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "ss_voi1.bin",  0x000000, 0x080000, CRC(503e51b7) SHA1(2e159fcc9bb0bef9a3476ae233bc8d61fabbb4bd) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* SUPER WORLD STADIUM 93 */
@@ -4802,6 +4931,10 @@ ROM_START( sws93 )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "ss_voi1.bin",  0x000000, 0x080000, CRC(503e51b7) SHA1(2e159fcc9bb0bef9a3476ae233bc8d61fabbb4bd) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* SUZUKA 8 HOURS (World?) */
@@ -5057,6 +5190,10 @@ ROM_START( valkyrie )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* game doesn't auto initialize nvram properly */
 	ROM_LOAD( "valkyrie.nv",  0x000000, 0x2000, CRC(d5ce4069) SHA1(ce01ebbbd8d4e03a7b8e0fa50296d6cc1a978800) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* KYUUKAI DOUCHUUKI */
@@ -5104,6 +5241,10 @@ ROM_START( kyukaidk )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 )    /* Sound voices */
 	ROM_LOAD16_BYTE( "ky1_v1.bin", 0x000000, 0x080000, CRC(5ff81aec) SHA1(0535eda474de0a4aa3b48649b04afe2b7a8619c9) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* KYUUKAI DOUCHUUKI (OLD) */
@@ -5151,6 +5292,10 @@ ROM_START( kyukaidko )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 )    /* Sound voices */
 	ROM_LOAD16_BYTE( "ky1_v1.bin", 0x000000, 0x080000, CRC(5ff81aec) SHA1(0535eda474de0a4aa3b48649b04afe2b7a8619c9) )
+
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom lookup table */
+	// from ordyne, not dumped from this hardware
+	ROM_LOAD( "lh5762.6n", 0x00000, 0x002000, BAD_DUMP CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* GOLLY GHOST */
@@ -5189,7 +5334,7 @@ ROM_START( gollygho )
 	ROM_REGION16_BE( 0x200000, "data_rom", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* All DAT ROM sockets unpopulated on PCB */
 
-	ROM_REGION16_BE( 0x2000, "zoomlut", 0 ) /* sprite zoom */
+	ROM_REGION16_BE( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5235,7 +5380,7 @@ ROM_START( bubbletr ) /* All labels were hand written and included the rom size,
 	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) ) /* dated 4/24 */
 	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) ) /* dated 4/24 */
 
-	ROM_REGION16_BE( 0x2000, "zoomlut", 0 ) /* sprite zoom */
+	ROM_REGION16_BE( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5281,7 +5426,7 @@ ROM_START( bubbletrj )
 	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) )
 	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) )
 
-	ROM_REGION16_BE( 0x2000, "zoomlut", 0 ) /* sprite zoom */
+	ROM_REGION16_BE( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
