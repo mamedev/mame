@@ -569,6 +569,7 @@ void ppc_device::device_start()
 	m_entry = nullptr;
 	m_nocode = nullptr;
 	m_out_of_cycles = nullptr;
+	m_bus_retry = nullptr;
 	m_tlb_mismatch = nullptr;
 	m_swap_tgpr = nullptr;
 	for (auto &lsw : m_lsw)
@@ -952,6 +953,8 @@ void ppc_device::device_start()
 		static_generate_entry_point();
 		static_generate_nocode_handler();
 		static_generate_out_of_cycles();
+		if (m_drcoptions & PPCDRC_BUS_RETRY)
+			static_generate_bus_retry();
 		static_generate_tlb_mismatch();
 		// 601 has a unified cache, so code can self-modify without icbi.
 		// PPCDRC_STRICT_601_SELF_MODIFY causes the write accessors to watch for stores
@@ -1223,6 +1226,9 @@ void ppc_device::device_stop()
 
 void ppc_device::device_reset()
 {
+	// discard any pending retry request (this getter clears the flag)
+	access_to_be_redone();
+
 	/* initialize the OEA state */
 	if (m_cap & PPCCAP_OEA)
 	{
