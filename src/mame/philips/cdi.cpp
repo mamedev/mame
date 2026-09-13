@@ -213,7 +213,7 @@ void quizard_state::machine_reset()
 	cdi_state::machine_reset();
 
 	m_boot_press = false;
-	m_boot_timer->adjust(attotime::from_seconds(13), 1);
+	m_boot_timer->adjust(attotime::from_seconds(22), 1);
 	m_mcu_p3 = 0x05; // RTS|RXD
 }
 
