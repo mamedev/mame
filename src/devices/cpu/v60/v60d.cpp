@@ -424,7 +424,7 @@ u32 v60_disassembler::decode_F1(const char *opnm, int opsize1, int opsize2, unsi
 	} else {
 		out_AM_Register(code & 0x1f, stream);
 		stream << ", ";
-		return decode_AM(ipc, pc+1, code & 0x40, opsize1, opcodes, stream) + 2;
+		return decode_AM(ipc, pc+1, code & 0x40, opsize2, opcodes, stream) + 2;
 	}
 }
 
@@ -700,16 +700,16 @@ DEFINE_EASY_OPCODE(CVTDPZ, "cvtd.pz", F7c, 0, 1)
 DEFINE_EASY_OPCODE(CVTDZP, "cvtd.zp", F7c, 1, 0)
 DEFINE_EASY_OPCODE_EX(DBGT, "dbgt", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBGE, "dbge", F6, 0, 0, STEP_COND)
-DEFINE_EASY_OPCODE_EX(DBLT, "dbgt", F6, 0, 0, STEP_COND)
-DEFINE_EASY_OPCODE_EX(DBLE, "dbge", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBLT, "dblt", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBLE, "dble", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBH, "dbh", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBNL, "dbnl", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBL, "dbl", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBNH, "dbnh", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBE, "dbe", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBNE, "dbne", F6, 0, 0, STEP_COND)
-DEFINE_EASY_OPCODE_EX(DBV, "dbe", F6, 0, 0, STEP_COND)
-DEFINE_EASY_OPCODE_EX(DBNV, "dbne", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBV, "dbv", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBNV, "dbnv", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBN, "dbn", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBP, "dbp", F6, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE_EX(DBR, "dbr", F6, 0, 0, STEP_COND)

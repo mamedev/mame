@@ -64,7 +64,7 @@ a2bus_ace2x00_slot6_device::a2bus_ace2x00_slot6_device(const machine_config &mco
 //-------------------------------------------------
 void a2bus_ace2x00_slot6_device::device_add_mconfig(machine_config &config)
 {
-	IWM(config, m_iwm, clock(), 1021800*2);
+	IWM(config, m_iwm, clock(), A2BUS_1M_CLOCK*2);
 	m_iwm->phases_cb().set(FUNC(a2bus_ace2x00_slot6_device::phases_w));
 	m_iwm->devsel_cb().set(FUNC(a2bus_ace2x00_slot6_device::devsel_w));
 	applefdintf_device::add_525(config, m_floppy[0]);

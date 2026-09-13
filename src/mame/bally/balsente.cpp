@@ -208,17 +208,19 @@ DIP locations verified for:
 #include "emu.h"
 #include "balsente.h"
 
+#include "sente6vb.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sente6vb.h"
 #include "machine/6821pia.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "video/mc6845.h"
+
 #include "speaker.h"
 
 #include "stocker.lh"
@@ -1408,7 +1410,6 @@ void balsente_state::balsente(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 24,16,8>, 1024);
-
 
 	// sound hardware
 	sente6vb_device &audio6vb(SENTE6VB(config, "audio6vb"));

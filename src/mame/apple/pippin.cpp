@@ -20,6 +20,8 @@
   Z8530 SCC
   CS4217 audio DAC
   Bt856 composite video encoder (I2C controlled)
+  AMD Am29F010 1Mbit flash (game save storage) at 0x40000000, one byte per
+    32-bit word, with its data bus wired bit-reversed (DQ7..DQ0 on D0..D7)
 
 ****************************************************************************/
 
@@ -31,6 +33,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "cpu/mn1880/mn1880.h"
 #include "machine/input_merger.h"
+#include "machine/intelfsh.h"
 #include "machine/ram.h"
 #include "sound/cdda.h"
 
@@ -63,6 +66,7 @@ public:
 	required_device<taos_device> m_taos;
 	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
+	required_device<amd_29f010_device> m_flash;
 
 private:
 	void pippin_map(address_map &map) ATTR_COLD;
@@ -70,6 +74,9 @@ private:
 	void cdmcu_data(address_map &map) ATTR_COLD;
 
 	void cuda_reset_w(int state);
+
+	u8 flash_r(offs_t offset);
+	void flash_w(offs_t offset, u8 data);
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -86,7 +93,8 @@ pippin_state::pippin_state(const machine_config &mconfig, device_type type, cons
 	m_cuda(*this, "cuda"),
 	m_taos(*this, "taos"),
 	m_adbbus(*this, "adb"),
-	m_ram(*this, RAM_TAG)
+	m_ram(*this, RAM_TAG),
+	m_flash(*this, "flash")
 {
 }
 
@@ -133,7 +141,8 @@ void pippin_state::machine_reset()
 
 void pippin_state::pippin_map(address_map &map)
 {
-	// 40000000 = flash ROM (type?)
+	// 1Mbit save flash: flash A0 is CPU A2, so each byte occupies the top byte lane of a 32-bit word
+	map(0x4000'0000, 0x4007'ffff).rw(FUNC(pippin_state::flash_r), FUNC(pippin_state::flash_w)).umask64(0xff00'0000'ff00'0000);
 
 	map(0xf000'0000, 0xf100'ffff).m(m_taos, FUNC(taos_device::map));
 
@@ -144,6 +153,16 @@ void pippin_state::cuda_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+u8 pippin_state::flash_r(offs_t offset)
+{
+	return bitswap<8>(m_flash->read(offset), 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
+void pippin_state::flash_w(offs_t offset, u8 data)
+{
+	m_flash->write(offset, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 void pippin_state::cdmcu_mem(address_map &map)
@@ -190,8 +209,8 @@ void pippin_state::pippin(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
 	RAM(config, m_ram);
-	m_ram->set_default_size("5M");
-	m_ram->set_extra_options("13M, 21M");
+	m_ram->set_default_size("13M");
+	m_ram->set_extra_options("5M, 21M");
 
 	GRAND_CENTRAL(config, m_grandcentral);
 	m_grandcentral->set_maincpu_tag("maincpu");
@@ -214,12 +233,17 @@ void pippin_state::pippin(machine_config &config)
 	m_scsibus->set_external_device(7, m_mesh);
 	m_mesh->drq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_drq));
 	m_mesh->irq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_irq));
+	m_mesh->cmd_done_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(5, !state); });
+	m_mesh->exception_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(6, !state); });
+	m_mesh->error_handler_cb().set([this](int state) { m_grandcentral->scsi1_status_bit_w(7, !state); });
 	m_grandcentral->scsi1_r_callback().set(m_mesh, FUNC(mesh_device::read));
 	m_grandcentral->scsi1_w_callback().set(m_mesh, FUNC(mesh_device::write));
 	m_grandcentral->scsi1_dma_r_callback().set(m_mesh, FUNC(mesh_device::dma16_r));
 	m_grandcentral->scsi1_dma_w_callback().set(m_mesh, FUNC(mesh_device::dma16_w));
 
 	APPLE_TAOS(config, m_taos, 31.3344_MHz_XTAL);
+
+	AMD_29F010(config, m_flash);
 
 	awacs_macrisc_device &awacs(AWACS_MACRISC(config, "codec", 45.1584_MHz_XTAL / 2));
 	awacs.dma_output().set(m_grandcentral, FUNC(heathrow_device::codec_dma_read));
@@ -310,4 +334,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME        FLAGS */
-COMP( 1996, pippin, 0,      0,      pippin,  pippin, pippin_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_NOT_WORKING)
+COMP( 1996, pippin, 0,      0,      pippin,  pippin, pippin_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_SUPPORTS_SAVE)

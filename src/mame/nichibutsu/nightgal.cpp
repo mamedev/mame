@@ -30,15 +30,14 @@ TODO:
 #include "sound/dac.h"
 #include "sound/ymopn.h"
 #include "video/jangou_blitter.h"
-#include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "video/resnet.h"
 
 
 namespace {
-
-#define MASTER_CLOCK    XTAL(19'968'000)
 
 class nightgal_state : public driver_device
 {
@@ -50,6 +49,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
+		m_palette(*this, "palette"),
+		m_blitter(*this, "blitter"),
 		m_io_cr_clear(*this, "CR_CLEAR"),
 		m_io_coins(*this, "COINS"),
 		m_io_pl1(*this, "PL1_%u", 1U),
@@ -57,23 +58,24 @@ public:
 		m_io_system(*this, "SYSTEM"),
 		m_io_dswa(*this, "DSWA"),
 		m_io_dswb(*this, "DSWB"),
-		m_io_dswc(*this, "DSWC"),
-		m_palette(*this, "palette"),
-		m_blitter(*this, "blitter")
+		m_io_dswc(*this, "DSWC")
 	{ }
 
-	void ngalsumr(machine_config &config);
-	void sexygal(machine_config &config);
-	void sweetgal(machine_config &config);
-	void sgaltrop(machine_config &config);
-	void royalqn(machine_config &config);
+	void ngalsumr(machine_config &config) ATTR_COLD;
+	void sexygal(machine_config &config) ATTR_COLD;
+	void sweetgal(machine_config &config) ATTR_COLD;
+	void sgaltrop(machine_config &config) ATTR_COLD;
+	void royalqn(machine_config &config) ATTR_COLD;
 
-	void init_ngalsumr();
-	void init_royalqn();
+	void init_ngalsumr() ATTR_COLD;
+	void init_royalqn() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	emu_timer *m_z80_wait_ack_timer;
-
 	required_shared_ptr<uint8_t> m_comms_ram;
 	optional_shared_ptr<uint8_t> m_sound_ram;
 
@@ -81,6 +83,32 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
+	required_device<jangou_blitter_device> m_blitter;
+
+	required_ioport m_io_cr_clear;
+	required_ioport m_io_coins;
+	required_ioport_array<6> m_io_pl1;
+	required_ioport_array<6> m_io_pl2;
+	required_ioport m_io_system;
+	required_ioport m_io_dswa;
+	required_ioport m_io_dswb;
+	required_ioport m_io_dswc;
+
+	emu_timer *m_z80_wait_ack_timer = nullptr;
+
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
+
+	/* video-related */
+	uint8_t m_blit_raw_data[3] {};
+
+	/* misc */
+	uint8_t m_nsc_latch = 0;
+	uint8_t m_z80_latch = 0;
+	uint8_t m_mux_data = 0;
+	uint8_t m_pal_bank = 0;
+
+	uint8_t m_sexygal_audioff = 0;
 
 	/* memory */
 	//void sexygal_nsc_true_blitter_w(uint8_t data);
@@ -101,11 +129,8 @@ private:
 
 	void ngalsumr_prot_latch_w(uint8_t data);
 	uint8_t ngalsumr_prot_value_r();
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	void nightgal_palette(palette_device &palette) const;
-	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette_cb(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void common_nsc_map(address_map &map) ATTR_COLD;
 	void common_sexygal_io(address_map &map) ATTR_COLD;
@@ -120,31 +145,8 @@ private:
 	void sgaltrop_nsc_map(address_map &map) ATTR_COLD;
 	void sweetgal_map(address_map &map) ATTR_COLD;
 
-	required_ioport m_io_cr_clear;
-	required_ioport m_io_coins;
-	required_ioport_array<6> m_io_pl1;
-	required_ioport_array<6> m_io_pl2;
-	required_ioport m_io_system;
-	required_ioport m_io_dswa;
-	required_ioport m_io_dswb;
-	required_ioport m_io_dswc;
-	required_device<palette_device> m_palette;
-	required_device<jangou_blitter_device> m_blitter;
 	void z80_wait_assert_cb();
 	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
-
-	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
-
-	/* video-related */
-	uint8_t m_blit_raw_data[3];
-
-	/* misc */
-	uint8_t m_nsc_latch;
-	uint8_t m_z80_latch;
-	uint8_t m_mux_data;
-	uint8_t m_pal_bank;
-
-	uint8_t m_sexygal_audioff;
 };
 
 void nightgal_state::video_start()
@@ -152,7 +154,7 @@ void nightgal_state::video_start()
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
-uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nightgal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -167,12 +169,12 @@ uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_in
 		}
 	}
 
-	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
+	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(), 0, 0, cliprect);
 	return 0;
 }
 
 // guess: use the same resistor values as Crazy Climber (needs checking on the real HW)
-void nightgal_state::nightgal_palette(palette_device &palette) const
+void nightgal_state::palette_cb(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
@@ -767,28 +769,28 @@ void nightgal_state::machine_reset()
 
 void nightgal_state::royalqn(machine_config &config)
 {
-	Z80(config, m_maincpu, MASTER_CLOCK / 8);        /* ? MHz */
+	Z80(config, m_maincpu, 19.968_MHz_XTAL / 8);        /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_map);
 	m_maincpu->set_addrmap(AS_IO, &nightgal_state::royalqn_io);
 	m_maincpu->set_vblank_int("screen", FUNC(nightgal_state::irq0_line_hold));
 
-	NSC8105(config, m_subcpu, MASTER_CLOCK / 8);
+	NSC8105(config, m_subcpu, 19.968_MHz_XTAL / 8);
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_nsc_map);
 
 	config.set_perfect_quantum(m_maincpu);
 
-	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
+	JANGOU_BLITTER(config, m_blitter, 19.968_MHz_XTAL/4);
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240);
-	screen.set_screen_update(FUNC(nightgal_state::screen_update_nightgal));
+	screen.set_raw(19.968_MHz_XTAL/4,320,0,256,264,16,240);
+	screen.set_screen_update(FUNC(nightgal_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(nightgal_state::nightgal_palette), 0x20);
+	PALETTE(config, m_palette, FUNC(nightgal_state::palette_cb), 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 19.968_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
 	aysnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
@@ -804,7 +806,7 @@ void nightgal_state::sexygal(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_nsc_map);
 	m_subcpu->set_vblank_int("screen", FUNC(nightgal_state::irq0_line_hold));
 
-	NSC8105(config, m_audiocpu, MASTER_CLOCK / 8);
+	NSC8105(config, m_audiocpu, 19.968_MHz_XTAL / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_audio_map);
 
 	clock_device &sampleclk(CLOCK(config, "sampleclk", 6000)); // quite a wild guess
@@ -814,7 +816,7 @@ void nightgal_state::sexygal(machine_config &config)
 
 	config.device_remove("aysnd");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 19.968_MHz_XTAL / 8));
 	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
 	ymsnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.40);
@@ -1092,6 +1094,34 @@ ROM_START( sweetgal )
 	ROM_LOAD( "sg.7e", 0x00, 0x20, CRC(5786a035) SHA1(29d95a6fb076d64ca217206fcadde51993830a88) )
 ROM_END
 
+ROM_START( sweetgala ) // this one has a smaller capacity sub board, with only half the samples
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10.3n", 0x00000, 0x04000, CRC(a8c34206) SHA1(c3ca3172aef56a115ab6d6211ead13b4d80c7dcc) )
+	ROM_LOAD( "11.3p", 0x04000, 0x04000, CRC(47ddf125) SHA1(a5c662f3492d9ae8dc5edab77292542ee12324ab) )
+
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "1.3a",  0x0000, 0x2000, CRC(5342c757) SHA1(b4ff84c45bd2c6a6a468f1d0daaf5b19c4dbf8fe) )
+
+	ROM_REGION( 0x6000, "samples", 0 )
+	ROM_LOAD( "12.sub",  0x00000, 0x04000, CRC(e49b024d) SHA1(848ad59916c53e2cc45224b6a80e391678cb425d) )
+	ROM_LOAD( "13.sub",  0x04000, 0x02000, CRC(6acce0b0) SHA1(8fc5fdbc5c6676335b08f21bb17e23e46ef46de2) )
+
+	ROM_REGION( 0x40000, "gfx", 0 )
+	ROM_LOAD( "2.3c",  0x00000, 0x04000, CRC(3a3d78f7) SHA1(71e35529f30c43ee8ec2363f85fe17042f1d304e) )
+	ROM_LOAD( "3.3d",  0x04000, 0x04000, CRC(c6f9b884) SHA1(32d6fe1906a3f1f528f30dbd3f89971b2ea1925b) )
+	// all ROMs below match sexygal
+	ROM_LOAD( "4.3e",  0x08000, 0x04000, CRC(f1cdbedb) SHA1(caacf2887a3a05e498d57d570a1e9873f95a5d5f) )
+	ROM_LOAD( "5.3f",  0x0c000, 0x04000, CRC(76569186) SHA1(79cb32c1f1a96f90d59f331a01ca548936933b87) )
+	ROM_LOAD( "6.3h",  0x10000, 0x04000, CRC(8b6268e4) SHA1(c57bb7fe8f079d8f202f370cd7bdce1cf0596ede) )
+	ROM_LOAD( "7.3jk", 0x14000, 0x04000, CRC(c88f68b8) SHA1(512019f465c298ba8fbf0f6c285a9b0d6c8f7411) )
+	ROM_LOAD( "8.3kl", 0x18000, 0x04000, CRC(4631e092) SHA1(961b10b556defe9e4ba84180149bb2ef4042dbe9) )
+	ROM_LOAD( "9.3m",  0x1c000, 0x04000, CRC(198df711) SHA1(adf9531ee7058db2314811aba7568bd332632947) )
+	ROM_FILL(          0x20000, 0x20000, 0x11 )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "sg.7e", 0x00, 0x20, CRC(5786a035) SHA1(29d95a6fb076d64ca217206fcadde51993830a88) )
+ROM_END
+
 /*
 
 Night Gal Summer (JPN Ver.)
@@ -1343,6 +1373,7 @@ GAME( 1984, royalqn,   0,        royalqn,  sexygal, nightgal_state, init_royalqn
 /* Type 2 HW */
 GAME( 1985, sexygal,   0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // セクシーギャル
 GAME( 1985, sweetgal,  sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // スイートギャル
+GAME( 1985, sweetgala, sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850410 SG 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // スイートギャル
 /* Type 3 HW */
 GAME( 1985, ngalsumr,  0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // ナイトギャルサマー
 /* Type 4 HW */

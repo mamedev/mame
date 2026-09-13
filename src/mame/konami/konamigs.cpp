@@ -208,9 +208,9 @@ u16 gsan_state::cf_regs_r(offs_t offset, u16 mem_mask)
 	offset *= 2;
 	u16 data = 0;
 	if (ACCESSING_BITS_0_7)
-		data |= m_ata->cs0_r(offset, 0xff) & 0xff;
+		data |= m_ata->cs0_r(offset) & 0xff;
 	if (ACCESSING_BITS_8_15)
-		data |= (m_ata->cs0_r(offset + 1, 0xff) << 8);
+		data |= (m_ata->cs0_r(offset + 1) << 8);
 	return data;
 }
 
@@ -218,20 +218,20 @@ void gsan_state::cf_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
-		m_ata->cs0_w(offset, data & 0xff, 0xff);
+		m_ata->cs0_w(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_ata->cs0_w(offset + 1, data >> 8, 0xff);
+		m_ata->cs0_w(offset + 1, data >> 8);
 }
 
 u16 gsan_state::cf_data_r()
 {
-	u16 data = m_ata->cs0_r(0, 0xffff);
+	u16 data = m_ata->cs0_r(0);
 	return data;
 }
 
 void gsan_state::cf_data_w(u16 data)
 {
-	m_ata->cs0_w(0, data, 0xffff);
+	m_ata->cs0_w(0, data);
 }
 
 // misc I/O

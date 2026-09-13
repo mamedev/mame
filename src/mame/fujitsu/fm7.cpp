@@ -1696,12 +1696,11 @@ static INPUT_PORTS_START( fm7 )
 	PORT_INCLUDE( fm7_keyboard )
 
 	PORT_START("DSW")
-	PORT_DIPNAME(0x01,0x01,"Switch A") PORT_DIPLOCATION("SWA:1")
-	PORT_DIPSETTING(0x00,DEF_STR( Off ))
-	PORT_DIPSETTING(0x01,DEF_STR( On ))
-	PORT_DIPNAME(0x02,0x02,"Boot mode") PORT_DIPLOCATION("SWA:2")
-	PORT_DIPSETTING(0x00,"DOS")
-	PORT_DIPSETTING(0x02,"BASIC")
+	PORT_DIPNAME(0x03,0x03,"Boot mode") PORT_DIPLOCATION("SWA:1,2")
+	PORT_DIPSETTING(0x00,"HALT")
+	PORT_DIPSETTING(0x01,"DOS")
+	PORT_DIPSETTING(0x02,"BUBBLE")
+	PORT_DIPSETTING(0x03,"BASIC")
 	PORT_DIPNAME(0x04,0x00,"Switch C") PORT_DIPLOCATION("SWA:3")
 	PORT_DIPSETTING(0x00,DEF_STR( Off ))
 	PORT_DIPSETTING(0x04,DEF_STR( On ))
@@ -1714,9 +1713,11 @@ static INPUT_PORTS_START( fm8 )
 	PORT_INCLUDE( fm7_keyboard )
 
 	PORT_START("DSW")
-	PORT_DIPNAME(0x02,0x02,"Boot mode") PORT_DIPLOCATION("SWA:2")
-	PORT_DIPSETTING(0x00,"DOS")
-	PORT_DIPSETTING(0x02,"BASIC")
+	PORT_DIPNAME(0x03,0x03,"Boot mode") PORT_DIPLOCATION("SWA:1,2")
+	PORT_DIPSETTING(0x00,"DBG/SFD")
+	PORT_DIPSETTING(0x01,"DOS")
+	PORT_DIPSETTING(0x02,"BUBBLE")
+	PORT_DIPSETTING(0x03,"BASIC")
 INPUT_PORTS_END
 
 void fm7_state::init_fm7()
@@ -1812,7 +1813,7 @@ void fm7_state::machine_reset()
 		m_init_rom_en = false;
 	if(m_type == SYS_FM7)
 	{
-		if(!(m_dsw->read() & 0x02))
+		if(!(m_dsw->read() & 0x03))
 		{
 			m_basic_rom_en = false;  // disabled for DOS mode
 			membank("bank1")->set_base(&m_a15_ram[0]);
@@ -1835,14 +1836,7 @@ void fm7_state::machine_reset()
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(m_type == SYS_FM7)
 	{
-		if(!(m_dsw->read() & 0x02))
-		{  // DOS mode
-			membank("bank17")->set_base(&m_btrom_ptr[0x600]);
-		}
-		else
-		{  // BASIC mode
-			membank("bank17")->set_base(&m_btrom_ptr[0x200]);
-		}
+		membank("bank17")->set_base(&m_btrom_ptr[(~m_dsw->read() & 0x03) * 0x200]);
 	}
 }
 
@@ -1888,6 +1882,9 @@ void fm7_state::fm7(machine_config &config)
 	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm7_sub_mem);
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::sub_irq_ack));
 	config.set_perfect_quantum(m_sub);
+
+	// FM-7 keyboard MCU (MB88401 at M125)
+	MB88401(config, m_kbmcu, 4_MHz_XTAL).set_disable(); // No ROM dump available
 
 	SPEAKER(config, "mono").front_center();
 	AY8913(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
@@ -2157,8 +2154,8 @@ ROM_START( fm8 )
 
 	// either one of these boot ROMs are selectable via DIP switch
 	ROM_REGION( 0x800, "boot", 0 )
-	ROM_LOAD( "bootbas8.rom", 0x0200,  0x0200, CRC(8260267a) SHA1(fee6fb9c52d22dd7108c68d08c74e2f3ebcb9e4d) )
-	ROM_LOAD( "bootdos8.rom", 0x0600,  0x0200, CRC(1ed5a506) SHA1(966538fa92c32fc15034576dc480cfa4a339384d) )
+	ROM_LOAD( "bootbas8.rom", 0x0000,  0x0200, CRC(8260267a) SHA1(fee6fb9c52d22dd7108c68d08c74e2f3ebcb9e4d) )
+	ROM_LOAD( "bootdos8.rom", 0x0400,  0x0200, CRC(1ed5a506) SHA1(966538fa92c32fc15034576dc480cfa4a339384d) )
 
 	// optional Kanji ROM (same as for the FM-7?)
 	ROM_REGION( 0x20000, "kanji1", 0 )
@@ -2166,17 +2163,19 @@ ROM_START( fm8 )
 ROM_END
 
 
+// FM-NEW7 Post-Production Version
 ROM_START( fmnew7 )
-	ROM_REGION( 0x8000, "fbasic", 0 ) // at 0x7ba5 there is the ID string 0302840301, meaning it's v3.02 from 1984/03/01
-	ROM_LOAD( "fbasic302.rom", 0x0000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) BAD_DUMP ) // last 1K is inaccessible
+	ROM_REGION( 0x8000, "fbasic", 0 ) // F-BASIC v3.02 from 1984/03/01
+	ROM_LOAD( "mb83256_160.m74", 0x0000,  0x8000, CRC(875697ad) SHA1(33f99927d1c4d881d951c7ae9e3268e9a0cad773) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "subsys_c.rom", 0xd800,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) BAD_DUMP ) // actually one 2764 + one half-used 2732
+	ROM_LOAD( "mb83256_167.m60", 0x8000,  0x8000, CRC(b9d42009) SHA1(49452573aeea6305807103dc4dce82bb7b4fbcb8) )
 
-	// either one of these boot ROMs are selectable via DIP switch
 	ROM_REGION( 0x800, "boot", 0 )
-	ROM_LOAD( "boot_bas.rom", 0x0200,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) BAD_DUMP ) // actually 0.5K banks of the same ROM
-	ROM_LOAD( "boot_dos.rom", 0x0600,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) BAD_DUMP )
+	ROM_LOAD( "t11-11.m73", 0x0000,  0x0800, CRC(3585ea2a) SHA1(51580d4221b93c3d3a5c05bc5dfed8f395e43c2d) )
+
+	ROM_REGION( 0x1000, "kbmcu", 0 )
+	ROM_LOAD( "mb88401.m76", 0x0000, 0x1000, NO_DUMP )
 
 	// optional Kanji ROM
 	ROM_REGION( 0x20000, "kanji1", 0 )
@@ -2184,22 +2183,25 @@ ROM_START( fmnew7 )
 ROM_END
 
 ROM_START( fm7 )
+	// MB83256 masked ROM (27256) with code 107 (V3.00) or 128 (V3.01) at location M151
 	ROM_REGION( 0x8000, "fbasic", 0 ) // at 0x7ba5 there is the ID string 0300820920, meaning it's v3.00 from 1982/09/20
 	ROM_LOAD( "fbasic300.rom", 0x0000,  0x7c00, CRC(87c98494) SHA1(d7e3603b0a2442c7632dad45f9704d9ad71968f5) BAD_DUMP ) // last 1K is inaccessible
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "subsys_c.rom", 0xd800,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) BAD_DUMP ) // actually one 2764 + one half-used 2732
+	// CG     MBM2732A-20 marked "TM11-12" at location M153
+	// SUBSYS MBM2764-20 marked "TN11-11"
+	//     or MB8364 marked 042 at location M154
+	ROM_LOAD( "subsys_c.rom", 0xd800,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) BAD_DUMP )
 
 	// either one of these boot ROMs are selectable via DIP switch
 	ROM_REGION( 0x800, "boot", 0 )
-	ROM_LOAD( "boot_bas.rom",   0x0200,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) BAD_DUMP ) // actually 0.5K banks of the same ROM
-	ROM_LOAD( "boot_dos_a.rom", 0x0600,  0x0200, CRC(bf441864) SHA1(616c17155f84fb0e3731a31ef0eb0cbb664a5600) BAD_DUMP )
+	ROM_LOAD( "tl11-11.m152", 0x0000,  0x0800, CRC(3585ea2a) SHA1(51580d4221b93c3d3a5c05bc5dfed8f395e43c2d))
 
 	ROM_REGION( 0x200, "fc00prom", 0 )
-	ROM_LOAD( "mb7053.ic139", 0x000, 0x200, NO_DUMP ) // 512x4 bipolar PROM for address decoding
+	ROM_LOAD( "mb7053.m139", 0x000, 0x200, NO_DUMP ) // 512x4 bipolar PROM for address decoding
 
 	ROM_REGION( 0x1000, "kbmcu", 0 )
-	ROM_LOAD( "mb88401.ic125", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "mb88401.m125", 0x0000, 0x1000, NO_DUMP )
 
 	// optional Kanji ROM
 	ROM_REGION( 0x20000, "kanji1", 0 )

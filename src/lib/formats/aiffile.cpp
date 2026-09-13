@@ -58,7 +58,7 @@ cassette_image::error aiffile_identify(cassette_image *cassette, cassette_image:
 	// Verify the chunk lengths
 	if (get_u32be(&chunk_header[4]) != length - 8 ||
 		get_u32be(&chunk_header[COMM_OFFSET + 4]) != SSND_OFFSET - 8 - COMM_OFFSET ||
-		get_u32be(&chunk_header[SSND_OFFSET + 4]) != length - 8 - SSND_OFFSET)
+		get_u32be(&chunk_header[SSND_OFFSET + 4]) > length - 8 - SSND_OFFSET)
 		return cassette_image::error::INVALID_IMAGE;
 
 	// Prepare to convert 80-bit extended floating point the cheap and simple way

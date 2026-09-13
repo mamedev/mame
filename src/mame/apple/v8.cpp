@@ -649,8 +649,8 @@ void eagle_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->readvideo_handler().set(FUNC(eagle_device::via2_video_config_r));
 }
 
-eagle_device::eagle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: v8_device(mconfig, EAGLE, tag, owner, clock)
+eagle_device::eagle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	v8_device(mconfig, EAGLE, tag, owner, clock)
 {
 }
 
@@ -731,17 +731,17 @@ void spice_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->readvideo_handler().set(FUNC(spice_device::via2_video_config_r));
 }
 
-spice_device::spice_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: v8_device(mconfig, type, tag, owner, clock),
-	  m_fdc(*this, "fdc"),
-	  m_floppy(*this, "fdc:%d", 0U),
-	  m_cur_floppy(nullptr),
-	  m_hdsel(0)
+spice_device::spice_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	v8_device(mconfig, type, tag, owner, clock),
+	m_fdc(*this, "fdc"),
+	m_floppy(*this, "fdc:%d", 0U),
+	m_cur_floppy(nullptr),
+	m_hdsel(0)
 {
 }
 
-spice_device::spice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: spice_device(mconfig, SPICE, tag, owner, clock)
+spice_device::spice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	spice_device(mconfig, SPICE, tag, owner, clock)
 {
 }
 
@@ -938,8 +938,8 @@ void tinkerbell_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->readvideo_handler().set(FUNC(tinkerbell_device::via2_video_config_r));
 }
 
-tinkerbell_device::tinkerbell_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: spice_device(mconfig, TINKERBELL, tag, owner, clock)
+tinkerbell_device::tinkerbell_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	spice_device(mconfig, TINKERBELL, tag, owner, clock)
 {
 }
 

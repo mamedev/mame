@@ -79,11 +79,16 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 
-#include "corestr.h"
 #include "emuopts.h"
 #include "fileio.h"
 
+#include "corestr.h"
+#include "ioprocs.h"
+#include "ioprocsstream.h"
+
 #include <cstring>
+#include <locale>
+#include <ostream>
 #include <iterator>
 #include <utility>
 
@@ -205,29 +210,29 @@ const char *cheat_parameter::text()
 //  save - save a single cheat parameter
 //-------------------------------------------------
 
-void cheat_parameter::save(util::core_file &cheatfile) const
+void cheat_parameter::save(std::ostream &cheatfile) const
 {
 	// output the parameter tag
-	cheatfile.printf("\t\t<parameter");
+	cheatfile << "\t\t<parameter";
 
 	if (!has_itemlist())
 	{
 		// if no items, just output min/max/step
 		if (m_minval != 0)
-			cheatfile.printf(" min=\"%s\"", m_minval.format());
+			util::stream_format(cheatfile, " min=\"%s\"", m_minval.format());
 		if (m_maxval != 0)
-			cheatfile.printf(" max=\"%s\"", m_maxval.format());
+			util::stream_format(cheatfile, " max=\"%s\"", m_maxval.format());
 		if (m_stepval != 1)
-			cheatfile.printf(" step=\"%s\"", m_stepval.format());
-		cheatfile.printf("/>\n");
+			util::stream_format(cheatfile, " step=\"%s\"", m_stepval.format());
+		cheatfile << "/>\n";
 	}
 	else
 	{
 		// iterate over items
-		cheatfile.printf(">\n");
+		cheatfile << ">\n";
 		for (item const &curitem : m_itemlist)
-			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem.value().format(), curitem.text());
-		cheatfile.printf("\t\t</parameter>\n");
+			util::stream_format(cheatfile, "\t\t\t<item value=\"%s\">%s</item>\n", curitem.value().format(), curitem.text());
+		cheatfile << "\t\t</parameter>\n";
 	}
 }
 
@@ -368,26 +373,26 @@ void cheat_script::execute(cheat_manager &manager, uint64_t &argindex)
 //  save - save a single cheat script
 //-------------------------------------------------
 
-void cheat_script::save(util::core_file &cheatfile) const
+void cheat_script::save(std::ostream &cheatfile) const
 {
 	// output the script tag
-	cheatfile.printf("\t\t<script");
+	cheatfile << "\t\t<script";
 	switch (m_state)
 	{
-	case SCRIPT_STATE_OFF:      cheatfile.printf(" state=\"off\"");     break;
-	case SCRIPT_STATE_ON:       cheatfile.printf(" state=\"on\"");      break;
+	case SCRIPT_STATE_OFF:      cheatfile << " state=\"off\"";     break;
+	case SCRIPT_STATE_ON:       cheatfile << " state=\"on\"";      break;
 	default:
-	case SCRIPT_STATE_RUN:      cheatfile.printf(" state=\"run\"");     break;
-	case SCRIPT_STATE_CHANGE:   cheatfile.printf(" state=\"change\"");  break;
+	case SCRIPT_STATE_RUN:      cheatfile << " state=\"run\"";     break;
+	case SCRIPT_STATE_CHANGE:   cheatfile << " state=\"change\"";  break;
 	}
-	cheatfile.printf(">\n");
+	cheatfile << ">\n";
 
 	// output entries
 	for (auto &entry : m_entrylist)
 		entry->save(cheatfile);
 
 	// close the tag
-	cheatfile.printf("\t\t</script>\n");
+	cheatfile << "\t\t</script>\n";
 }
 
 
@@ -532,42 +537,42 @@ void cheat_script::script_entry::execute(cheat_manager &manager, uint64_t &argin
 //  save - save a single action or output
 //-------------------------------------------------
 
-void cheat_script::script_entry::save(util::core_file &cheatfile) const
+void cheat_script::script_entry::save(std::ostream &cheatfile) const
 {
 	if (m_format.empty())
 	{
 		// output an action
-		cheatfile.printf("\t\t\t<action");
+		cheatfile << "\t\t\t<action";
 		if (!m_condition.is_empty())
-			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition));
-		cheatfile.printf(">%s</action>\n", cheat_manager::quote_expression(m_expression));
+			util::stream_format(cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(m_condition));
+		util::stream_format(cheatfile, ">%s</action>\n", cheat_manager::quote_expression(m_expression));
 	}
 	else
 	{
 		// output an output
-		cheatfile.printf("\t\t\t<output format=\"%s\"", m_format);
+		util::stream_format(cheatfile, "\t\t\t<output format=\"%s\"", m_format);
 		if (!m_condition.is_empty())
-			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition));
+			util::stream_format(cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(m_condition));
 
 		if (m_line != 0)
-			cheatfile.printf(" line=\"%d\"", m_line);
+			util::stream_format(cheatfile, " line=\"%d\"", m_line);
 
 		if (m_justify == ui::text_layout::text_justify::CENTER)
-			cheatfile.printf(" align=\"center\"");
+			cheatfile << " align=\"center\"";
 		else if (m_justify == ui::text_layout::text_justify::RIGHT)
-			cheatfile.printf(" align=\"right\"");
+			cheatfile << " align=\"right\"";
 
 		if (m_arglist.size() == 0)
 		{
-			cheatfile.printf(" />\n");
+			cheatfile << " />\n";
 		}
 		else
 		{
 			// output arguments
-			cheatfile.printf(">\n");
+			cheatfile << ">\n";
 			for (auto &curarg : m_arglist)
 				curarg->save(cheatfile);
-			cheatfile.printf("\t\t\t</output>\n");
+			cheatfile << "\t\t\t</output>\n";
 		}
 	}
 }
@@ -663,12 +668,12 @@ int cheat_script::script_entry::output_argument::values(uint64_t &argindex, uint
 //  save - save a single output argument
 //-------------------------------------------------
 
-void cheat_script::script_entry::output_argument::save(util::core_file &cheatfile) const
+void cheat_script::script_entry::output_argument::save(std::ostream &cheatfile) const
 {
-	cheatfile.printf("\t\t\t\t<argument");
+	cheatfile << "\t\t\t\t<argument";
 	if (m_count != 1)
-		cheatfile.printf(" count=\"%d\"", int(m_count));
-	cheatfile.printf(">%s</argument>\n", cheat_manager::quote_expression(m_expression));
+		util::stream_format(cheatfile, " count=\"%u\"", m_count);
+	util::stream_format(cheatfile, ">%s</argument>\n", cheat_manager::quote_expression(m_expression));
 }
 
 
@@ -763,27 +768,27 @@ cheat_entry::~cheat_entry()
 //  save - save a single cheat entry
 //-------------------------------------------------
 
-void cheat_entry::save(util::core_file &cheatfile) const
+void cheat_entry::save(std::ostream &cheatfile) const
 {
 	// determine if we have scripts
 	bool const has_scripts(m_off_script || m_on_script || m_run_script || m_change_script);
 
 	// output the cheat tag
-	cheatfile.printf("\t<cheat desc=\"%s\"", m_description);
+	util::stream_format(cheatfile, "\t<cheat desc=\"%s\"", m_description);
 	if (m_numtemp != DEFAULT_TEMP_VARIABLES)
-		cheatfile.printf(" tempvariables=\"%d\"", m_numtemp);
+		util::stream_format(cheatfile, " tempvariables=\"%d\"", m_numtemp);
 
 	if (m_comment.empty() && !m_parameter && !has_scripts)
 	{
-		cheatfile.printf(" />\n");
+		cheatfile << " />\n";
 	}
 	else
 	{
-		cheatfile.printf(">\n");
+		cheatfile << ">\n";
 
 		// save the comment
 		if (!m_comment.empty())
-			cheatfile.printf("\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment);
+			util::stream_format(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment);
 
 		// output the parameter, if present
 		if (m_parameter) m_parameter->save(cheatfile);
@@ -795,7 +800,7 @@ void cheat_entry::save(util::core_file &cheatfile) const
 		if (m_run_script) m_run_script->save(cheatfile);
 
 		// close the cheat tag
-		cheatfile.printf("\t</cheat>\n");
+		cheatfile << "\t</cheat>\n";
 	}
 }
 
@@ -1210,18 +1215,21 @@ bool cheat_manager::save_all(std::string const &filename)
 	// wrap the rest of catch errors
 	try
 	{
+		util::owritestream str(cheatfile, util::owritestream::UTF_8, false);
+		str.imbue(std::locale::classic());
+
 		// output the outer layers
-		cheatfile.printf("<?xml version=\"1.0\"?>\n");
-		cheatfile.printf("<!-- This file is autogenerated; comments and unknown tags will be stripped -->\n");
-		cheatfile.printf("<mamecheat version=\"%d\">\n", CHEAT_VERSION);
+		str << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		str << "<!-- This file is autogenerated; comments and unknown tags will be stripped -->\n";
+		util::stream_format(str, "<mamecheat version=\"%d\">\n", CHEAT_VERSION);
 
 		// iterate over cheats in the list and save them
 		for (auto &cheat : m_cheatlist)
-			cheat->save(cheatfile);
+			cheat->save(str);
 
 		// close out the file
-		cheatfile.printf("</mamecheat>\n");
-		return true;
+		str << "</mamecheat>\n" << std::flush;
+		return !cheatfile.flush() && str;
 	}
 	catch (emu_fatalerror const &err)
 	{

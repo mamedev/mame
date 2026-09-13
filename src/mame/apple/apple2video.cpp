@@ -98,6 +98,9 @@ void a2_video_device::device_reset()
 {
 	// cache derived values for delayed updates
 	m_scanner_period = (m_base_model == model::IIGS) ? 16 : 14;
+	// the IIgs Mega II runs one cycle behind the VGC, so a softswitch change reaches the
+	// video output one cycle later than on the IIe (the read side of this is the ALIGN_*
+	// constants in apple2gs.cpp)
 	m_delay_bias = (m_base_model == model::IIGS) ? 0 : 1;
 
 	// Start in fullscreen hires if there is no character ROM. This is used

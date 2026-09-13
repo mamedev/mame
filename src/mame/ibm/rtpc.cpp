@@ -89,9 +89,8 @@
   *  0x5b scsi
   *
   * WIP
-  *  - boots to vrm install disk menu
-  *  - requires improved hard disk controller emulation
   *  - slot 5 = Schooner, 8 = Clipper
+  *  - a6/15 error: requires floppy inserted; use non-bootable floppy to boot from hard disk
   */
 
 #include "emu.h"
@@ -117,8 +116,7 @@
 #include "bus/isa/5080pa.h"
 #include "bus/isa/amgda.h"
 #include "bus/isa/ega.h"
-#include "bus/isa/fdc.h"
-#include "bus/isa/ide.h"
+#include "bus/isa/fddda.h"
 #include "bus/isa/mda.h"
 #include "bus/isa/pcat512me.h"
 #include "bus/isa/ubpnic.h"
@@ -508,7 +506,6 @@ static void rtpc_isa8_cards(device_slot_interface &device)
 {
 	device.option_add("baseband", ISA8_UBPNIC);
 	device.option_add("ega", ISA8_EGA);
-	device.option_add("fdc", ISA8_FDC_AT);
 	device.option_add("mda", ISA8_MDA);
 }
 
@@ -516,7 +513,7 @@ static void rtpc_isa16_cards(device_slot_interface &device)
 {
 	device.option_add("5080pa", ISA16_5080PA);
 	device.option_add("amgda", ISA16_AMGDA);
-	device.option_add("ide", ISA16_IDE);
+	device.option_add("fddda", ISA16_FDDDA);
 	device.option_add("pcat512me", ISA16_PCAT512ME);
 
 	rtpc_isa8_cards(device);
@@ -561,7 +558,7 @@ void rtpc_state::ibm6150(machine_config &config)
 	m_scc->out_txdb_callback().set(port1, FUNC(rs232_port_device::write_txd));
 
 	// ISA slots
-	ISA16_SLOT(config, m_slot[0], m_isa->clock(), m_isa, rtpc_isa16_cards, "fdc",      false); // slot 1: disk/diskette adapter
+	ISA16_SLOT(config, m_slot[0], m_isa->clock(), m_isa, rtpc_isa16_cards, "fddda",    false); // slot 1: disk/diskette adapter
 	ISA16_SLOT(config, m_slot[1], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option (second fddda/esdi must be here)
 	ISA8_SLOT(config,  m_slot[2], m_isa->clock(), m_isa, rtpc_isa8_cards,  "mda",      false); // slot 3: option (mda must be here, ega must be here or slot 6)
 	ISA16_SLOT(config, m_slot[3], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
@@ -582,7 +579,7 @@ void rtpc_state::ibm6151(machine_config &config)
 	ISA16_SLOT(config, m_slot[2], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
 	ISA16_SLOT(config, m_slot[3], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
 	ISA16_SLOT(config, m_slot[4], m_isa->clock(), m_isa, rtpc_copro_cards, nullptr,    false); // slot 5: coprocessor/option
-	ISA16_SLOT(config, m_slot[5], m_isa->clock(), m_isa, rtpc_isa16_cards, "fdc",      false); // slot 6: disk/diskette adapter
+	ISA16_SLOT(config, m_slot[5], m_isa->clock(), m_isa, rtpc_isa16_cards, "fddda",    false); // slot 6: disk/diskette adapter
 }
 
 ROM_START(ibm6150)

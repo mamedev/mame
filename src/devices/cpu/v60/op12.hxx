@@ -733,7 +733,7 @@ uint32_t v60_device::opLDPR()
 	F12DecodeOperands(&v60_device::ReadAMAddress, 2,&v60_device::ReadAM, 2);
 	if (m_op2 <= 28)
 	{
-		if (m_flag1 &&(!(OpRead8(PC + 1)&0x80 && OpRead8(PC + 2) == 0xf4 ) ))
+		if (m_flag1)
 			m_reg[m_op2 + 36] = m_reg[m_op1];
 		else
 			m_reg[m_op2 + 36] = m_op1;

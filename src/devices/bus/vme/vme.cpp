@@ -258,9 +258,6 @@ void vme_slot_device::device_start()
 {
 }
 
-#undef LOG_OUTPUT_FUNC
-#define LOG_OUTPUT_FUNC device().logerror
-
 device_vme_card_interface::device_vme_card_interface(machine_config const &mconfig, device_t &device)
 	: device_interface(device, "vme")
 	, m_bus(nullptr)

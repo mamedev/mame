@@ -139,6 +139,7 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(1, 1));
 	m_vr0vid->set_addrmap(vr0video_device::AS_TEXTURE, &vrender0soc_device::texture_map);
 	m_vr0vid->set_addrmap(vr0video_device::AS_FRAME, &vrender0soc_device::frame_map);
+	m_vr0vid->set_screen(m_screen);
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
@@ -169,6 +170,7 @@ void vrender0soc_device::device_start()
 	{
 		m_uart[i]->set_channel_num(i);
 		m_uart[i]->set_parent(this);
+		m_uart[i]->set_external_clock(m_uart_uclk);
 	}
 
 	save_item(NAME(m_inten));

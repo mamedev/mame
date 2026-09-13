@@ -5493,6 +5493,26 @@ ROM_START( baracuda )
 	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
 ROM_END
 
+ROM_START( pacmanvcc ) // found on original PCB. All labels handwritten
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pac4_6e_vcc.6e",    0x0000, 0x1000, CRC(532bd09f) SHA1(ed362ae0b38a00747128046a14d68d2a676953ae) )
+	ROM_LOAD( "pac4_6f_vcc.6f",    0x1000, 0x1000, CRC(b9062f57) SHA1(cdfb2264fc5874cd18848fde936ea1314ce74cba) )
+	ROM_LOAD( "pac4_6h_vcc.6h",    0x2000, 0x1000, CRC(519b3c57) SHA1(cc03d67035f9d590fadef899d9a2d978a4978b39) )
+	ROM_LOAD( "pac4_6j_vcc.6j",    0x3000, 0x1000, CRC(8c2b0871) SHA1(3cb46cea10bbe7a77d90b28228128f6b558ca833) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pacman_5e_vcc.5e",    0x0000, 0x1000, CRC(0c944964) SHA1(06ef227747a440831c9a3a613b76693d52a2f0a9) )
+	ROM_LOAD( "pacman_5f_vcc.5f",    0x1000, 0x1000, CRC(958fedf9) SHA1(4a937ac02216ea8c96477d4a15522070507fb599) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+ROM_END
+
 ROM_START( popeyeman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pop1.6e",      0x0000, 0x0800, CRC(9d027c4a) SHA1(88e094880057451a75cdc2ce9477403021813982) )
@@ -9032,6 +9052,7 @@ GAME( 1981, bucanera,  puckman,  pacman,   pacman,   pacman_state,  empty_init, 
 GAME( 1981, hangly,    puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Igleck)",                     "Hangly-Man (set 1)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hangly2,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Igleck)",                     "Hangly-Man (set 2)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hangly3,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Igleck)",                     "Hangly-Man (set 3)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pacmanvcc, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (VCC)",                        "Pac-Man (VCC hack)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, baracuda,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Coinex)",                     "Barracuda",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, popeyeman, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Popeye-Man",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacuman,   puckman,  pacman,   pacuman,  pacman_state,  empty_init,    ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacu-Man (Spanish bootleg of Puck Man)",                   MACHINE_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame

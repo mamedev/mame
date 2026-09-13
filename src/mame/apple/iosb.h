@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "capella.h"
 #include "macrtc.h"
 
 #include "cpu/m68000/m68040.h"
@@ -42,6 +43,7 @@ public:
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_scsi_tag(T &&... args) { m_ncr.set_tag(std::forward<T>(args)...); }
+	template <typename... T> void set_capella_tag(T &&... args) { m_capella.set_tag(std::forward<T>(args)...); }
 
 	void pb3_w(int state) { m_adb_interrupt = state; }
 	void cb1_w(int state);  // ADB clock
@@ -76,13 +78,15 @@ protected:
 	devcb_write_line m_cb1, m_cb2, m_dfac_clock_w, m_dfac_data_w, m_dfac_latch_w;
 	devcb_read_line m_pa1, m_pa2, m_pa4, m_pa6;
 
-	required_device<m68000_musashi_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
+	optional_device<capella_device> m_capella;
 	required_device<ncr53c96_device> m_ncr;
 	required_device<via6522_device> m_via1;
 	required_device<quadra_pseudovia_device> m_via2;
 	required_device<asc_base_device> m_asc;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
+
 
 	u16 m_iosb_regs[0x20];
 

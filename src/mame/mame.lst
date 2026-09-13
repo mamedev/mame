@@ -1205,6 +1205,8 @@ ace1000
 albert
 am100
 am64
+a2lca2
+a2plca2
 apple2
 apple2jp
 apple2p
@@ -1326,6 +1328,9 @@ pmac7200_90
 pmac7200_100
 pmac7200_120
 
+@source:apple/maccordyceps.cpp
+pmac6200
+
 @source:apple/macii.cpp
 mac2fdhd
 macii
@@ -1360,6 +1365,12 @@ maclc550
 
 @source:apple/macpdm.cpp
 pmac6100
+pmac6100_66
+pmac7100
+pmac7100_80
+pmac8100
+pmac8100_100
+pmac8100_110
 
 @source:apple/macprtb.cpp
 macpb100
@@ -1377,6 +1388,7 @@ macpb180
 macpb180c
 
 @source:apple/macpwrbkmsc.cpp
+macpb150
 macpd210
 macpd230
 macpd250
@@ -16904,6 +16916,7 @@ ap10
 ctk530
 ctk551
 ctk601
+ctk630
 gz70sp
 
 @source:casio/ctrc1.cpp
@@ -17278,6 +17291,7 @@ neptunp2
 perlacrb
 rockroll
 unk960606
+unk960606a
 unk960606b
 
 @source:citoh/cit101.cpp
@@ -18412,6 +18426,7 @@ kotbinsp
 kotbinyo
 kotbinyosu
 mjchuuka
+mjchuukac
 mjdchuka
 mjflove
 mjgnight
@@ -18531,6 +18546,7 @@ realbrko
 
 @source:dynax/royalmah.cpp
 akamj
+akamja
 cafebrk
 cafedoll
 cafedollg
@@ -18543,6 +18559,7 @@ dragonmj
 dragonmj103
 ichiban
 ichiban235
+ichiban305
 ippatsu
 jangtaku
 janoh
@@ -18750,6 +18767,9 @@ advision
 @source:entex/sag.cpp
 sag
 
+@source:eolith/eoforce.cpp
+burnstrk
+
 @source:eolith/eolith.cpp
 candy
 fort2b
@@ -18827,6 +18847,9 @@ esp250c
 
 @source:esprit/executive10.cpp
 exe10102
+
+@source:excalibur/grandmaster.cpp
+egrandmas
 
 @source:excalibur/ivant.cpp
 igor
@@ -19282,6 +19305,7 @@ jolyjokrs
 jolyjokrt
 lluck3x3
 lluck4x1
+lluckasd
 lunapark
 lunaparkb
 lunaparkc
@@ -19564,7 +19588,10 @@ goldartuk
 lotoplay
 lotoplaya
 lotoplayb
+lotoplayc
 lotoplayp
+
+@source:gaelco/lotoplay_prog.cpp
 lotoplayz
 lotoplayza
 lotoplayzb
@@ -20195,8 +20222,10 @@ ragc153
 retro150
 retro150a
 rhhc152
+rocoball
 supreme
 table108
+tchib158
 throwbck
 touma560
 touma568
@@ -20230,6 +20259,7 @@ gp3x788
 
 @source:handheld/generalplus_gpce4.cpp
 digicolr
+l2lelmo
 mapacman
 parcade
 siddr
@@ -20241,12 +20271,12 @@ taturtf
 tamameet
 
 @source:handheld/generalplus_gpl162xx_lcdtype.cpp
+bkid218
 pcp8718
 pcp8728
-bkid218
 
 @source:handheld/generalplus_gpl951xx.cpp
-fixitflx
+chiikawa
 bfdigdug
 bfgalaga
 bfmpac
@@ -20255,7 +20285,11 @@ bfspyhnt
 bftetris
 bubltea
 dsgnpal
+fixitflx
 flufflav
+kenshino
+pink218
+pixlstar
 pockrmsr
 pokebala
 pokeissh
@@ -20276,10 +20310,17 @@ segapet3
 segapet3a
 segaptdx
 smkcatch
+smkfrnd
 smkgacha
 smkguras
 smkgurasa
+tamasmrt
+tamasmrta
+teriermn
 wiwcs
+
+@source:handheld/gc71_nes_bootleg.cpp
+gc71hh
 
 @source:handheld/gmaster.cpp
 gmaster
@@ -20396,6 +20437,7 @@ tmbaskb
 atw_avbp
 atw_barb
 atw_batm
+atw_blue
 atw_dp
 atw_enc
 atw_fz
@@ -20565,6 +20607,7 @@ nummunch
 nupogodi
 okhota
 rkosmosa
+supkubik
 taddams
 taltbeast
 tapollo13
@@ -20825,6 +20868,9 @@ rztoshden
 
 @source:handheld/scrablex.cpp
 scrablex
+
+@source:handheld/sfc_nes_bootleg.cpp
+sfcnes
 
 @source:handheld/talkingbb.cpp
 talkingbb
@@ -21811,6 +21857,7 @@ lhb3
 lhbv33c
 nkishusp
 ryukobou
+sdmg2641c
 tygn
 vbowl
 vbowlhk
@@ -21825,6 +21872,7 @@ genius6
 genius6a
 genius6b
 happyskl
+hjdmg
 iqblocka
 iqblockf
 jking103a
@@ -26844,6 +26892,7 @@ turboex
 @source:leapfrog/leappad.cpp
 leappad
 leappadmic
+leappadw
 mfleappad
 ltleappad
 
@@ -26923,15 +26972,15 @@ jr200u
 kn5000
 
 @source:matsushita/kn7000.cpp
-kn6000
 kn2400
-kn2600                          // SX-KN2600, same firmware as SX-KN2400
+kn2600
+kn6000
 kn6500
 kn7000
 
 @source:matsushita/myb3k.cpp
-myb3k
 jb3000
+myb3k
 stepone
 
 @source:mattel/aquarius.cpp
@@ -29466,8 +29515,8 @@ rodent
 3do_gdo101
 3do_hc21
 3do_try
-3dobios
 alg3do
+crime3do
 md23do
 orbatak
 sht3do
@@ -31803,6 +31852,7 @@ rbspm
 sball2k1
 sc2in1
 sglc
+sjms
 smatch03
 smwc
 ssanguoj
@@ -32054,6 +32104,7 @@ h01jce
 
 @source:misc/haiwei.cpp
 hqdf
+unkhaiwei
 
 @source:misc/hapyfish.cpp
 hapyfsh2
@@ -32347,6 +32398,7 @@ bigdeal0
 dallaspk
 hotslots
 kajotcrd
+libertyc
 lucky7i
 lucky7x
 magicard
@@ -33636,10 +33688,6 @@ vroulet
 
 @source:misc/whtm68k.cpp
 yizhix
-
-@source:misc/wildpkr.cpp
-tabpkr
-wildpkr
 
 @source:misc/winbingo.cpp
 wbingo06
@@ -35019,6 +35067,7 @@ pc9801vx
 pc286vs
 pc286u
 pc386m
+pc386v
 pc486se
 pc486mu
 
@@ -35357,6 +35406,7 @@ av2mj1bb
 av2mj2rg
 finalbny
 galkaika
+galkaikap
 galkoku
 galkokua
 hyouban
@@ -35422,6 +35472,7 @@ sexygal
 sgaltrop
 sgaltropa
 sweetgal
+sweetgala
 
 @source:nichibutsu/nyanpai.cpp
 4psimasy
@@ -35759,6 +35810,7 @@ zudugo
 @source:nintendo/nes_vt09.cpp
 cybar120
 dturbogt
+gampow50
 gujtv108
 joypad65
 lxplasma
@@ -35772,6 +35824,7 @@ msimm2
 msinamco
 msisinv
 msifrog
+pckarc50
 pumpactv
 rcapnp
 senario25
@@ -35814,14 +35867,20 @@ orb300
 retror30
 rminitv
 tvkunio1
+tvkunio2
+tvkunio3
 typo240
 
 @source:nintendo/nes_vt369_vtunknown.cpp
-36pcase
+100burgr
 168pcase
+200in1fn
 240in1ar
+36pcase
+500in1gf
 500in1hh
 a6plus
+asthh
 d12power
 d9_500
 denv150
@@ -35832,6 +35891,7 @@ dgun2593
 dvnimbus
 egame150
 f5_620
+fined200
 gb50_150
 gbox2020
 gcs2mgp
@@ -35847,6 +35907,7 @@ hkb502a
 jl1810gr
 jl2050
 jl2377
+jl2950
 lexi30
 lpgm240
 lxcap
@@ -35920,6 +35981,7 @@ unkra200
 urban240
 vibes240
 vibes240a
+vibes240e
 zl383
 zonefusn
 
@@ -35937,6 +35999,7 @@ gbox2022
 gprnrs1
 gprnrs16
 hhgc319
+jjfun365
 mc_7x6ss
 mc_8x6ss
 mc_9x6sa
@@ -36492,6 +36555,10 @@ drumsta
 @source:oberheim/dmx.cpp
 obdmx
 
+@source:oberheim/matrix6.cpp
+matrix6
+matrix6r
+
 @source:oberheim/ob8.cpp
 ob8
 
@@ -36499,6 +36566,7 @@ ob8
 obsx
 
 @source:oberheim/xpander.cpp
+matrix12
 xpander
 
 @source:olivetti/att6300p.cpp
@@ -36804,6 +36872,7 @@ pacmanpe
 pacmanso
 pacmansp
 pacmanug
+pacmanvcc
 pacmanvg
 pacmod
 pacplus
@@ -39034,6 +39103,8 @@ whtforce
 @source:pinball/supstarf.cpp
 supstarf
 supstarfa
+supstarfb
+supstarfc
 
 @source:pinball/taito.cpp
 cavnegro
@@ -40281,10 +40352,15 @@ cm300
 @source:roland/roland_sc55mk2.cpp
 sc55mk2
 
+@source:roland/roland_sc8850.cpp
+sc8850
+sc8820
+
 @source:roland/roland_sc88.cpp
 sc88
 sc88vl
 sc88pro
+vegspro
 
 @source:roland/roland_tb303.cpp
 tb303
@@ -40312,6 +40388,7 @@ tr808
 tr909
 
 @source:roland/roland_u20.cpp
+u110
 u20
 u220
 
@@ -40558,6 +40635,7 @@ ddz2
 djddz
 jzuanshi
 pljh
+xy168
 
 @source:seequa/chameleon.cpp
 chameleon
@@ -40807,6 +40885,7 @@ twinktmb
 
 @source:sega/megadriv_firecore.cpp
 atgame40
+bfmk
 dcat16
 mahg156
 matet
@@ -42218,16 +42297,22 @@ pclub2
 pclub26w
 pclub26wa
 pclub27s
+pclub2bb
 pclub2fc
 pclub2kc
+pclub2mb
 pclub2pe
 pclub2pf
+pclub2sr
+pclub2ts
 pclub2v3
 pclub2wb
+pclubnbc
 pclubol
 pclubor
 pclubpok
 pclubsc5
+pclubsc6
 pclubyo
 pclubyo2
 pcpooh2
@@ -43276,6 +43361,11 @@ x68ksupr
 x68kxvi
 
 @source:sharp/zaurus.cpp
+zmi10
+zmi310
+zmie1
+zmie21
+zmt300s
 zsl5500
 zslc500
 zsl5600
@@ -45341,6 +45431,7 @@ jgaoshou
 mtrain
 mtraina
 new2001
+ntrecity
 ptrain
 ptraina
 qbeebing
@@ -45369,6 +45460,7 @@ xtrain
 @source:success/big10.cpp
 big10
 big10a
+big10b
 
 @source:success/kurukuru.cpp
 kurukuru
@@ -45600,6 +45692,29 @@ alphatron
 
 @source:tab/tabe22.cpp
 tabe22
+
+@source:tabaustria/royalpkr.cpp
+csmarino
+csmarino020l
+eurodraw
+gmachine
+gmachine010m
+gmachine102m
+jollypk2
+jollypk2116l
+luckyfun
+royalpkr
+royalpkr152l
+royalpkr154l
+royalpkr170h
+royalpkr170l
+royalpkr185l
+royalpkr200l
+tripledr
+tripledr106l
+
+@source:tabaustria/wildpkr.cpp
+wildpkr
 
 @source:taito/2mindril.cpp
 2mindril
@@ -47171,10 +47286,12 @@ ti95
 
 @source:ti/ti85.cpp
 ti73
+ti73v7
 ti73b
 ti81
 ti81v2
 ti82
+ti82stfr
 ti83
 ti83p
 ti83pb
@@ -47196,6 +47313,8 @@ ti84pcsev2
 ti84pce
 ti84pcev15
 ti84pcev30
+ti84pcev50
+ti84pcev61
 ti85
 ti86
 
@@ -47736,6 +47855,7 @@ tsbuzz
 
 @source:tvgames/generalplus_gp327902.cpp
 chikawac
+dswitch
 fairicam
 smksagas
 smksagasa
@@ -47749,9 +47869,13 @@ tomyeggb
 mobigo
 mobigof
 mobigos
+mobigouk
+mobigouka
+mobigoukb
 
 @source:tvgames/generalplus_gpl16250_mobigo2.cpp
 mobigo2
+mobigo2g
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
 beambox
@@ -47795,6 +47919,7 @@ myac220
 smartfp
 smartfpf
 smartfps
+tfmat
 tkmag220
 typo176
 
@@ -47944,6 +48069,7 @@ zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
 dancef2p
+dbldance
 fundr200
 lx_aven
 lx_frozen
@@ -47975,6 +48101,7 @@ doraphonf
 doyousud
 dreamlss
 drumsups
+dvlaptop
 epo_tetr
 fordrace
 genitvp
@@ -47995,9 +48122,11 @@ lpetshop
 lxairjet
 lxspidaj
 mattelcs
+mgarage
 mpntball
 mpntbalt
 mylpony
+nvpoker
 ordentv
 pballpup
 pdcj
@@ -48012,6 +48141,7 @@ senspeed
 senwfit
 smartcyc
 spidm2
+stvscri
 swclone
 tiktokmm
 tmntbftc
@@ -48127,6 +48257,7 @@ disppal
 lexiseal
 lexizeus
 pokermor
+pokmax20
 vgcaplet
 vgcap35
 vsplus
@@ -48173,6 +48304,7 @@ cdlyoko
 dnv200fs
 m505neo
 m521neo
+movesyst
 mywicodx
 mywicogt
 oplayer
@@ -49180,6 +49312,7 @@ vsmilebfp
 
 @source:vtech/vsmilepro.cpp
 vsmilpro
+vsmilprof
 
 @source:vtech/vtech1.cpp
 fellow

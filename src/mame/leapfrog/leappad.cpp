@@ -232,6 +232,16 @@ ROM_START( leappad )
 	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
 ROM_END
 
+ROM_START( leappadw )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("uk")
+	ROM_SYSTEM_BIOS( 0, "uk",  "United Kingdom" )
+	ROMX_LOAD( "lpwriting.u5",       0x000000, 0x200000, CRC(78fb0f39) SHA1(b3faa8f24b9fae9911c3c088cbc8bd8919a2dfaa), ROM_BIOS(0) ) // "ToolPad V2.3.6 LeapPad FullBase V1.1.7 W2K-L0314" "Jun 24 2004 10:49:50 152-10774 2MB UK LPPW Full Base ROM: UK Library"
+
+	ROM_REGION( 0x8000, "bootloader", 0) // Main MCU (LeapFrog FS80A363) internal ROM (exact size unknown)
+	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
+ROM_END
+
 ROM_START( mfleappad )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("internat_v1.3")
@@ -276,6 +286,13 @@ ROM_END
 
 //    year, name,       parent, compat, machine,            input,            class,                  init,       company,    fullname,                  flags
 CONS( 2001, leappad,    0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, leappadw,   0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Writing",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Compatible with regular LeapPad carts, but also has system specific carts
 CONS( 2004, leappadmic, 0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Microphone", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Compatible with regular LeapPad carts
+// "LeapPad Read Aloud" (alt name for LeapPad Plus Microphone?)
+// "LeapPad Plus Writing & Microphone"
+// "QuantumPad" (has unique carts)
+
+// a 'Microphone Upgrade Kit' cartridge exists (gives regular units Microphone support?)
+
+CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, ltleappad,  0,      0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

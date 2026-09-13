@@ -189,15 +189,15 @@ u8 ivant_state::read_inputs()
 	// get input mux from P2/P7/P5
 	u16 inp_mux = BIT(~m_port5, 5) << 9 | bitswap<8>(~m_port7,0,1,7,6,5,4,3,2) << 1 | BIT(~m_port2, 6);
 
-	// read buttons
-	for (int i = 0; i < 2; i++)
-		if (BIT(inp_mux, i + 8))
-			data |= m_inputs[i]->read();
-
 	// read chessboard
 	for (int i = 0; i < 8; i++)
 		if (BIT(inp_mux, i))
 			data |= m_board->read_file(i, true);
+
+	// read buttons
+	for (int i = 0; i < 2; i++)
+		if (BIT(inp_mux, i + 8))
+			data |= m_inputs[i]->read();
 
 	// P64-P66 are also IRQ pins (the ON button is IRQ0)
 	if (!machine().side_effects_disabled())

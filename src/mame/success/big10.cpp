@@ -77,12 +77,16 @@ public:
 
 	void big10(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
-	uint8_t m_mux_data = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
 	output_finder<> m_lamp;
+
+	uint8_t m_mux_data = 0;
 
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -91,6 +95,11 @@ private:
 	void mux_w(uint8_t data);
 };
 
+
+void big10_state::machine_start()
+{
+	save_item(NAME(m_mux_data));
+}
 
 /****************************************
 *  Input Ports Demux & Common Routines  *
@@ -270,6 +279,14 @@ ROM_START( big10a )
 	ROM_LOAD( "auto.big-10-3.ic2", 0x8000, 0x4000, CRC(6ab10d37) SHA1(0ea137d08de3c72ef9e72126114f9da2be7602ab) )
 ROM_END
 
+// PCB marked SYSTEM MAKE3 with Cosmo Corporation sticker, ROMs unlabeled
+ROM_START( big10b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.ic4", 0x0000, 0x4000, CRC(df2f773c) SHA1(6b0ddfc4cb40cde28bc9eaca2c80984e62401542) )
+	ROM_LOAD( "2.ic3", 0x4000, 0x4000, CRC(9267f841) SHA1(ad7b32e92b2d81fc147b5d5c348961229f7f4f1c) )
+	ROM_LOAD( "3.ic2", 0x8000, 0x4000, CRC(6ab10d37) SHA1(0ea137d08de3c72ef9e72126114f9da2be7602ab) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -277,6 +294,7 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-//    YEAR  NAME    PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY         FULLNAME                      FLAGS
-GAME( 1985, big10,  0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",      "Big 10 (1985, Success)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, big10a, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "System Make",  "Big 10 (1986, System Make)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY         FULLNAME                             FLAGS
+GAME( 1985, big10,  0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",      "Big 10 (1985, Success)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, big10a, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "System Make",  "Big 10 (1986, System Make, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, big10b, big10a,   big10,    big10,    big10_state, empty_init, ROT0,   "System Make",  "Big 10 (1986, System Make, set 2)", MACHINE_SUPPORTS_SAVE )

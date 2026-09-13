@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -20,14 +20,10 @@ license:CC0-1.0
 	</software>
 
 	<!-- origin: archive.org -->
-	<software name="bopnrumb" supported="no">
+	<software name="bopnrumb">
 		<description>Bop 'n Rumble (cracked by The Last Science and The Artworx)</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
-		<notes><![CDATA[
-LOAD "BOP N RUMBLE",8,1
-[VIC] player sprite cuts off in the middle
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="bopn_rumble_1987_melbourne_house_h_the_last_sciencethe_artworx.d64" size="174848" crc="9ba2f963" sha1="d3e672d586f8fdc4719adce13cbe14a281bf7696" offset="0" />
@@ -50,6 +46,18 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
+	<software name="elvira2">
+		<description>Elvira II: The Jaws of Cerberus (Germany, FD-2000)</description>
+		<year>1992</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Flair Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1658880">
+				<rom name="elvira_ii_mistress_of_the_dark_1992_flair_software.d2m" size="1658880" crc="4eada167" sha1="03fc4eae44187826cf06e54610f525621e1b7cc3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fcc"> <!-- optional -->
 		<description>The Final ChessCard</description>
 		<year>1990</year>
@@ -67,6 +75,109 @@ Laggy [joystick] fire button (half the times won't trigger)
 			<feature name="part_id" value="Disk 2"/> <!-- save disk -->
 			<dataarea name="flop" size="174848">
 				<rom name="fcc_disk2.d64" size="174848" crc="60042a32" sha1="c768a13201bdf78e1dd387ef9370dc10259d3f22" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jb1520">
+		<description>1520 Printer/Plotter Demo Disks</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-1.a.d64" size="174848" crc="55a29473" sha1="6e2ebc2968a751b425a417bf21aa361e92454c16"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-1.b.d64" size="174848" crc="4cecd96e" sha1="1b57362903731d1475865a77708d7b4d6d9f25b1"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-1.c.d64" size="174848" crc="ab1305fc" sha1="765d37c370a34bdf48825eee11a43d88948e85f7"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-2.a.d64" size="174848" crc="ec10e299" sha1="425a38a7f44f4ffa806169f17309b23de99fd778"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-2.b.d64" size="174848" crc="3173cc1f" sha1="f1e13a68371a2c0eb4e300879760586ed1e682c3"/>
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb-1520-2.c.d64" size="174848" crc="079070ce" sha1="b4cf8cf3544a6008ffe4e3ffcd14a496429e5009"/>
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-3.a.d64" size="174848" crc="121e2e5c" sha1="4671c170e259e1f438ec35296d248598204daac5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-3.b.d64" size="174848" crc="698d84a1" sha1="2b4eb3a97cb2c15bf678e4d3df7b60af6a0cf6b5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-3.c.d64" size="174848" crc="e73ecaad" sha1="bdae4b475a101f7ee2ed8eab2530eb965ed21706"/>
+			</dataarea>
+		</part>
+
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-4.a.d64" size="174848" crc="e883f38d" sha1="bb95a520f3de2754abe3dcd986139f7ae776d06d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-4.b.d64" size="174848" crc="9829b758" sha1="1d9228d4220420d4d8e66a80cdae93e0fefc4e47"/>
+			</dataarea>
+		</part>
+
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-4.c.d64" size="174848" crc="c2ff5fd2" sha1="13c8778a6363e17eb8a4941da5eca4b8661c69ae"/>
+			</dataarea>
+		</part>
+
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-5.a.d64" size="174848" crc="f9e34779" sha1="e09d1dab94766e005412dd7a4a4ca2d684a274ef"/>
+			</dataarea>
+		</part>
+
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jb.1520-5.b.d64" size="174848" crc="92a526a2" sha1="db299e3727b4b58a28a19ddceca9dc31ad2f4418"/>
 			</dataarea>
 		</part>
 	</software>
@@ -139,6 +250,21 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
+	<software name="metaldstf" cloneof="metaldst" supported="no">
+		<description>Metal Dust (FD-4000)</description>
+		<year>2005</year>
+		<publisher>Protovision</publisher>
+
+		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3317760">
+				<rom name="metal_dust_2005_protovision.d4m" size="3317760" crc="8f06cc6d" sha1="640bedee3b30e1227c0867ff5fb5ef802c2070a4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- origin: archive.org -->
 	<software name="ragsrich" supported="no">
 		<description>Rags to Riches</description>
@@ -188,6 +314,20 @@ Hi-score table is corrupt (dump really?)
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="opthunder">
+		<description>Operation Thunderbolt</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Supports Magnum Light Phaser (magnum) in joystick port 1"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="operation_thunderbolt.d64" size="174848" crc="70737680" sha1="d961171e5519c39930219838f3b79561bbe5115b"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- !Compilations -->
 
@@ -507,6 +647,32 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="prodosdm" supported="no">
+		<description>Professional-DOS - VTS Release Demo</description>
+		<year>1987</year>
+		<publisher>VTS Data</publisher>
+		<sharedfeat name="requirement" value="iec8:c1541pd"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="professional-dos_vts_release_demo.d64" size="174848" crc="be43ee5e" sha1="006a821084231fa1619796aa5edd46ec5cfcc32e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ictutil" supported="no">
+		<description>ICT Hard-Disk Utilities v2</description>
+		<year>1987</year>
+		<publisher>InConTrol</publisher>
+		<sharedfeat name="requirement" value="iec8:minichief"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ictutili.d64" size="174848" crc="b9677d38" sha1="5add8d2618183f9145a00068dd20fe86928f9c35"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sfxse">
 		<description>SFX Sound Expander Test/Demo Disk</description>
 		<year>1985</year>
@@ -708,6 +874,50 @@ Hi-score table is corrupt (dump really?)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="turbo232.d64" size="174848" crc="48874d98" sha1="28b6d25bb0b62df81c4b17d9205c059c6736e817"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmdhd">
+		<description>CMD HD Utilities</description>
+		<year>1993</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="HD Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="hd-utilities.d64" size="174848" crc="4a3ab5df" sha1="b757538611e98fb71dbcfbf17f51dfa3c2ddfb6a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="GEOS Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="hd_geos_utils.d64" size="174848" crc="fd2ae57a" sha1="c132ab9b534aa51236c6622c0a37746b2f5a59ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmdfdutl">
+		<description>CMD FD Utilities v1.05</description>
+		<year>1993</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="fd-utilities_v105.d64" size="174848" crc="99115313" sha1="be1577a9afafee4ec1e4ef3704d54dcce86a83b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmdutil04">
+		<description>CMD Utilities '04</description>
+		<year>2004</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_utilities_04_s1.d64" size="174848" crc="6df2288f" sha1="3a3baef7c2d055d17d8c9fd592132cac55239e78"/>
 			</dataarea>
 		</part>
 	</software>

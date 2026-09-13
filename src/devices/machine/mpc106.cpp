@@ -110,14 +110,7 @@ void mpc106_host_device::device_start()
 		m_cpu_space->install_read_handler (0xfe800000, 0xfebfffff, read32s_delegate(*this, FUNC(mpc106_host_device::pci_io_r<0x00800000>)));
 		m_cpu_space->install_write_handler(0xfe800000, 0xfebfffff, write32s_delegate(*this, FUNC(mpc106_host_device::pci_io_w<0x00800000>)));
 
-		if (m_picr1 & PICR1_LE_MODE)
-		{
-			m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map_le);
-		}
-		else
-		{
-			m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map_be);
-		}
+		install_config_access_map();
 	}
 
 	save_item(NAME(m_pwrconfig1));
@@ -144,6 +137,20 @@ void mpc106_host_device::reset_all_mappings()
 void mpc106_host_device::device_reset()
 {
 	pci_host_device::device_reset();
+}
+
+// The CONFIG_ADDR/CONFIG_DATA window follows the host's byte order, so it has to be reinstalled
+// when the firmware flips PICR1[LE_MODE] (MaciNTosh ARC firmware needs this).
+void mpc106_host_device::install_config_access_map()
+{
+	if (m_picr1 & PICR1_LE_MODE)
+	{
+		m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map_le);
+	}
+	else
+	{
+		m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map_be);
+	}
 }
 
 void mpc106_host_device::access_map_le(address_map &map)
@@ -183,7 +190,7 @@ u32 mpc106_host_device::cpu_memory_r(offs_t offset, u32 mem_mask)
 {
 	if (m_picr1 & PICR1_LE_MODE)
 	{
-		return m_cpu_space->read_dword(Base + (offset * 4), mem_mask);
+		return m_cpu_space->read_dword(Base + ((offset * 4) ^ 4), mem_mask);
 	}
 	else
 	{
@@ -196,7 +203,7 @@ void mpc106_host_device::cpu_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (m_picr1 & PICR1_LE_MODE)
 	{
-		m_cpu_space->write_dword(Base + (offset * 4), data, mem_mask);
+		m_cpu_space->write_dword(Base + ((offset * 4) ^ 4), data, mem_mask);
 	}
 	else
 	{
@@ -215,7 +222,7 @@ u32 mpc106_host_device::pci_memory_r(offs_t offset, u32 mem_mask)
 {
 	if (m_picr1 & PICR1_LE_MODE)
 	{
-		return this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), mem_mask);
+		return this->space(AS_PCI_MEM).read_dword(Base + ((offset * 4) ^ 4), mem_mask);
 	}
 	else
 	{
@@ -228,7 +235,7 @@ void mpc106_host_device::pci_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (m_picr1 & PICR1_LE_MODE)
 	{
-		this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), data, mem_mask);
+		this->space(AS_PCI_MEM).write_dword(Base + ((offset * 4) ^ 4), data, mem_mask);
 	}
 	else
 	{
@@ -247,7 +254,7 @@ u32 mpc106_host_device::pci_io_r(offs_t offset, u32 mem_mask)
 {
 	if (m_picr1 & PICR1_LE_MODE)
 	{
-		return this->space(AS_PCI_IO).read_dword(Base + (offset * 4), mem_mask);
+		return this->space(AS_PCI_IO).read_dword(Base + ((offset * 4) ^ 4), mem_mask);
 	}
 	else
 	{
@@ -260,7 +267,7 @@ void mpc106_host_device::pci_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (m_picr1 & PICR1_LE_MODE)
 	{
-		this->space(AS_PCI_IO).write_dword(Base + (offset * 4), data, mem_mask);
+		this->space(AS_PCI_IO).write_dword(Base + ((offset * 4) ^ 4), data, mem_mask);
 	}
 	else
 	{
@@ -398,5 +405,11 @@ u32 mpc106_host_device::picr1_r()
 
 void mpc106_host_device::picr1_w(u32 data)
 {
+	const u32 changed = m_picr1 ^ data;
 	m_picr1 = data;
+
+	if ((changed & PICR1_LE_MODE) && (m_map_type == MAP_TYPE_B))
+	{
+		install_config_access_map();
+	}
 }

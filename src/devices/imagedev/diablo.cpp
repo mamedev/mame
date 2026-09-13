@@ -122,10 +122,8 @@ std::pair<std::error_condition, std::string> diablo_image_device::call_create(in
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	util::core_file::ptr proxy;
-	std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
-	if (!err)
-		m_origchd.create(std::move(proxy), uint64_t(totalsectors) * uint64_t(sectorsize), hunksize, sectorsize, compression);
+	std::error_condition err;
+	err = m_origchd.create(image_core_file(), uint64_t(totalsectors) * uint64_t(sectorsize), hunksize, sectorsize, compression);
 	if (err)
 		return std::make_pair(err, std::string());
 
@@ -210,19 +208,14 @@ std::error_condition diablo_image_device::internal_load_dsk()
 	}
 	else
 	{
-		util::core_file::ptr proxy;
-		err = util::core_file::open_proxy(image_core_file(), proxy);
-		if (!err)
-			err = m_origchd.open(std::move(proxy), true);
+		err = m_origchd.open(image_core_file(), true);
 		if (!err)
 		{
 			m_chd = &m_origchd;
 		}
 		else if (err == chd_file::error::FILE_NOT_WRITEABLE)
 		{
-			err = util::core_file::open_proxy(image_core_file(), proxy);
-			if (!err)
-				err = m_origchd.open(std::move(proxy), false);
+			err = m_origchd.open(image_core_file(), false);
 			if (!err)
 			{
 				err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);

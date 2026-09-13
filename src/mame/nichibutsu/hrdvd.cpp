@@ -224,21 +224,21 @@ void hrdvd_ata_controller_device::dma_write(uint16_t data)
 uint16_t hrdvd_ata_controller_device::read(offs_t offset, uint16_t mem_mask)
 {
 	if(mem_mask == 0xffff)
-		return swapendian_int16(internal_read_cs0(offset * 2, 0xffff));
+		return swapendian_int16(internal_read_cs0(offset * 2));
 	else if(ACCESSING_BITS_0_7)
-		return internal_read_cs0(offset * 2 + 1, 0xff);
+		return internal_read_cs0(offset * 2 + 1);
 	else
-		return internal_read_cs0(offset * 2, 0xff) << 8;
+		return internal_read_cs0(offset * 2) << 8;
 }
 
 void hrdvd_ata_controller_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(mem_mask == 0xffff)
-		internal_write_cs0(offset * 2, swapendian_int16(data), 0xffff);
+		internal_write_cs0(offset * 2, swapendian_int16(data));
 	else if(ACCESSING_BITS_0_7)
-		internal_write_cs0(offset * 2 + 1, data, 0xff);
+		internal_write_cs0(offset * 2 + 1, data);
 	else
-		internal_write_cs0(offset * 2, data >> 8, 0xff);
+		internal_write_cs0(offset * 2, data >> 8);
 }
 
 

@@ -76,7 +76,7 @@ private:
 	class ti99_rpk_socket;
 	class rpk;
 
-	static std::error_condition rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name, std::unique_ptr<rpk> &result);
+	static std::error_condition rpk_open(emu_options &options, util::random_read &stream, const char *system_name, std::unique_ptr<rpk> &result);
 	static std::error_condition rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result);
 	static std::unique_ptr<ti99_rpk_socket> rpk_load_ram_resource(emu_options &options, const rpk_socket &socket, const char *system_name);
 
@@ -171,6 +171,8 @@ public:
 	ti99_cartridge_pcb();
 	virtual ~ti99_cartridge_pcb() { }
 
+	device_t &device() { return *m_cart; }
+
 protected:
 	virtual void readz(offs_t offset, uint8_t *value);
 	virtual void write(offs_t offset, uint8_t data);
@@ -199,7 +201,6 @@ protected:
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
 	bool                is_grom_idle() { return m_cart->m_grom_idle; }
-	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const { m_cart->logerror(fmt, args...); }
 
 	ti99_cartridge_device*  m_cart;
 

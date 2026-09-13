@@ -235,6 +235,9 @@ k053936_device::k053936_device(const machine_config &mconfig, const char *tag, d
 	m_linectrl(nullptr),
 	m_xoff(0),
 	m_yoff(0),
+	m_xoff_flip(0),
+	m_yoff_flip(0),
+	m_flip(false),
 	m_wrap(false)
 {
 }
@@ -250,6 +253,7 @@ void k053936_device::device_start()
 
 	save_pointer(NAME(m_ctrl), 0x20);
 	save_pointer(NAME(m_linectrl), 0x4000);
+	save_item(NAME(m_flip));
 }
 
 //-------------------------------------------------
@@ -294,6 +298,9 @@ void k053936_device::zoom_draw_common(screen_device &screen, BitmapClass &bitmap
 	if (!tmap)
 		return;
 
+	int const xoff = m_flip ? m_xoff_flip : m_xoff;
+	int const yoff = m_flip ? m_yoff_flip : m_yoff;
+
 	if (m_ctrl[0x07] & 0x0040)
 	{
 		rectangle my_clip;
@@ -309,17 +316,17 @@ void k053936_device::zoom_draw_common(screen_device &screen, BitmapClass &bitmap
 
 		if (((m_ctrl[0x07] & 0x0002) && m_ctrl[0x09]) && (glfgreat_hack)) /* wrong, but fixes glfgreat */
 		{
-			my_clip.min_x = m_ctrl[0x08] + m_xoff + 2;
-			my_clip.max_x = m_ctrl[0x09] + m_xoff + 2 - 1;
+			my_clip.min_x = m_ctrl[0x08] + xoff + 2;
+			my_clip.max_x = m_ctrl[0x09] + xoff + 2 - 1;
 			if (my_clip.min_x < cliprect.min_x)
 				my_clip.min_x = cliprect.min_x;
 			if (my_clip.max_x > cliprect.max_x)
 				my_clip.max_x = cliprect.max_x;
 
-			y = m_ctrl[0x0a] + m_yoff - 2;
+			y = m_ctrl[0x0a] + yoff - 2;
 			if (y < cliprect.min_y)
 				y = cliprect.min_y;
-			maxy = m_ctrl[0x0b] + m_yoff - 2 - 1;
+			maxy = m_ctrl[0x0b] + yoff - 2 - 1;
 			if (maxy > cliprect.max_y)
 				maxy = cliprect.max_y;
 		}
@@ -334,7 +341,7 @@ void k053936_device::zoom_draw_common(screen_device &screen, BitmapClass &bitmap
 
 		while (y <= maxy)
 		{
-			uint16_t const *const lineaddr = m_linectrl.get() + 4 * ((y - m_yoff) & 0x1ff);
+			uint16_t const *const lineaddr = m_linectrl.get() + 4 * ((y - yoff) & 0x1ff);
 
 			my_clip.min_y = my_clip.max_y = y;
 
@@ -349,8 +356,8 @@ void k053936_device::zoom_draw_common(screen_device &screen, BitmapClass &bitmap
 			if (m_ctrl[0x06] & 0x0080)
 				incxy *= 256;
 
-			startx -= m_xoff * incxx;
-			starty -= m_xoff * incxy;
+			startx -= xoff * incxx;
+			starty -= xoff * incxy;
 
 			tmap->draw_roz(screen, bitmap, my_clip, startx << 5,starty << 5,
 					incxx << 5,incxy << 5,0,0,
@@ -381,11 +388,11 @@ void k053936_device::zoom_draw_common(screen_device &screen, BitmapClass &bitmap
 			incxy *= 256;
 		}
 
-		startx -= m_yoff * incyx;
-		starty -= m_yoff * incyy;
+		startx -= yoff * incyx;
+		starty -= yoff * incyy;
 
-		startx -= m_xoff * incxx;
-		starty -= m_xoff * incxy;
+		startx -= xoff * incxx;
+		starty -= xoff * incxy;
 
 		tmap->draw_roz(screen, bitmap, cliprect, startx << 5,starty << 5,
 				incxx << 5,incxy << 5,incyx << 5,incyy << 5,

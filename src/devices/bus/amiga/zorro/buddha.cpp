@@ -187,42 +187,42 @@ void buddha_device::ide_interrupt_enable_w(offs_t offset, uint16_t data, uint16_
 
 uint16_t buddha_device::ide_0_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_0->cs0_swap_r((offset >> 1) & 0x07, mem_mask);
+	return m_ata_0->cs0_swap_r((offset >> 1) & 0x07);
 }
 
 void buddha_device::ide_0_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_0->cs0_swap_w((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_0->cs0_swap_w((offset >> 1) & 0x07, data);
 }
 
 uint16_t buddha_device::ide_0_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_0->cs1_swap_r((offset >> 1) & 0x07, mem_mask);
+	return m_ata_0->cs1_swap_r((offset >> 1) & 0x07);
 }
 
 void buddha_device::ide_0_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_0->cs1_swap_w((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_0->cs1_swap_w((offset >> 1) & 0x07, data);
 }
 
 uint16_t buddha_device::ide_1_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_1->cs0_swap_r((offset >> 1) & 0x07, mem_mask);
+	return m_ata_1->cs0_swap_r((offset >> 1) & 0x07);
 }
 
 void buddha_device::ide_1_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_1->cs0_swap_w((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_1->cs0_swap_w((offset >> 1) & 0x07, data);
 }
 
 uint16_t buddha_device::ide_1_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ata_1->cs1_swap_r((offset >> 1) & 0x07, mem_mask);
+	return m_ata_1->cs1_swap_r((offset >> 1) & 0x07);
 }
 
 void buddha_device::ide_1_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ata_1->cs1_swap_w((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_1->cs1_swap_w((offset >> 1) & 0x07, data);
 }
 
 

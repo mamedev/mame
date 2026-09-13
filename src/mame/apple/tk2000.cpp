@@ -6,8 +6,10 @@
 
     Driver by R. Belmont
 
-    This system is only vaguely Apple II compatible.
-    The keyboard works entirely differently, which is a big deal.
+    This system is only vaguely Apple II compatible. The only video mode is
+    hi-res graphics (other Apple II modes are simulated), the keyboard and
+    joystick work entirely differently, and a lot of other I/O bits are
+    moved to different addresses.
 
     TODO: emulate expansion connector (not wholly Apple II compatible)
     TODO: emulate joystick port (wired to KBIN and KBOUT)

@@ -63,9 +63,11 @@ void w65816_device::init()
 	state_add(W65816_P,        "P",         m_P).callimport();
 	state_add(W65816_S,        "SP",        m_SP).callimport();
 	state_add(W65816_D,        "D",         m_D);
-	state_add(W65816_DB,       "DB",        m_DB);
 	state_add(W65816_PB,       "PB",        m_PB);
-	state_add(W65816_E,        "E",         m_E).callimport();
+	state_add(W65816_DB,       "DB",        m_DB);
+	state_add(W65816_E,        "e",         m_E).mask(1).callimport().formatstr("%1X");
+	state_add(W65816_IRQ,      "IRQ",       m_irq_state).mask(1).callimport().formatstr("%1X");
+	state_add(W65816_NMI,      "NMI",       m_nmi_state).mask(1).callimport().formatstr("%1X");
 	state_add(W65816_IR,       "IR",        m_IR);
 
 	save_item(NAME(m_PPC));
@@ -296,14 +298,14 @@ void w65816_device::state_string_export(const device_state_entry &entry, std::st
 	case STATE_GENFLAGS:
 	case W65816_P:
 		str = string_format("%c%c%c%c%c%c%c%c",
-						m_P & F_N ? 'N' : '.',
-						m_P & F_V ? 'V' : '.',
-						m_E ? 'E' : (m_P & F_M ? 'M' : '.'),
-						m_E ? '-' : (m_P & F_X ? 'X' : '.'),
-						m_P & F_D ? 'D' : '.',
-						m_P & F_I ? 'I' : '.',
-						m_P & F_Z ? 'Z' : '.',
-						m_P & F_C ? 'C' : '.');
+						m_P & F_N ? 'n' : '.',
+						m_P & F_V ? 'v' : '.',
+						m_P & F_M ? (m_E ? ' ' : 'm') : '.',
+						m_P & F_X ? (m_E ? 'b' : 'x') : '.',
+						m_P & F_D ? 'd' : '.',
+						m_P & F_I ? 'i' : '.',
+						m_P & F_Z ? 'z' : '.',
+						m_P & F_C ? 'c' : '.');
 		break;
 	}
 }

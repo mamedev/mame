@@ -22,7 +22,8 @@
 
 // ======================> cbm_serial_box_device
 
-class cbm_serial_box_device : public device_t, public device_cbm_iec_interface
+class cbm_serial_box_device : public device_t,
+							  public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
@@ -36,16 +37,28 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
-	void cbm_iec_atn(int state) override;
-	void cbm_iec_data(int state) override;
 	void cbm_iec_reset(int state) override;
 
 private:
+	enum
+	{
+		LED_RUN = 0,
+		LED_PAUSE,
+		LED_FULL
+	};
+
 	required_device<w65c02_device> m_maincpu;
+	required_device<cbm_iec_device> m_iec;
+	output_finder<3> m_leds;
+	required_ioport m_pb;
 
 	void serial_box_mem(address_map &map) ATTR_COLD;
+
+	uint8_t io_r();
+	void io_w(uint8_t data);
 };
 
 

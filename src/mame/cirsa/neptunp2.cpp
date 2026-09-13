@@ -634,6 +634,27 @@ ROM_START( unk960606 )
 	ROM_LOAD( "pal16l8.u6", 0x000, 0x104, NO_DUMP )
 ROM_END
 
+ROM_START( unk960606a )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "m27c801.u2", 0x000000, 0x100000, CRC(db7b9e6e) SHA1(442dd4c5b601c327e372e66ff330b35f927dba8b) )
+
+	ROM_REGION( 0x100000, "prg_data", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "u14", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u15", 0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16.u10", 0x000, 0x800, CRC(e2c0e3c5) SHA1(ec48d243bee97508147ab0b32e69e9c822cb3246) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "counters.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
+ROM_END
+
 /* '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'.
    It was found with most sockets unpopulated. This is mechanical.
    Two stickers on the PCB:
@@ -763,7 +784,8 @@ GAME( 2008,  gladiador,  0,         no_video, c960606,  neptunp2_state,       em
 GAME( 2006,  mltpoints,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
 GAME( 1999,  rockroll,   0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from parts' manual and sticker on PCB
 GAME( 2001?, unk960606,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
-GAME( 2001?, unk960606b, 0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( ????,  unk960606a, 0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 2)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2001?, unk960606b, 0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 3)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
 
 // B. Gaming Technology Ltd. (BGT) fruit machines on Cirsa "960606-5" CPU PCB
 GAME( 1997,  bg_barmy,   0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Barmy Army",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

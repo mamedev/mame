@@ -819,7 +819,7 @@ void namcos22_state::register_normals(int addr, float m[4][4])
 		if (dotproduct < 0.0f)
 			dotproduct = 0.0f;
 
-		m_LitSurfaceInfo[m_LitSurfaceCount++] = m_camera_ambient + m_camera_power * dotproduct;
+		m_LitSurfaceInfo[m_LitSurfaceCount++] = m_camera_ambient + m_LitSurfaceIntensity * dotproduct;
 	}
 }
 
@@ -1070,36 +1070,54 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 	zmax = std::clamp(zmax, 0.0f, (float)0x1fffff);
 	int cz_value = zmax + 0.5f; // not from zsort
 
-	// u, v, bri
+	// u, v
 	for (int i = 0; i < 4; i++)
 	{
-		int bri;
-
 		v[i].u = point_read(0 + i * 2 + addr);
 		v[i].v = point_read(1 + i * 2 + addr);
+	}
 
-		if (m_LitSurfaceCount > 0)
+	// bri
+	if (m_LitSurfaceCount > 0)
+	{
+		// lighting
+		if (m_LitSurfaceGouraud)
 		{
-			// lighting (prelim)
-			int index = m_LitSurfaceIndex++;
-			if (m_LitSurfaceCount > 4)
-				index >>= 2;
-			index %= m_LitSurfaceCount;
+			// Gouraud shading
+			int index = m_LitSurfaceTriangles ? (m_LitSurfaceIndex >> 1) : m_LitSurfaceIndex;
+			const int normal_index[4] = { 0, m_LitSurfaceWidth, m_LitSurfaceWidth + 1, 1 };
+			index = index / (m_LitSurfaceWidth - 1) + index;
 
-			bri = m_LitSurfaceInfo[index];
-		}
-		else if (packetformat & 0x40)
-		{
-			// gourad shading
-			bri = point_read(i + addr) >> 16 & 0xff;
+			for (int i = 0; i < 4; i++)
+				v[i].bri = m_LitSurfaceInfo[index + normal_index[i]];
+
+			// if using triangles, need to remap the normals a little
+			if (m_LitSurfaceTriangles)
+			{
+				if (m_LitSurfaceIndex & 1)
+					v[0].bri = v[1].bri;
+				else
+					v[2].bri = v[3].bri;
+			}
 		}
 		else
 		{
 			// flat shading
-			bri = color >> 16 & 0xff;
+			for (int i = 0; i < 4; i++)
+				v[i].bri = m_LitSurfaceInfo[m_LitSurfaceIndex];
 		}
-
-		v[i].bri = bri;
+	}
+	else if (packetformat & 0x40)
+	{
+		// Gouraud shading
+		for (int i = 0; i < 4; i++)
+			v[i].bri = point_read(i + addr) >> 16 & 0xff;
+	}
+	else
+	{
+		// flat shading
+		for (int i = 0; i < 4; i++)
+			v[i].bri = color >> 16 & 0xff;
 	}
 
 	// allocate quad
@@ -1168,6 +1186,7 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				color = point_read(addr + 2);
 				bias = 0;
 				blit_single_quad(color, addr + 3, m, bias, flags, packetformat);
+				m_LitSurfaceIndex++;
 				break;
 
 			case 0x18:
@@ -1181,16 +1200,22 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				color = point_read(addr + 2);
 				bias  = point_read(addr + 3);
 				blit_single_quad(color, addr + 4, m, bias, flags, packetformat);
+				m_LitSurfaceIndex++;
 				break;
 
 			case 0x10: /* vertex lighting */
-				/*
-				333401 (opcode)
-				000000  [count] [type]
-				000000  000000  007fff // normal vector
-				000000  000000  007fff // normal vector
-				000000  000000  007fff // normal vector
-				000000  000000  007fff // normal vector
+				/**
+				* word 0: opcode (333401)
+				* word 1: lighting mode, mesh width
+				*         ---x.----.----.----.----.----  use triangles (quads with two duplicated vertices)
+				*         ----.xxxx.----.----.----.----  mesh width
+				*         ----.----.----.----.----.--xx  shading mode (0 = flat, 1 = Gouraud, 2 = Gouraud with shared normals)
+				* word 2: number of normals
+				*         ----.--xx.----.----.----.----  normals in last batch minus 1
+				*         ----.----.xx--.----.----.----  56 extra normals for 1, 84 extra normals for 3
+				*         ----.----.----.----.----.xxxx  number of additional batches
+				* word 3: intensity of diffuse light
+				* words 4-15: four normal vectors
 
 				used in:
 				- acedrive/victlap sparks
@@ -1205,9 +1230,13 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				- ridgerac rotating sign before 2nd tunnel
 				- timecris Sherudo's knives
 				*/
-				m_SurfaceNormalFormat = point_read(addr + 3);
 				m_LitSurfaceCount = 0;
 				m_LitSurfaceIndex = 0;
+				m_LitSurfaceGouraud = (point_read(addr + 1) & 3) > 0;
+				m_LitSurfaceWidth = ((point_read(addr + 1) >> 16) & 0xf) + 1;
+				m_LitSurfaceTriangles = ((point_read(addr + 1) >> 20) & 1) > 0;
+				m_LitSurfaceIntensity = ((point_read(addr + 3) & 0xffff) * m_camera_power) >> 15;
+				
 				register_normals(addr + 4, m);
 				break;
 

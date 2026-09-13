@@ -810,7 +810,7 @@ private:
 		int gdb_regnum;
 		gdb_register_type gdb_type;
 		int gdb_bitsize;
-		int state_index;
+		const device_state_entry *state_entry;
 	};
 	std::vector<gdb_register> m_gdb_registers;
 	std::set<int> m_stop_reply_registers;
@@ -926,7 +926,11 @@ void debug_gdbstub::generate_target_xml()
 			target_xml += string_format("  <feature name=\"%s\">\n", feature_name);
 		}
 
-		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
+		// the group is the device's absolute path (the feature name without its "mame." prefix)
+		if ( reg.gdb_feature_name.compare(0, 5, "mame.") == 0 )
+			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\" group=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type], reg.gdb_feature_name.c_str() + 5);
+		else
+			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
 	}
 	if (!feature_name.empty())
 		target_xml += "  </feature>\n";
@@ -979,38 +983,88 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		for ( const auto &feature: register_map.features )
 			for ( const auto &reg: feature.registers )
 			{
-				bool added = false;
+				const device_state_entry *entry_found = nullptr;
 				for ( const auto &entry: m_state->state_entries() )
-				{
-					const char *symbol = entry->symbol();
-					if ( strcmp(symbol, reg.state_name) == 0 )
+					if ( strcmp(entry->symbol(), reg.state_name) == 0 )
 					{
-						gdb_register new_reg;
-						new_reg.gdb_feature_name = feature.feature_name;
-						new_reg.gdb_name = reg.gdb_name;
-						new_reg.gdb_regnum = cur_gdb_regnum;
-						new_reg.gdb_type = reg.gdb_type;
-						if ( reg.override_bitsize != -1 )
-							new_reg.gdb_bitsize = reg.override_bitsize;
-						else
-							new_reg.gdb_bitsize = entry->datasize() * 8;
-						new_reg.state_index = entry->index();
-						m_gdb_registers.push_back(std::move(new_reg));
-						if ( reg.stop_packet )
-							m_stop_reply_registers.insert(cur_gdb_regnum);
-						added = true;
-						cur_gdb_regnum++;
+						entry_found = entry.get();
 						break;
 					}
+				if ( entry_found != nullptr )
+				{
+					gdb_register new_reg;
+					new_reg.gdb_feature_name = feature.feature_name;
+					new_reg.gdb_name = reg.gdb_name;
+					new_reg.gdb_regnum = cur_gdb_regnum;
+					new_reg.gdb_type = reg.gdb_type;
+					if ( reg.override_bitsize != -1 )
+						new_reg.gdb_bitsize = reg.override_bitsize;
+					else
+						new_reg.gdb_bitsize = entry_found->datasize() * 8;
+					new_reg.state_entry = entry_found;
+					m_gdb_registers.push_back(std::move(new_reg));
+					if ( reg.stop_packet )
+						m_stop_reply_registers.insert(cur_gdb_regnum);
+					cur_gdb_regnum++;
 				}
-				if ( !added )
+				else
 					osd_printf_info("gdbstub: could not find register [%s]\n", reg.gdb_name);
 			}
 
-#if 0
-		for ( const auto &reg: m_gdb_registers )
-			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
-#endif
+		// append the visible state entries of every other device
+		{
+			std::set<std::string> used_names;
+			auto sanitize = [](std::string &s, bool keep_slash)
+			{
+				for (char &c : s)
+					if ( !isalnum(c) && c != '_' && (!keep_slash || c != '/') )
+						c = '_';
+			};
+			for ( const auto &reg: m_gdb_registers )
+				used_names.insert(reg.gdb_name);
+			for (device_state_interface &state : device_interface_enumerator<device_state_interface>(m_machine->root_device()))
+			{
+				if ( &state.device() == m_maincpu )
+					continue;
+				// ':' -> '/' keeps the path hierarchy unambiguous: device
+				// tags may contain '_' themselves
+				std::string tag = state.device().tag();
+				std::replace(tag.begin(), tag.end(), ':', '/');
+				sanitize(tag, true);
+				tag.erase(0, tag.find_first_not_of("_/"));
+				tag.erase(tag.find_last_not_of("_/") + 1);
+				tag.insert(tag.begin(), '/');
+				std::string feature_name = "mame." + tag;
+				for ( const auto &entry: state.state_entries() )
+				{
+					if ( !entry->visible() || entry->divider() )
+						continue;
+					std::string name = entry->symbol();
+					sanitize(name, false);
+					if ( name.empty() )
+						continue;
+					if ( !isalpha(name[0]) && name[0] != '_' )
+						name.insert(0, 1, '_');
+					if ( used_names.count(name) != 0 )
+					{
+						name = tag + "_" + name;
+						sanitize(name, false);
+						if ( used_names.count(name) != 0 )
+							continue;
+					}
+					used_names.insert(name);
+					gdb_register new_reg;
+					new_reg.gdb_feature_name = feature_name;
+					new_reg.gdb_name = name;
+					new_reg.gdb_regnum = cur_gdb_regnum++;
+					new_reg.gdb_type = TYPE_INT;
+					new_reg.gdb_bitsize = std::min(entry->datasize() * 8, 64);
+					new_reg.state_entry = entry.get();
+					m_gdb_registers.push_back(std::move(new_reg));
+				}
+			}
+		}
+
 
 		m_initialized = true;
 	}
@@ -1264,7 +1318,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_p(const char *buf)
 }
 
 //-------------------------------------------------------------------------
-// Write register n… with value r….
+// Write register n... with value r... .
 debug_gdbstub::cmd_reply debug_gdbstub::handle_P(const char *buf)
 {
 	if ( !m_target_xml_sent )
@@ -1354,7 +1408,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	else if ( name == "Xfer" )
 	{
 		// "features:read:target.xml:0,3fff"
-		if ( strncmp(params.c_str(), "features:read:", 14) == 0 )
+		if ( params.compare(0, 14, "features:read:") == 0 )
 		{
 			int offset = 0;
 			int length = 0;
@@ -1362,7 +1416,13 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 			{
 				if ( m_target_xml.empty() )
 					generate_target_xml();
+				if ( offset < 0 )
+					offset = 0;
 				length = std::min(length, (int) m_target_xml.length()-offset);
+				if ( offset > (int) m_target_xml.length() )
+					offset = m_target_xml.length();
+				if ( length < 0 )
+					length = 0;
 				std::string reply;
 				if ( offset + length < m_target_xml.length() )
 					reply += 'm';
@@ -1605,7 +1665,7 @@ std::string debug_gdbstub::get_register_string(int gdb_regnum)
 					: (reg.gdb_bitsize == 32) ? "%08"  PRIx64
 					: (reg.gdb_bitsize == 16) ? "%04"  PRIx64
 					:                           "%02"  PRIx64;
-	uint64_t value = m_state->state_int(reg.state_index);
+	uint64_t value = reg.state_entry->value();
 	if ( reg.gdb_bitsize < 64 )
 		value &= (1ULL << reg.gdb_bitsize) - 1;
 	if ( !m_is_be )
@@ -1644,7 +1704,7 @@ bool debug_gdbstub::parse_register_string(uint64_t *pvalue, const char *buf, int
 void debug_gdbstub::set_register_value(int gdb_regnum, uint64_t value)
 {
 	const gdb_register &reg = m_gdb_registers[gdb_regnum];
-	m_state->set_state_int(reg.state_index, value);
+	reg.state_entry->set_value(value);
 }
 
 //-------------------------------------------------------------------------

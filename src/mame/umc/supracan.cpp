@@ -1394,8 +1394,8 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 					m_dma_regs.source[ch] += src_dec  ? -1 : 1;
 				}
 			}
-			// TODO: are these DMA cycle steal?
-			// There's no indication of a DMA status read so far that would indicate burst.
+			// TODO: are these DMA burst or cycle steal?
+			// There's no indication of a DMA status read so far, it's more likely that it's really burst.
 			//m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(m_dma_regs.count[ch] * 2));
 		}
 		else if (data != 0x0000) // fake DMA, used by C.U.G.
@@ -1595,7 +1595,7 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 	//break;
 	case 0x40a:
 		// speedyd/magipool uses this to request main to kickoff a sound DMA.
-		// gamblord/formduel just sets this just to poll a sound command
+		// gamblord/formduel sets this just to poll a sound command
 		// all sets up 0x40c/0x40d as a buffer, and 0x40a to check if the irq is valid
 		// TODO: staiwbbl writes here from 68k side
 		// which raises a nopped irq service for now, may just acknowledge instead

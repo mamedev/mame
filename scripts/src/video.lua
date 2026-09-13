@@ -439,6 +439,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/gba_ppu.h,VIDEOS["GBA_PPU"] = true
+--------------------------------------------------
+
+if VIDEOS["GBA_PPU"] then
+	files {
+		MAME_DIR .. "src/devices/video/gba_ppu.cpp",
+		MAME_DIR .. "src/devices/video/gba_ppu.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 

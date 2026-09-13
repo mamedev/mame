@@ -27,6 +27,9 @@
 #define FLOPSND_TAG "floppysound"
 #define FLOPSPK "output"
 
+// Delay time for spinning sound; see spin_start_delay
+const int SPIN_SOUND_DELAY_MS = 10;
+
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, FLOPSND_TAG, "Floppy sound")
 
 /* ===================================================================
@@ -288,6 +291,8 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 		m_sound(nullptr),
 		m_last_track(0),
 		m_last_subtrack(0),
+		m_spin_start_timer(nullptr),
+		m_spin_start_withdisk(false),
 		m_motor_on(false),
 		m_with_disk(false),
 		m_spin_kind(floppy_sound_samples::QUIET),
@@ -311,6 +316,7 @@ void floppy_sound_device::register_for_save_states()
 {
 	save_item(NAME(m_last_track));
 	save_item(NAME(m_last_subtrack));
+	save_item(NAME(m_spin_start_withdisk));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_with_disk));
 	save_item(NAME(m_spin_kind));
@@ -330,8 +336,11 @@ void floppy_sound_device::register_for_save_states()
 
 void floppy_sound_device::device_start()
 {
+	m_spin_start_timer = timer_alloc(FUNC(floppy_sound_device::spin_start_delay), this);
+
 	register_for_save_states();
 
+	m_spin_start_timer->reset();
 	m_motor_on = false;
 	m_spin_kind = floppy_sound_samples::QUIET;
 	m_spin_sample = floppy_sound_samples::QUIET;
@@ -345,8 +354,8 @@ void floppy_sound_device::device_start()
 	m_firstturn = true;
 }
 
-/* 
-	For the DTD, see the introduction comments in drivesound.h	
+/*
+    For the DTD, see the introduction comments in drivesound.h
 */
 bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* devname)
 {
@@ -373,40 +382,40 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 
 	default_samples.clear();
 	m_samples.clear();
-	
+
 	/* This is a first pass, serving to resolve the derivations
-	  
+
 	   Idea: The drive name, passed in by the connector, may refer to a sample set
 	         directly, but also to a name that refers to the actual samples,
 	         or even following a longer path of indirection. This allows us to
 	         set up a categorization (like internal vs. external drives).
-	 	  
-	   Example:         
+
+	   Example:
 	         <drive name="ti99_peb_dsk1" base="ti99_peb_internal" />
 	         <drive name="ti99_peb_dsk2" base="ti99_peb_internal" />
 	         <drive name="ti99_peb_internal" base="default" />
-	           
+
 	         Both keys "ti99_peb_dsk1" and "ti99_peb_dsk2" refer to the
 	         key "ti99_peb_internal", and this one refers to the default
 	         samples.
-	        
-	   The base attribute is required in this usage. The end of the chain 
-	   is reached with an element without base attribute, which defines the 
+
+	   The base attribute is required in this usage. The end of the chain
+	   is reached with an element without base attribute, which defines the
 	   sample set. If there is no such element, the default samples are used.
-	        
+
 	   The value "none" turns off the samples for this name.
- 
+
 	     <drive name="..." base="none" />
-	
+
 	   Distinguishing between form factors is done at the end of the chain,
-	   so this alias naming is not concerned with form factors. 
+	   so this alias naming is not concerned with form factors.
 	*/
 	bool resolved = false;
 	bool found = false;
-	
+
 	// We limit the depth to 10 to avoid endless loops by misconfiguration
 	int loopcount = 10;
-	
+
 	while (!resolved && (loopcount > 0))
 	{
 		loopcount--;
@@ -415,13 +424,13 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 		{
 			char const *name = drvnode->get_attribute_string("name", "");
 			char const *base = drvnode->get_attribute_string("base", "");
-			
+
 			if (strlen(name) == 0)
 			{
 				LOGMASKED(LOG_CONFIG, "Missing name in sample set definition\n");
 				return false;
 			}
-			
+
 			if (strcmp(name,devname)==0)
 			{
 				found = true;
@@ -443,9 +452,9 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 				}
 			}
 		}
-		
+
 		// If the chain breaks at any position, use default
-		if (!found) 
+		if (!found)
 		{
 			LOGMASKED(LOG_CONFIG, "Name '%s' cannot be resolved\n", devname);
 			devname = "default";
@@ -453,17 +462,17 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 			break;
 		}
 	}
-	
+
 	if (loopcount == 0)
 	{
-		LOGMASKED(LOG_CONFIG, "Sample name '%s' cannot be resolved, loop in definition.\n", devname);  
+		LOGMASKED(LOG_CONFIG, "Sample name '%s' cannot be resolved, loop in definition.\n", devname);
 		devname = "default";
 	}
-	
+
 	/*  Now iterate over all drive nodes (except for the derivations).
 	    The name "default" is reserved for the default sample set, which may
 	    be offered for each form factor under this name.
-	    
+
 	    The first match by name and form factor is selected.
 	*/
 	for (util::xml::data_node const *drvnode = samplesnode->get_child("drive"); drvnode; drvnode = drvnode->get_next_sibling("drive"))
@@ -472,11 +481,11 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 		char const *path = drvnode->get_attribute_string("path", "");
 		char const *form = drvnode->get_attribute_string("formfactor", "");
 		char const *desc = drvnode->get_attribute_string("description", "");
-		
+
 		// Skip the derivations from the first pass
 		if (strlen(drvnode->get_attribute_string("base", ""))!=0)
 			continue;
-		
+
 		// Check for valid form factor and path
 		if (strlen(form)==0)
 		{
@@ -649,9 +658,9 @@ bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* dev
 				}
 			}
 		}
-		
-		// We found the desired sample set, but are there some important 
-		// samples missing? We could now fall back to defaults, 
+
+		// We found the desired sample set, but are there some important
+		// samples missing? We could now fall back to defaults,
 		// but these definitions were provided on purpose, and so
 		// we should make that failure explicit.
 		if (!spinloaded_sample)
@@ -738,7 +747,10 @@ void floppy_sound_device::set_samples(const char *name, int form_factor, int max
 /*
     Motor sound. Select appropriate sound sample, depending on whether the
     motor is started or keeps running. Motor samples are always fully
-    played.
+    played once started.
+    Since some drives are rapidly polled via the motor line, we allow for a
+    short delay before starting the motor sound. If the motor is turned off
+    during that time, no motor sound is played.
 */
 void floppy_sound_device::motor(bool running, bool withdisk)
 {
@@ -746,15 +758,15 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 	{
 		m_sound->update(); // required
 
+		LOGMASKED(LOG_SND_DETAIL, "Motor = %s [%s]\n", running? "on " : "off", machine().time().to_string());
+
 		if ((m_spin_kind==floppy_sound_samples::QUIET
 			|| m_spin_kind==floppy_sound_samples::END_EMPTY
 			|| m_spin_kind==floppy_sound_samples::END_LOADED ) && running) // motor was either off or already spinning down
 		{
-			m_spin_samplepos = 0;
-			// 3.5" floppy disks have a special first turn sound when the
-			// spindle motor latch meets the central metal hub hole.
-			m_spin_kind = withdisk? (m_firstturn? floppy_sound_samples::START_LOADED_INITIAL : floppy_sound_samples::START_LOADED) : floppy_sound_samples::START_EMPTY;
-			m_firstturn = false;
+			// See spin_start_delay
+			m_spin_start_withdisk = withdisk;
+			m_spin_start_timer->adjust(attotime::from_msec(SPIN_SOUND_DELAY_MS));
 		}
 		else
 		{
@@ -765,6 +777,9 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 				m_spin_kind = withdisk? floppy_sound_samples::END_LOADED : floppy_sound_samples::END_EMPTY; // go to spin down sound when loop is finished
 			}
 		}
+
+		if (!running)
+			m_spin_start_timer->reset(); // motor switched off again before the spindle sound could start: no sound at all
 
 		int old_sample = m_spin_sample;
 		m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samples.find_spin(m_spin_kind);
@@ -777,6 +792,38 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 	}
 	m_motor_on = running;
 	m_with_disk = withdisk;
+}
+
+/*
+    Some drives like the FD-2000 are polled via the MON line to check for
+    an inserted disk; the on-off time is only about 16us. We have to avoid
+    starting the spinning sound in that case. For that reason, the start is
+    delayed by a certain time (see SPIN_SOUND_DELAY_MS).
+
+    The value may be adapted to cover other cases, but it should not be so
+    high that the delay is noticeable: This delay only affects the output
+    of the spinning sound, but neither step/seek sounds nor the operation of
+    the drive. Realistic spin-up times should be a concern of the floppy drive
+    emulation.
+*/
+TIMER_CALLBACK_MEMBER(floppy_sound_device::spin_start_delay)
+{
+	m_sound->update(); // required
+
+	m_spin_samplepos = 0;
+	// 3.5" floppy disks have a special first turn sound when the
+	// spindle motor latch meets the central metal hub hole.
+	m_spin_kind = m_spin_start_withdisk? (m_firstturn? floppy_sound_samples::START_LOADED_INITIAL : floppy_sound_samples::START_LOADED) : floppy_sound_samples::START_EMPTY;
+	m_firstturn = false;
+
+	int old_sample = m_spin_sample;
+	m_spin_sample = m_samples.find_spin(m_spin_kind);
+
+	if (m_spin_sample == floppy_sound_samples::QUIET)
+		LOGMASKED(LOG_SND, "Spin off\n");
+	else
+		if (m_spin_sample != old_sample)
+			LOGMASKED(LOG_SND, "Spin sample = %d\n", m_spin_sample);
 }
 
 /*

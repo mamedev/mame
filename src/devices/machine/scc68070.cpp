@@ -711,13 +711,18 @@ TIMER_CALLBACK_MEMBER(scc68070_device::tx_callback)
 		m_uart.transmit_pointer--;
 
 		m_uart.status_register |= USR_TXRDY;
-		m_uart_tx_int = true;
-		update_ipl();
 	}
 
 	if (m_uart.transmit_pointer < 0)
 	{
 		m_uart.status_register |= USR_TXEMT | USR_TXRDY;
+	}
+
+	const bool tx_ready = (m_uart.status_register & USR_TXRDY) != 0;
+	if (tx_ready != m_uart_tx_int)
+	{
+		m_uart_tx_int = tx_ready;
+		update_ipl();
 	}
 }
 
@@ -1402,6 +1407,11 @@ void scc68070_device::uth_w(uint8_t data)
 	uart_tx(data);
 	m_uart.transmit_holding_register = data;
 	m_uart.status_register &= ~USR_TXRDY;
+	if (m_uart_tx_int)
+	{
+		m_uart_tx_int = false;
+		update_ipl();
+	}
 }
 
 uint8_t scc68070_device::urh_r()

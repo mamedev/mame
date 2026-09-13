@@ -18,7 +18,7 @@
 #include "decocrpt.h"
 #include "decospr.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
@@ -316,12 +316,12 @@ GFXDECODE_END
 void backfire_state::vbl_interrupt(int state)
 {
 	if (state)
-		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 }
 
 void backfire_state::irq_ack_w(uint32_t data)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -346,7 +346,7 @@ DECOSPR_PRIORITY_CB_MEMBER(backfire_state::pri_callback)
 void backfire_state::backfire(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28000000/4); /* Unconfirmed */
+	DE156(config, m_maincpu, 28000000/4); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &backfire_state::backfire_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");

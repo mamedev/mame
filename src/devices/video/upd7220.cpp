@@ -365,7 +365,7 @@ inline void upd7220_device::update_vsync_timer(int state)
 
 inline void upd7220_device::update_hsync_timer(int state)
 {
-	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : m_char_dots;
 	int y = screen().vpos();
 
 	int next_x = state ? m_hs * horiz_mult : 0;
@@ -408,7 +408,7 @@ inline void upd7220_device::recompute_parameters()
 	// microbx2 wants horizontal multiplier of x16
 	// pc9801:diremono sets up m_mode to be specifically in character mode, wanting x8 here
 	// TODO: verify compis uhrg video & high reso Hyper 98
-	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : m_char_dots;
 	const int vert_mult = (m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON ? 2 : 1;
 
 	int horiz_pix_total = (m_hs + m_hbp + m_hfp + m_aw) * horiz_mult;
@@ -688,6 +688,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, device_type type, 
 	m_lr(1),
 	m_disp(0),
 	m_gchr(0),
+	m_char_dots(8),
 	m_bitmap_mod(0),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
 {

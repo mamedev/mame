@@ -223,7 +223,10 @@ void amstrad_state::amstrad_cpc_green_palette(palette_device &palette) const
 /* on PC2. Apparently PC2 is always low on the CPC. ?!? */
 TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
 {
+	// MT 8744: strobe-induced port B read must not re-arm the strobe
+	m_in_pc2_strobe = true;
 	m_ppi->pc2_w(0);
+	m_in_pc2_strobe = false;
 }
 
 
@@ -2606,9 +2609,9 @@ uint8_t amstrad_state::amstrad_ppi_portb_r()
 			data |= 0x02;
 	}
 
-//logerror("amstrad_ppi_portb_r\n");
-	/* Schedule a write to PC2 */
-	m_pc2_low_timer->adjust(attotime::zero);
+	// schedule a PC2 strobe unless this read is the strobe itself re-entering (MT 8744)
+	if (!m_in_pc2_strobe)
+		m_pc2_low_timer->adjust(attotime::zero);
 
 	return data;
 }
@@ -3065,6 +3068,7 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	m_asic.dma_prescaler[2] = 0;
 	m_asic.dma_clear = 1;  // by default, DMA interrupts must be cleared by writing to the DSCR (&6c0f)
 	m_plus_irq_cause = 6;
+	m_in_pc2_strobe = false;
 
 	amstrad_common_init();
 	amstrad_reset_machine();

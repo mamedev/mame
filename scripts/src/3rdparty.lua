@@ -31,12 +31,12 @@ project "expat"
 		"PACKAGE=\"expat\"",
 		"PACKAGE_BUGREPORT=\"https://github.com/libexpat/libexpat/issues\"",
 		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat-2.7.1\"",
+		"PACKAGE_STRING=\"expat-2.8.3\"",
 		"PACKAGE_TARNAME=\"expat\"",
 		"PACKAGE_URL=\"\"",
-		"PACKAGE_VERSION=\"2.7.1\"",
+		"PACKAGE_VERSION=\"2.8.3\"",
 		"STDC_HEADERS",
-		"VERSION=\"2.7.1\"",
+		"VERSION=\"2.8.3\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
 		"XML_GE=1",
@@ -57,9 +57,15 @@ if _OPTIONS["targetos"]=="windows" then
 		"__USE_MINGW_ANSI_STDIO=0",
 	}
 end
-if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" then
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
 	defines {
 		"HAVE_ARC4RANDOM",
+		"HAVE_ARC4RANDOM_BUF",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	defines {
+		"HAVE_GETENTROPY",
 	}
 end
 if BASE_TARGETOS=="unix" then
@@ -113,6 +119,27 @@ end
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
+if _OPTIONS["targetos"]=="windows" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_rand_s.c",
+	}
+end
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random.c",
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random_buf.c",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_getentropy.c",
+	}
+end
+if BASE_TARGETOS=="unix" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_dev_urandom.c",
+	}
+end
 else
 links {
 	ext_lib("expat"),

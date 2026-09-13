@@ -20,7 +20,8 @@ public:
 		IRQ_LINE = INPUT_LINE_IRQ0,
 		APU_IRQ_LINE = INPUT_LINE_IRQ1,
 		NMI_LINE = INPUT_LINE_NMI,
-		V_LINE   = INPUT_LINE_IRQ0 + 16
+		V_LINE = INPUT_LINE_IRQ0 + 16,
+		RDY_LINE = INPUT_LINE_IRQ0 + 17
 	};
 
 	class memory_interface {
@@ -135,8 +136,9 @@ protected:
 	std::unique_ptr<memory_interface> m_mintf;
 	int m_inst_state, m_inst_substate;
 	int m_icount, m_bcount, m_count_before_instruction_step;
-	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state;
+	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state, m_rdy_state;
 	bool m_nmi_pending, m_irq_taken, m_sync, m_inhibit_interrupts;
+	bool m_irq_sampled, m_nmi_sampled;
 	bool m_uses_custom_memory_interface;
 
 	uint8_t read(uint16_t adr) { return m_mintf->read(adr); }
@@ -146,10 +148,14 @@ protected:
 	void write_9(uint16_t adr, uint8_t val) { m_mintf->write_9(adr, val); }
 	uint8_t read_arg(uint16_t adr) { return m_mintf->read_arg(adr); }
 	uint8_t read_pc() { return read_arg(m_PC); }
+	uint8_t read_pc_noirq() { return read_arg(m_PC); }
+	uint8_t read_arg_noirq(uint16_t adr) { return read_arg(adr); }
 	void prefetch_start();
-	void prefetch_end();
+	virtual void prefetch_end();
 	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
+
+	void sample_interrupt() { m_irq_sampled = m_irq_state || m_apu_irq_state; m_nmi_sampled = m_nmi_pending; }
 
 	u32 m_XPC;
 	virtual offs_t pc_to_external(u16 pc); // For paged PCs
@@ -299,7 +305,8 @@ enum {
 enum {
 	M6502_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6502_NMI_LINE = m6502_device::NMI_LINE,
-	M6502_SET_OVERFLOW = m6502_device::V_LINE
+	M6502_SET_OVERFLOW = m6502_device::V_LINE,
+	M6502_RDY_LINE = m6502_device::RDY_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6502, m6502_device)

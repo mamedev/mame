@@ -59,6 +59,8 @@ public:
 
 	void gpl162xx_lcdtype(machine_config &config);
 
+	void init_pink218();
+
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;

@@ -75,12 +75,12 @@ void gscpm_state::gscpm_io(address_map &map)
 
 uint8_t gscpm_state::cflash_r(offs_t offset)
 {
-	return m_ide->cs0_r(offset, 0xff);
+	return m_ide->cs0_r(offset);
 }
 
 void gscpm_state::cflash_w(offs_t offset, uint8_t data)
 {
-	m_ide->cs0_w(offset, data, 0xff);
+	m_ide->cs0_w(offset, data);
 }
 
 uint8_t gscpm_state::sio_r(offs_t offset)

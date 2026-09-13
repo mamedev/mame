@@ -59,30 +59,33 @@ u16 konmedalppc_state::ata_r(offs_t offset, u16 mem_mask)
 {
 	if (offset == 0)
 	{
-		return m_ata->cs0_swap_r(offset, mem_mask);
+		return m_ata->cs0_swap_r(offset);
 	}
 
-	u16 result = m_ata->cs0_r((offset<<1) + 1, 0x00ff)<<8;
-	result |= m_ata->cs0_r(offset<<1, 0xff);
-	return result;
+	u16 data = 0;
+	if (ACCESSING_BITS_0_7)
+		data |= m_ata->cs0_r(offset<<1) & 0xff;
+	if (ACCESSING_BITS_8_15)
+		data |= m_ata->cs0_r((offset<<1) + 1)<<8;
+	return data;
 }
 
 void konmedalppc_state::ata_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset == 0)
 	{
-		m_ata->cs0_swap_w(offset, data, mem_mask);
+		m_ata->cs0_swap_w(offset, data);
 		return;
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_ata->cs0_w(offset << 1, data & 0xff, 0xff);
+		m_ata->cs0_w(offset << 1, data & 0xff);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_ata->cs0_w((offset<<1) + 1, data>>8, 0xff);
+		m_ata->cs0_w((offset<<1) + 1, data>>8);
 	}
 }
 

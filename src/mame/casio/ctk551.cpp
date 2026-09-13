@@ -196,6 +196,7 @@
 
 #include "ap10.lh"
 #include "ctk530.lh"
+#include "ctk630.lh"
 
 namespace {
 
@@ -208,6 +209,7 @@ public:
 		, m_pwm(*this, "pwm")
 		, m_lcdc(*this, "lcdc")
 		, m_inputs(*this, "IN%u", 0U)
+		, m_dsp_port(*this, "P%c", 'A')
 		, m_outputs(*this, "%02x.%d.%d", 0U, 0U, 0U)
 		, m_led_touch(*this, "led_touch")
 		, m_led_console(*this, "led_console_%d", 0U)
@@ -217,6 +219,7 @@ public:
 
 	void ap10(machine_config& config);
 	void ctk530(machine_config& config);
+	void ctk630(machine_config& config);
 	void gz70sp(machine_config& config);
 	void ctk601(machine_config& config);
 	void ctk551(machine_config &config);
@@ -228,7 +231,7 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_clear) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	void pwm_row_w(int state) { m_pwm->write_my(state); }
-	void pwm_col_w(int state) { m_pwm->write_mx(state ^ 0xff);  }
+	void pwm_col_w(int state) { m_pwm->write_mx(~state);  }
 
 	ioport_value lcd_r()   { return m_lcdc->db_r() >> 4; }
 	void lcd_w(int state)
@@ -260,16 +263,20 @@ public:
 	void inputs_w(int state) { m_input_sel = state; }
 	ioport_value inputs_r();
 
-	void dsp_data_w(uint8_t data);
-	void dsp_cmd_w(uint8_t cmd);
+	void dsp_data_w(u8 data);
+	void dsp_cmd_w(u8 cmd);
+	void dsp_ctrl_w(u8 data) { m_dsp_ctrl = data; }
+	void dsp_port_w(u8 data);
+	u8 dsp_port_r();
 
 	void led_touch_w(int state) { m_led_touch = state; }
-	void led_console_w(uint8_t state);
+	void led_console_w(int state);
 	void apo_w(int state);
 
 private:
 	void ap10_map(address_map &map) ATTR_COLD;
 	void ctk530_map(address_map &map) ATTR_COLD;
+	void ctk630_map(address_map &map) ATTR_COLD;
 	void gz70sp_map(address_map &map) ATTR_COLD;
 	void ctk601_map(address_map &map) ATTR_COLD;
 
@@ -282,6 +289,7 @@ private:
 	emu_timer* m_nmi_timer = nullptr;
 
 	optional_ioport_array<4> m_inputs;
+	optional_ioport_array<2> m_dsp_port;
 
 	output_finder<64, 8, 5> m_outputs;
 	output_finder<> m_led_touch;
@@ -289,10 +297,11 @@ private:
 	output_finder<> m_led_power;
 
 	ioport_value m_switch{};
-	ioport_value m_input_sel{};
+	ioport_value m_input_sel;
 
-	uint8_t m_lcd_data{};
-	uint32_t m_dsp_data{};
+	u8 m_lcd_data;
+	u32 m_dsp_data;
+	u8 m_dsp_ctrl;
 
 	void screen_update(screen_svg_device &screen);
 };
@@ -333,7 +342,7 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_power_w)
 
 ioport_value ctk551_state::inputs_r()
 {
-	uint8_t result = 0xff;
+	u8 result = 0xff;
 	for (unsigned i = 0U; i < m_inputs.size(); i++)
 		if (!BIT(m_input_sel, i))
 			result &= m_inputs[i].read_safe(0xff);
@@ -341,18 +350,30 @@ ioport_value ctk551_state::inputs_r()
 	return result;
 }
 
-void ctk551_state::dsp_data_w(uint8_t data)
+void ctk551_state::dsp_data_w(u8 data)
 {
 	m_dsp_data >>= 8;
 	m_dsp_data |= (data << 24);
 }
 
-void ctk551_state::dsp_cmd_w(uint8_t data)
+void ctk551_state::dsp_cmd_w(u8 data)
 {
 	logerror("dsp_cmd_w: addr = %02x, data = %08x\n", data, m_dsp_data);
 }
 
-void ctk551_state::led_console_w(uint8_t state)
+void ctk551_state::dsp_port_w(u8 data)
+{
+	const u8 port = BIT(m_dsp_ctrl, 4);
+	if (m_dsp_port[port])
+		m_dsp_port[port]->write(data);
+}
+
+u8 ctk551_state::dsp_port_r()
+{
+	return m_dsp_port[BIT(m_dsp_ctrl, 4)].read_safe(0);
+}
+
+void ctk551_state::led_console_w(int state)
 {
 	for (unsigned i = 0; i < 6; i++)
 		m_led_console[i] = !BIT(state, i);
@@ -391,36 +412,47 @@ void ctk551_state::screen_update(screen_svg_device &screen)
 
 void ctk551_state::ap10_map(address_map& map)
 {
-	map(0x000000, 0x0fffff).rom().region("maincpu", 0).mirror(0x100000);
-	map(0x300000, 0x301fff).ram().share("nvram").mirror(0x07e000);
+	map(0x000000, 0x0fffff).mirror(0x100000).rom().region("maincpu", 0);
+	map(0x300000, 0x301fff).mirror(0x07e000).ram().share("nvram");
 	// TODO: DSP
-	map(0x380000, 0x380000).w(FUNC(ctk551_state::dsp_data_w));
-	map(0x380001, 0x380001).w(FUNC(ctk551_state::dsp_cmd_w));
-	map(0x380002, 0x380003).noprw();
-	map(0x380003, 0x380003).w(FUNC(ctk551_state::led_console_w));
+	map(0x380000, 0x380000).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_data_w));
+	map(0x380001, 0x380001).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_cmd_w));
+	map(0x380002, 0x380002).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_ctrl_w));
+	map(0x380003, 0x380003).mirror(0x07fffc).rw(FUNC(ctk551_state::dsp_port_r), FUNC(ctk551_state::dsp_port_w));
 }
 
 void ctk551_state::ctk530_map(address_map& map)
 {
-	map(0x000000, 0x0fffff).rom().region("maincpu", 0).mirror(0x100000);
+	map(0x000000, 0x0fffff).mirror(0x100000).rom().region("maincpu", 0);
+}
+
+void ctk551_state::ctk630_map(address_map& map)
+{
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
+	map(0x300000, 0x301fff).mirror(0x07e000).ram();
+	// TODO: DSP
+	map(0x380000, 0x380000).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_data_w));
+	map(0x380001, 0x380001).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_cmd_w));
+	map(0x380002, 0x380002).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_ctrl_w));
+	map(0x380003, 0x380003).mirror(0x07fffc).rw(FUNC(ctk551_state::dsp_port_r), FUNC(ctk551_state::dsp_port_w));
 }
 
 void ctk551_state::gz70sp_map(address_map& map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
-	map(0x300000, 0x301fff).ram().mirror(0x07e000);
-	map(0x380000, 0x380003).noprw(); // DSP is mapped here, but not actually present
+	map(0x300000, 0x301fff).mirror(0x07e000).ram();
+	map(0x380000, 0x3fffff).noprw(); // DSP is mapped here, but not actually present
 }
 
 void ctk551_state::ctk601_map(address_map& map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
-	map(0x300000, 0x307fff).ram().mirror(0x078000);
+	map(0x300000, 0x307fff).mirror(0x078000).ram();
 	// TODO: DSP
-	map(0x380000, 0x380000).w(FUNC(ctk551_state::dsp_data_w));
-	map(0x380001, 0x380001).w(FUNC(ctk551_state::dsp_cmd_w));
-	map(0x380002, 0x380003).noprw();
-	map(0x380002, 0x380003).portr("PB").portw("PA").umask16(0x00ff);
+	map(0x380000, 0x380000).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_data_w));
+	map(0x380001, 0x380001).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_cmd_w));
+	map(0x380002, 0x380002).mirror(0x07fffc).w(FUNC(ctk551_state::dsp_ctrl_w));
+	map(0x380003, 0x380003).mirror(0x07fffc).rw(FUNC(ctk551_state::dsp_port_r), FUNC(ctk551_state::dsp_port_w));
 }
 
 void ctk551_state::driver_start()
@@ -429,10 +461,15 @@ void ctk551_state::driver_start()
 
 	m_input_sel = 0xf;
 
+	m_lcd_data = 0;
+	m_dsp_data = 0;
+	m_dsp_ctrl = 0;
+
 	save_item(NAME(m_switch));
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_dsp_data));
+	save_item(NAME(m_dsp_ctrl));
 }
 
 
@@ -485,6 +522,7 @@ void ctk551_state::ctk530(machine_config& config)
 	m_maincpu->read_port2().set_constant(0);
 	m_maincpu->write_port2().set_nop();
 	m_maincpu->read_port3().set_constant(0);
+	m_maincpu->write_port3().set_nop();
 	m_maincpu->write_ple().set_ioport("PLE");
 
 	// MIDI
@@ -503,6 +541,21 @@ void ctk551_state::ctk530(machine_config& config)
 	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_ctk530);
+}
+
+void ctk551_state::ctk630(machine_config& config)
+{
+	ctk530(config);
+	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk630_map);
+	m_maincpu->read_port2().set_ioport("P2");
+	m_maincpu->write_ple().set_nop();
+
+	// TODO: DSP
+
+	m_pwm->set_size(5, 8);
+	m_pwm->set_segmask(0x1c, 0xff);
+
+	config.set_default_layout(layout_ctk630);
 }
 
 void ctk551_state::gz70sp(machine_config& config)
@@ -756,6 +809,11 @@ INPUT_PORTS_START(ap10)
 	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Damper Pedal")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Soft/Sostenuto Pedal")
+
+	// DSP ports
+	PORT_START("PA")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(ctk551_state::led_console_w))
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START(gz70sp)
@@ -939,6 +997,93 @@ INPUT_PORTS_START(ctk530)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(ctk551_state::pwm_col_w))
 	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(ctk551_state::pwm_row_w))
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START(ctk630)
+	PORT_INCLUDE(base_61key)
+	PORT_INCLUDE(base_velocity)
+
+	PORT_START("maincpu:kbd:FI8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 7")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Musical Pad 8")
+
+	PORT_START("maincpu:kbd:FI9")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Intro / Fill In")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Synchro / Ending")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Start / Stop")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("maincpu:kbd:FI10")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Pitch Bend Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Pitch Bend Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Normal / Variation")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Tempo Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Tempo Down")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Accomp Volume Up")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Accomp Volume Down")
+
+	PORT_START("maincpu:kbd:KI0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Mode")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Rhythm")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Layer")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Split")
+
+	PORT_START("maincpu:kbd:KI1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reverb")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Tone")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Transpose / Tune / MIDI")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Demo")
+
+	PORT_START("maincpu:kbd:KI2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Easy Preset")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Pad")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Memory")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Touch Response")
+
+	PORT_START("SWITCH")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ctk551_state::power_w), 0)
+
+	PORT_START("P1")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(ctk551_state::apo_w))
+	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) // DSP reset
+	PORT_CONFNAME( 0x80, 0x80, "Power Source" )
+	PORT_CONFSETTING(    0x80, "AC Adapter" )
+	PORT_CONFSETTING(    0x00, "Battery" )
+
+	PORT_START("P2")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_OTHER )  PORT_NAME("Pedal")
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// DSP ports
+	PORT_START("PA")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(ctk551_state::pwm_col_w))
+
+	PORT_START("PB")
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(ctk551_state::pwm_row_w))
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START(ctk601)
@@ -1151,14 +1296,19 @@ INPUT_PORTS_END
 
 ROM_START(ap10)
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP("ap10.lsi303", 0x000000, 0x100000, CRC(39caa214) SHA1(3b484628c1e6f0ad7c11e2ec7eff664294f9ec83)) // MX23C8100MC-12CA27
+	ROM_LOAD16_WORD_SWAP("mx23c8100mc-12ca17.lsi303", 0x000000, 0x100000, CRC(39caa214) SHA1(3b484628c1e6f0ad7c11e2ec7eff664294f9ec83))
 ROM_END
 
 ROM_START(ctk530)
 	ROM_REGION(0x100000, "maincpu", ROMREGION_ERASE00)
 
 	ROM_REGION16_BE(0x100000, "lsi102", 0)
-	ROM_LOAD16_WORD_SWAP("ctk530.lsi102", 0x000000, 0x100000, CRC(961bff85) SHA1(adfd46ef96fb53981b1b66cb89e3d716b0792ef0)) // MX23C8100PC-12CA19
+	ROM_LOAD16_WORD_SWAP("mx23c8100pc-12ca19.lsi102", 0x000000, 0x100000, CRC(961bff85) SHA1(adfd46ef96fb53981b1b66cb89e3d716b0792ef0))
+ROM_END
+
+ROM_START(ctk630)
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP("mx23c1610mc-12ca20.lsi104", 0x000000, 0x200000, CRC(69ebc7e5) SHA1(33c5a04939351d14368315a204f1ff5b4341f318))
 ROM_END
 
 ROM_START(gz70sp)
@@ -1168,7 +1318,7 @@ ROM_END
 
 ROM_START(ctk601)
 	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP("ctk601.lsi3", 0x000000, 0x200000, CRC(23ae6ab1) SHA1(c1a8a1b9af19888360b56587c58602c26ad5029e)) // MX23C1610MC-12CA62
+	ROM_LOAD16_WORD_SWAP("mx23c1610mc-12ca62.lsi3", 0x000000, 0x200000, CRC(23ae6ab1) SHA1(c1a8a1b9af19888360b56587c58602c26ad5029e))
 
 	ROM_REGION(366949, "screen", 0)
 	ROM_LOAD("ctk601.svg", 0, 366949, CRC(f150ca5a) SHA1(203fc05171ae6f5ef69c13dc4c0f538fb1ea152b))
@@ -1176,7 +1326,7 @@ ROM_END
 
 ROM_START(ctk551)
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP("ctk551.lsi2", 0x000000, 0x100000, CRC(66fc34cd) SHA1(47e9559edc106132f8a83462ed17a6c5c3872157)) // MSM538002E-T6
+	ROM_LOAD16_WORD_SWAP("msm538002e-t6gs.lsi2", 0x000000, 0x100000, CRC(66fc34cd) SHA1(47e9559edc106132f8a83462ed17a6c5c3872157))
 
 	ROM_REGION(285279, "screen", 0)
 	ROM_LOAD("ctk551lcd.svg", 0, 285279, CRC(1bb5da03) SHA1(a0cf22c6577c4ff0119ee7bb4ba8b487e23872d4))
@@ -1185,18 +1335,19 @@ ROM_END
 
 void ctk551_state::init_ap10()
 {
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	for (uint32_t addr = 0; addr < 0x80000; addr++)
+	u16* rom = (u16*)memregion("maincpu")->base();
+	const auto size = memregion("maincpu")->bytes() >> 1;
+	for (u32 addr = 0; addr < size; addr++)
 		rom[addr] = bitswap(rom[addr], 15, 14, 13, 10, 11, 12, 9, 8, 7, 6, 2, 3, 4, 5, 1, 0);
 }
 
 void ctk551_state::init_ctk530()
 {
-	uint16_t* dest = (uint16_t*)memregion("maincpu")->base();
-	const uint16_t* src = (uint16_t*)memregion("lsi102")->base();
-	for (uint32_t i = 0; i < 0x80000; i++)
+	u16* dest = (u16*)memregion("maincpu")->base();
+	const u16* src = (u16*)memregion("lsi102")->base();
+	for (u32 i = 0; i < 0x80000; i++)
 	{
-		const uint32_t addr = bitswap(i, 8, 9, 0, 2, 4, 6, 17, 16, 14, 12, 10, 11, 13, 15, 18, 7, 5, 3, 1);
+		const u32 addr = bitswap(i, 8, 9, 0, 2, 4, 6, 17, 16, 14, 12, 10, 11, 13, 15, 18, 7, 5, 3, 1);
 		dest[addr] = bitswap(src[i], 0, 2, 15, 13, 4, 6, 11, 9, 1, 3, 14, 12, 5, 7, 10, 8);
 	}
 }
@@ -1207,8 +1358,8 @@ void ctk551_state::init_gz70sp()
 	the version of this ROM bundled with the SW-10 softsynth has little endian samples, so byteswap them
 	(and stop at the end of sample data, not the end of the whole ROM, otherwise the ROM test fails)
 	*/
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	for (uint32_t addr = 0x2f000 >> 1; addr < 0x1fe8c2 >> 1; addr++)
+	u16* rom = (u16*)memregion("maincpu")->base();
+	for (u32 addr = 0x2f000 >> 1; addr < 0x1fe8c2 >> 1; addr++)
 		rom[addr] = swapendian_int16(rom[addr]);
 }
 
@@ -1218,6 +1369,7 @@ void ctk551_state::init_gz70sp()
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME          FLAGS
 SYST( 1995, ap10,    0,      0,      ap10,    ap10,   ctk551_state, init_ap10,   "Casio", "Celviano AP-10", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 SYST( 1995, ctk530,  0,      0,      ctk530,  ctk530, ctk551_state, init_ctk530, "Casio", "CTK-530",        MACHINE_SUPPORTS_SAVE )
+SYST( 1995, ctk630,  0,      0,      ctk630,  ctk630, ctk551_state, init_ap10,   "Casio", "CTK-630",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 SYST( 1996, gz70sp,  0,      0,      gz70sp,  gz70sp, ctk551_state, init_gz70sp, "Casio", "GZ-70SP",        MACHINE_SUPPORTS_SAVE )
 SYST( 1997, ctk601,  0,      0,      ctk601,  ctk601, ctk551_state, empty_init,  "Casio", "CTK-601",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 SYST( 2000, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init,  "Casio", "CTK-551",        MACHINE_SUPPORTS_SAVE )

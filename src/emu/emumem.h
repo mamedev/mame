@@ -2695,6 +2695,7 @@ class memory_manager
 	template<int Level, int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
 public:
 	// construction/destruction
+	memory_manager();
 	memory_manager(running_machine &machine);
 	~memory_manager();
 
@@ -2702,7 +2703,7 @@ public:
 	void initialize();
 
 	// getters
-	running_machine &machine() const { return m_machine; }
+	running_machine &machine() const { assert(m_machine); return *m_machine; }
 
 	// used for the debugger interface memory views
 	const util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_bank>> &banks() const { return m_banklist; }
@@ -2714,22 +2715,22 @@ public:
 
 	// shares
 	memory_share *share_alloc(device_t &dev, std::string name, u8 width, size_t bytes, endianness_t endianness);
-	memory_share *share_find(std::string_view name);
+	memory_share *share_find(std::string_view name) const;
 
 	// banks
 	memory_bank *bank_alloc(device_t &device, std::string tag);
-	memory_bank *bank_find(std::string_view tag);
+	memory_bank *bank_find(std::string_view tag) const;
 
 	// regions
 	memory_region *region_alloc(std::string name, u32 length, u8 width, endianness_t endian);
-	memory_region *region_find(std::string_view name);
+	memory_region *region_find(std::string_view name) const;
 	void region_free(std::string name);
 
 private:
 	struct stdlib_deleter { void operator()(void *p) const { std::free(p); } };
 
 	// internal state
-	running_machine &           m_machine;              // reference to the machine
+	running_machine *           m_machine;              // pointer to the machine
 
 	std::vector<std::unique_ptr<void, stdlib_deleter>>                                   m_datablocks;           // list of memory blocks to free on exit
 	util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // map of banks

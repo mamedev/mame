@@ -28,7 +28,7 @@
     Rogha/Wolf Fang             MAM     59      52,52,71,71     55, 56          104         113
     Captain America             MAN     101     52,71           56, 56          75
     Tumblepop                   MAP     59      52              56
-    Dragon Gun                  MAR     101     ?               74, 74          146         113,186,187
+    Dragon Gun                  MAR     101     186,187         74, 74          146         113
     Wizard Fire/Dark Seal 2     MAS     59      52,52,71,71     74, 74          104         113
     Funky Jet                   MAT     59      52              74              146
     Nitro Ball                  MAV     59      52,52,71,71     56, 74          146         113
@@ -42,8 +42,8 @@
     Heavy Smash                 MBG     156     52              141                         153,153,153
     Night Slashers DE-0397-0    MBH     156     52,52,52        74, 141         104         153,153,153,99,200
     Night Slashers DE-0395-1    MBH     156     52,52,52        74, 141         104         113,113,153,99,200
-3   Locked N Loaded             MBM     156     ?               74, 74          146         153,186,187
-4   Locked N Loaded (Conv.)     MBM     101     ?               74, 74          146         113,186,187
+3   Locked N Loaded             MBM     156     186,187         74, 74          146         153
+4   Locked N Loaded (Conv.)     MBM     101     186,187         74, 74          146         113
     Joe & Mac Return            MBN     156     52              141                         223,223
 2   Charlie Ninja               MBR     156     52              141                         223,223
     World Cup Volleyball 95     MBX     156     52              141             ?
@@ -76,6 +76,7 @@ Note: A version of Night Slashers runs on the DE-0395-1 using the 156 encryption
     Custom chip 99  = 'Ace' chip (Alpha blending with palette effects)
     Custom chip 156 = Encrypted ARM cpu
     Custom chip 102 = Encrypted 68000 cpu
+    Custom chip 186, 187 = See shared/namco_c355spr.cpp
 
     Custom chip 55 provides two playfields of 4bpp tiles, with optional
     rowscroll and column scroll.  Some games use two of these to give

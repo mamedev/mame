@@ -91,10 +91,11 @@
 
 #include "emu.h"
 
-#include "macadb.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "cpu/m68000/m68000.h"
@@ -127,7 +128,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_ram(*this, RAM_TAG),
@@ -157,9 +158,7 @@ public:
 		m_pmu_from_via(0),
 		m_pmu_ack(0),
 		m_pmu_req(0),
-		m_pmu_p0(0x80),
-		m_adb_line(1),
-		m_adb_akd(0)
+		m_pmu_p0(0x80)
 	{
 	}
 
@@ -209,8 +208,6 @@ private:
 	void pmu_data_w(u8 data);
 	u8 pmu_comms_r();
 	void pmu_comms_w(u8 data);
-	void set_adb_line(int state);
-	void set_adb_anykeydown(int state);
 	u8 pmu_adb_r();
 	void pmu_adb_w(u8 data);
 	u8 pmu_in_r();
@@ -222,7 +219,7 @@ private:
 	required_device<m68000_device> m_maincpu;
 	required_device<m50753_device> m_pmu;
 	required_device<via6522_device> m_via1;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ncr53c80_device> m_ncr5380;
 	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<ram_device> m_ram;
@@ -247,7 +244,6 @@ private:
 	bool m_overlay, m_pmu_blank_display;
 
 	u8 m_pmu_to_via, m_pmu_from_via, m_pmu_ack, m_pmu_req, m_pmu_p0;
-	s32 m_adb_line, m_adb_akd;
 };
 
 void macportable_state::nvram_default()
@@ -366,7 +362,7 @@ void macportable_state::pmu_p0_w(u8 data)
 
 u8 macportable_state::pmu_p1_r()
 {
-	return 0x08 | (m_adb_akd << 1);        // indicate on charger power
+	return 0x08 | (m_adbbus->adb_anykeydown_r() << 1); // indicate on charger power
 }
 
 u8 macportable_state::pmu_data_r()
@@ -404,24 +400,14 @@ void macportable_state::pmu_comms_w(u8 data)
 	m_pmu_ack = BIT(data, 6);
 }
 
-void macportable_state::set_adb_line(int state)
-{
-	m_adb_line = state;
-}
-
-void macportable_state::set_adb_anykeydown(int state)
-{
-	m_adb_akd = state;
-}
-
 u8 macportable_state::pmu_adb_r()
 {
-	return (m_adb_line << 1);
+	return m_adbbus->adb_line_r() << 1;
 }
 
 void macportable_state::pmu_adb_w(u8 data)
 {
-	m_macadb->adb_linechange_w((data & 1) ^ 1);
+	m_adbbus->adb_host_line_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_pmu_blank_display = BIT(data, 2) ^ 1;
 }
@@ -484,9 +470,6 @@ void macportable_state::machine_start()
 	save_item(NAME(m_pmu_ack));
 	save_item(NAME(m_pmu_req));
 	save_item(NAME(m_pmu_p0));
-	save_item(NAME(m_adb_line));
-	save_item(NAME(m_adb_akd));
-
 	m_6015_timer = timer_alloc(FUNC(macportable_state::mac_6015_tick), this);
 	m_6015_deassert_timer = timer_alloc(FUNC(macportable_state::mac_6015_untick), this);
 }
@@ -594,7 +577,7 @@ TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_tick)
 	m_via1->write_ca1(m_ca1_data);
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
-	m_macadb->portable_update_keyboard();
+	m_adbbus->poll_devices();
 
 	m_6015_deassert_timer->adjust(attotime::from_hz(60.15*525), 0);
 }
@@ -735,9 +718,9 @@ void macportable_state::macprtb(machine_config &config)
 	m_screen->set_visarea(0, 639, 0, 399);
 	m_screen->set_screen_update(FUNC(macportable_state::screen_update));
 
-	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
-	m_macadb->adb_data_callback().set(FUNC(macportable_state::set_adb_line));
-	m_macadb->adb_akd_callback().set(FUNC(macportable_state::set_adb_anykeydown));
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	SWIM1(config, m_swim, 15.6672_MHz_XTAL);
 	m_swim->phases_cb().set(FUNC(macportable_state::phases_w));

@@ -162,8 +162,6 @@ private:
 	int cddevicenum;
 
 	uint16_t cr1, cr2, cr3, cr4;
-	uint16_t prev_cr1, prev_cr2, prev_cr3, prev_cr4;
-	uint8_t status_type;
 	uint16_t hirqmask, hirqreg;
 	uint16_t cd_stat;
 	uint16_t cd_next_stat;

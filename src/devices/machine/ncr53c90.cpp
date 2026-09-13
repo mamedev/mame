@@ -103,6 +103,7 @@ void ncr53c94_device::map(address_map &map)
 	ncr53c90a_device::map(map);
 
 	map(0xc, 0xc).rw(FUNC(ncr53c94_device::conf3_r), FUNC(ncr53c94_device::conf3_w));
+	map(0xe, 0xe).lr8(NAME([]() { return 0x00; }));
 	map(0xf, 0xf).w(FUNC(ncr53c94_device::fifo_align_w));
 }
 
@@ -110,6 +111,8 @@ uint8_t ncr53c94_device::read(offs_t offset)
 {
 	if (offset == 12)
 		return conf3_r();
+	else if (offset == 14)
+		return 0x00;
 	return ncr53c90a_device::read(offset);
 }
 
@@ -198,6 +201,7 @@ ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, device_type ty
 	, config4(0)
 	, family_id(0x04)
 	, revision_level(0x02)
+	, tcount_hi2_loaded(false)
 {
 }
 
@@ -1406,8 +1410,10 @@ void ncr53c94_device::check_drq()
 void ncr53cf94_device::device_start()
 {
 	save_item(NAME(config4));
+	save_item(NAME(tcount_hi2_loaded));
 
 	config4 = 0;
+	tcount_hi2_loaded = false;
 
 	ncr53c94_device::device_start();
 }
@@ -1416,6 +1422,8 @@ void ncr53cf94_device::device_reset()
 {
 	config4 = 0;
 
+	tcount_hi2_loaded = false;
+
 	ncr53c94_device::device_reset();
 }
 
@@ -1423,14 +1431,15 @@ void ncr53cf94_device::load_tcounter()
 {
 	ncr53c94_device::load_tcounter();
 
-	// ID may be read by executing DMA NOP command twice, first with the features bit clear and then with it set
-	if ((config2 & S2FE) == 0)
-		tcount = (1 << 23) | (family_id << 19) | (revision_level << 16) | (tcount & 0xffff);
+	// A DMA NOP with the features enable bit set, if register 0x0E hasn't been
+	// written since reset, fills register 0x0E with the chip ID.
+	if (!tcount_hi2_loaded && (config2 & ENF) && ((command[0] & 0x7f) == CM_NOP))
+		tcounter = (1 << 23) | (family_id << 19) | (revision_level << 16) | (tcounter & 0xffff);
 }
 
 void ncr53cf94_device::conf2_w(uint8_t data)
 {
-	tcounter_mask = (data & S2FE) ? 0xffffff : 0xffff;
+	tcounter_mask = (data & ENF) ? 0xffffff : 0xffff;
 	config2 = data;
 }
 
@@ -1443,5 +1452,6 @@ uint8_t ncr53cf94_device::tcounter_hi2_r()
 void ncr53cf94_device::tcount_hi2_w(uint8_t data)
 {
 	tcount = (tcount & ~uint32_t(0xff0000)) | (uint32_t(data) << 16);
+	tcount_hi2_loaded = true;
 	LOG("tcount_hi2_w %02x (%s)\n", data, machine().describe_context());
 }

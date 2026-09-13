@@ -64,6 +64,7 @@ public:
 	void on_sound_update(const std::map<std::string, std::vector<std::pair<const sound_stream::sample_t *, int>>> &sound);
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
+	void on_machine_before_startup_screens();
 	void on_machine_before_load_settings();
 
 	template <typename T, typename U>

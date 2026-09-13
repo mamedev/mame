@@ -229,6 +229,10 @@ void f1gp_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 
+	// flipped-side dx/dy measured from the game's own scroll compensation
+	m_fg_tilemap->set_scrolldx(0, 160);
+	m_fg_tilemap->set_scrolldy(0, 10);
+
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_gfxctrl));
 	save_item(NAME(m_scroll));
@@ -289,6 +293,10 @@ void f1gp_state::gfxctrl_w(uint8_t data)
 {
 	m_flipscreen = data & 0x20;
 	m_gfxctrl = data & 0xdf;
+
+	// the ROZ layer is not flipped here: the game mirrors the 053936 matrix itself
+	m_fg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_k053936->set_flip(m_flipscreen != 0);
 }
 
 void f1gp2_state::rozbank_w(uint8_t data)
@@ -319,13 +327,13 @@ uint32_t f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bit
 	// quick kludge for "continue" screen priority
 	if (m_gfxctrl == 0x00)
 	{
-		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
-		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02, m_flipscreen);
+		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02, m_flipscreen);
 	}
 	else
 	{
-		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x00);
-		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x00, m_flipscreen);
+		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02, m_flipscreen);
 	}
 	return 0;
 }
@@ -868,14 +876,17 @@ void f1gp_state::f1gp(machine_config &config)
 	VSYSTEM_SPR2(config, m_spr_old[0], m_palette, gfx_f1gp_spr1);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>));
 	m_spr_old[0]->set_pritype(2);
+	m_spr_old[0]->set_flip_offsets(305, 232);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], m_palette, gfx_f1gp_spr2);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>));
 	m_spr_old[1]->set_pritype(2);
+	m_spr_old[1]->set_flip_offsets(305, 232);
 
 	K053936(config, m_k053936);
 	m_k053936->set_wrap(1);
 	m_k053936->set_offsets(-58, -2);
+	m_k053936->set_flip_offsets(-58, -3);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -1186,9 +1197,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, f1gp,   0,    f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
-GAME( 1991, f1gpa,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 3)",            MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // supposed to be the earliest version dumped and only work with steering wheel
+GAME( 1991, f1gp,   0,    f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
+GAME( 1991, f1gpa,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 3)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // supposed to be the earliest version dumped and only work with steering wheel
 GAME( 1991, f1gpbl, f1gp, f1gpbl, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
 GAME( 1992, f1gp2,  0,    f1gp2,  f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

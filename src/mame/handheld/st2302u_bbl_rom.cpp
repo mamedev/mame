@@ -354,10 +354,8 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	m_maincpu->in_pc_callback().set_ioport("PORTC");
 
 	SPEAKER(config, "mono").front_center();
-	m_maincpu->add_route(0, "mono", 1.00);
-	m_maincpu->add_route(1, "mono", 1.00);
-	m_maincpu->add_route(2, "mono", 1.00);
-	m_maincpu->add_route(3, "mono", 1.00);
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_CURRENT_DAC, "mono", 1.00);
 
 
 	SCREEN(config, m_screen).set_lcd();

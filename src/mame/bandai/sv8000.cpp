@@ -282,7 +282,7 @@ INPUT_PORTS_END
 void sv8000_state::sv8000(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 3.579545_MHz_XTAL/2);
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &sv8000_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sv8000_state::irq0_line_hold));
@@ -299,12 +299,12 @@ void sv8000_state::sv8000(machine_config &config)
 	m_s68047p->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_raw(3.579545_MHz_XTAL * 2, 456, 0, 372, 262, 0, 243);
 	screen.set_screen_update(m_s68047p, FUNC(s68047_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay8910(AY8910(config, "ay8910", 3.579545_MHz_XTAL/2));
+	ay8910_device &ay8910(AY8910(config, "ay8910", 3.579545_MHz_XTAL / 2));
 	ay8910.port_a_write_callback().set(FUNC(sv8000_state::ay_port_a_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 

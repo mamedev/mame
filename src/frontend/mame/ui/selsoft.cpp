@@ -27,12 +27,14 @@
 #include "luaengine.h"
 
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "path.h"
 #include "unicode.h"
 
 #include <algorithm>
 #include <iterator>
 #include <functional>
+#include <locale>
 #include <thread>
 #include <locale>
 
@@ -756,7 +758,13 @@ void menu_select_software::filter_selected(int index)
 					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 					if (!file.open(util::string_format("custom_%s_filter.ini", m_system.driver->name)))
 					{
-						filter.save_ini(file, 0);
+						{
+							util::owritestream str(file);
+							str.imbue(std::locale::classic());
+
+							filter.save_ini(str, 0);
+							str << std::flush;
+						}
 						file.close();
 					}
 				}

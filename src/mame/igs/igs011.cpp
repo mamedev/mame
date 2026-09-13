@@ -198,6 +198,7 @@ public:
 	void init_drgnwrldv40k() ATTR_COLD;
 	void init_ryukobou() ATTR_COLD;
 	void init_tygn() ATTR_COLD;
+	void init_sdmg2641c() ATTR_COLD;
 
 	void drgnwrld(machine_config &config) ATTR_COLD;
 	void drgnwrld_igs012(machine_config &config) ATTR_COLD;
@@ -2139,6 +2140,28 @@ void igs011_oki_state::init_nkishusp()
 	rom[0x4c67a/2]  =   0x6038;     // 04C67A: 6E38      bgt     $4c6b4 (system error)
 }
 
+void igs011_oki_state::init_sdmg2641c()
+{
+	u16 *src = (u16 *)m_maincpu_region->base();
+
+	const int rom_size = 0x80000;
+
+	for (int i = 0; i < rom_size/2; i++)
+	{
+		u16 x = src[i];
+
+		if ((i & 0x0300) != 0x0100)   // lhb: 0x1100
+			x ^= 0x0200;
+
+		if ((i & 0x0150) != 0x0000 && (i & 0x0152) != 0x0010)
+			x ^= 0x0004;
+
+		if ((i & 0x2084) != 0x2084 && (i & 0x2094) != 0x2014)
+			x ^= 0x0020;
+
+		src[i] = x;
+	}
+}
 
 /***************************************************************************
 
@@ -4651,6 +4674,18 @@ ROM_START( xymga )
 	ROM_LOAD( "igs_s0202.u39", 0x000000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // same as xymg, only without 1st and 2nd half identical
 ROM_END
 
+ROM_START( sdmg2641c ) // IGS PCB N0-0093-8
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "igs_m2403.u30", 0x00000, 0x80000, CRC(e5f197fe) SHA1(d17bf7f37251083645cf235e148cb819d1bd995d) )
+
+	ROM_REGION( 0x280000, "igs011", 0 )
+	ROM_LOAD( "rom.u15",      0x000000, 0x200000, NO_DUMP ) // soldered, not dumped yet
+	ROM_LOAD( "igs_l2404.u8", 0x200000, 0x080000, NO_DUMP ) // soldered, not dumped yet
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s0202.u39", 0x000000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // not dumped, but ROM code matches xymga's
+ROM_END
+
 
 } // anonymous namespace
 
@@ -4684,4 +4719,5 @@ GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_oki_stat
 GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,      init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,      init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   vbowl_state,      init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, sdmg2641c,     sdmg2,    xymga,           xymg,      igs011_oki_state, init_sdmg2641c,    ROT0, "IGS",                     "Chaoji Da Manguan II (China, V641C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing GFX ROM, inputs / outputs / protection need verifying
 GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_oki_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",             MACHINE_SUPPORTS_SAVE )

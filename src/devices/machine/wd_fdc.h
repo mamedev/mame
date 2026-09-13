@@ -314,6 +314,7 @@ private:
 	std::string format_description_string;
 
 	bool delay_int;
+	bool delay_cmd;
 
 	void delay_cycles(emu_timer *tm, int cycles);
 

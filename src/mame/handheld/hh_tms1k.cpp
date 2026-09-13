@@ -11506,7 +11506,7 @@ void splitsec_state::splitsec(machine_config &config)
 
 ROM_START( splitsec )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7314", 0x0000, 0x1000, CRC(e94b2098) SHA1(f0fc1f56a829252185592a2508740354c50bedf8) )
+	ROM_LOAD( "mp7314", 0x0000, 0x1000, CRC(5a70312c) SHA1(2cb988444e6fed1398df20a75727d9dfd4c2d0b8) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )

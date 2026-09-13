@@ -88,6 +88,8 @@ Scanline 0 is the start of vblank.
 #include "macrtc.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
 #include "bus/macpds/pds_tpdfpd.h"
@@ -106,7 +108,6 @@ Scanline 0 is the start of vblank.
 #include "machine/applefdintf.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "macadb.h"
 #include "macscsi.h"
 #include "sound/dac.h"
 #include "sound/flt_biquad.h"
@@ -144,7 +145,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via6522_0"),
 		m_adbmodem(*this, "adbmodem"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
 		m_scsihelp(*this, "scsihelp"),
@@ -202,7 +203,7 @@ private:
 	required_device<m68000_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	optional_device<adbmodem_device> m_adbmodem;
-	optional_device<macadb_device> m_macadb;
+	optional_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	optional_device<nscsi_bus_device> m_scsibus;
 	optional_device<mac_scsi_helper_device> m_scsihelp;
@@ -500,7 +501,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mac128_state::mac_scanline)
 
 	m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL - 9));
 
-	if ((!(scanline % 10)) && (!m_macadb))
+	if ((!(scanline % 10)) && (!m_adbbus))
 	{
 		mouse_callback();
 	}
@@ -1339,11 +1340,13 @@ void mac128_state::macse(machine_config &config)
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
 	m_adbmodem->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
-	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_adbmodem->irq_callback().set(FUNC(mac128_state::adb_irq_w));
 
-	MACADB(config, m_macadb, C7M);
-	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_BUS(config, m_adbbus);
+	m_adbbus->out_adb_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	R65NC22(config.replace(), m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));

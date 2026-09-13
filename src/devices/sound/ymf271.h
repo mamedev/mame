@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont, hap
+// copyright-holders:superctr
 #ifndef MAME_SOUND_YMF271_H
 #define MAME_SOUND_YMF271_H
 
@@ -20,6 +20,13 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	struct opx_alg
+	{
+		uint8_t mods[4];
+		uint8_t car;
+		uint8_t fbsrc;
+	};
+
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -36,121 +43,128 @@ protected:
 	TIMER_CALLBACK_MEMBER(timer_b_expired);
 
 private:
-	struct YMF271Slot
+	static constexpr int NUM_SLOTS = 48;
+	static constexpr int NUM_GROUPS = 12;
+
+	struct opx_slot
 	{
+		// function registers (decoded)
+		uint8_t kon;
 		uint8_t ext_en;
 		uint8_t ext_out;
-		uint8_t lfoFreq;
-		uint8_t lfowave;
-		uint8_t pms, ams;
-		uint8_t detune;
-		uint8_t multiple;
+		uint8_t lfo_freq;
+		uint8_t ams, pms, lfo_wave;
+		uint8_t dt, mul;
 		uint8_t tl;
-		uint8_t keyscale;
-		uint8_t ar;
-		uint8_t decay1rate, decay2rate;
-		uint8_t decay1lvl;
-		uint8_t relrate;
+		uint8_t ks, ar;
+		uint8_t d1r;
+		uint8_t d2r;
+		uint8_t d1l, rr;
+		uint16_t fnum;
 		uint8_t block;
-		uint8_t fns_hi;
-		uint32_t fns;
-		uint8_t feedback;
-		uint8_t waveform;
-		uint8_t accon;
-		uint8_t algorithm;
-		uint8_t ch0_level, ch1_level, ch2_level, ch3_level;
+		uint8_t fnum_latch;
+		uint8_t accon, fb, wave;
+		uint8_t alg;
+		uint8_t ch_level[4];
 
-		uint32_t startaddr;
-		uint32_t loopaddr;
-		uint32_t endaddr;
-		uint8_t altloop;
-		uint8_t fs;
-		uint8_t srcnote, srcb;
+		// PCM attribute registers (only meaningful if slot % 4 == 0)
+		uint32_t pcm_start;
+		uint32_t pcm_end;
+		uint32_t pcm_loop;
+		uint8_t pcm_altloop;
+		uint8_t pcm_fs;
+		uint8_t pcm_12bit;
+		uint8_t pcm_srcnote, pcm_srcb;
 
-		uint32_t step;
-		uint64_t stepptr;
+		// runtime state
+		int8_t block_s;
+		uint8_t keycode;
+		uint8_t eg_state;
+		int32_t eg_att;
+		uint32_t phase;
+		int32_t out;
+		int32_t acc;
+		int32_t fb_hist[2];
+		uint32_t lfo_cnt;
+		uint8_t lfo_pos;
+		uint32_t pcm_pos;
+		uint32_t pcm_frac;
+		uint8_t pcm_ended;   // End flag already raised since the last key-on
 
-		uint8_t active;
-		uint8_t bits;
-
-		// envelope generator
-		int32_t volume;
-		int32_t env_state;
-		int32_t env_attack_step;      // volume increase step in attack state
-		int32_t env_decay1_step;
-		int32_t env_decay2_step;
-		int32_t env_release_step;
-
-		int64_t feedback_modulation0;
-		int64_t feedback_modulation1;
-
-		int lfo_phase, lfo_step;
-		int lfo_amplitude;
-		double lfo_phasemod;
+		// connection cache (rebuilt when sync/algorithm changes)
+		uint8_t c_nmod;
+		uint8_t c_mod[3];
+		uint8_t c_fbhead;
+		int8_t c_fbtarget;
+		uint8_t c_carrier;
 	};
 
-	struct YMF271Group
+	struct opx_group
 	{
-		uint8_t sync, pfm;
+		uint8_t sync;
+		uint8_t pfm;
+		uint8_t dirty;
 	};
 
-	void init_state();
 	void init_tables();
-	void calculate_clock_correction();
-	void calculate_step(YMF271Slot *slot);
-	void update_envelope(YMF271Slot *slot);
-	void init_envelope(YMF271Slot *slot);
-	void init_lfo(YMF271Slot *slot);
-	void update_lfo(YMF271Slot *slot);
-	int64_t calculate_slot_volume(YMF271Slot *slot);
-	void update_pcm(int slotnum, int32_t *mixp, int length);
-	int64_t calculate_op(int slotnum, int64_t inp);
-	void set_feedback(int slotnum, int64_t inp);
-	void write_register(int slotnum, int reg, uint8_t data);
-	void ymf271_write_fm(int bank, uint8_t address, uint8_t data);
-	void ymf271_write_pcm(uint8_t address, uint8_t data);
-	void ymf271_write_timer(uint8_t address, uint8_t data);
+	void init_state();
 
-	inline int get_keyscaled_rate(int rate, int keycode, int keyscale);
-	inline int get_internal_keycode(int block, int fns);
-	inline int get_external_keycode(int block, int fns);
-	inline bool check_envelope_end(YMF271Slot *slot);
-	inline void calculate_status_end(int slotnum, bool state);
+	bool is_keyon_slot(int bank, int group) const;
+	int voice_slots(int bank, int group, int *slots) const;
+	static void update_keycode(opx_slot &s, int slotnum);
+	void slot_keyon(int slotnum);
+	void slot_keyoff(int slotnum);
+	void write_slot_reg(int slotnum, int reg, uint8_t data);
+	void write_fm(int bank, uint8_t address, uint8_t data);
+	void write_pcm(uint8_t address, uint8_t data);
+	void write_util(uint8_t address, uint8_t data);
+	void update_irq();
 
-	// lookup tables
-	std::unique_ptr<int16_t[]> m_lut_waves[8];
-	std::unique_ptr<double[]> m_lut_plfo[4][8];
-	std::unique_ptr<int[]> m_lut_alfo[4];
-	double m_lut_ar[64];
-	double m_lut_dc[64];
-	double m_lut_lfo[256];
-	int m_lut_attenuation[16];
-	int m_lut_total_level[128];
-	int m_lut_env_volume[256];
+	void connect(const opx_alg &alg, const int *slots, int n);
+	void rebuild_group(int g);
+	void eg_tick(opx_slot &s);
+	static int eg_rate(int rate2, int rks);
+	static uint32_t lfo_period(uint8_t n);
+	static void lfo_tick(opx_slot &s);
+	static int32_t lfo_pm(const opx_slot &s);
+	static int32_t lfo_am(const opx_slot &s);
+	static uint32_t phase_inc(const opx_slot &s, int32_t lfo_pm);
+	static uint32_t pcm_step(const opx_slot &s, int32_t lfo_pm);
+	int32_t pcm_word(const opx_slot &s, uint32_t pos);
+	int32_t pcm_sample(opx_slot &s, int slotnum, int32_t lfo_pm);
+	int32_t env_mul(int32_t v, uint32_t env) const;
+	int32_t op(uint32_t phase, int wave, uint32_t env) const;
+	static int32_t pan(int32_t v, uint8_t level);
+
+	// lookup tables (generated at start)
+	uint16_t m_logsin[256];
+	uint16_t m_exp[256];
 
 	// internal state
-	YMF271Slot m_slots[48];
-	YMF271Group m_groups[12];
+	opx_slot m_slots[NUM_SLOTS];
+	opx_group m_groups[NUM_GROUPS];
 
 	uint8_t m_regs_main[0x10];
 
-	uint32_t m_timerA;
-	uint32_t m_timerB;
-	uint8_t m_irqstate;
+	uint16_t m_timerA;
+	uint8_t m_timerB;
+	uint8_t m_timer_ctrl;
 	uint8_t m_status;
 	uint16_t m_end_status;
-	uint8_t m_enable;
+	uint8_t m_irqstate;
 
 	uint32_t m_ext_address;
 	uint8_t m_ext_rw;
 	uint8_t m_ext_readlatch;
+
+	uint32_t m_eg_cnt;
+	uint8_t m_eg_phase;
 
 	uint32_t m_master_clock;
 
 	emu_timer *m_timA;
 	emu_timer *m_timB;
 	sound_stream *m_stream;
-	std::vector<int32_t> m_mix_buffer;
 
 	devcb_write_line m_irq_handler;
 };

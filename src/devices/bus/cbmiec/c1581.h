@@ -63,7 +63,7 @@ private:
 		LED_ACT
 	};
 
-	void update_iec();
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 
 	void cnt_w(int state);
 	void sp_w(int state);
@@ -83,11 +83,14 @@ private:
 	required_ioport m_address;
 	output_finder<2> m_leds;
 
-	int m_data_out;             // serial data out
-	int m_atn_ack;              // attention acknowledge
-	int m_fast_ser_dir;         // fast serial direction
-	int m_sp_out;               // fast serial data out
-	int m_cnt_out;              // fast serial clock out
+	bool m_data_out;             // serial data out
+	bool m_atn_ack;              // attention acknowledge
+	bool m_ser_dir;         	 // fast serial direction
+	bool m_sp_out;               // fast serial data out
+	bool m_cnt_out;              // fast serial clock out
+	bool m_iec_clk;              // IEC clock line state
+	
+	emu_timer *m_iec_sync_timer;
 };
 
 

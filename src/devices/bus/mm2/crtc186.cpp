@@ -35,7 +35,7 @@
 
     TODO:
 
-    - graphics mode
+    - graphics mode (no software available to exercise it)
 
 */
 

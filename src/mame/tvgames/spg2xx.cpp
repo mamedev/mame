@@ -966,6 +966,21 @@ static INPUT_PORTS_START( doyousud )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mgarage )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Left")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Enter")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Back")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Accelerate")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Right")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
 ioport_value spg2xx_game_fordrace_state::wheel_r()
 {
 	return ioport("WHEEL_REAL")->read() >> 1;
@@ -1737,6 +1752,20 @@ static INPUT_PORTS_START( prail )
 
 	PORT_MODIFY("P3")
 	PORT_BIT( 0x0003, 0x0000, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_REMAP_TABLE(handle_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dvlaptop )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_DIPNAME( 0x0040, 0x0000, "Show Display 1" ) // might be a button
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+
+	PORT_MODIFY("P3")
+	PORT_DIPNAME( 0x0020, 0x0000, "Show Display 2" ) // might be a button
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 void spg2xx_game_state::machine_start()
@@ -2969,6 +2998,11 @@ ROM_START( lexiart )
 	ROM_LOAD16_WORD_SWAP( "lexibookartstudio.u3", 0x000000, 0x800000, CRC(fc417abb) SHA1(c0a18a2cf11c47086722f0ec88410614fed7c6f7) )
 ROM_END
 
+ROM_START( stvscri )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "scrivi_disegna.bin", 0x000000, 0x800000, CRC(44392a74) SHA1(ed59d7a2218c047aab3fa151e8fa781b81b59250) )
+ROM_END
+
 ROM_START( lexibds )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "barbiedrawingstudio.u3", 0x000000, 0x400000, CRC(16b5b52e) SHA1(e3719523d92d1302883f0b0c2d4b3fabedc34319) ) // no chip markings, dumped as 29LV320
@@ -3128,6 +3162,24 @@ ROM_END
 ROM_START( dinothun )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "dinothunder.bin", 0x000000, 0x400000, CRC(03e82604) SHA1(c39d72aa8a0750ee38ab01b317e77a46e1d6004e) )
+ROM_END
+
+ROM_START( dvlaptop )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "u3-main.u3-1", 0x000000, 0x800000, CRC(0457c902) SHA1(a0f49627e1e099262b92c2655d42090f32fb1d21) )
+	// 2nd bank? (or to drive the LCD?)  It's a SunPlus SPG2xx program like above
+	ROM_LOAD16_WORD_SWAP( "u8-slave.u8-1", 0x800000, 0x800000, CRC(d0627571) SHA1(029cb3b5d8b9e565c822c0705782770715b4fb53) )
+ROM_END
+
+
+ROM_START( nvpoker )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "poker.bin", 0x000000, 0x400000, CRC(0efbe6a7) SHA1(f266fac7a35535d37557604c782091222830d3d7) )
+ROM_END
+
+ROM_START( mgarage )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "monstergarage.bin", 0x000000, 0x400000, CRC(3a69ca21) SHA1(fc04d40d895db4a66cbb2c573d08041278cd2e2e) )
 ROM_END
 
 ROM_START( pdcj )
@@ -3321,6 +3373,8 @@ CONS( 200?, wfcentro,   wfart,    0, wfcentro,   spg2xx,     spg2xx_game_wfcentr
 
 CONS( 200?, lexiart,    0,        0, lexiart,    lexiart,    spg2xx_game_lexiart_state,       empty_init,    "Lexibook", "Lexibook Junior My 1st Drawing Studio", MACHINE_NOT_WORKING )
 
+CONS( 200?, stvscri,    0,        0, lexiart,    lexiart,    spg2xx_game_lexiart_state,       empty_init,    "Sapientino", "Smart TV Scrivi & Disegna (Italy)", MACHINE_NOT_WORKING )
+
 CONS( 200?, lexibds,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "Lexibook", "Lexibook Junior Barbie Drawing Board / Barbie Drawing Studio", MACHINE_NOT_WORKING )
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
@@ -3380,5 +3434,12 @@ CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,     spg2xx_game_state, 
 
 CONS( 2004, dinothun,   0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "N-Vision / Toy Quest", "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
 
+CONS( 2004, nvpoker,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               init_crc,      "N-Vision / Toy Quest", "Texas Hold'em Poker: World Poker Challenge - Las Vegas Edition", MACHINE_NOT_WORKING )
+
+CONS( 2004, mgarage,    0,        0, spg2xx,     mgarage,    spg2xx_game_state,               empty_init,    "N-Vision / Toy Quest", "Monster Garage", MACHINE_SUPPORTS_SAVE )
+
 // this Japan version uses different banking to spg2xx_pdc.cpp so is in here instead
 CONS( 2006, pdcj,       0,        0, pdcj,       pdcj,       spg2xx_game_pdcj_state,          empty_init,    "Conny / Takara", "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// has an monochrome LCD display (that part might not be dumped if it's done entirely by one of the globs) but can also connect to the TV
+CONS( 200?, dvlaptop,   0,        0, spg2xx,     dvlaptop,   spg2xx_game_state,               empty_init,    "VTech", "Double Vision Laptop (Germany)", MACHINE_NOT_WORKING )

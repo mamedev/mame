@@ -29,6 +29,8 @@ zeus2_renderer::zeus2_renderer(zeus2_device *state)
 
 DEFINE_DEVICE_TYPE(ZEUS2, zeus2_device, "zeus2", "Midway Zeus2")
 
+uint8_t *zeus2_device::s_waveram_base = nullptr;
+
 zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ZEUS2, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
@@ -75,6 +77,7 @@ void zeus2_device::device_start()
 {
 	/* allocate memory for "wave" RAM */
 	m_waveram = std::make_unique<uint32_t[]>(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	s_waveram_base = reinterpret_cast<uint8_t *>(m_waveram.get());
 	m_frameColor = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	m_frameDepth = std::make_unique<int32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 
@@ -141,7 +144,7 @@ void zeus2_device::device_reset()
 	texel_width = 256;
 	zeus_fifo_words = 0;
 	m_fill_color = 0;
-	m_fill_depth = 0;
+	m_fill_depth = 0xffffff;
 	m_texmodeReg = 0;
 	zeus_trans[3] = 0.0f;
 	m_useZOffset = false;
@@ -329,9 +332,8 @@ uint32_t zeus2_device::zeus2_r(offs_t offset)
 			break;
 
 		case 0x54:
-			// VCOUNT upper 16 bits
-			//result = (screen().vpos() << 16) | screen().vpos();
-			result = (screen().vpos() << 16);
+			// VCOUNT is in unscaled lines. Scale the count back in MAME's fake interlaced mode
+			result = ((screen().vpos() >> m_yScale) << 16);
 			break;
 	}
 
@@ -441,12 +443,14 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			m_yScale = (((m_zeusbase[0x39] >> 16) & 0xfff) < 0x100) ? 0 : 1;
 			int hor = ((m_zeusbase[0x34] & 0xffff) - (m_zeusbase[0x33] >> 16)) << m_yScale;
 			int ver = ((m_zeusbase[0x35] & 0xffff) + 1) << m_yScale;
-			popmessage("reg[30]: %08X Screen: %dH X %dV yScale: %d", m_zeusbase[0x30], hor, ver, m_yScale);
 			int vtotal = (m_zeusbase[0x37] & 0xffff) << m_yScale;
 			int htotal = (m_zeusbase[0x34] >> 16) << m_yScale;
 			//rectangle visarea((m_zeusbase[0x33] >> 16) << m_yScale, htotal - 1, 0, (m_zeusbase[0x35] & 0xffff) << m_yScale);
 			rectangle visarea(0, hor - 1, 0, ver - 1);
-			screen().configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, ZEUS2_VIDEO_CLOCK / 4.0));
+			// Dot clock is the PLL's 100MHz VCO (video clock x3/2) over reg 0x31's divider, held less one
+			// Interlaced mode doubles both totals (2x*2y), so x4 to scan both fields in one std-res field time
+			const XTAL dotclk = ZEUS2_VIDEO_CLOCK * 3 / 2 / (((m_zeusbase[0x31] >> 16) & 0xff) + 1) * (m_yScale ? 4 : 1);
+			screen().configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, dotclk));
 			zeus_cliprect = visarea;
 			zeus_cliprect.max_x -= zeus_cliprect.min_x;
 			zeus_cliprect.min_x = 0;
@@ -812,11 +816,18 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 						logerror("zeus2_register_update: Warning! Mask Register not equal to 0xffffffff\n");
 				}
 				if (m_zeusbase[0x51] == 0x00400000) {
-					// SGRAM Color Register
-					m_fill_color = m_zeusbase[0x58] & 0xffffff;
-					m_fill_depth = ((m_zeusbase[0x5a] & 0xffff) << 8) | (m_zeusbase[0x58] >> 24);
-					//m_fill_depth = -1;
-					if (m_zeusbase[0x58] != m_zeusbase[0x59])
+					// SGRAM Color Register.  R5E bit 5 packs 24 bit color with 24 bit depth,
+					// otherwise it is 32 bit color with 16 bit depth.
+					bool mode24 = m_zeusbase[0x5e] & 0x20;
+					if (mode24) {
+						m_fill_color = m_zeusbase[0x58] & 0xffffff;
+						m_fill_depth = ((m_zeusbase[0x59] & 0xffff) << 8) | (m_zeusbase[0x58] >> 24);
+					}
+					else {
+						m_fill_color = m_zeusbase[0x58];
+						m_fill_depth = (m_zeusbase[0x5a] & 0xffff) << 8;
+					}
+					if (m_zeusbase[0x58] != m_zeusbase[mode24 ? 0x5a : 0x59])
 						logerror("zeus2_register_update: Warning! Different fill colors are set.\n");
 					if (logit)
 						logerror(" -- Setting fill color = %06X depth = %06X ", m_fill_color, m_fill_depth);
@@ -838,7 +849,6 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				if (m_zeusbase[0x50] & 0x10000) {
 					addr = 0x0;
 					numPixels = WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8;
-					printf("Clearing buffer: numPixels: %08X addr: %08X reg50: %08X\n", numPixels, addr, m_zeusbase[0x50]);
 				}
 				if (logit)
 					logerror(" -- Clearing buffer: numPixels: %08X addr: %08X reg51: %08X", numPixels, addr, m_zeusbase[0x51]);
@@ -1747,9 +1757,13 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	extra.ucode_src = m_state->m_curUCodeSrc;
 	extra.tex_src = m_state->zeus_texbase;
+	extra.frame_base = m_state->frame_addr_from_xy(0, 0, true);
+	extra.frame_shift = m_state->frame_row_shift();
 	int texmode = texdata & 0xffff;
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
-	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
+	extra.solidcolor = m_state->m_zeusbase[0x00] & 0x7fff;
+	// Flat solid-color fill: texmode bits 10-11 both set (same as Zeus 1)
+	extra.solid_enable = ((texmode & 0x0c00) == 0x0c00);
 	extra.transcolor = (texmode & 0x180) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
 	extra.depth_min_enable = true;// (m_state->m_renderRegs[0x14] & 0x008000);
@@ -1758,10 +1772,13 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
 	extra.depth_write_enable = !(m_state->m_renderRegs[0x14] & 0x001000);
 	extra.depth_clear_enable = (m_state->m_renderRegs[0x14] & 0x000c00);
-	// 021e0e = blend with texture alpha for type 2, 020202 blend src / dst alpha
-	extra.blend_enable = ((m_state->m_renderRegs[0x40] == 0x020202) || (m_state->m_renderRegs[0x40] == 0x021e0e && (texmode & 0x3) == 2));
-	extra.srcAlpha = m_state->m_renderRegs[0x0c];
-	extra.dstAlpha = m_state->m_renderRegs[0x0d];
+	// 021e0e = blend, gated on type 2 here but not by the game.  Otherwise bit 17 turns the pixel
+	// ALU on and the second byte picks the destination factor, 0x02 taking it from reg 0x0d.
+	extra.blend_enable = ((m_state->m_renderRegs[0x40] & 0x02ff00) == 0x020200 || (m_state->m_renderRegs[0x40] == 0x021e0e && (texmode & 0x3) == 2));
+	// The low byte picks the source factor: 0x02 scales it by reg 0x0c, 0x04 takes it at unity.
+	// Clamp translucency (1.8 fixed, 0x100=1.0) to 0x100: scale8() takes a uint8_t, so >=0x100 would truncate to near-black.
+	extra.srcAlpha = ((m_state->m_renderRegs[0x40] & 0xff) == 0x04) ? 0x100 : std::min<uint32_t>(m_state->m_renderRegs[0x0c], 0x100);
+	extra.dstAlpha = std::min<uint32_t>(m_state->m_renderRegs[0x0d], 0x100);
 	extra.texture_alpha = false;
 	extra.texture_rgb555 = false;
 	switch (texmode & 0x3) {
@@ -1779,8 +1796,6 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			extra.get_texel = m_state->get_texel_8bit_2x2_alpha;
 			extra.texture_alpha = true;
 			extra.get_alpha = m_state->get_alpha_8bit_2x2_alpha;
-			extra.depth_test_enable = false;
-			extra.depth_write_enable = false;
 		}
 		else {
 			extra.texture_rgb555 = true;
@@ -1801,6 +1816,27 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 *  Rasterizers
 *************************************/
 
+// Blend srcColor into a frame buffer pixel and update depth; shared by the solid-fill and textured paths.
+static inline void zeus2_write_pixel(uint32_t &colorpix, int32_t &depthpix, rgb_t srcColor,
+	bool blend_enable, int32_t srcAlpha, int32_t dstAlpha, bool depth_write_enable, int32_t depthVal)
+{
+	if (blend_enable) {
+		// If src alpha is 0 don't write
+		if (srcAlpha == 0x00)
+			return;
+		rgb_t dstColor = colorpix;
+		if (srcAlpha != 0x100)
+			srcColor.scale8(srcAlpha);
+		if (dstAlpha == 0x100)
+			srcColor += dstColor;
+		else
+			srcColor += dstColor.scale8(dstAlpha);
+	}
+	colorpix = srcColor;
+	if (depth_write_enable)
+		depthpix = depthVal; // Should limit to 24 bits
+}
+
 void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid)
 {
 	int32_t curz = extent.param[0].start;
@@ -1819,9 +1855,11 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 	int32_t dstAlpha = object.dstAlpha;
 	bool depth_write_enable = object.depth_write_enable;
 	int texwidth = object.texwidth;
+	// RGB555 solidcolor expanded to RGB32
+	uint32_t solidColor = ((object.solidcolor & 0x7c00) << 9) | ((object.solidcolor & 0x3e0) << 6) | ((object.solidcolor & 0x1f) << 3);
 	int x;
 
-	uint32_t addr = m_state->frame_addr_from_xy(0, scanline, true);
+	uint32_t addr = object.frame_base + (scanline << object.frame_shift);
 	int32_t *depthptr = &m_state->m_frameDepth[addr];
 	uint32_t *colorptr = &m_state->m_frameColor[addr];
 	int32_t curDepthVal;
@@ -1832,15 +1870,12 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 			//curDepthVal = object.zbuf_min;
 			curDepthVal = 0xffffff;
 		} else if (object.depth_min_enable) {
-			curDepthVal = curz + object.zbuf_min;
+			// Render reg 0x15 is a floor on the depth value, not a per-object bias
+			curDepthVal = std::max(curz, object.zbuf_min);
 		}
 		else {
 			curDepthVal = curz;
 		}
-		//if (curz < object.zbuf_min)
-		//  curDepthVal = object.zbuf_min;
-		//else
-		//  curDepthVal = curz;
 		if (curDepthVal < 0)
 			curDepthVal = 0;
 		bool depth_pass = true;
@@ -1859,7 +1894,11 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 			if (v0 < 0) v0 = 0;
 			int u1 = (u0 + 1);
 			int v1 = (v0 + 1);
-			if (object.texture_rgb555) {
+			if (object.solid_enable) {
+				zeus2_write_pixel(colorptr[x], depthptr[x], solidColor, object.blend_enable,
+					srcAlpha, dstAlpha, depth_write_enable, curDepthVal);
+			}
+			else if (object.texture_rgb555) {
 				// Rendering for textures with direct color
 				rgb_t srcColor = m_state->get_rgb555(texbase, v0, u0, texwidth);
 				colorptr[x] = srcColor;
@@ -1930,32 +1969,8 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 					uint32_t color2 = m_state->m_pal_table[texel2];
 					uint32_t color3 = m_state->m_pal_table[texel3];
 					rgb_t srcColor = rgbaint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
-					if (object.blend_enable) {
-						// Need to check if this is correct or use incoming dstAlpha
-						//dstAlpha = 0x100 - srcAlpha;
-
-						// If src alpha is 256 don't blend
-						if (1 || srcAlpha != 0x100) {
-							rgb_t dstColor = colorptr[x];
-							if (srcAlpha != 0x100)
-								srcColor.scale8(srcAlpha);
-							if (dstAlpha == 0x100)
-								srcColor += dstColor;
-							else
-								srcColor += dstColor.scale8(dstAlpha);
-						}
-						// If src alpha is 0 don't write
-						if (srcAlpha != 0x00) {
-							colorptr[x] = srcColor;
-							if (depth_write_enable)
-								depthptr[x] = curDepthVal; // Should limit to 24 bits
-						}
-					}
-					else {
-						colorptr[x] = srcColor;
-						if (depth_write_enable)
-							depthptr[x] = curDepthVal; // Should limit to 24 bits
-					}
+					zeus2_write_pixel(colorptr[x], depthptr[x], srcColor, object.blend_enable,
+						srcAlpha, dstAlpha, depth_write_enable, curDepthVal);
 				}
 			// Rendering for textures with transparent color
 			//} else {

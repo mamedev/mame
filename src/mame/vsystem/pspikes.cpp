@@ -475,6 +475,12 @@ VIDEO_START_MEMBER(pspikes_base_state,turbofrc)
 	m_spritepalettebank = 0;
 	m_sprite_gfx = 2;
 
+	// flipped-side dx/dy measured from the game's own scroll compensation
+	m_tilemap[0]->set_scrolldx(0, 185);
+	m_tilemap[1]->set_scrolldx(0, 193);
+	m_tilemap[0]->set_scrolldy(0, 2);
+	m_tilemap[1]->set_scrolldy(0, 2);
+
 	register_state_globals();
 }
 
@@ -482,8 +488,8 @@ VIDEO_START_MEMBER(pspikes_base_state,aerofgtb)
 {
 	VIDEO_START_CALL_MEMBER(turbofrc);
 
-	m_tilemap[0]->set_scrolldx(1, 1);
-	m_tilemap[1]->set_scrolldx(1, 1);
+	m_tilemap[0]->set_scrolldx(1, 1 + 168);
+	m_tilemap[1]->set_scrolldx(1, 1 + 177);
 }
 
 
@@ -661,12 +667,12 @@ uint32_t pspikes_banked_sound_state::screen_update_turbofrc(screen_device &scree
 {
 	m_tilemap[0]->set_scroll_rows(512);
 	int scrolly = m_scrolly[0] + 2;
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < 512; i++)
 //      m_tilemap[0]->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[i] - 11);
-		m_tilemap[0]->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[7] - 11 - (m_flip_screen ? 188 : 0));
-	m_tilemap[0]->set_scrolly(0, scrolly - (m_flip_screen ? 2 : 0));
-	m_tilemap[1]->set_scrollx(0, m_scrollx[1] - (m_flip_screen ? 185 : 7));
-	m_tilemap[1]->set_scrolly(0, m_scrolly[1] + (m_flip_screen ? 0 : 2));
+		m_tilemap[0]->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[7] - 11);
+	m_tilemap[0]->set_scrolly(0, scrolly);
+	m_tilemap[1]->set_scrollx(0, m_scrollx[1] - 7);
+	m_tilemap[1]->set_scrolly(0, m_scrolly[1] + 2);
 
 	screen.priority().fill(0, cliprect);
 
@@ -2647,9 +2653,11 @@ void pspikes_banked_sound_state::turbofrc(machine_config &config)
 
 	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_turbofrc_spr1);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
+	m_spr[0]->set_flip_offsets(319, 224);
 
 	VSYSTEM_SPR2(config, m_spr[1], m_palette, gfx_turbofrc_spr2);
 	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
+	m_spr[1]->set_flip_offsets(319, 224);
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,turbofrc)
 
@@ -2696,10 +2704,12 @@ void pspikes_banked_sound_state::aerofgtb(machine_config &config)
 	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_turbofrc_spr1);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 	m_spr[0]->set_offsets(3, -1);
+	m_spr[0]->set_flip_offsets(311, 208);
 
 	VSYSTEM_SPR2(config, m_spr[1], m_palette, gfx_turbofrc_spr2);
 	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
 	m_spr[1]->set_offsets(3, -1);
+	m_spr[1]->set_flip_offsets(311, 208);
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,aerofgtb)
 
@@ -4028,11 +4038,11 @@ GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  karatblzbl_state,      
 // according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5'000 versus 500)
 // turbofrcua gives 5'000, the others 500.
 // NOTE: turbofrcua also denotes HP rank on these rocks, getting there without any life lost (almost impossible without cheating) makes those literally indestructible.
-GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 4
-GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 3
-GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 1)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 8
-GAME( 1991, turbofrcua, turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 7
-GAME( 1991, turbofrcj,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (Japan)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // no region code, program ROMs marked with a red dot
+GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE ) // region code 4
+GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE ) // region code 3
+GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 1)",    MACHINE_SUPPORTS_SAVE ) // region code 8
+GAME( 1991, turbofrcua, turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 2)",    MACHINE_SUPPORTS_SAVE ) // region code 7
+GAME( 1991, turbofrcj,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (Japan)",        MACHINE_SUPPORTS_SAVE ) // no region code, program ROMs marked with a red dot
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
 // sonicwi looks oldest set, aerofgt is slightly easier, aerofgtb/aerofgtc are noticeably harder

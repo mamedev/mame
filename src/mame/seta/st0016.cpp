@@ -6,6 +6,8 @@
 #include "st0016.h"
 #include "emupal.h"
 
+#include "multibyte.h"
+
 #include <algorithm>
 
 
@@ -227,7 +229,13 @@ u8 st0016_cpu_device::sprite_ram_r(offs_t offset)
 template <unsigned Which>
 void st0016_cpu_device::sprite_ram_w(offs_t offset, u8 data)
 {
-	m_spriteram[SPR_BANK_SIZE * m_spr_bank[Which] + offset] = data;
+	offset += SPR_BANK_SIZE * m_spr_bank[Which];
+	m_spriteram[offset] = data;
+	for (int i = 0; i < 8; i++)
+	{
+		if (m_tilemap[i].vram_base == (offset >> 13))
+			m_tilemap[i].tmap->mark_tile_dirty((offset & 0x1fff) >> 2);
+	}
 }
 
 u8 st0016_cpu_device::palette_ram_r(offs_t offset)
@@ -353,6 +361,26 @@ void st0016_cpu_device::vregs_w(offs_t offset, u8 data)
 	*/
 
 	m_vregs[offset] = data;
+	if (offset < 0x40)
+	{
+		tilemap_info &tmap = m_tilemap[offset >> 3];
+		const u32 prev_base = tmap.vram_base;
+		switch (offset & 0x7)
+		{
+			case 0x1:
+				tmap.vram_base = (data & 0x0e) << 12;
+				if (prev_base != tmap.vram_base)
+					tmap.tmap->mark_all_dirty();
+				[[fallthrough]];
+			case 0x0:
+				tmap.tmap->set_scrollx(m_vregs[offset & ~1] | (m_vregs[offset | 1] << 8));
+				break;
+			case 0x2:
+				tmap.tmap->set_scrolly(m_vregs[offset]);
+				break;
+			// 0x3 to 0x7 = size/mix/disable flag?
+		}
+	}
 	if (offset == 0xa8 && (data & 0x20))
 	{
 		u32 srcadr = (m_vregs[0xa0] | (m_vregs[0xa1] << 8) | (m_vregs[0xa2] << 16)) << 1;
@@ -610,6 +638,7 @@ void st0016_cpu_device::save_init()
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_vregs));
+	save_item(STRUCT_MEMBER(m_tilemap, vram_base));
 }
 
 
@@ -631,92 +660,71 @@ void st0016_cpu_device::startup()
 	m_spr_dx = 0;
 	m_spr_dy = 0;
 
+	for (int i = 0; i < 8; i++)
+	{
+		tilemap_info &tmap = m_tilemap[i];
+
+		// tilemap size guessed (from previous implementations)
+		tmap.tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(st0016_cpu_device::get_tile_info)), TILEMAP_SCAN_COLS, 8,8, 64,32);
+		tmap.tmap->set_user_data(&m_tilemap[i]);
+
+		tmap.vram_base = 0;
+	}
+
 	save_init();
+}
+
+
+TILE_GET_INFO_MEMBER(st0016_cpu_device::get_tile_info)
+{
+	tilemap_info *const layer = (tilemap_info *)tilemap.user_data();
+	tile_index = layer->vram_base + (tile_index << 2);	
+	const u32 code = get_u16le(&m_spriteram[tile_index]);
+	const u32 color = m_spriteram[tile_index + 2];
+	const u8 flags = TILE_FLIPXY(m_spriteram[tile_index + 3] >> 6); // crownpkr test mode doesn't seem to agree with this
+
+	tileinfo.set(m_ramgfx, code, color & 0x3f, flags);
 }
 
 
 void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	gfx_element *gfx = this->gfx(m_ramgfx);
-	//for (j = 0x40 - 8; j >= 0; j -= 8)
-	for (int j = 0; j < 0x40; j += 8)
+	//for (i = 7; i >= 0; i--)
+	for (int i = 0; i < 8; i++)
 	{
+		const int j = i << 3;
 		if (m_vregs[j + 1] && ((priority && (m_vregs[j + 3] == 0xff)) || ((!priority) && (m_vregs[j + 3] != 0xff))))
 		{
-			int i = m_vregs[j + 1] * 0x1000;
-
-			for (int x = 0; x < 32 * 2; x++)
+			tilemap_t *tilemap = m_tilemap[i].tmap;
+			bitmap_ind16 &pixmap = tilemap->pixmap();
+			for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
 			{
-				for (int y = 0; y < 8 * 4; y++)
+				const u16 *const srcline = &pixmap.pix((tilemap->scrolly() + sy - m_spr_dy) & 0xff);
+				u16 *const destline = &bitmap.pix(sy);
+				for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
 				{
-					const int code = m_spriteram[i] + 256 * m_spriteram[i + 1];
-					const int color = m_spriteram[i + 2] & 0x3f;
-
-					const bool flipx = BIT(m_spriteram[i + 3], 7); // crownpkr test mode doesn't seem to agree with this
-					const bool flipy = BIT(m_spriteram[i + 3], 6); // "
-
-					if (priority)
-					{
-						gfx->transpen(bitmap, cliprect,
-							code,
-							color,
-							flipx, flipy,
-							x * 8 + m_spr_dx, y * 8 + m_spr_dy, 0);
-					}
+					const u16 pixdata = srcline[(tilemap->scrollx() + sx - m_spr_dx) & 0x1ff];
+					const bool is_trans = (pixdata & 0xf) == 0;
+					if (priority && !is_trans)
+						destline[sx] = pixdata;
 					else
 					{
-						int ypos = y * 8 + m_spr_dy;// + ((m_vregs[j + 2] == 0xaf) ? 0x50 : 0); //hack for mayjinsen title screen
-						int xpos = x * 8 + m_spr_dx;
-						int gfxoffs = 0;
-						const u8 *const srcgfx = gfx->get_data(code);
-
-						for (int yloop = 0; yloop < 8; yloop++)
+						if (m_vregs[j + 7] == 0x12)
+							destline[sx] = (destline[sx] | ((pixdata & 0xf) << 4)) & 0x3ff;
+						else
 						{
-							u16 drawypos;
-
-							if (!flipy) { drawypos = ypos + yloop; }
-							else { drawypos = (ypos + 8 - 1) - yloop; }
-							u16 *const destline = &bitmap.pix(drawypos);
-							//u16 *destline = &bitmap.pix(drawypos ^ 0x07); // hack for dcrown test mode
-
-							for (int xloop = 0; xloop < 8; xloop++)
+							if (ismacs2())
 							{
-								u16 drawxpos;
-								const int pixdata = srcgfx[gfxoffs];
-
-								if (!flipx) { drawxpos = xpos + xloop; }
-								else { drawxpos = (xpos + 8 - 1) - xloop; }
-
-								if (drawxpos > cliprect.max_x)
-									drawxpos -= 512; // wrap around
-
-								if (cliprect.contains(drawxpos, drawypos))
-								{
-									if (m_vregs[j + 7] == 0x12)
-										destline[drawxpos] = (destline[drawxpos] | (pixdata << 4)) & 0x3ff;
-									else
-									{
-										if (ismacs2())
-										{
-											if (pixdata)// || destline[drawxpos]==UNUSED_PEN)
-											{
-												destline[drawxpos] = pixdata + (color * 16);
-											}
-										}
-										else
-										{
-											if (pixdata || destline[drawxpos] == UNUSED_PEN)
-											{
-												destline[drawxpos] = pixdata + (color * 16);
-											}
-										}
-									}
-								}
-								gfxoffs++;
+								if (!is_trans)// || (destline[sx] == UNUSED_PEN))
+									destline[sx] = pixdata;
+							}
+							else
+							{
+								if (!is_trans || (destline[sx] == UNUSED_PEN))
+									destline[sx] = pixdata;
 							}
 						}
 					}
-					i += 4;
 				}
 			}
 		}

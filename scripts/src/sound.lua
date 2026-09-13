@@ -1535,6 +1535,18 @@ if SOUNDS["MPEG_AUDIO"] then
 end
 
 ---------------------------------------------------
+-- Texas Instruments TMS320AV110 MPEG audio decoder
+--@src/devices/sound/tms320av110.h,SOUNDS["TMS320AV110"] = true
+---------------------------------------------------
+
+if SOUNDS["TMS320AV110"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tms320av110.cpp",
+		MAME_DIR .. "src/devices/sound/tms320av110.h",
+	}
+end
+
+---------------------------------------------------
 -- ZOOM ZSG-2
 --@src/devices/sound/zsg2.h,SOUNDS["ZSG2"] = true
 ---------------------------------------------------
@@ -1626,6 +1638,18 @@ if SOUNDS["TA7630"] then
 	files {
 		MAME_DIR .. "src/devices/sound/ta7630.cpp",
 		MAME_DIR .. "src/devices/sound/ta7630.h",
+	}
+end
+
+---------------------------------------------------
+-- STmicroelectronics TDA7433
+--@src/devices/sound/tda7433.h,SOUNDS["TDA7433"] = true
+---------------------------------------------------
+
+if SOUNDS["TDA7433"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tda7433.cpp",
+		MAME_DIR .. "src/devices/sound/tda7433.h",
 	}
 end
 
@@ -1938,6 +1962,18 @@ if SOUNDS["GT155"] then
 	files {
 		MAME_DIR .. "src/devices/sound/gt155.cpp",
 		MAME_DIR .. "src/devices/sound/gt155.h",
+	}
+end
+
+---------------------------------------------------
+-- Nintendo DS Sound
+--@src/devices/sound/nds_sound.h,SOUNDS["NDS_SOUND"] = true
+---------------------------------------------------
+
+if SOUNDS["NDS_SOUND"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nds_sound.cpp",
+		MAME_DIR .. "src/devices/sound/nds_sound.h",
 	}
 end
 

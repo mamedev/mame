@@ -93,6 +93,17 @@ rpk_reader::rpk_reader(char const *const *pcb_types, bool supports_ram)
 //  read
 //-------------------------------------------------
 
+std::error_condition rpk_reader::read(util::random_read &stream, rpk_file::ptr &result) const
+{
+	// open the RPK (as a zip file)
+	util::archive_file::ptr zipfile;
+	std::error_condition ziperr = util::archive_file::open_zip(stream, zipfile);
+	if (ziperr)
+		return ziperr;
+
+	return read(std::move(zipfile), result);
+}
+
 std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result) const
 {
 	// open the RPK (as a zip file)
@@ -101,23 +112,28 @@ std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&strea
 	if (ziperr)
 		return ziperr;
 
+	return read(std::move(zipfile), result);
+}
+
+std::error_condition rpk_reader::read(util::archive_file::ptr &&zipfile, rpk_file::ptr &result) const
+{
 	// open the layout XML
 	if (zipfile->search("layout.xml", false) < 0)
 		return error::MISSING_LAYOUT;
 
 	// determine the uncompressed length
 	uint64_t uncompressed_length_uint64 = zipfile->current_uncompressed_length();
-	size_t uncompressed_length = (size_t)uncompressed_length_uint64;
+	size_t const uncompressed_length = size_t(uncompressed_length_uint64);
 	if (uncompressed_length != uncompressed_length_uint64)
 		return std::errc::not_enough_memory;
 
 	// prepare a buffer for the layout XML
-	std::unique_ptr<char[]> layout_xml_text(new (std::nothrow) char[uncompressed_length + 1]);
+	std::unique_ptr<char []> layout_xml_text(new (std::nothrow) char[uncompressed_length + 1]);
 	if (!layout_xml_text)
 		return std::errc::not_enough_memory;
 
 	// and decompress it
-	ziperr = zipfile->decompress(&layout_xml_text[0], uncompressed_length);
+	std::error_condition const ziperr = zipfile->decompress(&layout_xml_text[0], uncompressed_length);
 	if (ziperr)
 		return ziperr;
 	layout_xml_text[uncompressed_length] = 0;

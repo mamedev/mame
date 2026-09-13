@@ -46,8 +46,8 @@ public:
 		m_maincpu(*this, "maincpu")
 	{}
 
-	void sweetland4(machine_config &config);
-	void tairyodk(machine_config &config);
+	void sweetland4(machine_config &config) ATTR_COLD;
+	void tairyodk(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<h8h_device> m_maincpu;

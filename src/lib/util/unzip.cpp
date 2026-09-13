@@ -83,10 +83,17 @@ public:
 		std::fill(m_buffer.begin(), m_buffer.end(), 0);
 	}
 
+	zip_file_impl(random_read &file) noexcept
+		: zip_file_impl(std::string())
+	{
+		m_file = &file;
+	}
+
 	zip_file_impl(random_read::ptr &&file) noexcept
 		: zip_file_impl(std::string())
 	{
-		m_file = std::move(file);
+		m_owned_file = std::move(file);
+		m_file = m_owned_file.get();
 	}
 
 	static ptr find_cached(std::string_view filename) noexcept
@@ -119,7 +126,7 @@ public:
 
 	std::error_condition initialize() noexcept
 	{
-		// read ecd data
+		// read ECD data
 		auto const ziperr = read_ecd();
 		if (ziperr)
 			return ziperr;
@@ -234,6 +241,7 @@ private:
 	{
 		if (!m_file)
 		{
+			assert(!m_owned_file);
 			osd_file::ptr file;
 			auto const filerr = osd_file::open(m_filename, OPEN_FLAG_READ, file, m_length);
 			if (filerr)
@@ -242,12 +250,13 @@ private:
 				//osd_printf_error("unzip: error reopening archive file %s (%s:%d %s)\n", m_filename, filerr.category().name(), filerr.value(), filerr.message());
 				return filerr;
 			}
-			m_file = osd_file_read(std::move(file));
-			if (!m_file)
+			m_owned_file = osd_file_read(std::move(file));
+			if (!m_owned_file)
 			{
 				osd_printf_error("unzip: not enough memory to open archive file %s\n", m_filename);
 				return std::errc::not_enough_memory;
 			}
+			m_file = m_owned_file.get();
 			osd_printf_verbose("unzip: opened archive file %s\n", m_filename);
 		}
 		else if (!m_length)
@@ -336,7 +345,8 @@ private:
 	static std::mutex                   s_cache_mutex;
 
 	const std::string           m_filename;                 // copy of ZIP filename (for caching)
-	random_read::ptr            m_file;                     // file handle
+	random_read::ptr            m_owned_file;               // file if owned
+	random_read *               m_file = nullptr;           // file handle
 	std::uint64_t               m_length = 0;               // length of zip file
 
 	ecd                         m_ecd;                      // end of central directory
@@ -723,7 +733,8 @@ void zip_file_impl::close(ptr &&zip) noexcept
 	{
 		// close the open files
 		osd_printf_verbose("unzip: closing archive file %s and sending to cache\n", zip->m_filename);
-		zip->m_file.reset();
+		zip->m_owned_file.reset();
+		zip->m_file = nullptr;
 
 		// find the first nullptr entry in the cache
 		std::lock_guard<std::mutex> guard(s_cache_mutex);
@@ -1665,6 +1676,32 @@ std::error_condition archive_file::open_zip(std::string_view filename, ptr &resu
 		if (err)
 			return err;
 	}
+
+	// allocate the archive API wrapper
+	result.reset(new (std::nothrow) zip_file_wrapper(std::move(newimpl)));
+	if (result)
+	{
+		return std::error_condition();
+	}
+	else
+	{
+		zip_file_impl::close(std::move(newimpl));
+		return std::errc::not_enough_memory;
+	}
+}
+
+std::error_condition archive_file::open_zip(random_read &file, ptr &result) noexcept
+{
+	// ensure we start with a nullptr result
+	result.reset();
+
+	// allocate memory for the zip_file structure
+	zip_file_impl::ptr newimpl(new (std::nothrow) zip_file_impl(file));
+	if (!newimpl)
+		return std::errc::not_enough_memory;
+	auto const err = newimpl->initialize();
+	if (err)
+		return err;
 
 	// allocate the archive API wrapper
 	result.reset(new (std::nothrow) zip_file_wrapper(std::move(newimpl)));

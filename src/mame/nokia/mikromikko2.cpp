@@ -262,6 +262,12 @@ void mm2_state::machine_start()
 	save_item(NAME(m_hold_latch));
 }
 
+static DEVICE_INPUT_DEFAULTS_START(ioe2)
+	DEVICE_INPUT_DEFAULTS("SID", 0x03, 0x00)
+	DEVICE_INPUT_DEFAULTS("SIC", 0x07, 0x01)
+	DEVICE_INPUT_DEFAULTS("S1", 0x07, 0x00)
+DEVICE_INPUT_DEFAULTS_END
+
 void mm2_state::mm2(machine_config &config)
 {
 	// SBC186
@@ -342,8 +348,8 @@ void mm2_state::mm2(machine_config &config)
 
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp1", m_exp, mikromikko2_expansion_bus_cards, "mmc186", false);
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp2", m_exp, mikromikko2_expansion_bus_cards, "crtc186", false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", m_exp, mikromikko2_expansion_bus_cards, "ioe186", false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", m_exp, mikromikko2_expansion_bus_cards, "ioe186", false).set_option_device_input_defaults("ioe186", DEVICE_INPUT_DEFAULTS_NAME(ioe2));
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp5", m_exp, mikromikko2_expansion_bus_cards, "meme186", false);
 }
 
@@ -362,7 +368,7 @@ ROM_START( mm2m35d )
 	ROMX_LOAD( "9491c.ic58", 0x8001, 0x4000, CRC(32047735) SHA1(408f03bc2d89257488e4b3336500681bb168cdec), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	ROM_REGION( 0x100, "x2212", 0 )
-	ROM_LOAD( "x2212", 0x000, 0x100, CRC(1b9f1518) SHA1(57928b28f654be84a00797ab5b5fa0389ae36016) )
+	ROM_LOAD( "x2212", 0x000, 0x100, CRC(ba945d01) SHA1(1c0bab62f5279b3333f19351f7d7114c0ad50e88) )
 ROM_END
 
 } // anonymous namespace

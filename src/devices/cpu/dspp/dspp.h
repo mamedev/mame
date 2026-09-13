@@ -33,6 +33,17 @@ public:
 	auto int_handler() { return m_int_handler.bind(); }
 	auto dma_read_handler() { return m_dma_read_handler.bind(); }
 	auto dma_write_handler() { return m_dma_write_handler.bind(); }
+	// DMA channel rolled over to its next buffer (offset = channel)
+	auto dma_rollover_handler() { return m_dma_rollover_handler.bind(); }
+
+	// Host side interface (DMA registers live in Madam, enables in Clio)
+	void frame_sync();
+	void host_dma_w(int channel, int reg, uint32_t data);
+	uint32_t host_dma_r(int channel, int reg);
+	void host_channel_enable_w(uint32_t set_mask, uint32_t clr_mask);
+	void host_fifo_init_w(uint32_t mask);
+	uint16_t host_fifo_status_r(int channel);
+	void host_tick_reset(bool default_period);
 
 	uint16_t read_output_fifo();
 
@@ -88,6 +99,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
+	inline void update_ticks();
+	inline void execute_one(bool check_debugger);
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
@@ -156,6 +169,22 @@ private:
 	devcb_write_line    m_int_handler;
 	devcb_read8         m_dma_read_handler;
 	devcb_write8        m_dma_write_handler;
+	devcb_write32       m_dma_rollover_handler;
+
+	// Audio frame model
+	uint32_t    m_frame_period;
+	int32_t     m_frame_counter;
+	bool        m_frame_sync;
+	uint16_t    m_tick;
+	uint16_t fifo_peek_r(offs_t offset);
+	void fifo_head_w(offs_t offset, uint16_t data);
+	uint16_t fifo_status_r(offs_t offset);
+	uint16_t outfifo_status_r(offs_t offset);
+	uint16_t fifo_pop_r(offs_t offset);
+	void outfifo_w(offs_t offset, uint16_t data);
+	uint16_t tick_r();
+	void tick_w(uint16_t data);
+	void new_frame();
 
 	// Internal functions
 	uint16_t read_op(offs_t pc);
@@ -163,7 +192,6 @@ private:
 	inline void write_data(offs_t addr, uint16_t data);
 
 	inline void update_pc();
-	inline void update_ticks();
 	inline void exec_control();
 	inline void exec_super_special();
 	inline void exec_special();
@@ -253,7 +281,9 @@ private:
 		// External control registers
 		uint32_t    m_dspx_control;
 	};
+protected:
 	dspp_internal_state* m_core;
+private:
 	dspp_internal_state m_local_core; // for non-DRC mode
 
 	// DMA
@@ -397,6 +427,9 @@ public:
 	void host_write(offs_t offset, uint32_t data);
 
 protected:
+	// device_execute_interface implementation
+	virtual void execute_run() override;
+
 	void data_bulldog_map(address_map &map) ATTR_COLD;
 };
 

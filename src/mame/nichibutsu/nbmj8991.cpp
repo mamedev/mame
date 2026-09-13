@@ -1940,7 +1940,47 @@ ROM_START( galkaika )
 	ROM_LOAD( "gkai_10.bin", 0x0c0000, 0x20000, CRC(43ecb3c5) SHA1(79d11b7b9b9597605cd6d3b8cecd615b706708b8) )
 	ROM_LOAD( "gkai_11.bin", 0x0e0000, 0x20000, CRC(66f4dbfa) SHA1(8bf1947a692116e6760e08ab95597e326518b6c9) )
 	ROM_LOAD( "gkai_12.bin", 0x100000, 0x10000, CRC(dc35168a) SHA1(966faf6f673a2c9262c472e7bf19bc0aed42116b) )
-	ROM_LOAD( "gkai_13.bin", 0x110000, 0x10000, CRC(d9f495f3) SHA1(06fc64088568564ac8ec7103585fff48962f3a2e) )
+	ROM_LOAD( "gkai_13.bin", 0x110000, 0x10000, CRC(d9f495f3) SHA1(06fc64088568564ac8ec7103585fff48962f3a2e) ) // 1xxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
+/*
+sticker on PCB:
+ギャルの開花
+サンプル基板
+GK-890837
+
+transliteration:
+Gal no Kaika Sample Kiban
+*/
+
+ROM_START( galkaikap )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.4l", 0x00000, 0x10000, CRC(6e748d74) SHA1(b61f0063d65660698b2fed8c5ab2a23ed6493c82) )
+
+	ROM_REGION( 0x20000, "voice", 0 ) // same as the production version
+	ROM_LOAD( "2.4n", 0x00000,  0x10000, CRC(db899dd5) SHA1(cd77ada2a8e1b0e03e66aa66c207aa3b07f51e19) )
+	ROM_LOAD( "3.4p", 0x10000,  0x10000, CRC(a66a1c52) SHA1(171da75df9e34f4fb36892c3074a305ae843754f) )
+
+	ROM_REGION( 0x120000, "gfx1", 0 )
+	ROM_LOAD( "4.3a",  0x000000, 0x10000, CRC(4aec5474) SHA1(bbada96c7107254a1ace1814d2d048ea89be94bd) ) // small differences from the production version
+	ROM_LOAD( "5.3b",  0x010000, 0x10000, CRC(602ba221) SHA1(85744d1aea00197a329478c84375b5db05902443) ) // "
+	ROM_LOAD( "6.3d",  0x020000, 0x10000, CRC(42de3fd9) SHA1(7e3e9eb943c5dd50533268aa2214bec101beb61c) ) // from here, everything matches the production version
+	ROM_LOAD( "7.3e",  0x030000, 0x10000, CRC(638b754d) SHA1(dc1b66e68d69c446f78698683de61e362be5c909) )
+	ROM_LOAD( "8.5a",  0x040000, 0x10000, CRC(7cca58ba) SHA1(ab650e2a21f08a6f87e7d2d4f24072c03402ce22) )
+	ROM_LOAD( "9.5b",  0x050000, 0x10000, CRC(42eae90b) SHA1(efbfa45f6879726faf178a74e5984d74454cf856) )
+	ROM_LOAD( "10.5d", 0x060000, 0x10000, CRC(bd6d933c) SHA1(d06a12aebc845452bfffeb8f63875750fac670ad) )
+	ROM_LOAD( "11.5e", 0x070000, 0x10000, CRC(a7089c0d) SHA1(7fae4660c0e9d1b5d41ea8a7fd4b0a0d5e335800) )
+	ROM_LOAD( "12.6a", 0x080000, 0x10000, CRC(1251687c) SHA1(59f36ef38d57e23df8a4d57e0c3c4371954a80ee) )
+	ROM_LOAD( "13.6b", 0x090000, 0x10000, CRC(5a4425dc) SHA1(42e3ca5b1667e8ab9a9f2450800273d662d53c73) )
+	ROM_LOAD( "14.6d", 0x0a0000, 0x10000, CRC(c1245365) SHA1(694661c35b22047f759d10c325482b2612e9ce5f) )
+	ROM_LOAD( "15.6e", 0x0b0000, 0x10000, CRC(087c363b) SHA1(2e4a36b6500c28ca29139432ca1b2dff52849d18) )
+	ROM_LOAD( "16.8a", 0x0c0000, 0x10000, CRC(0b5d42cf) SHA1(80d1dae23fd8b80418bf1db80582bbd77299f156) )
+	ROM_LOAD( "17.8b", 0x0d0000, 0x10000, CRC(230ea894) SHA1(7a60d6a72a3d74a4006e8f354176d2e82b05770e) )
+	ROM_LOAD( "18.8d", 0x0e0000, 0x10000, CRC(bac8af03) SHA1(99f39eabdd396f07cedb285e60bd40bb6ab8093c) )
+	ROM_LOAD( "19.8e", 0x0f0000, 0x10000, CRC(b5b90de2) SHA1(fc309ebe7c4a20da6dff80dc5bc231f4db9f9b4d) ) // from here on GFX differs again from the production version
+	ROM_LOAD( "20.9a", 0x100000, 0x10000, CRC(ba25f821) SHA1(b2b2d31bc68a98678aad92d7485da9feb1107a87) )
+	ROM_LOAD( "21.9b", 0x110000, 0x10000, CRC(68876be5) SHA1(ed4eaab8762bf1887d9ccbf7c92120b1cd78609c) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	// 2 empty sockets at 9d and 9e
 ROM_END
 
 ROM_START( tokyogal )
@@ -2135,6 +2175,7 @@ GAME( 1989, galkoku,  0,        galkoku,  galkoku,  nbmj8991_state, empty_init, 
 GAME( 1989, galkokua, galkoku,  galkoku,  galkoku,  nbmj8991_state, empty_init,    ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hyouban,  galkoku,  hyouban,  hyouban,  nbmj8991_state, empty_init,    ROT180, "Nichibutsu / T.R.Tec", "Mahjong Hyouban Musume (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, galkaika, 0,        galkaika, galkaika, nbmj8991_state, init_galkaika, ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kaika (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galkaikap,galkaika, galkaika, galkaika, nbmj8991_state, init_galkaika, ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kaika (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tokyogal, 0,        tokyogal, tokyogal, nbmj8991_state, init_tokyogal, ROT180, "Nichibutsu", "Tokyo Gal Zukan (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tokimbsj, tokyogal, tokimbsj, tokimbsj, nbmj8991_state, init_tokimbsj, ROT180, "Nichibutsu", "Tokimeki Bishoujo (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mcontest, 0,        mcontest, mcontest, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Miss Mahjong Contest (Japan)", MACHINE_SUPPORTS_SAVE )

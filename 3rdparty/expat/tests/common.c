@@ -10,7 +10,7 @@
    Copyright (c) 2003      Greg Stein <gstein@users.sourceforge.net>
    Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
    Copyright (c) 2005-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2026 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Joe Orton <jorton@redhat.com>
    Copyright (c) 2017      José Gutiérrez de la Concha <jose@zeroc.com>
@@ -19,6 +19,7 @@
    Copyright (c) 2020      Tim Gates <tim.gates@iress.com>
    Copyright (c) 2021      Donghee Na <donghee.na@python.org>
    Copyright (c) 2023-2024 Sony Corporation / Snild Dolkow <snild@sony.com>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -39,7 +40,11 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
+
+#include "expat_config.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -47,7 +52,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "expat_config.h"
 #include "expat.h"
 #include "internal.h"
 #include "chardata.h"
@@ -261,7 +265,7 @@ _run_attribute_check(const char *text, const XML_Char *expected,
 void
 _run_ext_character_check(const char *text, ExtTest *test_data,
                          const XML_Char *expected, const char *file, int line) {
-  CharData *const storage = (CharData *)malloc(sizeof(CharData));
+  CharData *const storage = malloc(sizeof(CharData));
 
   CharData_Init(storage);
   test_data->storage = storage;
@@ -303,7 +307,14 @@ duff_reallocator(void *ptr, size_t size) {
   return realloc(ptr, size);
 }
 
-// Portable remake of strndup(3) for C99; does not care about space efficiency
+// Portable remake of strnlen(3) for C99
+static size_t
+portable_strnlen(const char *s, size_t maxlen) {
+  const char *const end = (const char *)memchr(s, '\0', maxlen);
+  return (end == NULL) ? maxlen : (size_t)(end - s);
+}
+
+// Portable remake of strndup(3) for C99
 char *
 portable_strndup(const char *s, size_t n) {
   if ((s == NULL) || (n == SIZE_MAX)) {
@@ -311,7 +322,9 @@ portable_strndup(const char *s, size_t n) {
     return NULL;
   }
 
-  char *const buffer = (char *)malloc(n + 1);
+  n = portable_strnlen(s, n);
+
+  char *const buffer = malloc(n + 1);
   if (buffer == NULL) {
     errno = ENOMEM;
     return NULL;

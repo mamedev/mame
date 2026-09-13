@@ -44,7 +44,7 @@ float menu_audio_effects::change_f(float val, bool inc, bool alt_pressed, bool c
 		incval = -incval;
 
 	val = roundf((val + incval) * 10000.0f) / 10000.0f;
-	return std::clamp(val, 0.0f, 0.05f);
+	return std::clamp(val, 0.0001f, 0.05f);
 }
 
 u32 menu_audio_effects::change_int(u16 which, int val, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
@@ -207,7 +207,7 @@ u32 menu_audio_effects::flag_latency() const
 {
 	u32 flag = 0;
 	float latency = machine().sound().resampler_hq_latency();
-	if(latency > 0.0f)
+	if(latency > 0.0001f)
 		flag |= FLAG_LEFT_ARROW;
 	if(latency < 0.05f)
 		flag |= FLAG_RIGHT_ARROW;

@@ -36,6 +36,8 @@ vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const ch
 	, m_pritype(0) // hack until we have better handling
 	, m_xoffs(0)
 	, m_yoffs(0)
+	, m_flip_xoffs(308) // legacy values, correct at least for aerofgtb
+	, m_flip_yoffs(208)
 	, m_curr_sprite()
 {
 }
@@ -161,18 +163,20 @@ void vsystem_spr2_device::draw_sprites_common(uint16_t const *spriteram3,  int s
 
 		bool fx = m_curr_sprite.flipx;
 		bool fy = m_curr_sprite.flipy;
-		if (flip_screen)
-		{
-			m_curr_sprite.ox = 308 - m_curr_sprite.ox;
-			m_curr_sprite.oy = 208 - m_curr_sprite.oy;
-			fx = !fx;
-			fy = !fy;
-		}
 
 		m_curr_sprite.color += 16 * spritepalettebank;
 
 		m_curr_sprite.zoomx = 32 - m_curr_sprite.zoomx;
 		m_curr_sprite.zoomy = 32 - m_curr_sprite.zoomy;
+
+		if (flip_screen)
+		{
+			// the mirror point depends on the zoomed cell size
+			m_curr_sprite.ox = m_flip_xoffs + 16 - m_curr_sprite.zoomx / 2 - m_curr_sprite.ox;
+			m_curr_sprite.oy = m_flip_yoffs + 16 - m_curr_sprite.zoomy / 2 - m_curr_sprite.oy;
+			fx = !fx;
+			fy = !fy;
+		}
 
 		uint32_t const zx = m_curr_sprite.zoomx << 11;
 		uint32_t const zy = m_curr_sprite.zoomy << 11;

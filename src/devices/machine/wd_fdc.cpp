@@ -189,6 +189,7 @@ void wd_fdc_device_base::device_start()
 	mr = true;
 
 	delay_int = false;
+	delay_cmd = false;
 
 	save_item(NAME(status));
 	save_item(NAME(command));
@@ -352,18 +353,30 @@ void wd_fdc_device_base::command_end()
 	motor_timeout = 0;
 
 	if(status & S_BUSY) {
-		if (!t_cmd->enabled()) {
-			status &= ~S_BUSY;
-		}
 		// TBD: lost data should probably negate DRQ (and definitely shouldn't inhibit INTRQ), but when exactly?
 		if(drq && (status & S_LOST)) {
 			drq = false;
 			drq_cb(false);
 		}
-		if(!drq) {
-			intrq = true;
-			intrq_cb(intrq);
+		// Real hardware holds BUSY (and INTRQ) until a still-pending final DRQ is serviced, see drop_drq()
+		if(drq)
+			return;
+		if (!t_cmd->enabled()) {
+			status &= ~S_BUSY;
 		}
+		intrq = true;
+		intrq_cb(intrq);
+	}
+
+	// Dispatch a command that arrived while this one was still live (see
+	// do_cmd_w()). BUSY must be restored before dispatch -- do_cmd_w()
+	// doesn't set it itself -- or a FORCE INTERRUPT landing right after
+	// would see BUSY=0, think the FDC is idle, and leave this command's
+	// live_run() running unaborted instead of resetting it.
+	if(delay_cmd) {
+		delay_cmd = false;
+		status |= S_BUSY;
+		do_cmd_w();
 	}
 }
 
@@ -1077,6 +1090,13 @@ void wd_fdc_device_base::interrupt_start()
 		cur_live.tm = attotime::never;
 		status &= ~S_BUSY;
 		motor_timeout = 0;
+		// Real hardware never presents BUSY=0 with DRQ still pending (see
+		// command_end()/drop_drq()) -- a forced interrupt aborting a busy
+		// command must drop a still-outstanding DRQ here too.
+		if(drq) {
+			drq = false;
+			drq_cb(false);
+		}
 	} else {
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
@@ -1199,6 +1219,20 @@ void wd_fdc_device_base::do_cmd_w()
 		return;
 	}
 #endif
+	// A new command can arrive while the previous one is still live --
+	// typically the CPU moving on right after the last DRQ byte of a
+	// WRITE SECTOR, before the FDC finishes writing the trailing
+	// CRC/postamble on its own clock (still mid-flight in a live_delay()/
+	// t_gen callback). Defer dispatch until that completes, or barging in
+	// now would truncate the write or leave its floppy write session open
+	// for a later command to close at the wrong position, corrupting the
+	// track. FORCE INTERRUPT is exempt: it's meant to abort immediately,
+	// and has its own live-write handling in interrupt_start() below.
+	if(cur_live.state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
+		delay_cmd = true;
+		return;
+	}
+
 	command = cmd_buffer;
 	cmd_buffer = -1;
 
@@ -1355,9 +1389,13 @@ void wd_fdc_device_base::do_track_w()
 
 void wd_fdc_device_base::track_w(uint8_t val)
 {
+	if (!mr) return;
+
 	// No more than one write in flight
-	if(track_buffer != -1 || !mr)
-		return;
+	// C1571 accesses this register with an INC opcode,
+	// i.e. write old value, write new value, and the new value gets ignored by this
+	//if(track_buffer != -1)
+	//	return;
 
 	track_buffer = val ^ bus_invert_value;
 	delay_cycles(t_track, dden ? delay_register_commit*2 : delay_register_commit);
@@ -2224,6 +2262,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
 
+						// Checkpoint so a later rollback (from a CPU register
+						// poll landing ahead of this speculative live_run())
+						// resolves to "already done" instead of reverting to
+						// mid-write and re-issuing writes after the floppy's
+						// write session is already closed.
+						checkpoint();
+
 						// Act on delayed interrupt if set.
 						if(delay_int)
 							interrupt_start();
@@ -2261,6 +2306,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
+
+						// See the matching comment in the FM branch above.
+						checkpoint();
 
 						// Act on delayed interrupt if set.
 						if(delay_int)
@@ -2357,13 +2405,28 @@ void wd_fdc_device_base::set_drq()
 void wd_fdc_device_base::drop_drq()
 {
 	if(drq) {
-		// HACK: delay INTRQ until last byte is read (should that perhaps inhibit command completion instead?)
-		if(!(status & S_BUSY) && !intrq) {
-			intrq = true;
-			intrq_cb(intrq);
-		}
 		drq = false;
 		drq_cb(false);
+		// If command_end() deferred completion waiting on this final byte, finish it now
+		if(main_state == IDLE && (status & S_BUSY)) {
+			if (!t_cmd->enabled()) {
+				status &= ~S_BUSY;
+			}
+			if(!intrq) {
+				intrq = true;
+				intrq_cb(intrq);
+			}
+			// A command that arrived while this one was still live got
+			// deferred (see do_cmd_w()) -- now that we're truly done,
+			// dispatch it. See the matching comment in command_end() --
+			// BUSY needs restoring here too before the dispatch, for the
+			// same FORCE-INTERRUPT-right-after reason.
+			if(delay_cmd) {
+				delay_cmd = false;
+				status |= S_BUSY;
+				do_cmd_w();
+			}
+		}
 	}
 }
 

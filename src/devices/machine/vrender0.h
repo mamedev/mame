@@ -37,6 +37,8 @@ public:
 	void set_channel_num(s32 ch) { m_channel_num = ch; }
 	void set_parent(vrender0soc_device *parent) { m_parent = parent; }
 
+	void set_external_clock(u32 clock) { m_uclk = clock; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -53,6 +55,7 @@ private:
 	util::fifo<u8, 16> m_urxb_fifo; // receive FIFO
 
 	s32 m_channel_num = 0;
+	u32 m_uclk = 0;
 	vrender0soc_device *m_parent = nullptr;
 
 	u32 control_r();
@@ -87,6 +90,8 @@ public:
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
 	auto int_callback() { return m_int_cb.bind(); }
 	template <int Port> auto tx_callback() { return m_write_tx[Port].bind(); }
+	void set_uart_external_clock(u32 uclk) { m_uart_uclk = uclk; }
+	void set_uart_external_clock(const XTAL uclk) { m_uart_uclk = uclk.value(); }
 	template <int Port> void rx_w(int state) { m_uart[Port]->rx_w((u8)state); }
 
 	// handlers
@@ -122,6 +127,7 @@ private:
 	memory_share_creator<u16> m_frameram;
 
 	u32 m_ext_vclk = 0;
+	u32 m_uart_uclk = 0;
 
 	u32 m_inten = 0;
 	u8 m_int_high = 0;

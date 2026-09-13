@@ -39,7 +39,6 @@
 
 #include "emu.h"
 #include "cococart.h"
-#include "formats/rpk.h"
 
 #include "coco_dcmodem.h"
 #include "coco_fdc.h"
@@ -68,6 +67,8 @@
 #include "dragon_msx2.h"
 #include "dragon_serial.h"
 #include "dragon_sprites.h"
+
+#include "formats/rpk.h"
 
 
 /***************************************************************************
@@ -507,7 +508,7 @@ void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate up
 //  read_coco_rpk
 //-------------------------------------------------
 
-static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result)
+static std::error_condition read_coco_rpk(util::random_read &stream, rpk_file::ptr &result)
 {
 	// sanity checks
 	static_assert(std::size(coco_rpk_pcbdefs) - 1 == std::size(coco_rpk_cardslottypes));
@@ -516,7 +517,7 @@ static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&s
 	rpk_reader reader(coco_rpk_pcbdefs, false);
 
 	// and read the RPK file
-	return reader.read(std::move(stream), result);
+	return reader.read(stream, result);
 }
 
 
@@ -524,13 +525,13 @@ static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&s
 //  read_coco_rpk
 //-------------------------------------------------
 
-static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&stream, u8 *mem, offs_t cart_length, offs_t &actual_length)
+static std::error_condition read_coco_rpk(util::random_read &stream, u8 *mem, offs_t cart_length, offs_t &actual_length)
 {
 	actual_length = 0;
 
 	// open the RPK
 	rpk_file::ptr file;
-	std::error_condition err = read_coco_rpk(std::move(stream), file);
+	std::error_condition err = read_coco_rpk(stream, file);
 	if (err)
 		return err;
 
@@ -582,10 +583,7 @@ std::pair<std::error_condition, std::string> cococart_slot_device::call_load()
 		else if (is_filetype("rpk"))
 		{
 			// RPK file
-			util::core_file::ptr proxy;
-			std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
-			if (!err)
-				err = read_coco_rpk(std::move(proxy), base, cart_length, read_length);
+			std::error_condition const err = read_coco_rpk(image_core_file(), base, cart_length, read_length);
 			if (err)
 				return std::make_pair(err, std::string());
 		}
@@ -620,10 +618,7 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 	{
 		// RPK file
 		rpk_file::ptr file;
-		util::core_file::ptr proxy;
-		std::error_condition err = util::core_file::open_proxy(*hook.image_file(), proxy);
-		if (!err)
-			err = read_coco_rpk(std::move(proxy), file);
+		std::error_condition const err = read_coco_rpk(*hook.image_file(), file);
 		if (!err)
 			pcb_type = file->pcb_type();
 	}

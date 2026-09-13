@@ -5,11 +5,12 @@
         Ilitek ILI9335 LCD controller
 
         TODO:
-            Framerate control and front porch
+            Panic mode and front porch
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "ili9335.h"
 
 namespace {
@@ -81,6 +82,8 @@ namespace {
 
         REG_DEEPSBCTRL         = 0xE6
     };
+
+    static const uint16_t m_lcdhz[] = {31, 33, 34, 36, 39, 41, 44, 48, 52, 57, 62, 69, 78, 89};
 }
 
 // devices
@@ -134,7 +137,7 @@ uint8_t ili9335_device::control_read() {
 }
 
 void ili9335_device::data_write(uint8_t data) {
-    m_datalatch = ((m_datalatch << 8) | data);
+    m_datalatch = (m_datalatch << 8) | data;
 
     if (m_currreg == REG_GRAMPTR) {
         m_writelatch++;
@@ -143,18 +146,18 @@ void ili9335_device::data_write(uint8_t data) {
             // handle 18bpp mode
             m_writelatch = 0;
             if (m_lcdregs[REG_ENTRYMODE] & 0x4000) {
-                writePixel_666(m_datalatch & 0x3FFFF);
+                write_pixel_666(m_datalatch & 0x3FFFF);
             } else {
-                writePixel_666_unpacked(m_datalatch);
+                write_pixel_666_unpacked(m_datalatch);
             }
         } else if (!(m_lcdregs[REG_ENTRYMODE] & 0x8000) && m_writelatch >= 2) {
             // handle 16bpp mode
             m_writelatch = 0;
-            writePixel_565((uint16_t)m_datalatch);
+            write_pixel_565((uint16_t)m_datalatch);
         }
     } else {
         if (m_writelatch)
-            writeReg((uint16_t)m_datalatch);
+            write_reg((uint16_t)m_datalatch);
         m_writelatch = !m_writelatch;
     }
 }
@@ -167,11 +170,11 @@ uint8_t ili9335_device::data_read() {
         // the red and blue channels regardless of whether 
         // they were already swapped when written to GRAM.
 
-        uint32_t pixelRaw = getPixel(m_lcdregs[REG_CSRCOL], m_lcdregs[REG_CSRROW]);
+        uint32_t raw_pixel = get_pixel(m_lcdregs[REG_CSRCOL], m_lcdregs[REG_CSRROW]);
         if (m_lcdregs[REG_ENTRYMODE] & 0x1000)
-            pixelRaw = rgb666_swapBGR(pixelRaw);
+            raw_pixel = rgb666_swap_bgr(raw_pixel);
     
-        uint16_t pixel = rgb666_to_rgb565(pixelRaw);
+        uint16_t pixel = rgb666_to_rgb565(raw_pixel);
 
         data = m_readlatch ? pixel & 0xFF : pixel >> 8;
     } else {
@@ -184,7 +187,11 @@ uint8_t ili9335_device::data_read() {
     return data;
 }
 
-void ili9335_device::writeReg(uint16_t val) {
+void ili9335_device::set_screen(screen_device &screen) {
+    m_screen = &screen;
+}
+
+void ili9335_device::write_reg(uint16_t val) {
     uint16_t mask = 0;
 
     switch (m_currreg) {
@@ -198,7 +205,7 @@ void ili9335_device::writeReg(uint16_t val) {
         case REG_ENTRYMODE:
             mask = 0xD0B8;
             if (val & 0x80)
-                resetCursorRegs(val, true, true);
+                reset_cursor_regs(val, true, true);
             break;
 
         case REG_DATAFORMAT:
@@ -252,7 +259,7 @@ void ili9335_device::writeReg(uint16_t val) {
         case REG_CSRCOL:
             mask = 0x00FF;
             if (m_lcdregs[REG_ENTRYMODE] & 0x80) {
-                resetCursorRegs(m_lcdregs[REG_ENTRYMODE], true, false);
+                reset_cursor_regs(m_lcdregs[REG_ENTRYMODE], true, false);
                 return;
             } else {
                 m_lcdregs[REG_CSRROW] = m_currrow;
@@ -263,7 +270,7 @@ void ili9335_device::writeReg(uint16_t val) {
         case REG_CSRROW:
             mask = 0x01FF;
             if (m_lcdregs[REG_ENTRYMODE] & 0x80) {
-                resetCursorRegs(m_lcdregs[REG_ENTRYMODE], false, true);
+                reset_cursor_regs(m_lcdregs[REG_ENTRYMODE], false, true);
                 return;
             } else {
                 m_lcdregs[REG_CSRCOL] = m_currcol;
@@ -276,8 +283,9 @@ void ili9335_device::writeReg(uint16_t val) {
             break;
 
         case REG_FRCCTRL:
-            // TODO: set framerate
             mask = 0x000F;
+            if ((val & mask) <= 0x0D)
+                m_screen->set_refresh_hz(m_lcdhz[val & mask]);
             break;
 
         case REG_GMCTRL1:
@@ -371,11 +379,10 @@ void ili9335_device::writeReg(uint16_t val) {
             break;
     }
 
-    val &= mask;
-    m_lcdregs[m_currreg] = val;
+    m_lcdregs[m_currreg] = val & mask;
 }
 
-bool ili9335_device::updateCursorReg(uint16_t *cursor, uint16_t start, uint16_t end, uint8_t flag) {
+bool ili9335_device::update_cursor_reg(uint16_t *cursor, uint16_t start, uint16_t end, uint8_t flag) {
     bool next;
 
     if (m_lcdregs[REG_ENTRYMODE] & flag) {
@@ -389,15 +396,15 @@ bool ili9335_device::updateCursorReg(uint16_t *cursor, uint16_t start, uint16_t 
     return next;
 }
 
-void ili9335_device::resetCursorRegs(uint16_t mode, bool resetX, bool resetY) {
-    if (resetX)
+void ili9335_device::reset_cursor_regs(uint16_t mode, bool reset_x, bool reset_y) {
+    if (reset_x)
         m_lcdregs[REG_CSRCOL] = (mode & 0x10) ? m_lcdregs[REG_WINH_ADDR_STA] : m_lcdregs[REG_WINH_ADDR_END];
 
-    if (resetY)
+    if (reset_y)
         m_lcdregs[REG_CSRROW] = (mode & 0x20) ? m_lcdregs[REG_WINV_ADDR_STA] : m_lcdregs[REG_WINV_ADDR_END];
 }
 
-inline uint32_t ili9335_device::getGRAMData(uint32_t addr) {
+inline uint32_t ili9335_device::get_gram_data(uint32_t addr) {
     uint16_t hi = (m_gram[addr] << 8) | m_gram[addr + 1];
     uint16_t lo = (m_gram[addr + 2] << 8) | m_gram[addr + 3];
     return hi << 16 | lo;
@@ -416,10 +423,10 @@ inline uint32_t ili9335_device::getGRAMData(uint32_t addr) {
 // of course, this shifting assumes ints are 24 bits large. This driver uses 32, so the
 // result is shifted left an extra 8 bits.
 
-inline uint32_t ili9335_device::getPixel(uint16_t x, uint16_t y) {
+inline uint32_t ili9335_device::get_pixel(uint16_t x, uint16_t y) {
     uint32_t addr = (y*m_width + x) * 18;
     uint8_t shift = 14 - (addr & 0x7);
-    return (getGRAMData(addr / 8) >> shift) & 0x03FFFF;
+    return (get_gram_data(addr / 8) >> shift) & 0x03FFFF;
 }
 
 inline uint16_t ili9335_device::rgb666_to_rgb565(uint32_t pixel) {
@@ -429,29 +436,29 @@ inline uint16_t ili9335_device::rgb666_to_rgb565(uint32_t pixel) {
     return red | green | blue;
 }
 
-inline uint32_t ili9335_device::rgb666_swapBGR(uint32_t pixel) {
-    uint8_t blue = (pixel & 0x3F);
+inline uint32_t ili9335_device::rgb666_swap_bgr(uint32_t pixel) {
+    uint8_t blue = pixel & 0x3F;
     uint8_t green = (pixel & 0xFC0) >> 6;
     uint8_t red = (pixel & 0x3F000) >> 12;
     return red | (green << 6) | (blue << 12);
 }
 
-void ili9335_device::writePixel_565(uint16_t pixel) {
+void ili9335_device::write_pixel_565(uint16_t pixel) {
     uint8_t blue = (pixel << 1) & 0x3E;
     uint8_t green = (pixel >> 5) & 0x3F;
     uint8_t red = (pixel >> 10) & 0x3E;
 
     // on the ILI9335, a rgb565 color is expanded to rgb666 by using the 
     // high bits of the red and blue channels to set the extra lower bit
-    red |= (pixel >> 15);
+    red |= pixel >> 15;
     blue |= ((pixel & 0x10) == 0x10);
 
-    writePixel_666(blue | (green << 6) | (red << 12));
+    write_pixel_666(blue | (green << 6) | (red << 12));
 }
 
-void ili9335_device::writePixel_666(uint32_t pixel) {
+void ili9335_device::write_pixel_666(uint32_t pixel) {
     if (m_lcdregs[REG_ENTRYMODE] & 0x1000)
-        pixel = rgb666_swapBGR(pixel);
+        pixel = rgb666_swap_bgr(pixel);
 
     uint16_t x = m_lcdregs[REG_CSRCOL];
     uint16_t y = m_lcdregs[REG_CSRROW];
@@ -461,30 +468,30 @@ void ili9335_device::writePixel_666(uint32_t pixel) {
 
     uint32_t addr = ((y*m_width + x) * 18) / 8;
     uint8_t shift = 14 - (((y*m_width + x) * 18) % 8);
-    uint32_t newPixel = (~(0x0003FFFF << shift) & getGRAMData(addr)) | (pixel << shift);
+    uint32_t new_pixel = (~(0x0003FFFF << shift) & get_gram_data(addr)) | (pixel << shift);
 
     for (int i = 0; i < 4; i++)
-        m_gram[addr + (3 - i)] = (uint8_t)(newPixel >> 8*i);
+        m_gram[addr + (3 - i)] = (uint8_t)(new_pixel >> 8*i);
 
     // "auto-increment" for the cursor row actually auto-decrements.
     if (m_lcdregs[REG_ENTRYMODE] & 0x08) {
-        bool next = updateCursorReg(&m_lcdregs[REG_CSRROW], m_lcdregs[REG_WINV_ADDR_STA], m_lcdregs[REG_WINV_ADDR_END], 0x20);
+        bool next = update_cursor_reg(&m_lcdregs[REG_CSRROW], m_lcdregs[REG_WINV_ADDR_STA], m_lcdregs[REG_WINV_ADDR_END], 0x20);
 
         if (next)
-            updateCursorReg(&m_lcdregs[REG_CSRCOL], m_lcdregs[REG_WINH_ADDR_STA], m_lcdregs[REG_WINH_ADDR_END], 0x10);
+            update_cursor_reg(&m_lcdregs[REG_CSRCOL], m_lcdregs[REG_WINH_ADDR_STA], m_lcdregs[REG_WINH_ADDR_END], 0x10);
     } else {
-        bool next = updateCursorReg(&m_lcdregs[REG_CSRCOL], m_lcdregs[REG_WINH_ADDR_STA], m_lcdregs[REG_WINH_ADDR_END], 0x10);
+        bool next = update_cursor_reg(&m_lcdregs[REG_CSRCOL], m_lcdregs[REG_WINH_ADDR_STA], m_lcdregs[REG_WINH_ADDR_END], 0x10);
 
         if (next)
-            updateCursorReg(&m_lcdregs[REG_CSRROW], m_lcdregs[REG_WINV_ADDR_STA], m_lcdregs[REG_WINV_ADDR_END], 0x20);
+            update_cursor_reg(&m_lcdregs[REG_CSRROW], m_lcdregs[REG_WINV_ADDR_STA], m_lcdregs[REG_WINV_ADDR_END], 0x20);
     }
 }
 
-void ili9335_device::writePixel_666_unpacked(uint32_t pixel) {
+void ili9335_device::write_pixel_666_unpacked(uint32_t pixel) {
     uint8_t blue = (pixel >> 2) & 0x3F;
     uint8_t green = (pixel >> 10) & 0x3F;
     uint8_t red = (pixel >> 18) & 0x3F;
-    writePixel_666(blue | (green << 6) | (red << 12));
+    write_pixel_666(blue | (green << 6) | (red << 12));
 }
 
 uint32_t ili9335_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) {
@@ -498,29 +505,29 @@ uint32_t ili9335_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
     }
 
     if (m_lcdregs[REG_DRVOUTCTRL] & 0x0400) {
-        drawInterlacedFrame(bitmap);
+        draw_interlaced_frame(bitmap);
     } else if (m_lcdregs[REG_DISPCTRL1] & 0x3000) {        
         // draw partial image 1
         if (m_lcdregs[REG_DISPCTRL1] & 0x1000)
-            drawPartialImage(bitmap, m_lcdregs[REG_PARTIMG1DISPPOS], m_lcdregs[REG_PARTIMG1STARTLN], m_lcdregs[REG_PARTIMG1ENDLN]);
+            draw_partial_image(bitmap, m_lcdregs[REG_PARTIMG1DISPPOS], m_lcdregs[REG_PARTIMG1STARTLN], m_lcdregs[REG_PARTIMG1ENDLN]);
         
         // draw partial image 2
         if (m_lcdregs[REG_DISPCTRL1] & 0x2000)
-            drawPartialImage(bitmap, m_lcdregs[REG_PARTIMG2DISPPOS], m_lcdregs[REG_PARTIMG2STARTLN], m_lcdregs[REG_PARTIMG2ENDLN]);
+            draw_partial_image(bitmap, m_lcdregs[REG_PARTIMG2DISPPOS], m_lcdregs[REG_PARTIMG2STARTLN], m_lcdregs[REG_PARTIMG2ENDLN]);
     } else if (m_lcdregs[REG_DISPCTRL1] & 0x0100) {
         // draw a normal frame
-        int startLine = (m_lcdregs[REG_GATESCANCTRL] & 0x003F) * 8;
-        int lineCount = (m_lcdregs[REG_GATESCANCTRL] & 0x3F00) >> 5;
+        int start_line = (m_lcdregs[REG_GATESCANCTRL] & 0x003F) * 8;
+        int line_count = (m_lcdregs[REG_GATESCANCTRL] & 0x3F00) >> 5;
 
-        for (int y = startLine; y < startLine + lineCount + 8; y++)
+        for (int y = start_line; y < start_line + line_count + 8; y++)
             for (int x = 0; x < m_width; x++)
-                plotPixel(bitmap, getPixel(x, y - startLine), x, y);
+                plot_pixel(bitmap, get_pixel(x, y - start_line), x, y);
     }
 
     return 0;
 }
 
-void ili9335_device::drawInterlacedFrame(bitmap_rgb32 &bitmap) {
+void ili9335_device::draw_interlaced_frame(bitmap_rgb32 &bitmap) {
     uint16_t start1 = m_lcdregs[REG_PARTIMG1STARTLN];
     uint16_t end1 = m_lcdregs[REG_PARTIMG1ENDLN];
     uint16_t disp1 = m_lcdregs[REG_PARTIMG1DISPPOS];
@@ -536,25 +543,25 @@ void ili9335_device::drawInterlacedFrame(bitmap_rgb32 &bitmap) {
     if (m_lcdregs[REG_DISPCTRL1] & 0x1000) {
         for (int line = 0; line < m_height / 2; line++) {
             uint16_t y = start1 + line;
-            uint16_t dispY = ((disp1 + line) * 2) % m_height;
+            uint16_t disp_y = ((disp1 + line) * 2) % m_height;
 
             for (int x = 0; x < m_width; x++)
-                plotPixel(bitmap, getPixel(x, y), x, dispY);
+                plot_pixel(bitmap, get_pixel(x, y), x, disp_y);
         }
     }
 
     if (m_lcdregs[REG_DISPCTRL1] & 0x2000) {
         for (int line = 0; line < m_height / 2; line++) {
             uint16_t y = start2 + line;
-            uint16_t dispY = ((disp2 + line) * 2) % m_height;
+            uint16_t disp_y = ((disp2 + line) * 2) % m_height;
 
             for (int x = 0; x < m_width; x++)
-                plotPixel(bitmap, getPixel(x, y), x, dispY + 1);
+                plot_pixel(bitmap, get_pixel(x, y), x, disp_y + 1);
         }
     }
 }
 
-void ili9335_device::drawPartialImage(bitmap_rgb32 &bitmap, uint16_t disp_pos, uint16_t start_line, uint16_t end_line) {
+void ili9335_device::draw_partial_image(bitmap_rgb32 &bitmap, uint16_t disp_pos, uint16_t start_line, uint16_t end_line) {
     if (start_line >= end_line)
         return;
     
@@ -564,12 +571,12 @@ void ili9335_device::drawPartialImage(bitmap_rgb32 &bitmap, uint16_t disp_pos, u
             return;
 
         for (int x = 0; x < m_width; x++)
-            plotPixel(bitmap, getPixel(x, start_line + line), x, y);
+            plot_pixel(bitmap, get_pixel(x, start_line + line), x, y);
     }
 }
 
-void ili9335_device::plotPixel(bitmap_rgb32 &bitmap, uint32_t pixel18, uint8_t x, uint16_t y) {
-    // bail out if the coords are out of bounds or the LCD is off
+void ili9335_device::plot_pixel(bitmap_rgb32 &bitmap, uint32_t pixel18, uint8_t x, uint16_t y) {
+    // bail out if the coords are out of bounds
     if (y >= m_height || x >= m_width)
         return;
 

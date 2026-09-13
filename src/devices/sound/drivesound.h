@@ -227,10 +227,14 @@ private:
 	sound_stream*   m_sound;
 
 	floppy_sound_samples m_samples;
+	TIMER_CALLBACK_MEMBER(spin_start_delay);
 
 	int    m_max_track;
 	int    m_last_track;
 	int    m_last_subtrack;
+
+	emu_timer* m_spin_start_timer;   // delay between motor on and the spin-up sample actually starting
+	bool   m_spin_start_withdisk;    // withdisk value pending on m_spin_start_timer
 
 	bool   m_motor_on;
 	bool   m_with_disk;

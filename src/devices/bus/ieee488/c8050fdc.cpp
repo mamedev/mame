@@ -6,15 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - write protect
-    - 75,format speed error,01,00,0
-
-*/
-
 #include "emu.h"
 #include "c8050fdc.h"
 
@@ -376,7 +367,7 @@ void c8050_fdc_device::live_run(const attotime &limit)
 
 			// write bit
 			int write_bit = BIT(cur_live.shift_reg_write, 9);
-			if (!cur_live.rw_sel) { // TODO WPS
+			if (!cur_live.rw_sel && !get_floppy()->wpt_r()) {
 				/*
 				write precompensation
 

@@ -123,9 +123,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 			SetRegister(14, link);
 			SetRegister(SPSR, cpsr);
 			set_cpsr((GET_CPSR | I_MASK | (mask_fiq ? F_MASK : 0)) & ~T_MASK);
-			R15 = vector | m_vectorbase;
-			if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST))
-				R15 |= 0xFFFF0000;
+			R15 = vector | vector_base();    // CP15 c1 V bit selects the high vectors whether or not the MMU is enabled
 		}
 		else
 		{
@@ -139,11 +137,16 @@ void arm7_cpu_device::arm7_check_irq_state()
 		}
 	};
 
-	// Data Abort
+	// Data Abort, or the 26-bit data space address exception (same priority and completion rules, but vector 0x14 and
+	// always SVC mode - there is no ABT mode in the 26-bit world)
 	if (m_pendingAbtD)
 	{
-		enter_exception(eARM7_MODE_ABT, eARM7_MODE_SVC, pc, 0x10, false);   // R14 = aborted instruction + 8
+		if (m_pendingAddrExc)
+			enter_exception(eARM7_MODE_SVC, eARM7_MODE_SVC, T_IS_SET(cpsr) ? (pc + 2) : pc, 0x14, false);
+		else
+			enter_exception(eARM7_MODE_ABT, eARM7_MODE_SVC, T_IS_SET(cpsr) ? (pc + 2) : pc, 0x10, false);
 		m_pendingAbtD = false;
+		m_pendingAddrExc = false;
 		update_irq_state();
 		return;
 	}

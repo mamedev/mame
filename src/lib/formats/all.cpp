@@ -218,6 +218,10 @@
 #include "d81_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_D2M_DSK
+#include "d2m_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_D82_DSK
 #include "d82_dsk.h"
 #endif
@@ -528,6 +532,10 @@
 
 #ifdef HAS_FORMATS_PASTI_DSK
 #include "pasti_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_PC88_T88
+#include "pc88_t88.h"
 #endif
 
 #ifdef HAS_FORMATS_PC98FDI_DSK
@@ -995,6 +1003,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_D81_DSK
 	en.add(FLOPPY_D81_FORMAT); // d81_dsk.h
+#endif
+#ifdef HAS_FORMATS_D2M_DSK
+	en.add(FLOPPY_D1M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D2M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D4M_FORMAT); // d2m_dsk.h
 #endif
 #ifdef HAS_FORMATS_D82_DSK
 	en.add(FLOPPY_D82_FORMAT); // d82_dsk.h
@@ -1476,7 +1489,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
-//  en.category("NEC");
+    en.category("NEC");
+#ifdef HAS_FORMATS_PC88_T88
+  en.add(t88_cassette_formats); // pc88_t88.h
+#endif	
 //#ifdef HAS_FORMATS_P6001_CAS
 //  en.add(pc6001_cassette_formats); // p6001_cas.h
 //#endif

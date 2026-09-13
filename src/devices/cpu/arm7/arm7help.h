@@ -32,7 +32,7 @@
 #define HandleThumbALUAddFlags(rd, rn, op2)                                                       \
 	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
 				| (((!THUMB_SIGN_BITS_DIFFER(rn, op2)) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
-				| (((~(rn)) < (op2)) << C_BIT)                                                      \
+				| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                                           \
 	R15 += 2;
 

@@ -608,9 +608,13 @@ void filter_biquad_device::recalc()
 		{
 			// For lowpass and friends, just let the signal through unchanged.
 			case biquad_type::LOWPASS1P:
+			case biquad_type::LOWPASS1P1Z:
 			case biquad_type::LOWPASS:
 			case biquad_type::NOTCH:
 			case biquad_type::LOWSHELF:
+			case biquad_type::LOWSHELF1O:
+			case biquad_type::ALLPASS:
+			case biquad_type::ALLPASS1O:
 			default:
 				m_b0 = 1.0;
 				break;
@@ -621,6 +625,7 @@ void filter_biquad_device::recalc()
 			case biquad_type::BANDPASS:
 			case biquad_type::PEAK:
 			case biquad_type::HIGHSHELF:
+			case biquad_type::HIGHSHELF1O:
 				m_b0 = 0.0;
 				break;
 		}
@@ -641,19 +646,25 @@ void filter_biquad_device::recalc()
 
 		switch (m_type)
 		{
-			case biquad_type::LOWPASS1P:
+			case biquad_type::LOWPASS1P: // ONE POLE
 				m_a1 = exp(-2.0 * std::numbers::pi * (m_fc / m_stream->sample_rate()));
 				m_b0 = 1.0 - m_a1;
 				m_a1 = -m_a1;
 				m_b1 = m_b2 = m_a2 = 0.0;
 				break;
-			case biquad_type::HIGHPASS1P:
+			case biquad_type::HIGHPASS1P: // ONE POLE
 				m_a1 = -exp(-2.0 * std::numbers::pi * (0.5 - m_fc / m_stream->sample_rate()));
 				m_b0 = 1.0 + m_a1;
 				m_a1 = -m_a1;
 				m_b1 = m_b2 = m_a2 = 0.0;
 				break;
-			case biquad_type::HIGHPASS1P1Z:
+			case biquad_type::LOWPASS1P1Z: // ONE POLE ONE ZERO
+				normal = 1.0 / (1.0 / K + 1.0);
+				m_b0 = m_b1 = normal;
+				m_a1 = (1.0 - 1.0 / K) * normal;
+				m_b2 = m_a2 = 0.0;
+				break;
+			case biquad_type::HIGHPASS1P1Z: // ONE POLE ONE ZERO
 				normal = 1.0 / (K + 1.0);
 				m_b0 = normal;
 				m_b1 = -normal;
@@ -747,6 +758,55 @@ void filter_biquad_device::recalc()
 					m_a2 = (AMGain - sqrt(2.0 * AMGain) * K + Ksquared) * normal;
 				}
 				break;
+			case biquad_type::LOWSHELF1O: // 1ST ORDER
+				if (DBGain >= 0.0)
+				{
+					normal = 1.0 / (K + 1.0);
+					m_b0 = (K * AMGain + 1.0) * normal;
+					m_b1 = (K * AMGain - 1.0) * normal;
+					m_a1 = (K - 1.0) * normal;
+					m_b2 = m_a2 = 0.0;
+				}
+				else
+				{
+					normal = 1.0 / (K * AMGain + 1.0);
+					m_b0 = (K + 1.0) * normal;
+					m_b1 = (K - 1.0) * normal;
+					m_a1 = (K * AMGain - 1.0) * normal;
+					m_b2 = m_a2 = 0.0;
+				}
+				break;
+			case biquad_type::HIGHSHELF1O: // 1ST ORDER
+				if (DBGain >= 0.0)
+				{
+					normal = 1.0 / (K + 1.0);
+					m_b0 = (K + AMGain) * normal;
+					m_b1 = (K - AMGain) * normal;
+					m_a1 = (K - 1.0) * normal;
+					m_b2 = m_a2 = 0.0;
+				}
+				else
+				{
+					normal = 1.0 / (K + AMGain);
+					m_b0 = (K + 1.0) * normal;
+					m_b1 = (K - 1.0) * normal;
+					m_a1 = (K - AMGain) * normal;
+					m_b2 = m_a2 = 0.0;
+				}
+				break;
+			case biquad_type::ALLPASS:
+				m_b0 = (1.0 - KoverQ + Ksquared) * normal;
+				m_b1 = 2.0 * (Ksquared - 1.0) * normal;
+				m_b2 = 1.0;
+				m_a1 = m_b1;
+				m_a2 = m_b0;
+				break;
+			case biquad_type::ALLPASS1O: // 1ST ORDER
+				m_b0 = (1.0 - K) / (1.0 + K);
+				m_b1 = -1.0;
+				m_b2 = m_a2 = 0.0;
+				m_a1 = -1.0 * m_b0;
+				break;
 			default:
 				fatalerror("filter_biquad_device::recalc() - Invalid filter type!");
 				break;
@@ -766,7 +826,9 @@ void filter_biquad_device::recalc()
 	// but this can be 'faked' by adjusting the bx factors, so we support that anyway, even if it isn't realistic.
 	if ( (m_type != biquad_type::PEAK)
 		&& (m_type != biquad_type::LOWSHELF)
-		&& (m_type != biquad_type::HIGHSHELF) )
+		&& (m_type != biquad_type::HIGHSHELF)
+		&& (m_type != biquad_type::LOWSHELF1O)
+		&& (m_type != biquad_type::HIGHSHELF1O) )
 	{
 		m_b0 *= m_gain;
 		m_b1 *= m_gain;

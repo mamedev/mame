@@ -21,7 +21,7 @@
 #include "decocrpt.h"
 #include "decospr.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "cpu/h6280/h6280.h"
 #include "machine/input_merger.h"
 #include "sound/okim6295.h"
@@ -540,7 +540,7 @@ GFXDECODE_END
 void captaven_state::captaven(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4); // verified on pcb (Data East 101 custom)*/
+	DE101(config, m_maincpu, 28_MHz_XTAL / 4); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &captaven_state::main_map);
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3)); // pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb)
@@ -548,7 +548,7 @@ void captaven_state::captaven(machine_config &config)
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
-	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 
 	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
