@@ -17,6 +17,8 @@
 #define LOG_REGS         1
 // Setting ALWAYS_LOG_FIFO will always log the fifo versus having to hold 'L'
 #define ALWAYS_LOG_FIFO  0
+// Log each vertex as it is unpacked and again once projected
+#define LOG_VERTEX       0
 
 /*************************************
 *  Constructor
@@ -24,6 +26,7 @@
 zeus2_renderer::zeus2_renderer(zeus2_device *state)
 	: poly_manager<float, zeus2_poly_extra_data, 4>(state->machine())
 	, m_state(state)
+	, m_meshvert{}
 {
 }
 
@@ -113,6 +116,7 @@ void zeus2_device::device_start()
 	save_pointer(NAME(m_frameDepth), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	save_item(NAME(m_pal_table));
 	// m_ucode
+	save_item(NAME(m_interpFactor));
 	save_item(NAME(m_curUCodeSrc));
 	save_item(NAME(m_curPalTableSrc));
 	save_item(NAME(m_texmodeReg));
@@ -148,6 +152,7 @@ void zeus2_device::device_reset()
 	m_texmodeReg = 0;
 	zeus_trans[3] = 0.0f;
 	m_useZOffset = false;
+	m_interpFactor = 0.0f;
 }
 #if DUMP_WAVE_RAM
 #include <iostream>
@@ -1093,6 +1098,11 @@ if (subregdata_count[which] < 256)
 				logerror("\t(R%02X)  texbase = %06x", which, zeus_texbase);
 			break;
 
+		case 0x06:
+			if (logit)
+				logerror("\t(R%02X) = %06x Solid Fill Color", which, value);
+			break;
+
 		case 0x07:
 			if (logit)
 				logerror("\t(R%02X)  Texel Mask = %06x", which, value);
@@ -1384,10 +1394,11 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0xb7:
 			if (numwords < 2)
 				return false;
+			m_interpFactor = convert_float(data[1]);
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, " -- Set interp factor\n");
-				logerror("\t\tdata %8.5f\n", (double)convert_float(data[1]));
+				logerror("\t\tdata %8.5f\n", (double)m_interpFactor);
 			}
 			break;
 
@@ -1498,7 +1509,11 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 						break;
 
 					case 0x38:  /* crusnexo/thegrid */
-						if (m_system==THEGRID && m_curUCodeSrc==0x00000343) {
+						if (zeus_quad_size == 8) {
+							// pm3dli, thegrid's trimesh ucode
+							poly->zeus2_draw_mesh_vertex(databuffer, texdata, cmd, logit);
+						}
+						else if (m_system==THEGRID && m_curUCodeSrc==0x00000343) {
 							if (logit)
 								logerror("direct write [57]=%08X [51]==%08X\n", m_zeusbase[0x57], m_zeusbase[0x51]);
 							// Direct write to frame buffer
@@ -1516,8 +1531,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 					// thegrid: triangle mesh, pm3dli
 					case 0xa7:
 					case 0xaf:
-						if (1 || logit)
-							logerror(" unknown triangle data\n");
+						poly->zeus2_draw_mesh_vertex(databuffer, texdata, cmd, logit);
 						break;
 
 					default:
@@ -1541,6 +1555,19 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 			}
 		}
 	}
+}
+
+// Apply the reg 0x66 scale and the model matrix; fScale is passed so the quad path computes it once.
+void zeus2_renderer::zeus2_transform_vertex(z2_poly_vertex &vert, float fScale, uint32_t texdata, int logit)
+{
+	float x = vert.x * fScale, y = vert.y * fScale, z = vert.p[0] * fScale;
+#if PRINT_TEX_INFO
+	if (logit)
+		m_state->check_tex(texdata, z, m_state->zeus_matrix[2][2], m_state->zeus_trans[2]);
+#endif
+	vert.x    = x * m_state->zeus_matrix[0][0] + y * m_state->zeus_matrix[0][1] + z * m_state->zeus_matrix[0][2] + m_state->zeus_trans[0];
+	vert.y    = x * m_state->zeus_matrix[1][0] + y * m_state->zeus_matrix[1][1] + z * m_state->zeus_matrix[1][2] + m_state->zeus_trans[1];
+	vert.p[0] = x * m_state->zeus_matrix[2][0] + y * m_state->zeus_matrix[2][1] + z * m_state->zeus_matrix[2][2] + m_state->zeus_trans[2];
 }
 
 /*************************************
@@ -1652,34 +1679,13 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		unknownFloat[3] = m_state->convert_float(databuffer[13]);
 	}
 
-	int logextra = 0;
-
 	int intScale = m_state->m_zeusbase[0x66] - 0x8e;
 	float fScale = pow(2.0f, intScale);
 	int intUVScale = m_state->m_zeusbase[0x68] - 0x9d;
 	float uvScale = pow(2.0f, intUVScale);
 	for (int i = 0; i < 4; i++)
 	{
-		float x = vert[i].x;
-		float y = vert[i].y;
-		float z = vert[i].p[0];
-		if (1) {
-		  x *= fScale;
-		  y *= fScale;
-		  z *= fScale;
-		}
-#if PRINT_TEX_INFO
-		if (logit && i == 0) {
-			m_state->check_tex(texdata, z, m_state->zeus_matrix[2][2], m_state->zeus_trans[2]);
-		}
-#endif
-		vert[i].x =    x * m_state->zeus_matrix[0][0] + y * m_state->zeus_matrix[0][1] + z * m_state->zeus_matrix[0][2];
-		vert[i].y =    x * m_state->zeus_matrix[1][0] + y * m_state->zeus_matrix[1][1] + z * m_state->zeus_matrix[1][2];
-		vert[i].p[0] = x * m_state->zeus_matrix[2][0] + y * m_state->zeus_matrix[2][1] + z * m_state->zeus_matrix[2][2];
-
-		vert[i].x += m_state->zeus_trans[0];
-		vert[i].y += m_state->zeus_trans[1];
-		vert[i].p[0] += m_state->zeus_trans[2];
+		zeus2_transform_vertex(vert[i], fScale, texdata, logit && i == 0);
 
 		//vert[i].p[1] += ((texdata >> 8) & 0x1) ? 1.0f : 0.0f;
 		vert[i].p[1] *= uvScale;
@@ -1691,24 +1697,64 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 
 
-		if (logextra & logit)
+		if (LOG_VERTEX && logit)
 		{
 			m_state->logerror("\t\t(%f,%f,%f) (%02X,%02X)\n",
 				(double)vert[i].x, (double)vert[i].y, (double)vert[i].p[0],
 				(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f));
 		}
 	}
-	if (0 && logextra & logit && m_state->zeus_quad_size == 14) {
+	if (0 && LOG_VERTEX && logit && m_state->zeus_quad_size == 14) {
 		m_state->logerror("unknown: int16: %d %d %d %d %d %d %d %d float: %f %f %f %f\n",
 			unknown[0], unknown[1], unknown[2], unknown[3], unknown[4], unknown[5], unknown[6], unknown[7],
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
 	}
 
+	zeus2_render_poly(vert, 4, texdata, logit);
+}
+
+// thegrid's trimesh ucode pm3dli sends one vertex per 8-word record.  Commands 0xa7 and 0xaf
+// differ only in which of two slots the standing vertex is saved to before the new one arrives,
+// so the primitive is those two slots plus the newest; bit 0x200000 marks a full set.
+void zeus2_renderer::zeus2_draw_mesh_vertex(const uint32_t *databuffer, uint32_t texdata, uint8_t cmd, int logit)
+{
+	z2_poly_vertex vert;
+
+	// The record carries the vertex twice, the second pose as a delta, blended by the interp
+	// factor from FIFO command 0xb7.
+	float t = m_state->m_interpFactor;
+	vert.x    = (int16_t)(databuffer[2] >> 16) + t * (int16_t)(databuffer[4] >> 16);
+	vert.y    = (int16_t)databuffer[3]         + t * (int16_t)databuffer[5];
+	vert.p[0] = (int16_t)(databuffer[3] >> 16) + t * (int16_t)(databuffer[5] >> 16);
+
+	// u and v are already 8.8 texels here, so the reg 0x68 scale the quad fields need does not apply
+	vert.p[1] = float(databuffer[1] & 0xffff);
+	vert.p[2] = float(databuffer[1] >> 16) + float(texdata >> 16) * 256.0f;
+	vert.p[3] = 0.0f;
+
+	int intScale = m_state->m_zeusbase[0x66] - 0x8e;
+	zeus2_transform_vertex(vert, pow(2.0f, intScale), texdata, logit);
+
+	if (cmd == 0xa7)
+		m_meshvert[0] = m_meshvert[2];
+	else if (cmd == 0xaf)
+		m_meshvert[1] = m_meshvert[2];
+	m_meshvert[2] = vert;
+
+	if (databuffer[0] & 0x00200000)
+	{
+		z2_poly_vertex tri[3] = { m_meshvert[0], m_meshvert[1], m_meshvert[2] };
+		zeus2_render_poly(tri, 3, texdata, logit);
+	}
+}
+
+void zeus2_renderer::zeus2_render_poly(z2_poly_vertex *vert, int numverts, uint32_t texdata, int logit)
+{
 	// Near-plane clip straddling quads instead of rejecting them (which dropped the nearest
 	// crusnexo road segment), matching the Zeus 1 renderer.
 	float clipVal = reinterpret_cast<float&>(m_state->m_zeusbase[0x78]);
 	z2_poly_vertex clipvert[8];
-	int numverts = zclip_if_less<4>(4, vert, clipvert, clipVal);
+	numverts = zclip_if_less<4>(numverts, vert, clipvert, clipVal);
 	if (numverts < 3)
 		return;
 
@@ -1742,7 +1788,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 		clipvert[i].p[0] *= 4096.0f;  // 12.12
 
-		if (logextra & logit)
+		if (LOG_VERTEX && logit)
 			m_state->logerror("\t\t\tTranslated=(%f,%f, %f) scale = %f\n", (double)clipvert[i].x, (double)clipvert[i].y, (double)clipvert[i].p[0], ooz);
 	}
 	// Slow HSR
@@ -1761,7 +1807,9 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.frame_shift = m_state->frame_row_shift();
 	int texmode = texdata & 0xffff;
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
-	extra.solidcolor = m_state->m_zeusbase[0x00] & 0x7fff;
+	// Solid fill takes its color from render reg 0x06.  Host reg 0x00 is Zeus 1's source and
+	// reads back as STATUS0 here, so the fill was always black.
+	extra.solidcolor = m_state->m_renderRegs[0x06] & 0x7fff;
 	// Flat solid-color fill: texmode bits 10-11 both set (same as Zeus 1)
 	extra.solid_enable = ((texmode & 0x0c00) == 0x0c00);
 	extra.transcolor = (texmode & 0x180) ? 0 : 0x100;

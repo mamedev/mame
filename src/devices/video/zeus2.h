@@ -103,9 +103,14 @@ public:
 	void render_poly_8bit(int32_t scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
 
 	void zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdata, int logit);
+	void zeus2_draw_mesh_vertex(const uint32_t *databuffer, uint32_t texdata, uint8_t cmd, int logit);
 
 private:
+	void zeus2_transform_vertex(vertex_t &vert, float fScale, uint32_t texdata, int logit);
+	void zeus2_render_poly(vertex_t *vert, int numverts, uint32_t texdata, int logit);
+
 	zeus2_device* m_state;
+	vertex_t m_meshvert[3];   // pm3dli microcode vertex slots D, E and F
 };
 typedef zeus2_renderer::vertex_t z2_poly_vertex;
 typedef zeus2_renderer::extent_t z2_poly_extent;
@@ -154,6 +159,7 @@ public:
 	std::unique_ptr<int32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];
 	uint32_t m_ucode[0x200];
+	float m_interpFactor;
 	uint32_t m_curUCodeSrc;
 	uint32_t m_curPalTableSrc;
 	uint32_t m_texmodeReg;
