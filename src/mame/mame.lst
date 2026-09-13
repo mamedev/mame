@@ -1330,6 +1330,7 @@ pmac7200_120
 
 @source:apple/maccordyceps.cpp
 pmac6200
+pmac5200
 
 @source:apple/macii.cpp
 mac2fdhd

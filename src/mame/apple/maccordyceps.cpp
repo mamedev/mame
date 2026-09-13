@@ -86,6 +86,8 @@ public:
 
 	void init_pmac6200();
 
+	void pmac5200(machine_config &config);
+
 private:
 	required_device<ppc603_device> m_maincpu;
 	required_device<capella_device> m_capella;
@@ -110,6 +112,11 @@ private:
 	{
 		m_capella->nmi_w(state);
 	}
+
+
+	u32 id_r(offs_t offset, u32 mem_mask);
+
+	u32 m_model_id;
 };
 
 void pmac6200_state::machine_start()
@@ -124,6 +131,18 @@ void pmac6200_state::machine_reset()
 
 void pmac6200_state::init_pmac6200()
 {
+}
+
+uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
+{
+	// same behavior as in macpdm.cpp
+	// FIXME: Apple System Profiler only reports half the desired CPU speed
+	if (mem_mask == 0xffff'ffff)
+	{
+		return m_model_id & 0xffff;
+	}
+
+	return m_model_id;
 }
 
 /***************************************************************************
@@ -143,6 +162,7 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	map(0x00000000, 0xffffffff).m(m_f108, FUNC(f108_device::map));
 	map(0x00000000, 0xffffffff).m(m_video, FUNC(valkyrie_device::map));
 	map(0x50000000, 0x53ffffff).m(m_primetimeii, FUNC(primetime_device::map));
+	map(0x5ffffffc, 0x5fffffff).r(FUNC(pmac6200_state::id_r));
 
 	// SONIC ethernet is supposed to live here. for now, pretend it's not there
 	map(0x50f0a000, 0x50f0bfff).noprw();
@@ -154,8 +174,6 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	map(0xffc00000, 0xffffffff).rom().region("bootrom64", 0);
 
 	map(0x00000000, 0xffffffff).m(m_capella, FUNC(capella_device::map));
-
-	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a3250; }));
 }
 
 static INPUT_PORTS_START( macadb )
@@ -163,6 +181,8 @@ INPUT_PORTS_END
 
 void pmac6200_state::pmac6200(machine_config &config)
 {
+	m_model_id = 0xa55a3250;
+
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_bus_frequency(XTAL(75_MHz_XTAL)); // FSB freq to Capella
@@ -242,6 +262,14 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,64M"); // per service manual
 }
 
+
+void pmac6200_state::pmac5200(machine_config &config)
+{
+	pmac6200(config);
+
+	m_model_id = 0xa55a3258;
+}
+
 #define PPC_MAKE_BRANCH_ALWAYS(x) \
 	ROM_FILL(x,   1, 0x48) \
 	ROM_FILL(x+1, 1, 0x00) \
@@ -274,4 +302,9 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1995, pmac6200, 0, 0, pmac6200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200/75", MACHINE_NOT_WORKING)
+
+#define rom_pmac5200 rom_pmac6200
+
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   CLASS           INIT            COMPANY           FULLNAME                   FLAGS
+COMP( 1995, pmac6200, 0,        0,      pmac6200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200/75", MACHINE_NOT_WORKING)
+COMP( 1995, pmac5200, pmac6200, 0,      pmac5200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 5200/75", MACHINE_NOT_WORKING)
