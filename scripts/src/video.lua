@@ -1609,6 +1609,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/t6b79.h,VIDEOS["T6B79"] = true
+--------------------------------------------------
+
+if VIDEOS["T6B79"] then
+	files {
+		MAME_DIR .. "src/devices/video/t6b79.cpp",
+		MAME_DIR .. "src/devices/video/t6b79.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/tea1002.h,VIDEOS["TEA1002"] = true
 --------------------------------------------------
 
