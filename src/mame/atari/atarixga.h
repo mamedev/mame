@@ -138,9 +138,9 @@ private:
 		FPGA_DECIPHER
 	};
 
-	uint8_t m_mode = FPGA_IDLE;
-	uint16_t m_taps = 0;
-	uint16_t m_reply = 0;
+	uint8_t m_mode;
+	uint16_t m_taps;
+	uint16_t m_reply;
 };
 
 

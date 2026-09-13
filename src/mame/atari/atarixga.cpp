@@ -546,6 +546,9 @@ static constexpr offs_t PR_CHAR2    = 0x6c000; // write: character word (player 
 
 atari_136094_0004a_device::atari_136094_0004a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atari_xga_device(mconfig, ATARI_136094_0004A, tag, owner, clock)
+	, m_mode(FPGA_IDLE)
+	, m_taps(0)
+	, m_reply(0)
 {
 }
 
