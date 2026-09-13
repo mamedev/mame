@@ -118,7 +118,7 @@ TIMER_CALLBACK_MEMBER(huc6260_device::update_events)
 			{
 				/* Check if the screen should be resized */
 				m_height = LPF - (m_blur ? 1 : 0);
-				if (m_height != video_screen_get_height(m_screen))
+				if (m_height != screen().height())
 				{
 					rectangle visible_area;
 
@@ -128,7 +128,8 @@ TIMER_CALLBACK_MEMBER(huc6260_device::update_events)
 					visible_area.max_x = 64 + 1024 + 64 - 1;
 					visible_area.max_y = 18 + 242 - 1;
 
-					video_screen_configure(m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS(device->clock / (WPF * m_height)));
+					attotime refresh = clocks_to_attotime(WPF * m_height);
+					screen().configure(WPF, m_height, &visible_area, refresh);
 				}
 			}
 #endif
