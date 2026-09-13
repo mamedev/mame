@@ -98,7 +98,10 @@ void a2_video_device::device_reset()
 {
 	// cache derived values for delayed updates
 	m_scanner_period = (m_base_model == model::IIGS) ? 16 : 14;
-	m_delay_bias = 1;
+	// the IIgs Mega II runs one cycle behind the VGC, so a softswitch change reaches the
+	// video output one cycle later than on the IIe (the read side of this is the ALIGN_*
+	// constants in apple2gs.cpp)
+	m_delay_bias = (m_base_model == model::IIGS) ? 0 : 1;
 
 	// Start in fullscreen hires if there is no character ROM. This is used
 	// by the superga2 and tk2000 drivers, which support no other modes.
@@ -327,7 +330,7 @@ void a2_video_device::set_GS_textcol(u8 textcol)
 	const u8 bg = textcol & 0xf;
 	if ((m_GSfg != fg) || (m_GSbg != bg))
 	{
-		delayed_update(0);
+		screen().update_now();
 		m_GSfg = fg;
 		m_GSbg = bg;
 	}
@@ -338,7 +341,7 @@ void a2_video_device::set_GS_border(u8 border)
 	// select border color
 	if (m_GSborder != border)
 	{
-		delayed_update(0);
+		screen().update_now();
 		m_GSborder = border;
 	}
 }
@@ -347,7 +350,7 @@ void a2_video_device::set_newvideo(u8 newvideo)
 {
 	// select super hi-res and monochrome modes
 	if ((m_newvideo & 0xa0) != (newvideo & 0xa0))
-		delayed_update(0);
+		screen().update_now();
 	m_newvideo = newvideo;
 }
 
@@ -404,17 +407,6 @@ void a2_video_device::delayed_update(int cycles)
 	{
 		hpos -= screen().width();
 		vpos++;
-	}
-	else if (hpos < 0)
-	{
-		hpos += screen().width();
-		vpos--;
-		if (vpos < 0)
-		{
-			// the previous line belongs to the frame that has already been rendered
-			hpos = 0;
-			vpos = 0;
-		}
 	}
 	screen().update_partial(vpos, hpos);
 }

@@ -164,6 +164,8 @@ private:
 		DRAW
 	};
 
+	static constexpr u32 CEL_TRANSPARENT = 1 << 16;
+
 	struct {
 		cel_state_t state;
 		u32 address;
@@ -177,8 +179,13 @@ private:
 		double hdx, hdy, vdx, vdy;
 		double hddx, hddy;
 		u32 pixc, pre0, pre1;
+		u8 pixc_ms[2];
+		u8 pixc_mf[2];
 		u8 pixc_df[2];
-		std::vector<u16> buffer;
+		u16 pover_force_high, pover_mask;
+		// NOTE: u16 + 1 bit for marking pixel as transparent.
+		// This is done by the Pixel Decoder (PDC) internally.
+		std::vector<u32> buffer;
 	} m_cel;
 
 	struct {
@@ -198,18 +205,20 @@ private:
 	void cel_continue_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 cel_decompress();
 
-	typedef u16 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
+	u32 convert_8bpp_alt_multiply(u32 src_data, u8 alt_multiply);
+
+	typedef u32 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
 	static const get_pixel_func get_pixel_table[32 + 1];
-	u16 get_pixel_invalid(int x, int y, u16 woffset);
-	u16 get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset);
-	u16 get_pixel_packed(int x, int y, u16 woffset);
+	u32 get_pixel_invalid(int x, int y, u16 woffset);
+	u32 get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset);
+	u32 get_pixel_packed(int x, int y, u16 woffset);
 
 	typedef u16 (madam_device::*get_woffset_func)(u32 ptr);
 	static const get_woffset_func get_woffset_table[2];
@@ -218,18 +227,18 @@ private:
 
 	std::tuple<u8, u32> fetch_byte(u32 ptr, u8 frac);
 
-	typedef std::tuple<u16, u32> (madam_device::*fetch_rle_func)(u32 ptr, u8 frac);
+	typedef std::tuple<u32, u32> (madam_device::*fetch_rle_func)(u32 ptr, u8 frac);
 	static const fetch_rle_func fetch_rle_table[16];
 
-	std::tuple<u16, u32> get_unemulated(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_1bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_2bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_4bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_6bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_8bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_uncoded_8bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_16bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_unemulated(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_1bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_2bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_4bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_6bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_8bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_uncoded_8bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_16bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
 
 	emu_timer *m_cel_timer;
 	TIMER_CALLBACK_MEMBER(cel_tick_cb);

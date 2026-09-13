@@ -39,7 +39,8 @@ public:
 		m_dac(*this, "dac%u", 0U),
 		m_overlay_view(*this, "overlay_view"),
 		m_bankdev(*this, "bankdev"),
-		m_p1_r(*this, "P1.%u", 0)
+		m_p1_r(*this, "P1.%u", 0),
+		m_p2_r(*this, "P2.%u", 0)
 	{ }
 
 	void _3do(machine_config &config);
@@ -95,6 +96,7 @@ private:
 protected:
 	required_ioport_array<2> m_p1_r;
 private:
+	optional_ioport_array<2> m_p2_r;
 
 	SLOW2 m_slow2;
 	UNCLE m_uncle;

@@ -40422,7 +40422,7 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
 		<notes><![CDATA[
-Hangs after initial Rambo III credits screen, [CIAB] fails on comparing a TOD 0xd9 > 0x115 at PC=5856
+Not extensively tested
 TODO: shooting enemies may give repeated [Paula] samples, reverify
 ATK test: OK
 ]]></notes>

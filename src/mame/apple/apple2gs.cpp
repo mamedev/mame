@@ -296,9 +296,9 @@ private:
 	// the accessing cycle.  This keeps the alignment independent of the sub-cycle phase
 	// between the CPU clock and the pixel clock.
 	static constexpr int CYCLE_MID = 8; // half of a 1 MHz cycle, in pixels
-	static constexpr int ALIGN_VBL = 0; // VBL begins with the first cycle after active video
-	static constexpr int ALIGN_CNT = 1; // Mega II counters read one cycle ahead of the beam
-	static constexpr int ALIGN_RFB = 0; // floating bus returns the byte fetched in this cycle
+	static constexpr int ALIGN_VBL = 1; // VBL begins one cycle before the end of active video
+	static constexpr int ALIGN_CNT = 2; // video counters read two cycles ahead of the video output
+	static constexpr int ALIGN_RFB = 1; // floating bus returns the byte fetched for the next column
 	static constexpr int HPOS_VBL = BORDER_LEFT + ((40 - ALIGN_VBL) * 16) + CYCLE_MID;
 	// hardware testing shows SCB IRQs fire 8 video cycles after VBL
 	static constexpr int HPOS_VGC = HPOS_VBL + (8 * 16);

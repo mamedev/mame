@@ -880,7 +880,8 @@ Fails during install uncompress phase, RAM:lha causes software failure #80000004
 		<year>1994</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
-Black screen, [FDC] copy protection
+Throws [Lisa] massive pitch corruption in gameplay in FMODE=3
+Not extensively tested
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1941,7 +1942,8 @@ Gameplay looks way too fast
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Black screen, [FDC] dsksync == $0000
+Black screen, [FDC] dsksync == $0000 (fixed?)
+Not extensively tested
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1978,7 +1980,7 @@ Black screen, [FDC] dsksync == $0000
 		<year>1994</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
-Black screen, tests [CIA] for specific time range.
+Black screen, tests [CIA] for specific time range. Check [FDC] too.
 Doesn't show cursor on main menu
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -2004,7 +2006,7 @@ Doesn't show cursor on main menu
 		<year>1994</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
-Black screen when selecting any game option, tests [CIA] for specific time range.
+Black screen when selecting any game option, tests [CIA] for specific time range. Also check [FDC] burp
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -4424,7 +4426,7 @@ boot OK
 		<year>1995</year>
 		<publisher>Black Legend</publisher>
 		<notes><![CDATA[
-Erratic background scrolling, and status bar glitches out, [Lisa] GFX pitch with FMODE
+Erratic background scrolling, and status bar glitches out, [Lisa] GFX pitch with FMODE (TODO: which one?)
 Cannot exit from inventory menu?
 ]]></notes>
 		<info name="usage" value="Requires AGA" />

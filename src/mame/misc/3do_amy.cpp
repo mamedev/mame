@@ -92,6 +92,11 @@ void amy_device::clut_write(u32 data)
 				break;
 			case 0xc0:
 				LOG("0xc0: display-control word %06x\n", data & 0xff'ffff);
+
+				// TODO: needs cooperating with P-mode in Madam as well
+				// bit 15 of pixel out 1=fixed CLUT, 0=custom CLUT
+				if (BIT(data, 25))
+					popmessage("3do_amy.cpp: fixed CLUT enabled");
 				break;
 			default:
 				LOG("%02x: unknown word set! %06x\n", data & 0xff'ffff);

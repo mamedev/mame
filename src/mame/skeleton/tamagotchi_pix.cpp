@@ -100,7 +100,7 @@ INPUT_PORTS_END
 
 void tamagotchi_pix_state::tamapix(machine_config &config)
 {
-	ARM9(config, m_maincpu, 12'000'000); // not correct, needs a core with Thumb-2 support
+	ARM11(config, m_maincpu, 12'000'000); // needs a core with Thumb-2 support
 	m_maincpu->set_addrmap(AS_PROGRAM, &tamagotchi_pix_state::mem_map);
 
 	SCREEN(config, m_screen).set_lcd();
