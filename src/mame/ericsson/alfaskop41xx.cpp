@@ -181,9 +181,7 @@ private:
 void alfaskop4110_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	// Main memory is installed in machine_start, since how far it reaches
-	// depends on which memory board the unit has.  The video RAM keeps its
-	// own entry so that the share survives.
+	// Main memory is installed in machine_start, see -ram.
 	map(0x7800, 0x7fff).ram().share(m_vram); // TODO: Video RAM base address is configurable via NVRAM - this is the default
 
 	// NVRAM
@@ -487,14 +485,9 @@ void alfaskop4110_state::machine_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_imsk));
 
-	// The display unit took one of two memory boards and its operating
-	// software knows both: the sizing routine in DUOS walks upwards two bytes
-	// at a time until an address stops answering and then accepts a boundary
-	// of either F000 or F680, stopping the IPL with "MRW ERROR" for anything
-	// else.  The smaller board is not enough for every product: AlfaWord
-	// (4017-021) reports "Wrong Hardware configuration" and restarts the unit.
-	// Above F67F sit the NVRAM, the I/O boards and the ROM, so a larger board
-	// is simply not reachable past that point.
+	// Two sizes of memory board: the software accepts a top of either F000
+	// or F680 and stops the IPL with "MRW ERROR" for anything else.  Above
+	// F67F are the NVRAM, the I/O boards and the ROM.
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	u32 const top = (m_ram->size() < 0xf680) ? m_ram->size() : 0xf680;
 	space.install_ram(0x0000, 0x77ff, m_ram->pointer());
