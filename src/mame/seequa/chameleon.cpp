@@ -45,9 +45,9 @@ void isa8_fdc_chameleon_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_IO)
 	{
 		m_isa->install_device(0x074, 0x075, *this, &isa8_fdc_chameleon_device::map);
-		m_isa->install_device(0x3de, 0x3de, read8smo_delegate(*this, NAME([this](){ return 0xff; })),
+		m_isa->install_device(0x3de, 0x3de, read8smo_delegate(*this, NAME([](){ return 0xff; })),
 				write8smo_delegate(*this, NAME([this](uint8_t d){ dor_w((dor_r() & ~0x10) | ((d & 0x80) >> 3)); })));
-		m_isa->install_device(0x3df, 0x3df, read8smo_delegate(*this, NAME([this](){ return 0xff; })),
+		m_isa->install_device(0x3df, 0x3df, read8smo_delegate(*this, NAME([](){ return 0xff; })),
 				write8smo_delegate(*this, NAME([this](uint8_t d){ dor_w((dor_r() & ~4) | (d & 4)); })));
 	}
 }
