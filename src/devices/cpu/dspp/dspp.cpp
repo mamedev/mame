@@ -959,7 +959,7 @@ inline void dspp_device::exec_special()
 //  exec_branch - Execute a branch control op
 //-------------------------------------------------
 
-void dspp_device::exec_branch()
+inline void dspp_device::exec_branch()
 {
 	uint32_t mode = (m_core->m_op >> 13) & 3;
 	uint32_t select = (m_core->m_op >> 12) & 1;

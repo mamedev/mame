@@ -40,26 +40,25 @@ public:
 		, m_audiobank(*this, "audiobank")
 	{ }
 
-	void i4100_config(machine_config &config);
-	void i4100_config_360x224(machine_config &config);
-	void i4220_config(machine_config &config);
-	void i4220_config_320x240(machine_config &config);
-	void i4220_config_304x224(machine_config &config);
-	void i4300_config(machine_config &config);
-	void i4300_config_384x224(machine_config &config);
-	void i4300_config_320x240(machine_config &config);
-	void balcube(machine_config &config);
-	void bangball(machine_config &config);
-	void batlbubl(machine_config &config);
-	void daitoa(machine_config &config);
-	void msgogo(machine_config &config);
-	void puzzlet(machine_config &config);
+	void balcube(machine_config &config) ATTR_COLD;
+	void bangball(machine_config &config) ATTR_COLD;
+	void batlbubl(machine_config &config) ATTR_COLD;
+	void daitoa(machine_config &config) ATTR_COLD;
+	void msgogo(machine_config &config) ATTR_COLD;
+	void puzzlet(machine_config &config) ATTR_COLD;
 
-	void init_balcube();
-	void init_karatour();
+	void init_balcube() ATTR_COLD;
+	void init_karatour() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override {}
+	void i4100_config(machine_config &config) ATTR_COLD;
+	void i4100_config_360x224(machine_config &config) ATTR_COLD;
+	void i4220_config(machine_config &config) ATTR_COLD;
+	void i4220_config_320x240(machine_config &config) ATTR_COLD;
+	void i4220_config_304x224(machine_config &config) ATTR_COLD;
+	void i4300_config(machine_config &config) ATTR_COLD;
+	void i4300_config_384x224(machine_config &config) ATTR_COLD;
+	void i4300_config_320x240(machine_config &config) ATTR_COLD;
 
 	void ipl_w(u8 data);
 	void coin_lockout_1word_w(u8 data);
@@ -112,28 +111,29 @@ public:
 		: metro_state(mconfig, type, tag)
 	{ }
 
-	void metro_upd7810_sound(machine_config &config);
-	void daitorid_upd7810_sound(machine_config &config);
-	void daitorid(machine_config &config);
-	void dharma(machine_config &config);
-	void karatour(machine_config &config);
-	void lastforg(machine_config &config);
-	void lastfort(machine_config &config);
-	void pangpoms(machine_config &config);
-	void poitto(machine_config &config);
-	void pururun(machine_config &config);
-	void puzzli(machine_config &config);
-	void puzzlia(machine_config &config);
-	void sankokushi(machine_config &config);
-	void skyalert(machine_config &config);
-	void toride2g(machine_config &config);
+	void daitorid(machine_config &config) ATTR_COLD;
+	void dharma(machine_config &config) ATTR_COLD;
+	void karatour(machine_config &config) ATTR_COLD;
+	void lastforg(machine_config &config) ATTR_COLD;
+	void lastfort(machine_config &config) ATTR_COLD;
+	void pangpoms(machine_config &config) ATTR_COLD;
+	void poitto(machine_config &config) ATTR_COLD;
+	void pururun(machine_config &config) ATTR_COLD;
+	void puzzli(machine_config &config) ATTR_COLD;
+	void puzzlia(machine_config &config) ATTR_COLD;
+	void sankokushi(machine_config &config) ATTR_COLD;
+	void skyalert(machine_config &config) ATTR_COLD;
+	void toride2g(machine_config &config) ATTR_COLD;
 
-	void init_dharmak();
+	void init_dharmak() ATTR_COLD;
 
 	int custom_soundstatus_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	void metro_upd7810_sound(machine_config &config) ATTR_COLD;
+	void daitorid_upd7810_sound(machine_config &config) ATTR_COLD;
 
 private:
 	void sound_data_w(u8 data);
@@ -180,10 +180,10 @@ public:
 		, m_io_key(*this, "KEY%u", 0U)
 	{ }
 
-	void dokyusei(machine_config &config);
-	void dokyusp(machine_config &config);
-	void gakusai2(machine_config &config);
-	void gakusai(machine_config &config);
+	void dokyusei(machine_config &config) ATTR_COLD;
+	void dokyusp(machine_config &config) ATTR_COLD;
+	void gakusai2(machine_config &config) ATTR_COLD;
+	void gakusai(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -227,7 +227,7 @@ public:
 		, m_essnd(*this, "essnd")
 	{ }
 
-	void vmetal(machine_config &config);
+	void vmetal(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -257,7 +257,7 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
-	void mouja(machine_config &config);
+	void mouja(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

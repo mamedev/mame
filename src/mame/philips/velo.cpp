@@ -38,7 +38,7 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void velo1(machine_config &config);
+	void velo1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD { }
@@ -85,4 +85,4 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT         COMPANY     FULLNAME  FLAGS
-COMP( 1997, pvelo1, 0,       0,      velo1,   0,     velo1_state, empty_init,  "Philips",  "Velo 1", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1997, pvelo1, 0,       0,      velo1,   0,     velo1_state, empty_init,  "Philips",  "Velo 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -99,8 +99,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
-	inline void update_ticks();
-	inline void execute_one(bool check_debugger);
+	void update_ticks();
+	void execute_one(bool check_debugger);
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
@@ -188,23 +188,23 @@ private:
 
 	// Internal functions
 	uint16_t read_op(offs_t pc);
-	inline uint16_t read_data(offs_t addr);
-	inline void write_data(offs_t addr, uint16_t data);
+	uint16_t read_data(offs_t addr);
+	void write_data(offs_t addr, uint16_t data);
 
-	inline void update_pc();
-	inline void exec_control();
-	inline void exec_super_special();
-	inline void exec_special();
-	inline void exec_branch();
-	inline void exec_complex_branch();
-	inline void exec_arithmetic();
+	void update_pc();
+	void exec_control();
+	void exec_super_special();
+	void exec_special();
+	void exec_branch();
+	void exec_complex_branch();
+	void exec_arithmetic();
 	void parse_operands(uint32_t numops);
 	uint16_t read_next_operand();
 	void write_next_operand(uint16_t value);
-	inline void push_pc();
-	inline uint16_t pop_pc();
-	inline void set_rbase(uint32_t base, uint32_t addr);
-	inline uint16_t translate_reg(uint16_t reg);
+	void push_pc();
+	uint16_t pop_pc();
+	void set_rbase(uint32_t base, uint32_t addr);
+	uint16_t translate_reg(uint16_t reg);
 
 	void process_next_dma(int32_t channel);
 	void service_input_dma(int32_t channel);

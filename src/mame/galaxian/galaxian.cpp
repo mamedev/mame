@@ -741,16 +741,18 @@ TODO:
 
 #include "cclimber_a.h"
 
+#include "nl_konami.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "screen.h"
+
 #include "sound.h"
 #include "speaker.h"
 
-#include "nl_konami.h"
+#include <algorithm>
 
 
 /*************************************

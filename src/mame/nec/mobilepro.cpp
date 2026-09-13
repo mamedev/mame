@@ -39,7 +39,7 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void mobilepro(machine_config &config);
+	void mobilepro(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD { }
@@ -84,4 +84,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT  CLASS            INIT         COMPANY  FULLNAME         FLAGS
-COMP( 1996, mbpro450, 0,      0,      mobilepro,  0,     mobilepro_state, empty_init,  "NEC",   "MobilePro 450", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1996, mbpro450, 0,      0,      mobilepro,  0,     mobilepro_state, empty_init,  "NEC",   "MobilePro 450", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -986,7 +986,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				// doc contradicts itself with the nibble format,
 				// cfr. pover == 2 aquawrld definitely wants low nibble = [0] sets pixc=1f003f00.
 
-				const u8 df_table[4] = { 4, 1, 2, 3 };
+				constexpr u8 df_table[4] = { 4, 1, 2, 3 };
 
 				for (int i = 0; i < 2; i++)
 				{
@@ -1562,9 +1562,9 @@ u32 madam_device::get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset)
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
 
-	cel_address += ((y) * woffset) << 2;
-	cel_address += ((x & ~7) >> 3);
-	u8 src_shift = (x & 7) ^ 7;
+	cel_address += (y * woffset) << 2;
+	cel_address += (x & ~7) >> 3;
+	u8 src_shift = ~x & 7;
 
 	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift)) & 0x1;
 	u16 plut_data = (m_dma8_read_cb(cel_address) >> src_shift) & 0x1;
@@ -1581,9 +1581,9 @@ u32 madam_device::get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset)
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
 
-	cel_address += ((y) * woffset) << 2;
-	cel_address += ((x & ~3) >> 2);
-	u8 src_shift = (x & 3) ^ 3;
+	cel_address += (y * woffset) << 2;
+	cel_address += (x & ~3) >> 2;
+	u8 src_shift = ~x & 3;
 
 	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 2)) & 0x3;
 	u16 plut_data = (m_dma8_read_cb(cel_address) >> (src_shift * 2)) & 0x3;
@@ -1601,9 +1601,9 @@ u32 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
 
-	cel_address += ((y) * woffset) << 2;
-	cel_address += ((x & ~1) >> 1);
-	u8 src_shift = (x & 1) ^ 1;
+	cel_address += (y * woffset) << 2;
+	cel_address += (x & ~1) >> 1;
+	u8 src_shift = ~x & 1;
 
 	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
 	u16 plut_data = (m_dma8_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
@@ -1620,7 +1620,7 @@ u32 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
 
-	cel_address += ((y) * woffset) << 2;
+	cel_address += (y * woffset) << 2;
 	// math would make more sense with / 3 ~ % 3 but the pitch would be off that way (dword boundary?)
 	cel_address += (x / 4) * 3;
 	u8 src_shift = (~x & 3) * 6;
@@ -1641,9 +1641,9 @@ u32 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	u32 cel_address = m_cel.source_ptr;
 	u32 plut_address = m_cel.plut_ptr;
 
-	cel_address += ((y) * woffset) << 2;
-	cel_address += ((x) << 0);
-	//u8 src_shift = (x & 3) ^ 3;
+	cel_address += (y * woffset) << 2;
+	cel_address += x;
+	//u8 src_shift = ~x & 3;
 
 	// Source contains the lower PLUT ...
 	const u8 byte_data = m_dma8_read_cb(cel_address);
@@ -1667,9 +1667,9 @@ u32 madam_device::get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
-	cel_address += ((y) * woffset) << 2;
-	cel_address += (x);
-//	u8 src_shift = (x & 3) ^ 3;
+	cel_address += (y * woffset) << 2;
+	cel_address += x;
+	//u8 src_shift = ~x & 3;
 	const u8 src_ram = m_dma8_read_cb(cel_address);
 
 	// extend RGB332 into 555, cfr. Figure 2 of The Pixel Decoder "PDC"
@@ -1685,9 +1685,9 @@ u32 madam_device::get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
-	cel_address += ((y) * woffset) << 2;
-	cel_address += ((x & ~1) << 1);
-	u8 src_shift = (x & 1) ^ 1;
+	cel_address += (y * woffset) << 2;
+	cel_address += (x & ~1) << 1;
+	u8 src_shift = ~x & 1;
 
 	u16 src_data = m_dma32_read_cb(cel_address) >> (src_shift * 16);
 
@@ -1698,9 +1698,9 @@ u32 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
-	cel_address += ((y & ~1) * (woffset)) << (1);
-	cel_address += ((x) << 2);
-	u8 src_shift = (y & 1) ^ 1;
+	cel_address += ((y & ~1) * woffset) << 1;
+	cel_address += x << 2;
+	u8 src_shift = ~y & 1;
 
 	u16 src_data = m_dma32_read_cb(cel_address) >> (src_shift * 16);
 

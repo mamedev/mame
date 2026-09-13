@@ -117,7 +117,7 @@ public:
 	{
 	}
 
-	void sb55(machine_config &config);
+	void sb55(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(remote_key);
 

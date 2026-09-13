@@ -70,8 +70,8 @@ public:
 		, m_audiobank(*this, "audiobank")
 	{ }
 
-	void blzntrnd(machine_config &config);
-	void gstrik2(machine_config &config);
+	void blzntrnd(machine_config &config) ATTR_COLD;
+	void gstrik2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

@@ -128,7 +128,7 @@ TIMER_CALLBACK_MEMBER(huc6260_device::update_events)
 					visible_area.max_x = 64 + 1024 + 64 - 1;
 					visible_area.max_y = 18 + 242 - 1;
 
-					attotime refresh = clocks_to_attotime(WPF * m_height);
+					const attotime refresh = clocks_to_attotime(WPF * m_height);
 					screen().configure(WPF, m_height, &visible_area, refresh);
 				}
 			}
