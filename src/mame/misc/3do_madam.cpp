@@ -887,12 +887,13 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 			// selects P-Mode behaviour (matters for alt_multiply)
 			// 00=from decoder 01=<reserved> 10=P-Mode forced to zero 11=P-Mode forced to one
-			// - aquawrld forces PIXC to use the lower nibble in Mermaid mode.
+			// - aquawrld forces PIXC to use the upper nibble in Mermaid mode, cfr. below
 			const u8 pover = (m_cel.current_ccb & 0x180) >> 7;
+
 			// cache rather than storing the raw value for performance,
 			// assume reserved setting to read from decoder.
-			m_cel.pover_force_high = pover == 3 ? 0x8000 : 0x0000;
-			m_cel.pover_mask = pover == 2 ? 0x7fff : 0xffff;
+			m_cel.pover_force_high = pover == 2 ? 0x8000 : 0x0000;
+			m_cel.pover_mask = pover == 3 ? 0x7fff : 0xffff;
 
 			LOGCEL("        pover=%d plutpos=%d bgnd=%d noblk=%d pluta=%d\n"
 				, pover
@@ -984,16 +985,16 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 				// NOTE: [1] / [0] are P-bits settings, by default selectable with MSB of the decoder data.
 				// doc contradicts itself with the nibble format,
-				// cfr. pover == 2 aquawrld definitely wants low nibble = [0] sets pixc=1f003f00.
+				// cfr. pover == 2 aquawrld definitely wants high nibble = [1] sets pixc=1f003f00.
 
 				constexpr u8 df_table[4] = { 4, 1, 2, 3 };
 
 				for (int i = 0; i < 2; i++)
 				{
-					const u8 nibble = i * 16;
+					const u8 nibble = (1 - i) * 16;
 
 					// 31 / 15 1S: primary source (0=decoder 1=fb pixel)
-					//m_cel.pixc_1s[i] = BIT(m_cel.pixc, 15 + nibble);
+					m_cel.pixc_1s[i] = BIT(m_cel.pixc, 15 + nibble);
 
 					// MS: PMV source 00=CCB 01=decoder AMV, 10=decoder PMV & PDV 11=decoder PMV
 					m_cel.pixc_ms[i] = BIT(m_cel.pixc, 13 + nibble, 2);
@@ -1001,16 +1002,21 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 					m_cel.pixc_mf[i] = m_cel.pixc_ms[i] == 0 ? BIT(m_cel.pixc, 10 + nibble, 3) + 1 : 0;
 
 					// DF: sets PDV if MS != 2 (TBD)
-					m_cel.pixc_df[i] = df_table[BIT(m_cel.pixc, 8 + nibble, 2)];
+					m_cel.pixc_df[i] = m_cel.pixc_ms[i] != 2 ? df_table[BIT(m_cel.pixc, 8 + nibble, 2)] : 0;
 
 					// 23-22 / 7-6: 2S secondary source 00=0 01=CCB 10=fb pixel 11=from decoder
-					//m_cel.pixc_2s[i] = BIT(m_cel.pixc, 6 + nibble, 2);
+					m_cel.pixc_2s[i] = BIT(m_cel.pixc, 6 + nibble, 2);
 
 					// 21-17 / 5-1: AV secondary source starting value with 2S=1 (more settings inside ...)
-					//m_cel.pixc_av[i] = BIT(m_cel.pixc, 1 + nibble, 4);
+					m_cel.pixc_av[i] = BIT(m_cel.pixc, 1 + nibble, 4);
 
 					// 16 / 0: 2D secondary divider value (value + 1)
-					//m_cel.pixc_2d[i] = BIT(m_cel.pixc, 0 + nibble);
+					m_cel.pixc_2d[i] = BIT(m_cel.pixc, 0 + nibble);
+					LOGCEL("    P[%d]: 1S %d MS %d MF %d DF %d | 2S %d AV %d 2D %d\n"
+						, i
+						, m_cel.pixc_1s[i], m_cel.pixc_ms[i], m_cel.pixc_mf[i], m_cel.pixc_df[i]
+						, m_cel.pixc_2s[i], m_cel.pixc_av[i], m_cel.pixc_2d[i]
+					);
 				}
 			}
 
@@ -1377,7 +1383,7 @@ u32 madam_device::cel_decompress()
 	u32 tick_time = 1;
 	u32 source_ptr = m_cel.source_ptr;
 
-	const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
+	const u16 vcnt = ((m_cel.pre0 >> 6) & 0x3ff) + 1;
 	const bool uncoded = !!BIT(m_cel.pre0, 4);
 	const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
 
@@ -1655,7 +1661,7 @@ u32 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	// Elsewhere it mentions using an "Alternate Multiply" label ...
 	const u8 alt_multiply = ((byte_data & 0xe0) >> 5) + 1;
 
-	const u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+	const u16 src_data = (((m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1))) | m_cel.pover_force_high) & m_cel.pover_mask;;
 
 	const u16 dst_data = convert_8bpp_alt_multiply(src_data, alt_multiply);
 
@@ -1728,16 +1734,18 @@ u32 madam_device::get_pixel_packed(int x, int y, u16 woffset)
 
 u32 madam_device::convert_8bpp_alt_multiply(u32 src_data, u8 alt_multiply)
 {
-	u8 p = BIT(src_data, 15);
+	u8 p_mode = BIT(src_data, 15);
 	s16 r = (src_data & 0x7c00) >> 10;
 	s16 g = (src_data & 0x03e0) >> 5;
 	s16 b = (src_data & 0x001f) >> 0;
 
-	r = std::min((r * (alt_multiply + m_cel.pixc_mf[p])) >> m_cel.pixc_df[p], 0x1f);
-	g = std::min((g * (alt_multiply + m_cel.pixc_mf[p])) >> m_cel.pixc_df[p], 0x1f);
-	b = std::min((b * (alt_multiply + m_cel.pixc_mf[p])) >> m_cel.pixc_df[p], 0x1f);
+	const u8 pdv = m_cel.pixc_1s[p_mode] ? m_cel.pixc_2d[p_mode] : m_cel.pixc_df[p_mode];
 
-	return (p << 15) | (r << 10) | (g << 5) | b;
+	r = std::min((r * (alt_multiply + m_cel.pixc_mf[p_mode])) >> pdv, 0x1f);
+	g = std::min((g * (alt_multiply + m_cel.pixc_mf[p_mode])) >> pdv, 0x1f);
+	b = std::min((b * (alt_multiply + m_cel.pixc_mf[p_mode])) >> pdv, 0x1f);
+
+	return (p_mode << 15) | (r << 10) | (g << 5) | b;
 }
 
 
