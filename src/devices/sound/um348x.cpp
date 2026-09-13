@@ -49,16 +49,29 @@
 	distinct values across the two parts, matching the datasheet's count of
 	five mask tempos.
 
+	The 8 x 7 area
+	--------------
+	Identical on both parts, so fixed family logic rather than song data.
+	Entries 1 to 7 are one-hot and cover the seven bit positions exactly once;
+	entry 0 is the OR of entries 4 and 5. Read as counter preloads the one-hot
+	entries yield only the extreme divisors 1, 2 and 123 to 127, so it is not a
+	second tone table, and an exhaustive search over shift direction, feedback
+	taps, addressing and terminal state fits neither the duration ticks nor the
+	tempo multipliers better than chance. Its role is unresolved; nothing
+	audible depends on it.
+
 	What is NOT emulated
 	--------------------
 	- Songs whose multiplier could not be measured fall back to the most common
 	  value. Only three of the UM3482A's could be measured.
-	- One melody per part is rendered by the real chip in a staccato
-	  articulation: the output is re-struck once per tick, sounding for a
-	  fixed 1024 oscillator cycles at the head of each tick. Nothing in the
-	  note words marks which melody uses it, so it is not reproduced; the
-	  melody plays as sustained tones, correct in pitch and total length but
-	  not in texture.
+	- Mandolin articulation. The real part re-strikes the output once per tick,
+	  sounding for about 1024 oscillator cycles at the head of each tick. The
+	  header word says which song uses it and the device records that, but the
+	  texture is not synthesised: the song plays as sustained tones, right in
+	  pitch and total length. A first-cut burst model puts the edge count in
+	  the right range, 4394 against the capture's 4640 where sustained gives
+	  35195, but does not track the capture, so it is left out until it can be
+	  calibrated.
 	- The ROM dumps come from visual decapping. They are corroborated where the
 	  captures reach and unverified elsewhere.
 
@@ -79,6 +92,13 @@ constexpr u8  ROM_ROWS    = 64;
 constexpr u8  ROM_GROUPS  = 7;
 constexpr u8  REST_TONE   = 3;
 constexpr u8  CTRL_TONE   = 1;
+
+/*  A control word carries a timbre in its upper field instead of a duration.
+	Three values occur across the two dumps and the datasheet lists three
+	timbres. The mandolin selector is the one that costs no time; the other two
+	take the duration their field would give a note, measured at two song
+	boundaries in the UM3481A capture. */
+constexpr u8  TIMBRE_MANDOLIN = 4;
 
 constexpr u8 SUBCOLUMN_ORDER[8] = { 0, 1, 2, 3, 7, 6, 5, 4 };
 
@@ -176,7 +196,11 @@ ROM_START( um3481a )
 	ROM_REGION( 0x010, "tones", 0 ) // 16 entries of 7 bits, padded to bytes
 	ROM_LOAD( "um3481a_tones.bin",   0x000, 0x010, BAD_DUMP CRC(646cdaef) SHA1(48d45db842e2dd588b58ba6aa656c6496e514d23) )
 
-	ROM_REGION( 0x010, "unknown", 0 ) // 8 entries of 7 bits, padded to bytes, same as UM3482A
+	/*  8 entries of 7 bits, identical on both parts and so fixed family logic
+		rather than song data. Loaded only to record that it exists; nothing
+		reads it. Entries 1 to 7 are one-hot and cover the seven bit positions
+		exactly once, and entry 0 is the OR of entries 4 and 5. */
+	ROM_REGION( 0x008, "unknown", 0 )
 	ROM_LOAD( "unknown.bin",         0x000, 0x008, BAD_DUMP CRC(87a9efc4) SHA1(54ec7dea890dea8fd2aac85d7bee6db3c71d5db9) )
 ROM_END
 
@@ -214,6 +238,7 @@ um348x_device::um348x_device(const machine_config &mconfig, device_type type, co
 	m_sl(0),
 	m_as(0),
 	m_song(0),
+	m_timbre(0),
 	m_playing(false),
 	m_note_index(0),
 	m_note_start(0),
@@ -299,6 +324,23 @@ void um348x_device::device_start()
 	if (unknown)
 		logerror("tone codes with no divisor in the table: %04x; those notes will be silent\n", unknown);
 
+	/*  In both dumps every control word sits one past a song's opening rest.
+		Anything else is outside what has been measured, so say so; such a word
+		still gets its timed silence. */
+	for (u8 song = 0; song < MELODY_SLOTS; song++)
+	{
+		const u16 start = melody_start(song);
+		if (start > m_data_end)
+			continue;
+
+		u16 end = (song + 1 < MELODY_SLOTS) ? melody_start(song + 1) : TOTAL_NOTES;
+		if (end <= start || end > m_data_end + 1)
+			end = m_data_end + 1;
+		for (u16 i = start; i < end; i++)
+			if ((decode_word(m_notes->base(), i) & 0x0f) == CTRL_TONE && i != start + 1)
+				logerror("control word at %d is not the header of song %d\n", i, song + 1);
+	}
+
 	// One sample per oscillator cycle, so the emulated waveform lines up
 	// cycle for cycle with a logic capture of the real part.
 	m_stream = stream_alloc(0, 1, clock());
@@ -309,6 +351,7 @@ void um348x_device::device_start()
 	save_item(NAME(m_sl));
 	save_item(NAME(m_as));
 	save_item(NAME(m_song));
+	save_item(NAME(m_timbre));
 	save_item(NAME(m_playing));
 	save_item(NAME(m_note_index));
 	save_item(NAME(m_note_start));
@@ -436,6 +479,7 @@ void um348x_device::start_song()
 	m_note_start = start;
 	m_note_end = end;
 	m_playing = true;
+	m_timbre = 0;
 	m_out = 1;
 	start_word(start);
 }
@@ -449,17 +493,45 @@ void um348x_device::next_song()
 
 void um348x_device::start_word(u16 index)
 {
-	const u8 word = decode_word(m_notes->base(), index);
-	const u8 duration = (word >> 4) & 0x07;
-	const u8 tone     = word & 0x0f;
+	u8 tone;
 
-	m_note_index = index;
+	// The mandolin selector costs no time, so skip over it rather than
+	// scheduling a word of zero length
+	for ( ; ; index++)
+	{
+		if (index >= m_note_end || index >= TOTAL_NOTES)
+		{
+			m_playing = false;
+			m_divisor = 0;
+			return;
+		}
 
-	const bool opening_rest = (index == m_note_start) && (tone == REST_TONE);
-	const u32 units = opening_rest
-			? FIRST_REST_BASE_UNITS : u32(DURATION_TICKS[duration]) * m_multiplier;
+		const u8 word = decode_word(m_notes->base(), index);
+		const u8 duration = (word >> 4) & 0x07;
+		tone = word & 0x0f;
 
-	m_word_cycles = units * BASE_UNIT_CYCLES;
+		u32 units;
+		if ((index == m_note_start) && (tone == REST_TONE))
+		{
+			units = FIRST_REST_BASE_UNITS;
+		}
+		else if (tone == CTRL_TONE)
+		{
+			m_timbre = duration;
+			units = (duration == TIMBRE_MANDOLIN) ? 0 : u32(DURATION_TICKS[duration]) * m_multiplier;
+		}
+		else
+		{
+			units = u32(DURATION_TICKS[duration]) * m_multiplier;
+		}
+
+		if (units)
+		{
+			m_note_index = index;
+			m_word_cycles = units * BASE_UNIT_CYCLES;
+			break;
+		}
+	}
 
 	if (tone == REST_TONE || tone == CTRL_TONE)
 	{

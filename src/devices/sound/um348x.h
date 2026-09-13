@@ -63,6 +63,7 @@ private:
 	u8  m_as;
 
 	u8  m_song;             // where the select counter is pointing
+	u8  m_timbre;           // control field of the song's header word
 
 	// playback state
 	bool m_playing;
