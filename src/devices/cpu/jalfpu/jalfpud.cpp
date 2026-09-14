@@ -8,7 +8,7 @@
 
 namespace {
 
-const u8 load_sel[6] = { 0x3, 0x7, 0xb, 0xd, 0xe, 0xf };
+constexpr u8 LOAD_SEL[6] = { 0x3, 0x7, 0xb, 0xd, 0xe, 0xf };
 
 std::string reg(unsigned r)
 {
@@ -55,7 +55,7 @@ offs_t jaleco_fpu_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	switch (opc)
 	{
 	case 0x0: case 0x1: case 0x2: case 0x3: case 0x4: case 0x5:
-		util::stream_format(stream, "ld    %s,#$%04x", reg(load_sel[opc]), arg);
+		util::stream_format(stream, "ld    %s,#$%04x", reg(LOAD_SEL[opc]), arg);
 		break;
 
 	case 0x6: case 0x7:

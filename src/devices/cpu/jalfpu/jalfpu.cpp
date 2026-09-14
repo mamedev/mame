@@ -38,9 +38,9 @@ DEFINE_DEVICE_TYPE(JALECO_FPU, jaleco_fpu_device, "jalfpu", "Jaleco FPU math cop
 
 namespace {
 
-const u8 load_sel[6] = { 0x3, 0x7, 0xb, 0xd, 0xe, 0xf };
-const u8 group_reg[6] = { 0x6, 0x5, 0x4, 0x2, 0x1, 0x0 };
-const u16 mode_base[8] = { 0x000, 0x000, 0x100, 0x200, 0x000, 0x300, 0x300, 0x600 };
+constexpr u8 LOAD_SEL[6] = { 0x3, 0x7, 0xb, 0xd, 0xe, 0xf };
+constexpr u8 GROUP_REG[6] = { 0x6, 0x5, 0x4, 0x2, 0x1, 0x0 };
+constexpr u16 MODE_BASE[8] = { 0x000, 0x000, 0x100, 0x200, 0x000, 0x300, 0x300, 0x600 };
 
 } // anonymous namespace
 
@@ -222,7 +222,7 @@ u16 jaleco_fpu_device::mem_addr(u8 mode, u8 base)
 	u8 const sel = (mode >> 2) & 7;
 	if (!sel)
 		LOGUNIMPL("%03x: memory mode %02x\n", m_ppc, mode);
-	u16 const addr = (m_s[base] + mode_base[sel]) & 0xfff;
+	u16 const addr = (m_s[base] + MODE_BASE[sel]) & 0xfff;
 	if (BIT(mode, 1))
 		m_s[base] += BIT(mode, 0) ? -1 : 1;
 	return addr;
@@ -244,7 +244,7 @@ void jaleco_fpu_device::execute_one(u32 op)
 	switch (opc)
 	{
 	case 0x0: case 0x1: case 0x2: case 0x3: case 0x4: case 0x5:
-		m_s[load_sel[opc]] = arg;
+		m_s[LOAD_SEL[opc]] = arg;
 		break;
 
 	case 0x6:
@@ -473,7 +473,7 @@ void jaleco_fpu_device::execute_one(u32 op)
 		{
 			if (!BIT(mask, i))
 				continue;
-			u8 const r = group_reg[i];
+			u8 const r = GROUP_REG[i];
 			switch (fn)
 			{
 			case 0x1e: case 0x1f:
