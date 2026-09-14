@@ -16,7 +16,9 @@ public:
 		JALFPU_PC = 1,
 		JALFPU_S0, JALFPU_S1, JALFPU_S2, JALFPU_S3, JALFPU_S4, JALFPU_S5, JALFPU_S6, JALFPU_S7,
 		JALFPU_S8, JALFPU_S9, JALFPU_SA, JALFPU_SB, JALFPU_SC, JALFPU_SD, JALFPU_SE, JALFPU_SF,
-		JALFPU_C6, JALFPU_C7, JALFPU_SP, JALFPU_CTRL
+		JALFPU_C6, JALFPU_C7, JALFPU_SP, JALFPU_CTRL,
+		JALFPU_SIGN, JALFPU_STK0, JALFPU_STK1, JALFPU_STK2, JALFPU_STK3,
+		JALFPU_DELAY, JALFPU_DTGT
 	};
 
 	jaleco_fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -51,7 +53,8 @@ private:
 	u16 m_pc;
 	u16 m_ppc;
 	u16 m_s[16];
-	u16 m_c6, m_c7;
+	u16 m_c6;
+	u16 m_c7;
 	u8 m_flags;
 	u16 m_stack[4];
 	u8 m_sp;
