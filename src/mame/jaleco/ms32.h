@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/jalfpu/jalfpu.h"
 #include "cpu/v60/v60.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -104,6 +105,7 @@ protected:
 
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
+	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) { }
 
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
@@ -179,7 +181,12 @@ public:
 		ms32_state(mconfig, type, tag)
 		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
 		, m_io_analog(*this, "AN%u", 0U)
-		// TODO: COPROs
+		, m_fpu(*this, "fpu%u", 0U)
+		, m_fpu_data(*this, "fpu%u_data", 0U, 0x1200U, ENDIANNESS_LITTLE)
+		, m_fpu_prg(*this, "fpu%u_prg", 0U, 0x1000U, ENDIANNESS_LITTLE)
+		, m_road_ctrl(*this, "road_ctrl")
+		, m_road_lineram(*this, "road_lineram", 0x10000, ENDIANNESS_LITTLE)
+		, m_io_debug(*this, "DEBUG")
 	{}
 
 	void f1superb(machine_config &config) ATTR_COLD;
@@ -187,19 +194,29 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) override;
 private:
 	memory_share_creator<u16> m_road_vram;
 
 	required_ioport_array<3> m_io_analog;
+	required_device_array<jaleco_fpu_device, 2> m_fpu;
+	memory_share_array_creator<u16, 2> m_fpu_data;
+	memory_share_array_creator<u32, 2> m_fpu_prg;
+	required_shared_ptr<u32> m_road_ctrl;
+	memory_share_creator<u16> m_road_lineram;
+	required_ioport m_io_debug;
 
 	tilemap_t* m_extra_tilemap;
 
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 
-	void ms32_irq2_guess_w(u32 data);
-	void ms32_irq5_guess_w(u32 data);
-
 	void f1superb_map(address_map &map) ATTR_COLD;
+	u32 fpu_prg_r(int unit, offs_t offset);
+	void fpu_prg_w(int unit, offs_t offset, u32 data, u32 mem_mask);
+	void fpu0_prg_map(address_map &map) ATTR_COLD;
+	void fpu0_data_map(address_map &map) ATTR_COLD;
+	void fpu1_prg_map(address_map &map) ATTR_COLD;
+	void fpu1_data_map(address_map &map) ATTR_COLD;
 
 	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 road_vram_r16(offs_t offset);

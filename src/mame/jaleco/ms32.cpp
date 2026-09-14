@@ -701,16 +701,6 @@ u16 ms32_f1superbattle_state::road_vram_r16(offs_t offset)
 	return m_road_vram[offset];
 }
 
-void ms32_f1superbattle_state::ms32_irq2_guess_w(u32 data)
-{
-	irq_raise(2, true);
-}
-
-void ms32_f1superbattle_state::ms32_irq5_guess_w(u32 data)
-{
-	irq_raise(5, true);
-}
-
 u32 ms32_f1superbattle_state::analog_r()
 {
 	int a,b,c,d;
@@ -733,32 +723,69 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
 	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_f1superbattle_state::analog_r)).nopw(); // writes 7-led seg at very least
 
-	map(0xfce00800, 0xfce0085f).ram(); // ROZ0 control register (mirrored from 0x400?)
+	map(0xfce00800, 0xfce0085f).ram().share(m_road_ctrl);
 
-	/* these two are almost certainly wrong, they just let you see what
-	   happens if you generate the FPU ints without breaking other games */
-//  map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_f1superbattle_state::ms32_irq5_guess_w));
 	// bit 1: steering shock
 	// bit 0: seat motor
-//  map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_f1superbattle_state::ms32_irq2_guess_w));
+//  map(0xfd0f0000, 0xfd0f0003)
 
-	// Note: it is unknown how COPRO irqs actually acks,
-	// most likely candidate is a 0x06 ping at both $fd1024c8 / $fd1424c8
-	// irq_2: 0xffe00878 (really unused)
-	// irq_5: 0xffe008ac
-	// irq_7: 0xffe008ea (basically identical to irq_5)
-	// COPRO 1
-	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
-	map(0xfd104000, 0xfd105fff).ram(); // uploads data here
+	map(0xfd100000, 0xfd1023ff).lrw16(
+			NAME([this] (offs_t offset) { return m_fpu_data[0][offset]; }),
+			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_fpu_data[0][offset]); })).umask32(0x0000ffff);
+	map(0xfd102400, 0xfd1024ff).rw(m_fpu[0], FUNC(jaleco_fpu_device::host_r), FUNC(jaleco_fpu_device::host_w)).umask32(0x0000ffff);
+	map(0xfd104000, 0xfd105fff).lrw32(
+			NAME([this] (offs_t offset) { return fpu_prg_r(0, offset); }),
+			NAME([this] (offs_t offset, u32 data, u32 mem_mask) { fpu_prg_w(0, offset, data, mem_mask); }));
 
-	// COPRO 2
-	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
-	map(0xfd144000, 0xfd145fff).ram(); // same data here
+	map(0xfd140000, 0xfd1423ff).lrw16(
+			NAME([this] (offs_t offset) { return m_fpu_data[1][offset]; }),
+			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_fpu_data[1][offset]); })).umask32(0x0000ffff);
+	map(0xfd142400, 0xfd1424ff).rw(m_fpu[1], FUNC(jaleco_fpu_device::host_r), FUNC(jaleco_fpu_device::host_w)).umask32(0x0000ffff);
+	map(0xfd144000, 0xfd145fff).lrw32(
+			NAME([this] (offs_t offset) { return fpu_prg_r(1, offset); }),
+			NAME([this] (offs_t offset, u32 data, u32 mem_mask) { fpu_prg_w(1, offset, data, mem_mask); }));
 //  map(0xfd440000, 0xfd47ffff).ram(); // color?
 
 	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_f1superbattle_state::road_vram_r16), FUNC(ms32_f1superbattle_state::road_vram_w16)).umask32(0x0000ffff);
-	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
+	map(0xfde00000, 0xfde1ffff).lrw16(
+			NAME([this] (offs_t offset) { return m_road_lineram[offset]; }),
+			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_road_lineram[offset]); })).umask32(0x0000ffff);
 //  map(0xfe202000, 0xfe2fffff).ram(); // vram?
+}
+
+u32 ms32_f1superbattle_state::fpu_prg_r(int unit, offs_t offset)
+{
+	u32 const word = m_fpu_prg[unit][offset >> 1];
+	return BIT(offset, 0) ? (word & 0xffff) : (word >> 16);
+}
+
+void ms32_f1superbattle_state::fpu_prg_w(int unit, offs_t offset, u32 data, u32 mem_mask)
+{
+	u32 &word = m_fpu_prg[unit][offset >> 1];
+	if (BIT(offset, 0))
+		word = (word & 0xf0000) | (data & mem_mask & 0xffff) | (word & ~mem_mask & 0xffff);
+	else
+		word = (word & 0x0ffff) | ((((word >> 16) & ~mem_mask) | (data & mem_mask)) & 0xf) << 16;
+}
+
+void ms32_f1superbattle_state::fpu0_prg_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram().share("fpu0_prg");
+}
+
+void ms32_f1superbattle_state::fpu0_data_map(address_map &map)
+{
+	map(0x000, 0x8ff).ram().share("fpu0_data");
+}
+
+void ms32_f1superbattle_state::fpu1_prg_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram().share("fpu1_prg");
+}
+
+void ms32_f1superbattle_state::fpu1_data_map(address_map &map)
+{
+	map(0x000, 0x8ff).ram().share("fpu1_data");
 }
 
 /* F1 Super Battle speculation from nuapete
@@ -1531,6 +1558,9 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPSETTING(    0x0c, "7" )
 	PORT_DIPSETTING(    0x0e, "8" )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DEBUG")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Debug: Hide Road Layer") PORT_CODE(KEYCODE_O) PORT_TOGGLE
 INPUT_PORTS_END
 
 /********** GFX DECODE **********/
@@ -1758,6 +1788,17 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 {
 	ms32(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
+
+	// clock unknown
+	JALECO_FPU(config, m_fpu[0], XTAL(48'000'000) / 8);
+	m_fpu[0]->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::fpu0_prg_map);
+	m_fpu[0]->set_addrmap(AS_DATA, &ms32_f1superbattle_state::fpu0_data_map);
+	m_fpu[0]->irq_cb().set([this] (int state) { irq_raise(5, state); });
+
+	JALECO_FPU(config, m_fpu[1], XTAL(48'000'000) / 8);
+	m_fpu[1]->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::fpu1_prg_map);
+	m_fpu[1]->set_addrmap(AS_DATA, &ms32_f1superbattle_state::fpu1_data_map);
+	m_fpu[1]->irq_cb().set([this] (int state) { irq_raise(2, state); });
 
 	m_gfxdecode->set_info(gfx_f1superb);
 }

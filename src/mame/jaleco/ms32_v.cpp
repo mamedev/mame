@@ -101,6 +101,40 @@ void ms32_f1superbattle_state::video_start()
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 }
 
+void ms32_f1superbattle_state::draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front)
+{
+	if (BIT(m_io_debug->read(), 0))
+		return;
+
+	int const startx = (m_road_ctrl[0x00/4] & 0xffff) | ((m_road_ctrl[0x04/4] & 3) << 16);
+	int const starty = (m_road_ctrl[0x08/4] & 0xffff) | ((m_road_ctrl[0x0c/4] & 3) << 16);
+	int const offsx = m_road_ctrl[0x30/4] + (m_road_ctrl[0x38/4] & 1) * 0x400;
+	int const offsy = m_road_ctrl[0x34/4] + (m_road_ctrl[0x3c/4] & 1) * 0x400;
+
+	rectangle clip = cliprect;
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 const *const line = &m_road_lineram[8 * (y & 0xff)];
+		int const start2x = util::sext((line[0] & 0xffff) | ((line[1] & 3) << 16), 18);
+		int const start2y = util::sext((line[2] & 0xffff) | ((line[3] & 3) << 16), 18);
+		int const incxx = util::sext((line[4] & 0xffff) | ((line[5] & 1) << 16), 17);
+		int const incxy = util::sext((line[6] & 0xffff) | ((line[7] & 1) << 16), 17);
+
+		int const row = (start2y + util::sext(starty, 18) + offsy) & 0x3ff;
+		if (!m_road_vram[row * 2])
+			continue;
+		if ((((m_road_vram[row * 2 + 1] >> 4) & 0xf) < 4) != front)
+			continue;
+
+		clip.min_y = clip.max_y = y;
+		m_extra_tilemap->draw_roz(screen, bitmap, clip,
+				(start2x + util::sext(startx, 18) + offsx) << 16, (start2y + util::sext(starty, 18) + offsy) << 16,
+				incxx << 8, incxy << 8, 0, 0,
+				1,
+				0, 0);
+	}
+}
+
 /********** PALETTE WRITES **********/
 
 
@@ -399,6 +433,8 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	//popmessage("%02x %02x %02x %d %d %d",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2], asc_pri, scr_pri, rot_pri);
 
+	draw_extra_layers(screen, m_temp_bitmap_tilemaps, cliprect, false);
+
 	// tile-tile mixing
 	for(int prin=0;prin<4;prin++)
 	{
@@ -416,7 +452,10 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			}
 		}
 		else if(asc_pri == prin)
+		{
+			draw_extra_layers(screen, m_temp_bitmap_tilemaps, cliprect, true);
 			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		}
 	}
 
 	// tile-sprite mixing
