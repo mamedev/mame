@@ -177,6 +177,7 @@ public:
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void pet64(machine_config &config);
+	void cia_config(machine_config &config, int tod_clock);
 	void c64_mem(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
 	void vic_videoram_map(address_map &map) ATTR_COLD;
@@ -1498,6 +1499,35 @@ void c64_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
+//  cia_config - wire up the two CIAs
+//-------------------------------------------------
+
+//  Split out from the machine configs so the 64C, which fits a later CIA, can
+//  swap the devices and keep one copy of the wiring.
+
+void c64_state::cia_config(machine_config &config, int tod_clock)
+{
+	m_cia1->set_tod_clock(tod_clock);
+	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
+	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
+	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
+	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
+	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
+
+	m_cia2->set_tod_clock(tod_clock);
+	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
+	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
+	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
+	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
+	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
+	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
+	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
+	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+}
+
+
+//-------------------------------------------------
 //  machine_config( ntsc )
 //-------------------------------------------------
 
@@ -1544,24 +1574,8 @@ void c64_state::ntsc(machine_config &config)
 	PLS100(config, m_pla);
 
 	MOS6526(config, m_cia1, XTAL(14'318'181)/14);
-	m_cia1->set_tod_clock(60);
-	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
-	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
-	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
-	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
-	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
-	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
-
 	MOS6526(config, m_cia2, XTAL(14'318'181)/14);
-	m_cia2->set_tod_clock(60);
-	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
-	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
-	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
-	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
-	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
-	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
-	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
-	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+	cia_config(config, 60);
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
 	m_cassette->read_handler().set(FUNC(c64_state::cass_rd_w));
@@ -1671,6 +1685,9 @@ void sx64_state::ntsc_dx(machine_config &config)
 void c64c_state::ntsc_c(machine_config &config)
 {
 	ntsc(config);
+	MOS8521(config.replace(), m_cia1, XTAL(14'318'181)/14);
+	MOS8521(config.replace(), m_cia2, XTAL(14'318'181)/14);
+	cia_config(config, 60);
 	MOS8580(config.replace(), m_sid, XTAL(14'318'181)/14);
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
@@ -1725,24 +1742,8 @@ void c64_state::pal(machine_config &config)
 	PLS100(config, m_pla);
 
 	MOS6526(config, m_cia1, XTAL(17'734'472)/18);
-	m_cia1->set_tod_clock(50);
-	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
-	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
-	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
-	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
-	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
-	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
-
 	MOS6526(config, m_cia2, XTAL(17'734'472)/18);
-	m_cia2->set_tod_clock(50);
-	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
-	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
-	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
-	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
-	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
-	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
-	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
-	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+	cia_config(config, 50);
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
 	m_cassette->read_handler().set(FUNC(c64_state::cass_rd_w));
@@ -1828,6 +1829,9 @@ void sx64_state::pal_sx(machine_config &config)
 void c64c_state::pal_c(machine_config &config)
 {
 	pal(config);
+	MOS8521(config.replace(), m_cia1, XTAL(17'734'472)/18);
+	MOS8521(config.replace(), m_cia2, XTAL(17'734'472)/18);
+	cia_config(config, 50);
 	MOS8580(config.replace(), m_sid, XTAL(17'734'472)/18);
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
@@ -1881,7 +1885,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	// devices
 	PLS100(config, m_pla);
 
-	MOS6526(config, m_cia1, XTAL(17'734'472)/18);
+	MOS8521(config, m_cia1, XTAL(17'734'472)/18);
 	m_cia1->set_tod_clock(50);
 	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
@@ -1891,7 +1895,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_cia1->pb_rd_callback().set(FUNC(c64gs_state::cia1_pb_r));
 	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
 
-	MOS6526(config, m_cia2, XTAL(17'734'472)/18);
+	MOS8521(config, m_cia2, XTAL(17'734'472)/18);
 	m_cia2->set_tod_clock(50);
 	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
 	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
