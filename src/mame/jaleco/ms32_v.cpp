@@ -99,6 +99,8 @@ void ms32_f1superbattle_state::video_start()
 	ms32_state::video_start();
 
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+	std::fill(std::begin(m_road_line_class), std::end(m_road_line_class), 0);
+	save_item(NAME(m_road_line_class));
 }
 
 void ms32_f1superbattle_state::draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front)
@@ -114,6 +116,8 @@ void ms32_f1superbattle_state::draw_extra_layers(screen_device &screen, bitmap_i
 	rectangle clip = cliprect;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		if (front)
+			m_road_line_class[y & 0xff] = 0;
 		u16 const *const line = &m_road_lineram[8 * (y & 0xff)];
 		int const start2x = util::sext((line[0] & 0xffff) | ((line[1] & 3) << 16), 18);
 		int const start2y = util::sext((line[2] & 0xffff) | ((line[3] & 3) << 16), 18);
@@ -123,15 +127,42 @@ void ms32_f1superbattle_state::draw_extra_layers(screen_device &screen, bitmap_i
 		int const row = (start2y + util::sext(starty, 18) + offsy) & 0x3ff;
 		if (!m_road_vram[row * 2])
 			continue;
-		if ((((m_road_vram[row * 2 + 1] >> 4) & 0xf) < 4) != front)
+		u8 const road_class = (m_road_vram[row * 2 + 1] >> 4) & 0xf;
+		if ((road_class < 4) != front)
 			continue;
+		if (front)
+			m_road_line_class[y & 0xff] = road_class;
 
 		clip.min_y = clip.max_y = y;
 		m_extra_tilemap->draw_roz(screen, bitmap, clip,
 				(start2x + util::sext(startx, 18) + offsx) << 16, (start2y + util::sext(starty, 18) + offsy) << 16,
 				incxx << 8, incxy << 8, 0, 0,
 				1,
-				0, 0);
+				0, front ? (1 << 3) : 0);
+	}
+}
+
+void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	pen_t const *const paldata = m_palette->pens();
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 const *const tile = &m_temp_bitmap_tilemaps.pix(y);
+		u8 const *const tilepri = &screen.priority().pix(y);
+		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
+		u32 *const dst = &bitmap.pix(y);
+		u8 const road_class = m_road_line_class[y & 0xff];
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			u16 const sprdat = spr[x] & 0x0fff;
+			u8 const sprpri = (spr[x] & 0xf000) >> 8;
+			bool sprite_on_top = (sprdat & 0xff) && !(tilepri[x] & (1 << 2));
+			if (sprite_on_top && (tilepri[x] & (1 << 3)))
+				sprite_on_top = (m_priram[0x0c00 | sprpri | road_class] & 0xf0) != 0;
+			dst[x] = paldata[sprite_on_top ? sprdat : tile[x]];
+		}
 	}
 }
 
@@ -458,6 +489,13 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		}
 	}
 
+	mix_layers(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 	// tile-sprite mixing
 	// TODO: spaghetti code
 	// TODO: complete guesswork and missing many spots
@@ -722,8 +760,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			}
 		}
 	}
-
-	return 0;
 }
 
 void ms32_state::screen_vblank(int state)

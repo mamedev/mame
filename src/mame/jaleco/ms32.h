@@ -71,11 +71,11 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_ymf(*this, "ymf")
+		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
 		, m_roz_ctrl(*this, "roz_ctrl")
 		, m_tx_scroll(*this, "tx_scroll")
 		, m_bg_scroll(*this, "bg_scroll")
 		, m_mahjong_input_select(*this, "mahjong_select")
-		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
 		, m_palram(*this, "palram", 0x20000, ENDIANNESS_LITTLE)
 		, m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE)
 		, m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE)
@@ -106,6 +106,11 @@ protected:
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
 	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) { }
+	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	memory_share_creator<u8> m_priram;
+	bitmap_ind16 m_temp_bitmap_tilemaps;
+	bitmap_ind16 m_temp_bitmap_sprites;
 
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
@@ -115,7 +120,6 @@ private:
 	required_shared_ptr<u32> m_tx_scroll;
 	required_shared_ptr<u32> m_bg_scroll;
 	required_shared_ptr<u32> m_mahjong_input_select;
-	memory_share_creator<u8> m_priram;
 	memory_share_creator<u16> m_palram;
 	memory_share_creator<u16> m_rozram;
 	memory_share_creator<u16> m_lineram;
@@ -134,8 +138,6 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
 	u32 m_tilemaplayoutcontrol;
-	bitmap_ind16 m_temp_bitmap_tilemaps;
-	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind8 m_temp_bitmap_sprites_pri;
 	u32 m_brt[4];
 	int m_brt_r;
@@ -195,6 +197,7 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) override;
+	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 private:
 	memory_share_creator<u16> m_road_vram;
 
@@ -205,6 +208,7 @@ private:
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
 	required_ioport m_io_debug;
+	u8 m_road_line_class[256];
 
 	tilemap_t* m_extra_tilemap;
 
