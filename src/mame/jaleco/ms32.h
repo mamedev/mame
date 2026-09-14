@@ -71,7 +71,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_ymf(*this, "ymf")
-		, m_txram_view(nullptr)
 		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
 		, m_roz_ctrl(*this, "roz_ctrl")
 		, m_tx_scroll(*this, "tx_scroll")
@@ -112,9 +111,9 @@ protected:
 	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
 	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
 	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
-	void init_txram_latch(std::vector<u16> &latch) { latch.assign(m_txram.length(), 0); m_txram_view = latch.data(); }
-	void latch_txram(std::vector<u16> &latch);
-	u16 const *m_txram_view;
+	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
+	u16 const *txram() const { return &m_txram[0]; }
+	size_t txram_length() const { return m_txram.length(); }
 	u16 const *rozram_ptr() const { return &m_rozram[0]; }
 	u16 const *roz_lineram() const { return &m_lineram[0]; }
 	u32 const *roz_ctrl() const { return &m_roz_ctrl[0]; }
@@ -206,6 +205,7 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	virtual tilemap_t &create_tx_tilemap() override ATTR_COLD;
 	virtual tilemap_t &create_roz_tilemap() override ATTR_COLD;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect) override { }
@@ -229,6 +229,7 @@ private:
 
 	tilemap_t* m_extra_tilemap;
 
+	TILE_GET_INFO_MEMBER(get_latched_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 
 	void f1superb_map(address_map &map) ATTR_COLD;

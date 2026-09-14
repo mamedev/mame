@@ -22,9 +22,8 @@ priority should be given to
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 {
-	u16 const *const ram = m_txram_view ? m_txram_view : &m_txram[0];
-	const int tileno = ram[tile_index *2]   & 0xffff;
-	const int colour = ram[tile_index *2+1] & 0x000f;
+	const int tileno = m_txram[tile_index *2]   & 0xffff;
+	const int colour = m_txram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(2,tileno,colour,0);
 }
@@ -45,6 +44,14 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileinfo.set(1,tileno,colour,0);
 }
 
+TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_latched_tx_tile_info)
+{
+	const int tileno = m_txram_latch[tile_index *2]   & 0xffff;
+	const int colour = m_txram_latch[tile_index *2+1] & 0x000f;
+
+	tileinfo.set(2,tileno,colour,0);
+}
+
 TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
 {
 	const int tileno = m_road_vram[tile_index *2]   & 0xffff;
@@ -57,7 +64,7 @@ TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
 
 void ms32_state::video_start()
 {
-	m_tx_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_tx_tile_info)),  TILEMAP_SCAN_ROWS,  8, 8,  64, 64);
+	m_tx_tilemap     = &create_tx_tilemap();
 	m_bg_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16,  64, 64);
 	// alt layout, controller by register
 	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16);
@@ -95,9 +102,19 @@ void ms32_state::video_start()
 	save_item(NAME(m_brt_b));
 }
 
+tilemap_t &ms32_state::create_tx_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+}
+
 tilemap_t &ms32_state::create_roz_tilemap()
 {
 	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+}
+
+tilemap_t &ms32_f1superbattle_state::create_tx_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_latched_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 tilemap_t &ms32_f1superbattle_state::create_roz_tilemap()
@@ -117,7 +134,7 @@ void ms32_f1superbattle_state::video_start()
 	m_screen->register_screen_bitmap(m_layer_road);
 	m_screen->register_screen_bitmap(m_layer_roz);
 
-	init_txram_latch(m_txram_latch);
+	m_txram_latch.assign(txram_length(), 0);
 	save_item(NAME(m_txram_latch));
 	std::fill(std::begin(m_road_line_colour), std::end(m_road_line_colour), 0);
 	std::fill(std::begin(m_roz_line_colour), std::end(m_roz_line_colour), 0);
@@ -818,15 +835,6 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 				}
 			}
 		}
-	}
-}
-
-void ms32_state::latch_txram(std::vector<u16> &latch)
-{
-	if (!std::equal(latch.begin(), latch.end(), &m_txram[0]))
-	{
-		std::copy_n(&m_txram[0], latch.size(), latch.begin());
-		m_tx_tilemap->mark_all_dirty();
 	}
 }
 

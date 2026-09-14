@@ -768,8 +768,11 @@ void ms32_f1superbattle_state::fpu_prg_w(int unit, offs_t offset, u32 data, u32 
 
 void ms32_f1superbattle_state::f1superb_field_irq_w(int state)
 {
-	if (state)
-		latch_txram(m_txram_latch);
+	if (state && !std::equal(m_txram_latch.begin(), m_txram_latch.end(), txram()))
+	{
+		std::copy_n(txram(), m_txram_latch.size(), m_txram_latch.begin());
+		tx_tilemap()->mark_all_dirty();
+	}
 	field_irq_w(state);
 }
 
