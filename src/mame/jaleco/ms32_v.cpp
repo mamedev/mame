@@ -136,8 +136,6 @@ void ms32_f1superbattle_state::video_start()
 
 	m_txram_latch.assign(txram_length(), 0);
 	save_item(NAME(m_txram_latch));
-	std::fill(std::begin(m_road_line_colour), std::end(m_road_line_colour), 0);
-	std::fill(std::begin(m_roz_line_colour), std::end(m_roz_line_colour), 0);
 }
 
 void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour)
@@ -194,8 +192,10 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 
 	tx_tilemap()->draw(screen, m_layer_tx, cliprect, 0, 0);
 	bg_layer_tilemap()->draw(screen, m_layer_bg, cliprect, 0, 0);
-	draw_line_plane(screen, m_layer_road, cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], true, m_road_line_colour);
-	draw_line_plane(screen, m_layer_roz, cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), false, m_roz_line_colour);
+	u16 road_line_colour[256] = { };
+	u16 roz_line_colour[256] = { };
+	draw_line_plane(screen, m_layer_road, cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], true, road_line_colour);
+	draw_line_plane(screen, m_layer_roz, cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), false, roz_line_colour);
 
 	pen_t const *const paldata = m_palette->pens();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -206,8 +206,8 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 		u16 const *const road = &m_layer_road.pix(y);
 		u16 const *const roz = &m_layer_roz.pix(y);
 		u32 *const dst = &bitmap.pix(y);
-		u16 const road_depth = (m_road_line_colour[y & 0xff] >> 4) & 7;
-		u16 const roz_depth = (m_roz_line_colour[y & 0xff] >> 4) & 7;
+		u16 const road_depth = (road_line_colour[y & 0xff] >> 4) & 7;
+		u16 const roz_depth = (roz_line_colour[y & 0xff] >> 4) & 7;
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

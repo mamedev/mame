@@ -219,8 +219,6 @@ private:
 	memory_share_array_creator<u32, 2> m_fpu_prg;
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
-	u16 m_road_line_colour[256];
-	u16 m_roz_line_colour[256];
 	std::vector<u16> m_txram_latch;
 	bitmap_ind16 m_layer_tx;
 	bitmap_ind16 m_layer_bg;
