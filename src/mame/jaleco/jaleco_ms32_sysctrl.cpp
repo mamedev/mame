@@ -26,7 +26,7 @@
     - upper address line seems unconnected by 68k,
       and is it a mystery how watchdog is supposed to route here and assuming
       it is and not actually disabled by pin.
-    - network/COPROs irq connections, specifically for f1superb;
+    - network irq connection for f1superb;
     - actual chip name;
 
     BTANBs:
@@ -182,6 +182,7 @@ TIMER_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::flush_scanline_timer)
 
 	// 30 Hz irq
 	// TODO: unknown mechanics where this happens, is it even tied to scanline?
+	// f1superb needs it on the last active line (text layer is updated from this handler)
 	if (current_scanline == (m_field_irq_at_vblank ? m_crtc.vert_display - 1 : 0) && m_screen->frame_number() & 1)
 		m_invert_vblank_lines ? m_vblank_cb(1) : m_field_cb(1);
 

@@ -12,10 +12,12 @@
     two loop counters c6/c7, flags Z N C V.
 
     TODO:
-    - class d operations (register group, mask in bits 9-4)
-    - mul variants 1c-1e and the m field, divide remainder, unknown fn values
-    - memory addressing mode 0, condition codes 1, 9, a, b
-    - clock, second interrupt output, host registers other than s0-sf/pc/ctrl
+    - operations the F-1 program never uses are logged, not implemented
+      (unknown fn values, register group ops other than clear/latch/saturate,
+      control words other than halt)
+    - memory addressing selector 0, base of selector 5 unverified
+    - clock, second interrupt output (host ROM names "fpu 0-1"/"fpu 1-0"),
+      host registers other than s0-sf/pc/ctrl
 */
 
 #include "emu.h"
@@ -414,6 +416,7 @@ void jaleco_fpu_device::execute_one(u32 op)
 			u16 const v = m_s[a];
 			m_s[b] = BIT(v, 15) ? -v : v;
 			set_nz(m_s[b]);
+			// N reflects the input being positive; matches the host ROM's projected Y table
 			m_flags = (m_flags & ~F_N) | ((s16(v) > 0) ? F_N : 0);
 			break;
 		}
