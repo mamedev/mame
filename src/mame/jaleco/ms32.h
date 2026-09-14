@@ -73,14 +73,14 @@ public:
 		, m_ymf(*this, "ymf")
 		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
 		, m_roz_ctrl(*this, "roz_ctrl")
+		, m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE)
+		, m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE)
+		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_tx_scroll(*this, "tx_scroll")
 		, m_bg_scroll(*this, "bg_scroll")
 		, m_mahjong_input_select(*this, "mahjong_select")
 		, m_palram(*this, "palram", 0x20000, ENDIANNESS_LITTLE)
-		, m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE)
-		, m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE)
 		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
-		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
 		, m_io_mj(*this, "KEY%u", 0U)
 	{ }
@@ -112,14 +112,13 @@ protected:
 	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
 	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
 	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
-	u16 const *txram() const { return &m_txram[0]; }
-	size_t txram_length() const { return m_txram.length(); }
-	u16 const *rozram_ptr() const { return &m_rozram[0]; }
-	u16 const *roz_lineram() const { return &m_lineram[0]; }
-	u32 const *roz_ctrl() const { return &m_roz_ctrl[0]; }
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 
 	memory_share_creator<u8> m_priram;
+	required_shared_ptr<u32> m_roz_ctrl;
+	memory_share_creator<u16> m_rozram;
+	memory_share_creator<u16> m_lineram;
+	memory_share_creator<u16> m_txram;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
 
@@ -127,15 +126,11 @@ protected:
 	void ms32_sound_map(address_map &map) ATTR_COLD;
 
 private:
-	required_shared_ptr<u32> m_roz_ctrl;
 	required_shared_ptr<u32> m_tx_scroll;
 	required_shared_ptr<u32> m_bg_scroll;
 	required_shared_ptr<u32> m_mahjong_input_select;
 	memory_share_creator<u16> m_palram;
-	memory_share_creator<u16> m_rozram;
-	memory_share_creator<u16> m_lineram;
 	memory_share_creator<u16> m_sprram;
-	memory_share_creator<u16> m_txram;
 	memory_share_creator<u16> m_bgram;
 	optional_ioport_array<5> m_io_mj;
 
@@ -209,7 +204,7 @@ protected:
 	virtual tilemap_t &create_roz_tilemap() override ATTR_COLD;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect) override { }
-	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour);
+
 private:
 	memory_share_creator<u16> m_road_vram;
 
@@ -226,6 +221,8 @@ private:
 	bitmap_ind16 m_layer_roz;
 
 	tilemap_t* m_extra_tilemap;
+
+	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour);
 
 	TILE_GET_INFO_MEMBER(get_latched_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);

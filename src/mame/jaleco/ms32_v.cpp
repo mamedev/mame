@@ -134,7 +134,7 @@ void ms32_f1superbattle_state::video_start()
 	m_screen->register_screen_bitmap(m_layer_road);
 	m_screen->register_screen_bitmap(m_layer_roz);
 
-	m_txram_latch.assign(txram_length(), 0);
+	m_txram_latch.assign(m_txram.length(), 0);
 	save_item(NAME(m_txram_latch));
 }
 
@@ -195,7 +195,7 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 	u16 road_line_colour[256] = { };
 	u16 roz_line_colour[256] = { };
 	draw_line_plane(screen, m_layer_road, cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], true, road_line_colour);
-	draw_line_plane(screen, m_layer_roz, cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), false, roz_line_colour);
+	draw_line_plane(screen, m_layer_roz, cliprect, roz_tilemap(), &m_rozram[0], &m_lineram[0], &m_roz_ctrl[0], false, roz_line_colour);
 
 	pen_t const *const paldata = m_palette->pens();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
