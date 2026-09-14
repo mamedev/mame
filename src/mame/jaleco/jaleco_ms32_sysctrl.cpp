@@ -182,7 +182,7 @@ TIMER_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::flush_scanline_timer)
 
 	// 30 Hz irq
 	// TODO: unknown mechanics where this happens, is it even tied to scanline?
-	if (current_scanline == 0 && m_screen->frame_number() & 1)
+	if (current_scanline == (m_field_irq_at_vblank ? m_crtc.vert_display - 1 : 0) && m_screen->frame_number() & 1)
 		m_invert_vblank_lines ? m_vblank_cb(1) : m_field_cb(1);
 
 	uint32_t next_scanline = (current_scanline + 1) % crtc_vtotal();

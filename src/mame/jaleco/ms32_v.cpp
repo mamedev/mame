@@ -22,8 +22,9 @@ priority should be given to
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 {
-	const int tileno = m_txram[tile_index *2]   & 0xffff;
-	const int colour = m_txram[tile_index *2+1] & 0x000f;
+	u16 const *const ram = m_txram_view ? m_txram_view : &m_txram[0];
+	const int tileno = ram[tile_index *2]   & 0xffff;
+	const int colour = ram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(2,tileno,colour,0);
 }
@@ -101,6 +102,9 @@ void ms32_f1superbattle_state::video_start()
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	roz_tilemap() = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	roz_tilemap()->set_transparent_pen(0);
+
+	init_txram_latch(m_txram_latch);
+	save_item(NAME(m_txram_latch));
 	std::fill(std::begin(m_road_line_class), std::end(m_road_line_class), 0);
 	save_item(NAME(m_road_line_class));
 }
@@ -148,7 +152,8 @@ void ms32_f1superbattle_state::draw_extra_layers(screen_device &screen, bitmap_i
 
 u8 ms32_f1superbattle_state::sprite_mix_priority(const u16 *source, u8 pri)
 {
-	return std::clamp((source[0] >> 5) - 1, 0, 15) << 4;
+	bool const behind_text = m_priram[(pri | 0x0f00) / 2] & 0x38;
+	return ((behind_text ? 0 : 8) | std::clamp((source[0] >> 5) - 1, 0, 7)) << 4;
 }
 
 void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -166,8 +171,8 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			u16 const sprdat = spr[x] & 0x0fff;
-			u8 const segment = spr[x] >> 12;
-			bool sprite_on_top = (sprdat & 0xff) && !(tilepri[x] & (1 << 2));
+			u8 const segment = (spr[x] >> 12) & 7;
+			bool sprite_on_top = (sprdat & 0xff) && (!(tilepri[x] & (1 << 2)) || BIT(spr[x], 15));
 			if (sprite_on_top && (tilepri[x] & ((1 << 1) | (1 << 3))))
 				sprite_on_top = road_class >= segment;
 			dst[x] = paldata[sprite_on_top ? sprdat : tile[x]];
@@ -770,6 +775,15 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 				}
 			}
 		}
+	}
+}
+
+void ms32_state::latch_txram(std::vector<u16> &latch)
+{
+	if (!std::equal(latch.begin(), latch.end(), &m_txram[0]))
+	{
+		std::copy_n(&m_txram[0], latch.size(), latch.begin());
+		m_tx_tilemap->mark_all_dirty();
 	}
 }
 

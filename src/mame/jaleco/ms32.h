@@ -110,6 +110,9 @@ protected:
 	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	tilemap_t *&roz_tilemap() { return m_roz_tilemap; }
 	virtual u8 sprite_mix_priority(const u16 *source, u8 pri) { return pri; }
+	void init_txram_latch(std::vector<u16> &latch) { latch.assign(m_txram.length(), 0); m_txram_view = latch.data(); }
+	void latch_txram(std::vector<u16> &latch);
+	u16 const *m_txram_view = nullptr;
 	u16 const *rozram_ptr() const { return &m_rozram[0]; }
 	u16 const *roz_lineram() const { return &m_lineram[0]; }
 	u32 const *roz_ctrl() const { return &m_roz_ctrl[0]; }
@@ -215,6 +218,7 @@ private:
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
 	u8 m_road_line_class[256];
+	std::vector<u16> m_txram_latch;
 
 	tilemap_t* m_extra_tilemap;
 
