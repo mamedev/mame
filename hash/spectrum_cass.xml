@@ -7350,8 +7350,8 @@ no loading screen, no custom loader
 
 	<software name="capitant_a" cloneof="capitant">
 		<description>El Capitan Trueno (set 2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>Dinamic Software</publisher>
 		<part name="cass1" interface="spectrum_cass">
 			<dataarea name="cass" size="109212">
 				<rom name="capitan trueno.tzx" size="109212" crc="03b2cd57" sha1="db33348ce6cff774bf01bf7dfd63ba0a2e23dbc5"/>
@@ -34556,35 +34556,41 @@ Tape 3 - Side B: Turbo the Tortoise (Hi-Tec Software)
 	</software>
 
 	<software name="ssseymor">
-		<description>Super Star Seymour (Seymour Goes to Hollywood, Super Seymour Saves the Planet, Stuntman Seymour, Sergeant Seymour Robot Cop, Wild West Seymour)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Super Star Seymour</description>
+		<year>1992</year>
+		<publisher>Code Masters</publisher>
 		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Tape 1 Side 1 - Seymour Goes to Hollywood"/>
 			<dataarea name="cass" size="88340">
 				<rom name="super star seymour - tape 1 - side a.tzx" size="88340" crc="740fb905" sha1="aab43e64b65ab362f3262b2473d85924095d5487"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Tape 1 Side 2 - Super Seymour"/>
 			<dataarea name="cass" size="66099">
 				<rom name="super star seymour - tape 1 - side b.tzx" size="66099" crc="333b89a4" sha1="7dfcfdbf9e4e66c141ed362dc1df54cf0022bb4e"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="spectrum_cass">
+			<feature name="part_id" value="Tape 2 Side 1 - Stuntman Seymour"/>
 			<dataarea name="cass" size="51777">
 				<rom name="super star seymour - tape 2 - side a.tzx" size="51777" crc="84ca2c92" sha1="185177265a1e9f6e3e0baafc15fee5b0e06cabc6"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="spectrum_cass">
+			<feature name="part_id" value="Tape 2 Side 2 - Sergeant Seymour"/>
 			<dataarea name="cass" size="39884">
 				<rom name="super star seymour - tape 2 - side b.tzx" size="39884" crc="687b0893" sha1="ea1818734f105760fac4e457f2b14be57fa48685"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="spectrum_cass">
+			<feature name="part_id" value="Tape 3 Side 1 - Wild West Seymour"/>
 			<dataarea name="cass" size="88336">
 				<rom name="super star seymour - tape 3 - side a.tzx" size="88336" crc="950e2dd8" sha1="66545f7a3f57adee9c9360cb0cefa63f17dbc15d"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="spectrum_cass">
+			<feature name="part_id" value="Tape 3 Side 2 - Wild West Seymour"/>
 			<dataarea name="cass" size="88336">
 				<rom name="super star seymour - tape 3 - side b.tzx" size="88336" crc="e32bd90a" sha1="811e714c7362e23315bd20f22c974bdb6f1bfbe8"/>
 			</dataarea>
@@ -71776,23 +71782,23 @@ Side B: Once Upon a Lily Pad
 	</software>
 
 	<software name="dundeese">
-		<description>Dundee's European Challenge (Jocky Scott Version)</description>
+		<description>Dundee's European Challenge</description>
 		<year>1986</year>
 		<publisher>Season Soft</publisher>
 		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="49321">
-				<rom name="dundee_s european challenge (jocky scott version).tzx" size="49321" crc="eeec2578" sha1="b8a7a75d86890010173140c22b68d84ded121198"/>
+			<dataarea name="cass" size="49844">
+				<rom name="dundee_s european challenge.tzx" size="49844" crc="e4c23b92" sha1="4fcbc15f1c0dc1b9f07710955d02d1b68b898800"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dundeese_a" cloneof="dundeese">
-		<description>Dundee's European Challenge</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Dundee's European Challenge (Jocky Scott version)</description>
+		<year>1986</year>
+		<publisher>Season Soft</publisher>
 		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="49844">
-				<rom name="dundee_s european challenge.tzx" size="49844" crc="e4c23b92" sha1="4fcbc15f1c0dc1b9f07710955d02d1b68b898800"/>
+			<dataarea name="cass" size="49321">
+				<rom name="dundee_s european challenge (jocky scott version).tzx" size="49321" crc="eeec2578" sha1="b8a7a75d86890010173140c22b68d84ded121198"/>
 			</dataarea>
 		</part>
 	</software>
@@ -72038,7 +72044,7 @@ Side B: Once Upon a Lily Pad
 	</software>
 
 	<software name="dwarfsdo">
-		<description>Dwarf's Domain</description>
+		<description>Dwarfs Domain</description>
 		<year>1984</year>
 		<publisher>King Software</publisher>
 		<part name="cass" interface="spectrum_cass">
@@ -72049,7 +72055,7 @@ Side B: Once Upon a Lily Pad
 	</software>
 
 	<software name="dwarfsdo_a" cloneof="dwarfsdo">
-		<description>Dwarf's Domain (set 2)</description>
+		<description>Dwarfs Domain (alt)</description>
 		<year>1984</year>
 		<publisher>King Software</publisher>
 		<part name="cass" interface="spectrum_cass">
@@ -73448,7 +73454,7 @@ Side B - Game 1: The Dragonstar Trilogy Part III (Delta 4 Software)
 	</software>
 
 	<software name="educatio">
-		<description>Education Tape For Infants And Juniors</description>
+		<description>Education Tape for Infants and Juniors</description>
 		<year>1983</year>
 		<publisher>M.B.</publisher>
 		<part name="cass" interface="spectrum_cass">
@@ -73458,10 +73464,10 @@ Side B - Game 1: The Dragonstar Trilogy Part III (Delta 4 Software)
 		</part>
 	</software>
 
-	<software name="educatio_a" cloneof="educatio">
+	<software name="educompe">
 		<description>Educational Compendium</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Orwin Software</publisher>
 		<part name="cass1" interface="spectrum_cass">
 			<dataarea name="cass" size="31775">
 				<rom name="educational compendium - side 1.tzx" size="31775" crc="f152c26b" sha1="104dbb5d8fb329fab1c8b0a415fce03f110de7a6"/>
@@ -73817,8 +73823,8 @@ Side B - Game 1: The Dragonstar Trilogy Part III (Delta 4 Software)
 
 	<software name="elitecom">
 		<description>Elite Commander Editor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>Alexander Computing Systems</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="8869">
 				<rom name="elite commander editor.tzx" size="8869" crc="43a9b49b" sha1="7003dc61d4feac25dbced02dd8c55c011682f360"/>
@@ -142493,6 +142499,17 @@ Game 4 - Char-Wallah
 	</software>
 
 	<software name="superspo">
+		<description>Super Sports</description>
+		<year>1988</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="179293">
+				<rom name="super sports.tzx" size="179293" crc="c4dd1ca5" sha1="a2913ef4b8e03f1d526bf9cf97d6e2bc1f835d77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superspo_a" cloneof="superspo">
 		<description>Super Sports - The Olympic Challenge (Kixx)</description>
 		<year>1988</year>
 		<publisher>Kixx</publisher>
@@ -142503,21 +142520,10 @@ Game 4 - Char-Wallah
 		</part>
 	</software>
 
-	<software name="superspo_a" cloneof="superspo">
-		<description>Super Sports</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="179293">
-				<rom name="super sports.tzx" size="179293" crc="c4dd1ca5" sha1="a2913ef4b8e03f1d526bf9cf97d6e2bc1f835d77"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sprspri">
 		<description>Super Sprites</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Slowglass</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="26017">
 				<rom name="super sprites.tzx" size="26017" crc="a8b56040" sha1="4a15143a9b089fd736334b2b63fee8de69d4847b"/>
@@ -143304,23 +143310,23 @@ Game 4 - Char-Wallah
 	</software>
 
 	<software name="switchbl">
+		<description>Switch Blade</description>
+		<year>1991</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="52995">
+				<rom name="switch blade.tzx" size="52995" crc="cae096c8" sha1="f2f90e9604d3c69472034ecc4d310755a61c1eb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="switchbl_a" cloneof="switchbl">
 		<description>Switch Blade (GBH)</description>
 		<year>1991</year>
 		<publisher>GBH</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="52995">
 				<rom name="switch blade (gbh).tzx" size="52995" crc="9aac049d" sha1="f81667450100d190fe1f5fdb1de612e72d577d34"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="switchbl_a" cloneof="switchbl">
-		<description>Switch Blade</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="52995">
-				<rom name="switch blade.tzx" size="52995" crc="cae096c8" sha1="f2f90e9604d3c69472034ecc4d310755a61c1eb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160665,7 +160671,7 @@ Version without loading screen, maybe a pre-release
 		<part name="cass1" interface="spectrum_cass">
 			<feature name="part_id" value="Side A - ZXpert (Spectrum)"/>
 			<dataarea name="cass" size="53955">
-				<rom name="ZXpert (side A).tzx" status="nodump"/>
+				<rom name="ZXpert (side A).tzx" size="53955" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spectrum_cass">
@@ -177235,7 +177241,33 @@ Tape 3 - WWF WrestleMania (Ocean Software)
 	</software>
 
 	<software name="supremec">
-		<description>Supreme Challenge (compilation) (set 2)</description>
+		<description>Supreme Challenge</description>
+		<year>1988</year>
+		<publisher>Beau-Jolly</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<dataarea name="cass" size="50876">
+				<rom name="supreme challenge - tape 1 - side 1.tzx" size="50876" crc="bcdd8a10" sha1="7ca3691dddc28b47441d4b0f9c3a7cc8d8841b01"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<dataarea name="cass" size="47969">
+				<rom name="supreme challenge - tape 1 - side 2.tzx" size="47969" crc="0826fe3d" sha1="50b2707d3232d27d0a0f0eef1ed9af009efcdfdb"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="spectrum_cass">
+			<dataarea name="cass" size="95010">
+				<rom name="supreme challenge - tape 2 - side 1.tzx" size="95010" crc="0b3cdb7a" sha1="d3403642fc9f2e17abf808f8ed4564d9269fd66d"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="spectrum_cass">
+			<dataarea name="cass" size="37430">
+				<rom name="supreme challenge - tape 2 - side 2.tzx" size="37430" crc="aacfcb9a" sha1="32b064c759ae2f3b870ec3ae08c5ab9c4d7d78bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supremec_a" cloneof="supremec">
+		<description>Supreme Challenge (alt)</description>
 		<year>1988</year>
 		<publisher>Beau-Jolly</publisher>
 		<part name="cass1" interface="spectrum_cass">
@@ -177256,32 +177288,6 @@ Tape 3 - WWF WrestleMania (Ocean Software)
 		<part name="cass4" interface="spectrum_cass">
 			<dataarea name="cass" size="38820">
 				<rom name="supreme challenge - alternate - tape 2 - side 2.tzx" size="38820" crc="804e6c8c" sha1="54022281a0a3e6ba3a37a3cb2b1a360f924e78e9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supremec_d" cloneof="supremec">
-		<description>Supreme Challenge (compilation) (set 1)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass1" interface="spectrum_cass">
-			<dataarea name="cass" size="50876">
-				<rom name="supreme challenge - tape 1 - side 1.tzx" size="50876" crc="bcdd8a10" sha1="7ca3691dddc28b47441d4b0f9c3a7cc8d8841b01"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="spectrum_cass">
-			<dataarea name="cass" size="47969">
-				<rom name="supreme challenge - tape 1 - side 2.tzx" size="47969" crc="0826fe3d" sha1="50b2707d3232d27d0a0f0eef1ed9af009efcdfdb"/>
-			</dataarea>
-		</part>
-		<part name="cass3" interface="spectrum_cass">
-			<dataarea name="cass" size="95010">
-				<rom name="supreme challenge - tape 2 - side 1.tzx" size="95010" crc="0b3cdb7a" sha1="d3403642fc9f2e17abf808f8ed4564d9269fd66d"/>
-			</dataarea>
-		</part>
-		<part name="cass4" interface="spectrum_cass">
-			<dataarea name="cass" size="37430">
-				<rom name="supreme challenge - tape 2 - side 2.tzx" size="37430" crc="aacfcb9a" sha1="32b064c759ae2f3b870ec3ae08c5ab9c4d7d78bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -177321,7 +177327,7 @@ Tape 3 - Vendetta (System 3 Software)
 	</software>
 
 	<software name="taitocoi">
-		<description>Taito Coin-Op Hits (compilation)</description>
+		<description>Taito Coin-Op Hits</description>
 		<year>1988</year>
 		<publisher>Imagine Software</publisher>
 		<part name="cass1" interface="spectrum_cass">
