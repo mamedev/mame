@@ -238,6 +238,7 @@ void drc_frontend_base<Desc>::build_sequence(int start, int end, bool redispatch
 	int consecutive = 0;
 	int seqstart = -1;
 	int skipsleft = 0;
+	Desc *last_live_desc = nullptr;
 	for (int descnum = start; descnum < end; descnum++)
 	{
 		if (m_desc_array[descnum] != nullptr)
@@ -323,9 +324,21 @@ void drc_frontend_base<Desc>::build_sequence(int start, int end, bool redispatch
 
 			// if we're not getting skipped, add us to the end of the list and clear our array slot
 			if (skipsleft == 0)
+			{
 				m_desc_live_list.append(*curdesc);
+				last_live_desc = curdesc;
+			}
 			else
+			{
+				// if this reclaimed instruction was flagged as the end of the sequence, that flag
+				// must survive on the live list -- otherwise code_compile_block()'s walk from
+				// seqhead to seqlast runs off the end of the list without ever finding an
+				// end_sequence() node, leaving seqlast null (see the assert a few lines into
+				// code_compile_block() in mips3drc.cpp and equivalent DRC cores)
+				if (curdesc->end_sequence() && last_live_desc != nullptr)
+					last_live_desc->set_end_sequence();
 				m_desc_allocator.reclaim(*curdesc);
+			}
 
 			// if the current instruction starts skipping, reset our skip count
 			// otherwise, just decrement
