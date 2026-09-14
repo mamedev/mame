@@ -163,15 +163,16 @@ void jaleco_fpu_device::host_w(offs_t offset, u16 data, u16 mem_mask)
 	switch (offset)
 	{
 	case 0x30:
-		LOGHOST("%s: start at %03x\n", machine().describe_context(), data & 0x3ff);
-		m_pc = data & 0x3ff;
+		COMBINE_DATA(&m_pc);
+		m_pc &= 0x3ff;
+		LOGHOST("%s: start at %03x\n", machine().describe_context(), m_pc);
 		m_delay = false;
 		m_running = true;
 		break;
 
 	case 0x32:
 		COMBINE_DATA(&m_ctrl);
-		if (data & 0x0006)
+		if (data & mem_mask & 0x0006)
 			m_irq_cb(CLEAR_LINE);
 		break;
 
