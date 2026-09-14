@@ -431,9 +431,6 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrollx,scrolly;
-	int asc_pri;
-	int scr_pri;
-	int rot_pri;
 
 	/*
 	    sprite control regs
@@ -494,6 +491,19 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get());
 
+	draw_tile_layers(screen, cliprect);
+
+	mix_layers(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &cliprect)
+{
+	int asc_pri;
+	int scr_pri;
+	int rot_pri;
+
 	// TODO: actually understand this (per-scanline priority and alpha-blend over every layer?)
 	asc_pri = scr_pri = rot_pri = 0;
 
@@ -539,10 +549,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		else if(asc_pri == prin)
 			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 	}
-
-	mix_layers(screen, bitmap, cliprect);
-
-	return 0;
 }
 
 void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

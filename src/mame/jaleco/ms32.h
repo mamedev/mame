@@ -106,8 +106,8 @@ protected:
 
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
+	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect);
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	virtual tilemap_t &create_roz_tilemap() ATTR_COLD;
 	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
 	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
@@ -184,6 +184,7 @@ private:
 	void screen_vblank(int state);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
+	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 };
 
 class ms32_f1superbattle_state : public ms32_state
@@ -207,7 +208,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual tilemap_t &create_roz_tilemap() override ATTR_COLD;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority) override { }
+	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect) override { }
 	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour);
 private:
 	memory_share_creator<u16> m_road_vram;
