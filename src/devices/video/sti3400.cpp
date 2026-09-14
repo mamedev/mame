@@ -173,6 +173,9 @@ bool sti3400_device::execute_task()
 		}
 
 		m_decode_position += consumed;
+		// Firmware has already selected the picture buffers for this task.
+		if (result == mpeg_video::decode_result::PICTURE_HEADER)
+			continue;
 		// A contiguous span can end at the ring boundary while more input is available.
 		if ((result == mpeg_video::decode_result::NEED_DATA) && (consumed == available) && (m_decode_position < m_fifo_write))
 			continue;

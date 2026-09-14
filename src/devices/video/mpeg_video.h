@@ -24,10 +24,19 @@ class mpeg_video
 public:
 	enum class decode_result
 	{
+		PICTURE_HEADER,
 		PICTURE,
 		SEQUENCE_END,
 		NEED_DATA,
 		INVALID_DATA
+	};
+
+	enum class picture_type
+	{
+		I = 1,
+		P = 2,
+		B = 3,
+		D = 4
 	};
 
 	struct picture_buffer
@@ -45,25 +54,32 @@ public:
 
 	mpeg_video(int maximum_width, int maximum_height) ATTR_COLD;
 
-	// Decode one MPEG coded picture or sequence-end marker.
+	// Decode to the next picture header, completed picture or sequence end.
 	// input        = next bytes of the elementary video stream
 	// consumed     = bytes accepted from input, which the caller may discard
 	// buffers      = reconstructed, forward and backward YCbCr picture buffers
-	// width        = width of a completed output picture
-	// height       = height of a completed output picture
+	// width        = width at a picture header or completed output picture
+	// height       = height at a picture header or completed output picture
 	// frame_rate   = sequence picture rate
 	//
-	// returns PICTURE if a complete coded picture was reconstructed,
+	// returns PICTURE_HEADER before reading the caller's picture buffers,
+	// PICTURE if a complete coded picture was reconstructed,
 	// SEQUENCE_END if a standalone sequence-end marker was consumed, NEED_DATA
 	// if more input is required, or INVALID_DATA if invalid syntax was skipped.
 	// Partial syntax and any accepted lookahead are retained across calls.
 	// NEED_DATA accepts all supplied bytes.  An event can consume zero bytes
-	// when its syntax was retained by a preceding call.  Keep picture buffer
-	// bindings unchanged across NEED_DATA; the references and previous
-	// reconstructed contents are sampled at the picture header.
+	// when its syntax was retained by a preceding call.  On PICTURE_HEADER,
+	// use coding_type() and temporal_reference() to select the buffers supplied
+	// to the next call, which samples their contents before decoding slices.
+	// Keep these bindings until PICTURE or INVALID_DATA.  A sequence end after
+	// a picture is consumed with PICTURE and reported by picture_ends_sequence().
 
 	decode_result decode(std::span<const u8> input, std::size_t &consumed, const picture_buffers &buffers,
 						int &width, int &height, double &frame_rate);
+
+	picture_type coding_type() const { return picture_type(m_picture_coding_type); }
+	u16 temporal_reference() const { return m_temporal_reference; }
+	bool picture_ends_sequence() const { return m_picture_ends_sequence; }
 
 	// Clear persistent decoding state.
 	void clear() ATTR_COLD;
@@ -86,6 +102,7 @@ private:
 		SEQUENCE_HEADER,
 		GROUP_HEADER,
 		PICTURE_HEADER,
+		PICTURE_BUFFERS,
 		PICTURE_EXTRA,
 		SLICE_HEADER,
 		SLICE_EXTRA,
@@ -188,6 +205,8 @@ private:
 	u8 m_non_intra_quantizer_matrix[64];
 
 	s32 m_picture_coding_type;
+	u16 m_temporal_reference;
+	bool m_picture_ends_sequence;
 	bool m_full_pel_forward_vector;
 	bool m_full_pel_backward_vector;
 	s32 m_forward_f;
@@ -209,7 +228,7 @@ private:
 
 	void sequence_header();
 	void group_of_pictures();
-	void picture_header(const picture_buffers &buffers);
+	void picture_header();
 	void slice_header();
 	void macroblock();
 	void skipped_macroblock(int address);

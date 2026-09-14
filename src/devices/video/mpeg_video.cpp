@@ -456,6 +456,8 @@ void mpeg_video::clear()
 			m_intra_quantizer_matrix);
 	std::fill(std::begin(m_non_intra_quantizer_matrix), std::end(m_non_intra_quantizer_matrix), 16);
 	m_picture_coding_type = 0;
+	m_temporal_reference = 0;
+	m_picture_ends_sequence = false;
 	m_full_pel_forward_vector = false;
 	m_full_pel_backward_vector = false;
 	m_forward_f = 0;
@@ -498,6 +500,8 @@ void mpeg_video::register_save_state(device_t &device, int index)
 	device.save_item(m_intra_quantizer_matrix, "mpeg_video_intra_quantizer_matrix", index);
 	device.save_item(m_non_intra_quantizer_matrix, "mpeg_video_non_intra_quantizer_matrix", index);
 	device.save_item(m_picture_coding_type, "mpeg_video_picture_coding_type", index);
+	device.save_item(m_temporal_reference, "mpeg_video_temporal_reference", index);
+	device.save_item(m_picture_ends_sequence, "mpeg_video_picture_ends_sequence", index);
 	device.save_item(m_full_pel_forward_vector, "mpeg_video_full_pel_forward_vector", index);
 	device.save_item(m_full_pel_backward_vector, "mpeg_video_full_pel_backward_vector", index);
 	device.save_item(m_forward_f, "mpeg_video_forward_f", index);
@@ -577,8 +581,9 @@ mpeg_video::decode_result mpeg_video::decode(std::span<const u8> input, std::siz
 						throw invalid_stream();
 					write_frame(m_current_frame, buffers.reconstructed.data, buffers.reconstructed.bytes);
 					m_in_picture = false;
-					// A sequence-end marker completes this task, rather than starting another.
-					if (code == SEQUENCE_END_CODE)
+					// Report a sequence end with its final picture, so the caller can drain display references.
+					m_picture_ends_sequence = (code == SEQUENCE_END_CODE);
+					if (m_picture_ends_sequence)
 						gb(32);
 					width = m_horizontal_size;
 					height = m_vertical_size;
@@ -613,7 +618,20 @@ mpeg_video::decode_result mpeg_video::decode(std::span<const u8> input, std::siz
 				break;
 
 			case PICTURE_HEADER:
-				picture_header(buffers);
+				picture_header();
+				m_phase = PICTURE_BUFFERS;
+				width = m_horizontal_size;
+				height = m_vertical_size;
+				frame_rate = m_frame_rate;
+				return finish(decode_result::PICTURE_HEADER);
+
+			case PICTURE_BUFFERS:
+				if ((m_picture_coding_type == 2) || (m_picture_coding_type == 3))
+					read_frame(m_forward_reference, buffers.forward.data, buffers.forward.bytes);
+				if (m_picture_coding_type == 3)
+					read_frame(m_backward_reference, buffers.backward.data, buffers.backward.bytes);
+				// Preserve output contents for macroblocks absent from this picture.
+				read_frame(m_current_frame, buffers.reconstructed.data, buffers.reconstructed.bytes);
 				m_in_picture = true;
 				m_have_slice = false;
 				m_phase = PICTURE_EXTRA;
@@ -777,12 +795,12 @@ void mpeg_video::group_of_pictures()
 	gb(1); // broken link
 }
 
-void mpeg_video::picture_header(const picture_buffers &buffers)
+void mpeg_video::picture_header()
 {
 	if (!m_horizontal_size || !m_vertical_size)
 		throw invalid_stream();
 
-	gb(10); // temporal reference
+	const u16 temporal_reference = gb(10);
 	const int picture_coding_type = gb(3);
 	gb(16); // VBV delay
 
@@ -810,17 +828,12 @@ void mpeg_video::picture_header(const picture_buffers &buffers)
 		throw invalid_stream();
 
 	m_picture_coding_type = picture_coding_type;
+	m_temporal_reference = temporal_reference;
+	m_picture_ends_sequence = false;
 	m_full_pel_forward_vector = full_pel_forward_vector;
 	m_full_pel_backward_vector = full_pel_backward_vector;
 	m_forward_f = forward_f;
 	m_backward_f = backward_f;
-	if ((m_picture_coding_type == 2) || (m_picture_coding_type == 3))
-		read_frame(m_forward_reference, buffers.forward.data, buffers.forward.bytes);
-	if (m_picture_coding_type == 3)
-		read_frame(m_backward_reference, buffers.backward.data, buffers.backward.bytes);
-
-	// Macroblocks not reconstructed by the task retain their previous contents in RFP.
-	read_frame(m_current_frame, buffers.reconstructed.data, buffers.reconstructed.bytes);
 }
 
 void mpeg_video::reset_dc_predictors()
