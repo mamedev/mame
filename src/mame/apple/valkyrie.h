@@ -54,6 +54,7 @@ private:
 	u32 m_base, m_stride, m_video_timing;
 	s32 m_int_status;
 	u32 m_hres, m_vres, m_htotal, m_vtotal, m_config;
+	bool m_vbl_enabled;
 	u8 m_M, m_N, m_P;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
