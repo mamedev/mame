@@ -66,6 +66,7 @@ jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mco
 	, m_sound_ack_cb(*this)
 	, m_sound_reset_cb(*this)
 	, m_invert_vblank_lines(false)
+	, m_field_irq_at_vblank(false)
 {
 }
 

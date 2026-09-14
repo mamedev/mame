@@ -71,6 +71,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_ymf(*this, "ymf")
+		, m_txram_view(nullptr)
 		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
 		, m_roz_ctrl(*this, "roz_ctrl")
 		, m_tx_scroll(*this, "tx_scroll")
@@ -112,7 +113,7 @@ protected:
 	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
 	void init_txram_latch(std::vector<u16> &latch) { latch.assign(m_txram.length(), 0); m_txram_view = latch.data(); }
 	void latch_txram(std::vector<u16> &latch);
-	u16 const *m_txram_view = nullptr;
+	u16 const *m_txram_view;
 	u16 const *rozram_ptr() const { return &m_rozram[0]; }
 	u16 const *roz_lineram() const { return &m_lineram[0]; }
 	u32 const *roz_ctrl() const { return &m_roz_ctrl[0]; }

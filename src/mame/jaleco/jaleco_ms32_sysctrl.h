@@ -100,7 +100,7 @@ private:
 	TIMER_CALLBACK_MEMBER(flush_scanline_timer);
 
 	bool m_invert_vblank_lines;
-	bool m_field_irq_at_vblank = false;
+	bool m_field_irq_at_vblank;
 };
 
 // device type definition
