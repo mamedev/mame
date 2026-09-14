@@ -68,7 +68,7 @@ std::unique_ptr<util::disasm_interface> jaleco_fpu_device::create_disassembler()
 
 void jaleco_fpu_device::device_start()
 {
-	space(AS_PROGRAM).specific(m_program);
+	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
 
 	m_pc = m_ppc = 0;

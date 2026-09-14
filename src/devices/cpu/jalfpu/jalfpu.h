@@ -41,7 +41,7 @@ private:
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	memory_access<10, 2, -2, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<10, 2, -2, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access<12, 1, -1, ENDIANNESS_LITTLE>::specific m_data;
 
 	devcb_write_line m_irq_cb;
