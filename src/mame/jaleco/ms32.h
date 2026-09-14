@@ -108,7 +108,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	tilemap_t *&roz_tilemap() { return m_roz_tilemap; }
+	virtual tilemap_t &create_roz_tilemap() ATTR_COLD;
+	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
 	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
 	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
 	void init_txram_latch(std::vector<u16> &latch) { latch.assign(m_txram.length(), 0); m_txram_view = latch.data(); }
@@ -204,6 +205,7 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	virtual tilemap_t &create_roz_tilemap() override ATTR_COLD;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority) override { }
 	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour);

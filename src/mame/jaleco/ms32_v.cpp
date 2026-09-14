@@ -61,7 +61,7 @@ void ms32_state::video_start()
 	m_bg_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16,  64, 64);
 	// alt layout, controller by register
 	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16);
-	m_roz_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
+	m_roz_tilemap    = &create_roz_tilemap();
 
 	m_objectram_size = m_sprram.length();
 	m_sprram_buffer = make_unique_clear<u16[]>(m_objectram_size);
@@ -95,14 +95,22 @@ void ms32_state::video_start()
 	save_item(NAME(m_brt_b));
 }
 
+tilemap_t &ms32_state::create_roz_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+}
+
+tilemap_t &ms32_f1superbattle_state::create_roz_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+}
+
 void ms32_f1superbattle_state::video_start()
 {
 	ms32_state::video_start();
 
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	m_extra_tilemap->set_transparent_pen(0);
-	roz_tilemap() = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
-	roz_tilemap()->set_transparent_pen(0);
 
 	init_txram_latch(m_txram_latch);
 	save_item(NAME(m_txram_latch));
