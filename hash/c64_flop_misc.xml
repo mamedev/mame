@@ -328,6 +328,65 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="samsjrny" supported="no">
+		<description>Sam's Journey</description>
+		<year>2017</year>
+		<publisher>RGCD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="01-sams_journey_+6d_gp.d64" size="174848" crc="d5714741" sha1="b796f8a785c14eb93f43268c4b5afcfbbb2451d7"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="02-sams_journey_+6d_gp.d64" size="174848" crc="f7567f87" sha1="786d3ef5dabc7c48986a7df76f25d79e8a1b4aa4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="03-sams_journey_+6d_gp.d64" size="174848" crc="167207af" sha1="03fac1140d517a6e856915275cdc37db935d581e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="04-sams_journey_+6d_gp.d64" size="174848" crc="7f8f4a7d" sha1="1e99beeb5bbd1cf79a5744dedca9c1f26a61339a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creature2" supported="no">
+		<description>Creatures 2: Torture Trouble</description>
+		<year>1992</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="271a_creatures_2_1992_thalamus.d64" size="174848" crc="fc50a987" sha1="718a2277f1ef41321891f3b42a5c651cb9e853ea"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="271b_creatures_2_1992_thalamus.d64" size="174848" crc="b9c116aa" sha1="dd7098709c69c5e7cfc7539fc6c4d6f3e5bf8896"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mayhem" supported="no">
+		<description>Mayhem in Monsterland</description>
+		<year>1993</year>
+		<publisher>Apex Computer Productions</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="mayhem_in_monsterland_fix.d64" size="174848" crc="50536b5c" sha1="992ed5d6f40792dbff9d101aaa20ddf4e3d201c4"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!-- !Compilations -->
 
@@ -343,6 +402,18 @@ Hi-score table is corrupt (dump really?)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="goliath.d64" size="174848" crc="3c4f2931" sha1="5584a2406aab892884207f79065d3320ab0755af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="novaterm">
+		<description>Novaterm v9.6C</description>
+		<year>1997</year>
+		<publisher>Nick Rossi</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="novaterm96c.d64" size="174848" crc="a60c6730" sha1="eba38209a594440971a1129d6413b5cf584211d9"/>
 			</dataarea>
 		</part>
 	</software>
