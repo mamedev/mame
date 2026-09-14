@@ -42,12 +42,15 @@ DTD:
     <!ATTLIST ram file CDATA #IMPLIED>
     <!ATTLIST ram length CDATA #REQUIRED>
     <!ATTLIST pcb type CDATA #REQUIRED>
+    <!ATTLIST pcb bank_data_bits CDATA #IMPLIED>
+    <!ATTLIST pcb initial_bank CDATA #IMPLIED>
     <!ATTLIST socket id ID #REQUIRED>
     <!ATTLIST socket uses IDREF #REQUIRED>
 
 ***************************************************************************/
 
 #include "rpk.h"
+#include "ioprocs.h"
 #include "xmlfile.h"
 
 
@@ -178,6 +181,13 @@ std::error_condition rpk_reader::read(util::archive_file::ptr &&zipfile, rpk_fil
 
 	// create the rpk_file object
 	rpk_file::ptr file = std::make_unique<rpk_file>(std::move(zipfile), pcb_type);
+
+	// Optional board configuration. Board-specific validation belongs to the device.
+	for (char const *name : { "bank_data_bits", "initial_bank" })
+	{
+		std::string const *value = pcb_node->get_attribute_string_ptr(name);
+		if (value) file->m_pcb_features.emplace(name, *value);
+	}
 
 	// find the sockets and load their respective resource
 	for (util::xml::data_node const *socket_node = pcb_node->get_first_child(); socket_node; socket_node = socket_node->get_next_sibling())
@@ -394,12 +404,17 @@ rpk_socket::~rpk_socket()
 //  read_file
 //-------------------------------------------------
 
-std::error_condition rpk_socket::read_file(std::vector<std::uint8_t> &result) const
+std::error_condition rpk_socket::read_file(std::vector<std::uint8_t> &result, std::uint64_t max_length) const
 {
 	// find the file
 	if (m_rpk.zipfile().search(m_filename, false) < 0)
 		return rpk_reader::error::INVALID_FILE_REF;
+	if (m_rpk.zipfile().current_uncompressed_length() > max_length)
+		return std::errc::file_too_large;
 
+	// Check before narrowing to size_t (notably for ZIP64 ROM images).
+	if (m_rpk.zipfile().current_uncompressed_length() > result.max_size())
+		return std::errc::not_enough_memory;
 	// prepare a buffer
 	result.clear();
 	try
@@ -412,7 +427,7 @@ std::error_condition rpk_socket::read_file(std::vector<std::uint8_t> &result) co
 	}
 
 	// read the file
-	std::error_condition const ziperr = m_rpk.zipfile().decompress(&result[0], m_rpk.zipfile().current_uncompressed_length());
+	std::error_condition const ziperr = m_rpk.zipfile().decompress(result.data(), m_rpk.zipfile().current_uncompressed_length());
 	if (ziperr)
 		return ziperr;
 
@@ -420,7 +435,14 @@ std::error_condition rpk_socket::read_file(std::vector<std::uint8_t> &result) co
 	if (m_hashes.has_value())
 	{
 		util::hash_collection actual_hashes;
-		actual_hashes.compute(&result[0], result.size(), m_hashes->hash_types().c_str());
+		// The pointer overload takes a 32-bit length. Use the streaming overload
+		// so a ZIP64 cartridge is hashed in full, including bytes above 4 GiB.
+		auto input = util::ram_read(result.data(), result.size());
+		if (!input) return std::errc::not_enough_memory;
+		size_t actual;
+		auto const err = actual_hashes.compute(*input, 0, result.size(), actual, m_hashes->hash_types().c_str());
+		if (err) return err;
+		if (actual != result.size()) return std::errc::io_error;
 
 		if (actual_hashes != m_hashes)
 			return rpk_reader::error::INVALID_FILE_REF; // Hash check failed
