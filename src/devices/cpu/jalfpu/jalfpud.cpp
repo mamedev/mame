@@ -10,6 +10,8 @@ namespace {
 
 constexpr u8 LOAD_SEL[6] = { 0x3, 0x7, 0xb, 0xd, 0xe, 0xf };
 
+constexpr u16 CTL_HALT = 0x4080;
+
 std::string reg(unsigned r)
 {
 	return util::string_format("s%x", r);
@@ -136,7 +138,7 @@ offs_t jaleco_fpu_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 
 	case 0xe:
-		if (arg == 0x4080)
+		if (arg == CTL_HALT)
 		{
 			util::stream_format(stream, "halt");
 			flags |= STEP_OUT;

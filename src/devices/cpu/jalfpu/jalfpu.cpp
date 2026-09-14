@@ -42,6 +42,11 @@ constexpr u8 LOAD_SEL[6] = { 0x3, 0x7, 0xb, 0xd, 0xe, 0xf };
 constexpr u8 GROUP_REG[6] = { 0x6, 0x5, 0x4, 0x2, 0x1, 0x0 };
 constexpr u16 MODE_BASE[8] = { 0x000, 0x000, 0x100, 0x200, 0x000, 0x300, 0x300, 0x600 };
 
+// control words seen in the uploaded program
+constexpr u16 CTL_HALT = 0x4080;    // end of routine, interrupts the host
+constexpr u16 CTL_ENTRY_A = 0x4130; // routine entry marker (000 1c6 20d 237 338 38b), no effect
+constexpr u16 CTL_ENTRY_B = 0x4100; // routine entry marker (14c 167 1b6), no effect
+
 } // anonymous namespace
 
 
@@ -495,12 +500,12 @@ void jaleco_fpu_device::execute_one(u32 op)
 	}
 
 	case 0xe:
-		if (arg == 0x4080)
+		if (arg == CTL_HALT)
 		{
 			m_running = false;
 			m_irq_cb(ASSERT_LINE);
 		}
-		else if (arg != 0x4130 && arg != 0x4100)
+		else if (arg != CTL_ENTRY_A && arg != CTL_ENTRY_B)
 			unimplemented(op);
 		break;
 
