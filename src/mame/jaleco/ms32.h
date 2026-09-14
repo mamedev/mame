@@ -105,7 +105,6 @@ protected:
 
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
-	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) { }
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	tilemap_t *&roz_tilemap() { return m_roz_tilemap; }
@@ -204,10 +203,9 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
-	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) override;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority) override { }
-	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool front, u16 backdrop_row, u8 priority, bool wrap, bool record_colour);
+	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour);
 private:
 	memory_share_creator<u16> m_road_vram;
 
@@ -218,8 +216,9 @@ private:
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
 	u16 m_road_line_colour[256];
+	u16 m_roz_line_colour[256];
 	std::vector<u16> m_txram_latch;
-	bitmap_ind16 m_layer_tx, m_layer_bg, m_layer_p0f, m_layer_p0b, m_layer_p1f, m_layer_p1b;
+	bitmap_ind16 m_layer_tx, m_layer_bg, m_layer_road, m_layer_roz;
 
 	tilemap_t* m_extra_tilemap;
 

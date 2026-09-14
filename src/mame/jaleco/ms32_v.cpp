@@ -100,16 +100,17 @@ void ms32_f1superbattle_state::video_start()
 	ms32_state::video_start();
 
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+	m_extra_tilemap->set_transparent_pen(0);
 	roz_tilemap() = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	roz_tilemap()->set_transparent_pen(0);
 
 	init_txram_latch(m_txram_latch);
 	save_item(NAME(m_txram_latch));
 	std::fill(std::begin(m_road_line_colour), std::end(m_road_line_colour), 0);
-	save_item(NAME(m_road_line_colour));
+	std::fill(std::begin(m_roz_line_colour), std::end(m_roz_line_colour), 0);
 }
 
-void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool front, u16 backdrop_row, u8 priority, bool wrap, bool record_colour)
+void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour)
 {
 	int const startx = util::sext((ctrl[0x00/4] & 0xffff) | ((ctrl[0x04/4] & 3) << 16), 18);
 	int const starty = util::sext((ctrl[0x08/4] & 0xffff) | ((ctrl[0x0c/4] & 3) << 16), 18);
@@ -126,28 +127,18 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
 		int const incxy = util::sext((line[6] & 0xffff) | ((line[7] & 1) << 16), 17);
 
 		int const row = (start2y + starty + offsy) & 0x3ff;
-		u16 const tile = vram[row * 2];
-		if (!tile || ((tile < backdrop_row) != front))
+		line_colour[y & 0xff] = 0;
+		if (!vram[row * 2])
 			continue;
-		if (record_colour)
-			m_road_line_colour[y & 0xff] = vram[row * 2 + 1];
+		line_colour[y & 0xff] = vram[row * 2 + 1];
 
 		clip.min_y = clip.max_y = y;
 		tilemap->draw_roz(screen, bitmap, clip,
 				(start2x + startx + offsx) << 16, (start2y + starty + offsy) << 16,
 				incxx << 8, incxy << 8, 0, 0,
 				wrap,
-				0, priority);
+				0, 0);
 	}
-}
-
-void ms32_f1superbattle_state::draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front)
-{
-	if (front)
-		std::fill(std::begin(m_road_line_colour), std::end(m_road_line_colour), 0);
-
-	draw_line_plane(screen, bitmap, cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], front, 0xb00, front ? (1 << 3) : 0, true, false);
-	draw_line_plane(screen, bitmap, cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), front, 0xc00, front ? (1 << 1) : 0, false, front);
 }
 
 void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -162,11 +153,8 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 
 	tx_tilemap()->draw(screen, layer(m_layer_tx), cliprect, 0, 0);
 	bg_layer_tilemap()->draw(screen, layer(m_layer_bg), cliprect, 0, 0);
-	for (int front = 0; front < 2; front++)
-	{
-		draw_line_plane(screen, layer(front ? m_layer_p0f : m_layer_p0b), cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], front, 0xb00, 0, true, false);
-		draw_line_plane(screen, layer(front ? m_layer_p1f : m_layer_p1b), cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), front, 0xc00, 0, false, false);
-	}
+	draw_line_plane(screen, layer(m_layer_road), cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], true, m_road_line_colour);
+	draw_line_plane(screen, layer(m_layer_roz), cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), false, m_roz_line_colour);
 
 	pen_t const *const paldata = m_palette->pens();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -174,36 +162,35 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
 		u16 const *const tx = &m_layer_tx.pix(y);
 		u16 const *const bg = &m_layer_bg.pix(y);
-		u16 const *const p0f = &m_layer_p0f.pix(y);
-		u16 const *const p0b = &m_layer_p0b.pix(y);
-		u16 const *const p1f = &m_layer_p1f.pix(y);
-		u16 const *const p1b = &m_layer_p1b.pix(y);
+		u16 const *const road = &m_layer_road.pix(y);
+		u16 const *const roz = &m_layer_roz.pix(y);
 		u32 *const dst = &bitmap.pix(y);
-		u16 const depth = (m_road_line_colour[y & 0xff] >> 4) & 7;
+		u16 const road_depth = (m_road_line_colour[y & 0xff] >> 4) & 7;
+		u16 const roz_depth = (m_roz_line_colour[y & 0xff] >> 4) & 7;
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			bool const s_op = (spr[x] & 0xff) != 0;
 			u16 const pri = s_op ? (spr[x] >> 12) : 0;
+			u16 const depth = (roz[x] != 0xffff) ? roz_depth : road_depth;
 
-			u16 const idx = (!s_op << 12) | ((tx[x] == 0xffff) << 11) | (1 << 10) | ((p1f[x] == 0xffff) << 9) | ((p0f[x] == 0xffff) << 8) | ((bg[x] == 0xffff) << 7) | (pri << 3) | depth;
+			u16 const idx = (!s_op << 12) | ((tx[x] == 0xffff) << 11) | (1 << 10) | ((roz[x] == 0xffff) << 9) | ((road[x] == 0xffff) << 8) | ((bg[x] == 0xffff) << 7) | (pri << 3) | depth;
 			u8 const code = m_priram[idx];
 
-			u16 const backdrop = (p1b[x] != 0xffff) ? p1b[x] : (p0b[x] != 0xffff) ? p0b[x] : 0;
-			u16 pen = backdrop;
+			u16 pen = 0;
 			if (!BIT(code, 6))
 			{
 				switch ((code >> 3) & 7)
 				{
 				case 0: pen = spr[x] & 0x0fff; break;
 				case 1: pen = bg[x]; break;
-				case 2: pen = p1f[x]; break;
-				case 4: pen = p0f[x]; break;
+				case 2: pen = roz[x]; break;
+				case 4: pen = road[x]; break;
 				case 6: pen = tx[x]; break;
-				default: pen = 0xffff; break;
+				default: pen = 0; break;
 				}
 				if (pen == 0xffff)
-					pen = backdrop;
+					pen = 0;
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
@@ -512,8 +499,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	//popmessage("%02x %02x %02x %d %d %d",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2], asc_pri, scr_pri, rot_pri);
 
-	draw_extra_layers(screen, m_temp_bitmap_tilemaps, cliprect, false);
-
 	// tile-tile mixing
 	for(int prin=0;prin<4;prin++)
 	{
@@ -532,7 +517,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		}
 		else if(asc_pri == prin)
 		{
-			draw_extra_layers(screen, m_temp_bitmap_tilemaps, cliprect, true);
 			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 		}
 	}
