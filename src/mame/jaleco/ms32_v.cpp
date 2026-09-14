@@ -162,8 +162,8 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
 
 		clip.min_y = clip.max_y = y;
 		tilemap->draw_roz(screen, bitmap, clip,
-				(start2x + startx + offsx) << 16, (start2y + starty + offsy) << 16,
-				incxx << 8, incxy << 8, 0, 0,
+				u32(start2x + startx + offsx) << 16, u32(start2y + starty + offsy) << 16,
+				incxx * 0x100, incxy * 0x100, 0, 0,
 				wrap,
 				0, 0);
 	}
