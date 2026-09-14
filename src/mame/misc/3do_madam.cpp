@@ -1679,6 +1679,7 @@ u32 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
 }
 
 // - 'R' letter in "Welcome to the REAL world" for fz1
+// - crshburn track background
 u32 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
@@ -1690,6 +1691,9 @@ u32 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 	u8 src_shift = (~x & 3) * 6;
 
 	u16 plut_data = ((m_dma8_read_cb(cel_address + 0) << 16) + (m_dma8_read_cb(cel_address + 1) << 8) + (m_dma8_read_cb(cel_address + 2))) >> (src_shift) & 0x3f;
+
+	// TODO: bit 5 is p-mode selector
+	plut_data &= 0x1f;
 	plut_data <<= 1;
 
 	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
