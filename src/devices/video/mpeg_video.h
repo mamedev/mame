@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <memory>
 #include <span>
 
 class device_t;
@@ -96,9 +97,9 @@ private:
 
 	struct frame
 	{
-		std::vector<u8> y;
-		std::vector<u8> cb;
-		std::vector<u8> cr;
+		std::unique_ptr<u8[]> y;
+		std::unique_ptr<u8[]> cb;
+		std::unique_ptr<u8[]> cr;
 	};
 
 	struct macroblock_type
@@ -172,6 +173,9 @@ private:
 	std::size_t m_consumed;
 	int m_maximum_width;
 	int m_maximum_height;
+	// Allocated plane sizes remain fixed across sequence changes and resets.
+	unsigned m_luma_size;
+	unsigned m_chroma_size;
 
 	s32 m_horizontal_size;
 	s32 m_vertical_size;

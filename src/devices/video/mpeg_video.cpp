@@ -408,13 +408,13 @@ mpeg_video::mpeg_video(int maximum_width, int maximum_height) :
 
 	const unsigned maximum_mb_width = (m_maximum_width + 15) / 16;
 	const unsigned maximum_mb_height = (m_maximum_height + 15) / 16;
-	const unsigned luma_size = maximum_mb_width * 16 * maximum_mb_height * 16;
-	const unsigned chroma_size = maximum_mb_width * 8 * maximum_mb_height * 8;
+	m_luma_size = maximum_mb_width * 16 * maximum_mb_height * 16;
+	m_chroma_size = maximum_mb_width * 8 * maximum_mb_height * 8;
 	for (frame *const item : { &m_current_frame, &m_forward_reference, &m_backward_reference })
 	{
-		item->y.resize(luma_size);
-		item->cb.resize(chroma_size);
-		item->cr.resize(chroma_size);
+		item->y = std::make_unique<u8[]>(m_luma_size);
+		item->cb = std::make_unique<u8[]>(m_chroma_size);
+		item->cr = std::make_unique<u8[]>(m_chroma_size);
 	}
 
 	for (int x = 0; x != 8; x++)
@@ -471,9 +471,9 @@ void mpeg_video::clear()
 	m_previous_b_backward = false;
 	for (frame *const item : { &m_current_frame, &m_forward_reference, &m_backward_reference })
 	{
-		std::fill(item->y.begin(), item->y.end(), 0);
-		std::fill(item->cb.begin(), item->cb.end(), 0);
-		std::fill(item->cr.begin(), item->cr.end(), 0);
+		std::fill_n(item->y.get(), m_luma_size, 0);
+		std::fill_n(item->cb.get(), m_chroma_size, 0);
+		std::fill_n(item->cr.get(), m_chroma_size, 0);
 	}
 }
 
@@ -511,15 +511,15 @@ void mpeg_video::register_save_state(device_t &device, int index)
 	device.save_item(m_backward_vertical_previous, "mpeg_video_backward_vertical_previous", index);
 	device.save_item(m_previous_b_forward, "mpeg_video_previous_b_forward", index);
 	device.save_item(m_previous_b_backward, "mpeg_video_previous_b_backward", index);
-	device.save_item(m_current_frame.y, "mpeg_video_current_y", index);
-	device.save_item(m_current_frame.cb, "mpeg_video_current_cb", index);
-	device.save_item(m_current_frame.cr, "mpeg_video_current_cr", index);
-	device.save_item(m_forward_reference.y, "mpeg_video_forward_y", index);
-	device.save_item(m_forward_reference.cb, "mpeg_video_forward_cb", index);
-	device.save_item(m_forward_reference.cr, "mpeg_video_forward_cr", index);
-	device.save_item(m_backward_reference.y, "mpeg_video_backward_y", index);
-	device.save_item(m_backward_reference.cb, "mpeg_video_backward_cb", index);
-	device.save_item(m_backward_reference.cr, "mpeg_video_backward_cr", index);
+	device.save_pointer(m_current_frame.y, "mpeg_video_current_y", m_luma_size, index);
+	device.save_pointer(m_current_frame.cb, "mpeg_video_current_cb", m_chroma_size, index);
+	device.save_pointer(m_current_frame.cr, "mpeg_video_current_cr", m_chroma_size, index);
+	device.save_pointer(m_forward_reference.y, "mpeg_video_forward_y", m_luma_size, index);
+	device.save_pointer(m_forward_reference.cb, "mpeg_video_forward_cb", m_chroma_size, index);
+	device.save_pointer(m_forward_reference.cr, "mpeg_video_forward_cr", m_chroma_size, index);
+	device.save_pointer(m_backward_reference.y, "mpeg_video_backward_y", m_luma_size, index);
+	device.save_pointer(m_backward_reference.cb, "mpeg_video_backward_cb", m_chroma_size, index);
+	device.save_pointer(m_backward_reference.cr, "mpeg_video_backward_cr", m_chroma_size, index);
 }
 
 mpeg_video::decode_result mpeg_video::decode(std::span<const u8> input, std::size_t &consumed, const picture_buffers &buffers,
@@ -1036,22 +1036,22 @@ void mpeg_video::predict_macroblock(
 
 	if (forward)
 	{
-		predict_plane(m_current_frame.y.data(), m_luma_pitch, m_forward_reference.y.data(), m_luma_pitch,
+		predict_plane(m_current_frame.y.get(), m_luma_pitch, m_forward_reference.y.get(), m_luma_pitch,
 				macroblock_x, macroblock_y, 16, 16, forward_vector, false, false);
-		predict_plane(m_current_frame.cb.data(), m_chroma_pitch, m_forward_reference.cb.data(), m_chroma_pitch,
+		predict_plane(m_current_frame.cb.get(), m_chroma_pitch, m_forward_reference.cb.get(), m_chroma_pitch,
 				macroblock_x / 2, macroblock_y / 2, 8, 8, forward_vector, true, false);
-		predict_plane(m_current_frame.cr.data(), m_chroma_pitch, m_forward_reference.cr.data(), m_chroma_pitch,
+		predict_plane(m_current_frame.cr.get(), m_chroma_pitch, m_forward_reference.cr.get(), m_chroma_pitch,
 				macroblock_x / 2, macroblock_y / 2, 8, 8, forward_vector, true, false);
 		have_prediction = true;
 	}
 
 	if (backward)
 	{
-		predict_plane(m_current_frame.y.data(), m_luma_pitch, m_backward_reference.y.data(), m_luma_pitch,
+		predict_plane(m_current_frame.y.get(), m_luma_pitch, m_backward_reference.y.get(), m_luma_pitch,
 				macroblock_x, macroblock_y, 16, 16, backward_vector, false, have_prediction);
-		predict_plane(m_current_frame.cb.data(), m_chroma_pitch, m_backward_reference.cb.data(), m_chroma_pitch,
+		predict_plane(m_current_frame.cb.get(), m_chroma_pitch, m_backward_reference.cb.get(), m_chroma_pitch,
 				macroblock_x / 2, macroblock_y / 2, 8, 8, backward_vector, true, have_prediction);
-		predict_plane(m_current_frame.cr.data(), m_chroma_pitch, m_backward_reference.cr.data(), m_chroma_pitch,
+		predict_plane(m_current_frame.cr.get(), m_chroma_pitch, m_backward_reference.cr.get(), m_chroma_pitch,
 				macroblock_x / 2, macroblock_y / 2, 8, 8, backward_vector, true, have_prediction);
 	}
 }
@@ -1192,14 +1192,14 @@ void mpeg_video::put_block(unsigned index, const int *values, bool intra)
 
 	if (index < 4)
 	{
-		destination = m_current_frame.y.data();
+		destination = m_current_frame.y.get();
 		pitch = m_luma_pitch;
 		x = macroblock_x + ((index & 1) * 8);
 		y = macroblock_y + ((index >> 1) * 8);
 	}
 	else
 	{
-		destination = (index == 4) ? m_current_frame.cb.data() : m_current_frame.cr.data();
+		destination = (index == 4) ? m_current_frame.cb.get() : m_current_frame.cr.get();
 		pitch = m_chroma_pitch;
 		x = macroblock_x / 2;
 		y = macroblock_y / 2;
@@ -1256,9 +1256,9 @@ void mpeg_video::read_frame(frame &destination, const u8 *source, unsigned sourc
 	if (!source || (source_bytes < (luma_bytes + 2 * chroma_bytes)))
 		throw invalid_stream();
 
-	std::copy_n(source, luma_bytes, destination.y.begin());
-	std::copy_n(source + luma_bytes, chroma_bytes, destination.cb.begin());
-	std::copy_n(source + luma_bytes + chroma_bytes, chroma_bytes, destination.cr.begin());
+	std::copy_n(source, luma_bytes, destination.y.get());
+	std::copy_n(source + luma_bytes, chroma_bytes, destination.cb.get());
+	std::copy_n(source + luma_bytes + chroma_bytes, chroma_bytes, destination.cr.get());
 }
 
 void mpeg_video::write_frame(const frame &source, u8 *output, unsigned output_bytes) const
@@ -1268,9 +1268,9 @@ void mpeg_video::write_frame(const frame &source, u8 *output, unsigned output_by
 	if (!output || (output_bytes < (luma_bytes + 2 * chroma_bytes)))
 		throw invalid_stream();
 
-	std::copy_n(source.y.begin(), luma_bytes, output);
-	std::copy_n(source.cb.begin(), chroma_bytes, output + luma_bytes);
-	std::copy_n(source.cr.begin(), chroma_bytes, output + luma_bytes + chroma_bytes);
+	std::copy_n(source.y.get(), luma_bytes, output);
+	std::copy_n(source.cb.get(), chroma_bytes, output + luma_bytes);
+	std::copy_n(source.cr.get(), chroma_bytes, output + luma_bytes + chroma_bytes);
 }
 
 int mpeg_video::macroblock_address_increment()
