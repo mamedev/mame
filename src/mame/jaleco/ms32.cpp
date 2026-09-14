@@ -766,6 +766,23 @@ void ms32_f1superbattle_state::fpu_prg_w(int unit, offs_t offset, u32 data, u32 
 		word = (word & 0x0ffff) | ((((word >> 16) & ~mem_mask) | (data & mem_mask)) & 0xf) << 16;
 }
 
+void ms32_f1superbattle_state::f1superb_field_irq_w(int state)
+{
+	if (state)
+		latch_txram(m_txram_latch);
+	field_irq_w(state);
+}
+
+void ms32_f1superbattle_state::fpu0_irq_w(int state)
+{
+	irq_raise(5, state);
+}
+
+void ms32_f1superbattle_state::fpu1_irq_w(int state)
+{
+	irq_raise(2, state);
+}
+
 void ms32_f1superbattle_state::fpu0_prg_map(address_map &map)
 {
 	map(0x000, 0x3ff).ram().share("fpu0_prg");
@@ -1718,17 +1735,17 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
 
 	m_sysctrl->set_field_irq_last_active_line(true);
-	m_sysctrl->field_cb().set([this] (int state) { if (state) latch_txram(m_txram_latch); field_irq_w(state); });
+	m_sysctrl->field_cb().set(FUNC(ms32_f1superbattle_state::f1superb_field_irq_w));
 
 	JALECO_FPU(config, m_fpu[0], XTAL(48'000'000) / 8); // clock unknown, guessed
 	m_fpu[0]->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::fpu0_prg_map);
 	m_fpu[0]->set_addrmap(AS_DATA, &ms32_f1superbattle_state::fpu0_data_map);
-	m_fpu[0]->irq_cb().set([this] (int state) { irq_raise(5, state); });
+	m_fpu[0]->irq_cb().set(FUNC(ms32_f1superbattle_state::fpu0_irq_w));
 
 	JALECO_FPU(config, m_fpu[1], XTAL(48'000'000) / 8);
 	m_fpu[1]->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::fpu1_prg_map);
 	m_fpu[1]->set_addrmap(AS_DATA, &ms32_f1superbattle_state::fpu1_data_map);
-	m_fpu[1]->irq_cb().set([this] (int state) { irq_raise(2, state); });
+	m_fpu[1]->irq_cb().set(FUNC(ms32_f1superbattle_state::fpu1_irq_w));
 
 	m_gfxdecode->set_info(gfx_f1superb);
 }

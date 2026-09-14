@@ -236,6 +236,10 @@ private:
 	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 road_vram_r16(offs_t offset);
 
+	void f1superb_field_irq_w(int state);
+	void fpu0_irq_w(int state);
+	void fpu1_irq_w(int state);
+
 	u32 analog_r();
 };
 
