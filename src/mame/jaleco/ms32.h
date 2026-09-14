@@ -222,7 +222,10 @@ private:
 	u16 m_road_line_colour[256];
 	u16 m_roz_line_colour[256];
 	std::vector<u16> m_txram_latch;
-	bitmap_ind16 m_layer_tx, m_layer_bg, m_layer_road, m_layer_roz;
+	bitmap_ind16 m_layer_tx;
+	bitmap_ind16 m_layer_bg;
+	bitmap_ind16 m_layer_road;
+	bitmap_ind16 m_layer_roz;
 
 	tilemap_t* m_extra_tilemap;
 

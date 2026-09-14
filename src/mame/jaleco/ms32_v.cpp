@@ -112,6 +112,11 @@ void ms32_f1superbattle_state::video_start()
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	m_extra_tilemap->set_transparent_pen(0);
 
+	m_screen->register_screen_bitmap(m_layer_tx);
+	m_screen->register_screen_bitmap(m_layer_bg);
+	m_screen->register_screen_bitmap(m_layer_road);
+	m_screen->register_screen_bitmap(m_layer_roz);
+
 	init_txram_latch(m_txram_latch);
 	save_item(NAME(m_txram_latch));
 	std::fill(std::begin(m_road_line_colour), std::end(m_road_line_colour), 0);
@@ -165,18 +170,15 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
 */
 void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto layer = [&] (bitmap_ind16 &bmp) -> bitmap_ind16 &
-	{
-		if (bmp.width() != bitmap.width() || bmp.height() != bitmap.height())
-			bmp.allocate(bitmap.width(), bitmap.height());
-		bmp.fill(0xffff, cliprect);
-		return bmp;
-	};
+	m_layer_tx.fill(0xffff, cliprect);
+	m_layer_bg.fill(0xffff, cliprect);
+	m_layer_road.fill(0xffff, cliprect);
+	m_layer_roz.fill(0xffff, cliprect);
 
-	tx_tilemap()->draw(screen, layer(m_layer_tx), cliprect, 0, 0);
-	bg_layer_tilemap()->draw(screen, layer(m_layer_bg), cliprect, 0, 0);
-	draw_line_plane(screen, layer(m_layer_road), cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], true, m_road_line_colour);
-	draw_line_plane(screen, layer(m_layer_roz), cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), false, m_roz_line_colour);
+	tx_tilemap()->draw(screen, m_layer_tx, cliprect, 0, 0);
+	bg_layer_tilemap()->draw(screen, m_layer_bg, cliprect, 0, 0);
+	draw_line_plane(screen, m_layer_road, cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], true, m_road_line_colour);
+	draw_line_plane(screen, m_layer_roz, cliprect, roz_tilemap(), rozram_ptr(), roz_lineram(), roz_ctrl(), false, m_roz_line_colour);
 
 	pen_t const *const paldata = m_palette->pens();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
