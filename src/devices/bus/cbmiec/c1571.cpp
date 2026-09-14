@@ -583,7 +583,7 @@ void c1571_device::cbm_iec_reset(int state)
 {
 	if (!state)
 	{
-		device_reset();
+		reset();
 	}
 }
 

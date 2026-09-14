@@ -414,14 +414,14 @@ void c1541_device_base::via1_pb_w(uint8_t data)
 
 	*/
 
-	if (machine().phase() != machine_phase::RUNNING)
-		return;
+	if (machine().phase() == machine_phase::RUNNING)
+	{
+		// spindle motor
+		m_ga->mtr_w(BIT(data, 2));
 
-	// spindle motor
-	m_ga->mtr_w(BIT(data, 2));
-
-	// stepper motor
-	m_ga->stp_w(data & 0x03);
+		// stepper motor
+		m_ga->stp_w(data & 0x03);
+	}
 
 	// activity LED
 	m_leds[LED_ACT] = BIT(data, 3);
@@ -596,6 +596,7 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 
 void c1541_device_base::device_start()
 {
+	m_mtr_on_timer = timer_alloc(FUNC(c1541_device_base::mtr_on_tick), this);
 	m_iec_sync_timer = timer_alloc(FUNC(c1541_device_base::iec_sync_tick), this);
 
 	// install image callbacks
@@ -617,6 +618,14 @@ void c1541_device_base::device_reset()
 	// initialize gate array
 	m_ga->accl_w(0);
 	m_ga->ted_w(1);
+
+	// trigger motor on in lieu of via1_pb_w
+	m_mtr_on_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(c1541_device_base::mtr_on_tick)
+{
+	m_ga->mtr_w(1);
 }
 
 
@@ -638,6 +647,6 @@ void c1541_device_base::cbm_iec_reset(int state)
 {
 	if (!state)
 	{
-		device_reset();
+		reset();
 	}
 }
