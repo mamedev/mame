@@ -139,10 +139,7 @@ offs_t jaleco_fpu_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 
 	case 0xe:
 		if (arg == CTL_HALT)
-		{
 			util::stream_format(stream, "halt");
-			flags |= STEP_OUT;
-		}
 		else
 			util::stream_format(stream, "ctl   #$%04x", arg);
 		break;
@@ -157,20 +154,20 @@ offs_t jaleco_fpu_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		{
 			if (sense)
 			{
-				util::stream_format(stream, "call%s %03x", delay, target);
+				util::stream_format(stream, "%-5s %03x", util::string_format("call%s", delay), target);
 				flags |= STEP_OVER | step_over_extra(BIT(fn, 5) ? 1 : 0);
 			}
 			else
 			{
 				util::stream_format(stream, "ret%s", delay);
-				flags |= STEP_OUT;
+				flags |= STEP_OUT | step_over_extra(BIT(fn, 5) ? 1 : 0);
 			}
 		}
 		else if (code == 0 && sense)
-			util::stream_format(stream, "jmp%s  %03x", delay, target);
+			util::stream_format(stream, "%-5s %03x", util::string_format("jmp%s", delay), target);
 		else
 		{
-			util::stream_format(stream, "b%s%s%s %03x", sense ? "" : "n", cond_name(code), delay, target);
+			util::stream_format(stream, "%-5s %03x", util::string_format("b%s%s%s", sense ? "" : "n", cond_name(code), delay), target);
 			flags |= STEP_COND | step_over_extra(BIT(fn, 5) ? 1 : 0);
 		}
 		break;
