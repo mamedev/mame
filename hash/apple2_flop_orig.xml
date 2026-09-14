@@ -39601,6 +39601,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="supapbas">
+		<description>Super Apple Basic</description>
+		<year>1980</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="partno" value="05409" />
+		<info name="programmer" value="Paul Lutus" />
+		<info name="required_ram" value="Side A: 24K" />
+		<info name="required_ram" value="Side B: 48K" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A (DOS 3.2)" />
+			<dataarea name="flop" size="228176">
+				<rom name="Super Apple Basic - Disk 1, Side A.woz" size="228176" crc="192d1ec1" sha1="3ad051fd9463987c8ca3d1431ca1d9b15f368518" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B (DOS 3.3)" />
+			<dataarea name="flop" size="234832">
+				<rom name="Super Apple Basic - Disk 1, Side B.woz" size="234832" crc="a4f8c313" sha1="76eef4cb553e4f005cf2479bced003a9c471f56d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprearc">
 		<description>Super Ear Challenger (version 1984)</description>
 		<year>1984</year>
