@@ -202,7 +202,7 @@ bool jaleco_fpu_device::condition(u8 code)
 	case 0x4: return m_c7 != 0;
 	case 0x5: return m_c7-- != 0;
 	case 0x8: return m_flags & F_Z;
-	case 0x9: return (m_flags & F_Z) || (n != v);
+	case 0x9: return n != v;
 	case 0xa: return n == v;
 	case 0xb: return (n == v) && !(m_flags & F_Z);
 	case 0xd: return m_flags & F_C;

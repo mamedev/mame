@@ -109,7 +109,8 @@ protected:
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	tilemap_t *&roz_tilemap() { return m_roz_tilemap; }
-	virtual u8 sprite_mix_priority(const u16 *source, u8 pri) { return pri; }
+	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
+	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
 	void init_txram_latch(std::vector<u16> &latch) { latch.assign(m_txram.length(), 0); m_txram_view = latch.data(); }
 	void latch_txram(std::vector<u16> &latch);
 	u16 const *m_txram_view = nullptr;
@@ -206,8 +207,7 @@ protected:
 	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) override;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority) override { }
-	virtual u8 sprite_mix_priority(const u16 *source, u8 pri) override;
-	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool front, u16 backdrop_row, u8 priority, bool wrap, bool record_class);
+	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool front, u16 backdrop_row, u8 priority, bool wrap, bool record_colour);
 private:
 	memory_share_creator<u16> m_road_vram;
 
@@ -217,8 +217,9 @@ private:
 	memory_share_array_creator<u32, 2> m_fpu_prg;
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
-	u8 m_road_line_class[256];
+	u16 m_road_line_colour[256];
 	std::vector<u16> m_txram_latch;
+	bitmap_ind16 m_layer_tx, m_layer_bg, m_layer_p0f, m_layer_p0b, m_layer_p1f, m_layer_p1b;
 
 	tilemap_t* m_extra_tilemap;
 

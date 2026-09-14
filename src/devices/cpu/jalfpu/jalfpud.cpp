@@ -23,7 +23,7 @@ std::string cond_name(unsigned code)
 	case 0x4: return "c7";
 	case 0x5: return "djnz7";
 	case 0x8: return "z";
-	case 0x9: return "le";
+	case 0x9: return "lt";
 	case 0xa: return "ge";
 	case 0xb: return "gt";
 	case 0xd: return "c";
