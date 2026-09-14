@@ -515,9 +515,7 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			}
 		}
 		else if(asc_pri == prin)
-		{
 			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
-		}
 	}
 
 	mix_layers(screen, bitmap, cliprect);

@@ -725,9 +725,7 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 
 	map(0xfce00800, 0xfce0085f).ram().share(m_road_ctrl);
 
-	// bit 1: steering shock
-	// bit 0: seat motor
-//  map(0xfd0f0000, 0xfd0f0003)
+	map(0xfd0f0000, 0xfd0f0003).nopw(); // bit 1: steering shock, bit 0: seat motor
 
 	map(0xfd100000, 0xfd1023ff).lrw16(
 			NAME([this] (offs_t offset) { return m_fpu_data[0][offset]; }),
@@ -2684,12 +2682,6 @@ void ms32_state::init_ss92048_01()
 
 void ms32_f1superbattle_state::init_f1superb()
 {
-#if 0
-	// hack for ?, game needs FPUs emulated anyway, eventually remove me
-	u32 *pROM = (u32 *)memregion("maincpu")->base();
-	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
-	// the x offsets are never copied either ...
-#endif
 	init_ss92046_01();
 }
 
