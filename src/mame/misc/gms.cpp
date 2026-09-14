@@ -3355,6 +3355,9 @@ ROM_START( tbss )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
 	// u29 not populated
 	ROM_LOAD( "u39", 0x80000, 0x80000, CRC(4be91081) SHA1(0a3691bb2c7b5ba7fb5617cb16aacecb2fa93519) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(2c2e0cde) SHA1(ec59968b95131b35137fd948ae73e0d022dfc4b3) )
 ROM_END
 
 // 神机妙算 (Shénjī Miàosuàn)

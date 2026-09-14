@@ -4679,8 +4679,8 @@ ROM_START( sdmg2641c ) // IGS PCB N0-0093-8
 	ROM_LOAD16_WORD_SWAP( "igs_m2403.u30", 0x00000, 0x80000, CRC(e5f197fe) SHA1(d17bf7f37251083645cf235e148cb819d1bd995d) )
 
 	ROM_REGION( 0x280000, "igs011", 0 )
-	ROM_LOAD( "rom.u15",      0x000000, 0x200000, NO_DUMP ) // soldered, not dumped yet
-	ROM_LOAD( "igs_l2404.u8", 0x200000, 0x080000, NO_DUMP ) // soldered, not dumped yet
+	ROM_LOAD( "rom.u15",      0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
+	ROM_LOAD( "igs_l2404.u8", 0x200000, 0x080000, CRC(47dd4df5) SHA1(74e2fdb6a7052290b631fc13d31bc03261410e84) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_s0202.u39", 0x000000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // not dumped, but ROM code matches xymga's
@@ -4719,5 +4719,5 @@ GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_oki_stat
 GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,      init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,      init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   vbowl_state,      init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, sdmg2641c,     sdmg2,    xymga,           xymg,      igs011_oki_state, init_sdmg2641c,    ROT0, "IGS",                     "Chaoji Da Manguan II (China, V641C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing GFX ROM, inputs / outputs / protection need verifying
+GAME( 1997, sdmg2641c,     sdmg2,    xymga,           xymg,      igs011_oki_state, init_sdmg2641c,    ROT0, "IGS",                     "Chaoji Da Manguan II (China, V641C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // inputs / outputs / protection need verifying
 GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_oki_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",             MACHINE_SUPPORTS_SAVE )
