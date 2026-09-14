@@ -1723,7 +1723,8 @@ u32 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	// Elsewhere it mentions using an "Alternate Multiply" label ...
 	const u8 alt_multiply = ((byte_data & 0xe0) >> 5) + 1;
 
-	const u16 src_data = (((m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1))) | m_cel.pover_force_high) & m_cel.pover_mask;;
+	const u16 src_data = (((m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1))) | m_cel.pover_force_high) & m_cel.pover_mask;
+	//const u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
 
 	const u16 dst_data = convert_8bpp_alt_multiply(src_data, alt_multiply);
 
