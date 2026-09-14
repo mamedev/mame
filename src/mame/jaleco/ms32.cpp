@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Paul Priest
+// copyright-holders:David Haywood,Paul Priest, Andrea Bogazzi
 /* Jaleco MegaSystem 32 (Preliminary Driver)
 
  - hardware tests are needed to establish how the mixing really works (and interrupt source etc.)
@@ -787,6 +787,8 @@ void ms32_f1superbattle_state::fpu1_data_map(address_map &map)
 }
 
 /* F1 Super Battle hardware notes
+
+Coprocessor instruction set, road display and priority RAM mixing reverse engineered by Andrea Bogazzi.
 
 Extra boards on top of the MS32 motherboard and ROM cart:
 - F1-93158 (EB93007-20095): road plane graphics ROMs (MR93007-xx, gfx5), one custom QFP (marking unread)

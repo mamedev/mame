@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrea Bogazzi
 
+// Jaleco "FPU" math coprocessor disassembler
+
 #include "emu.h"
 #include "jalfpud.h"
 

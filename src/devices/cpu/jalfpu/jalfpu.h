@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrea Bogazzi
 
+// Jaleco "FPU" math coprocessor (F-1 Super Battle)
+
 #ifndef MAME_CPU_JALFPU_JALFPU_H
 #define MAME_CPU_JALFPU_JALFPU_H
 

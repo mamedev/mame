@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Paul Priest
+// copyright-holders:David Haywood,Paul Priest, Andrea Bogazzi
 #ifndef MAME_JALECO_MS32_H
 #define MAME_JALECO_MS32_H
 

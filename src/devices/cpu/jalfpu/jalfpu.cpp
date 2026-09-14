@@ -4,8 +4,8 @@
     Jaleco "FPU" math coprocessor (F-1 Super Battle)
 
     Unidentified part, programmed by the host at boot through shared RAM.
-    Instruction set reverse-engineered from the program the V70 uploads,
-    validated against its built-in self-test.
+    Instruction set reverse-engineered by Andrea Bogazzi from the program
+    the V70 uploads, validated against its built-in self-test.
 
     20-bit instructions: 4-bit opcode, 16-bit argument.
     Register operations: fn[15:10] a[9:6] m[5:4] b[3:0], 16 registers s0-sf,

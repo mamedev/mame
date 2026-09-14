@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrea Bogazzi
 
+// Jaleco "FPU" math coprocessor disassembler
+
 #ifndef MAME_CPU_JALFPU_JALFPUD_H
 #define MAME_CPU_JALFPU_JALFPUD_H
 
