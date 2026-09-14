@@ -5334,7 +5334,7 @@ ROM_START( gollygho )
 	ROM_REGION16_BE( 0x200000, "data_rom", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* All DAT ROM sockets unpopulated on PCB */
 
-	ROM_REGION16_BE( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5380,7 +5380,7 @@ ROM_START( bubbletr ) /* All labels were hand written and included the rom size,
 	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) ) /* dated 4/24 */
 	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) ) /* dated 4/24 */
 
-	ROM_REGION16_BE( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5426,7 +5426,7 @@ ROM_START( bubbletrj )
 	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) )
 	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) )
 
-	ROM_REGION16_BE( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
+	ROM_REGION( 0x2000, "s2sprite:scalelut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
