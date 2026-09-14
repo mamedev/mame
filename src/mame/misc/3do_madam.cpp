@@ -129,6 +129,7 @@ void madam_device::device_reset()
 	m_dma_playerbus_timer->adjust(attotime::never);
 	m_cel_timer->adjust(attotime::never);
 
+	std::fill(m_cel.buffer.begin(), m_cel.buffer.end(), CEL_TRANSPARENT);
 	// TODO: unknown init value
 	std::fill_n(m_mult, 40, 0);
 }
@@ -199,6 +200,7 @@ void madam_device::map(address_map &map)
 	// SPRCNTU - Continue the CEL engine (W)
 	map(0x0108, 0x010b).w(FUNC(madam_device::cel_continue_w));
 //  map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
+	// TODO: these contains CEL master switches, to be converted as typed fn
 	map(0x0110, 0x0113).lrw32(
 		NAME([this] () { return m_ccobctl0; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -240,59 +242,91 @@ void madam_device::map(address_map &map)
 			COMBINE_DATA(&m_regctl3);
 		})
 	);
-	// TODO: these are in 16.16 format
+	// TODO: these really smells as actually r/w some CEL engine parameters
+	// documentation just claims to *not* access it while running
 	map(0x0140, 0x0143).lrw32(
-		NAME([this] () { return m_xyposh; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("xyposh R\n");
+			return m_xyposh;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("xyposh: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_xyposh);
 		})
 	);
 	map(0x0144, 0x0147).lrw32(
-		NAME([this] () { return m_xyposl; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("xyposl R\n");
+			return m_xyposl;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("xyposl: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_xyposl);
 		})
 	);
 	map(0x0148, 0x014b).lrw32(
-		NAME([this] () { return m_linedxyh; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("linedxyh R\n");
+			return m_linedxyh;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("linedxyh: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_linedxyh);
 		})
 	);
 	map(0x014c, 0x014f).lrw32(
-		NAME([this] () { return m_linedxyl; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("linedxyl R\n");
+			return m_linedxyl;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("linedxyl: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_linedxyl);
 		})
 	);
-	// TODO: these are in 12.20 format
 	map(0x0150, 0x0153).lrw32(
-		NAME([this] () { return m_dxyh; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("dxyh R\n");
+			return m_dxyh;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("dxyh: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_dxyh);
 		})
 	);
 	map(0x0154, 0x0157).lrw32(
-		NAME([this] () { return m_dxyl; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("dxyl R\n");
+			return m_dxyl;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("dxyl: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_dxyl);
 		})
 	);
 	map(0x0158, 0x015b).lrw32(
-		NAME([this] () { return m_ddxyh; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("ddxyh R\n");
+			return m_ddxyh;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("ddxyh: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_ddxyh);
 		})
 	);
 	map(0x015c, 0x015f).lrw32(
-		NAME([this] () { return m_ddxyl; }),
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOGREGIS("ddxyl R\n");
+			return m_ddxyl;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("ddxyl: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_ddxyl);
@@ -300,21 +334,24 @@ void madam_device::map(address_map &map)
 	);
 	// PIP: Pen Index Palette (or PLT: Palette Look-up Table)
 	// Reads are split in words, but writes are dword (cutting at 0x1bf)
-	// TODO: does writing to 0x1c0-0x1ff go to mirror or they are just ignored?
 	map(0x0180, 0x01ff).lrw32(
 		NAME([this] (offs_t offset) {
 			const u16 reg = offset >> 1;
+			if (!machine().side_effects_disabled())
+				LOGREGIS("PIP[%d]: R\n", reg);
 			if (offset & 1)
 				return m_pip[reg & 0x0f] >> 16;
 
 			return m_pip[reg & 0x0f] & 0xffff;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// TODO: does writing to 0x1c0-0x1ff go to mirror or they are just ignored?
 			if (offset & 0x10)
 			{
 				LOG("Warning: write to PIP at %04x (ignored)\n", (offset * 4) + 0x180);
 				return;
 			}
+			LOGREGIS("PIP[%d]: %08x & %08x\n", offset, data, mem_mask);
 			COMBINE_DATA(&m_pip[offset & 0xf]);
 		})
 	);
@@ -920,7 +957,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			tick_time ++;
 
 			// plut fetch is optional
-			// TODO: find use cases
+			// TODO: find use cases when not
 			if (ldplut)
 			{
 				const u32 plut_addr = m_dma32_read_cb(m_cel.address + 0x0c);
@@ -1415,6 +1452,7 @@ u32 madam_device::cel_decompress()
 	// 1bpp and 2bpp are special: they have more than 1 intermediate byte step when drawing pixels.
 	// For now we std::ignore the return pointer and count manually from here instead.
 	const bool frac_byte_step = bpp == 1 || bpp == 2;
+	u16 eol_markers[pitch]{};
 
 	for (u16 yline = 0; yline < vcnt; yline ++)
 	{
@@ -1492,14 +1530,34 @@ u32 madam_device::cel_decompress()
 			}
 		}
 
-		// TODO: it is unclear what happens if the source data is uneven
-		// Documentation claims "not necessarily rectangle" ...
+		eol_markers[yline] = xpos;
 		tlhpcnt = std::max<unsigned>(tlhpcnt, xpos);
 		source_ptr = next_ptr;
 	}
 
 	// setup the preamble so that DRAW state knows what to do
 	m_cel.pre1 = (tlhpcnt - 1);
+
+	// A packed CEL is not necessarily rectangle, so we need to clear up a previous setup now that
+	// we have the actual line extents. Location here is primarily performance oriented,
+	// would tank if we 0-fill the full vector stack on every CEL.
+	// - waywarr (in particular Bridge stage and Crimson Glory kick normals)
+	// - cpquazar gameplay
+	// - icebrk gameplay
+	//if (m_cel.bgnd)
+	{
+		for (u16 yline = 0; yline < vcnt; yline ++)
+		{
+			const u16 x_marker = eol_markers[yline];
+			if (x_marker < tlhpcnt)
+			{
+				const u32 base_y = yline * pitch;
+				for (s16 xpos = x_marker; xpos < tlhpcnt; xpos ++)
+					m_cel.buffer[base_y + (xpos % pitch)] = CEL_TRANSPARENT;
+			}
+		}
+	}
+
 	return tick_time;
 }
 
@@ -1719,10 +1777,6 @@ u32 madam_device::get_pixel_packed(int x, int y, u16 woffset)
 	const u32 src_address = x + (y * pitch);
 
 	u32 src_data = m_cel.buffer[src_address];
-	// Clear after use so that the next CEL won't draw glitchy GFXs due of
-	// PACK_EOL + the calculated tlhpcnt.
-	// Location here is primarily performance oriented, would tank if we 0-fill the full vector stack.
-	m_cel.buffer[src_address] = CEL_TRANSPARENT;
 	return src_data;
 }
 

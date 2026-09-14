@@ -54,7 +54,7 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Mizuki</publisher>
 		<notes><![CDATA[
-[Madam] Mermaid Mode: minor RMW glitches, stage select is offset in some places (check skipx)
+[Madam] Mermaid Mode stage select is offset in some places (check skipx)
 ]]></notes>
 		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo, -->
 		<!-- pressing play/pause between game 3do logo and now loading will pause with no feedback -->
@@ -143,8 +143,7 @@ May optionally use a [Player] mouse
 		<year>1996</year>
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
-[Madam] has no pointer in main menu (check PIXC)
-Has RMW bugs in gameplay
+[Madam] PIXC bugs: has no pointer in main menu, requires additive blending for status bar boxes
 Not extensively tested, untested preview section
 ]]></notes>
 		<info name="barcode" value="7 90561 02379 1"/>
@@ -244,7 +243,7 @@ Hangs after second FMV, regardless of skipping or not
 		<year>1995</year>
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
-Occasional [Madam] RMW bugs
+[Madam] PIXC for game over animation drawing
 ]]></notes>
 		<info name="barcode" value="0 37988 83026 8"/>
 		<info name="serial" value="FZ-SW0001"/>
@@ -367,7 +366,6 @@ Bonus section (3rd option) is untested
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
 [DSPP] sometimes hiccups SFXs during gameplay
-[Madam] occasional RMW corruption on playfield, particularly on drain balls
 ]]></notes>
 		<info name="barcode" value="0 37988 83005 3"/>
 		<info name="developer" value="Japan DataWorks"/>
@@ -428,7 +426,7 @@ Not extensively tested
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
 [Madam] corrupted CEL for Krisalis logo at startup
-Title screen, options and pause menu have RMW or PIXC bugs
+Title screen, options and pause menu have PIXC bugs
 ]]></notes>
 		<!-- 7 90561 02500 9 for other pressings (same content?) -->
 		<info name="barcode" value="7 90561 00942 9"/>
@@ -449,10 +447,8 @@ Title screen, options and pause menu have RMW or PIXC bugs
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-[AMY] sets wrong strips on intro logos
-[Sport] missing layer clearances
-[Madam] minor RMW bug in options menu, offset "select game speed" in character select
-Sensitive to CEL timings
+[Sport] missing layer clearances, doesn't draw Capcom logo at startup
+[Madam] Sensitive to CEL timings
 Eventually requires support for [Player] Capcom fighting pad
 ]]></notes>
 		<info name="alt_title" value="スーパーストリートファイターIIX"/>
@@ -523,7 +519,7 @@ Not extensively tested
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
 Pixelated elements in main menu and gameplay, check [Madam] CEL output
-[Madam] Center of screen is too dim in gameplay, likely PIXC
+[Madam] Center of screen is too dim in gameplay (player doesn't get drawn), check PIXC and ALSC
 ]]></notes>
 		<info name="barcode" value="0 13252 01900 3"/>
 		<info name="developer" value="Elite Systems"/>
@@ -534,6 +530,10 @@ Pixelated elements in main menu and gameplay, check [Madam] CEL output
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- TODO: waywarr: Way of the Warrior -->
+	<!-- https://redump.info/disc/45731 -->
+	<!-- ... -->
 
 	<!-- https://redump.info/disc/88188 -->
 	<software name="whoshot" supported="no">

@@ -164,7 +164,8 @@ private:
 		DRAW
 	};
 
-	static constexpr u32 CEL_TRANSPARENT = 1 << 16;
+	static constexpr u32 CEL_TRANSPARENT = 1 << 31;
+	// TODO: base for alt_multiply for PIXC interactions here
 
 	struct {
 		cel_state_t state;
