@@ -107,6 +107,13 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) { }
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	tilemap_t *&roz_tilemap() { return m_roz_tilemap; }
+	virtual u8 sprite_mix_priority(const u16 *source, u8 pri) { return pri; }
+	u16 const *rozram_ptr() const { return &m_rozram[0]; }
+	u16 const *roz_lineram() const { return &m_lineram[0]; }
+	u32 const *roz_ctrl() const { return &m_roz_ctrl[0]; }
+	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 
 	memory_share_creator<u8> m_priram;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
@@ -166,14 +173,12 @@ private:
 	void init_ms32_common();
 
 	TILE_GET_INFO_MEMBER(get_ms32_tx_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg_tile_info);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
-	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 };
 
 class ms32_f1superbattle_state : public ms32_state
@@ -188,7 +193,6 @@ public:
 		, m_fpu_prg(*this, "fpu%u_prg", 0U, 0x1000U, ENDIANNESS_LITTLE)
 		, m_road_ctrl(*this, "road_ctrl")
 		, m_road_lineram(*this, "road_lineram", 0x10000, ENDIANNESS_LITTLE)
-		, m_io_debug(*this, "DEBUG")
 	{}
 
 	void f1superb(machine_config &config) ATTR_COLD;
@@ -198,6 +202,9 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void draw_extra_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool front) override;
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority) override { }
+	virtual u8 sprite_mix_priority(const u16 *source, u8 pri) override;
+	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool front, u16 backdrop_row, u8 priority, bool wrap, bool record_class);
 private:
 	memory_share_creator<u16> m_road_vram;
 
@@ -207,7 +214,6 @@ private:
 	memory_share_array_creator<u32, 2> m_fpu_prg;
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
-	required_ioport m_io_debug;
 	u8 m_road_line_class[256];
 
 	tilemap_t* m_extra_tilemap;

@@ -25,7 +25,7 @@
 #define LOG_UNIMPL (1U << 1)
 #define LOG_HOST   (1U << 2)
 
-#define VERBOSE (LOG_UNIMPL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 #define LOGUNIMPL(...) LOGMASKED(LOG_UNIMPL, __VA_ARGS__)

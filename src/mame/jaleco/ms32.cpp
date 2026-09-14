@@ -1558,9 +1558,6 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPSETTING(    0x0c, "7" )
 	PORT_DIPSETTING(    0x0e, "8" )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DEBUG")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Debug: Hide Road Layer") PORT_CODE(KEYCODE_O) PORT_TOGGLE
 INPUT_PORTS_END
 
 /********** GFX DECODE **********/
@@ -1575,10 +1572,10 @@ static GFXDECODE_START( gfx_ms32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_f1superb )
-	GFXDECODE_ENTRY( "roztiles", 0, gfx_16x16x8_raw, 0x2000, 0x10 )
+	GFXDECODE_ENTRY( "roztiles", 0, f1layout,        0x2000, 0x10 )
 	GFXDECODE_ENTRY( "bgtiles",  0, gfx_16x16x8_raw, 0x1000, 0x10 )
 	GFXDECODE_ENTRY( "txtiles",  0, gfx_8x8x8_raw,   0x6000, 0x10 )
-	GFXDECODE_ENTRY( "gfx5",     0, f1layout,        0x0000, 0x80 ) // not tilemap data?
+	GFXDECODE_ENTRY( "gfx5",     0, f1layout,        0x0000, 0x80 )
 GFXDECODE_END
 
 
@@ -1788,6 +1785,8 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 {
 	ms32(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
+
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	// clock unknown
 	JALECO_FPU(config, m_fpu[0], XTAL(48'000'000) / 8);
