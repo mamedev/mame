@@ -141,6 +141,20 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
 	}
 }
 
+/*
+    Per-pixel lookup in priority RAM, index layout matching the other MS32 games' tables:
+    bit 12     sprite transparent
+    bit 11     text transparent
+    bit 10     unknown, always 1 on the games checked
+    bit 9      ROZ transparent
+    bit 8      road plane transparent (always 1 on games without it)
+    bit 7      BG transparent
+    bits 6-3   sprite priority (attribute bits 7-4)
+    bits 2-0   line depth, colour bits 6-4 of the ROZ line, or of the road plane line where ROZ is transparent
+
+    Output: bits 5-3 select the layer (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text), bit 6 selects the backdrop.
+    TODO: bit 2 clear is approximated as half brightness, bits 1-0 are ignored
+*/
 void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	auto layer = [&] (bitmap_ind16 &bmp) -> bitmap_ind16 &
