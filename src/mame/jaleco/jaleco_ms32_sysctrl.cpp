@@ -66,7 +66,7 @@ jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mco
 	, m_sound_ack_cb(*this)
 	, m_sound_reset_cb(*this)
 	, m_invert_vblank_lines(false)
-	, m_field_irq_at_vblank(false)
+	, m_field_irq_last_active_line(false)
 {
 }
 
@@ -184,7 +184,7 @@ TIMER_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::flush_scanline_timer)
 	// 30 Hz irq
 	// TODO: unknown mechanics where this happens, is it even tied to scanline?
 	// f1superb needs it on the last active line (text layer is updated from this handler)
-	if (current_scanline == (m_field_irq_at_vblank ? m_crtc.vert_display - 1 : 0) && m_screen->frame_number() & 1)
+	if (current_scanline == (m_field_irq_last_active_line ? m_crtc.vert_display - 1 : 0) && m_screen->frame_number() & 1)
 		m_invert_vblank_lines ? m_vblank_cb(1) : m_field_cb(1);
 
 	uint32_t next_scanline = (current_scanline + 1) % crtc_vtotal();

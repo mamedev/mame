@@ -1717,7 +1717,7 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 	ms32(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
 
-	m_sysctrl->set_field_irq_at_vblank(true);
+	m_sysctrl->set_field_irq_last_active_line(true);
 	m_sysctrl->field_cb().set([this] (int state) { if (state) latch_txram(m_txram_latch); field_irq_w(state); });
 
 	JALECO_FPU(config, m_fpu[0], XTAL(48'000'000) / 8); // clock unknown, guessed
