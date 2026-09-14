@@ -334,14 +334,21 @@ void jaleco_fpu_device::execute_one(u32 op)
 				m_flags |= F_V;
 				break;
 			}
-			m_s[0xd] = dividend / divisor;
+			u32 const quotient = dividend / divisor;
+			if (quotient > 0xffff)
+			{
+				LOGUNIMPL("%03x: unsigned divide overflow\n", m_ppc);
+				m_flags |= F_V;
+				break;
+			}
+			m_s[0xd] = quotient;
 			m_s[b] = dividend % divisor;
 			set_nz(m_s[0xd]);
 			break;
 		}
 		case 0x2f:
 		{
-			s32 const dividend = s32((u32(m_s[b]) << 16) | m_s[0xd]);
+			s64 const dividend = s32((u32(m_s[b]) << 16) | m_s[0xd]);
 			s16 const divisor = s16(m_s[a]);
 			if (!divisor)
 			{
@@ -349,7 +356,14 @@ void jaleco_fpu_device::execute_one(u32 op)
 				m_flags |= F_V;
 				break;
 			}
-			m_s[0xd] = dividend / divisor;
+			s64 const quotient = dividend / divisor;
+			if ((quotient < -0x8000) || (quotient > 0x7fff))
+			{
+				LOGUNIMPL("%03x: signed divide overflow\n", m_ppc);
+				m_flags |= F_V;
+				break;
+			}
+			m_s[0xd] = quotient;
 			m_s[b] = dividend % divisor;
 			set_nz(m_s[0xd]);
 			break;
