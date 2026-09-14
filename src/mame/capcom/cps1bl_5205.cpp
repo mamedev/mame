@@ -363,7 +363,7 @@ void cps1bl_5205_state::captcommb2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_5205_state, captcommb2)
 	MCFG_MACHINE_RESET_OVERRIDE(cps1bl_5205_state, captcommb2)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps1bl_5205_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(cps1bl_5205_state::screen_vblank_cps1));
@@ -425,7 +425,7 @@ void cps1bl_5205_state::sf2mdt(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(cps1bl_5205_state, captcommb2)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps1bl_5205_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(cps1bl_5205_state::screen_vblank_cps1));

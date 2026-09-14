@@ -1149,7 +1149,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper[1], attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(0x190, 0x100+16);
@@ -1189,7 +1189,7 @@ void jclub2_state::jclub2(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper[1], attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(0x190, 0x100+16);
@@ -1231,7 +1231,7 @@ void darkhors_state::darkhors(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper[1], attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(0x190, 0x100+16);

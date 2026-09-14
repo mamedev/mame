@@ -613,7 +613,7 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	{
 		PALETTE(config, m_palette[i]).set_entries(0x8000);
 
-		SCREEN(config, m_screen[i], SCREEN_TYPE_RASTER);
+		SCREEN(config, m_screen[i]);
 		m_screen[i]->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 		m_screen[i]->set_palette(m_palette[i]);
 

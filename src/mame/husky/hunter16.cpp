@@ -218,7 +218,7 @@ void hunter16_state::hunter16(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hunter16_state::io_16_map);
 	m_maincpu->pt_in_cb().set(FUNC(hunter16_state::pt_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(240, 128);
 	m_screen->set_visarea(0, 239, 0, 63);
@@ -237,7 +237,7 @@ void hunter16_state::hunter1680(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hunter16_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &hunter16_state::io_1680_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_raw(14.318181_MHz_XTAL, 912, 0, 640, 296, 0, 200);
 	m_screen->set_screen_update("cga", FUNC(mc6845_device::screen_update));
 

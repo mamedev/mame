@@ -100,7 +100,7 @@ void mt5510_state::mt5510(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom2").do_callback().set("duart", FUNC(scn2681_device::ip5_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(45.8304_MHz_XTAL / 2, 1120, 0, 960, 341, 0, 300); // wild guess at resolution
 	screen.set_screen_update(FUNC(mt5510_state::screen_update));
 }

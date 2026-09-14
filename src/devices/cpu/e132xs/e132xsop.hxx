@@ -1480,7 +1480,7 @@ void hyperstone_device::hyperstone_rol()
 
 	uint32_t val = m_core->local_regs[dst_code];
 
-	val = rotl_32(val, n);
+	val = std::rotl(val, n);
 
 	SR &= ~(V_MASK | Z_MASK | C_MASK | N_MASK);
 	if (!(val & 0x80000000) ? (val & mask) : ((val & mask) ^ mask))

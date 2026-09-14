@@ -1058,7 +1058,7 @@ void x68k_state::x68000_base(machine_config &config)
 	m_rtc->set_year_offset(20);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(69.55199_MHz_XTAL / 2, 1096, 0, 768, 568, 0, 512);  // initial setting
 	m_screen->set_screen_update(FUNC(x68k_state::screen_update));
 

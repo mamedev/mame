@@ -62,7 +62,7 @@ V4: 1MB DRAM
 V5: 128KB+16KB DRAM, dual-CPU! (2*68K @ 16MHz)
 
 V2/V3/V4 have the same program, V2/V3 versions can be run by decreasing the
-RAM size (-ramsize option). It's not verified if V1 has the same program, but
+RAM size (-ram option). It's not verified if V1 has the same program, but
 it probably does.
 
 V6-V11 are on model 6117. Older 1986 model 6081/6088/6089 uses a 6502 CPU.

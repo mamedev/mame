@@ -138,13 +138,12 @@ ioport_constructor isa8_chessmsr_device::device_input_ports() const
 
 void isa8_chessmsr_device::device_add_mconfig(machine_config &config)
 {
-	ARM(config, m_maincpu, 30_MHz_XTAL/2);
+	ARM2(config, m_maincpu, 30_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &isa8_chessmsr_device::chessmsr_mem);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	GENERIC_LATCH_8(config, m_sublatch);
-	m_sublatch->data_pending_callback().set_inputline(m_maincpu, ARM_FIRQ_LINE);
+	m_sublatch->data_pending_callback().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
 }
 
 

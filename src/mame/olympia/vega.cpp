@@ -818,7 +818,7 @@ void vega_state::vega(machine_config &config)
 	m_ins8154->out_b().set(FUNC(vega_state::ins8154_pb_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(vega_state::screen_update));
 	screen.set_palette(m_palette);
 

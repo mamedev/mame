@@ -662,7 +662,7 @@ void sega_ferie_state::sega_ferie(machine_config &config)
 	// FIXME: Guessed timings
 	TIMER(config, "irq").configure_periodic(FUNC(sega_ferie_state::irq), attotime::from_hz(200));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(LCD_W, LCD_H);

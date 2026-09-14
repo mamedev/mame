@@ -305,7 +305,7 @@ void kminus_state::kminus(machine_config &config)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(kminus_state::kbd_put));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(26_MHz_XTAL / 2, 840, 0, 640, 309, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

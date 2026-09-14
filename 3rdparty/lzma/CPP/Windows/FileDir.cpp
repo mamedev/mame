@@ -15,8 +15,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "../Common/StringConvert.h"
 #include "../Common/C_FileIO.h"
+#include "../Common/MyBuffer2.h"
+#include "../Common/StringConvert.h"
 #endif
 
 #include "FileDir.h"
@@ -37,7 +38,12 @@ static bool FiTime_To_timespec(const CFiTime *ft, timespec &ts)
 {
   if (ft)
   {
+#if defined(_AIX)
+    ts.tv_sec  = ft->tv_sec;
+    ts.tv_nsec = ft->tv_nsec;
+#else
     ts = *ft;
+#endif
     return true;
   }
   // else
@@ -118,7 +124,7 @@ bool GetSystemDir(FString &path)
 #endif // UNDER_CE
 
 
-bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
+static bool SetFileTime_Base(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime, DWORD dwFlagsAndAttributes)
 {
   #ifndef _UNICODE
   if (!g_IsNT)
@@ -131,14 +137,14 @@ bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CF
   HANDLE hDir = INVALID_HANDLE_VALUE;
   IF_USE_MAIN_PATH
     hDir = ::CreateFileW(fs2us(path), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+        NULL, OPEN_EXISTING, dwFlagsAndAttributes, NULL);
   #ifdef Z7_LONG_PATH
   if (hDir == INVALID_HANDLE_VALUE && USE_SUPER_PATH)
   {
     UString superPath;
     if (GetSuperPath(path, superPath, USE_MAIN_PATH))
       hDir = ::CreateFileW(superPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-          NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+          NULL, OPEN_EXISTING, dwFlagsAndAttributes, NULL);
   }
   #endif
 
@@ -151,6 +157,15 @@ bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CF
   return res;
 }
 
+bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
+{
+  return SetFileTime_Base(path, cTime, aTime, mTime, FILE_FLAG_BACKUP_SEMANTICS);
+}
+
+bool SetLinkFileTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
+{
+  return SetFileTime_Base(path, cTime, aTime, mTime, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT);
+}
 
 
 bool SetFileAttrib(CFSTR path, DWORD attrib)
@@ -217,6 +232,8 @@ bool RemoveDir(CFSTR path)
 }
 
 
+// When moving a directory, oldFile and newFile must be on the same drive.
+
 bool MyMoveFile(CFSTR oldFile, CFSTR newFile)
 {
   #ifndef _UNICODE
@@ -245,7 +262,65 @@ bool MyMoveFile(CFSTR oldFile, CFSTR newFile)
   return false;
 }
 
+#if defined(Z7_WIN32_WINNT_MIN) && Z7_WIN32_WINNT_MIN >= 0x0500
+static DWORD WINAPI CopyProgressRoutine_to_ICopyFileProgress(
+  LARGE_INTEGER TotalFileSize,          // file size
+  LARGE_INTEGER TotalBytesTransferred,  // bytes transferred
+  LARGE_INTEGER /* StreamSize */,             // bytes in stream
+  LARGE_INTEGER /* StreamBytesTransferred */, // bytes transferred for stream
+  DWORD /* dwStreamNumber */,                 // current stream
+  DWORD /* dwCallbackReason */,               // callback reason
+  HANDLE /* hSourceFile */,                   // handle to source file
+  HANDLE /* hDestinationFile */,              // handle to destination file
+  LPVOID lpData                         // from CopyFileEx
+)
+{
+  return ((ICopyFileProgress *)lpData)->CopyFileProgress(
+      (UInt64)TotalFileSize.QuadPart,
+      (UInt64)TotalBytesTransferred.QuadPart);
+}
+#endif
+
+bool MyMoveFile_with_Progress(CFSTR oldFile, CFSTR newFile,
+    ICopyFileProgress *progress)
+{
+#if defined(Z7_WIN32_WINNT_MIN) && Z7_WIN32_WINNT_MIN >= 0x0500
+#ifndef _UNICODE
+  if (g_IsNT)
+#endif
+  if (progress)
+  {
+    IF_USE_MAIN_PATH_2(oldFile, newFile)
+    {
+      if (::MoveFileWithProgressW(fs2us(oldFile), fs2us(newFile),
+          CopyProgressRoutine_to_ICopyFileProgress, progress, MOVEFILE_COPY_ALLOWED))
+        return true;
+      if (::GetLastError() == ERROR_REQUEST_ABORTED)
+        return false;
+    }
+    #ifdef Z7_LONG_PATH
+    if (USE_SUPER_PATH_2)
+    {
+      UString d1, d2;
+      if (GetSuperPaths(oldFile, newFile, d1, d2, USE_MAIN_PATH_2))
+        return BOOLToBool(::MoveFileWithProgressW(d1, d2,
+            CopyProgressRoutine_to_ICopyFileProgress, progress, MOVEFILE_COPY_ALLOWED));
+    }
+    #endif
+    return false;
+  }
+#else
+  UNUSED_VAR(progress)
+#endif
+  return MyMoveFile(oldFile, newFile);
+}
+
 #ifndef UNDER_CE
+#if !defined(Z7_WIN32_WINNT_MIN) || Z7_WIN32_WINNT_MIN < 0x0500  // Win2000
+#define Z7_USE_DYN_CreateHardLink
+#endif
+
+#ifdef Z7_USE_DYN_CreateHardLink
 EXTERN_C_BEGIN
 typedef BOOL (WINAPI *Func_CreateHardLinkW)(
     LPCWSTR lpFileName,
@@ -253,6 +328,7 @@ typedef BOOL (WINAPI *Func_CreateHardLinkW)(
     LPSECURITY_ATTRIBUTES lpSecurityAttributes
     );
 EXTERN_C_END
+#endif
 #endif // UNDER_CE
 
 bool MyCreateHardLink(CFSTR newFileName, CFSTR existFileName)
@@ -270,6 +346,7 @@ bool MyCreateHardLink(CFSTR newFileName, CFSTR existFileName)
   else
   #endif
   {
+#ifdef Z7_USE_DYN_CreateHardLink
     const
     Func_CreateHardLinkW
       my_CreateHardLinkW = Z7_GET_PROC_ADDRESS(
@@ -277,9 +354,13 @@ bool MyCreateHardLink(CFSTR newFileName, CFSTR existFileName)
         "CreateHardLinkW");
     if (!my_CreateHardLinkW)
       return false;
+    #define MY_CreateHardLinkW  my_CreateHardLinkW
+#else
+    #define MY_CreateHardLinkW  CreateHardLinkW
+#endif
     IF_USE_MAIN_PATH_2(newFileName, existFileName)
     {
-      if (my_CreateHardLinkW(fs2us(newFileName), fs2us(existFileName), NULL))
+      if (MY_CreateHardLinkW(fs2us(newFileName), fs2us(existFileName), NULL))
         return true;
     }
     #ifdef Z7_LONG_PATH
@@ -287,7 +368,7 @@ bool MyCreateHardLink(CFSTR newFileName, CFSTR existFileName)
     {
       UString d1, d2;
       if (GetSuperPaths(newFileName, existFileName, d1, d2, USE_MAIN_PATH_2))
-        return BOOLToBool(my_CreateHardLinkW(d1, d2, NULL));
+        return BOOLToBool(MY_CreateHardLinkW(d1, d2, NULL));
     }
     #endif
   }
@@ -579,6 +660,35 @@ bool RemoveDirWithSubItems(const FString &path)
   return RemoveDir(path);
 }
 
+bool RemoveDirAlways_if_Empty(const FString &path)
+{
+  const DWORD attrib = NFind::GetFileAttrib(path);
+  if (attrib != INVALID_FILE_ATTRIBUTES
+      && (attrib & FILE_ATTRIBUTE_READONLY))
+  {
+    bool need_ClearAttrib = true;
+    if ((attrib & FILE_ATTRIBUTE_REPARSE_POINT) == 0)
+    {
+      FString s (path);
+      s.Add_PathSepar();
+      NFind::CEnumerator enumerator;
+      enumerator.SetDirPrefix(s);
+      NFind::CDirEntry fi;
+      if (enumerator.Next(fi))
+      {
+        // we don't want to change attributes, if there are files
+        // in directory, because RemoveDir(path) will fail.
+        need_ClearAttrib = false;
+        // SetLastError(ERROR_DIR_NOT_EMPTY);
+        // return false;
+      }
+    }
+    if (need_ClearAttrib)
+      SetFileAttrib(path, 0); // we clear read-only attrib to remove read-only dir
+  }
+  return RemoveDir(path);
+}
+
 #endif // _WIN32
 
 #ifdef UNDER_CE
@@ -780,7 +890,7 @@ bool CreateTempFile2(CFSTR prefix, bool addRandom, AString &postfix, NIO::COutFi
       unsigned k;
       for (k = 0; k < 8; k++)
       {
-        const unsigned t = val & 0xF;
+        const unsigned t = (unsigned)val & 0xF;
         val >>= 4;
         s[k] = (char)((t < 10) ? ('0' + t) : ('A' + (t - 10)));
       }
@@ -805,7 +915,7 @@ bool CreateTempFile2(CFSTR prefix, bool addRandom, AString &postfix, NIO::COutFi
     }
     if (outFile)
     {
-      if (outFile->Create(path, false))
+      if (outFile->Create_NEW(path))
         return true;
     }
     else
@@ -862,9 +972,9 @@ bool CTempFile::Remove()
   return !_mustBeDeleted;
 }
 
-bool CTempFile::MoveTo(CFSTR name, bool deleteDestBefore)
+bool CTempFile::MoveTo(CFSTR name, bool deleteDestBefore,
+    ICopyFileProgress *progress)
 {
-  // DWORD attrib = 0;
   if (deleteDestBefore)
   {
     if (NFind::DoesFileExist_Raw(name))
@@ -875,8 +985,8 @@ bool CTempFile::MoveTo(CFSTR name, bool deleteDestBefore)
     }
   }
   DisableDeleting();
-  return MyMoveFile(_path, name);
-  
+  // if (!progress) return MyMoveFile(_path, name);
+  return MyMoveFile_with_Progress(_path, name, progress);
   /*
   if (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_READONLY))
   {
@@ -925,34 +1035,59 @@ bool RemoveDir(CFSTR path)
 }
 
 
-static BOOL My_CopyFile(CFSTR oldFile, CFSTR newFile)
+static BOOL My_CopyFile(CFSTR oldFile, CFSTR newFile, ICopyFileProgress *progress)
 {
-  NWindows::NFile::NIO::COutFile outFile;
-  if (!outFile.Create(newFile, false))
-    return FALSE;
-  
-  NWindows::NFile::NIO::CInFile inFile;
-  if (!inFile.Open(oldFile))
-    return FALSE;
-
-  char buf[1 << 14];
-
-  for (;;)
   {
-    const ssize_t num = inFile.read_part(buf, sizeof(buf));
-    if (num == 0)
-      return TRUE;
-    if (num < 0)
+    NIO::COutFile outFile;
+    if (!outFile.Create_NEW(newFile))
       return FALSE;
-    size_t processed;
-    const ssize_t num2 = outFile.write_full(buf, (size_t)num, processed);
-    if (num2 != num || processed != (size_t)num)
+    NIO::CInFile inFile;
+    if (!inFile.Open(oldFile))
       return FALSE;
+    
+    const size_t k_BufSize = 1 << 16;
+    CAlignedBuffer1 buf(k_BufSize);
+    
+    UInt64 length = 0;
+    if (progress && !inFile.GetLength(length))
+      length = 0;
+    UInt64 prev = 0;
+    UInt64 cur = 0;
+    for (;;)
+    {
+      const ssize_t num = inFile.read_part(buf, k_BufSize);
+      if (num == 0)
+        return TRUE;
+      if (num < 0)
+        break;
+      size_t processed;
+      const ssize_t num2 = outFile.write_full(buf, (size_t)num, processed);
+      if (num2 != num || processed != (size_t)num)
+        break;
+      cur += (size_t)num2;
+      if (progress && cur - prev >= (1u << 20))
+      {
+        prev = cur;
+        if (progress->CopyFileProgress(length, cur) != PROGRESS_CONTINUE)
+        {
+          errno = EINTR; // instead of WIN32::ERROR_REQUEST_ABORTED
+          break;
+        }
+      }
+    }
   }
+  // There is file IO error or process was interrupted by user.
+  // We close output file and delete it.
+  // DeleteFileAlways doesn't change errno (if successed), but we restore errno.
+  const int errno_save = errno;
+  DeleteFileAlways(newFile);
+  errno = errno_save;
+  return FALSE;
 }
 
 
-bool MyMoveFile(CFSTR oldFile, CFSTR newFile)
+bool MyMoveFile_with_Progress(CFSTR oldFile, CFSTR newFile,
+    ICopyFileProgress *progress)
 {
   int res = rename(oldFile, newFile);
   if (res == 0)
@@ -960,7 +1095,7 @@ bool MyMoveFile(CFSTR oldFile, CFSTR newFile)
   if (errno != EXDEV) // (oldFile and newFile are not on the same mounted filesystem)
     return false;
 
-  if (My_CopyFile(oldFile, newFile) == FALSE)
+  if (My_CopyFile(oldFile, newFile, progress) == FALSE)
     return false;
     
   struct stat info_file;
@@ -972,6 +1107,11 @@ bool MyMoveFile(CFSTR oldFile, CFSTR newFile)
   ret = chmod(dst,info_file.st_mode & g_umask.mask);
   */
   return (unlink(oldFile) == 0);
+}
+
+bool MyMoveFile(CFSTR oldFile, CFSTR newFile)
+{
+  return MyMoveFile_with_Progress(oldFile, newFile, NULL);
 }
 
 
@@ -1042,17 +1182,15 @@ bool GetCurrentDir(FString &path)
 
 
 
-bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
+static bool SetFileTime_Base(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime, const int flags)
 {
   // need testing
   /*
   struct utimbuf buf;
   struct stat st;
   UNUSED_VAR(cTime)
- 
   printf("\nstat = %s\n", path);
   int ret = stat(path, &st);
-
   if (ret == 0)
   {
     buf.actime  = st.st_atime;
@@ -1064,47 +1202,42 @@ bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CF
     buf.actime  = cur_time;
     buf.modtime = cur_time;
   }
-
   if (aTime)
   {
     UInt32 ut;
     if (NTime::FileTimeToUnixTime(*aTime, ut))
       buf.actime = ut;
   }
-
   if (mTime)
   {
     UInt32 ut;
     if (NTime::FileTimeToUnixTime(*mTime, ut))
       buf.modtime = ut;
   }
-
   return utime(path, &buf) == 0;
   */
 
   // if (!aTime && !mTime) return true;
-
   struct timespec times[2];
   UNUSED_VAR(cTime)
-  
   bool needChange;
   needChange  = FiTime_To_timespec(aTime, times[0]);
   needChange |= FiTime_To_timespec(mTime, times[1]);
-
-  /*
-  if (mTime)
-  {
-    printf("\n time = %ld.%9ld\n", mTime->tv_sec, mTime->tv_nsec);
-  }
-  */
-
+  // if (mTime) { printf("\n time = %ld.%9ld\n", mTime->tv_sec, mTime->tv_nsec);  }
   if (!needChange)
     return true;
-  const int flags = 0; // follow link
-    // = AT_SYMLINK_NOFOLLOW; // don't follow link
   return utimensat(AT_FDCWD, path, times, flags) == 0;
 }
 
+bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
+{
+  return SetFileTime_Base(path, cTime, aTime, mTime, 0); // (flags = 0) means follow_link
+}
+
+bool SetLinkFileTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
+{
+  return SetFileTime_Base(path, cTime, aTime, mTime, AT_SYMLINK_NOFOLLOW);
+}
 
 
 struct C_umask

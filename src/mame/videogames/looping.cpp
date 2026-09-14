@@ -684,7 +684,7 @@ void looping_state::looping(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 224 + 16);
 	screen.set_screen_update(FUNC(looping_state::screen_update));
 	screen.set_palette(m_palette);

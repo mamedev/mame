@@ -442,7 +442,7 @@ void bfm_adder2_device::device_add_mconfig(machine_config &config)
 	M6809(config, m_cpu, 8_MHz_XTAL / 4);  // 2 MHz
 	m_cpu->set_addrmap(AS_PROGRAM, &bfm_adder2_device::prg_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(400, 280);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(50);

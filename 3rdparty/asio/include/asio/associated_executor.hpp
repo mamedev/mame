@@ -2,7 +2,7 @@
 // associated_executor.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,12 +20,14 @@
 #include "asio/detail/functional.hpp"
 #include "asio/detail/type_traits.hpp"
 #include "asio/execution/executor.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/inline_executor.hpp"
 #include "asio/is_executor.hpp"
-#include "asio/system_executor.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 template <typename T, typename Executor>
 struct associated_executor;
@@ -113,7 +115,7 @@ struct associated_executor_impl<T, E,
  * get(t,e) and with return type @c type or a (possibly const) reference to @c
  * type.
  */
-template <typename T, typename Executor = system_executor>
+template <typename T, typename Executor = inline_executor>
 struct associated_executor
 #if !defined(GENERATING_DOCUMENTATION)
   : detail::associated_executor_impl<T, Executor>
@@ -176,7 +178,7 @@ get_associated_executor(const T& t, ExecutionContext& ctx,
     typename ExecutionContext::executor_type>::get(t, ctx.get_executor());
 }
 
-template <typename T, typename Executor = system_executor>
+template <typename T, typename Executor = inline_executor>
 using associated_executor_t = typename associated_executor<T, Executor>::type;
 
 namespace detail {
@@ -228,6 +230,7 @@ struct associated_executor<reference_wrapper<T>, Executor>
   }
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

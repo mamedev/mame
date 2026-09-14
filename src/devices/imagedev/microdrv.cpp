@@ -170,7 +170,7 @@ bool read_tape_record_header(uint8_t *image, const std::vector<uint8_t> &tape_da
 	int &slot, int &next_slot, size_t &p)
 {
 	if (p + MDV_HEADER_LENGTH > tape_data.size() || next_slot >= MDV_SECTOR_COUNT) {
-	    return false;
+		return false;
 	}
 
 	slot = next_slot;
@@ -198,7 +198,7 @@ void fill_image_data_record(uint8_t *image, const uint8_t *data_header, const ui
 
 
 bool read_tape_record_data(uint8_t *image, const std::vector<uint8_t> &tape_data,
-                           const int &slot, size_t &p, std::vector<uint8_t> &orphan)
+						   const int &slot, size_t &p, std::vector<uint8_t> &orphan)
 {
 	if (p + MDV_BLOCK_HEADER_LENGTH > tape_data.size()) {
 		return false;

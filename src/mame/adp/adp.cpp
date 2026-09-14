@@ -560,7 +560,7 @@ void adp_state::quickjac(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768));
 	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(384, 280);
@@ -667,6 +667,16 @@ ROM_START( skattva )
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2", 0x00000, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
 	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5", 0x00001, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
+ROM_END
+
+ROM_START( skattvs1 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "skat_tv_code_1_s1_05.09.1995.u2", 0x00000, 0x20000, CRC(06cc0e9f) SHA1(713fc15dfde9257fbe360803bb46481bf54dc644) )
+	ROM_LOAD16_BYTE( "skat_tv_code_2_s1_05.09.1995.u6", 0x00001, 0x20000, CRC(deef7b8c) SHA1(66c706c90d5d88722250db98799b3dbf26b722be) )
+
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "f1_i.u2", 0x00000, 0x20000, CRC(4869a889) SHA1(ad9f3fcdfd3630f9ad5b93a9d2738de9fc3514d3) )
+	ROM_LOAD16_BYTE( "f1_ii.u5", 0x00001, 0x20000, CRC(17681537) SHA1(133685854b2080aaa3d0cced0287bc454d1f3bfc) )
 ROM_END
 
 ROM_START( fashiong )
@@ -806,6 +816,7 @@ GAME( 1993, kkornf4,   0,        skattv,   skattv,   adp_state, empty_init, ROT0
 GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           0 )
 GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",                         MACHINE_NOT_WORKING ) // throws FOUL error on startup
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
+GAME( 1995, skattvs1,  skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (S1)",                      0 )
 GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           0 )
 GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           0 )
 GAME( 1998, sbsoli,    0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat Bierskat Solitaire (F2)",      0 )

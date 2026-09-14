@@ -75,6 +75,7 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -182,10 +183,9 @@ void cyclemb_state::cyclemb_palette(palette_device &palette) const
 		int const val = color_prom[i | 0x100] | (color_prom[i | 0x000] << 4);
 		int bit0, bit1, bit2;
 
-		bit0 = 0;
-		bit1 = BIT(val, 6);
-		bit2 = BIT(val, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(val, 6);
+		bit1 = BIT(val, 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		bit0 = BIT(val, 3);
 		bit1 = BIT(val, 4);
@@ -205,18 +205,17 @@ void cyclemb_state::cyclemb_palette(palette_device &palette) const
 void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int x,y,count;
-	count = 0;
+	int count = 0;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<64;x++)
+		for (int x = 0; x < 64; x++)
 		{
 			int attr = m_cram[count];
 			int tile = (m_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
-	//      int sx_offs = flip_screen() ? 512 : 0
+			//int sx_offs = flip_screen() ? 512 : 0
 			int scrollx = ((m_vram[(y/2)+odd_line]) + (m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(!(attr & 4))
@@ -307,11 +306,10 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int x,y;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=2;x<62;x++)
+		for (int x = 2; x < 62; x++)
 		{
 			/* upper bits of the first address of cram seems to be related to colour cycling */
 
@@ -1005,7 +1003,7 @@ void cyclemb_state::cyclemb(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(cyclemb_state::irq0_line_hold), attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

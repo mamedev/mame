@@ -527,6 +527,17 @@ void wd1010_device::cmd_read_sector()
 	}
 
 	harddisk_image_device *file = m_drives[drive()].drive;
+
+	// verify that the selected drive is there
+	if (file == nullptr || !file->exists())
+	{
+		LOG("--> No drive selected, aborting\n");
+
+		set_error(ERR_AC);
+		end_command();
+		return;
+	}
+
 	const auto &info = file->get_info();
 
 	// verify that we can read
@@ -575,6 +586,10 @@ void wd1010_device::cmd_read_sector()
 
 	set_bdrq(1);
 
+	// the sector is in the buffer, so the host is free to empty it; the command
+	// itself only completes once the buffer manager returns brdy, so cip stays set
+	m_status &= ~STATUS_BSY;
+
 	// interrupt at bdrq time?
 	if (BIT(m_command, 3) == 0)
 		set_intrq(1);
@@ -595,6 +610,18 @@ void wd1010_device::cmd_write_sector()
 	}
 
 	harddisk_image_device *file = m_drives[drive()].drive;
+
+	// verify that the selected drive is there
+	if (file == nullptr || !file->exists())
+	{
+		LOG("--> No drive selected, aborting\n");
+
+		set_bdrq(0);
+		set_error(ERR_AC);
+		end_command();
+		return;
+	}
+
 	uint8_t buffer[512];
 
 	set_bdrq(0);

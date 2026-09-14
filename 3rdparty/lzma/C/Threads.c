@@ -1,5 +1,5 @@
 /* Threads.c -- multithreading library
-2023-03-04 : Igor Pavlov : Public domain */
+: Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -59,6 +59,111 @@ WRes Thread_Wait_Close(CThread *p)
   return (res != 0 ? res : res2);
 }
 
+typedef struct MY_PROCESSOR_NUMBER {
+    WORD  Group;
+    BYTE  Number;
+    BYTE  Reserved;
+} MY_PROCESSOR_NUMBER, *MY_PPROCESSOR_NUMBER;
+
+typedef struct MY_GROUP_AFFINITY {
+#if defined(Z7_GCC_VERSION) && (Z7_GCC_VERSION < 100000)
+    // KAFFINITY is not defined in old mingw
+    ULONG_PTR
+#else
+    KAFFINITY
+#endif
+      Mask;
+    WORD   Group;
+    WORD   Reserved[3];
+} MY_GROUP_AFFINITY, *MY_PGROUP_AFFINITY;
+
+typedef BOOL (WINAPI *Func_SetThreadGroupAffinity)(
+    HANDLE hThread,
+    CONST MY_GROUP_AFFINITY *GroupAffinity,
+    MY_PGROUP_AFFINITY PreviousGroupAffinity);
+
+typedef BOOL (WINAPI *Func_GetThreadGroupAffinity)(
+    HANDLE hThread,
+    MY_PGROUP_AFFINITY GroupAffinity);
+
+typedef BOOL (WINAPI *Func_GetProcessGroupAffinity)(
+    HANDLE hProcess,
+    PUSHORT GroupCount,
+    PUSHORT GroupArray);
+
+Z7_DIAGNOSTIC_IGNORE_CAST_FUNCTION
+
+#if 0
+#include <stdio.h>
+#define PRF(x) x
+/*
+--
+  before call of SetThreadGroupAffinity()
+    GetProcessGroupAffinity return one group.
+  after call of SetThreadGroupAffinity():
+    GetProcessGroupAffinity return more than group,
+    if SetThreadGroupAffinity() was to another group.
+--
+  GetProcessAffinityMask MS DOCs:
+  {
+    If the calling process contains threads in multiple groups,
+    the function returns zero for both affinity masks.
+  }
+  but tests in win10 with 2 groups (less than 64 cores total):
+    GetProcessAffinityMask() still returns non-zero affinity masks
+    even after SetThreadGroupAffinity() calls.
+*/
+static void PrintProcess_Info()
+{
+  {
+    const
+      Func_GetProcessGroupAffinity fn_GetProcessGroupAffinity =
+     (Func_GetProcessGroupAffinity) Z7_CAST_FUNC_C GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+          "GetProcessGroupAffinity");
+    if (fn_GetProcessGroupAffinity)
+    {
+      unsigned i;
+      USHORT GroupCounts[64];
+      USHORT GroupCount = Z7_ARRAY_SIZE(GroupCounts);
+      BOOL boolRes = fn_GetProcessGroupAffinity(GetCurrentProcess(),
+          &GroupCount, GroupCounts);
+      printf("\n====== GetProcessGroupAffinity : "
+          "boolRes=%u GroupCounts = %u :",
+          boolRes, (unsigned)GroupCount);
+      for (i = 0; i < GroupCount; i++)
+        printf(" %u", GroupCounts[i]);
+      printf("\n");
+    }
+  }
+  {
+    DWORD_PTR processAffinityMask, systemAffinityMask;
+    if (GetProcessAffinityMask(GetCurrentProcess(), &processAffinityMask, &systemAffinityMask))
+    {
+      PRF(printf("\n====== GetProcessAffinityMask : "
+        ": processAffinityMask=%x, systemAffinityMask=%x\n",
+        (UInt32)processAffinityMask, (UInt32)systemAffinityMask);)
+    }
+    else
+      printf("\n==GetProcessAffinityMask FAIL");
+  }
+}
+#else
+#ifndef USE_THREADS_CreateThread
+// #define PRF(x)
+#endif
+#endif
+
+/* if we send (stackSize=0) to CreateThread(), it will
+   use default value PE::SizeOfStackReserve from exe file.
+   PE::SizeOfStackReserve == 1 MiB in exe file with default linker options.
+   Windows aligns specified value to the next 64 KB range. */
+static const unsigned k_StackSize_ReserveSize =
+  #ifdef UNDER_CE
+    1 << 17;
+  #else
+    1 << 20;
+  #endif
+
 WRes Thread_Create(CThread *p, THREAD_FUNC_TYPE func, LPVOID param)
 {
   /* Windows Me/98/95: threadId parameter may not be NULL in _beginthreadex/CreateThread functions */
@@ -66,13 +171,52 @@ WRes Thread_Create(CThread *p, THREAD_FUNC_TYPE func, LPVOID param)
   #ifdef USE_THREADS_CreateThread
 
   DWORD threadId;
-  *p = CreateThread(NULL, 0, func, param, 0, &threadId);
+  *p = CreateThread(NULL, k_StackSize_ReserveSize, func, param, STACK_SIZE_PARAM_IS_A_RESERVATION, &threadId);
   
   #else
+
+#define CALL_beginthreadex(func2, param2, flags, threadIdPtr) \
+    ((HANDLE)(_beginthreadex(NULL, k_StackSize_ReserveSize, func2, param2, (flags) | STACK_SIZE_PARAM_IS_A_RESERVATION, threadIdPtr)))
   
   unsigned threadId;
-  *p = (HANDLE)(_beginthreadex(NULL, 0, func, param, 0, &threadId));
-  
+  *p = CALL_beginthreadex(func, param, 0, &threadId);
+
+#if 0 // 1 : for debug
+  {
+      DWORD_PTR prevMask;
+      DWORD_PTR affinity = 1 << 0;
+      prevMask = SetThreadAffinityMask(*p, (DWORD_PTR)affinity);
+      prevMask = prevMask;
+  }
+#endif
+#if 0 // 1 : for debug
+  {
+      /* win10: new thread will be created in same group that is assigned to parent thread
+                but affinity mask will contain all allowed threads of that group,
+                even if affinity mask of parent group is not full
+         win11: what group it will be created, if we have set
+                affinity of parent thread with ThreadGroupAffinity?
+      */
+      const
+         Func_GetThreadGroupAffinity fn =
+        (Func_GetThreadGroupAffinity) Z7_CAST_FUNC_C GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+             "GetThreadGroupAffinity");
+      if (fn)
+      {
+        // BOOL wres2;
+        MY_GROUP_AFFINITY groupAffinity;
+        memset(&groupAffinity, 0, sizeof(groupAffinity));
+        /* wres2 = */ fn(*p, &groupAffinity);
+        PRF(printf("\n==Thread_Create cur = %6u GetThreadGroupAffinity(): "
+            "wres2_BOOL = %u, group=%u mask=%x\n",
+            GetCurrentThreadId(),
+            wres2,
+            groupAffinity.Group,
+            (UInt32)groupAffinity.Mask);)
+      }
+  }
+#endif
+
   #endif
 
   /* maybe we must use errno here, but probably GetLastError() is also OK. */
@@ -93,7 +237,7 @@ WRes Thread_Create_With_Affinity(CThread *p, THREAD_FUNC_TYPE func, LPVOID param
   HANDLE h;
   WRes wres;
   unsigned threadId;
-  h = (HANDLE)(_beginthreadex(NULL, 0, func, param, CREATE_SUSPENDED, &threadId));
+  h = CALL_beginthreadex(func, param, CREATE_SUSPENDED, &threadId);
   *p = h;
   wres = HandleToWRes(h);
   if (h)
@@ -110,7 +254,84 @@ WRes Thread_Create_With_Affinity(CThread *p, THREAD_FUNC_TYPE func, LPVOID param
       */
     }
     {
-      DWORD prevSuspendCount = ResumeThread(h);
+      const DWORD prevSuspendCount = ResumeThread(h);
+      /* ResumeThread() returns:
+         0 : was_not_suspended
+         1 : was_resumed
+        -1 : error
+      */
+      if (prevSuspendCount == (DWORD)-1)
+        wres = GetError();
+    }
+  }
+
+  /* maybe we must use errno here, but probably GetLastError() is also OK. */
+  return wres;
+
+  #endif
+}
+
+
+WRes Thread_Create_With_Group(CThread *p, THREAD_FUNC_TYPE func, LPVOID param, unsigned group, CAffinityMask affinityMask)
+{
+#ifdef USE_THREADS_CreateThread
+
+  UNUSED_VAR(group)
+  UNUSED_VAR(affinityMask)
+  return Thread_Create(p, func, param);
+  
+#else
+  
+  /* Windows Me/98/95: threadId parameter may not be NULL in _beginthreadex/CreateThread functions */
+  HANDLE h;
+  WRes wres;
+  unsigned threadId;
+  h = CALL_beginthreadex(func, param, CREATE_SUSPENDED, &threadId);
+  *p = h;
+  wres = HandleToWRes(h);
+  if (h)
+  {
+    // PrintProcess_Info();
+    {
+      const
+         Func_SetThreadGroupAffinity fn =
+        (Func_SetThreadGroupAffinity) Z7_CAST_FUNC_C GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+             "SetThreadGroupAffinity");
+      if (fn)
+      {
+        // WRes wres2;
+        MY_GROUP_AFFINITY groupAffinity, prev_groupAffinity;
+        memset(&groupAffinity, 0, sizeof(groupAffinity));
+        // groupAffinity.Mask must use only bits that supported by current group
+        // (groupAffinity.Mask = 0) means all allowed bits
+        groupAffinity.Mask = affinityMask;
+        groupAffinity.Group = (WORD)group;
+        // wres2 =
+        fn(h, &groupAffinity, &prev_groupAffinity);
+        /*
+        if (groupAffinity.Group == prev_groupAffinity.Group)
+          wres2 = wres2;
+        else
+          wres2 = wres2;
+        if (wres2 == 0)
+        {
+          wres2 = GetError();
+          PRF(printf("\n==SetThreadGroupAffinity error: %u\n", wres2);)
+        }
+        else
+        {
+          PRF(printf("\n==Thread_Create_With_Group::SetThreadGroupAffinity()"
+            " threadId = %6u"
+            " group=%u mask=%x\n",
+            threadId,
+            prev_groupAffinity.Group,
+            (UInt32)prev_groupAffinity.Mask);)
+        }
+        */
+      }
+    }
+    {
+      const DWORD prevSuspendCount = ResumeThread(h);
       /* ResumeThread() returns:
          0 : was_not_suspended
          1 : was_resumed
@@ -195,20 +416,19 @@ WRes CriticalSection_Init(CCriticalSection *p)
 
 // ---------- POSIX ----------
 
-#ifndef __APPLE__
+#if defined(__linux__) && !defined(__APPLE__) && !defined(_AIX) && !defined(__ANDROID__)
 #ifndef Z7_AFFINITY_DISABLE
 // _GNU_SOURCE can be required for pthread_setaffinity_np() / CPU_ZERO / CPU_SET
 // clang < 3.6       : unknown warning group '-Wreserved-id-macro'
 // clang 3.6 - 12.01 : gives warning "macro name is a reserved identifier"
 // clang >= 13       : do not give warning
 #if !defined(_GNU_SOURCE)
-  #if defined(__clang__) && (__clang_major__ >= 4) && (__clang_major__ <= 12)
-    #pragma GCC diagnostic ignored "-Wreserved-id-macro"
-  #endif
-#define _GNU_SOURCE
+Z7_DIAGNOSTIC_IGNORE_BEGIN_RESERVED_MACRO_IDENTIFIER
+// #define _GNU_SOURCE
+Z7_DIAGNOSTIC_IGNORE_END_RESERVED_MACRO_IDENTIFIER
 #endif // !defined(_GNU_SOURCE)
 #endif // Z7_AFFINITY_DISABLE
-#endif // __APPLE__
+#endif // __linux__
 
 #include "Threads.h"
 
@@ -244,8 +464,9 @@ WRes Thread_Create_With_CpuSet(CThread *p, THREAD_FUNC_TYPE func, LPVOID param, 
   {
     if (cpuSet)
     {
-      #ifdef Z7_AFFINITY_SUPPORTED
-      
+      // pthread_attr_setaffinity_np() is not supported for MUSL compile.
+      // so we check for __GLIBC__ here
+#if defined(Z7_AFFINITY_SUPPORTED) && defined( __GLIBC__)
       /*
       printf("\n affinity :");
       unsigned i;
@@ -267,7 +488,7 @@ WRes Thread_Create_With_CpuSet(CThread *p, THREAD_FUNC_TYPE func, LPVOID param, 
       // ret2 =
       pthread_attr_setaffinity_np(&attr, sizeof(*cpuSet), cpuSet);
       // if (ret2) ret = ret2;
-      #endif
+#endif
     }
     
     ret = pthread_create(&p->_tid, &attr, func, param);
@@ -297,6 +518,13 @@ WRes Thread_Create(CThread *p, THREAD_FUNC_TYPE func, LPVOID param)
   return Thread_Create_With_CpuSet(p, func, param, NULL);
 }
 
+/*
+WRes Thread_Create_With_Group(CThread *p, THREAD_FUNC_TYPE func, LPVOID param, unsigned group, CAffinityMask affinity)
+{
+  UNUSED_VAR(group)
+  return Thread_Create_With_Affinity(p, func, param, affinity);
+}
+*/
 
 WRes Thread_Create_With_Affinity(CThread *p, THREAD_FUNC_TYPE func, LPVOID param, CAffinityMask affinity)
 {
@@ -369,13 +597,20 @@ WRes AutoResetEvent_CreateNotSignaled(CAutoResetEvent *p)
   { return AutoResetEvent_Create(p, 0); }
 
 
+#if defined(Z7_LLVM_CLANG_VERSION) && (__clang_major__ == 13)
+// freebsd:
+#pragma GCC diagnostic ignored "-Wthread-safety-analysis"
+#endif
+
 WRes Event_Set(CEvent *p)
 {
   RINOK(pthread_mutex_lock(&p->_mutex))
   p->_state = True;
-  int res1 = pthread_cond_broadcast(&p->_cond);
-  int res2 = pthread_mutex_unlock(&p->_mutex);
-  return (res2 ? res2 : res1);
+  {
+    const int res1 = pthread_cond_broadcast(&p->_cond);
+    const int res2 = pthread_mutex_unlock(&p->_mutex);
+    return (res2 ? res2 : res1);
+  }
 }
 
 WRes Event_Reset(CEvent *p)
@@ -408,8 +643,8 @@ WRes Event_Close(CEvent *p)
     return 0;
   p->_created = 0;
   {
-    int res1 = pthread_mutex_destroy(&p->_mutex);
-    int res2 = pthread_cond_destroy(&p->_cond);
+    const int res1 = pthread_mutex_destroy(&p->_mutex);
+    const int res2 = pthread_cond_destroy(&p->_cond);
     return (res1 ? res1 : res2);
   }
 }
@@ -487,8 +722,8 @@ WRes Semaphore_Close(CSemaphore *p)
     return 0;
   p->_created = 0;
   {
-    int res1 = pthread_mutex_destroy(&p->_mutex);
-    int res2 = pthread_cond_destroy(&p->_cond);
+    const int res1 = pthread_mutex_destroy(&p->_mutex);
+    const int res2 = pthread_cond_destroy(&p->_cond);
     return (res1 ? res1 : res2);
   }
 }
@@ -549,6 +784,18 @@ LONG InterlockedIncrement(LONG volatile *addend)
   #endif
 }
 
+LONG InterlockedDecrement(LONG volatile *addend)
+{
+  // Print("InterlockedDecrement")
+  #ifdef USE_HACK_UNSAFE_ATOMIC
+    LONG val = *addend - 1;
+    *addend = val;
+    return val;
+  #else
+    return __sync_sub_and_fetch(addend, 1);
+  #endif
+}
+
 #endif // _WIN32
 
 WRes AutoResetEvent_OptCreate_And_Reset(CAutoResetEvent *p)
@@ -556,6 +803,23 @@ WRes AutoResetEvent_OptCreate_And_Reset(CAutoResetEvent *p)
   if (Event_IsCreated(p))
     return Event_Reset(p);
   return AutoResetEvent_CreateNotSignaled(p);
+}
+
+void ThreadNextGroup_Init(CThreadNextGroup *p, UInt32 numGroups, UInt32 startGroup)
+{
+  // printf("\n====== ThreadNextGroup_Init numGroups = %x: startGroup=%x\n", numGroups, startGroup);
+  if (numGroups == 0)
+      numGroups = 1;
+  p->NumGroups = numGroups;
+  p->NextGroup = startGroup % numGroups;
+}
+
+
+UInt32 ThreadNextGroup_GetNext(CThreadNextGroup *p)
+{
+  const UInt32 next = p->NextGroup;
+  p->NextGroup = (next + 1) % p->NumGroups;
+  return next;
 }
 
 #undef PRF

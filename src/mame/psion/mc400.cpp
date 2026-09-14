@@ -383,7 +383,7 @@ void psionmc_state::mc200(machine_config &config)
 {
 	psionmc(config);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(640, 200);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);
@@ -397,7 +397,7 @@ void psionmc_state::mc400(machine_config &config)
 {
 	psionmc(config);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(640, 400);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);

@@ -25,7 +25,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include <bit>
@@ -213,10 +213,9 @@ void pmicrodx_state::pmicrodx(machine_config &config)
 	m_display->set_bri_levels(0.05);
 	config.set_default_layout(layout_cking_pmicrodx);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/3, 851/3);
-	screen.set_visarea_full();
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

@@ -14,7 +14,7 @@
 #include "video/hd44780.h"
 
 #include "debugger.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 namespace {
@@ -68,10 +68,10 @@ private:
 
 	void lcd_data_w(u8 data);
 	void led_data_w(offs_t, u16 data, u16 mem_mask);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_svg_update(screen_svg_device &screen);
 };
 
-u32 psr540_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void psr540_state::screen_svg_update(screen_svg_device &screen)
 {
 	const u8 *render = m_lcdc->render();
 	for(int yy=0; yy != 8; yy++)
@@ -80,8 +80,6 @@ u32 psr540_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 			for(int xx=0; xx != 5; xx++)
 				m_outputs[x][yy][xx] = (v >> xx) & 1;
 		}
-
-	return 0;
 }
 
 void psr540_state::machine_start()
@@ -155,11 +153,10 @@ void psr540_state::psr540(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	/* video hardware */
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto &screen = SCREEN_SVG(config, "screen");
 	screen.set_refresh_hz(60);
 	screen.set_size(1080, 360);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(psr540_state::screen_update));
+	screen.set_screen_svg_update(FUNC(psr540_state::screen_svg_update));
 
 	SPEAKER(config, "speaker", 2).front();
 

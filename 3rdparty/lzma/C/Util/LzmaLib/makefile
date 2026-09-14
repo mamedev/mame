@@ -14,16 +14,19 @@ C_OBJS = \
   $O\CpuArch.obj \
   $O\LzFind.obj \
   $O\LzFindMt.obj \
-  $O\LzFindOpt.obj \
   $O\LzmaDec.obj \
   $O\LzmaEnc.obj \
   $O\LzmaLib.obj \
   $O\Threads.obj \
 
+!include "../../../CPP/7zip/LzFindOpt.mak"
+!include "../../../CPP/7zip/LzmaDec.mak"
+
 OBJS = \
   $O\Precomp.obj \
   $(LIB_OBJS) \
   $(C_OBJS) \
+  $(ASM_OBJS) \
   $O\resource.res
 
 !include "../../../CPP/Build.mak"
@@ -52,3 +55,5 @@ $(C_OBJS): ../../$(*B).c
 	$(CCOMPLB_USE)
 
 !ENDIF
+
+!include "../../Asm_c.mak"

@@ -669,7 +669,7 @@ void coinmvga_state::coinmvga(machine_config &config)
 	MSM6242(config, "rtc", 32768);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MACH_CLOCK / 2, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(FUNC(coinmvga_state::screen_update_coinmvga));
 	//screen.set_palette(m_palette);

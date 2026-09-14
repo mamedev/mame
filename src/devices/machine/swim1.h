@@ -81,9 +81,6 @@ private:
 	floppy_image_device *m_floppy;
 	emu_timer *m_timer;
 
-	u64 m_flux_write_start;
-	std::array<u64, 32> m_flux_write;
-	u32 m_flux_write_count;
 	u64 m_last_sync;
 
 	u8 m_ism_param[16];
@@ -117,7 +114,6 @@ private:
 
 	u64 time_to_cycles(const attotime &tm) const;
 	attotime cycles_to_time(u64 cycles) const;
-	void flush_write(u64 when = 0);
 
 	u64 iwm_window_size() const;
 	u64 iwm_half_window_size() const;

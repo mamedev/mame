@@ -738,7 +738,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_cb)
 }
 
 // P_Timer*_Ctrl
-// 
+//
 // 15  TM*IF/C
 // 14  TM*IE
 // 13  TM*EN
@@ -748,12 +748,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_cb)
 // 10  EXTASEL[0]
 //  9  EXTBSEL[1]
 //  8  EXTBSEL[0]
-// 
+//
 //  7
 //  6  SRCBSEL[2]
 //  5  SRCBSEL[1]
 //  4  SRCBSEL[0]
-// 
+//
 //  3  SRCASEL[3]
 //  2  SRCASEL[2]
 //  1  SRCASEL[1]
@@ -779,7 +779,7 @@ void generalplus_gpl162xx_base_device::timer_ctrl_w(u16 data)
 }
 
 // P_Timer*_Preload
-// 
+//
 // all bits are the preload value
 
 template<int Timer>
@@ -797,7 +797,7 @@ void generalplus_gpl162xx_base_device::timer_preload_w(u16 data)
 }
 
 // P_Timer*_Upcount
-// 
+//
 // all bits are the upcount value (read only)
 
 template<int Timer>
@@ -814,17 +814,17 @@ u16 generalplus_gpl162xx_base_device::timer_upcount_r()
 // 14  CCP*EN[0]
 // 13
 // 12
-// 
+//
 // 11
 // 10
 //  9  CAP*SEL[1]
 //  8  CAP*SEL[0]
-// 
+//
 //  7
 //  6
 //  5  CMP*SEL[1]
 //  4  CMP*SEL[0]
-// 
+//
 //  3
 //  2
 //  1  PWM*SEL[1]
@@ -846,7 +846,7 @@ void generalplus_gpl162xx_base_device::timer_ccp_ctrl_w(u16 data)
 
 
 // P_Timer*_CCReg  (Timers A,B,C only)
-// 
+//
 // all bits are the comparison value
 
 template<int Timer>
@@ -2268,7 +2268,7 @@ void generalplus_gpl162xx_base_device::base_internal_map(address_map &map)
 
 	map(0x0078b8, 0x0078b8).w(m_gpl_timebase, FUNC(gpl_timebase_device::timebase_reset_w)); // 78b8 - TimeBase_Reset
 
-	
+
 	map(0x0078c0, 0x0078c0).rw(FUNC(generalplus_gpl162xx_base_device::timer_ctrl_r<0>), FUNC(generalplus_gpl162xx_base_device::timer_ctrl_w<0>)); // beijuehh
 	map(0x0078c1, 0x0078c1).rw(FUNC(generalplus_gpl162xx_base_device::timer_ccp_ctrl_r<0>), FUNC(generalplus_gpl162xx_base_device::timer_ccp_ctrl_w<0>)); // 78c1 - TimerA_CCCtrl
 	map(0x0078c2, 0x0078c2).rw(FUNC(generalplus_gpl162xx_base_device::timer_preload_r<0>), FUNC(generalplus_gpl162xx_base_device::timer_preload_w<0>)); // 78c2 - TimerA_Preload
@@ -2384,13 +2384,13 @@ void generalplus_gpl162xx_base_device::internal_rom_64kword(address_map &map)
 {
 	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpl16250va_device::internalrom_lower32_r)); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
 	map(0x10000, 0x17fff).rom().region("internal", 0x10000); // upper words of internal ROM is always visible
-//	map(0x18000, 0x1ffff).noprw(); // reserved
+//  map(0x18000, 0x1ffff).noprw(); // reserved
 }
 
 void generalplus_gpl162xx_base_device::no_internal_rom(address_map &map)
 {
 	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpl16250va_device::cs_space_boot_mirror_r)); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
-//	map(0x10000, 0x1ffff).noprw(); // reserved
+//  map(0x10000, 0x1ffff).noprw(); // reserved
 }
 
 void generalplus_gpl162xx_base_device::internal_rom_4kword(address_map &map)

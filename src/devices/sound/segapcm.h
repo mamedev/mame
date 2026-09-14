@@ -36,7 +36,7 @@ protected:
 
 		segapcm_base_device *host;
 
-		uint32_t addr = ~0; // current address (16.8 fixed point)
+		uint32_t addr = 0xffff00; // current address (16.8 fixed point)
 		uint16_t loop = ~0; // loop address
 		uint8_t end = ~0;   // end address (bit 16-8 valid)
 		uint8_t freq = ~0;  // frequency

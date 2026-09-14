@@ -2,11 +2,11 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	h8500_frt.cpp
+    h8500_frt.cpp
 
-	H8/500 family 16-bit free-running timer (FRT).
+    H8/500 family 16-bit free-running timer (FRT).
 
-	TODOs: external clock input, input capture, and the FTOA/FTOB compare outputs.
+    TODOs: external clock input, input capture, and the FTOA/FTOB compare outputs.
 
 ***************************************************************************/
 

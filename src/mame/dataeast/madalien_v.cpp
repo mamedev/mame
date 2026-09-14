@@ -361,7 +361,7 @@ GFXDECODE_END
 
 void madalien_state::madalien_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256);
 	screen.set_screen_update(FUNC(madalien_state::screen_update_madalien));
 	screen.set_palette(m_palette);

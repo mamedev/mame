@@ -335,7 +335,7 @@ void zms8085_state::zephyr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zms8085_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &zms8085_state::io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15.582_MHz_XTAL, 980, 0, 800, 265, 0, 250);
 	screen.set_screen_update(FUNC(zms8085_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, I8085_RST55_LINE, ASSERT_LINE);

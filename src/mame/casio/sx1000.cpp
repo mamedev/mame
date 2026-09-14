@@ -245,12 +245,12 @@ void sx1000_state::common(machine_config &config)
 	PIC8259(config, m_pic);
 
 	// M6845 config screen: HTOTAL: 944  VTOTAL: 444  MAX_X: 639  MAX_Y: 399  HSYNC: 720-823  VSYNC: 416-425  Freq: 76.347534fps
-	SCREEN(config, m_screen_crtc, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen_crtc);
 	m_screen_crtc->set_raw(48'800'000, 944, 0, 640, 444, 0, 400);
 	m_screen_crtc->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
 
 	// ACRTC: full 944x449 vis (200, 18)-(847, 417)
-	SCREEN(config, m_screen_acrtc, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen_acrtc);
 	m_screen_acrtc->set_raw(48'800'000, 944, 200, 847, 449, 18, 417);
 	m_screen_acrtc->set_screen_update(m_acrtc, FUNC(hd63484_device::update_screen));
 	m_screen_acrtc->set_palette(m_palette_acrtc);

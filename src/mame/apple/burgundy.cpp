@@ -111,6 +111,8 @@ void burgundy_device::sound_stream_update(sound_stream &stream)
 		stream.put_int(1, 0, 0, 32768);
 	}
 
+	m_input_cb(m_phase, 0);
+
 	m_phase = (m_phase + 1) & 0xfff;
 }
 

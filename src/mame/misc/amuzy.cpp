@@ -286,7 +286,7 @@ void amuzy_state::amuzy(machine_config &config)
 	m_maincpu->read_port7().set_ioport("IN0");
 	m_maincpu->read_portb().set_ioport("IN1");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// screen parameters are completely made up
 	m_screen->set_refresh_hz(59.62);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));

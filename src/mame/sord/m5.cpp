@@ -1666,7 +1666,7 @@ void m5_state::ntsc(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set(m_ctc, FUNC(z80ctc_device::trg3)).invert();
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 
@@ -1682,7 +1682,7 @@ void m5_state::pal(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set(m_ctc, FUNC(z80ctc_device::trg3)).invert();
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 //-------------------------------------------------
@@ -1709,7 +1709,7 @@ void brno_state::brno(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set(m_ctc, FUNC(z80ctc_device::trg3)).invert();
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// RAM disk (maximum is 1024kB 256x 4kB banks)
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("256K,768K,1M");

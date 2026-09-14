@@ -104,9 +104,10 @@
 #include "multibyte.h"
 #include "opresolv.h"
 
-#include "eminline.h"
+#include "osdcomm.h" // swapendian_int*
 #include "osdcore.h" // osd_printf_error
 
+#include <bit>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -249,7 +250,7 @@ void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 {
 	for(int i=0; i<size; i+=2) {
 		chk += get_u16be(&data[i]);
-		chk = rotr_32(chk, 1);
+		chk = std::rotr(chk, 1);
 	}
 }
 
@@ -439,55 +440,141 @@ bool apple_2mg_format::supports_save() const noexcept
 	return true;
 }
 
+namespace {
+
+struct format_2mg {
+	uint32_t type;
+	uint32_t data_length;
+	uint32_t form_factor;
+	uint32_t variant;
+};
+
+const format_2mg s_formats[] = {
+	{ 0, 143360, floppy_image::FF_525, floppy_image::SSSD },
+	{ 1, 143360, floppy_image::FF_525, floppy_image::SSSD },
+	{ 1, 409600, floppy_image::FF_35, floppy_image::SSDD },
+	{ 1, 819200, floppy_image::FF_35, floppy_image::DSDD }
+	//{ 2, 232960, floppy_image::FF_525, floppy_image::SSSD }
+};
+
+} // anonymous namespace
+
 int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint8_t signature[4];
-	auto const [err, actual] = read_at(io, 0, signature, 4);
-	if(err || (4 != actual))
+	uint8_t header[32];
+	auto const [err, actual] = read_at(io, 0, header, 32);
+	if(err || (32 != actual))
 		return 0;
 
-	if(!memcmp(signature, "2IMG", 4))
-		return FIFID_SIGN;
-
 	// Bernie ][ The Rescue wrote 2MGs with the signature byte-flipped, other fields are valid
-	if(!memcmp(signature, "GMI2", 4))
-		return FIFID_SIGN;
+	if(memcmp(header, "2IMG", 4) && memcmp(header, "GMI2", 4))
+		return 0;
 
-	return 0;
+	bool found = false;
+	uint32_t data_length = get_u32le(&header[0x1c]);
+	for(auto const &format : s_formats) {
+		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != format.form_factor)
+			continue;
+		if(!variants.empty() && !has_variant(variants, format.variant))
+			continue;
+		if(format.type == header[0xc]) {
+			if(format.data_length == data_length) {
+				found = true;
+				break;
+			} else if(format.data_length == swapendian_int32(data_length)) {
+				data_length = format.data_length;
+				found = true;
+				break;
+			}
+		}
+	}
+	if(!found)
+		return 0;
+
+	uint64_t size;
+	if(!io.length(size) && (data_length + get_u32le(&header[0x18]) == size))
+		return FIFID_SIGN | FIFID_STRUCT;
+
+	return FIFID_SIGN;
 }
 
 bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	desc_gcr_sector sectors[12];
-	uint8_t sdata[512*12], header[64];
+	uint8_t header[64];
 	read_at(io, 0, header, 64); // FIXME: check for errors and premature EOF
+	uint8_t secttype = header[0xc];
 	uint32_t blocks = get_u32le(&header[0x14]);
 	uint32_t pos_data = get_u32le(&header[0x18]);
 
-	if(blocks != 1600 && blocks != 16390)
-		return false;
+	if(secttype > 1)
+		return false; // nibble images not supported
+	if(secttype == 0 && blocks == 0)
+		blocks = get_u24le(&header[0x1d]) / 2;
+	if(blocks != 280 && blocks != 800 && blocks != 1600 && blocks != 16390)
+		return false; // ProDOS hard disk images not supported
 
-	image.set_form_variant(floppy_image::FF_35, (blocks > 800) ? floppy_image::DSDD : floppy_image::SSDD);
+	if(blocks == 280) {
+		uint8_t volume = (secttype == 0 && (header[0x11] & 1)) ? header[0x10] : 0xfe;
 
-	for(int track=0; track < 80; track++) {
-		for(int head=0; head < 2; head++) {
-			int ns = 12 - (track/16);
-			read_at(io, pos_data, sdata, 512*ns); // FIXME: check for errors and premature EOF
-			pos_data += 512*ns;
+		image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+
+		uint8_t sdata[256*16];
+		desc_gcr_sector sectors[16];
+		for(int track=0; track < 35; track++) {
+			read_at(io, pos_data, sdata, 256*16); // FIXME: check for errors and premature EOF
+			pos_data += 256*16;
 
 			int si = 0;
-			for(int i=0; i<ns; i++) {
+			for(int i=0; i<16; i++) {
 				sectors[si].track = track;
-				sectors[si].head = head;
-				sectors[si].sector = i;
-				sectors[si].info = 0x22;
+				sectors[si].head = 0;
+				sectors[si].sector = si;
+				sectors[si].info = volume;
 				sectors[si].tag = nullptr;
-				sectors[si].data = sdata + 512*i;
-				si = (si + 2) % ns;
-				if(si == 0)
-					si++;
+				sectors[si].data = sdata + 256*i;
+				if(secttype == 1) {
+					// ProDOS order
+					si = (si + 2) % 16;
+					if(si == 0)
+						si++;
+				} else {
+					// DOS 3.3 order
+					if(si < 3)
+						si += 13;
+					else
+						si -= 2;
+				}
 			}
-			build_mac_track_gcr(track, head, image, sectors);
+			build_apple_16sect_track_gcr(track, 0, image, sectors);
+		}
+	} else {
+		if(secttype != 1)
+			return false;
+
+		image.set_form_variant(floppy_image::FF_35, (blocks > 800) ? floppy_image::DSDD : floppy_image::SSDD);
+
+		uint8_t sdata[512*12];
+		desc_gcr_sector sectors[12];
+		for(int track=0; track < 80; track++) {
+			for(int head=0; head < ((blocks > 800) ? 2 : 1); head++) {
+				int ns = 12 - (track/16);
+				read_at(io, pos_data, sdata, 512*ns); // FIXME: check for errors and premature EOF
+				pos_data += 512*ns;
+
+				int si = 0;
+				for(int i=0; i<ns; i++) {
+					sectors[si].track = track;
+					sectors[si].head = head;
+					sectors[si].sector = i;
+					sectors[si].info = (blocks > 800) ? 0x22 : 0x02;
+					sectors[si].tag = nullptr;
+					sectors[si].data = sdata + 512*i;
+					si = (si + 2) % ns;
+					if(si == 0)
+						si++;
+				}
+				build_mac_track_gcr(track, head, image, sectors);
+			}
 		}
 	}
 	return true;
@@ -495,6 +582,9 @@ bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const s
 
 bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
+	int g_tracks, g_heads;
+	image.get_actual_geometry(g_tracks, g_heads);
+
 	uint8_t header[0x40];
 	int pos_data = 0x40;
 
@@ -507,24 +597,51 @@ bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint3
 	header[8] = 0x40;
 	// version
 	header[0xa] = 1;
-	// flags
-	header[0xc] = 1;    // ProDOS sector order
-	// number of ProDOS blocks
-	header[0x14] = 0x40; header[0x15] = 0x06;   // 0x640 (1600)
 	// offset to sector data
 	header[0x18] = 0x40;
-	// bytes of disk data
-	header[0x1c] = 0x00; header[0x1d] = 0x80; header[0x1e] = 0x0c;  // 0xC8000 (819200)
-	write_at(io, 0, header, 0x40); // FIXME: check for errors
+	if(image.get_form_factor() == floppy_image::FF_525) {
+		// flags
+		header[0xc] = 0;    // DOS sector order
+		// number of ProDOS blocks
+		put_u32le(&header[0x14], 280);
+		// bytes of disk data
+		put_u32le(&header[0x1c], 143360);
 
-	for(int track=0; track < 80; track++) {
-		for(int head=0; head < 2; head++) {
-			auto sectors = extract_sectors_from_track_mac_gcr6(head, track, image);
-			for(unsigned int i=0; i < sectors.size(); i++) {
-				auto &sdata = sectors[i];
-				sdata.resize(512+12);
-				write_at(io, pos_data, &sdata[12], 512); // FIXME: check for errors
-				pos_data += 512;
+		uint8_t vl;
+		for(int track=0; track < 35; track++) {
+			auto buf = generate_bitstream_from_track(track, 0, 3915, image);
+			auto sectors = extract_sectors_from_track_apple_16sect_gcr6(buf, vl);
+			if(vl != 0xfe && header[0x11] == 0) {
+				header[0x10] = vl;
+				header[0x11] = 1;
+			}
+			for(int si : {0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15}) {
+				auto &sdata = sectors[si];
+				sdata.resize(256);
+				write_at(io, pos_data, &sdata[0], 256); // FIXME: check for errors
+				pos_data += 256;
+			}
+		}
+
+		write_at(io, 0, header, 0x40); // FIXME: check for errors
+	} else {
+		// flags
+		header[0xc] = 1;    // ProDOS sector order
+		// number of ProDOS blocks
+		put_u32le(&header[0x14], 800 * g_heads);
+		// bytes of disk data
+		put_u32le(&header[0x1c], 409600 * g_heads);
+		write_at(io, 0, header, 0x40); // FIXME: check for errors
+
+		for(int track=0; track < 80; track++) {
+			for(int head=0; head < g_heads; head++) {
+				auto sectors = extract_sectors_from_track_mac_gcr6(head, track, image);
+				for(unsigned int i=0; i < sectors.size(); i++) {
+					auto &sdata = sectors[i];
+					sdata.resize(512+12);
+					write_at(io, pos_data, &sdata[12], 512); // FIXME: check for errors
+					pos_data += 512;
+				}
 			}
 		}
 	}

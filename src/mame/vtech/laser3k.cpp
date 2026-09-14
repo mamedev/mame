@@ -1209,7 +1209,7 @@ void laser3k_state::laser3k(machine_config &config)
 	M6502(config, m_maincpu, 14_MHz_XTAL / 14); // 1 or 2 MHz depending on soft switch
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser3k_state::laser3k_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(300*2, 192);

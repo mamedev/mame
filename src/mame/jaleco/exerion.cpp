@@ -868,7 +868,7 @@ void exerion_state::exerion(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &exerion_state::sub_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 3, 424, 96, 96+320, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(exerion_state::screen_update));
 	m_screen->set_palette(m_palette);

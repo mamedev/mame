@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Commodore 1570/1571/1571CR Single Disk Drive emulation
+    Commodore 1570/1571 Single Disk Drive emulation
 
 **********************************************************************/
 
@@ -12,12 +12,12 @@
 #pragma once
 
 #include "cbmiec.h"
+#include "mos5710.h"
 #include "bus/c64/bn1541.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/wd1002a_wx1.h"
+#include "machine/input_merger.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
 
@@ -37,13 +37,13 @@
 
 // ======================> c1571_device
 
-class c1571_device : public device_t, public device_cbm_iec_interface, public device_c64_floppy_parallel_interface
+class c1571_device : public device_t, 
+					 public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
 	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void via0_irq_w(int state);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
@@ -51,16 +51,11 @@ public:
 
 	uint8_t via1_r(offs_t offset);
 	void via1_w(offs_t offset, uint8_t data);
-	void via1_irq_w(int state);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
 
-	void cia_irq_w(int state);
-	void cia_pc_w(int state);
 	void cia_cnt_w(int state);
 	void cia_sp_w(int state);
-	uint8_t cia_pb_r();
-	void cia_pb_w(uint8_t data);
 
 	void byte_w(int state);
 
@@ -69,6 +64,7 @@ public:
 	void wpt_callback(floppy_image_device *floppy, int state);
 
 	void c1571_mem(address_map &map) ATTR_COLD;
+
 protected:
 	c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -87,10 +83,6 @@ protected:
 	virtual void cbm_iec_data(int state) override;
 	virtual void cbm_iec_reset(int state) override;
 
-	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(uint8_t data) override;
-	virtual void parallel_strobe_w(int state) override;
-
 	void add_base_mconfig(machine_config &config);
 	void add_cia_mconfig(machine_config &config);
 
@@ -100,7 +92,7 @@ protected:
 		LED_ACT
 	};
 
-	void update_iec();
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
@@ -113,18 +105,17 @@ protected:
 	output_finder<2> m_leds;
 
 	// signals
-	int m_1_2mhz;                           // clock speed
+	bool m_1_2mhz;                           // clock speed
 
 	// IEC bus
-	int m_data_out;                         // serial data out
-	int m_ser_dir;                          // fast serial direction
-	int m_sp_out;                           // fast serial data out
-	int m_cnt_out;                          // fast serial clock out
+	bool m_data_out;                         // serial data out
+	bool m_ser_dir;                          // fast serial direction
+	bool m_sp_out;                           // fast serial data out
+	bool m_cnt_out;                          // fast serial clock out
+	bool m_iec_atn;
+	bool m_iec_clk;
 
-	// interrupts
-	int m_via0_irq;                         // VIA #0 interrupt request
-	int m_via1_irq;                         // VIA #1 interrupt request
-	int m_cia_irq;                          // CIA interrupt request
+	emu_timer *m_iec_sync_timer;
 };
 
 
@@ -143,51 +134,8 @@ protected:
 };
 
 
-// ======================> c1571cr_device
-
-class c1571cr_device :  public c1571_device
-{
-public:
-	// construction/destruction
-	c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
-private:
-	void via0_pa_w(uint8_t data);
-	void via0_pb_w(uint8_t data);
-};
-
-
-// ======================> mini_chief_device
-
-class mini_chief_device :  public c1571_device
-{
-public:
-	// construction/destruction
-	mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
-private:
-	uint8_t cia_pa_r();
-	void cia_pa_w(uint8_t data);
-	void cia_pb_w(uint8_t data);
-
-	void mini_chief_mem(address_map &map) ATTR_COLD;
-};
-
-
 // device type definition
-DECLARE_DEVICE_TYPE(C1570,      c1570_device)
-DECLARE_DEVICE_TYPE(C1571,      c1571_device)
-DECLARE_DEVICE_TYPE(C1571CR,    c1571cr_device)
-DECLARE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device)
+DECLARE_DEVICE_TYPE(C1570, c1570_device)
+DECLARE_DEVICE_TYPE(C1571, c1571_device)
 
 #endif // MAME_BUS_CBMIEC_C1571_H

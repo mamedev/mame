@@ -63,24 +63,22 @@ HRESULT CWorkDirTempFile::CreateTempFile(const FString &originalPath)
   NWorkDir::CInfo workDirInfo;
   workDirInfo.Load();
   FString namePart;
-  const FString workDir = GetWorkDir(workDirInfo, originalPath, namePart);
-  CreateComplexDir(workDir);
+  FString path = GetWorkDir(workDirInfo, originalPath, namePart);
+  CreateComplexDir(path);
+  path += namePart;
   _outStreamSpec = new COutFileStream;
   OutStream = _outStreamSpec;
-  if (!_tempFile.Create(workDir + namePart, &_outStreamSpec->File))
-  {
+  if (!_tempFile.Create(path, &_outStreamSpec->File))
     return GetLastError_noZero_HRESULT();
-  }
   _originalPath = originalPath;
   return S_OK;
 }
 
-HRESULT CWorkDirTempFile::MoveToOriginal(bool deleteOriginal)
+HRESULT CWorkDirTempFile::MoveToOriginal(bool deleteOriginal,
+    NWindows::NFile::NDir::ICopyFileProgress *progress)
 {
   OutStream.Release();
-  if (!_tempFile.MoveTo(_originalPath, deleteOriginal))
-  {
+  if (!_tempFile.MoveTo(_originalPath, deleteOriginal, progress))
     return GetLastError_noZero_HRESULT();
-  }
   return S_OK;
 }

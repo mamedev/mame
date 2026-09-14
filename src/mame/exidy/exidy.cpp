@@ -1513,7 +1513,7 @@ void exidy_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
 	PALETTE(config, m_palette).set_entries(8);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART);
 	m_screen->set_screen_update(FUNC(exidy_state::screen_update));

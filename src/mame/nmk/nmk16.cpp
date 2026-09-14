@@ -4353,7 +4353,7 @@ void tharrierb_state::machine_start()
 */
 void nmk16_state::set_screen_lowres(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(12'000'000)/2, 384, 92, 348, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
@@ -4366,7 +4366,7 @@ void nmk16_state::set_screen_lowres(machine_config &config)
 // only used for powerins and (original) clones
 void nmk16_state::set_screen_midres(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'000'000)/2, 448, 60, 380, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
@@ -4379,7 +4379,7 @@ void nmk16_state::set_screen_midres(machine_config &config)
 
 void nmk16_state::set_screen_hires(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 28, 412, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
@@ -5779,7 +5779,7 @@ void nmk16_state::powerinsa(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::powerinsa_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 60, 380, 262, 16, 240); // ~60hz, XTAL verified, correct params?
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 	m_screen->screen_vblank().set(FUNC(nmk16_state::screen_vblank_powerins_bootleg));
@@ -5819,7 +5819,7 @@ void nmk16_state::powerinsb(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(nmk16_state::irq0_line_hold), attotime::from_hz(120));  // YM2203 rate is at 150??
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 60, 380, 262, 16, 240); // ~60hz, XTAL verified, correct params?
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 	m_screen->screen_vblank().set(FUNC(nmk16_state::screen_vblank_powerins_bootleg));
@@ -5894,7 +5894,7 @@ void nmk16_state::manybloc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(56);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(256, 256);

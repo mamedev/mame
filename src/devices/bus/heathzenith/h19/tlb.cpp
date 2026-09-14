@@ -1126,7 +1126,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	// based on the H19 ROM code for 60 Hz
 	m_screen->set_raw(BASE_DOT_CLOCK, 768, 32, 672, 270, 0, 250);
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));

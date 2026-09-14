@@ -2163,7 +2163,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(20'000'000) / 4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK);
 	m_screen->set_screen_update(FUNC(gottlieb_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -2226,7 +2226,7 @@ void gottlieb_ld_state::g2laser(machine_config &config)
 	m_laserdisc->set_screen(m_screen);
 	// right channel is processed as data
 
-	SCREEN(config.replace(), m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config.replace(), m_screen);
 	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
 	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
@@ -2284,7 +2284,7 @@ void gottlieb_ld_state::cobram3(machine_config &config)
 	m_laserdisc->set_screen(m_screen);
 	// right channel is processed as data
 
-	SCREEN(config.replace(), m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config.replace(), m_screen);
 	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
 	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));

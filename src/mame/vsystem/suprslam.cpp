@@ -432,7 +432,7 @@ void suprslam_state::suprslam(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprslam);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300)); // hand-tuned

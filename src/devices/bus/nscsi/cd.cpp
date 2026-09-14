@@ -224,7 +224,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 				m_write_path.append(PATH_SEPARATOR);
 				m_write_path.append((char *)&m_xfer_buffer[0]);
 				if (osd_file::open(m_write_path, OPEN_FLAG_CREATE | OPEN_FLAG_WRITE, file, filesize)) {
-					LOG("Open for write/creation failed for [%s]\n", m_write_path.c_str());
+					LOG("Open for write/creation failed for [%s]\n", m_write_path);
 					scsi_status_complete(SS_CHECK_CONDITION);
 					sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 					return;
@@ -238,7 +238,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 				osd_file::ptr file;
 				uint64_t filesize;
 
-				LOG("flushing [%s] to disk at %08x\n", m_write_path.c_str(), m_write_offset * 512);
+				LOG("flushing [%s] to disk at %08x\n", m_write_path, m_write_offset * 512);
 				osd_file::open(m_write_path, OPEN_FLAG_WRITE, file, filesize);
 				file->write(&m_xfer_buffer[0], m_write_offset * 512, m_write_length, actualWritten);
 
@@ -297,9 +297,7 @@ void nscsi_cdrom_device::update_directory()
 
 		while ((ourEntry = directory->read()) != nullptr)
 		{
-			// FIXME: use-after-free
-			// the directory entry's name is not valid after a subsequent call to read()
-			m_directory.push_back(*ourEntry);
+			m_directory.push_back({ ourEntry->name, ourEntry->type, ourEntry->size });
 
 			// API version 0 has a hard cap of 100 files
 			if (m_directory.size() >= 99)
@@ -970,7 +968,7 @@ void nscsi_cdrom_device::scsi_command()
 				m_scsi_cmdbuf[pos] = index;
 				m_scsi_cmdbuf[pos + 1] = m_directory[index].type != osd::directory::entry::entry_type::DIR;
 				// There's a guaranteed null terminator one byte after the name field
-				strncpy(reinterpret_cast<char *>(&m_scsi_cmdbuf[pos + 2]), m_directory[index].name, 31);
+				strncpy(reinterpret_cast<char *>(&m_scsi_cmdbuf[pos + 2]), m_directory[index].name.c_str(), 31);
 				m_scsi_cmdbuf[pos + 36] = (m_directory[index].size >> 24) & 0xff;
 				m_scsi_cmdbuf[pos + 37] = (m_directory[index].size >> 16) & 0xff;
 				m_scsi_cmdbuf[pos + 38] = (m_directory[index].size >> 8) & 0xff;
@@ -1022,7 +1020,7 @@ void nscsi_cdrom_device::scsi_command()
 		u64 size;
 		if (osd_file::open(tmpPath, OPEN_FLAG_READ, file, size))
 		{
-			LOG("Open failed for [%s]\n", tmpPath.c_str());
+			LOG("Open failed for [%s]\n", tmpPath);
 			scsi_status_complete(SS_CHECK_CONDITION);
 			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 			return;

@@ -1195,7 +1195,7 @@ void legionna_state::legionna(machine_config &config)
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(36*8, 36*8);
@@ -1252,7 +1252,7 @@ void legionna_state::heatbrl(machine_config &config)
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(36*8, 36*8);
@@ -1310,7 +1310,7 @@ void legionna_state::godzilla(machine_config &config)
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 //  screen.set_refresh_hz(61);
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 //  screen.set_size(42*8, 36*8);
@@ -1371,7 +1371,7 @@ void legionna_state::denjinmk(machine_config &config)
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(42*8, 36*8);
 	screen.set_refresh_hz(56); // <= 56 FPS, Value from doc
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -1430,7 +1430,7 @@ void legionna_state::grainbow(machine_config &config)
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 36*8);
@@ -1489,7 +1489,7 @@ void legionna_state::cupsoc(machine_config &config)
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(42*8, 36*8);

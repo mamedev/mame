@@ -658,7 +658,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::sound_portmap);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(44*8, 30*8);
@@ -703,7 +703,7 @@ void hatris_state::hatris(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &hatris_state::sound_portmap);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(44*8, 30*8);

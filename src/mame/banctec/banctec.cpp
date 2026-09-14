@@ -150,7 +150,7 @@ void banctec_state::banctec(machine_config &config)
 // The U20 EPROM holds the image data for the character set.
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size((52+1)*8, (31+1)*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);

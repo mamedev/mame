@@ -6,6 +6,14 @@
 
 *********************************************************************/
 
+/*
+
+    TODO:
+
+    - keyboard ROM is not dumped
+
+*/
+
 #include "emu.h"
 #include "mm2kb.h"
 #include "machine/keyboard.ipp"
@@ -194,4 +202,21 @@ void mm2_keyboard_device::device_reset()
 	clear_fifo();
 	reset_key_state();
 	start_processing(attotime::from_hz(600));
+}
+
+void mm2_keyboard_device::received_byte(uint8_t byte)
+{
+	switch (byte)
+	{
+		case 0x78: // initiate self test
+			transmit_byte(0x7a); // self test passed
+			break;
+
+		case 0x7b: // keylock switch status
+			transmit_byte(0);
+			transmit_byte(0);
+			transmit_byte(0);
+			transmit_byte(0);
+			break;
+	}
 }

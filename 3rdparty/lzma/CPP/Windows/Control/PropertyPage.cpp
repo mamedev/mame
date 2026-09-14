@@ -141,7 +141,7 @@ INT_PTR MyPropertySheet(const CObjectVector<CPageInfo> &pagesInfo, HWND hwndPare
     sheet.pszCaption = titleA;
     sheet.nPages = pagesA.Size();
     sheet.nStartPage = 0;
-    sheet.ppsp = (LPCPROPSHEETPAGEA)(const void *)&pagesA.Front();
+    sheet.ppsp = (LPCPROPSHEETPAGEA)(const void *)pagesA.ConstData();
     sheet.pfnCallback = NULL;
     return ::PropertySheetA(&sheet);
   }
@@ -156,7 +156,7 @@ INT_PTR MyPropertySheet(const CObjectVector<CPageInfo> &pagesInfo, HWND hwndPare
     sheet.pszCaption = title;
     sheet.nPages = pagesW.Size();
     sheet.nStartPage = 0;
-    sheet.ppsp = (LPCPROPSHEETPAGEW)(const void *)&pagesW.Front();
+    sheet.ppsp = (LPCPROPSHEETPAGEW)(const void *)pagesW.ConstData();
     sheet.pfnCallback = NULL;
     return ::PropertySheetW(&sheet);
   }

@@ -1,5 +1,5 @@
 /* Threads.h -- multithreading library
-2023-04-02 : Igor Pavlov : Public domain */
+: Igor Pavlov : Public domain */
 
 #ifndef ZIP7_INC_THREADS_H
 #define ZIP7_INC_THREADS_H
@@ -9,12 +9,21 @@
 
 #else
 
+#include "Compiler.h"
+
+// #define Z7_AFFINITY_DISABLE
 #if defined(__linux__)
 #if !defined(__APPLE__) && !defined(_AIX) && !defined(__ANDROID__)
 #ifndef Z7_AFFINITY_DISABLE
 #define Z7_AFFINITY_SUPPORTED
 // #pragma message(" ==== Z7_AFFINITY_SUPPORTED")
-// #define _GNU_SOURCE
+#if !defined(_GNU_SOURCE)
+// #pragma message(" ==== _GNU_SOURCE set")
+// we need _GNU_SOURCE for cpu_set_t, if we compile for MUSL
+Z7_DIAGNOSTIC_IGNORE_BEGIN_RESERVED_MACRO_IDENTIFIER
+#define _GNU_SOURCE
+Z7_DIAGNOSTIC_IGNORE_END_RESERVED_MACRO_IDENTIFIER
+#endif
 #endif
 #endif
 #endif
@@ -131,11 +140,21 @@ WRes Thread_Create_With_Affinity(CThread *p, THREAD_FUNC_TYPE func, LPVOID param
 WRes Thread_Wait_Close(CThread *p);
 
 #ifdef _WIN32
+WRes Thread_Create_With_Group(CThread *p, THREAD_FUNC_TYPE func, LPVOID param, unsigned group, CAffinityMask affinityMask);
 #define Thread_Create_With_CpuSet(p, func, param, cs) \
   Thread_Create_With_Affinity(p, func, param, *cs)
 #else
 WRes Thread_Create_With_CpuSet(CThread *p, THREAD_FUNC_TYPE func, LPVOID param, const CCpuSet *cpuSet);
 #endif
+
+typedef struct
+{
+  unsigned NumGroups;
+  unsigned NextGroup;
+} CThreadNextGroup;
+
+void ThreadNextGroup_Init(CThreadNextGroup *p, unsigned numGroups, unsigned startGroup);
+unsigned ThreadNextGroup_GetNext(CThreadNextGroup *p);
 
 
 #ifdef _WIN32
@@ -173,7 +192,7 @@ WRes CriticalSection_Init(CCriticalSection *p);
 
 #else // _WIN32
 
-typedef struct _CEvent
+typedef struct
 {
   int _created;
   int _manual_reset;
@@ -199,7 +218,7 @@ WRes Event_Wait(CEvent *p);
 WRes Event_Close(CEvent *p);
 
 
-typedef struct _CSemaphore
+typedef struct
 {
   int _created;
   UInt32 _count;
@@ -219,7 +238,7 @@ WRes Semaphore_Wait(CSemaphore *p);
 WRes Semaphore_Close(CSemaphore *p);
 
 
-typedef struct _CCriticalSection
+typedef struct
 {
   pthread_mutex_t _mutex;
 } CCriticalSection;
@@ -230,6 +249,7 @@ void CriticalSection_Enter(CCriticalSection *cs);
 void CriticalSection_Leave(CCriticalSection *cs);
 
 LONG InterlockedIncrement(LONG volatile *addend);
+LONG InterlockedDecrement(LONG volatile *addend);
 
 #endif  // _WIN32
 

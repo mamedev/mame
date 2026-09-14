@@ -120,7 +120,7 @@ void lee1220_state::lee1220(machine_config &config)
 
 	PIT8253(config, "pit"); // Intel D8253-5
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(28'944'000, 1152, 0, 960, 420, 0, 400);
 	screen.set_screen_update(m_crtc, FUNC(hd6845s_device::screen_update));

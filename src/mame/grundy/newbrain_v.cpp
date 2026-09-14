@@ -184,7 +184,7 @@ GFXDECODE_END
 
 void newbrain_state::newbrain_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_screen_update(FUNC(newbrain_state::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_size(640, 250);

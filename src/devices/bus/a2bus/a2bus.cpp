@@ -168,7 +168,8 @@ a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, cons
 	, m_out_nmi_cb(*this)
 	, m_out_inh_cb(*this)
 	, m_out_dma_cb(*this)
-	, m_slot_irq_mask(0), m_slot_nmi_mask(0)
+	, m_in_open_bus_cb(*this, 0xff)
+	, m_slot_irq_mask(0), m_slot_nmi_mask(0), m_dma_bank(0)
 {
 }
 
@@ -182,6 +183,9 @@ void a2bus_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_slot_irq_mask = m_slot_nmi_mask = 0;
+	m_dma_bank = 0;
+
+	save_item(NAME(m_dma_bank));
 }
 
 //-------------------------------------------------
@@ -269,12 +273,23 @@ void a2bus_device::set_dma_line(int state)
 
 uint8_t a2bus_device::dma_r(uint16_t offset)
 {
-	return m_maincpu_space->read_byte(offset);
+	return m_maincpu_space->read_byte((uint32_t(m_dma_bank) << 16) | offset);
 }
 
 void a2bus_device::dma_w(uint16_t offset, uint8_t data)
 {
-	m_maincpu_space->write_byte(offset, data);
+	m_maincpu_space->write_byte((uint32_t(m_dma_bank) << 16) | offset, data);
+}
+
+// Cards that hold the Apple in wait states until they're ready use this
+void a2bus_device::defer_host_access()
+{
+	cpu_device &cpu = downcast<cpu_device &>(m_maincpu_space->device());
+
+	if (cpu.cpu_is_interruptible())
+	{
+		cpu.defer_access();
+	}
 }
 
 void a2bus_device::recalc_inh(int slot)
@@ -345,4 +360,50 @@ void device_a2bus_card_interface::interface_pre_start()
 
 		m_a2bus->add_a2bus_card(m_slot, this);
 	}
+}
+
+
+uint8_t device_a2bus_card_interface::read_c0nx(uint8_t offset)
+{
+	if (!device().machine().side_effects_disabled())
+		device().logerror("a2bus: unhandled read at C0n%x\n", offset);
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_c0nx(uint8_t offset, uint8_t data)
+{
+	device().logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset);
+}
+
+uint8_t device_a2bus_card_interface::read_cnxx(uint8_t offset)
+{
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_cnxx(uint8_t offset, uint8_t data)
+{
+	device().logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset);
+}
+
+uint8_t device_a2bus_card_interface::read_c800(uint16_t offset)
+{
+	if (!device().machine().side_effects_disabled())
+		device().logerror("a2bus: unhandled read at %04x\n", offset + 0xc800);
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_c800(uint16_t offset, uint8_t data)
+{
+	device().logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800);
+}
+
+uint8_t device_a2bus_card_interface::read_inh_rom(uint16_t offset)
+{
+	if (!device().machine().side_effects_disabled())
+		device().logerror("a2bus: unhandled read at C0n%x\n", offset);
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_inh_rom(uint16_t offset, uint8_t data)
+{
 }

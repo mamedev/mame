@@ -858,7 +858,7 @@ void psikyosh_state::psikyo3v1(machine_config &config)
 	EEPROM_93C56_8BIT(config, m_eeprom).default_value(0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64 * 8, 32 * 8);
 	m_screen->set_visarea(0, 40 * 8 - 1, 0, 28 * 8 - 1);

@@ -70,7 +70,7 @@ void a2bus_ssprite_device::device_add_mconfig(machine_config &config)
 	TMS9918A(config, m_tms, XTAL(10'738'635)).set_screen(SCREEN_TAG);
 	m_tms->set_vram_size(0x4000); // 16k of VRAM
 	m_tms->int_callback().set(FUNC(a2bus_ssprite_device::tms_irq_w));
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_ay, 1022727).add_route(ALL_OUTPUTS, "mono", 1.0);

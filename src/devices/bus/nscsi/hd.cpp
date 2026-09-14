@@ -200,6 +200,12 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 
 	case SC_READ_6:
+		// required for firmware version 1.6 on the ICD AdSCSI Zorro card
+		if (get_lun(m_scsi_cmdbuf[1] >> 5)) {
+			LOG("command READ aborted, bad LUN\n");
+			bad_lun();
+			break;
+		}
 		lba = get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff;
 		blocks = m_scsi_cmdbuf[4];
 		if(!blocks)

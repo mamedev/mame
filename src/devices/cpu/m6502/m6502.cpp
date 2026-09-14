@@ -90,8 +90,11 @@ void m6502_device::init()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_apu_irq_state));
 	save_item(NAME(m_v_state));
+	save_item(NAME(m_rdy_state));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_taken));
+	save_item(NAME(m_irq_sampled));
+	save_item(NAME(m_nmi_sampled));
 	save_item(NAME(m_inst_state));
 	save_item(NAME(m_inst_substate));
 	save_item(NAME(m_inst_state_base));
@@ -115,8 +118,11 @@ void m6502_device::init()
 	m_irq_state = false;
 	m_apu_irq_state = false;
 	m_v_state = false;
+	m_rdy_state = true;
 	m_nmi_pending = false;
 	m_irq_taken = false;
+	m_irq_sampled = false;
+	m_nmi_sampled = false;
 	m_inst_state = STATE_RESET;
 	m_inst_substate = 0;
 	m_inst_state_base = 0;
@@ -132,6 +138,8 @@ void m6502_device::device_reset()
 	m_inst_state_base = 0;
 	m_nmi_pending = false;
 	m_irq_taken = false;
+	m_irq_sampled = false;
+	m_nmi_sampled = false;
 	m_sync = false;
 	m_sync_w(CLEAR_LINE);
 	m_inhibit_interrupts = false;
@@ -426,6 +434,9 @@ void m6502_device::execute_set_input(int inputnum, int state)
 			m_P |= F_V;
 		m_v_state = state == ASSERT_LINE;
 		break;
+	case RDY_LINE:
+		m_rdy_state = state == ASSERT_LINE;
+		break;
 	}
 }
 
@@ -501,7 +512,7 @@ void m6502_device::prefetch_end()
 	if(!m_sync_w.isunset())
 		m_sync_w(CLEAR_LINE);
 
-	if((m_nmi_pending || ((m_irq_state || m_apu_irq_state) && !(m_P & F_I))) && !m_inhibit_interrupts) {
+	if(((m_nmi_pending && m_nmi_sampled) || (m_irq_sampled && !(m_P & F_I))) && !m_inhibit_interrupts) {
 		m_irq_taken = true;
 		m_IR = 0x00;
 	} else

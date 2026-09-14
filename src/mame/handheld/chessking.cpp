@@ -324,7 +324,7 @@ void chessking_state::chesskng(machine_config &config)
 	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 160);
 	m_screen->set_visarea_full();

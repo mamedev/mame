@@ -592,7 +592,7 @@ void meyc8080_state::meyc8080(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
 	screen.set_refresh_hz(60);

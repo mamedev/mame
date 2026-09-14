@@ -21,12 +21,13 @@
 #include "dfac.h"
 #include "dfac2.h"
 #include "egret.h"
-#include "macadb.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 #include "omega.h"
 #include "sonora.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -55,7 +56,7 @@ public:
 	macvail_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_sonora(*this, "sonora"),
 		m_dfac(*this, "dfac"),
@@ -84,7 +85,7 @@ public:
 
 private:
 	required_device<m68030_device> m_maincpu;
-	optional_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<sonora_device> m_sonora;
 	optional_device<dfac_device> m_dfac;
@@ -328,7 +329,9 @@ void macvail_state::maclc3_base(machine_config &config)
 	nubus.out_irqe_callback().set(m_sonora, FUNC(sonora_device::slot2_irq_w));
 	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
-	MACADB(config, m_macadb, C15M);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 }
 
 void macvail_state::maclc3(machine_config &config)
@@ -346,10 +349,10 @@ void macvail_state::maclc3(machine_config &config)
 	m_egret->dfac_sda_callback().append(m_omega, FUNC(omega_device::data_write));
 	m_egret->dfac_latch_callback().set(m_dfac, FUNC(dfac_device::latch_write));
 	m_egret->dfac_latch_callback().append(m_omega, FUNC(omega_device::latch_write));
-	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_egret->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_egret->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));
 	m_egret->via_data_callback().set(m_sonora, FUNC(sonora_device::cb2_w));
-	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+	m_adbbus->out_adb_callback().set(m_egret, FUNC(egret_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_sonora->pb3_callback().set(m_egret, FUNC(egret_device::get_xcvr_session));
@@ -379,15 +382,15 @@ void macvail_state::maclc520(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(macvail_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));
 	m_cuda->via_data_callback().set(m_sonora, FUNC(sonora_device::cb2_w));
 	m_cuda->iic_scl_callback().set(m_omega, FUNC(omega_device::clock_write));
 	m_cuda->iic_sda_callback().set(m_omega, FUNC(omega_device::data_write));
 	m_cuda->dfac_latch_callback().set(m_omega, FUNC(omega_device::latch_write));
 	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_sonora->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));

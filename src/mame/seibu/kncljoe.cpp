@@ -541,7 +541,7 @@ void kncljoe_state::kncljoe(machine_config &config)
 	m_soundcpu->set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz(4000)); // every 4 scanlines
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 0, 256);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_screen_update(FUNC(kncljoe_state::screen_update));

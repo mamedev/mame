@@ -140,6 +140,6 @@ ROM_END
 
 
 // Hasbro games
-CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",  MACHINE_IMPERFECT_SOUND )
-CONS( 2005, dsgnwrld,  0,        0, dreamlif, dsgnwrld,   dreamlif_state, empty_init, "Hasbro", "Designer's World (Version 1.0, Dec 20 2005)",  MACHINE_IMPERFECT_SOUND )
-CONS( 2006, gigapets,  0,        0, dreamlif, gigapets,   dreamlif_state, empty_init, "Hasbro", "Giga Pets Explorer (Version 1.34.1, Mar 17 2006)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2005, dreamlif,  0, 0, dreamlif, dreamlif, dreamlif_state, empty_init, "Hasbro",               "Dream Life (Version 1.0, Feb 07 2005)",            MACHINE_IMPERFECT_SOUND )
+CONS( 2005, dsgnwrld,  0, 0, dreamlif, dsgnwrld, dreamlif_state, empty_init, "Hasbro",               "Designer's World (Version 1.0, Dec 20 2005)",      MACHINE_IMPERFECT_SOUND )
+CONS( 2006, gigapets,  0, 0, dreamlif, gigapets, dreamlif_state, empty_init, "Hasbro / Tiger Games", "Giga Pets Explorer (Version 1.34.1, Mar 17 2006)", MACHINE_IMPERFECT_SOUND )

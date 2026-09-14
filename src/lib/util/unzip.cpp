@@ -14,6 +14,7 @@
 #include "hashing.h"
 #include "ioprocs.h"
 #include "multibyte.h"
+#include "pkzipdefs.h"
 #include "timeconv.h"
 
 #include "osdcore.h"
@@ -82,10 +83,17 @@ public:
 		std::fill(m_buffer.begin(), m_buffer.end(), 0);
 	}
 
+	zip_file_impl(random_read &file) noexcept
+		: zip_file_impl(std::string())
+	{
+		m_file = &file;
+	}
+
 	zip_file_impl(random_read::ptr &&file) noexcept
 		: zip_file_impl(std::string())
 	{
-		m_file = std::move(file);
+		m_owned_file = std::move(file);
+		m_file = m_owned_file.get();
 	}
 
 	static ptr find_cached(std::string_view filename) noexcept
@@ -118,7 +126,7 @@ public:
 
 	std::error_condition initialize() noexcept
 	{
-		// read ecd data
+		// read ECD data
 		auto const ziperr = read_ecd();
 		if (ziperr)
 			return ziperr;
@@ -233,6 +241,7 @@ private:
 	{
 		if (!m_file)
 		{
+			assert(!m_owned_file);
 			osd_file::ptr file;
 			auto const filerr = osd_file::open(m_filename, OPEN_FLAG_READ, file, m_length);
 			if (filerr)
@@ -241,12 +250,13 @@ private:
 				//osd_printf_error("unzip: error reopening archive file %s (%s:%d %s)\n", m_filename, filerr.category().name(), filerr.value(), filerr.message());
 				return filerr;
 			}
-			m_file = osd_file_read(std::move(file));
-			if (!m_file)
+			m_owned_file = osd_file_read(std::move(file));
+			if (!m_owned_file)
 			{
 				osd_printf_error("unzip: not enough memory to open archive file %s\n", m_filename);
 				return std::errc::not_enough_memory;
 			}
+			m_file = m_owned_file.get();
 			osd_printf_verbose("unzip: opened archive file %s\n", m_filename);
 		}
 		else if (!m_length)
@@ -335,7 +345,8 @@ private:
 	static std::mutex                   s_cache_mutex;
 
 	const std::string           m_filename;                 // copy of ZIP filename (for caching)
-	random_read::ptr            m_file;                     // file handle
+	random_read::ptr            m_owned_file;               // file if owned
+	random_read *               m_file = nullptr;           // file handle
 	std::uint64_t               m_length = 0;               // length of zip file
 
 	ecd                         m_ecd;                      // end of central directory
@@ -459,7 +470,7 @@ public:
 	void                file_name(std::string &result) const    { read_string(result, 0x1e, file_name_length()); }
 	extra_field_reader  extra_field() const noexcept            { return extra_field_reader(m_buffer + 0x1e + file_name_length(), extra_field_length()); }
 
-	bool                signature_correct() const noexcept      { return signature() == 0x04034b50; }
+	bool                signature_correct() const noexcept      { return signature() == pkzip_defs::SIG_LCL_HDR; }
 
 	std::size_t total_length() const noexcept { return minimum_length() + file_name_length() + extra_field_length(); }
 	static constexpr std::size_t minimum_length() { return 0x1e; }
@@ -496,7 +507,7 @@ public:
 	std::string         file_comment() const                    { return read_string(0x2e + file_name_length() + extra_field_length(), file_comment_length()); }
 	void                file_comment(std::string &result) const { read_string(result, 0x2e + file_name_length() + extra_field_length(), file_comment_length()); }
 
-	bool                signature_correct() const noexcept      { return signature() == 0x02014b50; }
+	bool                signature_correct() const noexcept      { return signature() == pkzip_defs::SIG_CD_HDR; }
 
 	std::size_t total_length() const noexcept { return minimum_length() + file_name_length() + extra_field_length() + file_comment_length(); }
 	static constexpr std::size_t minimum_length() { return 0x2e; }
@@ -522,7 +533,7 @@ public:
 	std::uint64_t   dir_offset() const noexcept         { return read_qword(0x30); }
 	void const *    extensible_data() const noexcept    { return m_buffer + 0x38; }
 
-	bool            signature_correct() const noexcept  { return signature() == 0x06064b50; }
+	bool            signature_correct() const noexcept  { return signature() == pkzip_defs::SIG_ECD64; }
 
 	std::size_t total_length() const noexcept { return 0x0c + ecd64_size(); }
 	static constexpr std::size_t minimum_length() { return 0x38; }
@@ -539,7 +550,7 @@ public:
 	std::uint64_t   ecd64_offset() const noexcept       { return read_qword(0x08); }
 	std::uint32_t   total_disks() const noexcept        { return read_dword(0x10); }
 
-	bool            signature_correct() const noexcept  { return signature() == 0x07064b50; }
+	bool            signature_correct() const noexcept  { return signature() == pkzip_defs::SIG_ECD64_LOC; }
 
 	std::size_t total_length() const noexcept { return minimum_length(); }
 	static constexpr std::size_t minimum_length() { return 0x14; }
@@ -562,7 +573,7 @@ public:
 	std::string     comment() const                     { return read_string(0x16, comment_length()); }
 	void            comment(std::string &result) const  { read_string(result, 0x16, comment_length()); }
 
-	bool            signature_correct() const noexcept  { return signature() == 0x06054b50; }
+	bool            signature_correct() const noexcept  { return signature() == pkzip_defs::SIG_ECD; }
 
 	std::size_t total_length() const noexcept { return minimum_length() + comment_length(); }
 	static constexpr std::size_t minimum_length() { return 0x16; }
@@ -682,16 +693,16 @@ class general_flag_reader
 public:
 	general_flag_reader(std::uint16_t val) : m_value(val) { }
 
-	bool        encrypted() const noexcept              { return bool(m_value & 0x0001); }
-	bool        implode_8k_dict() const noexcept        { return bool(m_value & 0x0002); }
-	bool        implode_3_trees() const noexcept        { return bool(m_value & 0x0004); }
+	bool        encrypted() const noexcept              { return bool(m_value & pkzip_defs::GP_FLAG_ENCRYPTED); }
+	bool        implode_8k_dict() const noexcept        { return bool(m_value & pkzip_defs::GP_FLAG_IMPLODE_DICT_8K); }
+	bool        implode_3_trees() const noexcept        { return bool(m_value & pkzip_defs::GP_FLAG_IMPLODE_SFT_3); }
 	unsigned    deflate_option() const noexcept         { return unsigned((m_value >> 1) & 0x0003); }
-	bool        lzma_eos_mark() const noexcept          { return bool(m_value & 0x0002); }
-	bool        use_descriptor() const noexcept         { return bool(m_value & 0x0008); }
-	bool        patch_data() const noexcept             { return bool(m_value & 0x0020); }
-	bool        strong_encryption() const noexcept      { return bool(m_value & 0x0040); }
-	bool        utf8_encoding() const noexcept          { return bool(m_value & 0x0800); }
-	bool        directory_encryption() const noexcept   { return bool(m_value & 0x2000); }
+	bool        lzma_eos_mark() const noexcept          { return bool(m_value & pkzip_defs::GP_FLAG_LZMA_EOS); }
+	bool        use_descriptor() const noexcept         { return bool(m_value & pkzip_defs::GP_FLAG_DATA_DESC); }
+	bool        patch_data() const noexcept             { return bool(m_value & pkzip_defs::GP_FLAG_PATCHED_DATA); }
+	bool        strong_encryption() const noexcept      { return bool(m_value & pkzip_defs::GP_FLAG_ENCRYPTED_STRONG); }
+	bool        utf8_encoding() const noexcept          { return bool(m_value & pkzip_defs::GP_FLAG_UTF8); }
+	bool        directory_encryption() const noexcept   { return bool(m_value & pkzip_defs::GP_FLAG_CD_ENCRYPTED); }
 
 private:
 	std::uint16_t m_value;
@@ -722,7 +733,8 @@ void zip_file_impl::close(ptr &&zip) noexcept
 	{
 		// close the open files
 		osd_printf_verbose("unzip: closing archive file %s and sending to cache\n", zip->m_filename);
-		zip->m_file.reset();
+		zip->m_owned_file.reset();
+		zip->m_file = nullptr;
 
 		// find the first nullptr entry in the cache
 		std::lock_guard<std::mutex> guard(s_cache_mutex);
@@ -797,7 +809,7 @@ int zip_file_impl::search(std::uint32_t search_crc, std::string_view search_file
 			for (auto extra = reader.extra_field(); extra.length_sufficient(); extra = extra.next())
 			{
 				// look for ZIP64 extended info
-				if ((extra.header_id() == 0x0001) && (extra.data_size() >= zip64_ext_info_reader::minimum_length()))
+				if ((extra.header_id() == pkzip_defs::EXTRA_ID_ZIP64) && (extra.data_size() >= zip64_ext_info_reader::minimum_length()))
 				{
 					zip64_ext_info_reader const ext64(reader, extra);
 					if (extra.data_size() >= ext64.total_length())
@@ -810,7 +822,7 @@ int zip_file_impl::search(std::uint32_t search_crc, std::string_view search_file
 				}
 
 				// look for Info-ZIP UTF-8 path
-				if (!is_utf8 && (extra.header_id() == 0x7075) && (extra.data_size() >= utf8_path_reader::minimum_length()))
+				if (!is_utf8 && (extra.header_id() == pkzip_defs::EXTRA_ID_INFO_ZIP_UC_PATH) && (extra.data_size() >= utf8_path_reader::minimum_length()))
 				{
 					utf8_path_reader const utf8path(extra);
 					if (utf8path.version() == 1)
@@ -827,12 +839,12 @@ int zip_file_impl::search(std::uint32_t search_crc, std::string_view search_file
 				}
 
 				// look for NTFS extra field
-				if ((extra.header_id() == 0x000a) && (extra.data_size() >= ntfs_reader::minimum_length()))
+				if ((extra.header_id() == pkzip_defs::EXTRA_ID_NTFS) && (extra.data_size() >= ntfs_reader::minimum_length()))
 				{
 					ntfs_reader const ntfs(extra);
 					for (auto tag = ntfs.tag1(); tag.length_sufficient(); tag = tag.next())
 					{
-						if ((tag.tag() == 0x0001) && (tag.size() >= ntfs_times_reader::minimum_length()))
+						if ((tag.tag() == pkzip_defs::EXTRA_NTFS_TAG_TIMES) && (tag.size() >= ntfs_times_reader::minimum_length()))
 						{
 							ntfs_times_reader const times(tag);
 							ntfs_duration const ticks(times.mtime());
@@ -921,16 +933,16 @@ std::error_condition zip_file_impl::decompress(void *buffer, std::size_t length)
 	// handle compression types
 	switch (m_header.compression)
 	{
-	case 0:
+	case pkzip_defs::METHOD_STORE:
 		return decompress_data_type_0(offset, buffer, length);
 
-	case 8:
+	case pkzip_defs::METHOD_DEFLATE:
 		return decompress_data_type_8(offset, buffer, length);
 
-	case 14:
+	case pkzip_defs::METHOD_LZMA:
 		return decompress_data_type_14(offset, buffer, length);
 
-	case 93:
+	case pkzip_defs::METHOD_ZSTD:
 		return decompress_data_type_93(offset, buffer, length);
 
 	default:
@@ -1664,6 +1676,32 @@ std::error_condition archive_file::open_zip(std::string_view filename, ptr &resu
 		if (err)
 			return err;
 	}
+
+	// allocate the archive API wrapper
+	result.reset(new (std::nothrow) zip_file_wrapper(std::move(newimpl)));
+	if (result)
+	{
+		return std::error_condition();
+	}
+	else
+	{
+		zip_file_impl::close(std::move(newimpl));
+		return std::errc::not_enough_memory;
+	}
+}
+
+std::error_condition archive_file::open_zip(random_read &file, ptr &result) noexcept
+{
+	// ensure we start with a nullptr result
+	result.reset();
+
+	// allocate memory for the zip_file structure
+	zip_file_impl::ptr newimpl(new (std::nothrow) zip_file_impl(file));
+	if (!newimpl)
+		return std::errc::not_enough_memory;
+	auto const err = newimpl->initialize();
+	if (err)
+		return err;
 
 	// allocate the archive API wrapper
 	result.reset(new (std::nothrow) zip_file_wrapper(std::move(newimpl)));

@@ -350,7 +350,7 @@ void cortex_state::cortex(machine_config &config)
 	crtc.int_callback().set_inputline(m_maincpu, INT_9995_INT1);
 	crtc.int_callback().append(FUNC(cortex_state::vdp_int_w));
 	crtc.set_vram_size(0x4000);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	KR2376_ST(config, m_ay2376, 50000);
 	m_ay2376->x<0>().set_ioport("X0");

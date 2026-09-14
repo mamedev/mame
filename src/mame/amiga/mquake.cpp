@@ -325,8 +325,8 @@ void mquake_state::mquake(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&mquake_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 
 	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
-	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->custom_write_cb().set(m_chipset, FUNC(address_map_bank_device::write16));
 	m_copper->set_ecs_mode(false);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

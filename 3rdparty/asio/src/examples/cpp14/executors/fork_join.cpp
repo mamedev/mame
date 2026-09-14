@@ -76,7 +76,7 @@ private:
     auto p(queue_.front());
     queue_.pop();
     lock.unlock();
-    execute(lock, p); 
+    execute(lock, p);
     return true;
   }
 

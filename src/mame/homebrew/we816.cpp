@@ -255,7 +255,7 @@ void we816_state::we816(machine_config &config)
 	m_vdp->set_vram_size(0x8000);
 	m_vdp->int_callback().set("irqs", FUNC(input_merger_device::in_w<3>));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "mono").front_center();
 

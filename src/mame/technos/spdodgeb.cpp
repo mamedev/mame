@@ -581,7 +581,7 @@ void spdodgeb_state::spdodgeb(machine_config &config)
 	GENERIC_LATCH_8(config, "mculatch");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(spdodgeb_state::screen_update));
 	m_screen->set_palette(m_palette);

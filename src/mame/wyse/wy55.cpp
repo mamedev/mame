@@ -115,7 +115,7 @@ void wy55_state::wy55(machine_config &config)
 
 	//PC16552D(config, "uart", 14.7456_MHz_XTAL / 2); // 16C452 (divider not verified)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(49.4235_MHz_XTAL, 1575, 0, 1188, 448, 0, 416);
 	//m_screen->set_raw(49.4235_MHz_XTAL * 2 / 3, 1050, 0, 800, 392, 0, 338);
 	m_screen->set_screen_update(FUNC(wy55_state::screen_update));
@@ -140,7 +140,7 @@ void wy55_state::wy65(machine_config &config)
 
 	// TODO: NVRAM? (4x W24257S-70LL on board)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(58.9824_MHz_XTAL, 1575, 0, 1188, 448, 0, 416); // dimensions probably wrong
 	m_screen->set_screen_update(FUNC(wy55_state::screen_update));
 }

@@ -698,15 +698,13 @@ CDP1869_PCB_READ_MEMBER( comx35_state::comx35_pcb_r )
 
 void comx35_state::prd_w(int state)
 {
-	if ((m_prd == CLEAR_LINE) && (state == ASSERT_LINE))
+	if ((m_prd == ASSERT_LINE) && (state == CLEAR_LINE))
 	{
 		m_cr1 = m_iden ? CLEAR_LINE : ASSERT_LINE;
 		check_interrupt();
 	}
 
 	m_prd = state;
-
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF1, state);
 }
 
 
@@ -781,6 +779,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_maincpu->set_addrmap(AS_IO, &comx35_state::comx35_io);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(comx35_state::clear_r));
+	m_maincpu->ef1_cb().set(m_vis, FUNC(cdp1869_device::predisplay_r));
 	m_maincpu->ef2_cb().set(FUNC(comx35_state::ef2_r));
 	m_maincpu->ef4_cb().set(FUNC(comx35_state::ef4_r));
 	m_maincpu->q_cb().set(FUNC(comx35_state::q_w));
@@ -812,7 +811,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 
 	// expansion bus
 	// FIXME: determine expansion bus clock frequency
-	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
+	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, nullptr).irq_callback().set(FUNC(comx35_state::irq_w));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("32K");
@@ -894,5 +893,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME          FLAGS
-COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_SUPPORTS_SAVE )

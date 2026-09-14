@@ -1394,8 +1394,8 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 					m_dma_regs.source[ch] += src_dec  ? -1 : 1;
 				}
 			}
-			// TODO: are these DMA cycle steal?
-			// There's no indication of a DMA status read so far that would indicate burst.
+			// TODO: are these DMA burst or cycle steal?
+			// There's no indication of a DMA status read so far, it's more likely that it's really burst.
 			//m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(m_dma_regs.count[ch] * 2));
 		}
 		else if (data != 0x0000) // fake DMA, used by C.U.G.
@@ -1595,7 +1595,7 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 	//break;
 	case 0x40a:
 		// speedyd/magipool uses this to request main to kickoff a sound DMA.
-		// gamblord/formduel just sets this just to poll a sound command
+		// gamblord/formduel sets this just to poll a sound command
 		// all sets up 0x40c/0x40d as a buffer, and 0x40a to check if the irq is valid
 		// TODO: staiwbbl writes here from 68k side
 		// which raises a nopped irq service for now, may just acknowledge instead
@@ -2057,7 +2057,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				const int vdisplay_end = overscan_mode ? 232 : 240;
 
 				visarea.set(0, (h320_mode ? 320 : 256) - 1, vdisplay_start, vdisplay_end - 1);
-				m_screen->configure(htotal, 262, visarea, attotime::from_ticks(htotal * 262, U13_CLOCK / divider).as_attoseconds());
+				m_screen->configure(htotal, 262, visarea, attotime::from_ticks(htotal * 262, U13_CLOCK / divider));
 				//m_screen->reset_origin(0, 0);
 			}
 
@@ -2429,7 +2429,7 @@ void supracan_state::supracan(machine_config &config)
 
 	UMC6650(config, m_lockout);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(U13_CLOCK / 10, 342, 0, 256, 262, 8, 232);
 	m_screen->set_screen_update(FUNC(supracan_state::screen_update));
 	m_screen->set_palette("palette");

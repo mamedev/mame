@@ -390,7 +390,7 @@ void sprinter_state::update_cpu()
 void sprinter_state::update_video(bool is312)
 {
 	const u16 vtotal = SPRINT_HEIGHT - (8 * is312);
-	m_screen->configure(SPRINT_WIDTH, vtotal, m_screen->visible_area(), HZ_TO_ATTOSECONDS(X_SP / 3) * SPRINT_WIDTH * vtotal);
+	m_screen->configure(SPRINT_WIDTH, vtotal, m_screen->visible_area(), attotime::from_ticks(SPRINT_WIDTH * vtotal, X_SP / 3));
 	update_int(true);
 }
 

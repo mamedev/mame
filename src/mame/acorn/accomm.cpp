@@ -429,7 +429,7 @@ void accomm_state::accomm(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, G65816_LINE_IRQ);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(accomm_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);

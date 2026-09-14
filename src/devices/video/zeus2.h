@@ -50,8 +50,12 @@ struct zeus2_poly_extra_data
 	uint32_t          ctrl_word;
 	uint32_t          ucode_src;
 	uint32_t          tex_src;
+	// Render window latched here because rendering is deferred and mwskins moves it mid-frame
+	uint32_t          frame_base;
+	uint32_t          frame_shift;
 	bool            texture_alpha;
 	bool            texture_rgb555;
+	bool            solid_enable;
 	bool            blend_enable;
 	int32_t         zbuf_min;
 	bool            depth_min_enable;
@@ -70,11 +74,15 @@ struct zeus2_poly_extra_data
 #define WAVERAM_BLOCK0(blocknum)                ((void *)((uint8_t *)m_waveram.get() + 8 * (blocknum)))
 #define WAVERAM_BLOCK0_EXT(blocknum)            ((void *)((uint8_t *)m_state->m_waveram.get() + 8 * (blocknum)))
 
-#define WAVERAM_PTR8(base, bytenum)             ((uint8_t *)(base) + BYTE4_XOR_LE(bytenum))
+// Texel addressing wraps within waveram: crusnexo puts textures near the end of the buffer
+// and addresses rows past it, so a fetch that runs off the end must continue from the start.
+#define WAVERAM_WRAP(base, bytenum)             (s_waveram_base + (uint32_t((uint8_t *)(base) - s_waveram_base + (bytenum)) & (WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 - 1)))
+
+#define WAVERAM_PTR8(base, bytenum)             WAVERAM_WRAP(base, BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
 #define WAVERAM_WRITE8(base, bytenum, data)     do { *WAVERAM_PTR8(base, bytenum) = (data); } while (0)
 
-#define WAVERAM_PTR16(base, wordnum)            ((uint16_t *)(base) + BYTE_XOR_LE(wordnum))
+#define WAVERAM_PTR16(base, wordnum)            ((uint16_t *)WAVERAM_WRAP(base, 2 * BYTE_XOR_LE(wordnum)))
 #define WAVERAM_READ16(base, wordnum)           (*WAVERAM_PTR16(base, wordnum))
 #define WAVERAM_WRITE16(base, wordnum, data)    do { *WAVERAM_PTR16(base, wordnum) = (data); } while (0)
 
@@ -95,9 +103,14 @@ public:
 	void render_poly_8bit(int32_t scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
 
 	void zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdata, int logit);
+	void zeus2_draw_mesh_vertex(const uint32_t *databuffer, uint32_t texdata, uint8_t cmd, int logit);
 
 private:
+	void zeus2_transform_vertex(vertex_t &vert, float fScale, uint32_t texdata, int logit);
+	void zeus2_render_poly(vertex_t *vert, int numverts, uint32_t texdata, int logit);
+
 	zeus2_device* m_state;
+	vertex_t m_meshvert[3];   // pm3dli microcode vertex slots D, E and F
 };
 typedef zeus2_renderer::vertex_t z2_poly_vertex;
 typedef zeus2_renderer::extent_t z2_poly_extent;
@@ -141,10 +154,12 @@ public:
 	bool m_useZOffset;
 
 	std::unique_ptr<uint32_t[]> m_waveram;
+	static uint8_t *s_waveram_base;     // m_waveram start, for WAVERAM_WRAP
 	std::unique_ptr<uint32_t[]> m_frameColor;
 	std::unique_ptr<int32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];
 	uint32_t m_ucode[0x200];
+	float m_interpFactor;
 	uint32_t m_curUCodeSrc;
 	uint32_t m_curPalTableSrc;
 	uint32_t m_texmodeReg;
@@ -228,12 +243,14 @@ public:
 			return tms320c3x_device::fp_to_float(val);
 	}
 
+	inline uint32_t frame_row_shift() const { return 9 + m_yScale; }
+
 	inline uint32_t frame_addr_from_xy(uint32_t x, uint32_t y, bool render)
 	{
 		uint32_t addr;
 		if (render) {
-			// Rendering is y location
-			addr = m_renderRegs[0x4] << (9 + m_yScale);
+			// Rend XOffset/YOffset place the render window in the frame buffer
+			addr = (m_renderRegs[0x4] << frame_row_shift()) + m_renderRegs[0x3];
 		}
 		else {
 			// y.16:x.16 row/col
@@ -242,7 +259,7 @@ public:
 		}
 		//uint32_t addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
 		//  : frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
-		addr += (y << (9 + m_yScale)) + x;
+		addr += (y << frame_row_shift()) + x;
 		return addr;
 	}
 

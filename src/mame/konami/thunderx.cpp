@@ -806,7 +806,7 @@ void thunderx_state_base::common(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // verified on scontra and thunderx PCBs
 	screen.set_screen_update(FUNC(thunderx_state_base::screen_update));
 	screen.set_palette(m_palette);

@@ -998,7 +998,7 @@ void senjyo_state::senjyo(machine_config &config)
 	ctc.zc_callback<2>().set(FUNC(senjyo_state::dac_clock_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(senjyo_state::screen_update));
 

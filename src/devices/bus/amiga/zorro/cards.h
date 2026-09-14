@@ -2,7 +2,7 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    Amiga Zorro-II Cards
+    Amiga Zorro II/III Cards
 
 ***************************************************************************/
 
@@ -13,5 +13,7 @@
 
 
 void zorro2_cards(device_slot_interface &device) ATTR_COLD;
+void zorro3_cards(device_slot_interface &device) ATTR_COLD;
+
 
 #endif // MAME_BUS_AMIGA_ZORRO_CARDS_H

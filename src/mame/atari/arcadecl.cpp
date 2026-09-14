@@ -485,7 +485,7 @@ void sparkz_state::sparkz(machine_config &config)
 	palette.set_format(palette_device::IRGB_1555, 512);
 	palette.set_membits(8);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals

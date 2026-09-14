@@ -1625,7 +1625,7 @@ void bosco_state::bosco(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(bosco_state::screen_update_bosco));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
@@ -1701,7 +1701,7 @@ void galaga_state::galaga(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(galaga_state::screen_update_galaga));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
@@ -1817,7 +1817,7 @@ void xevious_state::xevious(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(xevious_state::screen_update_xevious));
 	m_screen->set_palette(m_palette);
@@ -1934,7 +1934,7 @@ void digdug_state::digdug(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(digdug_state::screen_update_digdug));
 	m_screen->set_palette(m_palette);

@@ -61,6 +61,7 @@ TODO:
 #include "circus.h"
 
 #include "cpu/m6502/m6502.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "circus.lh"
@@ -373,7 +374,7 @@ void circus_state::base_mcfg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE | VIDEO_UPDATE_SCANLINE); // needed for proper hardware collisions
 	m_screen->set_raw(11.289_MHz_XTAL / 2, 42*8, 0, 31*8, 280, 0, 256);
 	m_screen->set_screen_update(FUNC(circus_state::screen_update));
@@ -557,8 +558,8 @@ ROM_START( robotbwl )
 	ROM_LOAD( "6000.14d", 0x0000, 0x0020, CRC(a402ac06) SHA1(3bd75630786bcc86d9e9fbc826adc909eef9b41f) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // line drawing; not used by the emulation
-	ROM_LOAD( "5000.4d",  0x0000, 0x0200, NO_DUMP ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
-	ROM_LOAD( "5001.5d",  0x0200, 0x0200, NO_DUMP )
+	ROM_LOAD( "5000.4d",  0x0000, 0x0200, CRC(e69d8fc6) SHA1(d901f57f9dc49826d59a214ab612e1fbdb0849c2) ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
+	ROM_LOAD( "5001.5d",  0x0200, 0x0200, CRC(5022c4ea) SHA1(9aee52ea5d20e29196c2b3acd136d0f4cfdda392) )
 ROM_END
 
 ROM_START( trapeze ) // loose roms labelled with pencil

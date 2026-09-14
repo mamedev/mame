@@ -63,8 +63,12 @@ namespace
 			, m_eprom(*this, "eprom")
 			, m_ldac(*this, "ldac")
 			, m_rdac(*this, "rdac")
+			, m_speaker(*this, "speaker")
 		{
 		}
+
+		// device_t implementation
+		virtual void device_resolve_objects() override ATTR_COLD;
 
 	protected:
 		// optional information overrides
@@ -105,21 +109,36 @@ namespace
 
 		// internal state
 		required_memory_region m_eprom;
-		required_device<dac_byte_interface> m_ldac;
-		required_device<dac_byte_interface> m_rdac;
+		required_device<dac_byte_device_base> m_ldac;
+		required_device<dac_byte_device_base> m_rdac;
+		required_device<speaker_device> m_speaker;
 	};
 
 
 	//**************************************************************************
-	//  MACHINE AND ROM DECLARATIONS
+	//  MACHINE IMPLEMENTATION
 	//**************************************************************************
 
 	void coco_orch90_device::device_add_mconfig(machine_config &config)
 	{
-		SPEAKER(config, "speaker", 2).front();
+		// Single Stereo Speaker (2 output channels)
+		SPEAKER(config, m_speaker, 2).front();
+
 		DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
 		DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
 	}
+
+	//-------------------------------------------------
+	//  device_resolve_objects
+	//-------------------------------------------------
+
+	void coco_orch90_device::device_resolve_objects()
+	{
+		// Mono downmix back to the CoCo system cartridge audio input line
+		add_sound_route(*m_ldac, ALL_OUTPUTS, 0.25);
+		add_sound_route(*m_rdac, ALL_OUTPUTS, 0.25);
+	}
+
 
 	//-------------------------------------------------
 	//  cts_read
@@ -130,7 +149,8 @@ namespace
 		return m_eprom->base()[offset & 0x1fff];
 	}
 
-}
+} // anonymous namespace
+
 //**************************************************************************
 //  DEVICE DECLARATION
 //**************************************************************************

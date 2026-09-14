@@ -508,7 +508,7 @@ void zwackery_state::zwackery(machine_config &config)
 	m_pia2->readpb_handler().set_ioport("DSW");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(30);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*16, 30*16);

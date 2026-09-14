@@ -179,6 +179,7 @@ bool nabupc_format::load(util::random_read &io, uint32_t form_factor, const std:
 				sects[i].deleted = false;
 				sects[i].bad_data_crc = false;
 				sects[i].bad_addr_crc = false;
+				sects[i].weak = false;
 			}
 			build_nabu_track_mfm(track, head, image, 100000, sector_count, sects, f.gap_3, f.gap_1, f.gap_2, f.dpb);
 		}

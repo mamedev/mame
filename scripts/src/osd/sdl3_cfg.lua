@@ -4,7 +4,7 @@
 dofile('modules.lua')
 
 forcedincludes {
-	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
+	MAME_DIR .. "src/osd/sdl3/sdlprefix.h"
 }
 
 if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" then
@@ -119,7 +119,7 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"UNICODE",
 			"_UNICODE",
-			"_WIN32_WINNT=0x0600",
+			"_WIN32_WINNT=0x0A00",
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX",
 		}

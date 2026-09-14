@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(NASCOM_AVC, nascom_avc_device, "nascom_avc", "Nascom Advanced
 
 void nascom_avc_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16250000, 1024, 0, 768, 320, 0, 256);
 	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 

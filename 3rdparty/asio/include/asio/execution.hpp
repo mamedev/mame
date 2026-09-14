@@ -2,7 +2,7 @@
 // execution.hpp
 // ~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,7 @@
 #include "asio/execution/context.hpp"
 #include "asio/execution/context_as.hpp"
 #include "asio/execution/executor.hpp"
+#include "asio/execution/inline_exception_handling.hpp"
 #include "asio/execution/invocable_archetype.hpp"
 #include "asio/execution/mapping.hpp"
 #include "asio/execution/occupancy.hpp"

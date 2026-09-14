@@ -533,7 +533,7 @@ void toobin_state::toobin(machine_config &config)
 	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, toobin_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(MASTER_CLOCK / 2, 640, 0, 512, 416, 0, 384);
 	m_screen->set_screen_update(FUNC(toobin_state::screen_update));

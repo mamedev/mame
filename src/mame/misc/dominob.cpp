@@ -303,7 +303,7 @@ void dominob_state::dominob(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(dominob_state::irq0_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1524);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

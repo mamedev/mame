@@ -723,7 +723,7 @@ void replicator_state::replicator(machine_config &config)
 	/*TODO: Add an ATMEGA8U2 for USB-Serial communications */
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));

@@ -535,7 +535,7 @@ inline void hd63484_device::recompute_parameters()
 
 	rectangle visarea = screen().visible_area();
 	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
-	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
+	attotime frame_period = screen().frame_period(); // TODO: use clock() to calculate the frame_period
 	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
 	if (LOG)
 		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", m_hc * ppmc, m_vc, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
@@ -2097,10 +2097,13 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	for(int x=cliprect.min_x; x<=cliprect.max_x; x+=ppw)
 	{
 		uint16_t data = 0;
+		int screen_n = layer_n;
+
 		if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
 		{
 			data = readword(wind_offs);
 			wind_offs++;
+			screen_n = 3;
 		}
 		else if (active)
 			data = readword(base_offs);
@@ -2109,7 +2112,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 		{
 			int px = x + b;
 			if (!m_display_cb.isnull())
-				m_display_cb(bitmap, cliprect, y, px, data & mask);
+				m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
 			else if (cliprect.contains(px, y))
 				bitmap.pix(y, px) = data & mask;
 

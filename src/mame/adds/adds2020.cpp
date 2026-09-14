@@ -115,7 +115,7 @@ void adds2020_state::adds2020(machine_config &config)
 	SCN2661B(config, m_epci, 4.9152_MHz_XTAL);
 	m_epci->rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<0>));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	//screen.set_raw(24_MHz_XTAL, 960, 0, 800, 361, 0, 338);
 	screen.set_raw(36_MHz_XTAL, 1440, 0, 1188, 361, 0, 338);
 	screen.set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));

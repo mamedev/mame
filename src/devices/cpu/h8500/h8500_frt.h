@@ -6,8 +6,8 @@
 
     H8/500 family 16-bit free-running timer (FRT).
 
-	Based on Olivier Galibert's H8/300 family timer implementation,
-	particularly H8/325's which is almost identical to the H8/500 version.
+    Based on Olivier Galibert's H8/300 family timer implementation,
+    particularly H8/325's which is almost identical to the H8/500 version.
 
 ***************************************************************************/
 

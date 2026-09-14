@@ -365,7 +365,7 @@ inline void upd7220_device::update_vsync_timer(int state)
 
 inline void upd7220_device::update_hsync_timer(int state)
 {
-	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : m_char_dots;
 	int y = screen().vpos();
 
 	int next_x = state ? m_hs * horiz_mult : 0;
@@ -408,7 +408,7 @@ inline void upd7220_device::recompute_parameters()
 	// microbx2 wants horizontal multiplier of x16
 	// pc9801:diremono sets up m_mode to be specifically in character mode, wanting x8 here
 	// TODO: verify compis uhrg video & high reso Hyper 98
-	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : m_char_dots;
 	const int vert_mult = (m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON ? 2 : 1;
 
 	int horiz_pix_total = (m_hs + m_hbp + m_hfp + m_aw) * horiz_mult;
@@ -420,7 +420,7 @@ inline void upd7220_device::recompute_parameters()
 	if (horiz_pix_total == 0 || vert_pix_total == 0) //bail out if screen params aren't valid
 		return;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock() * 8) * horiz_pix_total * vert_pix_total;
+	attotime refresh = attotime::from_ticks(horiz_pix_total * vert_pix_total, clock() * 8);
 
 	rectangle visarea(
 			0, //(m_hs + m_hbp) * 8;
@@ -428,7 +428,7 @@ inline void upd7220_device::recompute_parameters()
 			m_vbp, //m_vs + m_vbp;
 			m_al * vert_mult + m_vbp - 1);//vert_pix_total - m_vfp - 1;
 
-	LOGCRTC("New Screen setup: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	LOGCRTC("New Screen setup: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
 	LOGCRTC("Visible Area: (%u, %u) - (%u, %u)\n", visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 	//LOGCRTC("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch);
 	//LOGCRTC("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);
@@ -688,6 +688,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, device_type type, 
 	m_lr(1),
 	m_disp(0),
 	m_gchr(0),
+	m_char_dots(8),
 	m_bitmap_mod(0),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
 {

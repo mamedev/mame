@@ -7,18 +7,18 @@
     GPL16248VB
     GPL16258VB
 
-	die is marked GCM420 on gormiti (assumed to be GPL16218B)
+    die is marked GCM420 on gormiti (assumed to be GPL16218B)
 
-	generalplus_gpl162xx_lcdtype.cpp appears to also use a GPL162xxB series
-	chip, just ignoring the video output, it does however use a custom OTP
-	which might mean it's a slight variarion on the above which documentation
-	indicates only have the OTP provided by GeneralPlus
+    generalplus_gpl162xx_lcdtype.cpp appears to also use a GPL162xxB series
+    chip, just ignoring the video output, it does however use a custom OTP
+    which might mean it's a slight variarion on the above which documentation
+    indicates only have the OTP provided by GeneralPlus
 
-	On the surface the B chips may appear to be cost-reduced versions of the
-	equivalent A chips (less RAM, smaller internal ROM, no support for MP3 etc.)
-	but they change the video in a number of noteworthy ways, including adding
-	YUV tilemap/sprite support, extended sprites from main RAM, byteswap unit
-	and more.
+    On the surface the B chips may appear to be cost-reduced versions of the
+    equivalent A chips (less RAM, smaller internal ROM, no support for MP3 etc.)
+    but they change the video in a number of noteworthy ways, including adding
+    YUV tilemap/sprite support, extended sprites from main RAM, byteswap unit
+    and more.
 
 **********************************************************************/
 

@@ -923,7 +923,7 @@ void vicdual_state::vicdual_root(machine_config &config)
 	TIMER(config, m_coinstate_timer).configure_generic(FUNC(vicdual_state::clear_coin_status));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART);
 }
 
@@ -4539,14 +4539,14 @@ ROM_END
 
 ROM_START( deepscch )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "ds1.u33",     0x0000, 0x0400, CRC(ceaede4d) SHA1(9ed7c5313f0610323956fbb05ef07eb3b1240362) )
-    ROM_LOAD( "ds2.u32",     0x0400, 0x0400, CRC(8cb21166) SHA1(a0768464e1c3e17051ef241d596f45e177a9f95c) )
-    ROM_LOAD( "ds3.u31",     0x0800, 0x0400, CRC(27a54b47) SHA1(9c8876cabbdb3c3745fc462c92470b3fc771f96b) )
-    ROM_LOAD( "ds4.u30",     0x0c00, 0x0400, CRC(f3ff0c08) SHA1(d8918be8395984d8209ed39aac3ebcf26ae2c345) )
-    ROM_LOAD( "ds5.u29",     0x1000, 0x0400, CRC(d5ecb6d9) SHA1(5cbaf5fa169632fb682865d0e9d420de2435c6c6) )
-    ROM_LOAD( "ds6.u28",     0x1400, 0x0400, CRC(89cb6ec6) SHA1(ea4f9f10768ca4dcd00889cbb0184d0c855a5b82) )
-    ROM_LOAD( "ds7.u27",     0x1800, 0x0400, CRC(f2c0d46c) SHA1(4e07e1d061ec6ef59e43f1dcb9b75016c30b2272) )
-    ROM_LOAD( "ds8.u26",     0x1c00, 0x0400, CRC(4834d3df) SHA1(e8bbbdb1dbaf780b34cffa9e4cb79229dae49998) )
+	ROM_LOAD( "ds1.u33",     0x0000, 0x0400, CRC(ceaede4d) SHA1(9ed7c5313f0610323956fbb05ef07eb3b1240362) )
+	ROM_LOAD( "ds2.u32",     0x0400, 0x0400, CRC(8cb21166) SHA1(a0768464e1c3e17051ef241d596f45e177a9f95c) )
+	ROM_LOAD( "ds3.u31",     0x0800, 0x0400, CRC(27a54b47) SHA1(9c8876cabbdb3c3745fc462c92470b3fc771f96b) )
+	ROM_LOAD( "ds4.u30",     0x0c00, 0x0400, CRC(f3ff0c08) SHA1(d8918be8395984d8209ed39aac3ebcf26ae2c345) )
+	ROM_LOAD( "ds5.u29",     0x1000, 0x0400, CRC(d5ecb6d9) SHA1(5cbaf5fa169632fb682865d0e9d420de2435c6c6) )
+	ROM_LOAD( "ds6.u28",     0x1400, 0x0400, CRC(89cb6ec6) SHA1(ea4f9f10768ca4dcd00889cbb0184d0c855a5b82) )
+	ROM_LOAD( "ds7.u27",     0x1800, 0x0400, CRC(f2c0d46c) SHA1(4e07e1d061ec6ef59e43f1dcb9b75016c30b2272) )
+	ROM_LOAD( "ds8.u26",     0x1c00, 0x0400, CRC(4834d3df) SHA1(e8bbbdb1dbaf780b34cffa9e4cb79229dae49998) )
 	// moved here so to not interact with the temporary reload
 	ROM_LOAD( "ch.u4",       0x3000, 0x0400, NO_DUMP )
 	ROM_LOAD( "ds9.u8",      0x2000, 0x0400, CRC(30e5bf4f) SHA1(d05aeeda233e72789ec9c3be540e18405c72c84b) )
@@ -5318,7 +5318,7 @@ GAME( 1980, samuraij,   samurai,  samurai,   samurai,   vicdual_state,   empty_i
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invcarht,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Car Hunt (Germany)",                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Deep Scan",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, deepscch,    0,       carhntds,  deepscch,  vicdual_state,   empty_init, ROT270, "Sega",                    "Deep Scan / Car Hunt",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing Car Hunt portion
+GAME( 1979, deepscch,   0,        carhntds,  deepscch,  vicdual_state,   empty_init, ROT270, "Sega",                    "Deep Scan / Car Hunt",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing Car Hunt portion
 GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Car Hunt / Deep Scan (France)",                          MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Tranquillizer Gun",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (upright)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

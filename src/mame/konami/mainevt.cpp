@@ -600,7 +600,7 @@ void mainevt_state::mainevt(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // same hardware as Devastators so assume 59.17
 	screen.set_screen_update(FUNC(mainevt_state::screen_update));
 	screen.set_palette("palette");
@@ -649,7 +649,7 @@ void devstors_state::devstors(machine_config &config)
 	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+24, 320-8, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(devstors_state::screen_update));
 	screen.set_palette("palette");

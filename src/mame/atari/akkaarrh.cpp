@@ -386,7 +386,7 @@ void akkaarrh_state::akkaarrh(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_akkaarrh);
 	PALETTE(config, m_palette).set_entries(256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(256, 262);
 	m_screen->set_visarea(0, 255, 0, 239);
 	m_screen->set_refresh_hz(60);

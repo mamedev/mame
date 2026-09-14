@@ -229,6 +229,12 @@ public:
 	macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class macronix_29lv320etti_device : public intelfsh8_device
+{
+public:
+	macronix_29lv320etti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 // TODO: both m29w640 can be either 8 or 16 bit interface
 class st_m29w640gb_device : public intelfsh8_device
 {
@@ -445,6 +451,7 @@ DECLARE_DEVICE_TYPE(MACRONIX_29F1610MC,      macronix_29f1610mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29F1610MC_16BIT,macronix_29f1610mc_16bit_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29L001MC,       macronix_29l001mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29LV160TMC,     macronix_29lv160tmc_device)
+DECLARE_DEVICE_TYPE(MACRONIX_29LV320ETTI,    macronix_29lv320etti_device)
 DECLARE_DEVICE_TYPE(ST_M29W640GB,            st_m29w640gb_device)
 DECLARE_DEVICE_TYPE(ST_M29W640FT,            st_m29w640ft_device)
 DECLARE_DEVICE_TYPE(TMS_29F040,              tms_29f040_device)

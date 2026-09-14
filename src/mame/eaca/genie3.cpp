@@ -680,7 +680,7 @@ void genie3_state::genie3(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(genie3_state::crtc_update_row));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(12.875_MHz_XTAL, 824, 0, 512, 312, 0, 192);
 	m_screen->set_screen_update(m_crtc, FUNC(hd6845s_device::screen_update));

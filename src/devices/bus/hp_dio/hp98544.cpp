@@ -76,7 +76,7 @@ ROM_END
 
 void dio16_98544_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, HP98544_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, HP98544_SCREEN_NAME));
 	screen.set_screen_update(FUNC(dio16_98544_device::screen_update));
 	screen.screen_vblank().set(FUNC(dio16_98544_device::vblank_w));
 	screen.set_raw(XTAL(64'108'800), 1408, 0, 1024, 795, 0, 768);

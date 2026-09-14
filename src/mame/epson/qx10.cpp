@@ -930,7 +930,7 @@ void qx10_state::qx10(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(qx10_state::inta_call));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_raw(16.67_MHz_XTAL, 872, 152, 792, 421, 4, 404);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);

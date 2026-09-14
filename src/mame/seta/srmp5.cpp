@@ -568,7 +568,7 @@ void srmp5_state::srmp5(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(96*8, 64*8);
 	screen.set_visarea(0*8, 42*8-1, 2*8, 32*8-1);

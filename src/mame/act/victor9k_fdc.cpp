@@ -1029,7 +1029,7 @@ void victor_9000_fdc_device::drw_w(int state)
 		}
 		else
 		{
-			pll_start_writing(cur_live.tm);
+			pll_start_writing(cur_live.tm, get_floppy());
 		}
 		checkpoint();
 		live_run();
@@ -1110,10 +1110,10 @@ void victor_9000_fdc_device::pll_reset(const attotime &when)
 	cur_pll.set_clock(attotime::from_nsec(2130));
 }
 
-void victor_9000_fdc_device::pll_start_writing(const attotime &tm)
+void victor_9000_fdc_device::pll_start_writing(const attotime &tm, floppy_image_device *floppy)
 {
 	pll_reset(cur_live.tm);
-	cur_pll.start_writing(tm);
+	cur_pll.start_writing(tm, floppy);
 }
 
 void victor_9000_fdc_device::pll_commit(floppy_image_device *floppy, const attotime &tm)
@@ -1247,7 +1247,7 @@ void victor_9000_fdc_device::live_run(const attotime &limit)
 
 			// write bit
 			int write_bit = 0;
-			if (!cur_live.drw) // TODO WPS
+			if (!cur_live.drw && !get_floppy()->wpt_r())
 			{
 				write_bit = BIT(cur_live.shift_reg_write, 9);
 				if (pll_write_next_bit(write_bit, cur_live.tm, get_floppy(), limit))

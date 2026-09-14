@@ -86,7 +86,7 @@ u16 namcos21_dsp_device::dspcomram_r(offs_t offset)
 
 void namcos21_dsp_device::dspcomram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int bank = 1 - (m_dspcomram_control[0x4/2] & 1);
+	int bank = ~m_dspcomram_control[0x4/2] & 1;
 	u16 *mem = &m_dspcomram[0x800 * bank];
 	COMBINE_DATA(&mem[offset]);
 }

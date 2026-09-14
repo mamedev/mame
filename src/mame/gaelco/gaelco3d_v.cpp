@@ -14,6 +14,7 @@
 #include "cpu/tms320c3x/tms320c3x.h"
 
 #include "video/rgbutil.h"
+#include "video.h"
 
 
 static constexpr unsigned MAX_POLYGONS = 4096;

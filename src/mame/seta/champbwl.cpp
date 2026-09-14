@@ -628,7 +628,7 @@ void champbwl_state::champbwl(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x01, -0x01);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.5);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -672,7 +672,7 @@ void doraemon_state::doraemon(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 256);

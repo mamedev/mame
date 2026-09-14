@@ -2,7 +2,7 @@
 // chat_message.hpp
 // ~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -79,7 +79,8 @@ public:
   void encode_header()
   {
     char header[header_length + 1] = "";
-    std::sprintf(header, "%4d", static_cast<int>(body_length_));
+    std::snprintf(header, header_length + 1,
+        "%4d", static_cast<int>(body_length_));
     std::memcpy(data_, header, header_length);
   }
 

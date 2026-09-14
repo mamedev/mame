@@ -244,6 +244,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |E58 | Taito Wolf motherboard | bootscreen ROM uses E58 |
 |E59 | Psychic Force 2012 ||
 |E61 | Land Maker ||
+|E62 | Sonic Blast Man no Janken Battle | reuses E41 for plds |
 |E63 | Operation Tiger / Second Mission ||
 |E66 | Jyanken Battle (Jyanken Power-tchu!) | ジャンケンパワッチュ！, undumped |
 |E67 | Harikiri Junior Baseball ||
@@ -259,7 +260,6 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |E96 | Capriccio Sesame ||
 |E98 | Stunt Typhoon Plus ||
 |Exx | Twin Qix ||
-|Exx | Sonic Blast Man no Janken Battle | reuses E41 for plds |
 |F12 | Tomé Baachan no Dagashiya | とめばあちゃんの駄菓子屋, undumped |
 |F14 | Raizin Ping Pong ||
 |F19 | Hello Kitty Koi no Shugoshin Uranai ||
@@ -270,7 +270,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |F39 | Dinoking Kids ||
 |F42 | Capriccio G-One HG | カプリチオG-ONE HG, undumped |
 |F54 | Dinoking Battle ||
-|F58 | Capriccio Star | カプリチオスター, undumped |
+|F58 | Capriccio Star RS | カプリチオスター RS, original Capriccio Star undumped |
 |F?? | Hard Puncher Hajime no Ippo - The Fighting! | F06? In [namco/namcos10.cpp](../namco/namcos10.cpp) as `ippo` / `ippo2` |
 |F?? | Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen | F06 as above? |
 |G05 | Capriccio Sesame W | カプリチオセサミW, undumped |

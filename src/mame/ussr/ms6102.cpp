@@ -298,7 +298,7 @@ void ms6102_state::ms6102(machine_config &config)
 	KR1601RR1(config, m_earom);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("i8275_1", FUNC(i8275_device::screen_update));
 	m_screen->set_raw(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12);
 

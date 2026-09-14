@@ -6,6 +6,8 @@ CFLAGS = $(CFLAGS) \
   -DZ7_EXTRACT_ONLY \
   -DZ7_NO_READ_FROM_CODER \
   -DZ7_SFX \
+  -DZ7_NO_LONG_PATH \
+  -DZ7_NO_LARGE_PAGES \
 
 !IFDEF UNDER_CE
 LIBS = $(LIBS) ceshell.lib Commctrl.lib
@@ -46,6 +48,7 @@ WIN_OBJS = \
   $O\Shell.obj \
   $O\Synchronization.obj \
   $O\System.obj \
+  $O\TimeUtils.obj \
   $O\Window.obj \
 
 WIN_CTRL_OBJS = \

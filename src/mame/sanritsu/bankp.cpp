@@ -550,7 +550,7 @@ void bankp_state::bankp(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(bankp_state::vblank_interrupt));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(bankp_state::screen_update));
 	screen.set_palette(m_palette);

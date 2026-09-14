@@ -185,6 +185,7 @@ bool oric_jasmin_format::load(util::random_read &io, uint32_t form_factor, const
 				sdesc[s].deleted = false;
 				sdesc[s].bad_data_crc = false;
 				sdesc[s].bad_addr_crc = false;
+				sdesc[s].weak = false;
 			}
 
 			build_wd_track_mfm(track, head, image, 100000, 17, sdesc, 38, 40);

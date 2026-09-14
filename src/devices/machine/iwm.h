@@ -61,9 +61,6 @@ private:
 	floppy_image_device *m_floppy;
 	emu_timer *m_timer;
 	u64 m_last_sync, m_next_state_change, m_sync_update, m_async_update;
-	u64 m_flux_write_start;
-	std::array<u64, 65536> m_flux_write;
-	u32 m_flux_write_count;
 	u32 m_q3_clock;
 	int m_active, m_rw, m_rw_state;
 	u8 m_data, m_whd, m_mode, m_status, m_control, m_rw_bit_count;
@@ -82,7 +79,6 @@ private:
 	u64 half_window_size() const;
 	u64 read_register_update_delay() const;
 	inline bool is_sync() const;
-	void flush_write(u64 when = 0);
 	void write_clock_start();
 	void write_clock_stop();
 };

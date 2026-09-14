@@ -435,7 +435,7 @@ void micronic_state::micronic(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &micronic_state::micronic_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update(HD61830_TAG, FUNC(hd61830_device::screen_update));
 	screen.set_size(120, 64);   //6x20, 8x8

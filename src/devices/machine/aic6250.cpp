@@ -172,6 +172,7 @@ void aic6250_device::device_start()
 	save_item(NAME(m_scsi_latch_data));
 
 	m_rev_cntrl = 0x02;
+	m_dma_count = 0;
 
 	m_state_timer = timer_alloc(FUNC(aic6250_device::state_loop), this);
 	m_state = IDLE;
@@ -654,20 +655,27 @@ void aic6250_device::scsi_ctrl_changed()
 
 	int_check();
 
-	// TODO: in future, probably schedule scsi engine, not just interrupt checks
-	//m_state_timer->adjust(attotime::zero);
+	// restart the state machine if it is waiting for a bus control change
+	if (m_state != IDLE && !m_state_timer->enabled())
+		m_state_timer->adjust(attotime::zero);
 }
 
 
 TIMER_CALLBACK_MEMBER(aic6250_device::state_loop)
 {
 	// step state machine until delay, idle state or interrupt
+	state_t const prev_state = m_state;
 	int delay = state_step();
 
 	// check for interrupts
 	bool const interrupt = int_check();
 
 	if (delay < 0)
+		return;
+
+	// a no-progress step is waiting for a bus-control change; scsi_ctrl_changed()
+	// restarts it, so don't respin at delay 0 (that freezes emulated time)
+	if (delay == 0 && m_state == prev_state)
 		return;
 
 	/*
@@ -1015,7 +1023,8 @@ void aic6250_device::back_w(int state)
 	if (!(m_control_reg_0 & R07W_P_MEM_CYCLE_REQ))
 	{
 		if (m_dma_cntrl & R05W_TRANSFER_DIR)
-			if (m_fifo.full() || m_dma_count < 8)
+			// stop the prefetch once the FIFO holds the rest of the transfer
+			if (m_fifo.full() || m_fifo.queue_length() >= m_dma_count)
 				m_state_timer->adjust(attotime::zero);
 			else
 				m_breq_cb(1);

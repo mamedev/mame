@@ -152,11 +152,13 @@ class device_wangpcbus_card_interface : public device_interface
 
 public:
 	// memory access
-	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) { return 0; }
+	// the bus ANDs all card responses, so cards that do not respond must
+	// return 0xffff to leave the data lines released
+	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) { return 0xffff; }
 	virtual void wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint16_t data) { }
 
 	// I/O access
-	virtual uint16_t wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask) { return 0; }
+	virtual uint16_t wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask) { return 0xffff; }
 	virtual void wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data) { }
 	bool sad(offs_t offset) const { return (offset & 0xf80) == (0x800 | (m_sid << 7)); }
 

@@ -2284,7 +2284,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
 	PALETTE(config, m_palette).set_entries(0x4000);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(52*8, 262);
 	m_screen->set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
@@ -2595,13 +2595,13 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x8000);
 	config.set_default_layout(layout_dualhsxs);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(52*8, 262);
 	m_screen->set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas32_state::screen_update_multi32_left));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_refresh_hz(60);
 	screen2.set_size(52*8, 262);
 	screen2.set_visarea(0*8, 52*8-1, 0*8, 28*8-1);

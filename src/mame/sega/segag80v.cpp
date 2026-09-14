@@ -413,15 +413,6 @@ int segag80v_state::draw_r()
  *
  *************************************/
 
-void segag80v_state::vblank_callback(screen_device &screen, bool state)
-{
-	if (!state)
-	{
-		m_edgint_ff_state = 1;
-		update_int();
-	}
-}
-
 void segag80v_state::update_int()
 {
 	//
@@ -914,17 +905,12 @@ void segag80v_state::g80v_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &segag80v_state::opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &segag80v_state::main_portmap);
 	m_maincpu->irqack_cb().set(FUNC(segag80v_state::irq_ack_w));
-//  m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(40);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(512, 1536, 640-32, 1408+32);
-	m_screen->set_screen_update(FUNC(segag80v_state::screen_update_segag80v));
-	m_screen->register_vblank_callback(vblank_state_delegate(&segag80v_state::vblank_callback, this));
-
 	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(40);
+	m_vector->set_visarea(512, 1536, 640-32, 1408+32);
+	m_vector->set_vector_update(FUNC(segag80v_state::vector_update_segag80v));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

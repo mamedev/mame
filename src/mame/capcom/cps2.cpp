@@ -1754,7 +1754,7 @@ void cps2_state::cps2(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps1));
 	m_screen->screen_vblank().set(FUNC(cps2_state::screen_vblank_cps1));

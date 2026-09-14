@@ -416,7 +416,7 @@ void eurocom2_state::eurocom2(machine_config &config)
 	MC6809(config, m_maincpu, 10.7172_MHz_XTAL / 2); // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &eurocom2_state::eurocom2_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT);
 	m_screen->set_screen_update(FUNC(eurocom2_state::screen_update));
 	m_screen->set_palette("palette");

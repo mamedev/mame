@@ -33,7 +33,6 @@
 #include "screen.h"
 #include "softlist.h"
 
-#include "formats/flopimg.h"
 #include "strformat.h"
 
 #include <iostream>
@@ -624,19 +623,12 @@ uint32_t next_state::fdc_control_r()
 	if(fdc) {
 		floppy_image_device *fdev = floppy0->get_device();
 		if(fdev->exists()) {
-			uint32_t variant = fdev->get_variant();
-			switch(variant) {
-			case floppy_image::SSSD:
-			case floppy_image::SSDD:
-			case floppy_image::DSDD:
-				return 3 << 24;
-
-			case floppy_image::DSHD:
-				return 2 << 24;
-
-			case floppy_image::DSED:
+			if(fdev->floppy_is_ed())
 				return 1 << 24;
-			}
+			else if(fdev->floppy_is_hd())
+				return 2 << 24;
+			else
+				return 3 << 24;
 		}
 	}
 
@@ -1015,7 +1007,7 @@ static void next_scsi_devices(device_slot_interface &device)
 void next_state::next_base(machine_config &config)
 {
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(next_state::screen_update));

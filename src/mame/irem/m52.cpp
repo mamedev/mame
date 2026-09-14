@@ -960,7 +960,7 @@ void m52_state::m52(machine_config &config)
 	PALETTE(config, m_bg_palette).set_entries(3 * 4, 32);
 	GFXDECODE(config, m_bg_gfxdecode, m_bg_palette, gfx_m52_bg);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 136, 376, 282, 22, 274);
 	m_screen->set_screen_update(FUNC(m52_state::screen_update));
 

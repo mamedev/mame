@@ -2370,7 +2370,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	visarea.set(0, scr_width - 1, 0, m_visible_scanlines - 1);
 
-	screen().configure(480 * scr_mul, m_total_scanlines, visarea, screen().frame_period().attoseconds());
+	screen().configure(480 * scr_mul, m_total_scanlines, visarea, screen().frame_period());
 }
 
 

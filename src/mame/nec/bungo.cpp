@@ -151,7 +151,7 @@ void bungo_mini5sx_state::mini5sx_config(machine_config &config)
 	I8255(config, m_ppi_prn);
 //  m_ppi_prn->in_pb_callback().set_ioport("PRNB");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	// TODO: copied verbatim from base PC98, verify clock et al.
 	m_screen->set_raw(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400);
 	m_screen->set_screen_update(FUNC(bungo_mini5sx_state::screen_update));

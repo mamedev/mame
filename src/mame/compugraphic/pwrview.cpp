@@ -504,7 +504,7 @@ void pwrview_state::pwrview(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &pwrview_state::pwrview_fetch_map);
 	m_maincpu->set_addrmap(AS_IO, &pwrview_state::pwrview_io);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_physical_aspect(3, 4); // Portrait CRT
 	screen.set_raw(XTAL(64'000'000)/8, 992, 0, 744, 1040, 0, 960);  // clock unknown
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));

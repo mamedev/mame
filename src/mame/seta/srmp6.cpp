@@ -615,7 +615,7 @@ void srmp6_state::srmp6(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp6_state::srmp6_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp6_state::irq4_line_assert)); // irq3 is a timer irq, but it's never enabled
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

@@ -60,7 +60,7 @@ DEFINE_DEVICE_TYPE(PDS_SEDISPLAY, macpds_sedisplay_device, "pds_sefp", "Radius S
 
 void macpds_sedisplay_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SEDISPLAY_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SEDISPLAY_SCREEN_NAME));
 	screen.set_screen_update(FUNC(macpds_sedisplay_device::screen_update));
 	screen.set_raw(55_MHz_XTAL, 800, 0, 640, 1024, 0, 870);
 }

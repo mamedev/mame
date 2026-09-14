@@ -8,6 +8,7 @@
 
 #include "sound/samples.h"
 #include "sound/discrete.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include <cmath>

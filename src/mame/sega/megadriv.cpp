@@ -766,7 +766,7 @@ void md_core_state::md_core_ntsc(machine_config &config)
 	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(MASTER_CLOCK_NTSC / 10 / 262 / 342); // same as SMS?
 //  m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8 / 262 / 427); // or 427 Htotal?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
@@ -790,7 +790,7 @@ void md_core_state::md_core_pal(machine_config &config)
 	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 10 / 313 / 342); // same as SMS?
 //  m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 8 / 313 / 423); // or 423 Htotal?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.

@@ -1185,7 +1185,7 @@ void berzerk_state::berzerk(machine_config &config)
 	TTL74181(config, m_ls181_12c);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(berzerk_state::screen_update));
 

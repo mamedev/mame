@@ -7,30 +7,39 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Incomplete XBus/CD drive semantics
-\- 3do disks fail to be recognized, reads Avatar structure, decides they aren't worth and moves on;
-\- Photo CD bails out at startup with error -8021 (unless A is held on 3do_fz10e & Sanyo based
-   romsets, where first picture is loaded then bails out anyway)
-\- Audio CD black screen (needs DSPP irq), has plenty of Cel, VDLP and sport issues later
+- Incomplete XBus/CD drive semantics;
+\- Audio CD has plenty of Cel, VDLP and sport issues. Also needs support between CD drive and DSPP
    (reads random port, asks for audio tracks *with* subcode);
-- Incomplete DSPP mapping
-\- Most notably it should restart on counter reloads (bp 38,1,{pc=0;g} to bypass hang in 3do_fz1)
-- Replace ARM7 with ARM60;
-- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, wrong ARM type?);
+\- Photo CD (winsenna): ugly DSPP scratching;
+- Incomplete DSPP mapping (semaphores, audio input, output FIFO flush, FIFO status flags,
+  RAM to DSPP N stack DMA);
+- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, possible mirroring?)
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
-- MMU (user programs will need it);
-- 3do_fz1: black screen after insert disk screen (needs DSPP irq);
-- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs;
+- Fence/MMU?  Games seem to run fine with stock ARM60 semantics.
+- Video CD module under Uncle/Woody (allegedly uses a C-Cube CL-450, also seen in Amiga,
+  x86 ReelMagic card and possibly more);
+
+TODO (BIOS programs):
+- 3do_fz1: DSPP is silent on planet splash screen
+- 3do_fz1j: DSPP has repeating noise on planet splash screen
+- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs on initial logo screen;
 - 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
-- 3do_try, 3do_hc21 (bios 1): throws "QueueSport error on cmd 4: xfer across 1M boundary",
-  has issues with layer clearances, never really pings Sport DMA, needs smaller VRAM?
-- 3do_fc2: same as above
+- 3do_try, 3do_hc21 (bios 1), 3do_fc2: throws "QueueSport error on cmd 4: xfer across 1M boundary"
+  in Logic Analyser (resulting in issues with layer clearances), never really pings Sport DMA,
+  needs smaller VRAM?
 - 3do_fc1: hangs on OpenDiskFile at PC=2e6dc, path="/rom/system/tasks/shell", will "give up" if
   skipped.
+
+TODO (Arcade variants):
+- crime3do/md23do/sht3do: lightgun hookup;
+- orbatak: ugly colors in service mode, not extensively tested;
+- The actual Player bus hookup will require specific subclasses for all these (namely can't use %p
+  for enumerating p2 then p1);
 
 References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
 - https://github.com/trapexit/portfolio_os
+- 3dodev wiki;
 
 Hardware descriptions:
 
@@ -126,7 +135,6 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "emu.h"
 #include "3do.h"
 
-#include "cpu/arm/arm.h"
 #include "cpu/arm7/arm7.h"
 #include "imagedev/cdromimg.h"
 
@@ -180,17 +188,113 @@ static INPUT_PORTS_START( 3do )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p A") PORT_PLAYER(1)
 
 	PORT_START("P1.1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME(u8"P1 P \u23f5/\u23f8") // Play/Pause
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME(u8"P1 X \u23f9") PORT_PLAYER(1) // Stop
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 RT") // Right Trigger
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 LT") // Left Trigger
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("%p C") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START )   PORT_NAME(u8"%p P \u23f5/\u23f8") PORT_PLAYER(1) // Play/Pause
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT )  PORT_NAME(u8"%p X \u23f9") PORT_PLAYER(1) // Stop
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("%p RT") PORT_PLAYER(1) // Right Trigger
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("%p LT") PORT_PLAYER(1) // Left Trigger
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2.0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // ID
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p A") PORT_PLAYER(2)
+
+	PORT_START("P2.1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("%p C") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START )   PORT_NAME(u8"%p P \u23f5/\u23f8") PORT_PLAYER(2) // Play/Pause
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT )  PORT_NAME(u8"%p X \u23f9") PORT_PLAYER(2) // Stop
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("%p RT") PORT_PLAYER(2) // Right Trigger
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("%p LT") PORT_PLAYER(2) // Left Trigger
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( orbatak )
+	// SILLY_CONTROL_PAD
+	// first two bytes 0xc0 - 0x00 for ID
+	PORT_START("P1.0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1.1")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// test mode fumbles the assignment of the coin chutes between
+	// input test, bookkeeping, coinage and actual gameplay.
+	// We go at user end, and make '5' / '6' match the in-game behaviour.
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+
+	// ID = 0x49, same as retail mouse
+	PORT_START("TRACK1.0")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED ) // buttons on retail, N/C from cabinet pic
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_0_r<0>));
+
+	PORT_START("TRACK1.1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_1_r<0>));
+
+	PORT_START("TRACK1.2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_2_r<0>));
+
+	PORT_START("TRACK2.0")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED ) // buttons on retail, N/C
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_0_r<1>));
+
+	PORT_START("TRACK2.1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_1_r<1>));
+
+	PORT_START("TRACK2.2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(orbatak_state::analog_2_r<1>));
+
+	// NOTE: retail mouse maps these with reversed direction
+	PORT_START("RAW_ANALOG.0")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(1)
+
+	PORT_START("RAW_ANALOG.1")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(1)
+
+	PORT_START("RAW_ANALOG.2")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(2)
+
+	PORT_START("RAW_ANALOG.3")
+	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+// both games maps player 2 first then player 1 next
+static INPUT_PORTS_START( alg_gun )
+	PORT_START("P1.0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // trigger
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) // unused in md23do
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // holster
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // highest bit for counter?
+
+	PORT_START("P1.1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) // trigger
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) // holster
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // highest bit for counter?
+INPUT_PORTS_END
+
 
 void _3do_state::machine_start()
 {
@@ -205,6 +309,23 @@ void _3do_state::machine_start()
 void _3do_state::machine_reset()
 {
 	// start with overlay enabled, and bank pointing at BIOS
+	m_overlay_view.select(0);
+	m_bankdev->set_bank(0);
+}
+
+void _3do_state::soft_reset_w(int state)
+{
+	if (state)
+	{
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(_3do_state::soft_reset_cb), this));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(_3do_state::soft_reset_cb)
+{
+	m_maincpu->reset();
+
+	// reset vector is fetched from the primary ROM
 	m_overlay_view.select(0);
 	m_bankdev->set_bank(0);
 }
@@ -248,10 +369,12 @@ void _3do_state::green_config(machine_config &config)
 		return res;
 	});
 	m_madam->arm_ctl_cb().set(m_clio, FUNC(clio_device::arm_ctl_w));
+	m_madam->dspp_dma_read_cb().set(m_clio, FUNC(clio_device::dspp_dma_r));
+	m_madam->dspp_dma_write_cb().set(m_clio, FUNC(clio_device::dspp_dma_w));
 	m_madam->irq_dexp_cb().set(m_clio, FUNC(clio_device::dexp_w));
 	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
 		if (offset == 0)
-			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16);
+			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16) | (m_p2_r[0]->read() << 8) | (m_p2_r[1]->read() << 0);
 
 		return 0;
 	});
@@ -265,6 +388,23 @@ void _3do_state::green_config(machine_config &config)
 		//  m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	});
 	m_clio->set_screen_tag("screen");
+	m_clio->dma_read_cb().set([this] (offs_t offset) -> u8 {
+		address_space &space = m_maincpu->space();
+		return space.read_byte(offset);
+	});
+	m_clio->dma_write_cb().set([this] (offs_t offset, u8 data) {
+		address_space &space = m_maincpu->space();
+		space.write_byte(offset, data);
+	});
+	m_clio->softreset_cb().set(FUNC(_3do_state::soft_reset_w));
+	m_clio->abort_cb().set([this] (int state) {
+		if (state)
+		{
+			m_madam->abort_w(madam_device::ABT_CLIOT);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_ABORT_EXCEPTION, ASSERT_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_ABORT_EXCEPTION, CLEAR_LINE);
+		}
+	});
 	m_clio->xbus_sel_cb().set([this] (u8 data) {
 		m_cdrom->enable_w(data != 0);
 	});
@@ -285,6 +425,22 @@ void _3do_state::green_config(machine_config &config)
 		}
 		m_cdrom->cmd_w(1);
 	});
+	// PIO path to the drive data FIFO (dipir uses it, the OS driver goes through Madam DMA)
+	m_clio->xbus_data_read_cb().set([this] (offs_t offset) -> u8 {
+		if (offset != 0)
+			return 0xff;
+		m_cdrom->cmd_w(1);
+		u8 res = m_cdrom->read();
+		m_cdrom->cmd_w(0);
+		return res;
+	});
+	m_clio->xbus_data_write_cb().set([this] (offs_t offset, u8 data) {
+		if (offset != 0)
+			return;
+		m_cdrom->cmd_w(1);
+		m_cdrom->write(data);
+		m_cdrom->cmd_w(0);
+	});
 	m_clio->exp_dma_enable_cb().set(m_madam, FUNC(madam_device::exp_dma_req_w));
 	m_clio->vsync_cb().set(m_madam, FUNC(madam_device::vdlp_start_w));
 	m_clio->hsync_cb().set(m_madam, FUNC(madam_device::vdlp_continue_w));
@@ -303,6 +459,7 @@ void _3do_state::green_config(machine_config &config)
 //  m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
 //  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
 	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_int_w)).invert();
+	m_cdrom->media_cb().set(m_clio, FUNC(clio_device::xbus_media_w));
 	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus_wr_w));
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
@@ -323,7 +480,7 @@ void _3do_state::_3do(machine_config &config)
 
 	green_config(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: proper params (mostly running in interlace mode)
 	// htotal=1592 according to page 36 of HW spec, this is off wrt 15.734 kHz spec
 	// (half clocks during HSync?)
@@ -347,7 +504,7 @@ void _3do_state::_3do_pal(machine_config &config)
 
 	green_config(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: as above, actual params are unknown
 	// assumed 15.625 kHz as per PAL spec, display range looks a bit off
 	m_screen->set_raw(X2_CLOCK_PAL / 2, 1888, 254, 1790, 313, 22, 312);
@@ -367,7 +524,52 @@ void _3do_state::arcade_ntsc(machine_config &config)
 	m_cdrom->add_region("cdimage");
 }
 
+void orbatak_state::orbatak(machine_config &config)
+{
+	arcade_ntsc(config);
+	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		switch(offset)
+		{
+			// SILLY_CONTROL_PAD + ID for player 1 trackball
+			case 0:
+			{
+				// calculate the deltas here for convenience
+				for (int i = 0; i < 4; i++)
+				{
+					const u16 raw_read = m_raw_analog[i]->read();
+					m_track_delta[i] = (raw_read - m_track_previous[i]) & 0x3ff;
+					m_track_previous[i] = raw_read;
+				}
 
+				return (0xc0 << 24) | (m_p1_r[0]->read() << 16) | (m_p1_r[1]->read() << 8) | (0x49);
+			}
+			// player 1 trackball inputs + player 2 trackball ID
+			case 1: return (m_track_p1_r[0]->read() << 24) | (m_track_p1_r[1]->read() << 16) | (m_track_p1_r[2]->read() << 8) | (0x49);
+			// player 2 trackball inputs
+			case 2: return (m_track_p2_r[0]->read() << 24) | (m_track_p2_r[1]->read() << 16) | (m_track_p2_r[2]->read() << 8);
+		}
+
+		return 0;
+	});
+}
+
+void alg_gun_state::alg_gun(machine_config &config)
+{
+	arcade_ntsc(config);
+	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		switch(offset)
+		{
+			case 0:
+				return (0x4d << 24) | (m_p1_r[1]->read() << 16);
+			case 1:
+				// should be 8 bit of ID and 24 of actual inputs but both games expects an extra byte
+				// to make this other side to work (padding or actual meaning?)
+				return (0x4d << 16) | (m_p1_r[0]->read() << 8);
+		}
+
+		return 0;
+	});
+}
 
 ROM_START(3do_fz1)
 	ROM_REGION32_BE( 0x200000, "bios", 0 )
@@ -484,34 +686,7 @@ ROM_START(3do_hc21)
 	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
-
-// Arcade section
-// TODO: still using the old BIOS scheme, determine what they actually used for Orbatak
-#define NTSC_BIOS \
-	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" ) \
-	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) ) \
-	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) ) \
-	ROM_SYSTEM_BIOS( 3, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) ) \
-	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
-
-
-ROM_START(3dobios)
-	NTSC_BIOS
-ROM_END
-
-
-ROM_START(orbatak)
-	NTSC_BIOS
-
-	DISK_REGION( "cdimage" )
-	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
-ROM_END
-
+// American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
 #define ALG_BIOS \
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
@@ -522,6 +697,21 @@ ROM_START(alg3do)
 	ALG_BIOS
 ROM_END
 
+ROM_START(orbatak)
+	ALG_BIOS
+
+	DISK_REGION( "cdimage" )
+	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
+ROM_END
+
+ROM_START(crime3do)
+	ALG_BIOS
+
+	DISK_REGION( "cdimage" )
+	// https://redump.info/disc/118129
+	// "crime patrol (usa) (arcade cd-rom)"
+	DISK_IMAGE_READONLY( "crime patrol", 0, SHA1(674ef07dbb0c2df3c65741ba81bee80cfb929748) )
+ROM_END
 
 ROM_START(md23do)
 	ALG_BIOS
@@ -546,32 +736,30 @@ ROM_END
 
 // console section
 // Panasonic
-CONS( 1993, 3do_fz1,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (USA)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1993, 3do_fz1e,   3do_fz1,    0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Europe)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz1j,   3do_fz1,    0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Japan)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz10,   0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (USA)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz10e,  3do_fz10,   0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Europe, Anvil chipset)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_fz10j,  3do_fz10,   0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1993, 3do_fz1,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (USA)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1993, 3do_fz1e,   3do_fz1,    0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Europe)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz1j,   3do_fz1,    0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Japan)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10,   0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (USA)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10e,  3do_fz10,   0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Europe, Anvil chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10j,  3do_fz10,   0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
 // Goldstar
-CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO GDO-101M Interactive Multiplayer (USA?)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO GDO-101M Interactive Multiplayer (USA?)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
 // Sanyo
-CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J TRY Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J TRY Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
 
 
 // Arcade section
-GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, orbatak, alg3do, orbatak,  orbatak,   orbatak_state, empty_init, ROT0,     "American Laser Games", "Orbatak (USA, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.0
+
+// MACHINE_IMPERFECT_TIMING doesn't really matter for the gun games, they are pure FMV based.
+GAME( 1995, crime3do,alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Crime Patrol (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.0
+GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.1
+GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.05
+
 // Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
 // (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)
-
-
-// American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
-GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
-
-GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
-

@@ -315,7 +315,7 @@ void wy50_state::wy50(machine_config &config)
 
 	ER1400(config, m_earom);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(68.85_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 375, 0, 338);
 	//screen.set_raw(68.85_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 375, 0, 338);

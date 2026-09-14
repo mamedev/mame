@@ -547,7 +547,7 @@ void skydiver_state::skydiver(machine_config &config)
 	latch3.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_NOISE_RST>));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 224);
 	screen.set_screen_update(FUNC(skydiver_state::screen_update));
 	screen.set_palette(m_palette);

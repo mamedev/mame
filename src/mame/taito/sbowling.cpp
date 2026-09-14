@@ -426,7 +426,7 @@ void sbowling_state::sbowling(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(32*8, 262);     /* vert size taken from mw8080bw */
 	screen.set_visarea(1*8, 31*8-1, 4*8, 32*8-1);

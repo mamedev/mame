@@ -515,7 +515,7 @@ isa16_f65535_device::isa16_f65535_device(const machine_config &mconfig, const ch
 
 void isa16_f65535_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(f65535_vga_device::screen_update));
 

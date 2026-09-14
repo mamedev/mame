@@ -1402,7 +1402,7 @@ void segas18_state::system18(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.23); // verified on pcb
 	m_screen->set_size(342,262);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);

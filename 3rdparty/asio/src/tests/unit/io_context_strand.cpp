@@ -2,7 +2,7 @@
 // io_context_strand.cpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,26 +21,16 @@
 #include "asio/io_context.hpp"
 #include "asio/dispatch.hpp"
 #include "asio/post.hpp"
+#include "asio/steady_timer.hpp"
 #include "asio/thread.hpp"
 #include "unit_test.hpp"
-
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/deadline_timer.hpp"
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/steady_timer.hpp"
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
 
 using namespace asio;
 
 namespace bindns = std;
 
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-typedef deadline_timer timer;
-namespace chronons = boost::posix_time;
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
 typedef steady_timer timer;
 namespace chronons = asio::chrono;
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
 
 void increment(int* count)
 {
@@ -161,18 +151,10 @@ void strand_test()
   timer timer1(ioc, chronons::seconds(3));
   timer1.wait();
   ASIO_CHECK(count == 0);
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-  timer1.expires_at(timer1.expires_at() + chronons::seconds(2));
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
   timer1.expires_at(timer1.expiry() + chronons::seconds(2));
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
   timer1.wait();
   ASIO_CHECK(count == 1);
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-  timer1.expires_at(timer1.expires_at() + chronons::seconds(2));
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
   timer1.expires_at(timer1.expiry() + chronons::seconds(2));
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
   timer1.wait();
   ASIO_CHECK(count == 2);
 

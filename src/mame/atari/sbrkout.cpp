@@ -558,7 +558,7 @@ void sbrkout_state::sbrkout(machine_config &config)
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sbrkout);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL/2, 384, 0, 256, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(sbrkout_state::screen_update_sbrkout));
 

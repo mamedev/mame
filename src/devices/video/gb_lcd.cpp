@@ -2336,7 +2336,7 @@ void dmg_ppu_device::update_state()
 			}
 			assert(state_cycles > 0);
 
-			if (m_state == GB_LCD_STATE_LYXX_M3 || m_state == GB_LCD_STATE_LYXX_M3_2 || m_state == GB_LCD_STATE_LYXX_M0 || m_state == GB_LCD_STATE_LYXX_M0)
+			if (m_state == GB_LCD_STATE_LYXX_M3 || m_state == GB_LCD_STATE_LYXX_M3_2 || m_state == GB_LCD_STATE_LYXX_M0 || m_state == GB_LCD_STATE_LYXX_M0_2)
 			{
 				// Execute <cycles> M3 cycles
 				if (m_enable_experimental_engine)

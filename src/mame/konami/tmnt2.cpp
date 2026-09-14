@@ -2416,7 +2416,7 @@ void punkshot_state::punkshot(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(punkshot_state::screen_update_punkshot));
 	m_screen->set_palette(m_palette);
@@ -2461,7 +2461,7 @@ void lgtnfght_state::lgtnfght(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(lgtnfght_state::screen_update_lgtnfght));
 	m_screen->set_palette(m_palette);
@@ -2509,7 +2509,7 @@ void blswhstl_state::blswhstl(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(blswhstl_state::screen_update_lgtnfght));
 	m_screen->set_palette(m_palette);
@@ -2565,7 +2565,7 @@ void glfgreat_state::glfgreat(machine_config &config)
 	adc.vin_callback().set(FUNC(glfgreat_state::controller_r));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(glfgreat_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2624,7 +2624,7 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(prmrsocr_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2679,7 +2679,7 @@ void tmnt2_state::tmnt2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // ball position
@@ -2729,7 +2729,7 @@ void ssriders_state::ssriders(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(ssriders_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2785,7 +2785,7 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(sunsetbl_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2826,7 +2826,7 @@ void punkshot_state::thndrx2(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(punkshot_state::screen_update_thndrx2));
 	m_screen->set_palette(m_palette);

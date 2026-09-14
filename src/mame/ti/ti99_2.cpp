@@ -246,7 +246,7 @@ private:
 
 void ti99_2_state::driver_start()
 {
-	m_ram_start = 0xf000 - m_ram->default_size();
+	m_ram_start = 0xf000 - m_ram->size();
 	m_first_ram_page = m_ram_start >> 12;
 }
 
@@ -417,7 +417,7 @@ void ti99_2_state::ti99_224(machine_config& config)
 	m_videoctrl->int_cb().set(FUNC(ti99_2_state::interrupt));
 
 	using namespace bus::ti99::internal;
-	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG));
 	screen.set_raw(XTAL(10'738'635) / 2,
 			video992_device::TOTAL_HORZ,
 			video992_device::HORZ_DISPLAY_START-12,
@@ -441,7 +441,7 @@ void ti99_2_state::ti99_232(machine_config& config)
 	m_videoctrl->int_cb().set(FUNC(ti99_2_state::interrupt));
 
 	using namespace bus::ti99::internal;
-	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG));
 	screen.set_raw(XTAL(10'738'635) / 2,
 			video992_device::TOTAL_HORZ,
 			video992_device::HORZ_DISPLAY_START-12,

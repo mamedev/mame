@@ -676,7 +676,7 @@ void qdrmfgp_state::qdrmfgp(machine_config &config)
 	m_ata->irq_handler().set(FUNC(qdrmfgp_state::ide_interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -720,7 +720,7 @@ void qdrmfgp_state::qdrmfgp2(machine_config &config)
 	m_ata->irq_handler().set(FUNC(qdrmfgp_state::gp2_ide_interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

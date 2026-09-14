@@ -1046,7 +1046,7 @@ void adam_state::adam(machine_config &config)
 	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
 	m_vdc->set_vram_size(0x4000);
 	m_vdc->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

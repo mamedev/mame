@@ -56,6 +56,8 @@ protected:
 	required_device<at28c16_device> m_at28c16;
 	optional_device_array<cat702_device, 2> m_cat702;
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	required_device<znmcu_device> m_znmcu;
 
 	std::array<int, 2> m_cat702_dataout;

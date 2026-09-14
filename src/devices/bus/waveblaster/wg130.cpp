@@ -75,7 +75,7 @@ void wg130_device::map(address_map &map)
 
 void wg130_device::device_add_mconfig(machine_config &config)
 {
-	GT913(config, m_gt913, 30_MHz_XTAL / 2);
+	GT913(config, m_gt913, 30_MHz_XTAL);
 	m_gt913->set_addrmap(AS_DATA, &wg130_device::map);
 	m_gt913->add_route(0, DEVICE_SELF_OWNER, 1.0, 0);
 	m_gt913->add_route(1, DEVICE_SELF_OWNER, 1.0, 1);

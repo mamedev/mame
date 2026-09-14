@@ -515,7 +515,7 @@ void famibox_state::famibox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &famibox_state::famibox_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.0988);
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);

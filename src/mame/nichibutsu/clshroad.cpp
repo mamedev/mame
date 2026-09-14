@@ -756,7 +756,7 @@ void firebatl_state::firebatl(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(firebatl_state::flip_screen_set));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	m_screen->set_screen_update(FUNC(firebatl_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -793,7 +793,7 @@ void clshroad_state::clshroad(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flip_screen_set));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	m_screen->set_screen_update(FUNC(clshroad_state::screen_update));
 	m_screen->set_palette(m_palette);

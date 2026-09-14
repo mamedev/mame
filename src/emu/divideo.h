@@ -17,10 +17,11 @@
 #ifndef MAME_EMU_DIVIDEO_H
 #define MAME_EMU_DIVIDEO_H
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+class screen_device;
 
 // ======================> device_video_interface
 

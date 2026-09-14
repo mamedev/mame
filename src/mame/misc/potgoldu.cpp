@@ -85,7 +85,7 @@ void potgold_state::potgold(machine_config &config)
 	m_maincpu->set_pixels_per_clock(1);
 	m_maincpu->set_scanline_rgb32_callback(FUNC(potgold_state::scanline_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(22.1184_MHz_XTAL / 2, 444, 0, 320, 233, 0, 200);
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 

@@ -296,7 +296,7 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	kbd.tx_handler().set(m_acia[0], FUNC(acia6850_device::write_rxd));
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(36_MHz_XTAL / 2.5, 800, 0, 640, 300, 0, 286);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));

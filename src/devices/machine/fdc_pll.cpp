@@ -16,8 +16,6 @@ void fdc_pll_t::set_clock(const attotime &_period)
 void fdc_pll_t::reset(const attotime &when)
 {
 	read_reset(when);
-	write_position = 0;
-	write_start_time = attotime::never;
 }
 
 void fdc_pll_t::read_reset(const attotime &when)
@@ -27,27 +25,22 @@ void fdc_pll_t::read_reset(const attotime &when)
 	freq_hist = 0;
 }
 
-void fdc_pll_t::start_writing(const attotime &tm)
+void fdc_pll_t::start_writing(const attotime &tm, floppy_image_device *floppy)
 {
-	write_start_time = tm;
-	write_position = 0;
+	if(floppy)
+		floppy->write_start(tm);
 }
 
 void fdc_pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
-	commit(floppy, tm);
-	write_start_time = attotime::never;
+	if(floppy)
+		floppy->write_end(tm);
 }
 
 void fdc_pll_t::commit(floppy_image_device *floppy, const attotime &tm)
 {
-	if(write_start_time.is_never() || tm == write_start_time)
-		return;
-
 	if(floppy)
-		floppy->write_flux(write_start_time, tm, write_position, write_buffer);
-	write_start_time = tm;
-	write_position = 0;
+		floppy->write_flush(tm);
 }
 
 int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
@@ -118,17 +111,12 @@ int fdc_pll_t::feed_read_data(attotime &tm, const attotime& edge, const attotime
 
 bool fdc_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
-	if(write_start_time.is_never()) {
-		write_start_time = ctime;
-		write_position = 0;
-	}
-
 	attotime etime = ctime + period;
 	if(etime > limit)
 		return true;
 
-	if(bit && write_position < std::size(write_buffer))
-		write_buffer[write_position++] = ctime + period/2;
+	if(bit && floppy)
+		floppy->write_flux_change(ctime + period/2);
 
 	tm = etime;
 	ctime = etime;

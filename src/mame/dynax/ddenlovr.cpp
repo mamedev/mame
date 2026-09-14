@@ -4845,7 +4845,7 @@ void htengoku_state::htengoku(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -9686,7 +9686,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256);
@@ -9809,7 +9809,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9899,7 +9899,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(mmpanic_state,mmpanic)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9967,7 +9967,7 @@ void hanakanz_state::hanakanz(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::standard_panels, "hf", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10020,7 +10020,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.1656);   // HSync 15.1015kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10147,7 +10147,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10496,7 +10496,7 @@ void hanakanz_state::jongtei(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256);
@@ -10569,7 +10569,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10618,7 +10618,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10689,7 +10689,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10778,7 +10778,7 @@ void hanakanz_state::daimyojn(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.7922);   // HSync 15.4248kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -11934,6 +11934,22 @@ ROM_START( mjchuuka )
 
 	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "d12101.1b", 0x00000, 0x80000, CRC(9759c65e) SHA1(cf098c07616b6d2a2ba10ff6ae0006442b675326) )
+ROM_END
+
+ROM_START( mjchuukac ) // Dynax D1200415 PCB. All labels peeled off.
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "rom.4b", 0x00000, 0x80000, NO_DUMP ) // no consistent read
+
+	ROM_REGION( 0x300000, "blitter", ROMREGION_ERASEFF ) // all dumped ROMs same as mjchuuka
+	ROM_LOAD16_BYTE( "rom.9c",  0x000000, 0x080000, CRC(83bfc841) SHA1(36547e737244f95004c598adeb46cebce9ab3231) )
+	ROM_LOAD16_BYTE( "rom.9a",  0x000001, 0x080000, CRC(1bf6220a) SHA1(ea18fdf6e1298a3b4c91fbf6219b1edcfecaeca3) )
+	ROM_LOAD16_BYTE( "rom.10c", 0x100000, 0x080000, CRC(3424c8ac) SHA1(ee48622b478d39c6bdb5a18cab204e14f7d54f7a) )
+	ROM_LOAD16_BYTE( "rom.10a", 0x100001, 0x080000, CRC(9052bd09) SHA1(3e8e32dea6c0cea895b7f16883e500e487689e72) )
+	ROM_LOAD(        "rom.11c", 0x280000, 0x040000, NO_DUMP ) // damaged
+	// flying wire from 11c to 11a empty socket (possibly 11c is already interleaved)
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "rom.1b", 0x00000, 0x80000, CRC(8d0bace1) SHA1(b84588c9503f718f165445e3a639962024d221e8) )
 ROM_END
 
 
@@ -13677,6 +13693,7 @@ GAME( 1997, mjmysterr,   0,        mjmyorntr, mjschuka,   ddenlovr_state, empty_
 GAME( 1997, hkagerou,    0,        hkagerou,  hkagerou,   hanakanz_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou (Japan)",                                           MACHINE_NO_COCKTAIL  )
 
 GAME( 1998, mjchuuka,    0,        mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Zhonghua Ernu (Taiwan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjchuukac,   mjchuuka, mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuuka Ken (China?)",                                    MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  ) // one bad ROM
 
 GAME( 1998, mjreach1,    0,        mjreach1,  mjreach1,   hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan, NM526-NSI)",                       MACHINE_NO_COCKTAIL  )
 GAME( 1998, mjreach1a,   mjreach1, mjreach1,  mjreach1,   hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan, NM526-01)",                        MACHINE_NO_COCKTAIL  )

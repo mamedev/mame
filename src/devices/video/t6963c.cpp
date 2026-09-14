@@ -452,7 +452,7 @@ void lm24014h_device::device_add_mconfig(machine_config &config)
 	T6963C(config, m_lcdc, 0); // XTAL is unknown
 	m_lcdc->set_addrmap(0, &lm24014h_device::ram_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(240, 64);

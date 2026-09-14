@@ -464,7 +464,7 @@ void supbtime_state::supbtime(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	screen.screen_vblank().set(FUNC(supbtime_state::vblank_w));
 	screen.set_screen_update(FUNC(supbtime_state::screen_update_supbtime));

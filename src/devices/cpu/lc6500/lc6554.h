@@ -18,7 +18,9 @@ enum
 	LC6554_E,
 	LC6554_DP,
 	LC6554_CTL,
-	LC6554_TM
+	LC6554_TM,
+	LC6554_SM,
+	LC6554_SS
 };
 
 class lc6554_cpu_device : public cpu_device
@@ -48,6 +50,12 @@ public:
 	auto pn_out_cb() { return m_port_out_cb[13].bind(); }
 	auto po_out_cb() { return m_port_out_cb[14].bind(); }
 	auto pp_out_cb() { return m_port_out_cb[15].bind(); } // 1-bit
+
+	auto so_out_cb() { return m_so_cb.bind(); }
+	auto sck_out_cb() { return m_sck_cb.bind(); }
+
+	void si_w(int state);
+	void sck_w(int state);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -107,6 +115,13 @@ private:
 	void set_cf(uint8_t data);
 	void set_zf(uint8_t data);
 	void set_cf_and_zf(uint8_t data);
+
+	void serial_clock(int state);
+	void set_serial_mode(uint8_t data, uint8_t mem_mask);
+	void set_serial_data(uint8_t data, uint8_t mem_mask);
+
+	bool serial_port_enabled() { return bool(BIT(m_serial_mode, 0)); }
+	bool serial_transmit() { return bool(BIT(m_serial_mode, 7)); }
 
 	// opcodes
 	void op_cla();
@@ -227,13 +242,21 @@ private:
 	uint16_t m_stack[8];
 	uint8_t m_sp;
 
-	// pseudo-port, mapping and amount unknown
-	uint8_t m_gp[16];
+	// pseudo-port access for OP and IP
 	bool m_gp_access;
+
+	// serial
+	uint8_t m_serial_mode;
+	uint8_t m_serial_shift;
+	bool m_si;
+	bool m_sck;
 
 	// io callbacks
 	devcb_read8::array<16> m_port_in_cb;
 	devcb_write8::array<16> m_port_out_cb;
+
+	devcb_write_line m_so_cb;
+	devcb_write_line m_sck_cb;
 };
 
 DECLARE_DEVICE_TYPE(LC6554, lc6554_cpu_device)

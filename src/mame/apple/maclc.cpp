@@ -27,11 +27,12 @@
 #include "dfac.h"
 #include "dfac2.h"
 #include "egret.h"
-#include "macadb.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 #include "v8.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -63,7 +64,7 @@ public:
 	maclc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_v8(*this, "v8"),
 		m_dfac(*this, "dfac"),
@@ -93,7 +94,7 @@ public:
 
 private:
 	required_device<m68000_musashi_device> m_maincpu;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<v8_device> m_v8;
 	optional_device<dfac_device> m_dfac;
@@ -413,18 +414,20 @@ void maclc_state::maclc_base(machine_config &config)
 	// only hook the slot $E IRQ up to the PDS slot.  ($C/$D/$E are 0/1/2 on the schematics).
 	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot2_irq_w));
 
-	MACADB(config, m_macadb, C15M);
-
 	EGRET(config, m_egret, XTAL(32'768));
 	m_egret->set_default_bios_tag("341s0850");
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_egret->dfac_scl_callback().set(m_dfac, FUNC(dfac_device::clock_write));
 	m_egret->dfac_sda_callback().set(m_dfac, FUNC(dfac_device::data_write));
 	m_egret->dfac_latch_callback().set(m_dfac, FUNC(dfac_device::latch_write));
-	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_egret->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_egret->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_egret->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
-	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+
+	ADB_BUS(config, m_adbbus);
+	m_adbbus->out_adb_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "kbd_ii");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "apple_mouse");
 	config.set_perfect_quantum(m_maincpu);
 
 	m_v8->pb3_callback().set(m_egret, FUNC(egret_device::get_xcvr_session));
@@ -482,12 +485,12 @@ void maclc_state::maccclas(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0417");
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
 	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	SPICE(config.replace(), m_v8, C15M);
@@ -531,12 +534,12 @@ void maclc_state::mactv(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0789");
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
 	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	TINKERBELL(config.replace(), m_v8, C15M);

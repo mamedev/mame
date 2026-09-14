@@ -1314,7 +1314,7 @@ void nc_state::nc_base(machine_config &config)
 	TIMER(config, "keyscan_timer").configure_periodic(FUNC(nc_state::keyscan_timer), attotime::from_msec(10));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(nc_state::screen_update));

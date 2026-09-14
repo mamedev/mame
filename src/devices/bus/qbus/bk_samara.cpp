@@ -43,10 +43,10 @@ public:
 	// construction/destruction
 	bk_samara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint16_t cs0_r(offs_t offset, uint16_t mem_mask = ~0);
-	uint16_t cs1_r(offs_t offset, uint16_t mem_mask = ~0);
-	void cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cs0_r(offs_t offset);
+	uint16_t cs1_r(offs_t offset);
+	void cs0_w(offs_t offset, uint16_t data);
+	void cs1_w(offs_t offset, uint16_t data);
 
 protected:
 	// device_t implementation
@@ -137,7 +137,7 @@ void bk_samara_device::device_start()
 	m_bus->program_space().unmap_write(0160000, 0167777);
 }
 
-uint16_t bk_samara_device::cs0_r(offs_t offset, uint16_t mem_mask)
+uint16_t bk_samara_device::cs0_r(offs_t offset)
 {
 	if (offset == 7)
 		return m_ata->cs0_r(7 - offset) ^ 0xffff;
@@ -145,12 +145,12 @@ uint16_t bk_samara_device::cs0_r(offs_t offset, uint16_t mem_mask)
 		return (m_ata->cs0_r(7 - offset) ^ 0xffff) & 0xff;
 }
 
-uint16_t bk_samara_device::cs1_r(offs_t offset, uint16_t mem_mask)
+uint16_t bk_samara_device::cs1_r(offs_t offset)
 {
 	return (m_ata->cs1_r(7 - offset) ^ 0xffff) & 0xff;
 }
 
-void bk_samara_device::cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bk_samara_device::cs0_w(offs_t offset, uint16_t data)
 {
 	if (offset == 7)
 		m_ata->cs0_w(7 - offset, (data ^ 0xffff));
@@ -158,7 +158,7 @@ void bk_samara_device::cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_ata->cs0_w(7 - offset, (data ^ 0xffff) & 0xff);
 }
 
-void bk_samara_device::cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bk_samara_device::cs1_w(offs_t offset, uint16_t data)
 {
 	m_ata->cs1_w(7 - offset, (data ^ 0xffff) & 0xff);
 }

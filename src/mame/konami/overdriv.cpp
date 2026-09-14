@@ -468,7 +468,7 @@ void overdriv_state::overdriv(machine_config &config)
 	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set_ioport("PADDLE");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 305, 264, 0, 224);
 	screen.set_screen_update(FUNC(overdriv_state::screen_update));
 	screen.set_palette("palette");

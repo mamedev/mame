@@ -62,7 +62,7 @@ HRESULT CHashBundle::SetMethods(DECL_EXTERNAL_CODECS_LOC_VARS const UStringVecto
     if (m.MethodName.IsEmpty())
       m.MethodName = k_DefaultHashMethod;
     
-    if (m.MethodName == "*")
+    if (m.MethodName.IsEqualTo("*"))
     {
       CRecordVector<CMethodId> tempMethods;
       GetHashMethods(EXTERNAL_CODECS_LOC_VARS tempMethods);
@@ -249,12 +249,12 @@ static void CSum_Name_OriginalToEscape(const AString &src, AString &dest)
     char c = src[i++];
     if (c == '\n')
     {
-      dest += '\\';
+      dest.Add_Char('\\');
       c = 'n';
     }
     else if (c == '\\')
-      dest += '\\';
-    dest += c;
+      dest.Add_Char('\\');
+    dest.Add_Char(c);
   }
 }
 
@@ -287,7 +287,7 @@ static bool CSum_Name_EscapeToOriginal(const char *s, AString &dest)
         isOK = false;
       }
     }
-    dest += c;
+    dest.Add_Char(c);
   }
   return isOK;
 }
@@ -403,7 +403,7 @@ static void WriteLine(CDynLimBuf &hashFileString,
   }
   
   if (isDir && !esc.IsEmpty() && esc.Back() != '/')
-    esc += '/';
+    esc.Add_Slash();
   
   if (tagMode)
   {
@@ -431,6 +431,19 @@ static void WriteLine(CDynLimBuf &hashFileString,
 }
 
 
+static void Convert_TagName_to_MethodName(AString &method)
+{
+  // we need to convert at least SHA512/256 to SHA512-256, and SHA512/224 to SHA512-224
+  // but we convert any '/' to '-'.
+  method.Replace('/', '-');
+}
+
+static void Convert_MethodName_to_TagName(AString &method)
+{
+  if (method.IsPrefixedBy_Ascii_NoCase("SHA512-2"))
+    method.ReplaceOneCharAtPos(6, '/');
+}
+
 
 static void WriteLine(CDynLimBuf &hashFileString,
     const CHashOptionsLocal &options,
@@ -440,8 +453,10 @@ static void WriteLine(CDynLimBuf &hashFileString,
 {
   AString methodName;
   if (!hb.Hashers.IsEmpty())
+  {
     methodName = hb.Hashers[0].Name;
-  
+    Convert_MethodName_to_TagName(methodName);
+  }
   AString hashesString;
   AddHashResultLine(hashesString, hb.Hashers);
   WriteLine(hashFileString, options, path, isDir, methodName, hashesString);
@@ -461,8 +476,8 @@ HRESULT HashCalc(
   if (options.StdInMode)
   {
     CDirItem di;
-    di.Size = (UInt64)(Int64)-1;
-    di.SetAsFile();
+    if (!di.SetAs_StdInFile())
+      return GetLastError_noZero_HRESULT();
     dirItems.Items.Add(di);
   }
   else
@@ -531,7 +546,19 @@ HRESULT HashCalc(
     
     if (options.StdInMode)
     {
+#if 1
       inStream = new CStdInFileStream;
+#else
+      if (!CreateStdInStream(inStream))
+      {
+        const DWORD lastError = ::GetLastError();
+        const HRESULT res = callback->OpenFileError(FString("stdin"), lastError);
+        hb.NumErrors++;
+        if (res != S_FALSE && res != S_OK)
+          return res;
+        continue;
+      }
+#endif
     }
     else
     {
@@ -561,7 +588,7 @@ HRESULT HashCalc(
           const FString phyPath = dirItems.GetPhyPath(i);
           if (!inStreamSpec->OpenShared(phyPath, options.OpenShareForWrite))
           {
-            HRESULT res = callback->OpenFileError(phyPath, ::GetLastError());
+            const HRESULT res = callback->OpenFileError(phyPath, ::GetLastError());
             hb.NumErrors++;
             if (res != S_FALSE)
               return res;
@@ -645,51 +672,40 @@ HRESULT HashCalc(
 }
 
 
-static inline char GetHex_Upper(unsigned v)
+void HashHexToString(char *dest, const Byte *data, size_t size)
 {
-  return (char)((v < 10) ? ('0' + v) : ('A' + (v - 10)));
-}
-
-static inline char GetHex_Lower(unsigned v)
-{
-  return (char)((v < 10) ? ('0' + v) : ('a' + (v - 10)));
-}
-
-void HashHexToString(char *dest, const Byte *data, UInt32 size)
-{
-  dest[size * 2] = 0;
-  
   if (!data)
   {
-    for (UInt32 i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
       dest[0] = ' ';
       dest[1] = ' ';
       dest += 2;
     }
+    *dest = 0;
     return;
   }
   
-  if (size <= 8)
+  if (size > 8)
+    ConvertDataToHex_Lower(dest, data, size);
+  else if (size == 0)
   {
-    dest += size * 2;
-    for (UInt32 i = 0; i < size; i++)
-    {
-      const unsigned b = data[i];
-      dest -= 2;
-      dest[0] = GetHex_Upper((b >> 4) & 0xF);
-      dest[1] = GetHex_Upper(b & 0xF);
-    }
+    *dest = 0;
+    return;
   }
   else
   {
-    for (UInt32 i = 0; i < size; i++)
+    const char *dest_start = dest;
+    dest += size * 2;
+    *dest = 0;
+    do
     {
-      const unsigned b = data[i];
-      dest[0] = GetHex_Lower((b >> 4) & 0xF);
-      dest[1] = GetHex_Lower(b & 0xF);
-      dest += 2;
+      const size_t b = *data++;
+      dest -= 2;
+      dest[0] = GET_HEX_CHAR_UPPER(b >> 4);
+      dest[1] = GET_HEX_CHAR_UPPER(b & 15);
     }
+    while (dest != dest_start);
   }
 }
 
@@ -720,31 +736,6 @@ void CHasherState::WriteToString(unsigned digestIndex, char *s) const
 
 namespace NHash {
 
-static size_t ParseHexString(const char *s, Byte *dest) throw()
-{
-  size_t num;
-  for (num = 0;; num++, s += 2)
-  {
-    unsigned c = (Byte)s[0];
-    unsigned v0;
-         if (c >= '0' && c <= '9') v0 =      (c - '0');
-    else if (c >= 'A' && c <= 'F') v0 = 10 + (c - 'A');
-    else if (c >= 'a' && c <= 'f') v0 = 10 + (c - 'a');
-    else
-      return num;
-    c = (Byte)s[1];
-    unsigned v1;
-         if (c >= '0' && c <= '9') v1 =      (c - '0');
-    else if (c >= 'A' && c <= 'F') v1 = 10 + (c - 'A');
-    else if (c >= 'a' && c <= 'f') v1 = 10 + (c - 'a');
-    else
-      return num;
-    if (dest)
-      dest[num] = (Byte)(v1 | (v0 << 4));
-  }
-}
-
-
 #define IsWhite(c) ((c) == ' ' || (c) == '\t')
 
 bool CHashPair::IsDir() const
@@ -753,7 +744,7 @@ bool CHashPair::IsDir() const
     return false;
   // here we expect that Dir items contain only zeros or no Hash
   for (size_t i = 0; i < Hash.Size(); i++)
-    if (Hash[i] != 0)
+    if (Hash.ConstData()[i] != 0)
       return false;
   return true;
 }
@@ -776,7 +767,7 @@ bool CHashPair::ParseCksum(const char *s)
   Name = end;
   
   Hash.Alloc(4);
-  SetBe32(Hash, crc)
+  SetBe32a(Hash, crc)
 
   Size_from_Arc = size;
   Size_from_Arc_Defined = true;
@@ -797,48 +788,87 @@ static const char * const k_CsumMethodNames[] =
 {
     "sha256"
   , "sha224"
-//  , "sha512/224"
-//  , "sha512/256"
-  , "sha512"
+  , "sha512-224"
+  , "sha512-256"
   , "sha384"
+  , "sha512"
+  , "sha3-224"
+  , "sha3-256"
+  , "sha3-384"
+  , "sha3-512"
+//  , "shake128"
+//  , "shake256"
   , "sha1"
+  , "sha2"
+  , "sha3"
+  , "sha"
   , "md5"
+  , "blake2s"
   , "blake2b"
-  , "crc64"
+  , "blake2sp"
+  , "xxh64"
   , "crc32"
+  , "crc64"
   , "cksum"
 };
 
-static UString GetMethod_from_FileName(const UString &name)
+
+// returns true, if (method) is known hash method or hash method group name.
+static bool GetMethod_from_FileName(const UString &name, AString &method)
 {
+  method.Empty();
   AString s;
   ConvertUnicodeToUTF8(name, s);
   const int dotPos = s.ReverseFind_Dot();
-  const char *src = s.Ptr();
-  bool isExtension = false;
   if (dotPos >= 0)
   {
-    isExtension = true;
-    src = s.Ptr(dotPos + 1);
+    method = s.Ptr(dotPos + 1);
+    if (method.IsEqualTo_Ascii_NoCase("txt") ||
+        method.IsEqualTo_Ascii_NoCase("asc"))
+    {
+      method.Empty();
+      const int dotPos2 = s.Find('.');
+      if (dotPos2 >= 0)
+        s.DeleteFrom(dotPos2);
+    }
   }
-  const char *m = "";
+  if (method.IsEmpty())
+  {
+    // we support file names with "sum" and "sums" postfixes: "sha256sum", "sha256sums"
+    unsigned size;
+    if (s.Len() > 4 && StringsAreEqualNoCase_Ascii(s.RightPtr(4), "sums"))
+      size = 4;
+    else if (s.Len() > 3 && StringsAreEqualNoCase_Ascii(s.RightPtr(3), "sum"))
+      size = 3;
+    else
+      return false;
+    method = s;
+    method.DeleteFrom(s.Len() - size);
+  }
+
   unsigned i;
   for (i = 0; i < Z7_ARRAY_SIZE(k_CsumMethodNames); i++)
   {
-    m = k_CsumMethodNames[i];
-    if (isExtension)
+    const char *m = k_CsumMethodNames[i];
+    if (method.IsEqualTo_Ascii_NoCase(m))
     {
-      if (StringsAreEqual_Ascii(src, m))
-        break;
+      // method = m; // we can get lowcase
+      return true;
     }
-    else if (IsString1PrefixedByString2_NoCase_Ascii(src, m))
-      if (StringsAreEqual_Ascii(src + strlen(m), "sums"))
-        break;
   }
-  UString res;
-  if (i != Z7_ARRAY_SIZE(k_CsumMethodNames))
-    res = m;
-  return res;
+
+/*
+  for (i = 0; i < Z7_ARRAY_SIZE(k_CsumMethodNames); i++)
+  {
+    const char *m = k_CsumMethodNames[i];
+    if (method.IsPrefixedBy_Ascii_NoCase(m))
+    {
+      method = m; // we get lowcase
+      return true;
+    }
+  }
+*/
+  return false;
 }
 
 
@@ -854,10 +884,11 @@ bool CHashPair::Parse(const char *s)
     s++;
     escape = true;
   }
+  Escape = escape;
   
   // const char *kMethod = GetMethod_from_FileName(s);
   // if (kMethod)
-  if (ParseHexString(s, NULL) < 4)
+  if ((size_t)(FindNonHexChar(s) - s) < 4)
   {
     // BSD-style checksum line
     {
@@ -903,10 +934,10 @@ bool CHashPair::Parse(const char *s)
   }
 
   {
-    const size_t num = ParseHexString(s, NULL);
-    Hash.Alloc(num);
-    ParseHexString(s, Hash);
-    const size_t numChars = num * 2;
+    const size_t numChars = (size_t)(FindNonHexChar(s) - s) & ~(size_t)1;
+    Hash.Alloc(numChars / 2);
+    if ((size_t)(ParseHexString(s, Hash) - Hash) != numChars / 2)
+      throw 101;
     HashString.SetFrom(s, (unsigned)numChars);
     s += numChars;
   }
@@ -1062,7 +1093,7 @@ Z7_COM7F_IMF(CHandler::GetRawProp(UInt32 index, PROPID propID, const void **data
   if (propID == kpidChecksum)
   {
     const CHashPair &hp = HashPairs[index];
-    if (hp.Hash.Size() > 0)
+    if (hp.Hash.Size() != 0)
     {
       *data = hp.Hash;
       *dataSize = (UInt32)hp.Hash.Size();
@@ -1091,7 +1122,7 @@ static void Add_OptSpace_String(UString &dest, const char *src)
 
 Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value))
 {
-  NWindows::NCOM::CPropVariant prop;
+  NCOM::CPropVariant prop;
   switch (propID)
   {
     case kpidPhySize: if (_phySize != 0) prop = _phySize; break;
@@ -1115,17 +1146,12 @@ Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value))
         s.Add_UInt32(_hashSize * 8);
         s += "-bit";
       }
-      if (!_nameExtenstion.IsEmpty())
-      {
-        s.Add_Space_if_NotEmpty();
-        s += _nameExtenstion;
-      }
       if (_is_PgpMethod)
       {
         Add_OptSpace_String(s, "PGP");
         if (!_pgpMethod.IsEmpty())
         {
-          s += ":";
+          s.Add_Colon();
           s += _pgpMethod;
         }
       }
@@ -1135,6 +1161,18 @@ Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value))
         Add_OptSpace_String(s, "TAG");
       if (_are_there_Dirs)
         Add_OptSpace_String(s, "DIRS");
+      if (!_method_from_FileName.IsEmpty())
+      {
+        Add_OptSpace_String(s, "filename_method:");
+        s += _method_from_FileName;
+        if (!_is_KnownMethod_in_FileName)
+          s += ":UNKNOWN";
+      }
+      if (!_methods.IsEmpty())
+      {
+        Add_OptSpace_String(s, "cmd_method:");
+        s += _methods[0];
+      }
       prop = s;
       break;
     }
@@ -1146,6 +1184,7 @@ Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value))
           prop = true;
       break;
     }
+    default: break;
   }
   prop.Detach(value);
   return S_OK;
@@ -1155,8 +1194,8 @@ Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value))
 Z7_COM7F_IMF(CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *value))
 {
   // COM_TRY_BEGIN
-  NWindows::NCOM::CPropVariant prop;
-  CHashPair &hp = HashPairs[index];
+  NCOM::CPropVariant prop;
+  const CHashPair &hp = HashPairs[index];
   switch (propID)
   {
     case kpidIsDir:
@@ -1169,9 +1208,17 @@ Z7_COM7F_IMF(CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *val
       UString path;
       hp.Get_UString_Path(path);
 
-      NArchive::NItemName::ReplaceToOsSlashes_Remove_TailSlash(path,
-          true); // useBackslashReplacement
-
+      bool useBackslashReplacement = true;
+      if (_supportWindowsBackslash && !hp.Escape && path.Find(L"\\\\") < 0)
+      {
+#if WCHAR_PATH_SEPARATOR == L'/'
+        path.Replace(L'\\', L'/');
+#else
+        useBackslashReplacement = false;
+#endif
+      }
+      NArchive::NItemName::ReplaceToOsSlashes_Remove_TailSlash(
+          path, useBackslashReplacement);
       prop = path;
       break;
     }
@@ -1195,6 +1242,7 @@ Z7_COM7F_IMF(CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *val
         prop = hp.Method;
       break;
     }
+    default: break;
   }
   prop.Detach(value);
   return S_OK;
@@ -1233,6 +1281,15 @@ static HRESULT ReadStream_to_Buf(IInStream *stream, CByteBuffer &buf, IArchiveOp
 }
 
 
+static bool isThere_Zero_Byte(const Byte *data, size_t size)
+{
+  for (size_t i = 0; i < size; i++)
+    if (data[i] == 0)
+      return true;
+  return false;
+}
+
+
 Z7_COM7F_IMF(CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallback *openCallback))
 {
   COM_TRY_BEGIN
@@ -1244,17 +1301,9 @@ Z7_COM7F_IMF(CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallb
 
     CObjectVector<CHashPair> &pairs = HashPairs;
 
-    bool zeroMode = false;
-    bool cr_lf_Mode = false;
-    {
-      for (size_t i = 0; i < buf.Size(); i++)
-        if (buf[i] == 0)
-        {
-          zeroMode = true;
-          break;
-        }
-    }
+    const bool zeroMode = isThere_Zero_Byte(buf, buf.Size());
     _is_ZeroMode = zeroMode;
+    bool cr_lf_Mode = false;
     if (!zeroMode)
       cr_lf_Mode = Is_CR_LF_Data(buf, buf.Size());
 
@@ -1268,13 +1317,21 @@ Z7_COM7F_IMF(CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallb
         NCOM::CPropVariant prop;
         RINOK(openVolumeCallback->GetProperty(kpidName, &prop))
         if (prop.vt == VT_BSTR)
-          _nameExtenstion = GetMethod_from_FileName(prop.bstrVal);
+          _is_KnownMethod_in_FileName = GetMethod_from_FileName(prop.bstrVal, _method_from_FileName);
       }
     }
 
-    bool cksumMode = false;
-    if (_nameExtenstion.IsEqualTo_Ascii_NoCase("cksum"))
-      cksumMode = true;
+    if (!_methods.IsEmpty())
+    {
+      ConvertUnicodeToUTF8(_methods[0], _method_for_Extraction);
+    }
+    if (_method_for_Extraction.IsEmpty())
+    {
+      // if (_is_KnownMethod_in_FileName)
+      _method_for_Extraction = _method_from_FileName;
+    }
+
+    const bool cksumMode = _method_for_Extraction.IsEqualTo_Ascii_NoCase("cksum");
     _is_CksumMode = cksumMode;
 
     size_t pos = 0;
@@ -1371,6 +1428,7 @@ void CHandler::ClearVars()
   _is_ZeroMode = false;
   _are_there_Tags = false;
   _are_there_Dirs = false;
+  _is_KnownMethod_in_FileName = false;
   _hashSize_Defined = false;
   _hashSize = 0;
 }
@@ -1379,7 +1437,8 @@ void CHandler::ClearVars()
 Z7_COM7F_IMF(CHandler::Close())
 {
   ClearVars();
-  _nameExtenstion.Empty();
+  _method_from_FileName.Empty();
+  _method_for_Extraction.Empty();
   _pgpMethod.Empty();
   HashPairs.Clear();
   return S_OK;
@@ -1406,19 +1465,73 @@ static bool CheckDigests(const Byte *a, const Byte *b, size_t size)
 }
 
 
-static void AddDefaultMethod(UStringVector &methods, unsigned size)
+static void AddDefaultMethod(UStringVector &methods,
+    const char *name, unsigned size)
 {
+  int shaVersion = -1;
+  if (name)
+  {
+    if (StringsAreEqualNoCase_Ascii(name, "sha"))
+    {
+      shaVersion = 0;
+      if (size == 0)
+        size = 32;
+    }
+    else if (StringsAreEqualNoCase_Ascii(name, "sha1"))
+    {
+      shaVersion = 1;
+      if (size == 0)
+        size = 20;
+    }
+    else if (StringsAreEqualNoCase_Ascii(name, "sha2"))
+    {
+      shaVersion = 2;
+      if (size == 0)
+        size = 32;
+    }
+    else if (StringsAreEqualNoCase_Ascii(name, "sha3"))
+    {
+      if (size == 0 ||
+               size == 32) name = "sha3-256";
+      else if (size == 28) name = "sha3-224";
+      else if (size == 48) name = "sha3-384";
+      else if (size == 64) name = "sha3-512";
+    }
+    else if (StringsAreEqualNoCase_Ascii(name, "sha512"))
+    {
+      // we allow any sha512 derived hash inside .sha512 file:
+           if (size == 48) name = "sha384";
+      else if (size == 32) name = "sha512-256";
+      else if (size == 28) name = "sha512-224";
+    }
+    if (shaVersion >= 0)
+      name = NULL;
+  }
+  
   const char *m = NULL;
-       if (size == 32) m = "sha256";
-  else if (size == 20) m = "sha1";
-  else if (size == 16) m = "md5";
-  else if (size ==  8) m = "crc64";
-  else if (size ==  4) m = "crc32";
+  if (name)
+    m = name;
   else
+  {
+         if (size == 64) m = "sha512";
+    else if (size == 48) m = "sha384";
+    else if (size == 32) m = "sha256";
+    else if (size == 28) m = "sha224";
+    else if (size == 20) m = "sha1";
+    else if (shaVersion < 0)
+    {
+           if (size == 16) m = "md5";
+      else if (size ==  8) m = "crc64";
+      else if (size ==  4) m = "crc32";
+    }
+  }
+
+  if (!m)
     return;
-  #ifdef Z7_EXTERNAL_CODECS
+
+#ifdef Z7_EXTERNAL_CODECS
   const CExternalCodecs *_externalCodecs = g_ExternalCodecs_Ptr;
-  #endif
+#endif
   CMethodId id;
   if (FindHashMethod(EXTERNAL_CODECS_LOC_VARS
       AString(m), id))
@@ -1449,15 +1562,15 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
   CHashBundle hb_Glob;
   // UStringVector methods = options.Methods;
   UStringVector methods;
-  
-  if (methods.IsEmpty() && !_nameExtenstion.IsEmpty())
+
+/*
+  if (methods.IsEmpty() && !utf_nameExtenstion.IsEmpty() && !_hashSize_Defined)
   {
-    AString utf;
-    ConvertUnicodeToUTF8(_nameExtenstion, utf);
     CMethodId id;
-    if (FindHashMethod(EXTERNAL_CODECS_LOC_VARS utf, id))
+    if (FindHashMethod(EXTERNAL_CODECS_LOC_VARS utf_nameExtenstion, id))
       methods.Add(_nameExtenstion);
   }
+*/
   
   if (methods.IsEmpty() && !_pgpMethod.IsEmpty())
   {
@@ -1466,12 +1579,21 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
       methods.Add(UString(_pgpMethod));
   }
 
+/*
   if (methods.IsEmpty() && _pgpMethod.IsEmpty() && _hashSize_Defined)
-    AddDefaultMethod(methods, _hashSize);
+  {
+    AddDefaultMethod(methods,
+        utf_nameExtenstion.IsEmpty() ? NULL : utf_nameExtenstion.Ptr(),
+        _hashSize);
+  }
+*/
 
-  RINOK(hb_Glob.SetMethods(
+  if (!methods.IsEmpty())
+  {
+    RINOK(hb_Glob.SetMethods(
       EXTERNAL_CODECS_LOC_VARS
       methods))
+  }
 
   Z7_DECL_CMyComPtr_QI_FROM(
       IArchiveUpdateCallbackFile,
@@ -1510,15 +1632,14 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
   if (!buf.Alloc(kBufSize))
     return E_OUTOFMEMORY;
 
-  CLocalProgress *lps = new CLocalProgress;
-  CMyComPtr<ICompressProgressInfo> progress = lps;
+  CMyComPtr2_Create<ICompressProgressInfo, CLocalProgress> lps;
   lps->Init(extractCallback, false);
-  lps->InSize = lps->OutSize = 0;
 
-  UInt32 i;
-  for (i = 0; i < numItems; i++)
+  for (UInt32 i = 0;; i++)
   {
     RINOK(lps->SetCur())
+    if (i >= numItems)
+      break;
     const UInt32 index = allFilesMode ? i : indices[i];
 
     CHashPair &hp = HashPairs[index];
@@ -1549,7 +1670,7 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
        Attrib and security of output file */
     askMode = NArchive::NExtract::NAskMode::kReadExternal;
 
-    extractCallback->PrepareOperation(askMode);
+    RINOK(extractCallback->PrepareOperation(askMode))
     
     const bool isAltStream = false;
 
@@ -1567,9 +1688,11 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
     {
       hb_Use = &hb_Loc;
       CMethodId id;
-      if (FindHashMethod(EXTERNAL_CODECS_LOC_VARS hp.Method, id))
+      AString methodName = hp.Method;
+      Convert_TagName_to_MethodName(methodName);
+      if (FindHashMethod(EXTERNAL_CODECS_LOC_VARS methodName, id))
       {
-        methods_loc.Add(UString(hp.Method));
+        methods_loc.Add(UString(methodName));
         RINOK(hb_Loc.SetMethods(
             EXTERNAL_CODECS_LOC_VARS
             methods_loc))
@@ -1579,7 +1702,10 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
     }
     else if (methods.IsEmpty())
     {
-      AddDefaultMethod(methods_loc, (unsigned)hp.Hash.Size());
+      AddDefaultMethod(methods_loc,
+          _method_for_Extraction.IsEmpty() ? NULL :
+          _method_for_Extraction.Ptr(),
+          (unsigned)hp.Hash.Size());
       if (!methods_loc.IsEmpty())
       {
         hb_Use = &hb_Loc;
@@ -1598,7 +1724,7 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
       {
         if ((step & 0xFF) == 0)
         {
-          RINOK(progress->SetRatioInfo(NULL, &fileSize))
+          RINOK(lps.Interface()->SetRatioInfo(NULL, &fileSize))
         }
         UInt32 size;
         RINOK(inStream->Read(buf, kBufSize, &size))
@@ -1627,7 +1753,7 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
     Int32 opRes = NArchive::NExtract::NOperationResult::kUnsupportedMethod;
     if (isSupportedMode
         && res_SetMethods != E_NOTIMPL
-        && hb_Use->Hashers.Size() > 0
+        && !hb_Use->Hashers.IsEmpty()
         )
     {
       const CHasherState &hs = hb_Use->Hashers[0];
@@ -1643,8 +1769,7 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
     RINOK(extractCallback->SetOperationResult(opRes))
   }
 
-  return lps->SetCur();
-
+  return S_OK;
   COM_TRY_END
 }
 
@@ -1781,10 +1906,6 @@ Z7_COM7F_IMF(CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
       methods.Add(_methods[k]);
     }
   }
-  else if (_crcSize_WasSet)
-  {
-    AddDefaultMethod(methods, _crcSize);
-  }
   else
   {
     Z7_DECL_CMyComPtr_QI_FROM(
@@ -1796,17 +1917,27 @@ Z7_COM7F_IMF(CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
       RINOK(getRootProps->GetRootProp(kpidArcFileName, &prop))
       if (prop.vt == VT_BSTR)
       {
-        const UString method = GetMethod_from_FileName(prop.bstrVal);
+        AString method;
+        /* const bool isKnownMethod = */ GetMethod_from_FileName(prop.bstrVal, method);
         if (!method.IsEmpty())
-          methods.Add(method);
+        {
+          AddDefaultMethod(methods, method, _crcSize_WasSet ? _crcSize : 0);
+          if (methods.IsEmpty())
+            return E_NOTIMPL;
+        }
       }
     }
+  }
+  if (methods.IsEmpty() && _crcSize_WasSet)
+  {
+    AddDefaultMethod(methods,
+        NULL, // name
+        _crcSize);
   }
 
   RINOK(hb.SetMethods(EXTERNAL_CODECS_LOC_VARS methods))
 
-  CLocalProgress *lps = new CLocalProgress;
-  CMyComPtr<ICompressProgressInfo> progress = lps;
+  CMyComPtr2_Create<ICompressProgressInfo, CLocalProgress> lps;
   lps->Init(callback, true);
 
   const UInt32 kBufSize = 1 << 15;
@@ -1830,7 +1961,6 @@ Z7_COM7F_IMF(CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
   if (options.HashMode_OnlyHash.Val && updateItems.Size() != 1)
     options.HashMode_OnlyHash.Val = false;
 
-  lps->OutSize = 0;
   complexity = 0;
 
   for (i = 0; i < updateItems.Size(); i++)
@@ -1884,7 +2014,7 @@ Z7_COM7F_IMF(CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
               if (getProps->GetProps(&size2, NULL, NULL, &mTime, NULL) == S_OK)
               {
                 currentComplexity = size2;
-                // item.MTime = NWindows::NTime::FileTimeToUnixTime64(mTime);;
+                // item.MTime = NTime::FileTimeToUnixTime64(mTime);;
               }
             }
             */
@@ -1905,7 +2035,7 @@ Z7_COM7F_IMF(CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
         {
           if ((step & 0xFF) == 0)
           {
-            RINOK(progress->SetRatioInfo(&fileSize, NULL))
+            RINOK(lps.Interface()->SetRatioInfo(&fileSize, NULL))
             // RINOK(callback->SetCompleted(&completeValue));
           }
           UInt32 size;
@@ -2027,6 +2157,9 @@ HRESULT CHandler::SetProperty(const wchar_t *nameSpec, const PROPVARIANT &value)
     return S_OK;
   }
 
+  if (name.IsEqualTo("backslash"))
+    return PROPVARIANT_to_bool(value, _supportWindowsBackslash);
+
   if (name.IsPrefixedBy_Ascii_NoCase("crc"))
   {
     name.Delete(0, 3);
@@ -2043,6 +2176,15 @@ HRESULT CHandler::SetProperty(const wchar_t *nameSpec, const PROPVARIANT &value)
   return E_INVALIDARG;
 }
 
+
+void CHandler::InitProps()
+{
+  _supportWindowsBackslash = true;
+  _crcSize_WasSet = false;
+  _crcSize = 4;
+  _methods.Clear();
+  _options.Init_HashOptionsLocal();
+}
 
 Z7_COM7F_IMF(CHandler::SetProperties(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps))
 {
@@ -2090,11 +2232,32 @@ void Codecs_AddHashArcHandler(CCodecs *codecs)
   
     // ubuntu uses "SHA256SUMS" file
     item.AddExts(UString (
-        "sha256 sha512 sha224 sha384 sha1 sha md5"
-        // "b2sum"
-        " crc32 crc64"
-        " asc"
+        "sha256"
+        " sha512"
+        " sha384"
+        " sha224"
+        " sha512-224"
+        " sha512-256"
+        " sha3-224"
+        " sha3-256"
+        " sha3-384"
+        " sha3-512"
+        // " shake128"
+        // " shake256"
+        " sha1"
+        " sha2"
+        " sha3"
+        " sha"
+        " md5"
+        " blake2s"
+        " blake2b"
+        " blake2sp"
+        " xxh64"
+        " crc32"
+        " crc64"
         " cksum"
+        " asc"
+        // " b2sum"
         ),
         UString());
 

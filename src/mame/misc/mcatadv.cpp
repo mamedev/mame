@@ -709,7 +709,7 @@ void mcatadv_state::mcatadv(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::mcatadv_sound_io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 256);

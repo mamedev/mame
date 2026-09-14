@@ -858,7 +858,7 @@ void pasopia7_state::p7_raster(machine_config &config)
 {
 	p7_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(640, 480);
@@ -880,7 +880,7 @@ void pasopia7_state::p7_lcd(machine_config &config)
 {
 	p7_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(640, 480);

@@ -63,7 +63,7 @@ protected:
 
 private:
 	// cpu
-	void int2_w(uint8_t data);
+	void iocpu_int2_w(uint8_t data);
 	void irq_ack8_w(uint8_t data);
 
 	// acia

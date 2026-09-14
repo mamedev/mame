@@ -311,7 +311,7 @@ void mogura_state::mogura(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mogura_state::io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // measured 59.1881
 	screen.set_screen_update(FUNC(mogura_state::screen_update));
 	screen.screen_vblank().set(FUNC(mogura_state::vblank));

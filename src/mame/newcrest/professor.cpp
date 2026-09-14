@@ -27,7 +27,7 @@ Hardware notes:
 #include "video/lc7580.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -214,10 +214,9 @@ void professor_state::professor(machine_config &config)
 	m_lcd->write_segs().set(FUNC(professor_state::lcd_output_w));
 	m_lcd->nvram_enable_backup(true);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 921/5);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
 	config.set_default_layout(layout_cxg_professor);

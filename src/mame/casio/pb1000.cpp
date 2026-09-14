@@ -477,7 +477,7 @@ void pb1000_state::pb1000(machine_config &config)
 	m_maincpu->port_write().set(FUNC(pb1000_state::port_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("hd44352", FUNC(hd44352_device::screen_update));

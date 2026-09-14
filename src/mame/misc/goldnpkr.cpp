@@ -5413,7 +5413,7 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
@@ -5849,7 +5849,7 @@ void blitz_state::megadpkr(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(blitz_state::mux_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (37 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(blitz_state::screen_update_goldnpkr));
 

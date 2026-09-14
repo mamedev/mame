@@ -141,7 +141,7 @@ void fruitpc_state::fruitpc(machine_config &config)
 
 	/* video hardware */
 	// TODO: custom 1998 Elpin Systems/STMicroeletronics BIOS internal to the SoC, likely PCI
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 

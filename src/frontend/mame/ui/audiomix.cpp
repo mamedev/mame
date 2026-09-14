@@ -16,6 +16,7 @@
 
 // emu
 #include "input.h"
+#include "sound.h"
 #include "speaker.h"
 
 // osd

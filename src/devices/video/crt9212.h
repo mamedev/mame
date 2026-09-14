@@ -80,7 +80,6 @@ private:
 	// internal state
 	bool m_clrcnt_edge;
 	uint8_t m_data_latch;
-	int m_ren_int;
 	int m_wen_int;
 	uint8_t m_ram[RAM_SIZE][2];
 	int m_buffer;

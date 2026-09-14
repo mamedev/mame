@@ -351,15 +351,16 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		{
 			for(int sector = 0; sector < sector_per_track; sector++)
 			{
-				sects[sector].track       = track;
-				sects[sector].head        = head;
-				sects[sector].sector      = sector_base + sector;
-				sects[sector].size        = ssize;
-				sects[sector].deleted     = false;
+				sects[sector].track        = track;
+				sects[sector].head         = head;
+				sects[sector].sector       = sector_base + sector;
+				sects[sector].size         = ssize;
+				sects[sector].deleted      = false;
 				sects[sector].bad_data_crc = false;
 				sects[sector].bad_addr_crc = false;
-				sects[sector].actual_size = sector_size;
-				sects[sector].data        = &imagebuf[pos];
+				sects[sector].weak         = false;
+				sects[sector].actual_size  = sector_size;
+				sects[sector].data         = &imagebuf[pos];
 				pos += sector_size;
 			}
 

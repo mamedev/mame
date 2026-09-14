@@ -1720,7 +1720,7 @@ void ms32_state::ms32(machine_config &config)
 	m_sysctrl->sound_reset_cb().set(FUNC(ms32_state::sound_reset_line_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// dot clock is 48/8 MHz, settable with /6 thru system register [0]
 	m_screen->set_raw(XTAL(48'000'000) / 8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	m_screen->set_screen_update(FUNC(ms32_state::screen_update));

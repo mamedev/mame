@@ -51,13 +51,13 @@ private:
 class device_ata_interface : public device_interface
 {
 public:
-	virtual uint16_t read_dma() = 0;
-	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) = 0;
-	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff) = 0;
+	virtual void read_dma(PAIR16 &data) = 0;
+	virtual void read_cs0(offs_t offset, PAIR16 &data) = 0;
+	virtual void read_cs1(offs_t offset, PAIR16 &data) = 0;
 
 	virtual void write_dma(uint16_t data) = 0;
-	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
-	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
+	virtual void write_cs0(offs_t offset, uint16_t data) = 0;
+	virtual void write_cs1(offs_t offset, uint16_t data) = 0;
 
 	virtual void write_dmack(int state) = 0;
 	virtual void write_csel(int state) = 0;

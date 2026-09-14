@@ -7,6 +7,8 @@ CFLAGS = $(CFLAGS) \
   -DZ7_NO_READ_FROM_CODER \
   -DZ7_SFX \
   -DZ7_NO_CRYPTO \
+  -DZ7_NO_LONG_PATH \
+  -DZ7_NO_LARGE_PAGES \
 
 CURRENT_OBJS = \
   $O\SfxSetup.obj \
@@ -36,6 +38,7 @@ WIN_OBJS = \
   $O\ResourceString.obj \
   $O\Synchronization.obj \
   $O\System.obj \
+  $O\TimeUtils.obj \
   $O\Window.obj \
 
 WIN_CTRL_OBJS = \

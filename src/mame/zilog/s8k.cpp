@@ -149,7 +149,7 @@ private:
 
 static INPUT_PORTS_START( s8k )
 	PORT_START("FRONTPANEL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Start")	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s8k_state::start_btn_cb), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Start")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s8k_state::start_btn_cb), 0)
 INPUT_PORTS_END
 
 
@@ -302,6 +302,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                   FLAGS
-COMP( 1982, s8000,   0,      0,      s8k,     s8k,   s8k_state, empty_init, "Zilog", "System 8000",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, s8000,   0,      0,      s8k,     s8k,   s8k_state, empty_init, "Zilog", "System 8000",             MACHINE_NO_SOUND_HW )
 COMP( 1982, s8000v1, s8000,  0,      s8k_v1,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Model 20/30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, s8000s2, s8000,  0,      s8k_s2,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Series Two",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, s8000s2, s8000,  0,      s8k_s2,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Series Two",  MACHINE_NO_SOUND_HW )

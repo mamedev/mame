@@ -1779,7 +1779,7 @@ void itech32_state::base_devices(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::GRBx_888, 8192);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(VIDEO_CLOCK, 508, 0, 384, 262, 0, 240); // most games configure the screen this way
 //  m_screen->set_raw(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256); // sftm, wcbowl and shufshot configure it this way

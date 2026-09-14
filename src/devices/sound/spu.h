@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "machine/ram.h"
+
 // ======================> spu_device
 
 class spu_stream_buffer;
@@ -47,12 +49,28 @@ protected:
 	float exp_release_rate[27];
 
 	// internal state
-	devcb_write_line m_irq_handler;
+	devcb_write_line m_irq_cb;
 
-	std::unique_ptr<unsigned char []> spu_ram;
-	reverb *rev;
+	emu_timer *m_irq_timer;
+	static constexpr uint32_t m_counter_shift = 5;
+	static constexpr uint32_t m_counter_size = 0x10000 << m_counter_shift;
+	required_device<ram_device> m_ram;
+	uint16_t *m_spu_ram;
+	uint32_t m_ram_shift;
+	uint32_t m_counter_word_next;
+	uint32_t m_counter_packet_next;
+	uint32_t m_counter_packet_shift;
+	std::array<unsigned int, 4> m_decoded_data_ptr;
+	std::array<unsigned int, 4> m_decoded_data_remaining;
+	unsigned int m_decoded_data_mask;
+	unsigned int m_decoded_data_size;
+	std::array<uint16_t, 32> m_fifo;
+	uint8_t m_fifo_ptr;
+	std::array<uint16_t, 8> m_packet;
+	unsigned int m_voice_active;
+
+	reverb* rev;
 	unsigned int taddr;
-	unsigned int sample_t;
 
 	spu_stream_buffer *xa_buffer;
 	spu_stream_buffer *cdda_buffer;
@@ -62,12 +80,9 @@ protected:
 	unsigned int cdda_freq;
 	unsigned int xa_channels;
 	unsigned int xa_spf;
-	unsigned int xa_out_ptr;
 	unsigned int cur_frame_sample;
 	unsigned int cur_generate_sample;
 	unsigned int dirty_flags;
-
-	uint16_t m_cd_out_ptr;
 
 	signed short xa_last[4];
 	bool status_enabled, xa_playing, cdda_playing;
@@ -93,8 +108,7 @@ protected:
 
 	struct voicereg
 	{
-		unsigned short vol_l;   // 0
-		unsigned short vol_r;   // 2
+		unsigned short vol[2];  // 0-2
 		unsigned short pitch;   // 4
 		unsigned short addr;    // 6
 		unsigned short adsl;    // 8
@@ -105,31 +119,34 @@ protected:
 
 	union
 	{
-		unsigned char reg[0x200];
+		unsigned char reg[0x400];
 		struct
 		{
-			voicereg voice[24];
-			unsigned short mvol_l;
-			unsigned short mvol_r;
-			unsigned short rvol_l;
-			unsigned short rvol_r;
-			unsigned int keyon;
-			unsigned int keyoff;
-			unsigned int fm;
-			unsigned int noise;
-			unsigned int reverb;
-			unsigned int chon;
-			unsigned short _unknown;
-			unsigned short reverb_addr;
-			unsigned short irq_addr;
-			unsigned short trans_addr;
-			unsigned short data;
-			unsigned short ctrl;
-			unsigned int status;
-			signed short cdvol_l;
-			signed short cdvol_r;
-			signed short exvol_l;
-			signed short exvol_r;
+			voicereg voice[24]; // 0x1f801c00-0x1f801d7e
+			unsigned short mvol[2]; // 0x1f801d80-0x1f801d82
+			unsigned short rvol[2]; // 0x1f801d84-0x1f801d86
+			unsigned short keyon[2]; // 0x1f801d88-0x1f801d8a
+			unsigned short keyoff[2];  // 0x1f801d8c-0x1f801d8e
+			unsigned short fm[2]; // 0x1f801d90-0x1f801d92
+			unsigned short noise[2]; // 0x1f801d94-0x1f801d96
+			unsigned short reverb[2]; // 0x1f801d98-0x1f801d9a
+			unsigned short chon[2]; // 0x1f801d9c-0x1f801d9e
+			unsigned short _unknown; // 0x1f801da0
+			unsigned short reverb_addr; // 0x1f801da2
+			unsigned short irq_addr; // 0x1f801da4
+			unsigned short trans_addr; // 0x1f801da6
+			unsigned short data; // 0x1f801da8
+			unsigned short ctrl; // 0x1f801daa
+			unsigned short ram_ctrl; // 0x1f801dac
+			unsigned short status; // 0x1f801dae
+			signed short cdvol[2]; // 0x1f801db0-0x1f801db2
+			signed short exvol[2]; // 0x1f801db4-0x1f801db6
+			signed short mvolx[2]; // 0x1f801db8-0x1f801dba
+			unsigned short _unknown2[2]; // 0x1f801dbc-0x1f801dbe
+			unsigned short reverbconfig[0x20]; // 0x1f801dc0-0x1f801dfe
+			signed short volumex[24][2]; // 0x1f801e00-0x1f801e5e
+			unsigned short _unknown3[0x10]; // 0x1f801e60-0x1f801e7e
+			unsigned short _unknown4[0xc0]; // 0x1f801e80-0x1f801ffe
 		} spureg;
 	};
 
@@ -151,7 +168,23 @@ protected:
 	void key_on(const int v);
 	void key_off(const int v);
 	bool update_envelope(const int v);
-	void write_data(const unsigned short data);
+	
+	uint16_t ram_read(uint32_t address);
+	void ram_write(uint32_t address, const uint16_t data);
+	uint16_t *packet_read(uint32_t address);
+	void write_fifo();
+
+	void write_decoded_data(int buffer, uint16_t sample)
+	{
+		if (m_decoded_data_remaining[buffer])
+		{
+			m_decoded_data_ptr[buffer]=(m_decoded_data_ptr[buffer]&m_decoded_data_mask)|(buffer*m_decoded_data_size);
+			ram_write(m_decoded_data_ptr[buffer], sample);
+			m_decoded_data_ptr[buffer]+=m_counter_word_next;
+			m_decoded_data_remaining[buffer]--;
+		}
+	}
+
 	void generate(void *ptr, const unsigned int sz);
 	void generate_voice(const unsigned int v, void *ptr, void *noiseptr, void *outxptr, const unsigned int sz);
 	void generate_noise(void *ptr, const unsigned int num);
@@ -162,6 +195,7 @@ protected:
 	void update_voice_state();
 	void update_voice_events(voiceinfo *vi);
 	void update_irq_event();
+	TIMER_CALLBACK_MEMBER(irq_timer_callback);
 	unsigned int get_irq_distance(const voiceinfo *vi);
 	void generate_xa(void *ptr, const unsigned int sz);
 	void generate_cdda(void *ptr, const unsigned int sz);
@@ -211,11 +245,12 @@ protected:
 	reverb_preset *find_reverb_preset(const unsigned short *param);
 
 public:
-	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto irq_handler() { return m_irq_handler.bind(); }
+	auto irq_handler() { return m_irq_cb.bind(); }
+	void set_cpu(psxcpu_device *cpu);
+	template<typename T> void set_ram(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
 	void set_stream_flags(sound_stream_flags flags) { m_stream_flags = flags; }
 
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
@@ -224,7 +259,7 @@ public:
 	void reinit_sound();
 	void kill_sound();
 
-	void start_dma(uint8_t *mainram, bool to_spu, uint32_t size);
+	void update_ram_ctrl();
 	bool play_xa(const unsigned int sector, const unsigned char *sec);
 	bool play_cdda(const unsigned int sector, const unsigned char *sec);
 	void flush_xa(const unsigned int sector=0);

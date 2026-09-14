@@ -40,7 +40,7 @@ private:
 	required_device<ds1643_device> m_rtc;
 	//required_device_array<cd2401, 2> m_uart;
 	required_device_array<rs232_port_device, 6> m_serial;
-	//required_device<ncr53c7xx_device> m_scsi;
+	//required_device<ncr53c710_device> m_scsi;
 	required_device<i82596_device> m_lan;
 
 	memory_view m_boot;

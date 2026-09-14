@@ -99,6 +99,7 @@ gba_rom_eeprom64_device::gba_rom_eeprom64_device(const machine_config &mconfig, 
 
 gba_rom_boktai_device::gba_rom_boktai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gba_rom_eeprom64_device(mconfig, GBA_ROM_BOKTAI, tag, owner, clock)
+	, m_rtc(*this, "rtc")
 	, m_sensor(*this, "LIGHTSENSE")
 {
 }
@@ -117,6 +118,7 @@ gba_rom_flash_device::gba_rom_flash_device(const machine_config &mconfig, const 
 
 gba_rom_flash_rtc_device::gba_rom_flash_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gba_rom_flash_device(mconfig, GBA_ROM_FLASH_RTC, tag, owner, clock)
+	, m_rtc(*this, "rtc")
 {
 }
 
@@ -134,6 +136,7 @@ gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, co
 
 gba_rom_flash1m_rtc_device::gba_rom_flash1m_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gba_rom_flash1m_device(mconfig, GBA_ROM_FLASH1M_RTC, tag, owner, clock)
+	, m_rtc(*this, "rtc")
 {
 }
 
@@ -223,7 +226,6 @@ void gba_rom_eeprom64_device::device_start()
 void gba_rom_boktai_device::device_start()
 {
 	gba_rom_eeprom64_device::device_start();
-	m_rtc = std::make_unique<gba_s3511_device>(machine());
 
 	save_item(NAME(m_last_val));
 	save_item(NAME(m_counter));
@@ -233,18 +235,6 @@ void gba_rom_boktai_device::device_reset()
 {
 	m_last_val = 0;
 	m_counter = 0;
-}
-
-void gba_rom_flash_rtc_device::device_start()
-{
-	gba_rom_device::device_start();
-	m_rtc = std::make_unique<gba_s3511_device>(machine());
-}
-
-void gba_rom_flash1m_rtc_device::device_start()
-{
-	gba_rom_device::device_start();
-	m_rtc = std::make_unique<gba_s3511_device>(machine());
 }
 
 void gba_rom_3dmatrix_device::device_start()
@@ -508,26 +498,43 @@ void gba_rom_flash1m_device::write_ram(offs_t offset, uint32_t data, uint32_t me
 }
 
 // cart variants with additional S3511 RTC
+void gba_rom_flash_rtc_device::device_add_mconfig(machine_config &config)
+{
+	gba_rom_flash_device::device_add_mconfig(config);
+
+	S3511(config, m_rtc, 32'768);
+}
 
 uint16_t gba_rom_flash_rtc_device::gpio_dev_read(int gpio_dirs)
 {
-	return 5 | (m_rtc->read_line() << 1);
+	return 5 | (m_rtc->data_r() << 1);
 }
 
 void gba_rom_flash_rtc_device::gpio_dev_write(uint16_t data, int gpio_dirs)
 {
-	m_rtc->write(data, gpio_dirs);
+	m_rtc->data_w(BIT(data, 1));
+	m_rtc->cs_w(BIT(data, 2));
+	m_rtc->sck_w(BIT(data, 0));
 }
 
 
+void gba_rom_flash1m_rtc_device::device_add_mconfig(machine_config &config)
+{
+	gba_rom_flash1m_device::device_add_mconfig(config);
+
+	S3511(config, m_rtc, 32'768);
+}
+
 uint16_t gba_rom_flash1m_rtc_device::gpio_dev_read(int gpio_dirs)
 {
-	return 5 | (m_rtc->read_line() << 1);
+	return 5 | (m_rtc->data_r() << 1);
 }
 
 void gba_rom_flash1m_rtc_device::gpio_dev_write(uint16_t data, int gpio_dirs)
 {
-	m_rtc->write(data, gpio_dirs);
+	m_rtc->data_w(BIT(data, 1));
+	m_rtc->cs_w(BIT(data, 2));
+	m_rtc->sck_w(BIT(data, 0));
 }
 
 
@@ -681,15 +688,22 @@ ioport_constructor gba_rom_boktai_device::device_input_ports() const
 	return INPUT_PORTS_NAME( boktai_sensor );
 }
 
+void gba_rom_boktai_device::device_add_mconfig(machine_config &config)
+{
+	S3511(config, m_rtc, 32'768);
+}
+
 uint16_t gba_rom_boktai_device::gpio_dev_read(int gpio_dirs)
 {
 	int light = (gpio_dirs == 7 && m_counter >= m_sensor->read()) ? 1 : 0;
-	return 5 | (m_rtc->read_line() << 1) | (light << 3);
+	return 5 | (m_rtc->data_r() << 1) | (light << 3);
 }
 
 void gba_rom_boktai_device::gpio_dev_write(uint16_t data, int gpio_dirs)
 {
-	m_rtc->write(data, gpio_dirs);
+	m_rtc->data_w(BIT(data, 1));
+	m_rtc->cs_w(BIT(data, 2));
+	m_rtc->sck_w(BIT(data, 0));
 	if (gpio_dirs == 7)
 	{
 		if (data & 2)
@@ -773,171 +787,6 @@ void gba_rom_3dmatrix_device::write_mapper(offs_t offset, uint32_t data)
 
 
 // Additional devices, to be moved to separate source files at a later stage
-
-/*-------------------------------------------------
- Seiko S-3511 RTC implementation
-
- TODO: transform this into a separate device, using
- also dirtc.cpp!
- -------------------------------------------------*/
-
-gba_s3511_device::gba_s3511_device(running_machine &machine) :
-			m_phase(S3511_RTC_IDLE),
-			m_machine(machine)
-{
-	m_last_val = 0;
-	m_bits = 0;
-	m_command = 0;
-	m_data_len = 1;
-	m_data[0] = 0;
-
-	m_machine.save().save_item(m_phase, "GBA_RTC/m_phase");
-	m_machine.save().save_item(m_data, "GBA_RTC/m_data");
-	m_machine.save().save_item(m_last_val, "GBA_RTC/m_last_val");
-	m_machine.save().save_item(m_bits, "GBA_RTC/m_bits");
-	m_machine.save().save_item(m_command, "GBA_RTC/m_command");
-	m_machine.save().save_item(m_data_len, "GBA_RTC/m_data_len");
-}
-
-
-uint8_t gba_s3511_device::convert_to_bcd(int val)
-{
-	return (((val % 100) / 10) << 4) | (val % 10);
-}
-
-void gba_s3511_device::update_time(int len)
-{
-	system_time curtime;
-	m_machine.current_datetime(curtime);
-
-	if (len == 7)
-	{
-		m_data[0] = convert_to_bcd(curtime.local_time.year);
-		m_data[1] = convert_to_bcd(curtime.local_time.month + 1);
-		m_data[2] = convert_to_bcd(curtime.local_time.mday);
-		m_data[3] = convert_to_bcd(curtime.local_time.weekday);
-		m_data[4] = convert_to_bcd(curtime.local_time.hour);
-		m_data[5] = convert_to_bcd(curtime.local_time.minute);
-		m_data[6] = convert_to_bcd(curtime.local_time.second);
-	}
-	else if (len == 3)
-	{
-		m_data[0] = convert_to_bcd(curtime.local_time.hour);
-		m_data[1] = convert_to_bcd(curtime.local_time.minute);
-		m_data[2] = convert_to_bcd(curtime.local_time.second);
-	}
-}
-
-
-int gba_s3511_device::read_line()
-{
-	int pin = 0;
-	switch (m_phase)
-	{
-		case S3511_RTC_DATAOUT:
-			//printf("mmm %d - %X - %d - %d\n", m_bits, m_data[m_bits >> 3], m_bits >> 3, BIT(m_data[m_bits >> 3], (m_bits & 7)));
-			pin = BIT(m_data[m_bits >> 3], (m_bits & 7));
-			m_bits++;
-			if (m_bits == 8 * m_data_len)
-			{
-				//for (int i = 0; i < m_data_len; i++)
-				//  printf("RTC DATA OUT COMPLETE %X (reg %d) \n", m_data[i], i);
-				m_bits = 0;
-				m_phase = S3511_RTC_IDLE;
-			}
-			break;
-	}
-	return pin;
-}
-
-
-void gba_s3511_device::write(uint16_t data, int gpio_dirs)
-{
-//  printf("gpio_dev_write data %X\n", data);
-	if (m_phase == S3511_RTC_IDLE && (m_last_val & 5) == 1 && (data & 5) == 5)
-	{
-		m_phase = S3511_RTC_COMMAND;
-		m_bits = 0;
-		m_command = 0;
-	}
-	else
-	{
-//      if (m_phase == 3)
-//          printf("RTC command OK\n");
-		if (!(m_last_val & 1) && (data & 1))
-		{
-			// bit transfer
-			m_last_val = data & 0xff;
-			switch (m_phase)
-			{
-				case S3511_RTC_DATAIN:
-					if (!BIT(gpio_dirs, 1))
-					{
-						m_data[m_bits >> 3] = (m_data[m_bits >> 3] >> 1) | ((data << 6) & 0x80);
-						m_bits++;
-						if (m_bits == 8 * m_data_len)
-						{
-							//for (int i = 0; i < m_data_len; i++)
-							//  printf("RTC DATA IN COMPLETE %X (reg %d) \n", m_data[i], i);
-							m_bits = 0;
-							m_phase = S3511_RTC_IDLE;
-						}
-					}
-					break;
-				case S3511_RTC_DATAOUT:
-					break;
-				case S3511_RTC_COMMAND:
-					m_command |= (BIT(data, 1) << (7 - m_bits));
-					m_bits++;
-					if (m_bits == 8)
-					{
-						m_bits = 0;
-						//printf("RTC command %X ENTERED!!!\n", m_command);
-						switch (m_command)
-						{
-							case 0x60:
-								// reset?
-								m_phase = S3511_RTC_IDLE;
-								m_bits = 0;
-								break;
-							case 0x62:
-								m_phase = S3511_RTC_DATAIN;
-								m_data_len = 1;
-								break;
-							case 0x63:
-								m_data_len = 1;
-								m_data[0] = 0x40;
-								m_phase = S3511_RTC_DATAOUT;
-								break;
-							case 0x64:
-								break;
-							case 0x65:
-								m_data_len = 7;
-								update_time(m_data_len);
-								m_phase = S3511_RTC_DATAOUT;
-								break;
-							case 0x67:
-								m_data_len = 3;
-								update_time(m_data_len);
-								m_phase = S3511_RTC_DATAOUT;
-								break;
-							default:
-								printf("Unknown RTC command %02X\n", m_command);
-								m_phase = S3511_RTC_IDLE;
-								break;
-						}
-					}
-					break;
-				case S3511_RTC_IDLE:
-				default:
-					break;
-			}
-		}
-		else
-			m_last_val = data & 0xff;
-	}
-}
-
 
 /*-------------------------------------------------
  GBA EEPROM Device

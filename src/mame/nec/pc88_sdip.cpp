@@ -144,6 +144,7 @@ ioport_value pc8801mc_memsw_device::dsw2_r()
 	return res;
 }
 ioport_value pc8801mc_memsw_device::auto_boot_floppy_r() { return BIT(m_bram[7], 0); }
-ioport_value pc8801mc_memsw_device::boot_mode_r() { return m_bram[1] & 3; }
+// prajator tests V2 from DSW2 port, wants the XOR (A & 0xc0 == 0x40)
+ioport_value pc8801mc_memsw_device::boot_mode_r() { return (m_bram[1] & 3) ^ 1; }
 ioport_value pc8801mc_memsw_device::cpu_clock_r() { return BIT(m_bram[0], 0); }
 

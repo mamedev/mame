@@ -752,7 +752,7 @@ void dassault_state::dassault(machine_config &config)
 	sharedram.intr_callback().set_inputline("sub", M68K_IRQ_6);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real PCB.
 	screen.set_screen_update(FUNC(dassault_state::screen_update));
 

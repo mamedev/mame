@@ -2,7 +2,7 @@
 // local/detail/impl/endpoint.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Derived from a public domain implementation written by Daniel Casimiro.
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,10 +29,11 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace local {
 namespace detail {
 
-endpoint::endpoint()
+endpoint::endpoint() noexcept
 {
   init("", 0);
 }
@@ -93,12 +94,12 @@ void endpoint::path(const std::string& p)
   init(p.data(), p.length());
 }
 
-bool operator==(const endpoint& e1, const endpoint& e2)
+bool operator==(const endpoint& e1, const endpoint& e2) noexcept
 {
   return e1.path() == e2.path();
 }
 
-bool operator<(const endpoint& e1, const endpoint& e2)
+bool operator<(const endpoint& e1, const endpoint& e2) noexcept
 {
   return e1.path() < e2.path();
 }
@@ -122,6 +123,7 @@ void endpoint::init(const char* path_name, std::size_t path_length)
 
 } // namespace detail
 } // namespace local
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -41,6 +41,8 @@ E I1     Vectored interrupt error
 #include "m20_kbd.h"
 
 #include "bus/rs232/rs232.h"
+#include "imagedev/harddriv.h"
+#include "machine/wd1000.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z8000/z8000.h"
 #include "imagedev/floppy.h"
@@ -76,6 +78,7 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
+		m_hdc(*this, "hdc"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -93,6 +96,7 @@ private:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
+	optional_device<wd1000_device> m_hdc;
 
 	required_device<palette_device> m_palette;
 
@@ -118,6 +122,8 @@ private:
 	void install_memory();
 
 	static void floppy_formats(format_registration &fr);
+	uint16_t segment_r();
+	uint16_t segtack_r();
 	uint16_t viack_r();
 	uint16_t nviack_r();
 };
@@ -326,12 +332,14 @@ void m20_state::m20_program_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+	map(0x7f0000, 0x7fffff).r(FUNC(m20_state::segment_r));
 }
 
 void m20_state::m20_data_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+	map(0x7f0000, 0x7fffff).r(FUNC(m20_state::segment_r));
 }
 
 
@@ -688,6 +696,20 @@ uint16_t m20_state::viack_r()
 	return m_i8259->acknowledge()<<1;
 }
 
+uint16_t m20_state::segment_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(z8001_device::SEGT_LINE, ASSERT_LINE);
+
+	return 0xffff;
+}
+
+uint16_t m20_state::segtack_r()
+{
+	m_maincpu->set_input_line(z8001_device::SEGT_LINE, CLEAR_LINE);
+	return 0xffff;
+}
+
 uint16_t m20_state::nviack_r()
 {
 	m_maincpu->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
@@ -704,6 +726,20 @@ void m20_state::int_w(int state)
 void m20_state::machine_start()
 {
 	install_memory();
+
+	// Only install WD1000 HD controller I/O if a hard disk image is mounted
+	if (m_hdc)
+	{
+		harddisk_image_device *hd0 = m_hdc->subdevice<harddisk_image_device>("0");
+		harddisk_image_device *hd1 = m_hdc->subdevice<harddisk_image_device>("1");
+		if ((hd0 && hd0->exists()) || (hd1 && hd1->exists()))
+		{
+			m_maincpu->space(AS_IO).install_readwrite_handler(0x1c0, 0x1cf, read8sm_delegate(*m_hdc, FUNC(wd1000_device::read)), write8sm_delegate(*m_hdc, FUNC(wd1000_device::write)), 0x00ff);
+		}
+	}
+
+	save_item(NAME(m_memsize));
+	save_item(NAME(m_port21));
 }
 
 void m20_state::machine_reset()
@@ -723,6 +759,7 @@ void m20_state::machine_reset()
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
 	m_kbdi8251->write_cts(0);
+	m_ttyi8251->write_cts(0);
 	if (m_apb)
 		m_apb->halt();
 }
@@ -751,13 +788,14 @@ void m20_state::m20(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m20_state::m20_program_mem);
 	m_maincpu->set_addrmap(AS_DATA, &m20_state::m20_data_mem);
 	m_maincpu->set_addrmap(AS_IO, &m20_state::m20_io);
+	m_maincpu->segtack().set(FUNC(m20_state::segtack_r));
 	m_maincpu->viack().set(FUNC(m20_state::viack_r));
 	m_maincpu->nviack().set(FUNC(m20_state::nviack_r));
 
 	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(512, 256);
@@ -807,6 +845,19 @@ void m20_state::m20(machine_config &config)
 
 	M20_8086(config, m_apb, m_maincpu, m_i8259, RAM_TAG);
 
+	/*
+	 default hard drive is 9Mb (180,6,33), 256 bytes per sector
+	 Bad block table at CHS 0 0 1
+	 Format:
+	    1st byte = number of bad blocks
+	    2nd byte = 0xff
+	    List of Bad blocks (4 bytes per block) follows
+	    | CYL L | CYL H| x x x S1 S0 S4 S3 S2  |  HEAD |
+	*/
+	WD1000(config, m_hdc, 20_MHz_XTAL / 4);
+	HARDDISK(config, "hdc:0", 0);
+	HARDDISK(config, "hdc:1", 0);
+
 	SOFTWARE_LIST(config, "flop_list").set_original("m20");
 }
 
@@ -850,6 +901,6 @@ ROM_END
 
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
-COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_SUPPORTS_SAVE )
 COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1986, m44,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M44", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

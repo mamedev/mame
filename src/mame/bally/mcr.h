@@ -53,6 +53,40 @@ public:
 		m_backlight(*this, "backlight")
 	{ }
 
+	void init_mcr_91490() ATTR_COLD;
+	void init_kroozr() ATTR_COLD;
+	void init_solarfox() ATTR_COLD;
+	void init_solarfoxc() ATTR_COLD;
+	void init_kick() ATTR_COLD;
+	void init_twotiger() ATTR_COLD;
+	void init_demoderb() ATTR_COLD;
+	void init_wacko() ATTR_COLD;
+	void init_mcr_90010() ATTR_COLD;
+	void init_dotrone() ATTR_COLD;
+	void init_journey() ATTR_COLD;
+
+	void mcr_91490_tcs(machine_config &config) ATTR_COLD;
+	void mcr_91490_snt(machine_config &config) ATTR_COLD;
+	void mcr_91490(machine_config &config) ATTR_COLD;
+	void mcr_90009(machine_config &config) ATTR_COLD;
+	void mcr_90010_tt(machine_config &config) ATTR_COLD;
+	void mcr_91475(machine_config &config) ATTR_COLD;
+	void mcr_90010(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
+	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
+	TILE_GET_INFO_MEMBER(mcr_91490_get_tile_info);
+	void mcr_set_color(int index, int data);
+	void journey_set_color(int index, int data);
+	void render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
+	void mcr_init(int cpuboard, int vidboard, int ssioboard) ATTR_COLD;
+
 	void mcr_control_port_w(uint8_t data);
 	void mcr_paletteram9_w(offs_t offset, uint8_t data);
 	void mcr_90009_videoram_w(offs_t offset, uint8_t data);
@@ -75,48 +109,15 @@ public:
 	uint8_t demoderb_ip2_r();
 	void demoderb_op4_w(uint8_t data);
 
-	void init_mcr_91490();
-	void init_kroozr();
-	void init_solarfox();
-	void init_kick();
-	void init_twotiger();
-	void init_demoderb();
-	void init_wacko();
-	void init_mcr_90010();
-	void init_dotrone();
-	void init_journey();
-
 	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
 
-	void mcr_91490_tcs(machine_config &config);
-	void mcr_91490_snt(machine_config &config);
-	void mcr_91490(machine_config &config);
-	void mcr_90009(machine_config &config);
-	void mcr_90010_tt(machine_config &config);
-	void mcr_91475(machine_config &config);
-	void mcr_90010(machine_config &config);
 	void cpu_90009_map(address_map &map) ATTR_COLD;
 	void cpu_90009_portmap(address_map &map) ATTR_COLD;
-	void cpu_90009_dp_map(address_map &map) ATTR_COLD;
-	void cpu_90009_dp_portmap(address_map &map) ATTR_COLD;
 	void cpu_90010_map(address_map &map) ATTR_COLD;
 	void cpu_90010_portmap(address_map &map) ATTR_COLD;
 	void cpu_91490_map(address_map &map) ATTR_COLD;
 	void cpu_91490_portmap(address_map &map) ATTR_COLD;
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
-	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
-	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
-	TILE_GET_INFO_MEMBER(mcr_91490_get_tile_info);
-	void mcr_set_color(int index, int data);
-	void journey_set_color(int index, int data);
-	void render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
-	void mcr_init(int cpuboard, int vidboard, int ssioboard);
 
 	int8_t m_mcr12_sprite_xoffs_flip = 0;
 	uint8_t m_input_mux = 0;
@@ -159,20 +160,11 @@ public:
 		m_meter_ram(*this, "meter", 0x200, ENDIANNESS_LITTLE)
 	{ }
 
-	uint8_t ip0_r();
-	void lamps1_w(uint8_t data);
-	void lamps2_w(uint8_t data);
-	void output_w(uint8_t data);
-	void meters_w(uint8_t data);
-
 	DECLARE_INPUT_CHANGED_MEMBER(coin_in_hit);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(hopper_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(coin_in_callback);
+	void init_dpoker() ATTR_COLD;
 
-	void init_dpoker();
-
-	void mcr_90009_dp(machine_config &config);
+	void mcr_90009_dp(machine_config &config) ATTR_COLD;
 
 private:
 	uint8_t m_coin_status;
@@ -182,6 +174,17 @@ private:
 	required_device<timer_device> m_hopper_timer;
 	output_finder<14> m_lamps;
 	memory_share_creator<uint8_t> m_meter_ram;
+
+	uint8_t ip0_r();
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void output_w(uint8_t data);
+	void meters_w(uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(hopper_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(coin_in_callback);
+
+	void cpu_90009_dp_map(address_map &map) ATTR_COLD;
+	void cpu_90009_dp_portmap(address_map &map) ATTR_COLD;
 };
 
 class mcr_nflfoot_state : public mcr_state
@@ -196,22 +199,10 @@ public:
 		m_ipu_pio1(*this, "ipu_pio1")
 	{ }
 
-	void sio_txda_w(int state);
-	void sio_txdb_w(int state);
-	void ipu_laserdisk_w(offs_t offset, uint8_t data);
-	uint8_t ipu_watchdog_r();
-	void ipu_watchdog_w(uint8_t data);
-	uint8_t ip2_r();
-	void op4_w(uint8_t data);
+	void init_nflfoot() ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(ipu_interrupt);
+	void mcr_91490_ipu(machine_config &config) ATTR_COLD;
 
-	void init_nflfoot();
-
-	void mcr_91490_ipu(machine_config &config);
-	void ipu_91695_map(address_map &map) ATTR_COLD;
-	void ipu_91695_portmap(address_map &map) ATTR_COLD;
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
@@ -225,6 +216,20 @@ private:
 	required_device<z80ctc_device> m_ipu_ctc;
 	required_device<z80pio_device> m_ipu_pio0;
 	required_device<z80pio_device> m_ipu_pio1;
+
+	void sio_txda_w(int state);
+	void sio_txdb_w(int state);
+	void ipu_laserdisk_w(offs_t offset, uint8_t data);
+	uint8_t ipu_watchdog_r();
+	void ipu_watchdog_w(uint8_t data);
+	uint8_t ip2_r();
+	void op4_w(uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
+	TIMER_DEVICE_CALLBACK_MEMBER(ipu_interrupt);
+
+	void ipu_91695_map(address_map &map) ATTR_COLD;
+	void ipu_91695_portmap(address_map &map) ATTR_COLD;
 };
 
 /*----------- defined in machine/mcr.cpp -----------*/

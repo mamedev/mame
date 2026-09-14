@@ -703,7 +703,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_maincpu->busack_cb().set(m_dmac, FUNC(z80dma_device::bai_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(trs80m2_state::screen_update));
@@ -797,7 +797,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_subcpu->set_disable();
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(trs80m2_state::screen_update));

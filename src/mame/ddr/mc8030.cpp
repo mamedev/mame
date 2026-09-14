@@ -171,6 +171,13 @@ uint32_t mc8030_state::screen_update_mc8030(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
+static DEVICE_INPUT_DEFAULTS_START( keyboard )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD",   0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY",   0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
+
 // this is a guess there is no information available
 static const z80_daisy_config daisy_chain[] =
 {
@@ -197,7 +204,7 @@ void mc8030_state::mc8030(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(512, 256);
@@ -228,21 +235,24 @@ void mc8030_state::mc8030(machine_config &config)
 
 	z80ctc_device& asp_ctc(Z80CTC(config, "asp_ctc", XTAL(2'457'600)));
 	asp_ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	// ZC0: to SIO CLK CH A
-	// ZC1: to SIO CLK CH B
+	asp_ctc.zc_callback<0>().set("asp_sio", FUNC(z80sio_device::txca_w));
+	asp_ctc.zc_callback<0>().append("asp_sio", FUNC(z80sio_device::rxca_w));
+	asp_ctc.zc_callback<1>().set("asp_sio", FUNC(z80sio_device::rxtxcb_w));
 	// ZC2: KMBG (??)
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
-	uart_clock.signal_handler().set("asp_sio", FUNC(z80sio_device::txca_w));
-	uart_clock.signal_handler().append("asp_sio", FUNC(z80sio_device::rxca_w));
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", XTAL(2'457'600) / 4));
+	ctc_clock.signal_handler().set("asp_ctc", FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append("asp_ctc", FUNC(z80ctc_device::trg2));
 
 	z80sio_device& sio(Z80SIO(config, "asp_sio", 4800));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
 	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 	rs232.rxd_handler().set("asp_sio", FUNC(z80sio_device::rxa_w));
 	rs232.cts_handler().set("asp_sio", FUNC(z80sio_device::ctsa_w));
 }

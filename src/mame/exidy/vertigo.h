@@ -14,7 +14,7 @@
 
 #include "machine/74148.h"
 #include "machine/adc0808.h"
-#include "video/vector.h"
+#include "vector.h"
 
 /*************************************
  *

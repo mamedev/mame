@@ -21,7 +21,7 @@ public:
 	nscsi_tape_device(const machine_config &config, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock, const std::string_view manufacturer, const std::string_view product, const std::string_view revision);
+	nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock, std::string_view manufacturer, std::string_view product, std::string_view revision);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

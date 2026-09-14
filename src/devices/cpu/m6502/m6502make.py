@@ -71,14 +71,24 @@ def emit(f, text):
 
 def identify_line_type(ins):
     if "eat-all-cycles" in ins: return "EAT"
-    for s in ["read", "write"]:
-        if s in ins:
-            return "MEMORY"
+    if "read" in ins: return "MEMORY_READ"
+    if "write" in ins: return "MEMORY_WRITE"
     return "NONE"
 
 
+def samples_interrupt(ins, single_cycle):
+    return (single_cycle or "read_sync" not in ins) and "_noirq" not in ins
+
+
+RDY_GATED_DEVICES = {"m6502", "m6510"}
+CMOS_DEVICES = {"w65c02", "r65c02", "r65c19", "w65c02s", "m65ce02", "m4510", "w65816"}
+
+
 def save_opcodes(f, device, opcodes):
+    rdy_gated = device in RDY_GATED_DEVICES
+    interrupt_sampled = device not in CMOS_DEVICES
     for name, instructions in opcodes:
+        single_cycle = sum(identify_line_type(ins) in ("MEMORY_READ", "MEMORY_WRITE") for ins in instructions) == 1
         emit(f, "void %s_device::%s_full()" % (device, name))
         emit(f, "{")
         substate = 1
@@ -90,7 +100,17 @@ def save_opcodes(f, device, opcodes):
                 emit(f, "\tm_inst_substate = %d;" % substate)
                 emit(f, "\treturn;")
                 substate += 1
-            elif line_type == "MEMORY":
+            elif line_type in ("MEMORY_READ", "MEMORY_WRITE"):
+                if rdy_gated and line_type == "MEMORY_READ":
+                    emit(f, "\twhile(!m_rdy_state) {")
+                    emit(f, "\t\tm_icount--;")
+                    emit(f, "\t\tif(m_icount <= 0) {")
+                    emit(f, "\t\t\tm_inst_substate = %d;" % substate)
+                    emit(f, "\t\t\treturn;")
+                    emit(f, "\t\t}")
+                    emit(f, "\t}")
+                if interrupt_sampled and samples_interrupt(ins, single_cycle):
+                    emit(f, "\tsample_interrupt();")
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
                 emit(f, "\tif(m_icount <= 0) {")
@@ -121,9 +141,19 @@ def save_opcodes(f, device, opcodes):
                 emit(f, "\treturn;")
                 emit(f, "\tcase %d:;" % substate)
                 substate += 1
-            elif line_type == "MEMORY":
+            elif line_type in ("MEMORY_READ", "MEMORY_WRITE"):
                 emit(f, "\t[[fallthrough]];")
                 emit(f, "case %d:" % substate)
+                if rdy_gated and line_type == "MEMORY_READ":
+                    emit(f, "\twhile(!m_rdy_state) {")
+                    emit(f, "\t\tm_icount--;")
+                    emit(f, "\t\tif(m_icount <= 0) {")
+                    emit(f, "\t\t\tm_inst_substate = %d;" % substate)
+                    emit(f, "\t\t\treturn;")
+                    emit(f, "\t\t}")
+                    emit(f, "\t}")
+                if interrupt_sampled and samples_interrupt(ins, single_cycle):
+                    emit(f, "\tsample_interrupt();")
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
                 emit(f, "\tif(m_icount <= 0) {")
@@ -216,9 +246,9 @@ def save_dasm(f, device, states):
         opc = tokens[0]
         mode = tokens[-1]
         extra = "0"
-        if opc in ["jsr", "bsr", "callf", "jpi", "jsb"]:
+        if opc in ["jsr", "bsr", "callf", "jpi", "jsb", "jsl"]:
             extra = "STEP_OVER"
-        elif opc in ["rts", "rti", "rtn", "retf", "tpi"]:
+        elif opc in ["rts", "rti", "rtn", "retf", "tpi", "rtl"]:
             extra = "STEP_OUT"
         elif opc in ["bcc", "bcs", "beq", "bmi", "bne", "bpl", "bvc", "bvs", "bbr", "bbs", "bbc", "bar", "bas"]:
             extra = "STEP_COND"

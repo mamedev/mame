@@ -117,8 +117,7 @@ macro prefetch_noirq
 5a80         ffff         0 jmp      abs16e   -
 
 # TODO: how is this instruction actually supposed to work?
-# gz70sp has an unused instance of it (probably used in whatever keyboard the ROM is based on)
-# located where a 'sleep' instruction would normally be.
+# ctk630 has it located where a 'sleep' instruction would normally be.
 # the lower 22 bits of the address point to a lone 'sleep' instruction at the end of the ROM,
 # but given the 16-bit program counter, it's not really clear what exactly is meant to happen.
 # for now, just setting bankl/bankh and jumping into the bankswitched memory area should be ok

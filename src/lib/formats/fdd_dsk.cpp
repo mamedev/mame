@@ -129,15 +129,16 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			else
 				/*auto const [err, actual] =*/ read_at(io, sec_offs[cur_sec_map], sect_data + cur_pos, sector_size); // FIXME: check for errors and premature EOF
 
-			sects[i].track       = tracks[cur_sec_map];
-			sects[i].head        = heads[cur_sec_map];
-			sects[i].sector      = secs[cur_sec_map];
-			sects[i].size        = sec_sizes[cur_sec_map];
-			sects[i].actual_size = sector_size;
-			sects[i].deleted     = false;
+			sects[i].track        = tracks[cur_sec_map];
+			sects[i].head         = heads[cur_sec_map];
+			sects[i].sector       = secs[cur_sec_map];
+			sects[i].size         = sec_sizes[cur_sec_map];
+			sects[i].actual_size  = sector_size;
+			sects[i].deleted      = false;
 			sects[i].bad_data_crc = false;
 			sects[i].bad_addr_crc = false;
-			sects[i].data        = sect_data + cur_pos;
+			sects[i].weak         = false;
+			sects[i].data         = sect_data + cur_pos;
 			cur_pos += sector_size;
 		}
 

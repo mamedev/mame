@@ -425,7 +425,7 @@ void anzterm_state::anzterm(machine_config &config)
 	ACIA6850(config, "acia.ic17");
 	ACIA6850(config, "acia.ic18");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_screen_update(FUNC(anzterm_state::screen_update));
 	screen.set_palette("palette");
 	screen.set_raw(15974400/4, 1024, 0, 104*8, 260, 0, 24*10); // this is totally wrong, it just stops a validation error

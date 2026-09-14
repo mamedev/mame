@@ -1061,7 +1061,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// V 0x1be / 0x14 / 0x194 / 0x1a8 / 0x1be
 	// H 0x294 / 0x3f / 0x221 / 0x24c / 0x294
 	// TODO: gets a 56.17 Hz with this, may be off by 1 or 2, verify on PCB, fix display ranges

@@ -2436,7 +2436,7 @@ void ssv_state::ssv(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(ssv_state::interrupt), "screen", 0, 1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(SSV_PIXEL_CLOCK, SSV_HTOTAL, SSV_HBEND, SSV_HBSTART, SSV_VTOTAL, SSV_VBEND, SSV_VBSTART);
 	m_screen->set_screen_update(FUNC(ssv_state::screen_update));
 	m_screen->set_palette(m_palette);

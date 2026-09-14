@@ -554,7 +554,7 @@ void quasar_state::quasar(machine_config &config)
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50); // from dot clock
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));

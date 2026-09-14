@@ -28,6 +28,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -45,6 +46,8 @@ struct coro_with_arg;
  * Template parameter @c Yield specifies type or signature used by co_yield,
  * @c Return specifies the type used for co_return, and @c Executor specifies
  * the underlying executor type.
+ *
+ * @sa @ref overview_coro "Resumable C++20 coroutines"
  */
 template <typename Yield = void, typename Return = void,
     typename Executor = any_io_executor,
@@ -284,6 +287,7 @@ template<typename T, typename Executor = asio::any_io_executor,
 using task = coro<void(), T, Executor, Allocator>;
 
 } // namespace experimental
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

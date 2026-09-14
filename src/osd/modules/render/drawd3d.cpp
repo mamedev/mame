@@ -1326,10 +1326,10 @@ void renderer_d3d9::pick_best_mode()
 	float best_score = 0.0f;
 
 	// determine the refresh rate of the primary screen
-	const screen_device *primary_screen = screen_device_enumerator(window().machine().root_device()).first();
+	const device_video_output_interface *primary_screen = video_output_interface_enumerator(window().machine().root_device()).first();
 	if (primary_screen != nullptr)
 	{
-		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
+		target_refresh = primary_screen->frame_period().as_hz();
 	}
 
 	// determine the minimum width/height for the selected target
@@ -2603,10 +2603,10 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 
 	cache_texture->GetSurfaceLevel(0, &cache_surface);
 
-	const screen_device *first_screen = screen_device_enumerator(d3d->window().machine().root_device()).first();
+	const device_video_output_interface *first_screen = video_output_interface_enumerator(d3d->window().machine().root_device()).first();
 	bool vector_screen =
 		first_screen != nullptr &&
-		first_screen->screen_type() == SCREEN_TYPE_VECTOR;
+		first_screen->is_vector();
 
 	float scale_factor = 0.75f;
 	int scale_count = vector_screen ? MAX_BLOOM_COUNT : HALF_BLOOM_COUNT;

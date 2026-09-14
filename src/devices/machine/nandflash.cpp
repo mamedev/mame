@@ -53,6 +53,8 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 	m_col_address_cycles(0),
 	m_row_address_cycles(0),
 	m_sequential_row_read(0),
+	m_read_time(attotime::never),
+	m_busy_until(attotime::never),
 	m_write_rnb(*this)
 {
 	memset(m_id, 0, sizeof(m_id));
@@ -151,6 +153,9 @@ samsung_k9f1g08u0m_device::samsung_k9f1g08u0m_device(const machine_config &mconf
 	m_col_address_cycles = 2;
 	m_row_address_cycles = 2;
 	m_sequential_row_read = 0;
+	// Taken from the documentation for worst case read time, may require more measuring on a real pcb
+	// but the majority of cycle cost comes from reading the data out once it's ready
+	m_read_time = attotime::from_usec(25);
 }
 
 samsung_k9lag08u0m_device::samsung_k9lag08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -339,6 +344,9 @@ int nand_device::is_protected()
 
 int nand_device::is_busy()
 {
+	if (m_busy_until != attotime::never && machine().time() < m_busy_until)
+		return 1;
+
 	return (m_status & 0x40) == 0;
 }
 
@@ -350,6 +358,7 @@ void nand_device::command_w(uint8_t data)
 	switch (data)
 	{
 	case 0xff: // Reset
+		m_busy_until = attotime::never;
 		m_mode = SM_M_INIT;
 		m_pointer_mode = SM_PM_A;
 		m_status = (m_status & 0x80) | 0x40;
@@ -478,7 +487,10 @@ void nand_device::command_w(uint8_t data)
 			else
 			{
 				m_write_rnb(0);
-				m_write_rnb(1);
+				if (m_read_time != attotime::never)
+					m_busy_until = machine().time() + m_read_time;
+				else
+					m_write_rnb(1);
 			}
 		}
 		break;
@@ -513,7 +525,11 @@ void nand_device::command_w(uint8_t data)
 		}
 		else
 		{
-			// do nothing
+			m_write_rnb(0);
+			if (m_read_time != attotime::never)
+				m_busy_until = machine().time() + m_read_time;
+			else
+				m_write_rnb(1);
 		}
 		break;
 	case 0x85: // Random Data Input

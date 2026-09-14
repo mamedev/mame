@@ -46,9 +46,6 @@ Space Echo:
   rather than patching out the test. code for the same test is in stratvox but
   isn't called, speakres has a very similar test but doesn't care about the result.
 
-vscompmj:
-- Stuck notes (constant tone) in-game after the mahjong tiles are laid down.
-
 
 ***************************************************************************
 
@@ -185,13 +182,13 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void routex(machine_config &config);
-	void route16(machine_config &config);
+	void routex(machine_config &config) ATTR_COLD;
+	void route16(machine_config &config) ATTR_COLD;
 
-	void init_route16();
-	void init_route16a();
-	void init_route16c();
-	void init_route16d();
+	void init_route16() ATTR_COLD;
+	void init_route16a() ATTR_COLD;
+	void init_route16c() ATTR_COLD;
+	void init_route16d() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -233,9 +230,9 @@ public:
 		, m_dac(*this, "dac")
 	{ }
 
-	void speakres(machine_config &config);
-	void stratvox(machine_config &config);
-	void spacecho(machine_config &config);
+	void speakres(machine_config &config) ATTR_COLD;
+	void stratvox(machine_config &config) ATTR_COLD;
+	void spacecho(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -265,10 +262,10 @@ public:
 		, m_key(*this, "KEY%u", 0U)
 	{ }
 
-	void jongpute(machine_config &config);
-	void vscompmj(machine_config &config);
+	void jongpute(machine_config &config) ATTR_COLD;
+	void vscompmj(machine_config &config) ATTR_COLD;
 
-	void init_vscompmj();
+	void init_vscompmj() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -380,50 +377,15 @@ void route16_state::init_route16d()
 
 void jongpute_state::init_vscompmj() // only opcodes encrypted
 {
-	uint8_t *rom = memregion("cpu1")->base();
-
-	uint8_t unk0 = 0x00;
-	uint8_t unk1 = 0x00;
-
-	static const uint8_t xor_table_00[0x08][0x08] =
-	{
-		{ 0x04, 0x01, 0x14, 0x14, 0x05, 0x10, 0x54, 0x05 }, // 0x0x and 0x2x
-		{ 0x15, 0x51, 0x01, 0x44, 0x50, 0x44, 0x11, 0x50 }, // 0x1x and 0x3x
-		{ 0x14, 0x50, 0x41, 0x15, 0x50, 0x15, 0x15, 0x41 }, // 0x4x and 0x6x
-		{ 0x11, 0x04, 0x40, 0x11, 0x11, 0x45, 0x10, 0x14 }, // 0x5x and 0x7x
-		{ 0x40, unk0, 0x15, unk0, 0x01, 0x44, 0x14, 0x54 }, // 0x8x and 0xax
-		{ 0x11, 0x40, unk0, unk0, 0x14, 0x01, 0x54, 0x51 }, // 0x9x and 0xbx
-		{ 0x05, 0x45, 0x10, 0x55, 0x51, 0x15, 0x55, 0x11 }, // 0xcx and 0xex
-		{ unk0, 0x41, 0x51, 0x10, 0x01, 0x44, 0x50, 0x50 }, // 0xdx and 0xfx
-	};
-
-	static const uint8_t xor_table_01[0x08][0x08] =
-	{
-		{ 0x41, 0x41, 0x45, 0x54, 0x44, 0x40, 0x55, 0x41 }, // 0x0x and 0x2x
-		{ 0x14, 0x14, 0x04, 0x45, 0x44, 0x01, 0x05, 0x05 }, // 0x1x and 0x3x
-		{ 0x40, 0x14, 0x01, 0x11, 0x45, 0x14, 0x04, 0x50 }, // 0x4x and 0x6x
-		{ 0x04, 0x40, 0x55, 0x55, 0x44, 0x40, 0x55, 0x55 }, // 0x5x and 0x7x
-		{ 0x01, 0x05, 0x14, 0x10, 0x01, unk1, 0x04, 0x04 }, // 0x8x and 0xax
-		{ 0x10, 0x04, 0x51, 0x01, 0x04, 0x04, 0x45, 0x51 }, // 0x9x and 0xbx
-		{ 0x11, 0x01, 0x44, 0x44, 0x05, 0x15, 0x10, 0x05 }, // 0xcx and 0xex
-		{ unk1, 0x14, 0x05, unk1, 0x01, 0x41, 0x04, 0x40 }, // 0xdx and 0xfx
-	};
+	uint8_t const *const rom  = memregion("cpu1")->base();
+	uint8_t const *const prom = memregion("dec_prom")->base();
 
 	for (int i = 0; i < 0x8000; i++)
 	{
-		uint8_t x = rom[i];
+		uint8_t const x = rom[i];
+		uint8_t const d = prom[(BIT(i, 0) << 6) | bitswap<6>(x, 7, 1, 4, 6, 2, 0)] & 0x0f;
 
-		uint8_t row = (BIT(x, 4) + (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
-
-		uint8_t xor_v = x & 0x07;
-
-		switch(i & 0x01)
-		{
-			case 0x00: x ^= xor_table_00[row][xor_v]; break;
-			case 0x01: x ^= xor_table_01[row][xor_v]; break;
-		}
-
-		m_decrypted_opcodes[i] = x;
+		m_decrypted_opcodes[i] = (x & 0xaa) | (BIT(d, 0) << 0) | (BIT(d, 1) << 2) | (BIT(d, 3) << 4) | (BIT(d, 2) << 6);
 	}
 }
 
@@ -1119,7 +1081,7 @@ void route16_state::route16(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_cpu1->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10_MHz_XTAL / 2, 320, 0, 256, 260, 8, 248);
 	m_screen->set_screen_update(FUNC(route16_state::screen_update_route16));
 
@@ -1638,7 +1600,7 @@ ROM_START( jongpute )
 	ROM_LOAD( "ju09",         0x0100, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
 ROM_END
 
-ROM_START( vscompmj )
+ROM_START( vscompmj ) // JKK-3A PCB
 	ROM_REGION( 0x8000, "cpu1", 0 ) // all 2732
 	ROM_LOAD( "j2_1.0r",           0x0000, 0x1000, CRC(e112ac58) SHA1(a274080dfd89c547335f93cb8f99e80ec7b972df) )
 	ROM_LOAD( "j2_2.0n",           0x1000, 0x1000, CRC(c751c041) SHA1(69063549e616fdd9d175b47275331986f1d3e0bd) )
@@ -1654,7 +1616,27 @@ ROM_START( vscompmj )
 	ROM_LOAD( "82s129.6k",         0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) )
 	ROM_LOAD( "82s129.6h",         0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) )
 
-	ROM_REGION( 0x0100, "proms2", 0 ) // currently unused by the emulation
+	ROM_REGION( 0x0100, "dec_prom", 0 )
+	ROM_LOAD( "82s129.9r",         0x0000, 0x0100, CRC(20ac25d8) SHA1(6f06472ac7fcb22c9060092a2d456be5d3ca6d5f) )
+ROM_END
+
+ROM_START( vscompmjh ) // JKK-3A PCB as the parent set, but labels are different and someone hacked out the Nichibutsu copyright on the title screen
+	ROM_REGION( 0x8000, "cpu1", 0 ) // all 2732
+	ROM_LOAD( "t1.0r",           0x0000, 0x1000, CRC(e112ac58) SHA1(a274080dfd89c547335f93cb8f99e80ec7b972df) ) // same as original
+	ROM_LOAD( "t2.0n",           0x1000, 0x1000, CRC(c751c041) SHA1(69063549e616fdd9d175b47275331986f1d3e0bd) ) // same as original
+	ROM_LOAD( "t3.0l",           0x2000, 0x1000, CRC(e85bf26b) SHA1(8bb6625433c9f86808a41bde7dd587bdc430b934) ) // same as original
+	ROM_LOAD( "t4.0k",           0x3000, 0x1000, CRC(829ee645) SHA1(3f035ddc51dbdc96ccf016266490fc54170b74e1) ) // minor changes
+	ROM_LOAD( "t5.0j",           0x7000, 0x1000, CRC(0fc714ce) SHA1(3c32cb95e846c594b865c59f0b86c3fb65cd2c8b) ) // minor changes
+
+	ROM_REGION( 0x2000, "cpu2", 0 )
+	ROM_LOAD( "t6.0e",           0x0000, 0x1000, CRC(3a559328) SHA1(dd6333ddcc8aa6097d83b21cfde740b2cb7c908b) ) // 2732
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	// The upper 128 bytes are 0's, used by the hardware to blank the display
+	ROM_LOAD( "82s129.6k",         0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) )
+	ROM_LOAD( "82s129.6h",         0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) )
+
+	ROM_REGION( 0x0100, "dec_prom", 0 )
 	ROM_LOAD( "82s129.9r",         0x0000, 0x0100, CRC(20ac25d8) SHA1(6f06472ac7fcb22c9060092a2d456be5d3ca6d5f) )
 ROM_END
 
@@ -1688,4 +1670,5 @@ GAME( 1980, speakhlp,  speakres, spacecho, spacecho, speakres_state, empty_init,
 
 GAME( 1981, jongpute,  0,        jongpute, jongpute, jongpute_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng,  jongpute, jongpute, jongpute, jongpute_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vscompmj,  jongpute, vscompmj, jongpute, jongpute_state, init_vscompmj, ROT0,   "Nichibutsu",                       "VS Computer Mahjong", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // decryption might be incomplete (attract resets), inputs seem read differently
+GAME( 1981, vscompmj,  jongpute, vscompmj, jongpute, jongpute_state, init_vscompmj, ROT0,   "Nichibutsu",                       "VS Computer Mahjong", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // inputs seem read differently
+GAME( 1981, vscompmjh, jongpute, vscompmj, jongpute, jongpute_state, init_vscompmj, ROT0,   "hack",                             "VS Computer Mahjong (hack)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // inputs seem read differently

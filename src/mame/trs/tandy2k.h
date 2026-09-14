@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "tandy2k_hdc.h"
 #include "tandy2kb.h"
 
 #include "bus/centronics/ctronics.h"
@@ -12,7 +13,6 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
-#include "imagedev/harddriv.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -28,6 +28,7 @@
 #include "video/crt9212.h"
 
 #include "emupal.h"
+#include "screen.h"
 
 #include "formats/tandy2k_dsk.h"
 
@@ -43,8 +44,6 @@
 #define CRT9212_0_TAG   "u55"
 #define CRT9212_1_TAG   "u15"
 #define CRT9021B_TAG    "u14"
-#define WD1010_TAG      "u18"
-#define WD1100_11_TAG   "u12"
 #define CENTRONICS_TAG  "centronics"
 #define RS232_TAG       "rs232"
 
@@ -64,6 +63,7 @@ public:
 		m_drb0(*this, CRT9212_0_TAG),
 		m_drb1(*this, CRT9212_1_TAG),
 		m_vac(*this, CRT9021B_TAG),
+		m_screen(*this, SCREEN_TAG),
 		m_colpal(*this, "colpal"),
 		m_vrambank(*this, "vrambank"),
 		m_timer_vidldsh(*this, "vidldsh"),
@@ -97,6 +97,7 @@ public:
 		m_dblank(0),
 		m_slg(0),
 		m_sld(0),
+		m_curs(0),
 		m_cgra(0),
 		m_vidla(0),
 		m_outspkr(0),
@@ -116,17 +117,14 @@ public:
 		}
 	}
 
-	void tandy2k_hd(machine_config &config);
 	void tandy2k(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
-private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	void tandy2k_mem(address_map &map) ATTR_COLD;
 	void tandy2k_io(address_map &map) ATTR_COLD;
-	void tandy2k_hd_io(address_map &map) ATTR_COLD;
 	void vpac_mem(address_map &map) ATTR_COLD;
 	void vrambank_mem(address_map &map) ATTR_COLD;
 
@@ -144,6 +142,7 @@ private:
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_colpal;
 	required_device<address_map_bank_device> m_vrambank;
 	required_device<timer_device> m_timer_vidldsh;
@@ -171,6 +170,7 @@ private:
 	void enable_w(uint8_t data);
 	void dma_mux_w(uint8_t data);
 	uint8_t kbint_clr_r();
+	void hle_keypress_w(int state);
 	uint8_t fldtc_r();
 	void fldtc_w(uint8_t data);
 	void addr_ctrl_w(uint8_t data);
@@ -185,12 +185,16 @@ private:
 	void vpac_drb_w(int state);
 	void vpac_wben_w(int state);
 	void vpac_cblank_w(int state);
+	void vpac_curs_w(int state);
+	void vpac_vs_w(int state);
 	void vpac_slg_w(int state);
 	void vpac_sld_w(int state);
 	uint8_t hires_status_r();
 	void hires_plane_w(uint8_t data);
 	void vidla_w(uint8_t data);
 	void drb_attr_w(uint8_t data);
+	int character_width() const { return m_clkcnt ? 8 : 10; }
+	void set_vidldsh_timer();
 	void kbdclk_w(int state);
 	void kbddat_w(int state);
 	uint8_t clkmouse_r(offs_t offset);
@@ -245,9 +249,19 @@ private:
 	uint8_t m_dblank;
 	int m_slg;
 	int m_sld;
+	int m_curs;
 	uint8_t m_cgra;
 	uint8_t m_vidla;
 	uint8_t m_hires_en = 0;
+	bitmap_rgb32 m_bitmap;
+	bool m_drb = true;
+	bool m_dout = false;
+	bool m_vs = true;
+	bool m_frame = false;
+	int m_int = 0;
+	int m_col = 0;
+	int m_row = 0;
+	int m_scanline = 0;
 
 	/* sound state */
 	int m_outspkr;
@@ -276,6 +290,24 @@ private:
 	required_ioport m_buttons;
 	required_ioport m_x_axis;
 	required_ioport m_y_axis;
+};
+
+class tandy2k_hd_state : public tandy2k_state
+{
+public:
+	tandy2k_hd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tandy2k_state(mconfig, type, tag),
+		m_hdc(*this, "hdc")
+	{
+	}
+	
+	void tandy2k_hd(machine_config &config);
+	
+protected:
+	required_device<tandy2k_hdc_device> m_hdc;
+
+private:
+	void tandy2k_hd_io(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TRS_TANDY2K_H

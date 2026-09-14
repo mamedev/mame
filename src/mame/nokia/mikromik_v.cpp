@@ -136,7 +136,7 @@ void mm1_state::mm1_palette(palette_device &palette) const
 
 void mm1_state::mm1_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz( 50 );
 	screen.set_screen_update(FUNC(mm1_state::screen_update));
 	screen.set_size( 800, 375 ); // (25 text rows * 15 vertical pixels / character)

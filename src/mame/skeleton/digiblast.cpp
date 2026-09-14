@@ -83,7 +83,7 @@ void digiblast_state::digiblast(machine_config &config)
 	ARM9(config, m_maincpu, 200000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &digiblast_state::digiblast_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(455, 262);

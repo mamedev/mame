@@ -119,6 +119,8 @@ Notes:
 #include "pc88_kbd.h"
 #include "pc8801.h"
 
+#include "formats/pc88_t88.h"
+
 #include "softlist_dev.h"
 
 #include "utf8.h"
@@ -553,6 +555,8 @@ uint8_t pc8801_state::port40_r()
 	data |= m_centronics_busy;
 //  data |= m_centronics_ack << 1;
 	data |= ioport("CTRL")->read() & 0xca;
+	// bit 2 is CMT CDIN, the tape input comparator (inherited from pc8001)
+	data |= cmt_cdin_r() << 2;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
 	// TODO: enable line from pc80s31k (bit 3, active_low)
@@ -792,7 +796,7 @@ void pc8801_state::main_io(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x0f).r("kbd", FUNC(pc8001_kbd_device::read_direct));
 	map(0x10, 0x10).w(FUNC(pc8801_state::port10_w));
-	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
+	map(0x20, 0x21).mirror(0x0e).r(m_usart, FUNC(i8251_device::read)).w(FUNC(pc8801_state::usart_w)); // CMT / RS-232C ch. 0
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
@@ -1078,9 +1082,9 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// TODO: these really maps to "general purpose inputs" UIP1 / UIP2
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-//	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
-//	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
+//  PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Disable CMD SING" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1107,12 +1111,12 @@ static INPUT_PORTS_START( pc8801 )
 	// vanilla PC8801 and mkII doesn't have V2
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-//	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
-//	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
-//	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
-//	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
-//	PORT_DIPSETTING(    0x80, "V1 Mode" )
-//	PORT_DIPSETTING(    0x00, "V2 Mode" )
+//  PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
+//  PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
+//  PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
+//  PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
+//  PORT_DIPSETTING(    0x80, "V1 Mode" )
+//  PORT_DIPSETTING(    0x00, "V2 Mode" )
 
 	PORT_START("CTRL")
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
@@ -1142,9 +1146,9 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x08, "9600bps" )
 	PORT_DIPSETTING(    0x09, "19200bps" )
 	#endif
-//	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
-//	PORT_DIPSETTING(    0x00, "Slow" )
-//	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
+//  PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
+//  PORT_DIPSETTING(    0x00, "Slow" )
+//  PORT_DIPSETTING(    0x40, DEF_STR( High ) )
 
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
@@ -1463,9 +1467,9 @@ void pc8801_state::pc8801(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	// TODO: needs T88 format support
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_formats(t88_cassette_formats);
 	m_cassette->set_interface("pc8801_cass");
 
 	// TODO: clock, receiver handler, DCD?
@@ -1473,7 +1477,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
 	m_screen->set_raw(PIXEL_CLOCK_15KHz, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8801_state::screen_update));
@@ -1534,6 +1538,7 @@ void pc8801_state::pc8801(machine_config &config)
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
 	SOFTWARE_LIST(config, "disk_n88_orig_list").set_original("pc8801_flop_orig");
 	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
+	SOFTWARE_LIST(config, "cass_n_list").set_compatible("pc8001_cass");
 	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc8801");
 }
 

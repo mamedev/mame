@@ -1010,7 +1010,7 @@ void tmc1800_state::tmc1800(machine_config &config)
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
 	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1045,7 +1045,7 @@ void osc1000b_state::osc1000b(machine_config &config)
 	m_maincpu->q_cb().set(FUNC(osc1000b_state::q_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(osc1000b_state::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_size(320, 200);
@@ -1079,7 +1079,7 @@ void tmc2000_state::tmc2000(machine_config &config)
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000_state::dma_w));
 
 	// video hardware
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 	SPEAKER(config, "mono").front_center();
 	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
@@ -1116,7 +1116,7 @@ void nano_state::nano(machine_config &config)
 	m_maincpu->dma_wr_cb().set(m_cti, FUNC(cdp1864_device::dma_w));
 
 	// video hardware
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 	SPEAKER(config, "mono").front_center();
 	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);

@@ -336,7 +336,7 @@ void c2031_device::via1_pb_w(uint8_t data)
 
 void c2031_device::byte_w(int state)
 {
-	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, !state);
 
 	m_via1->write_ca1(state);
 }
@@ -386,6 +386,7 @@ void c2031_device::device_add_mconfig(machine_config &config)
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
 	connector.set_formats(c2031_device::floppy_formats);
+	connector.enable_sound(true);
 }
 
 

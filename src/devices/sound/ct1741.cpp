@@ -99,7 +99,7 @@ void ct1741_dsp_device::device_reset()
 	m_dac_h = m_adc_h = false;
 	m_dma8_done = m_dma16_done = false;
 
-//	m_timer->adjust(attotime::never);
+//  m_timer->adjust(attotime::never);
 
 	m_irq8_w(CLEAR_LINE);
 	m_irq16_w(CLEAR_LINE);
@@ -718,7 +718,7 @@ TIMER_CALLBACK_MEMBER(ct1741_dsp_device::timer_tick)
 		++m_adc_fifo_head %= FIFO_SIZE;
 	}
 
-//	m_cpu->set_input_line(MCS51_T2_LINE, ASSERT_LINE);
+//  m_cpu->set_input_line(MCS51_T2_LINE, ASSERT_LINE);
 }
 
 uint8_t ct1741_dsp_device::dack_r()

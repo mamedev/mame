@@ -25,3 +25,4 @@ MAME’s source or working on scripts that run within the MAME framework.
     poly_manager
     audio_effects
     osd_audio
+    bgfx_vector_crt

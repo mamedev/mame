@@ -18,6 +18,7 @@
 #include "main.h"
 #include "natkeyboard.h"
 #include "profiler.h"
+#include "video.h"
 
 #include "ui/uimain.h"
 
@@ -931,6 +932,7 @@ std::string ioport_field::key_name(int which) const
 	case UCHAR_SHIFT_1: return "Shift";
 	case UCHAR_SHIFT_2: return "Ctrl";
 	case UCHAR_MAMEKEY(ESC): return "Esc";
+	case UCHAR_MAMEKEY(TAB): return "Tab";
 	case UCHAR_MAMEKEY(INSERT): return "Insert";
 	case UCHAR_MAMEKEY(DEL): return "Delete";
 	case UCHAR_MAMEKEY(HOME): return "Home";

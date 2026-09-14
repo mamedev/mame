@@ -1112,7 +1112,7 @@ void hp2640_base_state::hp2640_base(machine_config &config)
 	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2640_base_state::timer_10ms_exp));
 	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2640_base_state::timer_cursor_blink_inh));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
+	SCREEN(config, m_screen).set_color(rgb_t::white());
 	// Actual pixel clock is half this value: 21.06 MHz
 	// We use the doubled value to be able to emulate the half-pixel shifting of the real hw
 	// Each real-world half pixel is a whole MAME pixel

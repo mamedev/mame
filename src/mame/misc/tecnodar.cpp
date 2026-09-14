@@ -314,7 +314,7 @@ void tecnodar_state::tecnodar(machine_config &config)
 
 	EEPROM_93C46_8BIT(config, m_eeprom); // unknown 8-pin IC
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.245_MHz_XTAL)); // surface-scratched 40-pin DIP; exact type unknown
 	vdp.set_screen("screen");

@@ -380,7 +380,7 @@ void qix_state::qix_video(machine_config &config)
 	m_crtc->out_de_callback().set(FUNC(qix_state::display_enable_changed));
 	m_crtc->out_vsync_callback().set(FUNC(qix_state::vsync_changed));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100); /* from CRTC */
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

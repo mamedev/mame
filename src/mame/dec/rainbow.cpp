@@ -3162,7 +3162,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	m_z80->set_addrmap(AS_IO, &rainbow_base_state::rainbowz80_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240); // ~NTSC compatible video timing (?)
 	screen.set_screen_update(FUNC(rainbow_base_state::screen_update_rainbow));
 	screen.set_palette("vt100_video:palette");
@@ -3185,7 +3185,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	PALETTE(config, m_palette2).set_entries(32);
 
-	SCREEN(config, m_screen2, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen2);
 	m_screen2->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 
 	// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )

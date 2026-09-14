@@ -482,7 +482,7 @@ void dinopic_state::dinopic(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -524,7 +524,7 @@ void cps1bl_pic_state::punipic(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -562,7 +562,7 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -594,7 +594,7 @@ void slampic2_state::slampic2(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(slampic2_state, slampic2)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(slampic2_state::screen_update_fcrash));
 	//m_screen->screen_vblank().set(FUNC(slampic2_state::screen_vblank_cps1));

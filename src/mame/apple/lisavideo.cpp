@@ -54,7 +54,7 @@ const tiny_rom_entry *macxl_video_device::device_rom_region() const
 
 void lisa_video_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(*this, FUNC(lisa_video_device::screen_update));
 
 	// Need to put something, it's impossible to check the video rom

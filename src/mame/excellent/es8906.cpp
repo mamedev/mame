@@ -319,7 +319,7 @@ void es8906_state::es8906(machine_config &config)
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: everything
+	SCREEN(config, m_screen); // TODO: everything
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 32*8);

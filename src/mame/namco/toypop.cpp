@@ -729,7 +729,7 @@ void namcos16_state::liblrabl(machine_config &config)
 	m_namco56xx_2->in_callback<2>().set_ioport("P2_LEFT");
 	m_namco56xx_2->in_callback<3>().set_ioport("SERVICE");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 384, 0, 288, 264, 0, 224); // derived from Galaxian HW, 60.606060
 	screen.set_screen_update(FUNC(namcos16_state::screen_update));
 	screen.set_palette(m_palette);

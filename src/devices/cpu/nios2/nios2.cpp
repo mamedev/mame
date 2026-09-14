@@ -314,13 +314,13 @@ void nios2_device::execute_run()
 				break;
 
 			case 0x02: // roli
-				m_gpr[BIT(inst, 17, 5)] = rotl_32(get_reg(BIT(inst, 27, 5)), BIT(inst, 6, 5));
+				m_gpr[BIT(inst, 17, 5)] = std::rotl(get_reg(BIT(inst, 27, 5)), BIT(inst, 6, 5));
 				m_pc += 4;
 				m_icount--;
 				break;
 
 			case 0x03: // rol
-				m_gpr[BIT(inst, 17, 5)] = rotl_32(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
+				m_gpr[BIT(inst, 17, 5)] = std::rotl(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
 				m_pc += 4;
 				m_icount--;
 				break;
@@ -350,7 +350,7 @@ void nios2_device::execute_run()
 				break;
 
 			case 0x0b: // ror
-				m_gpr[BIT(inst, 17, 5)] = rotr_32(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
+				m_gpr[BIT(inst, 17, 5)] = std::rotr(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
 				m_pc += 4;
 				m_icount--;
 				break;

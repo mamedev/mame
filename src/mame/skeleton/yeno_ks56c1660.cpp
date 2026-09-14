@@ -65,7 +65,7 @@ void yeno_ks56c1660_state::yeno(machine_config &config)
 	// YENO 9205 KS56C1660-12
 
 	// monochrome LCD display, resolution unknown
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(yeno_ks56c1660_state::screen_update));

@@ -1,0 +1,90 @@
+# license:BSD-3-Clause
+# copyright-holders:R. Belmont
+# w65816_device -- WDC W65C816S
+#
+# bank 0x000 -- emulation mode
+brk_e_imm     ora_idx       cop_e_imm     ora_ds        tsb_zpg       ora_zpg       asl_zpg       ora_zil       php_imp       ora_imm       asl_acc       phd_imp       tsb_aba       ora_aba       asl_aba       ora_abl
+bpl_rel       ora_idy       ora_zpi       ora_dsy       trb_zpg       ora_zpx       asl_zpx       ora_ziy       clc_imp       ora_aby       inc_acc       tcs_imp       trb_aba       ora_abx       asl_abx       ora_alx
+jsr_adr       and_idx       jsl_abl       and_ds        bit_zpg       and_zpg       rol_zpg       and_zil       plp_imp       and_imm       rol_acc       pld_imp       bit_aba       and_aba       rol_aba       and_abl
+bmi_rel       and_idy       and_zpi       and_dsy       bit_zpx       and_zpx       rol_zpx       and_ziy       sec_imp       and_aby       dec_acc       tsc_imp       bit_abx       and_abx       rol_abx       and_alx
+rti_e_imp     eor_idx       wdm_imm       eor_ds        mvp_dbf       eor_zpg       lsr_zpg       eor_zil       pha_imp       eor_imm       lsr_acc       phk_imp       jmp_adr       eor_aba       lsr_aba       eor_abl
+bvc_rel       eor_idy       eor_zpi       eor_dsy       mvn_dbf       eor_zpx       lsr_zpx       eor_ziy       cli_imp       eor_aby       phy_imp       tcd_imp       jmp_abl       eor_abx       lsr_abx       eor_alx
+rts_imp       adc_idx       per_rell      adc_ds        stz_zpg       adc_zpg       ror_zpg       adc_zil       pla_imp       adc_imm       ror_acc       rtl_imp       jmp_ind       adc_aba       ror_aba       adc_abl
+bvs_rel       adc_idy       adc_zpi       adc_dsy       stz_zpx       adc_zpx       ror_zpx       adc_ziy       sei_imp       adc_aby       ply_imp       tdc_imp       jmp_iax       adc_abx       ror_abx       adc_alx
+bra_rel       sta_idx       brl_rell      sta_ds        sty_zpg       sta_zpg       stx_zpg       sta_zil       dey_imp       bit_imm       txa_imp       phb_imp       sty_aba       sta_aba       stx_aba       sta_abl
+bcc_rel       sta_idy       sta_zpi       sta_dsy       sty_zpx       sta_zpx       stx_zpy       sta_ziy       tya_imp       sta_aby       txs_imp       txy_imp       stz_aba       sta_abx       stz_abx       sta_alx
+ldy_imm       lda_idx       ldx_imm       lda_ds        ldy_zpg       lda_zpg       ldx_zpg       lda_zil       tay_imp       lda_imm       tax_imp       plb_imp       ldy_aba       lda_aba       ldx_aba       lda_abl
+bcs_rel       lda_idy       lda_zpi       lda_dsy       ldy_zpx       lda_zpx       ldx_zpy       lda_ziy       clv_imp       lda_aby       tsx_imp       tyx_imp       ldy_abx       lda_abx       ldx_aby       lda_alx
+cpy_imm       cmp_idx       rep_imm       cmp_ds        cpy_zpg       cmp_zpg       dec_zpg       cmp_zil       iny_imp       cmp_imm       dex_imp       wai_imp       cpy_aba       cmp_aba       dec_aba       cmp_abl
+bne_rel       cmp_idy       cmp_zpi       cmp_dsy       pei_zpg       cmp_zpx       dec_zpx       cmp_ziy       cld_imp       cmp_aby       phx_imp       stp_imp       jml_ind       cmp_abx       dec_abx       cmp_alx
+cpx_imm       sbc_idx       sep_imm       sbc_ds        cpx_zpg       sbc_zpg       inc_zpg       sbc_zil       inx_imp       sbc_imm       nop_imp       xba_imp       cpx_aba       sbc_aba       inc_aba       sbc_abl
+beq_rel       sbc_idy       sbc_zpi       sbc_dsy       pea_imm16     sbc_zpx       inc_zpx       sbc_ziy       sed_imp       sbc_aby       plx_imp       xce_imp       jsr_iax       sbc_abx       inc_abx       sbc_alx
+# bank 0x100 -- native M0X0
+brk_imm       ora_w_idx     cop_imm       ora_w_ds      tsb_w_zpg     ora_w_zpg     asl_w_zpg     ora_w_zil     php_imp       ora_w_imm16   asl_w_acc     phd_imp       tsb_w_aba     ora_w_aba     asl_w_aba     ora_w_abl
+bpl_rel       ora_w_idy     ora_w_zpi     ora_w_dsy     trb_w_zpg     ora_w_zpx     asl_w_zpx     ora_w_ziy     clc_imp       ora_w_aby     inc_w_acc     tcs_imp       trb_w_aba     ora_w_abx     asl_w_abx     ora_w_alx
+jsr_adr       and_w_idx     jsl_abl       and_w_ds      bit_w_zpg     and_w_zpg     rol_w_zpg     and_w_zil     plp_imp       and_w_imm16   rol_w_acc     pld_imp       bit_w_aba     and_w_aba     rol_w_aba     and_w_abl
+bmi_rel       and_w_idy     and_w_zpi     and_w_dsy     bit_w_zpx     and_w_zpx     rol_w_zpx     and_w_ziy     sec_imp       and_w_aby     dec_w_acc     tsc_imp       bit_w_abx     and_w_abx     rol_w_abx     and_w_alx
+rti_imp       eor_w_idx     wdm_imm       eor_w_ds      mvp_w_dbf     eor_w_zpg     lsr_w_zpg     eor_w_zil     pha_w_imp     eor_w_imm16   lsr_w_acc     phk_imp       jmp_adr       eor_w_aba     lsr_w_aba     eor_w_abl
+bvc_rel       eor_w_idy     eor_w_zpi     eor_w_dsy     mvn_w_dbf     eor_w_zpx     lsr_w_zpx     eor_w_ziy     cli_imp       eor_w_aby     phy_w_imp     tcd_imp       jmp_abl       eor_w_abx     lsr_w_abx     eor_w_alx
+rts_imp       adc_w_idx     per_rell      adc_w_ds      stz_w_zpg     adc_w_zpg     ror_w_zpg     adc_w_zil     pla_w_imp     adc_w_imm16   ror_w_acc     rtl_imp       jmp_ind       adc_w_aba     ror_w_aba     adc_w_abl
+bvs_rel       adc_w_idy     adc_w_zpi     adc_w_dsy     stz_w_zpx     adc_w_zpx     ror_w_zpx     adc_w_ziy     sei_imp       adc_w_aby     ply_w_imp     tdc_imp       jmp_iax       adc_w_abx     ror_w_abx     adc_w_alx
+bra_rel       sta_w_idx     brl_rell      sta_w_ds      sty_w_zpg     sta_w_zpg     stx_w_zpg     sta_w_zil     dey_w_imp     bit_w_imm16   txa_w_imp     phb_imp       sty_w_aba     sta_w_aba     stx_w_aba     sta_w_abl
+bcc_rel       sta_w_idy     sta_w_zpi     sta_w_dsy     sty_w_zpx     sta_w_zpx     stx_w_zpy     sta_w_ziy     tya_w_imp     sta_w_aby     txs_imp       txy_w_imp     stz_w_aba     sta_w_abx     stz_w_abx     sta_w_alx
+ldy_w_imm16   lda_w_idx     ldx_w_imm16   lda_w_ds      ldy_w_zpg     lda_w_zpg     ldx_w_zpg     lda_w_zil     tay_w_imp     lda_w_imm16   tax_w_imp     plb_imp       ldy_w_aba     lda_w_aba     ldx_w_aba     lda_w_abl
+bcs_rel       lda_w_idy     lda_w_zpi     lda_w_dsy     ldy_w_zpx     lda_w_zpx     ldx_w_zpy     lda_w_ziy     clv_imp       lda_w_aby     tsx_w_imp     tyx_w_imp     ldy_w_abx     lda_w_abx     ldx_w_aby     lda_w_alx
+cpy_w_imm16   cmp_w_idx     rep_imm       cmp_w_ds      cpy_w_zpg     cmp_w_zpg     dec_w_zpg     cmp_w_zil     iny_w_imp     cmp_w_imm16   dex_w_imp     wai_imp       cpy_w_aba     cmp_w_aba     dec_w_aba     cmp_w_abl
+bne_rel       cmp_w_idy     cmp_w_zpi     cmp_w_dsy     pei_zpg       cmp_w_zpx     dec_w_zpx     cmp_w_ziy     cld_imp       cmp_w_aby     phx_w_imp     stp_imp       jml_ind       cmp_w_abx     dec_w_abx     cmp_w_alx
+cpx_w_imm16   sbc_w_idx     sep_imm       sbc_w_ds      cpx_w_zpg     sbc_w_zpg     inc_w_zpg     sbc_w_zil     inx_w_imp     sbc_w_imm16   nop_imp       xba_imp       cpx_w_aba     sbc_w_aba     inc_w_aba     sbc_w_abl
+beq_rel       sbc_w_idy     sbc_w_zpi     sbc_w_dsy     pea_imm16     sbc_w_zpx     inc_w_zpx     sbc_w_ziy     sed_imp       sbc_w_aby     plx_w_imp     xce_imp       jsr_iax       sbc_w_abx     inc_w_abx     sbc_w_alx
+# bank 0x200 -- native M1X0
+brk_imm       ora_idx       cop_imm       ora_ds        tsb_zpg       ora_zpg       asl_zpg       ora_zil       php_imp       ora_imm       asl_acc       phd_imp       tsb_aba       ora_aba       asl_aba       ora_abl
+bpl_rel       ora_idy       ora_zpi       ora_dsy       trb_zpg       ora_zpx       asl_zpx       ora_ziy       clc_imp       ora_aby       inc_acc       tcs_imp       trb_aba       ora_abx       asl_abx       ora_alx
+jsr_adr       and_idx       jsl_abl       and_ds        bit_zpg       and_zpg       rol_zpg       and_zil       plp_imp       and_imm       rol_acc       pld_imp       bit_aba       and_aba       rol_aba       and_abl
+bmi_rel       and_idy       and_zpi       and_dsy       bit_zpx       and_zpx       rol_zpx       and_ziy       sec_imp       and_aby       dec_acc       tsc_imp       bit_abx       and_abx       rol_abx       and_alx
+rti_imp       eor_idx       wdm_imm       eor_ds        mvp_w_dbf     eor_zpg       lsr_zpg       eor_zil       pha_imp       eor_imm       lsr_acc       phk_imp       jmp_adr       eor_aba       lsr_aba       eor_abl
+bvc_rel       eor_idy       eor_zpi       eor_dsy       mvn_w_dbf     eor_zpx       lsr_zpx       eor_ziy       cli_imp       eor_aby       phy_w_imp     tcd_imp       jmp_abl       eor_abx       lsr_abx       eor_alx
+rts_imp       adc_idx       per_rell      adc_ds        stz_zpg       adc_zpg       ror_zpg       adc_zil       pla_imp       adc_imm       ror_acc       rtl_imp       jmp_ind       adc_aba       ror_aba       adc_abl
+bvs_rel       adc_idy       adc_zpi       adc_dsy       stz_zpx       adc_zpx       ror_zpx       adc_ziy       sei_imp       adc_aby       ply_w_imp     tdc_imp       jmp_iax       adc_abx       ror_abx       adc_alx
+bra_rel       sta_idx       brl_rell      sta_ds        sty_w_zpg     sta_zpg       stx_w_zpg     sta_zil       dey_w_imp     bit_imm       txa_imp       phb_imp       sty_w_aba     sta_aba       stx_w_aba     sta_abl
+bcc_rel       sta_idy       sta_zpi       sta_dsy       sty_w_zpx     sta_zpx       stx_w_zpy     sta_ziy       tya_imp       sta_aby       txs_imp       txy_w_imp     stz_aba       sta_abx       stz_abx       sta_alx
+ldy_w_imm16   lda_idx       ldx_w_imm16   lda_ds        ldy_w_zpg     lda_zpg       ldx_w_zpg     lda_zil       tay_w_imp     lda_imm       tax_w_imp     plb_imp       ldy_w_aba     lda_aba       ldx_w_aba     lda_abl
+bcs_rel       lda_idy       lda_zpi       lda_dsy       ldy_w_zpx     lda_zpx       ldx_w_zpy     lda_ziy       clv_imp       lda_aby       tsx_w_imp     tyx_w_imp     ldy_w_abx     lda_abx       ldx_w_aby     lda_alx
+cpy_w_imm16   cmp_idx       rep_imm       cmp_ds        cpy_w_zpg     cmp_zpg       dec_zpg       cmp_zil       iny_w_imp     cmp_imm       dex_w_imp     wai_imp       cpy_w_aba     cmp_aba       dec_aba       cmp_abl
+bne_rel       cmp_idy       cmp_zpi       cmp_dsy       pei_zpg       cmp_zpx       dec_zpx       cmp_ziy       cld_imp       cmp_aby       phx_w_imp     stp_imp       jml_ind       cmp_abx       dec_abx       cmp_alx
+cpx_w_imm16   sbc_idx       sep_imm       sbc_ds        cpx_w_zpg     sbc_zpg       inc_zpg       sbc_zil       inx_w_imp     sbc_imm       nop_imp       xba_imp       cpx_w_aba     sbc_aba       inc_aba       sbc_abl
+beq_rel       sbc_idy       sbc_zpi       sbc_dsy       pea_imm16     sbc_zpx       inc_zpx       sbc_ziy       sed_imp       sbc_aby       plx_w_imp     xce_imp       jsr_iax       sbc_abx       inc_abx       sbc_alx
+# bank 0x300 -- native M0X1
+brk_imm       ora_w_idx     cop_imm       ora_w_ds      tsb_w_zpg     ora_w_zpg     asl_w_zpg     ora_w_zil     php_imp       ora_w_imm16   asl_w_acc     phd_imp       tsb_w_aba     ora_w_aba     asl_w_aba     ora_w_abl
+bpl_rel       ora_w_idy     ora_w_zpi     ora_w_dsy     trb_w_zpg     ora_w_zpx     asl_w_zpx     ora_w_ziy     clc_imp       ora_w_aby     inc_w_acc     tcs_imp       trb_w_aba     ora_w_abx     asl_w_abx     ora_w_alx
+jsr_adr       and_w_idx     jsl_abl       and_w_ds      bit_w_zpg     and_w_zpg     rol_w_zpg     and_w_zil     plp_imp       and_w_imm16   rol_w_acc     pld_imp       bit_w_aba     and_w_aba     rol_w_aba     and_w_abl
+bmi_rel       and_w_idy     and_w_zpi     and_w_dsy     bit_w_zpx     and_w_zpx     rol_w_zpx     and_w_ziy     sec_imp       and_w_aby     dec_w_acc     tsc_imp       bit_w_abx     and_w_abx     rol_w_abx     and_w_alx
+rti_imp       eor_w_idx     wdm_imm       eor_w_ds      mvp_dbf       eor_w_zpg     lsr_w_zpg     eor_w_zil     pha_w_imp     eor_w_imm16   lsr_w_acc     phk_imp       jmp_adr       eor_w_aba     lsr_w_aba     eor_w_abl
+bvc_rel       eor_w_idy     eor_w_zpi     eor_w_dsy     mvn_dbf       eor_w_zpx     lsr_w_zpx     eor_w_ziy     cli_imp       eor_w_aby     phy_imp       tcd_imp       jmp_abl       eor_w_abx     lsr_w_abx     eor_w_alx
+rts_imp       adc_w_idx     per_rell      adc_w_ds      stz_w_zpg     adc_w_zpg     ror_w_zpg     adc_w_zil     pla_w_imp     adc_w_imm16   ror_w_acc     rtl_imp       jmp_ind       adc_w_aba     ror_w_aba     adc_w_abl
+bvs_rel       adc_w_idy     adc_w_zpi     adc_w_dsy     stz_w_zpx     adc_w_zpx     ror_w_zpx     adc_w_ziy     sei_imp       adc_w_aby     ply_imp       tdc_imp       jmp_iax       adc_w_abx     ror_w_abx     adc_w_alx
+bra_rel       sta_w_idx     brl_rell      sta_w_ds      sty_zpg       sta_w_zpg     stx_zpg       sta_w_zil     dey_imp       bit_w_imm16   txa_w_imp     phb_imp       sty_aba       sta_w_aba     stx_aba       sta_w_abl
+bcc_rel       sta_w_idy     sta_w_zpi     sta_w_dsy     sty_zpx       sta_w_zpx     stx_zpy       sta_w_ziy     tya_w_imp     sta_w_aby     txs_imp       txy_imp       stz_w_aba     sta_w_abx     stz_w_abx     sta_w_alx
+ldy_imm       lda_w_idx     ldx_imm       lda_w_ds      ldy_zpg       lda_w_zpg     ldx_zpg       lda_w_zil     tay_imp       lda_w_imm16   tax_imp       plb_imp       ldy_aba       lda_w_aba     ldx_aba       lda_w_abl
+bcs_rel       lda_w_idy     lda_w_zpi     lda_w_dsy     ldy_zpx       lda_w_zpx     ldx_zpy       lda_w_ziy     clv_imp       lda_w_aby     tsx_imp       tyx_imp       ldy_abx       lda_w_abx     ldx_aby       lda_w_alx
+cpy_imm       cmp_w_idx     rep_imm       cmp_w_ds      cpy_zpg       cmp_w_zpg     dec_w_zpg     cmp_w_zil     iny_imp       cmp_w_imm16   dex_imp       wai_imp       cpy_aba       cmp_w_aba     dec_w_aba     cmp_w_abl
+bne_rel       cmp_w_idy     cmp_w_zpi     cmp_w_dsy     pei_zpg       cmp_w_zpx     dec_w_zpx     cmp_w_ziy     cld_imp       cmp_w_aby     phx_imp       stp_imp       jml_ind       cmp_w_abx     dec_w_abx     cmp_w_alx
+cpx_imm       sbc_w_idx     sep_imm       sbc_w_ds      cpx_zpg       sbc_w_zpg     inc_w_zpg     sbc_w_zil     inx_imp       sbc_w_imm16   nop_imp       xba_imp       cpx_aba       sbc_w_aba     inc_w_aba     sbc_w_abl
+beq_rel       sbc_w_idy     sbc_w_zpi     sbc_w_dsy     pea_imm16     sbc_w_zpx     inc_w_zpx     sbc_w_ziy     sed_imp       sbc_w_aby     plx_imp       xce_imp       jsr_iax       sbc_w_abx     inc_w_abx     sbc_w_alx
+# bank 0x400 -- native M1X1
+brk_imm       ora_idx       cop_imm       ora_ds        tsb_zpg       ora_zpg       asl_zpg       ora_zil       php_imp       ora_imm       asl_acc       phd_imp       tsb_aba       ora_aba       asl_aba       ora_abl
+bpl_rel       ora_idy       ora_zpi       ora_dsy       trb_zpg       ora_zpx       asl_zpx       ora_ziy       clc_imp       ora_aby       inc_acc       tcs_imp       trb_aba       ora_abx       asl_abx       ora_alx
+jsr_adr       and_idx       jsl_abl       and_ds        bit_zpg       and_zpg       rol_zpg       and_zil       plp_imp       and_imm       rol_acc       pld_imp       bit_aba       and_aba       rol_aba       and_abl
+bmi_rel       and_idy       and_zpi       and_dsy       bit_zpx       and_zpx       rol_zpx       and_ziy       sec_imp       and_aby       dec_acc       tsc_imp       bit_abx       and_abx       rol_abx       and_alx
+rti_imp       eor_idx       wdm_imm       eor_ds        mvp_dbf       eor_zpg       lsr_zpg       eor_zil       pha_imp       eor_imm       lsr_acc       phk_imp       jmp_adr       eor_aba       lsr_aba       eor_abl
+bvc_rel       eor_idy       eor_zpi       eor_dsy       mvn_dbf       eor_zpx       lsr_zpx       eor_ziy       cli_imp       eor_aby       phy_imp       tcd_imp       jmp_abl       eor_abx       lsr_abx       eor_alx
+rts_imp       adc_idx       per_rell      adc_ds        stz_zpg       adc_zpg       ror_zpg       adc_zil       pla_imp       adc_imm       ror_acc       rtl_imp       jmp_ind       adc_aba       ror_aba       adc_abl
+bvs_rel       adc_idy       adc_zpi       adc_dsy       stz_zpx       adc_zpx       ror_zpx       adc_ziy       sei_imp       adc_aby       ply_imp       tdc_imp       jmp_iax       adc_abx       ror_abx       adc_alx
+bra_rel       sta_idx       brl_rell      sta_ds        sty_zpg       sta_zpg       stx_zpg       sta_zil       dey_imp       bit_imm       txa_imp       phb_imp       sty_aba       sta_aba       stx_aba       sta_abl
+bcc_rel       sta_idy       sta_zpi       sta_dsy       sty_zpx       sta_zpx       stx_zpy       sta_ziy       tya_imp       sta_aby       txs_imp       txy_imp       stz_aba       sta_abx       stz_abx       sta_alx
+ldy_imm       lda_idx       ldx_imm       lda_ds        ldy_zpg       lda_zpg       ldx_zpg       lda_zil       tay_imp       lda_imm       tax_imp       plb_imp       ldy_aba       lda_aba       ldx_aba       lda_abl
+bcs_rel       lda_idy       lda_zpi       lda_dsy       ldy_zpx       lda_zpx       ldx_zpy       lda_ziy       clv_imp       lda_aby       tsx_imp       tyx_imp       ldy_abx       lda_abx       ldx_aby       lda_alx
+cpy_imm       cmp_idx       rep_imm       cmp_ds        cpy_zpg       cmp_zpg       dec_zpg       cmp_zil       iny_imp       cmp_imm       dex_imp       wai_imp       cpy_aba       cmp_aba       dec_aba       cmp_abl
+bne_rel       cmp_idy       cmp_zpi       cmp_dsy       pei_zpg       cmp_zpx       dec_zpx       cmp_ziy       cld_imp       cmp_aby       phx_imp       stp_imp       jml_ind       cmp_abx       dec_abx       cmp_alx
+cpx_imm       sbc_idx       sep_imm       sbc_ds        cpx_zpg       sbc_zpg       inc_zpg       sbc_zil       inx_imp       sbc_imm       nop_imp       xba_imp       cpx_aba       sbc_aba       inc_aba       sbc_abl
+beq_rel       sbc_idy       sbc_zpi       sbc_dsy       pea_imm16     sbc_zpx       inc_zpx       sbc_ziy       sed_imp       sbc_aby       plx_imp       xce_imp       jsr_iax       sbc_abx       inc_abx       sbc_alx
+reset

@@ -62,6 +62,7 @@ private:
 	required_device<pc_lpt_device> m_lpt;
 	required_device<ns16450_device> m_serial;
 
+	u8 dir_r();
 	void dor_w(u8 data);
 	void fdc_irq_w(int state);
 	void fdc_drq_w(int state);

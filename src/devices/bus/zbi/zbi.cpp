@@ -112,9 +112,9 @@ void zbi_bus_device::busack_w(int state)
 		if (entry.busdaisy_req_state() == ASSERT_LINE)
 		{
 			if (state)
-				entry.busdaisy_req_ack();	// Acknowledge request
+				entry.busdaisy_req_ack();   // Acknowledge request
 			else
-				busreq_w(ASSERT_LINE);		// Trigger bus request on behalf of waiting device
+				busreq_w(ASSERT_LINE);      // Trigger bus request on behalf of waiting device
 
 			break;
 		}
@@ -211,7 +211,12 @@ void zbi_bus_device::ram32_w(offs_t offset, uint32_t data, uint32_t mask)
 uint16_t zbi_bus_device::viack_r()
 {
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	return intf ? intf->z80daisy_irq_ack() : 0;
+	uint16_t vec = intf ? intf->z80daisy_irq_ack() : 0;
+	// The ack changed the acked device's daisy state (INT -> IEO), so the VI
+	// request line must be re-evaluated -- otherwise it stays asserted and the
+	// CPU takes a phantom vectored interrupt that no device owns.
+	vi_w(CLEAR_LINE);
+	return vec;
 }
 
 uint16_t zbi_bus_device::nviack_r()

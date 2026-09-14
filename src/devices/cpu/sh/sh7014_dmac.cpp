@@ -356,7 +356,9 @@ TIMER_CALLBACK_MEMBER( sh7014_dmac_channel_device::dma_timer_callback )
 
 void sh7014_dmac_channel_device::dma_check()
 {
-	if (!m_dmac->is_transfer_allowed()) {
+	// a transfer runs only while DE and DME are both set, the transfer end
+	// flag is clear and neither error flag is up
+	if (!m_dmac->is_transfer_allowed() || !is_enabled() || (m_chcr & CHCR_TE) != 0) {
 		if (m_dma_timer_active) {
 			LOG("SH7014: DMA %d cancelled in-flight\n", m_channel_id);
 			m_dma_current_active_timer->adjust(attotime::never);

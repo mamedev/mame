@@ -201,6 +201,7 @@ const z8002_device::Z8000_init z8002_device::table[] = {
 	{ 0x4d16, 0x4df6, 16, 2,  15, &z8002_device::Z4D_ddN0_0110_addr },
 	{ 0x4d18, 0x4df8, 16, 2,  12, &z8002_device::Z4D_ddN0_1000_addr },
 	{ 0x4e11, 0x4ef0, 16, 2,  12, &z8002_device::Z4E_ddN0_ssN0_addr },
+	{ 0x4f00, 0x4fff,  1, 1,  10, &z8002_device::Z4F_ext },
 	{ 0x5000, 0x500f,  1, 2,  15, &z8002_device::Z50_0000_dddd_addr },
 	{ 0x5010, 0x50ff,  1, 2,  16, &z8002_device::Z50_ssN0_dddd_addr },
 	{ 0x5110, 0x51f0, 16, 2,  21, &z8002_device::Z51_ddN0_0000_addr },

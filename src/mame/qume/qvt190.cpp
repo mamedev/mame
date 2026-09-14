@@ -127,7 +127,7 @@ void qvt190_state::qvt190(machine_config &config)
 
 	ACIA6850(config, "acia2");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16.6698_MHz_XTAL, 882, 18, 738, 315, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

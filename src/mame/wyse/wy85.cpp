@@ -351,7 +351,7 @@ void wy85_state::wy85(machine_config &config)
 
 	WYSE_KEYBOARD(config, m_kybd, wy85_keyboards, "wy85");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(48.5568_MHz_XTAL / 3, 96 * 10, 0, 80 * 10, 281, 0, 260);
 	//screen.set_raw(48.5568_MHz_XTAL / 2, 160 * 9, 0, 132 * 9, 281, 0, 260);

@@ -1829,7 +1829,7 @@ void model1_state::model1(machine_config &config)
 
 	S24TILE(config, m_tiles, 0, 0x3fff).set_palette(m_palette);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(XTAL(16'000'000), 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
 	m_screen->set_screen_update(FUNC(model1_state::screen_update_model1));

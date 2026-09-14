@@ -818,7 +818,7 @@ void atarisy4_state::atarisy4(machine_config &config)
 	m_dsp0->set_addrmap(AS_IO, &atarisy4_state::dsp0_io_map);
 	m_dsp0->bio().set(FUNC(atarisy4_state::dsp0_bio_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(32'000'000/2, 660, 0, 512, 404, 0, 384);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_screen_update(FUNC(atarisy4_state::screen_update_atarisy4));

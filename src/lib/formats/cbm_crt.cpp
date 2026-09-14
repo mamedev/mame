@@ -136,7 +136,7 @@ static char const *const CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 //  cbm_crt_get_card - get slot interface card
 //-------------------------------------------------
 
-std::string cbm_crt_get_card(util::core_file &file)
+std::string cbm_crt_get_card(util::read_stream &file)
 {
 	// read the header
 	cbm_crt_header header;
@@ -157,7 +157,7 @@ std::string cbm_crt_get_card(util::core_file &file)
 //  cbm_crt_read_header - read cartridge header
 //-------------------------------------------------
 
-bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_size, int *exrom, int *game)
+bool cbm_crt_read_header(util::random_read &file, size_t *roml_size, size_t *romh_size, int *exrom, int *game)
 {
 	std::error_condition err;
 	size_t actual;
@@ -185,11 +185,15 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 	}
 
 	// determine ROM region lengths
-	while (!file.eof())
+	while (true)
 	{
 		cbm_crt_chip chip;
 		std::tie(err, actual) = read(file, &chip, CRT_CHIP_LENGTH);
-		if (err || (CRT_CHIP_LENGTH != actual))
+		if (err)
+			return false;
+		else if (!actual)
+			break;
+		else if (CRT_CHIP_LENGTH != actual)
 			return false;
 
 		const uint16_t address = get_u16be(chip.start_address);
@@ -223,7 +227,7 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 //  cbm_crt_read_data - read cartridge data
 //-------------------------------------------------
 
-bool cbm_crt_read_data(util::core_file &file, uint8_t *roml, uint8_t *romh)
+bool cbm_crt_read_data(util::random_read &file, uint8_t *roml, uint8_t *romh)
 {
 	if (file.seek(CRT_HEADER_LENGTH, SEEK_SET))
 		return false;
@@ -231,14 +235,18 @@ bool cbm_crt_read_data(util::core_file &file, uint8_t *roml, uint8_t *romh)
 	uint32_t roml_offset = 0;
 	uint32_t romh_offset = 0;
 
-	while (!file.eof())
+	while (true)
 	{
 		std::error_condition err;
 		size_t actual;
 
 		cbm_crt_chip chip;
 		std::tie(err, actual) = read(file, &chip, CRT_CHIP_LENGTH);
-		if (err || (CRT_CHIP_LENGTH != actual))
+		if (err)
+			return false;
+		else if (!actual)
+			break;
+		else if (CRT_CHIP_LENGTH != actual)
 			return false;
 
 		const uint16_t address = get_u16be(chip.start_address);

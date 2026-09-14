@@ -474,7 +474,7 @@ void rltennis_state::rltennis(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rltennis_state::rltennis_main);
 	m_maincpu->set_vblank_int("screen", FUNC(rltennis_state::interrupt));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(RLT_REFRESH_RATE);
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 319, 0, 239);

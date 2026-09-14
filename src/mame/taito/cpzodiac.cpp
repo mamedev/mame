@@ -134,7 +134,7 @@ void cpzodiac_state::main_map(address_map &map)
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram().share("vram"); // video?
 	map(0xe000, 0xe00f).rw("io", FUNC(te7750_device::read), FUNC(te7750_device::write));
-//	map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
+//  map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
 	map(0xe020, 0xe020).w("syt", FUNC(tc0140syt_device::master_port_w));
 	map(0xe021, 0xe021).rw("syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
@@ -253,7 +253,7 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 
 	/* video hardware */
 	// TODO
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64, 32);

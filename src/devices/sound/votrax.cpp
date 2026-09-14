@@ -1025,7 +1025,7 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 {
 	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 + k2*s)
 	double k0 = m_cclock * c2t;
-	double k1 = m_cclock * (c1b * c3 / c2t - c2t);
+	double k1 = m_cclock * (c1b * c3 / c2t + c2t);
 	double k2 = c2b;
 
 	// Don't pre-warp

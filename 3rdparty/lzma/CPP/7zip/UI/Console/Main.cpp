@@ -16,7 +16,7 @@
 
 #else // Z7_OLD_WIN_SDK
 
-typedef struct _PROCESS_MEMORY_COUNTERS {
+typedef struct {
     DWORD cb;
     DWORD PageFaultCount;
     SIZE_T PeakWorkingSetSize;
@@ -114,7 +114,7 @@ DECLARE_AND_SET_CLIENT_VERSION_VAR
 #elif defined(Z7_PROG_VARIANT_R)
   #define PROG_POSTFIX      "r"
   #define PROG_POSTFIX_2  " (r)"
-#elif !defined(Z7_EXTERNAL_CODECS)
+#elif defined(Z7_PROG_VARIANT_A) || !defined(Z7_EXTERNAL_CODECS)
   #define PROG_POSTFIX      "a"
   #define PROG_POSTFIX_2  " (a)"
 #else
@@ -148,15 +148,15 @@ static const char * const kHelpString =
     "\n"
     "<Switches>\n"
     "  -- : Stop switches and @listfile parsing\n"
-    "  -ai[r[-|0]]{@listfile|!wildcard} : Include archives\n"
-    "  -ax[r[-|0]]{@listfile|!wildcard} : eXclude archives\n"
+    "  -ai[r[-|0]][m[-|2]][w[-]]{@listfile|!wildcard} : Include archives\n"
+    "  -ax[r[-|0]][m[-|2]][w[-]]{@listfile|!wildcard} : eXclude archives\n"
     "  -ao{a|s|t|u} : set Overwrite mode\n"
     "  -an : disable archive_name field\n"
     "  -bb[0-3] : set output log level\n"
     "  -bd : disable progress indicator\n"
     "  -bs{o|e|p}{0|1|2} : set output stream for output/error/progress line\n"
     "  -bt : show execution time statistics\n"
-    "  -i[r[-|0]]{@listfile|!wildcard} : Include filenames\n"
+    "  -i[r[-|0]][m[-|2]][w[-]]{@listfile|!wildcard} : Include filenames\n"
     "  -m{Parameters} : set compression Method\n"
     "    -mmt[N] : set number of CPU threads\n"
     "    -mx[N] : set compression level: -mx1 (fastest) ... -mx9 (ultra)\n"
@@ -168,7 +168,14 @@ static const char * const kHelpString =
     "  -sa{a|e|s} : set Archive name mode\n"
     "  -scc{UTF-8|WIN|DOS} : set charset for console input/output\n"
     "  -scs{UTF-8|UTF-16LE|UTF-16BE|WIN|DOS|{id}} : set charset for list files\n"
-    "  -scrc[CRC32|CRC64|SHA1|SHA256|*] : set hash function for x, e, h commands\n"
+    "  -scrc[CRC32|CRC64|SHA256"
+#ifndef Z7_PROG_VARIANT_R
+    "|SHA1|XXH64"
+#ifdef Z7_PROG_VARIANT_Z
+    "|BLAKE2SP"
+#endif
+#endif
+    "|*] : set hash function for x, e, h commands\n"
     "  -sdel : delete files after compression\n"
     "  -seml[.] : send archive by email\n"
     "  -sfx[{name}] : Create SFX archive\n"
@@ -194,7 +201,7 @@ static const char * const kHelpString =
     "  -u[-][p#][q#][r#][x#][y#][z#][!newArchiveName] : Update options\n"
     "  -v{Size}[b|k|m|g] : Create volumes\n"
     "  -w[{path}] : assign Work directory. Empty path means a temporary directory\n"
-    "  -x[r[-|0]]{@listfile|!wildcard} : eXclude filenames\n"
+    "  -x[r[-|0]][m[-|2]][w[-]]{@listfile|!wildcard} : eXclude filenames\n"
     "  -y : assume Yes on all queries\n";
 
 // ---------------------------
@@ -206,7 +213,9 @@ static const char * const kNoFormats = "7-Zip cannot find the code that works wi
 static const char * const kUnsupportedArcTypeMessage = "Unsupported archive type";
 // static const char * const kUnsupportedUpdateArcType = "Can't create archive for that type";
 
+#ifndef Z7_EXTRACT_ONLY
 #define kDefaultSfxModule "7zCon.sfx"
+#endif
 
 Z7_ATTR_NORETURN
 static void ShowMessageAndThrowException(LPCSTR message, NExitCode::EEnum code)
@@ -244,9 +253,49 @@ static void ShowProgInfo(CStdOutStream *so)
 
   #ifdef __ARM_ARCH
   << " arm_v:" << __ARM_ARCH
+  #if (__ARM_ARCH == 8)
+    // for macos:
+    #if   defined(__ARM_ARCH_8_9__)
+      << ".9"
+    #elif defined(__ARM_ARCH_8_8__)
+      << ".8"
+    #elif defined(__ARM_ARCH_8_7__)
+      << ".7"
+    #elif defined(__ARM_ARCH_8_6__)
+      << ".6"
+    #elif defined(__ARM_ARCH_8_5__)
+      << ".5"
+    #elif defined(__ARM_ARCH_8_4__)
+      << ".4"
+    #elif defined(__ARM_ARCH_8_3__)
+      << ".3"
+    #elif defined(__ARM_ARCH_8_2__)
+      << ".2"
+    #elif defined(__ARM_ARCH_8_1__)
+      << ".1"
+    #endif
+  #endif
+    
+    #if defined(__ARM_ARCH_PROFILE) && \
+        (   __ARM_ARCH_PROFILE >= 'A' && __ARM_ARCH_PROFILE <= 'Z' \
+         || __ARM_ARCH_PROFILE >= 65  && __ARM_ARCH_PROFILE <= 65 + 25)
+      << "-" << (char)__ARM_ARCH_PROFILE
+    #endif
+
   #ifdef __ARM_ARCH_ISA_THUMB
   << " thumb:" << __ARM_ARCH_ISA_THUMB
   #endif
+  #endif
+
+  #ifdef _MIPS_ARCH
+  << " mips_arch:" << _MIPS_ARCH
+  #endif
+  #ifdef __mips_isa_rev
+  << " mips_isa_rev:" << __mips_isa_rev
+  #endif
+
+  #ifdef __iset__
+  << " e2k_v:" << __iset__
   #endif
   ;
 
@@ -380,16 +429,11 @@ static void PrintString(CStdOutStream &so, const UString &s, unsigned size)
     so << ' ';
 }
 
-static inline char GetHex(unsigned val)
-{
-  return (char)((val < 10) ? ('0' + val) : ('A' + (val - 10)));
-}
-
 static void PrintWarningsPaths(const CErrorPathCodes &pc, CStdOutStream &so)
 {
   FOR_VECTOR(i, pc.Paths)
   {
-    so.NormalizePrint_UString(fs2us(pc.Paths[i]));
+    so.NormalizePrint_UString_Path(fs2us(pc.Paths[i]));
     so << " : ";
     so << NError::MyFormatMessage(pc.Codes[i]) << endl;
   }
@@ -570,6 +614,8 @@ static void PrintStat()
 
   #ifndef UNDER_CE
   
+Z7_DIAGNOSTIC_IGNORE_CAST_FUNCTION
+
   PROCESS_MEMORY_COUNTERS m;
   memset(&m, 0, sizeof(m));
   BOOL memDefined = FALSE;
@@ -753,6 +799,7 @@ static void PrintHexId(CStdOutStream &so, UInt64 id)
 }
 
 #ifndef _WIN32
+#include <sys/resource.h>
 void Set_ModuleDirPrefix_From_ProgArg0(const char *s);
 #endif
 
@@ -774,6 +821,27 @@ int Main2(
   #if defined(_WIN32) && !defined(UNDER_CE)
   SetFileApisToOEM();
   #endif
+
+#if 1 && !defined(_WIN32)
+  {
+    // We increase RLIMIT_NOFILE because a high limit makes it easier for 7-Zip to work with multi-volume archives.
+    struct rlimit a;
+    const int kType = RLIMIT_NOFILE;
+    if (!getrlimit(kType, &a))
+    {
+      // printf("\nrlim_cur=%8lld rlim_max=%8lld \n", (long long)a.rlim_cur, (long long)a.rlim_max);
+      unsigned newVal = 1 << 12; // rlim_t : it's new soft limit
+      if (newVal > a.rlim_cur && a.rlim_cur < a.rlim_max)
+      {
+        if (newVal > a.rlim_max)
+          newVal = (unsigned)a.rlim_max;
+        a.rlim_cur = newVal;
+        setrlimit(kType, &a);
+        // if (!getrlimit(kType, &a)) printf("\nrlim_cur=%8lld rlim_max=%8lld \n", (long long)a.rlim_cur, (long long)a.rlim_max);
+      }
+    }
+  }
+#endif
 
   #ifdef ENV_HAVE_LOCALE
   // printf("\nBefore SetLocale() : %s\n", IsNativeUtf8() ? "NATIVE UTF-8" : "IS NOT NATIVE UTF-8");
@@ -811,11 +879,11 @@ int Main2(
     for (int i = 0; i < numArgs; i++)
     {
       AString a (args[i]);
-      /*
+#if 0
       printf("\n%d %s :", i, a.Ptr());
       for (unsigned k = 0; k < a.Len(); k++)
         printf(" %2x", (unsigned)(Byte)a[k]);
-      */
+#endif
       const UString s = MultiByteToUnicodeString(a);
       commandStrings.Add(s);
     }
@@ -862,9 +930,12 @@ int Main2(
 
   if (options.EnableHeaders)
   {
-    ShowCopyrightAndHelp(g_StdStream, false);
-    if (!parser.Parse1Log.IsEmpty())
-      *g_StdStream << parser.Parse1Log;
+    if (g_StdStream)
+    {
+      ShowCopyrightAndHelp(g_StdStream, false);
+      if (!parser.Parse1Log.IsEmpty())
+        *g_StdStream << parser.Parse1Log;
+    }
   }
 
   parser.Parse2(options);
@@ -907,6 +978,8 @@ int Main2(
     if (stderr_cp != -1) g_StdErr.CodePage = stderr_cp;
     if (stdin_cp != -1) g_StdIn.CodePage = stdin_cp;
   }
+  g_StdOut.ListPathSeparatorSlash = options.ListPathSeparatorSlash;
+  g_StdErr.ListPathSeparatorSlash = options.ListPathSeparatorSlash;
 
   unsigned percentsNameLevel = 1;
   if (options.LogLevel == 0 || options.Number_for_Percents != options.Number_for_Out)
@@ -921,15 +994,16 @@ int Main2(
     #if !defined(UNDER_CE)
     CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
     if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &consoleInfo))
-      consoleWidth = (unsigned)(unsigned short)consoleInfo.dwSize.X;
+      consoleWidth = (USHORT)consoleInfo.dwSize.X;
     #endif
     
     #else
     
+#if !defined(__sun)
     struct winsize w;
     if (ioctl(0, TIOCGWINSZ, &w) == 0)
       consoleWidth = w.ws_col;
-    
+#endif
     #endif
   }
 
@@ -1080,7 +1154,7 @@ int Main2(
         {
           s += " (";
           s += ext.AddExt;
-          s += ')';
+          s.Add_Char(')');
         }
       }
       
@@ -1103,15 +1177,15 @@ int Main2(
         {
           if (j != 0)
             so << ' ';
-          Byte b = sig[j];
+          const unsigned b = sig.ConstData()[j];
           if (b > 0x20 && b < 0x80)
           {
             so << (char)b;
           }
           else
           {
-            so << GetHex((b >> 4) & 0xF);
-            so << GetHex(b & 0xF);
+            so << GET_HEX_CHAR_UPPER(b >> 4);
+            so << GET_HEX_CHAR_UPPER(b & 15);
           }
         }
       }
@@ -1231,7 +1305,9 @@ int Main2(
     {
       CExtractScanConsole scan;
       
-      scan.Init(options.EnableHeaders ? g_StdStream : NULL, g_ErrStream, percentsStream);
+      scan.Init(options.EnableHeaders ? g_StdStream : NULL,
+          g_ErrStream, percentsStream,
+          options.DisablePercents);
       scan.SetWindowWidth(consoleWidth);
 
       if (g_StdStream && options.EnableHeaders)
@@ -1281,7 +1357,7 @@ int Main2(
       ecs->Password = options.Password;
       #endif
 
-      ecs->Init(g_StdStream, g_ErrStream, percentsStream);
+      ecs->Init(g_StdStream, g_ErrStream, percentsStream, options.DisablePercents);
       ecs->MultiArcMode = (ArchivePathsSorted.Size() > 1);
 
       ecs->LogLevel = options.LogLevel;
@@ -1445,6 +1521,7 @@ int Main2(
       CListOptions lo;
       lo.ExcludeDirItems = options.Censor.ExcludeDirItems;
       lo.ExcludeFileItems = options.Censor.ExcludeFileItems;
+      lo.DisablePercents = options.DisablePercents;
 
       hresultMain = ListArchives(
           lo,
@@ -1481,12 +1558,15 @@ int Main2(
   }
   else if (options.Command.IsFromUpdateGroup())
   {
+   #ifdef Z7_EXTRACT_ONLY
+    throw "update commands are not implemented";
+   #else
     CUpdateOptions &uo = options.UpdateOptions;
     if (uo.SfxMode && uo.SfxModule.IsEmpty())
       uo.SfxModule = kDefaultSfxModule;
 
     COpenCallbackConsole openCallback;
-    openCallback.Init(g_StdStream, g_ErrStream, percentsStream);
+    openCallback.Init(g_StdStream, g_ErrStream, percentsStream, options.DisablePercents);
 
     #ifndef Z7_NO_CRYPTO
     bool passwordIsDefined =
@@ -1511,7 +1591,7 @@ int Main2(
     callback.StdOutMode = uo.StdOutMode;
     callback.Init(
       // NULL,
-      g_StdStream, g_ErrStream, percentsStream);
+      g_StdStream, g_ErrStream, percentsStream, options.DisablePercents);
 
     CUpdateErrorInfo errorInfo;
 
@@ -1536,6 +1616,7 @@ int Main2(
         g_StdStream, se,
         true // options.EnableHeaders
         );
+   #endif
   }
   else if (options.Command.CommandType == NCommandType::kHash)
   {
@@ -1545,7 +1626,7 @@ int Main2(
     if (percentsStream)
       callback.SetWindowWidth(consoleWidth);
   
-    callback.Init(g_StdStream, g_ErrStream, percentsStream);
+    callback.Init(g_StdStream, g_ErrStream, percentsStream, options.DisablePercents);
     callback.PrintHeaders = options.EnableHeaders;
     callback.PrintFields = options.ListFields;
 

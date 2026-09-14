@@ -651,7 +651,7 @@ void mbee_state::mbee(machine_config &config)
 	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250)); /* not accurate */
 	m_screen->set_size(64*8, 19*16);           /* need at least 17 lines for NET */
@@ -719,7 +719,7 @@ void mbee_state::mbeeic(machine_config &config)
 	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250)); /* not accurate */
 	m_screen->set_size(80*8, 310);

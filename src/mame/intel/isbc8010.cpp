@@ -200,7 +200,7 @@ void isbc8010_state::isbc8010(machine_config &config)
 	/* video hardware */
 	// 96364 crt controller
 
-//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen_device &screen(SCREEN(config, "screen"));
 //  screen.set_refresh_hz(60);
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
 	   Each scanline is composed of 65 character times, 40 of which

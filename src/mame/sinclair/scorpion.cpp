@@ -802,7 +802,7 @@ void scorpiongmx_state::port_7efd_w(u8 data)
 	m_screen->configure((SPEC_CYCLES_PER_LINE * 2) << m_gfx_ext, m_screen->height()
 		, {scr.left() - broder.left(), scr.right() + broder.right()
 		, scr.top() - broder.top(), scr.bottom() + broder.bottom()}
-		, m_screen->frame_period().as_attoseconds());
+		, m_screen->frame_period());
 
 	m_magic_disabled = BIT(data, 2);
 

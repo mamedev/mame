@@ -625,10 +625,10 @@
 		<image>
 			<data>
 				<![CDATA[
-					<svg width="45" height="100" viewBox="0 0 45 100"><svg x="0" y="0" width="45" height="100" viewBox="0 0 45 100">
+					<svg width="45" height="100" viewBox="0 0 45 100">
 						<path d="M0,0V70C0,90 15,100 25,100 36,100 45,92 45,82 45,63 25,50 25,20V0Z" fill="#878787" stroke="none" />
 						<path d="M3.5,0V70C3.5,88.25 17.33333,96.5 25,96.5 34.30303,96.5 41.5,89.9 41.5,82 41.5,73.72807 36.97898,66.27187 31.91211,56.77148 26.84524,47.2711 21.5,35.77778 21.5,20V0Z" fill="#bbbbbb" stroke="none" />
-					</svg></svg>
+					</svg>
 				]]></data>
 			<color state="0" red="1" green="1" blue="1" />
 			<color state="1" red="0.78431" green="0.78431" blue="0.78431" />
@@ -638,10 +638,10 @@
 		<image>
 			<data>
 				<![CDATA[
-					<svg width="45" height="100" viewBox="0 0 45 100"><svg x="0" y="0" width="45" height="100" viewBox="0 0 45 100">
+					<svg width="45" height="100" viewBox="0 0 45 100">
 						<path d="M45,0V70C45,90 30,100 20,100 9,100 0,92 0,82 0,63 20,50 20,20V0Z" fill="#878787" stroke="none" />
 						<path d="M41.5,0V70C41.5,88.25 27.66667,96.5 20,96.5 10.69697,96.5 3.5,89.9 3.5,82 3.5,73.72807 8.02102,66.27187 13.08789,56.77148 18.15476,47.2711 23.5,35.77778 23.5,20V0Z" fill="#bbbbbb" stroke="none" />
-					</svg></svg>
+					</svg>
 				]]></data>
 			<color state="0" red="1" green="1" blue="1" />
 			<color state="1" red="0.78431" green="0.78431" blue="0.78431" />

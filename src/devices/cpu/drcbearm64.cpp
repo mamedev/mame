@@ -440,6 +440,8 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept override;
+	virtual drccodeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return false; }
 
@@ -1829,6 +1831,16 @@ bool drcbe_arm64::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 void drcbe_arm64::hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
 {
 	m_hash.invalidate_range(pcstart, pcend);
+}
+
+drccodeptr drcbe_arm64::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
+{
+	return m_hash.code_exists(mode, pc) ? m_hash.get_codeptr(mode, pc) : nullptr;
+}
+
+bool drcbe_arm64::hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept
+{
+	return m_hash.set_codeptr(mode, pc, code);
 }
 
 void drcbe_arm64::get_info(drcbe_info &info) const noexcept
@@ -3721,9 +3733,9 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 				// save some instructions by avoid mov to register by computing the ror and storing it into scratch directly
 				uint64_t result;
 				if (inst.size() == 4)
-					result = rotr_32(srcp.immediate(), rot);
+					result = std::rotr<uint32_t>(srcp.immediate(), rot);
 				else
-					result = rotr_64(srcp.immediate(), rot);
+					result = std::rotr<uint64_t>(srcp.immediate(), rot);
 
 				a.mov(scratch, result);
 				a.bfi(dst, scratch, lsb, pop);
@@ -3765,9 +3777,9 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 
 			uint64_t result;
 			if (inst.size() == 4)
-				result = rotl_32(srcp.immediate(), s) & maskp.immediate();
+				result = std::rotl<uint32_t>(srcp.immediate(), s) & maskp.immediate();
 			else
-				result = rotl_64(srcp.immediate(), s) & maskp.immediate();
+				result = std::rotl<uint64_t>(srcp.immediate(), s) & maskp.immediate();
 
 			if (result != 0)
 			{

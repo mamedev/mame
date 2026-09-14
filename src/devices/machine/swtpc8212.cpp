@@ -532,7 +532,7 @@ void swtpc8212_device::device_add_mconfig(machine_config &config)
 	m_uart->out_rts_callback().set(FUNC(swtpc8212_device::write_rts));
 	m_uart->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(17.0748_MHz_XTAL, 918, 0, 738, 310, 0, 280);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

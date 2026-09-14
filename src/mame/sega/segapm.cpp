@@ -111,8 +111,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(segapm_state::scanline_timer_cb)
 	bool int6_vbl = scanline == 224;
 
 	// only 68k irq valid, pushes stuff to a non-existant VDP, left-over?
-//	if (int6_vbl)
-//		m_maincpu->set_input_line(6, HOLD_LINE);
+//  if (int6_vbl)
+//      m_maincpu->set_input_line(6, HOLD_LINE);
 
 	m_32x->interrupt_cb(scanline, int6_vbl);
 
@@ -151,7 +151,7 @@ void segapm_state::segapm(machine_config &config)
 	m_32x->set_total_scanlines(262);
 
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK_NTSC / 8, 427, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segapm_state::screen_update));
 

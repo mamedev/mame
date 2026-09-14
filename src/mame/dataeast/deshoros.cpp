@@ -277,7 +277,7 @@ void destiny_state::destiny(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(destiny_state::irq0_line_hold), attotime::from_hz(50)); // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 
 	/* video hardware (dummy) */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16, 9*2);

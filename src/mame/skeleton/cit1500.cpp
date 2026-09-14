@@ -79,7 +79,7 @@ void cit1500_state::cit1500(machine_config &config)
 
 	//UPD7225(config, "cit1400");
 
-	//SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	//SCREEN(config, "screen").set_lcd();
 
 	//DS1302(config, "ds1302", 32.768_kHz_XTAL);
 }

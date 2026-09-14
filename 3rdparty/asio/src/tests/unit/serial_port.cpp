@@ -2,7 +2,7 @@
 // serial_port.cpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -90,7 +90,7 @@ void test()
     port1 = std::move(port2);
     port1 = std::move(port8);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     serial_port::executor_type ex = port1.get_executor();
     (void)ex;

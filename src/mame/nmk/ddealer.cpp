@@ -460,7 +460,7 @@ void ddealer_state::ddealer(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddealer);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL/2, 512, 28, 412, 278, 16, 240); // confirmed
 	screen.set_screen_update(FUNC(ddealer_state::screen_update));
 	screen.set_palette(m_palette);

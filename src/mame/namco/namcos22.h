@@ -178,6 +178,9 @@ private:
 	void free_scenenode(struct namcos22_scenenode *node);
 	struct namcos22_scenenode *alloc_scenenode(running_machine &machine, struct namcos22_scenenode *node);
 
+	using scanline_func = void (namcos22_renderer::*)(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+
+	void dispatch_scanline_poly(scanline_func callback, int clipverts, vertex_t const *clipv);
 	void renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 	void renderscanline_poly_ss22(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 	void renderscanline_sprite(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
@@ -479,9 +482,12 @@ protected:
 	u8 m_reflection = 0;
 	bool m_cullflip = false;
 	u8 m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES] = { };
-	int m_SurfaceNormalFormat = 0;
 	unsigned m_LitSurfaceCount = 0;
 	unsigned m_LitSurfaceIndex = 0;
+	int m_LitSurfaceWidth = 0;
+	int m_LitSurfaceIntensity = 0;
+	bool m_LitSurfaceGouraud = false;
+	bool m_LitSurfaceTriangles = false;
 	int m_pointrom_size = 0;
 	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;

@@ -1834,7 +1834,7 @@ void jaguar_state::cojagr3k(machine_config &config)
 	m_ide->irq_handler().set(FUNC(jaguar_state::external_int));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(COJAG_PIXEL_CLOCK / 2, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
@@ -1883,7 +1883,7 @@ void jaguar_state::jaguar(machine_config &config)
 //  MCFG_NVRAM_HANDLER(jaguar)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// TODO: vestigial, dynamically changed in jaguar_v anyway
 	m_screen->set_raw(JAGUAR_CLOCK / 2, 845, 101, 741, 262, 19, 248);

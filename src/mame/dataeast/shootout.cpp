@@ -550,7 +550,7 @@ void shootout_state::shootout(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &shootout_state::audio_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
 	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
 	screen.set_screen_update(FUNC(shootout_state::screen_update));
@@ -577,7 +577,7 @@ void shootoutj_state::shootoutj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &shootoutj_state::main_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
 	screen.set_raw (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
 	screen.set_screen_update(FUNC(shootoutj_state::screen_update));

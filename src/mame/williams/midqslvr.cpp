@@ -416,7 +416,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	m_voodoo2->set_status_cycles(1000);
 
 	// TODO: fix legacy raw setup here
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);

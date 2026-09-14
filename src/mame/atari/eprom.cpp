@@ -885,7 +885,7 @@ void eprom_state::eprom(machine_config &config)
 	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, eprom_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a SYNGEN chip to generate video signals
@@ -930,7 +930,7 @@ void eprom_state::klaxp(machine_config &config)
 	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, eprom_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a SYNGEN chip to generate video signals
@@ -979,7 +979,7 @@ void eprom_state::guts(machine_config &config)
 	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, eprom_state::s_guts_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a SYNGEN chip to generate video signals

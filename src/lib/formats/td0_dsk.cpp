@@ -946,13 +946,14 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			uint16_t size;
 			offset += 6;
 
-			sects[i].track       = hs[0];
-			sects[i].head        = hs[1];
-			sects[i].sector      = hs[2];
-			sects[i].size        = hs[3];
-			sects[i].deleted     = (hs[4] & 4) == 4;
+			sects[i].track        = hs[0];
+			sects[i].head         = hs[1];
+			sects[i].sector       = hs[2];
+			sects[i].size         = hs[3];
+			sects[i].deleted      = (hs[4] & 4) == 4;
 			sects[i].bad_data_crc = (hs[4] & 2) == 2;
 			sects[i].bad_addr_crc = false;
+			sects[i].weak         = false;
 
 			if(hs[4] & 0x30)
 				size = 0;

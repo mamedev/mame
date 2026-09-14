@@ -1022,7 +1022,7 @@ void sun3_state::sun3(machine_config &config)
 	M68020(config, m_maincpu, 16670000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	screen_device &bwtwo(SCREEN(config, "bwtwo"));
 	bwtwo.set_screen_update(NAME((&sun3_state::bw2_update<1152, 900>)));
 	bwtwo.set_size(1600,1100);
 	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
@@ -1132,7 +1132,7 @@ void sun3_state::sun3_50(machine_config &config)
 
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 
-	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	screen_device &bwtwo(SCREEN(config, "bwtwo"));
 	bwtwo.set_screen_update(FUNC(sun3_state::bw2_350_update));
 	bwtwo.set_size(1600,1100);
 	bwtwo.set_visarea(0, 1152-1, 0, 900-1);

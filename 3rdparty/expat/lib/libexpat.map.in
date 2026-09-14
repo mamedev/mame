@@ -1,0 +1,124 @@
+LIBEXPAT_1.0.0 {
+ global:
+  XML_DefaultCurrent;
+  XML_ErrorString;
+  XML_ExternalEntityParserCreate;
+  XML_GetBase;
+  XML_GetBuffer;
+  XML_GetCurrentByteIndex;
+  XML_GetCurrentColumnNumber;
+  XML_GetCurrentLineNumber;
+  XML_GetErrorCode;
+  XML_Parse;
+  XML_ParseBuffer;
+  XML_ParserCreate;
+  XML_ParserFree;
+  XML_SetBase;
+  XML_SetCharacterDataHandler;
+  XML_SetDefaultHandler;
+  XML_SetElementHandler;
+  XML_SetExternalEntityRefHandler;
+  XML_SetNotationDeclHandler;
+  XML_SetProcessingInstructionHandler;
+  XML_SetUnknownEncodingHandler;
+  XML_SetUnparsedEntityDeclHandler;
+  XML_SetUserData;
+  XML_UseParserAsHandlerArg;
+};
+
+LIBEXPAT_1.1.0 {
+ global:
+  XML_GetCurrentByteCount;
+  XML_GetSpecifiedAttributeCount;
+  XML_ParserCreateNS;
+  XML_SetCdataSectionHandler;
+  XML_SetCommentHandler;
+  XML_SetDefaultHandlerExpand;
+  XML_SetEncoding;
+  XML_SetExternalEntityRefHandlerArg;
+  XML_SetNamespaceDeclHandler;
+  XML_SetNotStandaloneHandler;
+} LIBEXPAT_1.0.0;
+
+LIBEXPAT_1.95.0 {
+ global:
+  XML_ExpatVersion;
+  XML_GetIdAttributeIndex;
+  XML_GetInputContext;
+  XML_ParserCreate_MM;
+  XML_SetAttlistDeclHandler;
+  XML_SetDoctypeDeclHandler;
+  XML_SetElementDeclHandler;
+  XML_SetEndCdataSectionHandler;
+  XML_SetEndDoctypeDeclHandler;
+  XML_SetEndElementHandler;
+  XML_SetEndNamespaceDeclHandler;
+  XML_SetEntityDeclHandler;
+  XML_SetParamEntityParsing;
+  XML_SetReturnNSTriplet;
+  XML_SetStartCdataSectionHandler;
+  XML_SetStartDoctypeDeclHandler;
+  XML_SetStartElementHandler;
+  XML_SetStartNamespaceDeclHandler;
+  XML_SetXmlDeclHandler;
+} LIBEXPAT_1.1.0;
+
+LIBEXPAT_1.95.3 {
+ global:
+  XML_ExpatVersionInfo;
+  XML_ParserReset;
+} LIBEXPAT_1.95.0;
+
+LIBEXPAT_1.95.4 {
+ global:
+  XML_SetSkippedEntityHandler;
+} LIBEXPAT_1.95.3;
+
+LIBEXPAT_1.95.5 {
+ global:
+  XML_GetFeatureList;
+  XML_UseForeignDTD;
+} LIBEXPAT_1.95.4;
+
+LIBEXPAT_1.95.6 {
+ global:
+  XML_FreeContentModel;
+  XML_MemFree;
+  XML_MemMalloc;
+  XML_MemRealloc;
+} LIBEXPAT_1.95.5;
+
+LIBEXPAT_1.95.8 {
+ global:
+  XML_GetParsingStatus;
+  XML_ResumeParser;
+  XML_StopParser;
+} LIBEXPAT_1.95.6;
+
+LIBEXPAT_2.1.0 {
+ global:
+@_EXPAT_COMMENT_ATTR_INFO@ XML_GetAttributeInfo;
+  XML_SetHashSalt;
+} LIBEXPAT_1.95.8;
+
+LIBEXPAT_2.4.0 {
+ global:
+@_EXPAT_COMMENT_DTD_OR_GE@ XML_SetBillionLaughsAttackProtectionActivationThreshold;
+@_EXPAT_COMMENT_DTD_OR_GE@ XML_SetBillionLaughsAttackProtectionMaximumAmplification;
+} LIBEXPAT_2.1.0;
+
+LIBEXPAT_2.6.0 {
+ global:
+  XML_SetReparseDeferralEnabled;
+} LIBEXPAT_2.4.0;
+
+LIBEXPAT_2.7.2 {
+ global:
+@_EXPAT_COMMENT_DTD_OR_GE@ XML_SetAllocTrackerActivationThreshold;
+@_EXPAT_COMMENT_DTD_OR_GE@ XML_SetAllocTrackerMaximumAmplification;
+} LIBEXPAT_2.6.0;
+
+LIBEXPAT_2.8.0 {
+ global:
+  XML_SetHashSalt16Bytes;
+} LIBEXPAT_2.7.2;

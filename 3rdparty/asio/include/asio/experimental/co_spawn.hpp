@@ -18,15 +18,16 @@
 #include "asio/detail/config.hpp"
 #include <utility>
 #include "asio/compose.hpp"
+#include "asio/deferred.hpp"
 #include "asio/detail/type_traits.hpp"
 #include "asio/experimental/coro.hpp"
-#include "asio/experimental/deferred.hpp"
-#include "asio/experimental/prepend.hpp"
+#include "asio/prepend.hpp"
 #include "asio/redirect_error.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -180,6 +181,7 @@ co_spawn(coro<void() noexcept, void, Executor> c, CompletionToken&& token)
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

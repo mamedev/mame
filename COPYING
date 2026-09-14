@@ -59,7 +59,7 @@ AES-256-CBC
 Copyright (c) 2024 Hallo Weeks
 
 Asio C++ Library
-Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 
 Permission is hereby granted, free of charge, to any person or
 organization obtaining a copy of the software and accompanying
@@ -167,13 +167,13 @@ Clark Cooper
 Copyright (c) 2001-2025 Expat maintainers
 
 Lua - a powerful, fast, lightweight, embeddable scripting language
-Copyright (c) 1994-2024 Lua.org, PUC-Rio
+Copyright (c) 1994-2025 Lua.org, PUC-Rio
 
 LuaFileSystem - File System Library for Lua
 Copyright (c) 2003-2015 Kepler Project
 
-LuaSQLite 3 - a Lua 5.1 to 5.3 wrapper for the SQLite3 library
-Copyright (c) 2002-2016 Tiago Dionizio, Doug Currie
+lsqlite3 - an SQLite 3 database binding for Lua 5
+Copyright (C) 2002-2016 Tiago Dionizio, Doug Currie
 
 lua-linenoise
 Copyright (c) 2011-2015 Rob Hoelz <rob@hoelz.ro>
@@ -182,7 +182,7 @@ lua_zlib - Lua 5.1 interface to zlib
 Copyright (c) 2009 Brian Maher
 
 OpenGL Mathematics (GLM)
-Copyright (c) 2005 -2016 G-Truc Creation
+Copyright (c) 2005 - G-Truc Creation
 
 PortAudio Portable Real-Time Audio Library
 Copyright (c) 1999-2006 Ross Bencina and Phil Burk
@@ -192,7 +192,7 @@ Copyright (c) 1999-2000 Ross Bencina and Phil Burk
 Copyright (c) 2001-2009 Roger B. Dannenberg
 
 pugixml - a C++ XML processing library
-Copyright (c) 2006-2019 Arseny Kapoulkine
+Copyright (c) 2006-2026 Arseny Kapoulkine
 
 RapidJSON - A fast JSON parser/generator for C++ with both SAX/DOM style API
 Copyright (c) 2015 THL A29 Limited, a Tencent company, and Milo Yip.

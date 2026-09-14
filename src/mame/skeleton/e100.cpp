@@ -536,7 +536,7 @@ void e100_state::e100(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(4_MHz_XTAL, 265, 0, 256, 265, 0, 256);
 	screen.set_screen_update(FUNC(e100_state::screen_update));
 	screen.set_palette("palette");

@@ -2,7 +2,7 @@
 // handler_allocator.cpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,15 +12,12 @@
 #define HANDLER_ALLOCATOR_HPP
 
 #include "asio.hpp"
-#include <boost/aligned_storage.hpp>
-#include <boost/noncopyable.hpp>
 
 // Class to manage the memory to be used for handler-based custom allocation.
 // It contains a single block of memory which may be returned for allocation
 // requests. If the memory is in use when an allocation request is made, the
 // allocator delegates allocation to the global heap.
 class handler_allocator
-  : private boost::noncopyable
 {
 public:
   handler_allocator()
@@ -28,12 +25,15 @@ public:
   {
   }
 
+  handler_allocator(const handler_allocator&) = delete;
+  handler_allocator& operator=(const handler_allocator&) = delete;
+
   void* allocate(std::size_t size)
   {
-    if (!in_use_ && size < storage_.size)
+    if (!in_use_ && size < sizeof(storage_))
     {
       in_use_ = true;
-      return storage_.address();
+      return storage_;
     }
 
     return ::operator new(size);
@@ -41,7 +41,7 @@ public:
 
   void deallocate(void* pointer)
   {
-    if (pointer == storage_.address())
+    if (pointer == storage_)
     {
       in_use_ = false;
     }
@@ -53,7 +53,7 @@ public:
 
 private:
   // Storage space used for handler-based custom memory allocation.
-  boost::aligned_storage<1024> storage_;
+  alignas(std::max_align_t) unsigned char storage_[1024];
 
   // Whether the handler-based custom allocation storage has been used.
   bool in_use_;

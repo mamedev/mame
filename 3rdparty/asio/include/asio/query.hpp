@@ -2,7 +2,7 @@
 // query.hpp
 // ~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,6 +27,7 @@
 #if defined(GENERATING_DOCUMENTATION)
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 /// A customisation point that queries the value of a property.
 /**
@@ -94,11 +95,12 @@ struct query_result
   typedef automatically_determined type;
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #else // defined(GENERATING_DOCUMENTATION)
 
-namespace asio_query_fn {
+namespace ASIO_VERSIONED_NAME(query_fn) {
 
 using asio::conditional_t;
 using asio::decay_t;
@@ -252,22 +254,29 @@ struct static_instance
 template <typename T>
 const T static_instance<T>::instance = {};
 
-} // namespace asio_query_fn
+} // namespace ASIO_VERSIONED_NAME(query_fn)
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
+
+#if defined(ASIO_HAS_INLINE_VARIABLES)
+inline constexpr ASIO_VERSIONED_NAME(query_fn)::impl query{};
+#else // defined(ASIO_HAS_INLINE_VARIABLES)
 namespace {
 
-static constexpr const asio_query_fn::impl&
-  query = asio_query_fn::static_instance<>::instance;
+static constexpr const ASIO_VERSIONED_NAME(query_fn)::impl&
+  query = ASIO_VERSIONED_NAME(query_fn)::static_instance<>::instance;
 
 } // namespace
+#endif // defined(ASIO_HAS_INLINE_VARIABLES)
 
-typedef asio_query_fn::impl query_t;
+typedef ASIO_VERSIONED_NAME(query_fn)::impl query_t;
 
 template <typename T, typename Property>
 struct can_query :
   integral_constant<bool,
-    asio_query_fn::call_traits<query_t, T, void(Property)>::overload !=
-      asio_query_fn::ill_formed>
+    ASIO_VERSIONED_NAME(query_fn)::call_traits<
+      query_t, T, void(Property)>::overload !=
+        ASIO_VERSIONED_NAME(query_fn)::ill_formed>
 {
 };
 
@@ -281,7 +290,8 @@ constexpr bool can_query_v = can_query<T, Property>::value;
 template <typename T, typename Property>
 struct is_nothrow_query :
   integral_constant<bool,
-    asio_query_fn::call_traits<query_t, T, void(Property)>::is_noexcept>
+    ASIO_VERSIONED_NAME(query_fn)::call_traits<
+      query_t, T, void(Property)>::is_noexcept>
 {
 };
 
@@ -295,13 +305,14 @@ constexpr bool is_nothrow_query_v = is_nothrow_query<T, Property>::value;
 template <typename T, typename Property>
 struct query_result
 {
-  typedef typename asio_query_fn::call_traits<
+  typedef typename ASIO_VERSIONED_NAME(query_fn)::call_traits<
       query_t, T, void(Property)>::result_type type;
 };
 
 template <typename T, typename Property>
 using query_result_t = typename query_result<T, Property>::type;
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #endif // defined(GENERATING_DOCUMENTATION)

@@ -464,7 +464,7 @@ void fz1_state::fz10m(machine_config &config)
 
 	HD44352(config, m_lcdc, 2_MHz_XTAL); // actually HD44350 + 2x HD44251
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(m_lcdc, FUNC(hd44352_device::screen_update));

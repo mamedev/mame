@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="c64_hdd" description="Commodore 64 hard disks">
+
+	<software name="minichief">
+		<description>ICT Mini Chief MC-20</description>
+		<year>1987</year>
+		<publisher>InConTrol</publisher>
+
+		<!-- Seagate ST225 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="minichief" sha1="c5146009a240841f816e65c218e8d43b68931c28" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cmdhd20">
+		<description>CMD HD-20</description>
+		<year>1990</year>
+		<publisher>Creative Micro Designs</publisher>
+
+		<!-- Seagate ST-125N -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="cmdhd20" sha1="ab1e36af7640eb0fce5c85200a21ffee7e0f12aa" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

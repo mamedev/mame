@@ -269,8 +269,8 @@ void mb8795_device::tx_dma_w(u8 data, bool eof)
 		LOGMASKED(LOG_TX, "send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x\n",
 			m_txbuf[0], m_txbuf[1], m_txbuf[2], m_txbuf[3], m_txbuf[4], m_txbuf[5], m_txlen);
 
-		if(m_txlen > 1500)
-			m_txlen = 1500; // Weird packet send on loopback test in the next
+		if(m_txlen > 1518)
+			m_txlen = 1518; // Weird packet send on loopback test in the next
 
 		// append frame check sequence
 		put_u32le(&m_txbuf[m_txlen], util::crc32_creator::simple(m_txbuf, m_txlen));

@@ -742,7 +742,7 @@ void renegade_state::renegade(machine_config &config)
 	TAITO68705_MCU(config, m_mcu, 12000000/4); /* 3 MHz (measured) */
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12000000/2, 384, 0, 256, 272, 19, 257);
 	m_screen->set_screen_update(FUNC(renegade_state::screen_update));
 	m_screen->set_palette("palette");

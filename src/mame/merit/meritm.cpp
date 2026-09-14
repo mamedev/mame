@@ -1174,7 +1174,7 @@ void meritm_state::crt250(machine_config &config)
 	TIMER(config, "vblank_start").configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
 	TIMER(config, "vblank_end").configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
+	SCREEN(config, "screen").set_screen_update(FUNC(meritm_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

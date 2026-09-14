@@ -60,6 +60,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
+	void install_config_access_map();
 	void access_map_le(address_map &map) ATTR_COLD;
 	void access_map_be(address_map &map) ATTR_COLD;
 	u32 be_config_address_r();

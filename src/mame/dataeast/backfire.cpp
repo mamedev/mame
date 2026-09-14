@@ -18,7 +18,7 @@
 #include "decocrpt.h"
 #include "decospr.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
@@ -316,12 +316,12 @@ GFXDECODE_END
 void backfire_state::vbl_interrupt(int state)
 {
 	if (state)
-		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 }
 
 void backfire_state::irq_ack_w(uint32_t data)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -346,7 +346,7 @@ DECOSPR_PRIORITY_CB_MEMBER(backfire_state::pri_callback)
 void backfire_state::backfire(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28000000/4); /* Unconfirmed */
+	DE156(config, m_maincpu, 28000000/4); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &backfire_state::backfire_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -361,7 +361,7 @@ void backfire_state::backfire(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_backfire);
 	config.set_default_layout(layout_dualhsxs);
 
-	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lscreen);
 	m_lscreen->set_refresh_hz(60);
 	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_lscreen->set_size(40*8, 32*8);
@@ -370,7 +370,7 @@ void backfire_state::backfire(machine_config &config)
 	m_lscreen->set_palette(m_palette);
 	m_lscreen->screen_vblank().set(FUNC(backfire_state::vbl_interrupt));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	rscreen.set_size(40*8, 32*8);
@@ -420,8 +420,8 @@ void backfire_state::backfire(machine_config &config)
 	SPEAKER(config, "rspeaker").front_center();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 28000000 / 2));
-	ymz.add_route(0, "lspeaker", 1.0, 0);
-	ymz.add_route(1, "rspeaker", 1.0, 1);
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
 }
 
 

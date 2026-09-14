@@ -22,7 +22,8 @@ enum
 	Z80_AF, Z80_BC, Z80_DE, Z80_HL,
 	Z80_IX, Z80_IY, Z80_AF2, Z80_BC2, Z80_DE2, Z80_HL2,
 	Z80_R, Z80_I, Z80_IM, Z80_IFF1, Z80_IFF2, Z80_HALT,
-	Z80_DC0, Z80_DC1, Z80_DC2, Z80_DC3, Z80_WZ
+	Z80_DC0, Z80_DC1, Z80_DC2, Z80_DC3, Z80_WZ, Z80_IR,
+	Z80__LAST = Z80_IR
 };
 
 class z80_device : public cpu_device, public z80_daisy_chain_interface
@@ -208,7 +209,7 @@ protected:
 	int    m_tmp_irq_vector;
 	PAIR16 m_shared_data;
 	PAIR16 m_shared_data2;
-	u8     m_rtemp;
+	PAIR16 m_irtmp;
 
 	u32    m_ref;
 	u8     m_m1_cycles;

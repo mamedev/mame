@@ -25,7 +25,7 @@
 #include "machine/z80daisy.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -44,7 +44,6 @@ public:
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_vector(*this, "vector"),
-		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch3(*this, "soundlatch3"),
@@ -70,7 +69,6 @@ private:
 	required_device<dac_bit_interface> m_dac1;
 	required_device<dac_bit_interface> m_dac2;
 	required_device<vector_device> m_vector;
-	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<generic_latch_8_device> m_soundlatch3;
@@ -420,7 +418,7 @@ void cchasm_state::refresh_control_w(offs_t offset, uint8_t data)
 
 void cchasm_state::machine_start()
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_xcenter = visarea.xcenter() << 16;
 	m_ycenter = visarea.ycenter() << 16;
@@ -481,11 +479,8 @@ void cchasm_state::cchasm(machine_config &config)
 
 	/* video hardware */
 	VECTOR(config, m_vector);
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(40);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 1024-1, 0, 768-1);
-	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
+	m_vector->set_refresh_hz(40);
+	m_vector->set_visarea(0, 1024-1, 0, 768-1);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

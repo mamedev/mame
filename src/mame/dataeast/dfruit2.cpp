@@ -368,7 +368,7 @@ void dfruit2_state::dfruit2(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(200)); // TODO: probably wrong period
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);

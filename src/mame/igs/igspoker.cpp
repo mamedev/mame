@@ -1978,7 +1978,7 @@ void _1layer_state::base(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8); // TODO: wrong screen size!
@@ -2500,7 +2500,7 @@ void _2layers_state::init_igs_ncs2()
 
 }
 
-ROM_START( igs_ncs2 )
+ROM_START( igs_ncs2 ) // IGS PCB N0-0204-3
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ncs_v100n.u20", 0x00000, 0x10000, CRC(2bb91de5) SHA1(b0b7b3b9cee1ce4da10cf78ef1c8079f3d9cafbf) )
 	ROM_LOAD( "ncs_v100n.u21", 0x10000, 0x10000, CRC(678e412c) SHA1(dba031d3576d098d314d6589dd1aeda44d17c650) )

@@ -697,7 +697,7 @@ void toki_ms_state::tokims(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toki_ms_state::audio_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL / 3, 426, 0, 256, 272, 16, 240); // FIXME: generic, not measured
 	m_screen->set_screen_update(FUNC(toki_ms_state::screen_update));
 	m_screen->set_palette(m_palette);

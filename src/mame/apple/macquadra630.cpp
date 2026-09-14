@@ -40,10 +40,13 @@
 #include "dfac2.h"
 #include "f108.h"
 #include "iosb.h"
-#include "macadb.h"
 #include "mactoolbox.h"
 #include "valkyrie.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
 #include "cpu/m68000/m68040.h"
@@ -70,7 +73,7 @@ public:
 		m_primetimeii(*this, "primetimeii"),
 		m_dfac2(*this, "dfac2"),
 		m_video(*this, "valkyrie"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_cuda(*this, "cuda"),
 		m_ram(*this, RAM_TAG)
 	{
@@ -90,7 +93,7 @@ private:
 	required_device<primetimeii_device> m_primetimeii;
 	required_device<dfac2_device> m_dfac2;
 	required_device<valkyrie_device> m_video;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
 
@@ -164,6 +167,22 @@ void quadra630_state::macqd630(machine_config &config)
 	m_f108->set_rom_tag("bootrom");
 	m_f108->write_ata_irq().set(m_primetimeii, FUNC(primetimeii_device::ata_irq_w));
 
+	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
+		});
+	NSCSI_CONNECTOR(config, "f108:scsi:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:6", mac_scsi_devices, nullptr);
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
+
 	PRIMETIMEII(config, m_primetimeii, 33_MHz_XTAL);
 	m_primetimeii->set_maincpu_tag("maincpu");
 	m_primetimeii->set_scsi_tag("f108:ncr53c96");
@@ -171,17 +190,19 @@ void quadra630_state::macqd630(machine_config &config)
 	VALKYRIE(config, m_video, C32M);
 	m_video->write_irq().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x40>));
 
-	MACADB(config, m_macadb, C15M);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(quadra630_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_primetimeii, FUNC(primetime_device::cb1_w));
 	m_cuda->via_data_callback().set(m_primetimeii, FUNC(primetime_device::cb2_w));
 	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
+	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &sda_merger(INPUT_MERGER_ALL_HIGH(config, "sda"));

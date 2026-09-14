@@ -46,7 +46,6 @@ crt9212_device::crt9212_device(const machine_config &mconfig, const char *tag, d
 	m_wclk(0),
 	m_clrcnt_edge(false),
 	m_data_latch(0),
-	m_ren_int(0),
 	m_wen_int(0),
 	m_buffer(0),
 	m_rac(0),
@@ -73,7 +72,6 @@ void crt9212_device::device_start()
 	save_item(NAME(m_wclk));
 	save_item(NAME(m_clrcnt_edge));
 	save_item(NAME(m_data_latch));
-	save_item(NAME(m_ren_int));
 	save_item(NAME(m_wen_int));
 	save_item(NAME(m_ram[0]));
 	save_item(NAME(m_ram[1]));
@@ -129,7 +127,11 @@ void crt9212_device::rclk_w(int state)
 			m_clrcnt_edge = false;
 		}
 
-		if (m_ren_int && (m_rac < RAM_SIZE))
+		// unlike the write data, which is latched one clock before it is written to
+		// the RAM, the read enable is not delayed, so the character output on the
+		// clock following the one that cleared the counter is the first character
+		// of the row buffer
+		if (m_ren && (m_rac < RAM_SIZE))
 		{
 			// output data
 			m_write_dout(m_ram[m_rac][!m_buffer]);
@@ -143,8 +145,6 @@ void crt9212_device::rclk_w(int state)
 				m_write_rof(1);
 			}
 		}
-
-		m_ren_int = m_ren;
 	}
 
 	m_rclk = state;
@@ -162,7 +162,7 @@ void crt9212_device::wclk_w(int state)
 		if (m_wen_int && (m_wac < RAM_SIZE))
 		{
 			// input data
-			m_ram[m_rac][m_buffer] = m_data_latch;
+			m_ram[m_wac][m_buffer] = m_data_latch;
 
 			// increment write address counter
 			m_wac++;

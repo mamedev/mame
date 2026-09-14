@@ -2,7 +2,7 @@
 // detail/impl/kqueue_reactor.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2005 Stefan Arentz (stefan at soze dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@
 
 #if defined(ASIO_HAS_KQUEUE)
 
+#include "asio/config.hpp"
 #include "asio/detail/kqueue_reactor.hpp"
 #include "asio/detail/scheduler.hpp"
 #include "asio/detail/throw_error.hpp"
@@ -41,17 +42,24 @@
 #endif
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 kqueue_reactor::kqueue_reactor(asio::execution_context& ctx)
   : execution_context_service_base<kqueue_reactor>(ctx),
     scheduler_(use_service<scheduler>(ctx)),
-    mutex_(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          REACTOR_REGISTRATION, scheduler_.concurrency_hint())),
+    mutex_(config(ctx).get("reactor", "registration_locking", true),
+        config(ctx).get("reactor", "registration_locking_spin_count", 0)),
     kqueue_fd_(do_kqueue_create()),
     interrupter_(),
     shutdown_(false),
-    registered_descriptors_mutex_(mutex_.enabled())
+    io_locking_(config(ctx).get("reactor", "io_locking", true)),
+    io_locking_spin_count_(
+        config(ctx).get("reactor", "io_locking_spin_count", 0)),
+    registered_descriptors_mutex_(mutex_.enabled()),
+    registered_descriptors_(execution_context::allocator<void>(ctx),
+        config(ctx).get("reactor", "preallocated_io_objects", 0U),
+        io_locking_, io_locking_spin_count_)
 {
   struct kevent events[1];
   ASIO_KQUEUE_EV_SET(&events[0], interrupter_.read_descriptor(),
@@ -447,6 +455,9 @@ void kqueue_reactor::run(long usec, op_queue<operation>& ops)
   struct kevent events[128];
   int num_events = kevent(kqueue_fd_, 0, 0, events, 128, timeout);
 
+  if (num_events > 0)
+    (void)ref_count_read_acquire(allocation_counter_);
+
 #if defined(ASIO_ENABLE_HANDLER_TRACKING)
   // Trace the waiting events.
   for (int i = 0; i < num_events; ++i)
@@ -562,8 +573,9 @@ int kqueue_reactor::do_kqueue_create()
 kqueue_reactor::descriptor_state* kqueue_reactor::allocate_descriptor_state()
 {
   mutex::scoped_lock descriptors_lock(registered_descriptors_mutex_);
-  return registered_descriptors_.alloc(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-        REACTOR_IO, scheduler_.concurrency_hint()));
+  auto* s = registered_descriptors_.alloc(io_locking_, io_locking_spin_count_);
+  ref_count_up_release(allocation_counter_);
+  return s;
 }
 
 void kqueue_reactor::free_descriptor_state(kqueue_reactor::descriptor_state* s)
@@ -597,6 +609,7 @@ timespec* kqueue_reactor::get_timeout(long usec, timespec& ts)
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #undef ASIO_KQUEUE_EV_SET

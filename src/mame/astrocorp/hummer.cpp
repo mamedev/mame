@@ -144,7 +144,7 @@ void hummer_state::hummer(machine_config &config)
 	M68000(config, m_maincpu, 22.579_MHz_XTAL / 2);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(120_MHz_XTAL / 10 * 2, 781, 0, 512, 261*2, 0, 240*2); // TODO
 	screen.set_screen_update(FUNC(hummer_state::screen_update));
 	screen.set_palette("palette");

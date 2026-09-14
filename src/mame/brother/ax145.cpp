@@ -258,7 +258,7 @@ void ax145_state::ax145(machine_config &config) {
 	TIMER(config, "1khz").configure_periodic(FUNC(ax145_state::int2_timer_callback), attotime::from_hz(1000)); // just guessing frequency, based on LW-30, 350, 450
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_color(rgb_t(6, 245, 206));
 	screen.set_physical_aspect(480, 128);
 	screen.set_refresh_hz(78.1);

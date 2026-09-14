@@ -81,6 +81,8 @@ protected:
 	uint8_t reg_trpl_r();
 	uint8_t reg_if1l_r();
 
+	void observe_bus_cycle(offs_t offset, bool if1);
+
 	//helpers
 	void out_ns_cb(int state);
 	void out_busack_cb(int state);
@@ -95,10 +97,17 @@ protected:
 	devcb_write_line m_ns_cb;
 	devcb_write_line m_busack_cb;
 
-	// Board registers
-	uint8_t m_reg_snvr	= 0; // Segment Violation Register
-	uint8_t m_reg_trpl	= 0; // Segment trap memory address low-byte
-	uint8_t m_reg_if1l	= 0; // Segment trap instruction low-byte
+	// Board registers: snapshots of the running latches below, captured by
+	// the segment trap flip-flop (U20 sheet 8) when SEGT- is raised.
+	uint8_t m_reg_snvr  = 0; // Segment Violation Register
+	uint8_t m_reg_trpl  = 0; // Segment trap memory address low-byte
+	uint8_t m_reg_if1l  = 0; // Segment trap instruction low-byte
+
+	// Running bus-side latches and the SEGT- line state
+	uint8_t m_lad_seg   = 0; // segment number of the current memory cycle
+	uint8_t m_lad_low   = 0; // low address byte of the current memory cycle
+	uint8_t m_if1_low   = 0; // low address byte of the last IFETCH1 cycle
+	bool m_segt_state   = false;
 
 	bool m_is_seg_os = false;
 	bool m_is_seg_user = false;
@@ -162,9 +171,9 @@ private:
 	void centronics_ack_w(uint8_t data);
 
 	// Board registers
-	uint8_t m_reg_scr	= 0; // System Configuration Register
-	uint8_t m_reg_sbr	= 0; // System Break Register
-	uint8_t m_reg_nbr	= 0; // Normal Break Register
+	uint8_t m_reg_scr   = 0; // System Configuration Register
+	uint8_t m_reg_sbr   = 0; // System Break Register
+	uint8_t m_reg_nbr   = 0; // Normal Break Register
 
 	int m_centronics_busy = 0;
 	int m_centronics_select = 0;
@@ -254,13 +263,13 @@ private:
 	void cio_w(offs_t offset, uint8_t data) { m_cio->write(~(offset >> 1), data); }
 
 	// Board registers
-	uint16_t m_reg_scr	= 0; // System Configuration Register
-	uint8_t m_reg_ubr	= 0; // User Break Register
+	uint16_t m_reg_scr  = 0; // System Configuration Register
+	uint8_t m_reg_ubr   = 0; // User Break Register
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ZBI_S8K_CPU10,	zbi_s8k_cpu10_card_device)
-DECLARE_DEVICE_TYPE(ZBI_S8K_CPU,	zbi_s8k_cpu_card_device)
-DECLARE_DEVICE_TYPE(ZBI_S8K_HPCPU,	zbi_s8k_hpcpu_card_device)
+DECLARE_DEVICE_TYPE(ZBI_S8K_CPU10,  zbi_s8k_cpu10_card_device)
+DECLARE_DEVICE_TYPE(ZBI_S8K_CPU,    zbi_s8k_cpu_card_device)
+DECLARE_DEVICE_TYPE(ZBI_S8K_HPCPU,  zbi_s8k_hpcpu_card_device)
 
 #endif // MAME_BUS_ZBI_S8K_CPU_H

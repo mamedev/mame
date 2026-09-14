@@ -649,7 +649,6 @@ Known issues:
 - nicetsuk: Hangs on boot due to suspected issues with the PSX's timers
 - knpuzzle: Audio/sound effects can be glitchy, sound glitches on the difficulty select screen for a moment
 - panikuru: Audio/sound effects can be glitchy
-- gegemdb, kd2001, slotouji: Not decrypted yet
 - Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
@@ -689,6 +688,11 @@ public:
 	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_gpu(*this, "gpu")
+		, m_spu(*this, "spu")
+		, m_ram(*this, "ram")
+		, m_gpu_ram(*this, "gpu_ram")
+		, m_spu_ram(*this, "spu_ram")
 		, m_decrypter(*this, "decrypter")
 		, m_ata(*this, "ata")
 		, m_io_update_interrupt(*this)
@@ -724,6 +728,11 @@ protected:
 	void namcos10_map_mgexio(address_map &map) ATTR_COLD;
 
 	required_device<psxcpu_device> m_maincpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	optional_device<ns10_decrypter_device> m_decrypter;
 
 	unscramble_func m_unscrambler;
@@ -923,7 +932,6 @@ class namcos10_memp3_state : public namcos10_memn_state
 public:
 	namcos10_memp3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_memn_state(mconfig, type, tag)
-		, m_ram(*this, "maincpu:ram")
 		, m_memp3_mcu(*this, "memp3_mcu")
 		, m_lc82310(*this, "mp3_decoder")
 		, m_mcu_ram(*this, "mcu_ram")
@@ -980,7 +988,6 @@ private:
 
 	void mp3_data_w(uint16_t data);
 
-	required_device<ram_device> m_ram;
 	required_device<tmp95c061_device> m_memp3_mcu;
 	required_device<lc82310_device> m_lc82310;
 	required_shared_ptr<uint16_t> m_mcu_ram;
@@ -1090,24 +1097,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 void namcos10_state::namcos10_base(machine_config &config)
 {
 	/* basic machine hardware */
-	CXD8606BQ(config, m_maincpu, XTAL(101'491'200));
+	CXD8606BQ(config, m_maincpu, 101.4912_MHz_XTAL);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->set_disable_rom_berr(true);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	/* video hardware */
-	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 54V25632s
+	CXD8561CQ(config, m_gpu, 101.4912_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0); // 2 54V25632s
+
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
 	// TODO: This must be replaced with a proper CXD2938Q device, CD-ROM functionality of chip not used
-	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
-	spu.set_stream_flags(STREAM_SYNCHRONOUS);
-	spu.add_route(0, "speaker", 0.75, 0);
-	spu.add_route(1, "speaker", 0.75, 1);
+	SPU(config, m_spu, 101.4912_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->set_stream_flags(STREAM_SYNCHRONOUS);
+	m_spu->add_route(0, "speaker", 0.75, 0);
+	m_spu->add_route(1, "speaker", 0.75, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K").set_default_value(0); // ram is external on CXD2938Q, internal on CXD2941R. Both limited to 512k
 
 	// TODO: Trace main PCB to see where JAMMA I/O goes and/or how int10 can be triggered (SM10MA3?)
 	m_io_update_interrupt.bind().set("maincpu:irq", FUNC(psxirq_device::intin10));
@@ -1913,7 +1932,8 @@ void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 			0x000000006800d3f5ULL, 0x0000000000000058ULL, 0x000000006800d2d5ULL, 0x0000000000001840ULL,
 		},
 		0x5b22,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 9) & (gf2_reduce(0x0000000010065810ULL & previous_cipherwords) ^ gf2_reduce(0x0000000021005810ULL & previous_plainwords)) & 1) << 10;
 		}
@@ -1941,7 +1961,8 @@ void namcos10_memn_state::ns10_gahaha(machine_config &config)
 			0x000000003120c000ULL, 0x0000000000002100ULL, 0x0000000018e002a6ULL, 0x00000000a19121a0ULL,
 		},
 		0xaea7,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return 0;
 		}
 	});
@@ -1968,7 +1989,8 @@ void namcos10_memn_state::ns10_gahaha2(machine_config &config)
 			0x0000000001800400ULL, 0x0000000090000040ULL, 0x0000000000009002ULL, 0x00000403a5020004ULL,
 		},
 		0x925a,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			u64 previous_masks = previous_cipherwords^previous_plainwords;
 			return (1 & ((previous_masks >> 26) ^ (previous_masks >> 37)) & (previous_masks >> 46)) * 0x8860;
 		}
@@ -1995,7 +2017,8 @@ void namcos10_memn_state::ns10_gamshara(machine_config &config)
 			0x000000004400d1f1ULL, 0x000000006001ce08ULL, 0x00000000000000c8ULL, 0x0000000054023002ULL,
 		},
 		0x25ab,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 7) & (previous_masks >> 13) & 1) << 2;
 		}
@@ -2010,8 +2033,72 @@ void namcos10_memn_state::ns10_gegemdb(machine_config &config)
 
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xb, 0xa, 0x4, 0x5, 0x7, 0x6, 0x1, 0x3, 0x0, 0x2); };
 
-	/* decrypter device (CPLD in hardware?) */
-	// GEGEMDB_DECRYPTER(config, m_decrypter);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000000000000094ULL,
+			0x0000000000000801ULL,
+			0x00000000a3980c08ULL,
+			0x0000000000001022ULL,
+			0x0000000000000882ULL,
+			0x0000000000005100ULL,
+			0x0000000069d345dbULL,
+			0x0000000020012006ULL,
+			0x0000000000000041ULL,
+			0x0000000000000001ULL,
+			0x00000000000001a0ULL,
+			0x0000000000008030ULL,
+			0x0000000000004500ULL,
+			0x000000009125e81eULL,
+			0x0000000000008240ULL,
+			0x000000009125ea1aULL,
+		},
+		{
+			0x00000000000000a4ULL,
+			0x0000000000000801ULL,
+			0x0000000022000c09ULL,
+			0x0000000000001042ULL,
+			0x0000000000001082ULL,
+			0x0000000000005200ULL,
+			0x00000000200545ddULL,
+			0x0000000020014006ULL,
+			0x0000000000000041ULL,
+			0x0000000000000002ULL,
+			0x0000000000000020ULL,
+			0x0000000000000030ULL,
+			0x0000000000008500ULL,
+			0x000000000209e812ULL,
+			0x0000000000008440ULL,
+			0x000000000209e61aULL,
+		},
+		0x1d39,
+		[] (std::uint64_t previous_cipherwords, std::uint64_t previous_plainwords) -> std::uint16_t
+		{
+			const std::uint64_t previous_masks =
+				previous_cipherwords ^ previous_plainwords;
+
+			return ((previous_masks >> 3) &
+					(gf2_reduce(previous_cipherwords & 0x00000000a3980c00ULL) ^
+					gf2_reduce(previous_plainwords & 0x0000000022000c00ULL)) &
+					1U)
+					<< 9;
+		},
+		[] (int iv) -> std::uint64_t
+		{
+			constexpr std::uint64_t values[16]{
+				0x0000000000000000ULL, 0x000000000000000eULL,
+				0x000000000000000fULL, 0x0000000000000009ULL,
+				0x0000000000000003ULL, 0x0000000000000001ULL,
+				0x0000000000000002ULL, 0x000000000000000dULL,
+				0x0000000000000006ULL, 0x000000000000000cULL,
+				0x0000000000000008ULL, 0x000000000000000bULL,
+				0x0000000000000007ULL, 0x0000000000000005ULL,
+				0x0000000000000004ULL, 0x000000000000000aULL,
+			};
+
+			return values[iv & 0x0f];
+		},
+	});
+
 }
 
 void namcos10_memn_state::ns10_gjspace(machine_config &config)
@@ -2034,7 +2121,8 @@ void namcos10_memn_state::ns10_gjspace(machine_config &config)
 			0x0000000000001101ULL, 0x000000000000a002ULL, 0x0000000029001740ULL, 0x00000000a4309bfcULL,
 		},
 		0x2e7f,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return 0;
 		}
 	});
@@ -2049,7 +2137,55 @@ void namcos10_memn_state::ns10_kd2001(machine_config &config)
 
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00008938899c4390ULL,
+			0x0000000000001400ULL,
+			0x0000000000000010ULL,
+			0x00000040618019ULL,
+			0x00000000004200ULL,
+			0x00006c25af247961ULL,
+			0x00006c258fac3921ULL,
+			0x00000056c1005aULL,
+			0x00000056c1087aULL,
+			0x00000000000818ULL,
+			0x00000000001280ULL,
+			0x000016862d1ae887ULL,
+			0x00008938ba206792ULL,
+			0x00000000000118ULL,
+			0x00000000008800ULL,
+			0x00000040618018ULL,
+		},
+		{
+			0x0000000104a4c790ULL,
+			0x0000000000001400ULL,
+			0x0000000000000200ULL,
+			0x0000000227801dULL,
+			0x00000000004200ULL,
+			0x0000000c02b17961ULL,
+			0x0000000c02397921ULL,
+			0x0000000607805aULL,
+			0x0000000607007aULL,
+			0x00000000000910ULL,
+			0x00000000000280ULL,
+			0x0000002c0084e803ULL,
+			0x00000001023a6792ULL,
+			0x00000000002018ULL,
+			0x00000000008810ULL,
+			0x0000000227805aULL,
+		},
+		0x869b,
+		[] (std::uint64_t previous_cipherwords, std::uint64_t previous_plainwords) -> std::uint16_t
+		{
+			const std::uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+
+			return ((previous_masks >> 12) &
+					(gf2_reduce(previous_cipherwords & 0x00008938899c4390ULL) ^
+					gf2_reduce(previous_plainwords & 0x0000000104a44390ULL)) &
+					1U)
+					<< 2;
+		},
+	});
 }
 
 void namcos10_memn_state::ns10_keroro(machine_config &config)
@@ -2073,11 +2209,13 @@ void namcos10_memn_state::ns10_keroro(machine_config &config)
 			0x0000000020014080ULL, 0x0000000000002208ULL, 0x0000000000000228ULL, 0x0000000020014200ULL,
 		},
 		0xee91,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return ((previous_masks>>4) & ((previous_masks>>24) ^ (previous_masks>>26)) & 1) << 6;
+			return ((previous_masks >> 4) & ((previous_masks >> 24) ^ (previous_masks >> 26)) & 1) << 6;
 		},
-		[] (int iv) -> uint64_t {
+		[] (int iv) -> uint64_t
+		{
 			constexpr uint64_t values[16]{
 				0x0000, 0x0602, 0x0302, 0x0101, 0x0203, 0x0802, 0x0603, 0x0303,
 				0x0001, 0x0803, 0x0501, 0x0500, 0x0202, 0x0100, 0x0401, 0x0400,
@@ -2107,7 +2245,8 @@ void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
 			0x00000000012a04a2ULL, 0x00000000003984a4ULL, 0x0000000000000700ULL, 0x0000000000000882ULL,
 		},
 		0x01e2,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 0x13) & (gf2_reduce(0x0000000014001290ULL & previous_cipherwords) ^ gf2_reduce(0x0000000000021290ULL & previous_plainwords)) & 1) << 1;
 		}
@@ -2134,7 +2273,8 @@ void namcos10_memn_state::ns10_konotako(machine_config &config)
 			0x000000009000200bULL, 0x0000000000000310ULL, 0x0000000000001840ULL, 0x0000000000000400ULL,
 		},
 		0x0748,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 7) & (previous_masks >> 15) & 1) << 15;
 		}
@@ -2162,7 +2302,8 @@ void namcos10_memn_state::ns10_medalnt(machine_config &config)
 			0x000000004c000044ULL, 0x000000000000080aULL, 0x000000000a001214ULL, 0x0000000000000190ULL,
 		},
 		0x5d04,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>26) & (gf2_reduce(previous_cipherwords & 0x10100080) ^ gf2_reduce(previous_plainwords & 0x40100080))) << 4;
 		}
@@ -2190,7 +2331,8 @@ void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 			0x0000000000000024ULL, 0x000000000000a080ULL, 0x0000000000000042ULL, 0x000000000020001eULL,
 		},
 		0x4c57,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (((previous_masks>>15) & (gf2_reduce(previous_cipherwords & 0x24200000) ^ gf2_reduce(previous_plainwords & 0x44200000))) & 1) << 9;
 		}
@@ -2217,11 +2359,13 @@ void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 			0x00000081470a1122ULL, 0x0000000000006200ULL, 0x00009170ac403013ULL, 0x0000000000001044ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & gf2_reduce(previous_masks & 0x120100400000) & gf2_reduce(previous_masks & 0x11800020000)) * 0x11;
 		},
-		[] (int iv) -> uint64_t {
+		[] (int iv) -> uint64_t
+		{
 			constexpr uint64_t values[16]{
 				0x0000, 0x0000, 0x0000, 0x2000, 0x801a, 0x6000, 0x0002, 0x0000,
 				0x0000, 0x0018, 0x0000, 0x0420, 0x0000, 0x8800, 0x0000, 0xc000,
@@ -2252,7 +2396,8 @@ void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 			0x0000000000000404ULL, 0x0000000000004201ULL, 0x0000000000001100ULL, 0x000000008c0057b2ULL,
 		},
 		0xbe32,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 1) & (gf2_reduce(0x0000000040de8fb3ULL & previous_cipherwords) ^ gf2_reduce(0x0000000088008fb3ULL & previous_plainwords)) & 1) << 2;
 		}
@@ -2280,7 +2425,8 @@ void namcos10_memn_state::ns10_pacmball(machine_config &config)
 			0x0000000000000a80ULL, 0x0000000000004408ULL, 0x0000000000000300ULL, 0x0000800000228002ULL,
 		},
 		0x247c,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 2) & (previous_masks >> 6) & 1) << 1;
 		}
@@ -2307,10 +2453,14 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 			0x0000000000000214ULL, 0x0000000090004190ULL, 0x0000000000001040ULL, 0x0000000000006008ULL,
 		},
 		0x7c29,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
-			return (1 & ((gf2_reduce(0x0000000088300281ULL & previous_cipherwords) ^ gf2_reduce(0x0000000004600281ULL & previous_plainwords))) & ((gf2_reduce(0x0000a13140090000ULL & previous_cipherwords) ^ gf2_reduce(0x0000806240090000ULL & previous_plainwords)))) << 2;
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
+			return (1 &
+					((gf2_reduce(0x0000000088300281ULL & previous_cipherwords) ^ gf2_reduce(0x0000000004600281ULL & previous_plainwords))) &
+					((gf2_reduce(0x0000a13140090000ULL & previous_cipherwords) ^ gf2_reduce(0x0000806240090000ULL & previous_plainwords)))) << 2;
 		},
-		[] (int iv) -> uint64_t {
+		[] (int iv) -> uint64_t
+		{
 			constexpr uint64_t values[16]{
 				0x0000, 0x020e, 0x0412, 0x0411, 0x0204, 0x001b, 0x0009, 0x0207,
 				0x2040, 0x2440, 0x0012, 0x0001, 0x0614, 0x000a, 0x0214, 0x041b,
@@ -2342,7 +2492,8 @@ void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 			0x0000002400880201ULL,0x0000000000000300ULL,0x00000000000000c0ULL,0x0000000000000408ULL
 		},
 		0xe1b8,
-		[] (uint16_t nonlinear_bit) -> uint16_t {
+		[] (uint16_t nonlinear_bit) -> uint16_t
+		{
 			return nonlinear_bit << 11;
 		}
 	});
@@ -2369,9 +2520,10 @@ void namcos10_memn_state::ns10_puzzball(machine_config &config)
 			0x0000000000008402ULL, 0x0000021d0040c004ULL, 0x0000008c40880123ULL, 0x000000000000c000ULL,
 		},
 		0x31d6,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return (1 & (previous_masks>>29) & (gf2_reduce(previous_cipherwords & 0x180882002000ULL) ^ gf2_reduce(previous_plainwords & 0x80ac0002000ULL))) << 4;
+			return (1 & (previous_masks >> 29) & (gf2_reduce(previous_cipherwords & 0x180882002000ULL) ^ gf2_reduce(previous_plainwords & 0x80ac0002000ULL))) << 4;
 		}
 	});
 }
@@ -2398,7 +2550,8 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 			0x0000000001410806ULL, 0x00000000042c8019ULL, 0x0000000000000880ULL, 0x00000000b0010920ULL,
 		},
 		0x3aa8,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 0) & (previous_masks >> 3) & 1) << 10;
 		}
@@ -2413,7 +2566,56 @@ void namcos10_memn_state::ns10_slotouji(machine_config &config)
 
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0xa, 0xb, 0x8, 0x9, 0x6, 0x5, 0x4, 0x7, 0x1, 0x0, 0x2, 0x3); };
 
-	// TODO: decrypter
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000aa54e43d43aeULL,
+			0x000000000000a001ULL,
+			0x0000000000002028ULL,
+			0x0000000002d72600ULL,
+			0x0000000000000800ULL,
+			0x0000000000000008ULL,
+			0x0000aa540e548327ULL,
+			0x00000000000000c0ULL,
+			0x0000000000200130ULL,
+			0x0000000000001000ULL,
+			0x0000000000290024ULL,
+			0x00000000a3d165c2ULL,
+			0x0000000000000205ULL,
+			0x00000000000000d0ULL,
+			0x0000000000000940ULL,
+			0x00000000a3d160c3ULL,
+		},
+		{
+			0x000000044402438eULL,
+			0x000000000000a000ULL,
+			0x0000000000002020ULL,
+			0x0000000000133620ULL,
+			0x0000000000000010ULL,
+			0x000000000000000aULL,
+			0x00000004022383a6ULL,
+			0x00000000000020c0ULL,
+			0x0000000004300120ULL,
+			0x0000000000001004ULL,
+			0x0000000002224024ULL,
+			0x00000000021361caULL,
+			0x0000000000000001ULL,
+			0x0000000000000090ULL,
+			0x0000000000000842ULL,
+			0x00000000021368c3ULL,
+		},
+		0x3583,
+		[] (std::uint64_t previous_cipherwords, std::uint64_t previous_plainwords) -> std::uint16_t
+		{
+			const std::uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+
+			return ((previous_masks >> 10) &
+					(gf2_reduce(previous_cipherwords & 0x0000000000000100ULL) ^
+					gf2_reduce(previous_plainwords & 0x0000000000000100ULL)) &
+					1U)
+					<< 4;
+		},
+	});
+
 }
 
 void namcos10_memn_state::ns10_startrgn(machine_config &config)
@@ -2436,7 +2638,8 @@ void namcos10_memn_state::ns10_startrgn(machine_config &config)
 			0x0000000000000428ULL, 0x0000000000001001ULL, 0x000012020b10ceabULL, 0x0000000000000144ULL,
 		},
 		0x8c46,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 12) & (previous_masks >> 14) & 1) << 4;
 		}
@@ -2464,7 +2667,8 @@ void namcos10_memn_state::ns10_sugorotic(machine_config &config)
 			0x0000000040228110ULL, 0x000000000016c000ULL, 0x0000000000003002ULL, 0x0000223010010020ULL,
 		},
 		0x9006,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 25) & (previous_masks >> 22)) * 0xa00;
 		}
@@ -2492,7 +2696,8 @@ void namcos10_memn_state::ns10_taiko2(machine_config &config)
 			0x0000184022210002ULL, 0x000000006c00400cULL, 0x000000004e140816ULL, 0x0000000080090008ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 25) & (previous_masks >> 31)) << 4;
 		}
@@ -2520,7 +2725,8 @@ void namcos10_memn_state::ns10_taiko3(machine_config &config)
 			0x00002a004a150020ULL, 0x0000000030804200ULL, 0x0000000000000610ULL, 0x00000000c2001080ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return ((
 				(((previous_cipherwords >> 35) ^ (previous_cipherwords >> 39) ^ (previous_plainwords >> 40) ^ (previous_plainwords >> 42)) & (gf2_reduce(previous_cipherwords & 0x820508000800ULL) ^ gf2_reduce(previous_plainwords & 0x90c12c000800ULL))) ^
 				(((previous_cipherwords >> 35) ^ (previous_cipherwords >> 39)) & ((previous_plainwords >> 40) ^ (previous_plainwords >> 42))) ^
@@ -2551,7 +2757,8 @@ void namcos10_memn_state::ns10_taiko4(machine_config &config)
 			0x000000000a801a80ULL, 0x0000000000001400ULL, 0x0000000000250262ULL, 0x0000000020404081ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 2) & (previous_masks>>14)) << 1;
 		}
@@ -2579,7 +2786,8 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 			0x0000000050020216ULL, 0x0000288101811400ULL, 0x0000000000000009ULL, 0x0000000000000124ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return ((
 				((previous_cipherwords >> 4) & (gf2_reduce(previous_cipherwords & 0x242800000000) ^ gf2_reduce(previous_plainwords & 0x42100010000))) ^
 				((previous_cipherwords >> 17) & (gf2_reduce(previous_cipherwords & 0x1094000) ^ gf2_reduce(previous_plainwords & 0x100084000))) ^
@@ -2612,7 +2820,8 @@ void namcos10_memn_state::ns10_taiko6(machine_config &config)
 			0x00000000320b0890ULL, 0x0000000000000802ULL, 0x00000000902a8800ULL, 0x0000000000000020ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>13) & (gf2_reduce(previous_cipherwords & 0x86000000ULL) ^ gf2_reduce(previous_plainwords & 0x8a000000ULL))) << 15;
 		}
@@ -2640,11 +2849,12 @@ void namcos10_memn_state::ns10_taikort(machine_config &config)
 			0x0000000098619241ULL, 0x0000000000004808ULL, 0x000000000f201040ULL, 0x0000a0d290820001ULL
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return ((((previous_plainwords >> 25) & (gf2_reduce(previous_cipherwords & 0x40a000000001ULL) ^ gf2_reduce(previous_plainwords & 0xa000200001ULL))) ^
 					((previous_plainwords >> 27) & (gf2_reduce(previous_cipherwords & 0x2400440ULL) ^ gf2_reduce(previous_plainwords & 0x80400440ULL))) ^
 					((previous_cipherwords >> 19) & (gf2_reduce(previous_cipherwords & 0x18000201ULL) ^ gf2_reduce(previous_plainwords & 0x10000201ULL))) ^
-					((previous_cipherwords ^ previous_plainwords ^ (previous_cipherwords >> 27) ^ (previous_plainwords >> 21)) & ((previous_cipherwords^previous_plainwords) >> 6 ^ (previous_cipherwords^previous_plainwords) >> 26)) ) & 1) * 0x4010;
+					((previous_cipherwords ^ previous_plainwords ^ (previous_cipherwords >> 27) ^ (previous_plainwords >> 21)) & ((previous_cipherwords ^ previous_plainwords) >> 6 ^ (previous_cipherwords^previous_plainwords) >> 26))) & 1) * 0x4010;
 		}
 	});
 }
@@ -2955,7 +3165,8 @@ void namcos10_memp3_state::ns10_g13jnr(machine_config &config)
 			0x0000470001100102ULL, 0x00000000408c0083ULL, 0x0000000000000002ULL, 0x0000000000000308ULL,
 		},
 		0x9546,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 6) & (previous_masks >> 10)) << 14;
 		}
@@ -2982,7 +3193,8 @@ void namcos10_memp3_state::ns10_nicetsuk(machine_config &config)
 			0x00000000c8000504ULL, 0x0000000000000111ULL, 0x0000000032086008ULL, 0x0000000000000248ULL,
 		},
 		0x9f6b,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>12) & (gf2_reduce(previous_cipherwords & 0x808400410000ULL) ^ gf2_reduce(previous_plainwords & 0x81100630000ULL))) << 4;
 		}
@@ -3009,7 +3221,8 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 			0x0000000080209020ULL, 0x0000141044200008ULL, 0x0000000000000020ULL, 0x0000000000008108ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>12) & (gf2_reduce(previous_cipherwords & 0x140840000000ULL) ^ gf2_reduce(previous_plainwords & 0x141040000000ULL))) << 14;
 		},
@@ -4217,7 +4430,7 @@ GAME( 2000, ptblank3,  0,        ns10_ptblank3,  ptblank3,     namcos10_memn_sta
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ROM VER. B 01/11/19 MON 00:00:00 in test mode
+GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ROM VER. B 01/11/19 MON 00:00:00 in test mode
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
@@ -4233,15 +4446,15 @@ GAME( 2002, sugorotca, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_sta
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // May 2 2003, decrypter not done yet
-GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // decrypter not done yet
+GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // May 2 2003
+GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
 GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Jun 14 2005 17:12:31
 GAME( 2005, medalnta,  medalnt,  ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Mar  8 2005 11:18:10
 GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Banpresto", "Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ GYM100-1-WP-MPR-0-A20 MON MAR 3 2008 14:47:17
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ GYM100-1-WP-MPR-0-A20 MON MAR 3 2008 14:47:17
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
 GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

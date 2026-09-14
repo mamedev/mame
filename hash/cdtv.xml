@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -695,6 +695,18 @@ cd32: inputs are quite uncontrollable, most notably with raising bets (verify)
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="covergirlstrippoker" sha1="773d750c9d580e17a1f40c1ed05fe3daadeae919" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- From TOSEC release -->
+	<software name="covgrlsp_dk" cloneof="covgrlsp" supported="yes">
+		<description>Cover Girl Strip Poker (Danish, Swedish, Norwegian)</description>
+		<year>1992</year>
+		<publisher>Emotional Pictures</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="covergirlstrippoker_dk" sha1="07f7dc6a30b6b662adc03297255018970edbf29c" />
 			</diskarea>
 		</part>
 	</software>

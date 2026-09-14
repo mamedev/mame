@@ -162,7 +162,7 @@ void sgi_gr1_device::device_add_mconfig(machine_config &config)
 	 // STEREO: Cx:D+H-P=0+246-57, Cy:V-32=39-32+1
 	 *
 	 */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(pixel_clock, 1680, 246, 246 + 1280, 1065, 39, 39 + 1024);
 	m_screen->set_screen_update(m_re.finder_tag(), FUNC(sgi_re2_device::screen_update));
 

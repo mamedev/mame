@@ -185,7 +185,7 @@ void tim011_state::tim011(machine_config &config)
 	/* video hardware */
 	PALETTE(config, m_palette, FUNC(tim011_state::tim011_palette), 4);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.288_MHz_XTAL, 768, 0, 512, 320, 0, 256);
 	screen.set_screen_update(FUNC(tim011_state::screen_update_tim011));
 	screen.set_palette(m_palette);

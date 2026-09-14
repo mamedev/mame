@@ -112,7 +112,7 @@ private:
 	required_device_array<rs232_port_device, 4> m_async;
 	required_device<duscc68562_device> m_duscc;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr53c7xx_device> m_scsi;
+	required_device<ncr53c700_device> m_scsi;
 	required_device<speaker_sound_device> m_speaker;
 
 	output_finder<3> m_leds;
@@ -274,7 +274,7 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", aviion88k_scsi_devices, nullptr);
 
 	// scsi host adapter (NCR53C700)
-	NCR53C7XX(config, m_scsi, 66'000'000);
+	NCR53C700(config, m_scsi, 66'000'000);
 	m_scsibus->set_external_device(7, m_scsi);
 
 	// TODO: ethernet (AM79C900)

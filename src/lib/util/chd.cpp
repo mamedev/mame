@@ -20,9 +20,9 @@
 #include <zlib.h>
 
 #include <algorithm>
+#include <bit>
 #include <cassert>
 #include <cstddef>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <new>
@@ -37,6 +37,7 @@
 const char *HARD_DISK_METADATA_FORMAT = "CYLS:%d,HEADS:%d,SECS:%d,BPS:%d";
 const char *CDROM_TRACK_METADATA_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d";
 const char *CDROM_TRACK_METADATA2_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d PREGAP:%d PGTYPE:%s PGSUB:%s POSTGAP:%d";
+const char *CDROM_SESSION_METADATA_FORMAT = "SESSION:%d";
 const char *GDROM_TRACK_METADATA_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d PAD:%d PREGAP:%d PGTYPE:%s PGSUB:%s POSTGAP:%d";
 const char *AV_METADATA_FORMAT = "FPS:%d.%06d WIDTH:%d HEIGHT:%d INTERLACED:%d CHANNELS:%d SAMPLERATE:%d";
 
@@ -106,6 +107,7 @@ enum
 // description of where a metadata entry lives within the file
 struct chd_file::metadata_entry
 {
+	uint32_t                index;			// index of the metadata
 	uint64_t                offset;         // offset within the file of the header
 	uint64_t                next;           // offset within the file of the next header
 	uint64_t                prev;           // offset within the file of the previous header
@@ -248,23 +250,6 @@ inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint3
 	if (UNEXPECTED(err))
 		throw err;
 	return offset;
-}
-
-
-//-------------------------------------------------
-//  bits_for_value - return the number of bits
-//  necessary to represent all numbers 0..value
-//-------------------------------------------------
-
-inline uint8_t chd_file::bits_for_value(uint64_t value) noexcept
-{
-	uint8_t result = 0;
-	while (value != 0)
-	{
-		value >>= 1;
-		result++;
-	}
-	return result;
 }
 
 
@@ -604,6 +589,88 @@ std::error_condition chd_file::set_parent_sha1(util::sha1_t parent) noexcept
 }
 
 /**
+ * @fn  std::error_condition chd_file::create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4])
+ *
+ * @brief   -------------------------------------------------
+ *            create - create a new file with no parent using an existing opened file handle
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  file    The file.
+ * @param   logicalbytes    The logicalbytes.
+ * @param   hunkbytes       The hunkbytes.
+ * @param   unitbytes       The unitbytes.
+ * @param   compression     The compression.
+ *
+ * @return  A std::error_condition.
+ */
+
+std::error_condition chd_file::create(
+		util::random_read_write &file,
+		uint64_t logicalbytes,
+		uint32_t hunkbytes,
+		uint32_t unitbytes,
+		const chd_codec_type (&compression)[4])
+{
+	// make sure we don't already have a file open
+	if (UNEXPECTED(m_file))
+		return error::ALREADY_OPEN;
+
+	assert(!m_owned_file);
+
+	// set the header parameters
+	m_logicalbytes = logicalbytes;
+	m_hunkbytes = hunkbytes;
+	m_unitbytes = unitbytes;
+	memcpy(m_compression, compression, sizeof(m_compression));
+	m_parent.reset();
+
+	// don't take ownership of the file
+	m_file = &file;
+	return create_common();
+}
+
+/**
+ * @fn  std::error_condition chd_file::create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent)
+ *
+ * @brief   -------------------------------------------------
+ *            create - create a new file with a parent using an existing opened file handle
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  file    The file.
+ * @param   logicalbytes    The logicalbytes.
+ * @param   hunkbytes       The hunkbytes.
+ * @param   compression     The compression.
+ * @param [in,out]  parent  The parent.
+ *
+ * @return  A std::error_condition.
+ */
+
+std::error_condition chd_file::create(
+		util::random_read_write &file,
+		uint64_t logicalbytes,
+		uint32_t hunkbytes,
+		const chd_codec_type (&compression)[4],
+		chd_file &parent)
+{
+	// make sure we don't already have a file open
+	if (UNEXPECTED(m_file))
+		return error::ALREADY_OPEN;
+
+	assert(!m_owned_file);
+
+	// set the header parameters
+	m_logicalbytes = logicalbytes;
+	m_hunkbytes = hunkbytes;
+	m_unitbytes = parent.unit_bytes();
+	memcpy(m_compression, compression, sizeof(m_compression));
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), &parent); // don't take ownership of parent
+
+	// don't take ownership of the file
+	m_file = &file;
+	return create_common();
+}
+
+/**
  * @fn  std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4])
  *
  * @brief   -------------------------------------------------
@@ -640,7 +707,8 @@ std::error_condition chd_file::create(
 	m_parent.reset();
 
 	// take ownership of the file
-	m_file = std::move(file);
+	m_owned_file = std::move(file);
+	m_file = m_owned_file.get();
 	return create_common();
 }
 
@@ -678,10 +746,11 @@ std::error_condition chd_file::create(
 	m_hunkbytes = hunkbytes;
 	m_unitbytes = parent.unit_bytes();
 	memcpy(m_compression, compression, sizeof(m_compression));
-	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), &parent);
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), &parent); // don't take ownership of parent
 
 	// take ownership of the file
-	m_file = std::move(file);
+	m_owned_file = std::move(file);
+	m_file = m_owned_file.get();
 	return create_common();
 }
 
@@ -811,6 +880,39 @@ std::error_condition chd_file::open(
 }
 
 /**
+ * @fn  std::error_condition chd_file::open(util::random_read_write &file, bool writeable, chd_file *parent)
+ *
+ * @brief   -------------------------------------------------
+ *            open - open an existing file for read or read/write
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  file    The file.
+ * @param   writeable       true if writeable.
+ * @param [in,out]  parent  If non-null, the parent.
+ *
+ * @return  A std::error_condition.
+ */
+
+std::error_condition chd_file::open(
+		util::random_read_write &file,
+		bool writeable,
+		chd_file *parent,
+		const open_parent_func &open_parent)
+{
+	// make sure we don't already have a file open
+	if (UNEXPECTED(m_file))
+		return error::ALREADY_OPEN;
+
+	assert(!m_owned_file);
+
+	// open the file
+	m_file = &file;
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), parent); // don't take ownership of parent
+	m_cachehunk = ~0;
+	return open_common(writeable, open_parent);
+}
+
+/**
  * @fn  std::error_condition chd_file::open(util::random_read_write::ptr &&file, bool writeable, chd_file *parent)
  *
  * @brief   -------------------------------------------------
@@ -837,8 +939,9 @@ std::error_condition chd_file::open(
 		return std::errc::invalid_argument;
 
 	// open the file
-	m_file = std::move(file);
-	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), parent);
+	m_owned_file = std::move(file);
+	m_file = m_owned_file.get();
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), parent); // don't take ownership of parent
 	m_cachehunk = ~0;
 	return open_common(writeable, open_parent);
 }
@@ -854,7 +957,8 @@ std::error_condition chd_file::open(
 void chd_file::close()
 {
 	// reset file characteristics
-	m_file.reset();
+	m_owned_file.reset();
+	m_file = nullptr;
 	m_allow_reads = false;
 	m_allow_writes = false;
 
@@ -919,10 +1023,10 @@ std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
 				case V34_MAP_ENTRY_TYPE_COMPRESSED:
 					{
 						uint32_t const blocklen = get_u16be(&rawmap[12]) | (uint32_t(rawmap[14]) << 16);
-						std::error_condition err = file_read(blockoffs, &m_compressed[0], blocklen);
+						std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 						if (UNEXPECTED(err))
 							return err;
-						m_decompressor[0]->process(&m_compressed[0], blocklen);
+						m_decompressor[0]->process(m_compressed.data(), blocklen);
 						return std::error_condition();
 					}
 
@@ -958,11 +1062,11 @@ std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
 				case COMPRESSION_TYPE_2:
 				case COMPRESSION_TYPE_3:
 					{
-						std::error_condition err = file_read(blockoffs, &m_compressed[0], blocklen);
+						std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 						if (UNEXPECTED(err))
 							return err;
 						auto &decompressor = *m_decompressor[rawmap[0]];
-						decompressor.process(&m_compressed[0], blocklen);
+						decompressor.process(m_compressed.data(), blocklen);
 						return std::error_condition();
 					}
 
@@ -1045,10 +1149,10 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 				case V34_MAP_ENTRY_TYPE_COMPRESSED:
 					{
 						uint32_t const blocklen = get_u16be(&rawmap[12]) | (uint32_t(rawmap[14]) << 16);
-						std::error_condition err = file_read(blockoffs, &m_compressed[0], blocklen);
+						std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 						if (UNEXPECTED(err))
 							return err;
-						m_decompressor[0]->decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
+						m_decompressor[0]->decompress(m_compressed.data(), blocklen, dest, m_hunkbytes);
 						if (UNEXPECTED(!nocrc && (util::crc32_creator::simple(dest, m_hunkbytes) != blockcrc)))
 							return std::error_condition(error::DECOMPRESSION_ERROR);
 						return std::error_condition();
@@ -1115,14 +1219,14 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 					case COMPRESSION_TYPE_2:
 					case COMPRESSION_TYPE_3:
 						{
-							std::error_condition err = file_read(blockoffs, &m_compressed[0], blocklen);
+							std::error_condition err = file_read(blockoffs, m_compressed.data(), blocklen);
 							if (UNEXPECTED(err))
 								return err;
 							auto &decompressor = *m_decompressor[rawmap[0]];
-							decompressor.decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
+							decompressor.decompress(m_compressed.data(), blocklen, dest, m_hunkbytes);
 							util::crc16_t const calculated = !decompressor.lossy()
 									? util::crc16_creator::simple(dest, m_hunkbytes)
-									: util::crc16_creator::simple(&m_compressed[0], blocklen);
+									: util::crc16_creator::simple(m_compressed.data(), blocklen);
 							if (UNEXPECTED(calculated != blockcrc))
 								return std::error_condition(error::DECOMPRESSION_ERROR);
 							return std::error_condition();
@@ -1206,16 +1310,11 @@ std::error_condition chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 	if (rawentry == 0)
 	{
 		// first make sure we need to allocate it
-		bool all_zeros = true;
-		const auto *scan = reinterpret_cast<const uint32_t *>(buffer);
-		for (uint32_t index = 0; index < m_hunkbytes / 4; index++)
-		{
-			if (scan[index] != 0)
-			{
-				all_zeros = false;
-				break;
-			}
-		}
+		const auto *scan = static_cast<const uint8_t *>(buffer);
+		const bool all_zeros = std::all_of(
+				scan,
+				scan + m_hunkbytes,
+				[] (uint8_t value) { return value == 0; });
 
 		// if it's all zeros, do nothing more
 		if (all_zeros)
@@ -1240,8 +1339,8 @@ std::error_condition chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 			return err;
 
 		// update the cached hunk if we just wrote it
-		if (hunknum == m_cachehunk && buffer != &m_cache[0])
-			memcpy(&m_cache[0], buffer, m_hunkbytes);
+		if (hunknum == m_cachehunk && buffer != m_cache.data())
+			memcpy(m_cache.data(), buffer, m_hunkbytes);
 
 		return std::error_condition();
 	}
@@ -1307,6 +1406,9 @@ std::error_condition chd_file::write_units(uint64_t unitnum, const void *buffer,
 
 std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 {
+	if (!bytes)
+		return std::error_condition();
+	
 	// iterate over hunks
 	uint32_t const first_hunk = offset / m_hunkbytes;
 	uint32_t const last_hunk = (offset + bytes - 1) / m_hunkbytes;
@@ -1329,7 +1431,7 @@ std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_
 			// otherwise, read from the cache
 			if (curhunk != m_cachehunk)
 			{
-				std::error_condition err = read_hunk(curhunk, &m_cache[0]);
+				std::error_condition err = read_hunk(curhunk, m_cache.data());
 				if (UNEXPECTED(err))
 					return err;
 				m_cachehunk = curhunk;
@@ -1360,6 +1462,9 @@ std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_
 
 std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t bytes)
 {
+	if (!bytes)
+		return std::error_condition();
+	
 	// iterate over hunks
 	uint32_t const first_hunk = offset / m_hunkbytes;
 	uint32_t const last_hunk = (offset + bytes - 1) / m_hunkbytes;
@@ -1381,13 +1486,13 @@ std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, 
 			// otherwise, write from the cache
 			if (curhunk != m_cachehunk)
 			{
-				err = read_hunk(curhunk, &m_cache[0]);
+				err = read_hunk(curhunk, m_cache.data());
 				if (UNEXPECTED(err))
 					return err;
 				m_cachehunk = curhunk;
 			}
 			memcpy(&m_cache[startoffs], source, endoffs + 1 - startoffs);
-			err = write_hunk(curhunk, &m_cache[0]);
+			err = write_hunk(curhunk, m_cache.data());
 		}
 
 		// handle errors and advance
@@ -1417,15 +1522,40 @@ std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, 
 
 std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
 {
+	uint32_t index = 0;
+	return read_metadata(searchtag,searchindex, output, index);
+}
+
+/**
+ * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index)
+ *
+ * @brief   -------------------------------------------------
+ *            read_metadata - read the indexed metadata of the given type
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_METADATA_NOT_FOUND   Thrown when a chderr metadata not found error
+ *                                          condition occurs.
+ *
+ * @param   searchtag       The searchtag.
+ * @param   searchindex     The searchindex.
+ * @param [in,out]  output  The output.
+ * @param [in,out]  index   The index of the metadata.
+ *
+ * @return  An error condition.
+ */
+
+std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index)
+{
 	// if we didn't find it, just return
 	metadata_entry metaentry;
 	if (std::error_condition err = metadata_find(searchtag, searchindex, metaentry))
 		return err;
 
+	index = metaentry.index;
 	// read the metadata
 	try { output.assign(metaentry.length, '\0'); }
 	catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
-	return file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
+	return file_read(metaentry.offset + METADATA_HEADER_SIZE, output.data(), metaentry.length);
 }
 
 /**
@@ -1453,7 +1583,7 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
 	// read the metadata
 	try { output.resize(metaentry.length); }
 	catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
-	return file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
+	return file_read(metaentry.offset + METADATA_HEADER_SIZE, output.data(), metaentry.length);
 }
 
 /**
@@ -1515,7 +1645,7 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
 	// read the metadata
 	try { output.resize(metaentry.length); }
 	catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
-	err = file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
+	err = file_read(metaentry.offset + METADATA_HEADER_SIZE, output.data(), metaentry.length);
 	if (UNEXPECTED(err))
 		return err;
 	resulttag = metaentry.metatag;
@@ -1678,12 +1808,12 @@ std::error_condition chd_file::clone_all_metadata(chd_file &source)
 		// read the metadata item
 		try { filedata.resize(metaentry.length); }
 		catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
-		err = source.file_read(metaentry.offset + METADATA_HEADER_SIZE, &filedata[0], metaentry.length);
+		err = source.file_read(metaentry.offset + METADATA_HEADER_SIZE, filedata.data(), metaentry.length);
 		if (UNEXPECTED(err))
 			return err;
 
 		// write it to the destination
-		err = write_metadata(metaentry.metatag, (uint32_t)-1, &filedata[0], metaentry.length, metaentry.flags);
+		err = write_metadata(metaentry.metatag, (uint32_t)-1, filedata.data(), metaentry.length, metaentry.flags);
 		if (UNEXPECTED(err))
 			return err;
 	}
@@ -1725,14 +1855,14 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 
 		// allocate memory and read the data
 		filedata.resize(metaentry.length);
-		err = file_read(metaentry.offset + METADATA_HEADER_SIZE, &filedata[0], metaentry.length);
+		err = file_read(metaentry.offset + METADATA_HEADER_SIZE, filedata.data(), metaentry.length);
 		if (UNEXPECTED(err))
 			throw err;
 
 		// create an entry for this metadata and add it
 		metadata_hash hashentry;
 		put_u32be(hashentry.tag, metaentry.metatag);
-		hashentry.sha1 = util::sha1_creator::simple(&filedata[0], metaentry.length);
+		hashentry.sha1 = util::sha1_creator::simple(filedata.data(), metaentry.length);
 		hasharray.push_back(hashentry);
 	}
 	if (err != error::METADATA_NOT_FOUND)
@@ -1740,13 +1870,19 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 
 	// sort the array
 	if (!hasharray.empty())
-		qsort(&hasharray[0], hasharray.size(), sizeof(hasharray[0]), metadata_hash_compare);
+		std::sort(
+				hasharray.begin(),
+				hasharray.end(),
+				[] (metadata_hash const &a, metadata_hash const &b)
+				{
+					return memcmp(&a, &b, sizeof(metadata_hash)) < 0;
+				});
 
 	// read the raw data hash from our header and start a new SHA1 with that data
 	util::sha1_creator overall_sha1;
 	overall_sha1.append(&rawsha1, sizeof(rawsha1));
 	if (!hasharray.empty())
-		overall_sha1.append(&hasharray[0], hasharray.size() * sizeof(hasharray[0]));
+		overall_sha1.append(hasharray.data(), hasharray.size() * sizeof(hasharray[0]));
 	return overall_sha1.finish();
 }
 
@@ -2029,8 +2165,13 @@ void chd_file::parse_v5_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 	m_mapoffset = get_u64be(&rawheader[40]);
 	m_metaoffset = get_u64be(&rawheader[48]);
 	m_hunkbytes = get_u32be(&rawheader[56]);
-	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitbytes = get_u32be(&rawheader[60]);
+
+	// hunk and unit sizes must be non-zero before calculating counts
+	if (UNEXPECTED(!m_hunkbytes || !m_unitbytes))
+		throw std::error_condition(error::INVALID_FILE);
+
+	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
 
 	// determine compression
@@ -2073,11 +2214,11 @@ std::error_condition chd_file::compress_v5_map()
 	try
 	{
 		// first get a CRC-16 of the original rawmap
-		util::crc16_t mapcrc = util::crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12);
+		util::crc16_t mapcrc = util::crc16_creator::simple(m_rawmap.data(), m_hunkcount * 12);
 
 		// create a buffer to hold the RLE data
 		std::vector<uint8_t> compression_rle(m_hunkcount);
-		uint8_t *dest = &compression_rle[0];
+		uint8_t *dest = compression_rle.data();
 
 		// use a huffman encoder for 16 different codes, maximum length is 8 bits
 		huffman_encoder<16, 8> encoder;
@@ -2110,7 +2251,7 @@ std::error_condition chd_file::compress_v5_map()
 			else if (curcomp == COMPRESSION_PARENT)
 			{
 				// promote parent block references to more compact forms
-				uint32_t refunit = get_u48be(&m_rawmap[hunknum * 12 + 4]);
+				uint64_t const refunit = get_u48be(&m_rawmap[hunknum * 12 + 4]);
 				if (refunit == mulu_32x32(hunknum, m_hunkbytes) / m_unitbytes)
 					curcomp = COMPRESSION_PARENT_SELF;
 				else if (refunit == last_parent)
@@ -2158,9 +2299,9 @@ std::error_condition chd_file::compress_v5_map()
 		}
 
 		// determine the number of bits we need to hold the a length and a hunk index
-		const uint8_t lengthbits = bits_for_value(max_complen);
-		const uint8_t selfbits = bits_for_value(max_self);
-		const uint8_t parentbits = bits_for_value(max_parent);
+		const uint8_t lengthbits = std::bit_width(max_complen);
+		const uint8_t selfbits = std::bit_width(max_self);
+		const uint8_t parentbits = std::bit_width(max_parent);
 
 		// determine the needed size of the output buffer
 		// 16 bytes is required for the header
@@ -2185,13 +2326,13 @@ std::error_condition chd_file::compress_v5_map()
 			throw std::error_condition(error::COMPRESSION_ERROR);
 
 		// encode the data
-		for (uint8_t *src = &compression_rle[0]; src < dest; src++)
+		for (uint8_t *src = compression_rle.data(); src < dest; src++)
 			encoder.encode_one(bitbuf, *src);
 
 		// for each compression type, output the relevant data
 		lastcomp = 0;
 		count = 0;
-		uint8_t *src = &compression_rle[0];
+		uint8_t *src = compression_rle.data();
 		uint64_t firstoffs = 0;
 		for (uint32_t hunknum = 0; hunknum < m_hunkcount; hunknum++)
 		{
@@ -2256,7 +2397,7 @@ std::error_condition chd_file::compress_v5_map()
 		// write the map header
 		uint32_t complen = bitbuf.flush();
 		assert(!bitbuf.overflow());
-		put_u32be(&compressed[0], complen);
+		put_u32be(compressed.data(), complen);
 		put_u48be(&compressed[4], firstoffs);
 		put_u16be(&compressed[10], mapcrc);
 		compressed[12] = lengthbits;
@@ -2265,7 +2406,7 @@ std::error_condition chd_file::compress_v5_map()
 		compressed[15] = 0;
 
 		// write the result
-		m_mapoffset = file_append(&compressed[0], complen + 16);
+		m_mapoffset = file_append(compressed.data(), complen + 16);
 
 		// then write the map offset
 		uint8_t rawbuf[sizeof(uint64_t)];
@@ -2298,7 +2439,7 @@ void chd_file::decompress_v5_map()
 	// if no offset, we haven't written it yet
 	if (m_mapoffset == 0)
 	{
-		memset(&m_rawmap[0], 0xff, m_rawmap.size());
+		memset(m_rawmap.data(), 0xff, m_rawmap.size());
 		return;
 	}
 
@@ -2317,10 +2458,10 @@ void chd_file::decompress_v5_map()
 
 	// now read the map
 	std::vector<uint8_t> compressed(mapbytes);
-	ioerr = file_read(m_mapoffset + 16, &compressed[0], mapbytes);
+	ioerr = file_read(m_mapoffset + 16, compressed.data(), mapbytes);
 	if (UNEXPECTED(ioerr))
 		throw ioerr;
-	bitstream_in bitbuf(&compressed[0], compressed.size());
+	bitstream_in bitbuf(compressed.data(), compressed.size());
 
 	// first decode the compression types
 	huffman_decoder<16, 8> decoder;
@@ -2409,7 +2550,7 @@ void chd_file::decompress_v5_map()
 	}
 
 	// verify the final CRC
-	if (UNEXPECTED(util::crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12) != mapcrc))
+	if (UNEXPECTED(util::crc16_creator::simple(m_rawmap.data(), m_hunkcount * 12) != mapcrc))
 		throw std::error_condition(error::DECOMPRESSION_ERROR);
 }
 
@@ -2442,8 +2583,8 @@ std::error_condition chd_file::create_common()
 		if (UNEXPECTED(m_parent && m_parent->version() < 3))
 			throw std::error_condition(error::UNSUPPORTED_VERSION);
 
-		// must be an even number of units per hunk
-		if (UNEXPECTED(m_hunkbytes % m_unitbytes != 0))
+		// must have valid sizes and a whole number of units per hunk
+		if (UNEXPECTED(!m_hunkbytes || !m_unitbytes || (m_hunkbytes % m_unitbytes != 0)))
 			throw std::error_condition(std::errc::invalid_argument);
 		if (UNEXPECTED(m_parent && m_unitbytes != m_parent->unit_bytes()))
 			throw std::error_condition(std::errc::invalid_argument);
@@ -2643,7 +2784,7 @@ void chd_file::create_open_common()
 	}
 	else
 	{
-		std::error_condition err = file_read(m_mapoffset, &m_rawmap[0], m_rawmap.size());
+		std::error_condition err = file_read(m_mapoffset, m_rawmap.data(), m_rawmap.size());
 		if (UNEXPECTED(err))
 			throw err;
 	}
@@ -2808,6 +2949,7 @@ std::error_condition chd_file::metadata_find(chd_metadata_tag metatag, int32_t m
 	{
 		metaentry.offset = m_metaoffset;
 		metaentry.prev = 0;
+		metaentry.index = 0;
 	}
 	else
 	{
@@ -2836,6 +2978,7 @@ std::error_condition chd_file::metadata_find(chd_metadata_tag metatag, int32_t m
 				return std::error_condition();
 
 		// no match, fetch the next link
+		metaentry.index++;
 		metaentry.prev = metaentry.offset;
 		metaentry.offset = metaentry.next;
 	}
@@ -2906,23 +3049,6 @@ void chd_file::metadata_update_hash()
 		throw err;
 }
 
-/**
- * @fn  int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *elem2)
- *
- * @brief   -------------------------------------------------
- *            metadata_hash_compare - compare two hash entries
- *          -------------------------------------------------.
- *
- * @param   elem1   The first element.
- * @param   elem2   The second element.
- *
- * @return  A CLIB_DECL.
- */
-
-int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *elem2)
-{
-	return memcmp(elem1, elem2, sizeof(metadata_hash));
-}
 
 
 
@@ -3002,7 +3128,7 @@ void chd_file_compressor::compress_begin()
 
 	// reset work item state
 	m_work_buffer.resize(hunk_bytes() * (WORK_BUFFER_HUNKS + 1));
-	memset(&m_work_buffer[0], 0, m_work_buffer.size());
+	memset(m_work_buffer.data(), 0, m_work_buffer.size());
 	m_compressed_buffer.resize(hunk_bytes() * WORK_BUFFER_HUNKS);
 	for (int itemnum = 0; itemnum < WORK_BUFFER_HUNKS; itemnum++)
 	{
@@ -3091,7 +3217,7 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			for (uint32_t unit = 0; unit < units; unit++)
 			{
 				if (m_parent_map.find(item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1) == hashmap::NOT_FOUND)
-					m_parent_map.add(item.m_hunknum * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
+					m_parent_map.add(uint64_t(item.m_hunknum) * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
 			}
 		}
 		else if (!compressed())
@@ -3306,8 +3432,8 @@ void chd_file_compressor::async_read()
 	if ((m_read_done_offset + numbytes) > logical_bytes())
 		numbytes = logical_bytes() - m_read_done_offset;
 
-	uint8_t *const dest = &m_work_buffer[0] + (m_read_done_offset % work_buffer_bytes);
-	assert((&m_work_buffer[0] == dest) || (&m_work_buffer[work_buffer_bytes / 2] == dest));
+	uint8_t *const dest = m_work_buffer.data() + (m_read_done_offset % work_buffer_bytes);
+	assert((m_work_buffer.data() == dest) || (&m_work_buffer[work_buffer_bytes / 2] == dest));
 	assert(!(m_read_done_offset % hunk_bytes()));
 	uint64_t const end_offset = m_read_done_offset + numbytes;
 

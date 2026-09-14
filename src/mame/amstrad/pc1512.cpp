@@ -1157,7 +1157,7 @@ void pc1512_state::pc1512(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_raw(28.636363_MHz_XTAL, 912, 0, 910, 262, 0, 260);
 	screen.set_screen_update(m_vdu, FUNC(ams40041_device::screen_update));
 

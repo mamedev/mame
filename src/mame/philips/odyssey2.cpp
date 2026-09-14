@@ -772,7 +772,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(odyssey2_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette("palette");
@@ -834,7 +834,7 @@ void vpp_state::g7400(machine_config &config)
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(vpp_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette("palette");

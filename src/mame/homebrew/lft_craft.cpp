@@ -209,7 +209,7 @@ void lft_craft_state::craft(machine_config &config)
 	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(FUNC(lft_craft_state::port_d_w));
 
 	PALETTE(config, m_palette, FUNC(lft_craft_state::init_palette), 64);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK, 635, 47, 527, 525, 36, 516);
 	m_screen->set_screen_update(FUNC(lft_craft_state::screen_update));
 

@@ -14,13 +14,14 @@
     TODO:
 
     - cleanup
-    - http://hitmen.c02.at/temp/palstuff/
+    - https://hitmen.c02.at/temp/palstuff/
 
 */
 
 #include "emu.h"
 #include "mos6566.h"
 
+#include "cpu/m6502/m6502.h"
 #include "screen.h"
 
 
@@ -126,37 +127,13 @@ static const rgb_t PALETTE_MOS[] =
 		} \
 	} while (0)
 
-#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8569))
+#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 #define IS_VICIIE               ((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 
 #define ROW25_YSTART      0x33
 #define ROW25_YSTOP       0xfb
 #define ROW24_YSTART      0x37
 #define ROW24_YSTOP       0xf7
-
-#define RASTERLINE_2_C64(a)     (a)
-#define C64_2_RASTERLINE(a)     (a)
-#define XPOS                (VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE) / 2)
-#define YPOS                (VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE) / 2 */)
-#define FIRSTCOLUMN         50
-
-/* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
-
-#define LIGHTPEN_BUTTON     (m_in_lightpen_button_func(0))
-#define LIGHTPEN_X_VALUE    (m_in_lightpen_x_func(0))
-#define LIGHTPEN_Y_VALUE    (m_in_lightpen_y_func(0))
-
-/* lightpen delivers values from internal counters; they do not start with the visual area or frame area */
-#define VIC2_MAME_XPOS          0
-#define VIC2_MAME_YPOS          0
-#define VIC6567_X_BEGIN         38
-#define VIC6567_Y_BEGIN         -6             /* first 6 lines after retrace not for lightpen! */
-#define VIC6569_X_BEGIN         38
-#define VIC6569_Y_BEGIN         -6
-#define VIC2_X_BEGIN            (IS_PAL ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
-#define VIC2_Y_BEGIN            (IS_PAL ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
-#define VIC2_X_VALUE            ((LIGHTPEN_X_VALUE / 1.3) + 12)
-#define VIC2_Y_VALUE            ((LIGHTPEN_Y_VALUE      ) + 10)
 
 /* sprites 0 .. 7 */
 #define SPRITEON(nr)            (m_reg[0x15] & (1 << nr))
@@ -196,6 +173,7 @@ static const rgb_t PALETTE_MOS[] =
 #define FOREGROUNDCOLOR         (m_reg[0x24] & 0x0f)
 
 #define VIC2_LINES              (IS_PAL ? VIC6569_LINES : VIC6567_LINES)
+#define VIC2_CYCLESPERLINE      (IS_PAL ? VIC6569_CYCLESPERLINE : VIC6567_CYCLESPERLINE)
 #define VIC2_FIRST_DMA_LINE     (IS_PAL ? VIC6569_FIRST_DMA_LINE : VIC6567_FIRST_DMA_LINE)
 #define VIC2_LAST_DMA_LINE      (IS_PAL ? VIC6569_LAST_DMA_LINE : VIC6567_LAST_DMA_LINE)
 #define VIC2_FIRST_DISP_LINE    (IS_PAL ? VIC6569_FIRST_DISP_LINE : VIC6567_FIRST_DISP_LINE)
@@ -312,7 +290,6 @@ inline void mos6566_device::spr_ba(int num)
 	if (BIT(m_spr_dma_on, num))
 	{
 		set_ba(CLEAR_LINE);
-		m_rdy_cycles += 2;
 	}
 	else if (num > 1 && !BIT(m_spr_dma_on, num - 1))
 	{
@@ -368,7 +345,6 @@ inline void mos6566_device::bad_line_ba()
 		if (m_ba)
 		{
 			set_ba(CLEAR_LINE);
-			m_rdy_cycles += 55 - m_cycle;
 		}
 	}
 	else
@@ -779,6 +755,7 @@ void mos6566_device::device_reset()
 	m_color_data = 0;
 	m_last_char_data = 0;
 	m_vblanking = 0;
+	m_lp_latched_this_frame = false;
 	m_ml_index = 0;
 	m_rc = 0;
 	m_vc = 0;
@@ -828,7 +805,6 @@ void mos6566_device::device_reset()
 	m_ba = CLEAR_LINE;
 	m_aec = CLEAR_LINE;
 	m_aec_delay = 0xff;
-	m_rdy_cycles = 0;
 
 	set_ba(ASSERT_LINE);
 	set_aec(ASSERT_LINE);
@@ -843,9 +819,6 @@ void mos6566_device::execute_run()
 {
 	do
 	{
-		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
-		uint8_t vic_cycles = total_cycles() & 0xff;
-
 		m_phi0 = 0;
 
 		m_aec_delay <<= 1;
@@ -892,8 +865,11 @@ void mos6566_device::execute_run()
 			{
 				// Vertical blank, reset counters
 				m_rasterline = m_vc_base = 0;
+				m_lp_latched_this_frame = false;
 				m_ref_cnt = 0xff;
 				m_vblanking = 0;
+
+				m_bad_lines_enabled = 0;
 
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
@@ -1414,12 +1390,6 @@ void mos6566_device::execute_run()
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
 
-		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
-		{
-			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
-			m_rdy_cycles = 0;
-		}
-
 		m_icount--;
 	} while (m_icount > 0);
 }
@@ -1433,9 +1403,6 @@ void mos6569_device::execute_run()
 {
 	do
 	{
-		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
-		uint8_t vic_cycles = total_cycles() & 0xff;
-
 		m_phi0 = 0;
 
 		m_aec_delay <<= 1;
@@ -1484,8 +1451,11 @@ void mos6569_device::execute_run()
 			{
 				// Vertical blank, reset counters
 				m_rasterline = m_vc_base = 0;
+				m_lp_latched_this_frame = false;
 				m_ref_cnt = 0xff;
 				m_vblanking = 0;
+
+				m_bad_lines_enabled = 0;
 
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
@@ -1984,12 +1954,6 @@ void mos6569_device::execute_run()
 
 		m_raster_x += 8;
 		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
-
-		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
-		{
-			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
-			m_rdy_cycles = 0;
-		}
 
 		m_icount--;
 	} while (m_icount > 0);
@@ -2737,7 +2701,7 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 		{
 			if (BIT(m_reg[offset], 0) != BIT(data, 0))
 			{
-				m_cpu->set_unscaled_clock(clock() << BIT(data, 0));
+				m_cpu->set_unscaled_clock((clock() / 8) << BIT(data, 0));
 			}
 
 			m_reg[offset] = data | 0xfc;
@@ -2778,13 +2742,71 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 
 void mos6566_device::lp_w(int state)
 {
-	if (m_lp && !state && !(m_reg[REGISTER_IRQ] & IRQ_LP))
+	if (m_lp && !state && !m_lp_latched_this_frame)
 	{
 		m_reg[REGISTER_LPX] = m_raster_x >> 1;
 		m_reg[REGISTER_LPY] = m_rasterline;
+		m_lp_latched_this_frame = true;
 
 		set_interrupt(IRQ_LP);
 	}
 
 	m_lp = state;
+}
+
+
+//-------------------------------------------------
+//  time_until_pos - time until the chip's own
+//  raster_x/rasterline counters (the ones lp_w
+//  latches into LPX/LPY) reach the given position
+//-------------------------------------------------
+
+attotime mos6566_device::time_until_pos(int rasterline, int raster_x) const
+{
+	// m_raster_x holds 0x004, 0x00c, ..., 0x1f4 (0x1fc is skipped by the
+	// wraparound check in execute_run()), so it free-runs on a 63-value
+	// cycle regardless of variant - NOT 64, and NOT tied to cycles_per_line
+	// (65 on NTSC, 63 on PAL).
+	int constexpr raster_x_period = ((0x1f4 - 0x004) / 8) + 1;
+
+	int const cycles_per_line = VIC2_CYCLESPERLINE;
+
+	int lines_to_advance = (rasterline - m_rasterline + VIC2_LINES) % VIC2_LINES;
+	if (lines_to_advance == 0)
+		lines_to_advance = VIC2_LINES;
+
+	u64 cycles_to_line_start = u64(cycles_per_line - m_cycle + 1) + u64(lines_to_advance - 1) * cycles_per_line;
+
+	int const current_x_index = (m_raster_x / 8) % raster_x_period;
+	int const target_x_index = ((raster_x / 8) % raster_x_period + raster_x_period) % raster_x_period;
+	int const index_at_line_start = (current_x_index + int(cycles_to_line_start % raster_x_period)) % raster_x_period;
+
+	// raster_x_period <= cycles_per_line always, so the soonest match is
+	// always within the target line itself.
+	int const delta = (target_x_index - index_at_line_start + raster_x_period) % raster_x_period;
+
+	return clocks_to_attotime(cycles_to_line_start + delta);
+}
+
+
+//-------------------------------------------------
+//  time_until_lightpen_pos - time_until_pos(),
+//  taking a crosshair position (0-255 across the
+//  visible picture, matching vcs_lightpen_device's
+//  LIGHTX/LIGHTY convention) instead of raw chip
+//  coordinates
+//-------------------------------------------------
+
+attotime mos6566_device::time_until_lightpen_pos(int x255, int y255) const
+{
+	int const visible_lines = IS_PAL ? VIC6569_VISIBLELINES : VIC6567_VISIBLELINES;
+	int const target_rasterline = (VIC2_FIRST_DISP_LINE + (y255 * visible_lines) / 256) % VIC2_LINES;
+
+	int const columns_total = IS_PAL ? VIC6569_COLUMNS : VIC6567_COLUMNS;
+	int const visible_columns = IS_PAL ? VIC6569_VISIBLECOLUMNS : VIC6567_VISIBLECOLUMNS;
+
+	int constexpr BITMAP_X_TO_RASTER_X = 17; // hand-tuned
+	int const target_raster_x = ((x255 * visible_columns) / 256 + BITMAP_X_TO_RASTER_X + columns_total) % columns_total;
+
+	return time_until_pos(target_rasterline, target_raster_x);
 }

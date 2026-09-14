@@ -109,7 +109,7 @@ void tvgame_state::tvgame(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tvgame_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(tvgame_state::screen_update));
@@ -139,5 +139,5 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT        COMPANY      FULLNAME              FLAGS
-CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  tvgame_state, empty_init, "Mr. Isizu", "Z80 TV Game System", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME              FLAGS
+CONS( 2011, tvgame, 0,      0,      tvgame,  tvgame, tvgame_state, empty_init, "Mr. Isizu", "Z80 TV Game System", MACHINE_SUPPORTS_SAVE )

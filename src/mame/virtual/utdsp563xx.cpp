@@ -672,7 +672,7 @@ void utdsp563xx_state::utdsp563xx(machine_config &config)
 	DSP56311(config, m_cpu, 66_MHz_XTAL);
 	m_cpu->set_hard_omr(0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_native_aspect();
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);

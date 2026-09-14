@@ -271,7 +271,7 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 
 	MICROTOUCH(config, "microtouch", 9600).stx().set("uart", FUNC(ins8250_uart_device::rx_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// HTOTAL: 440  VTOTAL: 260  MAX_X: 319  MAX_Y: 199  HSYNC: 360-391  VSYNC: 224-239  Freq: 60.096154fps
 	screen.set_raw(27'500'000 / 32, 440, 0, 320, 260, 0, 200);
 	screen.set_screen_update(FUNC(pntnpuzls_state::screen_update));

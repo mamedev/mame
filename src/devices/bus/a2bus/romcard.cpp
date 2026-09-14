@@ -244,8 +244,9 @@ void a2bus_romcard_device::do_io(int offset)
 
 uint8_t a2bus_romcard_device::read_c0nx(uint8_t offset)
 {
-	do_io(offset & 0xf);
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		do_io(offset & 0xf);
+	return get_open_bus();
 }
 
 

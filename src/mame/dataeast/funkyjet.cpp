@@ -409,7 +409,7 @@ void funkyjet_state::funkyjet(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	m_screen->set_size(40*8, 32*8);

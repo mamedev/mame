@@ -20,7 +20,7 @@ const unsigned k_HashCalc_NumGroups = 4;
   if (size <= 8) : upper case : reversed byte order : it shows 32-bit/64-bit number, if data contains little-endian number
   if (size >  8) : lower case : original byte order (as big-endian byte sequence)
 */
-void HashHexToString(char *dest, const Byte *data, UInt32 size);
+void HashHexToString(char *dest, const Byte *data, size_t size);
 
 enum
 {
@@ -226,6 +226,7 @@ struct CHashPair
   CByteBuffer Hash;
   char Mode;
   bool IsBSD;
+  bool Escape;
   bool Size_from_Arc_Defined;
   bool Size_from_Disk_Defined;
   AString Method;
@@ -259,6 +260,7 @@ struct CHashPair
   CHashPair():
       Mode(0)
       , IsBSD(false)
+      , Escape(false)
       , Size_from_Arc_Defined(false)
       , Size_from_Disk_Defined(false)
       // , HashLengthInBits(0)
@@ -275,41 +277,33 @@ Z7_CLASS_IMP_CHandler_IInArchive_3(
     ISetProperties
 )
   bool _isArc;
-  UInt64 _phySize;
-  CObjectVector<CHashPair> HashPairs;
-  UString _nameExtenstion;
-  // UString _method_fromName;
-  AString _pgpMethod;
+  bool _supportWindowsBackslash;
+  bool _crcSize_WasSet;
   bool _is_CksumMode;
   bool _is_PgpMethod;
   bool _is_ZeroMode;
   bool _are_there_Tags;
   bool _are_there_Dirs;
+  bool _is_KnownMethod_in_FileName;
   bool _hashSize_Defined;
   unsigned _hashSize;
-
-  bool _crcSize_WasSet;
   UInt32 _crcSize;
+  UInt64 _phySize;
+  CObjectVector<CHashPair> HashPairs;
   UStringVector _methods;
+  AString _method_from_FileName;
+  AString _pgpMethod;
+  AString _method_for_Extraction;
+  CHashOptionsLocal _options;
 
   void ClearVars();
-
-  void InitProps()
-  {
-    _crcSize_WasSet = false;
-    _crcSize = 4;
-    _methods.Clear();
-    _options.Init_HashOptionsLocal();
-  }
-
-  CHashOptionsLocal _options;
+  void InitProps();
 
   bool CanUpdate() const
   {
     if (!_isArc || _is_PgpMethod || _is_CksumMode)
       return false;
     return true;
-
   }
 
   HRESULT SetProperty(const wchar_t *nameSpec, const PROPVARIANT &value);

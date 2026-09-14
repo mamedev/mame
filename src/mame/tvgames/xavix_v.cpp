@@ -127,24 +127,37 @@ void superxavix_state::bmp_palram_l_w(offs_t offset, uint8_t data)
 }
 
 
+void xavix_state::spriteram_set_high_x(offs_t offset, uint8_t data)
+{
+	offset &= 0xff;
+	m_fragment_sprite[0x000 + offset] = (m_fragment_sprite[0x000 + offset] & 0xfe) | (data ? 1 : 0);
+	m_fragment_sprite[0x400 + offset] = data ? 1 : 0;
+}
+
 void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 {
-	if (offset < 0x100)
+	if (offset < 0x100) // 0x000 - 0x0ff
+	{
+		m_fragment_sprite[offset] = data & 0xfe;
+		spriteram_set_high_x(offset, data & 0x01);
+	}
+	else if (offset < 0x300) // 0x100-0x2ff
 	{
 		m_fragment_sprite[offset] = data;
-		m_fragment_sprite[offset + 0x400] = data & 0x01;
 	}
-	else if (offset < 0x400)
+	else if (offset < 0x400) // 0x300-0x3ff
 	{
+		// copy sprite x bit 7 into bit 8 (which is stored at 0x4xx, and can also be seen in the low bit of 0x0xx)
+		// pl1000 has explicit codepaths where it doesn't bother to set the 0x400-0x4ff range if it isn't needed
+		// and we can't be using old values from there
 		m_fragment_sprite[offset] = data;
+		spriteram_set_high_x(offset, data & 0x80);
 	}
-	else if (offset < 0x500)
+	else if (offset < 0x500) // 0x400-0x4ff
 	{
-		m_fragment_sprite[offset] = data & 1;
-		m_fragment_sprite[offset - 0x400] = (m_fragment_sprite[offset - 0x400] & 0xfe) | (data & 0x01);
-		m_sprite_xhigh_ignore_hack = false; // still doesn't help monster truck test mode case, which writes here, but still expects values to be ignored
+		spriteram_set_high_x(offset, data & 0x01);
 	}
-	else
+	else // 0x500-0x7ff
 	{
 		m_fragment_sprite[offset] = data;
 	}
@@ -1163,59 +1176,17 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			int drawline = line - spritelowy;
 
-
-			/* coordinates are signed, based on screen position 0,0 being at the center of the screen
-			   tile addressing likewise, point 0,0 is center of tile?
-			   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
-			   this is likely still incorrect
-
-			   -- NOTE! HACK!
-
-			   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
-			   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
-			   maybe only works with certain tile sizes?
-
-			   some code even suggests this should be bit 0 of attr0, but it never gets set there
-			   (I'm mirroring the bits in the write handler at the moment)
-
-			   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
-			   behavior, as we need to make use of xposh for the left side in cases that need it, but that
-			   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
-
-			   monster truck hidden service mode ends up writing to the RAM, breaking the 'clock' display if
-			   we use the values for anything.. again suggesting there must be a way to ignore it entirely?
-
-			 */
+			// There's also an oddity with pl1000, where you can shoot cars that have
+			// wrapped around to the edge before they vanish, previously these were
+			// visible (incorrectly) now they are not visible, but you can still shoot
+			// them (maybe BTNAB)
 
 			int xposh = spr_xposh[i] & 1;
 
-			if (xpos & 0x80) // left side of center
-			{
-				xpos &= 0x7f;
-				xpos = -0x80 + xpos;
-
-				// this also breaks the epoch logo on suprtvpc, although some ingame elements need it
-				if (!m_sprite_xhigh_ignore_hack)
-					if (!xposh)
-						xpos -= 0x80;
-
-			}
-			else // right side of center
-			{
-				xpos &= 0x7f;
-
-				if (!m_sprite_xhigh_ignore_hack)
-					if (xposh)
-						xpos += 0x80;
-			}
-
-			xpos += 128;
-
+			xpos |= xposh << 8;
+			xpos ^= 0x100;
 			xpos += xpos_adjust;
-
-			// galplus phalanx beam (sprite wraparound)
-			if (xpos<-0x80)
-				xpos += 256+128;
+			xpos -= 0x80;
 
 			int bpp = 1;
 

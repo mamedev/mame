@@ -14,7 +14,7 @@
     which matches the "priority among interrupts on the same level"
     column of table 5-2.
 
-	TODO: DTC support
+    TODO: DTC support
 
 ***************************************************************************/
 

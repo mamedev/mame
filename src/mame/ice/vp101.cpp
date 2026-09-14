@@ -563,7 +563,7 @@ void vp10x_state::vp101(machine_config &config)
 	m_maincpu->set_system_clock(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::main_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(vp10x_state::screen_update));
@@ -583,7 +583,7 @@ void vp10x_state::vp50(machine_config &config)
 	m_maincpu->set_system_clock(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::vp50_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(vp10x_state::vp50_screen_update));

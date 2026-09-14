@@ -26,13 +26,15 @@
 
 --]]--------------------------------------------------------------------------
 
--- extended for LuaSQLite3, and for Lua 5.2 (using lunitx)
--- Copyright (c) 2005-13 Doug Currie
+-- extended for LuaSQLite3, and for Lua 5.2 through 5.4 (using lunitx)
+-- Copyright (c) 2005-18 Doug Currie
 -- Same license as above
 
 local sqlite3 = require(arg[1]) -- "lsqlite3complete" or "lsqlite3"
 
 local os = os
+local io = io
+local table = table
 
 --local lunit = require "lunitx"
 local lunit = require "lunit"
@@ -49,6 +51,88 @@ else
     module('tests_sqlite3', lunit.testcase, package.seeall)
     tests_sqlite3 = _M
 
+end
+
+-- test for Windows
+
+local is_win = package.config:sub(1, 1) == "\\"
+
+-- \ on Windows, / on Unix
+
+local dir_sep = is_win and "\\" or "/"
+
+-- auxiliary function:
+-- gets the real full path
+-- to a temporary directory
+-- in the operating system
+
+local function get_temp_dir()
+  local tmp_dir
+  if is_win then
+    tmp_dir = os.getenv("TMP") or os.getenv("TEMP")
+    if tmp_dir then
+      -- remove trailing dir sep
+      tmp_dir = (tmp_dir:gsub("[\\/]$", ""))
+    else
+      -- C:\
+      local drive = os.getenv("SystemDrive") or "C:\\"
+      if drive then
+        tmp_dir = (drive:gsub("[\\/]$", "")) .. "\\TMP"
+      else
+        tmp_dir = "C:\\TMP"
+      end
+    end
+  else
+    -- On macOS 26, /tmp is a symbolic link,
+    -- which makes the assertion on `test_db_filename'
+    -- to fail, because it tries to compare
+    -- the symbolic link path with the
+    -- real file path. Thus, we test whether
+    -- /tmp is a symlink, and resolve the path
+    -- when it is needed.
+
+    tmp_dir = "/tmp"
+    local is_tmp_symlink = false
+    local test_tmp_process = io.popen("if test -L " .. tmp_dir .. "; then printf 'true'; else printf 'false'; fi;", "r")
+
+    if test_tmp_process then
+      local content = test_tmp_process:read("*a")
+      test_tmp_process:close()
+      is_tmp_symlink = content and content:lower() == "true"
+    end
+
+    if is_tmp_symlink then
+      local readlink_process = io.popen("readlink -f " .. tmp_dir, "r")
+      if readlink_process then
+        local link_path = readlink_process:read("*a")
+        readlink_process:close()
+        if link_path then
+          -- trim start, trim end, and erase trailing dir sep on `link_path'
+          tmp_dir = (link_path:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\\/]$", ""))
+        end
+      end
+    end
+  end
+  return tmp_dir
+end
+
+-- auxiliary function:
+-- combines multiple path
+-- components to form a
+-- joined path
+
+local function path_join(...)
+  local path = {}
+  for i, component in ipairs({...}) do
+    table.insert(path, (component:gsub("[\\/]$", dir_sep)))
+  end
+  return table.concat(path, dir_sep)
+end
+
+-- auxiliary function:
+-- gets a temporary filename
+local function get_temp_file(name)
+  return path_join(get_temp_dir(), name)
 end
 
 -- compat
@@ -78,7 +162,7 @@ lunit_wrap("open_memory", function()
 end)
 
 lunit_wrap("open", function()
-  local filename = "/tmp/__lua-sqlite3-20040906135849." .. os.time()
+  local filename = get_temp_file("__lua-sqlite3-20040906135849." .. os.time())
   local db = assert_userdata( sqlite3.open(filename) )
   assert( db:close() )
   os.remove(filename)
@@ -236,6 +320,115 @@ function basics.test_update()
   basics.insert(2, "Hello Lua")
   basics.update(1, "Hello World")
 end
+
+
+
+---------------------
+-- Iterator styles --
+---------------------
+
+local iterating = lunit_TestCase("Iterator")
+
+function iterating.setup()
+  iterating.db = assert_userdata( sqlite3.open_memory() )
+  assert_equal( sqlite3.OK, iterating.db:exec("CREATE TABLE test (id, name)") )
+  assert_equal( sqlite3.OK, iterating.db:exec("INSERT INTO test VALUES (1, 'Hello World')") )
+  assert_equal( sqlite3.OK, iterating.db:exec("INSERT INTO test VALUES (2, 'Hello Lua')") )
+  assert_equal( sqlite3.OK, iterating.db:exec("INSERT INTO test VALUES (3, 'Hello sqlite3')") )
+end
+
+function iterating.teardown()
+  assert_equal( sqlite3.OK, iterating.db:close() )
+end
+
+function iterating.test_rows()
+  local expected = {
+    "Hello World",
+    "Hello Lua",
+    "Hello sqlite3",
+  }
+  for row in iterating.db:rows("SELECT * FROM test ORDER BY id") do
+    assert( row[1] > 0 and row[1] <= 3, "Index out of range" )
+    assert_equal( expected[row[1]], row[2])
+  end
+
+  for row in iterating.db:nrows("SELECT * FROM test ORDER BY id") do
+    assert( row.id > 0 and row.id <= 3, "Index out of range" )
+    assert_equal( expected[row.id], row.name)
+  end
+
+  for id, name in iterating.db:urows("SELECT * FROM test ORDER BY id") do
+    assert( id > 0 and id <= 3, "Index out of range" )
+    assert_equal( expected[id], name)
+  end
+end
+
+function iterating.test_arg_rows()
+  local expected = {
+    "Hello World",
+    "Hello Lua",
+    "Hello sqlite3",
+  }
+  for row in iterating.db:rows("SELECT * FROM test WHERE id >= ? ORDER BY id", 2) do
+    assert( row[1] > 1 and row[1] <= 3, "Index out of range" )
+    assert_equal( expected[row[1]], row[2])
+  end
+
+  for row in iterating.db:nrows("SELECT * FROM test WHERE id >= ? ORDER BY id", 2) do
+    assert( row.id > 1 and row.id <= 3, "Index out of range" )
+    assert_equal( expected[row.id], row.name)
+  end
+
+  for id, name in iterating.db:urows("SELECT * FROM test WHERE id >= ? ORDER BY id", 2) do
+    assert( id > 1 and id <= 3, "Index out of range" )
+    assert_equal( expected[id], name)
+  end
+end
+
+function iterating.test_narg_rows()
+  local expected = {
+    "Hello World",
+    "Hello Lua",
+    "Hello sqlite3",
+  }
+  for row in iterating.db:rows("SELECT * FROM test WHERE id >= ? ORDER BY id", { 2 }) do
+    assert( row[1] > 1 and row[1] <= 3, "Index out of range" )
+    assert_equal( expected[row[1]], row[2])
+  end
+
+  for row in iterating.db:nrows("SELECT * FROM test WHERE id >= ? ORDER BY id", { 2 }) do
+    assert( row.id > 1 and row.id <= 3, "Index out of range" )
+    assert_equal( expected[row.id], row.name)
+  end
+
+  for id, name in iterating.db:urows("SELECT * FROM test WHERE id >= ? ORDER BY id", { 2 }) do
+    assert( id > 1 and id <= 3, "Index out of range" )
+    assert_equal( expected[id], name)
+  end
+end
+
+function iterating.test_namedarg_rows()
+  local expected = {
+    "Hello World",
+    "Hello Lua",
+    "Hello sqlite3",
+  }
+  for row in iterating.db:rows("SELECT * FROM test WHERE id >= :low ORDER BY id", { low = 2 }) do
+    assert( row[1] > 1 and row[1] <= 3, "Index out of range" )
+    assert_equal( expected[row[1]], row[2])
+  end
+
+  for row in iterating.db:nrows("SELECT * FROM test WHERE id >= :low ORDER BY id", { low = 2 }) do
+    assert( row.id > 1 and row.id <= 3, "Index out of range" )
+    assert_equal( expected[row.id], row.name)
+  end
+
+  for id, name in iterating.db:urows("SELECT * FROM test WHERE id >= :low ORDER BY id", { low = 2 }) do
+    assert( id > 1 and id <= 3, "Index out of range" )
+    assert_equal( expected[id], name)
+  end
+end
+
 
 
 ---------------------------------
@@ -482,7 +675,7 @@ function b.teardown()
   assert_number( b.db:close() )
 end
 
-function b.test_auto_parameter_names()
+function b.test_auto_parameter_names_colon()
   local stmt = assert_userdata( b.db:prepare("INSERT INTO test VALUES(:a, $b, :a2, :b2, $a, :b, $a3, $b3)") )
   local parameters = assert_number( stmt:bind_parameter_count() )
   assert_equal( 8, parameters )
@@ -496,7 +689,7 @@ function b.test_auto_parameter_names()
   assert_equal( "$b3", stmt:bind_parameter_name(8) )
 end
 
-function b.test_auto_parameter_names()
+function b.test_auto_parameter_names_dollar()
   local stmt = assert_userdata( b.db:prepare("INSERT INTO test VALUES($a, $b, $a2, $b2, $a, $b, $a3, $b3)") )
   local parameters = assert_number( stmt:bind_parameter_count() )
   assert_equal( 6, parameters )
@@ -1087,7 +1280,7 @@ function db_bu.setup()
   assert_equal( sqlite3.OK, db_bu.db_src:exec("INSERT INTO test VALUES (1, 'Hello World')") )
   assert_equal( sqlite3.OK, db_bu.db_src:exec("INSERT INTO test VALUES (2, 'Hello Lua')") )
   assert_equal( sqlite3.OK, db_bu.db_src:exec("INSERT INTO test VALUES (3, 'Hello SQLite')") )
-  db_bu.filename = "/tmp/__lua-sqlite3-20161102233049." .. os.time()
+  db_bu.filename = get_temp_file("__lua-sqlite3-20161102233049." .. os.time())
   db_bu.db_tgt = assert_userdata( sqlite3.open(db_bu.filename) )
 end
 
@@ -1145,7 +1338,7 @@ function db_bu_gc.setup()
   assert_equal( sqlite3.OK, db_bu_gc.db_src:exec("INSERT INTO test VALUES (1, 'Hello World')") )
   assert_equal( sqlite3.OK, db_bu_gc.db_src:exec("INSERT INTO test VALUES (2, 'Hello Lua')") )
   assert_equal( sqlite3.OK, db_bu_gc.db_src:exec("INSERT INTO test VALUES (3, 'Hello SQLite')") )
-  db_bu_gc.filename = "/tmp/__lua-sqlite3-20161103120909." .. os.time()
+  db_bu_gc.filename = get_temp_file("__lua-sqlite3-20161103120909." .. os.time())
   db_bu_gc.db_tgt = assert_userdata( sqlite3.open(db_bu_gc.filename) )
 end
 
@@ -1212,7 +1405,7 @@ r094 = lunit_TestCase("Functions added 0.9.4")
 
 function r094.setup()
   r094.db = assert( sqlite3.open_memory() )
-  r094.filename = "/tmp/__lua-sqlite3-20161112163049." .. os.time()
+  r094.filename = get_temp_file("__lua-sqlite3-20161112163049." .. os.time())
   r094.db_fn = assert_userdata( sqlite3.open(r094.filename) )
 end
 
@@ -1243,6 +1436,57 @@ function r094.test_db_filename()
   assert_number( db2:close() )
 
 end
+
+--------------------------------------
+-- Test for defect ticket d54dc056  --
+--------------------------------------
+
+local db_lgblob = lunit_TestCase("Large Blob")
+
+function db_lgblob.setup()
+  db_lgblob.filename = get_temp_file("__lua-sqlite3-20180630t." .. os.time())
+  db_lgblob.db = assert_userdata( sqlite3.open(db_lgblob.filename) )
+  assert_equal( sqlite3.OK,
+   db_lgblob.db:exec("CREATE TABLE IF NOT EXISTS test ( "..
+                     "filename TEXT PRIMARY KEY, ISOtime TEXT, wav BLOB )") )
+end
+
+function db_lgblob.teardown()
+  assert( db_lgblob.db:close() )
+  os.remove(db_lgblob.filename)
+end
+
+function db_lgblob.test()
+    local db = db_lgblob.db
+    local lb = string.rep('Hello\0SQLite\0', 1000000) -- 13Mbytes
+
+    local stat = db:prepare(
+            "INSERT OR REPLACE INTO test (filename, ISOtime, wav) VALUES (?,?,?)")
+    stat:bind(1, 'fn')
+    stat:bind(2, '2018-06-30')
+    stat:bind_blob(3, lb)
+    rc = stat:step()
+    assert_equal( sqlite3.DONE, rc )
+    if rc == sqlite3.DONE then
+      stat:finalize()
+      db:close()
+    end
+
+    db_lgblob.db = assert_userdata( sqlite3.open(db_lgblob.filename) )
+    db = db_lgblob.db
+
+    stat = db:prepare("SELECT wav FROM test WHERE filename = ?")
+    stat:bind(1,'fn')
+    stat:step()
+    local body = stat:get_value(0)
+
+    assert_equal( lb, body )
+    assert( string.len(lb) == (13 * 1000000) )
+end
+
+-------------------------
+-- Run the unit tests  --
+-------------------------
 
 lunit.main()
 

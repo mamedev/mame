@@ -142,7 +142,7 @@ void mbc020_state::mbc020(machine_config &config)
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 1016, 0, 640, 263, 0, 225);
 	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 

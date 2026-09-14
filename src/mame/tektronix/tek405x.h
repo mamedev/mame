@@ -19,7 +19,7 @@
 
 #include "sound/spkrdev.h"
 
-#include "video/vector.h"
+#include "vector.h"
 
 #include "emupal.h"
 

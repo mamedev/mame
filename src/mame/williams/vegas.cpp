@@ -1899,7 +1899,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_ethernet->irq_handler().set(FUNC(vegas_state::ethernet_interrupt));
 
 	// screen
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Screeen size and timing is re-calculated later in voodoo card
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);

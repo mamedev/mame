@@ -1938,7 +1938,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_neogeo);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
 	m_screen->set_screen_update(FUNC(neogeo_base_state::screen_update));
 
@@ -12097,7 +12097,6 @@ GAME( 1996, ninjamas,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1996, twinspri,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "Twinkle Star Sprites", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, zintrckb,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg",          "Zintrick / Oshidashi Zentrix (bootleg of CD version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, crswd2bl,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg (Razoola)","Crossed Swords 2 (bootleg of CD version)", MACHINE_SUPPORTS_SAVE )
-
 
 // Aicom (was a part of Sammy) / Yumekobo (changed name in 1996)
 GAME( 1992, viewpoin,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Sammy / Aicom", "Viewpoint", MACHINE_SUPPORTS_SAVE )

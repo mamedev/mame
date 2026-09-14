@@ -584,7 +584,7 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 	MB3773(config, m_watchdog);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // frames per second, vblank duration
 	m_screen->set_size(40*8, 32*8);

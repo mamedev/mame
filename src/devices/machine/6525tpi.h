@@ -56,12 +56,6 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	void i0_w(int state);
-	void i1_w(int state);
-	void i2_w(int state);
-	void i3_w(int state);
-	void i4_w(int state);
-
 	uint8_t pa_r();
 	uint8_t pb_r();
 	uint8_t pc_r();
@@ -77,6 +71,12 @@ public:
 	void pb5_w(int state) { port_line_w(m_in_b, 5, state); }
 	void pb6_w(int state) { port_line_w(m_in_b, 6, state); }
 	void pb7_w(int state) { port_line_w(m_in_b, 7, state); }
+
+	void pc0_w(int state) { portc_line_w(0, state); }
+	void pc1_w(int state) { portc_line_w(1, state); }
+	void pc2_w(int state) { portc_line_w(2, state); }
+	void pc3_w(int state) { portc_line_w(3, state); }
+	void pc4_w(int state) { portc_line_w(4, state); }
 
 protected:
 	// device-level overrides
@@ -103,15 +103,15 @@ private:
 	uint8_t m_port_b, m_ddr_b, m_in_b;
 	uint8_t m_port_c, m_ddr_c, m_in_c;
 
-	uint8_t m_ca_level, m_cb_level, m_interrupt_level;
-
 	uint8_t m_cr;
 	uint8_t m_air;
 
-	uint8_t m_irq_level[5];
+	uint8_t m_irq_latch;
 
 	void set_interrupt();
 	void clear_interrupt();
+
+	void portc_line_w(int line, int state);
 
 	// helper function to write a single line
 	static void port_line_w(uint8_t &port, int line, int state);

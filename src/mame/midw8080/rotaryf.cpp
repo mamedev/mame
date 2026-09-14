@@ -273,7 +273,7 @@ void rotaryf_state::rotaryf(machine_config &config)
 	ppi.tri_pc_callback().set_constant(0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(32*8, 262);     /* vert size is a guess, taken from mw8080bw */
 	screen.set_visarea(1*8, 30*8-1, 0*8, 32*8-1);
 	screen.set_refresh_hz(60);

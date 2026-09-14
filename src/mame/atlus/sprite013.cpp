@@ -125,6 +125,8 @@ TODO:
 #include "emu.h"
 #include "sprite013.h"
 
+#include "video.h"
+
 DEFINE_DEVICE_TYPE(SPRITE013, sprite013_device, "sprite013", "013 Sprite generator")
 
 sprite013_device::sprite013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

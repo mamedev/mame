@@ -407,7 +407,7 @@ void safarir_state::safarir(machine_config &config)
 	PALETTE(config, "palette", FUNC(safarir_state::safarir_palette), 2 * 8);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_safarir);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 26*8-1);
 	screen.set_refresh_hz(60);

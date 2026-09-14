@@ -2,7 +2,7 @@
 // ranged_wait_for_all.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,26 +23,17 @@ int main()
   asio::posix::stream_descriptor err(ctx, ::dup(STDERR_FILENO));
 
   using op_type = decltype(
-      out.async_write_some(
-        asio::buffer("", 0),
-        asio::deferred
-      )
+      out.async_write_some(asio::buffer("", 0))
     );
 
   std::vector<op_type> ops;
 
   ops.push_back(
-      out.async_write_some(
-        asio::buffer("first\r\n", 7),
-        asio::deferred
-      )
+      out.async_write_some(asio::buffer("first\r\n", 7))
     );
 
   ops.push_back(
-      err.async_write_some(
-        asio::buffer("second\r\n", 8),
-        asio::deferred
-      )
+      err.async_write_some(asio::buffer("second\r\n", 8))
     );
 
   asio::experimental::make_parallel_group(ops).async_wait(

@@ -554,7 +554,7 @@ void atarifb_state::atarifb(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL/2, 384, 0, 304, 262, 8, 248);
 	m_screen->set_screen_update(FUNC(atarifb_state::screen_update_atarifb));
 	m_screen->set_palette(m_palette);

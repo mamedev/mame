@@ -3921,7 +3921,7 @@ void cps_state::cps1_10MHz(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(cps_state, cps1)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps_state::screen_update_cps1));
 	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));

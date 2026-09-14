@@ -761,7 +761,7 @@ void tutor_state::tutor(machine_config &config)
 	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// Sound
 	SPEAKER(config, "sound_out").front_center();

@@ -358,7 +358,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	AY8912(config, m_ay8912, 4_MHz_XTAL/4);
 	m_ay8912->port_a_read_callback().set(FUNC(dragon_alpha_state::psg_porta_read));
 	m_ay8912->port_a_write_callback().set(FUNC(dragon_alpha_state::psg_porta_write));
-	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.75);
+	m_ay8912->add_route(ALL_OUTPUTS, m_mux, 0.75, mc14529_device::y_sound_input(3));
 
 	// pia 2
 	PIA6821(config, m_pia_2);

@@ -20,7 +20,7 @@ As of 2/12/2001 the latest software levels:
 
 Game Title       Level  Released
 ----------------------------------
-Cruis'n Exotica  v2.4   08/23/2000
+Cruis'n Exotica  v2.4   08/31/2000
 Invasion         v5.0   12/14/1999
 The Grid         v1.2   10/18/2000
 
@@ -621,10 +621,11 @@ uint32_t midzeus_state::tms320c32_control_r(offs_t offset)
 	// watch for accesses to the timers
 	if (offset == 0x24 || offset == 0x34)
 	{
-		// timer is clocked at 100ns
+		// CLKSRC in the timer's control register selects the internal clock, H1/2 = CLKIN/4;
+		// the external TCLK rate is unknown, so keep the 100ns the driver has always assumed
 		int const which = (offset >> 4) & 1;
-		int32_t const result = (m_timer[which]->elapsed() * 10000000).as_double();
-		return result;
+		uint32_t const rate = BIT(m_tms320c32_control[offset - 4], 9) ? m_maincpu->unscaled_clock() / 4 : 10000000;
+		return m_timer[which]->elapsed().as_ticks(rate);
 	}
 
 	// log anything else except the memory control register
@@ -1170,7 +1171,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(      0x0400, "Stand Up" )
 	PORT_DIPSETTING(      0x0000, "Sit Down" )
-	PORT_DIPNAME( 0x0800, 0x0800, "Wheel Invert" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Invert Wheel Force Feedback/Shifter Polarity" )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" ) // Manual lists this dip as Unused
@@ -1389,7 +1390,7 @@ void midzeus_state::midzeus(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
 	m_screen->set_screen_update(FUNC(midzeus_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1438,7 +1439,7 @@ void midzeus2_state::midzeus2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(ZEUS2_VIDEO_CLOCK / 4, 666, 0, 512, 438, 0, 400);
 	m_screen->set_screen_update(m_zeus, FUNC(zeus2_device::screen_update));
 

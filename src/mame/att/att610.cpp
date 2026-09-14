@@ -147,7 +147,7 @@ void att610_state::att610(machine_config &config)
 	duart.outport_cb().set("sio", FUNC(z80sio_device::rxcb_w)).bit(3);
 	duart.outport_cb().append("sio", FUNC(z80sio_device::txcb_w)).bit(3);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(21.6675_MHz_XTAL, 963, 0, 720, 375, 0, 351);
 	//m_screen->set_raw(27.72_MHz_XTAL, 1232, 0, 924, 375, 0, 351);
 	m_screen->set_screen_update(FUNC(att610_state::screen_update));

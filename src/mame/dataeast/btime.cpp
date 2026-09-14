@@ -2307,7 +2307,7 @@ void btime_state::btime(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, "audionmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 8, 248, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(btime_state::screen_update_btime));
 	m_screen->set_palette(m_palette);
@@ -2495,7 +2495,7 @@ void scregg_state::dommy(machine_config &config)
 	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 8, 248, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(scregg_state::screen_update_eggs));
 	m_screen->set_palette(m_palette);
@@ -2520,7 +2520,7 @@ void scregg_state::scregg(machine_config &config)
 	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 8, 248, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(scregg_state::screen_update_eggs));
 	m_screen->set_palette(m_palette);

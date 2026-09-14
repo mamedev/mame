@@ -125,7 +125,7 @@ private:
 
 void a2bus_ieee488_device::device_add_mconfig(machine_config &config)
 {
-	TMS9914(config, m_tms9914, 1021800);
+	TMS9914(config, m_tms9914, A2BUS_1M_CLOCK);
 	// TMS9914 IRQ line is not hooked up
 	m_tms9914->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_tms9914->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));

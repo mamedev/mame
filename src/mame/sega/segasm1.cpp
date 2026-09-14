@@ -604,7 +604,7 @@ void systemm1_state::m1base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &systemm1_state::z80_map);
 	m_soundcpu->set_addrmap(AS_IO, &systemm1_state::z80_io_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// TODO: from System 24, might not be accurate for System M1
 	m_screen->set_raw(XTAL(16'000'000), 656, 0 /*+69*/, 496 /*+69*/, 424, 0 /*+25*/, 384 /*+25*/);

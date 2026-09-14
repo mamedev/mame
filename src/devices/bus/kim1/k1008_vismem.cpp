@@ -49,7 +49,7 @@ private:
 
 void kim1bus_k1008_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(kim1bus_k1008_device::screen_update));
 	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 260, 0, 200);
 	m_screen->set_palette("palette");

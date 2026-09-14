@@ -26,6 +26,7 @@
 #include "render.h"
 #include "screen.h"
 #include "softlist.h"
+#include "video.h"
 
 #include "corestr.h"
 #include "multibyte.h"

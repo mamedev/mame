@@ -515,7 +515,7 @@ void shaolins_state::shaolins(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// Pixel clock is / 3 the master clock (6'144'000)
 	// Refresh rate is 60.606060 Hz, with 40 vblank lines
 	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);

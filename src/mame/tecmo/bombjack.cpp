@@ -728,7 +728,7 @@ template <typename T>
 void bombjack_state::bombjack_base(machine_config &config, T &&psg_type)
 {
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(CLOCK_X2 / 2, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(bombjack_state::screen_update));
 	m_screen->set_palette(m_palette);

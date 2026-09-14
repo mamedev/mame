@@ -276,7 +276,7 @@ void crei680_state::crei680(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_crei680);
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);

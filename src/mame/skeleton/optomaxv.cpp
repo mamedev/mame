@@ -671,7 +671,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 
 	// VIDEO PCB (B1)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.screen_vblank().set(m_b1_pit, FUNC(pit68230_device::h2_w));

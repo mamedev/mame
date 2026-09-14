@@ -2096,7 +2096,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	mpu4_common(config);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(VIDEO_MASTER_CLOCK, (63*8)+(17*8), 0, (63*8), (37*8)+17, 0, (37*8));
 	// note this directly affects the scanline counters used below, and thus the timing of everything
 	screen.set_screen_update("scn2674_vid", FUNC(scn2674_device::screen_update));

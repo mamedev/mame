@@ -398,7 +398,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	MB3773(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(61.31);  // verified on pcb
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); // wrong but improves sprite-background synchronization
 	screen.set_size(64*8, 32*8);

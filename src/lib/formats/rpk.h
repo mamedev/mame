@@ -124,9 +124,12 @@ public:
 	rpk_reader(rpk_reader &&) = delete;
 
 	// methods
+	std::error_condition read(util::random_read &stream, rpk_file::ptr &result) const;
 	std::error_condition read(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result) const;
 
 private:
+	std::error_condition read(util::archive_file::ptr &&zipfile, rpk_file::ptr &result) const;
+
 	char const *const * m_pcb_types;
 	bool                m_supports_ram;
 };

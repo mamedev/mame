@@ -257,7 +257,7 @@ void rd100_state::rd100(machine_config &config)
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);

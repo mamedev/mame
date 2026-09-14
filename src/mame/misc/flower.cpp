@@ -527,7 +527,7 @@ void flower_state::flower(machine_config &config)
 	outlatch.q_out_cb<4>().set(FUNC(flower_state::coin_counter_w));
 	outlatch.q_out_cb<5>().set_nop();
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(flower_state::screen_update));
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // derived from Galaxian HW, 60.606060
 	m_screen->set_palette(m_palette);

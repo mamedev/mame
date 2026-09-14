@@ -1546,19 +1546,19 @@ void asap_device::ashl_c0()
 
 void asap_device::rotl()
 {
-	DSTVAL = rotl_32(SRC1VAL, SRC2VAL);
+	DSTVAL = std::rotl(SRC1VAL, SRC2VAL);
 }
 
 void asap_device::rotl_c()
 {
-	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
+	uint32_t dst = std::rotl(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 	DSTVAL = dst;
 }
 
 void asap_device::rotl_c0()
 {
-	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
+	uint32_t dst = std::rotl(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 }
 

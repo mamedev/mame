@@ -14,6 +14,7 @@
 #include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "machine/upd765.h"
 #include "video/pc_vga.h"
 
@@ -91,6 +92,10 @@ uint16_t mn89304_vga_device::offset()
 
 namespace {
 
+// data wheel: detents per full turn, and the drag adjuster's 0..100 range plus one
+static constexpr int ENCODER_POSITIONS = 24;
+static constexpr int ENCODER_DRAG_POSITIONS = 101;
+
 class kn5000_state : public driver_device
 {
 public:
@@ -112,6 +117,8 @@ public:
 		, m_sstat(0)
 		, m_cpanel_inta(0)
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(encoder_moved);
 
 	void kn5000(machine_config &config) ATTR_COLD;
 
@@ -151,7 +158,7 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x140000, 0x14ffff).w(m_subcpu_latch, FUNC(generic_latch_8_device::write)); // @ IC22
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1dffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
-	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
+	map(0x1e0000, 0x1fffff).ram().share("nvram"); // 1Mbit SRAM @ IC21 (CS0)
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
 	//map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
@@ -446,6 +453,20 @@ static INPUT_PORTS_START(kn5000)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DOWN 2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 2")
+	// TEMPO/PROGRAM data wheel below the LCD: an endless rotary encoder, so a wrapping
+	// positional control.  Each step becomes one detent for the control panel device.
+	PORT_START("ENCODER")
+	PORT_BIT(0x1f, 0x00, IPT_POSITIONAL) PORT_NAME("Tempo / Program Data Wheel")
+		PORT_POSITIONS(ENCODER_POSITIONS) PORT_WRAPS PORT_SENSITIVITY(20) PORT_KEYDELTA(1)
+		PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)
+		PORT_FULL_TURN_COUNT(ENCODER_POSITIONS)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_POSITIONS)
+
+	// The same wheel, as an adjuster for the layout script to drag; detents from both are summed.
+	PORT_START("ENCODER_DRAG")
+	PORT_ADJUSTER(50, "Tempo / Program Data Wheel (mouse drag)")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_DRAG_POSITIONS)
+
 INPUT_PORTS_END
 
 
@@ -463,6 +484,22 @@ void kn5000_state::machine_reset()
 {
 	m_checking_device_led_cn11 = 0;
 	m_checking_device_led_cn12 = 0;
+}
+
+// A step of the data wheel.  Both wheel controls arrive here; param is the control's full
+// turn, so that a wrap reads as one detent rather than a full-scale move backwards.
+INPUT_CHANGED_MEMBER(kn5000_state::encoder_moved)
+{
+	int const modulus = int(param);
+	int delta = int(newval) - int(oldval);
+	if (delta > modulus / 2)
+		delta -= modulus;
+	else if (delta < -modulus / 2)
+		delta += modulus;
+
+	// magnitude is kept, not reduced to a direction: the firmware uses it as an acceleration index
+	if (delta != 0)
+		m_cpanel->encoder_detent(delta);
 }
 
 void kn5000_state::kn5000(machine_config &config)
@@ -656,7 +693,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 	/* video hardware */
 	// LCD Controller MN89304 @ IC206 24_MHz_XTAL
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
 	screen.set_screen_update("vga", FUNC(mn89304_vga_device::screen_update));
 
@@ -666,6 +703,8 @@ void kn5000_state::kn5000(machine_config &config)
 	vga.set_vram_size(0x80000);
 	// iochrdy tied to refresh pin and SA19, A21 and A20 to GND
 	// TODO: VGA.A18 signal, banking? From maincpu thru a T7W139F decoder
+
+	NVRAM(config, "nvram");
 
 	config.set_default_layout(layout_kn5000);
 }
@@ -727,7 +766,7 @@ ROM_START(kn5000)
 	ROMX_LOAD("kn5000_subprogram_v140_compressed.rom", 0x0e0000, 0x16bc4, CRC(5b182629) SHA1(13098dd150c5a6083a5d15a63d5d785802d8e8ae), ROM_BIOS(5)) // v5
 
 	ROM_REGION16_LE(0x400000, "rhythm_data", 0)
-	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(76d11a5e) SHA1(e4b572d318c9fe7ba00e5b44ea783e89da9c68bd))
+	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(aa4917ce) SHA1(fef7f1927935d8fdada2afbdbfac29aac56e1c3c))
 
 	ROM_REGION16_LE(0x1000000, "waveform", 0)
 	ROM_LOAD("kn5000_waveform_rom.ic304", 0x000000, 0x400000, NO_DUMP)

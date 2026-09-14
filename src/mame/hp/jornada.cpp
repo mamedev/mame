@@ -625,7 +625,7 @@ void jornada_state::jornada720(machine_config &config)
 	SED1356(config, m_epson);
 	m_epson->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 240);
 	screen.set_visarea(0, 640-1, 0, 240-1);

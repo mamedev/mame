@@ -333,6 +333,7 @@ protected:
 		bool deleted;
 		bool bad_data_crc;
 		bool bad_addr_crc;
+		bool weak;
 	};
 
 	struct desc_gcr_sector
@@ -347,6 +348,7 @@ protected:
 	static void build_wd_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
 	static void build_pc_track_fm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
 	static void build_pc_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
+	static void build_apple_16sect_track_gcr(int track, int head, floppy_image &image, const desc_gcr_sector *sects);
 	static void build_mac_track_gcr(int track, int head, floppy_image &image, const desc_gcr_sector *sects);
 
 	//! @brief Extract standard sectors from a regenerated bitstream.
@@ -363,6 +365,9 @@ protected:
 
 	//! Victor 9000 type sectors with GCR5 encoding
 	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream);
+
+	//! Apple II type sectors with GCR6 encoding
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_apple_16sect_gcr6(const std::vector<bool> &bitstream, uint8_t &vl);
 
 	//! Mac type sectors with GCR6 encoding
 	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, const floppy_image &image);

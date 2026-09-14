@@ -489,7 +489,7 @@ void pzlestar_state::pzlestar(machine_config &config)
 	v9958.set_screen_ntsc("screen");
 	v9958.set_vram_size(0x20000);
 	v9958.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ymsnd", XTAL(21'477'272)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -506,7 +506,7 @@ void sexyboom_state::sexyboom(machine_config &config)
 	v9958.set_screen_ntsc("screen");
 	v9958.set_vram_size(0x20000);
 	v9958.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	PALETTE(config, "palette").set_entries(19780);
 

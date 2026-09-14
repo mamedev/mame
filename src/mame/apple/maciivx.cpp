@@ -21,11 +21,12 @@
 
 #include "dfac.h"
 #include "egret.h"
-#include "macadb.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 #include "vasp.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
@@ -57,7 +58,7 @@ public:
 	maciivx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_vasp(*this, "vasp"),
 		m_dfac(*this, "dfac"),
@@ -83,7 +84,7 @@ public:
 
 private:
 	required_device<m68030_device> m_maincpu;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<vasp_device> m_vasp;
 	required_device<dfac_device> m_dfac;
@@ -375,7 +376,9 @@ void maciivx_state::maciiv_base(machine_config &config)
 	m_vasp->add_route(0, m_dfac, 1.0, 0);
 	m_vasp->add_route(1, m_dfac, 1.0, 1);
 
-	MACADB(config, m_macadb, C15M);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -409,10 +412,10 @@ void maciivx_state::maciivx(machine_config &config)
 	m_egret->dfac_scl_callback().set(m_dfac, FUNC(dfac_device::clock_write));
 	m_egret->dfac_sda_callback().set(m_dfac, FUNC(dfac_device::data_write));
 	m_egret->dfac_latch_callback().set(m_dfac, FUNC(dfac_device::latch_write));
-	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_egret->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_egret->via_clock_callback().set(m_vasp, FUNC(vasp_device::cb1_w));
 	m_egret->via_data_callback().set(m_vasp, FUNC(vasp_device::cb2_w));
-	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+	m_adbbus->out_adb_callback().set(m_egret, FUNC(egret_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_vasp->pb3_callback().set(m_egret, FUNC(egret_device::get_xcvr_session));

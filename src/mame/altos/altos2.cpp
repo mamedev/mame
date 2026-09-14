@@ -165,7 +165,7 @@ void altos2_state::altos2(machine_config &config)
 
 	X2210(config, m_novram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(40_MHz_XTAL / 2, 960, 0, 800, 347, 0, 325);
 	screen.set_screen_update(FUNC(altos2_state::screen_update));
 

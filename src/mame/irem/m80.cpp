@@ -380,7 +380,7 @@ void shisen_state::shisen(machine_config &config)
 	TIMER(config, "v1").configure_scanline(FUNC(shisen_state::sound_nmi), "screen", 1, 2);  // clocked by V1? (Vigilante)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 2, 96*8, 0*8, 64*8, 284, 0, 256); // sync rates not verified
 	screen.set_screen_update(FUNC(shisen_state::screen_update));
 	screen.set_palette(m_palette);

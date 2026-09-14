@@ -567,7 +567,7 @@ void fp_state::fp(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_apricotp);
 
-	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG));
 	screen_lcd.set_refresh_hz(50);
 	screen_lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen_lcd.set_screen_update(FUNC(fp_state::screen_update));
@@ -575,7 +575,7 @@ void fp_state::fp(machine_config &config)
 	screen_lcd.set_visarea_full();
 	screen_lcd.set_palette("palette");
 
-	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG));
 	screen_crt.set_refresh_hz(50);
 	screen_crt.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen_crt.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));

@@ -2,16 +2,16 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Akai L6009
+    Akai L6009
 
-	This is the sound hardware used in the S1000 and S1100 samplers. It actually comprises two chips
-	running in tandem: ITP-L6009 (tone generator) and FLR-L6009 (filters and mixer).
+    This is the sound hardware used in the S1000 and S1100 samplers. It actually comprises two chips
+    running in tandem: ITP-L6009 (tone generator) and FLR-L6009 (filters and mixer).
 
-	TODO:
-	- verify volume and filter envelope behavior (ENV_SHIFT is basically a complete guess, and volume
-	  is probably not entirely linear)
-	- sample interpolation: 6-point sinc interpolation using one of four coefficient tables in ROM
-	  (more info: https://www.kvraudio.com/forum/viewtopic.php?t=628777)
+    TODO:
+    - verify volume and filter envelope behavior (ENV_SHIFT is basically a complete guess, and volume
+      is probably not entirely linear)
+    - sample interpolation: 6-point sinc interpolation using one of four coefficient tables in ROM
+      (more info: https://www.kvraudio.com/forum/viewtopic.php?t=628777)
 ***************************************************************************/
 
 #include "emu.h"

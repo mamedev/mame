@@ -821,7 +821,7 @@ void vixen_state::vixen(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(vixen_state::vixen_int_ack));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(vixen_state::screen_update));
 	screen.set_raw(23.9616_MHz_XTAL / 2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10);

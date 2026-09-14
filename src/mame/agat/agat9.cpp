@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(AGAT9VIDEO, agat9video_device, "agat9video", "Agat-9 Video")
 
 void agat9video_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(10'500'000), 672, 0, 512, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(agat9video_device::screen_update));
 	m_screen->set_palette(DEVICE_SELF);

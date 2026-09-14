@@ -211,31 +211,61 @@ void cgc7900_state::interrupt_mask_w(u16 data)
 
 	if (m_int_mask != data)
 	{
-		u16 changed = m_int_mask ^ data;
-
 		LOG("i_mask: changed %04X -> %04X\n", m_int_mask, data);
 
-		for (int i = 0; i < 16; i++)
-		{
-			if (BIT(changed, i) && BIT(data, i))
-			{
-				LOG("i_mask: pin %d disabled, clearing irq\n", i);
-				irq_encoder(i, CLEAR_LINE);
-			}
-			if (BIT(changed, i) && !BIT(data, i))
-			{
-				LOG("i_mask: pin %d enabled, %s irq\n", i, BIT(m_int_active, i) ? "setting" : "clearing");
-				irq_encoder(i, BIT(m_int_active, i));
-			}
-		}
-	}
+		m_int_mask = data;
 
-	m_int_mask = data;
+		update_interrupts();
+	}
 }
+
+/*-------------------------------------------------
+    cpu_space_map - interrupt acknowledge
+-------------------------------------------------*/
 
 void cgc7900_state::cpu_space_map(address_map &map)
 {
-	map(0xfffff2, 0xffffff).lr16(NAME([] (offs_t offset) -> u16 { return int_vectors[offset + 1]; }));
+	map(0xfffff2, 0xffffff).r(FUNC(cgc7900_state::int_ack_r));
+}
+
+/*-------------------------------------------------
+    int_ack_r - interrupt vector fetch
+-------------------------------------------------*/
+
+u16 cgc7900_state::int_ack_r(offs_t offset)
+{
+	int const level = offset + 1;
+	u16 const pending = m_int_active & ~m_int_mask;
+	int vector = -1;
+
+	/*
+	    Each interrupt level has its own priority encoder, whose output forms
+	    the low 3 bits of the vector placed on the bus during the acknowledge
+	    cycle, so the source with the lowest numbered vector of those still
+	    requesting service on the acknowledged level wins.
+	*/
+	for (int pin = 0; pin < 16; pin++)
+	{
+		if (BIT(pending, pin) && (int_levels[pin] == level) && ((vector == -1) || (int_vectors[pin] < vector)))
+			vector = int_vectors[pin];
+	}
+
+	if (vector == -1)
+	{
+		// nothing left to acknowledge, let the bus error timer run out
+		if (!machine().side_effects_disabled())
+		{
+			LOG("int_ack: level %d spurious\n", level);
+
+			m_maincpu->trigger_bus_error();
+		}
+
+		return 0;
+	}
+
+	LOG("int_ack: level %d vector %02X\n", level, vector);
+
+	return vector;
 }
 
 void cgc7900_state::irq_encoder(int pin, int state)
@@ -245,10 +275,31 @@ void cgc7900_state::irq_encoder(int pin, int state)
 	else
 		m_int_active &= ~(1 << pin);
 
-	if (!BIT(m_int_mask, pin))
+	update_interrupts();
+}
+
+/*-------------------------------------------------
+    update_interrupts - refresh the IPL inputs
+-------------------------------------------------*/
+
+void cgc7900_state::update_interrupts()
+{
+	u16 const pending = m_int_active & ~m_int_mask;
+	bool level4 = false, level5 = false;
+
+	for (int pin = 0; pin < 16; pin++)
 	{
-		m_maincpu->set_input_line(int_levels[pin], state);
+		if (BIT(pending, pin))
+		{
+			if (int_levels[pin] == 5)
+				level5 = true;
+			else
+				level4 = true;
+		}
 	}
+
+	m_maincpu->set_input_line(M68K_IRQ_5, level5 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, level4 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*-------------------------------------------------
@@ -308,11 +359,6 @@ void cgc7900_state::disk_command_w(u16 data)
 {
 }
 
-u16 cgc7900_state::unmapped_r()
-{
-	return machine().rand();
-}
-
 /***************************************************************************
     MEMORY MAPS
 ***************************************************************************/
@@ -326,7 +372,7 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).ram().share("chrom_ram");
 	map(0x800000, 0x80ffff).rom().region(M68000_TAG, 0);
-	map(0x810000, 0x9fffff).r(FUNC(cgc7900_state::unmapped_r));
+	map(0x810000, 0x9fffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xa00000, 0xbfffff).rw(FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
 	map(0xc00000, 0xdfffff).ram().share("plane_ram");
 	map(0xe00000, 0xe1ffff).w(FUNC(cgc7900_state::color_status_w));
@@ -436,6 +482,8 @@ void cgc7900_state::machine_start()
 {
 	/* register for state saving */
 	save_pointer(NAME(m_overlay_ram.target()), 0x4000);
+	save_item(NAME(m_int_mask));
+	save_item(NAME(m_int_active));
 }
 
 void cgc7900_state::machine_reset()
@@ -451,6 +499,8 @@ void cgc7900_state::machine_reset()
 	m_i8251_0->write_cts(0);
 
 	m_int_active = 0;
+
+	update_interrupts();
 }
 
 /***************************************************************************

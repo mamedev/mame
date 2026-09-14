@@ -375,7 +375,7 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(100)); // TODO: period is guessed
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

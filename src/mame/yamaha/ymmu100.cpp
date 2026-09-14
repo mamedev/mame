@@ -122,12 +122,14 @@
 
 #include "emu.h"
 
+#include "mulcd.h"
+
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/h8/h8s2655.h"
-#include "mulcd.h"
-#include "sound/swp30.h"
 #include "bus/plg1x0/plg1x0.h"
+#include "cpu/h8/h8s2655.h"
+#include "machine/nvram.h"
+#include "sound/swp30.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -267,7 +269,7 @@ void mu100_state::machine_reset()
 void mu100_state::mu100_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
-	map(0x200000, 0x21ffff).ram(); // 128K work RAM
+	map(0x200000, 0x21ffff).ram().share("nvram"); // 128K work RAM
 	map(0x400000, 0x401fff).m(m_swp30, FUNC(swp30_device::map));
 }
 
@@ -503,6 +505,8 @@ void mu100_state::mu100(machine_config &config)
 {
 	mu100b(config);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+
 	MULCD(config, m_lcd);
 }
 
@@ -536,6 +540,9 @@ ROM_START( mu100 )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(2e82cbd4) SHA1(d1f0e2713bf2cca9156c562e23fcce4fa5d7cfb3) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
+
+	ROM_REGION16_BE( 0x20000, "nvram", 0 )
+	ROM_LOAD16_WORD_SWAP( "factory_sram.ic12", 0x00000, 0x20000, CRC(54dc97cc) SHA1(7a8602cd6e13a7b91f444a85ebb6ebcca4277323) )
 ROM_END
 
 // mu100r roms are identical to the mu100

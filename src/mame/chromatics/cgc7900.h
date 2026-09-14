@@ -57,7 +57,7 @@ public:
 		, m_i8251_1(*this, INS8251_1_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_region m_char_rom;
@@ -95,7 +95,7 @@ public:
 	void z_mode_w(u16 data);
 	void color_status_w(u16 data);
 	u16 sync_r();
-	u16 unmapped_r();
+	u16 int_ack_r(offs_t offset);
 
 	template <unsigned N> void irq(int state) { irq_encoder(N, state); }
 
@@ -125,6 +125,7 @@ private:
 	bool kbd_ready = false;
 
 	void irq_encoder(int pin, int state);
+	void update_interrupts();
 };
 
 #endif // MAME_CHROMATICS_CGC7900_H

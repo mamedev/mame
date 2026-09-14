@@ -861,7 +861,7 @@ void ngp_state::ngp_common(machine_config &config)
 	soundcpu.set_addrmap(AS_PROGRAM, &ngp_state::z80_mem);
 	soundcpu.set_addrmap(AS_IO, &ngp_state::z80_io);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_raw(6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152);
 
 	/* sound hardware */

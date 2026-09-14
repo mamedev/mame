@@ -91,7 +91,7 @@ void is48x_state::is482(machine_config &config)
 
 	EEPROM_28256(config, "eeprom"); // AT28C256
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(60_MHz_XTAL / 2, 770, 0, 560, 532, 0, 475); // FIXME: vertical rate is supposed to be 75 Hz
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

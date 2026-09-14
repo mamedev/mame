@@ -35,6 +35,9 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 
+	// device_state_interface implementation
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 	// register access
 	u16 sr_r();
 	void sr_w(u16 data);

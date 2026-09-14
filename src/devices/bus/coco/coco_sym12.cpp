@@ -12,6 +12,10 @@
     This cartridge is a complex sound cartridge. It had 4 AY-3-8910 PSG
     connected thru a PIA. It contained no ROM.
 
+    It had two modes mono and stereo. Picked by jumper.
+    We emulate stereo to the device's RCA jacks, and mono back thru the
+    cartridge port.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -52,8 +56,11 @@ namespace
 		virtual void device_start() override
 		{
 			// install handlers
-			install_readwrite_handler( 0xff60, 0xff63, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
+			install_readwrite_handler(0xff60, 0xff63, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
 		}
+
+		// device_t implementation
+		virtual void device_resolve_objects() override ATTR_COLD;
 
 		u8 read_porta();
 		void write_porta(u8 data);
@@ -77,23 +84,37 @@ namespace
 		pia.readpa_handler().set(*this, FUNC(coco_symphony_twelve_device::read_porta));
 		pia.writepb_handler().set(*this, FUNC(coco_symphony_twelve_device::write_portb));
 
-		SPEAKER(config, "s12", 2).front();
+		// Single center speaker with 2 channels (Left = 0, Right = 1)
+		SPEAKER(config, "speaker", 2).front_center();
+
 		AY8910(config, m_ay8910[0], DERIVED_CLOCK(1, 1));
 		m_ay8910[0]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[0]->add_route(ALL_OUTPUTS, "s12", 0.50, 0);
+		m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 
 		AY8910(config, m_ay8910[1], DERIVED_CLOCK(1, 1));
 		m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[1]->add_route(ALL_OUTPUTS, "s12", 0.50, 0);
+		m_ay8910[1]->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 
 		AY8910(config, m_ay8910[2], DERIVED_CLOCK(1, 1));
 		m_ay8910[2]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[2]->add_route(ALL_OUTPUTS, "s12", 0.50, 1);
+		m_ay8910[2]->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 
 		AY8910(config, m_ay8910[3], DERIVED_CLOCK(1, 1));
 		m_ay8910[3]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[3]->add_route(ALL_OUTPUTS, "s12", 0.50, 1);
+		m_ay8910[3]->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
+	}
 
+	//**************************************************************************
+	//  device_resolve_objects
+	//**************************************************************************
+
+	void coco_symphony_twelve_device::device_resolve_objects()
+	{
+		// Mono downmix back to the CoCo system cartridge audio input line
+		add_sound_route(*m_ay8910[0], ALL_OUTPUTS, 0.25);
+		add_sound_route(*m_ay8910[1], ALL_OUTPUTS, 0.25);
+		add_sound_route(*m_ay8910[2], ALL_OUTPUTS, 0.25);
+		add_sound_route(*m_ay8910[3], ALL_OUTPUTS, 0.25);
 	}
 
 	//**************************************************************************

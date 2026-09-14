@@ -80,7 +80,7 @@ void wy150_state::wy150(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 8464 or 5564 or similar (e.g. Winbond W2465-70LL) + battery
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(48_MHz_XTAL, 1530, 0, 1200, 523, 0, 416); // 31.372 kHz horizontal
 	//m_screen->set_raw(48_MHz_XTAL, 1530, 0, 1188, 402, 0, 338);
 	// TBD: WY-160 should have different parameters (has 76 Hz refresh rate rather than 78 Hz)

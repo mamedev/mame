@@ -478,6 +478,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sys573_jvs_host(*this, "sys573_jvs_host"),
+		m_gpu(*this, "gpu"),
+		m_spu(*this, "spu"),
 		m_k573dio(*this, "k573dio"),
 		m_output_lamps(*this, "lamp%u", 0U),
 		m_output_blue_io_lamp(*this, "blue io %u", 0U),
@@ -546,7 +548,9 @@ public:
 		m_pccard2(*this, "pccard2"),
 		m_pccard_cd{ 1, 1 },
 		m_h8_response(*this, "h8_response"),
-		m_ram(*this, "maincpu:ram"),
+		m_ram(*this, "ram"),
+		m_gpu_ram(*this, "gpu_ram"),
+		m_spu_ram(*this, "spu_ram"),
 		m_flashbank(*this, "flashbank"),
 		m_in2(*this, "IN2"),
 		m_out1(*this, "OUT1"),
@@ -668,6 +672,8 @@ protected:
 
 	required_device<psxcpu_device> m_maincpu;
 	required_device<sys573_jvs_host> m_sys573_jvs_host;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
 	optional_device<k573dio_device> m_k573dio;
 
 	output_finder<2> m_output_lamps;
@@ -834,6 +840,8 @@ private:
 	uint8_t m_jvs_output_buffer[512];
 
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	required_device<address_map_bank_device> m_flashbank;
 	required_ioport m_in2;
 	required_ioport m_out1;
@@ -2537,12 +2545,13 @@ void ksys573_state::cr589_config(device_t *device)
 void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 {
 	/* basic machine hardware */
-	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530CQ(config, m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573_map);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, this));
 	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, this));
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(ksys573_state::ata_interrupt));
@@ -2575,16 +2584,26 @@ void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 	ADDRESS_MAP_BANK(config, m_flashbank ).set_map( &ksys573_state::flashbank_map ).set_options( ENDIANNESS_LITTLE, 16, 32, 0x400000);
 
 	/* video hardware */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, m_maincpu.target()).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0);
+
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
-	spu.add_route(0, "speaker", 1.0, 0);
-	spu.add_route(1, "speaker", 1.0, 1);
+	SPU(config, m_spu, 67.7376_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->add_route(0, "speaker", 1.0, 0);
+	m_spu->add_route(1, "speaker", 1.0, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K,1M,2M,4M").set_default_value(0);
 
 	M48T58(config, "m48t58");
 

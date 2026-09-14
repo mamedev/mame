@@ -18,6 +18,7 @@ class m68340_cpu_device : public fscpu32_device
 {
 	friend class mc68340_serial_module_device;
 	friend class mc68340_timer_module_device;
+	friend class mc68340_dma_module_device;
 
 public:
 	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -31,6 +32,10 @@ public:
 	auto tgate1_in_callback() { return m_timer[0]->m_tgate_in_cb.bind(); }
 	auto tout2_out_callback() { return m_timer[1]->m_tout_out_cb.bind(); }
 	auto tgate2_in_callback() { return m_timer[1]->m_tgate_in_cb.bind(); }
+	auto dma_dack1_out_callback() { return m_dma->dack_out_callback<0>(); }
+	auto dma_done1_out_callback() { return m_dma->done_out_callback<0>(); }
+	auto dma_dack2_out_callback() { return m_dma->dack_out_callback<1>(); }
+	auto dma_done2_out_callback() { return m_dma->done_out_callback<1>(); }
 
 	uint16_t get_cs(offs_t address);
 
@@ -41,6 +46,12 @@ public:
 	void tgate1_w(int state){ m_timer[0]->tgate_w(state); }
 	void tin2_w(int state)  { m_timer[1]->tin_w(state);  }
 	void tgate2_w(int state){ m_timer[1]->tgate_w(state); }
+
+	// DMA handshake inputs are active low.
+	void dma_dreq1_w(int state) { m_dma->dreq_w<0>(state); }
+	void dma_done1_w(int state) { m_dma->done_w<0>(state); }
+	void dma_dreq2_w(int state) { m_dma->dreq_w<1>(state); }
+	void dma_done2_w(int state) { m_dma->done_w<1>(state); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -53,9 +64,10 @@ protected:
 private:
 	required_device<mc68340_serial_module_device> m_serial;
 	required_device_array<mc68340_timer_module_device, 2> m_timer;
+	required_device<mc68340_dma_module_device> m_dma;
 
 	void update_ipl();
-	void internal_vectors_r(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 	uint8_t int_ack(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
@@ -68,6 +80,7 @@ private:
 
 	int calc_cs(offs_t address) const;
 	int get_timer_index(mc68340_timer_module_device *timer) { return (timer == m_timer[0].target()) ? 0 : 1; }
+	bool is_mbar_access(offs_t address) const;
 
 	int m_currentcs;
 	uint32_t m_clock_mode;
@@ -84,8 +97,6 @@ private:
 
 	uint16_t m68340_internal_base_r(offs_t offset, uint16_t mem_mask = ~0);
 	void m68340_internal_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t m68340_internal_dma_r(offs_t offset, uint16_t mem_mask = ~0);
-	void m68340_internal_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m68340_internal_sim_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint8_t m68340_internal_sim_ports_r(offs_t offset);
 	uint16_t m68340_internal_sim_cs_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -97,11 +108,8 @@ private:
 	void set_modck(int state);
 	void extal_w(int state);
 
-	void m68340_internal_map(address_map &map) ATTR_COLD;
-
 	/* 68340 peripheral modules */
 	m68340_sim*    m_m68340SIM;
-	m68340_dma*    m_m68340DMA;
 
 	uint32_t m_m68340_base;
 

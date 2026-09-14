@@ -172,7 +172,7 @@ void z29_state::z29(machine_config &config)
 	m_keyboard->keyin_callback().set(FUNC(z29_state::keyin_w));
 	m_keyboard->reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET).invert();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.784_MHz_XTAL, 880, 0, 640, 280, 0, 250);
 	screen.set_screen_update("crtc1", FUNC(i8276_device::screen_update));
 

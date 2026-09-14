@@ -317,7 +317,7 @@ void battlera_state::battlera(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0.60); // music data is stereo, but hardware isn't
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(21.477272_MHz_XTAL, battlera_vce_device::WPF, 64, 64 + 1024 + 64, battlera_vce_device::LPF, 18, 18 + 242);
 	m_screen->set_screen_update(m_vce, FUNC(battlera_vce_device::screen_update));
 	m_screen->set_palette(m_vce);

@@ -438,7 +438,7 @@ void flipjack_state::flipjack(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(flipjack_state::portc_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0); // from crtc
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

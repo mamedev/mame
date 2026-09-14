@@ -452,7 +452,7 @@ void intv_state::intv(machine_config &config)
 	STIC(config, m_stic, XTAL(3'579'545));
 	m_stic->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.92);
 	//screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* not accurate */
 	screen.set_screen_update(FUNC(intv_state::screen_update_intv));

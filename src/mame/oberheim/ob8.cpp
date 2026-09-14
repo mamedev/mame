@@ -5,7 +5,7 @@ The OB-8 is an 8-voice digitally-controlled analog synthesizer.
 
 The firmware runs on a Z80.
 
-The driver is based on the OB8 srevice manual and schematics, and is intended
+The driver is based on the OB8 service manual and schematics, and is intended
 as an educational tool.
 
 This driver is very much an early-stage skeleton.

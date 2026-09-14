@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -7928,7 +7928,7 @@ more investigation needed...
 	<software name="blackbas">
 		<description>Bassin's Black Bass (USA)</description>
 		<year>1994</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SNS-AB2E-USA" />
 		<info name="release" value="199411xx" />
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -12142,10 +12142,13 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="doom">
+	<software name="doom" supported="no">
 		<description>Doom (Europe)</description>
 		<year>1996</year>
 		<publisher>Williams Entertainment</publisher>
+		<notes><![CDATA[
+Video display flickers, has double width bar at bottom, runs too slow
+]]></notes>
 		<info name="serial" value="SNSP-AD8P-FAH, SNSP-AD8P-NOE" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
@@ -25911,7 +25914,7 @@ more investigation needed...
 	<software name="sblkbass">
 		<description>Super Black Bass (USA)</description>
 		<year>1993</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SNS-BQ-USA" />
 		<info name="release" value="199304xx" />
 		<part name="cart" interface="snes_cart">
@@ -35004,10 +35007,13 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="accelebr">
+	<software name="accelebr" supported="no">
 		<description>Accele Brid (Japan)</description>
 		<year>1993</year>
 		<publisher>Tomy</publisher>
+		<notes><![CDATA[
+Hangs after few seconds of gameplay, [open bus]
+]]></notes>
 		<info name="serial" value="SHVC-AY" />
 		<info name="release" value="19931126" />
 		<info name="alt_title" value="アクセルブリッド" />
@@ -36484,7 +36490,7 @@ List of unclassified roms
 	<software name="bazoe">
 		<description>Bazoe! Mahou Sekai (Japan)</description>
 		<year>1993</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SHVC-VM" />
 		<info name="release" value="19930723" />
 		<info name="alt_title" value="バズー!魔法世界" />
@@ -39314,10 +39320,13 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="doomj" cloneof="doom">
+	<software name="doomj" cloneof="doom" supported="no">
 		<description>Doom (Japan)</description>
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
+		<notes><![CDATA[
+(same as doom)
+]]></notes>
 		<info name="serial" value="SHVC-AD8J-JPN" />
 		<info name="release" value="19960301" />
 		<info name="alt_title" value="ドゥーム" />
@@ -39332,10 +39341,13 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="doomu" cloneof="doom">
+	<software name="doomu" cloneof="doom" supported="no">
 		<description>Doom (USA)</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
+		<notes><![CDATA[
+(same as doom)
+]]></notes>
 		<info name="release" value="199509xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
@@ -59545,7 +59557,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	<software name="sblkbassj" cloneof="sblkbass">
 		<description>Super Black Bass (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SHVC-BQ" />
 		<info name="release" value="19921204" />
 		<info name="alt_title" value="スーパーブラックバス" />
@@ -61742,7 +61754,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	<software name="sshangh" cloneof="shangh2">
 		<description>Super Shanghai - Dragon's Eye (Hot-B) (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SHVC-DE" />
 		<info name="release" value="19920428" />
 		<info name="alt_title" value="スーパー上海ドラゴンズアイ" />

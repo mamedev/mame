@@ -199,9 +199,9 @@ void upd933_device::update_pending_irq()
 
 	for (int i = 0; i < 8; i++)
 	{
-		env_active |= (m_dca[i].calc_timeout(new_time)
-				   ||  m_dco[i].calc_timeout(new_time)
-				   ||  m_dcw[i].calc_timeout(new_time));
+		env_active |= m_dca[i].calc_timeout(new_time);
+		env_active |= m_dco[i].calc_timeout(new_time);
+		env_active |= m_dcw[i].calc_timeout(new_time);
 	}
 
 	if (env_active)

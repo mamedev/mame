@@ -756,7 +756,7 @@ void swyft_state::swyft(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &swyft_state::swyft_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15.8976_MHz_XTAL / 2, 500, 0, 320, 265, 0, 242); // total guess
 	screen.set_screen_update(FUNC(swyft_state::screen_update_swyft));
 	screen.set_palette("palette");

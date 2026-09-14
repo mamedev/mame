@@ -768,7 +768,7 @@ void casino_state::statusbj(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(casino_state::ppi_portc_hi_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.44_MHz_XTAL / 2, 384, 0, 320, 270, 0, 240);
 	screen.set_screen_update(FUNC(casino_state::screen_update));
 	screen.set_palette(m_palette);

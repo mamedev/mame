@@ -1056,7 +1056,7 @@ void wecleman_state::wecleman(machine_config &config)
 	KONAMI_007452_MATH(config, "k007452");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(320 +16, 256);
@@ -1122,7 +1122,7 @@ void hotchase_state::hotchase(machine_config &config)
 	adc.vin_callback().set(FUNC(hotchase_state::selected_ip_r));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(320 +16, 256);

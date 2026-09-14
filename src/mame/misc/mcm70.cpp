@@ -379,7 +379,7 @@ void mcm70_state::mcm70(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcm70_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mcm70_state::io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(mcm70_state::screen_update));
 	screen.set_size(887, 27);

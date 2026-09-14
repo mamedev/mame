@@ -545,7 +545,7 @@ void tnx1_state::config(machine_config &config)
 
 	/* video hardware */
 	// FIXME: 59.94 screen refresh is the NTSC standard
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.94);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*16, 32*16);

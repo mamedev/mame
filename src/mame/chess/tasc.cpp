@@ -42,7 +42,6 @@ notes:
 - holding UP+DOWN on boot load the TestMode
 
 TODO:
-- bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
 - more accurate dynamic cpu clock divider (same problem as in saitek/risc2500.cpp),
   sound pitch is correct now though
 - does the R40 version have the same clock divider value?
@@ -55,7 +54,7 @@ BTANB:
 
 #include "emu.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/smartboard.h"
@@ -97,7 +96,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm60_cpu_device> m_maincpu;
 	memory_view m_boot_view;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
@@ -107,8 +106,6 @@ private:
 	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_out_leds;
-
-	emu_timer *m_boot_timer;
 
 	u32 m_control = 0;
 	u32 m_prev_pc = 0;
@@ -123,8 +120,6 @@ private:
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
-
-	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
 };
 
 
@@ -135,7 +130,6 @@ private:
 
 void tasc_state::machine_start()
 {
-	m_boot_timer = timer_alloc(FUNC(tasc_state::disable_bootrom), this);
 	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	// register for savestates
@@ -147,7 +141,6 @@ void tasc_state::machine_start()
 void tasc_state::machine_reset()
 {
 	m_boot_view.select(0);
-	m_boot_timer->adjust(attotime::never);
 
 	m_prev_pc = m_maincpu->pc();
 	m_prev_cycle = m_maincpu->total_cycles();
@@ -169,11 +162,10 @@ u32 tasc_state::input_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		// disconnect bootrom from the bus after next opcode
-		if (m_boot_timer->remaining().is_never())
-			m_boot_timer->adjust(m_maincpu->cycles_to_attotime(10));
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 
-		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
+		// disconnect bootrom from the bus after next opcode
+		m_boot_view.select(1);
 	}
 
 	// read chessboard
@@ -295,9 +287,8 @@ INPUT_PORTS_END
 void tasc_state::tasc(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 30_MHz_XTAL);
+	ARM60(config, m_maincpu, 30_MHz_XTAL); // PROG32/DATA32 low: the 26-bit configuration
 	m_maincpu->set_addrmap(AS_PROGRAM, &tasc_state::main_map);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(tasc_state::irq1_line_assert), irq_period);

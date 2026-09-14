@@ -565,7 +565,7 @@ void twins_state::base_config(machine_config &config)
 
 void twins_state::video_config(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(8000000, 512, 0, 320, 312, 0, 204); // Common PAL values, HSync of 15.625 kHz unverified
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);

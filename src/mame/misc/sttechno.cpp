@@ -178,8 +178,8 @@ private:
 
 	void uart_config_w(uint16_t data);
 
-	void ata_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ata_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ata_cs0_w(offs_t offset, uint16_t data);
+	uint16_t ata_cs0_r(offs_t offset);
 
 	void ata_control_w(uint16_t data);
 
@@ -412,20 +412,20 @@ void sttechno_state::uart_config_w(uint16_t data)
 	LOGMASKED(LOG_UART, "uart_config_w %04x\n", data);
 }
 
-void sttechno_state::ata_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sttechno_state::ata_cs0_w(offs_t offset, uint16_t data)
 {
 	if (!m_ata_enabled)
 		return;
 
-	m_ata->cs0_w(offset, data, mem_mask);
+	m_ata->cs0_w(offset, data);
 }
 
-uint16_t sttechno_state::ata_cs0_r(offs_t offset, uint16_t mem_mask)
+uint16_t sttechno_state::ata_cs0_r(offs_t offset)
 {
 	if (!m_ata_enabled)
 		return 0;
 
-	return m_ata->cs0_r(offset, mem_mask);
+	return m_ata->cs0_r(offset);
 }
 
 void sttechno_state::ata_control_w(uint16_t data)
@@ -580,7 +580,7 @@ void sttechno_state::shambros(machine_config &config)
 	M68000(config, m_maincpu, XTAL(42'954'545) / 2); // divisor guessed, anything slower and the game stops functioning (timer flickers, CD-ROM reads are too slow)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sttechno_state::cpu_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(42'954'545) / 6, 456, 0, 336, 262, 0, 240); // guessed
 	screen.set_screen_update(FUNC(sttechno_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2);

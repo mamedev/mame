@@ -1424,7 +1424,7 @@ void videopkr_state::videopkr(machine_config &config)
 	TIMER(config, "t1_timer").configure_periodic(FUNC(videopkr_state::sound_t1_callback), attotime::from_hz(50));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(5*8, 31*8-1, 3*8, 29*8-1);
 	screen.set_refresh_hz(60);

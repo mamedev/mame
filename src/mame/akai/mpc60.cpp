@@ -656,7 +656,7 @@ void mpc60_state::mpc60(machine_config &config)
 	lcdc.set_addrmap(0, &mpc60_state::lcd_map);
 	lcdc.set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 64);

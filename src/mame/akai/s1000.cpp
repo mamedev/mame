@@ -2,19 +2,19 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Akai S1000, S1100 samplers
+    Akai S1000, S1100 samplers
 
-	These are the 16-bit successors to the 12-bit S900/S950 family, and are the first S-series
-	samplers to use dedicated sound hardware instead of off-the-shelf DMA controllers.
+    These are the 16-bit successors to the 12-bit S900/S950 family, and are the first S-series
+    samplers to use dedicated sound hardware instead of off-the-shelf DMA controllers.
 
-	TODO:
-	- layouts
-	- some sound hardware details (see devices/sound/l6009.cpp)
-	- software list for floppies
-	- make sure SCSI hard disks work (currently only tested with CDs)
-	- S1000KB support (same ROMs as S1000 plus extra key scan MCU, probably uPD7811 like X7000)
-	- S1100EX support? (expander version of S1100, connects over both MIDI and SCSI)
-	- DSP56001 emulation is needed for S1100 onboard effects
+    TODO:
+    - layouts
+    - some sound hardware details (see devices/sound/l6009.cpp)
+    - software list for floppies
+    - make sure SCSI hard disks work (currently only tested with CDs)
+    - S1000KB support (same ROMs as S1000 plus extra key scan MCU, probably uPD7811 like X7000)
+    - S1100EX support? (expander version of S1100, connects over both MIDI and SCSI)
+    - DSP56001 emulation is needed for S1100 onboard effects
 ***************************************************************************/
 
 #include "emu.h"
@@ -43,9 +43,10 @@
 
 #include "formats/s900_dsk.h"
 #include "formats/hxchfe_dsk.h"
+#include "formats/mfi_dsk.h"
 
 namespace {
-	
+
 class s1000_state : public driver_device
 {
 public:
@@ -285,7 +286,7 @@ void s1000_state::s1000pb(machine_config &config)
 	m_lcdc->set_addrmap(0, &s1000_state::lcd_map);
 	m_lcdc->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update(m_lcdc, FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 64);
@@ -330,8 +331,9 @@ void s1000_state::s1000pb(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, s1000_floppies, "35hd", floppy_formats).enable_sound(true);
 
-	// TODO: S900/S950, S1000 floppy softlists
 	SOFTWARE_LIST(config, "cd_list").set_compatible("s3000_cdrom");
+	SOFTWARE_LIST(config, "flop_s900").set_original("s900_flop");
+	SOFTWARE_LIST(config, "flop_s1000").set_original("s1000_flop");
 }
 
 /**************************************************************************/
@@ -592,7 +594,7 @@ INPUT_PORTS_START( s1000 )
 	PORT_MODIFY("PA")
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(s1000_state::dial_r<0>));
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(s1000_state::dial_r<1>));
-	
+
 	PORT_MODIFY("P3000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Foot Switch")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_OTHER  ) // high when foot switch plugged in

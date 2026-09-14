@@ -171,7 +171,7 @@ void gamecube_state::gc(machine_config &config)
 	m_cpu->set_bus_frequency(200'000'000); // 200 MHz 64-bit bus width to main memory
 	m_cpu->set_addrmap(AS_PROGRAM, &gamecube_state::ppc_mem);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);

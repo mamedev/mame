@@ -139,7 +139,7 @@ void roland_jv80_state::jv880_mem_map(address_map &map)
 void roland_jv80_state::jv_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(88, 247, 0)); // bright green
-	palette.set_pen_color(1, rgb_t(3, 3, 60));	 // dark blue
+	palette.set_pen_color(1, rgb_t(3, 3, 60));   // dark blue
 }
 
 HD44780_PIXEL_UPDATE(roland_jv80_state::lcd_pixel_update)
@@ -164,7 +164,7 @@ void roland_jv80_state::jv880(machine_config &config)
 	m_pcm->set_device_rom_tag("waverom");
 	m_pcm->int_callback().set(FUNC(roland_jv80_state::pcm_int_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(80);
 	m_screen->set_palette("palette");
 

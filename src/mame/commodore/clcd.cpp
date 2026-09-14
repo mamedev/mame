@@ -776,7 +776,7 @@ void clcd_state::clcd(machine_config &config)
 	m_rtc->set_default_24h(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update(FUNC(clcd_state::screen_update));
 	screen.set_size(480, 128);

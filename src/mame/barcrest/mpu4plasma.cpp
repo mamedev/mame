@@ -89,7 +89,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 
 	SCC8530(config, "scc", 4915200).out_int_callback().set_inputline("plasmacpu", 4);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

@@ -305,6 +305,10 @@ public:
 	void read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, bool &romd, bool &ramd, bool &hre, bool &vr);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	uint8_t videoram_read(offs_t offset) const { return m_ram->pointer()[(0x8000 + offset) & videoram_mask()]; }
+	void videoram_write(offs_t offset, uint8_t data) { m_ram->pointer()[(0x8000 + offset) & videoram_mask()] = data; }
+	offs_t videoram_mask() const { return m_ram->size() - 0x8001; }
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t m1_r(offs_t offset) override;
@@ -334,6 +338,7 @@ public:
 	// memory state
 	int m_eme = 0;                  // extended memory enable
 	uint8_t m_map[16]{};            // memory page register
+	bool m_30k = false;             // 30K block trigger (M1 fetch from 7800-7fff)
 
 	// video state
 	int m_txoff = 0;                // text display enable

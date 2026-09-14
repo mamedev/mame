@@ -7,6 +7,7 @@
 #include "machine/scc68070.h"
 #include "cdislavehle.h"
 #include "cdicdic.h"
+#include "cdi220_lcd.h"
 #include "sound/dmadac.h"
 #include "mcd212.h"
 #include "cpu/mcs51/i8051.h"

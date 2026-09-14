@@ -270,7 +270,7 @@ void carpolo_state::carpolo(machine_config &config)
 	m_ttl74153_1k->zb_cb().set(FUNC(carpolo_state::ls153_zb_w)); // pia1 pb4
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(11.289_MHz_XTAL / 2, 336, 0, 240, 280, 0, 256);
 	screen.set_screen_update(FUNC(carpolo_state::screen_update));
 	screen.screen_vblank().set(FUNC(carpolo_state::screen_vblank));

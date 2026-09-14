@@ -173,7 +173,7 @@ void tourtabl_state::tourtabl(machine_config &config)
 	m_tia->read_input_port_callback().set(FUNC(tourtabl_state::tourtabl_read_input_port));
 	m_tia->databus_contents_callback().set(FUNC(tourtabl_state::tourtabl_get_databus_contents));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200);
 	m_screen->set_screen_update(m_tia, FUNC(tia_video_device::screen_update));
 

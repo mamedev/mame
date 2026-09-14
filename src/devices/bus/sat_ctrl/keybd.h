@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Angelo Salese, Fabio Priuli
 /**********************************************************************
 
     Sega Saturn Keyboard emulation
@@ -11,8 +11,8 @@
 
 #pragma once
 
-
 #include "ctrl.h"
+#include "machine/keyboard.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,7 +21,8 @@
 // ======================> saturn_keybd_device
 
 class saturn_keybd_device : public device_t,
-							public device_saturn_control_port_interface
+							public device_saturn_control_port_interface,
+							protected device_matrix_keyboard_interface<18U>
 {
 public:
 	// construction/destruction
@@ -29,8 +30,6 @@ public:
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
 	// device-level overrides
@@ -42,16 +41,16 @@ protected:
 	virtual uint8_t read_status() override { return 0xf1; }
 	virtual uint8_t read_id(int idx) override { return m_ctrl_id; }
 
+	// device_matrix_interface overrides
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_break(uint8_t row, uint8_t column) override;
+	virtual void key_repeat(uint8_t row, uint8_t column) override;
+
 private:
 	uint8_t m_status;
 	uint8_t m_data;
-	uint8_t m_prev_data;
-	uint16_t m_repeat_count;
 
 	uint16_t get_game_key();
-
-	required_ioport_array<16> m_key;
-	required_ioport m_key_s1;
 };
 
 // device type definition

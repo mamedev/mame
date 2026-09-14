@@ -184,6 +184,11 @@ device.configured (read-only)
     A Boolean indicating whether the device has completed configuration.
 device.started (read-only)
     A Boolean indicating whether the device has completed starting.
+device.outputs[] (read-only)
+    A collection of :ref:`output proxies <luascript-ref-outputproxy>` for the
+    device’s outputs, indexed by name.  The index operator and ``index_of``
+    methods have O(log2(n)) complexity; all other supported operations have O(1)
+    complexity.
 device.debug (read-only)
     The :ref:`debugger interface <luascript-ref-devdebug>` to the device if it
     is a CPU device, or ``nil`` if it is not a CPU device or the debugger is not
@@ -421,9 +426,9 @@ screen.height (read-only)
 screen.refresh (read-only)
     The screen’s configured refresh rate in Hertz (this may not reflect the
     current value).
-screen.refresh_attoseconds (read-only)
-    The screen’s configured refresh interval in attoseconds (this may not
-    reflect the current value).
+screen.refresh_interval (read-only)
+    The screen’s configured refresh interval as an :ref:`attotime
+    <luascript-ref-attotime>` (this may not reflect the current value).
 screen.xoffset (read-only)
     The screen’s default X position offset.  This is a floating-point number
     where one (1) corresponds to the X size of the screen’s container.  This may

@@ -1122,7 +1122,7 @@ void attache_state::attache(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
 	screen.set_screen_update(FUNC(attache_state::screen_update));
 
@@ -1204,7 +1204,7 @@ void attache816_state::attache816(machine_config &config)
 	m_extcpu->set_addrmap(AS_IO, &attache816_state::attache_x86_io);
 	config.set_perfect_quantum(m_extcpu);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
 	screen.set_screen_update(FUNC(attache_state::screen_update));
 

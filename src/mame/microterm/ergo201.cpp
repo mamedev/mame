@@ -162,7 +162,7 @@ void ergo201_state::ergo201(machine_config &config)
 
 	ER1400(config, m_earom); // GI ER-1400
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16.313_MHz_XTAL, 855, 0, 720, 318, 0, 300);
 	screen.set_screen_update(FUNC(ergo201_state::screen_update));
 	screen.set_color(rgb_t::green()); // P31

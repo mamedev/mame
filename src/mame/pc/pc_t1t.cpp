@@ -381,7 +381,7 @@ void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
 {
 	m_chr_gen.set_tag("chrgen");
 
-	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME));
 	screen.set_raw(XTAL(14'318'181),912,0,640,262,0,200);
 	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
 
@@ -397,7 +397,7 @@ void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
 
 void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME));
 	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
 	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
 

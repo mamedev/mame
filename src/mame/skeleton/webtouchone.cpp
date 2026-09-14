@@ -136,7 +136,7 @@ void webtouchone_state::webtouchone(machine_config &config)
 	MPC8240(config, m_maincpu, XTAL(32'768'000)); // Actually a Motorola XPC823ZT66A
 	m_maincpu->set_addrmap(AS_PROGRAM, &webtouchone_state::main_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // Hitachi SX19V001-ZZA (7,6'' touch, color, 640x480)
+	SCREEN(config, m_screen).set_lcd(); // Hitachi SX19V001-ZZA (7,6'' touch, color, 640x480)
 	m_screen->set_refresh_hz(60); // Guess
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);

@@ -170,7 +170,7 @@ void CArcInfoEx::AddExts(const UString &ext, const UString &addExt)
     if (i < addExts.Size())
     {
       extInfo.AddExt = addExts[i];
-      if (extInfo.AddExt == L"*")
+      if (extInfo.AddExt.IsEqualTo("*"))
         extInfo.AddExt.Empty();
     }
     Exts.Add(extInfo);
@@ -211,10 +211,11 @@ static FString GetBaseFolderPrefixFromRegistry()
       && !NFind::DoesFileOrDirExist(moduleFolderPrefix + kFormatsFolderName))
   {
     FString path;
-    if (ReadPathFromRegistry(HKEY_CURRENT_USER,  kProgramPath2Value, path)) return path;
-    if (ReadPathFromRegistry(HKEY_LOCAL_MACHINE, kProgramPath2Value, path)) return path;
-    if (ReadPathFromRegistry(HKEY_CURRENT_USER,  kProgramPathValue,  path)) return path;
-    if (ReadPathFromRegistry(HKEY_LOCAL_MACHINE, kProgramPathValue,  path)) return path;
+    if (   ReadPathFromRegistry(HKEY_CURRENT_USER,  kProgramPath2Value, path)
+        || ReadPathFromRegistry(HKEY_LOCAL_MACHINE, kProgramPath2Value, path)
+        || ReadPathFromRegistry(HKEY_CURRENT_USER,  kProgramPathValue,  path)
+        || ReadPathFromRegistry(HKEY_LOCAL_MACHINE, kProgramPathValue,  path))
+      moduleFolderPrefix = path;
   }
   #endif
   
@@ -262,6 +263,8 @@ static HRESULT GetMethodBoolProp(Func_GetMethodProperty getMethodProperty, UInt3
 #if defined(__clang__)
 #pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
+
+Z7_DIAGNOSTIC_IGNORE_CAST_FUNCTION
 
 #define MY_GET_FUNC(dest, type, lib, func)  \
   dest = Z7_GET_PROC_ADDRESS(type, lib.Get_HMODULE(), func);
@@ -500,7 +503,9 @@ HRESULT CCodecs::LoadFormats()
 #ifdef Z7_LARGE_PAGES
 extern "C"
 {
-  extern SIZE_T g_LargePageSize;
+  extern size_t g_LargePageSize;
+  extern size_t g_LargePageThresholdMin;
+  extern UInt32 g_LargePageFlags;
 }
 #endif
 
@@ -632,11 +637,27 @@ HRESULT CCodecs::LoadDll(const FString &dllPath, bool needCheckDll, bool *loaded
     */
 
     #ifdef Z7_LARGE_PAGES
-    if (g_LargePageSize != 0)
     {
-      MY_GET_FUNC_LOC (setLargePageMode, Func_SetLargePageMode, lib.Lib, "SetLargePageMode")
-      if (setLargePageMode)
-        setLargePageMode();
+      MY_GET_FUNC_LOC (setLargePageMode2, Func_SetLargePageMode2, lib.Lib, "SetLargePageMode2")
+      if (setLargePageMode2)
+      {
+        /* const HRESULT hres = */ setLargePageMode2(g_LargePageFlags, g_LargePageSize, g_LargePageThresholdMin);
+        /*
+        if (hres != S_OK)
+        {
+          CCodecError &error = Errors.AddNew();
+          error.Path = dllPath;
+          error.Message = "SetLargePageMode2 Error";
+          error.ErrorCode = hres;
+        }
+        */
+      }
+      else if (g_LargePageSize != 0)
+      {
+        MY_GET_FUNC_LOC (setLargePageMode, Func_SetLargePageMode, lib.Lib, "SetLargePageMode")
+        if (setLargePageMode)
+          setLargePageMode();
+      }
     }
     #endif
 
@@ -927,8 +948,8 @@ bool CCodecs::FindFormatForArchiveType(const UString &arcType, CIntVector &forma
     const UString name = arcType.Mid(pos, (unsigned)pos2 - pos);
     if (name.IsEmpty())
       return false;
-    int index = FindFormatForArchiveType(name);
-    if (index < 0 && name != L"*")
+    const int index = FindFormatForArchiveType(name);
+    if (index < 0 && !name.IsEqualTo("*"))
     {
       formatIndices.Clear();
       return false;

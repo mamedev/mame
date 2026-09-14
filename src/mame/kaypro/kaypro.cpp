@@ -316,7 +316,7 @@ void kayproii_state::kayproii(machine_config &config)
 	m_maincpu->set_daisy_config(kayproii_daisy_chain);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(13.9776_MHz_XTAL, 128 * 7, 0, 80 * 7, 260, 0, 240);
 	m_screen->set_screen_update(FUNC(kayproii_state::screen_update_kayproii));
 	m_screen->set_palette(m_palette);
@@ -405,7 +405,7 @@ void kaypro84_state::kaypro484(machine_config &config)
 	m_maincpu->set_daisy_config(kaypro484_daisy_chain);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18_MHz_XTAL, 856, 0, 640, 426, 0, 400);
 	m_screen->set_screen_update(FUNC(kaypro84_state::screen_update_kaypro484));
 

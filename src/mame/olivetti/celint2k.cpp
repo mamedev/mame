@@ -346,7 +346,7 @@ void celint2k_state::celint2k(machine_config &config)
 
 	PCF8573(config, m_rtc, 32.768_kHz_XTAL);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // TECDIS C425901 backlight 320x240 gLCD
+	screen_device &screen(SCREEN(config, "screen").set_lcd()); // TECDIS C425901 backlight 320x240 gLCD
 	screen.set_refresh_hz(60); // Guess
 	screen.set_screen_update(m_lcdc, FUNC(msm6255_device::screen_update));
 	screen.set_size(480, 240);

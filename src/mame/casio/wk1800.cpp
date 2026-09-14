@@ -40,7 +40,7 @@
 #include "video/hd44780.h"
 
 #include "emupal.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -93,7 +93,7 @@ protected:
 private:
 	void wk1600_map(address_map &map) ATTR_COLD;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_update(screen_svg_device &screen);
 
 	required_memory_region m_sound_rom;
 
@@ -205,7 +205,7 @@ void wk1600_state::apo_w(int state)
 }
 
 /**************************************************************************/
-u32 wk1600_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void wk1600_state::screen_update(screen_svg_device &screen)
 {
 	const u8 *render = m_lcdc->render();
 	for (int x = 0; x < 64; x++)
@@ -218,8 +218,6 @@ u32 wk1600_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		}
 		render += 8;
 	}
-
-	return 0;
 }
 
 
@@ -310,11 +308,10 @@ void wk1600_state::wk1600(machine_config &config)
 	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be SED1278F2A; clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
-	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	auto &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1755, 450);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(wk1600_state::screen_update));
+	screen.set_screen_svg_update(FUNC(wk1600_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 

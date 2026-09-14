@@ -595,7 +595,7 @@ void base_state::base(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(blmbycar_state::irq1_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(0x180, 0x100);
 	screen.set_screen_update(FUNC(blmbycar_state::screen_update));

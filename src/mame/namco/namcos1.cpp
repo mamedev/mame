@@ -1039,7 +1039,7 @@ void namcos1_state::ns1(machine_config &config)
 	LS157(config, m_dsw_sel); // LS257 'A3'
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(49'152'000)/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8);
 	screen.set_screen_update(FUNC(namcos1_state::screen_update));
 	screen.screen_vblank().set(FUNC(namcos1_state::screen_vblank));

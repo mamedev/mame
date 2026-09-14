@@ -949,7 +949,7 @@ void monon_color_state::monon_color(machine_config &config)
 
 	// is this a 3:4 (true vertical) 240x320 screen rotated on its side?
 	// the scan direction for drawing is highly unusual
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(120);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(monon_color_state::screen_update));

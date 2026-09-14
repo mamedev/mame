@@ -1283,7 +1283,7 @@ void jack_state::jack(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &jack_state::sound_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(jack_state::screen_update<true>));
 	m_screen->set_palette(m_palette);

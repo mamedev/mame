@@ -13,13 +13,13 @@
 
 #pragma once
 
+#include "gt913_timer.h"
 #include "h8.h"
 #include "h8_intc.h"
 #include "h8_port.h"
 #include "h8_sci.h"
-#include "machine/gt913_io.h"
 #include "machine/gt913_kbd.h"
-#include "machine/gt913_snd.h"
+#include "sound/gt913.h"
 
 class gt913_device : public h8_device, public device_mixer_interface {
 public:
@@ -35,9 +35,14 @@ public:
 	auto write_port3() { return m_write_port[PORT_3].bind(); }
 	auto write_ple()   { return m_write_ple.bind(); }
 
+protected:
 	void uart_rate_w(u8 data);
 	void uart_control_w(offs_t offset, u8 data);
 	u8 uart_control_r(offs_t offset);
+
+	void adc_control_w(uint8_t data);
+	uint8_t adc_control_r();
+	uint8_t adc_data_r();
 
 	void data_w(offs_t offset, u8 data);
 	u8 data_r(offs_t offset);
@@ -45,7 +50,6 @@ public:
 	void syscr_w(u8 data);
 	u8 syscr_r();
 
-protected:
 	/* indirect reads/writes with banking support */
 	u8 read8ib(u32 adr);
 	void write8ib(u32 adr, u8 data);
@@ -67,6 +71,9 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
@@ -95,6 +102,10 @@ protected:
 	u16 m_banknum;
 	u8 m_syscr;
 
+	/* 2x ADC */
+	bool m_adc_enable, m_adc_channel;
+	uint8_t m_adc_data[2];
+
 	required_device<gt913_intc_device> m_intc;
 
 	/* sound */
@@ -103,8 +114,9 @@ protected:
 	/* key controller */
 	required_device<gt913_kbd_hle_device> m_kbd;
 
-	/* misc. I/O (timers, ADCs) */
-	required_device<gt913_io_hle_device> m_io_hle;
+	/* timers */
+	required_device<gt913_timer16_device> m_timer0;
+	required_device<gt913_timer8_device> m_timer1;
 
 	/* 3x 8-bit I/O ports */
 	required_device_array<h8_port_device, 3> m_port;

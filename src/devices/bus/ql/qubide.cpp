@@ -211,11 +211,11 @@ uint8_t qubide_device::read(offs_t offset, uint8_t data)
 			switch (offset & 0x0f)
 			{
 			case 0:
-				data = m_ata->cs1_r(0x07, 0xff);
+				data = m_ata->cs1_r(0x07);
 				break;
 
 			default:
-				data = m_ata->cs0_r(offset & 0x07, 0xff);
+				data = m_ata->cs0_r(offset & 0x07);
 				break;
 
 			case 0x08: case 0x0a: case 0x0c:
@@ -229,7 +229,7 @@ uint8_t qubide_device::read(offs_t offset, uint8_t data)
 				break;
 
 			case 0x0e: case 0x0f:
-				data = m_ata->cs1_r(0x05, 0xff);
+				data = m_ata->cs1_r(0x05);
 				break;
 			}
 		}
@@ -256,7 +256,7 @@ void qubide_device::write(offs_t offset, uint8_t data)
 			switch (offset & 0x0f)
 			{
 			case 0: case 0x0e: case 0x0f:
-				m_ata->cs1_w(0x05, data, 0xff);
+				m_ata->cs1_w(0x05, data);
 				break;
 
 			case 0x08: case 0x0a: case 0x0c:
@@ -270,7 +270,7 @@ void qubide_device::write(offs_t offset, uint8_t data)
 				break;
 
 			default:
-				m_ata->cs0_w(offset & 0x07, data, 0xff);
+				m_ata->cs0_w(offset & 0x07, data);
 				break;
 			}
 		}

@@ -21,6 +21,8 @@
 #ifndef MAME_EMU_SPEAKER_H
 #define MAME_EMU_SPEAKER_H
 
+#include "interface/audio.h"
+
 #pragma once
 
 

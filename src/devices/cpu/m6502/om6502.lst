@@ -223,9 +223,11 @@ bcc_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(!(m_P & F_C)) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}
@@ -235,9 +237,11 @@ bcs_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(m_P & F_C) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}
@@ -247,9 +251,11 @@ beq_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(m_P & F_Z) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}
@@ -275,9 +281,11 @@ bmi_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(m_P & F_N) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}
@@ -287,9 +295,11 @@ bne_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(!(m_P & F_Z)) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}
@@ -299,9 +309,11 @@ bpl_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(!(m_P & F_N)) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}
@@ -319,18 +331,19 @@ brk_imp
 	dec_SP();
 	write(m_SP, m_PC);
 	dec_SP();
+	m_TMP = m_nmi_pending;
 	write(m_SP, m_irq_taken ? m_P & ~F_B : m_P);
 	dec_SP();
-	if(m_nmi_pending) {
+	if(m_TMP) {
 		standard_irq_callback(NMI_LINE, m_PC);
-		m_PC = read_arg(0xfffa);
-		m_PC = set_h(m_PC, read_arg(0xfffb));
+		m_PC = read_arg_noirq(0xfffa);
+		m_PC = set_h(m_PC, read_arg_noirq(0xfffb));
 		m_nmi_pending = false;
 	} else {
 		if(m_irq_taken)
 			standard_irq_callback(IRQ_LINE, m_PC);
-		m_PC = read_arg(0xfffe);
-		m_PC = set_h(m_PC, read_arg(0xffff));
+		m_PC = read_arg_noirq(0xfffe);
+		m_PC = set_h(m_PC, read_arg_noirq(0xffff));
 	}
 	m_irq_taken = false;
 	m_P |= F_I; // Do *not* move after the prefetch
@@ -341,9 +354,11 @@ bvc_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(!(m_P & F_V)) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}
@@ -353,9 +368,11 @@ bvs_rel
 	m_TMP = read_pc();
 	m_PC++;
 	if(m_P & F_V) {
-		read_pc();
 		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_pc();
 			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		} else {
+			read_pc_noirq();
 		}
 		m_PC += int8_t(m_TMP);
 	}

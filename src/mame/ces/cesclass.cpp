@@ -369,14 +369,14 @@ void cesclassic_state::cesclassic(machine_config &config)
 	// DS1232 MicroMonitor
 
 	// LCD screen section (2bpp)
-	screen_device &l_screen(SCREEN(config, "l_lcd", SCREEN_TYPE_LCD));
+	screen_device &l_screen(SCREEN(config, "l_lcd").set_lcd());
 	l_screen.set_refresh_hz(60);
 	l_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	l_screen.set_screen_update(FUNC(cesclassic_state::screen_update<0>));
 	l_screen.set_size(256+128, 64+24);
 	l_screen.set_visarea(0, 128 - 1, 0, 64 - 1);
 
-	screen_device &r_screen(SCREEN(config, "r_lcd", SCREEN_TYPE_LCD));
+	screen_device &r_screen(SCREEN(config, "r_lcd").set_lcd());
 	r_screen.set_refresh_hz(60);
 	r_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	r_screen.set_screen_update(FUNC(cesclassic_state::screen_update<1>));

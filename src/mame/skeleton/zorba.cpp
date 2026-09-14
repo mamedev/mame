@@ -250,7 +250,7 @@ void zorba_state::zorba(machine_config &config)
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.318'181_MHz_XTAL, 880, 0, 640, 297, 0, 275);
 	screen.set_color(rgb_t::green());
 	screen.set_screen_update(m_crtc, FUNC(i8275_device::screen_update));

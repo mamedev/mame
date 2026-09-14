@@ -2,14 +2,14 @@
 // copyright-holders:R. Belmont, AJR, Olivier Galibert
 /***************************************************************************
 
-	Hitachi H8/500 family base CPU device.
-	Disassembler by AJR, execution core by R. Belmont
+    Hitachi H8/500 family base CPU device.
+    Disassembler by AJR, execution core by R. Belmont
 
-	The H8/500 is a 16-bit microcontroller architecture that's kind of a
-	Thumb version of the H8/300, to draw an ARM analogy.  Instead of fixed
-	16-bit instruction words, instructions vary from 1 to 6 bytes, and a set
-	of smaller, faster instructions that go to a movable special area in
-	the first 64K help to optimize code size.
+    The H8/500 is a 16-bit microcontroller architecture that's kind of a
+    Thumb version of the H8/300, to draw an ARM analogy.  Instead of fixed
+    16-bit instruction words, instructions vary from 1 to 6 bytes, and a set
+    of smaller, faster instructions that go to a movable special area in
+    the first 64K help to optimize code size.
 
 ***************************************************************************/
 
@@ -718,7 +718,7 @@ u8 h8500_device::do_subx8(u8 v1, u8 v2)
 {
 	const u8 c = m_sr & SR_C ? 1 : 0;
 	const u16 res = v1 - v2 - c;
-	m_sr &= ~(SR_N | SR_V | SR_Z | SR_C);
+	m_sr &= ~(SR_N | SR_V | SR_C);
 	if(u8(res))
 		m_sr &= ~SR_Z;
 	if(s8(res) < 0)

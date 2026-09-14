@@ -516,7 +516,7 @@ void leapster_state::leapster(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(leapster_state::testirq));
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(160, 160);
 	screen.set_visarea(0, 160-1, 0, 160-1);

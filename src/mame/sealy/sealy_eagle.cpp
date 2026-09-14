@@ -146,7 +146,7 @@ void sealy_eagle_state::qczl(machine_config &config)
 	DS1302(config, "rtc", 32.768_kHz_XTAL);
 
 	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

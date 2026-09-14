@@ -1390,6 +1390,6 @@ GAME( 2011, brvbladeg, coh3002t, coh3002t_bl, taitogn_jp1, taitogn_state,   init
 GAME( 2011, flamegung, coh3002t, coh3002t_bl, taitogn_jp1, ttgncl0_state,   init_nozoom, ROT0,    "bootleg (Arcade MOD BIOS)", "Flame Gunner (VER 1.40G)",          MACHINE_SUPPORTS_SAVE )
 GAME( 2011, ftimpactg, coh3002t, coh3002t_bl, taitogn_jp1, taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "Fighters' Impact (VER 2.10G)",      MACHINE_SUPPORTS_SAVE )
 GAME( 2011, gdariusg,  coh3002t, coh3002t_bl, taitogn_jp1, taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "G-Darius (VER 2.70G)",              MACHINE_SUPPORTS_SAVE )
-GAME( 2011, raystormg, coh3002t, coh3002t_bl, raystormg,   taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "Ray Storm (VER 2.60G)",             MACHINE_SUPPORTS_SAVE )
+GAME( 2011, raystormg, coh3002t, coh3002t_bl, raystormg,   taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "RayStorm (VER 2.60G)",              MACHINE_SUPPORTS_SAVE )
 GAME( 2011, shngmtkbg, coh3002t, coh3002t_bl, taitogn_jp1, ttgncl0_state,   init_nozoom, ROT0,    "bootleg (Arcade MOD BIOS)", "Shanghai Matekibuyuu (VER 1.20G)",  MACHINE_SUPPORTS_SAVE )
 GAME( 2011, tblkkuzug, coh3002t, coh3002t_bl, taitogn_jp1, ttgncl0_state,   init_nozoom, ROT0,    "bootleg (Arcade MOD BIOS)", "The Block Kuzushi (VER 1.10G)",     MACHINE_SUPPORTS_SAVE )

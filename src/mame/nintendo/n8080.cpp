@@ -1168,7 +1168,7 @@ void spacefev_state::spacefev(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &spacefev_state::main_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(spacefev_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1192,7 +1192,7 @@ void sheriff_state::sheriff(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(sheriff_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1225,7 +1225,7 @@ void helifire_state::helifire(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &helifire_state::main_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(helifire_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(helifire_state::screen_vblank));

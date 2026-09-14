@@ -635,7 +635,7 @@ void mrsdyna_state::mrsdyna(machine_config &config)
 	unklatch.parallel_out_cb().set(FUNC(mrsdyna_state::unk_0x28_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(9'828'000 / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(mrsdyna_state::screen_update));
 	screen.set_palette(m_palette);

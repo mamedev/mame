@@ -44,7 +44,7 @@ protected:
 	void key_break(u8 row, u8 column) override { if (row > 7) transmit_byte(0x40 | ((row << 4) + column)); }
 
 private:
-	virtual void received_byte(uint8_t byte) override {};
+	virtual void received_byte(uint8_t byte) override;
 
 	devcb_write_line m_write_txd;
 };

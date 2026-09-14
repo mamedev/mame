@@ -433,7 +433,7 @@ void blockout_state::blockout(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// assume same as ddragon3 with adjusted visible display area
 	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
 	m_screen->set_screen_update(FUNC(blockout_state::screen_update));

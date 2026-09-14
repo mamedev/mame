@@ -6,15 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - white noise
-    - scanline based update
-
-*/
-
 #include "emu.h"
 #include "cdp1869.h"
 
@@ -29,6 +20,30 @@
 #define CDP1869_WEIGHT_RED      30 // % of max luminance
 #define CDP1869_WEIGHT_GREEN    59
 #define CDP1869_WEIGHT_BLUE     11
+
+#define CDP1869_MIN_CHROMA      0.4 // chrominance amplitude left at zero luminance
+#define CDP1869_GAMMA           2.2 // display gamma the luminances are given for
+
+// fractional bits used by the sound generators' clock cycle counters
+static constexpr int CLOCK_FRAC = 32;
+
+// The white noise generator is a shift register clocked by the noise range
+// divider. Its sequence was recovered from a recording of a real machine with
+// the range set to 0, the slowest, so that every individual bit is resolvable.
+// Over all 8823 bits measured the output obeys, without a single exception,
+//
+//   q = q[-1] ^ q[-4] ^ q[-5] ^ q[-10] ^ q[-11] ^ q[-13] ^ q[-14] ^ q[-15] ^ q[-17]
+//
+// The characteristic polynomial of that recurrence is not primitive; it factors
+// into (x + 1)^4 * (x^2 + x + 1) * P(x) with P primitive of degree 11. What is
+// heard is therefore an 11 stage maximal length sequence of period 2047 mixed
+// with a period 12 term, and the whole sequence repeats every 24564 bits rather
+// than every 2^17-1.
+static constexpr u32 WNOISE_LENGTH = 17;
+
+// a state lifted from the same recording, so that the sequence starts out on
+// the cycle the real chip runs on
+static constexpr u32 WNOISE_SEED = 0x08144;
 
 #define CDP1869_COLUMNS_HALF    20
 #define CDP1869_COLUMNS_FULL    40
@@ -99,24 +114,48 @@ void cdp1869_device::cdp1869(address_map &map)
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_rgb - get RGB value
+//  get_rgb - get the RGB value for chrominance
+//  field c displayed at the luminance of field l
 //-------------------------------------------------
 
-rgb_t cdp1869_device::get_rgb(int i, int c, int l)
+rgb_t cdp1869_device::get_rgb(int c, int l)
 {
+	// Table 5: the luminance of a colour field is the sum of the weights of its
+	// set bits, which is also the luma of the corresponding full-drive primary,
+	// so a field displayed at its own luminance is simply that primary.
+	int const cr = BIT(c, 2), cb = BIT(c, 1), cg = BIT(c, 0);
+
+	int const chroma = (cr * CDP1869_WEIGHT_RED) + (cg * CDP1869_WEIGHT_GREEN) + (cb * CDP1869_WEIGHT_BLUE);
+
 	int luma = 0;
 
 	luma += (l & 4) ? CDP1869_WEIGHT_RED : 0;
 	luma += (l & 1) ? CDP1869_WEIGHT_GREEN : 0;
 	luma += (l & 2) ? CDP1869_WEIGHT_BLUE : 0;
 
-	luma = (luma * 0xff) / 100;
+	// In tone-on-tone mode (CFC=1) chrominance and luminance come from
+	// different fields (Table 4), and the decoder adds the colour difference
+	// signals of field c to the luminance of field l. The chrominance amplitude
+	// follows that luminance, so a tone below the luminance of its own hue is
+	// desaturated towards black rather than clipped against it. It never quite
+	// disappears though: on a real machine the darkest tone of a hue is not
+	// black but a very dark shade of it, which is what the floor is for. An
+	// achromatic field has no colour difference signals at all and so always
+	// gives a grey scale, and when l == c this reduces to the primary selected
+	// by c.
+	double const sat = chroma ? std::clamp(luma / double(chroma), CDP1869_MIN_CHROMA, 1.0) : 1.0;
 
-	int const r = (c & 4) ? luma : 0;
-	int const g = (c & 1) ? luma : 0;
-	int const b = (c & 2) ? luma : 0;
+	// Table 5 gives the percentage of the maximum luminance seen on the screen,
+	// not the drive that produces it, so the levels are gamma encoded. Without
+	// that the tones just below full drive are not told apart from it at all.
+	auto const level = [luma, chroma, sat] (int component)
+	{
+		double const y = std::clamp(luma + (sat * ((component * 100) - chroma)), 0.0, 100.0) / 100.0;
 
-	return rgb_t(r, g, b);
+		return int((std::pow(y, 1.0 / CDP1869_GAMMA) * 0xff) + 0.5);
+	};
+
+	return rgb_t(level(cr), level(cg), level(cb));
 }
 
 
@@ -220,7 +259,7 @@ void cdp1869_device::update_prd_changed_timer()
 		next_state = ASSERT_LINE;
 	}
 
-	if (m_dispoff)
+	if (m_dispoff_frame)
 	{
 		next_state = CLEAR_LINE;
 	}
@@ -255,12 +294,49 @@ int cdp1869_device::get_lines()
 //  get_pmemsize - get page memory size
 //-------------------------------------------------
 
-uint16_t cdp1869_device::get_pmemsize(int cols, int rows)
+size_t cdp1869_device::get_pmemsize(int cols, int rows)
 {
-	int pmemsize = cols * rows;
+	// The refresh address counter returns to zero at the maximum display
+	// page-memory size of the format, not at the number of characters on the
+	// screen, and that is what makes the scroll technique of the OUT 7
+	// instruction work: the display window is only a part of the page memory, so
+	// the counter keeps counting past the window before it wraps. Rolling a 20
+	// character wide 24 row display through 960 bytes of page memory is the
+	// example worked out in the data sheet.
+	//
+	// The sizes are not derivable from the format bits, so they are simply the
+	// ones tabulated with the display format combinations, in the same order.
+	// The 9-LINE bit does not appear here because each of the three PAL formats
+	// listed has the same size as the NTSC format that shares its other bits.
+	static constexpr uint16_t PMEMSIZE[16] =
+	{
+	//  FRES HORZ, FRES VERT, DOUBLE PAGE, 16-LINE HI-RES
+		 240,   // 0 0 0 0    6x8/6x9, 20 char/row, 12 rows
+		 240,   // 0 0 0 1    6x16,    20 char/row,  6 rows
+		1200,   // 0 0 1 0    6x8,     20 char/row, 12 rows
+		   0,   // 0 0 1 1    invalid
+		 960,   // 0 1 0 0    6x8/6x9, 20 char/row, 24 rows
+		 960,   // 0 1 0 1    6x16,    20 char/row, 12 rows
+		1920,   // 0 1 1 0    6x8,     20 char/row, 24 rows
+		   0,   // 0 1 1 1    invalid
+		   0,   // 1 0 0 0    invalid
+		 240,   // 1 0 0 1    6x16,    40 char/row,  6 rows
+		1200,   // 1 0 1 0    6x8,     40 char/row, 12 rows
+		   0,   // 1 0 1 1    invalid
+		 960,   // 1 1 0 0    6x8/6x9, 40 char/row, 24 rows
+		 960,   // 1 1 0 1    6x16,    40 char/row, 12 rows
+		1920,   // 1 1 1 0    6x8,     40 char/row, 24 rows
+		   0    // 1 1 1 1    invalid
+	};
 
-	if (m_dblpage) pmemsize *= 2;
-	if (m_line16) pmemsize *= 2;
+	// the two 1200 byte entries are the sizes as printed, and they are the only
+	// two that cannot be reconciled with the 960 byte single-page and 1920 byte
+	// maximum page memory sizes given in the text
+	size_t pmemsize = PMEMSIZE[(m_freshorz << 3) | (m_fresvert << 2) | (m_dblpage << 1) | m_line16];
+
+	// the remaining combinations are invalid and produce improper display
+	// operation, so there is nothing better to do than wrap at the window
+	if (!pmemsize) pmemsize = cols * rows;
 
 	return pmemsize;
 }
@@ -270,7 +346,7 @@ uint16_t cdp1869_device::get_pmemsize(int cols, int rows)
 //  get_pma - get page memory address
 //-------------------------------------------------
 
-uint16_t cdp1869_device::get_pma()
+offs_t cdp1869_device::get_pma()
 {
 	if (m_dblpage)
 	{
@@ -377,7 +453,10 @@ void cdp1869_device::device_start()
 	// allocate timers
 	m_prd_timer = timer_alloc(FUNC(cdp1869_device::prd_update), this);
 	m_dispoff = 0;
+	m_dispoff_frame = 0;
 	update_prd_changed_timer();
+
+	screen().register_vblank_callback(vblank_state_delegate(&cdp1869_device::screen_vblank, this));
 
 	// initialize palette
 	m_bkg = 0;
@@ -396,8 +475,13 @@ void cdp1869_device::device_start()
 	m_freshorz = 0;
 	m_hma = 0;
 	m_col = 0;
-	m_incr = 0;
-	m_signal = 0;
+	m_toneclk = 0;
+	m_toneout = false;
+	m_wnclk = 0;
+	m_wnshift = WNOISE_SEED;
+	m_wnamp = 0;
+	m_wnfreq = 0;
+	m_wnoff = 0;
 	m_cfc = 0;
 	m_toneoff = 0;
 	m_cmem = 0;
@@ -405,6 +489,7 @@ void cdp1869_device::device_start()
 	// register for state saving
 	save_item(NAME(m_prd));
 	save_item(NAME(m_dispoff));
+	save_item(NAME(m_dispoff_frame));
 	save_item(NAME(m_fresvert));
 	save_item(NAME(m_freshorz));
 	save_item(NAME(m_cmem));
@@ -416,9 +501,11 @@ void cdp1869_device::device_start()
 	save_item(NAME(m_bkg));
 	save_item(NAME(m_pma));
 	save_item(NAME(m_hma));
-	save_item(NAME(m_signal));
-	save_item(NAME(m_incr));
+	save_item(NAME(m_toneclk));
+	save_item(NAME(m_toneout));
 	save_item(NAME(m_toneoff));
+	save_item(NAME(m_wnclk));
+	save_item(NAME(m_wnshift));
 	save_item(NAME(m_wnoff));
 	save_item(NAME(m_tonediv));
 	save_item(NAME(m_tonefreq));
@@ -452,6 +539,28 @@ TIMER_CALLBACK_MEMBER(cdp1869_device::prd_update)
 
 
 //-------------------------------------------------
+//  screen_vblank - recognize a change of the
+//  DISP OFF bit at the end of the frame
+//-------------------------------------------------
+
+void cdp1869_device::screen_vblank(screen_device &screen, bool state)
+{
+	// A change of the DISP OFF bit is only recognized at the end of the frame,
+	// so the bit programmed by an OUT 3 instruction takes effect on the frame
+	// after the one it was written during. The screen has already been rendered
+	// by the time this runs, so latching the bit here gives exactly that.
+	if (state && (m_dispoff != m_dispoff_frame))
+	{
+		m_dispoff_frame = m_dispoff;
+
+		// PREDISPLAY and DISPLAY are held high while the display is off, so the
+		// pending transition has to be recomputed for the new state
+		update_prd_changed_timer();
+	}
+}
+
+
+//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
@@ -472,16 +581,17 @@ void cdp1869_device::cdp1869_palette(palette_device &palette) const
 {
 	int i;
 
-	// color-on-color display (CFC=0)
+	// color-on-color display (CFC=0): chrominance and luminance share one field
 	for (i = 0; i < 8; i++)
-		palette.set_pen_color(i, get_rgb(i, i, 15));
+		palette.set_pen_color(i, get_rgb(i, i));
 
-	// tone-on-tone display (CFC=1)
+	// tone-on-tone display (CFC=1): chrominance from BKG, luminance from the
+	// character color bits
 	for (int c = 0; c < 8; c++)
 	{
 		for (int l = 0; l < 8; l++)
 		{
-			palette.set_pen_color(i, get_rgb(i, c, l));
+			palette.set_pen_color(i, get_rgb(c, l));
 			i++;
 		}
 	}
@@ -495,56 +605,82 @@ void cdp1869_device::cdp1869_palette(palette_device &palette) const
 
 void cdp1869_device::sound_stream_update(sound_stream &stream)
 {
-	sound_stream::sample_t signal = m_signal;
+	bool const tone = !m_toneoff && m_toneamp;
+	bool const wnoise = !m_wnoff && m_wnamp;
 
-	if (!m_toneoff && m_toneamp)
+	if (!tone && !wnoise)
 	{
-		double frequency = (clock() / 2) / (512 >> m_tonefreq) / (m_tonediv + 1);
-//      double amplitude = m_toneamp * ((0.78*5) / 15);
+		stream.fill(0, 0.0);
+		return;
+	}
 
-		int rate = stream.sample_rate() / 2;
+	// the selected octave is divided by TONE DIV + 1 and the output flip-flop
+	// divides that by two again, so the tone toggles every N clock cycles
+	u64 const tonetoggle = u64(512 >> m_tonefreq) * (m_tonediv + 1) << CLOCK_FRAC;
 
-		/* get progress through wave */
-		int incr = m_incr;
+	// the noise range divider has no equivalent of TONE DIV, and there is no
+	// output flip-flop either, so the shift register is clocked every N cycles
+	u64 const wnclock = u64(4096 >> m_wnfreq) << CLOCK_FRAC;
 
-		if (signal < 0)
+	// both amplitudes are set by a 4 bit binary R/2R ladder, so they are linear,
+	// and both ladders drive the same summing node
+	sound_stream::sample_t const toneamp = sound_stream::sample_t(m_toneamp) / 15.0;
+	sound_stream::sample_t const wnamp = sound_stream::sample_t(m_wnamp) / 15.0;
+
+	// a change of range or divisor may have left a counter out of range
+	if (m_toneclk >= tonetoggle) m_toneclk %= tonetoggle;
+	if (m_wnclk >= wnclock) m_wnclk %= wnclock;
+
+	// integrate both generators over each output sample period, so that the
+	// edges keep their exact position in time to a fraction of a sample instead
+	// of being snapped to a sample boundary, and so that a generator clocked
+	// faster than the sample rate averages out instead of aliasing back down
+	// into the audible band
+	u64 const step = (u64(clock()) << CLOCK_FRAC) / stream.sample_rate();
+
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+	{
+		u64 remaining = step, tonehigh = 0, wnhigh = 0;
+
+		while (remaining)
 		{
-			signal = -(sound_stream::sample_t(m_toneamp) / 15.0);
-		}
-		else
-		{
-			signal = sound_stream::sample_t(m_toneamp) / 15.0;
-		}
+			u64 const slice = std::min({ remaining, tonetoggle - m_toneclk, wnclock - m_wnclk });
 
-		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
-		{
-			stream.put(0, sampindex, signal);
-			incr -= frequency;
-			while( incr < 0 )
+			if (m_toneout) tonehigh += slice;
+			if (BIT(m_wnshift, 0)) wnhigh += slice;
+
+			remaining -= slice;
+
+			// the dividers keep running while a generator is gated off
+			m_toneclk += slice;
+
+			if (m_toneclk == tonetoggle)
 			{
-				incr += rate;
-				signal = -signal;
+				m_toneclk = 0;
+				m_toneout = !m_toneout;
+			}
+
+			m_wnclk += slice;
+
+			if (m_wnclk == wnclock)
+			{
+				m_wnclk = 0;
+
+				int const feedback = BIT(m_wnshift, 0) ^ BIT(m_wnshift, 3) ^ BIT(m_wnshift, 4)
+						^ BIT(m_wnshift, 9) ^ BIT(m_wnshift, 10) ^ BIT(m_wnshift, 12)
+						^ BIT(m_wnshift, 13) ^ BIT(m_wnshift, 14) ^ BIT(m_wnshift, 16);
+
+				m_wnshift = ((m_wnshift << 1) | feedback) & make_bitmask<u32>(WNOISE_LENGTH);
 			}
 		}
 
-		/* store progress through wave */
-		m_incr = incr;
-		m_signal = signal;
+		sound_stream::sample_t sample = 0.0;
+
+		if (tone) sample += toneamp * sound_stream::sample_t((double(tonehigh) / step) * 2.0 - 1.0);
+		if (wnoise) sample += wnamp * sound_stream::sample_t((double(wnhigh) / step) * 2.0 - 1.0);
+
+		stream.put(0, sampindex, sample);
 	}
-/*
-    if (!m_wnoff)
-    {
-        double amplitude = m_wnamp * ((0.78*5) / 15);
-
-        for (int wndiv = 0; wndiv < 128; wndiv++)
-        {
-            double frequency = (clock() / 2) / (4096 >> m_wnfreq) / (wndiv + 1):
-
-            sum_square_wave(buffer, frequency, amplitude);
-        }
-    }
-*/
-
 }
 
 
@@ -552,9 +688,17 @@ void cdp1869_device::sound_stream_update(sound_stream &stream)
 //  draw_line - draw character line
 //-------------------------------------------------
 
-void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint8_t data, int color)
+void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprect, int x, int y, uint8_t data, int color)
 {
 	pen_t const fg = m_palette->pen(color);
+
+	auto const plot = [&bitmap, &cliprect, fg] (int x, int y)
+	{
+		if (cliprect.contains(x, y))
+		{
+			bitmap.pix(y, x) = fg;
+		}
+	};
 
 	data <<= 2;
 
@@ -562,20 +706,20 @@ void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 	{
 		if (data & 0x80)
 		{
-			bitmap.pix(y, x) = fg;
+			plot(x, y);
 
 			if (!m_fresvert)
 			{
-				bitmap.pix(y + 1, x) = fg;
+				plot(x, y + 1);
 			}
 
 			if (!m_freshorz)
 			{
-				bitmap.pix(y, x + 1) = fg;
+				plot(x + 1, y);
 
 				if (!m_fresvert)
 				{
-					bitmap.pix(y + 1, x + 1) = fg;
+					plot(x + 1, y + 1);
 				}
 			}
 		}
@@ -596,7 +740,7 @@ void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 //  draw_char - draw character
 //-------------------------------------------------
 
-void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint16_t pma)
+void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, const rectangle &cliprect, int x, int y, uint16_t pma)
 {
 	uint8_t pmd = read_page_ram_byte(pma);
 
@@ -610,7 +754,7 @@ void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 
 		int color = get_pen(ccb0, ccb1, pcb);
 
-		draw_line(bitmap, rect, rect.min_x + x, rect.min_y + y, data, color);
+		draw_line(bitmap, cliprect, rect.min_x + x, rect.min_y + y, data, color);
 
 		y++;
 
@@ -641,11 +785,13 @@ void cdp1869_device::out3_w(uint8_t data)
 	    7   fres horz
 	*/
 
+	screen().update_partial(screen().vpos(), screen().hpos());
+
 	m_bkg = data & 0x07;
 	m_cfc = BIT(data, 3);
 	m_dispoff = BIT(data, 4);
 	m_col = (data & 0x60) >> 5;
-	m_freshorz = BIT(data, 7);
+	m_freshorz = BIT(data, 7); // changing this mid-frame confuses the real chip's address counter
 }
 
 
@@ -802,6 +948,8 @@ void cdp1869_device::out7_w(offs_t offset)
 
 uint8_t cdp1869_device::char_ram_r(offs_t offset)
 {
+	if (m_prd) return 0xff;
+
 	uint8_t cma = offset & 0x0f;
 	uint16_t pma;
 
@@ -831,6 +979,8 @@ uint8_t cdp1869_device::char_ram_r(offs_t offset)
 
 void cdp1869_device::char_ram_w(offs_t offset, uint8_t data)
 {
+	if (m_prd) return;
+
 	uint8_t cma = offset & 0x0f;
 	uint16_t pma;
 
@@ -860,6 +1010,8 @@ void cdp1869_device::char_ram_w(offs_t offset, uint8_t data)
 
 uint8_t cdp1869_device::page_ram_r(offs_t offset)
 {
+	if (m_prd) return 0xff;
+
 	uint16_t pma;
 
 	if (m_cmem)
@@ -881,6 +1033,8 @@ uint8_t cdp1869_device::page_ram_r(offs_t offset)
 
 void cdp1869_device::page_ram_w(offs_t offset, uint8_t data)
 {
+	if (m_prd) return;
+
 	uint16_t pma;
 
 	if (m_cmem)
@@ -950,7 +1104,7 @@ uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	outer &= cliprect;
 	bitmap.fill(m_palette->pen(m_bkg), outer);
 
-	if (!m_dispoff)
+	if (!m_dispoff_frame)
 	{
 		int width = CH_WIDTH;
 		int height = get_lines();
@@ -978,7 +1132,7 @@ uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				int x = sx * width;
 				int y = sy * height;
 
-				draw_char(bitmap, screen_rect, x, y, addr);
+				draw_char(bitmap, screen_rect, cliprect, x, y, addr);
 
 				addr++;
 

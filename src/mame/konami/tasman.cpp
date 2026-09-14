@@ -670,7 +670,7 @@ void kongambl_state::kongambl(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // fake, they'll be changed by CCU anyway, TBD
 	m_screen->set_screen_update(FUNC(kongambl_state::screen_update_kongambl));
 	m_screen->set_palette(m_palette);

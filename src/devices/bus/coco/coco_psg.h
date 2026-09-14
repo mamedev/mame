@@ -33,6 +33,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	virtual u8 cts_read(offs_t offset) override;
 	virtual void cts_write(offs_t offset, u8 data) override;
@@ -42,6 +43,7 @@ protected:
 private:
 	required_device<ay8910_device> m_psg;
 	required_device<sst_39sf040_device> m_flash;
+	required_device<speaker_device> m_speaker;
 
 	void flash2aaa_w(offs_t offset, u8 data);
 	void flash5555_w(offs_t offset, u8 data);

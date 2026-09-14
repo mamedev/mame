@@ -237,7 +237,7 @@ void prof180x_state::prof180x(machine_config &config)
 	syslatch.q_out_cb<7>().set(FUNC(prof180x_state::mm1_flag_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(prof180x_state::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

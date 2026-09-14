@@ -531,14 +531,15 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					density = hs[6];
 				}
 
-				sects[i].track       = hs[0];
-				sects[i].head        = hs[1];
-				sects[i].sector      = hs[2];
-				sects[i].size        = hs[3];
-				sects[i].actual_size = size;
-				sects[i].deleted     = hs[7] != 0;
+				sects[i].track        = hs[0];
+				sects[i].head         = hs[1];
+				sects[i].sector       = hs[2];
+				sects[i].size         = hs[3];
+				sects[i].actual_size  = size;
+				sects[i].deleted      = hs[7] != 0;
 				sects[i].bad_data_crc = hs[8] == 0xb0;  // according to hxc
 				sects[i].bad_addr_crc = hs[8] == 0xa0;
+				sects[i].weak         = false;
 
 				if(size) {
 					sects[i].data    = sect_data + sdatapos;

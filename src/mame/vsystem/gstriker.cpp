@@ -25,7 +25,8 @@ Grand Striker has an IRQ2 which is probably network related.
 
 TODO:
 - Finish hooking up the inputs
-- Tilemap scrolling/rotation/zooming or whatever effect it needs
+- MB60553 words 1, 2, 5 and 6 of the line table and registers 2/3 are
+  never used by these games, so their function is unknown
 - Priorities are wrong. I suspect they need sprite orthogonality
 - Missing mixer registers (mainly layer enable/disable)
 - Tecmo World Cup '94 has missing protection emulation for draw buy-in
@@ -653,7 +654,7 @@ void gstriker_state::base(machine_config &config)
 
 	MB3773(config, m_watchdog);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5000)); // hand-tuned, it needs a bit

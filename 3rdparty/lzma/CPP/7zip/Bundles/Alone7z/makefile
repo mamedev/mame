@@ -2,8 +2,13 @@ PROG = 7zr.exe
 
 # USE_C_AES = 1
 # USE_C_SHA = 1
+# USE_C_CRC64 = 1
+# USE_C_CRC = 1
+# NO_ASM_GNU=1
+# NO_ASM=1
 
 CFLAGS = $(CFLAGS) -DZ7_PROG_VARIANT_R
+# CONSOLE_VARIANT_FLAGS=-DZ7_PROG_VARIANT_R
 
 COMMON_OBJS = \
   $O\CommandLineParser.obj \
@@ -143,7 +148,6 @@ C_OBJS = \
   $O\LzmaEnc.obj \
   $O\MtCoder.obj \
   $O\MtDec.obj \
-  $O\Sort.obj \
   $O\SwapBytes.obj \
   $O\Threads.obj \
   $O\Xz.obj \
@@ -159,5 +163,6 @@ C_OBJS = \
 !include "../../LzFindOpt.mak"
 !include "../../LzmaDec.mak"
 !include "../../Sha256.mak"
+!include "../../Sort.mak"
 
 !include "../../7zip.mak"

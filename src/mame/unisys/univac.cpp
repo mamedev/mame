@@ -587,7 +587,7 @@ void univac_state::uts20(machine_config &config)
 	latch_e0.q_out_cb<6>().set(FUNC(univac_state::porte6_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(univac_state::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_uts);

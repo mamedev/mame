@@ -6,14 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - drive not ready if ready_r() is connected to CIA
-
-*/
-
 #include "emu.h"
 #include "c1581.h"
 
@@ -95,8 +87,8 @@ const tiny_rom_entry *c1563_device::device_rom_region() const
 void c1581_device::c1581_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x400f).mirror(0x1ff0).rw(M8520_TAG, FUNC(mos8520_device::read), FUNC(mos8520_device::write));
-	map(0x6000, 0x6003).mirror(0x1ffc).rw(WD1772_TAG, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
+	map(0x4000, 0x400f).mirror(0x1ff0).rw(m_cia, FUNC(mos8520_device::read), FUNC(mos8520_device::write));
+	map(0x6000, 0x6003).mirror(0x1ffc).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
 	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
 }
 
@@ -109,14 +101,14 @@ void c1581_device::cnt_w(int state)
 {
 	m_cnt_out = state;
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 void c1581_device::sp_w(int state)
 {
 	m_sp_out = state;
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 uint8_t c1581_device::cia_pa_r()
@@ -139,7 +131,7 @@ uint8_t c1581_device::cia_pa_r()
 	uint8_t data = 0;
 
 	// ready
-	//data |= !m_floppy->ready_r() << 1;
+	data |= m_floppy->ready_r() << 1;
 
 	// device number
 	data |= ((m_slot->get_address() - 8) & 0x03) << 3;
@@ -235,15 +227,15 @@ void c1581_device::cia_pb_w(uint8_t data)
 	m_data_out = BIT(data, 1);
 
 	// clock out
-	m_bus->clk_w(this, !BIT(data, 3));
+	m_iec_clk = !BIT(data, 3);
 
 	// attention acknowledge
 	m_atn_ack = BIT(data, 4);
 
 	// fast serial direction
-	m_fast_ser_dir = BIT(data, 5);
+	m_ser_dir = BIT(data, 5);
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -273,10 +265,10 @@ void c1581_device::floppy_formats(format_registration &fr)
 
 void c1581_device::device_add_mconfig(machine_config &config)
 {
-	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
+	M6502(config, m_maincpu, XTAL(16'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1581_device::c1581_mem);
 
-	MOS8520(config, m_cia, 16_MHz_XTAL / 8);
+	MOS8520(config, m_cia, XTAL(16'000'000)/8);
 	m_cia->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_cia->cnt_wr_callback().set(FUNC(c1581_device::cnt_w));
 	m_cia->sp_wr_callback().set(FUNC(c1581_device::sp_w));
@@ -285,7 +277,9 @@ void c1581_device::device_add_mconfig(machine_config &config)
 	m_cia->pb_rd_callback().set(FUNC(c1581_device::cia_pb_r));
 	m_cia->pb_wr_callback().set(FUNC(c1581_device::cia_pb_w));
 
-	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	WD1772(config, m_fdc, XTAL(16'000'000)/2);
+	m_fdc->set_disable_motor_control(true);
+	
 	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true).enable_sound(true);
 }
 
@@ -323,35 +317,34 @@ ioport_constructor c1581_device::device_input_ports() const
 //  c1581_device - constructor
 //-------------------------------------------------
 
-c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_cbm_iec_interface(mconfig, *this),
-		m_maincpu(*this, M6502_TAG),
-		m_cia(*this, M8520_TAG),
-		m_fdc(*this, WD1772_TAG),
-		m_floppy(*this, WD1772_TAG":0:35dd"),
-		m_address(*this, "ADDRESS"),
-		m_leds(*this, "led%u", 0U),
-		m_data_out(0),
-		m_atn_ack(0),
-		m_fast_ser_dir(0),
-		m_sp_out(1),
-		m_cnt_out(1)
+c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_cbm_iec_interface(mconfig, *this),
+	m_maincpu(*this, M6502_TAG),
+	m_cia(*this, M8520_TAG),
+	m_fdc(*this, WD1772_TAG),
+	m_floppy(*this, WD1772_TAG":0:35dd"),
+	m_address(*this, "ADDRESS"),
+	m_leds(*this, "led%u", 0U),
+	m_data_out(1),
+	m_atn_ack(0),
+	m_ser_dir(0),
+	m_sp_out(1),
+	m_cnt_out(1),
+	m_iec_clk(1)
 {
 }
 
 c1581_device::c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: c1581_device(mconfig, C1581, tag, owner, clock)
-{
-}
+	: c1581_device(mconfig, C1581, tag, owner, clock) { }
 
 
 //-------------------------------------------------
 //  c1563_device - constructor
 //-------------------------------------------------
 
-c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: c1581_device(mconfig, C1563, tag, owner, clock) { }
+c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	c1581_device(mconfig, C1563, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -360,12 +353,15 @@ c1563_device::c1563_device(const machine_config &mconfig, const char *tag, devic
 
 void c1581_device::device_start()
 {
+	m_iec_sync_timer = timer_alloc(FUNC(c1581_device::iec_sync_tick), this);
+
 	// state saving
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_atn_ack));
-	save_item(NAME(m_fast_ser_dir));
+	save_item(NAME(m_ser_dir));
 	save_item(NAME(m_sp_out));
 	save_item(NAME(m_cnt_out));
+	save_item(NAME(m_iec_clk));
 }
 
 
@@ -375,18 +371,14 @@ void c1581_device::device_start()
 
 void c1581_device::device_reset()
 {
-	m_maincpu->reset();
-
-	m_cia->reset();
-	m_fdc->reset();
-
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(0);
 
 	m_sp_out = 1;
 	m_cnt_out = 1;
+	m_iec_clk = 1;
 
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -396,7 +388,7 @@ void c1581_device::device_reset()
 
 void c1581_device::cbm_iec_srq(int state)
 {
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -406,7 +398,7 @@ void c1581_device::cbm_iec_srq(int state)
 
 void c1581_device::cbm_iec_atn(int state)
 {
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -416,7 +408,7 @@ void c1581_device::cbm_iec_atn(int state)
 
 void c1581_device::cbm_iec_data(int state)
 {
-	update_iec();
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 
@@ -434,24 +426,28 @@ void c1581_device::cbm_iec_reset(int state)
 
 
 //-------------------------------------------------
-//  update_iec -
+//  iec_sync_tick - 
 //-------------------------------------------------
 
-void c1581_device::update_iec()
+TIMER_CALLBACK_MEMBER(c1581_device::iec_sync_tick)
 {
-	m_cia->cnt_w(m_fast_ser_dir || m_bus->srq_r());
-	m_cia->sp_w(m_fast_ser_dir || m_bus->data_r());
+	m_cia->cnt_w(m_ser_dir || m_bus->srq_r());
+	m_cia->sp_w(m_ser_dir || m_bus->data_r());
 
-	int atn = m_bus->atn_r();
+	// serial attention
+	bool atn = m_bus->atn_r();
 	m_cia->flag_w(atn);
 
+	// serial clock
+	m_bus->clk_w(this, m_iec_clk);
+
 	// serial data
-	int data = !m_data_out && !(m_atn_ack && !atn);
-	if (m_fast_ser_dir) data &= m_sp_out;
+	bool data = !m_data_out && !(m_atn_ack && !atn);
+	if (m_ser_dir) data &= m_sp_out;
 	m_bus->data_w(this, data);
 
 	// fast clock
-	int srq = 1;
-	if (m_fast_ser_dir) srq &= m_cnt_out;
+	bool srq = 1;
+	if (m_ser_dir) srq &= m_cnt_out;
 	m_bus->srq_w(this, srq);
 }

@@ -3,9 +3,13 @@
 #ifndef ZIP7_INC_WINDOWS_SECURITY_UTILS_H
 #define ZIP7_INC_WINDOWS_SECURITY_UTILS_H
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#include <ntsecapi.h>
+#else
 #include <NTSecAPI.h>
+#endif
 
-#include "Defs.h"
+#include "WinDefs.h"
 
 #ifndef _UNICODE
 
@@ -17,6 +21,8 @@ typedef NTSTATUS (NTAPI *Func_LsaAddAccountRights)(LSA_HANDLE PolicyHandle,
     PSID AccountSid, PLSA_UNICODE_STRING UserRights, ULONG CountOfRights );
 #define MY_STATUS_NOT_IMPLEMENTED  ((NTSTATUS)0xC0000002L)
 }
+
+Z7_DIAGNOSTIC_IGNORE_CAST_FUNCTION
 
 #define POLICY_FUNC_CALL(fff, str)  \
   if (hModule == NULL) return MY_STATUS_NOT_IMPLEMENTED; \

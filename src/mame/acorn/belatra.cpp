@@ -131,12 +131,18 @@ void belatra_state::belatra(machine_config &config)
 	ARM7500(config, m_maincpu, 56_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &belatra_state::program_map);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
-	ARM_VIDC20(config, m_vidc, 24'000'000); // chip type and clock guessed
+	SPEAKER(config, "speaker", 2).front();
+
+	// TODO: test if VGA or TV mode
+	ARM_VIDC20(config, m_vidc, 56_MHz_XTAL / 2); // chip type and clock guessed
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
+	// TODO: check if mono or stereo
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	ARM7500FE_IOMD(config, m_iomd, 56_MHz_XTAL);
 	m_iomd->set_host_cpu_tag(m_maincpu);
@@ -149,10 +155,12 @@ void belatra_state::belatra(machine_config &config)
 	m_iomd->iocr_write_id().set([this] (int state) { logerror("%s: IOCR write ID %d\n", machine().describe_context(), state); });
 	m_iomd->iolines_read().set([this] () { logerror("%s: IO lines read\n", machine().describe_context()); return uint8_t(0); });
 	m_iomd->iolines_write().set([this] (uint8_t data) { logerror("%s: IO lines write %02x\n", machine().describe_context(), data); });
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+
+	// TODO: actual connection to AUX port, mouse or otherwise
 
 	// AT90S2313(config, "mcu", xxxx); // TODO: AVR 8-bit core, only the fairyl2 set has a dump
 
-	SPEAKER(config, "speaker", 2).front();
 	// unknown sound
 }
 

@@ -368,7 +368,7 @@ void extrema_m27sv_state::extrema_m27sv(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

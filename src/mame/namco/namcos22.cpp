@@ -26,13 +26,13 @@ TODO:
 - tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
 - ridgera2 title screen scrolls horizontally on some video footage, C139 related?
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
-- improve vertex lighting (is it phong shading?)
 - global offset is wrong in non-super22 testmode video test
 - acedrive/victlap testmode video test flickers
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
 - ss22 testmode video test screen#13 geometry should not be lopsided (uses draw_direct_poly)
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
+- adillor race end should fade polygons to red, these are vics sprites with a size of 0, expected x/y size is 0x100
 - propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
 - polygon position problems? (also has glitches on real hw, but not as bad)
   + timecris stage 1-2 start, beam appears through platform
@@ -588,7 +588,7 @@ Notes:
       C379         : Namco custom C379 (QFP64)
       C396         : Namco custom C396 (QFP160)
       C403         : Namco custom C403 (QFP136)
-      C405         : Namco custom C396 (x2, QFP176)
+      C405         : Namco custom C405 (x2, QFP176)
       SS22D1       : PALCE 20V8H (PLCC28, labelled 'SS22D1')
       SS22D2       : PALCE 16V8H (PLCC20, labelled 'SS22D2')
       SS22D3       : PALCE 16V8H (PLCC20, labelled 'SS22D3')
@@ -3695,9 +3695,12 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_objectshift));
 	save_item(NAME(m_viewmatrix));
 	save_item(NAME(m_LitSurfaceInfo));
-	save_item(NAME(m_SurfaceNormalFormat));
 	save_item(NAME(m_LitSurfaceCount));
 	save_item(NAME(m_LitSurfaceIndex));
+	save_item(NAME(m_LitSurfaceWidth));
+	save_item(NAME(m_LitSurfaceIntensity));
+	save_item(NAME(m_LitSurfaceGouraud));
+	save_item(NAME(m_LitSurfaceTriangles));
 	save_item(NAME(m_tilemapattr));
 	save_item(NAME(m_rowscroll));
 	save_item(NAME(m_lastrow));
@@ -3795,7 +3798,7 @@ void namcos22_state::namcos22(machine_config &config)
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos22_state::screen_update_namcos22));
 	m_screen->screen_vblank().set(FUNC(namcos22_state::screen_vblank));

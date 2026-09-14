@@ -121,7 +121,7 @@ void a2bus_ezcgi_device::device_add_mconfig(machine_config &config)
 	TMS9918A(config, m_tms, XTAL(10'738'635)).set_screen(SCREEN_TAG);
 	m_tms->set_vram_size(0x4000); // 16k of VRAM
 	m_tms->int_callback().set(FUNC(a2bus_ezcgi_device::tms_irq_w));
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 }
 
 void a2bus_ezcgi_9938_device::device_add_mconfig(machine_config &config)
@@ -131,7 +131,7 @@ void a2bus_ezcgi_9938_device::device_add_mconfig(machine_config &config)
 	m_tms->set_screen(SCREEN_TAG);
 	m_tms->int_cb().set(FUNC(a2bus_ezcgi_9938_device::tms_irq_w));
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -146,7 +146,7 @@ void a2bus_ezcgi_9958_device::device_add_mconfig(machine_config &config)
 	m_tms->set_screen(SCREEN_TAG);
 	m_tms->int_cb().set(FUNC(a2bus_ezcgi_9958_device::tms_irq_w));
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

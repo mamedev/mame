@@ -234,7 +234,7 @@ uint16_t amiga_dmac_device::autoconfig_r(offs_t offset, uint16_t mem_mask)
 
 void amiga_dmac_device::autoconfig_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	autoconfig_write(*m_space, data, mem_mask);
+	autoconfig_write(*m_space, offset, data, mem_mask);
 }
 
 uint16_t amiga_dmac_device::istr_r(offs_t offset, uint16_t mem_mask)

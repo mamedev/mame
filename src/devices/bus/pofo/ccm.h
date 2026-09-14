@@ -74,9 +74,7 @@ class device_portfolio_memory_card_slot_interface : public device_interface
 
 public:
 	virtual bool cdet() { return 1; }
-
-	virtual uint8_t nrdi_r(offs_t offset) { return 0xff; }
-	virtual void nwri_w(offs_t offset, uint8_t data) { }
+	virtual void ncc2_w(int state) { }
 
 protected:
 	// construction/destruction
@@ -91,8 +89,8 @@ protected:
 // ======================> portfolio_memory_card_slot_device
 
 class portfolio_memory_card_slot_device : public device_t,
-									 public device_single_card_slot_interface<device_portfolio_memory_card_slot_interface>,
-									 public device_memcard_image_interface
+									 	  public device_single_card_slot_interface<device_portfolio_memory_card_slot_interface>,
+									 	  public device_memcard_image_interface
 {
 public:
 	// construction/destruction
@@ -105,11 +103,15 @@ public:
 
 	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	void set_memspace(address_space &space) { m_memspace_ptr = &space; }
+
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
+	void ncc2_w(int state) { if (m_card != nullptr) m_card->ncc2_w(state); }
 
-	uint8_t nrdi_r(offs_t offset) { return (m_card != nullptr) ? m_card->nrdi_r(offset) : 0xff; }
-	void nwri_w(offs_t offset, uint8_t data) { if (m_card != nullptr) m_card->nwri_w(offset, data); }
+	// card interface
+	address_space &memspace() { return m_memspace_ptr ? *m_memspace_ptr : *m_memspace; }
 
 protected:
 	// device_t implementation
@@ -125,6 +127,9 @@ protected:
 
 	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
+
+	optional_address_space m_memspace;
+	address_space *m_memspace_ptr = nullptr;
 
 	device_portfolio_memory_card_slot_interface *m_card;
 };

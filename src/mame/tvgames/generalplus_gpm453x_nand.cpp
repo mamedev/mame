@@ -85,7 +85,7 @@ void generalplus_gpm453x_game_state::gpm453x(machine_config &config)
 	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpm453x_game_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -106,5 +106,5 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2021, leapland,    0,       0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init, "LeapFrog", "LeapLand Adventures (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, leappawp,    0,       0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init, "LeapFrog", "PAW Patrol: To The Rescue! (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, leapland, 0, 0, gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init, "LeapFrog", "LeapLand Adventures (UK)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, leappawp, 0, 0, gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init, "LeapFrog", "PAW Patrol: To The Rescue! (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -468,7 +468,7 @@ void z1013_state::z1013(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &z1013_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(8_MHz_XTAL, 512, 0, 256, 302, 0, 256);
 	screen.set_screen_update(FUNC(z1013_state::screen_update_z1013));
 	screen.set_palette("palette");

@@ -228,7 +228,7 @@ osd::audio_info sound_sdl3::get_information()
 		m_deviceinfo.m_nodes[node].m_display_name = m_devices[node].m_name;
 		m_deviceinfo.m_nodes[node].m_id = node + 1;
 		uint32_t freq = m_devices[node].m_freq;
-		m_deviceinfo.m_nodes[node].m_rate = audio_rate_range{ freq, freq, freq };
+		m_deviceinfo.m_nodes[node].m_rate = audio_rate_range{ freq, 8000, 192000 };
 		if (m_devices[node].m_issource) {
 			m_deviceinfo.m_nodes[node].m_sources = m_devices[node].m_channels;
 		} else {
@@ -251,7 +251,7 @@ uint32_t sound_sdl3::stream_sink_open(uint32_t node, std::string name, uint32_t 
 	const SDL_AudioDeviceID device_id = m_devices[devnode].m_device_id;
 	SDL_AudioSpec dspec;
 
-	dspec.freq = m_devices[devnode].m_freq;
+	dspec.freq = rate;
 	dspec.format = SDL_AUDIO_S16;
 	dspec.channels = m_devices[devnode].m_channels;
 
@@ -295,7 +295,7 @@ uint32_t sound_sdl3::stream_source_open(uint32_t node, std::string name, uint32_
 
 	std::unique_ptr<stream_info> stream = std::make_unique<stream_info>(m_stream_next_id++, dspec.channels, rate);
 
-	printf("opening source device %d at rate %d channels %d\n", device_id, dspec.freq, dspec.channels);
+	//printf("opening source device %d at rate %d channels %d\n", device_id, dspec.freq, dspec.channels);
 
 	stream->m_sdl_id = SDL_OpenAudioDevice(device_id, &dspec);
 	if (!stream->m_sdl_id)
@@ -348,10 +348,13 @@ void sound_sdl3::stream_sink_update(uint32_t id, const int16_t *buffer, int samp
 	}
 
 	const stream_info *stream = si->second.get();
+	const auto frame_size = sizeof(int16_t) * stream->m_buffer.channels();
 	const auto queue_size = SDL_GetAudioStreamQueued(stream->m_sdl_stream);
-	if (queue_size <= 8 * samples_this_frame)
+	const auto threshold = 8 * samples_this_frame * frame_size;
+
+	if (queue_size <= threshold)
 	{
-		SDL_PutAudioStreamData(stream->m_sdl_stream, (void *)buffer, samples_this_frame * sizeof(int16_t) * stream->m_buffer.channels());
+		SDL_PutAudioStreamData(stream->m_sdl_stream, (void *)buffer, samples_this_frame * frame_size);
 	}
 }
 

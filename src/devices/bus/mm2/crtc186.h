@@ -36,6 +36,7 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void map(address_map &map) ATTR_COLD;
@@ -73,15 +74,20 @@ private:
 	void vpac_drb_w(int state);
 	void vpac_wben_w(int state);
 	void vpac_cblank_w(int state);
+	void vpac_curs_w(int state);
+	void vpac_vs_w(int state);
 	void vpac_slg_w(int state);
 	void vpac_sld_w(int state);
 	void vidla_w(uint8_t data);
 	void drb_attr_w(uint8_t data);
 	void set_vidldsh_timer();
+	int character_width() const { return m_modeg ? 16 : 10; }
+	void draw_character(int x, int y);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
 
 	u8 m_vidla;
+	u8 m_vidat;
 	bool m_cpl;
 	bool m_blc;
 	bool m_mode;
@@ -89,8 +95,15 @@ private:
 	bool m_c70_50;
 	bool m_cru;
 	bool m_crb;
-	int m_cursor_x;
-	int m_cursor_y;
+	bool m_curs;
+	bool m_drb;
+	bool m_dout;
+	bool m_vs;
+	bool m_frame;
+	int m_cgra;
+	int m_col;
+	int m_row;
+	int m_scanline;
 
 	static constexpr rgb_t halflit() { return rgb_t(0x7f, 0x7f, 0x7f); }
 };

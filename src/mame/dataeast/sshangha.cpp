@@ -520,7 +520,7 @@ void sshangha_state::sshangha(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);
@@ -695,7 +695,7 @@ void sshangha_state::init_sshangha()
 } // anonymous namespace
 
 
-GAME( 1992, sshangha,  0,        sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",                 "Super Shanghai Dragon's Eye (World)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghaj, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",                 "Super Shanghai Dragon's Eye (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghak, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B (Taito license)", "Super Shanghai Dragon's Eye (Korea)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghab, sshangha, sshanghab, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg",               "Super Shanghai Dragon's Eye (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshangha,  0,        sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co.",                 "Super Shanghai Dragon's Eye (World)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghaj, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co.",                 "Super Shanghai Dragon's Eye (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghak, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co. (Taito license)", "Super Shanghai Dragon's Eye (Korea)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghab, sshangha, sshanghab, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg",                   "Super Shanghai Dragon's Eye (World, bootleg)", MACHINE_SUPPORTS_SAVE )

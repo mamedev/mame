@@ -1862,7 +1862,7 @@ void gx400_state::nemesis(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(gx400_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1896,7 +1896,7 @@ void gx400_state::konamigt(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(gx400_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1933,7 +1933,7 @@ void gx400_state::gx400(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(gx400_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1973,7 +1973,7 @@ void salamand_state::salamand(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(salamand_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2016,7 +2016,7 @@ void salamand_state::blkpnthr(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(salamand_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2057,7 +2057,7 @@ void hcrash_state::citybomb(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(hcrash_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2096,7 +2096,7 @@ void salamand_state::nyanpani(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(salamand_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2144,7 +2144,7 @@ void hcrash_state::hcrash(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(hcrash_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2197,7 +2197,7 @@ void bubsys_state::bubsys(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(bubsys_state::screen_update));
 	m_screen->set_palette(m_palette);

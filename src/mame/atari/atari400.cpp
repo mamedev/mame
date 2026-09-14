@@ -2005,7 +2005,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	M6502(config, m_maincpu, pokey_device::FREQ_17_EXACT);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
 //  m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);

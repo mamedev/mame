@@ -555,7 +555,7 @@ void hotchili_state::hotchili(machine_config &config)
 	RAM(config, m_ram).set_default_size("2K").set_default_value(0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw( MAIN_CLOCK / 2, 260, 0, 256, 256, 16, 239);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(hotchili_state::screen_update));

@@ -513,7 +513,7 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 1000).add_route(ALL_OUTPUTS, "mono", 1.00); // Unknown freq
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_ef9345, FUNC(ef9345_device::screen_update));
 	screen.set_size(492, 270);

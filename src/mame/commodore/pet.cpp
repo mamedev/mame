@@ -1695,7 +1695,7 @@ void pet_state::pet(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(XTAL(8'000'000)/2, 320, 0, 320, 200, 0, 200);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
@@ -1949,7 +1949,7 @@ void pet80_state::pet80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(XTAL(16'000'000), 800, 0, 640, 333, 0, 250);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));

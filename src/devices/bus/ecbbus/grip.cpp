@@ -412,7 +412,7 @@ void ecb_grip21_device::device_add_mconfig(machine_config &config)
 	z80.set_addrmap(AS_IO, &ecb_grip21_device::grip_io);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_color(rgb_t::white());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate

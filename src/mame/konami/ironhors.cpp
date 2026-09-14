@@ -833,7 +833,7 @@ void ironhors_base_state::base(machine_config &config)
 	MC6809E(config, m_maincpu, 18.432_MHz_XTAL / 12); // 1.536 MHz
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	m_screen->set_palette(m_palette);
 

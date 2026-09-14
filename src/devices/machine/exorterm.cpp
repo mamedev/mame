@@ -813,7 +813,7 @@ void exorterm155_device::device_add_mconfig(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_size(80*9, 24*12);
 	m_screen->set_visarea(0, 80*9-1, 0, 24*12-1);

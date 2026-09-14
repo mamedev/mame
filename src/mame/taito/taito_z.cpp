@@ -3159,7 +3159,7 @@ void taitoz_state::screen_config(machine_config &config, int vdisp_start, int vd
 //  26.860 MHz comes from the video board, assume /4 pixel clock
 //  contcirc and enforce uses a narrower visible area (checked via service mode),
 //  confirm if they outputs the same syncs.
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(26'686'000)/4, 424, 0, 320, 262, vdisp_start, vdisp_end);
 }
 

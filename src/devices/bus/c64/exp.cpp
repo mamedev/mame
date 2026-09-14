@@ -112,7 +112,7 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 
 		if (!loaded_through_softlist())
 		{
-			util::core_file &file = image_core_file();
+			util::random_read &file = image_core_file();
 			size = length();
 
 			if (is_filetype("80"))

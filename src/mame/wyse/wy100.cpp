@@ -257,7 +257,7 @@ void wy100_state::wy100(machine_config &config)
 	m_pci->dtr_handler().set(m_modem, FUNC(rs232_port_device::write_dtr));
 	m_pci->txd_handler().set(FUNC(wy100_state::txd_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.48_MHz_XTAL, 1000, 0, 800, 308, 0, 286);
 	//screen.set_raw(18.48_MHz_XTAL, 1100, 0, 800, 336, 0, 312);
 	screen.set_color(rgb_t::green());

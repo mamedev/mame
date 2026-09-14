@@ -19,6 +19,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
 #include "sound/ay8910.h"
+#include "sound.h"
 #include "speaker.h"
 
 #define AD2083_TMS5110_CLOCK        XTAL(640'000)

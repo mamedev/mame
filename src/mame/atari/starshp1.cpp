@@ -846,7 +846,7 @@ void starshp1_state::starshp1(machine_config &config)
 	constexpr int VBEND = 0x000;
 	constexpr int VBSTART = 0x0f0;
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(starshp1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(starshp1_state::screen_vblank));

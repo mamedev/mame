@@ -449,6 +449,8 @@ protected:
 
 	/* derived info based on flavor */
 	uint32_t        m_pfnmask;
+	uint64_t        m_pagemask_mask;
+	uint32_t        m_config_wmask;
 	uint8_t         m_tlbentries;
 
 	/* memory accesses */
@@ -863,7 +865,7 @@ class vr5500be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) // Should be 64 bits
+		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_VR5500, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
 };
@@ -872,7 +874,7 @@ class vr5500le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
+		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_VR5500, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };

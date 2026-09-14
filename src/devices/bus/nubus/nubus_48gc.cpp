@@ -273,7 +273,7 @@ void jmfb_device::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_monitors);
 
-	screen_device &screen(SCREEN(config, GC48_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, GC48_SCREEN_NAME));
 	screen.set_screen_update(FUNC(jmfb_device::screen_update));
 	screen.set_raw(20_MHz_XTAL / 21 * 127 / 4, 864, 0, 640, 525, 0, 480);
 	//screen.set_raw(20_MHz_XTAL / 19 * 190 / 2, 1'456, 0, 1'152, 915, 0, 870);
@@ -806,7 +806,7 @@ void jmfb_device::update_crtc()
 		screen().configure(
 				hpixels, vlines,
 				rectangle(left, left + width - 1, top, top + height - 1),
-				attotime::from_ticks(frametotal << (convolution ? 2 : 0) >> (interlace ? 1 : 0), pixclk).attoseconds());
+				attotime::from_ticks(frametotal << (convolution ? 2 : 0) >> (interlace ? 1 : 0), pixclk));
 
 		set_vbl_timer();
 	}

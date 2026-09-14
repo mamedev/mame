@@ -2,7 +2,7 @@
 // experimental/parallel_group.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +20,7 @@
 #include "asio/async_result.hpp"
 #include "asio/detail/array.hpp"
 #include "asio/detail/memory.hpp"
+#include "asio/detail/throw_exception.hpp"
 #include "asio/detail/type_traits.hpp"
 #include "asio/detail/utility.hpp"
 #include "asio/experimental/cancellation_condition.hpp"
@@ -27,6 +28,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -137,6 +139,8 @@ struct is_async_operation_range
 /**
  * See the documentation for asio::experimental::make_parallel_group for
  * a usage example.
+ *
+ * @sa @ref overview_parallel_group "Co-ordinating parallel operations"
  */
 template <typename... Ops>
 class parallel_group
@@ -156,6 +160,9 @@ private:
   std::tuple<Ops...> ops_;
 
 public:
+  static_assert(sizeof...(Ops) >= 1,
+      "parallel_group requires at least one operation");
+
   /// Constructor.
   explicit parallel_group(Ops... ops)
     : ops_(std::move(ops)...)
@@ -206,6 +213,36 @@ public:
 /// Create a group of operations that may be launched in parallel.
 /**
  * For example:
+ * @code asio::experimental::make_parallel_group(
+ *    in.async_read_some(asio::buffer(data)),
+ *    timer.async_wait()
+ *  ).async_wait(
+ *    asio::experimental::wait_for_all(),
+ *    [](
+ *        std::array<std::size_t, 2> completion_order,
+ *        std::error_code ec1, std::size_t n1,
+ *        std::error_code ec2
+ *    )
+ *    {
+ *      switch (completion_order[0])
+ *      {
+ *      case 0:
+ *        {
+ *          std::cout << "descriptor finished: " << ec1 << ", " << n1 << "\n";
+ *        }
+ *        break;
+ *      case 1:
+ *        {
+ *          std::cout << "timer finished: " << ec2 << "\n";
+ *        }
+ *        break;
+ *      }
+ *    }
+ *  );
+ * @endcode
+ *
+ * If preferred, the asynchronous operations may be explicitly packaged as
+ * function objects:
  * @code asio::experimental::make_parallel_group(
  *    [&](auto token)
  *    {
@@ -273,11 +310,19 @@ private:
 
 public:
   /// Constructor.
+  /**
+   * @throws std::logic_error Thrown if the range is empty.
+   */
   explicit ranged_parallel_group(Range range,
       const Allocator& allocator = Allocator())
     : range_(std::move(range)),
       allocator_(allocator)
   {
+    if (range_.empty())
+    {
+      std::logic_error e("ranged_parallel_group must be non-empty");
+      asio::detail::throw_exception(e);
+    }
   }
 
   /// The completion signature for the group of operations.
@@ -330,30 +375,16 @@ public:
 /**
  * @param range A range containing the operations to be launched.
  *
+ * @throws std::logic_error Thrown if the range is empty.
+ *
  * For example:
  * @code
- * using op_type = decltype(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
+ * using op_type =
+ *   decltype(socket1.async_read_some(asio::buffer(data1)));
  *
  * std::vector<op_type> ops;
- *
- * ops.push_back(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
- *
- * ops.push_back(
- *     socket2.async_read_some(
- *       asio::buffer(data2),
- *       asio::deferred
- *     )
- *   );
+ * ops.push_back(socket1.async_read_some(asio::buffer(data1)));
+ * ops.push_back(socket2.async_read_some(asio::buffer(data2)));
  *
  * asio::experimental::make_parallel_group(ops).async_wait(
  *     asio::experimental::wait_for_all(),
@@ -389,30 +420,16 @@ make_parallel_group(Range&& range,
  *
  * @param range A range containing the operations to be launched.
  *
+ * @throws std::logic_error Thrown if the range is empty.
+ *
  * For example:
  * @code
- * using op_type = decltype(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
+ * using op_type =
+ *   decltype(socket1.async_read_some(asio::buffer(data1)));
  *
  * std::vector<op_type> ops;
- *
- * ops.push_back(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
- *
- * ops.push_back(
- *     socket2.async_read_some(
- *       asio::buffer(data2),
- *       asio::deferred
- *     )
- *   );
+ * ops.push_back(socket1.async_read_some(asio::buffer(data1)));
+ * ops.push_back(socket2.async_read_some(asio::buffer(data2)));
  *
  * asio::experimental::make_parallel_group(
  *     std::allocator_arg_t,
@@ -448,6 +465,7 @@ make_parallel_group(allocator_arg_t, const Allocator& allocator, Range&& range,
 }
 
 } // namespace experimental
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

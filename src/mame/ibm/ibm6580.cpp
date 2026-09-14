@@ -947,7 +947,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(25_MHz_XTAL / 2, 833, 0, 640, 428, 0, 400);
 	m_screen->set_screen_update(FUNC(ibm6580_state::screen_update));
 	m_screen->set_palette("palette");

@@ -50,12 +50,17 @@ check_PROGRAMS = \
 	unit/buffer \
 	unit/buffer_registration \
 	unit/buffers_iterator \
+	unit/cancel_after \
+	unit/cancel_at \
 	unit/cancellation_signal \
 	unit/cancellation_state \
 	unit/cancellation_type \
+	unit/co_composed \
 	unit/co_spawn \
 	unit/completion_condition \
 	unit/compose \
+	unit/composed \
+	unit/config \
 	unit/connect \
 	unit/connect_pipe \
 	unit/consign \
@@ -65,12 +70,14 @@ check_PROGRAMS = \
 	unit/deferred \
 	unit/detached \
 	unit/dispatch \
+	unit/disposition \
 	unit/error \
 	unit/execution/any_executor \
 	unit/execution/blocking \
 	unit/execution/blocking_adaptation \
 	unit/execution/context_as \
 	unit/execution/executor \
+	unit/execution/inline_exception_handling \
 	unit/execution/invocable_archetype \
 	unit/execution/mapping \
 	unit/execution/outstanding_work \
@@ -80,12 +87,17 @@ check_PROGRAMS = \
 	unit/executor \
 	unit/executor_work_guard \
 	unit/file_base \
+	unit/fwd_first \
+	unit/fwd_last \
 	unit/generic/basic_endpoint \
 	unit/generic/datagram_protocol \
 	unit/generic/raw_protocol \
 	unit/generic/seq_packet_protocol \
 	unit/generic/stream_protocol \
 	unit/high_resolution_timer \
+	unit/immediate \
+	unit/inline_executor \
+	unit/inline_or_executor \
 	unit/io_context \
 	unit/io_context_strand \
 	unit/ip/address \
@@ -132,6 +144,7 @@ check_PROGRAMS = \
 	unit/read_until \
 	unit/readable_pipe \
 	unit/recycling_allocator \
+	unit/redirect_disposition \
 	unit/redirect_error \
 	unit/registered_buffer \
 	unit/serial_port \
@@ -176,14 +189,16 @@ check_PROGRAMS = \
 	unit/write \
 	unit/write_at
 
-if !STANDALONE
 noinst_PROGRAMS = \
+	performance/client \
+	performance/server
+
+if !STANDALONE
+noinst_PROGRAMS += \
 	latency/tcp_client \
 	latency/tcp_server \
 	latency/udp_client \
-	latency/udp_server \
-	performance/client \
-	performance/server
+	latency/udp_server
 endif
 
 if HAVE_CXX11
@@ -216,13 +231,17 @@ check_PROGRAMS += \
 endif
 endif
 
+if HAVE_BOOST_COROUTINE
+check_PROGRAMS += \
+	unit/spawn
+endif
+
 if HAVE_OPENSSL
 check_PROGRAMS += \
 	unit/ssl/context_base \
 	unit/ssl/context \
 	unit/ssl/error \
 	unit/ssl/host_name_verification \
-	unit/ssl/rfc2818_verification \
 	unit/ssl/stream_base \
 	unit/ssl/stream
 endif
@@ -266,12 +285,17 @@ TESTS = \
 	unit/buffer \
 	unit/buffer_registration \
 	unit/buffers_iterator \
+	unit/cancel_after \
+	unit/cancel_at \
 	unit/cancellation_signal \
 	unit/cancellation_state \
 	unit/cancellation_type \
+	unit/co_composed \
 	unit/co_spawn \
 	unit/completion_condition \
 	unit/compose \
+	unit/composed \
+	unit/config \
 	unit/connect \
 	unit/connect_pipe \
 	unit/consign \
@@ -280,12 +304,14 @@ TESTS = \
 	unit/deferred \
 	unit/detached \
 	unit/dispatch \
+	unit/disposition \
 	unit/error \
 	unit/execution/any_executor \
 	unit/execution/blocking \
 	unit/execution/blocking_adaptation \
 	unit/execution/context_as \
 	unit/execution/executor \
+	unit/execution/inline_exception_handling \
 	unit/execution/invocable_archetype \
 	unit/execution/mapping \
 	unit/execution/outstanding_work \
@@ -295,7 +321,12 @@ TESTS = \
 	unit/executor \
 	unit/executor_work_guard \
 	unit/file_base \
+	unit/fwd_first \
+	unit/fwd_last \
 	unit/high_resolution_timer \
+	unit/immediate \
+	unit/inline_executor \
+	unit/inline_or_executor \
 	unit/io_context \
 	unit/io_context_strand \
 	unit/ip/address \
@@ -342,6 +373,7 @@ TESTS = \
 	unit/read_until \
 	unit/readable_pipe \
 	unit/recycling_allocator \
+	unit/redirect_disposition \
 	unit/redirect_error \
 	unit/registered_buffer \
 	unit/serial_port \
@@ -396,6 +428,11 @@ TESTS += \
 	unit/experimental/parallel_group
 endif
 
+if HAVE_BOOST_COROUTINE
+TESTS += \
+	unit/spawn
+endif
+
 if HAVE_CXX20
 TESTS += \
 	unit/experimental/promise
@@ -422,7 +459,6 @@ TESTS += \
 	unit/ssl/context \
 	unit/ssl/error \
 	unit/ssl/host_name_verification \
-	unit/ssl/rfc2818_verification \
 	unit/ssl/stream_base \
 	unit/ssl/stream
 endif
@@ -431,15 +467,16 @@ noinst_HEADERS = \
 	latency/high_res_clock.hpp \
 	unit/unit_test.hpp
 
-AM_CXXFLAGS = -I$(srcdir)/../../include
+AM_CXXFLAGS = -I$(srcdir)/../../include -DASIO_DISABLE_DEPRECATED_MSG
+
+performance_client_SOURCES = performance/client.cpp
+performance_server_SOURCES = performance/server.cpp
 
 if !STANDALONE
 latency_tcp_client_SOURCES = latency/tcp_client.cpp
 latency_tcp_server_SOURCES = latency/tcp_server.cpp
 latency_udp_client_SOURCES = latency/udp_client.cpp
 latency_udp_server_SOURCES = latency/udp_server.cpp
-performance_client_SOURCES = performance/client.cpp
-performance_server_SOURCES = performance/server.cpp
 endif
 
 unit_any_completion_executor_SOURCES = unit/any_completion_executor.cpp
@@ -480,12 +517,17 @@ unit_buffers_iterator_SOURCES = unit/buffers_iterator.cpp
 unit_buffered_read_stream_SOURCES = unit/buffered_read_stream.cpp
 unit_buffered_stream_SOURCES = unit/buffered_stream.cpp
 unit_buffered_write_stream_SOURCES = unit/buffered_write_stream.cpp
+unit_cancel_after_SOURCES = unit/cancel_after.cpp
+unit_cancel_at_SOURCES = unit/cancel_at.cpp
 unit_cancellation_signal_SOURCES = unit/cancellation_signal.cpp
 unit_cancellation_state_SOURCES = unit/cancellation_state.cpp
 unit_cancellation_type_SOURCES = unit/cancellation_type.cpp
+unit_co_composed_SOURCES = unit/co_composed.cpp
 unit_co_spawn_SOURCES = unit/co_spawn.cpp
 unit_completion_condition_SOURCES = unit/completion_condition.cpp
 unit_compose_SOURCES = unit/compose.cpp
+unit_composed_SOURCES = unit/composed.cpp
+unit_config_SOURCES = unit/config.cpp
 unit_connect_SOURCES = unit/connect.cpp
 unit_connect_pipe_SOURCES = unit/connect_pipe.cpp
 unit_consign_SOURCES = unit/consign.cpp
@@ -495,12 +537,14 @@ unit_defer_SOURCES = unit/defer.cpp
 unit_deferred_SOURCES = unit/deferred.cpp
 unit_detached_SOURCES = unit/detached.cpp
 unit_dispatch_SOURCES = unit/dispatch.cpp
+unit_disposition_SOURCES = unit/disposition.cpp
 unit_error_SOURCES = unit/error.cpp
 unit_execution_any_executor_SOURCES = unit/execution/any_executor.cpp
 unit_execution_blocking_SOURCES = unit/execution/blocking.cpp
 unit_execution_blocking_adaptation_SOURCES = unit/execution/blocking_adaptation.cpp
 unit_execution_context_as_SOURCES = unit/execution/context_as.cpp
 unit_execution_executor_SOURCES = unit/execution/executor.cpp
+unit_execution_inline_exception_handling_SOURCES = unit/execution/inline_exception_handling.cpp
 unit_execution_invocable_archetype_SOURCES = unit/execution/invocable_archetype.cpp
 unit_execution_mapping_SOURCES = unit/execution/mapping.cpp
 unit_execution_outstanding_work_SOURCES = unit/execution/outstanding_work.cpp
@@ -510,12 +554,17 @@ unit_execution_context_SOURCES = unit/execution_context.cpp
 unit_executor_SOURCES = unit/executor.cpp
 unit_executor_work_guard_SOURCES = unit/executor_work_guard.cpp
 unit_file_base_SOURCES = unit/file_base.cpp
+unit_fwd_first_SOURCES = unit/fwd_first.cpp
+unit_fwd_last_SOURCES = unit/fwd_last.cpp
 unit_generic_basic_endpoint_SOURCES = unit/generic/basic_endpoint.cpp
 unit_generic_datagram_protocol_SOURCES = unit/generic/datagram_protocol.cpp
 unit_generic_raw_protocol_SOURCES = unit/generic/raw_protocol.cpp
 unit_generic_seq_packet_protocol_SOURCES = unit/generic/seq_packet_protocol.cpp
 unit_generic_stream_protocol_SOURCES = unit/generic/stream_protocol.cpp
 unit_high_resolution_timer_SOURCES = unit/high_resolution_timer.cpp
+unit_immediate_SOURCES = unit/immediate.cpp
+unit_inline_executor_SOURCES = unit/inline_executor.cpp
+unit_inline_or_executor_SOURCES = unit/inline_or_executor.cpp
 unit_io_context_SOURCES = unit/io_context.cpp
 unit_io_context_strand_SOURCES = unit/io_context_strand.cpp
 unit_ip_address_SOURCES = unit/ip/address.cpp
@@ -562,6 +611,7 @@ unit_read_at_SOURCES = unit/read_at.cpp
 unit_read_until_SOURCES = unit/read_until.cpp
 unit_readable_pipe_SOURCES = unit/readable_pipe.cpp
 unit_recycling_allocator_SOURCES = unit/recycling_allocator.cpp
+unit_redirect_disposition_SOURCES = unit/redirect_disposition.cpp
 unit_redirect_error_SOURCES = unit/redirect_error.cpp
 unit_registered_buffer_SOURCES = unit/registered_buffer.cpp
 unit_serial_port_SOURCES = unit/serial_port.cpp
@@ -615,6 +665,11 @@ unit_experimental_concurrent_channel_SOURCES = unit/experimental/concurrent_chan
 unit_experimental_parallel_group_SOURCES = unit/experimental/parallel_group.cpp
 endif
 
+if HAVE_BOOST_COROUTINE
+unit_spawn_SOURCES = unit/spawn.cpp
+unit_spawn_LDADD = -lboost_context
+endif
+
 if HAVE_CXX20
 unit_experimental_promise_SOURCES = unit/experimental/promise.cpp
 
@@ -639,7 +694,6 @@ unit_ssl_context_SOURCES = unit/ssl/context.cpp
 unit_ssl_error_SOURCES = unit/ssl/error.cpp
 unit_ssl_stream_base_SOURCES = unit/ssl/stream_base.cpp
 unit_ssl_host_name_verification_SOURCES = unit/ssl/host_name_verification.cpp
-unit_ssl_rfc2818_verification_SOURCES = unit/ssl/rfc2818_verification.cpp
 unit_ssl_stream_SOURCES = unit/ssl/stream.cpp
 endif
 

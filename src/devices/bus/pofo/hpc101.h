@@ -40,11 +40,9 @@ protected:
 	// device_portfolio_expansion_slot_interface overrides
 	bool pdet() override { return 1; }
 
-	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-
 private:
 	required_device<i8255_device> m_ppi;
+	memory_passthrough_handler m_ppi_tap;
 };
 
 

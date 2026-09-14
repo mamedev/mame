@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "exp.h"
 #include "crtc186.h"
+#include "ioe186.h"
 #include "meme186.h"
 #include "mmc186.h"
 
@@ -117,6 +118,7 @@ device_mikromikko2_expansion_bus_card_interface::device_mikromikko2_expansion_bu
 void mikromikko2_expansion_bus_cards(device_slot_interface &device)
 {
 	device.option_add("crtc186", NOKIA_CRTC186);
+	device.option_add("ioe186", NOKIA_IOE186);
 	device.option_add("meme186", NOKIA_MEME186);
 	device.option_add("mmc186", NOKIA_MMC186);
 }

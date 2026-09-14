@@ -322,6 +322,9 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev, 
 			{
 				desc.set_ctr_used();
 				desc.set_ctr_modified();
+				// branch folding
+				if ((G_BO(op) & 0x10) && (!prev || !prev->ctr_modified()) && (is_601_class() || is_603_class()))
+					desc.cycles = 0;
 			}
 			if (op & M_LK)
 				desc.set_lr_modified();

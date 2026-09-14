@@ -64,7 +64,7 @@ void eks515_state::eks515(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &eks515_state::prog_map);
 	maincpu.port_in_cb<3>().set_constant(0xff); // silence logging
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);

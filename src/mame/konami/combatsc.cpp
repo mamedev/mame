@@ -667,7 +667,7 @@ void combatsc_state::combatsc(machine_config &config)
 	KONAMI_007452_MATH(config, "k007452");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -710,7 +710,7 @@ void combatscb_state::combatscb(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatscb_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);

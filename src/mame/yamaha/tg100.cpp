@@ -1,33 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, superctr
 /*
-	Yamaha TG100 AWM Tone Generator
-	Driver by R. Belmont, based on a skeleton written by superctr
+    Yamaha TG100 AWM Tone Generator
+    Driver by R. Belmont, based on a skeleton written by superctr
 
-	Roms dumped by vampirefrog
-	Service manual scanned by bmos
+    Roms dumped by vampirefrog
+    Service manual scanned by bmos
 
-	CPU: Hitachi HD6435208A00P (H8/520)
-	- 20MHz clock
-	- Mode bits 0,1 high, 2 low
-	- 32kb RAM (1x HM65256 PSRAM)
-	Sound generator: Yamaha YMW258-F (GEW8, identical to MultiPCM?)
-	- 9.4MHz clock
-	- 28 voices polyphony
-	- 2MB sample ROM containing 140 12-bit PCM samples
-	Effect DSP: Yamaha YM3413
-	- clocked by sound generator
-	- Effect memory: 64kb (2x HM65256 PSRAM)
-	LCD:
-	- 1x16 characters
+    CPU: Hitachi HD6435208A00P (H8/520)
+    - 20MHz clock
+    - Mode bits 0,1 high, 2 low
+    - 32kb RAM (1x HM65256 PSRAM)
+    Sound generator: Yamaha YMW258-F (GEW8, identical to MultiPCM?)
+    - 9.4MHz clock
+    - 28 voices polyphony
+    - 2MB sample ROM containing 140 12-bit PCM samples
+    Effect DSP: Yamaha YM3413
+    - clocked by sound generator
+    - Effect memory: 64kb (2x HM65256 PSRAM)
+    LCD:
+    - 1x16 characters
 
-	Other ICs:
-	HG62E11R54FS (XK462A00) Gate array (LCD control, glue logic)
+    Other ICs:
+    HG62E11R54FS (XK462A00) Gate array (LCD control, glue logic)
 
-	TODO:
-	- Investigate YM3413 effect DSP
-	- LEDs
-	- Layout
+    TODO:
+    - Investigate YM3413 effect DSP
+    - LEDs
+    - Layout
 */
 
 #include "emu.h"
@@ -202,7 +202,7 @@ void tg100_state::tg100(machine_config &config)
 	m_ymw258->add_route(0, "speaker", 1.0, 0);
 	m_ymw258->add_route(1, "speaker", 1.0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(80);
 	m_screen->set_size(240, 64); // 1x16, 8x8
 	m_screen->set_visarea(0, 240 - 1, 0, 64 - 1);

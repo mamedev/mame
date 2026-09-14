@@ -261,16 +261,16 @@ void pangofun_state::pangofun(machine_config &config)
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0x20000, "romdisk", 0 )
-	ROM_LOAD("bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
+	ROM_REGION32_LE( 0x20000, "romdisk", 0 )
+	ROM_LOAD( "bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
 	/*bank8.u19 , NOT POPULATED */
 
-	ROM_REGION32_LE(0x20000, "bios", 0 ) /* motherboard bios */
+	ROM_REGION32_LE( 0x20000, "bios", 0 ) /* motherboard bios */
 	ROM_COPY( "romdisk",  0x000000, 0x00000, 0x10000 )
 	ROM_LOAD( "bios.bin", 0x010000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
 	/* this is what was on the rom board, mapping unknown */
-	ROM_REGION32_LE(0x800000, "game_prg", ROMREGION_ERASEFF )    /* rom board */
+	ROM_REGION32_LE( 0x800000, "game_prg", ROMREGION_ERASEFF )    /* rom board */
 	ROM_LOAD16_BYTE( "bank0.u11", 0x000001, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
 	ROM_LOAD16_BYTE( "bank0.u31", 0x000000, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
 	/* Following two  references to a SB Pro clone sound card. */
@@ -288,6 +288,9 @@ ROM_START(pangofun)
 					/*bank6.u37 , NOT POPULATED */
 					/*bank7.u18 , NOT POPULATED */
 					/*bank7.u37 , NOT POPULATED */
+
+	ROM_REGION( 0x157, "pld", 0 )
+	ROM_LOAD( "palce20v8h.u42", 0x000, 0x157, CRC(56903ef1) SHA1(8fb86d45490455cf09b138202095ede4d3667360) )
 ROM_END
 
 } // anonymous namespace

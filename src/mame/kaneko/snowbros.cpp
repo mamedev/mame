@@ -1941,7 +1941,7 @@ void snowbros_state::snowbros_base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &snowbros_pandora_state::sound_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5); /* ~57.5 - confirmed */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 262);
@@ -2049,7 +2049,7 @@ void snowbros_state::honeydol(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &snowbros_state::honeydol_sound_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(32*8, 262);
@@ -2088,7 +2088,7 @@ void snowbros_state::twinadv(machine_config &config)
 	m_soundcpu->set_vblank_int("screen", FUNC(snowbros_state::irq0_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(32*8, 262);
@@ -2169,7 +2169,7 @@ void snowbros3_state::snowbro3(machine_config &config) /* PCB has 16MHz & 12MHz 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -2198,7 +2198,7 @@ void snowbros_pandora_state::yutnori(machine_config &config)
 //  WATCHDOG_TIMER(config, "watchdog"); // maybe
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 262);

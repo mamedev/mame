@@ -6,8 +6,10 @@
 
     Driver by R. Belmont
 
-    This system is only vaguely Apple II compatible.
-    The keyboard works entirely differently, which is a big deal.
+    This system is only vaguely Apple II compatible. The only video mode is
+    hi-res graphics (other Apple II modes are simulated), the keyboard and
+    joystick work entirely differently, and a lot of other I/O bits are
+    moved to different addresses.
 
     TODO: emulate expansion connector (not wholly Apple II compatible)
     TODO: emulate joystick port (wired to KBIN and KBOUT)
@@ -450,7 +452,7 @@ void tk2000_state::tk2000(machine_config &config)
 
 	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);

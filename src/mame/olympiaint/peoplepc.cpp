@@ -290,7 +290,7 @@ void peoplepc_state::olypeopl(machine_config &config)
 
 	I8255(config, "ppi8255");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(XTAL(22'000'000), 640, 0, 640, 475, 0, 475);
 	screen.set_screen_update("h46505", FUNC(mc6845_device::screen_update));
 

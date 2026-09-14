@@ -21,7 +21,6 @@
 
 #include "coco_pak.h"
 #include "sound/sn76496.h"
-#include "speaker.h"
 
 #define SN76489AN_TAG   "gmc_psg"
 
@@ -40,6 +39,7 @@ namespace
 		// construction/destruction
 		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+		virtual void device_resolve_objects() override ATTR_COLD;
 
 	protected:
 		// device-level overrides
@@ -53,8 +53,17 @@ namespace
 
 void coco_pak_gmc_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "gmc_speaker").front_center();
-	SN76489A(config, m_psg, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "gmc_speaker", 1.0);
+	SN76489A(config, m_psg, 4_MHz_XTAL);
+}
+
+
+//-------------------------------------------------
+//  device_resolve_objects
+//-------------------------------------------------
+
+void coco_pak_gmc_device::device_resolve_objects()
+{
+	add_sound_route(*m_psg, ALL_OUTPUTS, 1.0);
 }
 
 

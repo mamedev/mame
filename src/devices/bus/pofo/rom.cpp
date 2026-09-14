@@ -43,10 +43,18 @@ void portfolio_rom_card_device::device_start()
 
 
 //-------------------------------------------------
-//  nrdi_r - read
+//  ncc2_w - CCM bank select
 //-------------------------------------------------
 
-uint8_t portfolio_rom_card_device::nrdi_r(offs_t offset)
+void portfolio_rom_card_device::ncc2_w(int state)
 {
-	return (m_rom) ? m_rom[offset] : 0xff;
+	if (state)
+	{
+		m_tap = m_slot->memspace().install_read_tap(0xc0000, 0xdffff, "ccm_rom",
+			[this] (offs_t offset, u8 &data, u8) { data = m_rom ? m_rom[offset & 0x1ffff] : 0xff; }, &m_tap);
+	}
+	else
+	{
+		m_tap.remove();
+	}
 }

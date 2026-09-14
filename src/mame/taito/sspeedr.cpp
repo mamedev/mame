@@ -582,7 +582,7 @@ void sspeedr_state::sspeedr(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.318181_MHz_XTAL / 2, 456, 0, 376, 264, 0, 248);
 	screen.set_screen_update(FUNC(sspeedr_state::screen_update));
 	screen.screen_vblank().set(FUNC(sspeedr_state::screen_vblank));

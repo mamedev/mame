@@ -510,7 +510,7 @@ void pgm_state::pgmbase(machine_config &config)
 	V3021(config, "rtc");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL/5, 640, 0, 448, 264, 0, 224); // or 20MHz / 2? framerate verified
 	screen.set_screen_update(m_video, FUNC(igs023_video_device::screen_update));
 	screen.screen_vblank().set(FUNC(pgm_state::screen_vblank));
@@ -571,6 +571,9 @@ ROM_START( pgm )
 
 	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", ROMREGION_ERASEFF ) /* Sprite Colour Data */
 	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
+
+	ROM_REGION( 0x117, "pld", 0 )
+	ROM_LOAD( "pal.u7", 0x000, 0x117, CRC(bfa23d78) SHA1(32078fec6f3747a081b8dc735452dc1dae4b3d51) )
 ROM_END
 
 ROM_START( orlegend )

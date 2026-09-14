@@ -31,12 +31,12 @@ project "expat"
 		"PACKAGE=\"expat\"",
 		"PACKAGE_BUGREPORT=\"https://github.com/libexpat/libexpat/issues\"",
 		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat-2.7.1\"",
+		"PACKAGE_STRING=\"expat-2.8.3\"",
 		"PACKAGE_TARNAME=\"expat\"",
 		"PACKAGE_URL=\"\"",
-		"PACKAGE_VERSION=\"2.7.1\"",
+		"PACKAGE_VERSION=\"2.8.3\"",
 		"STDC_HEADERS",
-		"VERSION=\"2.7.1\"",
+		"VERSION=\"2.8.3\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
 		"XML_GE=1",
@@ -57,9 +57,15 @@ if _OPTIONS["targetos"]=="windows" then
 		"__USE_MINGW_ANSI_STDIO=0",
 	}
 end
-if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" then
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
 	defines {
 		"HAVE_ARC4RANDOM",
+		"HAVE_ARC4RANDOM_BUF",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	defines {
+		"HAVE_GETENTROPY",
 	}
 end
 if BASE_TARGETOS=="unix" then
@@ -113,6 +119,27 @@ end
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
+if _OPTIONS["targetos"]=="windows" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_rand_s.c",
+	}
+end
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random.c",
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random_buf.c",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_getentropy.c",
+	}
+end
+if BASE_TARGETOS=="unix" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_dev_urandom.c",
+	}
+end
 else
 links {
 	ext_lib("expat"),
@@ -227,6 +254,7 @@ end
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_ldm.c",
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstdmt_compress.c",
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_opt.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_preSplit.c",
 		--MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress_amd64.S", only supports GCC-like assemblers and SysV calling convention
 		MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress.c",
 		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_ddict.c",
@@ -833,7 +861,6 @@ project "7z"
 	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-error=undef",
-			"-Wno-error=strict-prototypes",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") then
@@ -1008,9 +1035,6 @@ project "lualibs"
 	}
 
 	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-error=unused-variable",
-		}
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -1018,15 +1042,10 @@ project "lualibs"
 	configuration { "vs*" }
 if _OPTIONS["vs"]==nil then
 		buildoptions {
-			"/wd4101", -- warning C4101: 'identifier': unreferenced local variable
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
 			"/wd4152", -- warning C4152: nonstandard extension, function/data pointer conversion in expression
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
-		}
-elseif _OPTIONS["vs"]=="clangcl" then
-		buildoptions {
-			"-Wno-error=unused-variable",
 		}
 end
 
@@ -1063,11 +1082,11 @@ project "sqlite3"
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-bad-function-cast",
+			"-Wno-error=bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
@@ -1076,16 +1095,16 @@ if _OPTIONS["gcc"]~=nil then
 		}
 	else
 		buildoptions_c {
-			"-Wno-return-local-addr", -- sqlite3.c in GCC 10
-			"-Wno-misleading-indentation",  -- sqlite3.c in GCC 11.1
+			"-Wno-error=return-local-addr", -- sqlite3.c in GCC 10
+			"-Wno-error=misleading-indentation",  -- sqlite3.c in GCC 11.1
 		}
 	end
 end
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 end
 

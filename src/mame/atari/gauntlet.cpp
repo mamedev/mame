@@ -774,7 +774,7 @@ void gauntlet_state::base(machine_config &config)
 	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, gauntlet_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a SYNGEN chip to generate video signals

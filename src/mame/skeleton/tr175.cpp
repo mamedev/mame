@@ -94,7 +94,7 @@ void tr175_state::tr175(machine_config &config)
 	M68000(config, m_maincpu, 12'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tr175_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(28.322_MHz_XTAL, 900, 0, 720, 449, 0, 416); // guess
 	screen.set_screen_update("avdc", FUNC(scn2674_device::screen_update));
 

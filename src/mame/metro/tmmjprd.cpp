@@ -675,7 +675,7 @@ void tmmjprd_state::tmpdoki(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tmmjprd);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_888, 0x1000);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(64*16, 64*16);
@@ -698,7 +698,7 @@ void tmmjprd_state::tmmjprd(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(64*16, 64*16);

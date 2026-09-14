@@ -145,7 +145,6 @@ private:
 
 	// memory pointers
 	memory_share_array_creator<u16, 2> m_vram;
-	memory_share_creator<u16> m_control;
 
 	// internal state
 	struct deco16_tmap
@@ -202,6 +201,8 @@ private:
 	s32 m_last_small, m_last_big;
 
 	s32 m_8x8_gfx_bank, m_16x16_gfx_bank;
+
+	u16 m_control[8];
 
 	u16 vram_common_r(u8 index, offs_t offset);
 	void vram_common_w(u8 index, offs_t offset, u16 data, u16 mem_mask = ~0);

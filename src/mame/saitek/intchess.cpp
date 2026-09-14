@@ -293,7 +293,7 @@ void intchess_state::intchess(machine_config &config)
 	m_encoder->data_tri_callback().set(m_encoder, FUNC(mm74c923_device::read));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50); // PAL
 	m_screen->set_size(8*20 + 32, 8*16 + 32);
 	m_screen->set_visarea(0, 8*20-1, 0, 8*16-1);

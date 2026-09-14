@@ -385,7 +385,7 @@ void bloodbro_ms_state::bloodbrom(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bloodbro_ms_state::sound_program_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);

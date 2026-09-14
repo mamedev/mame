@@ -5,7 +5,7 @@
     System 8000 CPU-A & HPCPU boards
 
 =========================================================
-				System I/O Space Memory Map
+                System I/O Space Memory Map
 =========================================================
 I/O Space      Device Class            Current use
 =========================================================
@@ -15,15 +15,15 @@ I/O Space      Device Class            Current use
 1000 - 1FFF    Tape Devices            9-Track 1000 - 101F
 2000 - 6FFF    Reserved                FPP 2000 - 200F
 7000 - 8FFF    Disk Devices
-				- SMDC                 7F00 - 7F0F
-				- WDC/mWDC             8000 - 80FF
+                - SMDC                 7F00 - 7F0F
+                - WDC/mWDC             8000 - 80FF
 9000 - 9FFF    Available to User
 A000 - DFFF    Reserved
 E000 - FFFF    Communication Devices
-				- CPU                  FFC1 - FFFF
-				- ICP                  EF01 - EF0F
-				- SSB                  FF41 - FF7F
-				- SSB                  FF01 - FF3F
+                - CPU                  FFC1 - FFFF
+                - ICP                  EF01 - EF0F
+                - SSB                  FF41 - FF7F
+                - SSB                  FF01 - FF3F
 =========================================================
 
 ***************************************************************************/
@@ -34,6 +34,7 @@ E000 - FFFF    Communication Devices
 
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
+#include "machine/clock.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -42,29 +43,29 @@ E000 - FFFF    Communication Devices
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CLK_CPU		(44.444_MHz_XTAL / 8)	/* 5.5555 Mhz */
-#define CLK_HPCPU	(CLK_CPU * 2)			/* 11.111 Mhz */
-#define CLK_BUS		CLK_CPU
-#define CLK_MASTER	(CLK_CPU * 4)
-#define CLK_CTC		(2.4576_MHz_XTAL / 2)
-#define CLK_SCC		((2.4576_MHz_XTAL).value())
+#define CLK_CPU     (44.444_MHz_XTAL / 8)   /* 5.5555 Mhz */
+#define CLK_HPCPU   (CLK_CPU * 2)           /* 11.111 Mhz */
+#define CLK_BUS     CLK_CPU
+#define CLK_MASTER  (CLK_CPU * 4)
+#define CLK_CTC     (2.4576_MHz_XTAL / 2)
+#define CLK_SCC     ((2.4576_MHz_XTAL).value())
 
 // System Configuration Register control bits 0-3
-#define SCR_BD_MEMON	0x01	// Use off-board memory (disable monitor ROM and local RAM)
-#define SCR_MMU_ONH		0x02	// Enable MMUs (disable linear memory)
-#define SCR_SEG_USER	0x04	// Segmented user space
-#define SCR_CLR_PARITY	0x08	// Enable NMI from parity or ECC error
+#define SCR_BD_MEMON    0x01    // Use off-board memory (disable monitor ROM and local RAM)
+#define SCR_MMU_ONH     0x02    // Enable MMUs (disable linear memory)
+#define SCR_SEG_USER    0x04    // Segmented user space
+#define SCR_CLR_PARITY  0x08    // Enable NMI from parity or ECC error
 
 // Non-Maskable Interrupt reason codes
-static constexpr uint16_t NMI_MANUAL 	= 0x0001;
-static constexpr uint16_t NMI_PWRFAIL	= 0x0002;
-static constexpr uint16_t NMI_ECCERR 	= 0x0004;
+static constexpr uint16_t NMI_MANUAL    = 0x0001;
+static constexpr uint16_t NMI_PWRFAIL   = 0x0002;
+static constexpr uint16_t NMI_ECCERR    = 0x0004;
 
 s8k_cpu_base::s8k_cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_zbi_card_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
-	, m_local_ram(*this, "local_ram", 0x800, ENDIANNESS_BIG)	// 2 KB
+	, m_local_ram(*this, "local_ram", 0x800, ENDIANNESS_BIG)    // 2 KB
 	, m_view_code(*this, "memview_code")
 	, m_view_data(*this, "memview_data")
 	, m_view_stck(*this, "memview_stck")
@@ -84,6 +85,10 @@ void s8k_cpu_base::base_device_start()
 	save_item(NAME(m_reg_snvr));
 	save_item(NAME(m_reg_trpl));
 	save_item(NAME(m_reg_if1l));
+	save_item(NAME(m_lad_seg));
+	save_item(NAME(m_lad_low));
+	save_item(NAME(m_if1_low));
+	save_item(NAME(m_segt_state));
 }
 
 void s8k_cpu_base::base_device_reset()
@@ -93,6 +98,10 @@ void s8k_cpu_base::base_device_reset()
 	m_reg_snvr = 0;
 	m_reg_trpl = 0;
 	m_reg_if1l = 0;
+	m_lad_seg = 0;
+	m_lad_low = 0;
+	m_if1_low = 0;
+	m_segt_state = false;
 
 	m_view_code.select(0);
 	m_view_data.select(0);
@@ -115,7 +124,33 @@ void s8k_cpu_base::base_device_resolve_objects()
 
 void s8k_cpu_base::segt_interrupt(int state)
 {
+	if (state && !m_segt_state)
+	{
+		// U66 (sheet 2) and U48-U50 (sheet 3) capture the segment number
+		// and the address low bytes -- which the Z8010s cannot record --
+		// at the moment the segment trap is raised.  A trap handler
+		// combines them with the high bytes latched inside the MMUs.
+		m_reg_snvr = m_lad_seg;
+		m_reg_trpl = m_lad_low;
+		m_reg_if1l = m_if1_low;
+	}
+	m_segt_state = (state != 0);
 	m_maincpu->set_input_line(z8001_device::SEGT_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void s8k_cpu_base::observe_bus_cycle(offs_t offset, bool if1)
+{
+	m_lad_seg = uint8_t(offset >> 16) & 0x7f;
+	m_lad_low = uint8_t(offset);
+	if (if1)
+	{
+		m_if1_low = uint8_t(offset);
+		// Every MMU sits on the CPU's address/data bus and snoops each
+		// IFETCH1 cycle, whether or not it translates it.
+		m_mmu_code->ifetch1_observed(offset);
+		m_mmu_data->ifetch1_observed(offset);
+		m_mmu_stck->ifetch1_observed(offset);
+	}
 }
 
 uint16_t s8k_cpu_base::segtack_r()
@@ -182,15 +217,12 @@ z8010_device *s8k_cpu_base::select_code_mmu(offs_t offset)
 				mmu = m_mmu_stck;
 		}
 	}
-	else	// Non-seg OS
+	else    // Non-seg OS
 	{
-		if ((seg & 0x3f) < 2)	// OS segs 0,1,64,65
+		if ((seg & 0x3f) < 2)   // OS segs 0,1,64,65
 		{
-			if (m_normal_mode)	// Trying to access in normal mode?
+			if (m_normal_mode)  // Trying to access in normal mode?
 			{
-				// SEGTRAP!
-				m_reg_snvr = seg;
-				m_reg_if1l = offset;
 				mmu = nullptr;
 				segt_interrupt(1);
 			}
@@ -217,7 +249,7 @@ z8010_device *s8k_cpu_base::select_data_mmu(offs_t offset, uint8_t sbr, uint8_t 
 
 	if (m_is_seg_os)
 	{
-		if (!m_normal_mode)	// System mode
+		if (!m_normal_mode) // System mode
 		{
 			mmu = m_mmu_code;
 		}
@@ -233,15 +265,14 @@ z8010_device *s8k_cpu_base::select_data_mmu(offs_t offset, uint8_t sbr, uint8_t 
 			mmu = m_mmu_data;
 		}
 	}
-	else	// Non-seg OS
+	else    // Non-seg OS
 	{
-		if ((seg & 0x3f) < 2)	// OS segs 0,1,64,65
+		if ((seg & 0x3f) < 2)   // OS segs 0,1,64,65
 		{
-			if (m_normal_mode)	// Trying to access in normal mode?
+			if (m_normal_mode)  // Trying to access in normal mode?
 			{
-				// SEGTRAP!
-				m_reg_snvr = seg;
-				m_reg_trpl = offset;
+				// SEGTRAP!  (the address latches are captured by the
+				// segment trap flip-flop in segt_interrupt)
 				mmu = nullptr;
 				segt_interrupt(1);
 			}
@@ -272,7 +303,7 @@ uint16_t s8k_cpu_base::ram_r(address_space &space, offs_t offset, uint16_t mask)
 	if (translate_addr(space.spacenum(), false, offset))
 		data = m_bus->ram16_r(offset, mask);
 	else if (space.spacenum() == AS_PROGRAM)
-		data = 0x8d07;	// NOP instruction
+		data = 0x8d07;  // NOP instruction
 
 	return data;
 }
@@ -407,7 +438,7 @@ void zbi_s8k_cpu10_card_device::reg_scr_w(uint16_t data)
 		m_is_seg_user = !!(data & SCR_SEG_USER);
 	}
 
-	m_reg_scr = (m_reg_scr & 0xf0) | ( data & 0x0f );	// Mask off read-only nibble
+	m_reg_scr = (m_reg_scr & 0xf0) | ( data & 0x0f );   // Mask off read-only nibble
 }
 
 uint8_t zbi_s8k_cpu10_card_device::reg_sbr_r()
@@ -529,22 +560,24 @@ bool zbi_s8k_cpu10_card_device::translate_addr(int spacenum, bool write, offs_t 
 	if (m_reg_scr & SCR_MMU_ONH)
 	{
 		bool code_access = (spacenum == AS_PROGRAM);
+		int st = code_access ?
+					(m_maincpu->is_ifetch1() ?
+						z8002_device::ST_IFETCH_1 :
+						z8002_device::ST_IFETCH_N) :
+					(stack_access ?
+						z8002_device::ST_REQ_STACK :
+						z8002_device::ST_REQ_DATA);
+
+		observe_bus_cycle(offset, st == z8002_device::ST_IFETCH_1);
+
 		z8010_device *mmu = code_access ?
 							select_code_mmu(offset) : select_data_mmu(offset, m_reg_sbr, m_reg_nbr);
 
 		if (mmu)
 		{
-			int st = code_access ?
-						(m_maincpu->is_ifetch1() ?
-							z8002_device::ST_IFETCH_1 :
-							z8002_device::ST_IFETCH_N) :
-						(stack_access ?
-							z8002_device::ST_REQ_STACK :
-							z8002_device::ST_REQ_DATA);
-
 			LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
 
-			offset &= 0x3f'ffff;	// Mask off seg bit 7 to disable URS checking in MMUs
+			offset &= 0x3f'ffff;    // Mask off seg bit 7 to disable URS checking in MMUs
 
 			return mmu->translate(offset, write, true, m_dma_on, st);
 		}
@@ -623,7 +656,6 @@ void zbi_s8k_cpu10_card_device::centronics_ack_w(uint8_t data)
 void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 {
 	Z8001(config, m_maincpu, CLK_CPU);
-	m_maincpu->set_m20_hack(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zbi_s8k_cpu10_card_device::addrmap_program);
 	m_maincpu->set_addrmap(AS_DATA, &zbi_s8k_cpu10_card_device::addrmap_data);
 	m_maincpu->set_addrmap(z8001_device::AS_STACK, &zbi_s8k_cpu10_card_device::addrmap_stack);
@@ -648,6 +680,11 @@ void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 	m_sio[0]->out_txdb_callback().set("sio0:chb:console", FUNC(rs232_port_device::write_txd));
 	m_sio[0]->out_rtsb_callback().set("sio0:chb:console", FUNC(rs232_port_device::write_rts));
 	m_sio[0]->out_dtrb_callback().set("sio0:chb:console", FUNC(rs232_port_device::write_dtr));
+	// Local console terminal: loop the driver's own DTR/RTS back as DCD/CTS so
+	// carrier is present when sioopen() does its carrier-wait on a read-only
+	// open of /dev/console (otherwise the console shell sleeps forever).
+	m_sio[0]->out_dtrb_callback().append(m_sio[0], FUNC(z80sio_device::dcdb_w));
+	m_sio[0]->out_rtsb_callback().append(m_sio[0], FUNC(z80sio_device::ctsb_w));
 
 	rs232_port_device &rs232_0(RS232_PORT(config, "sio0:cha:tty0", default_rs232_devices, nullptr));
 	rs232_0.rxd_handler().set(m_sio[0], FUNC(z80sio_device::rxa_w));
@@ -735,12 +772,20 @@ void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 	Z80CTC(config, m_ctc[2], CLK_CPU);
 	m_ctc[2]->set_clk<0>(CLK_CTC);
 	m_ctc[2]->set_clk<1>(CLK_CTC);
-	m_ctc[2]->set_clk<2>(CLK_CTC);
 	m_ctc[2]->zc_callback<0>().set(m_sio[3], FUNC(z80sio_device::rxca_w));
 	m_ctc[2]->zc_callback<0>().append(m_sio[3], FUNC(z80sio_device::txca_w));
 	m_ctc[2]->zc_callback<1>().set(m_sio[3], FUNC(z80sio_device::rxcb_w));
 	m_ctc[2]->zc_callback<1>().append(m_sio[3], FUNC(z80sio_device::txcb_w));
 	m_ctc[2]->zc_callback<2>().set(m_ctc[2], FUNC(z80ctc_device::trg3));
+
+	// Real-time (line) clock: CTC 2 channels 2 & 3 are cascaded and run in
+	// COUNTER mode, counting the independent 1.2288 MHz baud-rate oscillator fed
+	// to the CTC trigger inputs (S8000 CPU Hardware Manual sec 4.2.2). ZEUS
+	// programs ch2 /256 and ch3 /80 -> a 60 Hz jiffy interrupt.  Feed ch2 only
+	// through trg2: configuring both its internal clock and this external trigger
+	// would count the oscillator twice and make the ZEUS clock run at 120 Hz.
+	clock_device &rtc_clk(CLOCK(config, "rtc_clk", CLK_CTC));
+	rtc_clk.signal_handler().set(m_ctc[2], FUNC(z80ctc_device::trg2));
 
 	Z80PIO(config, m_pio, CLK_CPU);
 	m_pio->in_pa_callback().set(FUNC(zbi_s8k_cpu10_card_device::pa_data_r));
@@ -838,15 +883,15 @@ ROM_END
 static INPUT_PORTS_START( s8k_cpu10 )
 	PORT_START("SEGJP")
 	PORT_CONFNAME(0x01, 0x00, "Support Segmented OS (Must Be No)")
-	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(	0x01, DEF_STR( Yes ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(   0x01, DEF_STR( Yes ) )
 
 	PORT_START("DIPSW")
-	PORT_DIPNAME( 0x30, 0x20, "Serial Console Baud Rate" )	PORT_DIPLOCATION("U70:1,4")
-	PORT_DIPSETTING(	0x00, "300 baud" )
-	PORT_DIPSETTING(	0x10, "1200 baud" )
-	PORT_DIPSETTING(	0x20, "9600 baud" )
-	PORT_DIPSETTING(	0x30, "19200 baud" )
+	PORT_DIPNAME( 0x30, 0x20, "Serial Console Baud Rate" )  PORT_DIPLOCATION("U70:1,4")
+	PORT_DIPSETTING(    0x00, "300 baud" )
+	PORT_DIPSETTING(    0x10, "1200 baud" )
+	PORT_DIPSETTING(    0x20, "9600 baud" )
+	PORT_DIPSETTING(    0x30, "19200 baud" )
 	PORT_DIPUNUSED_DIPLOC( 0xC0, 0xC0, "U70:2,3" )
 INPUT_PORTS_END
 
@@ -886,19 +931,19 @@ void zbi_s8k_cpu_card_device::install_memory()
 static INPUT_PORTS_START( s8k_cpu )
 	PORT_START("SEGJP")
 	PORT_CONFNAME(0x01, 0x00, "Support Segmented OS (v2.2+ Only)")
-	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(	0x01, DEF_STR( Yes ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(   0x01, DEF_STR( Yes ) )
 
 	PORT_START("DIPSW")
-	PORT_DIPNAME( 0x30, 0x20, "Serial Console Baud Rate" )	PORT_DIPLOCATION("U70:1,4")
-	PORT_DIPSETTING(	0x00, "300 baud" )
-	PORT_DIPSETTING(	0x10, "1200 baud" )
-	PORT_DIPSETTING(	0x20, "9600 baud" )
-	PORT_DIPSETTING(	0x30, "19200 baud" )
-	PORT_DIPNAME( 0xC0, 0x40, "Primary Boot Device" )		PORT_DIPLOCATION("U70:2,3")
-	PORT_DIPSETTING(	0xC0, "8-inch Disk")
-	PORT_DIPSETTING(	0x80, "5.25-inch Disk")
-	PORT_DIPSETTING(	0x40, "SMD Disk")
+	PORT_DIPNAME( 0x30, 0x20, "Serial Console Baud Rate" )  PORT_DIPLOCATION("U70:1,4")
+	PORT_DIPSETTING(    0x00, "300 baud" )
+	PORT_DIPSETTING(    0x10, "1200 baud" )
+	PORT_DIPSETTING(    0x20, "9600 baud" )
+	PORT_DIPSETTING(    0x30, "19200 baud" )
+	PORT_DIPNAME( 0xC0, 0x40, "Primary Boot Device" )       PORT_DIPLOCATION("U70:2,3")
+	PORT_DIPSETTING(    0xC0, "8-inch Disk")
+	PORT_DIPSETTING(    0x80, "5.25-inch Disk")
+	PORT_DIPSETTING(    0x40, "SMD Disk")
 INPUT_PORTS_END
 
 // ROM size: 4x4KB
@@ -960,7 +1005,7 @@ ioport_constructor zbi_s8k_cpu_card_device::device_input_ports() const
 
 zbi_s8k_hpcpu_card_device::zbi_s8k_hpcpu_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s8k_cpu_base(mconfig, ZBI_S8K_HPCPU, tag, owner, clock)
-	, m_cache(*this, "cache", 0x8000, ENDIANNESS_BIG)	// 32 KB
+	, m_cache(*this, "cache", 0x8000, ENDIANNESS_BIG)   // 32 KB
 	, m_scc(*this, "scc")
 	, m_cio(*this, "cio")
 {
@@ -976,22 +1021,26 @@ bool zbi_s8k_hpcpu_card_device::translate_addr(int spacenum, bool write, offs_t 
 	if (m_reg_scr & SCR_MMU_ONH)
 	{
 		bool code_access = (spacenum == AS_PROGRAM);
+		int st = code_access ?
+					(m_maincpu->is_ifetch1() ?
+						z8002_device::ST_IFETCH_1 :
+						z8002_device::ST_IFETCH_N) :
+					(stack_access ?
+						z8002_device::ST_REQ_STACK :
+						z8002_device::ST_REQ_DATA);
+
+		// Board latches and MMU bus snoop see the cycle before any
+		// violation can be raised for it.
+		observe_bus_cycle(offset, st == z8002_device::ST_IFETCH_1);
+
 		z8010_device *mmu = code_access ?
 							select_code_mmu(offset) : select_data_mmu(offset, 0, m_reg_ubr);
 
 		if (mmu)
 		{
-			int st = code_access ?
-						(m_maincpu->is_ifetch1() ?
-							z8002_device::ST_IFETCH_1 :
-							z8002_device::ST_IFETCH_N) :
-						(stack_access ?
-							z8002_device::ST_REQ_STACK :
-							z8002_device::ST_REQ_DATA);
-
 			LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
 
-			offset &= 0x3f'ffff;	// Mask off seg bit 7 to disable URS checking in MMUs
+			offset &= 0x3f'ffff;    // Mask off seg bit 7 to disable URS checking in MMUs
 
 			return mmu->translate(offset, write, true, m_dma_on, st);
 		}
@@ -1051,7 +1100,7 @@ void zbi_s8k_hpcpu_card_device::reg_scr_w(uint16_t data)
 		m_is_seg_user = !!(data & SCR_SEG_USER);
 	}
 
-	m_reg_scr = (m_reg_scr & 0x0ff0) | ( data & 0xf00f );	// Mask off read-only parts
+	m_reg_scr = (m_reg_scr & 0x0ff0) | ( data & 0xf00f );   // Mask off read-only parts
 }
 
 uint8_t zbi_s8k_hpcpu_card_device::reg_ubr_r()
@@ -1178,7 +1227,6 @@ void zbi_s8k_hpcpu_card_device::device_resolve_objects()
 void zbi_s8k_hpcpu_card_device::device_add_mconfig(machine_config &config)
 {
 	Z8001(config, m_maincpu, CLK_HPCPU);
-	m_maincpu->set_m20_hack(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zbi_s8k_hpcpu_card_device::addrmap_program);
 	m_maincpu->set_addrmap(AS_DATA, &zbi_s8k_hpcpu_card_device::addrmap_data);
 	m_maincpu->set_addrmap(z8001_device::AS_STACK, &zbi_s8k_hpcpu_card_device::addrmap_stack);
@@ -1219,19 +1267,19 @@ void zbi_s8k_hpcpu_card_device::device_add_mconfig(machine_config &config)
 
 static INPUT_PORTS_START( s8k_hpcpu )
 	PORT_START("DIPSW")
-	PORT_DIPNAME( 0x0030, 0x0010, "Serial Console Baud Rate" )	PORT_DIPLOCATION("F4:7,8")
-	PORT_DIPSETTING(	  0x0030, "300 baud" )
-	PORT_DIPSETTING(	  0x0020, "1200 baud" )
-	PORT_DIPSETTING(	  0x0010, "9600 baud" )
-	PORT_DIPSETTING(	  0x0000, "19200 baud" )
-	PORT_DIPNAME( 0x00C0, 0x0040, "Primary Boot Device" )		PORT_DIPLOCATION("F4:5,6")
-	PORT_DIPSETTING(	  0x00C0, "8-inch Disk")
-	PORT_DIPSETTING(	  0x0080, "5.25-inch Disk")
-	PORT_DIPSETTING(	  0x0040, "SMD Disk")
-	PORT_DIPUNKNOWN_DIPLOC(0x0100, 0x0100, "F4:4")	// "INVALID BOOT DEVICE CODE" when enabled
-	PORT_DIPUNKNOWN_DIPLOC(0x0200, 0x0200, "F4:3")	// Lots of errors (non-seg mode?)
-	PORT_DIPUNKNOWN_DIPLOC(0x0400, 0x0000, "F4:2")	// Enables baud 300 when disabled, but generates "ERROR #0030" (off-board tty?)
-	PORT_DIPUNKNOWN_DIPLOC(0x0800, 0x0800, "F4:1")	// Nothing (test skip?)
+	PORT_DIPNAME( 0x0030, 0x0010, "Serial Console Baud Rate" )  PORT_DIPLOCATION("F4:7,8")
+	PORT_DIPSETTING(      0x0030, "300 baud" )
+	PORT_DIPSETTING(      0x0020, "1200 baud" )
+	PORT_DIPSETTING(      0x0010, "9600 baud" )
+	PORT_DIPSETTING(      0x0000, "19200 baud" )
+	PORT_DIPNAME( 0x00C0, 0x0040, "Primary Boot Device" )       PORT_DIPLOCATION("F4:5,6")
+	PORT_DIPSETTING(      0x00C0, "8-inch Disk")
+	PORT_DIPSETTING(      0x0080, "5.25-inch Disk")
+	PORT_DIPSETTING(      0x0040, "SMD Disk")
+	PORT_DIPUNKNOWN_DIPLOC(0x0100, 0x0100, "F4:4")  // "INVALID BOOT DEVICE CODE" when enabled
+	PORT_DIPUNKNOWN_DIPLOC(0x0200, 0x0200, "F4:3")  // Lots of errors (non-seg mode?)
+	PORT_DIPUNKNOWN_DIPLOC(0x0400, 0x0000, "F4:2")  // Enables baud 300 when disabled, but generates "ERROR #0030" (off-board tty?)
+	PORT_DIPUNKNOWN_DIPLOC(0x0800, 0x0800, "F4:1")  // Nothing (test skip?)
 INPUT_PORTS_END
 
 // ROM size: 2x8KB

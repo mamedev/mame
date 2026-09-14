@@ -476,7 +476,7 @@ void _4roses_state::_4roses(machine_config &config)
 
 	// video hardware
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size((124+1)*4, (30+1)*8);          // guess. taken from funworld games
@@ -601,4 +601,4 @@ void rugby_state::driver_init()
 /*    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS          INIT         ROT   COMPANY      FULLNAME                         FLAGS  */
 GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, driver_init, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, driver_init, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, rugby,   0,      rugby,   4roses, rugby_state,   driver_init, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, rugby,   0,      rugby,   4roses, rugby_state,   driver_init, ROT0, "C.M.C.",    "Rugby? (Four Roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

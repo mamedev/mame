@@ -934,7 +934,7 @@ void jedi_state::jedi(machine_config &config)
 #if DEBUG_GFXDECODE
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jedi);
 #endif
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64*8, 262); // verify vert size
 	m_screen->set_visarea(0*8, 37*8-1, 0*8, 30*8-1);

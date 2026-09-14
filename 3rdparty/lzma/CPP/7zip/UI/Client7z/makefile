@@ -21,6 +21,7 @@ WIN_OBJS = \
   $O\FileName.obj \
   $O\PropVariant.obj \
   $O\PropVariantConv.obj \
+  $O\TimeUtils.obj \
 
 7ZIP_COMMON_OBJS = \
   $O\FileStreams.obj \

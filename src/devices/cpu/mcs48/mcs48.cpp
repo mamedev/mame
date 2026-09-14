@@ -72,6 +72,7 @@
     UPD7751 64   1k   27  (8048, speech synthesizer in internal ROM)
 
     8039   128    0   27  (external ROM)
+    MB8881 128    0   27  (8039 clone)
     8049   128   2k   27  (ROM)
     8749   128   2k   27  (EPROM)
     M58715 128   2k   27  (8049 clone)
@@ -201,6 +202,7 @@ DEFINE_DEVICE_TYPE(I8742AH, i8742ah_device, "i8742ah", "Intel 8742AH")
 
 DEFINE_DEVICE_TYPE(MB8884,  mb8884_device,  "mb8884",  "Fujitsu MB8884")
 DEFINE_DEVICE_TYPE(UPD7751, upd7751_device, "upd7751", "NEC uPD7751")
+DEFINE_DEVICE_TYPE(MB8881,  mb8881_device,  "mb8881",  "Fujitsu MB8881")
 DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "Mitsubishi M58715")
 
 
@@ -304,6 +306,11 @@ mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, dev
 
 upd7751_device::upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mcs48_cpu_device(mconfig, UPD7751, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
+{
+}
+
+mb8881_device::mb8881_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mcs48_cpu_device(mconfig, MB8881, tag, owner, clock, 0, 128, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
@@ -1187,7 +1194,7 @@ void mcs48_cpu_device::device_start()
 	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
 	state_add(MCS48_SP,        "SP",        m_psw).mask(0x7).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%12s");
 	state_add(MCS48_A,         "A",         m_a);
 	state_add(MCS48_TC,        "TC",        m_timer);
 	state_add(MCS48_TPRE,      "TPRE",      m_prescaler).mask(0x1f);

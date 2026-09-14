@@ -127,7 +127,7 @@ void titan_soc_state::titan_soc(machine_config &config)
 	ARM920T(config, m_maincpu, 200000000); // type + clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &titan_soc_state::map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(320, 256);
@@ -170,6 +170,6 @@ void titan_soc_state::init_titan_soc()
 } // anonymous namespace
 
 
-CONS( 2009, megadri4,  0,        0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2009, megadri4a, megadri4, 0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2004, colecofl,  0,        0, titan_soc, titan_soc, titan_soc_state, empty_init,     "AtGames",                     "Colecovision Flashback",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, megadri4,  0,        0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, megadri4a, megadri4, 0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, colecofl,  0,        0, titan_soc, titan_soc, titan_soc_state, empty_init,     "AtGames",                     "Colecovision Flashback",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

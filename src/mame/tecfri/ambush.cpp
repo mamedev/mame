@@ -44,10 +44,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -69,20 +71,30 @@ public:
 		m_sprite_ram(*this, "sprite_ram"),
 		m_attribute_ram(*this, "attribute_ram"),
 		m_scroll_ram(*this, "scroll_ram"),
-		m_char_tilemap(nullptr),
-		m_color_bank(0)
+		m_char_tilemap(nullptr)
 	{ }
 
-	void ambush_base(machine_config &config);
-	void ambush(machine_config &config);
-	void mariobl(machine_config &config);
-	void mariobla(machine_config &config);
-	void dkong3abl(machine_config &config);
+	void ambush_base(machine_config &config) ATTR_COLD;
+	void ambush(machine_config &config) ATTR_COLD;
+	void mariobl(machine_config &config) ATTR_COLD;
+	void mariobla(machine_config &config) ATTR_COLD;
+	void dkong3abl(machine_config &config) ATTR_COLD;
 
 private:
-	void ambush_palette(palette_device &palette) const;
-	void mariobl_palette(palette_device &palette) const;
-	void dkong3_palette(palette_device &palette) const;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device_array<ls259_device, 2> m_outlatch;
+
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_attribute_ram;
+	required_shared_ptr<uint8_t> m_scroll_ram;
+
+	tilemap_t *m_char_tilemap = nullptr;
+	uint8_t m_color_bank = 0;
+
+	void ambush_palette(palette_device &palette) const ATTR_COLD;
+	void mariobl_palette(palette_device &palette) const ATTR_COLD;
+	void dkong3_palette(palette_device &palette) const ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -99,8 +111,7 @@ private:
 	DECLARE_MACHINE_START(mariobl);
 	DECLARE_MACHINE_START(dkong3abl);
 
-	void coin_counter_1_w(int state);
-	void coin_counter_2_w(int state);
+	template <uint8_t Which> void coin_counter_w(int state);
 	void output_latches_w(offs_t offset, uint8_t data);
 
 	void bootleg_map(address_map &map) ATTR_COLD;
@@ -108,16 +119,6 @@ private:
 	void main_portmap(address_map &map) ATTR_COLD;
 
 	void register_save_states();
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_device_array<ls259_device, 2> m_outlatch;
-	required_shared_ptr<uint8_t> m_video_ram;
-	required_shared_ptr<uint8_t> m_sprite_ram;
-	required_shared_ptr<uint8_t> m_attribute_ram;
-	required_shared_ptr<uint8_t> m_scroll_ram;
-
-	tilemap_t *m_char_tilemap;
-	uint8_t m_color_bank;
 };
 
 
@@ -131,12 +132,12 @@ void ambush_state::main_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xc000, 0xc07f).ram();
-	map(0xc080, 0xc09f).ram().w(FUNC(ambush_state::scroll_ram_w)).share("scroll_ram");  // 1 byte for each column
+	map(0xc080, 0xc09f).ram().w(FUNC(ambush_state::scroll_ram_w)).share(m_scroll_ram);  // 1 byte for each column
 	map(0xc0a0, 0xc0ff).ram();
-	map(0xc100, 0xc1ff).ram().share("attribute_ram");  // 1 line corresponds to 4 in the video ram
-	map(0xc200, 0xc3ff).ram().share("sprite_ram");
-	map(0xc400, 0xc7ff).ram().share("video_ram");
-	map(0xc800, 0xc800).portr("sw1");
+	map(0xc100, 0xc1ff).ram().share(m_attribute_ram);  // 1 line corresponds to 4 in the video ram
+	map(0xc200, 0xc3ff).ram().share(m_sprite_ram);
+	map(0xc400, 0xc7ff).ram().share(m_video_ram);
+	map(0xc800, 0xc800).portr("SW1");
 	map(0xcc00, 0xcc07).w(FUNC(ambush_state::output_latches_w));
 }
 
@@ -153,15 +154,15 @@ void ambush_state::bootleg_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x7000, 0x71ff).ram().share("sprite_ram");
-	map(0x7200, 0x72ff).ram().share("attribute_ram");
+	map(0x7000, 0x71ff).ram().share(m_sprite_ram);
+	map(0x7200, 0x72ff).ram().share(m_attribute_ram);
 	map(0x7300, 0x737f).ram();
-	map(0x7380, 0x739f).ram().share("scroll_ram");  // not used on bootlegs?
+	map(0x7380, 0x739f).ram().share(m_scroll_ram);  // not used on bootlegs?
 	map(0x73a0, 0x73ff).ram();
-	map(0x7400, 0x77ff).ram().share("video_ram");
+	map(0x7400, 0x77ff).ram().share(m_video_ram);
 	map(0x8000, 0x9fff).rom();
 	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xa100, 0xa100).portr("sw1");
+	map(0xa100, 0xa100).portr("SW1");
 	map(0xa200, 0xa207).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xb000, 0xbfff).rom();
 	map(0xe000, 0xffff).rom();
@@ -173,7 +174,7 @@ void ambush_state::bootleg_map(address_map &map)
 //**************************************************************************
 
 static INPUT_PORTS_START( ambush )
-	PORT_START("buttons")
+	PORT_START("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2)  PORT_COCKTAIL
@@ -183,7 +184,7 @@ static INPUT_PORTS_START( ambush )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN1)
 
-	PORT_START("joystick")
+	PORT_START("JOYSTICK")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)   PORT_8WAY
@@ -193,7 +194,7 @@ static INPUT_PORTS_START( ambush )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)   PORT_8WAY  PORT_COCKTAIL
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)  PORT_8WAY  PORT_COCKTAIL
 
-	PORT_START("sw1")
+	PORT_START("SW1")
 	PORT_DIPNAME(0x03, 0x00, DEF_STR( Lives ))           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(   0x00, "3")
 	PORT_DIPSETTING(   0x01, "4")
@@ -222,7 +223,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ambusht )
 	PORT_INCLUDE(ambush)
 
-	PORT_MODIFY("sw1")
+	PORT_MODIFY("SW1")
 	PORT_DIPNAME(0x04, 0x04, DEF_STR( Allow_Continue ))  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(   0x00, DEF_STR( No ))
 	PORT_DIPSETTING(   0x04, DEF_STR( Yes ))
@@ -237,19 +238,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mariobl )
 	PORT_INCLUDE(ambush)
 
-	PORT_MODIFY("buttons")
+	PORT_MODIFY("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SERVICE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_MODIFY("joystick")
+	PORT_MODIFY("JOYSTICK")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_2WAY
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_2WAY
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_2WAY
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_2WAY
 	PORT_BIT(0x33, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_MODIFY("sw1")
+	PORT_MODIFY("SW1")
 	PORT_DIPNAME(0x1c, 0x00, DEF_STR( Coinage ))      PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(   0x08, DEF_STR( 3C_1C ))
 	PORT_DIPSETTING(   0x10, DEF_STR( 2C_1C ))
@@ -272,17 +273,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dkong3abl )
 	PORT_INCLUDE(ambush)
 
-	PORT_MODIFY("buttons")
+	PORT_MODIFY("BUTTONS")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
 	PORT_BIT(0x05, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_MODIFY("joystick")
+	PORT_MODIFY("JOYSTICK")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
 
-	PORT_MODIFY("sw1")
+	PORT_MODIFY("SW1")
 	PORT_DIPNAME(0x0c, 0x00, DEF_STR( Bonus_Life ))   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(   0x00, "30k")
 	PORT_DIPSETTING(   0x04, "40k")
@@ -428,7 +429,7 @@ uint32_t ambush_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		int sx = m_sprite_ram[offs + 3];
 		int sy = m_sprite_ram[offs + 0];
-		int wrap = BIT(m_sprite_ram[offs + 2], 4);
+		int const wrap = BIT(m_sprite_ram[offs + 2], 4);
 
 		// sprite disabled?
 		if (sy == 0x00 || sy == 0xff)
@@ -438,7 +439,7 @@ uint32_t ambush_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		if (((sx < 0x40) && wrap) || ((sx >= 0xc0) && !wrap))
 			continue;
 
-		int gfx = BIT(m_sprite_ram[offs + 2], 7);
+		int const gfx = BIT(m_sprite_ram[offs + 2], 7);
 		int code = ((m_sprite_ram[offs + 2] & 0x60) << 1) | (m_sprite_ram[offs + 1] & 0x3f);
 
 		if (gfx == 1)
@@ -469,7 +470,7 @@ uint32_t ambush_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			flipy = !flipy;
 		}
 
-		int color = (m_color_bank << 4) | (m_sprite_ram[offs + 2] & 0x0f);
+		int const color = (m_color_bank << 4) | (m_sprite_ram[offs + 2] & 0x0f);
 
 		m_gfxdecode->gfx(gfx)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
@@ -502,7 +503,7 @@ uint32_t ambush_state::screen_update_bootleg(screen_device &screen, bitmap_ind16
 		// 2  -6543210  Code low bits
 		// 3  76653210  Y coordinate
 
-		int sx = m_sprite_ram[offs + 0];
+		int const sx = m_sprite_ram[offs + 0];
 		int sy = m_sprite_ram[offs + 3];
 
 		// sprite disabled?
@@ -512,11 +513,11 @@ uint32_t ambush_state::screen_update_bootleg(screen_device &screen, bitmap_ind16
 		// adjust for rotation
 		sy = 240 - sy;
 
-		int flipx = BIT(m_sprite_ram[offs + 1], 7);
-		int flipy = BIT(m_sprite_ram[offs + 2], 7);
+		int const flipx = BIT(m_sprite_ram[offs + 1], 7);
+		int const flipy = BIT(m_sprite_ram[offs + 2], 7);
 
-		int code = ((m_sprite_ram[offs + 1] & 0x40) << 1) | (m_sprite_ram[offs + 2] & 0x7f);
-		int color = (m_color_bank << 4) | (m_sprite_ram[offs + 1] & 0x0f);
+		int const code = ((m_sprite_ram[offs + 1] & 0x40) << 1) | (m_sprite_ram[offs + 2] & 0x7f);
+		int const color = (m_color_bank << 4) | (m_sprite_ram[offs + 1] & 0x0f);
 
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
@@ -587,17 +588,17 @@ static GFXDECODE_START( gfx_dkong3abl )
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,     0, 32)
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER( ambush_state::ambush_char_tile_info )
+TILE_GET_INFO_MEMBER(ambush_state::ambush_char_tile_info)
 {
-	uint8_t attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
+	uint8_t const attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
 
 	// 7-------  Unused
 	// -65-----  Code high bits
 	// ---4----  Priority
 	// ----3210  Color
 
-	int code = ((attr & 0x60) << 3) | m_video_ram[tile_index];
-	int color = (m_color_bank << 4) | (attr & 0x0f);
+	int const code = ((attr & 0x60) << 3) | m_video_ram[tile_index];
+	int const color = (m_color_bank << 4) | (attr & 0x0f);
 	tileinfo.category = BIT(attr, 4);
 
 	tileinfo.set(0, code, color, 0);
@@ -605,25 +606,25 @@ TILE_GET_INFO_MEMBER( ambush_state::ambush_char_tile_info )
 
 TILE_GET_INFO_MEMBER( ambush_state::mariobl_char_tile_info )
 {
-	uint8_t attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
+	uint8_t const attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
 
 	// -6------ Color bank
 
-	int code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
-	int color = ((attr & 0x40) >> 2) | 8 | (m_video_ram[tile_index] >> 5);
+	int const code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
+	int const color = ((attr & 0x40) >> 2) | 8 | (m_video_ram[tile_index] >> 5);
 
 	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( ambush_state::dkong3abl_char_tile_info )
 {
-	uint8_t attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
+	uint8_t const attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
 
 	// -6------ Color bank
 	// -----210 Color
 
-	int code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
-	int color = (BIT(attr, 6) << 5) | (BIT(attr, 6) << 4) | (attr & 0x07);
+	int const code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
+	int const color = (BIT(attr, 6) << 5) | (BIT(attr, 6) << 4) | (attr & 0x07);
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -667,14 +668,10 @@ MACHINE_START_MEMBER( ambush_state, dkong3abl )
 	m_char_tilemap->set_transparent_pen(0);
 }
 
-void ambush_state::coin_counter_1_w(int state)
+template <uint8_t Which>
+void ambush_state::coin_counter_w(int state)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-void ambush_state::coin_counter_2_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
 void ambush_state::output_latches_w(offs_t offset, uint8_t data)
@@ -690,7 +687,7 @@ void ambush_state::output_latches_w(offs_t offset, uint8_t data)
 
 void ambush_state::ambush_base(machine_config &config)
 {
-	z80_device &maincpu(Z80(config, "maincpu", XTAL(18'432'000)/6));
+	z80_device &maincpu(Z80(config, "maincpu", XTAL(18'432'000) / 6));
 	maincpu.set_addrmap(AS_PROGRAM, &ambush_state::main_map);
 	maincpu.set_addrmap(AS_IO, &ambush_state::main_portmap);
 	maincpu.set_vblank_int("screen", FUNC(ambush_state::irq0_line_hold));
@@ -700,8 +697,8 @@ void ambush_state::ambush_base(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, ambush)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(18'432'000)/3, 384, 0, 256, 264, 16, 240);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(18'432'000) / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(ambush_state::screen_update));
 	screen.set_palette("palette");
 
@@ -711,12 +708,12 @@ void ambush_state::ambush_base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8912_device &ay1(AY8912(config, "ay1", XTAL(18'432'000)/6/2));
-	ay1.port_a_read_callback().set_ioport("buttons");
+	ay8912_device &ay1(AY8912(config, "ay1", XTAL(18'432'000) / 6 / 2));
+	ay1.port_a_read_callback().set_ioport("BUTTONS");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	ay8912_device &ay2(AY8912(config, "ay2", XTAL(18'432'000)/6/2));
-	ay2.port_a_read_callback().set_ioport("joystick");
+	ay8912_device &ay2(AY8912(config, "ay2", XTAL(18'432'000) / 6 / 2));
+	ay2.port_a_read_callback().set_ioport("JOYSTICK");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
@@ -728,11 +725,11 @@ void ambush_state::ambush(machine_config &config)
 	LS259(config, m_outlatch[0]);
 	m_outlatch[0]->q_out_cb<4>().set(FUNC(ambush_state::flip_screen_set));
 	m_outlatch[0]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
-	m_outlatch[0]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_1_w));
+	m_outlatch[0]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_w<0>));
 
 	LS259(config, m_outlatch[1]);
 	m_outlatch[1]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_2_w));
-	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_2_w));
+	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_w<1>));
 }
 
 void ambush_state::mariobl(machine_config &config)
@@ -742,7 +739,7 @@ void ambush_state::mariobl(machine_config &config)
 
 	// To be verified: do these bootlegs only have one LS259?
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<4>().set(FUNC(ambush_state::coin_counter_1_w));
+	outlatch.q_out_cb<4>().set(FUNC(ambush_state::coin_counter_w<0>));
 	outlatch.q_out_cb<6>().set(FUNC(ambush_state::color_bank_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
@@ -753,12 +750,12 @@ void ambush_state::mariobl(machine_config &config)
 
 	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mariobl_palette));
 
-	ay8910_device &ay1(AY8910(config.replace(), "ay1", XTAL(18'432'000)/6/2));
-	ay1.port_a_read_callback().set_ioport("buttons");
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", XTAL(18'432'000) / 6 / 2));
+	ay1.port_a_read_callback().set_ioport("BUTTONS");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	ay8910_device &ay2(AY8910(config.replace(), "ay2", XTAL(18'432'000)/6/2));
-	ay2.port_a_read_callback().set_ioport("joystick");
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", XTAL(18'432'000) / 6 / 2));
+	ay2.port_a_read_callback().set_ioport("JOYSTICK");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
@@ -929,10 +926,12 @@ ROM_START( mariobla )
 	ROM_REGION(0x6000, "gfx2", 0)
 	ROM_COPY("gfx", 0x0000, 0x0000, 0x6000)
 
-	ROM_REGION(0x2eb, "prom", 0)
-	ROM_LOAD( "6349-2n.2m",     0x000000, 0x000200, CRC(a334e4f3) SHA1(b15e3d9851b43976e98c47e3365c1b69022b0a7d))
-	ROM_LOAD( "6349-2n-cpu.5b", 0x000000, 0x000200, CRC(7250ad28) SHA1(8f5342562cdcc67890cb4c4880d75f9a40e63cf8))
-	ROM_LOAD( "82s153.7n",      0x000000, 0x0000eb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
+	ROM_REGION(0x400, "proms", 0)
+	ROM_LOAD( "6349-2n.2m",     0x000, 0x200, CRC(a334e4f3) SHA1(b15e3d9851b43976e98c47e3365c1b69022b0a7d))
+	ROM_LOAD( "6349-2n-cpu.5b", 0x200, 0x200, CRC(7250ad28) SHA1(8f5342562cdcc67890cb4c4880d75f9a40e63cf8))
+
+	ROM_REGION(0x100, "pld", ROMREGION_ERASE00)
+	ROM_LOAD( "82s153.7n", 0x000, 0x0eb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
 
 	ROM_REGION(0x200, "colors", 0)
 	ROM_LOAD("6349-2n.8h", 0x000, 0x200, CRC(6a109f4b) SHA1(b117f85728afc6d3efeff0a7075b797996916f6e))

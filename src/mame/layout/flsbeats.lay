@@ -8,15 +8,15 @@ Mirrors the real cabinet (top-down):
   * 64x16 dot-matrix display (an artwork dot grid of dmddot<n> outputs, NOT a MAME
     screen) at the top, centered, kept small so the lanes below can stretch
     across the full 16:9 width. Neon 'Flash'
-	tubes muted blue when unlit so it doesn't read as already lit, turning
-	pure white when lit (bound to lamp_flash; this is  the FLASH cue players
-	return on - gameplay-essential, not decorative).
+    tubes muted blue when unlit so it doesn't read as already lit, turning
+    pure white when lit (bound to lamp_flash; this is  the FLASH cue players
+    return on - gameplay-essential, not decorative).
   * 5 LED "tube" lanes stacked horizontally below the DMD (lane 0 top .. lane 4
     bottom), each 47 LEDs long, spanning nearly the full view width. Each lane
-	position is driven by TWO independent on/off outputs from the driver - a red
-	die (lane<r>_<c>_r) and a green die (lane<r>_<c>_g) - drawn as two overlaid
-	emitters combined with blend="add", so both dies lit sums to yellow the way
-	the real diffused package does.
+    position is driven by TWO independent on/off outputs from the driver - a red
+    die (lane<r>_<c>_r) and a green die (lane<r>_<c>_g) - drawn as two overlaid
+    emitters combined with blend="add", so both dies lit sums to yellow the way
+    the real diffused package does.
   * 5 round play buttons on each side (left/right), one per lane, at the lane ends.
     All buttons can light up (bound to btnlamp<n> outputs; default unlit).
   * On the LEFT cluster: UP and DOWN triangles above the 5 buttons, START
@@ -28,11 +28,11 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 
 	<!-- Bi-color lane LED. The unlit diffuser tube glows a fairly bright neutral
 	     white, provided by the always-on lane_led_base. A lit die must show its
-		 true saturated colour, not that colour added on top of the bright base, so
-		 each die is drawn in two passes: first a blend="multiply" mask that darkens
-		 the base to black wherever the die is lit (off = white = no change), then a
-		 blend="add" emitter that paints the saturated colour into that now-dark
-		 cell. Both dies lit -> red + green add to yellow. -->
+	     true saturated colour, not that colour added on top of the bright base, so
+	     each die is drawn in two passes: first a blend="multiply" mask that darkens
+	     the base to black wherever the die is lit (off = white = no change), then a
+	     blend="add" emitter that paints the saturated colour into that now-dark
+	     cell. Both dies lit -> red + green add to yellow. -->
 	<element name="lane_led_base">
 		<rect><color red="0.40" green="0.41" blue="0.47" /></rect>
 	</element>
@@ -81,7 +81,7 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 
 	<!-- Lane-gap flash lighting: Drawn BEFORE the lane <repeat> block in the view so the
 	     lane LEDs always render on top (lanes always take z-order priority), matching
-		 the real cabinet where the neon tubes are physically below the lane LED strips. -->
+	     the real cabinet where the neon tubes are physically below the lane LED strips. -->
 	<element name="flash_top" defstate="0">
 		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,1 L111.67,7 L156.33,7 L258,1" fill="none" stroke="#384761" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>]]></data></image>
 		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,1 L111.67,7 L156.33,7 L258,1" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>]]></data></image>
@@ -160,7 +160,7 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 
 	<!-- Flash-lit background wash:
 	     unlit state matches the panel background; lit state is a lighter
-		 neutral tint of the background. -->
+	     neutral tint of the background. -->
 	<element name="flash_glow" defstate="0">
 		<rect state="0"><color red="0.015" green="0.015" blue="0.025" /></rect>
 		<rect state="1"><color red="0.12" green="0.12" blue="0.16" /></rect>
@@ -172,9 +172,9 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 		<element ref="panel"><bounds x="0" y="0" width="320" height="180" /></element>
 
 		<!-- Flash-lit background wash: a simulation of the neon tubes
-			 lighting up most of the cabinet and surrounding area.
-			 Aids in gameplay so less focus is needed on the comparatively small 
-			 elements between the lanes -->
+		     lighting up most of the cabinet and surrounding area.
+		     Aids in gameplay so less focus is needed on the comparatively small
+		     elements between the lanes -->
 		<element ref="flash_glow" name="lamp_flash"><bounds x="0" y="0" width="320" height="180" /></element>
 
 		<!-- DMD: top, centered. 64x16 dot-matrix display rendered as an artwork dot
@@ -188,7 +188,7 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 		<!-- Lane-gap flash lighting: drawn BEFORE the lane <repeat> block below
 		     so the lane LEDs always render on top (lanes always take z-order
 		     priority), matching the cabinet where the neon tubes are physically
-			 below the lane LED strips. One light per gap between the 5 lane rows. -->
+		     below the lane LED strips. One light per gap between the 5 lane rows. -->
 		<element ref="flash_top" name="lamp_flash"><bounds x="116.25" y="69" width="87.5" height="7.4" /></element>
 		<element ref="flash_hbar" name="lamp_flash"><bounds x="80" y="89.2" width="160" height="8" /></element>
 		<element ref="flash_hbar" name="lamp_flash"><bounds x="80" y="111.8" width="160" height="8" /></element>
@@ -237,9 +237,9 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 
 		<!-- Genre labels, left of the P1 button column (x=8), one per lane,
 		     rotated 90 like SELECT/START. Two-line lanes use a near column
-			 (x=4.7, closer to the button) for the FIRST line and a far column
-			 (x=2.4) for the SECOND line; rotate=90 renders the near column on
-			 top, so this ordering is required to read correctly top-to-bottom.
+		     (x=4.7, closer to the button) for the FIRST line and a far column
+		     (x=2.4) for the SECOND line; rotate=90 renders the near column on
+		     top, so this ordering is required to read correctly top-to-bottom.
 		     x=4.7 also opens up breathing room from the button edge (x=8). -->
 		<element ref="lbl_lane0a">
 			<bounds x="4.7" y="59.75" width="2" height="6" />

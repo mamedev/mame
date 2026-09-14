@@ -76,7 +76,7 @@ INPUT_PORTS_END
 
 void newton_state::gen1(machine_config &config)
 {
-	ARM7(config, m_maincpu, XTAL(20'000'000)); // really ARM610
+	ARM610(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &newton_state::mem_map);
 
 	RAM(config, m_ram);
@@ -114,7 +114,7 @@ void newton_state::emate(machine_config &config)
 
 void newton_state::mp2000(machine_config &config)
 {
-	ARM710A(config, m_maincpu, 162000000); // really SA110
+	SA110(config, m_maincpu, 162000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &newton_state::mem_map);
 
 	RAM(config, m_ram);

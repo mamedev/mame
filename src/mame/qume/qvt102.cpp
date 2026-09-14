@@ -646,7 +646,7 @@ void qvt102_state::qvt102(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x TC5514-APL + 3V battery
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(16.6698_MHz_XTAL, 882, 9, 729, 315, 0, 300); // 80x24+1
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));

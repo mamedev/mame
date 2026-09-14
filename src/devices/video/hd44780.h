@@ -153,6 +153,8 @@ public:
 	// construction/destruction
 	sed1278_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static auto parent_rom_device_type() { return &HD44780; }
+
 protected:
 	// device_t implementation
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -164,6 +166,8 @@ class ks0066_device : public hd44780_base_device
 public:
 	// construction/destruction
 	ks0066_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &HD44780; }
 
 protected:
 	// device_t implementation

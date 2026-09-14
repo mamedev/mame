@@ -291,7 +291,7 @@ void gameking_state::gameking(machine_config &config)
 	m_maincpu->dac_callback().set("dac", FUNC(dac_byte_interface::write));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(48, 32);
 	m_screen->set_visarea_full();

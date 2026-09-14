@@ -2,7 +2,7 @@
 // redirect_error.cpp
 // ~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -114,8 +114,100 @@ void redirect_error_test()
 #endif // defined(ASIO_HAS_STD_FUTURE_CLASS)
 }
 
+void partial_redirect_error_test()
+{
+  asio::io_context io1;
+  asio::io_context io2;
+  asio::system_timer timer1(io1);
+  asio::error_code ec = asio::error::would_block;
+  int count = 0;
+
+  timer1.expires_after(asio::chrono::seconds(0));
+  timer1.async_wait(asio::redirect_error(ec))(
+      asio::bind_executor(io2.get_executor(),
+        redirect_error_handler(&count)));
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(count == 0);
+
+  io1.run();
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(count == 0);
+
+  io2.run();
+
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(count == 1);
+
+  ec = asio::error::would_block;
+  timer1.async_wait(asio::redirect_error(ec))(
+      asio::bind_executor(io2.get_executor(),
+        asio::deferred))(redirect_error_handler(&count));
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(count == 1);
+
+  io1.restart();
+  io1.run();
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(count == 1);
+
+  io2.restart();
+  io2.run();
+
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(count == 2);
+
+  ec = asio::error::would_block;
+  timer1.async_wait()(asio::redirect_error(ec))(
+      asio::bind_executor(io2.get_executor(),
+        asio::deferred))(redirect_error_handler(&count));
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(count == 2);
+
+  io1.restart();
+  io1.run();
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(count == 2);
+
+  io2.restart();
+  io2.run();
+
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(count == 3);
+
+#if defined(ASIO_HAS_STD_FUTURE_CLASS)
+  ec = asio::error::would_block;
+  std::future<void> f = timer1.async_wait(asio::redirect_error(ec))(
+      asio::bind_executor(io2.get_executor(), asio::use_future));
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(f.wait_for(std::chrono::seconds(0))
+      == std::future_status::timeout);
+
+  io1.restart();
+  io1.run();
+
+  ASIO_CHECK(ec == asio::error::would_block);
+  ASIO_CHECK(f.wait_for(std::chrono::seconds(0))
+      == std::future_status::timeout);
+
+  io2.restart();
+  io2.run();
+
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(f.wait_for(std::chrono::seconds(0))
+      == std::future_status::ready);
+#endif // defined(ASIO_HAS_STD_FUTURE_CLASS)
+}
+
 ASIO_TEST_SUITE
 (
   "redirect_error",
   ASIO_TEST_CASE(redirect_error_test)
+  ASIO_TEST_CASE(partial_redirect_error_test)
 )

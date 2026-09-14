@@ -132,7 +132,7 @@ void _600cat_state::_600cat(machine_config &config)
 	m_maincpu->out_sc2_cb().set(FUNC(_600cat_state::sc2_w));
 	m_maincpu->out_ser_tx_cb().set(FUNC(_600cat_state::ser_tx_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(120, 36);

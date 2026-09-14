@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    MOS 6526/8520 Complex Interface Adapter emulation
+    MOS 6526/8521/8520 Complex Interface Adapter emulation
 
 **********************************************************************
                             _____   _____
@@ -14,8 +14,8 @@
                    PA4   6 |             | 35  RS3
                    PA5   7 |             | 34  _RES
                    PA6   8 |             | 33  DB0
-                   PA7   9 |             | 32  DB1
-                   PB0  10 |   MOS6526   | 31  DB2
+                   PA7   9 |   MOS6526   | 32  DB1
+                   PB0  10 |   MOS8521   | 31  DB2
                    PB1  11 |   MOS8520   | 30  DB3
                    PB2  12 |             | 29  DB4
                    PB3  13 |             | 28  DB5
@@ -26,32 +26,6 @@
                    _PC  18 |             | 23  _CS
                    TOD  19 |             | 22  R/W
                    Vcc  20 |_____________| 21  _IRQ
-
-                            _____   _____
-                  FCO*   1 |*    \_/     | 48  FDO*
-                   TED   2 |             | 47  FCI*
-                  phi0   3 |             | 46  FDI*
-                 CLKIN   4 |             | 45  IRQ
-                 CTRLO   5 |             | 44  RSET
-                 CTRLI   6 |             | 43
-                  phi2   7 |             | 42
-                    D7   8 |             | 41  INDEX*
-                    D6   9 |             | 40  WG2*
-                    D5  10 |             | 39  WPRT*
-                    D4  11 |             | 38  RPULSE
-                   GND  12 |   MOS5710   | 37  Q
-                   Vcc  13 |             | 36  Vcc
-                    D3  14 |             | 35  GND
-                    D2  15 |             | 34  CS3*
-                    D1  16 |             | 33  CS2*
-                    D0  17 |             | 32  CS1*
-                   A15  18 |             | 31  R/W*
-                   A14  19 |             | 30  OSC
-                   A13  20 |             | 29  XTL1
-                   A12  21 |             | 28  XTL2
-                   A10  22 |             | 27  A0
-                    A4  23 |             | 26  A1
-                    A3  24 |_____________| 25  A2
 
 **********************************************************************/
 
@@ -85,8 +59,8 @@ public:
 	auto pb_wr_callback() { return m_write_pb.bind(); }
 	auto pc_wr_callback() { return m_write_pc.bind(); }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	uint8_t pa_r() { return m_pa; }
 	uint8_t pb_r() { return m_pb; }
@@ -100,15 +74,7 @@ public:
 	void tod_w(int state);
 
 protected:
-	enum
-	{
-		TYPE_6526,
-		TYPE_6526A,
-		TYPE_8520,
-		TYPE_5710
-	};
-
-	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -117,21 +83,47 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(advance_tod_clock);
 
+	// On the 6526 an ICR read swallows the readable Timer B flag bit of an
+	// underflow landing in the next cycle
+	virtual bool icr_read_loses_tb() const { return true; }
+
+	// On the later chips the read bits are only driven to zero a cycle after the
+	// read, so one more read still sees the flags it cleared
+	virtual bool icr_read_sticky() const { return false; }
+
+	// The 6526 latches IR through one more stage than the later chips, so its
+	// IRQ - and the IR bit an ICR read returns - lags theirs by a cycle
+	virtual bool irq_one_cycle_early() const { return false; }
+
+	// On the 8520 a timer-high write force-loads and starts a stopped one-shot timer
+	virtual bool timer_hi_starts_oneshot() const { return false; }
+
+	// The 8520 latches the interrupt sources a cycle after they form
+	virtual bool irq_sources_delayed() const { return false; }
+
+	// The 8520's time-of-day is a plain binary counter, so it has no unused
+	// register bits and powers up at zero rather than 01:00:00.0
+	virtual uint8_t tod_mask(int offset) const;
+	virtual uint32_t tod_reset_value() const { return 0x01000000UL; }
+
 	int m_icount;
-	const int m_variant;
 	int m_tod_clock;
 
 	void update_interrupt();
+	void update_alarm();
 	void update_pa();
 	void update_pb();
 	void set_cra(uint8_t data);
 	void set_crb(uint8_t data);
 	void serial_input();
+	void serial_load();
 	void serial_output();
 	void clock_ta();
 	void clock_tb();
 	void clock_pipeline();
-	uint8_t bcd_increment(uint8_t value);
+	void clock_tod_divider();
+	uint8_t increment_digits(uint8_t value);
+	uint8_t increment_hour(uint8_t value);
 	virtual void clock_tod();
 	uint8_t read_tod(int offset);
 	void write_tod(int offset, uint8_t data);
@@ -150,13 +142,21 @@ protected:
 	bool m_irq;
 	int m_ir0;
 	int m_ir1;
+	int m_irq_pending;
 	uint8_t m_icr;
 	uint8_t m_imr;
-//  bool m_icr_read;
+	bool m_icr_read;
+	bool m_icr_tb_lost;
+	uint8_t m_icr_delay;
+	uint8_t m_icr_sticky;
+	uint8_t m_icr_sticky_next;
 
 	// peripheral ports
 	int m_pc;
+	int m_prb_access;
+	uint8_t m_prb_rw;
 	int m_flag;
+	int m_flag_pending;
 	uint8_t m_pra;
 	uint8_t m_prb;
 	uint8_t m_ddra;
@@ -172,10 +172,16 @@ protected:
 	uint8_t m_sdr;
 	uint8_t m_shift;
 	bool m_sdr_empty;
+	bool m_shift_loaded;
 	int m_bits;
+	int m_sp_delay;
+	int m_sdr_load_delay;
+	uint8_t m_cnt_hist;
+	bool m_sdr_force_finish;
 
 	// timers
 	int m_ta_out;
+	int m_ta_out_last;
 	int m_tb_out;
 	int m_ta_pb6;
 	int m_tb_pb7;
@@ -183,6 +189,7 @@ protected:
 	int m_count_a1;
 	int m_count_a2;
 	int m_count_a3;
+	int m_feed_a0;
 	int m_load_a0;
 	int m_load_a1;
 	int m_load_a2;
@@ -191,6 +198,7 @@ protected:
 	int m_count_b1;
 	int m_count_b2;
 	int m_count_b3;
+	int m_feed_b0;
 	int m_load_b0;
 	int m_load_b1;
 	int m_load_b2;
@@ -203,12 +211,17 @@ protected:
 	uint8_t m_crb;
 
 	// time-of-day
+	int m_tod_in;
+	int m_tod_pending;
+	int m_tod_div;
+	int m_alarm_pending;
 	int m_tod_count;
 	uint32_t m_tod;
 	uint32_t m_tod_latch;
 	uint32_t m_alarm;
 	bool m_tod_stopped;
 	bool m_tod_latched;
+	bool m_alarm_match;
 	emu_timer *m_tod_timer;
 };
 
@@ -219,6 +232,27 @@ class mos6526a_device : public mos6526_device
 {
 public:
 	mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual bool icr_read_loses_tb() const override { return false; }
+	virtual bool icr_read_sticky() const override { return true; }
+	virtual bool irq_one_cycle_early() const override { return true; }
+};
+
+
+// ======================> mos8521_device
+
+class mos8521_device : public mos6526_device
+{
+public:
+	mos8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// modelled as the 6526A: the two share these differences from the 6526, but
+	// what else separates them has not been established
+	virtual bool icr_read_loses_tb() const override { return false; }
+	virtual bool icr_read_sticky() const override { return true; }
+	virtual bool irq_one_cycle_early() const override { return true; }
 };
 
 
@@ -229,30 +263,25 @@ class mos8520_device : public mos6526_device
 public:
 	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void clock_tod() override;
-};
-
-
-// ======================> mos5710_device
-
-class mos5710_device : public mos6526_device
-{
-public:
-	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	//uint8_t read(offs_t offset);
-	//void write(offs_t offset, uint8_t data);
+	virtual bool icr_read_loses_tb() const override { return false; }
+	virtual bool icr_read_sticky() const override { return true; }
+	virtual bool irq_one_cycle_early() const override { return true; }
+	virtual bool timer_hi_starts_oneshot() const override { return true; }
+	virtual bool irq_sources_delayed() const override { return true; }
+	virtual uint8_t tod_mask(int offset) const override { return 0xff; }
+	virtual uint32_t tod_reset_value() const override { return 0; }
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(MOS6526,  mos6526_device)
 DECLARE_DEVICE_TYPE(MOS6526A, mos6526a_device)
+DECLARE_DEVICE_TYPE(MOS8521,  mos8521_device)
 DECLARE_DEVICE_TYPE(MOS8520,  mos8520_device)
-DECLARE_DEVICE_TYPE(MOS5710,  mos5710_device)
 
 #endif // MAME_MACHINE_MOS6526_H

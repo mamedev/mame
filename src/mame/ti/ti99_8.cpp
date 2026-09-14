@@ -800,7 +800,7 @@ void ti99_8_state::ti99_8_60hz(machine_config &config)
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*
@@ -815,7 +815,7 @@ void ti99_8_state::ti99_8_50hz(machine_config &config)
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*

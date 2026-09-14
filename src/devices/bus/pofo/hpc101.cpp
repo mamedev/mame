@@ -82,6 +82,12 @@ pofo_hpc101_device::pofo_hpc101_device(const machine_config &mconfig, const char
 
 void pofo_hpc101_device::device_start()
 {
+	m_slot->iospace().install_read_tap(0x807f, 0x807f, "hpc101_id",
+		[] (offs_t offset, u8 &data, u8) { data = 0x02; });
+
+	m_ppi_tap = m_slot->iospace().install_readwrite_tap(0x8078, 0x807b, "hpc101_ppi",
+		[this] (offs_t offset, u8 &data, u8) { data = m_ppi->read(offset & 0x03); },
+		[this] (offs_t offset, u8 &data, u8) { m_ppi->write(offset & 0x03, data); }, &m_ppi_tap);
 }
 
 
@@ -92,43 +98,4 @@ void pofo_hpc101_device::device_start()
 void pofo_hpc101_device::device_reset()
 {
 	m_ppi->reset();
-}
-
-
-//-------------------------------------------------
-//  nrdi_r - read
-//-------------------------------------------------
-
-uint8_t pofo_hpc101_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
-{
-	if (!bcom)
-	{
-		if ((offset & 0x0f) == 0x0f)
-		{
-			data = 0x02;
-		}
-
-		if ((offset & 0x0c) == 0x08)
-		{
-			data = m_ppi->read(offset & 0x03);
-		}
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  nwri_w - write
-//-------------------------------------------------
-
-void pofo_hpc101_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
-{
-	if (!bcom)
-	{
-		if ((offset & 0x0c) == 0x08)
-		{
-			m_ppi->write(offset & 0x03, data);
-		}
-	}
 }

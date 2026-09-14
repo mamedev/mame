@@ -930,7 +930,7 @@ void spacecom_state::spacecom(machine_config &config)
 	maincpu.out_inte_func().set(FUNC(spacecom_state::int_enable_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(18'000'000) / 3, 384, 0, 256, 260, 0, 224); // parameters guessed
 	m_screen->set_screen_update(FUNC(spacecom_state::screen_update_spacecom));
 
@@ -1302,7 +1302,7 @@ void _8080bw_state::escmars(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_mw8080bw));
 
@@ -3087,7 +3087,7 @@ void shuttlei_state::shuttlei(machine_config &config)
 	maincpu.out_inte_func().set(FUNC(shuttlei_state::int_enable_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(32*8, 32*8);

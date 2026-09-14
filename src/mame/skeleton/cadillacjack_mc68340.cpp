@@ -108,7 +108,7 @@ void mgp340y_state::mgp340y(machine_config &config)
 
 	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify all once it works
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify all once it works
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

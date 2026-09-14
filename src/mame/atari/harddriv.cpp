@@ -1507,7 +1507,7 @@ void harddriv_state::driver_nomsp(machine_config &config)
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(1024);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(HARDDRIV_GSP_CLOCK/12*4, 160*4, 0, 127*4, 417, 0, 384);
 	m_screen->set_screen_update("gsp", FUNC(tms34010_device::tms340x0_ind16));
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);

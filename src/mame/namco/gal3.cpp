@@ -652,7 +652,7 @@ void gal3_state::gal3(machine_config &config)
 	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
 
 	// video chain 1
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(64*8, 64*8);
@@ -680,7 +680,7 @@ void gal3_state::gal3(machine_config &config)
 	m_namcos21_dsp_c67[0]->set_renderer_tag("namcos21_3d_1");
 
 	// video chain 2
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(64*8, 64*8);

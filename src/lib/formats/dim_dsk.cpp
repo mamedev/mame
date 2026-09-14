@@ -114,12 +114,13 @@ bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				}
 				else
 					sects[i].sector      = i+1;
-				sects[i].size        = size;
-				sects[i].actual_size = bps;
-				sects[i].deleted     = false;
+				sects[i].size         = size;
+				sects[i].actual_size  = bps;
+				sects[i].deleted      = false;
 				sects[i].bad_data_crc = false;
 				sects[i].bad_addr_crc = false;
-				sects[i].data        = &sect_data[sdatapos];
+				sects[i].weak         = false;
+				sects[i].data         = &sect_data[sdatapos];
 				std::tie(err, actual) = read_at(io, offset, sects[i].data, bps); // FIXME: check for errors and premature EOF
 				offset += bps;
 				sdatapos += bps;

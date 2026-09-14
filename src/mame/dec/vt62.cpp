@@ -83,7 +83,7 @@ void vt62_state::vt62(machine_config &mconfig)
 
 	AY51013(mconfig, m_uart);
 
-	screen_device &screen(SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(mconfig, "screen"));
 	screen.set_raw(15.36_MHz_XTAL, 1000, 0, 800, 256, 0, 240);
 	screen.set_screen_update(FUNC(vt62_state::screen_update));
 }

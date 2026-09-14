@@ -454,7 +454,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, const 
 	m_ppi->out_pc_callback().set(FUNC(msx_state::ppi_port_c_w));
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	// sound hardware
 	SPEAKER(config, m_speaker).front_center();

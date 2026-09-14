@@ -657,7 +657,7 @@ void taitowlf_state::taitowlf(machine_config &config)
 
 	// TODO: displays bootscreen ROM contents (512x240 8bpp) while the board is in vga_pass off state
 	// This is provided by one of the CPLDs that is on the Taito PCB stack, CRTC values needs to be verified in this state
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	m_screen->set_size(800, 262);
 	m_screen->set_visarea(0, 512 - 1, 0, 240 - 1);

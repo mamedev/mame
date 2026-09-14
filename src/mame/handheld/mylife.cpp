@@ -79,7 +79,7 @@ void mylife_state::mylife(machine_config &config)
 
 	I2C_24C02(config, m_seeprom);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 256); // unknown resolution
 	m_screen->set_visarea(0, 256-1, 0, 256-1);

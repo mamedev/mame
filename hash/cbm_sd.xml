@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="cbm_sd" description="Commodore SD card images">
+
+	<software name="sd2iec">
+		<description>SD2IEC</description>
+		<year>2013</year>
+		<publisher>NBLA000</publisher>
+
+		<!-- 16GB FAT32 disk with CBM-FileBrowser v1.6 -->
+		<part name="card" interface="sdcard">
+			<diskarea name="harddriv">
+				<disk name="sd2iec" sha1="258cd2ae923fb6e054f9179b5ac94d394a1f5cfd" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

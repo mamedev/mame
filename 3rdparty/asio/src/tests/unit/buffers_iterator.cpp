@@ -2,7 +2,7 @@
 // buffers_iterator.cpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -47,7 +47,6 @@ void test()
     array<const_buffer, 2> cb2 = {{ buffer(cdata1), buffer(cdata2) }};
     vector<const_buffer> cb3;
     cb3.push_back(buffer(cdata1));
-
 
     // buffers_iterator constructors.
 

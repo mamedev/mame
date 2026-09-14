@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "gba_ppu.h"
+
 #include "emupal.h"
 
 
@@ -58,10 +60,9 @@ protected:
 
 
 class gba_lcd_device
-		: public device_t
+		: public gba_ppu_device
 		, public device_video_interface
 		, public device_palette_interface
-		, protected gba_registers<0x060 / 4, 0x000>
 {
 public:
 	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -74,8 +75,6 @@ public:
 	void gba_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gba_oam_r(offs_t offset);
 	void gba_oam_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	TIMER_CALLBACK_MEMBER(perform_hbl);
-	TIMER_CALLBACK_MEMBER(perform_scan);
 
 	auto int_hblank_callback() { return m_int_hblank_cb.bind(); }
 	auto int_vblank_callback() { return m_int_vblank_cb.bind(); }
@@ -92,31 +91,6 @@ protected:
 	virtual u32 palette_entries() const noexcept override { return 32 * 32 * 32; }
 
 private:
-	struct internal_reg
-	{
-		int32_t status;
-		bool  update;
-	};
-	internal_reg m_bg2x, m_bg2y, m_bg3x, m_bg3y;
-
-	uint8_t bg_video_mode();
-
-	enum class dispcnt : uint16_t
-	{
-		alt_frame_sel = 0x0010,
-		vram_map_1d   = 0x0040,
-		forced_blank  = 0x0080,
-		bg0_en        = 0x0100,
-		bg1_en        = 0x0200,
-		bg2_en        = 0x0400,
-		bg3_en        = 0x0800,
-		obj_en        = 0x1000,
-		win0_en       = 0x2000,
-		win1_en       = 0x4000,
-		obj_win_en    = 0x8000
-	};
-	bool is_set(dispcnt flag);
-
 	enum class dispstat : uint16_t
 	{
 		vblank        = 0x0001,
@@ -130,62 +104,8 @@ private:
 	void clear(dispstat flag);
 	bool is_set(dispstat flag);
 
-	enum class bgcnt : uint16_t
-	{
-		mosaic_en     = 0x0040,
-		palette_256   = 0x0080,
-		wraparound_en = 0x2000
-	};
-	bool is_set(uint16_t bgxcnt, bgcnt flag);
-
-	uint8_t  bg_priority(uint16_t bgxcnt);
-	uint32_t bg_char_base(uint16_t bgxcnt);
-	uint32_t bg_screen_base(uint16_t bgxcnt);
-	void   bg_screen_size(uint16_t bgxcnt, bool text, int &width, int &height);
-
-	enum class size_type
-	{
-		bg_h = 0,
-		bg_v,
-		obj_h,
-		obj_v
-	};
-	uint16_t mosaic_size(size_type type);
-
-	enum class sfx : uint16_t
-	{
-		none    = 0x0000,
-		alpha   = 0x0040,
-		lighten = 0x0080,
-		darken  = 0x00c0
-	};
-	sfx color_sfx();
-
-	enum class target
-	{
-		first = 0,
-		second
-	};
-	uint8_t color_sfx_target(target id);
-
-	uint16_t tile_number(uint16_t vram_data) { return vram_data & 0x03ff; }
-	bool   tile_hflip(uint16_t vram_data) { return vram_data & 0x0400; }
-	bool   tile_vflip(uint16_t vram_data) { return vram_data & 0x0800; }
-
-	void update_mask(uint8_t *mask, int y);
-	void draw_roz_bitmap_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, int32_t X, int32_t Y, int32_t PA, int32_t PB, int32_t PC, int32_t PD, internal_reg &currentx, internal_reg &currenty, int depth);
-	void draw_roz_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, int32_t X, int32_t Y, int32_t PA, int32_t PB, int32_t PC, int32_t PD, internal_reg &currentx, internal_reg &currenty);
-	void draw_bg_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, uint32_t hofs, uint32_t vofs);
-	void draw_oam_window(uint32_t *scanline, int y);
-	void draw_oam(uint32_t *scanline, int y);
-	void draw_scanline(int y);
-
-	bool is_in_window_h(int x, int window);
-	bool is_in_window_v(int y, int window);
-
-	uint32_t alpha_blend(uint32_t color0, uint32_t color1);
-	uint32_t increase_brightness(uint32_t color);
-	uint32_t decrease_brightness(uint32_t color);
+	TIMER_CALLBACK_MEMBER(perform_hbl);
+	TIMER_CALLBACK_MEMBER(perform_scan);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init();
@@ -204,10 +124,7 @@ private:
 
 	bitmap_ind16 m_bitmap;
 
-	uint32_t m_scanline[6][240];
-
-	// constants
-	static constexpr uint32_t TRANSPARENT_PIXEL = 0x80000000;
+	uint16_t m_dispstat;
 };
 
 #endif // MAME_VIDEO_GBA_LCD_H

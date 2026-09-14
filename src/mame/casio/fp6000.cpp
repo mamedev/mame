@@ -472,7 +472,7 @@ void fp6000_state::fp6000(machine_config &config)
 	m_pit->out_handler<2>().set(FUNC(fp6000_state::pit_timer2_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16000000, 1024, 0, 640, 272, 0, 200); // 16 MHz?
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

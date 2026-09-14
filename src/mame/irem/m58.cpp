@@ -551,7 +551,7 @@ void m58_state::yard(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yard);
 	PALETTE(config, m_palette, FUNC(m58_state::palette), 256+256+256, 256+256+16);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 282, 42, 266);
 	m_screen->set_screen_update(FUNC(m58_state::screen_update));
 	m_screen->set_palette(m_palette);

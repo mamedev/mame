@@ -51,6 +51,7 @@
 
 #include "emu.h"
 #include "bus/a2gameio/gameio.h"
+
 #include "bus/a2gameio/brightpen.h"
 #include "bus/a2gameio/joystick.h"
 #include "bus/a2gameio/joyport.h"
@@ -59,6 +60,8 @@
 #include "bus/a2gameio/paddles.h"
 #include "bus/a2gameio/gizmo.h"
 #include "bus/a2gameio/wico_joystick.h"
+#include "bus/a2gameio/serial.h"
+#include "bus/a2gameio/organ.h"
 
 //**************************************************************************
 //  CONNECTOR DEVICE IMPLEMENTATION
@@ -85,6 +88,8 @@ void apple2_gameio_device::iiandplus_options(device_slot_interface &slot)
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
 	slot.option_add("wicojoy", APPLE2_WICO_JOYSTICK);
 	slot.option_add("brightpen", APPLE2_BRIGHTPEN);
+	slot.option_add("serial", APPLE2_GAMEIO_SERIAL);
+	slot.option_add("organ", APPLE_ORGAN);
 }
 
 void apple2_gameio_device::default_options(device_slot_interface &slot)
@@ -93,6 +98,8 @@ void apple2_gameio_device::default_options(device_slot_interface &slot)
 	slot.option_add("paddles", APPLE2_PADDLES);
 	slot.option_add("gizmo", APPLE2_GIZMO);
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
+	slot.option_add("serial", APPLE2_GAMEIO_SERIAL);
+	slot.option_add("organ", APPLE_ORGAN);
 }
 
 void apple2_gameio_device::joystick_options(device_slot_interface &slot)

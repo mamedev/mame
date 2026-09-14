@@ -19,12 +19,12 @@ enum
 
 enum
 {
-	SYSTEM_ID = 4,
-	VERSION,
-	MEM_CONFIG,
-	GPIO_IN = 12,
-	GPIO_DDR,
-	GPIO_OUT
+	ASPEN_SYSTEM_ID = 4,
+	ASPEN_VERSION,
+	ASPEN_MEM_CONFIG,
+	ASPEN_GPIO_IN = 12,
+	ASPEN_GPIO_DDR,
+	ASPEN_GPIO_OUT
 };
 
 DEFINE_DEVICE_TYPE(BANDIT, bandit_host_device, "banditpci", "Apple Bandit PowerPC-to-PCI bridge")
@@ -70,11 +70,11 @@ u32 aspen_host_device::regs_r(offs_t offset, u32 mem_mask)
 	u32 r = 0;
 	switch (offset & 0x1f)
 	{
-		case SYSTEM_ID:
+		case ASPEN_SYSTEM_ID:
 			r = 0x40010000;
 			break;
 
-		case VERSION:
+		case ASPEN_VERSION:
 			r = 0x01000000;
 			break;
 
@@ -173,7 +173,7 @@ void bandit_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_ma
 
 	if ((tempdata & 3) == 1)
 	{
-			tempdata |= 0x80000000;
+		tempdata |= 0x80000000;
 	}
 
 	pci_host_device::config_address_w(offset, tempdata, mem_mask);
@@ -239,12 +239,16 @@ void bandit_host_device::cpu_memory_w(offs_t offset, u32 data, u32 mem_mask)
 template u32 bandit_host_device::cpu_memory_r<0>(offs_t offset, u32 mem_mask);
 template void bandit_host_device::cpu_memory_w<0>(offs_t offset, u32 data, u32 mem_mask);
 
+template u32 bandit_host_device::cpu_memory_r<0xffc0'0000>(offs_t offset, u32 mem_mask);
+
 // map PCI memory and I/O space stuff here
 void bandit_host_device::map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 									 u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space)
 {
 	memory_space->install_read_handler(0, 0x3fff'ffff, read32s_delegate(*this, FUNC(bandit_host_device::cpu_memory_r<0>)));
 	memory_space->install_write_handler(0, 0x3fff'ffff, write32s_delegate(*this, FUNC(bandit_host_device::cpu_memory_w<0>)));
+
+	memory_space->install_read_handler(0xffc0'0000, 0xffff'ffff, read32s_delegate(*this, FUNC(bandit_host_device::cpu_memory_r<0xffc0'0000>)));
 }
 
 void aspen_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_mask)

@@ -838,7 +838,7 @@ void rallyx_state::rallyx(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 48*8, 0*8, 36*8, 33*8, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_rallyx));
 	m_screen->set_palette(m_palette);
@@ -894,7 +894,7 @@ void rallyx_state::jungler(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 48*8, 0*8, 36*8, 33*8, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_jungler));
 	m_screen->set_palette(m_palette);

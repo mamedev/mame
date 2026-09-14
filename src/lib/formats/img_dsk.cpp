@@ -137,6 +137,7 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[ sector ].sector = real_sector;
 				sects[ sector ].bad_data_crc = false;
 				sects[ sector ].bad_addr_crc = false;
+				sects[ sector ].weak = false;
 				sects[ sector ].deleted = false;
 				sects[ sector ].data = &image_data[offset_in_image];
 			}

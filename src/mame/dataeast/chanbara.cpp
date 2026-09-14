@@ -399,7 +399,7 @@ void chanbara_state::chanbara(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chanbara_state::prg_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // DECO video CRTC
 	screen.set_screen_update(FUNC(chanbara_state::screen_update));
 	screen.set_palette(m_palette);

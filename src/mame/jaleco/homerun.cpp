@@ -652,7 +652,7 @@ void homerun_state::dynashot(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(homerun_state::scrollx_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(20'000'000) / 4, 328, 0, 256, 253, 0, 240);
 	m_screen->set_screen_update(FUNC(homerun_state::screen_update));
 	m_screen->set_palette(m_palette);

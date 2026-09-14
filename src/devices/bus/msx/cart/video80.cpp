@@ -107,7 +107,7 @@ void msx_cart_video80_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(DOT_CLOCK, 1024, 0, 640, 312, 0, 192);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

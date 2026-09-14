@@ -2,7 +2,7 @@
 // co_spawn.cpp
 // ~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,7 +23,9 @@
 #include <stdexcept>
 #include "asio/any_completion_handler.hpp"
 #include "asio/bind_cancellation_slot.hpp"
+#include "asio/dispatch.hpp"
 #include "asio/io_context.hpp"
+#include "asio/use_awaitable.hpp"
 
 asio::awaitable<void> void_returning_coroutine()
 {
@@ -115,11 +117,64 @@ void test_co_spawn_immediate_cancel()
   ASIO_CHECK(result != nullptr);
 }
 
+asio::awaitable<void> void_returning_dispatch_coroutine()
+{
+  co_await asio::dispatch(asio::use_awaitable);
+  co_return;
+}
+
+asio::awaitable<int> int_returning_dispatch_coroutine()
+{
+  co_await asio::dispatch(asio::use_awaitable);
+  co_return 42;
+}
+
+void test_co_spawn_with_immediate_completion_via_dispatch()
+{
+  asio::io_context ctx;
+
+  bool called = false;
+  asio::post(ctx,
+      [&]
+      {
+        asio::co_spawn(ctx, void_returning_dispatch_coroutine(),
+            [&](std::exception_ptr)
+            {
+              called = true;
+            });
+
+        ASIO_CHECK(!called);
+      });
+
+  ctx.run();
+
+  ASIO_CHECK(called);
+
+  int result = 0;
+  asio::post(ctx,
+      [&]
+      {
+        asio::co_spawn(ctx, int_returning_dispatch_coroutine(),
+            [&](std::exception_ptr, int i)
+            {
+              result = i;
+            });
+
+        ASIO_CHECK(result == 0);
+      });
+
+  ctx.restart();
+  ctx.run();
+
+  ASIO_CHECK(result == 42);
+}
+
 ASIO_TEST_SUITE
 (
   "co_spawn",
   ASIO_TEST_CASE(test_co_spawn_with_any_completion_handler)
   ASIO_TEST_CASE(test_co_spawn_immediate_cancel)
+  ASIO_TEST_CASE(test_co_spawn_with_immediate_completion_via_dispatch)
 )
 
 #else // defined(ASIO_HAS_CO_AWAIT)

@@ -423,7 +423,7 @@ void hp16500_state::hp1650(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp1650_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -445,7 +445,7 @@ void hp16500_state::hp1651(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp1651_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -467,7 +467,7 @@ void hp16500_state::hp16500a(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500a_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -487,7 +487,7 @@ void hp16500_state::hp16500b(machine_config &config)
 	M68EC030(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hp16500_state::screen_update_hp16500));
 	screen.set_size(576,384);
 	screen.set_visarea(0, 576-1, 0, 384-1);

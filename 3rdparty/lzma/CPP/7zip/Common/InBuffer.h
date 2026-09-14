@@ -51,6 +51,7 @@ public:
   bool WasFinished() const { return _wasFinished; }
 
   void SetStream(ISequentialInStream *stream) { _stream = stream; }
+  void ClearStreamPtr() { _stream = NULL; }
   
   void SetBuf(Byte *buf, size_t bufSize, size_t end, size_t pos)
   {
@@ -94,7 +95,18 @@ public:
     return *_buf++;
   }
   
+  size_t ReadBytesPart(Byte *buf, size_t size);
   size_t ReadBytes(Byte *buf, size_t size);
+  const Byte *Lookahead(size_t &rem)
+  {
+    rem = (size_t)(_bufLim - _buf);
+    if (!rem)
+    {
+      ReadBlock();
+      rem = (size_t)(_bufLim - _buf);
+    }
+    return _buf;
+  }
   size_t Skip(size_t size);
 };
 

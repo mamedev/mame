@@ -84,6 +84,7 @@ private:
 
 	void ctrl_w(uint8_t data);
 	void status_w(uint8_t data);
+	bool fdc_wait();
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 

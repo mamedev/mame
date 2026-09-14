@@ -27,7 +27,8 @@ amiga_cpuslot_device::amiga_cpuslot_device(const machine_config &mconfig, const 
 	m_ovr_cb(*this),
 	m_int2_cb(*this),
 	m_int6_cb(*this),
-	m_ipl7_cb(*this)
+	m_ipl7_cb(*this),
+	m_fc_cb(*this, 0)
 {
 }
 

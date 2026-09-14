@@ -1243,8 +1243,16 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 			if (istartx > istopx)
 				std::swap(istartx, istopx);
 
-			// compute parameter starting points and deltas
+			// apply left/right clipping BEFORE calculating parameter start
+			if (!(Flags & POLY_FLAG_NO_CLIPPING))
+			{
+				istartx = std::max(istartx, cliprect.left());
+				istopx = std::min(istopx, cliprect.right() + 1);
+			}
+
+			// set the extent
 			extent_t &extent = unit.extent[extnum];
+
 			if (ParamCount > 0)
 			{
 				BaseType ldy = fully - ledge->v1->y;
@@ -1256,24 +1264,12 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 				{
 					BaseType lparam = ledge->v1->p[paramnum] + ldy * ledge->dpdy[paramnum];
 					BaseType rparam = redge->v1->p[paramnum] + rdy * redge->dpdy[paramnum];
+
 					BaseType dpdx = (rparam - lparam) * oox;
 
 					extent.param[paramnum].start = lparam + (BaseType(istartx) + BaseType(0.5) - startx) * dpdx;
 					extent.param[paramnum].dpdx = dpdx;
 				}
-			}
-
-			// apply left/right clipping
-			if (!(Flags & POLY_FLAG_NO_CLIPPING))
-			{
-				if (istartx < cliprect.left())
-				{
-					for (int paramnum = 0; paramnum < ParamCount; paramnum++)
-						extent.param[paramnum].start += (cliprect.left() - istartx) * extent.param[paramnum].dpdx;
-					istartx = cliprect.left();
-				}
-				if (istopx > cliprect.right())
-					istopx = cliprect.right() + 1;
 			}
 
 			// set the extent and update the total pixel count

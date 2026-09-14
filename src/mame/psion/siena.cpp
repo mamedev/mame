@@ -285,7 +285,7 @@ void siena_state::siena(machine_config &config)
 	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(240, 160);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);

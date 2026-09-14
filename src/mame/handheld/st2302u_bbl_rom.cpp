@@ -354,13 +354,11 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	m_maincpu->in_pc_callback().set_ioport("PORTC");
 
 	SPEAKER(config, "mono").front_center();
-	m_maincpu->add_route(0, "mono", 1.00);
-	m_maincpu->add_route(1, "mono", 1.00);
-	m_maincpu->add_route(2, "mono", 1.00);
-	m_maincpu->add_route(3, "mono", 1.00);
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_CURRENT_DAC, "mono", 1.00);
 
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);
@@ -385,7 +383,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	m_maincpu->in_pc_callback().set_ioport("PORTC");
 
 	// incorrect for bbl338
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);

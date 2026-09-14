@@ -392,7 +392,7 @@ void f1_state::act_f1(machine_config &config)
 	syslatch.q_out_cb<7>().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14_MHz_XTAL, 896, 0, 640, 312, 0, 256);
 	//screen.set_raw(14_MHz_XTAL, 896, 0, 640, 260, 0, 200);
 	screen.set_screen_update(FUNC(f1_state::screen_update));

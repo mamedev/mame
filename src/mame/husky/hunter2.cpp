@@ -421,7 +421,7 @@ void hunter2_state::hunter2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hunter2_state::hunter2_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 128);

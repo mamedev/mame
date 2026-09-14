@@ -331,7 +331,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mm2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(marblmd2_state::screen_update));
 	m_screen->set_palette("palette");

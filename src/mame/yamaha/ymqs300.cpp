@@ -224,7 +224,7 @@ void qs300_state::qs300(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(qs300_state::lcd_palette), 2);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(240, 80);
 	screen.set_visarea(0, 239, 0, 63);

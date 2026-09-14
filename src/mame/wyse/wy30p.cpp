@@ -125,7 +125,7 @@ void wy30p_state::wy30p(machine_config &config)
 
 	WYSE_KEYBOARD(config, m_keyboard, wy30_keyboards, "wy30");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(31.2795_MHz_XTAL * 2 / 3, 1050, 0, 800, 331, 0, 312); // divider and dimensions guessed
 	m_screen->set_screen_update(FUNC(wy30p_state::screen_update));
 	m_screen->screen_vblank().set_inputline("maincpu", MCS51_INT0_LINE);

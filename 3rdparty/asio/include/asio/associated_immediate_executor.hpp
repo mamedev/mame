@@ -2,7 +2,7 @@
 // associated_immediate_executor.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 template <typename T, typename Executor>
 struct associated_immediate_executor;
@@ -49,9 +50,10 @@ struct has_immediate_executor_type<T,
 template <typename E, typename = void, typename = void>
 struct default_immediate_executor
 {
-  typedef require_result_t<E, execution::blocking_t::never_t> type;
+  typedef decay_t<require_result_t<E, execution::blocking_t::never_t>> type;
 
-  static type get(const E& e) noexcept
+  static auto get(const E& e) noexcept
+    -> decltype(asio::require(e, execution::blocking.never))
   {
     return asio::require(e, execution::blocking.never);
   }
@@ -175,6 +177,8 @@ struct associated_immediate_executor_impl<T, E,
  * @li Provide a noexcept static member function named @c get, callable as @c
  * get(t,e) and with return type @c type or a (possibly const) reference to @c
  * type.
+ *
+ * @sa @ref overview_immediate_completion "Customising immediate completion"
  */
 template <typename T, typename Executor>
 struct associated_immediate_executor
@@ -273,6 +277,7 @@ struct associated_immediate_executor<reference_wrapper<T>, Executor>
   }
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

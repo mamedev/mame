@@ -13,6 +13,7 @@
 
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
+#include "cpu/mb88xxx/mb88xxx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "sound/ay8910.h"
@@ -33,6 +34,7 @@ public:
 		m_vectors(*this, "vectors"),
 		m_maincpu(*this, "maincpu"),
 		m_sub(*this, "sub"),
+		m_kbmcu(*this, "kbmcu"),
 		m_cassette(*this, "cassette"),
 		m_beeper(*this, "beeper"),
 		m_psg(*this, "psg"),
@@ -253,6 +255,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_sub;
+	optional_device<mb88401_cpu_device> m_kbmcu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
 	optional_device<ay8910_device> m_psg;

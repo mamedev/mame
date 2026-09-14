@@ -254,7 +254,7 @@ void bsktball_state::bsktball(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(bsktball_state::nmion_w)); // NMI On
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL/2, 384, 0, 256, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(bsktball_state::screen_update_bsktball));
 	m_screen->set_palette(m_palette);

@@ -68,7 +68,7 @@ void myaatari_state::myaatari(machine_config &config)
 	ARM9(config, m_maincpu, 72000000); // unknown ARM core
 	m_maincpu->set_addrmap(AS_PROGRAM, &myaatari_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -104,13 +104,13 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "dreamGEAR", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, myaatari, 0, 0, myaatari, myaatari, myaatari_state, empty_init, "dreamGEAR", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // HDMI stick, runs the Famicom titles using an emulator
-CONS( 2021, kuniotv,       0,              0,      myaatari, myaatari, myaatari_state, empty_init, "Lithon", "Kunio-kun TV (5-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, kuniotv,  0, 0, myaatari, myaatari, myaatari_state, empty_init, "Lithon", "Kunio-kun TV (5-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // unbranded box, generic looking Pac-Man logo, runs arcade version with copyrights stripped out
-CONS( 2021, pachdmi,       0,              0,      myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Pac-Man HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, pachdmi,  0, 0, myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Pac-Man HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // similar to the Pac-Man, generic looking HDMI sticks
-CONS( 2021, galghdmi,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Galaga HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, tetrhdmi,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Tetris HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, galghdmi, 0, 0, myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Galaga HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, tetrhdmi, 0, 0, myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Tetris HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

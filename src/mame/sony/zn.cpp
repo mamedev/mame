@@ -59,7 +59,9 @@ zn_state::zn_state(const machine_config &mconfig, device_type type, const char *
 	m_speaker(*this, "speaker" ),
 	m_at28c16(*this, "at28c16"),
 	m_cat702(*this, "cat702_%u", 1),
-	m_ram(*this, "maincpu:ram"),
+	m_ram(*this, "ram"),
+	m_gpu_ram(*this, "gpu_ram"),
+	m_spu_ram(*this, "spu_ram"),
 	m_znmcu(*this, "znmcu"),
 	m_cat702_dataout{},
 	m_coin(0),
@@ -74,41 +76,51 @@ void zn_state::zn1_1mb_vram(machine_config &config)
 {
 	zn1_2mb_vram(config);
 
-	CXD8561Q(config.replace(), m_gpu, 53.693175_MHz_XTAL, 0x100000, m_maincpu).set_screen(m_screen);
+	m_gpu_ram->set_default_size("1M").set_extra_options("1M,2M").set_default_value(0);
 }
 
 void zn_state::zn1_2mb_vram(machine_config &config)
 {
-	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530CQ(config, m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::maincpu_program_map);
 
-	CXD8561Q(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu);
-	SPU(config, m_spu, XTAL(67'737'600) / 2, m_maincpu);
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
 
 	zn_base(config);
 }
 
 void zn_state::zn2(machine_config &config)
 {
-	CXD8661R(config, m_maincpu, XTAL(100'000'000));
+	CXD8661R(config, m_maincpu, 100_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::zn2_maincpu_program_map);
 
-	CXD8654Q(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu);
-	SPU(config, m_spu, XTAL(67'737'600) / 2, m_maincpu);
+	CXD8654Q(config, m_gpu, 100_MHz_XTAL / 2);
 
 	zn_base(config);
 }
 
 void zn_state::zn_base(machine_config &config)
 {
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+	m_maincpu->set_ram(m_ram);
 
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
+
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
 	m_gpu->set_screen(m_screen);
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0);
 
+	SCREEN(config, m_screen);
+
+	SPU(config, m_spu, 67.7376_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
 	m_spu->add_route(0, m_speaker, 0.35, 0);
 	m_spu->add_route(1, m_speaker, 0.35, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K,1M,2M,4M").set_default_value(0);
 
 	SPEAKER(config, m_speaker, 2).front();
 
@@ -195,9 +207,6 @@ uint8_t zn_state::boardconfig_r()
 
 	int boardconfig = 64 | 32;
 
-	if (m_gpu->vram_size() == 2 * 1024 * 1024)
-		boardconfig |= 8;
-
 	switch (m_ram->size())
 	{
 	case 0x400000:
@@ -213,6 +222,12 @@ uint8_t zn_state::boardconfig_r()
 		boardconfig |= 3;
 		break;
 	}
+
+	if (m_spu_ram->size() > 512 * 1024)
+		boardconfig |= 4;
+
+	if (m_gpu_ram->size() > 1 * 1024 * 1024)
+		boardconfig |= 8;
 
 	return boardconfig;
 }
@@ -1212,7 +1227,7 @@ public:
 		m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&primrag2_state::dma_read, this));
 		m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&primrag2_state::dma_write, this));
 
-		m_maincpu->subdevice<ram_device>("ram")->set_default_size("8M");
+		m_ram->set_default_size("8M");
 
 		WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(600)); // 600ms Ds1232 TD floating
 

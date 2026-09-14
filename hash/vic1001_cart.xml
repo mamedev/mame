@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -1360,21 +1360,6 @@ B-2007 : Innovative Computing
 			<dataarea name="blk5" size="0x2000">
 				<rom name="fast eddie (sirius)(1982)(220--).a0" size="0x2000" crc="59323c50" sha1="14e2e9c9c560764e9425896a9186a6a14cd1e6f2" offset="0x0000" />
 			</dataarea>
-		</part>
-	</software>
-
-	<software name="fe3" supported="no">
-		<description>Final Expansion 3</description>
-		<year>2011</year>
-		<publisher>Denial</publisher>
-		<info name="serial" value="VIC-2011" />
-		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		<part name="cart" interface="vic1001_cart">
-			<feature name="slot" value="fe" />
-			<dataarea name="rom" size="0x80000">
-				<rom name="fe3vice-r020.bin" size="0x80000" crc="c12d844a" sha1="3946b6595f4ac0469a9fd97e4cd156618e868deb" offset="0x0000" />
-			</dataarea>
-			<dataarea name="ram" size="0x80000"/>
 		</part>
 	</software>
 

@@ -22,7 +22,7 @@
 #include "mks3.h"
 
 #include "emupal.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 
@@ -64,7 +64,7 @@ private:
 	u8 pad_r();
 	void txd_w(u8 data);
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_svg_update(screen_svg_device &screen);
 
 	u8 m_matrixsel = 0U;
 };
@@ -122,7 +122,7 @@ void psr340_state::machine_reset()
 {
 }
 
-u32 psr340_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void psr340_state::screen_svg_update(screen_svg_device &screen)
 {
 	const u8 *render = m_lcdc->render();
 	for(int yy=0; yy != 8; yy++)
@@ -131,8 +131,6 @@ u32 psr340_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 			for(int xx=0; xx != 5; xx++)
 				m_outputs[x][yy][xx] = (v >> xx) & 1;
 		}
-
-	return 0;
 }
 
 
@@ -235,11 +233,10 @@ void psr340_state::psr340(machine_config &config)
 	m_lcdc->set_lcd_size(2, 40);
 
 	/* video hardware */
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto &screen = SCREEN_SVG(config, "screen");
 	screen.set_refresh_hz(60);
 	screen.set_size(800, 384);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(psr340_state::screen_update));
+	screen.set_screen_svg_update(FUNC(psr340_state::screen_svg_update));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(swx00_device::sci_rx_w<0>));
 

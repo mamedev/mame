@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "palette")
+DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "Palette")
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries, u32 indirect)
 	: palette_device(mconfig, tag, owner, 0U)

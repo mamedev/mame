@@ -708,7 +708,7 @@ void roundup5_state::roundup5(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(roundup5_state::output_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(roundup5_state::CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(roundup5_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 0);

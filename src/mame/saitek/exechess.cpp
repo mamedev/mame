@@ -20,7 +20,7 @@ Hardware notes:
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 
 // internal artwork
 #include "saitek_exechess.lh"
@@ -240,10 +240,9 @@ void exechess_state::exechess(machine_config &config)
 	m_display->set_interpolation(0.2);
 	config.set_default_layout(layout_saitek_exechess);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1020/1.5, 1080/1.5);
-	screen.set_visarea_full();
 }
 
 

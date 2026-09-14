@@ -601,7 +601,7 @@ offs_t apple2_common_device::com_2byte_op(std::ostream &stream, offs_t pc, const
 
 	if (m_GScpu)
 	{
-		if (m_GScpu->g65816_get_reg(g65816_device::G65816_D) != 0)
+		if (m_GScpu->state_int(W65816_D) != 0)
 		{
 			return 0;
 		}
@@ -627,7 +627,7 @@ offs_t apple2_common_device::com_3byte_op(std::ostream &stream, offs_t pc, const
 	// check for GS-specific stores with the databank set
 	if (m_GScpu)
 	{
-		u32 bank = m_GScpu->g65816_get_reg(g65816_device::G65816_DB) << 16;
+		u32 bank = m_GScpu->state_int(W65816_DB) << 16;
 		bank |= operand;
 
 		if (const auto symbol = find_symbol(gs_vectors, std::end(gs_vectors), bank))

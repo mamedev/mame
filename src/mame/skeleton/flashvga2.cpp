@@ -255,7 +255,7 @@ void flashvga2_state::flashvga2(machine_config &config)
 	I2C_24C256(config, m_eeprom);
 
 	// TODO: refine, is it really 60 Hz?
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(flashvga2_state::screen_update));
 	screen.set_size(911, 525);
@@ -295,11 +295,11 @@ ROM_START( ruletamag )
 	ROM_FILL( 0x0060 >> 1, 1, 0x0b )
 
 	// does further checks if this skipped (going back to "error en reloj")
-//	ROM_FILL( 0x00b0 >> 1, 1, 0x55 )
-//	ROM_FILL( 0x00b2 >> 1, 1, 0xaa )
+//  ROM_FILL( 0x00b0 >> 1, 1, 0x55 )
+//  ROM_FILL( 0x00b2 >> 1, 1, 0xaa )
 
-//	ROM_FILL( 0x0008 >> 1, 1, 0x71 )
-//	ROM_FILL( 0x000a >> 1, 1, 0xac )
+//  ROM_FILL( 0x0008 >> 1, 1, 0x71 )
+//  ROM_FILL( 0x000a >> 1, 1, 0xac )
 ROM_END
 
 

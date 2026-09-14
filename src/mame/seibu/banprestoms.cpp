@@ -458,7 +458,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(40)); // TODO: this is trial and error, not verified
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: copied from other drivers using the same CRTC
+	screen_device &screen(SCREEN(config, "screen")); // TODO: copied from other drivers using the same CRTC
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

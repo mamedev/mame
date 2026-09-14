@@ -189,7 +189,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r));
 
 	// diagnostic LCD display
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*20+1, 19);

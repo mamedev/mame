@@ -629,7 +629,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);                    // ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
@@ -710,7 +710,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_dsw_shifter[1]->qh_callback().set(FUNC(lufykzku_state::dsw_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);                    // ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);

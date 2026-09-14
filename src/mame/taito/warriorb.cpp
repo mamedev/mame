@@ -162,6 +162,7 @@ Colscroll effects?
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "layout/generic.h"
@@ -605,7 +606,7 @@ void warriorb_state::darius2d(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(40*8, 32*8);
@@ -621,7 +622,7 @@ void warriorb_state::darius2d(machine_config &config)
 	m_tc0110pcr[0]->set_shift(0);
 	m_tc0110pcr[0]->set_color_callback(FUNC(warriorb_state::color_xbgr555));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(40*8, 32*8);
@@ -684,7 +685,7 @@ void warriorb_state::warriorb(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(40*8, 32*8);
@@ -700,7 +701,7 @@ void warriorb_state::warriorb(machine_config &config)
 	m_tc0110pcr[0]->set_shift(0);
 	m_tc0110pcr[0]->set_color_callback(FUNC(warriorb_state::color_xbgr555));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(40*8, 32*8);

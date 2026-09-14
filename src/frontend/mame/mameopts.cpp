@@ -76,26 +76,10 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 			parse_one_ini(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI, &error_stream);
 
 		machine_config config(*cursystem, options);
-		for (const screen_device &device : screen_device_enumerator(config.root_device()))
+		for (const device_video_output_interface &device : video_output_interface_enumerator(config.root_device()))
 		{
-			// parse "raster.ini" for raster games
-			if (device.screen_type() == SCREEN_TYPE_RASTER)
-			{
-				parse_one_ini(options, "raster", OPTION_PRIORITY_SCREEN_INI, &error_stream);
-				break;
-			}
-			// parse "vector.ini" for vector games
-			if (device.screen_type() == SCREEN_TYPE_VECTOR)
-			{
-				parse_one_ini(options, "vector", OPTION_PRIORITY_SCREEN_INI, &error_stream);
-				break;
-			}
-			// parse "lcd.ini" for lcd games
-			if (device.screen_type() == SCREEN_TYPE_LCD)
-			{
-				parse_one_ini(options, "lcd", OPTION_PRIORITY_SCREEN_INI, &error_stream);
-				break;
-			}
+			parse_one_ini(options, device.output_type_name(), OPTION_PRIORITY_SCREEN_INI, &error_stream);
+			break;
 		}
 	}
 

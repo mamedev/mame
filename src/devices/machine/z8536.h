@@ -411,6 +411,7 @@ protected:
 
 	// interrupt state
 	int m_irq;
+	int m_ius_level;    // interrupt under service level, gates the daisy chain
 
 	// register state
 	u8 m_register[48];

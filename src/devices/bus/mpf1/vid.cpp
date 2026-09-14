@@ -77,7 +77,7 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override
 	{
-		screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+		screen_device &screen(SCREEN(config, "screen"));
 		screen.set_raw(8_MHz_XTAL, 512, 0, 320, 326, 0, 240);
 		screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 

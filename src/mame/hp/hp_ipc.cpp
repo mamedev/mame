@@ -838,7 +838,7 @@ void hp_ipc_state::hp_ipc(machine_config &config)
 	// horizontal time = 60 us (min)
 	// ver.refresh period = ~300 us
 	// ver.period = 16.7ms (~60 hz)
-	SCREEN(config , m_screen , SCREEN_TYPE_LCD); // actually an EL display
+	SCREEN(config, m_screen).set_lcd(); // actually an EL display
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
 	m_screen->set_raw(6_MHz_XTAL * 2 , 720 , 0 , 512 , 261 , 0 , 255);
@@ -857,7 +857,7 @@ void hp_ipc_state::hp9808a(machine_config &config)
 	// 64kw/128kb video RAM
 	m_gpu->set_vram_size(64);
 
-	SCREEN(config , m_screen , SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_color(rgb_t::amber()); // actually a kind of EL display
 	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
 	m_screen->set_raw(6_MHz_XTAL * 2 , 880 , 0 , 640 , 425 , 0 , 400);

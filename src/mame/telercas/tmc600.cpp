@@ -34,7 +34,7 @@ HP14782-1
 |-------------------------------------------------------------------------------------------|
 
 Notes:
-    All IC's shown. TMCP-300 and TMC-700 expansions have been installed.
+    All IC's shown. TMCP-300 (audio output) and TMC-700 (RF video/printer) expansions have been installed.
 
     ROM0-5  - Toshiba TMM2732DI 4Kx8 EPROM
     ROM6    - Hitachi HN462732G 4Kx8 EPROM
@@ -80,7 +80,7 @@ Notes:
                 3   mono audio output
                 4   N/C
                 5   mono audio output
-    CN8     - 10x2 pin keyboard connector
+    CN8     - 10x2 pin keyboard connector PCB header
     SW1     - RUN/STOP switch (left=run, right=stop)
     SW2     - internal speaker/external audio switch [TMCP-300]
     P1      - color phase lock adjustment potentiometer
@@ -94,19 +94,32 @@ Notes:
     K2      - RF channel adjustment variable inductor (VHF I) [TMC-700]
     LS1     - loudspeaker
 
-*/
+    Designed by Hannu Peiponen and Timo Virtaneva.
 
-/*
 
-    TODO
+KB-76
 
-    - screen update is too fast
-    - cursor on text should blink as dark blue
-    - PRWNOISE and PRBEEP return wrong values
-    - CDP1869 white noise
-    - connect expansion bus
-    - series I ROMs
-    - DOS ROMs
+|---------------------------------------------------------------------------------------------|
+|                                          |--CN1--|                                LED1      |
+|                                                                                             |
+| DEL   1!  2"  3#  4$  5%  6&  7'  8(  9)  0   -=  ^~  @\  BREAK       7   8   9   UP  ESC   |
+|                                                                                             |
+|   CTRL  Q   W   E   R   T   Y   U   I   O   P   Å   ;+  RETURN        4   5   6   RT  SW1   |
+|                                                                                             |
+|    SHIFT  A   S   D   F   G   H   J   K   L   Ö   Ä   :*  LINE        1   2   3   DN  CTRL  |
+|    LOCK                                                   FEED                              |
+|    SHIFT    Z   X   C   V   B   N   M   ,<  .>  /?  SHIFT             ,   0   .   LT  ALT   |
+|                                                                                       MODE  |
+|                          SPACE                                                              |
+|                                                                                             |
+|---------------------------------------------------------------------------------------------|
+
+Notes:
+
+    SW*     - RAFI RS 76 M (mould .516 / code 145 502) switch
+	SW1		- unmarked key
+    LED1    - red power on LED
+    CN1     - 10x2 pin keyboard connector PCB header, bottom side of PCB
 
 */
 
@@ -121,6 +134,7 @@ Notes:
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/cdp1869.h"
+#include "sound/flt_rc.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -131,9 +145,6 @@ Notes:
 #define CDP1852_BUS_TAG     "cdp1852_bus"
 #define CDP1852_TMC700_TAG  "cdp1852_printer"
 #define CENTRONICS_TAG      "centronics"
-
-#define TMC600_PAGE_RAM_SIZE    0x400
-#define TMC600_PAGE_RAM_MASK    0x3ff
 
 namespace {
 
@@ -151,7 +162,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_char_rom(*this, "chargen"),
 		m_page_ram(*this, "page_ram"),
-		m_color_ram(*this, "color_ram", TMC600_PAGE_RAM_SIZE, ENDIANNESS_LITTLE),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_run(*this, "RUN"),
 		m_key_row(*this, "Y%u", 0)
 	{ }
@@ -197,7 +208,6 @@ private:
 	bool m_rtc_int = false;
 	u8 m_out3 = 0;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 
@@ -235,12 +245,12 @@ void tmc600_state::vismac_data_w(uint8_t data)
 
 uint8_t tmc600_state::get_color(uint16_t pma)
 {
-	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint16_t pageaddr = pma & 0x3ff;
 	uint8_t color = m_color_ram[pageaddr];
 
 	if (BIT(color, 3) && m_blink)
 	{
-		color = 0;
+		color ^= 0x07;
 	}
 
 	return color;
@@ -259,7 +269,7 @@ void tmc600_state::cdp1869_page_ram(address_map &map)
 
 CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 {
-	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint16_t pageaddr = pma & 0x3ff;
 	uint8_t color = get_color(pageaddr);
 	uint16_t charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
 	uint8_t cdb = m_char_rom[charaddr] & 0x3f;
@@ -272,7 +282,7 @@ CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 
 CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 {
-	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint16_t pageaddr = pma & 0x3ff;
 	uint8_t color = get_color(pageaddr);
 
 	return BIT(color, 0);
@@ -280,6 +290,8 @@ CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 
 void tmc600_state::prd_w(int state)
 {
+	m_maincpu->ef1_w(state);
+
 	if (!state) {
 		m_frame++;
 
@@ -302,8 +314,9 @@ void tmc600_state::video_start()
 	// state saving
 	save_item(NAME(m_vismac_reg_latch));
 	save_item(NAME(m_vismac_color_latch));
-	save_item(NAME(m_frame));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_rtc_int));
 	save_item(NAME(m_out3));
 }
 
@@ -392,7 +405,7 @@ QUICKLOAD_LOAD_MEMBER(tmc600_state::quickload_cb)
 
 void tmc600_state::tmc600_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
+	map(0x0000, 0x5fff).rom().nopw();
 	map(0x6000, 0x7fff).ram();
 	map(0xf400, 0xf7ff).m(m_vis, FUNC(cdp1869_device::char_map));
 	map(0xf800, 0xffff).m(m_vis, FUNC(cdp1869_device::page_map));
@@ -403,7 +416,6 @@ void tmc600_state::tmc600_io_map(address_map &map)
 	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
 	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
 	map(0x05, 0x05).rw(FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
-//  map(0x06, 0x06).w(FUNC(tmc600_state::floppy_w);
 	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
@@ -522,7 +534,7 @@ GFXDECODE_END
 void tmc600_state::tmc600(machine_config &config)
 {
 	// CPU
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, 3.57_MHz_XTAL));
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, XTAL(3'579'545)));
 	cpu.set_addrmap(AS_PROGRAM, &tmc600_state::tmc600_map);
 	cpu.set_addrmap(AS_IO, &tmc600_state::tmc600_io_map);
 	cpu.wait_cb().set_constant(1);
@@ -538,7 +550,7 @@ void tmc600_state::tmc600(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	CDP1869(config, m_vis, 3.57_MHz_XTAL, &tmc600_state::cdp1869_page_ram);
+	CDP1869(config, m_vis, XTAL(3'579'545), &tmc600_state::cdp1869_page_ram);
 	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
 	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
 	m_vis->set_pcb_read_callback(FUNC(tmc600_state::tmc600_pcb_r));
@@ -546,7 +558,11 @@ void tmc600_state::tmc600(machine_config &config)
 	m_vis->pal_ntsc_callback().set_constant(1);
 	m_vis->prd_callback().set(FUNC(tmc600_state::prd_w));
 	m_vis->set_screen(SCREEN_TAG);
-	m_vis->add_route(ALL_OUTPUTS, "mono", 0.1);
+	// the SOUND pin is coupled through a capacitor, and its R/2R ladder has an
+	// output impedance of 2.5R (R ~ 2 kOhm), giving a first order high pass at
+	// ~3.2 kHz as measured from a recording of the real machine
+	m_vis->add_route(ALL_OUTPUTS, "sndfilter", 0.1);
+	FILTER_RC(config, "sndfilter").set_rc(filter_rc_device::HIGHPASS, 5000, 0, 0, CAP_N(10)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// keyboard output latch
 	CDP1852(config, m_bwio); // clock is CDP1802 TPB
@@ -577,6 +593,8 @@ void tmc600_state::tmc600(machine_config &config)
 
 	// expansion bus connector
 	TMC600_EUROBUS_SLOT(config, m_bus, tmc600_eurobus_cards, nullptr);
+	m_bus->set_memspace(CDP1802_TAG, AS_PROGRAM);
+	m_bus->set_iospace(CDP1802_TAG, AS_IO);
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("8K");
@@ -631,5 +649,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME                     FLAGS
-//COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_SUPPORTS_SAVE )

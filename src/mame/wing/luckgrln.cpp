@@ -845,7 +845,7 @@ void luckgrln_state::luckgrln(machine_config &config)
 
 	MSM6242(config, "rtc");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL, 752, 0, 512, 274, 0, 256);
 	m_screen->set_screen_update(FUNC(luckgrln_state::screen_update));
 

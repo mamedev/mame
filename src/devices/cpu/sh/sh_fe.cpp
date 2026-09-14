@@ -286,7 +286,6 @@ bool sh_common_execution::frontend::describe_group_2(opcode_desc &desc, const op
 		desc.set_r_used(REG_M);
 		desc.set_r_used(REG_N);
 		desc.set_mac_modified();
-		desc.cycles = 2;
 		return true;
 	}
 
@@ -429,7 +428,8 @@ bool sh_common_execution::frontend::describe_group_8(opcode_desc &desc, const op
 	case  9 << 8: // BT(opcode & 0xff);
 	case 11 << 8: // BF(opcode & 0xff);
 		desc.set_is_conditional_branch();
-		desc.cycles = 3;
+		desc.set_sr_used();
+		desc.cycles = 1;   // taken adds 2, charged by the generator
 		disp = util::sext(opcode, 8);
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
 		return true;
@@ -437,7 +437,8 @@ bool sh_common_execution::frontend::describe_group_8(opcode_desc &desc, const op
 	case 13 << 8: // BTS(opcode & 0xff);
 	case 15 << 8: // BFS(opcode & 0xff);
 		desc.set_is_conditional_branch();
-		desc.cycles = 2;
+		desc.set_sr_used();
+		desc.cycles = 1;   // taken adds 1, charged by the generator
 		disp = util::sext(opcode, 8);
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
 		desc.delayslots = 1;
@@ -491,14 +492,21 @@ bool sh_common_execution::frontend::describe_group_12(opcode_desc &desc, const o
 		return true;
 
 	case 12 << 8: // TSTM(opcode & 0xff);
+		desc.set_r_used(0);
+		desc.set_gbr_used();
+		desc.set_sr_modified();
+		desc.set_reads_memory();
+		desc.cycles = 3;
+		return true;
+
 	case 13 << 8: // ANDM(opcode & 0xff);
 	case 14 << 8: // XORM(opcode & 0xff);
 	case 15 << 8: // ORM(opcode & 0xff);
 		desc.set_r_used(0);
-		desc.set_sr_used();
 		desc.set_gbr_used();
-		desc.set_sr_modified();
 		desc.set_reads_memory();
+		desc.set_writes_memory();
+		desc.cycles = 3;
 		return true;
 	}
 
@@ -534,12 +542,14 @@ bool sh_common_execution::frontend::describe_group_0(opcode_desc &desc, const op
 		return true;
 
 	case 0x03: // BSRF(Rn);
+		desc.set_r_used(REG_N);
 		desc.set_pr_modified();
 
 		desc.set_is_unconditional_branch();
 		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
+		desc.cycles = 2;
 
 		return true;
 
@@ -753,6 +763,7 @@ bool sh_common_execution::frontend::describe_group_4(opcode_desc &desc, const op
 		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
+		desc.cycles = 2;
 		return true;
 
 	case 0x0e: // LDCSR(Rn);
@@ -801,6 +812,7 @@ bool sh_common_execution::frontend::describe_group_4(opcode_desc &desc, const op
 		desc.set_gbr_used();
 		desc.set_r_modified(REG_N);
 		desc.set_writes_memory();
+		desc.cycles = 2;
 		return true;
 
 	case 0x16: // LDSMMACL(Rn);
@@ -817,6 +829,7 @@ bool sh_common_execution::frontend::describe_group_4(opcode_desc &desc, const op
 		desc.set_r_modified(REG_N);
 		desc.set_gbr_modified();
 		desc.set_reads_memory();
+		desc.cycles = 3;
 		return true;
 
 	case 0x1a: // LDSMACL(Rn);
@@ -857,6 +870,7 @@ bool sh_common_execution::frontend::describe_group_4(opcode_desc &desc, const op
 		desc.set_vbr_used();
 		desc.set_r_modified(REG_N);
 		desc.set_writes_memory();
+		desc.cycles = 2;
 		return true;
 
 	case 0x24: // ROTCL(Rn);
@@ -879,6 +893,7 @@ bool sh_common_execution::frontend::describe_group_4(opcode_desc &desc, const op
 		desc.set_r_modified(REG_N);
 		desc.set_vbr_modified();
 		desc.set_reads_memory();
+		desc.cycles = 3;
 		return true;
 
 	case 0x2a: // LDSPR(Rn);
@@ -886,12 +901,13 @@ bool sh_common_execution::frontend::describe_group_4(opcode_desc &desc, const op
 		desc.set_pr_modified();
 		return true;
 
-	case 0x2b: // JMP(Rm);
-		desc.set_r_used(REG_M);
+	case 0x2b: // JMP(Rn);
+		desc.set_r_used(REG_N);
 		desc.set_is_unconditional_branch();
 		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
+		desc.cycles = 2;
 		return true;
 
 	case 0x2e: // LDCVBR(Rn);

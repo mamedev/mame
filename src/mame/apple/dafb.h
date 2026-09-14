@@ -25,8 +25,8 @@ public:
 
 	auto dafb_irq() { return m_irq.bind(); }
 
-	u32 dafb_r(offs_t offset);
-	void dafb_w(offs_t offset, u32 data);
+	virtual u32 dafb_r(offs_t offset);
+	virtual void dafb_w(offs_t offset, u32 data);
 	u32 swatch_r(offs_t offset);
 	void swatch_w(offs_t offset, u32 data);
 	virtual u32 ramdac_r(offs_t offset);
@@ -40,21 +40,37 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	void recalc_ints();
-	void recalc_mode();
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	u16 m_scsi_ctrl[2];
-	int m_drq[2];
-	int m_scsi_read_cycles[2], m_scsi_write_cycles[2], m_scsi_dma_read_cycles[2], m_scsi_dma_write_cycles[2];
+	// Registers are matched on their byte offset with DAFB's 4-byte packing.  Derivatives on a
+	// PowerPC bus space the same register file 16 bytes apart, which m_reg_shift normalizes away.
+	u32 reg_offset(offs_t offset) const { return (offset >> m_reg_shift) << 2; }
+
+	// The pixel clock divider comes out of the RAMDAC, which isn't the same part on every derivative.
+	virtual int clock_divider() const { return 1 << ((m_ac842_pbctrl & 0x60) >> 5); }
+
+	u8 read_monitor_sense();
+	void recalc_ints();
+	virtual void recalc_mode();
+
 	u32 m_vram_size;
 	int m_dafb_version;
 	u32 m_pixel_clock;
+	u8 m_reg_shift;
 
 	u8 m_pal_address, m_pal_idx, m_ac842_pbctrl, m_mode;
 
+	// the Swatch CRTC state and the frame buffer itself are shared with derivatives that
+	// substitute their own RAMDAC and pixel readout
+	required_device<palette_device> m_palette;
+	std::unique_ptr<u32[]> m_vram;
+	u8 m_timing_control, m_monitor_id;
+	u32 m_base, m_stride;
+	u8 m_swatch_mode;
+	u32 m_hres, m_vres, m_config;
+
 private:
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	required_ioport m_monitor_config;
 	devcb_write_line m_irq;
 
@@ -83,19 +99,14 @@ private:
 		VFPEQ
 	};
 
-	std::unique_ptr<u32[]> m_vram;
 	emu_timer *m_vbl_timer, *m_cursor_timer;
 	u32 m_vram_offset;
-	u8 m_timing_control, m_monitor_id;
-	u32 m_base, m_stride, m_test;
+	u32 m_test;
 	u32 m_horizontal_params[10], m_vertical_params[7];
-	u8 m_swatch_mode;
 	u16 m_cursor_line, m_anim_line;
 	s32 m_int_status;
 	u8 m_dp8531_regs[16];
-	u32 m_hres, m_vres, m_htotal, m_vtotal, m_config, m_block_control, m_swatch_test;
-
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 m_htotal, m_vtotal, m_block_control, m_swatch_test;
 
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 	TIMER_CALLBACK_MEMBER(cursor_tick);
@@ -119,6 +130,9 @@ public:
 	template <int bus> u16 turboscsi_dma_r(offs_t offset, u16 mem_mask);
 	template <int bus> void turboscsi_dma_w(offs_t offset, u16 data, u16 mem_mask);
 
+	virtual u32 dafb_r(offs_t offset) override;
+	virtual void dafb_w(offs_t offset, u32 data) override;
+
 protected:
 	dafb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -127,6 +141,9 @@ protected:
 private:
 	required_device<m68000_musashi_device> m_maincpu;
 	ncr53c94_device *m_ncr[2];
+	u16 m_scsi_ctrl[2];
+	int m_drq[2];
+	int m_scsi_read_cycles[2], m_scsi_write_cycles[2], m_scsi_dma_read_cycles[2], m_scsi_dma_write_cycles[2];
 };
 
 class dafb_q950_device : public dafb_device

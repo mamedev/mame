@@ -199,7 +199,7 @@ void m82_state::nes_m82(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m82_state::m82_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	m_screen->set_screen_update(m_ppu, FUNC(ppu2c0x_device::screen_update));
 

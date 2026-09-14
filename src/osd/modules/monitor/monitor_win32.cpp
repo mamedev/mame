@@ -18,7 +18,7 @@
 #include "osdcore.h"
 #include "strconv.h"
 #include "window.h"
-#include "windows/video.h"
+#include "windows/winvideo.h"
 
 // standard windows headers
 #include <windows.h>

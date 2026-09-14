@@ -208,7 +208,7 @@ void esp250c_state::esp250c(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &esp250c_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &esp250c_state::io_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(50_MHz_XTAL, 1034, 0, 800, 690, 0, 416); // wrong
 	m_screen->set_screen_update(FUNC(esp250c_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(esp250c_state::vblank_w));

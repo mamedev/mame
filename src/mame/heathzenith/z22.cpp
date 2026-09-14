@@ -185,7 +185,7 @@ void z22_state::z22(machine_config &config)
 
 	// TODO: Keyboard (asynchronous serial, like Z-49?)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_raw(16.5888_MHz_XTAL, 873, 0, 720, 317, 0, 300);
 	screen.set_screen_update(m_crtc, FUNC(r6545_1_device::screen_update));

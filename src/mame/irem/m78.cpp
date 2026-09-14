@@ -325,7 +325,7 @@ void m78_state::bj92(machine_config &config)
 	TIMER(config, "v1").configure_scanline(FUNC(m78_state::sound_nmi), "screen", 1, 2);  // clocked by V1? (Vigilante)
 
 	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(55);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(512, 384);

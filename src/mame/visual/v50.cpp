@@ -300,7 +300,7 @@ void visual50_state::visual50(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(visual50_state::ppi_portb_w));
 	ppi.out_pc_callback().set(FUNC(visual50_state::ppi_portc_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(17.320_MHz_XTAL, 900, 0, 720, 321, 0, 300);
 	m_screen->set_screen_update(m_pvtc, FUNC(scn2672_device::screen_update));
 

@@ -689,7 +689,7 @@ ROM_END
 
 void ie15_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(ie15_device::screen_update));
 	m_screen->set_raw(XTAL(30'800'000)/2,

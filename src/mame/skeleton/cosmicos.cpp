@@ -670,7 +670,7 @@ void cosmicos_state::cosmicos(machine_config &config)
 	TIMER(config, "digit").configure_periodic(FUNC(cosmicos_state::digit_tick), attotime::from_hz(100));
 	TIMER(config, "interrupt").configure_periodic(FUNC(cosmicos_state::int_tick), attotime::from_hz(1000));
 
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

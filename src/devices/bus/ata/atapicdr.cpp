@@ -51,7 +51,8 @@ void atapi_cdrom_device::device_start()
 
 	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
 
-	m_identify_buffer[0] = 0x8500; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
+	// ATAPI device, cmd set 5 compliant, removable media, DRQ within 3 ms of PACKET command
+	m_identify_buffer[0] = 0x8580;
 
 	m_identify_buffer[23] = ('1' << 8) | '.';
 	m_identify_buffer[24] = ('0' << 8) | ' ';
@@ -128,6 +129,22 @@ void atapi_cdrom_device::ExecCommand()
 {
 	switch(command[0])
 	{
+		case T10MMC_CMD_READ_DISC_STRUCTURE:
+			// Mac OS X distinguishes ATAPI CD-ROM and DVD-ROM drives by if
+			// they accept this (DVD-only) command.
+			if(type() != ATAPI_DVDROM)
+			{
+				m_phase = SCSI_PHASE_STATUS;
+				m_sense_key = SCSI_SENSE_KEY_ILLEGAL_REQUEST;
+				m_sense_asc = 0x20; // INVALID COMMAND OPERATION CODE
+				m_sense_ascq = 0;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				return;
+			}
+			break;
+
+		case T10SPC_CMD_TEST_UNIT_READY:
 		case T10SBC_CMD_READ_CAPACITY:
 		case T10SBC_CMD_READ_10:
 		case T10MMC_CMD_READ_SUB_CHANNEL:

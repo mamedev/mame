@@ -295,6 +295,7 @@ void s3virge_vga_device::crtc_map(address_map &map)
 			return res;
 		})
 	);
+	map(0x50, 0x50).unmaprw(); // doesn't have CR50
 	map(0x53, 0x53).lrw8(
 		NAME([this] (offs_t offset) {
 			return s3.cr53;
