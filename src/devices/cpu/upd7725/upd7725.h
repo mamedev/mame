@@ -35,6 +35,7 @@ class necdsp_device : public cpu_device
 public:
 	auto p0() { return m_out_p0_cb.bind(); }
 	auto p1() { return m_out_p1_cb.bind(); }
+	auto so() { return m_out_so_cb.bind(); }
 
 	uint8_t status_r();
 	uint8_t data_r();
@@ -42,7 +43,7 @@ public:
 
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits);
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, uint32_t rambits, uint32_t stackbits);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -144,6 +145,10 @@ private:
 	// 1 = next opcode is the first half of int firing 'NOP'
 	// 2 = next opcode is the second half of int firing 'CALL 0100'
 	int m_irq_firing;
+	const uint16_t m_program_mask;
+	const uint16_t m_data_rom_mask;
+	const uint16_t m_data_ram_mask;
+	const uint8_t m_stack_mask;
 	memory_access<14, 2, -2, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<14, 2, -2, ENDIANNESS_BIG>::specific m_program;
 	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_data;
@@ -157,9 +162,15 @@ protected:
 	//devcb_read_line   m_in_dack_cb;
 	devcb_write_line    m_out_p0_cb;
 	devcb_write_line    m_out_p1_cb;
-	//devcb_write8      m_out_so_cb;
+	devcb_write16       m_out_so_cb;
 	//devcb_write_line  m_out_sorq_cb;
 	//devcb_write_line  m_out_drq_cb;
+};
+
+class upd7720_device : public necdsp_device
+{
+public:
+	upd7720_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class upd7725_device : public necdsp_device
@@ -183,6 +194,7 @@ public:
 };
 
 // device type definition
+DECLARE_DEVICE_TYPE(UPD7720,  upd7720_device)
 DECLARE_DEVICE_TYPE(UPD7725,  upd7725_device)
 DECLARE_DEVICE_TYPE(UPD96050, upd96050_device)
 
