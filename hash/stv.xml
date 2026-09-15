@@ -220,9 +220,9 @@ Unstable in multicart, may hang after Atlus logo
 		</part>
 	</software>
 
-	<!-- Game: Puzzle &amp; Action: Sando-R -->
-	<software name="sandor">
-		<description>Puzzle &amp; Action: Sando-R (J 951114 V1.000)</description>
+	<!-- Game: Puzzle &amp; Action: Sand-R -->
+	<software name="sandr">
+		<description>Puzzle &amp; Action: Sand-R (J 951114 V1.000)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
@@ -318,7 +318,7 @@ Is this game really CART-AM as the header says?
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: Treasure Hunt -->
-	<software name="thunt" cloneof="sandor" supported="no">
+	<software name="thunt" cloneof="sandr" supported="no">
 		<description>Puzzle &amp; Action: Treasure Hunt (JUET 970901 V2.00E)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -335,7 +335,7 @@ Is this game really CART-AM as the header says?
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: BoMulEul Chajara -->
-	<software name="thuntk" supported="no" cloneof="sandor">
+	<software name="thuntk" supported="no" cloneof="sandr">
 		<description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
 		<year>1997</year>
 		<publisher>Sega / Deniam</publisher>

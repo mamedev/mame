@@ -1133,10 +1133,10 @@ ROM_END
 // C-Chip includes the string 'By_TAITO_Copration_On_OSAKA_BUNSHITU._01.Sep.1987_Toshiaki.Kato_Tsutomuawa_4
 
 //    year  rom       parent    machine   inp      state          init
-GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (World, rev 2, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (World, rev 2, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (Japan, rev 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America",  "Operation Wolf (US, rev 2)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito",                      "Operation Wolf (World, rev 2, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito",                      "Operation Wolf (World, rev 2, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",                      "Operation Wolf (Japan, rev 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",                      "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America",              "Operation Wolf (US, rev 2)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  init_opwolfb,  ROT0, "bootleg (Bear Corporation)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  init_opwolfp,  ROT0, "Taito",          "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected
+GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  init_opwolfp,  ROT0, "Taito",                      "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected
