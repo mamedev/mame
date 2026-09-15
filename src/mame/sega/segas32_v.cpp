@@ -25,7 +25,7 @@
 
     - Wrong priority cases (parenthesis for the level setup):
       dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
-      dbzvrvs: Sheng-Long speech balloon during Piccolo ending (fixme: check levels).
+      dbzvrvs: Shen-Long speech balloon during Piccolo ending (fixme: check levels).
       f1lap: attract mode ranking sprite-based text ($a) vs. road ($d)
       f1lap: attract mode map display (after aforementioned), sprite-based turn names
       ($a) are hidden by map ($d) again;
