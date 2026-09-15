@@ -214,6 +214,18 @@ private:
 	virtual uint16_t sj_70001c_r() override;
 };
 
+class xmvsfmb_state : public songjang_state
+{
+public:
+	xmvsfmb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		songjang_state(mconfig, type, tag)
+	{
+	}
+
+private:
+	virtual uint16_t sj_70001c_r() override;
+};
+
 /************************************ Mega Drive Bootlegs *************************************/
 
 
@@ -409,6 +421,12 @@ uint16_t shuifeng_state::sj_70001c_r()
 {
 	logerror("%s: reading from sj_70001c_r\n", machine().describe_context());
 	return 0x0031;
+}
+
+uint16_t xmvsfmb_state::sj_70001c_r()
+{
+	logerror("%s: reading from sj_70001c_r\n", machine().describe_context());
+	return 0x0032;
 }
 
 /*************************************
@@ -802,6 +820,17 @@ ROM_START( shuifeng )
 	ROM_LOAD( "shuihufengyunzhuan-oki.u3", 0x00000, 0x80000, CRC(44287ab4) SHA1(42de2010e73c036a2a0e01c9dd3c1c8aef1a54a1) )
 ROM_END
 
+ROM_START( xmvsfmb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u26", 0x000000, 0x080000, CRC(6af064cd) SHA1(5498b27953bcd84656746cb731ddfcefbf814be3) )
+	ROM_LOAD16_BYTE( "u29", 0x000001, 0x080000, CRC(33edaa56) SHA1(8b88aa4995b71a405af83763119acfcede6012ab) )
+	ROM_LOAD16_BYTE( "u28", 0x100000, 0x080000, CRC(8a0af7b9) SHA1(b89b8bb03e5959615405d2ade3b9ea510cbf75cc) )
+	ROM_LOAD16_BYTE( "u27", 0x100001, 0x080000, CRC(0270099d) SHA1(ec696312a5d17b4820e6c280ffe9b455d15cb7cc) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "u3", 0x00000, 0x80000, CRC(6a941c30) SHA1(decb028f7e14662cd6c1cb2486a5d46a74af850f) )
+ROM_END
+
 } // anonymous namespace
 
 /*************************************
@@ -812,11 +841,14 @@ ROM_END
 
 // Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile RAM
 // Is 'Genie 2000' part of the title, and the parent set a bootleg?
-GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing",  "Puckman Pockimon Genie 2000",           0 )
-GAME( 2000, jingling,  puckpkmn, jingling,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS Co. Ltd", "Jingling Jiazu Genie 2000",             0 )
-GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "bootleg",     "Puckman Pockimon Genie 2000 (bootleg)", 0 )
-GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",   "Juezhan Tianhuang",                     MACHINE_IMPERFECT_SOUND )
+GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing",          "Puckman Pockimon Genie 2000",                              0 )
+GAME( 2000, jingling,  puckpkmn, jingling,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS Co. Ltd",         "Jingling Jiazu Genie 2000",                                0 )
+GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "bootleg",             "Puckman Pockimon Genie 2000 (bootleg)",                    0 )
+GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",           "Juezhan Tianhuang",                                        MACHINE_IMPERFECT_SOUND )
 
 // some corruption on cutscenes between levels, emulation bug or glitch in the original conversion?
-GAME( 200?, songjang,  0,        songjang,  songjang, songjang_state, init_puckpkmn, ROT0, "WAH LAP",     "Songjiangyanyi Final",                  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, shuifeng,  0,        songjang,  jzth,     shuifeng_state, init_puckpkmn, ROT0, "WAH LAP",     "Shuihu Feng Yun Zhuan",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, songjang,  0,        songjang,  songjang, songjang_state, init_puckpkmn, ROT0, "WAH LAP",             "Songjiangyanyi Final",                                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, shuifeng,  0,        songjang,  jzth,     shuifeng_state, init_puckpkmn, ROT0, "WAH LAP",             "Shuihu Feng Yun Zhuan",                                    MACHINE_IMPERFECT_GRAPHICS )
+
+// everything TODO
+GAME( 1999, xmvsfmb,   0,        songjang,  jzth,     xmvsfmb_state,  init_puckpkmn, ROT0, "bootleg (Puir Star)", "X-Men vs. Street Fighter (bootleg of Mega Drive version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
