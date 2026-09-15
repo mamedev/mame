@@ -20,6 +20,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/timer.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -56,12 +57,17 @@ private:
 
 	void vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	u16 lico_2a0000_r(offs_t offset, uint16_t mem_mask = ~0);
+	u16 lico_2a000a_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	void licocai_map(address_map &map) ATTR_COLD;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) ATTR_COLD;
 
 	u16 m_vdp_dest;
+	u16 m_vdp_write_type;
 	u32 m_vdp_addr;
 	std::unique_ptr<u8[]> m_vram;
 };
@@ -81,26 +87,38 @@ DEVICE_IMAGE_LOAD_MEMBER(licocai_state::cart_load)
 void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vdp_dest = data & mem_mask;
+	logerror("%s: set m_vdp_dest to %04x\n", machine().describe_context(), m_vdp_dest);
 }
 
 void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_vdp_dest == 0x0002) // uploads some 16x16x4 tiles to RAM
 	{
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (gfxdata?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
+		if (m_vdp_write_type == 0x0000)
+		{
+			logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (gfxdata?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
 
-		m_vram[(m_vdp_addr + 0) & 0xffff] = (data >> 8) & 0x00ff;
-		m_vram[(m_vdp_addr + 1) & 0xffff] = (data >> 0) & 0x00ff;
+			m_vram[(m_vdp_addr + 0) & 0xffff] = (data >> 8) & 0x00ff;
+			m_vram[(m_vdp_addr + 1) & 0xffff] = (data >> 0) & 0x00ff;
 
-		m_gfxdecode->gfx(0)->mark_dirty(m_vdp_addr / 0x80);
-
-		m_vdp_addr+=2;
+			m_gfxdecode->gfx(0)->mark_dirty(m_vdp_addr / 0x80);
+			m_vdp_addr += 2;
+		}
+		else
+		{
+			logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (write type %04x)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask, m_vdp_write_type);
+		}
 
 	}
-	else if (m_vdp_dest == 0x0000) // or 0x0009, or 0x0013
+	else if (m_vdp_dest == 0x0000)
 	{
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram position?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
 		m_vdp_addr = data;
+	}
+	else if (m_vdp_dest == 0x0005)
+	{
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (write type?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+		m_vdp_write_type = data;
 	}
 	else
 	{
@@ -108,7 +126,18 @@ void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-static const gfx_layout tile_layout =
+
+u16 licocai_state::lico_2a0000_r(offs_t offset, uint16_t mem_mask)
+{
+	return machine().rand();
+}
+
+u16 licocai_state::lico_2a000a_r(offs_t offset, uint16_t mem_mask)
+{
+	return machine().rand();
+}
+
+static const gfx_layout tile16_layout =
 {
 	16,16,
 	0x200,
@@ -119,23 +148,24 @@ static const gfx_layout tile_layout =
 	16*16*4
 };
 
-
 void licocai_state::machine_start()
 {
 	save_item(NAME(m_vdp_dest));
 	save_item(NAME(m_vdp_addr));
+	save_item(NAME(m_vdp_write_type));
 
 	// clears 0x10000 bytes on startup
 	m_vram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_vram), 0x10000);
 
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, tile_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, tile16_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
 }
 
 void licocai_state::machine_reset()
 {
 	m_vdp_dest = 0;
 	m_vdp_addr = 0;
+	m_vdp_write_type = 0;
 }
 
 void licocai_state::video_start()
@@ -155,19 +185,35 @@ void licocai_state::licocai_map(address_map &map)
 	map(0x210000, 0x210001).w(FUNC(licocai_state::vdp_dest_select_w));
 	map(0x210002, 0x210003).w(FUNC(licocai_state::vdp_data_w));
 
-	map(0x700000, 0x7fffff).ram();
+	map(0x2a0000, 0x2a0001).r(FUNC(licocai_state::lico_2a0000_r));
+	map(0x2a000a, 0x2a000b).r(FUNC(licocai_state::lico_2a000a_r));
+
+// tests from 0x7e0000 if not mapped it writes 'system ram error' to the start of vram (but hasn't uploaded a font?)
+	map(0x7e0000, 0x7effff).ram();
+	map(0x7f0000, 0x7fffff).ram();
 }
 
 static INPUT_PORTS_START( licocai )
 INPUT_PORTS_END
 
+TIMER_DEVICE_CALLBACK_MEMBER(licocai_state::scanline)
+{
+	// wrong!
+	
+	// irqs 3 & 5 (indirectly) point to valid code, others (indirectly) point to rte
+
+	if (param == 64)
+		m_maincpu->set_input_line(3, HOLD_LINE);
+
+	if (param == 224)
+		m_maincpu->set_input_line(5, HOLD_LINE);
+
+}
+
 void licocai_state::licocai(machine_config &config)
 {
 	M68000(config, m_maincpu, 10'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &licocai_state::licocai_map);
-	m_maincpu->set_vblank_int("screen", FUNC(licocai_state::irq3_line_hold));
-
-	// irqs 3 & 5 (indirectly) point to valid code, others (indirectly) point to rte
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
@@ -178,6 +224,8 @@ void licocai_state::licocai(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100); // wrong
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(licocai_state::scanline), "screen", 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
