@@ -1055,7 +1055,7 @@ void v25_common_device::device_start()
 
 	state_add( V25_IDB, "IDB", m_IDB).mask(0xffe00).callimport();
 
-	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
@@ -1104,6 +1104,7 @@ void v25_common_device::state_import(const device_state_entry &entry)
 				m_ip = m_debugger_temp & 0x0000f;
 			}
 			m_prev_ip = m_ip;
+			CHANGE_PC;
 			break;
 
 		case V25_IDB:
