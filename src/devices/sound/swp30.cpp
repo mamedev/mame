@@ -426,7 +426,7 @@ void swp30_device::streaming_block::scale_and_clamp(s16 &val0, s16 &val1, s16 &v
 
 void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos - 1 : m_pos;
+	s32 spos = (m_loop & 0x80000000) ? (-m_pos - 1) : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 1);
 	switch(spos & 1) {
@@ -459,7 +459,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 
 void swp30_device::streaming_block::read_12(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos - 1 : m_pos;
+	s32 spos = (m_loop & 0x80000000) ? (-m_pos - 1) : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 3)*3;
 	switch(spos & 7) {
@@ -560,7 +560,7 @@ void swp30_device::streaming_block::read_12(memory_access<25, 2, -2, ENDIANNESS_
 
 void swp30_device::streaming_block::read_8(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos - 1 : m_pos;
+	s32 spos = (m_loop & 0x80000000) ? (-m_pos - 1) : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 2);
 	switch(spos & 3) {
@@ -690,8 +690,9 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 	// sample earlier and the values are swapped here to get previous,
 	// current, next and the one after, as when playing forwards.
 	if((m_loop & 0x80000000) && (m_address >> 30) != 3) {
-		std::swap(val0, val3);
-		std::swap(val1, val2);
+		using std::swap;
+		swap(val0, val3);
+		swap(val1, val2);
 	}
 	if(m_first)
 		val0 = 0;
@@ -1431,7 +1432,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 		k0 -= 9;
 		u32 a = (4 << k0) - 1;
 		u32 b = (2 << k0) - 1;
-		static const u8 mx[8] = { 0x00, 0x20, 0x44, 0xa2, 0x55, 0x75, 0xee, 0xfe };
+		constexpr u8 mx[8] = { 0x00, 0x20, 0x44, 0xa2, 0x55, 0x75, 0xee, 0xfe };
 		return ((mx[k1] >> (sample_counter & 7)) & 1) ? a : b;
 	}
 
@@ -1439,7 +1440,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 		if(sample_counter & 1)
 			return 1;
 		u32 s1 = (sample_counter & 0xe) >> 1;
-		static const u8 mx[8] = { 0x00, 0x01, 0x22, 0xa8, 0x55, 0xab, 0x77, 0xfd };
+		constexpr u8 mx[8] = { 0x00, 0x01, 0x22, 0xa8, 0x55, 0xab, 0x77, 0xfd };
 		return (mx[k1] >> s1) & 1;
 	}
 
@@ -1448,7 +1449,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 	if(sample_counter & util::make_bitmask<u32>(k0))
 		return 0;
 
-	static const u16 mx[8] = { 0x5555, 0x5557, 0x5757, 0x5777, 0x7777, 0x777f, 0x7f7f, 0x7fff };
+	constexpr u16 mx[8] = { 0x5555, 0x5557, 0x5757, 0x5777, 0x7777, 0x777f, 0x7f7f, 0x7fff };
 	return (mx[k1] >> ((sample_counter >> k0) & 0xf)) & 1;
 }
 
@@ -3323,7 +3324,7 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			o = util::string_format("(%s) << %d", o, shift == 3 ? 4 : shift);
 
 		u32 sat = BIT(opcode, 0x1e, 2);
-		static const char *const satmode[4] = { "=", "=s", "=_", "=a" };
+		static char const *const satmode[4] = { "=", "=s", "=_", "=a" };
 
 		append(r, util::string_format("p %s %s", satmode[sat], o));
 	}
@@ -3366,7 +3367,7 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 	u32 memmode = BIT(opcode, 0x24, 2);
 	if(memmode) {
-		static const char *modes[4] = { nullptr, "w", "r", "1r" };
+		static char const *const modes[4] = { nullptr, "w", "r", "1r" };
 		append(r, util::string_format("mem_%s %s%s%s", modes[memmode], memmode != 1 && BIT(opcode, 0x23) ? "@" : "+", goffset(pc/3), BIT(opcode, 0x21) ? "+idx" : ""));
 	}
 
@@ -3753,10 +3754,10 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_ADD(block, I0, I0, 1);
 		if(BIT(opcode, 0x21))
 			UML_ADD(block, I0, I0, mem(&m_ram_index));
-		if(amem != 1 && BIT(opcode, 0x23))
+		if(amem != 1 && BIT(opcode, 0x23)) {
 			// Absolute address, no sample counter and no bank mapping
 			UML_AND(block, I0, I0, 0x3ffff);
-		else {
+		} else {
 			UML_SUB(block, I0, I0, mem(&m_sample_counter));
 			// Mask within the bank, then move to the bank start
 			UML_AND(block, I0, I0, mask);
