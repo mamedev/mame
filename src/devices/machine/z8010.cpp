@@ -49,6 +49,8 @@ inline void z8010_device::INC_DSC(const uint8_t max_dsc = DSC_SDR_ATTR)
 {
 	if (m_dsc < max_dsc)
 		++m_dsc;
+	else
+		m_dsc = DSC_SDR_BAH;
 }
 
 //-------------------------------------------------
