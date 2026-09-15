@@ -309,6 +309,7 @@ private:
 		static u16 revram_encode(u32 v);
 		static u32 revram_decode(u16 v);
 		static s16 m1_expand(s16 v);
+		static s32 pack24(s64 p);
 
 		static void call_rand(void *ms);
 		static void call_revram_encode(void *ms);
@@ -316,6 +317,8 @@ private:
 
 		void step();
 		void drc(drcuml_block &block, u16 pc);
+		void drc_pack24(drcuml_block &block, bool dither, uml::code_label label);
+		void drc_t_value(drcuml_block &block, u32 index2);
 		void reset();
 	};
 
