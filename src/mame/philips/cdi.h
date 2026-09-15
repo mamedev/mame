@@ -50,7 +50,7 @@ protected:
 
 	required_device<scc68070_device> m_maincpu;
 	required_region_ptr<uint16_t> m_main_rom;
-	optional_device<screen_device> m_lcd;
+	optional_device<cdi220_lcd> m_lcd;
 	optional_device<cdislave_hle_device> m_slave_hle;
 	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
 	optional_device<m68hc05c8_device> m_servo;
@@ -61,7 +61,6 @@ protected:
 
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
-	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override ATTR_COLD;
 
 	void cdimono1_mem(address_map &map) ATTR_COLD;

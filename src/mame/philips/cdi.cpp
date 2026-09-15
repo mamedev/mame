@@ -364,20 +364,6 @@ void cdi_state::dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 /*************************
-*       LCD screen       *
-*************************/
-
-
-uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t lcd_state[16];
-	std::copy_n(m_slave_hle->get_lcd_state(), 16, lcd_state);
-
-	cdi220_lcd::draw(bitmap, cliprect, lcd_state);
-	return 0;
-}
-
-/*************************
 *    Machine Drivers     *
 *************************/
 
@@ -397,12 +383,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd);
-	m_lcd->set_refresh_hz(50);
-	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(cdi220_lcd::WIDTH, cdi220_lcd::HEIGHT);
-	m_lcd->set_visarea_full();
-	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
+	CDI220_LCD(config, m_lcd);
 
 	PALETTE(config, "palette").set_entries(0x100);
 
@@ -417,6 +398,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	CDI_SLAVE_HLE(config, m_slave_hle);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 	m_slave_hle->atten_callback().set(m_cdic, FUNC(cdicdic_device::atten_w));
+	m_slave_hle->lcd_callback().set(m_lcd, FUNC(cdi220_lcd::state_w));
 
 	CDROM(config, m_cdrom);
 	m_cdrom->set_interface("cdrom");
@@ -448,12 +430,7 @@ void cdi_state::cdimono2(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd);
-	m_lcd->set_refresh_hz(60);
-	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(cdi220_lcd::WIDTH, cdi220_lcd::HEIGHT);
-	m_lcd->set_visarea_full();
-	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
+	CDI220_LCD(config, m_lcd);
 
 	PALETTE(config, "palette").set_entries(0x100);
 
@@ -492,12 +469,7 @@ void cdi_state::cdi910(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd);
-	m_lcd->set_refresh_hz(60);
-	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(cdi220_lcd::WIDTH, cdi220_lcd::HEIGHT);
-	m_lcd->set_visarea_full();
-	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
+	CDI220_LCD(config, m_lcd);
 
 	PALETTE(config, "palette").set_entries(0x100);
 
