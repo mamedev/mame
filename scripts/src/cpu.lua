@@ -2780,6 +2780,23 @@ if opt_tool(CPUS, "AVR8") then
 end
 
 --------------------------------------------------
+-- Toshiba T6M53 ASIC
+--@src/devices/cpu/t6m53/t6m53.h,CPUS["T6M53"] = true
+--------------------------------------------------
+
+if CPUS["T6M53"] then
+    files {
+        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
+        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
+    }
+end
+
+if opt_tool(CPUS, "T6M53") then
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
+end
+
+--------------------------------------------------
 -- Texas Instruments TMS1000 series
 --@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
