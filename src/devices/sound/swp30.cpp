@@ -2294,14 +2294,17 @@ template<int Sel> void swp30_device::revram_data_w(u16 data)
 	else
 		m_revram_data = (m_revram_data & 0xffff0000) |  data;
 
+	// The value is 16.16 with the sample in the upper word, while the MEG
+	// writes its memory at p >> 15 where 1.0 is 1 << 23.  Scale it the
+	// same way, keeping the sign.
 	if(!Sel)
-		m_reverb->write_word(m_revram_adr, meg_state::revram_encode(m_revram_data >> 5));
+		m_reverb->write_word(m_revram_adr, meg_state::revram_encode(s32(m_revram_data) >> 8));
 }
 
 template<int Sel> u16 swp30_device::revram_data_r()
 {
 	if(Sel)
-		m_revram_data = meg_state::revram_decode(m_reverb->read_word(m_revram_adr)) << 5;
+		m_revram_data = meg_state::revram_decode(m_reverb->read_word(m_revram_adr)) << 8;
 
 	return Sel ? m_revram_data >> 16 : m_revram_data;
 }
@@ -2918,7 +2921,7 @@ void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
 
 //    33333333 33333333 22222222 22222222 11111111 11111111 00000000 00000000
 //    fedcba98 76543210 fedcba98 76543210 fedcba98 76543210 fedcba98 76543210
-//    ABCDEFFF Grrrrrrr HHHmmmmm m-II--J- KKLLMMNN OOPPQRrr rrrrrSmm mmmm----
+//    ABCDEFFF Grrrrrrr HHHmmmmm m-IIT-J- KKLLMMNN OOPPQRrr rrrrrSmm mmmm----
 //    +                               + +                                ++++ = bits set at least once in the mu100 programs
 
 //    m = low is read port, high is write port, memory register
@@ -2934,6 +2937,11 @@ void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
 //    H = m register write source (0, 1, 3 unknown, 2 lfo, 4 mem read, 5 rand, 6 p, 7 m register)
 //    I = memory mode, none/read/write/read+1
 //    J = add index to address on memory access
+//    T = memory read at an absolute address: offset (+ index) (+1), without
+//        the sample counter and the mappings.  The firmware uploads lookup
+//        tables there through the revram address/data registers (waveforms,
+//        curves) when it loads effects like ring mod, auto pan or the
+//        multiband compressor.
 //    K = saturation mode (0 = none, 1 = 24.15, 2 = 0 to max positive 24.15, 3 = abs then max positive 24.15)
 //    L = shift left writing to p
 //    M = adder mode (0 = add, 1 = sub, 2 = add abs, 3 = binary and)
@@ -3351,7 +3359,7 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	u32 memmode = BIT(opcode, 0x24, 2);
 	if(memmode) {
 		static const char *modes[4] = { nullptr, "w", "r", "1r" };
-		append(r, util::string_format("mem_%s +%s%s", modes[memmode], goffset(pc/3), BIT(opcode, 0x21) ? "+idx" : ""));
+		append(r, util::string_format("mem_%s %s%s%s", modes[memmode], memmode != 1 && BIT(opcode, 0x23) ? "@" : "+", goffset(pc/3), BIT(opcode, 0x21) ? "+idx" : ""));
 	}
 
 	if(opcode == 0)
@@ -3735,13 +3743,18 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		UML_LOAD(block, I0, m_offset.data(), pc/3, SIZE_WORD, SCALE_x2);
 		if(amem == 3)
 			UML_ADD(block, I0, I0, 1);
-		UML_SUB(block, I0, I0, mem(&m_sample_counter));
 		if(BIT(opcode, 0x21))
 			UML_ADD(block, I0, I0, mem(&m_ram_index));
-		// Mask within the bank, then move to the bank start
-		UML_AND(block, I0, I0, mask);
-		if(base)
-			UML_ADD(block, I0, I0, base);
+		if(amem != 1 && BIT(opcode, 0x23))
+			// Absolute address, no sample counter and no bank mapping
+			UML_AND(block, I0, I0, 0x3ffff);
+		else {
+			UML_SUB(block, I0, I0, mem(&m_sample_counter));
+			// Mask within the bank, then move to the bank start
+			UML_AND(block, I0, I0, mask);
+			if(base)
+				UML_ADD(block, I0, I0, base);
+		}
 		if(amem == 1) {
 			UML_MOV(block, mem(&m_retval), mem(&m_ram_write));
 			UML_CALLC(block, call_revram_encode, this);
@@ -3930,7 +3943,9 @@ void swp30_device::meg_state::step()
 		break;
 	}
 	case 2: {
-		u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
+		u32 address = BIT(opcode, 0x23) ?
+			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0)) & 0x3ffff :
+			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
 		if(address != 0xffffffff) {
 			u16 val = m_swp->m_reverb_cache.read_word(address);
 			m_memr_value[m_delay_2] = revram_decode(val);
@@ -3939,7 +3954,9 @@ void swp30_device::meg_state::step()
 		break;
 	}
 	case 3: {
-		u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
+		u32 address = BIT(opcode, 0x23) ?
+			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) + 1) & 0x3ffff :
+			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
 		if(address != 0xffffffff) {
 			u16 val = m_swp->m_reverb_cache.read_word(address);
 			m_memr_value[m_delay_2] = revram_decode(val);
