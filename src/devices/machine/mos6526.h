@@ -83,8 +83,8 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(advance_tod_clock);
 
-	// On the 6526 an ICR read swallows the readable Timer B flag bit of an
-	// underflow landing in the next cycle
+	// On the 6526 the ICR read's clear window is held a little longer for the
+	// Timer B flag bit, so a flag set right after a read is swallowed
 	virtual bool icr_read_loses_tb() const { return true; }
 
 	// On the later chips the read bits are only driven to zero a cycle after the
@@ -140,13 +140,15 @@ protected:
 
 	// interrupts
 	bool m_irq;
-	int m_ir0;
-	int m_ir1;
-	int m_irq_pending;
+	int m_ir_set_prev;
+	int m_ir_set_prev2;
+	int m_icr7;
+	int m_ir_latch;
 	uint8_t m_icr;
 	uint8_t m_imr;
 	bool m_icr_read;
-	bool m_icr_tb_lost;
+	bool m_icr_read_prev;
+	bool m_ir_clr_pending;
 	uint8_t m_icr_delay;
 	uint8_t m_icr_sticky;
 	uint8_t m_icr_sticky_next;
