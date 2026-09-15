@@ -48,11 +48,27 @@ void floppy_image::set_variant(uint32_t _variant)
 
 	uint32_t sectors;
 	switch(variant) {
+	case SSSD10:
+	case SSDD10:
+	case SSQD10:
+	case DSSD10:
+	case DSDD10:
+	case DSQD10:
+		sectors = 10;
+		break;
+	case SSSD16:
 	case SSDD16:
 	case SSQD16:
+	case DSSD16:
 	case DSDD16:
 	case DSQD16:
 		sectors = 16;
+		break;
+	case SSSD32:
+	case SSDD32:
+	case DSSD32:
+	case DSDD32:
+		sectors = 32;
 		break;
 	default:
 		sectors = 0;
