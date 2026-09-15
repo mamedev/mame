@@ -514,9 +514,6 @@ void tms9901_device::phi_line(int state)
 			if (!m_clock_mode)
 				m_clock_read_register = m_decrementer_value;
 
-			// We signal the interrupt in sync with the clock line
-			signal_int();
-
 			// For the next phi assert
 			// MZ: This costs a lot of performance for a minimum of benefit.
 			if (m_poll_lines) sample_interrupt_inputs();
@@ -526,6 +523,11 @@ void tms9901_device::phi_line(int state)
 			if (m_clockdiv==32)
 				timer_clock_in(CLEAR_LINE);
 		}
+
+		// INTREQ follows the external clock, not the decrementer's /64 clock.
+		// Delaying deassertion can leave a stale interrupt request after the
+		// CPU acknowledges a peripheral and then enables interrupts.
+		signal_int();
 	}
 }
 
