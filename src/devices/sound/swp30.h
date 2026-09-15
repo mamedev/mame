@@ -446,6 +446,7 @@ private:
 	u16 wave_busy_r();
 	template<int Sel> u16 wave_val_r();
 	template<int Sel> void wave_val_w(u16 data);
+	u16 revram_enable_r();
 	void revram_enable_w(u16 data);
 	void revram_clear_w(u16 data);
 	u16 revram_status_r();
