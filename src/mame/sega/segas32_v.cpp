@@ -23,12 +23,6 @@
     - Sonic while globally flipped via the service menu, fails to flip
       the "SEGA" and "SEGASONIC" sprite based logos on the title screen.
 
-    - titlef NBG0 and NBG2 layers are currently hidden during gameplay.
-      It sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
-      Game actually uses the "rowscroll/rowselect" tables for a line window
-      effect to draw the boxing ring over NBG0.
-      Same deal for ga2 when in stage 2 cave a wall torch is lit.
-
     - Wrong priority cases (parenthesis for the level setup):
       dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
       dbzvrvs: Sheng-Long speech balloon during Piccoro ending (fixme: check levels).
@@ -89,6 +83,10 @@
                  -------- ------d-  Disable tilemap layer 1
                  -------- -------d  Disable tilemap layer 0
         F04      tttttttt --------  Rowscroll/select table page number
+                 -------- --i-----  Inhibit rowscroll/rowselect for tilemap layer 3
+                                    (clip window 3 becomes a line window fed by its tables)
+                 -------- ---i----  Inhibit rowscroll/rowselect for tilemap layer 2
+                                    (clip window 2 becomes a line window fed by its tables)
                  -------- ----s---  Enable rowselect for tilemap layer 3
                  -------- -----s--  Enable rowselect for tilemap layer 2
                  -------- ------c-  Enable rowscroll for tilemap layer 3
@@ -559,9 +557,86 @@ TILE_GET_INFO_MEMBER(segas32_state::get_text_tile_info)
  *
  *************************************/
 
+/*
+    Line windows
+
+    Same concept as the later Saturn VDP2 line window (VDP2 user's manual,
+    page 184): a clipping window applied with a per-scanline line table rather
+    than per-screen.  Two of the five clipping windows can be driven this way,
+    each from the line table of one rowscroll layer:
+
+      - $31FF04 bit 4 (NBG2 rowscroll/rowselect inhibited): clipping window 2
+        takes its left edge from the NBG2 rowscroll group ($x000) and its
+        right edge from the NBG2 rowselect group ($x200), one entry per
+        scanline.
+      - $31FF04 bit 5 (NBG3 inhibited): clipping window 3 likewise, from the
+        NBG3 groups ($x100 and $x300).
+
+    The window keeps the top and bottom of its register rectangle; only the
+    horizontal edges come from the table, 9 bits each like the registers, and
+    a line whose edges fall off screen (titlef writes $FFFF) contributes
+    nothing on that line.  Every layer whose clip select picks the window sees
+    the result, with the usual clip in/out polarity.
+
+    ga2 draws the lit-torch circle in the stage 2 cave with window 2 on NBG3,
+    matching footage of an original PCB.  titlef is a two-monitor game and
+    uses both: the left monitor's NBG0/NBG2 sit on window 2 and the right
+    monitor's NBG1/NBG3 on window 3, each fed the ring horizon of its own
+    camera, which is what shows the two windows to be independent.  jpark
+    cuts player 1's raptor-tunnel flashlight out of the NBG2 darkness with
+    window 2; player 2's light is a hole in the NBG2 tiles themselves, so
+    with player 2 alone the table stays zero over a full-screen clip-out
+    rectangle and the window has to fall away, which is what reading a zero
+    row literally gives.  All three games leave the layer's rowscroll enable
+    set next to the inhibit bit; the inhibit bit alone is taken as the
+    switch.
+*/
+
+void segas32_state::build_clip_extents(uint16_t *extent, const rectangle *clips, int mask, const rectangle &tempclip)
+{
+	// sort the rectangles by left edge
+	int sorted[5];
+	for (int i = 0; i < 5; i++)
+		sorted[i] = i;
+	for (int i = 0; i < 5; i++)
+		for (int j = i + 1; j < 5; j++)
+			if (clips[sorted[i]].min_x > clips[sorted[j]].min_x) { int temp = sorted[i]; sorted[i] = sorted[j]; sorted[j] = temp; }
+
+	// start off with an entry at tempclip.min_x
+	uint16_t *const first = extent;
+	*extent++ = tempclip.min_x;
+
+	// loop in sorted order over extents
+	for (int j = 0; j < 5; j++)
+	{
+		if (BIT(mask, sorted[j]))
+		{
+			const rectangle &cur = clips[sorted[j]];
+
+			// see if this intersects our last extent
+			if (extent != &first[1] && cur.min_x <= extent[-1])
+			{
+				if (cur.max_x > extent[-1])
+					extent[-1] = cur.max_x;
+			}
+			else
+			{
+				// otherwise, just append to the list
+				*extent++ = cur.min_x;
+				*extent++ = cur.max_x;
+			}
+		}
+	}
+
+	// append an ending entry
+	*extent++ = tempclip.max_x;
+}
+
+
 bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable, bool clipout, int clipmask, const rectangle &cliprect, extents_list *list)
 {
 	const bool flip = BIT(m_videoram[0x1ff00 / 2], 9);
+	const rectangle &visarea = screen.visible_area();
 	rectangle tempclip;
 
 	// expand our cliprect to exclude the bottom-right
@@ -582,7 +657,6 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 
 	// extract the from videoram into locals, and apply the cliprect
 	rectangle clips[5];
-	int sorted[5];
 	for (int i = 0; i < 5; i++)
 	{
 		if (!flip)
@@ -594,58 +668,23 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		}
 		else
 		{
-			const rectangle &visarea = screen.visible_area();
-
 			clips[i].max_x = (visarea.max_x + 1) - (m_videoram[0x1ff60/2 + i * 4] & 0x1ff);
 			clips[i].max_y = (visarea.max_y + 1) - (m_videoram[0x1ff62/2 + i * 4] & 0x0ff);
 			clips[i].min_x = (visarea.max_x + 1) - ((m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
 			clips[i].min_y = (visarea.max_y + 1) - ((m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
 		}
 		clips[i] &= tempclip;
-		sorted[i] = i;
 	}
-
-	// bubble sort them by min_x
-	for (int i = 0; i < 5; i++)
-		for (int j = i + 1; j < 5; j++)
-			if (clips[sorted[i]].min_x > clips[sorted[j]].min_x) { int temp = sorted[i]; sorted[i] = sorted[j]; sorted[j] = temp; }
 
 	// create all valid extent combinations
 	for (int i = 1; i < 32; i++)
-	{
 		if (i & clipmask)
-		{
-			uint16_t *extent = &list->extent[i][0];
+			build_clip_extents(&list->extent[i][0], clips, i, tempclip);
 
-			// start off with an entry at tempclip.min_x
-			*extent++ = tempclip.min_x;
-
-			// loop in sorted order over extents
-			for (int j = 0; j < 5; j++)
-			{
-				if (BIT(i, sorted[j]))
-				{
-					const rectangle &cur = clips[sorted[j]];
-
-					// see if this intersects our last extent
-					if (extent != &list->extent[i][1] && cur.min_x <= extent[-1])
-					{
-						if (cur.max_x > extent[-1])
-							extent[-1] = cur.max_x;
-					}
-					else
-					{
-						// otherwise, just append to the list
-						*extent++ = cur.min_x;
-						*extent++ = cur.max_x;
-					}
-				}
-			}
-
-			// append an ending entry
-			*extent++ = tempclip.max_x;
-		}
-	}
+	// windows 2 and 3 are line windows while their rowscroll layer is inhibited
+	const uint16_t rowctl = m_videoram[0x1ff04/2];
+	uint16_t const *const table = &m_videoram[(rowctl >> 10) * 0x400];
+	const int linemask = (BIT(rowctl, 4) ? 0x04 : 0) | (BIT(rowctl, 5) ? 0x08 : 0);
 
 	// loop over scanlines and build extents
 	for (int y = tempclip.min_y; y < tempclip.max_y; y++)
@@ -656,7 +695,44 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		for (int i = 0; i < 5; i++)
 			if ((BIT(clipmask , i)) && y >= clips[i].min_y && y < clips[i].max_y)
 				sect |= 1 << i;
-		list->scan_extent[y] = sect;
+
+		// a scanline under a line window gets its own extent list
+		if (sect & linemask)
+		{
+			rectangle lineclips[5];
+			for (int i = 0; i < 5; i++)
+				lineclips[i] = clips[i];
+
+			const int line = flip ? (visarea.max_y - y) : y;
+			for (int i = 2; i <= 3; i++)
+			{
+				if (BIT(sect & linemask, i))
+				{
+					const int left = table[0x000 + 0x100 * (i - 2) + line] & 0x1ff;
+					const int right = table[0x200 + 0x100 * (i - 2) + line] & 0x1ff;
+
+					if (!flip)
+					{
+						lineclips[i].min_x = left;
+						lineclips[i].max_x = right + 1;
+					}
+					else
+					{
+						lineclips[i].min_x = (visarea.max_x + 1) - (right + 1);
+						lineclips[i].max_x = (visarea.max_x + 1) - left;
+					}
+					lineclips[i] &= tempclip;
+
+					if (lineclips[i].min_x >= lineclips[i].max_x)
+						sect &= ~(1 << i);
+				}
+			}
+
+			build_clip_extents(&list->extent[32 + y][0], lineclips, sect, tempclip);
+			list->scan_extent[y] = 32 + y;
+		}
+		else
+			list->scan_extent[y] = sect;
 	}
 
 	return clipout;

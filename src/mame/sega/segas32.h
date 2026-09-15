@@ -86,8 +86,8 @@ protected:
 
 	struct extents_list
 	{
-		uint8_t                   scan_extent[256]{};
-		uint16_t                  extent[32][16]{};
+		uint16_t                  scan_extent[256]{};
+		uint16_t                  extent[32 + 256][16]{};   // 32 window combinations, then one per scanline under a line window
 	};
 
 
@@ -180,6 +180,7 @@ protected:
 	void titlef_sw2_output(int which, uint16_t data);
 	void scross_sw1_output(int which, uint16_t data);
 	void scross_sw2_output(int which, uint16_t data);
+	static void build_clip_extents(uint16_t *extent, const rectangle *clips, int mask, const rectangle &tempclip);
 	bool compute_clipping_extents(screen_device &screen, bool enable, bool clipout, int clipmask, const rectangle &cliprect, extents_list *list);
 	void compute_tilemap_flips(int bgnum, bool &flipx, bool &flipy);
 	void update_tilemap_zoom(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
