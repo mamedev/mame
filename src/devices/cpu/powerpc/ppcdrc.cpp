@@ -1029,7 +1029,7 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		{
 			if (exception == EXCEPTION_ITLBMISS)
 				UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);      // or      [srr1],0x00040000
-			else if (exception == EXCEPTION_DTLBMISSL)
+			else if (exception == EXCEPTION_DTLBMISSS)
 				UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00010000);      // or      [srr1],0x00010000
 			if (exception == EXCEPTION_ITLBMISS || exception == EXCEPTION_DTLBMISSL || exception == EXCEPTION_DTLBMISSS)
 				UML_ROLINS(block, SPR32(SPROEA_SRR1), CR32(0), 28, CRMASK(0));  // rolins  [srr1],[cr0],28,crmask(0)
