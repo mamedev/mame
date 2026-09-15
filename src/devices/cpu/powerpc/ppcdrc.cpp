@@ -45,8 +45,9 @@
 #define MODE_PROTECTION                 0x02        // 4XX
 #define MODE_USER                       0x04
 
-// Mask for the actual part of a vTLB entry that needs to cause a recompile
-#define VTLB_MAPPING_MASK               (~vtlb_entry(FLAGS_MASK) | FLAG_VALID)
+// Mask for the actual part of a vTLB entry that needs to cause a recompile.
+// Bits 8-11 are below the smallest page and carry 603 protection, not mapping.
+#define VTLB_MAPPING_MASK               (~vtlb_entry(0xfff) | FLAG_VALID)
 
 // exit codes
 #define EXECUTE_OUT_OF_CYCLES           0
@@ -916,7 +917,7 @@ void ppc_device::static_generate_tlb_mismatch()
 		alloc_handle(m_drcuml.get(), &m_exception[EXCEPTION_ITLBMISS], "exception_itlb_miss");
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(20));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// generate a hash jump via the current mode and PC
 	alloc_handle(m_drcuml.get(), &m_tlb_mismatch, "tlb_mismatch");
@@ -951,6 +952,17 @@ void ppc_device::static_generate_tlb_mismatch()
 	}
 	else
 	{
+		// a fetch the entry refuses is a protection ISI; reporting a miss would have
+		// the handler reload the same entry and fault again forever
+		int itlbmiss = label++;
+		UML_MOV(block, mem(&m_core->param1), TR_FETCH);                     // mov     [param1],TR_FETCH
+		UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                     // callc   get_dsisr,ppc
+		UML_MOV(block, I1, mem(&m_core->param1));                           // mov     i1,[param1]
+		UML_TEST(block, I1, DSISR_PROTECTED);                               // test    i1,DSISR_PROTECTED
+		UML_JMPc(block, COND_Z, itlbmiss);                                  // jmp     itlbmiss,z
+		UML_AND(block, I1, I1, DSISR_NOT_FOUND | DSISR_PROTECTED);          // and     i1,i1,reason
+		UML_EXH(block, *m_exception[EXCEPTION_ISI], I1);                    // exh     isi,i1
+		UML_LABEL(block, itlbmiss);                                         // itlbmiss:
 		UML_MOV(block, SPR32(SPR603_IMISS), I0);                                        // mov     [imiss],i0
 		UML_MOV(block, SPR32(SPR603_ICMP), mem(&m_core->mmu603_cmp));                          // mov     [icmp],[mmu603_cmp]
 		UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                     // mov     [hash1],[mmu603_hash][0]

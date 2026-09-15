@@ -1461,6 +1461,16 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 		m_core->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
 		if ((entry & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID))
 		{
+			// These flags are the only protection a software-reloaded TLB has.
+			if (!(entry & (1 << (intention & (TR_TYPE | TR_USER)))))
+			{
+				// C clear rather than PP: a store TLB miss lets software set it.
+				const vtlb_entry ppwrite = (intention & TR_USER) ?
+						PPC603_TLB_PP_USER_WRITABLE : PPC603_TLB_PP_WRITABLE;
+				if ((transtype == TR_WRITE) && (entry & ppwrite))
+					return DSISR_NOT_FOUND | DSISR_STORE;
+				return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
+			}
 			address = (entry & 0xfffff000) | (address & 0x00000fff);
 			return 0x001;
 		}
@@ -1538,7 +1548,13 @@ bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address, 
 void ppc_device::ppccom_tlb_fill()
 {
 	offs_t address = m_core->param0;
-	if (ppccom_translate_address_internal(m_core->param1, false, address) > 1)
+	const uint32_t result = ppccom_translate_address_internal(m_core->param1, false, address);
+	if ((m_cap & PPCCAP_603_MMU) && (result & DSISR_PROTECTED))
+	{
+		// the DSI reason is re-derived from this entry; flushing loops forever
+		return;
+	}
+	if (result > 1)
 	{
 		// The page tables no longer translate this address, so kick it out of the TLB
 		vtlb_flush_address(m_core->param0);
@@ -1645,12 +1661,12 @@ void ppc_device::ppccom_execute_mtsr()
 		// If that happens, bump the translation generation.
 		if (((oldval ^ newval) & 0x80ff'ffff) != 0)
 		{
-			// 603 TLB entries are tagged with the VSID, so the segment's fixed entries are now stale
-			if (m_cap & PPCCAP_603_MMU)
-				vtlb_flush_fixed(seg << 28, 0xf000'0000);
-
 			m_core->m_translation_generation++;
 		}
+
+		// entries are tagged with the VSID and record Ks/Kp, so both stale them
+		if ((m_cap & PPCCAP_603_MMU) && ((oldval ^ newval) & 0xe0ff'ffff) != 0)
+			vtlb_flush_fixed(seg << 28, 0xf000'0000);
 	}
 }
 
@@ -1828,10 +1844,31 @@ void ppc_device::ppccom_execute_tlbl()
 	// determine entry number; we use machine().rand() for associativity
 	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
-	// Determine the access flags, for both supervisor and user modes.
-	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED | USER_READ_ALLOWED | USER_FETCH_ALLOWED;
-	if (m_core->spr[SPR603_RPA] & 0x80)
-		flags |= WRITE_ALLOWED | USER_WRITE_ALLOWED;
+	// RPA is the PTE's second word. A store also needs C, so the first store
+	// to a page loaded for a read misses again and lets software set it.
+	const uint32_t segreg = m_core->sr[address >> 28];
+	const uint8_t protbits = m_core->spr[SPR603_RPA] & 0x03;
+	const uint8_t supkey = BIT(segreg, 30);     // Ks
+	const uint8_t userkey = BIT(segreg, 29);    // Kp
+	const bool changed = BIT(m_core->spr[SPR603_RPA], 7);
+
+	flags = FLAG_VALID;
+	if (page_access_allowed(TR_READ, supkey, protbits))
+		flags |= READ_ALLOWED | FETCH_ALLOWED;
+	if (page_access_allowed(TR_READ, userkey, protbits))
+		flags |= USER_READ_ALLOWED | USER_FETCH_ALLOWED;
+	if (page_access_allowed(TR_WRITE, supkey, protbits))
+	{
+		flags |= PPC603_TLB_PP_WRITABLE;
+		if (changed)
+			flags |= WRITE_ALLOWED;
+	}
+	if (page_access_allowed(TR_WRITE, userkey, protbits))
+	{
+		flags |= PPC603_TLB_PP_USER_WRITABLE;
+		if (changed)
+			flags |= USER_WRITE_ALLOWED;
+	}
 
 	// load the entry
 	vtlb_load(entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
