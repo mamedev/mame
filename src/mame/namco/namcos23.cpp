@@ -1249,6 +1249,7 @@ It can also be used with Final Furlong when wired correctly.
 #include "video.h"
 
 #include "md8412b_s23.h"
+#include "namco_c139.h"
 #include "namco_settings.h"
 #include "vpx3220a.h"
 
@@ -1305,6 +1306,7 @@ It can also be used with Final Furlong when wired correctly.
 #define LOG_C451            (1ULL << 46)
 #define LOG_SH2_VPX         (1ULL << 47)
 #define LOG_DIRECT          (1ULL << 48)
+#define LOG_LINK            (1ULL << 49)
 #define LOG_ALL ( LOG_CLIP_DATA | LOG_3D_STATE_ERR | LOG_3D_STATE_UNK | LOG_VEC_ERR | LOG_VEC_UNK | LOG_RENDER_ERR | LOG_RENDER_INFO | LOG_MODEL_ERR | \
 				LOG_MODEL_INFO | LOG_MODELS | LOG_C435_PIO_UNK | LOG_C435_UNK | LOG_C417_UNK | LOG_C417_ACK | LOG_C412_UNK | LOG_C421_UNK | \
 				LOG_C422_IRQ | LOG_C422_UNK | LOG_C361_UNK | LOG_CTL_UNK | LOG_C417_IRQ | LOG_C361_IRQ | LOG_MATRIX_INFO | LOG_VEC_INFO | \
@@ -1347,6 +1349,28 @@ namespace
 
 static s32 u32_to_s24(u32 v);
 static s32 u32_to_s10(u32 v);
+
+// Cabinet-link (C139/C422) assist tuning for the timecrs2 link code.
+//
+// While linked gameplay is staged the game's RX service refills its link
+// keepalive counter only while the counter is still above zero; the
+// within-frame service decrement can therefore hit zero between refills,
+// firing a one-way COM-fallback that disarms the partner's ingest.
+// Flooring the counter at 2 (raising it only when it reads below that,
+// never lowering a refilled counter) keeps the game's own refill and
+// arming paths reachable without ever firing the fallback.
+static constexpr u32 LINK_KEEPALIVE_FLOOR = 2;
+
+// The game's per-entity tick releases any REMOTE-placeholder entity
+// (owned by the partner, its script never run locally) that receives no
+// partner state for 17 consecutive frames (~0.28 s).  At the link's
+// round-start exchange cadence a spawn-burst serve can take longer than
+// that, so freshly-spawned placeholders would die unserved.  The patched
+// immediate widens the compare (sltiu count, imm) from 0x11 (17 ticks) to
+// 0x1F (31 ticks, ~0.52 s) - beyond the worst-case serve latency.  Only
+// remote placeholders are affected: every scripted completion requires an
+// entity's program to have RUN, which the placeholder state forbids.
+static constexpr u32 REAPER_PATIENCE_IMM = 0x001f;
 
 enum
 {
@@ -1729,7 +1753,6 @@ public:
 	{ }
 
 	void s23(machine_config &config);
-	void timecrs2(machine_config &config);
 	void downhill(machine_config &config);
 	void panicprk(machine_config &config);
 
@@ -2082,6 +2105,114 @@ protected:
 			});
 		}
 	}
+};
+
+// Time Crisis II runs as a linked pair of cabinets connected through the
+// C139/C422 serial link controller.  The link controller, its memory-map
+// window and the per-frame link service are scoped to this subclass so
+// every other System 23 game keeps the plain C422 register stub.
+class timecrs2_state : public namcos23_state
+{
+public:
+	timecrs2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos23_state(mconfig, type, tag),
+		m_c139(*this, "c139")
+	{ }
+
+	void timecrs2(machine_config &config);
+
+protected:
+	void mips_map(address_map &map) ATTR_COLD;
+
+	virtual void vblank(int state) override;
+
+	// per-frame (vblank rising edge) link service, see the definition
+	void link_vblank_service();
+
+	// bridge from namco_c139_device's IRQ output line into the existing
+	// irq_update() / MAIN_C422_IRQ infrastructure
+	void c139_irq_w(int state);
+
+	required_device<namco_c139_device> m_c139;  // twin-cabinet link controller (silkscreened "C422" on System 23 PCBs)
+
+	// Cabinet-link (C139/C422) per-frame service state - see
+	// link_vblank_service().
+	//
+	// The RAM-code assists below are all VERIFY-BEFORE-POKE: the target
+	// word is read back each vblank until it matches the expected original
+	// instruction (the boot loader copies the main program from ROM into
+	// RAM in early boot, so the word reads 0 for the first frames - a zero
+	// word cannot execute meanwhile), then rewritten with ONLY its 16-bit
+	// immediate field changed (or NOPed).  Any OTHER non-zero word trips a
+	// one-shot ROM-revision refusal and the assist stays inert - an
+	// unverified instruction is never patched.  A once-per-second guard
+	// re-reads each patched word and re-pokes if the original
+	// re-materialized (loader re-copy / soft-reset re-boot; a soft reset
+	// also flushes the whole DRC cache, and each patched routine first
+	// executes long after the early-boot poke lands, so the DRC always
+	// compiles from the patched RAM - a residual re-copy window fails to
+	// STOCK behaviour only).
+	u32 m_link_frame_count = 0;     // vblank counter for the 1/s guards
+
+	// op6F clock-adoption suppression.  The game's link opcode 0x6F
+	// carries the master cabinet's play-clock pair; the slave's RX handler
+	// adopts both words into its own player record unconditionally.  The
+	// master's pair is never re-based mid-round, so an adoption lands the
+	// slave's freshly re-based segment clock back on a stale value and
+	// splits the local pair consistency its scoring/HUD consumers rely on.
+	// Both adoption stores are NOPed (the master's role gate skips them
+	// anyway, so the patch is structurally inert on the master); the cost
+	// is a bounded cross-cabinet play-clock skew.  Each NOP keeps a
+	// read-only per-vblank falsifier that MUST stay silent: a value jump
+	// with the adoption fingerprint means an adoption path the patch does
+	// not cover.
+	bool m_no394b_poked = false;    // one-shot: the +0x394 store NOP is in RAM
+	bool m_no394b_refused = false;  // one-shot: ROM-revision guard tripped - inert
+	u32 m_no394b_repokes = 0;       // guard re-pokes after re-materialization (expect 0)
+	u32 m_no394_adopt_edges = 0;    // falsifier hits (MUST stay 0 while poked)
+	bool m_no394_have_prev = false;
+	u32 m_no394_prev_394 = 0;       // player record +0x394 last vblank (jump basis)
+	bool m_no390b_poked = false;    // one-shot: the +0x390 store NOP is in RAM
+	bool m_no390b_refused = false;  // one-shot: ROM-revision guard tripped - inert
+	u32 m_no390b_repokes = 0;       // guard re-pokes after re-materialization (expect 0)
+	u32 m_no390b_jump390s = 0;      // falsifier: positive +0x390 jumps > +2 (MUST stay 0 while poked)
+	bool m_no390b_have_prev = false;
+	u32 m_no390b_prev_390 = 0;      // player record +0x390 last vblank (jump basis)
+
+	// Wave-anchor resurrect.  The game tracks each area's wave-anchor
+	// entity in a small 4-slot (id, handle) ring; its find-or-create
+	// returns a DEAD ring slot's handle WITHOUT resurrecting (only a
+	// strict not-found reaches the create+register path), so an anchor
+	// whose slot died can never be re-created and the area completes
+	// empty.  Blanking a dead slot's id to 0xFFFFFFFF makes it invisible
+	// to every find (both find loops fast-path id == -1, which can never
+	// match 0xFFFFFFFF) while leaving it a perfectly reusable free slot
+	// (registration scans for handle < 0 only) - the next commit of that
+	// anchor id misses, creates a fresh entity and reuses the slot.
+	// Verdict-neutral for the completion check (found-dead -1 and
+	// not-found -2 are both negative; the check is sign-only).  DATA-side
+	// only: one word of game data per dead slot, live handles never
+	// touched.
+	u32 m_ars_scrubs = 0;           // total dead-slot id scrubs
+
+	// remote-placeholder reaper patience (see REAPER_PATIENCE_IMM)
+	bool m_rpp_poked = false;       // one-shot: the widened immediate is in RAM
+	bool m_rpp_refused = false;     // one-shot: ROM-revision guard tripped - inert
+	u32 m_rpp_repokes = 0;          // guard re-pokes after re-materialization (expect 0)
+
+	// TX single-burst quantum.  The game's TX pump chops any frame larger
+	// than 0xFF halfwords into a <=0xFF-halfword chunk train, but that
+	// ceiling is the pump's own burst quantum, not the chip's frame limit:
+	// the receive-side drain validator accepts slot lengths up to 0x400
+	// halfwords (one full C422 TX window slot).  Widening the pump's
+	// frame-start size compare (slti len, 0x100 -> slti len, 0x401) makes
+	// every frame up to 0x400 halfwords emit as ONE burst, halving the
+	// stop-and-wait round-trips a multi-chunk frame costs.  The C139
+	// device passes such bursts through whole (its chunk tracking keys on
+	// the exact 0xFF-halfword saturated size).
+	bool m_bq_poked = false;        // one-shot: the widened immediate is in RAM
+	bool m_bq_refused = false;      // one-shot: ROM-revision guard tripped - inert
+	u32 m_bq_repokes = 0;           // guard re-pokes after re-materialization (expect 0)
 };
 
 class rapidrvr_state : public gorgon_state
@@ -5170,6 +5301,300 @@ void namcos23_state::vblank(int state)
 	m_adc->adtrg_w(state);
 }
 
+void timecrs2_state::vblank(int state)
+{
+	// service the cabinet link ahead of the vblank IRQ so everything it
+	// touches is settled before the game's vblank handler runs
+	if (state)
+		link_vblank_service();
+
+	namcos23_state::vblank(state);
+}
+
+// Cabinet-link (C139/C422) per-frame service.  The RAM addresses below
+// are from the timecrs2 link code; every RAM-code patch is additionally
+// verify-before-poke (see the member block), so on ROM revisions whose
+// program differs the patches refuse one-shot and stay inert.  All
+// RAM-side work is gated on an established link: during solo play the
+// game's RAM is never touched.
+void timecrs2_state::link_vblank_service()
+{
+	++m_link_frame_count;
+	u16 const cur_counter = u16(m_mainram[0x002CEDD8 / 4] >> 16); // link state-machine call counter
+
+	// Push our state counter to the C139 every frame so the keepalive
+	// replay can stamp current bytes 0-1 (the partner counter the
+	// peer's dispatcher reads).
+	m_c139->set_local_counter(cur_counter);
+
+	bool const linked = m_c139->is_linked();
+
+	// Keepalive floor: while linked gameplay is staged (mode word
+	// 0x802F3FD0 == 2), raise the link keepalive word 0x802F3FD8 to
+	// the floor whenever it reads below it.  The game's RX service
+	// refills the keepalive to 0x10 only while it is still above
+	// zero; once it reads 0 a one-way COM-fallback disarms the
+	// partner's ingest and no path re-arms it mid-stage.  Flooring
+	// (never lowering) keeps the game's own refill and arming paths
+	// reachable.  Ordered before the device hooks below so a freshly
+	// floored keepalive reads as alive in the same vblank pass.
+	if (linked)
+	{
+		u32 const staging_mode = m_mainram[0x002F3FD0 / 4];
+		u32 const keepalive    = m_mainram[0x002F3FD8 / 4];
+		if (staging_mode == 2 && keepalive < LINK_KEEPALIVE_FLOOR)
+		{
+			m_mainram[0x002F3FD8 / 4] = LINK_KEEPALIVE_FLOOR;
+			LOGMASKED(LOG_LINK, "link keepalive floored frame=%u pre=%u post=%u\n",
+					m_link_frame_count, keepalive, LINK_KEEPALIVE_FLOOR);
+		}
+	}
+
+	// per-vblank frame-token send + bounded lockstep barrier
+	m_c139->vblank_tick();
+
+	// Push the link-session phase to the device every vblank (only
+	// the driver can read the game's staging mode word; READ-ONLY
+	// here).  The device debounces the signal and models the chip's
+	// TX-complete release only in the stable in-game state.
+	{
+		u32 const staging_mode = m_mainram[0x002F3FD0 / 4];
+		m_c139->set_ingame(staging_mode == 2, staging_mode);
+	}
+
+	// everything below reads or writes game RAM - linked sessions only
+	if (!linked)
+		return;
+
+	// op6F +0x394 (segment clock) adoption store NOP.  The word at
+	// virtual 0x800B2508 must read 0xAC460394 (sw $a2,0x394($v0), the
+	// sole +0x394 store of the op6F clock-adoption receiver) before
+	// it is NOPed; 0 = program not copied yet, keep waiting; anything
+	// else = one-shot ROM-revision refusal.
+	if (!m_no394b_poked && !m_no394b_refused)
+	{
+		address_space &prog = m_maincpu->space(AS_PROGRAM);
+		u32 const word = prog.read_dword(0x000b2508);
+		if (word == 0xac460394)
+		{
+			prog.write_dword(0x000b2508, 0x00000000);
+			m_no394b_poked = true;
+			LOGMASKED(LOG_LINK, "op6F +0x394 adoption store NOPed @0x800B2508 (frame=%u)\n",
+					m_link_frame_count);
+		}
+		else if (word != 0)
+		{
+			m_no394b_refused = true;
+			LOGMASKED(LOG_LINK, "op6F +0x394 adoption NOP REFUSED @0x800B2508 found=%08x expected=AC460394 - staying inert\n",
+					word);
+		}
+	}
+
+	// op6F +0x390 (play clock) adoption store NOP - the other half of
+	// the adoption pair, one instruction earlier.  The word at
+	// virtual 0x800B2504 must read 0xAC470390 (sw $a3,0x390($v0)).
+	// With both halves NOPed the receiver still parses the two clock
+	// values and returns the advanced stream pointer exactly as
+	// before; it just stores nothing.
+	if (!m_no390b_poked && !m_no390b_refused)
+	{
+		address_space &prog = m_maincpu->space(AS_PROGRAM);
+		u32 const word = prog.read_dword(0x000b2504);
+		if (word == 0xac470390)
+		{
+			prog.write_dword(0x000b2504, 0x00000000);
+			m_no390b_poked = true;
+			LOGMASKED(LOG_LINK, "op6F +0x390 adoption store NOPed @0x800B2504 (frame=%u)\n",
+					m_link_frame_count);
+		}
+		else if (word != 0)
+		{
+			m_no390b_refused = true;
+			LOGMASKED(LOG_LINK, "op6F +0x390 adoption NOP REFUSED @0x800B2504 found=%08x expected=AC470390 - staying inert\n",
+					word);
+		}
+	}
+
+	// Remote-placeholder reaper patience widening.  The word at
+	// virtual 0x800B71A0 must read 0x2C420011 (sltiu $v0,$v0,0x11 -
+	// the 17-tick unserved-placeholder timeout compare); the
+	// replacement is constructed from the verified word by changing
+	// ONLY the 16-bit immediate field (see REAPER_PATIENCE_IMM).
+	if (!m_rpp_poked && !m_rpp_refused)
+	{
+		address_space &prog = m_maincpu->space(AS_PROGRAM);
+		u32 const word = prog.read_dword(0x000b71a0);
+		if (word == 0x2c420011)
+		{
+			u32 const patched = (word & 0xffff0000) | REAPER_PATIENCE_IMM; // still sltiu $v0,$v0,imm
+			prog.write_dword(0x000b71a0, patched);
+			m_rpp_poked = true;
+			LOGMASKED(LOG_LINK, "remote-placeholder reaper patience widened @0x800B71A0 new=%08X (17 -> 31 ticks; frame=%u)\n",
+					patched, m_link_frame_count);
+		}
+		else if (word != 0)
+		{
+			m_rpp_refused = true;
+			LOGMASKED(LOG_LINK, "reaper patience poke REFUSED @0x800B71A0 found=%08x expected=2C420011 - staying inert\n",
+					word);
+		}
+	}
+
+	// TX single-burst quantum widening.  The word at virtual
+	// 0x8000BC78 must read 0x28420100 (slti $v0,$v0,0x100 - the TX
+	// pump's frame-start burst-size selector: smaller frames take the
+	// whole-frame path, larger ones start a 0xFF-halfword chunk
+	// train).  The immediate is widened to 0x401 so every frame up to
+	// 0x400 halfwords - the receive validator's own ceiling - takes
+	// the whole-frame path as ONE burst.
+	if (!m_bq_poked && !m_bq_refused)
+	{
+		address_space &prog = m_maincpu->space(AS_PROGRAM);
+		u32 const word = prog.read_dword(0x0000bc78);
+		if (word == 0x28420100)
+		{
+			u32 const patched = (word & 0xffff0000) | 0x0401; // still slti $v0,$v0,imm
+			prog.write_dword(0x0000bc78, patched);
+			m_bq_poked = true;
+			LOGMASKED(LOG_LINK, "TX pump burst quantum widened @0x8000BC78 new=%08X (0x100 -> 0x401 halfwords; frame=%u)\n",
+					patched, m_link_frame_count);
+		}
+		else if (word != 0)
+		{
+			m_bq_refused = true;
+			LOGMASKED(LOG_LINK, "burst quantum poke REFUSED @0x8000BC78 found=%08x expected=28420100 - staying inert\n",
+					word);
+		}
+	}
+
+	// op6F +0x394 adoption falsifier + 1/s re-poke guard.  The
+	// adoption fingerprint: the player record's +0x394 segment clock
+	// (0x802F43F4) jumping by more than +/-2 between vblank samples
+	// AND landing within +/-3 of the +0x390 play clock (0x802F43F0) -
+	// legitimate writers cannot produce that (ticks are +1/+2;
+	// re-init and re-base values land nowhere near the running
+	// clock).  With the store NOPed this MUST stay silent; a hit
+	// means an adoption path the NOP does not cover.
+	{
+		u32 const rec0_390 = m_mainram[0x002F43F0 / 4]; // player record +0x390 play clock
+		u32 const rec0_394 = m_mainram[0x002F43F4 / 4]; // player record +0x394 segment clock
+		if (m_no394_have_prev)
+		{
+			s32 const jump = s32(rec0_394 - m_no394_prev_394);
+			s32 const gap  = s32(rec0_394 - rec0_390);
+			if ((jump < -2 || jump > 2) && gap >= -3 && gap <= 3)
+			{
+				++m_no394_adopt_edges;
+				LOGMASKED(LOG_LINK, "op6F +0x394 adoption fingerprint frame=%u jump=%d new394=%08x cur390=%08x edges_total=%u (MUST stay 0 while the NOP is in place)\n",
+						m_link_frame_count, jump, rec0_394, rec0_390, m_no394_adopt_edges);
+			}
+		}
+		m_no394_prev_394 = rec0_394;
+		m_no394_have_prev = true;
+
+		if (m_link_frame_count % 60 == 0)
+		{
+			address_space &prog = m_maincpu->space(AS_PROGRAM);
+			u32 const word2508 = prog.read_dword(0x000b2508);
+			if (m_no394b_poked && word2508 == 0xac460394)
+			{
+				prog.write_dword(0x000b2508, 0x00000000);
+				++m_no394b_repokes;
+				LOGMASKED(LOG_LINK, "op6F +0x394 adoption store re-NOPed @0x800B2508 frame=%u repokes_total=%u (word re-materialized - loader re-copy or soft-reset re-boot)\n",
+						m_link_frame_count, m_no394b_repokes);
+			}
+		}
+	}
+
+	// op6F +0x390 adoption falsifier + 1/s re-poke guard.  Any
+	// POSITIVE +0x390 jump greater than +2 between vblank samples is
+	// the adoption fingerprint (normal ticks are +1/+2; re-inits are
+	// negative-class; the segment re-base zeroes +0x394, not +0x390).
+	{
+		u32 const rec0_390 = m_mainram[0x002F43F0 / 4]; // player record +0x390 play clock
+		if (m_no390b_have_prev)
+		{
+			s32 const jump = s32(rec0_390 - m_no390b_prev_390);
+			if (jump > 2)
+			{
+				++m_no390b_jump390s;
+				LOGMASKED(LOG_LINK, "op6F +0x390 adoption fingerprint frame=%u jump=%d new390=%08x jumps_total=%u (MUST stay 0 while the NOP is in place)\n",
+						m_link_frame_count, jump, rec0_390, m_no390b_jump390s);
+			}
+		}
+		m_no390b_prev_390 = rec0_390;
+		m_no390b_have_prev = true;
+
+		if (m_link_frame_count % 60 == 0)
+		{
+			address_space &prog = m_maincpu->space(AS_PROGRAM);
+			u32 const word2504 = prog.read_dword(0x000b2504);
+			if (m_no390b_poked && word2504 == 0xac470390)
+			{
+				prog.write_dword(0x000b2504, 0x00000000);
+				++m_no390b_repokes;
+				LOGMASKED(LOG_LINK, "op6F +0x390 adoption store re-NOPed @0x800B2504 frame=%u repokes_total=%u (word re-materialized - loader re-copy or soft-reset re-boot)\n",
+						m_link_frame_count, m_no390b_repokes);
+			}
+		}
+	}
+
+	// 1/s re-poke guard for the reaper-patience word.
+	if (m_link_frame_count % 60 == 0)
+	{
+		address_space &prog = m_maincpu->space(AS_PROGRAM);
+		u32 const wordb71a0 = prog.read_dword(0x000b71a0);
+		if (m_rpp_poked && wordb71a0 == 0x2c420011)
+		{
+			u32 const patched = (wordb71a0 & 0xffff0000) | REAPER_PATIENCE_IMM;
+			prog.write_dword(0x000b71a0, patched);
+			++m_rpp_repokes;
+			LOGMASKED(LOG_LINK, "reaper patience re-poked @0x800B71A0 new=%08X frame=%u repokes_total=%u\n",
+					patched, m_link_frame_count, m_rpp_repokes);
+		}
+	}
+
+	// 1/s re-poke guard for the burst-quantum word.
+	if (m_link_frame_count % 60 == 0)
+	{
+		address_space &prog = m_maincpu->space(AS_PROGRAM);
+		u32 const wordbc78 = prog.read_dword(0x0000bc78);
+		if (m_bq_poked && wordbc78 == 0x28420100)
+		{
+			u32 const patched = (wordbc78 & 0xffff0000) | 0x0401;
+			prog.write_dword(0x0000bc78, patched);
+			++m_bq_repokes;
+			LOGMASKED(LOG_LINK, "TX pump burst quantum re-poked @0x8000BC78 new=%08X frame=%u repokes_total=%u\n",
+					patched, m_link_frame_count, m_bq_repokes);
+		}
+	}
+
+	// Wave-anchor resurrect: dead-slot id scrub over the 4-slot
+	// (id, handle) anchor ring at 0x802D2030 (8 bytes per slot: id
+	// word + handle halfword in the top half of the following word).
+	// Any slot with handle < 0 (GUARD: live handles never touched)
+	// and a real id (not 0 = init state, not 0xFFFFFFFF = already
+	// scrubbed) gets its id word blanked so the next find-or-create
+	// of that anchor id misses and creates a fresh entity into the
+	// still-free slot.  Runs after the sampling above so a scrub can
+	// never be mistaken for a game transaction by any observer.
+	{
+		for (int s = 0; s < 4; s++)
+		{
+			u32 const ringid = m_mainram[(0x002D2030 + 8 * s) / 4];
+			s32 const ringh  = s16(m_mainram[(0x002D2034 + 8 * s) / 4] >> 16); // handle lane = top half (big-endian)
+			if (ringh >= 0)
+				continue; // GUARD: never touch a live handle
+			if (ringid == 0xffffffff || ringid == 0)
+				continue; // already scrubbed / init state - nothing to do
+			m_mainram[(0x002D2030 + 8 * s) / 4] = 0xffffffff;
+			++m_ars_scrubs;
+			LOGMASKED(LOG_LINK, "wave-anchor dead slot scrubbed frame=%u slot=%d id=%08x h=%d scrubs_total=%u\n",
+					m_link_frame_count, s, ringid, ringh, m_ars_scrubs);
+		}
+	}
+}
+
 void gorgon_state::vblank(int state)
 {
 	namcos23_state::vblank(state);
@@ -5495,6 +5920,14 @@ void namcos23_state::c422_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOGMASKED(LOG_C422_UNK, "%s: c422 unknown write %x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 	COMBINE_DATA(&m_c422.regs[offset]);
+}
+
+void timecrs2_state::c139_irq_w(int state)
+{
+	if (state)
+		irq_update(m_main_irqcause | MAIN_C422_IRQ);
+	else
+		irq_update(m_main_irqcause & ~MAIN_C422_IRQ);
 }
 
 
@@ -5938,6 +6371,15 @@ void namcos23_state::mips_map(address_map &map)
 {
 	namcos23_state::mips_base_map(map);
 
+	// 0x0100005C is a real register on the sibling boards (the C361 IRQ
+	// acknowledge / C435 PIO-mode port) but is deliberately unmapped on
+	// plain System 23, where the game code still writes it ~250 times per
+	// frame.  An unmapped write is discarded anyway, so a write NOP is
+	// byte-identical behaviour - it only silences the unmapped-write log
+	// spam.  namcoss23_state::mips_map chains this map and then re-maps
+	// 0x0100005C to its real handler, so Super System 23 is unaffected.
+	map(0x0100005c, 0x0100005f).nopw();
+
 	map(0x06000000, 0x0600ffff).ram().share("nvram"); // Backup RAM
 	map(0x06200000, 0x06203fff).ram(); // C422 RAM
 	map(0x06400000, 0x0640000f).rw(FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
@@ -5970,6 +6412,16 @@ void namcos23_state::mips_map(address_map &map)
 
 	map(0x0e800000, 0x0e800001).r(FUNC(namcos23_state::sub_comm_status_r));
 	map(0x0e800002, 0x0e800003).rw(FUNC(namcos23_state::sub_comm_data_r), FUNC(namcos23_state::sub_comm_data_w));
+}
+
+void timecrs2_state::mips_map(address_map &map)
+{
+	namcos23_state::mips_map(map);
+
+	// the C139/C422 link controller's shared RAM and register file take
+	// over the C422 windows from the plain register stub
+	map(0x06200000, 0x06203fff).rw(m_c139, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w)); // C422 (=C139) RAM
+	map(0x06400000, 0x0640000f).m(m_c139, FUNC(namco_c139_device::regs_map)); // C422 registers
 }
 
 void crszone_state::mips_map(address_map &map)
@@ -6807,9 +7259,16 @@ void namcos23_state::panicprk(machine_config &config)
 	m_jvs->set_default_option("namco_asca3a");
 }
 
-void namcos23_state::timecrs2(machine_config &config)
+void timecrs2_state::timecrs2(machine_config &config)
 {
 	s23(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &timecrs2_state::mips_map);
+
+	// Twin-cabinet serial link controller (silkscreened "C422", believed
+	// to be a faster-clocked C139)
+	NAMCO_C139(config, m_c139);
+	m_c139->irq_handler().set(FUNC(timecrs2_state::c139_irq_w));
+
 	m_jvs->set_default_option("namco_tssio");
 }
 
@@ -7324,6 +7783,15 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(timecrs2)
 	PORT_INCLUDE(s23)
 
+	// DIP:5 gates the game's twin-cabinet link-search flow.  Relabelled
+	// from the s23 base "Unknown" here (timecrs2 family only) so other
+	// System 23 games' unrelated DIP:5 meanings keep their labels;
+	// tag/mask/defaults unchanged.
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x08, 0x08, "Link Play Enabled") PORT_DIPLOCATION("DIP:5")
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+
 	PORT_MODIFY("JVS_PLAYER1")
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_NAME("User Service Down")
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_NAME("User Service Up")
@@ -7346,6 +7814,10 @@ static INPUT_PORTS_START(crszone)
 	PORT_INCLUDE(timecrs2)
 
 	PORT_MODIFY("JVS_PLAYER1")
+	// Crisis Zone has no twin-cabinet link - mask 0x4000 carries the
+	// timecrs2 "Link ID" configuration field in the included port set,
+	// so return it to an unused input here
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_UNUSED) // BUTTON4
 	PORT_BIT(0x00002000, IP_ACTIVE_LOW, IPT_UNUSED) // BUTTON5 (Motor test shows NG if this is not pressed)
 
 	PORT_MODIFY("JVS_SCREEN_POSITION_INPUT_X1")
@@ -8837,9 +9309,9 @@ GAME( 1997, downhillu,   downhill, downhill,    downhill,  namcos23_state,      
 GAME( 1997, motoxgo,     0,        motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (World, MG3 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (US, MG2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov1a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state,       empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state,       empty_init,  ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state,       empty_init,  ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  timecrs2_state,       empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  timecrs2_state,       empty_init,  ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  timecrs2_state,       empty_init,  ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcoss23_state,      empty_init,  ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcoss23_state,      empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, panicprk,    0,        panicprk,    panicprk,  namcos23_state,       empty_init,  ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",       GAME_FLAGS )
