@@ -8,27 +8,20 @@
 
 	- C64 Emulator Test Suite 2.15 (100%)
 	- VICE testprogs CIA tests (100%)
-	- vAmigaTS on a500, against the suite's own A500 photos (32 GOOD,
-	  27 FAIR, 18 POOR of 77) - half the POOR results are the CNT tests
-	- reDIP-CIA gate-level model (51/56), differs on:
+	- vAmigaTS on a500 (100% of non-deprecated usable tests)
+	- reDIP-CIA gate-level model (62/72), differs on:
+		all models
+		- ser_receive (matches vAmigaTS ser1)
 		6526
 		- irq_timing (matches VICE)
 		6526A/8521
 		- icr_ack_underflow (matches VICE)
 		8520
-		- tod_mask (matches vAmigaTS/showcia1)
+		- tod_mask (matches vAmigaTS showcia1)
+		- cra_todin (matches vAmigaTS timer3b/timer3c)
 		- tod_alarm (hypothetical)
 
 **********************************************************************/
-
-/*
-
-    TODO:
-
-    - flag_w & amigafdc both auto-inverts index pulses, it also fails ICR vAmigaTS/showcia1 test
-      (expected: 0x00, actual: 0x10)
-
-*/
 
 #include "emu.h"
 #include "mos6526.h"
@@ -73,6 +66,12 @@ enum
 
 // cycles between an SDR write and the byte reaching the shift register
 #define SDR_LOAD_DELAY  2
+
+// cycles between the 8th CNT edge of a reception and the byte reaching SDR
+#define SDR_RECV_DELAY  5
+
+// cycles between an SPMODE change abandoning a reception and the SP flag
+#define SP_ABANDON_DELAY    1
 
 
 // interrupt mask register
@@ -232,6 +231,13 @@ void mos6526_device::set_cra(uint8_t data)
 
 			m_sdr_force_finish = !settled || (toggling && !(m_bits == 8 && !m_cnt));
 		}
+		else if (m_sdr_recv_delay >= 2)
+		{
+			// an abandoned reception never reaches SDR, but still releases
+			// its SP interrupt
+			m_sdr_recv_delay = 0;
+			m_sp_delay = SP_ABANDON_DELAY;
+		}
 		else if (m_sdr_force_finish)
 		{
 			// going back to output releases it as a serial interrupt
@@ -250,7 +256,7 @@ void mos6526_device::set_cra(uint8_t data)
 		}
 	}
 
-	m_cra = data & ~CRA_LOAD;
+	m_cra = data & cra_mask();
 
 	m_feed_a0 = (data & 0x21) == CRA_START;
 	m_count_a1 = m_count_a0 = m_feed_a0;
@@ -390,8 +396,20 @@ void mos6526_device::clock_tod()
 
 void mos8520_device::clock_tod()
 {
-	m_tod++;
-	m_tod &= 0x00ffffff;
+	// the carry is a nibble ripple and the alarm comparator sees it half way,
+	// so a tick from $xxxFFF passes through $xxx000 and an alarm set to that
+	// fires on a value the counter never settles on
+	if ((m_tod & 0x000fff) == 0x000fff)
+	{
+		m_tod &= 0xfff000;
+		update_alarm();
+
+		m_tod = (m_tod + 0x001000) & 0xffffff;
+	}
+	else
+	{
+		m_tod++;
+	}
 }
 
 
@@ -502,10 +520,12 @@ void mos6526_device::serial_input()
 
 	if (m_bits == 8)
 	{
-		m_sdr = m_shift;
 		m_bits = 0;
 
-		m_icr |= ICR_SP;
+		// the byte is still in flight for a few cycles, and an SPMODE change
+		// inside that window abandons it rather than releasing it
+		m_sdr_recv = m_shift;
+		m_sdr_recv_delay = SDR_RECV_DELAY;
 	}
 }
 
@@ -560,6 +580,16 @@ void mos6526_device::serial_load()
 	m_sdr_empty = true;
 	m_shift_loaded = true;
 	m_bits = 0;
+}
+
+
+void mos6526_device::serial_receive()
+{
+	if (m_sdr_recv_delay && !--m_sdr_recv_delay)
+	{
+		m_sdr = m_sdr_recv;
+		m_icr |= ICR_SP;
+	}
 }
 
 
@@ -830,6 +860,7 @@ void mos6526_device::synchronize()
 
 	clock_ta();
 
+	serial_receive();
 	serial_output();
 
 	clock_tb();
@@ -940,6 +971,8 @@ void mos6526_device::device_start()
 	save_item(NAME(m_ta_out_last));
 	save_item(NAME(m_sdr_load_delay));
 	save_item(NAME(m_sdr_force_finish));
+	save_item(NAME(m_sdr_recv));
+	save_item(NAME(m_sdr_recv_delay));
 	save_item(NAME(m_ta_out));
 	save_item(NAME(m_tb_out));
 	save_item(NAME(m_ta_pb6));
@@ -1028,6 +1061,8 @@ void mos6526_device::device_reset()
 	m_ta_out_last = 0;
 	m_sdr_load_delay = 0;
 	m_sdr_force_finish = false;
+	m_sdr_recv = 0;
+	m_sdr_recv_delay = 0;
 
 	m_ta_out = 0;
 	m_tb_out = 0;

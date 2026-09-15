@@ -105,6 +105,7 @@ protected:
 	// register bits and powers up at zero rather than 01:00:00.0
 	virtual uint8_t tod_mask(int offset) const;
 	virtual uint32_t tod_reset_value() const { return 0x01000000UL; }
+	virtual uint8_t cra_mask() const { return 0xef; }
 
 	int m_icount;
 	int m_tod_clock;
@@ -116,6 +117,7 @@ protected:
 	void set_cra(uint8_t data);
 	void set_crb(uint8_t data);
 	void serial_input();
+	void serial_receive();
 	void serial_load();
 	void serial_output();
 	void clock_ta();
@@ -180,6 +182,8 @@ protected:
 	int m_sdr_load_delay;
 	uint8_t m_cnt_hist;
 	bool m_sdr_force_finish;
+	uint8_t m_sdr_recv;
+	int m_sdr_recv_delay;
 
 	// timers
 	int m_ta_out;
@@ -277,6 +281,7 @@ protected:
 	virtual bool irq_sources_delayed() const override { return true; }
 	virtual uint8_t tod_mask(int offset) const override { return 0xff; }
 	virtual uint32_t tod_reset_value() const override { return 0; }
+	virtual uint8_t cra_mask() const override { return 0x6f; }
 };
 
 
