@@ -240,6 +240,14 @@ void device_vtlb_interface::vtlb_load(int entrynum, int numpages, offs_t address
 		}
 	}
 
+	// an empty entry must take no reference, or vtlb_fill() can never clear page zero
+	if (numpages == 0)
+	{
+		m_live[liveindex] = 0;
+		m_fixedpages[entrynum] = 0;
+		return;
+	}
+
 	// claim this new entry
 	m_live[liveindex] = tableindex + 1;
 	m_refcnt[tableindex]++;
