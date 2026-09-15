@@ -2,11 +2,6 @@
 <!--
 license:CC0-1.0
 copyright-holders:m1macrophage
-
-This layout is based on oberheim_matrix12.lay, but some components removed, some
-changed, and some added.
-
-The same coordinate system is used for both layouts.
 -->
 <mamelayout version="2">
 	<element name="txt_master">
@@ -23,12 +18,13 @@ The same coordinate system is used for both layouts.
 	</element>
 	<element name="txt_patch_l"><text string="PATCH" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
 	<element name="txt_patch_name"><text string="PATCH NAME" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
-	<element name="txt_voice_1"><text string="VOICE 1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
-	<element name="txt_voice_2"><text string="VOICE 2"><color red="1.0" green="1.0" blue="1.0"/></text></element>
-	<element name="txt_voice_3"><text string="VOICE 3"><color red="1.0" green="1.0" blue="1.0"/></text></element>
-	<element name="txt_voice_4"><text string="VOICE 4"><color red="1.0" green="1.0" blue="1.0"/></text></element>
-	<element name="txt_voice_5"><text string="VOICE 5"><color red="1.0" green="1.0" blue="1.0"/></text></element>
-	<element name="txt_voice_6"><text string="VOICE 6"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice"><text string="VOICE"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_1"><text string="1-2"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_2"><text string="3-4"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_3"><text string="5-6"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_4"><text string="7-8"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_5"><text string="9-10"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_6"><text string="11-12"><color red="1.0" green="1.0" blue="1.0"/></text></element>
 	<element name="txt_curr_page"><text string="CURRENT PAGE" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
 	<element name="txt_modulation_page">
 		<text string="MODULATION PAGE" align="2"><color red="0.65" green="0.80" blue="0.40"/></text>
@@ -42,6 +38,8 @@ The same coordinate system is used for both layouts.
 	<element name="txt_patch_grey"><text string="PATCH"><color red="0.70" green="0.70" blue="0.70"/></text></element>
 	<element name="txt_store"><text string="STORE"><color red="0.90" green="0.90" blue="0.90"/></text></element>
 	<element name="txt_patch_edit"><text string="PATCH EDIT"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_voices_1_6"><text string="VOICES 1-6" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_voices_7_12"><text string="VOICES 7-12" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
 
 	<element name="txt_plus"><text string="+"><color red="1.0" green="1.0" blue="1.0"/></text></element>
 	<element name="txt_minus"><text string="-"><color red="1.0" green="1.0" blue="1.0"/></text></element>
@@ -88,16 +86,6 @@ The same coordinate system is used for both layouts.
 	<element name="txt_mono"><text string="MONO"><color red="0.90" green="0.90" blue="0.90"/></text></element>
 	<element name="txt_right"><text string="RIGHT" align="2"><color red="0.90" green="0.90" blue="0.90"/></text></element>
 
-	<element name="txt_cv_gate_in">
-		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
-		<text string="CV AND GATE INPUTS"><color red="0.90" green="0.90" blue="0.90"/></text>
-	</element>
-	<repeat count="6">
-		<param name="num" start="1" increment="1"/>
-		<element name="txt_gate_~num~"><text string="GATE ~num~"><color red="0.90" green="0.90" blue="0.90"/></text></element>
-		<element name="txt_cv_~num~"><text string="CV~num~"><color red="0.90" green="0.90" blue="0.90"/></text></element>
-	</repeat>
-
 	<element name="txt_trigger"><text string="TRIGGER"><color red="0.90" green="0.90" blue="0.90"/></text></element>
 	<element name="txt_trig_in"><text string="IN"><color red="0.90" green="0.90" blue="0.90"/></text></element>
 	<element name="txt_pedal_input"><text string="PEDAL INPUT"><color red="0.90" green="0.90" blue="0.90"/></text></element>
@@ -135,10 +123,16 @@ The same coordinate system is used for both layouts.
 		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
 		<text string=" SINGLE/MULTI PATCH PAGE SELECT" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
 	</element>
+	<element name="txt_levers">
+		<rect><color red="0.20" green="0.20" blue="0.20"/></rect>
+		<text string=" LEVERS" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
+	</element>
 
 	<element name="case_grey"><rect><color red="0.30" green="0.30" blue="0.30"/></rect></element>
 	<element name="case_dark"><rect><color red="0.20" green="0.20" blue="0.20"/></rect></element>
+	<element name="case_shadow"><rect><color red="0.10" green="0.10" blue="0.10"/></rect></element>
 	<element name="wood"><rect><color red="0.50" green="0.25" blue="0.10"/></rect></element>
+	<element name="dark_wood"><rect><color red="0.25" green="0.10" blue="0.05"/></rect></element>
 	<element name="blue_line"><rect><color red="0.25" green="0.50" blue="0.70"/></rect></element>
 	<element name="white_line"><rect><color red="0.75" green="0.75" blue="0.75"/></rect></element>
 	<element name="cyan_line"><rect><color red="0.65" green="0.75" blue="0.75"/></rect></element>
@@ -149,7 +143,7 @@ The same coordinate system is used for both layouts.
 
 	<element name="plugin_warning" defstate="1">
 		<rect state="1"><color red="1" green="1" blue="0" alpha="0.2"/></rect>
-		<text state="1" string="*** to control knobs with a mouse, enable the layout plugin ***">
+		<text state="1" string="*** to control levers and knobs with a mouse, enable the layout plugin ***">
 			<color red="0.9" green="0.9" blue="0.9"/>
 		</text>
 	</element>
@@ -255,40 +249,85 @@ The same coordinate system is used for both layouts.
 		</repeat>
 	</group>
 
+	<element name="lever_well">
+		<rect>
+			<bounds x="0" y="0" width="70" height="80"/>
+			<color red="0.15" green="0.15" blue="0.15"/>
+		</rect>
+		<rect>
+			<bounds x="4" y="4" width="62" height="72"/>
+			<color red="0.00" green="0.00" blue="0.00"/>
+		</rect>
+	</element>
+	<element name="lever_bg"><rect><color red="0.10" green="0.10" blue="0.10"/></rect></element>
+	<element name="lever_knob"><rect><color red="0.20" green="0.20" blue="0.20"/></rect></element>
+
+	<group name="lever">
+		<element ref="lever_bg" id="~lever_id~"><bounds x="0" y="0" width="28" height="72"/></element>
+		<element ref="lever_knob" id="~lever_id~_knob">
+			<animate inputtag="~lever_id~" inputmask="0xffff"/>
+			<bounds state="100" x="0" y="0" width="28" height="14"/>
+			<bounds state="0" x="0" y="58" width="28" height="14"/>
+		</element>
+	</group>
+
+	<element name="whitekey">
+		<rect>
+			<color state="0" red="0.90" green="0.90" blue="0.90"/>
+			<color state="1" red="0.50" green="0.50" blue="0.50"/>
+		</rect>
+	</element>
+
+	<element name="blackkey">
+		<rect>
+			<bounds x="0" y="0" width="21" height="135"/>
+			<color red="0.05" green="0.05" blue="0.05"/>
+		</rect>
+		<rect>
+			<bounds x="2" y="8" width="17" height="125"/>
+			<color state="0" red="0.20" green="0.20" blue="0.20"/>
+			<color state="1" red="0.50" green="0.50" blue="0.50"/>
+		</rect>
+	</element>
+
+	<group name="keyboard_octave">
+		<bounds x="0" y="0" width="245" height="210"/>
+		<element ref="whitekey"><bounds x="1" y="0" width="33" height="210"/></element><!-- C -->
+		<element ref="whitekey"><bounds x="36" y="0" width="33" height="210"/></element><!-- D -->
+		<element ref="whitekey"><bounds x="71" y="0" width="33" height="210"/></element><!-- E -->
+		<element ref="whitekey"><bounds x="106" y="0" width="33" height="210"/></element><!-- F -->
+		<element ref="whitekey"><bounds x="141" y="0" width="33" height="210"/></element><!-- G -->
+		<element ref="whitekey"><bounds x="176" y="0" width="33" height="210"/></element><!-- A -->
+		<element ref="whitekey"><bounds x="211" y="0" width="33" height="210"/></element><!-- B -->
+		<element ref="blackkey"><bounds x="21" y="0" width="21" height="135"/></element><!-- C# -->
+		<element ref="blackkey"><bounds x="63" y="0" width="21" height="135"/></element><!-- D# -->
+		<element ref="blackkey"><bounds x="125" y="0" width="21" height="135"/></element><!-- F# -->
+		<element ref="blackkey"><bounds x="164" y="0" width="21" height="135"/></element><!-- G# -->
+		<element ref="blackkey"><bounds x="204" y="0" width="21" height="135"/></element><!-- A# -->
+	</group>
+
 	<group name="case">
-		<bounds x="0" y="0" width="1500" height="450"/>
+		<bounds x="0" y="0" width="1500" height="750"/>
 
 		<!-- Case -->
 
-		<element ref="wood"><bounds x="118" y="8" width="22" height="442"/></element>
-		<element ref="wood"><bounds x="1360" y="8" width="22" height="442"/></element>
+		<element ref="wood"><bounds x="8" y="8" width="22" height="735"/></element>
+		<element ref="dark_wood"><bounds x="30" y="526" width="14" height="210"/></element>
+		<element ref="wood"><bounds x="1470" y="8" width="22" height="735"/></element>
+		<element ref="dark_wood"><bounds x="1456" y="526" width="14" height="210"/></element>
 
-		<element ref="case_dark"><bounds x="140" y="12" width="1220" height="22"/></element>
-		<element ref="case_grey"><bounds x="140" y="34" width="1220" height="386"/></element>
-		<element ref="case_dark"><bounds x="140" y="420" width="1220" height="22"/></element>
+		<element ref="case_dark"><bounds x="30" y="12" width="1440" height="22"/></element>
+		<element ref="case_grey"><bounds x="30" y="34" width="1440" height="386"/></element>
+		<element ref="case_dark"><bounds x="30" y="420" width="1440" height="86"/></element>
+		<element ref="case_shadow"><bounds x="30" y="506" width="1440" height="20"/></element>
 
 		<!-- I/O labels -->
 
-		<element ref="white_line"><bounds x="190" y="50" width="290" height="1"/></element>
-		<element ref="txt_audio_out"><bounds x="310" y="46" width="50" height="9"/></element>
+		<element ref="white_line"><bounds x="190" y="49" width="80" height="1"/></element>
+		<element ref="txt_audio_out"><bounds x="208" y="46" width="44" height="8"/></element>
 		<element ref="txt_left"><bounds x="190" y="37" width="24" height="6"/></element>
 		<element ref="txt_mono"><bounds x="215" y="37" width="30" height="6"/></element>
 		<element ref="txt_right"><bounds x="246" y="37" width="24" height="6"/></element>
-		<repeat count="6">
-			<param name="num" start="1" increment="1"/>
-			<param name="txt_x" start="291" increment="33"/>
-			<element ref="txt_voice_~num~"><bounds x="~txt_x~" y="37" width="30" height="6"/></element>
-		</repeat>
-
-		<element ref="white_line"><bounds x="510" y="50" width="290" height="1"/></element>
-		<element ref="txt_cv_gate_in"><bounds x="610" y="46" width="90" height="9"/></element>
-		<repeat count="6">
-			<param name="num" start="1" increment="1"/>
-			<param name="txt_gate_x" start="510" increment="51"/>
-			<param name="txt_cv_x" start="532" increment="51"/>
-			<element ref="txt_gate_~num~"><bounds x="~txt_gate_x~" y="37" width="20" height="6"/></element>
-			<element ref="txt_cv_~num~"><bounds x="~txt_cv_x~" y="37" width="20" height="6"/></element>
-		</repeat>
 
 		<element ref="txt_trigger"><bounds x="814" y="37" width="36" height="6"/></element>
 		<element ref="txt_trig_in"><bounds x="814" y="43" width="36" height="6"/></element>
@@ -302,8 +341,8 @@ The same coordinate system is used for both layouts.
 		<element ref="txt_to"><bounds x="1053" y="37" width="14" height="6"/></element>
 		<element ref="txt_from"><bounds x="1068" y="37" width="24" height="6"/></element>
 
-		<element ref="white_line"><bounds x="1115" y="50" width="90" height="1"/></element>
-		<element ref="txt_midi"><bounds x="1150" y="46" width="20" height="9"/></element>
+		<element ref="white_line"><bounds x="1115" y="49" width="90" height="1"/></element>
+		<element ref="txt_midi"><bounds x="1150" y="46" width="20" height="8"/></element>
 		<element ref="txt_midi_in"><bounds x="1115" y="37" width="14" height="6"/></element>
 		<element ref="txt_midi_out"><bounds x="1150" y="37" width="20" height="6"/></element>
 		<element ref="txt_midi_thru"><bounds x="1181" y="37" width="24" height="6"/></element>
@@ -311,6 +350,31 @@ The same coordinate system is used for both layouts.
 		<element ref="txt_mem_protect"><bounds x="1222" y="47" width="50" height="6"/></element>
 		<element ref="txt_on"><bounds x="1230" y="37" width="14" height="6"/></element>
 		<element ref="txt_off"><bounds x="1255" y="37" width="16" height="6"/></element>
+
+		<!-- Levers -->
+
+		<element ref="case_dark"><bounds x="44" y="526" width="148" height="210"/></element>
+
+		<element ref="blue_line"><bounds x="54" y="535" width="126" height="10"/></element>
+		<element ref="txt_levers"><bounds x="80" y="533" width="54" height="14"/></element>
+
+		<element ref="txt_2"><bounds x="92" y="563" width="15" height="8"/></element>
+		<element ref="txt_1"><bounds x="124" y="563" width="15" height="8"/></element>
+
+		<element ref="lever_well"><bounds x="78" y="574" width="70" height="80"/></element>
+		<param name="lever_id" value="lever_2"/>
+		<group ref="lever"><bounds x="84" y="578" width="28" height="72"/></group>
+		<param name="lever_id" value="lever_1"/>
+		<group ref="lever"><bounds x="114" y="578" width="28" height="72"/></group>
+
+		<element ref="blue_line"><bounds x="54" y="710" width="126" height="3"/></element>
+
+		<!-- Keyboard -->
+		<repeat count="5">
+			<param name="kbd_x" start="194" increment="245"/>
+			<group ref="keyboard_octave"><bounds x="~kbd_x~" y="526" width="245" height="210"/></group>
+		</repeat>
+		<element ref="whitekey"><bounds x="1420" y="526" width="33" height="210"/></element>
 	</group>
 
 	<group name="edit_panel">
@@ -354,7 +418,8 @@ The same coordinate system is used for both layouts.
 		<repeat count="6">
 			<param name="num" start="1" increment="1"/>
 			<param name="txt_x" start="291" increment="21"/>
-			<element ref="txt_voice_~num~"><bounds x="~txt_x~" y="174" width="22" height="5"/></element>
+			<element ref="txt_voice"><bounds x="~txt_x~" y="168" width="20" height="5"/></element>
+			<element ref="txt_voice_~num~"><bounds x="~txt_x~" y="174" width="20" height="5"/></element>
 		</repeat>
 		<element ref="txt_curr_page"><bounds x="440" y="174" width="35" height="5"/></element>
 
@@ -404,6 +469,15 @@ The same coordinate system is used for both layouts.
 				<bounds x="~button_x~" y="240" width="25" height="25"/>
 			</element>
 		</repeat>
+
+		<!-- "Voices" button -->
+		<element ref="button" inputtag="switches_6" inputmask="0x80">
+			<bounds x="449" y="240" width="25" height="25"/>
+		</element>
+		<element ref="txt_voices_1_6"><bounds x="439" y="271" width="45" height="8"/></element>
+		<element ref="led" name="led_voices_1_6"><bounds x="484" y="271" width="9" height="9"/></element>
+		<element ref="txt_voices_7_12"><bounds x="439" y="286" width="45" height="8"/></element>
+		<element ref="led" name="led_voices_7_12"><bounds x="484" y="286" width="9" height="9"/></element>
 
 		<!-- Numeric keypad -->
 		<!-- 7 -->
@@ -740,7 +814,7 @@ The same coordinate system is used for both layouts.
 	<element name="fm_lag_page_sel_label">
 		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
 		<text string="FM/LAG" align="1"><bounds x="0" y="0" width="40" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
-		<text string="CVMIDI" align="1"><bounds x="35" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+		<text string="V. ASSIGN" align="1"><bounds x="35" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
 	</element>
 
 	<element name="fm_lag_page_sel_diagram">
@@ -804,7 +878,7 @@ The same coordinate system is used for both layouts.
 	<element name="track_x_page_sel_label">
 		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
 		<text string="TRACK X" align="1"><bounds x="0" y="0" width="40" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
-		<text string="ZONE" align="1"><bounds x="40" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+		<text string="ZONE X" align="1"><bounds x="40" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
 	</element>
 
 	<element name="track_x_page_sel_diagram">
@@ -1045,6 +1119,7 @@ The same coordinate system is used for both layouts.
 	<element name="lfo_x_page_sel_label">
 		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
 		<text string="LFO X" align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="DETUNE" align="1"><bounds x="28" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
 	</element>
 
 	<element name="lfo_x_page_sel_diagram">
@@ -1144,8 +1219,8 @@ The same coordinate system is used for both layouts.
 
 	<element name="misc_page_sel_label">
 		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
-		<text string="MISC." align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
-		<text string="MISC." align="1"><bounds x="26" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+		<text string="NAME" align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="NAME" align="1"><bounds x="25" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
 	</element>
 
 	<group name="page_sel_button">
@@ -1303,25 +1378,25 @@ The same coordinate system is used for both layouts.
 
 	<!-- View of the entire synthesizer. -->
 	<view name="Full">
-		<bounds x="113" y="0" width="1280" height="450"/>
-		<group ref="case"><bounds x="0" y="0" width="1500" height="450"/></group>
+		<bounds x="0" y="0" width="1500" height="750"/>
+		<group ref="case"><bounds x="0" y="0" width="1500" height="750"/></group>
 		<group ref="edit_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
 		<group ref="patch_page_sel_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
 
 		<collection name="warnings">
-			<element ref="plugin_warning" id="plugin_warning"><bounds x="500" y="15" width="500" height="16"/></element>
+			<element ref="plugin_warning" id="plugin_warning"><bounds x="475" y="15" width="550" height="16"/></element>
 		</collection>
 	</view>
 
 	<!-- The compact view includes the edit panel and a compact variation of the page select panel. -->
 	<view name="Compact">
 		<bounds x="150" y="50" width="920" height="365"/>
-		<element ref="case_grey"><bounds x="50" y="50" width="1120" height="365"/></element>
+		<element ref="case_grey"><bounds x="150" y="50" width="920" height="365"/></element>
 		<group ref="edit_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
 		<group ref="compact_patch_page_sel_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
 
 		<collection name="warnings">
-			<element ref="plugin_warning" id="plugin_warning"><bounds x="470" y="52" width="280" height="9"/></element>
+			<element ref="plugin_warning" id="plugin_warning"><bounds x="460" y="52" width="300" height="9"/></element>
 		</collection>
 	</view>
 
@@ -1332,7 +1407,7 @@ The same coordinate system is used for both layouts.
 		<group ref="edit_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
 
 		<collection name="warnings">
-			<element ref="plugin_warning" id="plugin_warning"><bounds x="400" y="52" width="270" height="9"/></element>
+			<element ref="plugin_warning" id="plugin_warning"><bounds x="385" y="52" width="300" height="9"/></element>
 		</collection>
 	</view>
 
@@ -1347,9 +1422,11 @@ The same coordinate system is used for both layouts.
 	<script><![CDATA[
 		file:set_resolve_tags_callback(
 			function()
-				for i, viewname in ipairs({"Full", "Compact", "Edit"}) do
-					mgr = slider_manager:new(file.views[viewname])
+				local full_mgr = slider_manager:new(file.views["Full"])
+				local compact_mgr = slider_manager:new(file.views["Compact"])
+				local edit_mgr = slider_manager:new(file.views["Edit"])
 
+				for i, mgr in ipairs({full_mgr, compact_mgr, edit_mgr}) do
 					mgr:add_knob("volume_knob", "volume_knob", 1.6, HORIZONTAL, "volume_knob_dot")
 					mgr:get_layout_item("volume_knob_value"):set_color_callback(
 						function()
@@ -1362,6 +1439,11 @@ The same coordinate system is used for both layouts.
 					end
 
 					mgr:get_layout_item("plugin_warning"):set_state(0)
+				end
+
+				for i = 1, 2 do
+					local lever_id = "lever_" .. i
+					full_mgr:add_sprung_slider(lever_id, lever_id .. "_knob", lever_id)
 				end
 			end)
 
