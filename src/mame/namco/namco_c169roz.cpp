@@ -18,24 +18,40 @@
   m_is_namcofl are split out:
     - scanline layer (FL layer 0, NB-2 / System 2 layer 1)
     - color nibble width (FL 3-bit, otherwise 4-bit)
-  Per-scanline records already contain that line's startx/starty. Adding
-  clip.min_y * incyx/incyy on a 1-line clip double-counted Speed Racer's road.
+
+  Per-scanline records already contain that line's startx/starty.
+  Adding clip.min_y * incyx/incyy on a 1-line clip double-counted
+  Speed Racer's road.
+
   Wrap-on tiles at params.size then adds left/top. Wrap-off walk is already
   in full 4096×4096 tilemap space: left/top/size are the visible rectangle,
   and samples outside that window are skipped (not wrapped, not sampled).
+
   Analog (36,3) stays in unpack for both layer-wide and scanline walks
-  (chip front-porch). Subtracting it on scanlines shifted Speed Racer /
-  Final Lap R roads by 36px X and 3px of texture Y. Scanline records
-  already hold that line's start, so min_y * inc is not applied again.
+  (chip front-porch).
+
+  Subtracting it on scanlines shifted Speed Racer / Final Lap R roads
+  by 36px X and 3px of texture Y.
+
+  Scanline records already hold that line's start,
+  so min_y * inc is not applied again.
+
   FL per-line inc is a 16-bit scale (Speed Racer ldis); bits 14-12 are
-  not left/top. Mach Breakers producer C ANDs word2/3 with $8FFF then
-  ORs left/top into bits 14-12 — same 12-bit signed inc as layer-wide.
+  not left/top.
+
+  Mach Breakers producer C ANDs word2/3 with $8FFF then ORs left/top into
+  bits 14-12 — same 12-bit signed inc as layer-wide.
+
   Unpacking those as int16_t turns 0x8xxx (small negative) into ~-28000
-  and shears the ranking floor. Speed Racer scanline word0 $6000 is the
-  Y wrap period (>>3 → 3072px). Mach Breakers word0 $4000 is not a
-  2048px wrap. Firmware starty is already % (word0<<1). Analog is
-  applied after that wrap, then the chip's 12-bit wrap; dest-0 also
-  writes row 192. Scanline mode stays control[0] == 0x8000.
+  and shears the ranking floor.
+
+  Speed Racer scanline word0 $6000 is the Y wrap period (>>3 → 3072px).
+  Mach Breakers word0 $4000 is not a 2048px wrap.
+
+  Firmware starty is already % (word0<<1). Analog is applied after that wrap,
+  then the chip's 12-bit wrap; dest-0 also writes row 192.
+
+  Scanline mode stays control[0] == 0x8000.
 
 ******************************************************************************/
 
