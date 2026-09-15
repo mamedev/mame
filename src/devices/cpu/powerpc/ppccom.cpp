@@ -1645,6 +1645,10 @@ void ppc_device::ppccom_execute_mtsr()
 		// If that happens, bump the translation generation.
 		if (((oldval ^ newval) & 0x80ff'ffff) != 0)
 		{
+			// 603 TLB entries are tagged with the VSID, so the segment's fixed entries are now stale
+			if (m_cap & PPCCAP_603_MMU)
+				vtlb_flush_fixed(seg << 28, 0xf000'0000);
+
 			m_core->m_translation_generation++;
 		}
 	}
@@ -1764,12 +1768,19 @@ void ppc_device::ppccom_dcbz_check()
 void ppc_device::ppccom_execute_tlbie()
 {
 	// The 603/604/750 TLBs are indexed by the low bits of the effective page index alone
-	// (EA[14-19] on the 750), so tlbie invalidates that whole class.  Mac OS X aliases
-	// user pages through its copyin/copyout window and expects the tlbie of the user
-	// address to flush the alias as well.
-	for (uint32_t seg = 0; seg < 16; seg++)
+	// (EA[15-19] on the 603, EA[14-19] on the 750), so tlbie invalidates that whole class.
+	// Mac OS X aliases user pages through its copyin/copyout window and expects the tlbie
+	// of the user address to flush the alias as well.
+	if (m_cap & PPCCAP_603_MMU)
 	{
-		vtlb_flush_address((m_core->param0 & 0x0fffffff) | (seg << 28));
+		vtlb_flush_fixed(m_core->param0, 0x0001f000);
+	}
+	else
+	{
+		for (uint32_t seg = 0; seg < 16; seg++)
+		{
+			vtlb_flush_address((m_core->param0 & 0x0fffffff) | (seg << 28));
+		}
 	}
 
 	// A page table entry for this page may have changed; if code was compiled
