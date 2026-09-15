@@ -3139,6 +3139,11 @@ void sci_state::machine_start()
 	save_item(NAME(m_sci_int6));
 
 	m_int6_timer = timer_alloc(FUNC(sci_state::trigger_int6), this);
+
+	m_spritebuf_display = std::make_unique<u16[]>(0x800);
+	save_pointer(NAME(m_spritebuf_display), 0x800);
+	save_item(NAME(m_sprphase));
+
 }
 
 void taitoz_state::machine_reset()
