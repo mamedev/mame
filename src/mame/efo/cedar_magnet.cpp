@@ -1083,8 +1083,15 @@ ROM_START( cedmag )
 	// no disk inserted
 ROM_END
 
-// Marked as BAD_DUMP because of the missing tracks (hence the different size).
 ROM_START( mag_boob )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_boob41.dsk", 0x00000, 0xf0000, CRC(79ca3f0d) SHA1(7daff6445e23f150b908b9c622fb66d7d92bfd04) ) // Floppy labeled "BOOBY KID / VERTICAL / VER. 4.1"
+ROM_END
+
+// Marked as BAD_DUMP because of the missing tracks (hence the different size).
+ROM_START( mag_boobcc )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
@@ -1111,7 +1118,7 @@ ROM_START( mag_day )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "mag_day.dsk", 0x00000, 0xf0000, CRC(bc65302d) SHA1(6ace68a0b5f7a07a8f5c318c5359011074e7f2ec) )
+	ROM_LOAD( "mag_day.dsk", 0x00000, 0xf0000, CRC(205dbff9) SHA1(c00154cede00e99a7f62034fa4ddf0f5ff27b7a2) )
 ROM_END
 
 /*
@@ -1284,7 +1291,7 @@ ROM_START( mag_wara )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "mag_wara.dsk", 0x00000, 0xf0000, CRC(6296ea6f) SHA1(c0aaf51362bfa3362ef39c3fb1e1c848b73fd780) )
+	ROM_LOAD( "mag_wara.dsk", 0x00000, 0xf0000, CRC(1bdabae0) SHA1(0341c46c6832e8682c9a39058e970e5cb2546544) )
 ROM_END
 
 ROM_START( mag_xain )
@@ -1299,7 +1306,8 @@ ROM_END
 
 
 GAME( 1987, cedmag,     0,        cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Magnet System",                                  MACHINE_IS_BIOS_ROOT )
-GAME( 1987, mag_boob,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (Magnet System)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
+GAME( 1987, mag_boob,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (version 4.1, Magnet System)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
+GAME( 1987, mag_boobcc, mag_boob, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (version CC, Magnet System)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
 GAME( 1987, mag_burn,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "The Burning Cavern (31/03/87)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
 GAME( 198?, mag_coco,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Cocomania (version CC, Magnet System)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, mag_day,    cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "A Day In Space (31/03/87)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
