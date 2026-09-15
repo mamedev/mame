@@ -426,7 +426,7 @@ void swp30_device::streaming_block::scale_and_clamp(s16 &val0, s16 &val1, s16 &v
 
 void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos : m_pos;
+	s32 spos = m_loop & 0x80000000 ? -m_pos - 1 : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 1);
 	switch(spos & 1) {
@@ -459,7 +459,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 
 void swp30_device::streaming_block::read_12(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos : m_pos;
+	s32 spos = m_loop & 0x80000000 ? -m_pos - 1 : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 3)*3;
 	switch(spos & 7) {
@@ -560,7 +560,7 @@ void swp30_device::streaming_block::read_12(memory_access<25, 2, -2, ENDIANNESS_
 
 void swp30_device::streaming_block::read_8(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos : m_pos;
+	s32 spos = m_loop & 0x80000000 ? -m_pos - 1 : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 2);
 	switch(spos & 3) {
@@ -684,6 +684,14 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 	case 1: read_12(wave, val0, val1, val2, val3); break;
 	case 2: read_8 (wave, val0, val1, val2, val3); break;
 	case 3: read_8c(wave, val0, val1, val2, val3); break;
+	}
+	// When playing backwards, the four values are read in address order,
+	// which is the reverse of the playback order.  The read starts one
+	// sample earlier and the values are swapped here to get previous,
+	// current, next and the one after, as when playing forwards.
+	if((m_loop & 0x80000000) && (m_address >> 30) != 3) {
+		std::swap(val0, val3);
+		std::swap(val1, val2);
 	}
 	if(m_first)
 		val0 = 0;
