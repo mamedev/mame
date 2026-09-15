@@ -380,7 +380,7 @@ void segas32_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		const int page = offset >> 9;
 		offset &= 0x1ff;
 
-		/* scan the cache for a matching pages */
+		/* scan the cache for a matching page */
 		for (entry = m_cache_head; entry != nullptr; entry = entry->next)
 			if (entry->page == page)
 				entry->tmap->mark_tile_dirty(offset);
