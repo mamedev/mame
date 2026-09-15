@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:Angelo Salese
+
+Luna 88K layout
+-->
+
+<mamelayout version="2">
+
+	<element name="static_chassis">
+		<rect>
+			<color red="0.71" green="0.66" blue="0.57" />
+		</rect>
+	</element>
+
+	<view name="Full Layout">
+		<bounds left="0" right="1280" top="0" bottom="1280" />
+		<screen index="0">
+			<bounds left="0" right="1280" top="0" bottom="1024" />
+		</screen>
+
+		<element ref="static_chassis">
+			<bounds left="0" right="1280" top="1024" bottom="1280" />
+		</element>
+
+		<screen index="1">
+			<bounds left="278" right="518" top="1058" bottom="1098" />
+		</screen>
+	</view>
+
+</mamelayout>

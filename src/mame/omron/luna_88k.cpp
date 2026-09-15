@@ -54,6 +54,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "luna_88k.lh"
+
 #include "debugger.h"
 
 #include "endianness.h"
@@ -103,6 +105,8 @@ protected:
 	void iop_map_pio(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+
+	void palette_init(palette_device &palette) const;
 
 	void plane_common_w(offs_t offset, u32 data, u32 mem_mask);
 	void logic_common_w(offs_t offset, u32 data);
@@ -248,6 +252,13 @@ void luna88k2_state::init()
 
 	// HACK: bypass PC-I/F test failure
 	m_eprom[0x1e4c0 >> 2] = 0xf7206000;
+}
+
+// TODO: refine colors (needs a better ref pic)
+void luna_88k_state_base::palette_init(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(88, 247, 0)); // bright green
+	palette.set_pen_color(1, rgb_t(14, 72, 0));  // dark green
 }
 
 void luna_88k_state_base::machine_start()
@@ -546,7 +557,9 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 	m_lcdc->set_function_set_at_any_time(true);
 	m_lcdc->set_lcd_size(2, 16);
 
-	palette_device &palette(PALETTE(config, "palette", palette_device::MONOCHROME));
+	config.set_default_layout(layout_luna_88k);
+
+	palette_device &palette(PALETTE(config, "palette", FUNC(luna88k_state::palette_init), 2));
 
 	screen_device &lcd(SCREEN(config, "lcd").set_lcd());
 	lcd.set_raw(192'000, 40 * 6, 0, 16 * 6, 2 * 8, 0, 2 * 8);
