@@ -28,7 +28,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cart3" supported="no">
-		<description>Cart 3 (Yellow)</description>
+		<description>Cart 3 (yellow)</description>
 		<year>1992</year>
 		<publisher>Socrates / C&amp;E</publisher>
 		<part name="cart" interface="licocai_cart">
