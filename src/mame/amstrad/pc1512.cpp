@@ -412,7 +412,7 @@ uint8_t pc1512_base_state::printer_r(offs_t offset)
 		data |= m_centronics_select << 4;
 		data |= m_centronics_perror << 5;
 		data |= m_centronics_ack << 6;
-		data |= m_centronics_busy << 7;
+		data |= !m_centronics_busy << 7;
 		break;
 
 	case 2:
@@ -534,9 +534,10 @@ void pc1512_base_state::printer_w(offs_t offset, uint8_t data)
 
 		m_printer_control = data & 0x1f;
 
-		m_centronics->write_strobe(BIT(data, 0));
-		m_centronics->write_autofd(BIT(data, 1));
+		m_centronics->write_strobe(!BIT(data, 0));
+		m_centronics->write_autofd(!BIT(data, 1));
 		m_centronics->write_init(BIT(data, 2));
+		m_centronics->write_select_in(!BIT(data, 3));
 
 		m_ack_int_enable = BIT(data, 4);
 		update_ack();
@@ -1010,7 +1011,7 @@ void pc1512_base_state::drive_select_w(uint8_t data)
 void pc1512_base_state::update_ack()
 {
 	if (m_ack_int_enable)
-		m_pic->ir7_w(m_centronics_ack);
+		m_pic->ir7_w(!m_centronics_ack);
 	else
 		m_pic->ir7_w(CLEAR_LINE);
 }
