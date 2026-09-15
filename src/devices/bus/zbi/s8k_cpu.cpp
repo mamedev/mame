@@ -172,6 +172,10 @@ uint16_t s8k_cpu_base::segtack_r()
 
 uint16_t s8k_cpu_base::nmiack_r()
 {
+	m_mmu_code->instruction_end();
+	m_mmu_data->instruction_end();
+	m_mmu_stck->instruction_end();
+
 	uint16_t code = m_nmi_code;
 
 	m_nmi_code = 0;
@@ -568,7 +572,11 @@ bool zbi_s8k_cpu10_card_device::translate_addr(int spacenum, bool write, offs_t 
 						z8002_device::ST_REQ_STACK :
 						z8002_device::ST_REQ_DATA);
 
-		observe_bus_cycle(offset, st == z8002_device::ST_IFETCH_1);
+		observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
+		// SUP is shared by all three MMUs, not just the selected address driver.
+		if (!machine().side_effects_disabled() && !m_dma_on &&
+			(m_mmu_code->cpu_suppressed() || m_mmu_data->cpu_suppressed() || m_mmu_stck->cpu_suppressed()))
+			return false;
 
 		z8010_device *mmu = code_access ?
 							select_code_mmu(offset) : select_data_mmu(offset, m_reg_sbr, m_reg_nbr);
@@ -1035,7 +1043,11 @@ bool zbi_s8k_hpcpu_card_device::translate_addr(int spacenum, bool write, offs_t 
 
 		// Board latches and MMU bus snoop see the cycle before any
 		// violation can be raised for it.
-		observe_bus_cycle(offset, st == z8002_device::ST_IFETCH_1);
+		observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
+		// SUP is shared by all three MMUs, not just the selected address driver.
+		if (!machine().side_effects_disabled() && !m_dma_on &&
+			(m_mmu_code->cpu_suppressed() || m_mmu_data->cpu_suppressed() || m_mmu_stck->cpu_suppressed()))
+			return false;
 
 		z8010_device *mmu = code_access ?
 							select_code_mmu(offset) : select_data_mmu(offset, 0, m_reg_ubr);
