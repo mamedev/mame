@@ -317,7 +317,7 @@ void heath_h17_fdc_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_FLPY);
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_FLPY, m_p506_signals);
 
 		if (addr_ranges.size() == 1)
 		{
