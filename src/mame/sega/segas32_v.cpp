@@ -25,7 +25,7 @@
 
     - Wrong priority cases (parenthesis for the level setup):
       dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
-      dbzvrvs: Sheng-Long speech balloon during Piccoro ending (fixme: check levels).
+      dbzvrvs: Sheng-Long speech balloon during Piccolo ending (fixme: check levels).
       f1lap: attract mode ranking sprite-based text ($a) vs. road ($d)
       f1lap: attract mode map display (after aforementioned), sprite-based turn names
       ($a) are hidden by map ($d) again;
@@ -83,6 +83,8 @@
                  -------- ------d-  Disable tilemap layer 1
                  -------- -------d  Disable tilemap layer 0
         F04      tttttttt --------  Rowscroll/select table page number
+                 -------- --l-----  Enable per-line clipping window 3 (overrides rowscroll/select table)
+                 -------- ---l----  Enable per-line clipping window 2 (overrides rowscroll/select table)
                  -------- ----s---  Enable rowselect for tilemap layer 3
                  -------- -----s--  Enable rowselect for tilemap layer 2
                  -------- ------c-  Enable rowscroll for tilemap layer 3
@@ -1607,7 +1609,7 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 					uint32_t pixels = spritedata[++curaddr & addrmask];
 
 					/* draw four pixels */
-					pix = (pixels >> 28) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(transp)  x += xdelta; xacc += hzoom; } xacc -= 0x10000;
+					pix = (pixels >> 28) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(transp); x += xdelta; xacc += hzoom; } xacc -= 0x10000;
 					pix = (pixels >> 24) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(0);      x += xdelta; xacc += hzoom; } xacc -= 0x10000;
 					pix = (pixels >> 20) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(0);      x += xdelta; xacc += hzoom; } xacc -= 0x10000;
 					pix = (pixels >> 16) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(0);      x += xdelta; xacc += hzoom; } xacc -= 0x10000;
