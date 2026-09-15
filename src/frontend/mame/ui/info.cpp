@@ -263,19 +263,18 @@ void get_system_warnings(
 //  machine_static_info - constructors
 //-------------------------------------------------
 
-machine_static_info::machine_static_info(const ui_options &options, machine_config const &config)
-	: machine_static_info(options, config, nullptr)
+machine_static_info::machine_static_info(machine_config const &config)
+	: machine_static_info(config, nullptr)
 {
 }
 
-machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const &ports)
-	: machine_static_info(options, config, &ports)
+machine_static_info::machine_static_info(machine_config const &config, ioport_list const &ports)
+	: machine_static_info(config, &ports)
 {
 }
 
-machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports)
-	: m_options(options)
-	, m_flags(config.gamedrv().flags)
+machine_static_info::machine_static_info(machine_config const &config, ioport_list const *ports)
+	: m_flags(config.gamedrv().flags)
 	, m_emulation_flags(config.gamedrv().type.emulation_flags())
 	, m_unemulated_features(config.gamedrv().type.unemulated_features())
 	, m_imperfect_features(config.gamedrv().type.imperfect_features())
@@ -395,14 +394,14 @@ bool machine_static_info::has_severe_warnings() const noexcept
 //  driver status box
 //-------------------------------------------------
 
-rgb_t machine_static_info::status_color() const noexcept
+rgb_t machine_static_info::status_color(ui_colors const &colors) const noexcept
 {
 	if (has_severe_warnings())
-		return UI_RED_COLOR;
+		return colors.status_error_color();
 	else if ((machine_flags() & MACHINE_WARNINGS & ~::machine_flags::REQUIRES_ARTWORK) || unemulated_features() || imperfect_features())
-		return UI_YELLOW_COLOR;
+		return colors.status_warning_color();
 	else
-		return UI_GREEN_COLOR;
+		return colors.status_good_color();
 }
 
 
@@ -411,14 +410,14 @@ rgb_t machine_static_info::status_color() const noexcept
 //  warning message based on severity
 //-------------------------------------------------
 
-rgb_t machine_static_info::warnings_color() const noexcept
+rgb_t machine_static_info::warnings_color(ui_colors const &colors) const noexcept
 {
 	if (has_severe_warnings())
-		return UI_RED_COLOR;
+		return colors.status_error_color();
 	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
-		return UI_YELLOW_COLOR;
+		return colors.status_warning_color();
 	else
-		return m_options.background_color();
+		return colors.background_color();
 }
 
 
@@ -428,7 +427,7 @@ rgb_t machine_static_info::warnings_color() const noexcept
 //-------------------------------------------------
 
 machine_info::machine_info(running_machine &machine)
-	: machine_static_info(dynamic_cast<mame_ui_manager *>(&machine.ui())->options(), machine.config(), machine.ioport().ports())
+	: machine_static_info(machine.config(), machine.ioport().ports())
 	, m_machine(machine)
 {
 }
