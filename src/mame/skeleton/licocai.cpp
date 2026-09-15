@@ -85,28 +85,33 @@ void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem
 
 void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
-
 	if (m_vdp_dest == 0x0002) // uploads some 16x16x4 tiles to RAM
 	{
-		m_vram[(m_vdp_addr + 0) & 0x3ffff] = (data >> 8) & 0x00ff;
-		m_vram[(m_vdp_addr + 1) & 0x3ffff] = (data >> 0) & 0x00ff;
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (gfxdata?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
+
+		m_vram[(m_vdp_addr + 0) & 0xffff] = (data >> 8) & 0x00ff;
+		m_vram[(m_vdp_addr + 1) & 0xffff] = (data >> 0) & 0x00ff;
 
 		m_gfxdecode->gfx(0)->mark_dirty(m_vdp_addr / 0x80);
 
 		m_vdp_addr+=2;
 
 	}
-	else if (m_vdp_dest == 0x0005)
+	else if (m_vdp_dest == 0x0000) // or 0x0009, or 0x0013
 	{
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram position?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
 		m_vdp_addr = data;
+	}
+	else
+	{
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (unknown)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
 	}
 }
 
 static const gfx_layout tile_layout =
 {
 	16,16,
-	0x800,
+	0x200,
 	4,
 	{ 0*256,1*256,2*256,3*256 },
 	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
@@ -120,8 +125,9 @@ void licocai_state::machine_start()
 	save_item(NAME(m_vdp_dest));
 	save_item(NAME(m_vdp_addr));
 
-	m_vram = make_unique_clear<u8[]>(0x40000);
-	save_pointer(NAME(m_vram), 0x40000);
+	// clears 0x10000 bytes on startup
+	m_vram = make_unique_clear<u8[]>(0x10000);
+	save_pointer(NAME(m_vram), 0x10000);
 
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, tile_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
 }
@@ -144,6 +150,7 @@ uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void licocai_state::licocai_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
+	// reads from 19E564 etc. why? (is the ROM the proper size?)
 
 	map(0x210000, 0x210001).w(FUNC(licocai_state::vdp_dest_select_w));
 	map(0x210002, 0x210003).w(FUNC(licocai_state::vdp_data_w));
