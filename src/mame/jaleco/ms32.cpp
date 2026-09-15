@@ -135,10 +135,6 @@ there are sprite lag issues - sprites should be framebuffered
 
 missing clipping window effect in gametngk intro
 
-
-Not Working Games
------------------
-
 f1superb - network link not emulated (MCU on the F1-93159 I/O board is not dumped)
          - steering shock and seat motor outputs not hooked up
          - priority RAM output bits 1-0 ignored, "effect" outputs drawn at half brightness
@@ -727,21 +723,8 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 
 	map(0xfd0f0000, 0xfd0f0003).nopw(); // bit 1: steering shock, bit 0: seat motor
 
-	map(0xfd100000, 0xfd1023ff).lrw16(
-			NAME([this] (offs_t offset) { return m_fpu_data[0][offset]; }),
-			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_fpu_data[0][offset]); })).umask32(0x0000ffff);
-	map(0xfd102400, 0xfd1024ff).rw(m_fpu[0], FUNC(jaleco_fpu_device::host_r), FUNC(jaleco_fpu_device::host_w)).umask32(0x0000ffff);
-	map(0xfd104000, 0xfd105fff).lrw32(
-			NAME([this] (offs_t offset) { return fpu_prg_r(0, offset); }),
-			NAME([this] (offs_t offset, u32 data, u32 mem_mask) { fpu_prg_w(0, offset, data, mem_mask); }));
-
-	map(0xfd140000, 0xfd1423ff).lrw16(
-			NAME([this] (offs_t offset) { return m_fpu_data[1][offset]; }),
-			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_fpu_data[1][offset]); })).umask32(0x0000ffff);
-	map(0xfd142400, 0xfd1424ff).rw(m_fpu[1], FUNC(jaleco_fpu_device::host_r), FUNC(jaleco_fpu_device::host_w)).umask32(0x0000ffff);
-	map(0xfd144000, 0xfd145fff).lrw32(
-			NAME([this] (offs_t offset) { return fpu_prg_r(1, offset); }),
-			NAME([this] (offs_t offset, u32 data, u32 mem_mask) { fpu_prg_w(1, offset, data, mem_mask); }));
+	map(0xfd100000, 0xfd105fff).m(m_fpu[0], FUNC(jaleco_fpu_device::host_map));
+	map(0xfd140000, 0xfd145fff).m(m_fpu[1], FUNC(jaleco_fpu_device::host_map));
 //  map(0xfd440000, 0xfd47ffff).ram(); // color?
 
 	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_f1superbattle_state::road_vram_r16), FUNC(ms32_f1superbattle_state::road_vram_w16)).umask32(0x0000ffff);
@@ -749,21 +732,6 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 			NAME([this] (offs_t offset) { return m_road_lineram[offset]; }),
 			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_road_lineram[offset]); })).umask32(0x0000ffff);
 //  map(0xfe202000, 0xfe2fffff).ram(); // vram?
-}
-
-u32 ms32_f1superbattle_state::fpu_prg_r(int unit, offs_t offset)
-{
-	u32 const word = m_fpu_prg[unit][offset >> 1];
-	return BIT(offset, 0) ? (word & 0xffff) : (word >> 16);
-}
-
-void ms32_f1superbattle_state::fpu_prg_w(int unit, offs_t offset, u32 data, u32 mem_mask)
-{
-	u32 &word = m_fpu_prg[unit][offset >> 1];
-	if (BIT(offset, 0))
-		word = (word & 0xf0000) | (data & mem_mask & 0xffff) | (word & ~mem_mask & 0xffff);
-	else
-		word = (word & 0x0ffff) | ((((word >> 16) & ~mem_mask) | (data & mem_mask)) & 0xf) << 16;
 }
 
 void ms32_f1superbattle_state::f1superb_field_irq_w(int state)
@@ -784,26 +752,6 @@ void ms32_f1superbattle_state::fpu0_irq_w(int state)
 void ms32_f1superbattle_state::fpu1_irq_w(int state)
 {
 	irq_raise(2, state);
-}
-
-void ms32_f1superbattle_state::fpu0_prg_map(address_map &map)
-{
-	map(0x000, 0x3ff).ram().share("fpu0_prg");
-}
-
-void ms32_f1superbattle_state::fpu0_data_map(address_map &map)
-{
-	map(0x000, 0x8ff).ram().share("fpu0_data");
-}
-
-void ms32_f1superbattle_state::fpu1_prg_map(address_map &map)
-{
-	map(0x000, 0x3ff).ram().share("fpu1_prg");
-}
-
-void ms32_f1superbattle_state::fpu1_data_map(address_map &map)
-{
-	map(0x000, 0x8ff).ram().share("fpu1_data");
 }
 
 /* F1 Super Battle hardware notes
@@ -1741,13 +1689,9 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 	m_sysctrl->field_cb().set(FUNC(ms32_f1superbattle_state::f1superb_field_irq_w));
 
 	JALECO_FPU(config, m_fpu[0], XTAL(48'000'000) / 8); // clock unknown, guessed
-	m_fpu[0]->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::fpu0_prg_map);
-	m_fpu[0]->set_addrmap(AS_DATA, &ms32_f1superbattle_state::fpu0_data_map);
 	m_fpu[0]->irq_cb().set(FUNC(ms32_f1superbattle_state::fpu0_irq_w));
 
 	JALECO_FPU(config, m_fpu[1], XTAL(48'000'000) / 8);
-	m_fpu[1]->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::fpu1_prg_map);
-	m_fpu[1]->set_addrmap(AS_DATA, &ms32_f1superbattle_state::fpu1_data_map);
 	m_fpu[1]->irq_cb().set(FUNC(ms32_f1superbattle_state::fpu1_irq_w));
 
 	m_gfxdecode->set_info(gfx_f1superb);
@@ -2733,5 +2677,4 @@ GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state,       
 GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-/* these boot and show something */
-GAMEL(1994, f1superb,  0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )
+GAMEL(1994, f1superb,  0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

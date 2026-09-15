@@ -52,10 +52,30 @@ constexpr u16 CTL_ENTRY_B = 0x4100; // routine entry marker (14c 167 1b6), no ef
 
 jaleco_fpu_device::jaleco_fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, JALECO_FPU, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 10, -2)
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 12, -1)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(jaleco_fpu_device::program_map), this))
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 12, -1, address_map_constructor(FUNC(jaleco_fpu_device::data_map), this))
+	, m_prg_ram(*this, "prg")
+	, m_data_ram(*this, "data")
 	, m_irq_cb(*this)
 {
+}
+
+void jaleco_fpu_device::program_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram().share("prg");
+}
+
+void jaleco_fpu_device::data_map(address_map &map)
+{
+	map(0x000, 0x8ff).ram().share("data");
+}
+
+// host bus window, 32-bit: data RAM, registers, program RAM (opcode and argument in separate longs)
+void jaleco_fpu_device::host_map(address_map &map)
+{
+	map(0x0000, 0x23ff).rw(FUNC(jaleco_fpu_device::host_data_r), FUNC(jaleco_fpu_device::host_data_w)).umask32(0x0000ffff);
+	map(0x2400, 0x24ff).rw(FUNC(jaleco_fpu_device::host_r), FUNC(jaleco_fpu_device::host_w)).umask32(0x0000ffff);
+	map(0x4000, 0x5fff).rw(FUNC(jaleco_fpu_device::host_prg_r), FUNC(jaleco_fpu_device::host_prg_w));
 }
 
 device_memory_interface::space_config_vector jaleco_fpu_device::memory_space_config() const
@@ -145,6 +165,31 @@ void jaleco_fpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
+
+u16 jaleco_fpu_device::host_data_r(offs_t offset)
+{
+	return m_data_ram[offset];
+}
+
+void jaleco_fpu_device::host_data_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_data_ram[offset]);
+}
+
+u32 jaleco_fpu_device::host_prg_r(offs_t offset)
+{
+	u32 const word = m_prg_ram[offset >> 1];
+	return BIT(offset, 0) ? (word & 0xffff) : (word >> 16);
+}
+
+void jaleco_fpu_device::host_prg_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	u32 &word = m_prg_ram[offset >> 1];
+	if (BIT(offset, 0))
+		word = (word & 0xf0000) | (data & mem_mask & 0xffff) | (word & ~mem_mask & 0xffff);
+	else
+		word = (word & 0x0ffff) | ((((word >> 16) & ~mem_mask) | (data & mem_mask)) & 0xf) << 16;
+}
 
 u16 jaleco_fpu_device::host_r(offs_t offset)
 {

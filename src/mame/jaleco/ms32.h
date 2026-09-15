@@ -189,8 +189,6 @@ public:
 		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
 		, m_io_analog(*this, "AN%u", 0U)
 		, m_fpu(*this, "fpu%u", 0U)
-		, m_fpu_data(*this, "fpu%u_data", 0U, 0x1200U, ENDIANNESS_LITTLE)
-		, m_fpu_prg(*this, "fpu%u_prg", 0U, 0x1000U, ENDIANNESS_LITTLE)
 		, m_road_ctrl(*this, "road_ctrl")
 		, m_road_lineram(*this, "road_lineram", 0x10000, ENDIANNESS_LITTLE)
 	{}
@@ -210,8 +208,6 @@ private:
 
 	required_ioport_array<3> m_io_analog;
 	required_device_array<jaleco_fpu_device, 2> m_fpu;
-	memory_share_array_creator<u16, 2> m_fpu_data;
-	memory_share_array_creator<u32, 2> m_fpu_prg;
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
 	std::vector<u16> m_txram_latch;
@@ -228,12 +224,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 
 	void f1superb_map(address_map &map) ATTR_COLD;
-	u32 fpu_prg_r(int unit, offs_t offset);
-	void fpu_prg_w(int unit, offs_t offset, u32 data, u32 mem_mask);
-	void fpu0_prg_map(address_map &map) ATTR_COLD;
-	void fpu0_data_map(address_map &map) ATTR_COLD;
-	void fpu1_prg_map(address_map &map) ATTR_COLD;
-	void fpu1_data_map(address_map &map) ATTR_COLD;
 
 	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 road_vram_r16(offs_t offset);

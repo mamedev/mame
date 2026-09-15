@@ -25,8 +25,7 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 
-	u16 host_r(offs_t offset);
-	void host_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void host_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -45,6 +44,8 @@ private:
 	address_space_config m_data_config;
 	memory_access<10, 2, -2, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access<12, 1, -1, ENDIANNESS_LITTLE>::specific m_data;
+	required_shared_ptr<u32> m_prg_ram;
+	required_shared_ptr<u16> m_data_ram;
 
 	devcb_write_line m_irq_cb;
 
@@ -64,6 +65,16 @@ private:
 	bool m_running;
 	bool m_delay;
 	u16 m_delay_target;
+
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+
+	u16 host_r(offs_t offset);
+	void host_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 host_data_r(offs_t offset);
+	void host_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 host_prg_r(offs_t offset);
+	void host_prg_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void set_nz(u16 v);
 	bool condition(u8 code);
