@@ -340,7 +340,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 //  translate - translate memory address
 //-------------------------------------------------
 
-bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int st)
+z8010_device::memory_result z8010_device::translate(offs_t offset, bool write, bool sys, bool dma, int st)
 {
 	bool nsup = true;
 	bool exec;
@@ -363,9 +363,10 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		(((m_mode & MODE_URS) != 0) != BIT(offset, 22)) ||              // Upper range select?
 		((m_mode & MODE_MST) && (((m_mode & MODE_NMS) == 0) != sys)))   // System/normal mode?
 	{
-		offset = 0;
-		LOG("%s: INVALID MMU STATE! offset: %06x, mode: %02x, sys: %01x\n", machine().describe_context(), offset, m_mode, sys);
-		return false;
+		// An unselected MMU releases its address outputs; this is not a
+		// protection violation and does not assert SUP.  The board determines
+		// what happens when no MMU drives the address bus.
+		return { 0, false, false };
 	}
 
 	if (m_mode & MODE_TRNS) // Is translation on?
@@ -469,5 +470,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		LOG("MMU TRNS: new offs %06x, seg: %02x, viol: %02x, sup: %01x\n", offset, sn, viol, !nsup);
 	}
 
-	return nsup;
+	// A protection violation suppresses the access, but does not release
+	// the translated address.  Transparent mode also drives the bus.
+	return { offset, true, !nsup };
 }

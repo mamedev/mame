@@ -579,7 +579,11 @@ bool zbi_s8k_cpu10_card_device::translate_addr(int spacenum, bool write, offs_t 
 
 			offset &= 0x3f'ffff;    // Mask off seg bit 7 to disable URS checking in MMUs
 
-			return mmu->translate(offset, write, true, m_dma_on, st);
+			auto const result = mmu->translate(offset, write, true, m_dma_on, st);
+			if (!result.address_driven || result.suppress)
+				return false;
+			offset = result.address;
+			return true;
 		}
 	}
 
@@ -1042,7 +1046,11 @@ bool zbi_s8k_hpcpu_card_device::translate_addr(int spacenum, bool write, offs_t 
 
 			offset &= 0x3f'ffff;    // Mask off seg bit 7 to disable URS checking in MMUs
 
-			return mmu->translate(offset, write, true, m_dma_on, st);
+			auto const result = mmu->translate(offset, write, true, m_dma_on, st);
+			if (!result.address_driven || result.suppress)
+				return false;
+			offset = result.address;
+			return true;
 		}
 	}
 

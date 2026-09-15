@@ -109,7 +109,14 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	bool translate(offs_t &offset, bool write, bool sys, bool dma, int st);
+	struct memory_result
+	{
+		offs_t address;       // valid only when address_driven is true
+		bool address_driven;  // false when the address outputs are high impedance
+		bool suppress;        // SUP asserted for this memory cycle
+	};
+
+	memory_result translate(offs_t offset, bool write, bool sys, bool dma, int st);
 
 	void ifetch1_observed(offs_t offset);
 
