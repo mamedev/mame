@@ -5,6 +5,9 @@ license:CC0-1.0
 -->
 <softwarelist name="licocai_cart" description="Socrates / C&amp;E LICO Cai System Cartridges">
 
+	<!-- data seems to end abruptly in all of these, are they complete? -->
+	
+	<!-- 1ST AND 2ND HALF IDENTICAL, could be bad -->
 	<software name="cart1" supported="no">
 		<description>Cart 1 (green)</description>
 		<year>1992</year>
@@ -17,7 +20,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cart2" supported="no">
-		<description>Cart 2 (white)</description>
+		<description>Cart 2 (red)</description>
 		<year>1992</year>
 		<publisher>Socrates / C&amp;E</publisher>
 		<part name="cart" interface="licocai_cart">
@@ -27,6 +30,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- 1ST AND 2ND HALF IDENTICAL, could be bad -->
 	<software name="cart3" supported="no">
 		<description>Cart 3 (yellow)</description>
 		<year>1992</year>
