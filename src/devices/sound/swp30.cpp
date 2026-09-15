@@ -3672,9 +3672,9 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 	if(dr) {
 		if(BIT(opcode, 0x37)) {
 			if(sr)
-				UML_DMOV(block, mem(&m_rw_value[index3]), mem(&m_r[sr]));
+				UML_MOV(block, mem(&m_rw_value[index3]), mem(&m_r[sr]));
 			else
-				UML_DMOV(block, mem(&m_rw_value[index3]), 0);
+				UML_MOV(block, mem(&m_rw_value[index3]), 0);
 		} else {
 			UML_DMOV(block, I0, mem(&m_p));
 			if(!BIT(opcode, 0x0a)) {
@@ -3713,7 +3713,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 
 	if(BIT(opcode, 0x3e)) {
 		UML_DSAR(block, I0, mem(&m_p), 15+8);
-		UML_STORE(block, m_index_value.data(), index3, I0, SIZE_WORD, SCALE_x2);
+		UML_MOV(block, mem(&m_index_value[index3]), I0);
 	}
 
 	// Memory access
@@ -3726,15 +3726,17 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 				break;
 		u16 mapr = m_map[bank];
 		u32 mask = (1 << (10+BIT(mapr, 8, 3))) - 1;
-		u32 offset = BIT(mapr, 0, 8) << 10;
-		if(amem == 3)
-			offset ++;
+		u32 base = BIT(mapr, 0, 8) << 10;
 		UML_LOAD(block, I0, m_offset.data(), pc/3, SIZE_WORD, SCALE_x2);
+		if(amem == 3)
+			UML_ADD(block, I0, I0, 1);
 		UML_SUB(block, I0, I0, mem(&m_sample_counter));
-		UML_ADD(block, I0, I0, offset);
 		if(BIT(opcode, 0x21))
 			UML_ADD(block, I0, I0, mem(&m_ram_index));
+		// Mask within the bank, then move to the bank start
 		UML_AND(block, I0, I0, mask);
+		if(base)
+			UML_ADD(block, I0, I0, base);
 		if(amem == 1) {
 			UML_MOV(block, mem(&m_retval), mem(&m_ram_write));
 			UML_CALLC(block, call_revram_encode, this);
