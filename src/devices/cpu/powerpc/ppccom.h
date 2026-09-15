@@ -375,6 +375,11 @@ enum
 #define DSISR_INVALID_ECWX  0x00100000      /* DSI: ECIWX or ECOWX used with EAR[E] = 0 */
 #define DSISR_INSTRUCTION   0x000fffff      /* align: instruction decoding bits FIXME: mask/shift depends on addressing mode */
 
+/* Set when PP and the key permit writing, so a store refused for want of C can
+   be told from one refused by PP. One per mode, as the two keys can differ. */
+#define PPC603_TLB_PP_WRITABLE      0x100
+#define PPC603_TLB_PP_USER_WRITABLE 0x200
+
 
 // PowerPC 4XX IRQ bits
 #define PPC4XX_IRQ_BIT_CRITICAL     (0x80000000 >> 0)
