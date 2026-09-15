@@ -4,7 +4,7 @@
 
 /*
  TODO:
-  - Fix sound emulation (speed needs verifying + sample playback)
+  - Fix timings and sound emulation (speed needs verifying + sample playback on real hardware)
   - Fix sprite communication / banking
     * bit "output bit 0x02 %d (IC21)" at 0x42 might be important
     * mag_xain sometimes leaves old sprites on the screen, probably due to a lost clear
@@ -19,7 +19,6 @@
     * there are no per-game protection devices, so it's something to do with the base hardware
     * there seem to be 2 checks, one based on a weird sector on the discs, the other based on
       a port read
-  - Add additional hardware notes from ArcadeHacker
   - Layer enables on War Mission? (transitions from title screen etc.)
 
  notes:
