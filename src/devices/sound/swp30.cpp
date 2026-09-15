@@ -2012,7 +2012,7 @@ void swp30_device::map(address_map &map)
 	rctrl(map, 0x3a).rw(FUNC(swp30_device::meg_map_r<5>), FUNC(swp30_device::meg_map_w<5>));
 	rctrl(map, 0x3c).rw(FUNC(swp30_device::meg_map_r<6>), FUNC(swp30_device::meg_map_w<6>));
 	rctrl(map, 0x3e).rw(FUNC(swp30_device::meg_map_r<7>), FUNC(swp30_device::meg_map_w<7>));
-	rctrl(map, 0x40).w (FUNC(swp30_device::revram_enable_w));
+	rctrl(map, 0x40).rw(FUNC(swp30_device::revram_enable_r), FUNC(swp30_device::revram_enable_w));
 	rctrl(map, 0x41).w (FUNC(swp30_device::revram_clear_w));
 	rctrl(map, 0x42).r (FUNC(swp30_device::revram_status_r));
 	rctrl(map, 0x4a).w (FUNC(swp30_device::revram_adr_w<1>));
@@ -2257,6 +2257,11 @@ u32 swp30_device::meg_state::revram_decode(u16 v)
 	return vb;
 }
 
+
+u16 swp30_device::revram_enable_r()
+{
+	return m_revram_enable;
+}
 
 void swp30_device::revram_enable_w(u16 data)
 {
