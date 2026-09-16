@@ -71,7 +71,7 @@ private:
 	u16 m_vdp_write_type;
 	u32 m_vdp_addr;
 	std::unique_ptr<u8[]> m_vram;
-	std::unique_ptr<u8[]> m_spram;
+	//std::unique_ptr<u8[]> m_spram;
 };
 
 void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -82,8 +82,7 @@ void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem
 
 void licocai_state::vdp_data_upload(uint16_t data, uint16_t mem_mask)
 {
-
-	if (m_vdp_write_type == 0x0000)
+	//if (m_vdp_write_type == 0x0000)
 	{
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (data_upload?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
 
@@ -92,8 +91,10 @@ void licocai_state::vdp_data_upload(uint16_t data, uint16_t mem_mask)
 
 		m_gfxdecode->gfx(1)->mark_dirty(m_vdp_addr / 0x80);
 		m_gfxdecode->gfx(2)->mark_dirty(m_vdp_addr / 0x20);
+		m_gfxdecode->gfx(3)->mark_dirty(m_vdp_addr / 0x20);
 		m_vdp_addr += 2;
 	}
+	/*
 	else if (m_vdp_write_type == 0x00c8)
 	{
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (spritelist upload?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
@@ -106,6 +107,7 @@ void licocai_state::vdp_data_upload(uint16_t data, uint16_t mem_mask)
 	{
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (write type %04x)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask, m_vdp_write_type);
 	}
+	*/
 }
 
 void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -224,6 +226,18 @@ static const gfx_layout tile16_ram_1bpp_layout =
 	16*16
 };
 
+static const gfx_layout tile8_ram_4bpp_layout =
+{
+	8,8,
+	0x800,
+	4,
+	{ 0,8, 128, 136 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*16,1*16,2*16,3*16, 4*16,5*16,6*16,7*16 },
+	16*16
+};
+
+
 static const gfx_layout tile16_1bpp_layout =
 {
 	16,16,
@@ -240,6 +254,7 @@ static GFXDECODE_START( gfx_licocai )
 	GFXDECODE_ENTRY( "maincpu", 0, tile16_1bpp_layout,   0, 1  ) // entry 0 - debug (has a 16x16x1bpp font from tiles 5580+)
 	// entry 1 created in init
 	// entry 2 created in init
+	// entry 3 created in init
 GFXDECODE_END
 
 void licocai_state::machine_start()
@@ -252,12 +267,15 @@ void licocai_state::machine_start()
 	m_vram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_vram), 0x10000);
 
+	/*
 	// uploads ~0x800 bytes of data in what might be this mode
 	m_spram = make_unique_clear<u8[]>(0x800);
 	save_pointer(NAME(m_spram), 0x800);
+	*/
 
 	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, tile16_ram_4bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
 	m_gfxdecode->set_gfx(2, std::make_unique<gfx_element>(m_palette, tile16_ram_1bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 2, 0));
+	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, tile8_ram_4bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
 }
 
 void licocai_state::machine_reset()
@@ -273,6 +291,21 @@ void licocai_state::video_start()
 
 uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+	// there's a tilemap (or large sprite) at the start of RAM (maybe it can be relocated)
+	gfx_element *gfx = m_gfxdecode->gfx(1);
+	int count = 0;
+	for (int y = 0; y < 16; y++)
+	{
+		for (int x = 0; x < 16; x++)
+		{
+			u16 tile = m_vram[count + 1] | (m_vram[count + 0] << 8);
+			gfx->transpen(bitmap, cliprect, tile & 0xff, 0, 0, 0, x * 16, y * 16, 0);
+
+			count += 2;
+		}
+	}
+
 	return 0;
 }
 
@@ -318,8 +351,8 @@ void licocai_state::licocai(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(licocai_state::screen_update));
 	screen.set_palette("palette");
 
