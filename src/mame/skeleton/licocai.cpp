@@ -115,8 +115,8 @@ void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	switch (m_vdp_dest)
 	{
 	case 0x0000:
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram position?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
-		m_vdp_addr = data;
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram word position?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+		m_vdp_addr = data << 1;
 		break;
 
 	case 0x0001:
@@ -293,19 +293,16 @@ uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	bitmap.fill(0, cliprect);
 	// there's a tilemap (or large sprite) at the start of RAM (maybe it can be relocated)
-	// only half the tilemap seems to have been uploaded though?
 	gfx_element *gfx = m_gfxdecode->gfx(3);
 	int count = 0;
 	// left side of screen
 	for (int y = 0; y < 32; y++)
 	{
-		for (int x = 0; x < 16; x++)
+		for (int x = 0; x < 32; x++)
 		{
 			u16 dat = m_vram[count + 1] | (m_vram[count + 0] << 8);
 
-			u16 tile = (dat & 0xff)  + 0x260;
-			if (dat & 0x1000)
-				tile += 0x100;
+			u16 tile = (dat & 0x7ff);
 
 			gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8, 0);
 
