@@ -16,7 +16,7 @@ license:CC0-1.0
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="green" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="lico-cai-cart1-green.bin" size="0x100000" crc="b084ddd4" sha1="a785e465d9635f16c0f49c9fd9bd35682c19ec09" status="bad_dump" />
+				<rom name="lico-cai-cart1-green.bin" size="0x100000" crc="b084ddd4" sha1="a785e465d9635f16c0f49c9fd9bd35682c19ec09" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@ license:CC0-1.0
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="orange/yellow" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="lico-cai-cart3-yellow.bin" size="0x100000" crc="70154f14" sha1="039c8a42cf5259f9ab88cbcf74accdc4f6d6b456" status="bad_dump" />
+				<rom name="lico-cai-cart3-yellow.bin" size="0x100000" crc="70154f14" sha1="039c8a42cf5259f9ab88cbcf74accdc4f6d6b456" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
