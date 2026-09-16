@@ -4195,6 +4195,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/wd1015.h,MACHINES["WD1015"] = true
+---------------------------------------------------
+
+if MACHINES["WD1015"] then
+	files {
+		MAME_DIR .. "src/devices/machine/wd1015.cpp",
+		MAME_DIR .. "src/devices/machine/wd1015.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd1002_hd0.h,MACHINES["WD1002_HD0"] = true
 ---------------------------------------------------
 

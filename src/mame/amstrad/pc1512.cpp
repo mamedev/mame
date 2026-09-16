@@ -1286,8 +1286,7 @@ void pc1512_state::pc1512dd(machine_config &config)
 void pc1512_state::pc1512hd(machine_config &config)
 {
 	pc1512(config);
-	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
-	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
 }
@@ -1426,8 +1425,7 @@ void pc1640_state::pc1640dd(machine_config &config)
 void pc1640_state::pc1640hd(machine_config &config)
 {
 	pc1640(config);
-	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
-	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
 }
