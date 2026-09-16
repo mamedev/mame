@@ -113,6 +113,9 @@ public:
 	//#define G_B0  0x75
 
 	//  6b  @ 73827 // must be a 2 byte operation on al? after an AND, at end of interrupt, 2nd byte is 0x08
+	// only used by the link beacon timer (reload = ((tick >> 2) & 0x0f) OP 8), which has no
+	// counterpart in the other Toaplan V25 sound programs to compare against; XOR, OR and
+	// ADD all give a workable beacon period and unlinked play is unaffected either way
 	#define G_6B  0x34 // treat as XOR, could be OR?
 
 	//  59  @ 73505 and 7379B
@@ -122,7 +125,8 @@ public:
 	// 16-bit shift group (homophone of 0xec), see INTP0 ring writer @ 736dc and EEPROM sync @ 70328
 	#define G_43 0xd1
 
-	// push ix, see note-release handler @ 72770 (pop bp pairs with it, routine ends in plain ret)
+	// push ix, see note-release handler @ 72770 (pop bp pairs with it, routine ends in
+	// plain ret); confirmed against the same routine in batsugun's unencrypted V25 code
 	#define G_00 0x56
 
 	static constexpr u8 dt7_decryption_table[256] = {
