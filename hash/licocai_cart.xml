@@ -7,7 +7,7 @@ license:CC0-1.0
 
 	<!-- data seems to end abruptly in all of these, are they complete? -->
 	
-	<!-- 1ST AND 2ND HALF IDENTICAL, could be bad -->
+	<!-- has 3FFFF(2M) in the header, probably a word count, so 0x80000 bytes, so probably not bad -->
 	<software name="znfsg" supported="no">
 		<description>Zhuo Ná Fen Shù Guài</description>
 		<year>1992</year>
@@ -16,34 +16,35 @@ license:CC0-1.0
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="green" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="lico-cai-cart1-green.bin" size="0x100000" crc="b084ddd4" sha1="a785e465d9635f16c0f49c9fd9bd35682c19ec09" status="baddump" />
+				<rom name="lico-cai-cart1-green.bin" size="0x80000" crc="73940e86" sha1="cfac9b4a10eb203395ea82281217aa57ec89aea9" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- has 16M in the header, and data seems to end abruptly. 16M bytes would be 0x200000, 16M words would be 0x400000, likely bad -->
 	<software name="zyfhk" supported="no">
 		<description>Zhù Yin Fú Hào Ka</description>
-		<year>1992</year>
+		<year>1994</year>
 		<publisher>Socrates / C&amp;E</publisher>
 		<info name="alt_title" value="注音符號卡"/>	
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="pink/red" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="lico-cai-cart2-white.bin" size="0x100000" crc="6a81d065" sha1="14b8580d48ed3a989255611d7b1f8e77076ce59a" />
+				<rom name="lico-cai-cart2-white.bin" size="0x100000" crc="6a81d065" sha1="14b8580d48ed3a989255611d7b1f8e77076ce59a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- 1ST AND 2ND HALF IDENTICAL, could be bad -->
+	<!-- no size listed in header, data ends abruptly, was dumped at double this size but with identical halves, likely bad -->
 	<software name="kshs" supported="no">
-		<description>Kuài Suàn Hao Shou</description>
-		<year>1992</year>
+		<description>Kuài Suàn Hao Shou / Smart Kids</description>
+		<year>1994</year>
 		<publisher>Socrates / C&amp;E</publisher>
 		<info name="alt_title" value="快算好手"/>	
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="orange/yellow" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="lico-cai-cart3-yellow.bin" size="0x100000" crc="70154f14" sha1="039c8a42cf5259f9ab88cbcf74accdc4f6d6b456" status="baddump" />
+				<rom name="lico-cai-cart3-yellow.bin" size="0x80000" crc="41b4dcc6" sha1="3f90bcaa5917d2e303eeef80d4979239964deab2" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
