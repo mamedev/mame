@@ -208,8 +208,27 @@ private:
 	
     void emaxi_ic21_latch_led_a_w(u8 data);
     void emaxi_ic22_latch_led_b_w(u8 data);
+	void emaxi_misc_latch_w(u8 data);
     void emaxii_ic34_latch_led_a_w(u8 data);
     void emaxii_ic35_latch_led_b_w(u16 data);
+	void emaxii_misc_latch_w(u8 data);
+	
+	u16 emax_ii_lsi1_test_r(offs_t offset)
+	{
+		if (offset == 0) m_lsi1_test_count++;
+
+		u32 val;
+		switch (m_lsi1_test_count)
+		{
+			case 1:  val = 0x12345678; break;
+			case 2:  val = 0x12345678; break;
+			case 3:  val = 0xEDCBA987; break;
+			case 4:  val = 0xEDCBA987; break;
+			default: val = 0x12345678; break;
+		}
+	
+		return offset == 0 ? (val & 0xFFFF) : (val >> 16);
+	}
 
     HD44780_PIXEL_UPDATE(pixel_update);
 
@@ -365,6 +384,19 @@ void emax_state::emaxi_ic22_latch_led_b_w(u8 data)
     m_fdd->mon_w(BIT(data, (unsigned)emaxi_ic22_latch_led_b::MTR));
 }
 
+void emax_state::emaxi_misc_latch_w(u8 data)
+{
+	bool fdienb = BIT(data, 7);
+	m_midi_off = !BIT(data, 6);
+		
+	update_acia_rxd();
+		
+	//LOGEMAX(LOG_LATCH, "cswewe: writing %02x with MIDIOF=%d \n", data, m_midi_off);
+		
+	m_eeprom->cs_write(fdienb);
+	m_eeprom->di_write(m_midi_off);
+}
+
 void emax_state::emaxii_ic34_latch_led_a_w(u8 data)
 {
     LOGEMAX(LOG_LATCH, "emaxii_ic34_latch_led_a_w (%s): 0x%02X (DrvSelect=%s Trans=%s PreDef=%s DynProc=%s Mast=%s Samp=%s DigProc=%s PreMan=%s)\n",
@@ -391,6 +423,17 @@ void emax_state::emaxii_ic35_latch_led_b_w(u16 data)
 		
     m_fdd->ss_w(!BIT(data, (unsigned)emaxii_ic35_latch_led_b::SIDE));
     m_fdd->mon_w(BIT(data, (unsigned)emaxii_ic35_latch_led_b::MTR));
+}
+
+void emax_state::emaxii_misc_latch_w(u8 data)
+{
+	bool eece = BIT(data, 7);
+	m_midi_off = BIT(data, 6);
+		
+	//LOGEMAX(LOG_LATCH, "%s: cswewe: %02x eece: %d midiof: %d \n", machine().describe_context().c_str(), data, eece, m_midi_off);
+		
+	m_eeprom->cs_write(eece);
+	m_eeprom->di_write(m_midi_off);
 }
 
 void emax_state::machine_start()
@@ -529,6 +572,7 @@ void emax_state::emax_periphs(address_map &map)
     
     map(0x8E4000, 0x8E4000).w(FUNC(emax_state::emaxi_ic21_latch_led_a_w));
     map(0x8E4002, 0x8E4002).w(FUNC(emax_state::emaxi_ic22_latch_led_b_w));
+	map(0xAA4000, 0xAA4000).w(FUNC(emax_state::emaxi_misc_latch_w));
 
 	map(0x822000, 0x822000).w(m_fdc, FUNC(wd1772_device::cmd_w));
     map(0x822400, 0x822400).r(m_fdc, FUNC(wd1772_device::status_r));
@@ -554,6 +598,8 @@ void emax_state::emax_periphs(address_map &map)
 		LOGEMAX(LOG_IRQ, "read irq: %02x \n", m_irq_latch);
 		return m_irq_latch;
         }, "irq_latch_r");
+		
+	map(0xfffe01, 0xfffe03).nopr(); // temporarily mute logging, unsure why this is occurring
     
 	map(0x8E6000, 0x8E6000).lw8([this](u8 data) {
 		LOGEMAX(LOG_IRQ, "stint off \n"); 
@@ -563,29 +609,10 @@ void emax_state::emax_periphs(address_map &map)
 		irq_w<TGINT>(0); }, "tgint_w");
 	
 	map(0xAA6000, 0xAA6000).lr8([this]() {		
-		LOGEMAX(LOG_SCN,
-        "%s: csrscn: tmp=%02x SERIAL shift=%02x bits=%d\n",
-        machine().describe_context().c_str(),
-        scanner_dta,
-        m_scn_shift,
-        m_scn_bits);
-		
+		LOGEMAX(LOG_SCN, "%s: csrscn: tmp=%02x SERIAL shift=%02x bits=%d\n", machine().describe_context().c_str(),
+			scanner_dta, m_scn_shift, m_scn_bits);	
 		return 0x00;
 		}, "csrscn");
-		
-	map(0xAA4000, 0xAA4000).lw8([this](u8 data) {
-		bool fdienb = BIT(data, 7);
-		m_midi_off = !BIT(data, 6);
-		
-		update_acia_rxd();
-		
-		//LOGEMAX(LOG_LATCH, "cswewe: writing %02x with MIDIOF=%d \n", data, m_midi_off);
-		
-		m_eeprom->cs_write(fdienb);
-		m_eeprom->di_write(m_midi_off);		
-		}, "cswewe");
-		
-	map(0xfffe01, 0xfffe03).nopr(); // temporarily mute logging, unsure why this is occurring
 		
 	// Temporary mappings to pass the bootprom diagnostics:
     map(0xaa2000, 0xaa2000).w(FUNC(emax_state::echip_cmd_w));
@@ -640,6 +667,7 @@ void emax_state::emax2_map(address_map &map)
     
     map(0xCF0000, 0xCF0000).w(FUNC(emax_state::emaxii_ic34_latch_led_a_w));
     map(0xDF0000, 0xDF0003).w(FUNC(emax_state::emaxii_ic35_latch_led_b_w));
+	map(0xEF0000, 0xEF0000).w(FUNC(emax_state::emaxii_misc_latch_w));
     
     map(0x0a8018, 0x0a8018).w(m_acia2, FUNC(acia6850_device::control_w));
     map(0x0a801a, 0x0a801a).r(m_acia2, FUNC(acia6850_device::status_r));
@@ -661,69 +689,31 @@ void emax_state::emax2_map(address_map &map)
     map(0x3f8000, 0x3f8007).rw(m_ctc, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	
 	map(0x698000, 0x698000).lr8([this]() {
-		LOGEMAX(LOG_SCN, "%s: ccscan_r: tmp %02x \n", machine().describe_context().c_str(), scanner_dta); 
-		
+		LOGEMAX(LOG_SCN, "%s: ccscan_r: tmp %02x \n", machine().describe_context().c_str(), scanner_dta); 	
 		return scanner_dta;
 		}, "ccscan_r");
 		
-	// misc latch
-	map(0xEF0000, 0xEF0000).lw8([this](u8 data) {
-		bool eece = BIT(data, 7);
-		m_midi_off = BIT(data, 6);
-		
-		//LOGEMAX(LOG_LATCH, "%s: cswewe: %02x eece: %d midiof: %d \n", machine().describe_context().c_str(), data, eece, m_midi_off);
-		
-		m_eeprom->cs_write(eece);
-		m_eeprom->di_write(m_midi_off);
-	
-		}, "misc_latch_w");
-		
 	map(0x9E8800, 0x9E8803).lw16([this](offs_t offset, u16 data) {
-		if (offset == 0)
-			emaxii_lsi2_test_1_lo = data;
-		else
-			emaxii_lsi2_test_1_hi = data;
+		if (offset == 0) emaxii_lsi2_test_1_lo = data;
+		else emaxii_lsi2_test_1_hi = data;
 	}, "emax_ii_lsi2_test_1_w");
 		
 	map(0x9E8880, 0x9E8883).lw16([this](offs_t offset, u16 data) {
-		if (offset == 0)
-			emaxii_lsi2_test_2_lo = data;
-		else
-			emaxii_lsi2_test_2_hi = data;
+		if (offset == 0) emaxii_lsi2_test_2_lo = data;
+		else emaxii_lsi2_test_2_hi = data;
 	}, "emax_ii_lsi2_test_2_w");
 		
 	map(0x9EA800, 0x9EA803).lr16([this](offs_t offset) {
-		if (offset == 0)
-			return emaxii_lsi2_test_1_lo;
-		else
-			return emaxii_lsi2_test_1_hi;
+		return offset == 0 ? emaxii_lsi2_test_1_lo : emaxii_lsi2_test_1_hi;
 		}, "emax_ii_lsi2_test_1_r");
 		
 	map(0x9EA880, 0x9EA883).lr16([this](offs_t offset) {
-		if (offset == 0)
-			return emaxii_lsi2_test_2_lo;
-		else
-			return emaxii_lsi2_test_2_hi;
+		return offset == 0 ? emaxii_lsi2_test_2_lo : emaxii_lsi2_test_2_hi;
 	}, "emax_ii_lsi2_test_2_r");
 	
 	// LSI #1 passing 'hack'
 	map(0x8e8000, 0x8e83ff).ram().mirror(0x0400).share("emax_ii_lsi1_ram");
-	map(0x8e8700, 0x8e8703).lr16([this](offs_t offset) {
-		if (offset == 0)
-			m_lsi1_test_count++;
-
-		u32 val;
-		switch (m_lsi1_test_count)
-		{
-			case 1:  val = 0x12345678; break;
-			case 2:  val = 0x12345678; break;
-			case 3:  val = 0xEDCBA987; break;
-			case 4:  val = 0xEDCBA987; break;
-			default: val = 0x12345678; break;
-		}
-	
-		return offset == 0 ? (val & 0xFFFF) : (val >> 16);
-	}, "emax_ii_lsi1_test_r");
+	map(0x8e8700, 0x8e8703).r(FUNC(emax_state::emax_ii_lsi1_test_r));
     
     map(0xAE8000, 0xAE8000).w(m_fdc, FUNC(wd1772_device::cmd_w));
     map(0xAE8400, 0xAE8400).r(m_fdc, FUNC(wd1772_device::status_r));
