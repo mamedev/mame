@@ -56,6 +56,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void vdp_data_upload(uint16_t data, uint16_t mem_mask);
+	void update_pen(u16 pen);
 
 	void vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -63,8 +64,10 @@ private:
 	u16 vdp_data_r(offs_t offset, uint16_t mem_mask = ~0);
 	u16 lico_2a0000_r(offs_t offset, uint16_t mem_mask = ~0);
 	u16 lico_2a000a_r(offs_t offset, uint16_t mem_mask = ~0);
-	void lico_200008_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void lico_20000a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pal_addr_low_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pal_addr_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pal_low_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pal_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void licocai_map(address_map &map) ATTR_COLD;
 
@@ -72,7 +75,12 @@ private:
 	u16 m_vdp_write_type;
 	u32 m_vdp_write_addr;
 	u32 m_vdp_read_addr;
+
+	u16 m_paladdr;
+
 	std::unique_ptr<u8[]> m_vram;
+	std::unique_ptr<u8[]> m_palhigh;
+	std::unique_ptr<u8[]> m_pallow;
 };
 
 void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -183,28 +191,71 @@ u16 licocai_state::lico_2a000a_r(offs_t offset, uint16_t mem_mask)
 	return machine().rand();
 }
 
-
-void licocai_state::lico_200008_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void licocai_state::pal_addr_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask & 0xff00)
 	{
-		fatalerror("write to upper byte lico_200008_w %04x %04x\n", data, mem_mask);
+		fatalerror("write to upper byte pal_addr_low_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		logerror("%s: lico_200008_w %02x\n", machine().describe_context(), data & 0xff);
+		logerror("%s: pal_addr_low_w %02x\n", machine().describe_context(), data & 0xff);
+		m_paladdr = (m_paladdr & 0x0300) | (data & 0xff);
 	}
 }
 
-void licocai_state::lico_20000a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void licocai_state::pal_addr_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask & 0xff00)
 	{
-		fatalerror("write to upper byte lico_20000a_w %04x %04x\n", data, mem_mask);
+		fatalerror("write to upper byte pal_addr_high_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		logerror("%s: lico_20000a_w %02x\n", machine().describe_context(), data & 0xff);
+		logerror("%s: pal_addr_high_w (pal mode/mask?) %02x\n", machine().describe_context(), data & 0xff);
+		m_paladdr = (m_paladdr & 0x00ff) | ((data & 0x03) << 8);
+	}
+}
+
+void licocai_state::update_pen(u16 pen)
+{
+/*
+	u16 pal = m_pallow[pen] | (m_palhigh[pen] << 8);
+
+	const u8 r = (pal >> 6) & 0x07;
+	const u8 g = (pal >> 3) & 0x07;
+	const u8 b = (pal >> 0) & 0x07;
+
+	m_palette->set_pen_color(pen, rgb_t(r << 5, g << 5, b << 5));
+*/
+}
+
+void licocai_state::pal_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (mem_mask & 0xff00)
+	{
+		fatalerror("write to upper byte pal_low_w %04x %04x\n", data, mem_mask);
+	}
+	else
+	{
+		logerror("%s: pal_low_w addr:%04x %02x\n", machine().describe_context(), m_paladdr, data & 0xff);
+		m_pallow[m_paladdr & 0x3ff] = data & 0xff;
+	}
+}
+
+void licocai_state::pal_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (mem_mask & 0xff00)
+	{
+		fatalerror("write to upper byte pal_high_w %04x %04x\n", data, mem_mask);
+	}
+	else
+	{
+		logerror("%s: pal_high_w addr:%04x %02x\n", machine().describe_context(), m_paladdr, data & 0xff);
+		m_palhigh[m_paladdr & 0x3ff] = data & 0xff;
+		update_pen(m_paladdr & 0x3ff);
+
+		m_paladdr++;
 	}
 }
 
@@ -268,10 +319,17 @@ void licocai_state::machine_start()
 	save_item(NAME(m_vdp_write_addr));
 	save_item(NAME(m_vdp_write_type));
 	save_item(NAME(m_vdp_read_addr));
+	save_item(NAME(m_paladdr));
 
 	// clears 0x10000 bytes on startup, so assume main VRAM is that size
 	m_vram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_vram), 0x10000);
+
+	m_palhigh = make_unique_clear<u8[]>(0x400);
+	save_pointer(NAME(m_palhigh), 0x400);
+
+	m_pallow = make_unique_clear<u8[]>(0x400);
+	save_pointer(NAME(m_pallow), 0x400);
 
 	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, tile16_ram_4bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
 	m_gfxdecode->set_gfx(2, std::make_unique<gfx_element>(m_palette, tile16_ram_1bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 2, 0));
@@ -284,6 +342,7 @@ void licocai_state::machine_reset()
 	m_vdp_write_addr = 0;
 	m_vdp_read_addr = 0;
 	m_vdp_write_type = 0;
+	m_paladdr = 0;
 }
 
 void licocai_state::video_start()
@@ -305,7 +364,7 @@ uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			u16 tile = (dat & 0x7ff);
 
-			gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8, 0);
+			gfx->transpen(bitmap, cliprect, tile, 0x10, 0, 0, x * 8, y * 8, 0);
 
 			count += 2;
 		}
@@ -320,11 +379,11 @@ void licocai_state::licocai_map(address_map &map)
 	// there are data reads from 19E564 etc. why? (is the ROM the proper size?) - handled with mirror for now
 	// could be there's a gap in how the ROM maps?
 
-	// 0x200004, 0x200005 // similar to lico_200008_w  reg num?  (could be sound?)
-	// 0x200006, 0x200007 // similar to lico_20000a_w  value?
-
-	map(0x200008, 0x200009).w(FUNC(licocai_state::lico_200008_w)); // used as a pair
-	map(0x20000a, 0x20000b).w(FUNC(licocai_state::lico_20000a_w));
+	// some kind of RAM DAC?
+	map(0x200004, 0x200005).w(FUNC(licocai_state::pal_addr_low_w));
+	map(0x200006, 0x200007).w(FUNC(licocai_state::pal_addr_high_w));
+	map(0x200008, 0x200009).w(FUNC(licocai_state::pal_low_w));
+	map(0x20000a, 0x20000b).w(FUNC(licocai_state::pal_high_w));
 
 	map(0x210000, 0x210001).rw(FUNC(licocai_state::vdp_status_r), FUNC(licocai_state::vdp_dest_select_w));
 	map(0x210002, 0x210003).rw(FUNC(licocai_state::vdp_data_r), FUNC(licocai_state::vdp_data_w));
@@ -350,8 +409,8 @@ void licocai_state::licocai(machine_config &config)
 	M68000(config, m_maincpu, 10'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &licocai_state::licocai_map);
 	// wrong, just to keep things moving
-	m_maincpu->set_periodic_int(FUNC(licocai_state::irq3_line_hold), attotime::from_hz(400));
-	m_maincpu->set_periodic_int(FUNC(licocai_state::irq5_line_hold), attotime::from_hz(200));
+	m_maincpu->set_periodic_int(FUNC(licocai_state::irq3_line_hold), attotime::from_hz(30));
+	m_maincpu->set_periodic_int(FUNC(licocai_state::irq5_line_hold), attotime::from_hz(40));
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
@@ -361,7 +420,7 @@ void licocai_state::licocai(machine_config &config)
 	screen.set_screen_update(FUNC(licocai_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100); // wrong
+	PALETTE(config, m_palette).set_entries(0x400);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_licocai);
 
