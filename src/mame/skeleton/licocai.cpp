@@ -60,6 +60,7 @@ private:
 	void vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	u16 vdp_status_r(offs_t offset, uint16_t mem_mask = ~0);
+	u16 vdp_data_r(offs_t offset, uint16_t mem_mask = ~0);
 	u16 lico_2a0000_r(offs_t offset, uint16_t mem_mask = ~0);
 	u16 lico_2a000a_r(offs_t offset, uint16_t mem_mask = ~0);
 	void lico_200008_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -69,9 +70,9 @@ private:
 
 	u16 m_vdp_dest;
 	u16 m_vdp_write_type;
-	u32 m_vdp_addr;
+	u32 m_vdp_write_addr;
+	u32 m_vdp_read_addr;
 	std::unique_ptr<u8[]> m_vram;
-	//std::unique_ptr<u8[]> m_spram;
 };
 
 void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -82,46 +83,50 @@ void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem
 
 void licocai_state::vdp_data_upload(uint16_t data, uint16_t mem_mask)
 {
-	//if (m_vdp_write_type == 0x0000)
-	{
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (data_upload?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
+	logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (data_upload?)\n", machine().describe_context(), m_vdp_dest, m_vdp_write_addr, data, mem_mask);
 
-		m_vram[(m_vdp_addr + 0) & 0xffff] = (data >> 8) & 0x00ff;
-		m_vram[(m_vdp_addr + 1) & 0xffff] = (data >> 0) & 0x00ff;
+	m_vram[(m_vdp_write_addr + 0) & 0xffff] = (data >> 8) & 0x00ff;
+	m_vram[(m_vdp_write_addr + 1) & 0xffff] = (data >> 0) & 0x00ff;
 
-		m_gfxdecode->gfx(1)->mark_dirty(m_vdp_addr / 0x80);
-		m_gfxdecode->gfx(2)->mark_dirty(m_vdp_addr / 0x20);
-		m_gfxdecode->gfx(3)->mark_dirty(m_vdp_addr / 0x20);
-		m_vdp_addr += 2;
-	}
-	/*
-	else if (m_vdp_write_type == 0x00c8)
-	{
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (spritelist upload?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
-		// write type c8 and address 7800 might be a spritelist?
-		m_spram[(m_vdp_addr + 0) & 0x7ff] = (data >> 8) & 0x00ff;
-		m_spram[(m_vdp_addr + 1) & 0x7ff] = (data >> 0) & 0x00ff;
-		m_vdp_addr += 2;
-	}
-	else
-	{
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (write type %04x)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask, m_vdp_write_type);
-	}
-	*/
+	m_gfxdecode->gfx(1)->mark_dirty(m_vdp_write_addr / 0x80);
+	m_gfxdecode->gfx(2)->mark_dirty(m_vdp_write_addr / 0x20);
+	m_gfxdecode->gfx(3)->mark_dirty(m_vdp_write_addr / 0x20);
+	m_vdp_write_addr += 2;
 }
+
+u16 licocai_state::vdp_data_r(offs_t offset, uint16_t mem_mask)
+{
+	switch (m_vdp_dest)
+	{
+	case 0x0002:
+	{
+		logerror("%s: vdp_data_r with m_vdp_dest %02x addr %04x (data read)\n", machine().describe_context(), m_vdp_dest, m_vdp_read_addr);
+		u16 dat = (m_vram[(m_vdp_read_addr + 0) & 0xffff] << 8) | m_vram[(m_vdp_read_addr + 1) & 0xffff];
+		m_vdp_read_addr += 2;
+		return dat;
+	}
+
+	default:
+		logerror("%s: vdp_data_r with m_vdp_dest %02x addr %04x (register read)\n", machine().describe_context(), m_vdp_dest, m_vdp_read_addr);
+		return 0x00;
+	}
+	return 0x00;
+}
+
 
 void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (m_vdp_dest)
 	{
 	case 0x0000:
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram word position?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
-		m_vdp_addr = data << 1;
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram word write position)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+		m_vdp_write_addr = data << 1;
 		break;
 
 	case 0x0001:
 		// after a while
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (unknown)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram word read position)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+		m_vdp_read_addr = data << 1;
 		break;
 
 	case 0x0002:
@@ -260,18 +265,13 @@ GFXDECODE_END
 void licocai_state::machine_start()
 {
 	save_item(NAME(m_vdp_dest));
-	save_item(NAME(m_vdp_addr));
+	save_item(NAME(m_vdp_write_addr));
 	save_item(NAME(m_vdp_write_type));
+	save_item(NAME(m_vdp_read_addr));
 
 	// clears 0x10000 bytes on startup, so assume main VRAM is that size
 	m_vram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_vram), 0x10000);
-
-	/*
-	// uploads ~0x800 bytes of data in what might be this mode
-	m_spram = make_unique_clear<u8[]>(0x800);
-	save_pointer(NAME(m_spram), 0x800);
-	*/
 
 	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, tile16_ram_4bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
 	m_gfxdecode->set_gfx(2, std::make_unique<gfx_element>(m_palette, tile16_ram_1bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 2, 0));
@@ -281,7 +281,8 @@ void licocai_state::machine_start()
 void licocai_state::machine_reset()
 {
 	m_vdp_dest = 0;
-	m_vdp_addr = 0;
+	m_vdp_write_addr = 0;
+	m_vdp_read_addr = 0;
 	m_vdp_write_type = 0;
 }
 
@@ -326,7 +327,7 @@ void licocai_state::licocai_map(address_map &map)
 	map(0x20000a, 0x20000b).w(FUNC(licocai_state::lico_20000a_w));
 
 	map(0x210000, 0x210001).rw(FUNC(licocai_state::vdp_status_r), FUNC(licocai_state::vdp_dest_select_w));
-	map(0x210002, 0x210003).w(FUNC(licocai_state::vdp_data_w));
+	map(0x210002, 0x210003).rw(FUNC(licocai_state::vdp_data_r), FUNC(licocai_state::vdp_data_w));
 
 	map(0x2a0000, 0x2a0001).r(FUNC(licocai_state::lico_2a0000_r));
 	map(0x2a000a, 0x2a000b).r(FUNC(licocai_state::lico_2a000a_r));
