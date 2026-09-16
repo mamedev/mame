@@ -3192,6 +3192,18 @@ u32 swp30_device::meg_state::resolve_address(u16 pc, s32 offset)
 	return 0xffffffff;
 }
 
+// Which bank of the map an instruction lands in, same selection as
+// resolve_address.  The bit of that number in the tlb enable register says
+// whether the bank is turned off
+int swp30_device::meg_state::map_bank(u16 pc) const
+{
+	u16 key = (pc / 12) << 11;
+	for(int i=0; i != 7; i++)
+		if(m_map[i+1] <= m_map[i] || ((m_map[i+1] & 0xf800) > key))
+			return i;
+	return 7;
+}
+
 u32 swp30_device::meg_state::get_lfo(int lfo)
 {
 	constexpr u32 offsets[16] = {
@@ -3407,6 +3419,8 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		L_M1_M5,   // m1 expansion, exp < 5
 		L_LFO1,    // lfo, first label
 		L_LFO2,    // lfo, second label
+		L_MEM_OFF, // memory access on a bank turned off in the tlb enable
+		L_MEM_DONE,// memory access, end
 	};
 
 	UML_DEBUG(block, pc);
@@ -3749,6 +3763,14 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		u16 mapr = m_map[bank];
 		u32 mask = (1 << (10+BIT(mapr, 8, 3))) - 1;
 		u32 base = BIT(mapr, 0, 8) << 10;
+		// A bank turned off in the tlb enable register drops writes and reads
+		// as zero.  Absolute reads do not go through the map, so they are not
+		// affected
+		const bool mapped = amem == 1 || !BIT(opcode, 0x23);
+		if(mapped) {
+			UML_TEST(block, mem(&m_swp->m_revram_enable), 1 << bank);
+			UML_JMPc(block, COND_NZ, (pc << 4) | L_MEM_OFF);
+		}
 		UML_LOAD(block, I0, m_offset.data(), pc/3, SIZE_WORD, SCALE_x2);
 		if(amem == 3)
 			UML_ADD(block, I0, I0, 1);
@@ -3769,11 +3791,19 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_CALLC(block, call_revram_encode, this);
 			UML_MOV(block, I1, mem(&m_retval));
 			UML_WRITE(block, I0, I1, SIZE_WORD, memory_space(swp30_device::AS_REVERB));
+			if(mapped)
+				UML_LABEL(block, (pc << 4) | L_MEM_OFF);
 		} else {
 			UML_READ(block, I1, I0, SIZE_WORD, memory_space(swp30_device::AS_REVERB));
 			UML_MOV(block, mem(&m_retval), I1);
 			UML_CALLC(block, call_revram_decode, this);
 			UML_MOV(block, mem(&m_memr_value[index2]), mem(&m_retval));
+			if(mapped) {
+				UML_JMP(block, (pc << 4) | L_MEM_DONE);
+				UML_LABEL(block, (pc << 4) | L_MEM_OFF);
+				UML_MOV(block, mem(&m_memr_value[index2]), 0);
+				UML_LABEL(block, (pc << 4) | L_MEM_DONE);
+			}
 		}
 	}
 }
@@ -3943,15 +3973,24 @@ void swp30_device::meg_state::step()
 	}
 	m_t_value[m_delay_2] = BIT(opcode, 0x3e) ? (m_p >> 8) & 0x7fff : m_p >> (15+8);
 
-	// Memory access
+	// Memory access.  A bank turned off in the tlb enable register drops
+	// writes and reads as zero, absolute reads excepted since they do not
+	// go through the map
 	switch(BIT(opcode, 0x24, 2)) {
 	case 1: {
+		if(BIT(m_swp->m_revram_enable, map_bank(m_pc)))
+			break;
 		u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
 		if(address != 0xffffffff)
 			m_swp->m_reverb_cache.write_word(address, revram_encode(m_ram_write));
 		break;
 	}
 	case 2: {
+		if(!BIT(opcode, 0x23) && BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
+			m_memr_value[m_delay_2] = 0;
+			m_memr_active[m_delay_2] = true;
+			break;
+		}
 		u32 address = BIT(opcode, 0x23) ?
 			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0)) & 0x3ffff :
 			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
@@ -3963,6 +4002,11 @@ void swp30_device::meg_state::step()
 		break;
 	}
 	case 3: {
+		if(!BIT(opcode, 0x23) && BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
+			m_memr_value[m_delay_2] = 0;
+			m_memr_active[m_delay_2] = true;
+			break;
+		}
 		u32 address = BIT(opcode, 0x23) ?
 			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) + 1) & 0x3ffff :
 			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
