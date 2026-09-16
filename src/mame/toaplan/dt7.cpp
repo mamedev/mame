@@ -196,20 +196,15 @@ void dt7_state::write_port_2(u8 data)
 	// rising edge on bit 2: parallel load
 	if (!(m_ioport_state & 0x04) && (data & 0x04))
 	{
-		const u16 sys = m_sysport->read();
-		const u16 p1 = m_p1port->read();
-		const u16 p2 = m_p2port->read();
+		const u8 p1 = m_p1port->read();
+		const u8 p2 = m_p2port->read();
 
-		// chain 0: controls + start, coin/service, 2P start, gate
-		u8 b0 = (p1 & 0x7f) | ((sys & 0x20) ? 0x80 : 0x00);
-		u8 b1 = (BIT(sys, 3) << 0) | (BIT(sys, 4) << 2) | (BIT(sys, 0) << 4) | (BIT(sys, 1) << 6) | (BIT(sys, 2) << 7);
-		u8 b2 = (sys & 0x40) ? 0x80 : 0x00;
-		m_shift_chain[0] = ~(b0 | (b1 << 8) | (b2 << 16)) & 0x00ffffff;
+		// chain 0: 1P controls, system byte, 2P start echo, gate
+		m_shift_chain[0] = ~(p1 | (m_sysport->read() << 8) | ((p2 & 0x80) << 16)) & 0x00ffffff;
 		m_shift_chain[0] |= 0xff000000;
 
 		// chain 1: 2P / linked unit side
-		u8 c0 = (p2 & 0x7f) | ((sys & 0x40) ? 0x80 : 0x00);
-		m_shift_chain[1] = (~c0 & 0xff) | 0xffffff00;
+		m_shift_chain[1] = (~p2 & 0xff) | 0xffffff00;
 	}
 
 	// rising edge on bit 3: shift both chains one bit
@@ -428,21 +423,25 @@ void dt7_state::dt7(machine_config &config)
 
 
 static INPUT_PORTS_START( dt7 )
+	// bit layouts follow the serial shift chains (chain 0 byte 0, byte 1 and
+	// chain 1 byte 0)
 	PORT_START("IN1")
 	TOAPLAN_JOY_UDLR_3_BUTTONS( 1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 )
 
 	PORT_START("IN2")
 	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("SYS")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_TILT )
-	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_TILT )
+	TOAPLAN_TEST_SWITCH( 0x80, IP_ACTIVE_HIGH )
 
 	// per-seat auxiliary input latches; the sound CPU forwards them into the
 	// ring buffer half that is exchanged over the cabinet link, so they are
