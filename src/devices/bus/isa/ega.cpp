@@ -587,7 +587,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc_ega(*this, EGA_CRTC_NAME), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_irq(0), m_video_mode(0),
-	m_palette(*this, "palette"), m_screen(*this, EGA_SCREEN_NAME)
+	m_last_pixel_value(0), m_palette(*this, "palette"), m_screen(*this, EGA_SCREEN_NAME)
 {
 }
 
@@ -642,6 +642,7 @@ void isa8_ega_device::device_start()
 	save_item(STRUCT_MEMBER(m_attribute, index));
 	save_item(STRUCT_MEMBER(m_attribute, data));
 	save_item(STRUCT_MEMBER(m_attribute, index_write));
+	save_item(NAME(m_last_pixel_value));
 	save_pointer(NAME(m_vram), 256 * 1024);
 
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, "user2");
@@ -814,6 +815,8 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 		*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
 		*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
 		*p = m_attribute.data[   data        & 0x03 ]; p++;
+
+		m_last_pixel_value = *(p - 1);
 	}
 	else
 	{
@@ -847,6 +850,8 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 			data2 >>= 1;
 			data3 >>= 1;
 		}
+
+		m_last_pixel_value = p[0];
 	}
 }
 
@@ -909,7 +914,12 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_text )
 	*p = ( data & 0x02 ) ? fg : bg; p++;
 	*p = ( data & 0x01 ) ? fg : bg; p++;
 	if ( !( m_sequencer.data[0x01] & 0x01 ) )
+	{
 		*p = ( m_attribute.data[0x10] & 0x04 ) ? *(p - 1) : bg;
+		m_last_pixel_value = *p;
+	}
+	else
+		m_last_pixel_value = *(p - 1);
 }
 
 
@@ -1210,11 +1220,17 @@ uint8_t isa8_ega_device::pc_ega8_3X0_r(offs_t offset)
 
 		if ( m_display_enable )
 		{
-			/* For the moment i'm putting in some bogus data */
-			static int pixel_data;
-
-			pixel_data = ( pixel_data + 1 ) & 0x03;
-			data |= ( pixel_data << 4 );
+			/* Diagnostic bits 4-5 feed back 2 of the attribute controller's 6
+			   P0-P5 color outputs, selected by the Video Status Mux Field in
+			   AR12 bits 5-4, from whichever pixel was drawn last. */
+			uint8_t pins = m_last_pixel_value;
+			switch ( ( m_attribute.data[0x12] >> 4 ) & 0x03 )
+			{
+			case 0: data |= ( BIT(pins, 0) << 4 ) | ( BIT(pins, 2) << 5 ); break;
+			case 1: data |= ( BIT(pins, 4) << 4 ) | ( BIT(pins, 5) << 5 ); break;
+			case 2: data |= ( BIT(pins, 1) << 4 ) | ( BIT(pins, 3) << 5 ); break;
+			case 3: data |= ( BIT(pins, 5) << 4 ) | ( BIT(pins, 3) << 5 ); break;
+			}
 		}
 
 		/* Reset the attirubte writing flip flop to let the next write go to the index reigster */
