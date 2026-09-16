@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -8,22 +8,26 @@ license:CC0-1.0
 	<!-- data seems to end abruptly in all of these, are they complete? -->
 	
 	<!-- 1ST AND 2ND HALF IDENTICAL, could be bad -->
-	<software name="cart1" supported="no">
-		<description>Cart 1 (green)</description>
+	<software name="znfsg" supported="no">
+		<description>Zhuo Ná Fen Shù Guài</description>
 		<year>1992</year>
 		<publisher>Socrates / C&amp;E</publisher>
+		<info name="alt_title" value="捉拿分數怪"/>
 		<part name="cart" interface="licocai_cart">
+			<feature name="label_color" value="green" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="lico-cai-cart1-green.bin" size="0x100000" crc="b084ddd4" sha1="a785e465d9635f16c0f49c9fd9bd35682c19ec09" />
+				<rom name="lico-cai-cart1-green.bin" size="0x100000" crc="b084ddd4" sha1="a785e465d9635f16c0f49c9fd9bd35682c19ec09" status="bad_dump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cart2" supported="no">
-		<description>Cart 2 (red)</description>
+	<software name="zyfhk" supported="no">
+		<description>Zhù Yin Fú Hào Ka</description>
 		<year>1992</year>
 		<publisher>Socrates / C&amp;E</publisher>
+		<info name="alt_title" value="注音符號卡"/>	
 		<part name="cart" interface="licocai_cart">
+			<feature name="label_color" value="pink/red" />
 			<dataarea name="rom" size="0x100000">
 				<rom name="lico-cai-cart2-white.bin" size="0x100000" crc="6a81d065" sha1="14b8580d48ed3a989255611d7b1f8e77076ce59a" />
 			</dataarea>
@@ -31,13 +35,15 @@ license:CC0-1.0
 	</software>
 
 	<!-- 1ST AND 2ND HALF IDENTICAL, could be bad -->
-	<software name="cart3" supported="no">
-		<description>Cart 3 (yellow)</description>
+	<software name="kshs" supported="no">
+		<description>Kuài Suàn Hao Shou</description>
 		<year>1992</year>
 		<publisher>Socrates / C&amp;E</publisher>
+		<info name="alt_title" value="快算好手"/>	
 		<part name="cart" interface="licocai_cart">
+			<feature name="label_color" value="orange/yellow" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="lico-cai-cart3-yellow.bin" size="0x100000" crc="70154f14" sha1="039c8a42cf5259f9ab88cbcf74accdc4f6d6b456" />
+				<rom name="lico-cai-cart3-yellow.bin" size="0x100000" crc="70154f14" sha1="039c8a42cf5259f9ab88cbcf74accdc4f6d6b456" status="bad_dump" />
 			</dataarea>
 		</part>
 	</software>
