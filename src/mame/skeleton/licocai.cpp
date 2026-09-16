@@ -59,6 +59,7 @@ private:
 
 	void vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	u16 vdp_status_r(offs_t offset, uint16_t mem_mask = ~0);
 	u16 lico_2a0000_r(offs_t offset, uint16_t mem_mask = ~0);
 	u16 lico_2a000a_r(offs_t offset, uint16_t mem_mask = ~0);
 	void lico_200008_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -66,12 +67,11 @@ private:
 
 	void licocai_map(address_map &map) ATTR_COLD;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-
 	u16 m_vdp_dest;
 	u16 m_vdp_write_type;
 	u32 m_vdp_addr;
 	std::unique_ptr<u8[]> m_vram;
+	std::unique_ptr<u8[]> m_spram;
 };
 
 void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -82,6 +82,7 @@ void licocai_state::vdp_dest_select_w(offs_t offset, uint16_t data, uint16_t mem
 
 void licocai_state::vdp_data_upload(uint16_t data, uint16_t mem_mask)
 {
+
 	if (m_vdp_write_type == 0x0000)
 	{
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (data_upload?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
@@ -90,6 +91,14 @@ void licocai_state::vdp_data_upload(uint16_t data, uint16_t mem_mask)
 		m_vram[(m_vdp_addr + 1) & 0xffff] = (data >> 0) & 0x00ff;
 
 		m_gfxdecode->gfx(0)->mark_dirty(m_vdp_addr / 0x80);
+		m_vdp_addr += 2;
+	}
+	else if (m_vdp_write_type == 0x00c8)
+	{
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x addr %04x: %04x %04x (spritelist upload?)\n", machine().describe_context(), m_vdp_dest, m_vdp_addr, data, mem_mask);
+		// write type c8 and address 7800 might be a spritelist?
+		m_spram[(m_vdp_addr + 0) & 0x7ff] = (data >> 8) & 0x00ff;
+		m_spram[(m_vdp_addr + 1) & 0x7ff] = (data >> 0) & 0x00ff;
 		m_vdp_addr += 2;
 	}
 	else
@@ -105,6 +114,11 @@ void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x0000:
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (vram position?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
 		m_vdp_addr = data;
+		break;
+
+	case 0x0001:
+		// after a while
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (unknown)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
 		break;
 
 	case 0x0002:
@@ -140,6 +154,12 @@ void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
+u16 licocai_state::vdp_status_r(offs_t offset, uint16_t mem_mask)
+{
+	// read in irq
+	logerror("%s: vdp_status_r\n", machine().describe_context());
+	return machine().rand();
+}
 
 u16 licocai_state::lico_2a0000_r(offs_t offset, uint16_t mem_mask)
 {
@@ -153,6 +173,31 @@ u16 licocai_state::lico_2a000a_r(offs_t offset, uint16_t mem_mask)
 	// read at end of IRQs, ack?
 	logerror("%s: lico_2a000a_r\n", machine().describe_context());
 	return machine().rand();
+}
+
+
+void licocai_state::lico_200008_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (mem_mask & 0xff00)
+	{
+		fatalerror("write to upper byte lico_200008_w %04x %04x\n", data, mem_mask);
+	}
+	else
+	{
+		logerror("%s: lico_200008_w %02x\n", machine().describe_context(), data & 0xff);
+	}
+}
+
+void licocai_state::lico_20000a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (mem_mask & 0xff00)
+	{
+		fatalerror("write to upper byte lico_20000a_w %04x %04x\n", data, mem_mask);
+	}
+	else
+	{
+		logerror("%s: lico_20000a_w %02x\n", machine().describe_context(), data & 0xff);
+	}
 }
 
 // there seem to be other formats uploaded too?
@@ -206,6 +251,10 @@ void licocai_state::machine_start()
 	m_vram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_vram), 0x10000);
 
+	// uploads ~0x800 bytes of data in what might be this mode
+	m_spram = make_unique_clear<u8[]>(0x800);
+	save_pointer(NAME(m_spram), 0x800);
+
 	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, tile16_ram_4bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 16, 0));
 	m_gfxdecode->set_gfx(2, std::make_unique<gfx_element>(m_palette, tile16_ram_1bpp_layout, &m_vram[0x0], 0, m_palette->entries() / 2, 0));
 }
@@ -226,30 +275,6 @@ uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-void licocai_state::lico_200008_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (mem_mask & 0xff00)
-	{
-		fatalerror("write to upper byte lico_200008_w %04x %04x\n", data, mem_mask);
-	}
-	else
-	{
-		logerror("%s: lico_200008_w %02x\n", machine().describe_context(), data & 0xff);
-	}
-}
-
-void licocai_state::lico_20000a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (mem_mask & 0xff00)
-	{
-		fatalerror("write to upper byte lico_20000a_w %04x %04x\n", data, mem_mask);
-	}
-	else
-	{
-		logerror("%s: lico_20000a_w %02x\n", machine().describe_context(), data & 0xff);
-	}
-}
-
 void licocai_state::licocai_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).mirror(0x100000).rom();
@@ -262,7 +287,7 @@ void licocai_state::licocai_map(address_map &map)
 	map(0x200008, 0x200009).w(FUNC(licocai_state::lico_200008_w)); // used as a pair
 	map(0x20000a, 0x20000b).w(FUNC(licocai_state::lico_20000a_w));
 
-	map(0x210000, 0x210001).w(FUNC(licocai_state::vdp_dest_select_w));
+	map(0x210000, 0x210001).rw(FUNC(licocai_state::vdp_status_r), FUNC(licocai_state::vdp_dest_select_w));
 	map(0x210002, 0x210003).w(FUNC(licocai_state::vdp_data_w));
 
 	map(0x2a0000, 0x2a0001).r(FUNC(licocai_state::lico_2a0000_r));
@@ -279,24 +304,15 @@ void licocai_state::licocai_map(address_map &map)
 static INPUT_PORTS_START( licocai )
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(licocai_state::scanline)
-{
-	// wrong!
-	
-	// irqs 3 & 5 (indirectly) point to valid code, others (indirectly) point to rte
 
-	if (param == 64)
-		m_maincpu->set_input_line(3, HOLD_LINE);
-
-	if (param == 224)
-		m_maincpu->set_input_line(5, HOLD_LINE);
-
-}
 
 void licocai_state::licocai(machine_config &config)
 {
 	M68000(config, m_maincpu, 10'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &licocai_state::licocai_map);
+	// wrong, just to keep things moving
+	m_maincpu->set_periodic_int(FUNC(licocai_state::irq3_line_hold), attotime::from_hz(400));
+	m_maincpu->set_periodic_int(FUNC(licocai_state::irq5_line_hold), attotime::from_hz(200));
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
@@ -307,8 +323,6 @@ void licocai_state::licocai(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100); // wrong
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(licocai_state::scanline), "screen", 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_licocai);
 
