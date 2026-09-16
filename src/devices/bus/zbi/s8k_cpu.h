@@ -69,6 +69,9 @@ protected:
 
 	uint16_t nmiack_r();
 	uint16_t segtack_r();
+	uint16_t viack_r();
+	uint16_t nviack_r();
+	void mmu_instruction_end();
 
 	void segt_interrupt(int state);
 

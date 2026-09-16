@@ -115,7 +115,8 @@ void s8k_cpu_base::base_device_resolve_objects()
 
 	m_maincpu->ns().append(*m_bus, FUNC(zbi_bus_device::ns_w));
 	m_maincpu->busack().append(*m_bus, FUNC(zbi_bus_device::busack_w));
-	m_maincpu->viack().set(*m_bus, FUNC(zbi_bus_device::viack_r));
+	m_maincpu->viack().set(FUNC(s8k_cpu_base::viack_r));
+	m_maincpu->nviack().set(FUNC(s8k_cpu_base::nviack_r));
 }
 
 //**************************************************************************
@@ -170,11 +171,28 @@ uint16_t s8k_cpu_base::segtack_r()
 	return code;
 }
 
-uint16_t s8k_cpu_base::nmiack_r()
+void s8k_cpu_base::mmu_instruction_end()
 {
 	m_mmu_code->instruction_end();
 	m_mmu_data->instruction_end();
 	m_mmu_stck->instruction_end();
+}
+
+uint16_t s8k_cpu_base::viack_r()
+{
+	mmu_instruction_end();
+	return m_bus->viack_r();
+}
+
+uint16_t s8k_cpu_base::nviack_r()
+{
+	mmu_instruction_end();
+	return 0xffff;
+}
+
+uint16_t s8k_cpu_base::nmiack_r()
+{
+	mmu_instruction_end();
 
 	uint16_t code = m_nmi_code;
 
