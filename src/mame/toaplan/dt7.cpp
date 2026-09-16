@@ -5,16 +5,16 @@
    differences to keep it separate
 
    TODO:
-    - verify audio CPU opcodes (see toaplan_v25_tables.h)
-    - correctly hook up interrupts (especially V25)
-    - correctly hook up inputs (there's a steering wheel test? is the game switchable)
+    - verify remaining unknown audio CPU opcodes (see toaplan_v25_tables.h); the ones
+      the game actually executes are now covered
     - serial comms (needs support in V25 core?) for linked units
     - verify frequencies on chips
-    - verify alt titles, some regions have 'Car Fighting' as a subtitle, region comes from EEPROM?
+    - verify alt titles, some regions have 'Car Fighting' as a subtitle, region comes
+      from EEPROM word 2; add per-region clones with EEPROM defaults like fixeight
+    - verify the exact byte/bit layout of the second input chain and the 0x58008 /
+      0x5800a latches (2P / linked unit side)
     - verify text layer palettes
-    - service mode doesn't display properly
-    - currently only coins up with service button
-    - sound dies after one stage?
+    - service mode doesn't display properly and its pages don't advance
     - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
@@ -60,6 +60,8 @@ public:
 		, m_sysport(*this, "SYS")
 		, m_p1port(*this, "IN1")
 		, m_p2port(*this, "IN2")
+		, m_miscport(*this, "MISC%u", 0U)
+		, m_anport(*this, "AN%u", 0U)
 	{ }
 
 public:
@@ -96,6 +98,7 @@ private:
 	u8 read_port_t();
 	u8 read_port_2();
 	void write_port_2(u8 data);
+	void write_port_0(u8 data);
 
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
@@ -107,6 +110,8 @@ private:
 	void screen_vblank(int state);
 
 	u8 m_ioport_state;
+	u8 m_dac_value;
+	u32 m_shift_chain[2];
 
 	tilemap_t *m_tx_tilemap[2];    /* Tilemap for extra-text-layer */
 
@@ -126,6 +131,8 @@ private:
 	required_ioport m_sysport;
 	required_ioport m_p1port;
 	required_ioport m_p2port;
+	required_ioport_array<2> m_miscport;
+	required_ioport_array<4> m_anport;
 };
 
 
@@ -135,148 +142,77 @@ void dt7_state::dt7_irq(int state)
 	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 
-	// this reads the inputs (again what is the source?)
-	// the audio CPU also has a 'serial' interrupt populated?
-	// and the boards can be linked together
-
-	// amongst other things this interrupt copies input data to where the 68k can see it
-	// although triggering it here might not be correct as the game just ends up showing 'mach race'
-	// m_audiocpu->set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
+	// INTP0 publishes the scanned inputs to the 68k through the ring buffer
+	m_audiocpu->set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-// this is conditional on the unknown type of branch (see #define G_B0 in the table0
+// SAR ADC comparators: bit n set when analog channel n >= the port 0 DAC value
 u8 dt7_state::read_port_t()
 {
-	if (!machine().side_effects_disabled())
-		logerror("%s: read port t\n", machine().describe_context());
-	return machine().rand();
+	u8 ret = 0;
+	for (int i = 0; i < 4; i++)
+		if (m_anport[i]->read() >= m_dac_value)
+			ret |= 1 << i;
+	return ret;
+}
+
+void dt7_state::write_port_0(u8 data)
+{
+	m_dac_value = data;
 }
 
 u8 dt7_state::eeprom_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("%s: eeprom_r\n", machine().describe_context());
-	// if you allow eeprom hookup at the moment (remove the ram hack reads)
-	// the game will init it the first time but then 2nd boot will be upside
-	// down as Japan region, and hang after the region warning
-	//return 0xff;
 	return m_eepromport->read();
 }
 
 void dt7_state::eeprom_w(u8 data)
 {
-	logerror("%s: eeprom_w %02x\n", machine().describe_context(), data);
 	m_eepromport->write(data);
 }
 
+// digital inputs: two serial chains on P2, bit 2 = parallel load, bit 3 = shift
+// clock, bits 0/1 = data (LSB first); last byte of chain 1 must idle at 0xff
 u8 dt7_state::read_port_2()
 {
-	// input/coin data is read in bits 0/1
-	// it's probably latched by toggling bit 2 low->high and shifted by toggling bit 3
-	// it gets put in RAM then worked on by the external interrupt
-
-	if (!machine().side_effects_disabled())
-		logerror("%s: read port 2\n", machine().describe_context());
-	return m_ioport_state;
+	return (m_ioport_state & 0xfc) | (m_shift_chain[0] & 1) | ((m_shift_chain[1] & 1) << 1);
 }
 
-// it seems to attempt to read inputs (including the tilt switch?) here on startup
-// strangely all the EEPROM access code (which is otherwise very similar to FixEight
-// also has accesses to this port added, maybe something is sitting in the middle?
 void dt7_state::write_port_2(u8 data)
 {
-	if ((m_ioport_state & 0x01) != (data & 0x01))
+	// rising edge on bit 2: parallel load
+	if (!(m_ioport_state & 0x04) && (data & 0x04))
 	{
-		if (data & 0x01)
-			logerror("%s: bit 0x01 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x01 high to low\n", machine().describe_context());
+		const u16 sys = m_sysport->read();
+		const u16 p1 = m_p1port->read();
+		const u16 p2 = m_p2port->read();
+
+		// chain 0: controls + start, coin/service, 2P start, gate
+		u8 b0 = (p1 & 0x7f) | ((sys & 0x20) ? 0x80 : 0x00);
+		u8 b1 = (BIT(sys, 3) << 0) | (BIT(sys, 4) << 2) | (BIT(sys, 0) << 4) | (BIT(sys, 1) << 6) | (BIT(sys, 2) << 7);
+		u8 b2 = (sys & 0x40) ? 0x80 : 0x00;
+		m_shift_chain[0] = ~(b0 | (b1 << 8) | (b2 << 16)) & 0x00ffffff;
+		m_shift_chain[0] |= 0xff000000;
+
+		// chain 1: 2P / linked unit side
+		u8 c0 = p2 & 0x7f;
+		m_shift_chain[1] = (~c0 & 0xff) | 0xffffff00;
 	}
 
-	if ((m_ioport_state & 0x02) != (data & 0x02))
+	// rising edge on bit 3: shift both chains one bit
+	if (!(m_ioport_state & 0x08) && (data & 0x08))
 	{
-		if (data & 0x02)
-			logerror("%s: bit 0x02 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x02 high to low\n", machine().describe_context());
-	}
-
-	if ((m_ioport_state & 0x04) != (data & 0x04))
-	{
-		if (data & 0x04)
-			logerror("%s: bit 0x04 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x04 high to low\n", machine().describe_context());
-	}
-
-	if ((m_ioport_state & 0x08) != (data & 0x08))
-	{
-		if (data & 0x08)
-			logerror("%s: bit 0x08 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x08 high to low\n", machine().describe_context());
-	}
-
-	if ((m_ioport_state & 0x10) != (data & 0x10))
-	{
-		if (data & 0x10)
-			logerror("%s: bit 0x10 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x10 high to low\n", machine().describe_context());
-	}
-
-	if ((m_ioport_state & 0x20) != (data & 0x20))
-	{
-		if (data & 0x20)
-			logerror("%s: bit 0x20 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x20 high to low\n", machine().describe_context());
-	}
-
-	if ((m_ioport_state & 0x40) != (data & 0x40))
-	{
-		if (data & 0x40)
-			logerror("%s: bit 0x40 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x40 high to low\n", machine().describe_context());
-	}
-
-	if ((m_ioport_state & 0x80) != (data & 0x80))
-	{
-		if (data & 0x80)
-			logerror("%s: bit 0x80 low to high\n", machine().describe_context());
-		else
-			logerror("%s: bit 0x80 high to low\n", machine().describe_context());
+		m_shift_chain[0] = (m_shift_chain[0] >> 1) | 0x80000000;
+		m_shift_chain[1] = (m_shift_chain[1] >> 1) | 0x80000000;
 	}
 
 	m_ioport_state = data;
 }
 
-
-// hacks because the sound CPU isn't running properly
 u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
-	u16 ret = m_shared_ram[offset];
-
-	int pc = m_maincpu->pc();
-
-	if (pc == 0x7d84) { return 0xff; } // status?
-
-	u32 addr = (offset * 2) + 0x610000;
-
-	if (addr == 0x061f00c) { return m_sysport->read(); }
-	if (addr == 0x061d000) { return 0x00; } // settings (from EEPROM?) including flipscreen
-	if (addr == 0x061d002) { return 0x00; } // settings (from EEPROM?) dipswitch?
-	if (addr == 0x061d004) { return 0x00; } // settings (from EEPROM?) region
-	if (addr == 0x061f004) { return m_p1port->read(); } // P1 inputs
-	if (addr == 0x061f006) { return m_p2port->read(); } // P2 inputs
-	//if (addr == 0x061f00e) { return machine().rand(); } // P2 coin / start
-
-	if (!machine().side_effects_disabled())
-		logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
-
-	return ret;
+	return m_shared_ram[offset];
 }
 
 void dt7_state::shared_ram_w(offs_t offset, u8 data)
@@ -339,26 +275,26 @@ void dt7_state::dt7_68k_1_mem(address_map &map)
 
 u8 dt7_state::unmapped_v25_io1_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("%s: 0x58008 unknown read\n", machine().describe_context());
-	return machine().rand();
+	return m_miscport[0]->read();
 }
 
 u8 dt7_state::unmapped_v25_io2_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("%s: 0x5800a unknown read\n", machine().describe_context());
-	return machine().rand();
+	return m_miscport[1]->read();
 }
 
 void dt7_state::machine_start()
 {
 	save_item(NAME(m_ioport_state));
+	save_item(NAME(m_dac_value));
+	save_item(NAME(m_shift_chain));
 }
 
 void dt7_state::machine_reset()
 {
 	m_ioport_state = 0x00;
+	m_dac_value = 0x00;
+	m_shift_chain[0] = m_shift_chain[1] = 0xffffffff;
 }
 
 void dt7_state::dt7_v25_mem(address_map &map)
@@ -412,6 +348,7 @@ void dt7_state::dt7(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &dt7_state::dt7_v25_mem);
 	audiocpu.set_decryption_table(toaplan_v25_tables::dt7_decryption_table);
 	audiocpu.pt_in_cb().set(FUNC(dt7_state::read_port_t));
+	audiocpu.p0_out_cb().set(FUNC(dt7_state::write_port_0));
 	audiocpu.p2_in_cb().set(FUNC(dt7_state::read_port_2));
 	audiocpu.p2_out_cb().set(FUNC(dt7_state::write_port_2));
 	audiocpu.p1_in_cb().set(FUNC(dt7_state::eeprom_r));
@@ -485,6 +422,24 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("MISC0") // latched at 0x58008, read raw by the sound CPU
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("MISC1") // latched at 0x5800a, read raw by the sound CPU
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("AN0") // digitized against the port 0 DAC, calibrated via EEPROM words 0xfc/0xfe
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("AN1")
+	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("AN2")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+
+	PORT_START("AN3")
+	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
