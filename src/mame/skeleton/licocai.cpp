@@ -293,14 +293,21 @@ uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	bitmap.fill(0, cliprect);
 	// there's a tilemap (or large sprite) at the start of RAM (maybe it can be relocated)
-	gfx_element *gfx = m_gfxdecode->gfx(1);
+	// only half the tilemap seems to have been uploaded though?
+	gfx_element *gfx = m_gfxdecode->gfx(3);
 	int count = 0;
-	for (int y = 0; y < 16; y++)
+	// left side of screen
+	for (int y = 0; y < 32; y++)
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			u16 tile = m_vram[count + 1] | (m_vram[count + 0] << 8);
-			gfx->transpen(bitmap, cliprect, tile & 0xff, 0, 0, 0, x * 16, y * 16, 0);
+			u16 dat = m_vram[count + 1] | (m_vram[count + 0] << 8);
+
+			u16 tile = (dat & 0xff)  + 0x260;
+			if (dat & 0x1000)
+				tile += 0x100;
+
+			gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8, 0);
 
 			count += 2;
 		}
