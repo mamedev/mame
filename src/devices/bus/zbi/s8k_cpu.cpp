@@ -115,8 +115,8 @@ void s8k_cpu_base::base_device_resolve_objects()
 
 	m_maincpu->ns().append(*m_bus, FUNC(zbi_bus_device::ns_w));
 	m_maincpu->busack().append(*m_bus, FUNC(zbi_bus_device::busack_w));
-	m_maincpu->viack().set(FUNC(s8k_cpu_base::viack_r));
-	m_maincpu->nviack().set(FUNC(s8k_cpu_base::nviack_r));
+	m_maincpu->viack().set(*this, FUNC(s8k_cpu_base::viack_r));
+	m_maincpu->nviack().set(*this, FUNC(s8k_cpu_base::nviack_r));
 }
 
 //**************************************************************************
