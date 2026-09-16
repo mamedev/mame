@@ -173,6 +173,34 @@ void arm7_disassembler::WriteRegisterOperand1( std::ostream &stream, uint32_t op
 	WriteShiftCount(stream, opcode);
 } /* WriteRegisterOperand */
 
+void arm7_disassembler::WriteRegisterList( std::ostream &stream, uint16_t operand )
+{
+	stream << '{';
+
+	int j=0,last=0,found=0;
+	for (j=0; j<16; j++) {
+		if (operand&(1<<j) && found==0) {
+			if (operand&((1<<j)-1))
+				stream << ", ";
+			found=1;
+			last=j;
+		}
+		else if ((operand&(1<<j))==0 && found) {
+			util::stream_format(stream, "R%d", last);
+			if (last!=j-1)
+				util::stream_format(stream, "-R%d", j-1);
+			found=0;
+		}
+	}
+	if (found) {
+		if (last != 15)
+			util::stream_format(stream, "R%d-", last);
+		stream << "R15";
+	}
+
+	stream << '}';
+}
+
 
 void arm7_disassembler::WriteBranchAddress( std::ostream &stream, uint32_t pc, uint32_t opcode, bool h_bit )
 {
@@ -690,6 +718,12 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 				util::stream_format( stream, "%c%c", (opcode&0x01000000) ? 'E' : 'F', (opcode&0x00800000) ? 'D' : 'A');
 			else
 				util::stream_format( stream, "%c%c", (opcode&0x00800000) ? 'I' : 'D', (opcode&0x01000000) ? 'B' : 'A');
+			if (opcode & 0x00008000)
+			{
+				dasmflags = STEP_OUT;
+				if (opcode < 0xe0000000)
+					dasmflags |= STEP_COND;
+			}
 		}
 		else
 		{
@@ -704,35 +738,9 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		util::stream_format( stream, "R%d", rn );
 		if( opcode&0x00200000 )
 			stream << '!';
-		stream << ", {";
+		stream << ", ";
 
-		{
-			int j=0,last=0,found=0;
-			for (j=0; j<16; j++) {
-				if (opcode&(1<<j) && found==0) {
-					if (opcode&((1<<j)-1))
-						stream << ", ";
-					found=1;
-					last=j;
-				}
-				else if ((opcode&(1<<j))==0 && found) {
-					util::stream_format(stream, "R%d", last);
-					if (last!=j-1)
-						util::stream_format(stream, "-R%d", j-1);
-					found=0;
-				}
-			}
-			if (found) {
-				if (last != 15)
-					util::stream_format(stream, "R%d-", last);
-				stream << "R15";
-				dasmflags = STEP_OUT;
-				if (opcode < 0xe0000000)
-					dasmflags |= STEP_COND;
-			}
-		}
-
-		stream << '}';
+		WriteRegisterList(stream, opcode & 0x0000ffff);
 
 		if( opcode&0x00400000 )
 		{
@@ -1275,42 +1283,15 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 		case 0x5: /* PUSH {Rlist}{LR} */
 			stream << "PUSH";
 			WritePadding(stream, start_position);
-			stream << '{';
-			if (opcode & 0x100)
-				stream << "LR, ";
-			for( offs = 7; offs >= 0; offs-- )
-			{
-				if( opcode & ( 1 << offs ) )
-				{
-					util::stream_format(stream, "R%d", offs);
-					if( opcode & ( (1 << offs) - 1 ) )
-						stream << ", ";
-				}
-			}
-			util::stream_format( stream, "}");
+			WriteRegisterList(stream, (opcode & 0x100) << 6 | (opcode & 0xff));
 			break;
 		case 0xc: /* POP {Rlist} */
 		case 0xd: /* POP {Rlist}{PC} */
 			stream << "POP";
 			WritePadding(stream, start_position);
-			stream << '{';
-			for( offs = 0; offs < 8; offs++ )
-			{
-				if( opcode & ( 1 << offs ) )
-				{
-					if( opcode & ( (1 << offs) - 1 ) )
-						stream << ", ";
-					util::stream_format(stream, "R%d", offs);
-				}
-			}
+			WriteRegisterList(stream, (opcode & 0x100) << 7 | (opcode & 0xff));
 			if (opcode & 0x100)
-			{
-				if ((opcode & 0xff) != 0)
-					stream << ", ";
-				stream << "PC";
 				dasmflags = STEP_OUT;
-			}
-			stream << '}';
 			break;
 		default:
 			util::stream_format(stream, "INVALID %04x", opcode);
