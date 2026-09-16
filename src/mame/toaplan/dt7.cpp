@@ -444,10 +444,14 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("MISC0") // latched at 0x58008, read raw by the sound CPU
+	// per-seat auxiliary input latches; the sound CPU forwards them into the
+	// ring buffer half that is exchanged over the cabinet link, so they are
+	// local inputs (possibly handle-mode steering), not the linked players -
+	// those arrive over the serial link and read as idle without one
+	PORT_START("MISC0") // latched at 0x58008
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("MISC1") // latched at 0x5800a, read raw by the sound CPU
+	PORT_START("MISC1") // latched at 0x5800a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("AN0") // digitized against the port 0 DAC, calibrated via EEPROM words 0xfc/0xfe
