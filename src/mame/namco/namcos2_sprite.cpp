@@ -10,8 +10,30 @@
     C135 - Checks is object is displayed on Current output line.
     C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
 
+    C146 (80 pin QFP), after furrtek's reverse engineered RTL (tested on Cosmo Gang the Video):
+    - CH0-CH31 carry four 8bpp pixels at a time, pixel k of colour plane g on CH(4g+k)
+    - on a 12M rising edge with SL = 100 (SL2 = OBEN, SL1 = 6M, SL0 = /1H) the four pixels are
+      loaded into eight 4-bit shift registers, one per colour plane, in reverse order when FLIP
+      is high. Four transparency flags are loaded with them, a pixel being transparent when all
+      eight of its planes are set.
+    - any other 12M rising edge shifts, with 1s coming in, so the chip idles at colour 0xff.
+      Pixel 3 of the group is the first one out (pixel 0 with FLIP), TRA flags transparent ones.
+    - 1V (line parity) selects the line buffer being built: the pixels go out on LDA when it is
+      high and on LDB when it is low, and the other bus is held at 0xff. That is how the buffer
+      being scanned out gets cleared for its next turn.
+    - LDA and LDB are tri-stated by /LOE0 and /LOE1, nothing else is read back.
+    - no reset
+    For the boards using obj_layout the four pixels the C146 sees are simply the big-endian
+    32-bit word formed by the four object ROMs.
+
+    The C106 zoom counter steps twice for each pixel out of the C146 (see draw_line).
+    The one line delay of the real line buffers (a line is built while the previous one is
+    displayed) is not reproduced; sprite RAM is sampled when the line is drawn.
+
     Metal Hawk requires a different draw function, so might use a different chip unless the hookup
-    is just scrambled (needs checking).
+    is just scrambled (needs checking). Its object ROMs hold one byte per pixel and the rotated
+    sprites can't be a single four ROM load, so its pixels are passed to the C146 from the decoded
+    graphics like everyone else's.
 
     "Shadow" sprites are used in the baseball games to remap the background tile pen, and they're
     also used a lot in valkyrie.
@@ -23,6 +45,31 @@
 
 #include "emu.h"
 #include "namcos2_sprite.h"
+
+#include <algorithm>
+
+
+namespace {
+
+// four decoded pixels as they arrive on CH0-CH31: the leftmost one goes on the
+// k = 3 lines, since that is the one the C146 sends out first
+u32 c146_ch(const u8 *src)
+{
+	u32 ch = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		// spread the eight planes onto every fourth line
+		u32 p = src[i];
+		p = (p | (p << 12)) & 0x000f000f;
+		p = (p | (p << 6)) & 0x03030303;
+		p = (p | (p << 3)) & 0x11111111;
+		ch |= p << (3 - i);
+	}
+	return ch;
+}
+
+} // anonymous namespace
+
 
 DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Namco System 2 Sprites (C106,C134,C135,C146)")
 DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE_FINALLAP, namcos2_sprite_finallap_device, "namcos2_sprite_finallap", "Namco System 2 Sprites (C106,C134,C135,C146) (Final Lap)")
@@ -63,59 +110,140 @@ void namcos2_sprite_device::device_start()
 
 	screen().register_screen_bitmap(m_renderbitmap);
 	screen().register_screen_bitmap(m_screenbitmap);
+
+	for (auto &buf : m_linebuf)
+		std::fill(std::begin(buf), std::end(buf), 0xffff);
+
+	save_item(NAME(m_c146.m_sr_col));
+	save_item(NAME(m_c146.m_sr_tra));
 }
 
 /**************************************************************************************/
 
+void namcos2_sprite_device::c146::load(u32 ch, bool flip)
+{
+	// OPA: all eight planes of the pixel set
+	u8 opa = 0;
+	for (int k = 0; k < 4; k++)
+	{
+		if (((ch >> k) & 0x11111111) == 0x11111111)
+			opa |= 1 << k;
+	}
+
+	if (flip)
+	{
+		// the four pixels in reverse order, i.e. every nibble mirrored
+		ch = ((ch & 0x55555555) << 1) | ((ch >> 1) & 0x55555555);
+		ch = ((ch & 0x33333333) << 2) | ((ch >> 2) & 0x33333333);
+		m_sr_tra = bitswap<4>(opa, 0, 1, 2, 3);
+	}
+	else
+	{
+		m_sr_tra = opa;
+	}
+	m_sr_col = ch;
+}
+
+void namcos2_sprite_device::c146::shift()
+{
+	m_sr_tra = ((m_sr_tra << 1) | 1) & 0x0f;
+	m_sr_col = (m_sr_col << 1) | 0x11111111;
+}
+
+u8 namcos2_sprite_device::c146::out() const
+{
+	// SR_OUT: bit 3 of each register, gathered back into a colour
+	u32 c = (m_sr_col >> 3) & 0x11111111;
+	c = (c | (c >> 3)) & 0x03030303;
+	c = (c | (c >> 6)) & 0x000f000f;
+	c = (c | (c >> 12)) & 0x000000ff;
+	return c;
+}
+
 /**************************************************************************************/
 
-void namcos2_sprite_device::draw_single_sprite(
-		bitmap_ind16 &bitmap, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color, bool flipx, bool flipy, int sx, int sy,
-		int sizex, int sizey, u32 prival)
+void namcos2_sprite_device::add_sprite(
+		gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy,
+		int sizex, int sizey, u32 prival, u8 srcx, u8 srcy, u8 size)
 {
-	const u8 *const gfxdata = gfx->get_data(code % gfx->elements());
-	const u16 pal = gfx->granularity() * (color % gfx->colors());
+	sprite_entry &spr = m_sprite[m_sprite_count++];
 
-	const u8 offsxor = flipx ? (gfx->width() - 1) : 0;
-	const u16 lutbank = (flipy ? 0x1000 : 0) | sizey;
+	spr.gfx = gfx;
+	spr.code = code % gfx->elements();
+	spr.pri = (prival & 0xf) << 12;
+	spr.pal = gfx->granularity() * (color % gfx->colors());
+	spr.sx = sx & m_xmask;
+	spr.sy = sy;
+	spr.sizex = sizex;
+	spr.sizey = sizey;
+	spr.lutbank = (flipy ? 0x1000 : 0) | sizey;
+	spr.srcx = srcx;
+	spr.srcy = srcy;
+	spr.size = size;
+	spr.flipx = flipx;
+}
 
-	for (int y = 0; y <= sizey; y++)
+void namcos2_sprite_device::draw_line(int y, const rectangle &cliprect)
+{
+	// 1V high: this line is built in line buffer A and the pixels leave the C146 on LDA
+	const int v1 = BIT(y, 0);
+	u16 *const lb = m_linebuf[v1 ? 0 : 1];
+
+	for (int i = 0; i < m_sprite_count; i++)
 	{
-		const int yy = (sy + y) & 0x1ff;
+		const sprite_entry &spr = m_sprite[i];
 
-		if (yy >= clip.min_y && yy <= clip.max_y)
+		// is the object on this line?
+		const int row = (y - spr.sy) & 0x1ff;
+		if (row > spr.sizey)
+			continue;
+
+		int dy = m_scalelut_region[spr.lutbank | (row << 6)];
+		if (dy > 0x1f)
+			continue;
+		if (spr.size < 32)
+			dy >>= 1;
+
+		const u8 *const src = spr.gfx->get_data(spr.code) + ((spr.srcy + dy) * spr.gfx->rowbytes()) + spr.srcx;
+		int xx = spr.sx;
+		int siz = 0;
+
+		for (int n = 0; n < spr.size; n += 4)
 		{
-			int dy = m_scalelut_region[lutbank | (y << 6)];
-			if (dy > 0x1f)
-				continue;
-			int xx = sx & m_xmask;
-			int siz = 0;
-			int offs = 0;
+			// the groups of a flipped object are fetched backwards, the C146
+			// turns the four pixels round inside each of them
+			m_c146.load(c146_ch(&src[spr.flipx ? (spr.size - 4 - n) : n]), spr.flipx);
 
-			if (gfx->height() < 32) dy >>= 1;
-			const u8 *const src = &gfxdata[dy * gfx->rowbytes()];
-
-			for (int x = gfx->width() << 1; x > 0; x--)
+			for (int p = 0; p < 4; p++)
 			{
-				if (xx >= clip.min_x && xx <= clip.max_x)
-				{
-					const u8 c = src[(offs >> 1) ^ offsxor];
+				if (p)
+					m_c146.shift();
 
-					if (c != 0xff)
-						bitmap.pix(yy, xx) = ((prival & 0xf) << 12) | ((pal + c) & 0xfff);
-				}
-				offs++;
+				const u8 c = v1 ? m_c146.lda(v1) : m_c146.ldb(v1);
+				const bool tra = m_c146.tra();
 
-				siz += 1 + sizex;
-				if (siz >= 0x40)
+				// the zoom counter steps twice for every pixel out of the C146
+				for (int step = 0; step < 2; step++)
 				{
-					xx = (xx + (siz >> 6)) & m_xmask;
-					siz &= 0x3f;
+					if (!tra)
+						lb[xx] = spr.pri | ((spr.pal + c) & 0xfff);
+
+					siz += 1 + spr.sizex;
+					if (siz >= 0x40)
+					{
+						xx = (xx + (siz >> 6)) & m_xmask;
+						siz &= 0x3f;
+					}
 				}
 			}
 		}
 	}
+
+	// scan-out; while this buffer is read the next line is built in the other
+	// one, so the C146 holds this bus at 0xff and the buffer comes back empty
+	u16 *const dest = &m_renderbitmap.pix(y);
+	std::copy(&lb[cliprect.min_x], &lb[cliprect.max_x + 1], &dest[cliprect.min_x]);
+	std::fill_n(lb, std::size(m_linebuf[0]), 0xffff);
 }
 
 void namcos2_sprite_device::copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip)
@@ -181,8 +309,9 @@ void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const
 template <class BitmapClass>
 void namcos2_sprite_device::draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int control)
 {
-	m_renderbitmap.fill(0xffff, cliprect);
-	draw_sprites(cliprect, control);
+	get_sprites(control);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		draw_line(y, cliprect);
 	copybitmap(screen, bitmap, cliprect);
 }
 
@@ -196,10 +325,14 @@ void namcos2_sprite_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, co
 	draw_common(screen, bitmap, cliprect, control);
 }
 
-void namcos2_sprite_device::draw_sprites(const rectangle &cliprect, int control)
+void namcos2_sprite_device::get_sprites(int control)
 {
 	gfx_element *const sgfx = gfx(0);
 
+	// cells are picked per entry, see add_sprite
+	sgfx->set_source_clip(0, 32, 0, 32);
+
+	m_sprite_count = 0;
 	const int offset = (control & 0x000f) * (128 * 4);
 	for (int loop = 0; loop < 128; loop++)
 	{
@@ -245,24 +378,20 @@ void namcos2_sprite_device::draw_sprites(const rectangle &cliprect, int control)
 			const bool flipx = BIT(word1, 14);
 
 			if (!is_32)
-				sgfx->set_source_clip(BIT(word1, 0) ? 16 : 0, 16, BIT(word1, 1) ? 16 : 0, 16);
+			{
+				add_sprite(sgfx, sprn, color, flipx, flipy, xpos, ypos, sizex, sizey, prival,
+						BIT(word1, 0) ? 16 : 0, BIT(word1, 1) ? 16 : 0, 16);
+			}
 			else
-				sgfx->set_source_clip(0, 32, 0, 32);
-
-			draw_single_sprite(
-					m_renderbitmap,
-					cliprect,
-					sgfx,
-					sprn, color,
-					flipx, flipy,
-					xpos, ypos,
-					sizex, sizey,
-					prival);
+			{
+				add_sprite(sgfx, sprn, color, flipx, flipy, xpos, ypos, sizex, sizey, prival,
+						0, 0, 32);
+			}
 		}
 	}
-} /* draw_sprites */
+} /* get_sprites */
 
-void namcos2_sprite_metalhawk_device::draw_sprites(const rectangle &cliprect, int control)
+void namcos2_sprite_metalhawk_device::get_sprites(int control)
 {
 	/**
 	 * word#0
@@ -293,6 +422,12 @@ void namcos2_sprite_metalhawk_device::draw_sprites(const rectangle &cliprect, in
 	 *  --------xxxx---- color
 	 *  x--------------- unknown
 	 */
+
+	// cells are picked per entry, see add_sprite
+	gfx(0)->set_source_clip(0, 32, 0, 32);
+	gfx(1)->set_source_clip(0, 32, 0, 32);
+
+	m_sprite_count = 0;
 	for (int loop = 0; loop < 128; loop++)
 	{
 		const u16 ypos  = m_spriteram[(loop * 8) + 0];
@@ -331,20 +466,14 @@ void namcos2_sprite_metalhawk_device::draw_sprites(const rectangle &cliprect, in
 				{
 					sy += (0x20 - (sizey + 1)) / 0xc;
 				}
-				sgfx->set_source_clip(0, 32, 0, 32);
+				add_sprite(sgfx, sprn, color, flipx, flipy, sx, sy, sizex, sizey, prival,
+						0, 0, 32);
 			}
 			else
-				sgfx->set_source_clip(BIT(tile, 0) ? 16 : 0, 16, BIT(tile, 1) ? 16 : 0, 16);
-
-			draw_single_sprite(
-					m_renderbitmap,
-					cliprect,
-					sgfx,
-					sprn, color,
-					flipx, flipy,
-					sx, sy,
-					sizex, sizey,
-					prival);
+			{
+				add_sprite(sgfx, sprn, color, flipx, flipy, sx, sy, sizex, sizey, prival,
+						BIT(tile, 0) ? 16 : 0, BIT(tile, 1) ? 16 : 0, 16);
+			}
 		}
 	}
-} /* draw_sprites_metalhawk */
+} /* get_sprites_metalhawk */
